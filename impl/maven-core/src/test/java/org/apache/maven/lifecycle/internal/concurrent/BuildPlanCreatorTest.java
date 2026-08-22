@@ -240,40 +240,49 @@ class BuildPlanCreatorTest {
     }
 
     /**
-     * Tests that {@code filterByScope} filters upstream projects by exact scope match,
-     * treating null-scoped dependencies as "compile" (Maven default).
+     * Tests that {@code filterByScope} expands scopes to match Maven dependency resolution semantics.
+     * "compile" includes compile, provided, and system scoped dependencies (plus null-scoped which
+     * defaults to compile). This ensures provided-scope reactor dependencies are properly ordered in
+     * the build plan when needed at compile time.
      */
     @Test
     void testFilterByScopeMatchesExact() {
         MavenProject compileDep = createProjectWithId("g", "compile-dep");
         MavenProject providedDep = createProjectWithId("g", "provided-dep");
+        MavenProject systemDep = createProjectWithId("g", "system-dep");
+        MavenProject runtimeDep = createProjectWithId("g", "runtime-dep");
         MavenProject testDep = createProjectWithId("g", "test-dep");
         MavenProject nullScopeDep = createProjectWithId("g", "null-scope-dep");
-        List<MavenProject> upstream = List.of(compileDep, providedDep, testDep, nullScopeDep);
+        List<MavenProject> upstream = List.of(compileDep, providedDep, systemDep, runtimeDep, testDep, nullScopeDep);
 
         MavenProject consumer = new MavenProject();
         consumer.getDependencies().add(createDependency("g", "compile-dep", "compile"));
         consumer.getDependencies().add(createDependency("g", "provided-dep", "provided"));
+        consumer.getDependencies().add(createDependency("g", "system-dep", "system"));
+        consumer.getDependencies().add(createDependency("g", "runtime-dep", "runtime"));
         consumer.getDependencies().add(createDependency("g", "test-dep", "test"));
         consumer.getDependencies().add(createDependency("g", "null-scope-dep", null));
 
-        // "compile" matches explicit compile + null-scoped (Maven default is compile)
+        // "compile" scope expands to compile + provided + system + null-scoped (Maven default)
         List<MavenProject> compileFiltered =
                 BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "compile");
-        assertEquals(2, compileFiltered.size());
+        assertEquals(4, compileFiltered.size());
         assertTrue(compileFiltered.contains(compileDep));
+        assertTrue(compileFiltered.contains(providedDep));
+        assertTrue(compileFiltered.contains(systemDep));
         assertTrue(compileFiltered.contains(nullScopeDep));
 
-        // "provided" matches only provided-scoped
-        List<MavenProject> providedFiltered =
-                BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "provided");
-        assertEquals(1, providedFiltered.size());
-        assertTrue(providedFiltered.contains(providedDep));
+        // "runtime" scope expands to compile + runtime
+        List<MavenProject> runtimeFiltered =
+                BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "runtime");
+        assertEquals(3, runtimeFiltered.size());
+        assertTrue(runtimeFiltered.contains(compileDep));
+        assertTrue(runtimeFiltered.contains(runtimeDep));
+        assertTrue(runtimeFiltered.contains(nullScopeDep));
 
-        // "test" matches only test-scoped
+        // "test" scope expands to all scopes
         List<MavenProject> testFiltered = BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "test");
-        assertEquals(1, testFiltered.size());
-        assertTrue(testFiltered.contains(testDep));
+        assertEquals(6, testFiltered.size());
     }
 
     /**

@@ -43,6 +43,7 @@ import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.plugin.descriptor.AfterLink;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.MavenException;
@@ -95,6 +96,8 @@ import static org.apache.maven.api.Lifecycle.AT;
 import static org.apache.maven.api.Lifecycle.BEFORE;
 import static org.apache.maven.api.Lifecycle.Phase.PACKAGE;
 import static org.apache.maven.api.Lifecycle.Phase.READY;
+import static org.apache.maven.api.Lifecycle.Phase.RESOURCES;
+import static org.apache.maven.api.Lifecycle.Phase.SOURCES;
 import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.CREATED;
 import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.EXECUTED;
 import static org.apache.maven.lifecycle.internal.concurrent.BuildStep.FAILED;
@@ -375,14 +378,19 @@ public class BuildPlanExecutor {
             // Check if all predecessors are executed successfully
             boolean allPredecessorsExecuted = step.predecessors.stream().allMatch(s -> s.status.get() == EXECUTED);
 
-            // Special case for after:* steps - they should run if their corresponding before:* step ran
+            // Special case for after:* steps - they should run if their corresponding phase step ran
             if (isAfterStep) {
                 String phaseName = step.name.substring(AFTER.length());
-                // Always process after:* steps for cleanup if their before:* step ran
-                shouldExecute = plan.step(step.project, BEFORE + phaseName)
+                // Run after:* steps for cleanup if their phase step itself ran or failed.
+                // Check the phase step (not before:*) because before:* is an empty lifecycle
+                // setup step that completes early — it doesn't indicate the phase's mojos ran.
+                // If the phase was SKIPPED (e.g. due to a dependency cascade), the after:*
+                // step should also be skipped to prevent downstream steps from executing
+                // out of order.
+                shouldExecute = plan.step(step.project, phaseName)
                         .map(s -> {
                             int stepStatus = s.status.get();
-                            return stepStatus == EXECUTED;
+                            return stepStatus == EXECUTED || stepStatus == FAILED;
                         })
                         .orElse(false);
 
@@ -577,6 +585,12 @@ public class BuildPlanExecutor {
                     List<MojoExecution> executions = step.executions().toList();
                     if (!executions.isEmpty()) {
                         attachToThread(step);
+                        // Set a thread-local project reference so the concurrent
+                        // MojoExecutor can build its DependencyContext with the
+                        // correct project.  session.getCurrentProject() is racy —
+                        // another thread can overwrite it between attachToThread
+                        // and mojoExecutor.execute.
+                        org.apache.maven.lifecycle.internal.concurrent.MojoExecutor.setThreadProject(step.project);
                         clock.start();
                         try {
                             executions.forEach(mojoExecution -> {
@@ -584,7 +598,17 @@ public class BuildPlanExecutor {
                                 finalizeMojoConfiguration(mojoExecution);
                             });
                             mojoExecutor.execute(session, executions);
+                            // Record lifecycle phase on the correct project directly.
+                            // The base MojoExecutor's PhaseRecorder uses session.getCurrentProject()
+                            // which is overwritten by concurrent threads in parallel builds,
+                            // causing phases to be recorded on the wrong project. This ensures
+                            // ReactorReader.determineBuildOutputDirectoryForArtifact() can find
+                            // compiled output via project.hasLifecyclePhase().
+                            if (!step.name.startsWith(BEFORE) && !step.name.startsWith(AFTER)) {
+                                step.project.addLifecyclePhase(step.name);
+                            }
                         } finally {
+                            org.apache.maven.lifecycle.internal.concurrent.MojoExecutor.clearThreadProject();
                             clock.stop();
                         }
                     }
@@ -723,8 +747,16 @@ public class BuildPlanExecutor {
          * matching purposes. Note that this does <em>not</em> perform path-scope
          * resolution — for example, filtering by "compile" will not include
          * "provided"-scoped dependencies even though they contribute to
-         * {@code PathScope.MAIN_COMPILE}. This keeps the filter simple and predictable;
-         * broader scope-aware filtering can be added in a follow-up if needed.
+         * {@code PathScope.MAIN_COMPILE}.
+         * <p>
+         * The scope parameter is expanded to match the Maven dependency resolution semantics:
+         * <ul>
+         *   <li>"compile" matches compile, provided, and system scoped dependencies</li>
+         *   <li>"runtime" matches compile and runtime scoped dependencies</li>
+         *   <li>"test" matches all scopes</li>
+         * </ul>
+         * This ensures that provided-scope reactor dependencies are properly ordered in the
+         * build plan when needed for compilation.
          *
          * @param project the project whose dependencies to check
          * @param upstreamProjects the list of upstream reactor projects
@@ -736,12 +768,30 @@ public class BuildPlanExecutor {
             if (scope == null || scope.isEmpty()) {
                 return upstreamProjects;
             }
+            Set<String> matchingScopes = expandScope(scope);
             return upstreamProjects.stream()
                     .filter(dep -> project.getDependencies().stream()
                             .anyMatch(d -> dep.getGroupId().equals(d.getGroupId())
                                     && dep.getArtifactId().equals(d.getArtifactId())
-                                    && scope.equals(d.getScope() != null ? d.getScope() : "compile")))
+                                    && matchingScopes.contains(d.getScope() != null ? d.getScope() : "compile")))
                     .collect(Collectors.toList());
+        }
+
+        /**
+         * Expands a dependency scope identifier to the set of artifact scopes that are included
+         * in dependency resolution for that scope. This mirrors the semantics of
+         * {@link org.apache.maven.lifecycle.internal.MojoExecutor#toScopes(String)}.
+         */
+        private static Set<String> expandScope(String scope) {
+            return switch (scope) {
+                case "compile" -> Set.of("compile", "provided", "system");
+                case "runtime" -> Set.of("compile", "runtime");
+                case "compile+runtime" -> Set.of("compile", "provided", "system", "runtime");
+                case "runtime+system" -> Set.of("compile", "system", "runtime");
+                case "test" -> Set.of("compile", "provided", "system", "runtime", "test");
+                case "test-only" -> Set.of("test");
+                default -> Set.of(scope);
+            };
         }
 
         protected BuildPlan computeForkPlan(BuildStep step, MojoExecution execution, BuildPlan buildPlan) {
@@ -1034,6 +1084,22 @@ public class BuildPlanExecutor {
                                 }
                             });
                 });
+
+                // Maven 3 personality: enforce sequential SOURCES → RESOURCES ordering.
+                // In Maven 3, generate-resources always ran after process-sources, so plugins
+                // bound to resource phases could rely on source generation being complete.
+                // The V4 lifecycle allows them to run in parallel; V4-native plugins should
+                // use @After(phase="sources") to declare the dependency explicitly.
+                @SuppressWarnings("unchecked")
+                Map<String, Object> userProps =
+                        session != null ? (Map<String, Object>) (Map<?, ?>) session.getUserProperties() : null;
+                if (Features.mavenMaven3Personality(userProps)) {
+                    BuildStep afterSources = steps.get(AFTER + SOURCES);
+                    BuildStep beforeResources = steps.get(BEFORE + RESOURCES);
+                    if (afterSources != null && beforeResources != null) {
+                        beforeResources.executeAfter(afterSources);
+                    }
+                }
 
                 // Only keep mojo executions before the end phase
                 String endPhase = lifecyclePhase.startsWith(BEFORE) || lifecyclePhase.startsWith(AFTER)

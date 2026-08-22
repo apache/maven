@@ -391,8 +391,11 @@ public class MojoExecutor {
         }
 
         ArtifactFilter artifactFilter = getArtifactFilter(mojoDescriptor);
+        // Use the project captured in the dependency context — session.getCurrentProject()
+        // is shared mutable state that can be overwritten by concurrent threads in the
+        // concurrent builder, causing the filter to be applied to the wrong project.
         List<MavenProject> projectsToResolve = LifecycleDependencyResolver.getProjects(
-                session.getCurrentProject(), session, mojoDescriptor.isAggregator());
+                dependencyContext.getProject(), session, mojoDescriptor.isAggregator());
         for (MavenProject projectToResolve : projectsToResolve) {
             projectToResolve.setArtifactFilter(artifactFilter);
         }
