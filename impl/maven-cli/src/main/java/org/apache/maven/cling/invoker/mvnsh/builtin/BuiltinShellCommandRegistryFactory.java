@@ -32,6 +32,7 @@ import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.cli.InvokerException;
+import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -65,6 +66,17 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
     @Override
     public CommandRegistry createShellCommandRegistry(LookupContext context) {
         return new BuiltinShellCommandRegistry(context);
+    }
+
+    /**
+     * Reports the exit code of a command invoked from the shell. Commands terminate by throwing
+     * {@link InvokerException.ExitException}, and they do so on success as well: {@code --help} and
+     * {@code --version} exit with code 0. Only a non-zero code is an error worth reporting.
+     */
+    static void reportExitCode(Logger logger, String commandName, int exitCode) {
+        if (exitCode != 0) {
+            logger.error(commandName + " command exited with exit code " + exitCode);
+        }
     }
 
     private static class BuiltinShellCommandRegistry extends JlineCommandRegistry implements AutoCloseable {
@@ -202,7 +214,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
                                 .cwd(shellContext.cwd.get())
                                 .build()));
             } catch (InvokerException.ExitException e) {
-                shellContext.logger.error("mvn command exited with exit code " + e.getExitCode());
+                reportExitCode(shellContext.logger, "mvn", e.getExitCode());
             } catch (Exception e) {
                 saveException(e);
             }
@@ -240,7 +252,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
                                 .cwd(shellContext.cwd.get())
                                 .build()));
             } catch (InvokerException.ExitException e) {
-                shellContext.logger.error("mvnenc command exited with exit code " + e.getExitCode());
+                reportExitCode(shellContext.logger, "mvnenc", e.getExitCode());
             } catch (Exception e) {
                 saveException(e);
             }
@@ -258,7 +270,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
                                 .cwd(shellContext.cwd.get())
                                 .build()));
             } catch (InvokerException.ExitException e) {
-                shellContext.logger.error("mvnup command exited with exit code " + e.getExitCode());
+                reportExitCode(shellContext.logger, "mvnup", e.getExitCode());
             } catch (Exception e) {
                 saveException(e);
             }
