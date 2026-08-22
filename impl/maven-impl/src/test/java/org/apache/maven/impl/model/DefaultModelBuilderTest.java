@@ -51,6 +51,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -69,6 +70,34 @@ class DefaultModelBuilderTest {
         session = ApiRunner.createSession();
         builder = session.getService(ModelBuilder.class);
         assertNotNull(builder);
+    }
+
+    @Test
+    public void testParentProfileCacheDistinguishesActiveProfileContexts() {
+        DefaultProfileActivationContext.Record withoutRelease = recordActiveProfile(List.of(), "release");
+        DefaultProfileActivationContext.Record withRelease = recordActiveProfile(List.of("release"), "release");
+
+        assertFalse(
+                withoutRelease.matches(newProfileActivationContext(List.of("release"), List.of())),
+                "a parent assembled without -Prelease must not be reused for a module built with -Prelease");
+        assertFalse(
+                withRelease.matches(newProfileActivationContext(List.of(), List.of())),
+                "a parent assembled with -Prelease must not be reused for a module built without it");
+        assertTrue(withoutRelease.matches(newProfileActivationContext(List.of(), List.of())));
+        assertTrue(withRelease.matches(newProfileActivationContext(List.of("release"), List.of())));
+    }
+
+    @Test
+    public void testParentProfileCacheDistinguishesInactiveProfileContexts() {
+        DefaultProfileActivationContext recording =
+                newProfileActivationContext(List.of(), List.of()).start();
+        recording.isProfileInactive("release");
+        DefaultProfileActivationContext.Record withoutSuppression = recording.stop();
+
+        assertFalse(
+                withoutSuppression.matches(newProfileActivationContext(List.of(), List.of("release"))),
+                "a parent assembled without -!release must not be reused for a module built with -!release");
+        assertTrue(withoutSuppression.matches(newProfileActivationContext(List.of(), List.of())));
     }
 
     @Test
@@ -598,6 +627,20 @@ class DefaultModelBuilderTest {
         assertNotNull(managedDep, "Managed dependency for the sibling module should be kept");
         assertEquals(
                 "1.0-SNAPSHOT", managedDep.getVersion(), "Version should be inferred from the reactor sibling module");
+    }
+
+    private static DefaultProfileActivationContext.Record recordActiveProfile(
+            List<String> activeIds, String profileId) {
+        DefaultProfileActivationContext recording =
+                newProfileActivationContext(activeIds, List.of()).start();
+        recording.isProfileActive(profileId);
+        return recording.stop();
+    }
+
+    private static DefaultProfileActivationContext newProfileActivationContext(
+            List<String> activeIds, List<String> inactiveIds) {
+        return new DefaultProfileActivationContext(
+                null, null, null, activeIds, inactiveIds, Map.of(), Map.of(), Model.newInstance());
     }
 
     private Path getPom(String name) {
