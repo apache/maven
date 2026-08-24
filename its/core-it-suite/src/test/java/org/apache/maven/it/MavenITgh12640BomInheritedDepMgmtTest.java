@@ -18,6 +18,7 @@
  */
 package org.apache.maven.it;
 
+import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -51,9 +52,9 @@ class MavenITgh12640BomInheritedDepMgmtTest extends AbstractMavenIntegrationTest
      */
     @Test
     void testBomConsumerPomExcludesInheritedDepMgmt() throws Exception {
-        Path basedir = extractResources("/gh-12640-bom-inherited-depmgmt");
+        File basedir = extractResources("/gh-12640-bom-inherited-depmgmt");
 
-        Verifier verifier = newVerifier(basedir);
+        Verifier verifier = newVerifier(basedir.getAbsolutePath());
         verifier.deleteArtifacts("org.apache.maven.its.gh12640");
         verifier.addCliArguments("install");
         verifier.execute();
@@ -61,7 +62,7 @@ class MavenITgh12640BomInheritedDepMgmtTest extends AbstractMavenIntegrationTest
 
         // Read the consumer POM that was installed to the local repo
         Path consumerPomPath =
-                verifier.getArtifactPath("org.apache.maven.its.gh12640", "bom", "1.0.0-SNAPSHOT", "pom");
+                Path.of(verifier.getArtifactPath("org.apache.maven.its.gh12640", "bom", "1.0.0-SNAPSHOT", "pom"));
 
         assertTrue(Files.exists(consumerPomPath), "Consumer POM not found at " + consumerPomPath);
 
@@ -102,16 +103,16 @@ class MavenITgh12640BomInheritedDepMgmtTest extends AbstractMavenIntegrationTest
      */
     @Test
     void testBomConsumerPomWithFlattenExcludesInheritedDepMgmt() throws Exception {
-        Path basedir = extractResources("/gh-12640-bom-inherited-depmgmt");
+        File basedir = extractResources("/gh-12640-bom-inherited-depmgmt");
 
-        Verifier verifier = newVerifier(basedir);
+        Verifier verifier = newVerifier(basedir.getAbsolutePath());
         verifier.deleteArtifacts("org.apache.maven.its.gh12640");
         verifier.addCliArguments("install", "-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Path consumerPomPath =
-                verifier.getArtifactPath("org.apache.maven.its.gh12640", "bom", "1.0.0-SNAPSHOT", "pom");
+                Path.of(verifier.getArtifactPath("org.apache.maven.its.gh12640", "bom", "1.0.0-SNAPSHOT", "pom"));
 
         assertTrue(Files.exists(consumerPomPath), "Consumer POM not found at " + consumerPomPath);
 
