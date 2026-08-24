@@ -203,6 +203,71 @@ class ConditionParserTest {
         assertEquals("SUCCESS!", parser.parse(expression));
     }
 
+    /**
+     * The tokenizer emits a bare {@code !} token, so the parser has to be able to consume it.
+     * The {@code contains(..)} cases also cover a {@code !} inside a string literal, which the
+     * tokenizer must leave alone.
+     */
+    @Test
+    void testLogicalNotOperator() {
+        assertFalse((Boolean) parser.parse("!true"));
+        assertTrue((Boolean) parser.parse("!false"));
+        assertTrue((Boolean) parser.parse("!!true"));
+        assertFalse((Boolean) parser.parse("!!!true"));
+        assertTrue((Boolean) parser.parse("!contains('Hello, World!', 'OpenAI')"));
+        assertFalse((Boolean) parser.parse("!contains('Hello, World!', 'World')"));
+    }
+
+    /**
+     * {@code !x} is sugar for the {@code not(x)} function and must agree with it.
+     */
+    @Test
+    void testLogicalNotOperatorMatchesNotFunction() {
+        assertEquals(
+                parser.parse("not(contains('Hello, World!', 'OpenAI'))"),
+                parser.parse("!contains('Hello, World!', 'OpenAI')"));
+        assertEquals(
+                parser.parse("not(contains('Hello, World!', 'World'))"),
+                parser.parse("!contains('Hello, World!', 'World')"));
+        assertEquals(parser.parse("not(true)"), parser.parse("!true"));
+    }
+
+    /**
+     * {@code !} binds tighter than comparison and the logical operators, as it does in Java.
+     */
+    @Test
+    void testLogicalNotOperatorPrecedence() {
+        assertTrue((Boolean) parser.parse("!false && true"));
+        assertFalse((Boolean) parser.parse("!true && false"));
+        assertTrue((Boolean) parser.parse("!true || true"));
+        assertTrue((Boolean) parser.parse("!(true && false)"));
+        assertTrue((Boolean) parser.parse("!(1 > 2)"));
+        assertFalse((Boolean) parser.parse("!('a' != 'b')"));
+    }
+
+    /**
+     * Coercion of non-boolean operands must match what the {@code not()} function does.
+     */
+    @Test
+    void testLogicalNotOperatorCoercion() {
+        assertFalse((Boolean) parser.parse("!'abc'"));
+        assertTrue((Boolean) parser.parse("!''"));
+        assertFalse((Boolean) parser.parse("!length('ab')"));
+        assertTrue((Boolean) parser.parse("!0"));
+        assertFalse((Boolean) parser.parse("!1"));
+    }
+
+    /**
+     * A bare {@code !} must not disturb the {@code !=} operator, which the tokenizer emits as a
+     * single token.
+     */
+    @Test
+    void testNotEqualsStillParsesAsOneOperator() {
+        assertTrue((Boolean) parser.parse("1 != 2"));
+        assertFalse((Boolean) parser.parse("'abc' != 'abc'"));
+        assertTrue((Boolean) parser.parse("'abc' != 'cdf'"));
+    }
+
     @Test
     void testStringComparison() {
         assertTrue((Boolean) parser.parse("'abc' != 'cdf'"));
