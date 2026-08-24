@@ -159,6 +159,8 @@ under the License.
     <junitVersion>5.13.4</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
     <logbackClassicVersion>1.6.3</logbackClassicVersion>
+    <!-- Also selects the Mimir core extension in .github/ci-extensions.xml; the two must match -->
+    <mimirVersion>0.12.0</mimirVersion>
     <mockitoVersion>5.23.0</mockitoVersion>
     <plexusInteractivityVersion>1.5.1</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.29</plexusInterpolationVersion>
@@ -707,7 +709,7 @@ under the License.
       <dependency>
         <groupId>eu.maveniverse.maven.mimir</groupId>
         <artifactId>testing</artifactId>
-        <version>0.12.0</version>
+        <version>${mimirVersion}</version>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->

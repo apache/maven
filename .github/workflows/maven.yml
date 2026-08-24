@@ -32,7 +32,7 @@ concurrency:
 permissions: {}
 
 env:
-  MIMIR_VERSION: 0.12.0
+  # MIMIR_VERSION is not pinned here: every job resolves it from pom.xml
   MIMIR_BASEDIR: ~/.mimir
   MIMIR_LOCAL: ~/.mimir/local
   MAVEN_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/java_heapdump.hprof
@@ -57,6 +57,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Resolve Mimir version
+        shell: bash
+        run: .github/ci-resolve-mimir-version.sh
 
       - name: Prepare Mimir for Maven 3.x
         shell: bash
@@ -162,6 +166,10 @@ jobs:
         with:
           persist-credentials: false
 
+      - name: Resolve Mimir version
+        shell: bash
+        run: .github/ci-resolve-mimir-version.sh
+
       - name: Prepare Mimir for Maven 4.x
         shell: bash
         run: |
@@ -262,6 +270,10 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Resolve Mimir version
+        shell: bash
+        run: .github/ci-resolve-mimir-version.sh
 
       - name: Prepare Mimir for Maven 4.x
         shell: bash
