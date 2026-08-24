@@ -20,6 +20,7 @@ package org.apache.maven.impl.model.profile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
@@ -564,6 +565,11 @@ public class ConditionParser {
      * Converts an object to a string representation.
      * If the object is a {@code Double}, it formats it without any decimal places.
      * Otherwise, it uses the {@code String.valueOf} method.
+     * <p>
+     * Formatting uses {@link Locale#ROOT} so that profile activation does not depend on the
+     * default locale of the machine running the build. Without it, a locale whose default
+     * numbering system is not latin (for example {@code hi-IN-u-nu-deva}) would render
+     * {@code 42} as {@code ४२}.
      *
      * @param value the object to convert to a string
      * @return the string representation of the object
@@ -572,7 +578,7 @@ public class ConditionParser {
         if (value instanceof Double || value instanceof Float) {
             double doubleValue = ((Number) value).doubleValue();
             if (doubleValue == Math.floor(doubleValue) && !Double.isInfinite(doubleValue)) {
-                return String.format("%.0f", doubleValue);
+                return String.format(Locale.ROOT, "%.0f", doubleValue);
             }
         }
         return String.valueOf(value);

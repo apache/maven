@@ -19,6 +19,7 @@
 package org.apache.maven.impl.model.profile;
 
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.ModelBuilderException;
@@ -65,6 +66,9 @@ public class ConditionFunctions {
 
     /**
      * Converts the given string to uppercase.
+     * <p>
+     * The conversion uses {@link Locale#ROOT} so that profile activation does not depend on the
+     * default locale of the machine running the build.
      *
      * @param args A list containing a single string argument
      * @return The uppercase version of the input string
@@ -75,11 +79,14 @@ public class ConditionFunctions {
             throw new IllegalArgumentException("upper function requires exactly one argument");
         }
         String s = ConditionParser.toString(args.get(0));
-        return s.toUpperCase();
+        return s.toUpperCase(Locale.ROOT);
     }
 
     /**
      * Converts the given string to lowercase.
+     * <p>
+     * The conversion uses {@link Locale#ROOT} so that profile activation does not depend on the
+     * default locale of the machine running the build.
      *
      * @param args A list containing a single string argument
      * @return The lowercase version of the input string
@@ -90,7 +97,7 @@ public class ConditionFunctions {
             throw new IllegalArgumentException("lower function requires exactly one argument");
         }
         String s = ConditionParser.toString(args.get(0));
-        return s.toLowerCase();
+        return s.toLowerCase(Locale.ROOT);
     }
 
     /**
