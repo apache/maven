@@ -93,6 +93,8 @@ public class DefaultModelValidator implements ModelValidator {
 
     private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
 
+    private static final String ILLEGAL_RELATIVE_PATH_CHARS = ":\"<>|?*";
+
     private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_FS_CHARS;
 
     private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_FS_CHARS;
@@ -439,6 +441,23 @@ public class DefaultModelValidator implements ModelValidator {
             }
 
             Severity errOn30 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_0);
+            Severity errOn31 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_1);
+
+            // [MNG-8129] Validate that relativePath does not contain characters that are illegal in filesystem paths
+            if (parent != null
+                    && parent.getRelativePath() != null
+                    && !parent.getRelativePath().isEmpty()) {
+                validateBannedCharacters(
+                        "parent.",
+                        "relativePath",
+                        problems,
+                        errOn31,
+                        Version.V20,
+                        parent.getRelativePath(),
+                        null,
+                        parent,
+                        ILLEGAL_RELATIVE_PATH_CHARS);
+            }
 
             boolean isModelVersion41OrMore = !Objects.equals(ModelBuilder.MODEL_VERSION_4_0_0, m.getModelVersion());
             if (isModelVersion41OrMore) {
