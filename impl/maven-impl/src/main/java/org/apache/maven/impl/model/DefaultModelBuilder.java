@@ -737,8 +737,18 @@ public class DefaultModelBuilder implements ModelBuilder {
                 // Root directory not available, continue without it
             }
 
-            // Handle root vs non-root project properties with profile activation
-            if (!Objects.equals(rootDirectory, model.getProjectDirectory())) {
+            // Handle root vs non-root project properties with profile activation.
+            // Use toAbsolutePath().normalize() for robust comparison — rootDirectory from
+            // session.getRootDirectory() may not be normalized, while model.getProjectDirectory()
+            // (derived from pomFile.getParent() in PathSource) is always normalized. Without
+            // consistent normalization, the root model can incorrectly enter this branch and
+            // trigger infinite recursion through readFileModel() (GH-12598).
+            Path normalizedRootDir =
+                    rootDirectory != null ? rootDirectory.toAbsolutePath().normalize() : null;
+            Path normalizedProjectDir = model.getProjectDirectory() != null
+                    ? model.getProjectDirectory().toAbsolutePath().normalize()
+                    : null;
+            if (!Objects.equals(normalizedRootDir, normalizedProjectDir)) {
                 Path rootModelPath = modelProcessor.locateExistingPom(rootDirectory);
                 if (rootModelPath != null) {
                     // Check if the root model path is within the root directory to prevent infinite loops
@@ -747,8 +757,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // Also skip if the root model is already being read in an outer call frame
                     // to prevent StackOverflowError when a project has an internal parent in a
                     // subdirectory with CI-friendly ${revision} and a .mvn/ root marker (GH-12301).
+                    // Use toAbsolutePath().normalize() for the guard check to handle paths
+                    // obtained via different representations (e.g., symlinks, relative segments).
                     if (isParentWithinRootDirectory(rootModelPath, rootDirectory)
-                            && !activeModelReads.contains(rootModelPath.normalize())) {
+                            && !activeModelReads.contains(
+                                    rootModelPath.toAbsolutePath().normalize())) {
                         Model rootModel =
                                 derive(Sources.buildSource(rootModelPath)).readFileModel(activeModelReads);
                         properties.putAll(getPropertiesWithProfiles(rootModel, properties));
@@ -1582,7 +1595,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             setSource(modelSource.getLocation());
             logger.debug("Reading file model from " + modelSource.getLocation());
             Path sourcePath = modelSource.getPath();
-            Path normalizedPath = sourcePath != null ? sourcePath.normalize() : null;
+            // Use toAbsolutePath().normalize() for consistent path identity in activeModelReads.
+            // This must match the normalization used in getEnhancedProperties() guard check
+            // to prevent StackOverflowError from path representation mismatches (GH-12598).
+            Path normalizedPath =
+                    sourcePath != null ? sourcePath.toAbsolutePath().normalize() : null;
             boolean trackRead = normalizedPath != null && activeModelReads.add(normalizedPath);
             try {
                 try {
