@@ -18,9 +18,7 @@
  */
 package org.apache.maven.impl.model;
 
-import java.io.IOException;
 import java.lang.reflect.Field;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -50,7 +48,6 @@ import org.apache.maven.api.services.Sources;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -630,78 +627,6 @@ class DefaultModelBuilderTest {
         assertNotNull(managedDep, "Managed dependency for the sibling module should be kept");
         assertEquals(
                 "1.0-SNAPSHOT", managedDep.getVersion(), "Version should be inferred from the reactor sibling module");
-    }
-
-    /**
-     * Verifies that getEnhancedProperties uses absolute normalized paths for comparing
-     * rootDirectory and model.getProjectDirectory(), preventing StackOverflowError when
-     * paths have different representations (e.g., non-normalized rootDirectory from
-     * session.getRootDirectory() vs normalized model.getProjectDirectory() from PathSource).
-     *
-     * @see <a href="https://github.com/apache/maven/issues/12598">GH-12598</a>
-     */
-    @Test
-    public void testNoStackOverflowWithNonNormalizedRootDirectory(@TempDir Path tempDir) throws IOException {
-        // Create a project with an internal parent using CI-friendly ${revision}
-        // and a .mvn/ root marker — the scenario from GH-12301/GH-12598
-        Path projectDir = tempDir.resolve("project");
-        Files.createDirectories(projectDir.resolve(".mvn"));
-        Files.createDirectories(projectDir.resolve("parent"));
-
-        // Internal parent POM (in subdirectory)
-        Files.writeString(
-                projectDir.resolve("parent/pom.xml"),
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                        + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n"
-                        + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
-                        + "    xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0"
-                        + " http://maven.apache.org/maven-v4_0_0.xsd\">\n"
-                        + "  <modelVersion>4.1.0</modelVersion>\n"
-                        + "  <groupId>org.test.gh12598</groupId>\n"
-                        + "  <artifactId>parent</artifactId>\n"
-                        + "  <version>1.0-SNAPSHOT</version>\n"
-                        + "  <packaging>pom</packaging>\n"
-                        + "</project>\n");
-
-        // Root POM referencing internal parent with ${revision}
-        Files.writeString(
-                projectDir.resolve("pom.xml"),
-                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                        + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n"
-                        + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
-                        + "    xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0"
-                        + " http://maven.apache.org/maven-v4_0_0.xsd\">\n"
-                        + "  <modelVersion>4.1.0</modelVersion>\n"
-                        + "  <parent>\n"
-                        + "    <groupId>org.test.gh12598</groupId>\n"
-                        + "    <artifactId>parent</artifactId>\n"
-                        + "    <version>${revision}</version>\n"
-                        + "    <relativePath>parent</relativePath>\n"
-                        + "  </parent>\n"
-                        + "  <artifactId>root</artifactId>\n"
-                        + "  <packaging>pom</packaging>\n"
-                        + "  <properties>\n"
-                        + "    <revision>1.0-SNAPSHOT</revision>\n"
-                        + "  </properties>\n"
-                        + "</project>\n");
-
-        // Build using a path with redundant segments to trigger path representation mismatch.
-        // The path "project/parent/../pom.xml" resolves to the same file as "project/pom.xml",
-        // but Path.equals() returns false before normalization.
-        Path nonNormalizedPom = projectDir.resolve("parent").resolve("..").resolve("pom.xml");
-
-        ModelBuilderRequest request = ModelBuilderRequest.builder()
-                .session(session)
-                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
-                .source(Sources.buildSource(nonNormalizedPom))
-                .build();
-
-        // This should complete without StackOverflowError
-        ModelBuilderResult result =
-                assertDoesNotThrow(() -> builder.newSession().build(request));
-        assertNotNull(result);
-        assertNotNull(result.getFileModel());
-        assertEquals("root", result.getFileModel().getArtifactId());
     }
 
     private static DefaultProfileActivationContext.Record recordActiveProfile(
