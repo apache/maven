@@ -1654,7 +1654,6 @@ class PluginUpgradeStrategyTest {
     @Nested
     @DisplayName("XML Formatting")
     class XmlFormattingTests {
-
         @Test
         @DisplayName("should format pluginManagement with proper indentation")
         void shouldFormatPluginManagementWithProperIndentation() throws Exception {
