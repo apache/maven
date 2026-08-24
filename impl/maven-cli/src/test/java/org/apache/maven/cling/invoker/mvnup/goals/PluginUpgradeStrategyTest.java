@@ -470,6 +470,40 @@ class PluginUpgradeStrategyTest {
         }
 
         @Test
+        @DisplayName("should upgrade maven-war-plugin when below minimum")
+        void shouldUpgradeWarPluginWhenBelowMinimum() throws Exception {
+            Document doc = PomBuilder.create()
+                    .plugin("org.apache.maven.plugins", "maven-war-plugin", "2.1.1")
+                    .buildDocument();
+            UpgradeResult result = strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
+
+            assertTrue(result.success() && result.modifiedCount() > 0, "Should have upgraded maven-war-plugin");
+            String version = new Editor(doc)
+                    .root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.4.0", version, "maven-war-plugin should be upgraded to 3.4.0");
+        }
+
+        @Test
+        @DisplayName("should upgrade maven-ear-plugin when below minimum")
+        void shouldUpgradeEarPluginWhenBelowMinimum() throws Exception {
+            Document doc = PomBuilder.create()
+                    .plugin("org.apache.maven.plugins", "maven-ear-plugin", "3.2.0")
+                    .buildDocument();
+            UpgradeResult result = strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
+
+            assertTrue(result.success() && result.modifiedCount() > 0, "Should have upgraded maven-ear-plugin");
+            String version = new Editor(doc)
+                    .root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.4.0", version, "maven-ear-plugin should be upgraded to 3.4.0");
+        }
+
+        @Test
         @DisplayName("should not upgrade when version is already higher")
         void shouldNotUpgradeWhenVersionAlreadyHigher() throws Exception {
             String pomXml = """
@@ -766,43 +800,33 @@ class PluginUpgradeStrategyTest {
     @Nested
     @DisplayName("Plugin Upgrade Configuration")
     class PluginUpgradeConfigurationTests {
-
         @Test
         @DisplayName("should have predefined plugin upgrades")
         void shouldHavePredefinedPluginUpgrades() throws Exception {
             List<PluginUpgrade> upgrades = PluginUpgradeStrategy.getPluginUpgrades();
-
             assertFalse(upgrades.isEmpty(), "Should have predefined plugin upgrades");
 
-            // Verify some expected plugins are included
-            boolean hasCompilerPlugin =
-                    upgrades.stream().anyMatch(upgrade -> "maven-compiler-plugin".equals(upgrade.artifactId()));
-            boolean hasExecPlugin =
-                    upgrades.stream().anyMatch(upgrade -> "exec-maven-plugin".equals(upgrade.artifactId()));
-            boolean hasSurefirePlugin =
-                    upgrades.stream().anyMatch(upgrade -> "maven-surefire-plugin".equals(upgrade.artifactId()));
-            boolean hasFailsafePlugin =
-                    upgrades.stream().anyMatch(upgrade -> "maven-failsafe-plugin".equals(upgrade.artifactId()));
-            boolean hasSurefireReportPlugin =
-                    upgrades.stream().anyMatch(upgrade -> "maven-surefire-report-plugin".equals(upgrade.artifactId()));
-
-            assertTrue(hasCompilerPlugin, "Should include maven-compiler-plugin upgrade");
-            assertTrue(hasExecPlugin, "Should include exec-maven-plugin upgrade");
-            assertTrue(hasSurefirePlugin, "Should include maven-surefire-plugin upgrade");
-            assertTrue(hasFailsafePlugin, "Should include maven-failsafe-plugin upgrade");
-            assertTrue(hasSurefireReportPlugin, "Should include maven-surefire-report-plugin upgrade");
+            for (String expected : List.of(
+                    "maven-compiler-plugin",
+                    "exec-maven-plugin",
+                    "maven-surefire-plugin",
+                    "maven-failsafe-plugin",
+                    "maven-surefire-report-plugin",
+                    "maven-war-plugin",
+                    "maven-ear-plugin")) {
+                assertTrue(
+                        upgrades.stream().anyMatch(u -> expected.equals(u.artifactId())),
+                        "Should include " + expected + " upgrade");
+            }
         }
 
         @Test
         @DisplayName("should have valid plugin upgrade definitions")
-        void shouldHaveValidPluginUpgradeDefinitions() throws Exception {
-            List<PluginUpgrade> upgrades = PluginUpgradeStrategy.getPluginUpgrades();
-
-            for (PluginUpgrade upgrade : upgrades) {
+        void shouldHaveValidPluginUpgradeDefinitions() {
+            for (PluginUpgrade upgrade : PluginUpgradeStrategy.getPluginUpgrades()) {
                 assertNotNull(upgrade.groupId(), "Plugin upgrade should have groupId");
                 assertNotNull(upgrade.artifactId(), "Plugin upgrade should have artifactId");
                 assertNotNull(upgrade.minVersion(), "Plugin upgrade should have minVersion");
-                // configuration can be null for some plugins
             }
         }
     }
@@ -810,7 +834,6 @@ class PluginUpgradeStrategyTest {
     @Nested
     @DisplayName("Inherited Plugin Detection")
     class InheritedPluginDetectionTests {
-
         @Test
         @DisplayName("should inject pluginManagement with comment for plugins inherited from remote parent")
         void shouldInjectPluginManagementWithCommentForRemoteParentPlugins() throws Exception {
@@ -1618,15 +1641,13 @@ class PluginUpgradeStrategyTest {
     @Nested
     @DisplayName("Strategy Description")
     class StrategyDescriptionTests {
-
         @Test
         @DisplayName("should provide meaningful description")
         void shouldProvideMeaningfulDescription() {
-            String description = strategy.getDescription();
-
-            assertNotNull(description, "Description should not be null");
-            assertFalse(description.trim().isEmpty(), "Description should not be empty");
-            assertTrue(description.toLowerCase().contains("plugin"), "Description should mention plugins");
+            assertNotNull(strategy.getDescription(), "Description should not be null");
+            assertFalse(strategy.getDescription().trim().isEmpty(), "Description should not be empty");
+            assertTrue(
+                    strategy.getDescription().toLowerCase().contains("plugin"), "Description should mention plugins");
         }
     }
 
