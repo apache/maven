@@ -810,7 +810,8 @@ under the License.
         <plugin>
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
-          <version>0.18</version><!-- Remove if correct version comes from parent -->
+          <version>0.18</version>
+          <!-- Remove if correct version comes from parent -->
           <configuration>
             <inputExcludeStds>
               <exclude>ALL</exclude>
