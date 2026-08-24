@@ -518,7 +518,8 @@ class ReactorReader implements MavenWorkspaceReader {
     private Path getProjectLocalRepo() {
         if (projectLocalRepository == null) {
             Path root = session.getRequest().getRootDirectory();
-            String userPath = session.getRequest().getUserProperties().getProperty(Constants.MAVEN_PROJECT_LOCAL_REPO);
+            String userPath =
+                    session.getRequest().getUserProperties().getProperty(Constants.MAVEN_REACTOR_OUTPUT_REPOSITORY);
             if (userPath != null && !userPath.isEmpty()) {
                 Path path = Paths.get(userPath);
                 projectLocalRepository = path.isAbsolute() ? path : root.resolve(path);
