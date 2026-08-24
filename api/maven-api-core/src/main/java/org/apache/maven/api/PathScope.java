@@ -61,8 +61,8 @@ public interface PathScope extends ExtensibleEnum {
             DependencyScope.COMPILE,
             DependencyScope.PROVIDED);
 
-    PathScope MAIN_RUNTIME =
-            pathScope("main-runtime", ProjectScope.MAIN, DependencyScope.API, DependencyScope.COMPILE, DependencyScope.RUNTIME);
+    PathScope MAIN_RUNTIME = pathScope(
+            "main-runtime", ProjectScope.MAIN, DependencyScope.API, DependencyScope.COMPILE, DependencyScope.RUNTIME);
 
     PathScope TEST_COMPILE = pathScope(
             "test-compile",
