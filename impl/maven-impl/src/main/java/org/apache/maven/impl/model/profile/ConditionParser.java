@@ -288,11 +288,21 @@ public class ConditionParser {
     }
 
     /**
-     * Parses unary operations (negation).
+     * Parses unary operations: logical not ({@code !}) and arithmetic negation ({@code -}).
+     * <p>
+     * {@code !} is equivalent to the {@code not()} function and uses the same {@link #toBoolean}
+     * coercion. Being handled here gives both operators a higher precedence than multiplication,
+     * addition, comparison and the logical operators, so {@code !a && b} parses as
+     * {@code (!a) && b}.
      *
      * @return the result of parsing unary operations
      */
     private Object parseUnary() {
+        if (current < tokens.size() && tokens.get(current).equals("!")) {
+            current++;
+            Object value = parseUnary();
+            return !toBoolean(value);
+        }
         if (current < tokens.size() && tokens.get(current).equals("-")) {
             current++;
             Object value = parseUnary();
