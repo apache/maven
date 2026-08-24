@@ -210,22 +210,20 @@ public class DefaultMaven implements Maven {
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
         //
         sessionScope.enter();
-        try {
-            MavenChainedWorkspaceReader chainedWorkspaceReader =
-                    new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader);
-            try (CloseableSession closeableSession = newCloseableSession(request, chainedWorkspaceReader)) {
-                MavenSession session = new MavenSession(closeableSession, request, result);
-                session.setSession(defaultSessionFactory.newSession(session));
+        MavenChainedWorkspaceReader chainedWorkspaceReader =
+                new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader);
+        try (CloseableSession closeableSession = newCloseableSession(request, chainedWorkspaceReader)) {
+            MavenSession session = new MavenSession(closeableSession, request, result);
+            session.setSession(defaultSessionFactory.newSession(session));
 
-                sessionScope.seed(MavenSession.class, session);
-                sessionScope.seed(RepositorySystemSession.class, closeableSession); // fixed in Maven 3.10.x
-                sessionScope.seed(Session.class, session.getSession());
-                sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(session.getSession()));
+            sessionScope.seed(MavenSession.class, session);
+            sessionScope.seed(RepositorySystemSession.class, closeableSession); // fixed in Maven 3.10.x
+            sessionScope.seed(Session.class, session.getSession());
+            sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(session.getSession()));
 
-                legacySupport.setSession(session);
+            legacySupport.setSession(session);
 
-                return doExecute(request, session, result, chainedWorkspaceReader);
-            }
+            return doExecute(request, session, result, chainedWorkspaceReader);
         } finally {
             sessionScope.exit();
         }

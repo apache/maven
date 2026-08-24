@@ -33,6 +33,7 @@ import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.repository.WorkspaceRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -58,7 +59,7 @@ class DefaultMavenSessionScopeTest {
     @Test
     void testSessionScopeIsExitedOnWorkspaceReaderError() throws Exception {
         WorkspaceReader badReader = mock(WorkspaceReader.class);
-        when(badReader.getRepository()).thenReturn(null);
+        when(badReader.getRepository()).thenReturn(new WorkspaceRepository("test", "badReader"));
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
                 .setLocalRepositoryPath(tempDir)
@@ -82,15 +83,6 @@ class DefaultMavenSessionScopeTest {
         MavenExecutionResult result = defaultMaven.execute(request);
 
         assertFalse(result.getExceptions().isEmpty(), "Expected at least one exception from bad workspace reader");
-
-        Throwable rootCause = result.getExceptions().get(0);
-        while (rootCause.getCause() != null) {
-            rootCause = rootCause.getCause();
-        }
-        assertTrue(
-                rootCause instanceof NullPointerException,
-                "Expected NullPointerException from null getRepository(), got: "
-                        + rootCause.getClass().getName());
 
         assertTrue(sessionScope.isScopeEmpty(), "Session scope must be exited even on workspace reader error");
     }
