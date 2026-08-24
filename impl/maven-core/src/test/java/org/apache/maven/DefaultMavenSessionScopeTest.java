@@ -33,7 +33,6 @@ import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.eclipse.aether.repository.WorkspaceReader;
-import org.eclipse.aether.repository.WorkspaceRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -59,7 +58,7 @@ class DefaultMavenSessionScopeTest {
     @Test
     void testSessionScopeIsExitedOnWorkspaceReaderError() throws Exception {
         WorkspaceReader badReader = mock(WorkspaceReader.class);
-        when(badReader.getRepository()).thenReturn(new WorkspaceRepository("test", "badReader"));
+        when(badReader.getRepository()).thenReturn(null);
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
                 .setLocalRepositoryPath(tempDir)
