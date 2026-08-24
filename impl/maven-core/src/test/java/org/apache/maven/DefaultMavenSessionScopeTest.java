@@ -19,9 +19,6 @@
 package org.apache.maven;
 
 import java.io.File;
-import java.lang.reflect.Field;
-import java.nio.file.Files;
-import java.util.List;
 
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.execution.BuildResumptionAnalyzer;
@@ -37,6 +34,7 @@ import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -45,18 +43,28 @@ import static org.mockito.Mockito.when;
 
 class DefaultMavenSessionScopeTest {
 
+    @TempDir
+    File tempDir;
+
+    /**
+     * Test subclass that exposes scope emptiness without reflection.
+     */
+    private static class TestSessionScope extends SessionScope {
+        boolean isScopeEmpty() {
+            return values.isEmpty();
+        }
+    }
+
     @Test
     void testSessionScopeIsExitedOnWorkspaceReaderError() throws Exception {
         WorkspaceReader badReader = mock(WorkspaceReader.class);
         when(badReader.getRepository()).thenReturn(null);
 
-        File localRepoDir = Files.createTempDirectory("local-repo").toFile();
-        localRepoDir.deleteOnExit();
         MavenExecutionRequest request = new DefaultMavenExecutionRequest()
-                .setLocalRepositoryPath(localRepoDir)
+                .setLocalRepositoryPath(tempDir)
                 .setWorkspaceReader(badReader);
 
-        SessionScope sessionScope = new SessionScope();
+        TestSessionScope sessionScope = new TestSessionScope();
 
         DefaultMaven defaultMaven = new DefaultMaven(
                 mock(Lookup.class),
@@ -73,11 +81,17 @@ class DefaultMavenSessionScopeTest {
 
         MavenExecutionResult result = defaultMaven.execute(request);
 
-        assertFalse(result.getExceptions().isEmpty());
+        assertFalse(result.getExceptions().isEmpty(), "Expected at least one exception from bad workspace reader");
 
-        Field valuesField = SessionScope.class.getSuperclass().getDeclaredField("values");
-        valuesField.setAccessible(true);
-        List<?> values = (List<?>) valuesField.get(sessionScope);
-        assertTrue(values.isEmpty(), "Session scope must be exited even on workspace reader error");
+        Throwable rootCause = result.getExceptions().get(0);
+        while (rootCause.getCause() != null) {
+            rootCause = rootCause.getCause();
+        }
+        assertTrue(
+                rootCause instanceof NullPointerException,
+                "Expected NullPointerException from null getRepository(), got: "
+                        + rootCause.getClass().getName());
+
+        assertTrue(sessionScope.isScopeEmpty(), "Session scope must be exited even on workspace reader error");
     }
 }
