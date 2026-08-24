@@ -35,8 +35,8 @@ class MavenModelMergerTest {
 
     @Test
     void testMergeInputLocationCoordinates() {
-        InputLocation target = InputLocation.of(10, 20, InputSource.of("target", "target.xml"));
-        InputLocation source = InputLocation.of(30, 40, InputSource.of("source", "source.xml"));
+        InputLocation target = InputLocation.of(10, 20, new InputSource("target", "target.xml"));
+        InputLocation source = InputLocation.of(30, 40, new InputSource("source", "source.xml"));
 
         assertCoordinates(30, 40, InputLocation.merge(target, source, true));
         assertCoordinates(10, 20, InputLocation.merge(target, source, false));
@@ -50,8 +50,8 @@ class MavenModelMergerTest {
 
     @Test
     void testMergeListInputLocationCoordinates() {
-        InputLocation target = InputLocation.of(10, 20, InputSource.of("target", "target.xml"));
-        InputLocation source = InputLocation.of(30, 40, InputSource.of("source", "source.xml"));
+        InputLocation target = InputLocation.of(10, 20, new InputSource("target", "target.xml"));
+        InputLocation source = InputLocation.of(30, 40, new InputSource("source", "source.xml"));
 
         assertCoordinates(10, 20, InputLocation.merge(target, source, Collections.emptyList()));
 
