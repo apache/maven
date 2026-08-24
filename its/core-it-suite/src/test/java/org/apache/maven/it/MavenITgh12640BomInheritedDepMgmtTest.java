@@ -42,6 +42,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITgh12640BomInheritedDepMgmtTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh12640BomInheritedDepMgmtTest() {
+        super("[4.0.0-rc-1,)");
+    }
+
     /**
      * Verify that the BOM consumer POM contains only entries declared in the BOM,
      * not entries inherited from the parent's dependency management.
