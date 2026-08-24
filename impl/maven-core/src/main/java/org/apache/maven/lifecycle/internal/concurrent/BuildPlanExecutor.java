@@ -211,10 +211,10 @@ public class BuildPlanExecutor {
                     session.getProjects().size());
             // Propagate the parallel flag to the root session
             session.setParallel(threads > 1);
-            this.executor = new PhasingExecutor(Executors.newFixedThreadPool(threads, new BuildThreadFactory()));
 
-            // build initial plan
+            // Build the initial plan before creating the executor so constructor failures cannot leak it.
             this.plan = buildInitialPlan(taskSegments);
+            this.executor = new PhasingExecutor(Executors.newFixedThreadPool(threads, new BuildThreadFactory()));
         }
 
         BuildContext() {
