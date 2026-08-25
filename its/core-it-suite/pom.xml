@@ -516,7 +516,7 @@ under the License.
             <configuration>
               <target>
                 <delete dir="${mavenHome}" />
-                <unzip dest="${mavenHome}" src="${sessionRootDirectory}/apache-maven/target/apache-maven-${project.version}-bin.zip">
+                <unzip dest="${mavenHome}" src="${maven.multiModuleProjectDirectory}/apache-maven/target/apache-maven-${project.version}-bin.zip">
                   <regexpmapper from="^([^/]+)/(.*)$" handledirsep="true" to="\2" />
                 </unzip>
                 <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug,mvnenc" perm="ugo+rx" />
@@ -662,6 +662,11 @@ under the License.
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-antrun-plugin</artifactId>
             <executions>
+              <!-- Disable the default distribution extraction -->
+              <execution>
+                <id>unpack-built-maven-distro</id>
+                <phase>none</phase>
+              </execution>
               <execution>
                 <id>unpack-maven-distro</id>
                 <goals>
