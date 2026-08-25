@@ -18,7 +18,6 @@
  */
 package org.apache.maven.testing.plugin.stubs;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -1195,9 +1194,9 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
         return new DefaultRepositorySystemValidator(getValidatorFactories());
     }
 
-    private List<ValidatorFactory> validatorFactories;
+    private Map<String, ValidatorFactory> validatorFactories;
 
-    public final List<ValidatorFactory> getValidatorFactories() {
+    public final Map<String, ValidatorFactory> getValidatorFactories() {
         checkClosed();
         if (validatorFactories == null) {
             validatorFactories = createValidatorFactories();
@@ -1205,9 +1204,9 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
         return validatorFactories;
     }
 
-    protected List<ValidatorFactory> createValidatorFactories() {
-        List<ValidatorFactory> result = new ArrayList<>();
-        result.add(new MavenValidatorFactory());
+    protected Map<String, ValidatorFactory> createValidatorFactories() {
+        Map<String, ValidatorFactory> result = new HashMap<>();
+        result.put("mavenValidatorFactory", new MavenValidatorFactory());
         return result;
     }
 
