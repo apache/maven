@@ -370,7 +370,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 context.coloredOutput != null ? context.coloredOutput : !Terminal.TYPE_DUMB.equals(terminal.getType()));
 
         // handle rawStreams: some would like to act on true, some on false
-        if (context.options().rawStreams().orElse(false)) {
+        // quiet mode implies raw streams — plugins that write to System.out (e.g. help:evaluate
+        // -DforceStdout) must not be decorated with "[INFO] [stdout]" prefix, otherwise scripting
+        // use cases like $(mvn -q help:evaluate ...) break (see GH-12730)
+        if (context.options().rawStreams().orElse(false)
+                || context.options().quiet().orElse(false)) {
             doConfigureWithTerminalWithRawStreamsEnabled(context);
         } else {
             doConfigureWithTerminalWithRawStreamsDisabled(context);
