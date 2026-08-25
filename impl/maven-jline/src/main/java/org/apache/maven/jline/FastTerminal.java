@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -36,6 +37,7 @@ import org.jline.terminal.MouseEvent;
 import org.jline.terminal.Size;
 import org.jline.terminal.Sized;
 import org.jline.terminal.Terminal;
+import org.jline.terminal.impl.DumbTerminal;
 import org.jline.terminal.spi.SystemStream;
 import org.jline.terminal.spi.TerminalExt;
 import org.jline.terminal.spi.TerminalProvider;
@@ -47,28 +49,88 @@ public class FastTerminal implements TerminalExt {
 
     private final CompletableFuture<Terminal> terminal;
 
+    /**
+     * The thread running the builder and the consumer. Every method of this class delegates through
+     * {@link #getTerminal()}, so code running on this thread before the terminal is published would
+     * wait on the very future it is itself computing.
+     */
+    private final Thread buildThread;
+
+    /**
+     * Stand-in handed to {@link #buildThread} while the real terminal is still being built, so that
+     * logging from the builder or the consumer degrades to unstyled output instead of deadlocking.
+     * Created on demand, and only ever by {@link #buildThread}.
+     */
+    private Terminal reentrantFallback;
+
+    /**
+     * Captured before {@link #buildThread} starts, hence before the consumer swaps the system streams
+     * for logging-backed ones. Writing to the live {@code System.err} instead would feed the fallback
+     * output back into the logger it came from.
+     */
+    private final OutputStream fallbackOutput;
+
     public FastTerminal(Callable<Terminal> builder, Consumer<Terminal> consumer) {
         this.terminal = new CompletableFuture<>();
-        new Thread(
-                        () -> {
-                            try {
-                                Terminal term = builder.call();
-                                consumer.accept(term);
-                                terminal.complete(term);
-                            } catch (Exception e) {
-                                terminal.completeExceptionally(new MavenException(e));
-                            }
-                        },
-                        "fast-terminal-thread")
-                .start();
+        this.fallbackOutput = System.err;
+        this.buildThread = new Thread(
+                () -> {
+                    try {
+                        Terminal term = builder.call();
+                        consumer.accept(term);
+                        terminal.complete(term);
+                    } catch (Exception e) {
+                        terminal.completeExceptionally(new MavenException(e));
+                    }
+                },
+                "fast-terminal-thread");
+        // a wedged builder must not keep the JVM alive; everything waits on the future, not the thread
+        this.buildThread.setDaemon(true);
+        this.buildThread.start();
     }
 
     public TerminalExt getTerminal() {
+        if (isBuildThreadWaitingOnItself()) {
+            return (TerminalExt) reentrantFallback();
+        }
         try {
             return (TerminalExt) terminal.get();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * True when the caller is the thread building the terminal and the terminal is not published yet.
+     * Waiting for the future here would never return, since this thread is the one that completes it.
+     */
+    private boolean isBuildThreadWaitingOnItself() {
+        return Thread.currentThread() == buildThread && !isBuilt();
+    }
+
+    /**
+     * Whether the terminal has been published. {@link MessageUtils#systemUninstall()} waits for the
+     * build to finish, so a caller that must not block has to check this first.
+     */
+    boolean isBuilt() {
+        return terminal.isDone();
+    }
+
+    private Terminal reentrantFallback() {
+        // only buildThread reaches this, so no synchronization is needed
+        if (reentrantFallback == null) {
+            try {
+                reentrantFallback = new DumbTerminal(
+                        "fast-terminal-fallback",
+                        Terminal.TYPE_DUMB,
+                        InputStream.nullInputStream(),
+                        fallbackOutput,
+                        StandardCharsets.UTF_8);
+            } catch (IOException e) {
+                throw new MavenException(e);
+            }
+        }
+        return reentrantFallback;
     }
 
     @Override
