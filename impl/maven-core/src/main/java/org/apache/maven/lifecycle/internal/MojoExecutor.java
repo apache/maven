@@ -438,9 +438,18 @@ public class MojoExecutor {
                             .getData()
                             .computeIfAbsent(PROJECT_INDEX, () -> new ProjectIndex(session.getProjects()));
 
-                    int index = projectIndex.getIndices().get(projectId);
+                    Integer idx = projectIndex.getIndices().get(projectId);
+                    if (idx == null) {
+                        throw new LifecycleExecutionException(
+                                "No project index found for project " + projectId, mojoExecution, project);
+                    }
+                    int index = idx;
 
                     MavenProject forkedProject = projectIndex.getProjects().get(projectId);
+                    if (forkedProject == null) {
+                        throw new LifecycleExecutionException(
+                                "No project found for project " + projectId, mojoExecution, project);
+                    }
 
                     forkedProjects.add(forkedProject);
 
