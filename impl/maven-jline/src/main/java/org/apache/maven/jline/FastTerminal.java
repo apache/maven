@@ -21,9 +21,9 @@ package org.apache.maven.jline;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
@@ -37,7 +37,6 @@ import org.jline.terminal.MouseEvent;
 import org.jline.terminal.Size;
 import org.jline.terminal.Sized;
 import org.jline.terminal.Terminal;
-import org.jline.terminal.impl.DumbTerminal;
 import org.jline.terminal.spi.SystemStream;
 import org.jline.terminal.spi.TerminalExt;
 import org.jline.terminal.spi.TerminalProvider;
@@ -57,11 +56,10 @@ public class FastTerminal implements TerminalExt {
     private final Thread buildThread;
 
     /**
-     * Stand-in handed to {@link #buildThread} while the real terminal is still being built, so that
-     * logging from the builder or the consumer degrades to unstyled output instead of deadlocking.
-     * Created on demand, and only ever by {@link #buildThread}.
+     * Writer handed to {@link #buildThread} while the real terminal is still being built. Created on
+     * demand, and only ever by {@link #buildThread}.
      */
-    private Terminal reentrantFallback;
+    private PrintWriter fallbackWriter;
 
     /**
      * Captured before {@link #buildThread} starts, hence before the consumer swaps the system streams
@@ -90,9 +88,6 @@ public class FastTerminal implements TerminalExt {
     }
 
     public TerminalExt getTerminal() {
-        if (isBuildThreadWaitingOnItself()) {
-            return (TerminalExt) reentrantFallback();
-        }
         try {
             return (TerminalExt) terminal.get();
         } catch (Exception e) {
@@ -116,21 +111,12 @@ public class FastTerminal implements TerminalExt {
         return terminal.isDone();
     }
 
-    private Terminal reentrantFallback() {
+    private PrintWriter fallbackWriter() {
         // only buildThread reaches this, so no synchronization is needed
-        if (reentrantFallback == null) {
-            try {
-                reentrantFallback = new DumbTerminal(
-                        "fast-terminal-fallback",
-                        Terminal.TYPE_DUMB,
-                        InputStream.nullInputStream(),
-                        fallbackOutput,
-                        StandardCharsets.UTF_8);
-            } catch (IOException e) {
-                throw new MavenException(e);
-            }
+        if (fallbackWriter == null) {
+            fallbackWriter = new PrintWriter(new OutputStreamWriter(fallbackOutput, Charset.defaultCharset()), true);
         }
-        return reentrantFallback;
+        return fallbackWriter;
     }
 
     @Override
@@ -155,7 +141,8 @@ public class FastTerminal implements TerminalExt {
 
     @Override
     public PrintWriter writer() {
-        return getTerminal().writer();
+        // the log sink writes here, and must not wait for the terminal this thread is building
+        return isBuildThreadWaitingOnItself() ? fallbackWriter() : getTerminal().writer();
     }
 
     @Override
@@ -260,7 +247,11 @@ public class FastTerminal implements TerminalExt {
 
     @Override
     public String getType() {
-        return getTerminal().getType();
+        // AttributedCharSequence.toAnsi asks for the type first and renders plain for a dumb one,
+        // so answering here keeps message rendering off the terminal this thread is building
+        return isBuildThreadWaitingOnItself()
+                ? Terminal.TYPE_DUMB
+                : getTerminal().getType();
     }
 
     @Override

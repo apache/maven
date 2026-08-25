@@ -22,8 +22,10 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
 
 import org.jline.terminal.Terminal;
+import org.jline.terminal.TerminalBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +37,10 @@ import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
  * {@link MessageUtils#systemInstall} publishes the terminal before the background thread has built
  * it, so anything that thread logs is rendered through a terminal that same thread is still
  * producing. See <a href="https://github.com/apache/maven/issues/12761">#12761</a>.
+ * <p>
+ * A single log statement asks the terminal for two things, its type while rendering the message and
+ * its writer while emitting the line, so both are exercised from both halves of the window: the
+ * builder callable, and the consumer that runs before the terminal is published.
  * <p>
  * The timeouts are preemptive on purpose: a regression parks the build thread forever, and only an
  * abandoning timeout turns that into a red test rather than a hung fork.
@@ -54,46 +60,39 @@ class FastTerminalReentrancyTest {
     }
 
     @Test
-    void renderingAMessageFromTheBuilderDoesNotDeadlock() {
+    void usingTheTerminalFromTheBuilderDoesNotDeadlock() {
         assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
-            CompletableFuture<String> rendered = new CompletableFuture<>();
-            installAndAwait(builder ->
-                    rendered.complete(MessageUtils.builder().warning("WARNING").build()));
-            // the stand-in reports itself as dumb, so the style is dropped rather than emitted blind
-            assertEquals("WARNING", rendered.get());
+            CompletableFuture<String[]> probed = new CompletableFuture<>();
+            installAndAwait(builder -> probed.complete(probe()), terminal -> {});
+            assertProbe(probed.get());
         });
     }
 
     @Test
-    void takingTheWriterFromTheBuilderDoesNotDeadlock() {
+    void usingTheTerminalFromTheConsumerDoesNotDeadlock() {
         assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
-            CompletableFuture<Object> writer = new CompletableFuture<>();
-            installAndAwait(
-                    builder -> writer.complete(MessageUtils.getTerminal().writer()));
-            assertNotNull(writer.get());
+            CompletableFuture<String[]> probed = new CompletableFuture<>();
+            installAndAwait(builder -> {}, terminal -> probed.complete(probe()));
+            assertProbe(probed.get());
         });
     }
 
-    @Test
-    void renderingAMessageFromTheConsumerDoesNotDeadlock() {
-        assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
-            CompletableFuture<String> rendered = new CompletableFuture<>();
-            // the consumer runs on the same thread, before the future is completed
-            installAndAwait(
-                    builder -> {},
-                    terminal -> rendered.complete(
-                            MessageUtils.builder().warning("WARNING").build()));
-            assertEquals("WARNING", rendered.get());
-        });
+    /**
+     * Both terminal calls a single log statement makes, run on the terminal building thread.
+     */
+    private static String[] probe() {
+        String rendered = MessageUtils.builder().warning("WARNING").build();
+        assertNotNull(MessageUtils.getTerminal().writer());
+        return new String[] {rendered, MessageUtils.getTerminal().getType()};
     }
 
-    private void installAndAwait(java.util.function.Consumer<org.jline.terminal.TerminalBuilder> onBuilder) {
-        installAndAwait(onBuilder, terminal -> {});
+    private static void assertProbe(String[] probed) {
+        // the stand-in reports itself dumb, so the style is dropped rather than emitted blind
+        assertEquals(Terminal.TYPE_DUMB, probed[1]);
+        assertEquals("WARNING", probed[0]);
     }
 
-    private void installAndAwait(
-            java.util.function.Consumer<org.jline.terminal.TerminalBuilder> onBuilder,
-            java.util.function.Consumer<Terminal> onTerminal) {
+    private void installAndAwait(Consumer<TerminalBuilder> onBuilder, Consumer<Terminal> onTerminal) {
         MessageUtils.systemInstall(
                 builder -> {
                     onBuilder.accept(builder);
