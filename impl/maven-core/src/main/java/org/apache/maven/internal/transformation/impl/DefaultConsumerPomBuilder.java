@@ -355,7 +355,16 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         request.source(src);
         request.locationTracking(false);
         request.systemProperties(iSession.getSystemProperties());
-        request.userProperties(iSession.getUserProperties());
+        Map<String, String> userProperties = new LinkedHashMap<>();
+        // BUILD_CONSUMER does not reactivate project profiles, so expose properties from profiles
+        // that were already active when the project model was built.
+        if (project != null && project.getActiveProfiles() != null) {
+            for (org.apache.maven.model.Profile profile : project.getActiveProfiles()) {
+                userProperties.putAll(profile.getDelegate().getProperties());
+            }
+        }
+        userProperties.putAll(iSession.getUserProperties());
+        request.userProperties(userProperties);
         request.lifecycleBindingsInjector(lifecycleBindingsInjector::injectLifecycleBindings);
         // Pass remote repositories so that the model builder can resolve BOM imports
         // from non-central repositories (e.g., repositories defined in settings.xml profiles).
