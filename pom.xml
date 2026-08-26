@@ -144,7 +144,7 @@ under the License.
     <!-- various versions -->
     <asmVersion>9.10.1</asmVersion>
     <byteBuddyVersion>1.18.12</byteBuddyVersion>
-    <classWorldsVersion>2.12.0</classWorldsVersion>
+    <classWorldsVersion>2.12.1</classWorldsVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
     <domtripVersion>1.6.0</domtripVersion>
     <guiceVersion>5.1.0</guiceVersion>
@@ -160,11 +160,11 @@ under the License.
     <logbackClassicVersion>1.6.3</logbackClassicVersion>
     <mockitoVersion>5.23.0</mockitoVersion>
     <plexusInteractivityVersion>1.5.1</plexusInteractivityVersion>
-    <plexusInterpolationVersion>1.29</plexusInterpolationVersion>
-    <plexusTestingVersion>2.1.0</plexusTestingVersion>
-    <plexusXmlVersion>4.1.1</plexusXmlVersion>
+    <plexusInterpolationVersion>1.30.0</plexusInterpolationVersion>
+    <plexusTestingVersion>2.2.0</plexusTestingVersion>
+    <plexusXmlVersion>4.2.0</plexusXmlVersion>
     <resolverVersion>2.0.22</resolverVersion>
-    <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
+    <securityDispatcherVersion>4.2.0</securityDispatcherVersion>
     <sisuVersion>1.1.0</sisuVersion>
     <slf4jVersion>2.0.18</slf4jVersion>
     <stax2ApiVersion>4.3.0</stax2ApiVersion>
@@ -672,7 +672,7 @@ under the License.
       <dependency>
         <groupId>com.google.jimfs</groupId>
         <artifactId>jimfs</artifactId>
-        <version>1.3.1</version>
+        <version>1.3.2</version>
       </dependency>
 
       <dependency>
@@ -689,7 +689,7 @@ under the License.
       <dependency>
         <groupId>eu.maveniverse.maven.mimir</groupId>
         <artifactId>testing</artifactId>
-        <version>0.12.0</version>
+        <version>0.12.1</version>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
