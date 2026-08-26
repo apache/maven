@@ -1239,7 +1239,8 @@ public class DefaultModelValidator implements ModelValidator {
                 String scope = dependency.getScope();
                 if (DependencyScope.COMPILE_ONLY.id().equals(scope)
                         || DependencyScope.TEST_ONLY.id().equals(scope)
-                        || DependencyScope.TEST_RUNTIME.id().equals(scope)) {
+                        || DependencyScope.TEST_RUNTIME.id().equals(scope)
+                        || DependencyScope.API.id().equals(scope)) {
                     addViolation(
                             problems,
                             Severity.ERROR,

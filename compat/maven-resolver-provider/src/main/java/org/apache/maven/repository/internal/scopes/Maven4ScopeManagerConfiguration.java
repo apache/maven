@@ -91,6 +91,8 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
         result.add(internalScopeManager.createDependencyScope(
                 DependencyScope.COMPILE.id(), DependencyScope.COMPILE.isTransitive(), all()));
         result.add(internalScopeManager.createDependencyScope(
+                DependencyScope.API.id(), DependencyScope.API.isTransitive(), all()));
+        result.add(internalScopeManager.createDependencyScope(
                 DependencyScope.RUNTIME.id(),
                 DependencyScope.RUNTIME.isTransitive(),
                 byBuildPath(CommonBuilds.BUILD_PATH_RUNTIME)));

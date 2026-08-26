@@ -62,9 +62,22 @@ public enum DependencyScope {
     COMPILE_ONLY("compile-only", false),
 
     /**
-     * Compile, runtime and test.
+     * Compile, runtime and test (non-transitive).
+     * <p>
+     * <b>Note:</b> If a project uses this scope and doesn't explicitly opt-in to
+     * Maven 4 modelVersion (e.g., 4.1.0) through other features, the generated
+     * consumer POM may be downgraded to 4.0.0. In this case, downstream resolvers
+     * will remap this scope to {@code api} for backward compatibility, making it
+     * behave transitively again. To enforce non-transitive behavior, the project
+     * must ensure its modelVersion is preserved (e.g., via {@code preserveModelVersion=true}).
+     * </p>
      */
-    COMPILE("compile", true),
+    COMPILE("compile", false),
+
+    /**
+     * Compile, runtime and test, transitively.
+     */
+    API("api", true),
 
     /**
      * Runtime and test.
