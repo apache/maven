@@ -33,6 +33,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Dependency;
@@ -182,6 +183,20 @@ class DefaultModelBuilderTest {
 
         assertEquals(source, state.getSource("org.apache.maven.test", "duplicate-artifact"));
         assertEquals(source, state.getSource(null, "duplicate-artifact"));
+    }
+
+    @Test
+    void testMavenVersionRangeProfileActivation() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("maven-version-range-profile")))
+                .systemProperties(Map.of(Constants.MAVEN_VERSION, "4.1.0"))
+                .build();
+
+        ModelBuilderResult result = builder.newSession().build(request);
+
+        assertEquals("true", result.getEffectiveModel().getProperties().get("maven.range.profile.active"));
     }
 
     @Test
