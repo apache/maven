@@ -606,6 +606,9 @@ under the License.
     </profile>
     <profile>
       <id>run-its</id>
+      <properties>
+        <mavenHome>${project.build.directory}/apache-maven</mavenHome>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.apache.maven</groupId>
@@ -613,6 +616,13 @@ under the License.
           <version>${maven-version}</version>
           <classifier>bin</classifier>
           <type>zip</type>
+          <exclusions>
+            <!-- dependency only on Maven distribution -->
+            <exclusion>
+              <groupId>*</groupId>
+              <artifactId>*</artifactId>
+            </exclusion>
+          </exclusions>
         </dependency>
         <!-- not really used but will force download in the local repo used -->
         <dependency>
@@ -635,6 +645,54 @@ under the License.
             <configuration>
               <skip>false</skip>
             </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>download-maven-distro</id>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <phase>process-test-resources</phase>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.apache.maven</groupId>
+                      <artifactId>apache-maven</artifactId>
+                      <version>${maven-version}</version>
+                      <classifier>bin</classifier>
+                      <type>zip</type>
+                      <destFileName>maven-bin.zip</destFileName>
+                    </artifactItem>
+                  </artifactItems>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>unpack-maven-distro</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <phase>process-test-resources</phase>
+                <configuration>
+                  <target>
+                    <delete dir="${mavenHome}" />
+                    <unzip dest="${mavenHome}" src="${project.build.directory}/maven-bin.zip">
+                      <globmapper from="apache-maven-${maven-version}/*" handledirsep="true" to="*" />
+                    </unzip>
+                    <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug,mvnenc" perm="ugo+rx" />
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
