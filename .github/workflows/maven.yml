@@ -53,7 +53,7 @@ jobs:
 
       - name: Set up Maven
         run:
-          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=3.9.14"
+          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=3.10.0-rc-1"
 
       - name: Build with Maven
         run: ./mvnw verify -e -B -V -DdistributionFileName=apache-maven
@@ -140,7 +140,7 @@ jobs:
 
       - name: Set up Maven
         run:
-          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=3.9.14"
+          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=3.10.0-rc-1"
 
       - name: Running integration tests
         shell: bash
