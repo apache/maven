@@ -162,5 +162,4 @@ class SourcesTest {
         assertThrows(NullPointerException.class, () -> Sources.buildSource(null));
         assertThrows(NullPointerException.class, () -> Sources.resolvedSource(null, "location"));
     }
-
 }
