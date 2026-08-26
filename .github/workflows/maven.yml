@@ -47,7 +47,7 @@ jobs:
 
       - uses: actions/setup-java@b6effb05e454b25005698d916606bdc6ffcbf961 # v5.7.0
         with:
-          java-version: 21
+          java-version: 25
           distribution: 'zulu'
           cache: 'maven'
 
@@ -70,7 +70,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        java: [8, 11, 17, 21, 25]
+        java: [8, 25, 26]
 
       fail-fast: false
     runs-on: ${{ matrix.os }}
