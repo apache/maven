@@ -39,6 +39,7 @@ import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Organization;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginExecution;
+import org.apache.maven.api.model.QualityManagement;
 import org.apache.maven.api.model.ReportPlugin;
 import org.apache.maven.api.model.ReportSet;
 import org.apache.maven.api.model.Repository;
@@ -146,6 +147,19 @@ public class MavenModelMerger extends MavenMerger {
             if (tgt == null) {
                 builder.ciManagement(src);
                 builder.location("ciManagement", source.getLocation("ciManagement"));
+            }
+        }
+    }
+
+    @Override
+    protected void mergeModel_QualityManagement(
+            Model.Builder builder, Model target, Model source, boolean sourceDominant, Map<Object, Object> context) {
+        QualityManagement src = source.getQualityManagement();
+        if (src != null) {
+            QualityManagement tgt = target.getQualityManagement();
+            if (tgt == null) {
+                builder.qualityManagement(src);
+                builder.location("qualityManagement", source.getLocation("qualityManagement"));
             }
         }
     }

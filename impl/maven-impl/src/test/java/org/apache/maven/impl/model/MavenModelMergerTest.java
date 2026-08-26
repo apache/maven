@@ -25,6 +25,7 @@ import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Prerequisites;
 import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.model.QualityManagement;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -132,5 +133,28 @@ class MavenModelMergerTest {
         modelMerger.mergeModel_Profiles(builder, model, parent, false, null);
         assertEquals(1, builder.build().getProfiles().size());
         assertEquals("MODEL", builder.build().getProfiles().get(0).getId());
+    }
+
+    @Test
+    void testMergeModelQualityManagement() {
+        QualityManagement parentQualityManagement = QualityManagement.newBuilder()
+                .system("SonarQube")
+                .url("https://sonar.parent")
+                .build();
+        Model parent =
+                Model.newBuilder().qualityManagement(parentQualityManagement).build();
+        Model model = Model.newInstance();
+        Model.Builder builder = Model.newBuilder(model);
+        modelMerger.mergeModel_QualityManagement(builder, model, parent, false, null);
+        assertEquals(parentQualityManagement, builder.build().getQualityManagement());
+
+        QualityManagement childQualityManagement = QualityManagement.newBuilder()
+                .system("SonarQubeChild")
+                .url("https://sonar.child")
+                .build();
+        model = Model.newBuilder().qualityManagement(childQualityManagement).build();
+        builder = Model.newBuilder(model);
+        modelMerger.mergeModel_QualityManagement(builder, model, parent, false, null);
+        assertEquals(childQualityManagement, builder.build().getQualityManagement());
     }
 }
