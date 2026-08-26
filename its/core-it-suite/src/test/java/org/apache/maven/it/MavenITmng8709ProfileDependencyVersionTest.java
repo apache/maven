@@ -27,23 +27,17 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MavenITmng8709ProfileDependencyVersionTest extends AbstractMavenIntegrationTestCase {
 
-    MavenITmng8709ProfileDependencyVersionTest() {
-        super("[4.0.0-rc-7,)");
-    }
-
     @Test
     void dependencyVersionFromActiveProfileIsValidForConsumerPom() throws Exception {
-        Path basedir = extractResources("/mng-8709-profile-dependency-version")
-                .getAbsoluteFile()
-                .toPath();
+        Path basedir = extractResources("mng-8709-profile-dependency-version");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Path consumerPom = Path.of(verifier.getArtifactPath(
-                "org.apache.maven.its.mng8709", "profile-version", "1.0", "pom"));
+        Path consumerPom = verifier.getArtifactPath(
+                "org.apache.maven.its.mng8709", "profile-version", "1.0", "pom");
         String content = Files.readString(consumerPom);
         assertTrue(content.contains("<activeByDefault>true</activeByDefault>"));
         assertTrue(content.contains("<version>${junit.version}</version>"));
