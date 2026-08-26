@@ -216,9 +216,9 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                     ZipEntry pluginDescriptorEntry = pluginJar.getEntry(getPluginDescriptorLocation());
 
                     if (pluginDescriptorEntry != null) {
-                        InputStream is = pluginJar.getInputStream(pluginDescriptorEntry);
-
-                        pluginDescriptor = parsePluginDescriptor(is, plugin, pluginFile.getAbsolutePath());
+                        try (InputStream is = pluginJar.getInputStream(pluginDescriptorEntry)) {
+                            pluginDescriptor = parsePluginDescriptor(is, plugin, pluginFile.getAbsolutePath());
+                        }
                     }
                 }
             } else {
@@ -258,9 +258,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
     private PluginDescriptor parsePluginDescriptor(InputStream is, Plugin plugin, String descriptorLocation)
             throws PluginDescriptorParsingException {
-        try {
-            Reader reader = ReaderFactory.newXmlReader(is);
-
+        try (Reader reader = ReaderFactory.newXmlReader(is)) {
             PluginDescriptor pluginDescriptor = builder.build(reader, descriptorLocation);
 
             return pluginDescriptor;
