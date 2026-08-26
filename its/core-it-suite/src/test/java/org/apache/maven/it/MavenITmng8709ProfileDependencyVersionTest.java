@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MavenITmng8709ProfileDependencyVersionTest extends AbstractMavenIntegrationTestCase {
 
     MavenITmng8709ProfileDependencyVersionTest() {
-        super("[4.0.0-rc-6,)");
+        super("[4.0.0-rc-7,)");
     }
 
     @Test
