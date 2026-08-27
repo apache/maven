@@ -53,6 +53,7 @@ import org.slf4j.LoggerFactory;
 public class DefaultToolchainManager implements ToolchainManager {
     private final Map<String, ToolchainFactory> factories;
     private final Logger logger;
+    private volatile boolean sourceLevelCheckEmitted;
 
     @Inject
     public DefaultToolchainManager(Map<String, ToolchainFactory> factories) {
@@ -121,6 +122,11 @@ public class DefaultToolchainManager implements ToolchainManager {
      * (run {@code mvnup} to add the {@code maven-toolchains-plugin} with automatic JDK discovery).
      */
     void checkJdkSourceLevelCompatibility(Session session) {
+        // Avoid repeating the error for every module in --fail-at-end mode
+        if (sourceLevelCheckEmitted) {
+            return;
+        }
+
         int requiredSourceLevel = getProjectRequiredSourceLevel(session);
         if (requiredSourceLevel <= 0) {
             return;
@@ -131,7 +137,8 @@ public class DefaultToolchainManager implements ToolchainManager {
             return;
         }
 
-        // Running JDK is incompatible — emit clear, actionable error
+        // Running JDK is incompatible — emit clear, actionable error (once per build)
+        sourceLevelCheckEmitted = true;
         int latestJdk = JdkSourceLevelSupport.latestJdkForSourceLevel(requiredSourceLevel);
         logger.error(
                 "Project requires --source {} which needs JDK <= {}, but the running JDK {} no longer supports it.",
