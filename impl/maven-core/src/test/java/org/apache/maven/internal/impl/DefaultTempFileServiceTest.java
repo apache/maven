@@ -25,27 +25,28 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Supplier;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.services.TempFileService;
+import org.apache.maven.execution.MavenSession;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for DefaultTempFileService.
+ * Tests for DefaultTempFileService and TempFileCleanupParticipant.
  */
 class DefaultTempFileServiceTest {
 
-    private static final String KEEP_PROP = "maven.tempfile.keep";
-
     @AfterEach
     void clearKeepProp() {
-        System.clearProperty(KEEP_PROP);
+        System.clearProperty(Constants.MAVEN_TEMPFILE_KEEP);
     }
 
     @Test
@@ -99,15 +100,55 @@ class DefaultTempFileServiceTest {
         final Path f = svc.createTempFile(session, "keep-", ".tmp");
         assertTrue(Files.exists(f));
 
-        System.setProperty(KEEP_PROP, "true");
+        System.setProperty(Constants.MAVEN_TEMPFILE_KEEP, "true");
         svc.cleanup(session);
 
         assertTrue(Files.exists(f), "cleanup must be skipped when -Dmaven.tempfile.keep=true");
 
         // turn cleanup back on and verify it deletes
-        System.clearProperty(KEEP_PROP);
+        System.clearProperty(Constants.MAVEN_TEMPFILE_KEEP);
         svc.cleanup(session);
         assertFalse(Files.exists(f));
+    }
+
+    @Test
+    void cleanupParticipantDelegatesCleanupToService() throws IOException {
+        final TempFileService svc = new DefaultTempFileService();
+        final SessionData data = new MapBackedSessionData();
+        final Session apiSession = mock(Session.class);
+        when(apiSession.getData()).thenReturn(data);
+
+        final Path f = svc.createTempFile(apiSession, "participant-", ".tmp");
+        assertTrue(Files.exists(f), "temp file must exist before cleanup");
+
+        final MavenSession mavenSession = mock(MavenSession.class);
+        when(mavenSession.getSession()).thenReturn(apiSession);
+
+        final TempFileCleanupParticipant participant = new TempFileCleanupParticipant(svc);
+        participant.afterSessionEnd(mavenSession);
+
+        verify(mavenSession).getSession();
+        assertFalse(Files.exists(f), "temp file must be deleted after participant runs");
+    }
+
+    @Test
+    void cleanupParticipantSwallowsExceptions() {
+        final TempFileService failingSvc = mock(TempFileService.class);
+        try {
+            org.mockito.Mockito.doThrow(new IOException("simulated failure"))
+                    .when(failingSvc)
+                    .cleanup(org.mockito.ArgumentMatchers.any(Session.class));
+        } catch (final IOException e) {
+            throw new RuntimeException(e);
+        }
+
+        final Session apiSession = mock(Session.class);
+        final MavenSession mavenSession = mock(MavenSession.class);
+        when(mavenSession.getSession()).thenReturn(apiSession);
+
+        final TempFileCleanupParticipant participant = new TempFileCleanupParticipant(failingSvc);
+        // Must not throw — lifecycle callbacks should not propagate exceptions
+        participant.afterSessionEnd(mavenSession);
     }
 
     /**

@@ -26,6 +26,8 @@ import org.apache.maven.AbstractMavenLifecycleParticipant;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.TempFileService;
 import org.apache.maven.execution.MavenSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Hooks into the Maven lifecycle and removes all temp material after the session.
@@ -33,6 +35,8 @@ import org.apache.maven.execution.MavenSession;
 @Named
 @Singleton
 public final class TempFileCleanupParticipant extends AbstractMavenLifecycleParticipant {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(TempFileCleanupParticipant.class);
 
     private final TempFileService tempFileService;
 
@@ -48,10 +52,8 @@ public final class TempFileCleanupParticipant extends AbstractMavenLifecyclePart
         try {
             tempFileService.cleanup(apiSession);
         } catch (final Exception e) {
-            // We’re at session end; just log. Maven already reported build result.
-            // Use slf4j directly to avoid throwing from the lifecycle callback.
-            org.slf4j.LoggerFactory.getLogger(TempFileCleanupParticipant.class)
-                    .warn("Temp cleanup failed: {}", e.getMessage());
+            // We're at session end; just log. Maven already reported build result.
+            LOGGER.warn("Temp cleanup failed: {}", e.getMessage());
         }
     }
 }

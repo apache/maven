@@ -23,47 +23,53 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Service to create and track temporary files/directories for a Maven build.
  * All created paths are deleted automatically when the session ends.
+ *
+ * @since 4.1.0
  */
+@Experimental
 public interface TempFileService extends Service {
 
     /**
      * Creates a temp file in the default temp directory.
      */
     @Nonnull
-    Path createTempFile(Session session, String prefix, String suffix) throws IOException;
+    Path createTempFile(@Nonnull Session session, @Nullable String prefix, @Nullable String suffix) throws IOException;
 
     /**
      * Creates a temp file in the given directory.
      */
     @Nonnull
-    Path createTempFile(Session session, String prefix, String suffix, Path directory) throws IOException;
+    Path createTempFile(
+            @Nonnull Session session, @Nullable String prefix, @Nullable String suffix, @Nonnull Path directory)
+            throws IOException;
 
     /**
      * Creates a temp directory in the default temp directory.
      */
     @Nonnull
-    Path createTempDirectory(Session session, String prefix) throws IOException;
+    Path createTempDirectory(@Nonnull Session session, @Nullable String prefix) throws IOException;
 
     /**
      * Creates a temp directory in the given directory.
      */
     @Nonnull
-    Path createTempDirectory(Session session, String prefix, Path directory) throws IOException;
+    Path createTempDirectory(@Nonnull Session session, @Nullable String prefix, @Nonnull Path directory)
+            throws IOException;
 
     /**
      * Registers an externally created path for cleanup at session end.
      */
-    @Nonnull
-    void register(Session session, Path path);
+    void register(@Nonnull Session session, @Nonnull Path path);
 
     /**
      * Forces cleanup for the given session (normally called by lifecycle).
      */
-    @Nonnull
-    void cleanup(Session session) throws IOException;
+    void cleanup(@Nonnull Session session) throws IOException;
 }

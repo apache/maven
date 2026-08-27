@@ -41,7 +41,7 @@ import org.apache.maven.api.services.TempFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.apache.maven.api.Constants.KEEP_PROP;
+import static org.apache.maven.api.Constants.MAVEN_TEMPFILE_KEEP;
 
 /**
  * Default TempFileService implementation.
@@ -113,9 +113,9 @@ public final class DefaultTempFileService implements TempFileService {
     public void cleanup(final Session session) throws IOException {
         Objects.requireNonNull(session, "session");
 
-        if (Boolean.getBoolean(KEEP_PROP)) {
+        if (Boolean.getBoolean(MAVEN_TEMPFILE_KEEP)) {
             if (LOGGER.isInfoEnabled()) {
-                LOGGER.info("Skipping temp cleanup due to -D{}=true", KEEP_PROP);
+                LOGGER.info("Skipping temp cleanup due to -D{}=true", MAVEN_TEMPFILE_KEEP);
             }
             return;
         }
