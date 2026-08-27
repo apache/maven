@@ -63,6 +63,7 @@ class ItUtils {
     }
 
     public static void createFile(Path path) throws IOException {
+        Files.deleteIfExists(path);
         Files.createFile(path);
     }
 
