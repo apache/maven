@@ -149,12 +149,13 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-war-plugin",
                     "3.4.0",
-                    "Versions before 3.3.2 use reflection on java.util.Properties internals, blocked by JDK 17+ required by Maven 4"),
+                    "Older versions use XStream PropertiesConverter which reflects on Properties.defaults field,"
+                            + " blocked by JDK 17+ module system"),
             new PluginUpgrade(
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-ear-plugin",
                     "3.4.0",
-                    "Versions before 3.3.0 use reflection via plexus-archiver, blocked by JDK 17+ required by Maven 4"));
+                    "Older versions use plexus-archiver reflection blocked by JDK 17+ module system"));
 
     private static final List<PluginUpgrade> PLUGIN_DEPENDENCY_UPGRADES = List.of(new PluginUpgrade(
             "org.codehaus.mojo",
