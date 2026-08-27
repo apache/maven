@@ -81,14 +81,22 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
             return true;
         }
 
-        // Same default logic as CompatibilityFixStrategy: run when no specific options
+        // Default behavior: run when no specific options are provided,
+        // or when all options are explicitly disabled (safety net — toolchain
+        // setup should always run as it prevents build failures)
         boolean noOptionsSpecified = options.all().isEmpty()
                 && options.infer().isEmpty()
                 && options.model().isEmpty()
                 && options.plugins().isEmpty()
                 && options.modelVersion().isEmpty();
 
-        if (noOptionsSpecified) {
+        boolean allOptionsDisabled = options.all().map(v -> !v).orElse(false)
+                && options.infer().map(v -> !v).orElse(false)
+                && options.model().map(v -> !v).orElse(false)
+                && options.plugins().map(v -> !v).orElse(false)
+                && options.modelVersion().isEmpty();
+
+        if (noOptionsSpecified || allOptionsDisabled) {
             return true;
         }
 
