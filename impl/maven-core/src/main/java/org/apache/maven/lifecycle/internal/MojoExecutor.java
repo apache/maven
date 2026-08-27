@@ -441,14 +441,22 @@ public class MojoExecutor {
                     Integer idx = projectIndex.getIndices().get(projectId);
                     if (idx == null) {
                         throw new LifecycleExecutionException(
-                                "No project index found for project " + projectId, mojoExecution, project);
+                                "No project index found for project " + projectId
+                                        + ". This can happen with parallel builds (-T) or when extensions"
+                                        + " modify the session projects.",
+                                mojoExecution,
+                                project);
                     }
                     int index = idx;
 
                     MavenProject forkedProject = projectIndex.getProjects().get(projectId);
                     if (forkedProject == null) {
                         throw new LifecycleExecutionException(
-                                "No project found for project " + projectId, mojoExecution, project);
+                                "No project found for project " + projectId
+                                        + ". This can happen with parallel builds (-T) or when extensions"
+                                        + " modify the session projects.",
+                                mojoExecution,
+                                project);
                     }
 
                     forkedProjects.add(forkedProject);
