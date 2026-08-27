@@ -933,24 +933,17 @@ public class DefaultModelBuilder implements ModelBuilder {
                         continue;
                     }
 
-                    // MNG-XXXX: interpolate properties in the subproject/module path (e.g.
+                    // #12729: interpolate properties in the subproject/module path (e.g.
                     // <module>./../module/pom${version-discriminator}.xml</module>) before
                     // resolving it against the filesystem. Model-wide interpolation happens
                     // later in the build, but module paths must be resolved here, so we
-                    // interpolate just the path against the model, user and system properties.
-                    String interpolated = interpolator.interpolate(subproject, key -> {
-                        String value = activated.getProperties().get(key);
-                        if (value == null) {
-                            value = request.getUserProperties().get(key);
-                        }
-                        if (value == null) {
-                            value = request.getSystemProperties().get(key);
-                        }
-                        return value;
-                    });
-                    if (interpolated != null) {
-                        subproject = interpolated;
-                    }
+                    // interpolate just the path against the user, model and system properties.
+                    subproject = interpolator.interpolate(
+                            subproject,
+                            Interpolator.chain(
+                                    request.getUserProperties()::get,
+                                    activated.getProperties()::get,
+                                    request.getSystemProperties()::get));
 
                     subproject = subproject.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
