@@ -263,7 +263,12 @@ public final class InputLocation implements Serializable, InputLocationTracker {
             locations.putAll(sourceDominant ? sourceLocations : targetLocations);
         }
 
-        return InputLocation.of(target.getLineNumber(), target.getColumnNumber(), target.getSource(), locations);
+        InputLocation location = sourceDominant ? source : target;
+        if (location.getLineNumber() < 0 && location.getColumnNumber() < 0) {
+            location = sourceDominant ? target : source;
+        }
+
+        return InputLocation.of(location.getLineNumber(), location.getColumnNumber(), target.getSource(), locations);
     } // -- InputLocation merge( InputLocation, InputLocation, boolean )
 
     /**
@@ -302,7 +307,12 @@ public final class InputLocation implements Serializable, InputLocationTracker {
             }
         }
 
-        return InputLocation.of(target.getLineNumber(), target.getColumnNumber(), target.getSource(), locations);
+        InputLocation location = target;
+        if (location.getLineNumber() < 0 && location.getColumnNumber() < 0) {
+            location = source;
+        }
+
+        return InputLocation.of(location.getLineNumber(), location.getColumnNumber(), target.getSource(), locations);
     } // -- InputLocation merge( InputLocation, InputLocation, java.util.Collection )
 
     /**

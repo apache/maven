@@ -20,6 +20,8 @@ package org.apache.maven.impl.model;
 
 import java.util.Collections;
 
+import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Prerequisites;
 import org.apache.maven.api.model.Profile;
@@ -30,6 +32,37 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class MavenModelMergerTest {
     private MavenModelMerger modelMerger = new MavenModelMerger();
+
+    @Test
+    void testMergeInputLocationCoordinates() {
+        InputLocation target = InputLocation.of(10, 20, new InputSource("target", "target.xml"));
+        InputLocation source = InputLocation.of(30, 40, new InputSource("source", "source.xml"));
+
+        assertCoordinates(30, 40, InputLocation.merge(target, source, true));
+        assertCoordinates(10, 20, InputLocation.merge(target, source, false));
+
+        InputLocation unknownTarget = InputLocation.of(-1, -1, target.getSource());
+        assertCoordinates(30, 40, InputLocation.merge(unknownTarget, source, false));
+
+        InputLocation unknownSource = InputLocation.of(-1, -1, source.getSource());
+        assertCoordinates(10, 20, InputLocation.merge(target, unknownSource, true));
+    }
+
+    @Test
+    void testMergeListInputLocationCoordinates() {
+        InputLocation target = InputLocation.of(10, 20, new InputSource("target", "target.xml"));
+        InputLocation source = InputLocation.of(30, 40, new InputSource("source", "source.xml"));
+
+        assertCoordinates(10, 20, InputLocation.merge(target, source, Collections.emptyList()));
+
+        InputLocation unknownTarget = InputLocation.of(-1, -1, target.getSource());
+        assertCoordinates(30, 40, InputLocation.merge(unknownTarget, source, Collections.emptyList()));
+    }
+
+    private static void assertCoordinates(int lineNumber, int columnNumber, InputLocation location) {
+        assertEquals(lineNumber, location.getLineNumber());
+        assertEquals(columnNumber, location.getColumnNumber());
+    }
 
     // modelVersion is neither inherited nor injected
     @Test
