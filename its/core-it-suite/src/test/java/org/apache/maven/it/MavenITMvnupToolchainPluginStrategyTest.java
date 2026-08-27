@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
@@ -46,6 +47,12 @@ class MavenITMvnupToolchainPluginStrategyTest extends AbstractMavenIntegrationTe
     @Test
     void testMvnupAddsToolchainsPluginForOldSourceLevel() throws Exception {
         Path testDir = extractResources("mvnup-toolchain-plugin-strategy");
+
+        // Ensure mvnup script is executable (zip extraction may lose permissions on some CI environments)
+        Path mvnupBin = Paths.get(System.getProperty("maven.home"), "bin", "mvnup");
+        if (Files.exists(mvnupBin)) {
+            mvnupBin.toFile().setExecutable(true);
+        }
 
         // First run — should add the plugin
         Verifier verifier = newVerifier(testDir);
