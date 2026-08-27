@@ -438,9 +438,24 @@ public class MojoExecutor {
                             .getData()
                             .computeIfAbsent(PROJECT_INDEX, () -> new ProjectIndex(session.getProjects()));
 
-                    int index = projectIndex.getIndices().get(projectId);
+                    Integer index = projectIndex.getIndices().get(projectId);
+                    if (index == null) {
+                        throw new LifecycleExecutionException(
+                                "Forked execution references project '" + projectId
+                                        + "' which is not in the reactor. "
+                                        + "This can happen with parallel builds (-T) or when extensions modify the session projects.",
+                                mojoExecution,
+                                session.getCurrentProject());
+                    }
 
                     MavenProject forkedProject = projectIndex.getProjects().get(projectId);
+                    if (forkedProject == null) {
+                        throw new LifecycleExecutionException(
+                                "Forked execution references project '" + projectId
+                                        + "' which could not be found in the project index.",
+                                mojoExecution,
+                                session.getCurrentProject());
+                    }
 
                     forkedProjects.add(forkedProject);
 
