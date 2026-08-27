@@ -69,11 +69,11 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
     }
 
     /**
-     * Reports the exit code of a command invoked from the shell. Commands terminate by throwing
-     * {@link InvokerException.ExitException}, and they do so on success as well: {@code --help} and
-     * {@code --version} exit with code 0. Only a non-zero code is an error worth reporting.
+     * Logs an error when a shell command exits with a non-zero code.
+     * A zero exit code is silently ignored because commands such as {@code --help} and
+     * {@code --version} terminate normally via {@link InvokerException.ExitException} with code 0.
      */
-    static void reportExitCode(Logger logger, String commandName, int exitCode) {
+    static void reportNonZeroExitCode(Logger logger, String commandName, int exitCode) {
         if (exitCode != 0) {
             logger.error(commandName + " command exited with exit code " + exitCode);
         }
@@ -214,7 +214,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
                                 .cwd(shellContext.cwd.get())
                                 .build()));
             } catch (InvokerException.ExitException e) {
-                reportExitCode(shellContext.logger, "mvn", e.getExitCode());
+                reportNonZeroExitCode(shellContext.logger, "mvn", e.getExitCode());
             } catch (Exception e) {
                 saveException(e);
             }
@@ -252,7 +252,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
                                 .cwd(shellContext.cwd.get())
                                 .build()));
             } catch (InvokerException.ExitException e) {
-                reportExitCode(shellContext.logger, "mvnenc", e.getExitCode());
+                reportNonZeroExitCode(shellContext.logger, "mvnenc", e.getExitCode());
             } catch (Exception e) {
                 saveException(e);
             }
@@ -270,7 +270,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
                                 .cwd(shellContext.cwd.get())
                                 .build()));
             } catch (InvokerException.ExitException e) {
-                reportExitCode(shellContext.logger, "mvnup", e.getExitCode());
+                reportNonZeroExitCode(shellContext.logger, "mvnup", e.getExitCode());
             } catch (Exception e) {
                 saveException(e);
             }

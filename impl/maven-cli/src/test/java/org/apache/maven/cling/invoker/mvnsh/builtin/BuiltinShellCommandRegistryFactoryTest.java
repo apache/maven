@@ -33,7 +33,7 @@ class BuiltinShellCommandRegistryFactoryTest {
     void zeroExitCodeIsNotReported() {
         RecordingLogger logger = new RecordingLogger();
 
-        BuiltinShellCommandRegistryFactory.reportExitCode(logger, "mvn", 0);
+        BuiltinShellCommandRegistryFactory.reportNonZeroExitCode(logger, "mvn", 0);
 
         assertTrue(logger.entries.isEmpty(), () -> "unexpected output: " + logger.entries);
     }
@@ -42,7 +42,7 @@ class BuiltinShellCommandRegistryFactoryTest {
     void nonZeroExitCodeIsReportedAsError() {
         RecordingLogger logger = new RecordingLogger();
 
-        BuiltinShellCommandRegistryFactory.reportExitCode(logger, "mvn", 1);
+        BuiltinShellCommandRegistryFactory.reportNonZeroExitCode(logger, "mvn", 1);
 
         assertEquals(1, logger.entries.size());
         assertEquals(Logger.Level.ERROR, logger.entries.get(0).level());
