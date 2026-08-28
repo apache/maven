@@ -112,4 +112,20 @@ public interface LogOptions extends Options {
      * @return an {@link Optional} containing the grep pattern
      */
     Optional<String> grep();
+
+    /**
+     * Whether to launch the web-based report viewer instead of terminal output.
+     * When enabled, starts a local HTTP server serving an interactive build report viewer.
+     *
+     * @return an {@link Optional} containing {@code true} if the web viewer should be launched
+     */
+    Optional<Boolean> web();
+
+    /**
+     * The port number for the web server when {@link #web()} is enabled.
+     * If not specified, defaults to port 8080 with automatic fallback to an available port.
+     *
+     * @return an {@link Optional} containing the port number, or empty for automatic selection
+     */
+    Optional<Integer> port();
 }
