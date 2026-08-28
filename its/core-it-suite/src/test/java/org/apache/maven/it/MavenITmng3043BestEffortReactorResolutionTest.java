@@ -53,6 +53,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
+        verifier.deleteDirectory(".mvn/target");
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
         verifier.deleteDirectory("consumer-c/target");
@@ -109,6 +110,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
+        verifier.deleteDirectory(".mvn/target");
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
         verifier.deleteDirectory("consumer-c/target");
@@ -169,6 +171,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
+        verifier.deleteDirectory(".mvn/target");
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
         verifier.deleteDirectory("consumer-c/target");

@@ -56,6 +56,7 @@ class MavenITmng8645ConsumerPomDependencyManagementTest extends AbstractMavenInt
 
         // validate consumer pom
         Path consumerPom = basedir.resolve(Paths.get(
+                ".mvn",
                 "target",
                 "project-local-repo",
                 "org.apache.maven.its.mng8645",
