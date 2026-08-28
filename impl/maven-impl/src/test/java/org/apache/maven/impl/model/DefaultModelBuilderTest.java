@@ -19,9 +19,13 @@
 package org.apache.maven.impl.model;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 
@@ -39,6 +43,7 @@ import org.apache.maven.api.services.Sources;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -545,6 +550,128 @@ class DefaultModelBuilderTest {
         assertNotNull(managedDep, "Managed dependency for the sibling module should be kept");
         assertEquals(
                 "1.0-SNAPSHOT", managedDep.getVersion(), "Version should be inferred from the reactor sibling module");
+    }
+
+    /**
+     * Verifies that {@code getEnhancedProperties} correctly recognizes the root model when
+     * {@code rootDirectory} has a non-normalized representation (e.g., containing {@code /..}
+     * segments) that differs from the normalized {@code model.getProjectDirectory()}.
+     *
+     * <p>Without the fix (GH-12598), the method compares these paths with raw
+     * {@code Objects.equals()}, sees them as different, and incorrectly enters the non-root
+     * branch — which re-reads the root model from disk and uses its properties.  In a real
+     * Maven session this recursive re-read through CachingSupplier re-entrancy leads to
+     * {@code StackOverflowError}.
+     *
+     * <p>With the fix, both paths are compared via {@code toAbsolutePath().normalize()},
+     * they match, and the else-branch is taken — using the model passed to the method
+     * directly.  The test detects which branch was taken by adding a marker property to
+     * the model that does not exist in the POM on disk: the else-branch (fix) uses the
+     * model and includes the marker, while the if-branch (no fix) re-reads from disk and
+     * the marker is absent.
+     *
+     * @see <a href="https://github.com/apache/maven/issues/12598">GH-12598</a>
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testGetEnhancedPropertiesWithNonNormalizedRootDirectory(@TempDir Path tempDir) throws Exception {
+        // Create a project with a .mvn/ root marker and a subdirectory
+        Path projectDir = tempDir.resolve("project");
+        Files.createDirectories(projectDir.resolve(".mvn"));
+        Files.createDirectories(projectDir.resolve("subdir"));
+
+        // Simple root POM
+        Files.writeString(
+                projectDir.resolve("pom.xml"),
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                        + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n"
+                        + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                        + "    xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0"
+                        + " http://maven.apache.org/maven-v4_0_0.xsd\">\n"
+                        + "  <modelVersion>4.1.0</modelVersion>\n"
+                        + "  <groupId>org.test.gh12598</groupId>\n"
+                        + "  <artifactId>root</artifactId>\n"
+                        + "  <version>1.0-SNAPSHOT</version>\n"
+                        + "  <packaging>pom</packaging>\n"
+                        + "  <properties>\n"
+                        + "    <revision>1.0-SNAPSHOT</revision>\n"
+                        + "  </properties>\n"
+                        + "</project>\n");
+
+        // Build the project to get a ModelBuilderSessionState and the root Model
+        Path pomFile = projectDir.resolve("pom.xml");
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(pomFile))
+                .build();
+        ModelBuilder.ModelBuilderSession builderSession = builder.newSession();
+        ModelBuilderResult result = builderSession.build(request);
+        assertNotNull(result);
+        Model model = result.getFileModel();
+        assertNotNull(model);
+        assertEquals("root", model.getArtifactId());
+
+        // model.getProjectDirectory() is normalized by PathSource.
+        // Construct a non-normalized path that refers to the same directory.
+        // This simulates session.getRootDirectory() returning a non-normalized path.
+        Path nonNormalizedRootDir = projectDir.resolve("subdir").resolve("..");
+        assertFalse(
+                nonNormalizedRootDir.equals(model.getProjectDirectory()),
+                "Paths must differ in representation (non-normalized vs normalized)");
+        assertTrue(
+                Files.isSameFile(nonNormalizedRootDir, model.getProjectDirectory()),
+                "Paths must refer to the same directory");
+
+        // Add a marker property to the model that does NOT exist in the POM on disk.
+        // This lets us detect which branch getEnhancedProperties takes:
+        //   - else-branch (fix): uses the model parameter directly → marker present
+        //   - if-branch (no fix): re-reads model from disk → marker absent
+        Map<String, String> modelProps = new HashMap<>(model.getProperties());
+        modelProps.put("gh12598.marker", "from-model");
+        Model markedModel = model.withProperties(modelProps);
+        assertEquals("from-model", markedModel.getProperties().get("gh12598.marker"));
+
+        // Get the ModelBuilderSessionState via reflection (same pattern as testMergeRepositories)
+        Field mainSessionField = DefaultModelBuilder.ModelBuilderSessionImpl.class.getDeclaredField("mainSession");
+        mainSessionField.setAccessible(true);
+        DefaultModelBuilder.ModelBuilderSessionState state =
+                (DefaultModelBuilder.ModelBuilderSessionState) mainSessionField.get(builderSession);
+
+        // Clear the session's request cache so that the if-branch (which calls readFileModel
+        // to re-read the root model from disk) won't get a cache hit from the build() call.
+        Field requestCacheField = session.getClass().getSuperclass().getDeclaredField("requestCache");
+        requestCacheField.setAccessible(true);
+        requestCacheField.set(session, null);
+
+        // Invoke getEnhancedProperties via reflection with the non-normalized rootDirectory
+        // and the marked model.
+        Set<Path> activeModelReads = new HashSet<>();
+        Method getEnhancedProperties = DefaultModelBuilder.ModelBuilderSessionState.class.getDeclaredMethod(
+                "getEnhancedProperties", Model.class, Path.class, Set.class);
+        getEnhancedProperties.setAccessible(true);
+        Map<String, String> properties = (Map<String, String>)
+                getEnhancedProperties.invoke(state, markedModel, nonNormalizedRootDir, activeModelReads);
+
+        assertNotNull(properties);
+        assertTrue(properties.containsKey("project.rootDirectory"), "Result should contain project.rootDirectory");
+
+        // The key assertion: the marker property must be present in the result.
+        // With the fix, getEnhancedProperties recognizes that nonNormalizedRootDir
+        // and projectDirectory refer to the same directory (via toAbsolutePath().normalize()),
+        // takes the else-branch, and uses the passed-in model's properties directly —
+        // including our marker.
+        // Without the fix, it sees them as different (raw Objects.equals), takes the
+        // if-branch, re-reads the root model from disk (which lacks the marker), and
+        // the marker is absent. In a real Maven session, this incorrect branch leads to
+        // recursive readFileModel calls and StackOverflowError.
+        assertEquals(
+                "from-model",
+                properties.get("gh12598.marker"),
+                "getEnhancedProperties should use the passed-in model (else-branch) when "
+                        + "rootDirectory and projectDirectory refer to the same directory. "
+                        + "Marker absent means the if-branch was taken (re-read from disk), "
+                        + "which indicates the path normalization fix (GH-12598) is not working.");
     }
 
     private static DefaultProfileActivationContext.Record recordActiveProfile(
