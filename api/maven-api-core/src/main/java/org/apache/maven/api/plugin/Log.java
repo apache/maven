@@ -38,15 +38,9 @@ import org.apache.maven.api.annotations.Provider;
 public interface Log {
     /**
      * {@return true if the <b>trace</b> error level is enabled}
-     * <p>
-     * The default implementation returns {@code false} for backward
-     * compatibility with existing {@code Log} implementations.
-     *
      * @since 4.1.0
      */
-    default boolean isTraceEnabled() {
-        return false;
-    }
+    boolean isTraceEnabled();
 
     /**
      * Sends a message to the user in the <b>trace</b> error level.
@@ -54,49 +48,38 @@ public interface Log {
      * Trace is intended for Maven core internals and low-level framework
      * diagnostics.  Plugin authors should normally use {@link #debug} for
      * developer-facing diagnostic output.
-     * <p>
-     * The default implementation is a no-op for backward compatibility
-     * with existing {@code Log} implementations.
      *
      * @param content the message to log
      * @since 4.1.0
      */
-    default void trace(CharSequence content) {}
+    void trace(CharSequence content);
 
     /**
      * Sends a message (and accompanying exception) to the user at the <b>trace</b> error level.
-     * <p>
-     * The default implementation is a no-op for backward compatibility.
      *
      * @param content the message to log
      * @param error the error that caused this log
      * @since 4.1.0
      */
-    default void trace(CharSequence content, Throwable error) {}
+    void trace(CharSequence content, Throwable error);
 
     /**
      * Sends an exception to the user in the <b>trace</b> error level.
-     * <p>
-     * The default implementation is a no-op for backward compatibility.
      *
      * @param error the error that caused this log
      * @since 4.1.0
      */
-    default void trace(Throwable error) {}
+    void trace(Throwable error);
 
     /**
-     * The default implementation is a no-op for backward compatibility.
-     *
      * @since 4.1.0
      */
-    default void trace(Supplier<String> content) {}
+    void trace(Supplier<String> content);
 
     /**
-     * The default implementation is a no-op for backward compatibility.
-     *
      * @since 4.1.0
      */
-    default void trace(Supplier<String> content, Throwable error) {}
+    void trace(Supplier<String> content, Throwable error);
 
     /**
      * {@return true if the <b>debug</b> error level is enabled}
