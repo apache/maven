@@ -22,7 +22,6 @@ import java.lang.StackWalker.StackFrame;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.plugin.Log;
-import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,28 +63,22 @@ public class DefaultLog implements Log {
     }
 
     /**
-     * Wraps a logging call with Log API metadata: sets the ThreadLocal with
-     * source class name and thread ID, executes the actual SLF4J call, and
-     * clears the ThreadLocal.
+     * Wraps a logging call with Log API metadata: captures the caller's
+     * method name via {@link StackWalker}, sets the ThreadLocal, executes
+     * the actual SLF4J call, and clears the ThreadLocal.
      * <p>
      * The source class name is taken from the SLF4J logger name (which
      * is the mojo implementation FQCN, set at injection time).  The
-     * source method name is resolved via {@link StackWalker} only when
-     * build report capture is active (to avoid the ~1-5μs per-call cost
-     * on every enabled log statement during normal builds).
+     * source method name is resolved by walking the stack past this class
+     * to find the first external caller frame.
      */
     private void withMetadata(Runnable logAction) {
-        // Only pay the StackWalker cost when someone is actually capturing metadata
-        String callerMethodName = null;
-        if (ProjectBuildLogAppender.hasReportCapture()) {
-            callerMethodName = WALKER.walk(frames -> frames.dropWhile(f -> THIS_CLASS.equals(f.getClassName()))
-                    .findFirst()
-                    .map(StackFrame::getMethodName)
-                    .orElse(null));
-        }
-        @SuppressWarnings("deprecation") // Thread.getId() — threadId() requires Java 19+
-        long threadId = Thread.currentThread().getId();
-        LOG_API_METADATA.set(new LogApiMetadata(logger.getName(), callerMethodName, threadId));
+        String callerMethodName = WALKER.walk(frames -> frames.dropWhile(f -> THIS_CLASS.equals(f.getClassName()))
+                .findFirst()
+                .map(StackFrame::getMethodName)
+                .orElse(null));
+        LOG_API_METADATA.set(new LogApiMetadata(
+                logger.getName(), callerMethodName, Thread.currentThread().getId()));
         try {
             logAction.run();
         } finally {
