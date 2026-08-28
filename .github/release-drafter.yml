@@ -18,6 +18,9 @@
 _extends: maven-gh-actions-shared
 tag-template: maven-$RESOLVED_VERSION
 
+# Allows pre-release versions to be included when searching previous releases
+include-pre-releases: true
+
 # Override replacers to strip backport branch prefixes and handle JIRA links
 replacers:
   # Strip backport branch prefixes like [maven-4.0.x], [maven-3.x], etc.
