@@ -739,8 +739,18 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
 
-            // Handle root vs non-root project properties with profile activation
-            if (rootDirectory != null && !Objects.equals(rootDirectory, model.getProjectDirectory())) {
+            // Handle root vs non-root project properties with profile activation.
+            // Use toAbsolutePath().normalize() for robust comparison — rootDirectory from
+            // session.getRootDirectory() may not be normalized, while model.getProjectDirectory()
+            // (derived from pomFile.getParent() in PathSource) is always normalized. Without
+            // consistent normalization, the root model can incorrectly enter this branch and
+            // trigger infinite recursion through readFileModel() (GH-12598).
+            Path normalizedRootDir =
+                    rootDirectory != null ? rootDirectory.toAbsolutePath().normalize() : null;
+            Path normalizedProjectDir = model.getProjectDirectory() != null
+                    ? model.getProjectDirectory().toAbsolutePath().normalize()
+                    : null;
+            if (!Objects.equals(normalizedRootDir, normalizedProjectDir)) {
                 Path rootModelPath = modelProcessor.locateExistingPom(rootDirectory);
                 if (rootModelPath != null) {
                     // Check if the root model path is within the root directory to prevent infinite loops
@@ -749,8 +759,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // Also skip if the root model is already being read in an outer call frame
                     // to prevent StackOverflowError when a project has an internal parent in a
                     // subdirectory with CI-friendly ${revision} and a .mvn/ root marker (GH-12301).
+                    // Use toAbsolutePath().normalize() for the guard check to handle paths
+                    // obtained via different representations (e.g., symlinks, relative segments).
                     if (isParentWithinRootDirectory(rootModelPath, rootDirectory)
-                            && !activeModelReads.contains(rootModelPath.normalize())) {
+                            && !activeModelReads.contains(
+                                    rootModelPath.toAbsolutePath().normalize())) {
                         Model rootModel =
                                 derive(Sources.buildSource(rootModelPath)).readFileModel(activeModelReads);
                         properties.putAll(getPropertiesWithProfiles(rootModel, properties));
@@ -1584,7 +1597,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             setSource(modelSource.getLocation());
             logger.debug("Reading file model from " + modelSource.getLocation());
             Path sourcePath = modelSource.getPath();
-            Path normalizedPath = sourcePath != null ? sourcePath.normalize() : null;
+            // Use toAbsolutePath().normalize() for consistent path identity in activeModelReads.
+            // This must match the normalization used in getEnhancedProperties() guard check
+            // to prevent StackOverflowError from path representation mismatches (GH-12598).
+            Path normalizedPath =
+                    sourcePath != null ? sourcePath.toAbsolutePath().normalize() : null;
             boolean trackRead = normalizedPath != null && activeModelReads.add(normalizedPath);
             try {
                 try {
@@ -1723,7 +1740,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                             && !MODEL_VERSION_4_0_0.equals(model.getModelVersion())
                             // and if packaging is POM (we check type, but the session is not yet available,
                             // we would require the project realm if we want to support extensions
-                            && Type.POM.equals(model.getPackaging())) {
+                            && Type.POM.equals(model.getPackaging())
+                            // and if discovery is not disabled via property
+                            && Features.discoverSubprojects(request.getUserProperties())) {
                         List<String> subprojects = new ArrayList<>();
                         try (Stream<Path> files = Files.list(model.getProjectDirectory())) {
                             for (Path f : files.toList()) {
@@ -2338,17 +2357,16 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     /**
-     * Checks if subprojects are explicitly defined in the main model.
-     * This method distinguishes between:
-     * 1. No subprojects/modules element present - returns false (should auto-discover)
-     * 2. Empty subprojects/modules element present - returns true (should NOT auto-discover)
-     * 3. Non-empty subprojects/modules - returns true (should NOT auto-discover)
+     * Checks whether the model has a non-empty {@code <subprojects>} or {@code <modules>} element.
+     * <p>
+     * When this returns {@code false} and auto-discovery is enabled (via
+     * {@link Features#discoverSubprojects(Map)}), Maven will scan subdirectories
+     * for POM files. Users who want to suppress discovery without listing subprojects
+     * can set {@code -Dmaven.project.discoverSubprojects=false}.
      */
     @SuppressWarnings("deprecation")
     private static boolean hasSubprojectsDefined(Model model) {
-        // Only consider the main model: profiles do not influence auto-discovery
-        // Inline the check for explicit elements using location tracking
-        return model.getLocation("subprojects") != null || model.getLocation("modules") != null;
+        return !model.getSubprojects().isEmpty() || !model.getModules().isEmpty();
     }
 
     @Override

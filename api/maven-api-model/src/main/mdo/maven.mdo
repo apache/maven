@@ -435,6 +435,7 @@
      *
      * @return The base directory for the corresponding project or {@code null} if this model does not belong to a local
      *         project (e.g. describes the metadata of some artifact from the repository).
+     * @deprecated Use {@link #getProjectDirectoryPath()} instead, which returns a {@link java.nio.file.Path}.
      */
     @Deprecated
     public java.io.File getProjectDirectory() {
@@ -641,7 +642,7 @@
           <name>reports</name>
           <version>4.0.0</version>
           <description>
-            @deprecated Now ignored by Maven.
+            @deprecated Now ignored by Maven. Use the {@code reporting} element to configure report plugins instead.
           </description>
           <type>DOM</type>
           <annotations>
@@ -1078,7 +1079,7 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>
-            @deprecated Where to send the notification to - eg email address.
+            @deprecated Use the {@code configuration} properties map to specify the notification address instead.
           </description>
           <annotations>
             <annotation>@Deprecated(since = "4.0.0")</annotation>
@@ -2597,10 +2598,16 @@
           <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
+    /**
+     * @deprecated This method is a no-op and has no replacement.
+     */
     @Deprecated
     public void unsetInheritanceApplied() {
     }
 
+    /**
+     * @deprecated Use {@link #setInherited(String)} instead.
+     */
     @Deprecated
     public void setInherited(boolean value) {
       setInherited(Boolean.toString(value));
@@ -2663,7 +2670,7 @@
           <name>goals</name>
           <version>4.0.0</version>
           <description>
-            @deprecated Unused by Maven.
+            @deprecated Unused by Maven. Use {@code executions} to configure plugin goals instead.
           </description>
           <type>DOM</type>
           <annotations>
@@ -2702,6 +2709,8 @@
 
     /**
      * Reset the {@code executionMap} field to {@code null}
+     *
+     * @deprecated This method is a no-op and has no replacement.
      */
      @Deprecated
     public void flushExecutionMap() {
@@ -2934,6 +2943,8 @@
 
     /**
      * Reset the <code>reportPluginMap</code> field to <code>null</code>
+     *
+     * @deprecated This method is a no-op and has no replacement.
      */
     @Deprecated
     public void flushReportPluginMap() {
