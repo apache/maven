@@ -209,6 +209,50 @@ class EnhancedCompositeBeanHelperTest {
     }
 
     /**
+     * Verifies that when a child class shadows a parent field with the same name,
+     * setting the property injects into the child's field (not the parent's).
+     * This is the scenario reported in apache/maven-resources-plugin#497:
+     * both ResourcesMojo and TestResourcesMojo declare {@code private boolean skip},
+     * and DeclaredMembers iterates child-first then parent. Using {@code putIfAbsent}
+     * in buildFieldCache ensures the child's field wins.
+     */
+    @Test
+    void testSetPropertyOnShadowedFieldInjectsIntoChildField() throws Exception {
+        ChildBean bean = new ChildBean();
+        PlexusConfiguration config = new XmlPlexusConfiguration("skip");
+        config.setValue("true");
+
+        when(evaluator.evaluate("true")).thenReturn("true");
+
+        helper.setProperty(bean, "skip", null, config);
+
+        // The child's field must receive the value
+        assertTrue(bean.isChildSkip(), "Child's shadowed 'skip' field should be true");
+    }
+
+    /**
+     * Verifies that the field cache resolves the child's field even after
+     * the cache has been populated by a prior lookup on the same class.
+     */
+    @Test
+    void testShadowedFieldCacheConsistency() throws Exception {
+        ChildBean bean1 = new ChildBean();
+        ChildBean bean2 = new ChildBean();
+        PlexusConfiguration config = new XmlPlexusConfiguration("skip");
+        config.setValue("true");
+
+        when(evaluator.evaluate("true")).thenReturn("true");
+
+        // First call populates the cache
+        helper.setProperty(bean1, "skip", null, config);
+        // Second call uses the cache
+        helper.setProperty(bean2, "skip", null, config);
+
+        assertTrue(bean1.isChildSkip(), "First bean: child's 'skip' field should be true");
+        assertTrue(bean2.isChildSkip(), "Second bean: child's 'skip' field should be true");
+    }
+
+    /**
      * Test bean class for testing property setting.
      */
     public static class TestBean {
@@ -234,6 +278,32 @@ class EnhancedCompositeBeanHelperTest {
 
         public void addItem(String item) {
             this.items.add(item);
+        }
+    }
+
+    /**
+     * Parent bean that declares a {@code skip} field — mirrors ResourcesMojo.
+     */
+    public static class ParentBean {
+        @SuppressWarnings("unused")
+        private boolean skip;
+
+        public boolean isParentSkip() {
+            return skip;
+        }
+    }
+
+    /**
+     * Child bean that shadows the parent's {@code skip} field — mirrors TestResourcesMojo.
+     * Both parent and child declare {@code private boolean skip}; only the child's
+     * field should receive the injected value.
+     */
+    public static class ChildBean extends ParentBean {
+        @SuppressWarnings("unused")
+        private boolean skip;
+
+        public boolean isChildSkip() {
+            return skip;
         }
     }
 }
