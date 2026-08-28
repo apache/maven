@@ -46,7 +46,7 @@ public class SoftIdentityMap<K, V> implements Map<K, V> {
 
         SoftIdentityReference(T referent, ReferenceQueue<T> queue) {
             super(referent, queue);
-            this.hash = referent.hashCode();
+            this.hash = System.identityHashCode(referent);
         }
 
         @Override
@@ -59,7 +59,7 @@ public class SoftIdentityMap<K, V> implements Map<K, V> {
             }
             T thisRef = this.get();
             Object otherRef = other.get();
-            return thisRef != null && thisRef.equals(otherRef);
+            return thisRef != null && thisRef == otherRef;
         }
 
         @Override

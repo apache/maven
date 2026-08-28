@@ -159,7 +159,7 @@ class SoftIdentityMapTest {
             return "value2";
         });
 
-        assertEquals(1, computeCount.get(), "Should compute once for equal but distinct keys");
+        assertEquals(2, computeCount.get(), "Should compute separately for equal but distinct keys");
     }
 
     @Test
