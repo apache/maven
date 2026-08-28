@@ -152,6 +152,7 @@ public class CLIManager {
                 .desc("Force the use of an alternate POM file (or directory with pom.xml)")
                 .build());
         options.addOption(Option.builder(Character.toString(SET_USER_PROPERTY))
+                .longOpt("define")
                 .numberOfArgs(2)
                 .valueSeparator('=')
                 .desc("Define a user property")

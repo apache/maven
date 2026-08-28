@@ -350,6 +350,7 @@ public class CommonsCliOptions implements Options {
                     .desc("Display help information")
                     .get());
             options.addOption(Option.builder(USER_PROPERTY)
+                    .longOpt("define")
                     .numberOfArgs(2)
                     .valueSeparator('=')
                     .desc("Define a user property")
