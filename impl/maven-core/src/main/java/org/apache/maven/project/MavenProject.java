@@ -249,6 +249,14 @@ public class MavenProject implements Cloneable {
     }
 
     /**
+     * {@return the project's {@code <qualityManagement>} information (POM model 4.2.0), or {@code null} if none}
+     * @since 4.2.0
+     */
+    public org.apache.maven.api.model.QualityManagement getQualityManagement() {
+        return getModel().getDelegate().getQualityManagement();
+    }
+
+    /**
      * Returns the project corresponding to a declared parent.
      *
      * @return the parent, or null if no parent is declared or there was an error building it
@@ -611,11 +619,9 @@ public class MavenProject implements Cloneable {
 
     public String getGroupId() {
         String groupId = getModel().getGroupId();
-
         if ((groupId == null) && (getModel().getParent() != null)) {
             groupId = getModel().getParent().getGroupId();
         }
-
         return groupId;
     }
 
@@ -632,11 +638,7 @@ public class MavenProject implements Cloneable {
     }
 
     public String getName() {
-        if (getModel().getName() != null) {
-            return getModel().getName();
-        } else {
-            return getArtifactId();
-        }
+        return getModel().getName() != null ? getModel().getName() : getArtifactId();
     }
 
     public void setVersion(String version) {
@@ -645,11 +647,9 @@ public class MavenProject implements Cloneable {
 
     public String getVersion() {
         String version = getModel().getVersion();
-
         if ((version == null) && (getModel().getParent() != null)) {
             version = getModel().getParent().getVersion();
         }
-
         return version;
     }
 
