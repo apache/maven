@@ -327,14 +327,8 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
      */
     void addToolchainsPlugin(Document pomDocument, int maxJdkVersion) {
         Element root = pomDocument.root();
-        Element build = root.childElement(BUILD).orElse(null);
-        if (build == null) {
-            build = DomUtils.insertNewElement(BUILD, root);
-        }
-        Element plugins = build.childElement(PLUGINS).orElse(null);
-        if (plugins == null) {
-            plugins = DomUtils.insertNewElement(PLUGINS, build);
-        }
+        Element build = root.childElement(BUILD).orElseGet(() -> DomUtils.insertNewElement(BUILD, root));
+        Element plugins = build.childElement(PLUGINS).orElseGet(() -> DomUtils.insertNewElement(PLUGINS, build));
 
         Element plugin = DomUtils.createPlugin(plugins, TOOLCHAINS_PLUGIN_GROUP_ID, MAVEN_TOOLCHAINS_PLUGIN, null);
         Element executions = DomUtils.insertNewElement("executions", plugin);

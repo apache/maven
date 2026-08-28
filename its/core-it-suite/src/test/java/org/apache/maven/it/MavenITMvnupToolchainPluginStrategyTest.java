@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
@@ -29,11 +28,16 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Integration test for the {@code ToolchainPluginStrategy} in {@code mvnup}.
  * <p>
- * Verifies that running {@code mvnup apply} on a project with an old
+ * Verifies that running {@code mvn --up apply} on a project with an old
  * {@code --source} level (unsupported by the running JDK) automatically adds
  * the {@code maven-toolchains-plugin} with the {@code select-jdk-toolchain}
  * goal and the correct {@code <version>} constraint, and that a second run
  * is idempotent.
+ * <p>
+ * Uses {@code mvn --up} instead of the {@code mvnup} script directly.
+ * The {@code --up} flag is handled by the {@code mvn} launcher script
+ * which sets {@code -Dmaven.mainClass=MavenUpCling}, and {@code MavenCling}
+ * (the default entry point since MNG-2520) delegates to it.
  *
  * @since 4.1.0
  */
@@ -48,17 +52,12 @@ class MavenITMvnupToolchainPluginStrategyTest extends AbstractMavenIntegrationTe
     void testMvnupAddsToolchainsPluginForOldSourceLevel() throws Exception {
         Path testDir = extractResources("mvnup-toolchain-plugin-strategy");
 
-        // Ensure mvnup script is executable (zip extraction may lose permissions on some CI environments)
-        Path mvnupBin = Paths.get(System.getProperty("maven.home"), "bin", "mvnup");
-        if (Files.exists(mvnupBin)) {
-            mvnupBin.toFile().setExecutable(true);
-        }
-
         // First run — should add the plugin
+        // Use "mvn --up" to invoke mvnup via the MavenCling delegation (MNG-2520)
         Verifier verifier = newVerifier(testDir);
         verifier.setForkJvm(true);
         verifier.setLogFileName("first-run.txt");
-        verifier.setExecutable("mvnup");
+        verifier.addCliArgument("--up");
         verifier.addCliArgument("apply");
         verifier.addCliArgument("-d");
         verifier.addCliArgument(testDir.toString());
@@ -84,7 +83,7 @@ class MavenITMvnupToolchainPluginStrategyTest extends AbstractMavenIntegrationTe
         verifier = newVerifier(testDir);
         verifier.setForkJvm(true);
         verifier.setLogFileName("second-run.txt");
-        verifier.setExecutable("mvnup");
+        verifier.addCliArgument("--up");
         verifier.addCliArgument("apply");
         verifier.addCliArgument("-d");
         verifier.addCliArgument(testDir.toString());
