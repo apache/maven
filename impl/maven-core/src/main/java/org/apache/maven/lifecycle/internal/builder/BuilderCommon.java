@@ -114,30 +114,36 @@ public class BuilderCommon {
                 && session.getProjects().size() > 1) {
             final Set<Plugin> unsafePlugins = executionPlan.getNonThreadSafePlugins();
             if (!unsafePlugins.isEmpty()) {
-                for (String s : MultilineMessageHelper.format(
-                        "Your build is requesting parallel execution, but this project contains the following "
-                                + "plugin(s) that have goals not marked as thread-safe to support parallel execution.",
-                        "While this /may/ work fine, please look for plugin updates and/or "
-                                + "request plugins be made thread-safe.",
-                        "If reporting an issue, report it against the plugin in question, not against Apache Maven.")) {
-                    logger.warn(s);
-                }
+                StringBuilder warning = new StringBuilder();
+                warning.append(
+                        String.join(
+                                "\n",
+                                MultilineMessageHelper.format(
+                                        "Your build is requesting parallel execution, but this project contains the following "
+                                                + "plugin(s) that have goals not marked as thread-safe to support parallel execution.",
+                                        "While this /may/ work fine, please look for plugin updates and/or "
+                                                + "request plugins be made thread-safe.",
+                                        "If reporting an issue, report it against the plugin in question, not against Apache Maven.")));
                 if (logger.isDebugEnabled()) {
                     final Set<MojoDescriptor> unsafeGoals = executionPlan.getNonThreadSafeMojos();
-                    logger.warn("The following goals are not marked as thread-safe in " + project.getName() + ":");
+                    warning.append("\nThe following goals are not marked as thread-safe in ")
+                            .append(project.getName())
+                            .append(":");
                     for (MojoDescriptor unsafeGoal : unsafeGoals) {
-                        logger.warn("  " + unsafeGoal.getId());
+                        warning.append("\n  ").append(unsafeGoal.getId());
                     }
                 } else {
-                    logger.warn("The following plugins are not marked as thread-safe in " + project.getName() + ":");
+                    warning.append("\nThe following plugins are not marked as thread-safe in ")
+                            .append(project.getName())
+                            .append(":");
                     for (Plugin unsafePlugin : unsafePlugins) {
-                        logger.warn("  " + unsafePlugin.getId());
+                        warning.append("\n  ").append(unsafePlugin.getId());
                     }
-                    logger.warn("");
-                    logger.warn("Enable verbose output (-X) to see precisely which goals are not marked as"
+                    warning.append("\n\nEnable verbose output (-X) to see precisely which goals are not marked as"
                             + " thread-safe.");
                 }
-                logger.warn(MultilineMessageHelper.separatorLine());
+                warning.append('\n').append(MultilineMessageHelper.separatorLine());
+                logger.warn(warning.toString());
             }
         }
 

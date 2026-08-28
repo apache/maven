@@ -314,35 +314,36 @@ public class BuildPlanExecutor {
                         .filter(execution -> !execution.getMojoDescriptor().isV4Api())
                         .collect(Collectors.toSet());
                 if (!unsafeExecutions.isEmpty()) {
-                    for (String s : MultilineMessageHelper.format("""
-                                Your build is requesting concurrent execution, but this project contains the \
-                                following plugin(s) that have goals not built with Maven 4 to support concurrent \
-                                execution. While this /may/ work fine, please look for plugin updates and/or \
-                                request plugins be made thread-safe. If reporting an issue, report it against the \
-                                plugin in question, not against Apache Maven.""")) {
-                        logger.warn(s);
-                    }
+                    StringBuilder warning = new StringBuilder();
+                    warning.append(String.join(
+                            "\n",
+                            MultilineMessageHelper.format(
+                                    "Your build is requesting concurrent execution, but this project contains the "
+                                            + "following plugin(s) that have goals not built with Maven 4 to support concurrent "
+                                            + "execution. While this /may/ work fine, please look for plugin updates and/or "
+                                            + "request plugins be made thread-safe. If reporting an issue, report it against the "
+                                            + "plugin in question, not against Apache Maven.")));
                     if (logger.isDebugEnabled()) {
                         Set<MojoDescriptor> unsafeGoals = unsafeExecutions.stream()
                                 .map(MojoExecution::getMojoDescriptor)
                                 .collect(Collectors.toSet());
-                        logger.warn("The following goals are not Maven 4 goals:");
+                        warning.append("\nThe following goals are not Maven 4 goals:");
                         for (MojoDescriptor unsafeGoal : unsafeGoals) {
-                            logger.warn("  " + unsafeGoal.getId());
+                            warning.append("\n  ").append(unsafeGoal.getId());
                         }
                     } else {
                         Set<Plugin> unsafePlugins = unsafeExecutions.stream()
                                 .map(MojoExecution::getPlugin)
                                 .collect(Collectors.toSet());
-                        logger.warn("The following plugins are not Maven 4 plugins:");
+                        warning.append("\nThe following plugins are not Maven 4 plugins:");
                         for (Plugin unsafePlugin : unsafePlugins) {
-                            logger.warn("  " + unsafePlugin.getId());
+                            warning.append("\n  ").append(unsafePlugin.getId());
                         }
-                        logger.warn("");
-                        logger.warn("Enable verbose output (-X) to see precisely which goals are not marked as"
+                        warning.append("\n\nEnable verbose output (-X) to see precisely which goals are not marked as"
                                 + " thread-safe.");
                     }
-                    logger.warn(MultilineMessageHelper.separatorLine());
+                    warning.append('\n').append(MultilineMessageHelper.separatorLine());
+                    logger.warn(warning.toString());
                 }
             }
         }

@@ -293,9 +293,7 @@ public class MojoExecutor {
     }
 
     private static void warn(String msg) {
-        for (String s : MultilineMessageHelper.format(msg)) {
-            LOGGER.warn(s);
-        }
+        LOGGER.warn(String.join("\n", MultilineMessageHelper.format(msg)));
     }
 
     private void doExecute(MavenSession session, MojoExecution mojoExecution, DependencyContext dependencyContext)
