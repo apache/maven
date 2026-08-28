@@ -37,8 +37,8 @@ import com.google.inject.TypeLiteral;
 import com.google.inject.spi.TypeConverter;
 import com.google.inject.spi.TypeConverterBinding;
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.internal.xml.XmlNodeBuilder;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.MXParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParser;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -113,10 +113,10 @@ public final class PlexusXmlBeanConverter implements PlexusBeanConverter {
 
         final Class<?> rawType = toType.getRawType();
         if (XmlNode.class.isAssignableFrom(rawType)) {
-            return XmlNodeBuilder.build(parser);
+            return Xpp3DomBuilder.build(parser).getDom();
         }
         if (Xpp3Dom.class.isAssignableFrom(rawType)) {
-            return new Xpp3Dom(XmlNodeBuilder.build(parser));
+            return Xpp3DomBuilder.build(parser);
         }
         if (Properties.class.isAssignableFrom(rawType)) {
             return parseProperties(parser);
