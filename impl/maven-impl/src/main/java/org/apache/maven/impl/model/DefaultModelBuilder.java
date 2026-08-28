@@ -466,7 +466,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         public void putSource(String groupId, String artifactId, ModelSource source) {
             mappedSources
-                    .computeIfAbsent(new GAKey(groupId, artifactId), k -> new HashSet<>())
+                    .computeIfAbsent(new GAKey(groupId, artifactId), k -> ConcurrentHashMap.newKeySet())
                     .add(source);
             // Also  register the source under the null groupId
             if (groupId != null) {

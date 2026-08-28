@@ -40,10 +40,10 @@ public class ReactorGraph {
     private static final LinkedHashMap<String, Pattern> CLUSTER_PATTERNS = new LinkedHashMap<>();
     static {
         CLUSTER_PATTERNS.put("JLine", Pattern.compile("^org\\.jline:.*"));
-        CLUSTER_PATTERNS.put("Maven API", Pattern.compile("^org\\.apache\\.maven:maven-api-(?!impl).*"));
-        CLUSTER_PATTERNS.put("Maven Resolver", Pattern.compile("^org\\.apache\\.maven\\.resolver:.*"));
-        CLUSTER_PATTERNS.put("Maven Implementation", Pattern.compile("^org\\.apache\\.maven:maven-(support|impl|di|core|cli|xml|jline|logging|executor|testing):.*"));
-        CLUSTER_PATTERNS.put("Maven Compatibility", Pattern.compile("^org\\.apache\\.maven:maven-(artifact|builder-support|compat|embedder|model|model-builder|plugin-api|repository-metadata|resolver-provider|settings|settings-builder|toolchain-builder|toolchain-model):.*"));
+        CLUSTER_PATTERNS.put("Maven 4 API", Pattern.compile("^org\\.apache\\.maven:maven-api-(?!impl).*"));
+        CLUSTER_PATTERNS.put("Maven Resolver 2", Pattern.compile("^org\\.apache\\.maven\\.resolver:.*"));
+        CLUSTER_PATTERNS.put("Maven 4 Implementation", Pattern.compile("^org\\.apache\\.maven:maven-(support|impl|di|core|cli|xml|jline|logging|executor|testing):.*"));
+        CLUSTER_PATTERNS.put("Maven 3 Compatibility", Pattern.compile("^org\\.apache\\.maven:maven-(artifact|builder-support|compat|embedder|model|model-builder|plugin-api|repository-metadata|resolver-provider|settings|settings-builder|toolchain-builder|toolchain-model):.*"));
         CLUSTER_PATTERNS.put("Sisu", Pattern.compile("(^org\\.eclipse\\.sisu:.*)|(.*:guice:.*)|(.*:javax.inject:.*)|(.*:javax.annotation-api:.*)|(.*:aopalliance:.*)"));
         CLUSTER_PATTERNS.put("Plexus", Pattern.compile("^org\\.codehaus\\.plexus:.*"));
         CLUSTER_PATTERNS.put("XML Parsing", Pattern.compile("(.*:woodstox-core:.*)|(.*:stax2-api:.*)"));
@@ -89,6 +89,11 @@ public class ReactorGraph {
                 String nodeName = oldNodeName;
                 if (originalNode.get("label") instanceof Label l) {
                     nodeName = l.value();
+                    // fix "guice\njar:classes" label caused by classifier
+                    int i = nodeName.indexOf('\\');
+                    if (i > 0) {
+                        nodeName = nodeName.substring(0, i);
+                    }
                 }
                 MutableNode newNode = mutNode(nodeName);
                 nodeMap.put(nodeName, newNode);
@@ -187,10 +192,10 @@ public class ReactorGraph {
             String headerColor = clusterName.startsWith("Maven") ? "black" : "#808080";  // #808080 is a middle gray
             String prefix;
             switch (clusterName) {
-                case "MavenAPI": prefix = "../api/"; break;
-                case "MavenImplementation": prefix = "../impl/"; break;
-                case "MavenCompatibility": prefix = "../compat/"; break;
-                case "MavenResolver": prefix = "https://maven.apache.org/resolver/"; break;
+                case "Maven4API": prefix = "../api/"; break;
+                case "Maven4Implementation": prefix = "../impl/"; break;
+                case "Maven3Compatibility": prefix = "../compat/"; break;
+                case "MavenResolver2": prefix = "https://maven.apache.org/resolver/"; break;
                 default: prefix = null;
             }
 
@@ -252,9 +257,9 @@ public class ReactorGraph {
                 .setDirected(true)
                 .graphAttrs().add(Rank.inSubgraph(Rank.RankType.SAME))
                 .add(
-                        mutNode("MavenResolver"),
-                        mutNode("MavenAPI"),
-                        mutNode("MavenImplementation")
+                        mutNode("MavenResolver2"),
+                        mutNode("Maven4API"),
+                        mutNode("Maven4Implementation")
                 );
         highLevelGraph.add(topGroup);
 

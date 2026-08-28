@@ -237,10 +237,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     }
 
     Record stop() {
-        // only keep keys for which the value is `true`
         Objects.requireNonNull(record, "start() must be called before stop()");
-        record.usedActiveProfiles.values().removeIf(value -> !value);
-        record.usedInactiveProfiles.values().removeIf(value -> !value);
         return new Record(record); // Return immutable copy for thread-safe caching
     }
 

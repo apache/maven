@@ -316,10 +316,32 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             infoLine('-');
             String name = event.getProject().getName();
             infoMain("Skipping " + name);
-            logger.info("{} was not built because a module it depends on failed to build.", name);
+            if (dependsOnFailedProject(event)) {
+                logger.info("{} was not built because a module it depends on failed to build.", name);
+            } else {
+                logger.info("{} was not built because the build was stopped after an earlier failure.", name);
+            }
 
             infoLine('-');
         }
+    }
+
+    /**
+     * A project can be skipped for two different reasons: one of the modules it depends on failed,
+     * or the reactor was stopped after an unrelated module failed. Only the first one lets us blame
+     * a dependency, so tell them apart instead of always reporting the same cause.
+     * When the answer cannot be established, the dependency wording is kept.
+     */
+    private boolean dependsOnFailedProject(ExecutionEvent event) {
+        MavenSession session = event.getSession();
+        MavenProject project = event.getProject();
+        if (session == null || project == null || session.getProjectDependencyGraph() == null) {
+            return true;
+        }
+        MavenExecutionResult result = session.getResult();
+        return result == null
+                || session.getProjectDependencyGraph().getUpstreamProjects(project, true).stream()
+                        .anyMatch(upstream -> result.getBuildSummary(upstream) instanceof BuildFailure);
     }
 
     @Override

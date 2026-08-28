@@ -21,10 +21,19 @@ package org.apache.maven.impl.model;
 import java.lang.reflect.Field;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.Spliterator;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Dependency;
@@ -35,6 +44,7 @@ import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
@@ -42,8 +52,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -62,6 +74,34 @@ class DefaultModelBuilderTest {
     }
 
     @Test
+    public void testParentProfileCacheDistinguishesActiveProfileContexts() {
+        DefaultProfileActivationContext.Record withoutRelease = recordActiveProfile(List.of(), "release");
+        DefaultProfileActivationContext.Record withRelease = recordActiveProfile(List.of("release"), "release");
+
+        assertFalse(
+                withoutRelease.matches(newProfileActivationContext(List.of("release"), List.of())),
+                "a parent assembled without -Prelease must not be reused for a module built with -Prelease");
+        assertFalse(
+                withRelease.matches(newProfileActivationContext(List.of(), List.of())),
+                "a parent assembled with -Prelease must not be reused for a module built without it");
+        assertTrue(withoutRelease.matches(newProfileActivationContext(List.of(), List.of())));
+        assertTrue(withRelease.matches(newProfileActivationContext(List.of("release"), List.of())));
+    }
+
+    @Test
+    public void testParentProfileCacheDistinguishesInactiveProfileContexts() {
+        DefaultProfileActivationContext recording =
+                newProfileActivationContext(List.of(), List.of()).start();
+        recording.isProfileInactive("release");
+        DefaultProfileActivationContext.Record withoutSuppression = recording.stop();
+
+        assertFalse(
+                withoutSuppression.matches(newProfileActivationContext(List.of(), List.of("release"))),
+                "a parent assembled without -!release must not be reused for a module built with -!release");
+        assertTrue(withoutSuppression.matches(newProfileActivationContext(List.of(), List.of())));
+    }
+
+    @Test
     public void testPropertiesAndProfiles() {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
@@ -71,6 +111,92 @@ class DefaultModelBuilderTest {
         ModelBuilderResult result = builder.newSession().build(request);
         assertNotNull(result);
         assertEquals("21", result.getEffectiveModel().getProperties().get("maven.compiler.release"));
+    }
+
+    @Test
+    void testMappedSourcesSupportsConcurrentUpdates() throws Exception {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("simple-standalone")))
+                .build();
+        DefaultModelBuilder.ModelBuilderSessionState state =
+                ((DefaultModelBuilder) builder).new ModelBuilderSessionState(request);
+
+        int threadCount = 16;
+        int sourcesPerThread = 500;
+        CountDownLatch ready = new CountDownLatch(threadCount);
+        CountDownLatch start = new CountDownLatch(1);
+        ExecutorService executor = Executors.newFixedThreadPool(threadCount);
+        List<Future<?>> futures = new ArrayList<>(threadCount);
+        try {
+            for (int thread = 0; thread < threadCount; thread++) {
+                int threadId = thread;
+                futures.add(executor.submit(() -> {
+                    ready.countDown();
+                    assertTrue(start.await(10, TimeUnit.SECONDS));
+                    for (int source = 0; source < sourcesPerThread; source++) {
+                        state.putSource(
+                                "org.apache.maven.test",
+                                "shared-artifact",
+                                Sources.buildSource(Path.of("target", "source-" + threadId + '-' + source, "pom.xml")));
+                    }
+                    return null;
+                }));
+            }
+            assertTrue(ready.await(10, TimeUnit.SECONDS));
+            start.countDown();
+            for (Future<?> future : futures) {
+                future.get(30, TimeUnit.SECONDS);
+            }
+        } finally {
+            executor.shutdownNow();
+        }
+
+        int expectedSources = threadCount * sourcesPerThread;
+        Set<ModelSource> sources =
+                state.mappedSources.get(new DefaultModelBuilder.GAKey("org.apache.maven.test", "shared-artifact"));
+        assertTrue(sources.spliterator().hasCharacteristics(Spliterator.CONCURRENT));
+        assertEquals(expectedSources, sources.size());
+        assertEquals(
+                expectedSources,
+                state.mappedSources
+                        .get(new DefaultModelBuilder.GAKey(null, "shared-artifact"))
+                        .size());
+        assertThrows(IllegalStateException.class, () -> state.getSource("org.apache.maven.test", "shared-artifact"));
+        assertThrows(IllegalStateException.class, () -> state.getSource(null, "shared-artifact"));
+    }
+
+    @Test
+    void testMappedSourcesSuppressesDuplicateSources() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("simple-standalone")))
+                .build();
+        DefaultModelBuilder.ModelBuilderSessionState state =
+                ((DefaultModelBuilder) builder).new ModelBuilderSessionState(request);
+        ModelSource source = Sources.buildSource(Path.of("target", "duplicate-source", "pom.xml"));
+
+        state.putSource("org.apache.maven.test", "duplicate-artifact", source);
+        state.putSource("org.apache.maven.test", "duplicate-artifact", source);
+
+        assertEquals(source, state.getSource("org.apache.maven.test", "duplicate-artifact"));
+        assertEquals(source, state.getSource(null, "duplicate-artifact"));
+    }
+
+    @Test
+    void testMavenVersionRangeProfileActivation() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("maven-version-range-profile")))
+                .systemProperties(Map.of(Constants.MAVEN_VERSION, "4.1.0"))
+                .build();
+
+        ModelBuilderResult result = builder.newSession().build(request);
+
+        assertEquals("true", result.getEffectiveModel().getProperties().get("maven.range.profile.active"));
     }
 
     @Test
@@ -516,6 +642,20 @@ class DefaultModelBuilderTest {
         assertNotNull(managedDep, "Managed dependency for the sibling module should be kept");
         assertEquals(
                 "1.0-SNAPSHOT", managedDep.getVersion(), "Version should be inferred from the reactor sibling module");
+    }
+
+    private static DefaultProfileActivationContext.Record recordActiveProfile(
+            List<String> activeIds, String profileId) {
+        DefaultProfileActivationContext recording =
+                newProfileActivationContext(activeIds, List.of()).start();
+        recording.isProfileActive(profileId);
+        return recording.stop();
+    }
+
+    private static DefaultProfileActivationContext newProfileActivationContext(
+            List<String> activeIds, List<String> inactiveIds) {
+        return new DefaultProfileActivationContext(
+                null, null, null, activeIds, inactiveIds, Map.of(), Map.of(), Model.newInstance());
     }
 
     private Path getPom(String name) {

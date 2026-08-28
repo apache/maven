@@ -211,10 +211,10 @@ public class BuildPlanExecutor {
                     session.getProjects().size());
             // Propagate the parallel flag to the root session
             session.setParallel(threads > 1);
-            this.executor = new PhasingExecutor(Executors.newFixedThreadPool(threads, new BuildThreadFactory()));
 
-            // build initial plan
+            // Build the initial plan before creating the executor so constructor failures cannot leak it.
             this.plan = buildInitialPlan(taskSegments);
+            this.executor = new PhasingExecutor(Executors.newFixedThreadPool(threads, new BuildThreadFactory()));
         }
 
         BuildContext() {
@@ -523,7 +523,7 @@ public class BuildPlanExecutor {
 
                     // Check if there are any stored exceptions for this project
                     List<Throwable> failures = null;
-                    boolean allStepsExecuted = true;
+                    boolean allWorkExecuted = true;
                     for (BuildStep projectStep : plan.steps(step.project).toList()) {
                         Exception exception = projectStep.exception;
                         if (exception != null) {
@@ -532,8 +532,23 @@ public class BuildPlanExecutor {
                             }
                             failures.add(exception);
                         }
-                        allStepsExecuted &= step == projectStep || projectStep.status.get() == EXECUTED;
+                        // Only steps that carry mojo executions represent work that was asked for.
+                        // The plan holds a step for every phase of the lifecycle, so a project that
+                        // has run everything requested of it still has empty steps left over for the
+                        // phases beyond the requested tasks. Those get skipped as soon as the reactor
+                        // is halted, and must not turn a completed project into a skipped one.
+                        if (projectStep != step
+                                && projectStep.status.get() != EXECUTED
+                                && projectStep.hasExecutions()) {
+                            allWorkExecuted = false;
+                        }
                     }
+
+                    // A project whose setup never ran was never started at all: it is genuinely skipped,
+                    // even when it has no work of its own (an aggregator, for instance).
+                    boolean projectStarted = plan.step(step.project, SETUP)
+                            .map(setup -> setup.status.get() == EXECUTED)
+                            .orElse(false);
 
                     if (failures != null) {
                         // Handle the stored exception
@@ -546,7 +561,7 @@ public class BuildPlanExecutor {
                             failures.forEach(failure::addSuppressed);
                         }
                         handleBuildError(reactorContext, session, step.project, failure);
-                    } else if (allStepsExecuted) {
+                    } else if (projectStarted && allWorkExecuted) {
                         // If there were no failures, report success
                         projectExecutionListener.afterProjectExecutionSuccess(
                                 new ProjectExecutionEvent(session, step.project, Collections.emptyList()));
