@@ -395,7 +395,7 @@ public class BuildPlanExecutor {
                 if (shouldExecute && anyPredecessorFailed) {
                     // We'll run the step but mark it as SKIPPED instead of SCHEDULED
                     if (step.status.compareAndSet(CREATED, SKIPPED)) {
-                        logger.debug(
+                        logger.trace(
                                 "Running after:* step {} for cleanup but marking it as SKIPPED because a predecessor failed",
                                 step);
                         executor.execute(() -> {
@@ -406,7 +406,7 @@ public class BuildPlanExecutor {
                                 step.status.compareAndSet(SKIPPED, FAILED);
                                 // Store the exception in the step for handling in the TEARDOWN phase
                                 step.exception = e;
-                                logger.debug("Stored exception for step {} to be handled in TEARDOWN phase", step, e);
+                                logger.trace("Stored exception for step {} to be handled in TEARDOWN phase", step, e);
                                 // Let the scheduler handle after:* phases and TEARDOWN in the next cycle
                                 executePlan();
                             }
@@ -444,7 +444,7 @@ public class BuildPlanExecutor {
 
                         // Store the exception in the step for handling in the TEARDOWN phase
                         step.exception = e;
-                        logger.debug("Stored exception for step {} to be handled in TEARDOWN phase", step, e);
+                        logger.trace("Stored exception for step {} to be handled in TEARDOWN phase", step, e);
 
                         // Let the scheduler handle after:* phases and TEARDOWN in the next cycle
                         executePlan();
@@ -454,18 +454,18 @@ public class BuildPlanExecutor {
                 // Skip the step and provide a specific reason
                 if (!shouldExecute) {
                     if (status.isHalted()) {
-                        logger.debug("Skipping step {} because the build is halted", step);
+                        logger.trace("Skipping step {} because the build is halted", step);
                     } else if (status.isBlackListed(step.project)) {
-                        logger.debug("Skipping step {} because the project is blacklisted", step);
+                        logger.trace("Skipping step {} because the project is blacklisted", step);
                     } else if (TEARDOWN.equals(step.name)) {
                         // This should never happen given we always process TEARDOWN steps
                         logger.warn("Unexpected skipping of TEARDOWN step {}", step);
                     } else {
-                        logger.debug("Skipping step {} because a dependency has failed", step);
+                        logger.trace("Skipping step {} because a dependency has failed", step);
                     }
                 } else {
                     // Skip because predecessors failed or were skipped
-                    logger.debug(
+                    logger.trace(
                             "Skipping step {} because one or more predecessors did not execute successfully", step);
                 }
                 // Recursively call executePlan to process steps that depend on this one
