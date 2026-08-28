@@ -367,9 +367,13 @@ class ImmutableCollections {
         private ROProperties(Properties props) {
             super();
             if (props != null) {
-                // Do not use super.putAll, as it may delegate to put which throws an UnsupportedOperationException
-                for (Map.Entry<Object, Object> e : props.entrySet()) {
-                    super.put(e.getKey(), e.getValue());
+                // Use stringPropertyNames() to include entries from the defaults chain,
+                // then getProperty() to resolve each value through the chain.
+                // Do not use super.putAll or entrySet(), as the former may delegate to
+                // put (which throws UnsupportedOperationException) and the latter does
+                // not include entries inherited from defaults.
+                for (String name : props.stringPropertyNames()) {
+                    super.put(name, props.getProperty(name));
                 }
             }
         }
