@@ -61,6 +61,13 @@ public final class Features {
         return doGet(userProperties, Constants.MAVEN_CONSUMER_POM_REMOVE_UNUSED_MANAGED_DEPENDENCIES, true);
     }
 
+    /**
+     * Check if automatic subproject discovery is enabled for POM-packaged projects.
+     */
+    public static boolean discoverSubprojects(@Nullable Map<String, ?> userProperties) {
+        return doGet(userProperties, Constants.MAVEN_PROJECT_DISCOVER_SUBPROJECTS, true);
+    }
+
     private static boolean doGet(Map<String, ?> userProperties, String key, boolean def) {
         return doGet(userProperties != null ? userProperties.get(key) : null, def);
     }
