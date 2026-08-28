@@ -76,6 +76,7 @@ import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.SettingsUtilsV4;
+import org.apache.maven.internal.build.DefaultDiagnosticCollector;
 import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.logging.AsyncDrainWriter;
@@ -757,6 +758,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 }
             }
             context.logger.info("");
+
+            // Pipe structured problems directly to DiagnosticCollector so that
+            // key, suggestion, documentationUrl, and source location are preserved
+            // in the build report (instead of being lost to plain-text logging).
+            // This runs before SessionStarted, so the SLF4J auto-collection hook
+            // is not active yet — no double-counting risk.
+            pipeSettingsProblems(context, settingsResult);
         }
         return () -> {
             context.installationSettingsPath = null;
@@ -766,6 +774,20 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             context.interactive = true;
             context.localRepositoryPath = null;
         };
+    }
+
+    /**
+     * Pipes structured settings validation problems to the DiagnosticCollector.
+     * This preserves key, suggestion, documentationUrl, and source location
+     * that would otherwise be lost when problems are logged as plain text.
+     */
+    private void pipeSettingsProblems(C context, SettingsBuilderResult settingsResult) {
+        context.lookup.lookupOptional(DefaultDiagnosticCollector.class).ifPresent(collector -> {
+            for (BuilderProblem problem :
+                    settingsResult.getProblems().problems().toList()) {
+                collector.report(problem);
+            }
+        });
     }
 
     protected void customizeSettingsRequest(C context, SettingsBuilderRequest settingsBuilderRequest)
