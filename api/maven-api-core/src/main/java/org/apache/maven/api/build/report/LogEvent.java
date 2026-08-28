@@ -158,7 +158,7 @@ public interface LogEvent {
      * providing a global ordering across all event sources (Log API,
      * JUL, and direct SLF4J).
      *
-     * @return the sequence number, or {@code -1} if unavailable
+     * @return the sequence number, always non-negative
      * @since 4.1.0
      */
     default long sequenceNumber() {

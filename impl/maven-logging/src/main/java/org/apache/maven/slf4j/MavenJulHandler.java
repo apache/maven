@@ -27,8 +27,11 @@ import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import org.apache.maven.api.services.MessageBuilder;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
+
+import static org.apache.maven.jline.MessageUtils.builder;
 
 /**
  * A JUL {@link Handler} that routes {@code java.util.logging} events into
@@ -36,12 +39,14 @@ import org.slf4j.spi.LocationAwareLogger;
  * metadata that the standard {@code SLF4JBridgeHandler} silently drops
  * (source class name, source method name, thread ID).
  * <p>
- * All JUL events are routed through SLF4J so that {@link MavenSimpleLogger}
- * produces a consistent {@code formattedMessage} (with timestamp, logger name,
- * and ANSI styling) regardless of the event's origin.  The JUL metadata is
- * stashed in a thread-local <em>before</em> the SLF4J call so that downstream
+ * When a {@link MavenSimpleLogger.LogSink LogSink} is installed (i.e. during
+ * a build), JUL events are sent directly to the sink — bypassing SLF4J
+ * entirely.  The JUL metadata is stashed in a thread-local so downstream
  * consumers (e.g. {@code ProjectBuildLogAppender}) can read it when
  * constructing a structured {@code LogEvent}.
+ * <p>
+ * When no LogSink is installed (e.g. during early bootstrap), the handler
+ * falls back to routing through SLF4J for console output.
  * <p>
  * Usage — replace the standard SLF4J bridge in {@code LookupInvoker}:
  * <pre>
@@ -116,11 +121,7 @@ public class MavenJulHandler extends Handler {
             return;
         }
 
-        // Guard against null logger name (allowed by JUL spec)
         String loggerName = record.getLoggerName();
-        if (loggerName == null) {
-            loggerName = "";
-        }
         org.slf4j.Logger slf4jLogger = LoggerFactory.getLogger(loggerName);
         int slf4jLevel = julLevelToSlf4j(record.getLevel());
 
@@ -132,19 +133,21 @@ public class MavenJulHandler extends Handler {
         String message = formatMessage(record);
         Throwable throwable = record.getThrown();
 
-        // Set the JUL metadata before routing through SLF4J so that
-        // downstream consumers (e.g. ProjectBuildLogAppender) can read
-        // it when constructing a structured LogEvent.  By always going
-        // through SLF4J, the formattedMessage is produced by
-        // MavenSimpleLogger (with proper timestamp, logger name, and
-        // ANSI styling) regardless of whether the event originated from
-        // JUL or SLF4J — fixing the format inconsistency.
-        METADATA.set(
-                new JulMetadata(record.getSourceClassName(), record.getSourceMethodName(), record.getLongThreadID()));
-        try {
+        // If a LogSink is installed, bypass SLF4J entirely: call the sink
+        // directly with the JUL metadata so no information is lost in transit.
+        MavenSimpleLogger.LogSink sink = MavenSimpleLogger.getLogSink();
+        if (sink != null) {
+            METADATA.set(new JulMetadata(
+                    record.getSourceClassName(), record.getSourceMethodName(), record.getLongThreadID()));
+            try {
+                String formatted = formatForConsole(slf4jLevel, message);
+                sink.accept(slf4jLevel, loggerName, message, formatted, throwable);
+            } finally {
+                METADATA.remove();
+            }
+        } else {
+            // No LogSink — fall through to SLF4J for console output
             logToSlf4j(slf4jLogger, slf4jLevel, message, throwable);
-        } finally {
-            METADATA.remove();
         }
     }
 
@@ -190,6 +193,23 @@ public class MavenJulHandler extends Handler {
         }
 
         return message;
+    }
+
+    /**
+     * Formats a JUL message for console output, matching the {@code [LEVEL] message}
+     * style used by MavenSimpleLogger with ANSI coloring when available.
+     */
+    private static String formatForConsole(int level, String message) {
+        MessageBuilder mb = builder();
+        String levelStr =
+                switch (level) {
+                    case LocationAwareLogger.TRACE_INT -> mb.trace("TRACE").build();
+                    case LocationAwareLogger.DEBUG_INT -> mb.debug("DEBUG").build();
+                    case LocationAwareLogger.INFO_INT -> mb.info("INFO").build();
+                    case LocationAwareLogger.WARN_INT -> mb.warning("WARNING").build();
+                    default -> mb.error("ERROR").build();
+                };
+        return "[" + levelStr + "] " + message;
     }
 
     private static int julLevelToSlf4j(Level julLevel) {
