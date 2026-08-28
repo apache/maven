@@ -25,7 +25,6 @@ import javax.xml.stream.XMLStreamException;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -147,22 +146,22 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
                     MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
                     LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
-        Set<MojoDescriptor> alreadyPlannedExecutions = fillMojoDescriptors(session, project, mojoExecutions);
+        Set<String> alreadyPlannedExecutions = fillMojoDescriptors(session, project, mojoExecutions);
 
         for (MojoExecution mojoExecution : mojoExecutions) {
             setupMojoExecution(session, project, mojoExecution, alreadyPlannedExecutions);
         }
     }
 
-    private Set<MojoDescriptor> fillMojoDescriptors(
+    private Set<String> fillMojoDescriptors(
             MavenSession session, MavenProject project, List<MojoExecution> mojoExecutions)
             throws InvalidPluginDescriptorException, MojoNotFoundException, PluginResolutionException,
                     PluginDescriptorParsingException, PluginNotFoundException {
-        Set<MojoDescriptor> descriptors = new HashSet<>(mojoExecutions.size());
+        Set<String> descriptors = new HashSet<>(mojoExecutions.size());
 
         for (MojoExecution execution : mojoExecutions) {
             MojoDescriptor mojoDescriptor = fillMojoDescriptor(session, project, execution);
-            descriptors.add(mojoDescriptor);
+            descriptors.add(mojoDescriptor.getId());
         }
 
         return descriptors;
@@ -191,7 +190,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
             MavenSession session,
             MavenProject project,
             MojoExecution mojoExecution,
-            Set<MojoDescriptor> alreadyPlannedExecutions)
+            Set<String> alreadyPlannedExecutions)
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
                     MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
                     LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
@@ -354,7 +353,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
             MojoExecution mojoExecution,
             MavenSession session,
             MavenProject project,
-            Collection<MojoDescriptor> alreadyPlannedExecutions)
+            Set<String> alreadyPlannedExecutions)
             throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
                     PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
                     LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
@@ -364,7 +363,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
             return;
         }
 
-        alreadyPlannedExecutions.add(mojoDescriptor);
+        alreadyPlannedExecutions.add(mojoDescriptor.getId());
 
         List<MavenProject> forkedProjects =
                 LifecycleDependencyResolver.getProjects(project, session, mojoDescriptor.isAggregator());
@@ -395,7 +394,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
             MojoExecution mojoExecution,
             MavenSession session,
             MavenProject project,
-            Collection<MojoDescriptor> alreadyPlannedExecutions)
+            Set<String> alreadyPlannedExecutions)
             throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
                     PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
                     LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
@@ -427,7 +426,8 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
 
         for (List<MojoExecution> forkedExecutions : lifecycleMappings.values()) {
             for (MojoExecution forkedExecution : forkedExecutions) {
-                if (!alreadyPlannedExecutions.contains(forkedExecution.getMojoDescriptor())) {
+                if (!alreadyPlannedExecutions.contains(
+                        forkedExecution.getMojoDescriptor().getId())) {
                     finalizeMojoConfiguration(forkedExecution);
 
                     calculateForkedExecutions(forkedExecution, session, project, alreadyPlannedExecutions);
@@ -535,7 +535,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
             MojoExecution mojoExecution,
             MavenSession session,
             MavenProject project,
-            Collection<MojoDescriptor> alreadyPlannedExecutions)
+            Set<String> alreadyPlannedExecutions)
             throws MojoNotFoundException, PluginNotFoundException, PluginResolutionException,
                     PluginDescriptorParsingException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
                     LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {
@@ -550,7 +550,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
             throw new MojoNotFoundException(forkedGoal, pluginDescriptor);
         }
 
-        if (alreadyPlannedExecutions.contains(forkedMojoDescriptor)) {
+        if (alreadyPlannedExecutions.contains(forkedMojoDescriptor.getId())) {
             return Collections.emptyList();
         }
 
