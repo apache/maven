@@ -209,9 +209,9 @@ public class DefaultMaven implements Maven {
         // AbstractLifecycleParticipant lookups
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
         //
-        sessionScope.enter();
         MavenChainedWorkspaceReader chainedWorkspaceReader =
                 new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader);
+        sessionScope.enter();
         try (CloseableSession closeableSession = newCloseableSession(request, chainedWorkspaceReader)) {
             MavenSession session = new MavenSession(closeableSession, request, result);
             session.setSession(defaultSessionFactory.newSession(session));
