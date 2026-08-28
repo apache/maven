@@ -293,6 +293,10 @@
         return match;
     }
 
+    /**
+     * @deprecated This simplistic lookup does not support advanced mirror matching syntax.
+     * There is no direct replacement; use the Maven mirror matching infrastructure instead.
+     */
     @Deprecated
     public Mirror getMirrorOf(String repositoryId) {
         Mirror match = null;
