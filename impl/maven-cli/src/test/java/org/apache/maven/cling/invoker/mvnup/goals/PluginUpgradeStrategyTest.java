@@ -470,6 +470,40 @@ class PluginUpgradeStrategyTest {
         }
 
         @Test
+        @DisplayName("should upgrade maven-war-plugin when below minimum")
+        void shouldUpgradeWarPluginWhenBelowMinimum() throws Exception {
+            Document doc = PomBuilder.create()
+                    .plugin("org.apache.maven.plugins", "maven-war-plugin", "2.1.1")
+                    .buildDocument();
+            UpgradeResult result = strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
+
+            assertTrue(result.success() && result.modifiedCount() > 0, "Should have upgraded maven-war-plugin");
+            String version = new Editor(doc)
+                    .root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.4.0", version, "maven-war-plugin should be upgraded to 3.4.0");
+        }
+
+        @Test
+        @DisplayName("should upgrade maven-ear-plugin when below minimum")
+        void shouldUpgradeEarPluginWhenBelowMinimum() throws Exception {
+            Document doc = PomBuilder.create()
+                    .plugin("org.apache.maven.plugins", "maven-ear-plugin", "3.2.0")
+                    .buildDocument();
+            UpgradeResult result = strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
+
+            assertTrue(result.success() && result.modifiedCount() > 0, "Should have upgraded maven-ear-plugin");
+            String version = new Editor(doc)
+                    .root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("3.4.0", version, "maven-ear-plugin should be upgraded to 3.4.0");
+        }
+
+        @Test
         @DisplayName("should not upgrade when version is already higher")
         void shouldNotUpgradeWhenVersionAlreadyHigher() throws Exception {
             String pomXml = """
@@ -766,43 +800,33 @@ class PluginUpgradeStrategyTest {
     @Nested
     @DisplayName("Plugin Upgrade Configuration")
     class PluginUpgradeConfigurationTests {
-
         @Test
         @DisplayName("should have predefined plugin upgrades")
         void shouldHavePredefinedPluginUpgrades() throws Exception {
             List<PluginUpgrade> upgrades = PluginUpgradeStrategy.getPluginUpgrades();
-
             assertFalse(upgrades.isEmpty(), "Should have predefined plugin upgrades");
 
-            // Verify some expected plugins are included
-            boolean hasCompilerPlugin =
-                    upgrades.stream().anyMatch(upgrade -> "maven-compiler-plugin".equals(upgrade.artifactId()));
-            boolean hasExecPlugin =
-                    upgrades.stream().anyMatch(upgrade -> "exec-maven-plugin".equals(upgrade.artifactId()));
-            boolean hasSurefirePlugin =
-                    upgrades.stream().anyMatch(upgrade -> "maven-surefire-plugin".equals(upgrade.artifactId()));
-            boolean hasFailsafePlugin =
-                    upgrades.stream().anyMatch(upgrade -> "maven-failsafe-plugin".equals(upgrade.artifactId()));
-            boolean hasSurefireReportPlugin =
-                    upgrades.stream().anyMatch(upgrade -> "maven-surefire-report-plugin".equals(upgrade.artifactId()));
-
-            assertTrue(hasCompilerPlugin, "Should include maven-compiler-plugin upgrade");
-            assertTrue(hasExecPlugin, "Should include exec-maven-plugin upgrade");
-            assertTrue(hasSurefirePlugin, "Should include maven-surefire-plugin upgrade");
-            assertTrue(hasFailsafePlugin, "Should include maven-failsafe-plugin upgrade");
-            assertTrue(hasSurefireReportPlugin, "Should include maven-surefire-report-plugin upgrade");
+            for (String expected : List.of(
+                    "maven-compiler-plugin",
+                    "exec-maven-plugin",
+                    "maven-surefire-plugin",
+                    "maven-failsafe-plugin",
+                    "maven-surefire-report-plugin",
+                    "maven-war-plugin",
+                    "maven-ear-plugin")) {
+                assertTrue(
+                        upgrades.stream().anyMatch(u -> expected.equals(u.artifactId())),
+                        "Should include " + expected + " upgrade");
+            }
         }
 
         @Test
         @DisplayName("should have valid plugin upgrade definitions")
-        void shouldHaveValidPluginUpgradeDefinitions() throws Exception {
-            List<PluginUpgrade> upgrades = PluginUpgradeStrategy.getPluginUpgrades();
-
-            for (PluginUpgrade upgrade : upgrades) {
+        void shouldHaveValidPluginUpgradeDefinitions() {
+            for (PluginUpgrade upgrade : PluginUpgradeStrategy.getPluginUpgrades()) {
                 assertNotNull(upgrade.groupId(), "Plugin upgrade should have groupId");
                 assertNotNull(upgrade.artifactId(), "Plugin upgrade should have artifactId");
                 assertNotNull(upgrade.minVersion(), "Plugin upgrade should have minVersion");
-                // configuration can be null for some plugins
             }
         }
     }
@@ -810,7 +834,6 @@ class PluginUpgradeStrategyTest {
     @Nested
     @DisplayName("Inherited Plugin Detection")
     class InheritedPluginDetectionTests {
-
         @Test
         @DisplayName("should inject pluginManagement with comment for plugins inherited from remote parent")
         void shouldInjectPluginManagementWithCommentForRemoteParentPlugins() throws Exception {
@@ -1138,496 +1161,21 @@ class PluginUpgradeStrategyTest {
     }
 
     @Nested
-    @DisplayName("Quarkus Plugin Upgrades")
-    class QuarkusPluginUpgradeTests {
-
-        @Test
-        @DisplayName("should upgrade quarkus-maven-plugin with io.quarkus groupId when below minimum")
-        void shouldUpgradeQuarkusPluginWithIoQuarkusGroupId() throws Exception {
-            String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>io.quarkus</groupId>
-                                <artifactId>quarkus-maven-plugin</artifactId>
-                                <version>3.16.3</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
-
-            Document document = Document.of(pomXml);
-            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
-
-            UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.doApply(context, pomMap);
-
-            assertTrue(result.success(), "Plugin upgrade should succeed");
-            assertTrue(result.modifiedCount() > 0, "Should have upgraded quarkus-maven-plugin");
-
-            Editor editor = new Editor(document);
-            String version = editor.root()
-                    .path("build", "plugins", "plugin", "version")
-                    .map(Element::textContentTrimmed)
-                    .orElse(null);
-            assertEquals("3.26.0", version, "quarkus-maven-plugin should be upgraded to 3.26.0");
-        }
-
-        @Test
-        @DisplayName("should upgrade quarkus-maven-plugin with io.quarkus.platform groupId when below minimum")
-        void shouldUpgradeQuarkusPluginWithPlatformGroupId() throws Exception {
-            String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>io.quarkus.platform</groupId>
-                                <artifactId>quarkus-maven-plugin</artifactId>
-                                <version>3.16.3</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
-
-            Document document = Document.of(pomXml);
-            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
-
-            UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.doApply(context, pomMap);
-
-            assertTrue(result.success(), "Plugin upgrade should succeed");
-            assertTrue(result.modifiedCount() > 0, "Should have upgraded quarkus-maven-plugin");
-
-            Editor editor = new Editor(document);
-            String version = editor.root()
-                    .path("build", "plugins", "plugin", "version")
-                    .map(Element::textContentTrimmed)
-                    .orElse(null);
-            assertEquals("3.26.0", version, "quarkus-maven-plugin should be upgraded to 3.26.0");
-        }
-
-        @Test
-        @DisplayName("should not upgrade quarkus-maven-plugin when version is already sufficient")
-        void shouldNotUpgradeQuarkusPluginWhenVersionSufficient() throws Exception {
-            String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>io.quarkus</groupId>
-                                <artifactId>quarkus-maven-plugin</artifactId>
-                                <version>3.31.4</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
-
-            Document document = Document.of(pomXml);
-            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
-
-            UpgradeContext context = createMockContext();
-            strategy.doApply(context, pomMap);
-
-            Editor editor = new Editor(document);
-            String version = editor.root()
-                    .path("build", "plugins", "plugin", "version")
-                    .map(Element::textContentTrimmed)
-                    .orElse(null);
-            assertEquals("3.31.4", version, "Version 3.31.4 should be preserved");
-        }
-
-        @Test
-        @DisplayName("should decouple plugin version from shared BOM property")
-        void shouldDecouplePluginVersionFromSharedBomProperty() throws Exception {
-            String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <properties>
-                        <quarkus.platform.version>3.16.3</quarkus.platform.version>
-                    </properties>
-                    <dependencyManagement>
-                        <dependencies>
-                            <dependency>
-                                <groupId>io.quarkus.platform</groupId>
-                                <artifactId>quarkus-bom</artifactId>
-                                <version>${quarkus.platform.version}</version>
-                                <type>pom</type>
-                                <scope>import</scope>
-                            </dependency>
-                        </dependencies>
-                    </dependencyManagement>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>io.quarkus</groupId>
-                                <artifactId>quarkus-maven-plugin</artifactId>
-                                <version>${quarkus.platform.version}</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
-
-            Document document = Document.of(pomXml);
-            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
-
-            UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.doApply(context, pomMap);
-
-            assertTrue(result.success(), "Plugin upgrade should succeed");
-            assertTrue(result.modifiedCount() > 0, "Should have modified POM");
-
-            // BOM property should be unchanged
-            Editor editor = new Editor(document);
-            String bomVersion = editor.root()
-                    .path("properties", "quarkus.platform.version")
-                    .map(Element::textContentTrimmed)
-                    .orElse(null);
-            assertEquals("3.16.3", bomVersion, "BOM property should remain unchanged at 3.16.3");
-
-            // New property should be introduced
-            String pluginVersion = editor.root()
-                    .path("properties", "quarkus-plugin.version")
-                    .map(Element::textContentTrimmed)
-                    .orElse(null);
-            assertEquals("3.26.0", pluginVersion, "New quarkus-plugin.version property should be 3.26.0");
-
-            // Plugin version should reference the new property
-            String pluginVersionRef = editor.root()
-                    .path("build", "plugins", "plugin", "version")
-                    .map(Element::textContentTrimmed)
-                    .orElse(null);
-            assertEquals(
-                    "${quarkus-plugin.version}",
-                    pluginVersionRef,
-                    "Plugin should reference the new quarkus-plugin.version property");
-        }
-
-        @Test
-        @DisplayName("should not decouple when plugin has its own property not shared with BOM")
-        void shouldNotDecoupleWhenPluginHasOwnProperty() throws Exception {
-            String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <properties>
-                        <quarkus-plugin.version>3.16.3</quarkus-plugin.version>
-                    </properties>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>io.quarkus</groupId>
-                                <artifactId>quarkus-maven-plugin</artifactId>
-                                <version>${quarkus-plugin.version}</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
-
-            Document document = Document.of(pomXml);
-            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
-
-            UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.doApply(context, pomMap);
-
-            assertTrue(result.success(), "Plugin upgrade should succeed");
-            assertTrue(result.modifiedCount() > 0, "Should have upgraded quarkus-maven-plugin");
-
-            // The property should be upgraded directly (no decoupling needed)
-            Editor editor = new Editor(document);
-            String version = editor.root()
-                    .path("properties", "quarkus-plugin.version")
-                    .map(Element::textContentTrimmed)
-                    .orElse(null);
-            assertEquals("3.26.0", version, "Property should be upgraded directly to 3.26.0");
-
-            // Plugin should still reference the same property
-            String pluginVersionRef = editor.root()
-                    .path("build", "plugins", "plugin", "version")
-                    .map(Element::textContentTrimmed)
-                    .orElse(null);
-            assertEquals(
-                    "${quarkus-plugin.version}", pluginVersionRef, "Plugin should still reference the same property");
-        }
-
-        @Test
-        @DisplayName("should not decouple when BOM version is already sufficient")
-        void shouldNotDecoupleWhenBomVersionSufficient() throws Exception {
-            String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <properties>
-                        <quarkus.platform.version>3.31.4</quarkus.platform.version>
-                    </properties>
-                    <dependencyManagement>
-                        <dependencies>
-                            <dependency>
-                                <groupId>io.quarkus.platform</groupId>
-                                <artifactId>quarkus-bom</artifactId>
-                                <version>${quarkus.platform.version}</version>
-                                <type>pom</type>
-                                <scope>import</scope>
-                            </dependency>
-                        </dependencies>
-                    </dependencyManagement>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>io.quarkus</groupId>
-                                <artifactId>quarkus-maven-plugin</artifactId>
-                                <version>${quarkus.platform.version}</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
-
-            Document document = Document.of(pomXml);
-            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
-
-            UpgradeContext context = createMockContext();
-            strategy.doApply(context, pomMap);
-
-            // No new property should be introduced — version is already sufficient
-            Editor editor = new Editor(document);
-            String bomVersion = editor.root()
-                    .path("properties", "quarkus.platform.version")
-                    .map(Element::textContentTrimmed)
-                    .orElse(null);
-            assertEquals("3.31.4", bomVersion, "BOM property should remain unchanged");
-
-            // No quarkus-plugin.version should exist
-            Element newProp =
-                    editor.root().path("properties", "quarkus-plugin.version").orElse(null);
-            assertTrue(newProp == null, "Should not introduce new property when version is already sufficient");
-        }
-
-        @Test
-        @DisplayName("should emit version gap warning when decoupling")
-        void shouldEmitVersionGapWarningWhenDecoupling() throws Exception {
-            String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <properties>
-                        <quarkus.platform.version>3.16.3</quarkus.platform.version>
-                    </properties>
-                    <dependencyManagement>
-                        <dependencies>
-                            <dependency>
-                                <groupId>io.quarkus.platform</groupId>
-                                <artifactId>quarkus-bom</artifactId>
-                                <version>${quarkus.platform.version}</version>
-                                <type>pom</type>
-                                <scope>import</scope>
-                            </dependency>
-                        </dependencies>
-                    </dependencyManagement>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>io.quarkus</groupId>
-                                <artifactId>quarkus-maven-plugin</artifactId>
-                                <version>${quarkus.platform.version}</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
-
-            Document document = Document.of(pomXml);
-            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
-
-            UpgradeContext context = createMockContext();
-            strategy.doApply(context, pomMap);
-
-            // Verify warning was emitted about the version gap
-            verify(context.logger, atLeastOnce())
-                    .warn(argThat(msg -> msg.contains("quarkus-maven-plugin upgraded to 3.26.0")
-                            && msg.contains("3.16.3")
-                            && msg.contains("mismatched plugin and platform")));
-        }
-
-        @Test
-        @DisplayName("should include quarkus-maven-plugin in predefined plugin upgrades")
-        void shouldIncludeQuarkusPluginInPredefinedUpgrades() {
-            List<PluginUpgrade> upgrades = PluginUpgradeStrategy.getPluginUpgrades();
-
-            boolean hasIoQuarkus = upgrades.stream()
-                    .anyMatch(u -> "io.quarkus".equals(u.groupId()) && "quarkus-maven-plugin".equals(u.artifactId()));
-            boolean hasIoQuarkusPlatform = upgrades.stream()
-                    .anyMatch(u ->
-                            "io.quarkus.platform".equals(u.groupId()) && "quarkus-maven-plugin".equals(u.artifactId()));
-
-            assertTrue(hasIoQuarkus, "Should include io.quarkus:quarkus-maven-plugin upgrade");
-            assertTrue(hasIoQuarkusPlatform, "Should include io.quarkus.platform:quarkus-maven-plugin upgrade");
-
-            // Verify the reason text
-            upgrades.stream()
-                    .filter(u -> "quarkus-maven-plugin".equals(u.artifactId()))
-                    .forEach(u -> assertEquals(
-                            "Maven 4 compatibility (Aether API changes)",
-                            u.reason(),
-                            "Quarkus plugin upgrade should have the correct reason"));
-        }
-
-        @Test
-        @DisplayName("should upgrade quarkus-maven-plugin in pluginManagement")
-        void shouldUpgradeQuarkusPluginInPluginManagement() throws Exception {
-            String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <groupId>test</groupId>
-                    <artifactId>test</artifactId>
-                    <version>1.0.0</version>
-                    <build>
-                        <pluginManagement>
-                            <plugins>
-                                <plugin>
-                                    <groupId>io.quarkus</groupId>
-                                    <artifactId>quarkus-maven-plugin</artifactId>
-                                    <version>3.16.3</version>
-                                </plugin>
-                            </plugins>
-                        </pluginManagement>
-                    </build>
-                </project>
-                """;
-
-            Document document = Document.of(pomXml);
-            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
-
-            UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.doApply(context, pomMap);
-
-            assertTrue(result.success(), "Plugin upgrade should succeed");
-            assertTrue(result.modifiedCount() > 0, "Should have upgraded quarkus-maven-plugin in pluginManagement");
-
-            Editor editor = new Editor(document);
-            String version = editor.root()
-                    .path("build", "pluginManagement", "plugins", "plugin", "version")
-                    .map(Element::textContentTrimmed)
-                    .orElse(null);
-            assertEquals("3.26.0", version, "quarkus-maven-plugin in pluginManagement should be upgraded to 3.26.0");
-        }
-
-        @Test
-        @DisplayName("should not decouple when shared property is inherited from parent POM")
-        void shouldNotDecoupleWhenSharedPropertyIsInherited() throws Exception {
-            // The shared property is NOT declared in this POM — it's inherited from a parent.
-            // We cannot resolve its value, so decoupling should be skipped to avoid
-            // introducing a quarkus-plugin.version=3.26.0 that might downgrade an already-sufficient version.
-            String pomXml = """
-                <?xml version="1.0" encoding="UTF-8"?>
-                <project xmlns="http://maven.apache.org/POM/4.0.0">
-                    <modelVersion>4.0.0</modelVersion>
-                    <parent>
-                        <groupId>org.example</groupId>
-                        <artifactId>parent</artifactId>
-                        <version>1.0.0</version>
-                    </parent>
-                    <artifactId>child</artifactId>
-                    <dependencyManagement>
-                        <dependencies>
-                            <dependency>
-                                <groupId>io.quarkus.platform</groupId>
-                                <artifactId>quarkus-bom</artifactId>
-                                <version>${quarkus.platform.version}</version>
-                                <type>pom</type>
-                                <scope>import</scope>
-                            </dependency>
-                        </dependencies>
-                    </dependencyManagement>
-                    <build>
-                        <plugins>
-                            <plugin>
-                                <groupId>io.quarkus</groupId>
-                                <artifactId>quarkus-maven-plugin</artifactId>
-                                <version>${quarkus.platform.version}</version>
-                            </plugin>
-                        </plugins>
-                    </build>
-                </project>
-                """;
-
-            Document document = Document.of(pomXml);
-            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
-
-            UpgradeContext context = createMockContext();
-            strategy.doApply(context, pomMap);
-
-            Editor editor = new Editor(document);
-            Element newProp =
-                    editor.root().path("properties", "quarkus-plugin.version").orElse(null);
-            assertTrue(
-                    newProp == null, "Should not introduce quarkus-plugin.version when shared property is inherited");
-
-            // The plugin version reference should remain unchanged
-            String pluginVersion = editor.root()
-                    .path("build", "plugins", "plugin", "version")
-                    .map(Element::textContentTrimmed)
-                    .orElse(null);
-            assertEquals(
-                    "${quarkus.platform.version}",
-                    pluginVersion,
-                    "Plugin version should remain as the inherited property reference");
-        }
-    }
-
-    @Nested
     @DisplayName("Strategy Description")
     class StrategyDescriptionTests {
-
         @Test
         @DisplayName("should provide meaningful description")
         void shouldProvideMeaningfulDescription() {
-            String description = strategy.getDescription();
-
-            assertNotNull(description, "Description should not be null");
-            assertFalse(description.trim().isEmpty(), "Description should not be empty");
-            assertTrue(description.toLowerCase().contains("plugin"), "Description should mention plugins");
+            assertNotNull(strategy.getDescription(), "Description should not be null");
+            assertFalse(strategy.getDescription().trim().isEmpty(), "Description should not be empty");
+            assertTrue(
+                    strategy.getDescription().toLowerCase().contains("plugin"), "Description should mention plugins");
         }
     }
 
     @Nested
     @DisplayName("XML Formatting")
     class XmlFormattingTests {
-
         @Test
         @DisplayName("should format pluginManagement with proper indentation")
         void shouldFormatPluginManagementWithProperIndentation() throws Exception {
