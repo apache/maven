@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.build;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -34,8 +35,10 @@ import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.api.MonotonicClock;
@@ -43,8 +46,10 @@ import org.apache.maven.api.build.report.BuildReport;
 import org.apache.maven.api.build.report.BuildStatus;
 import org.apache.maven.api.build.report.FailureReport;
 import org.apache.maven.api.build.report.LogEvent;
+import org.apache.maven.api.build.report.LogLevel;
 import org.apache.maven.api.build.report.ModuleReport;
 import org.apache.maven.api.build.report.MojoReport;
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
@@ -86,6 +91,29 @@ public final class BuildReportCollector extends AbstractEventSpy {
 
     private static final int MAX_STACKTRACE_LINES = 30;
 
+    private final DefaultDiagnosticCollector diagnosticCollector;
+
+    @Inject
+    public BuildReportCollector(DefaultDiagnosticCollector diagnosticCollector) {
+        this.diagnosticCollector = diagnosticCollector;
+    }
+
+    /**
+     * No-arg constructor for tests that don't need diagnostic collection.
+     */
+    BuildReportCollector() {
+        this(new DefaultDiagnosticCollector());
+    }
+
+    /**
+     * Returns the diagnostic collector used by this build report collector.
+     * Plugins can inject {@link DefaultDiagnosticCollector} directly, but this
+     * accessor is provided for internal use and testing.
+     */
+    DefaultDiagnosticCollector getDiagnosticCollector() {
+        return diagnosticCollector;
+    }
+
     /**
      * Maximum number of log events captured per scope (mojo, module, or build).
      * Beyond this, events are dropped and a truncation notice is appended.
@@ -94,7 +122,7 @@ public final class BuildReportCollector extends AbstractEventSpy {
 
     // ---- Mutable state, populated during the build ----
 
-    /** Per-project mojo tracking: project key -> list of in-flight/completed mojos. */
+    /** Per-project mojo tracking: project key → list of in-flight/completed mojos. */
     private final Map<String, List<MojoTiming>> mojoTimings = new ConcurrentHashMap<>();
 
     /** Per-project start instants for duration computation. */
@@ -103,28 +131,28 @@ public final class BuildReportCollector extends AbstractEventSpy {
     /** Per-mojo start instants for duration computation. */
     private final Map<String, Instant> mojoStartTimes = new ConcurrentHashMap<>();
 
-    /** Session-level state - set once on SessionStarted. */
+    /** Session-level state — set once on SessionStarted. */
     private volatile MavenSession session;
 
     // ---- Log capture state ----
 
     /**
-     * Maps thread ID -> mojo key for the currently-executing mojo on that thread.
+     * Maps thread ID → mojo key for the currently-executing mojo on that thread.
      * Lifecycle events and mojo execution run on the same thread, so this is safe
      * for parallel builds with {@code -T}.
      */
     private final Map<Long, String> currentMojoByThread = new ConcurrentHashMap<>();
 
-    /** Per-mojo log buffers: mojo key -> captured log events. */
+    /** Per-mojo log buffers: mojo key → captured log events. */
     private final Map<String, List<LogEvent>> mojoLogBuffers = new ConcurrentHashMap<>();
 
     /**
-     * Maps thread ID -> project key for the currently-building project on that thread.
+     * Maps thread ID → project key for the currently-building project on that thread.
      * Used to route log events that occur between mojo executions to the module-level buffer.
      */
     private final Map<Long, String> currentProjectByThread = new ConcurrentHashMap<>();
 
-    /** Per-module log buffers: project key -> events captured outside any mojo. */
+    /** Per-module log buffers: project key → events captured outside any mojo. */
     private final Map<String, List<LogEvent>> moduleLogBuffers = new ConcurrentHashMap<>();
 
     /** Build-level log buffer: events captured outside any module lifecycle. */
@@ -165,7 +193,40 @@ public final class BuildReportCollector extends AbstractEventSpy {
 
     private void onSessionStarted(ExecutionEvent event) {
         this.session = event.getSession();
+        configureDiagnosticSuppression();
         installLogCapture();
+    }
+
+    /**
+     * Reads the {@code maven.diagnostic.suppress} user property and configures
+     * the diagnostic collector to suppress matching keys. The property accepts
+     * a comma-separated list of keys or patterns:
+     * <ul>
+     *   <li>Exact keys: {@code -Dmaven.diagnostic.suppress=deprecated-source-target}</li>
+     *   <li>Prefix wildcards: {@code -Dmaven.diagnostic.suppress=auto:*} (suppresses all
+     *       auto-collected warnings from Maven 3 plugins)</li>
+     *   <li>Multiple: {@code -Dmaven.diagnostic.suppress=key1,key2,auto:*}</li>
+     * </ul>
+     */
+    private void configureDiagnosticSuppression() {
+        if (session == null) {
+            return;
+        }
+        String suppressProp = session.getUserProperties().getProperty("maven.diagnostic.suppress");
+        if (suppressProp == null || suppressProp.isBlank()) {
+            return;
+        }
+        Set<String> keys = new LinkedHashSet<>();
+        for (String token : suppressProp.split(",")) {
+            String trimmed = token.trim();
+            if (!trimmed.isEmpty()) {
+                keys.add(trimmed);
+            }
+        }
+        if (!keys.isEmpty()) {
+            diagnosticCollector.setSuppressedKeys(keys);
+            LOGGER.debug("Diagnostic suppression configured: {}", keys);
+        }
     }
 
     private void onSessionEnded(ExecutionEvent event) {
@@ -176,12 +237,28 @@ public final class BuildReportCollector extends AbstractEventSpy {
             return;
         }
 
-        try {
-            BuildReport report = buildReport(endSession);
-            writeReport(report, endSession);
-        } catch (Exception e) {
-            // Never let the report collector crash the build
-            LOGGER.debug("Failed to produce build report: {}", e.getMessage(), e);
+        // Read warning mode from user properties (set by MavenInvoker from --warning-mode)
+        String warningMode = endSession.getUserProperties().getProperty("maven.build.warningMode", "summary");
+
+        BuildReport report = buildReport(endSession);
+        writeReport(report, endSession);
+
+        if (!"none".equalsIgnoreCase(warningMode)) {
+            printDiagnosticSummary();
+        }
+
+        // --warning-mode=fail: fail the build if any warnings were collected
+        if ("fail".equalsIgnoreCase(warningMode) && diagnosticCollector.hasWarnings()) {
+            int warningCount = 0;
+            for (DefaultDiagnosticSummary entry : diagnosticCollector.getSummary()) {
+                if (entry.problem().getSeverity() == BuilderProblem.Severity.WARNING) {
+                    warningCount += entry.count();
+                }
+            }
+            endSession
+                    .getResult()
+                    .addException(new RuntimeException(
+                            "Build has " + warningCount + " warning(s) and --warning-mode=fail is set"));
         }
     }
 
@@ -274,6 +351,21 @@ public final class BuildReportCollector extends AbstractEventSpy {
     private void captureLogEvent(LogEvent event) {
         long threadId = Thread.currentThread().getId();
 
+        // Auto-collect WARN-level log events as build problems, giving Maven 3 plugins
+        // automatic deduplication and summary at end of build without code changes.
+        // Skip our own logger to avoid feedback loops from problem summary printing.
+        if (event.level() == LogLevel.WARN
+                && event.message() != null
+                && !event.loggerName().equals(BuildReportCollector.class.getName())) {
+            String syntheticKey = syntheticDiagnosticKey(event.loggerName(), event.message());
+            diagnosticCollector.report(BuilderProblem.builder()
+                    .source(event.loggerName())
+                    .message(event.message())
+                    .severity(BuilderProblem.Severity.WARNING)
+                    .key(syntheticKey)
+                    .build());
+        }
+
         // 1. Mojo-level: event belongs to the currently-executing mojo on this thread
         String mKey = currentMojoByThread.get(threadId);
         if (mKey != null) {
@@ -305,9 +397,6 @@ public final class BuildReportCollector extends AbstractEventSpy {
     BuildReport buildReport(MavenSession endSession) {
         Instant now = MonotonicClock.now();
         Instant startInstant = endSession.getRequest().getStartInstant();
-        if (startInstant == null) {
-            startInstant = now;
-        }
         Duration totalDuration = Duration.between(startInstant, now);
 
         MavenExecutionResult result = endSession.getResult();
@@ -342,6 +431,9 @@ public final class BuildReportCollector extends AbstractEventSpy {
         boolean multiModule = endSession.getProjects().size() > 1;
         int threads = endSession.getRequest().getDegreeOfConcurrency();
 
+        // Problems (deduplicated)
+        List<BuilderProblem> problems = diagnosticCollector.getProblems();
+
         // Build-level log events (outside any module lifecycle)
         List<LogEvent> buildOutput = List.copyOf(buildLogBuffer);
 
@@ -357,7 +449,7 @@ public final class BuildReportCollector extends AbstractEventSpy {
                 threads,
                 moduleReports,
                 failureReports,
-                List.of(),
+                problems,
                 buildOutput);
     }
 
@@ -380,7 +472,7 @@ public final class BuildReportCollector extends AbstractEventSpy {
                 status = BuildStatus.FAILURE;
                 duration = summary.getExecTime();
             } else if (summary != null) {
-                // Unknown summary type - use its timing
+                // Unknown summary type — use its timing
                 duration = summary.getExecTime();
             } else {
                 // No summary means skipped
@@ -500,7 +592,7 @@ public final class BuildReportCollector extends AbstractEventSpy {
                 Files.createSymbolicLink(tmpLink, timestampedFile.getFileName());
                 atomicMove(tmpLink, latestFile);
             } catch (UnsupportedOperationException | IOException symEx) {
-                // Windows or restricted filesystem - fall back to a plain copy
+                // Windows or restricted filesystem — fall back to a plain copy
                 Files.writeString(latestFile, json);
             }
 
@@ -522,6 +614,67 @@ public final class BuildReportCollector extends AbstractEventSpy {
         }
     }
 
+    // ---- Diagnostic summary ----
+
+    /**
+     * Prints a deduplicated summary of diagnostics (warnings and errors) at the
+     * end of the build. This ensures important messages are not lost in scrollback.
+     */
+    void printDiagnosticSummary() {
+        List<DefaultDiagnosticSummary> summary = diagnosticCollector.getSummary();
+        if (summary.isEmpty()) {
+            return;
+        }
+
+        // Count unique warnings and total occurrences
+        int uniqueWarnings = 0;
+        int totalOccurrences = 0;
+        int uniqueErrors = 0;
+        for (DefaultDiagnosticSummary entry : summary) {
+            BuilderProblem.Severity sev = entry.problem().getSeverity();
+            if (sev == BuilderProblem.Severity.WARNING) {
+                uniqueWarnings++;
+                totalOccurrences += entry.count();
+            } else if (sev == BuilderProblem.Severity.ERROR) {
+                uniqueErrors++;
+                totalOccurrences += entry.count();
+            }
+        }
+
+        if (uniqueWarnings == 0 && uniqueErrors == 0) {
+            return;
+        }
+
+        // Print header
+        StringBuilder header = new StringBuilder();
+        if (uniqueWarnings > 0) {
+            header.append(uniqueWarnings).append(" warning");
+            if (uniqueWarnings > 1) {
+                header.append('s');
+            }
+        }
+        if (uniqueErrors > 0) {
+            if (header.length() > 0) {
+                header.append(", ");
+            }
+            header.append(uniqueErrors).append(" error");
+            if (uniqueErrors > 1) {
+                header.append('s');
+            }
+        }
+        if (totalOccurrences > (uniqueWarnings + uniqueErrors)) {
+            header.append(" (").append(totalOccurrences).append(" total occurrences)");
+        }
+
+        // Print the summary at INFO level. We intentionally do NOT re-print individual
+        // warning messages here — they were already logged inline at WARN level. Re-printing
+        // the raw message text would double warning counts in log parsers, trigger
+        // --fail-on-severity WARN again, and confuse tools that search for specific text.
+        // Full details are available in target/build-reports/.
+        LOGGER.info("");
+        LOGGER.info("Diagnostics: {} — see target/{}/{} for details", header, REPORT_DIR, REPORT_LATEST);
+    }
+
     // ---- Utility methods ----
 
     private static String projectKey(MavenProject project) {
@@ -530,6 +683,30 @@ public final class BuildReportCollector extends AbstractEventSpy {
 
     private static String mojoKey(MavenProject project, MojoExecution mojo) {
         return projectKey(project) + "#" + mojo.getGoal() + "@" + mojo.getExecutionId();
+    }
+
+    /**
+     * Generates a stable deduplication key for a warning intercepted from a
+     * Maven 3 plugin's {@code Log.warn()} call. The key is derived from the
+     * logger name and a normalized hash of the message text, so that the same
+     * warning from different modules or files deduplicates correctly.
+     * <p>
+     * File-specific coordinates (paths, line numbers) are stripped before hashing
+     * so that "Foo.java:42: unchecked cast" and "Bar.java:99: unchecked cast"
+     * map to the same key.
+     */
+    static String syntheticDiagnosticKey(String loggerName, String message) {
+        // Strip file coordinates for dedup: remove paths and line/column numbers
+        String normalized = message.replaceAll("\\S+\\.java:\\d+(:\\d+)?:?\\s*", "")
+                .replaceAll("\\S+[\\\\/][\\w.]+:\\d+", "")
+                .trim();
+        // Use a short logger suffix to namespace the key
+        String loggerSuffix = loggerName;
+        int lastDot = loggerName.lastIndexOf('.');
+        if (lastDot >= 0 && lastDot < loggerName.length() - 1) {
+            loggerSuffix = loggerName.substring(lastDot + 1);
+        }
+        return "auto:" + loggerSuffix + ":" + Integer.toHexString(normalized.hashCode());
     }
 
     static String truncateStackTrace(Throwable t) {
