@@ -51,6 +51,7 @@ class MavenITgh11162ConsumerPomScopesTest extends AbstractMavenIntegrationTestCa
         verifier.verifyErrorFreeLog();
 
         Path consumerPom = basedir.resolve(Paths.get(
+                ".mvn",
                 "target",
                 "project-local-repo",
                 "org.apache.maven.its.gh11162",
