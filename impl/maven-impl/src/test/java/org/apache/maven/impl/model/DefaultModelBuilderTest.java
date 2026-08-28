@@ -405,6 +405,36 @@ class DefaultModelBuilderTest {
     }
 
     /**
+     * Verify that building a model with BUILD_EFFECTIVE from a resolved source (null pomFile
+     * and null rootDirectory) does not throw a NullPointerException. This simulates the
+     * scenario from GH-12590 where both the session's root directory is unavailable
+     * (throws IllegalStateException) and the model source has no path, leading to a null
+     * rootDirectory in getEnhancedProperties.
+     *
+     * BUILD_EFFECTIVE is used because it goes through {@code buildEffectiveModel()} →
+     * {@code doReadFileModel()} with {@code isBuildRequest() == true}, exercising the
+     * {@code getEnhancedProperties()} call with a null rootDirectory.
+     */
+    @Test
+    public void testBuildEffectiveWithNullRootDirectory() {
+        Path pomPath = getPom("resolved-dependency");
+        // resolvedSource returns null for getPath(), and ApiRunner session throws
+        // IllegalStateException from getRootDirectory(), so rootDirectory will be null
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)
+                .source(Sources.resolvedSource(pomPath, "org.example:resolved-dep:1.0.0"))
+                .build();
+        ModelBuilderResult result = builder.newSession().build(request);
+        assertNotNull(result);
+        assertNotNull(result.getEffectiveModel());
+        assertNull(result.getEffectiveModel().getPomFile(), "pomFile should be null for resolved sources");
+        assertEquals("org.example", result.getEffectiveModel().getGroupId());
+        assertEquals("resolved-dep", result.getEffectiveModel().getArtifactId());
+        assertEquals("1.0.0", result.getEffectiveModel().getVersion());
+    }
+
+    /**
      * Verifies that when a BUILD_CONSUMER derived session is created with explicit
      * repositories, those repositories are propagated to the derived session's
      * {@code repositories} and {@code externalRepositories}.
