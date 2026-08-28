@@ -848,6 +848,9 @@ public class MavenCli {
     // This should probably be a separate tool and not be baked into Maven.
     //
     private void encryption(CliRequest cliRequest) throws Exception {
+        System.out.println(
+                "Note: Maven 3.x password encryption is obfuscation-grade and does not protect against a determined "
+                        + "attacker; see https://maven.apache.org/guides/mini/guide-encryption.html");
         if (cliRequest.commandLine.hasOption(CLIManager.ENCRYPT_MASTER_PASSWORD)) {
             String passwd = cliRequest.commandLine.getOptionValue(CLIManager.ENCRYPT_MASTER_PASSWORD);
 
