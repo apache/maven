@@ -126,6 +126,26 @@ public class CommonsCliLogOptions extends CommonsCliOptions implements LogOption
     }
 
     @Override
+    public Optional<Boolean> web() {
+        if (commandLine.hasOption(CLIManager.WEB)) {
+            return Optional.of(Boolean.TRUE);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Integer> port() {
+        if (commandLine.hasOption(CLIManager.PORT)) {
+            try {
+                return Optional.of(Integer.parseInt(commandLine.getOptionValue(CLIManager.PORT)));
+            } catch (NumberFormatException e) {
+                return Optional.empty();
+            }
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public void displayHelp(ParserRequest request, Consumer<String> printStream) {
         super.displayHelp(request, printStream);
         printStream.accept("");
@@ -146,6 +166,10 @@ public class CommonsCliLogOptions extends CommonsCliOptions implements LogOption
         printStream.accept("  mvnlog --json --module api        Output filtered JSON");
         printStream.accept("  mvnlog --json | jq '.modules'     Pipe to jq for complex queries");
         printStream.accept("");
+        printStream.accept("Web viewer:");
+        printStream.accept("  mvnlog --web                      Launch interactive web report viewer");
+        printStream.accept("  mvnlog --web --port 9090          Use custom port");
+        printStream.accept("");
     }
 
     @Override
@@ -164,6 +188,8 @@ public class CommonsCliLogOptions extends CommonsCliOptions implements LogOption
         public static final String MOJO = "M";
         public static final String LEVEL = "l";
         public static final String GREP = "g";
+        public static final String WEB = "w";
+        public static final String PORT = "p";
 
         @Override
         protected void prepareOptions(org.apache.commons.cli.Options options) {
@@ -211,6 +237,16 @@ public class CommonsCliLogOptions extends CommonsCliOptions implements LogOption
                     .hasArg()
                     .argName("pattern")
                     .desc("Search log messages for <pattern> (case-insensitive)")
+                    .get());
+            options.addOption(Option.builder(WEB)
+                    .longOpt("web")
+                    .desc("Launch web-based interactive report viewer")
+                    .get());
+            options.addOption(Option.builder(PORT)
+                    .longOpt("port")
+                    .hasArg()
+                    .argName("port")
+                    .desc("Port for the web server (default: 8080)")
                     .get());
         }
     }
