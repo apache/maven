@@ -141,6 +141,7 @@ under the License.
     <guavafailureaccessVersion>1.0.3</guavafailureaccessVersion>
     <wagonVersion>3.5.3</wagonVersion>
     <securityDispatcherVersion>2.0</securityDispatcherVersion>
+    <!-- plexus-cipher 2.1.0 uses an incompatible KDF; ciphertext encrypted with 2.0 will no longer decrypt — see #12811. Do not bump on this branch. -->
     <cipherVersion>2.0</cipherVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
     <resolverVersion>1.9.27</resolverVersion>
