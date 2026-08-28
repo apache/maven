@@ -490,6 +490,19 @@ public final class Constants {
     public static final String MAVEN_PLUGIN_VALIDATION_EXCLUDES = "maven.plugin.validation.excludes";
 
     /**
+     * User property for enabling/disabling automatic subproject discovery for POM-packaged projects.
+     * When set to {@code true} (default), Maven 4.1+ POM-packaged projects that do not declare
+     * {@code <subprojects>} or {@code <modules>} will automatically discover subprojects
+     * by scanning subdirectories for POM files.
+     * When set to {@code false}, automatic discovery is disabled regardless of whether
+     * {@code <subprojects>} or {@code <modules>} is declared.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_PROJECT_DISCOVER_SUBPROJECTS = "maven.project.discoverSubprojects";
+
+    /**
      * ProjectBuilder parallelism.
      *
      * @since 4.0.0

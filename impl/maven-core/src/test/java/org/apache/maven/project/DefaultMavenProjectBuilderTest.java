@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.services.ModelSource;
@@ -662,7 +663,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testEmptySubprojectsElementPreventsDiscovery() throws Exception {
+    public void testEmptySubprojectsElementDoesNotPreventDiscovery() throws Exception {
         File pom = getTestFile("src/test/resources/projects/subprojects-empty/pom.xml");
         ProjectBuildingRequest configuration = newBuildingRequest();
         InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
@@ -673,16 +674,12 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
                 .setRootDirectory(pom.toPath().getParent());
 
         List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
-        // Should only build the parent project, not discover the child
-        assertEquals(1, results.size());
-        MavenProject parent = results.get(0).getProject();
-        assertEquals("parent", parent.getArtifactId());
-        // The subprojects list should be empty since we explicitly defined an empty <subprojects /> element
-        assertTrue(parent.getModel().getDelegate().getSubprojects().isEmpty());
+        // Empty <subprojects /> no longer prevents discovery; use the property to opt out
+        assertEquals(2, results.size());
     }
 
     @Test
-    public void testEmptyModulesElementPreventsDiscovery() throws Exception {
+    public void testEmptyModulesElementDoesNotPreventDiscovery() throws Exception {
         File pom = getTestFile("src/test/resources/projects/modules-empty/pom.xml");
         ProjectBuildingRequest configuration = newBuildingRequest();
         InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
@@ -693,12 +690,28 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
                 .setRootDirectory(pom.toPath().getParent());
 
         List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
-        // Should only build the parent project, not discover the child
+        // Empty <modules /> no longer prevents discovery; use the property to opt out
+        assertEquals(2, results.size());
+    }
+
+    @Test
+    public void testDiscoverSubprojectsPropertyDisablesDiscovery() throws Exception {
+        File pom = getTestFile("src/test/resources/projects/subprojects-empty/pom.xml");
+        ProjectBuildingRequest configuration = newBuildingRequest();
+        InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
+        InternalMavenSession mavenSession = InternalMavenSession.from(internalSession);
+        mavenSession
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(pom.toPath().getParent());
+        mavenSession.getMavenSession().getUserProperties().put(Constants.MAVEN_PROJECT_DISCOVER_SUBPROJECTS, "false");
+
+        List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
+        // Discovery disabled via property: only the parent project should be built
         assertEquals(1, results.size());
         MavenProject parent = results.get(0).getProject();
         assertEquals("parent", parent.getArtifactId());
-        // The modules list should be empty since we explicitly defined an empty <modules /> element
-        assertTrue(parent.getModel().getDelegate().getModules().isEmpty());
+        assertTrue(parent.getModel().getDelegate().getSubprojects().isEmpty());
     }
 
     @Test
