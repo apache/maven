@@ -166,19 +166,24 @@ public class DefaultToolchainManager implements ToolchainManager {
 
         Project project = current.get();
 
-        // Check Model 4.1.0 <source><targetVersion> elements
+        // Check Model 4.1.0 <source><targetVersion> elements — take the minimum
+        // across all source directories so the most constraining level wins
         Build build = project.getModel().getBuild();
         if (build != null) {
             List<Source> sources = build.getSources();
             if (sources != null) {
+                int minLevel = Integer.MAX_VALUE;
                 for (Source source : sources) {
                     String targetVersion = source.getTargetVersion();
                     if (targetVersion != null && !targetVersion.isEmpty()) {
                         int level = JdkSourceLevelSupport.normalizeSourceLevel(targetVersion);
-                        if (level > 0) {
-                            return level;
+                        if (level > 0 && level < minLevel) {
+                            minLevel = level;
                         }
                     }
+                }
+                if (minLevel != Integer.MAX_VALUE) {
+                    return minLevel;
                 }
             }
         }
