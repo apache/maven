@@ -50,7 +50,9 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.Sources;
+import org.apache.maven.impl.DefaultRemoteRepository;
 import org.apache.maven.impl.standalone.ApiRunner;
+import org.eclipse.aether.repository.RepositoryPolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -259,6 +261,128 @@ class DefaultModelBuilderTest {
         assertEquals("third", repositories.get(1).getId());
         assertEquals("https://third.repo", repositories.get(1).getUrl()); // interpolated (own model properties)
         assertEquals("central", repositories.get(2).getId()); // default
+    }
+
+    /**
+     * Verifies that when multiple repositories share the same ID (e.g., after mirror injection
+     * maps both "central" and a profile-defined repo to the same mirror ID), their policies are
+     * merged so that SNAPSHOT resolution is not broken.
+     * <p>
+     * This is a regression test for <a href="https://github.com/apache/maven/issues/12769">MNG-12769</a>:
+     * when two mirror-injected repos with the same mirror ID but different snapshot policies
+     * were passed to the resolver, the deduplication logic would drop the snapshot-enabled policy,
+     * making SNAPSHOT parent POM resolution fail.
+     */
+    @Test
+    public void testDuplicateMirrorReposMergedForSnapshotResolution() throws Exception {
+        // Simulate two repos with the same mirror ID but different snapshot policies,
+        // as produced by mirror injection when multiple repos map to the same mirror.
+        org.eclipse.aether.repository.RemoteRepository releasesOnly =
+                new org.eclipse.aether.repository.RemoteRepository.Builder(
+                                "my-mirror", "default", "https://mirror.example.com/maven")
+                        .setReleasePolicy(new RepositoryPolicy(
+                                true, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .setSnapshotPolicy(new RepositoryPolicy(
+                                false, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .build();
+        org.eclipse.aether.repository.RemoteRepository releasesAndSnapshots =
+                new org.eclipse.aether.repository.RemoteRepository.Builder(
+                                "my-mirror", "default", "https://mirror.example.com/maven")
+                        .setReleasePolicy(new RepositoryPolicy(
+                                true, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .setSnapshotPolicy(new RepositoryPolicy(
+                                true, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .build();
+
+        RemoteRepository repo1 = new DefaultRemoteRepository(releasesOnly);
+        RemoteRepository repo2 = new DefaultRemoteRepository(releasesAndSnapshots);
+
+        // Build a request with duplicate mirror repos
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("simple-standalone")))
+                .repositories(List.of(repo1, repo2))
+                .build();
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+        mbs.build(request);
+
+        // Access the internal state to verify repository deduplication
+        DefaultModelBuilder.ModelBuilderSessionState mainState =
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
+        Field repositoriesField = DefaultModelBuilder.ModelBuilderSessionState.class.getDeclaredField("repositories");
+        repositoriesField.setAccessible(true);
+        List<RemoteRepository> repositories = (List<RemoteRepository>) repositoriesField.get(mainState);
+
+        // Should be deduplicated to a single entry
+        long mirrorCount =
+                repositories.stream().filter(r -> "my-mirror".equals(r.getId())).count();
+        assertEquals(1, mirrorCount, "Duplicate mirror repos should be merged into one");
+
+        // The merged repo should have snapshots enabled (most permissive policy wins)
+        RemoteRepository merged = repositories.stream()
+                .filter(r -> "my-mirror".equals(r.getId()))
+                .findFirst()
+                .orElseThrow();
+        DefaultRemoteRepository mergedImpl = (DefaultRemoteRepository) merged;
+        assertTrue(mergedImpl.getRepository().getPolicy(true).isEnabled(), "Merged repo should have snapshots enabled");
+        assertTrue(mergedImpl.getRepository().getPolicy(false).isEnabled(), "Merged repo should have releases enabled");
+    }
+
+    /**
+     * Verifies that repo deduplication also handles the reverse case: dominant has snapshots,
+     * recessive has releases-only. The merge should enable both.
+     */
+    @Test
+    public void testDuplicateMirrorReposMergedReversePolicyOrder() throws Exception {
+        // First repo: snapshots only
+        org.eclipse.aether.repository.RemoteRepository snapshotsOnly =
+                new org.eclipse.aether.repository.RemoteRepository.Builder(
+                                "my-mirror", "default", "https://mirror.example.com/maven")
+                        .setReleasePolicy(new RepositoryPolicy(
+                                false, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .setSnapshotPolicy(new RepositoryPolicy(
+                                true, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .build();
+        // Second repo: releases only
+        org.eclipse.aether.repository.RemoteRepository releasesOnly =
+                new org.eclipse.aether.repository.RemoteRepository.Builder(
+                                "my-mirror", "default", "https://mirror.example.com/maven")
+                        .setReleasePolicy(new RepositoryPolicy(
+                                true, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .setSnapshotPolicy(new RepositoryPolicy(
+                                false, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .build();
+
+        RemoteRepository repo1 = new DefaultRemoteRepository(snapshotsOnly);
+        RemoteRepository repo2 = new DefaultRemoteRepository(releasesOnly);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("simple-standalone")))
+                .repositories(List.of(repo1, repo2))
+                .build();
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+        mbs.build(request);
+
+        DefaultModelBuilder.ModelBuilderSessionState mainState =
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
+        Field repositoriesField = DefaultModelBuilder.ModelBuilderSessionState.class.getDeclaredField("repositories");
+        repositoriesField.setAccessible(true);
+        List<RemoteRepository> repositories = (List<RemoteRepository>) repositoriesField.get(mainState);
+
+        RemoteRepository merged = repositories.stream()
+                .filter(r -> "my-mirror".equals(r.getId()))
+                .findFirst()
+                .orElseThrow();
+        DefaultRemoteRepository mergedImpl = (DefaultRemoteRepository) merged;
+        assertTrue(
+                mergedImpl.getRepository().getPolicy(true).isEnabled(),
+                "Merged repo should have snapshots enabled (from dominant)");
+        assertTrue(
+                mergedImpl.getRepository().getPolicy(false).isEnabled(),
+                "Merged repo should have releases enabled (from recessive)");
     }
 
     @Test

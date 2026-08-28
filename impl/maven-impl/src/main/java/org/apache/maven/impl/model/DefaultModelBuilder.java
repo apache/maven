@@ -116,6 +116,7 @@ import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParserException;
 import org.apache.maven.api.spi.ModelTransformer;
+import org.apache.maven.impl.DefaultRemoteRepository;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.impl.cache.Cache;
@@ -303,10 +304,66 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         static List<RemoteRepository> repos(ModelBuilderRequest request) {
-            return List.copyOf(
-                    request.getRepositories() != null
-                            ? request.getRepositories()
-                            : request.getSession().getRemoteRepositories());
+            List<RemoteRepository> repos = request.getRepositories() != null
+                    ? request.getRepositories()
+                    : request.getSession().getRemoteRepositories();
+            return mergeRepositoriesById(repos);
+        }
+
+        /**
+         * Merges repositories that share the same ID by combining their policies.
+         * This handles the case where mirror injection produces multiple repository
+         * entries with the same mirror ID but different snapshot/release policies
+         * (e.g., when both "central" and a profile-defined repo are mirrored to the
+         * same mirror, producing two entries with the mirror's ID but different policies).
+         * Without this merge, policy deduplication in the resolver can drop the snapshot
+         * policy, causing SNAPSHOT parent resolution to fail (MNG-12769).
+         */
+        private static List<RemoteRepository> mergeRepositoriesById(List<RemoteRepository> repos) {
+            if (repos.size() <= 1) {
+                return List.copyOf(repos);
+            }
+            LinkedHashMap<String, RemoteRepository> byId = new LinkedHashMap<>();
+            boolean hasDuplicates = false;
+            for (RemoteRepository repo : repos) {
+                RemoteRepository existing = byId.putIfAbsent(repo.getId(), repo);
+                if (existing != null) {
+                    hasDuplicates = true;
+                    byId.put(repo.getId(), mergeRepositoryPolicies(existing, repo));
+                }
+            }
+            return hasDuplicates ? List.copyOf(byId.values()) : List.copyOf(repos);
+        }
+
+        /**
+         * Merges two repositories with the same ID by combining their policies.
+         * For each policy type (release/snapshot), the result is enabled if either
+         * input has it enabled. URL, proxy, authentication, and other properties
+         * are preserved from the dominant (first) repository.
+         */
+        private static RemoteRepository mergeRepositoryPolicies(RemoteRepository dominant, RemoteRepository recessive) {
+            if (dominant instanceof DefaultRemoteRepository d && recessive instanceof DefaultRemoteRepository r) {
+                org.eclipse.aether.repository.RemoteRepository dr = d.getRepository();
+                org.eclipse.aether.repository.RemoteRepository rr = r.getRepository();
+
+                boolean mergeSnapshots =
+                        rr.getPolicy(true).isEnabled() && !dr.getPolicy(true).isEnabled();
+                boolean mergeReleases =
+                        rr.getPolicy(false).isEnabled() && !dr.getPolicy(false).isEnabled();
+
+                if (mergeSnapshots || mergeReleases) {
+                    org.eclipse.aether.repository.RemoteRepository.Builder builder =
+                            new org.eclipse.aether.repository.RemoteRepository.Builder(dr);
+                    if (mergeSnapshots) {
+                        builder.setSnapshotPolicy(rr.getPolicy(true));
+                    }
+                    if (mergeReleases) {
+                        builder.setReleasePolicy(rr.getPolicy(false));
+                    }
+                    return new DefaultRemoteRepository(builder.build());
+                }
+            }
+            return dominant;
         }
 
         @SuppressWarnings("checkstyle:ParameterNumber")
