@@ -100,6 +100,15 @@ public class DefaultDependencyManagementInjector implements DependencyManagement
                 Object key = getDependencyKey().apply(managedDependency);
                 Dependency dependency = originalDeps.get(key);
                 if (dependency != null) {
+                    // When duplicate managed deps exist for the same key (e.g. MNG-4005),
+                    // each subsequent merge must use the already-merged result as the target
+                    // so that "first declaration wins" semantics are preserved (target dominates
+                    // when sourceDominant=false). Without this, the last managed dep would
+                    // overwrite earlier values instead of being ignored.
+                    Dependency.Builder prev = builderDeps.get(key);
+                    if (prev != null) {
+                        dependency = prev.build();
+                    }
                     Dependency.Builder merged = mergeDependencyToBuilder(dependency, managedDependency, false, context);
                     if (merged != null) {
                         builderDeps.put(key, merged);
