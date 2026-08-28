@@ -382,6 +382,21 @@ public final class Constants {
     public static final String MAVEN_VERSION_FILTER = "maven.session.versionFilter";
 
     /**
+     * User property for overriding the reactor output repository path used by the reactor reader to share
+     * artifacts between modules during a build. This repository enables partial and resumable builds
+     * (e.g. {@code mvn verify -r :module}) without requiring {@code install}.
+     * <p>
+     * The path may be absolute or relative to the root directory. If relative, it is resolved against
+     * the root directory of the project.
+     * </p>
+     * Default value: <code>${maven.rootDirectory}/.mvn/target/project-local-repo</code>.
+     *
+     * @since 4.0.0
+     */
+    @Config(defaultValue = "${maven.rootDirectory}/.mvn/target/project-local-repo")
+    public static final String MAVEN_REACTOR_OUTPUT_REPOSITORY = "maven.reactor.outputRepository";
+
+    /**
      * User property for chained LRM: the new "head" local repository to use, and "push" the existing into tail.
      * Similar to <code>maven.repo.local.tail</code>, this property may contain comma separated list of paths to be
      * used as local repositories (combine with chained local repository), but while latter is "appending" this
