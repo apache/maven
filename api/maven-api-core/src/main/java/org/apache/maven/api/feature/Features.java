@@ -62,7 +62,6 @@ public final class Features {
     }
 
 
-
     private static boolean doGet(Map<String, ?> userProperties, String key, boolean def) {
         return doGet(userProperties != null ? userProperties.get(key) : null, def);
     }
