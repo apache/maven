@@ -156,6 +156,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         pushUserProperties(context);
         setupGuiceClassLoading(context);
         configureLogging(context);
+        preliminaryInteractiveDetection(context);
         createTerminal(context);
         activateLogging(context);
         helpOrVersionAndMayExit(context);
@@ -299,6 +300,30 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             // fall back to default log level specified in conf
             // see https://issues.apache.org/jira/browse/MNG-2570 and https://github.com/apache/maven/issues/11199
             context.loggerLevel = Slf4jConfiguration.Level.INFO; // default for display purposes
+        }
+    }
+
+    /**
+     * Sets {@code context.interactive} based on CLI flags and CI detection <em>before</em>
+     * {@link #createTerminal(LookupContext)} runs. This is necessary because
+     * {@code createTerminal} caches the {@link BuildEventListener} (via
+     * {@link #determineBuildEventListener}), and the console-mode auto-detection
+     * in subclasses reads {@code context.interactive} to decide between rich/plain/verbose.
+     *
+     * <p>The full settings-based interactive-mode resolution still runs later in
+     * {@link #settings}, so this is a best-effort early pass using only CLI flags and
+     * CI environment detection — which is sufficient for the console-mode decision.</p>
+     */
+    protected void preliminaryInteractiveDetection(C context) {
+        if (context.options().forceInteractive().orElse(false)) {
+            context.interactive = true;
+        } else if (context.options().nonInteractive().orElse(false)) {
+            context.interactive = false;
+        } else if (context.invokerRequest.ciInfo().isPresent()) {
+            context.interactive = false;
+        } else {
+            // Default: assume interactive (settings may refine later)
+            context.interactive = true;
         }
     }
 
