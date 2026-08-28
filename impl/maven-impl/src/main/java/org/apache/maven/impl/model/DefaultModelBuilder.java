@@ -772,13 +772,15 @@ public class DefaultModelBuilder implements ModelBuilder {
                 properties.put("project.basedir", basedir);
                 properties.put("project.basedir.uri", basedirUri);
             }
-            try {
-                String root = rootDirectory.toString();
-                String rootUri = rootDirectory.toUri().toString();
-                properties.put("project.rootDirectory", root);
-                properties.put("project.rootDirectory.uri", rootUri);
-            } catch (IllegalStateException e) {
-                // Root directory not available, continue without it
+            if (rootDirectory != null) {
+                try {
+                    String root = rootDirectory.toString();
+                    String rootUri = rootDirectory.toUri().toString();
+                    properties.put("project.rootDirectory", root);
+                    properties.put("project.rootDirectory.uri", rootUri);
+                } catch (IllegalStateException e) {
+                    // Root directory not available, continue without it
+                }
             }
 
             // Handle root vs non-root project properties with profile activation.
