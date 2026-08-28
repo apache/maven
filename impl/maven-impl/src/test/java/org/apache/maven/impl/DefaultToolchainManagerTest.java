@@ -389,6 +389,25 @@ class DefaultToolchainManagerTest {
     }
 
     @Test
+    void getProjectRequiredSourceLevelMultipleSourcesTakesMinimum() {
+        // When multiple <source> elements have different targetVersions,
+        // the most constraining (minimum) level should win
+        when(session.getService(Lookup.class)).thenReturn(lookup);
+        when(lookup.lookupOptional(Project.class)).thenReturn(Optional.of(project));
+        Model model = Model.newBuilder()
+                .build(Build.newBuilder()
+                        .sources(List.of(
+                                Source.newBuilder().targetVersion("11").build(),
+                                Source.newBuilder().targetVersion("6").build(),
+                                Source.newBuilder().targetVersion("8").build()))
+                        .build())
+                .build();
+        when(project.getModel()).thenReturn(model);
+
+        assertEquals(6, manager.getProjectRequiredSourceLevel(session));
+    }
+
+    @Test
     void getProjectRequiredSourceLevelNoProject() {
         when(session.getService(Lookup.class)).thenReturn(lookup);
         when(lookup.lookupOptional(Project.class)).thenReturn(Optional.empty());
