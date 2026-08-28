@@ -203,6 +203,23 @@ public interface Options {
     Optional<String> console();
 
     /**
+     * Returns the warning display mode.
+     * <p>
+     * Controls how build warnings (diagnostics) are displayed:
+     * <ul>
+     *   <li>{@code "summary"} (default) — collect warnings, show deduplicated summary at end of build</li>
+     *   <li>{@code "all"} — show warnings inline as they occur AND show summary at end</li>
+     *   <li>{@code "none"} — suppress the diagnostic summary entirely</li>
+     *   <li>{@code "fail"} — show summary AND fail the build if any warnings exist</li>
+     * </ul>
+     *
+     * @return an {@link Optional} containing the warning mode, or empty if not set
+     * @since 4.1.0
+     */
+    @Nonnull
+    Optional<String> warningMode();
+
+    /**
      * Indicates whether Maven should operate in offline mode.
      *
      * @return an {@link Optional} containing true if offline mode is enabled, false if disabled, or empty if not specified
