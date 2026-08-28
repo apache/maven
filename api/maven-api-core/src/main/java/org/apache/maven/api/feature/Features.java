@@ -61,6 +61,8 @@ public final class Features {
         return doGet(userProperties, Constants.MAVEN_CONSUMER_POM_REMOVE_UNUSED_MANAGED_DEPENDENCIES, true);
     }
 
+
+
     private static boolean doGet(Map<String, ?> userProperties, String key, boolean def) {
         return doGet(userProperties != null ? userProperties.get(key) : null, def);
     }
