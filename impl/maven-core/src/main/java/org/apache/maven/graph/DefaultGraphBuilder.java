@@ -381,7 +381,12 @@ public class DefaultGraphBuilder implements GraphBuilder {
     private Consumer<org.apache.maven.model.building.ModelProblem> getModelProblemConsumer(MavenSession session) {
         org.apache.maven.api.Session apiSession = session.getSession();
         if (apiSession == null) {
-            return problem -> session.setModelProblems(true);
+            return problem -> {
+                List<org.apache.maven.model.building.ModelProblem> problems =
+                        new ArrayList<>(session.getModelProblems());
+                problems.add(problem);
+                session.setModelProblems(problems);
+            };
         }
         return problem -> apiSession.getModelProblemCollector().reportProblem(toApiModelProblem(problem));
     }

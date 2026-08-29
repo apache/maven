@@ -21,7 +21,9 @@ package org.apache.maven.execution;
 import java.io.File;
 import java.nio.file.Path;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
@@ -36,6 +38,7 @@ import org.apache.maven.artifact.repository.RepositoryCache;
 import org.apache.maven.impl.SettingsUtilsV4;
 import org.apache.maven.internal.impl.SessionModelProblemsBridge;
 import org.apache.maven.model.Profile;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -296,7 +299,7 @@ public class MavenSession implements Cloneable {
 
     private Session session;
 
-    private boolean modelProblems;
+    private List<ModelProblem> modelProblems = Collections.emptyList();
 
     @Deprecated
     /** @deprecated This appears not to be used anywhere within Maven itself. */
@@ -512,32 +515,32 @@ public class MavenSession implements Cloneable {
     }
 
     /**
-     * Returns whether the reactor projects had model problems.
+     * Returns the problems detected while building the Maven models.
      *
-     * @return {@code true} if model problems were encountered
+     * @return the model problems, never {@code null}
      * @since 3.10.0
      */
-    public boolean hasModelProblems() {
-        return modelProblems || (session != null && session.hasModelProblems());
+    public List<ModelProblem> getModelProblems() {
+        return session != null ? SessionModelProblemsBridge.getModelProblems(session) : modelProblems;
     }
 
     /**
-     * Sets whether the reactor projects had model problems.
+     * Records the problems detected while building the Maven models.
      *
-     * @param modelProblems whether model problems were encountered
+     * @param modelProblems the model problems, must not be {@code null}
      * @since 3.10.0
      */
-    public void setModelProblems(boolean modelProblems) {
-        this.modelProblems = modelProblems;
+    public void setModelProblems(List<ModelProblem> modelProblems) {
+        this.modelProblems = Collections.unmodifiableList(new ArrayList<>(requireNonNull(modelProblems)));
         if (session != null) {
-            SessionModelProblemsBridge.setLegacyFlag(session, modelProblems);
+            SessionModelProblemsBridge.setLegacyModelProblems(session, this.modelProblems);
         }
     }
 
     public void setSession(Session session) {
         this.session = session;
         if (session != null) {
-            SessionModelProblemsBridge.setLegacyFlag(session, modelProblems);
+            SessionModelProblemsBridge.setLegacyModelProblems(session, modelProblems);
         }
     }
     /*end[MAVEN4]*/
