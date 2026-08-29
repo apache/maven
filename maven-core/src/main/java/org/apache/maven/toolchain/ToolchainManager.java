@@ -44,6 +44,7 @@ public interface ToolchainManager {
      * @param type the type, must not be {@code null}
      * @param context the Maven session, must not be {@code null}
      * @return the toolchain selected by <code>maven-toolchains-plugin</code>
+     * @throws IllegalStateException if the configured toolchain cannot be created
      */
     Toolchain getToolchainFromBuildContext(String type, MavenSession context);
 
@@ -55,6 +56,7 @@ public interface ToolchainManager {
      * @param type the type, must not be {@code null}
      * @param requirements the requirements, may be {@code null}
      * @return the matching toolchains, never {@code null}
+     * @throws IllegalStateException if a configured toolchain cannot be created
      * @since 3.3.0
      */
     List<Toolchain> getToolchains(MavenSession session, String type, Map<String, String> requirements);
