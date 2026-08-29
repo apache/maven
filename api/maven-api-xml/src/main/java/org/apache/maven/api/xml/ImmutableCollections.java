@@ -378,13 +378,10 @@ class ImmutableCollections {
             if (props == null) {
                 return null;
             }
-            Properties defaults = null;
+            Properties defaults = new Properties();
             for (String name : props.stringPropertyNames()) {
                 // A direct String shadows its default, while a non-String value does not for getProperty.
                 if (!(props.get(name) instanceof String)) {
-                    if (defaults == null) {
-                        defaults = new Properties();
-                    }
                     defaults.setProperty(name, props.getProperty(name));
                 }
             }
