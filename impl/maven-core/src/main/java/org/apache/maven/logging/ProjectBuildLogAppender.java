@@ -31,6 +31,7 @@ public class ProjectBuildLogAppender implements AutoCloseable {
     private static final ThreadLocal<String> PROJECT_ID = new InheritableThreadLocal<>();
     private static final ThreadLocal<String> MOJO_ID = new InheritableThreadLocal<>();
     private static final ThreadLocal<String> FORKING_PROJECT_ID = new InheritableThreadLocal<>();
+    private static final ThreadLocal<String> FORKING_MOJO_ID = new InheritableThreadLocal<>();
 
     public static String getProjectId() {
         return PROJECT_ID.get();
@@ -60,9 +61,8 @@ public class ProjectBuildLogAppender implements AutoCloseable {
 
     /**
      * Sets or clears the mojo execution identifier in both the thread-local
-     * and the SLF4J MDC.  The value is available to any SLF4J appender via
-     * the MDC key {@code maven.mojo.id} and to JUL-bridged messages through
-     * the same MDC path.
+     * and the SLF4J MDC.  When clearing ({@code null}), if a forking mojo ID
+     * was saved, it is restored — mirroring the fork-aware project ID pattern.
      * <p>
      * Format: {@code "prefix:goal@executionId"}
      * (e.g. {@code "compiler:compile@default-compile"}).
@@ -74,8 +74,15 @@ public class ProjectBuildLogAppender implements AutoCloseable {
             MOJO_ID.set(mojoId);
             MDC.put(KEY_MOJO_ID, mojoId);
         } else {
-            MOJO_ID.remove();
-            MDC.remove(KEY_MOJO_ID);
+            // Restore the forking mojo's ID if one was saved
+            String forkingMojoId = FORKING_MOJO_ID.get();
+            if (forkingMojoId != null) {
+                MOJO_ID.set(forkingMojoId);
+                MDC.put(KEY_MOJO_ID, forkingMojoId);
+            } else {
+                MOJO_ID.remove();
+                MDC.remove(KEY_MOJO_ID);
+            }
         }
     }
 
@@ -84,6 +91,21 @@ public class ProjectBuildLogAppender implements AutoCloseable {
             FORKING_PROJECT_ID.set(forkingProjectId);
         } else {
             FORKING_PROJECT_ID.remove();
+        }
+    }
+
+    /**
+     * Saves or clears the mojo ID of the forking mojo, so it can be
+     * restored when the fork completes. Mirrors the {@link #setForkingProjectId}
+     * pattern for project IDs.
+     *
+     * @param forkingMojoId the forking mojo identifier, or {@code null} to clear
+     */
+    public static void setForkingMojoId(String forkingMojoId) {
+        if (forkingMojoId != null) {
+            FORKING_MOJO_ID.set(forkingMojoId);
+        } else {
+            FORKING_MOJO_ID.remove();
         }
     }
 

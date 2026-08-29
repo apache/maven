@@ -129,15 +129,15 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
     @Override
     public void mojoSucceeded(ExecutionEvent event) {
         setMdc(event);
-        ProjectBuildLogAppender.setMojoId(null);
         delegate.mojoSucceeded(event);
+        ProjectBuildLogAppender.setMojoId(null);
     }
 
     @Override
     public void mojoFailed(ExecutionEvent event) {
         setMdc(event);
-        ProjectBuildLogAppender.setMojoId(null);
         delegate.mojoFailed(event);
+        ProjectBuildLogAppender.setMojoId(null);
     }
 
     @Override
@@ -151,18 +151,22 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
         setMdc(event);
         delegate.forkStarted(event);
         ProjectBuildLogAppender.setForkingProjectId(event.getProject().getArtifactId());
+        // Save the forking mojo's ID so it can be restored when the fork completes
+        ProjectBuildLogAppender.setForkingMojoId(ProjectBuildLogAppender.getMojoId());
     }
 
     @Override
     public void forkSucceeded(ExecutionEvent event) {
         delegate.forkSucceeded(event);
         ProjectBuildLogAppender.setForkingProjectId(null);
+        ProjectBuildLogAppender.setForkingMojoId(null);
     }
 
     @Override
     public void forkFailed(ExecutionEvent event) {
         delegate.forkFailed(event);
         ProjectBuildLogAppender.setForkingProjectId(null);
+        ProjectBuildLogAppender.setForkingMojoId(null);
     }
 
     @Override

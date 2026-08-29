@@ -38,8 +38,13 @@ import org.apache.maven.api.annotations.Provider;
 public interface Log {
     /**
      * {@return true if the <b>trace</b> error level is enabled}
+     * <p>
+     * The default implementation returns {@code false} for backward
+     * compatibility with existing {@code Log} implementations.
      */
-    boolean isTraceEnabled();
+    default boolean isTraceEnabled() {
+        return false;
+    }
 
     /**
      * Sends a message to the user in the <b>trace</b> error level.
@@ -49,44 +54,54 @@ public interface Log {
      * ordering details.  Use {@link #debug(CharSequence)} instead for
      * messages that help <em>users</em> investigate their build
      * (e.g. why a module was recompiled).
+     * <p>
+     * The default implementation is a no-op for backward compatibility.
      *
      * @param content the message to log
      */
-    void trace(CharSequence content);
+    default void trace(CharSequence content) {}
 
     /**
      * Sends a message (and accompanying exception) to the user at the <b>trace</b> error level.
      * The error's stacktrace will be output when this error level is enabled.
+     * <p>
+     * The default implementation is a no-op for backward compatibility.
      *
      * @param content the message to log
      * @param error the error that caused this log
      */
-    void trace(CharSequence content, Throwable error);
+    default void trace(CharSequence content, Throwable error) {}
 
     /**
      * Sends an exception to the user in the <b>trace</b> error level.
      * The stack trace for this exception will be output when this error level is enabled.
+     * <p>
+     * The default implementation is a no-op for backward compatibility.
      *
      * @param error the error that caused this log
      */
-    void trace(Throwable error);
+    default void trace(Throwable error) {}
 
     /**
      * Sends a lazily-computed message in the <b>trace</b> error level.
      * The supplier is only evaluated if trace is enabled.
+     * <p>
+     * The default implementation is a no-op for backward compatibility.
      *
      * @param content the message supplier
      */
-    void trace(Supplier<String> content);
+    default void trace(Supplier<String> content) {}
 
     /**
      * Sends a lazily-computed message (and accompanying exception) in the <b>trace</b> error level.
      * The supplier is only evaluated if trace is enabled.
+     * <p>
+     * The default implementation is a no-op for backward compatibility.
      *
      * @param content the message supplier
      * @param error the error that caused this log
      */
-    void trace(Supplier<String> content, Throwable error);
+    default void trace(Supplier<String> content, Throwable error) {}
 
     /**
      * {@return true if the <b>debug</b> error level is enabled}
