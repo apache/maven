@@ -438,7 +438,13 @@ public class MojoExecutor {
                             .getData()
                             .computeIfAbsent(PROJECT_INDEX, () -> new ProjectIndex(session.getProjects()));
 
-                    int index = projectIndex.getIndices().get(projectId);
+                    Integer index = projectIndex.getIndices().get(projectId);
+                    if (index == null) {
+                        throw new LifecycleExecutionException(
+                                "Forked execution references project '" + projectId + "' which is not in the reactor",
+                                mojoExecution,
+                                project);
+                    }
 
                     MavenProject forkedProject = projectIndex.getProjects().get(projectId);
 
