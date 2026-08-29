@@ -89,7 +89,11 @@ class ConsumerPomArtifactTransformer extends TransformerSupport {
                     : Files.createTempFile(CONSUMER_POM_CLASSIFIER + "-", ".pom");
             deferDeleteFile(consumer);
 
-            project.addAttachedArtifact(createConsumerPomArtifact(project, consumer, session));
+            boolean alreadyAttached = project.getAttachedArtifacts().stream()
+                    .anyMatch(a -> CONSUMER_POM_CLASSIFIER.equals(a.getClassifier()) && "pom".equals(a.getType()));
+            if (!alreadyAttached) {
+                project.addAttachedArtifact(createConsumerPomArtifact(project, consumer, session));
+            }
         } else if (project.getModel().getDelegate().isRoot()) {
             throw new IllegalStateException(
                     "The use of the root attribute on the model requires the buildconsumer feature to be active");
