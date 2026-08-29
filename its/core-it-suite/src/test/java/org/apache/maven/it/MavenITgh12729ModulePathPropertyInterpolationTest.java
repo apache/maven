@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.nio.file.Path;
+import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,14 +34,18 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITgh12729ModulePathPropertyInterpolationTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh12729ModulePathPropertyInterpolationTest() {
+        super("[4.0.0-rc-1,)");
+    }
+
     /**
      * Verify that a POM-defined property in a {@code <module>} path is interpolated correctly.
      */
     @Test
     void testModulePathWithPomProperty() throws Exception {
-        Path basedir = extractResources("/gh-12729-module-path-property-interpolation");
+        File testDir = extractResources("/gh-12729-module-path-property-interpolation");
 
-        Verifier verifier = newVerifier(basedir);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -53,9 +57,9 @@ class MavenITgh12729ModulePathPropertyInterpolationTest extends AbstractMavenInt
      */
     @Test
     void testModulePathWithUserPropertyOverride() throws Exception {
-        Path basedir = extractResources("/gh-12729-module-path-property-interpolation");
+        File testDir = extractResources("/gh-12729-module-path-property-interpolation");
 
-        Verifier verifier = newVerifier(basedir);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         // The POM defines child-dir=child; this override should also resolve to "child"
         verifier.addCliArgument("-Dchild-dir=child");
         verifier.addCliArgument("validate");
