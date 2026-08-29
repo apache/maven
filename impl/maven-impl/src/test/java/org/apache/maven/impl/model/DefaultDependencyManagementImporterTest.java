@@ -18,13 +18,19 @@
  */
 package org.apache.maven.impl.model;
 
+import java.util.List;
+
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.ModelBuilderRequest;
+import org.apache.maven.api.services.ModelProblemCollector;
 import org.junit.jupiter.api.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.Mockito.mock;
 
 class DefaultDependencyManagementImporterTest {
     @Test
@@ -120,5 +126,45 @@ class DefaultDependencyManagementImporterTest {
         // Assert
         assertThat(result.getImportedFrom().toString())
                 .isEqualTo(differentSource.getLocation("").toString());
+    }
+
+    @Test
+    void testImportManagementInheritsVersionFromImportedBomWhenLocalEntryHasNoVersion() {
+        // A locally-declared dep mgmt entry with scope=provided but no version
+        Dependency localDep = Dependency.newBuilder()
+                .groupId("org.junit.jupiter")
+                .artifactId("junit-jupiter-api")
+                .scope("provided")
+                .build();
+
+        Model target = Model.newBuilder()
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(localDep))
+                        .build())
+                .build();
+
+        // An imported BOM providing the same dependency with a version
+        Dependency importedDep = Dependency.newBuilder()
+                .groupId("org.junit.jupiter")
+                .artifactId("junit-jupiter-api")
+                .version("5.10.0")
+                .build();
+
+        DependencyManagement importedBom = DependencyManagement.newBuilder()
+                .dependencies(List.of(importedDep))
+                .build();
+
+        DefaultDependencyManagementImporter importer = new DefaultDependencyManagementImporter();
+        Model result = importer.importManagement(
+                target, List.of(importedBom), mock(ModelBuilderRequest.class), mock(ModelProblemCollector.class));
+
+        List<Dependency> resultDeps = result.getDependencyManagement().getDependencies();
+        assertThat(resultDeps).hasSize(1);
+
+        Dependency merged = resultDeps.get(0);
+        assertThat(merged.getGroupId()).isEqualTo("org.junit.jupiter");
+        assertThat(merged.getArtifactId()).isEqualTo("junit-jupiter-api");
+        assertThat(merged.getVersion()).isEqualTo("5.10.0");
+        assertThat(merged.getScope()).isEqualTo("provided");
     }
 }
