@@ -1005,6 +1005,18 @@ public class DefaultModelBuilder implements ModelBuilder {
                         continue;
                     }
 
+                    // #12729: interpolate properties in the subproject/module path (e.g.
+                    // <module>./../module/pom${version-discriminator}.xml</module>) before
+                    // resolving it against the filesystem. Model-wide interpolation happens
+                    // later in the build, but module paths must be resolved here, so we
+                    // interpolate just the path against the user, model and system properties.
+                    subproject = interpolator.interpolate(
+                            subproject,
+                            Interpolator.chain(
+                                    request.getUserProperties()::get,
+                                    activated.getProperties()::get,
+                                    request.getSystemProperties()::get));
+
                     subproject = subproject.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
                     Path rawSubprojectFile = modelProcessor.locateExistingPom(pomDirectory.resolve(subproject));
