@@ -342,25 +342,25 @@ public class DefaultGraphBuilder implements GraphBuilder {
         }
 
         List<File> files = Arrays.asList(request.getPom().getAbsoluteFile());
-        boolean problems = collectProjects(projects, files, request);
-        session.setModelProblems(problems);
+        session.setModelProblems(collectProjects(projects, files, request));
         return projects;
     }
 
-    private boolean collectProjects(List<MavenProject> projects, List<File> files, MavenExecutionRequest request)
+    private List<ModelProblem> collectProjects(
+            List<MavenProject> projects, List<File> files, MavenExecutionRequest request)
             throws ProjectBuildingException {
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
         List<ProjectBuildingResult> results =
                 projectBuilder.build(files, request.isRecursive(), projectBuildingRequest);
 
-        boolean problems = false;
+        List<ModelProblem> problems = new ArrayList<>();
 
         for (ProjectBuildingResult result : results) {
             projects.add(result.getProject());
 
             if (!result.getProblems().isEmpty()) {
-                problems = true;
+                problems.addAll(result.getProblems());
 
                 if (logger.isWarnEnabled()) {
                     logger.warn("");
@@ -375,7 +375,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
             }
         }
 
-        if (problems) {
+        if (!problems.isEmpty()) {
             logger.warn("");
             logger.warn("It is highly recommended to fix these problems"
                     + " because they threaten the stability of your build.");
