@@ -60,13 +60,9 @@ public class DefaultLifecycleTaskSegmentCalculator implements LifecycleTaskSegme
 
     private final MojoDescriptorCreator mojoDescriptorCreator;
 
-    private final LifecyclePluginResolver lifecyclePluginResolver;
-
     @Inject
-    public DefaultLifecycleTaskSegmentCalculator(
-            MojoDescriptorCreator mojoDescriptorCreator, LifecyclePluginResolver lifecyclePluginResolver) {
+    public DefaultLifecycleTaskSegmentCalculator(MojoDescriptorCreator mojoDescriptorCreator) {
         this.mojoDescriptorCreator = mojoDescriptorCreator;
-        this.lifecyclePluginResolver = lifecyclePluginResolver;
     }
 
     @Override
@@ -107,8 +103,6 @@ public class DefaultLifecycleTaskSegmentCalculator implements LifecycleTaskSegme
             }
             if (isGoalSpecification(task)) {
                 // "pluginPrefix[:version]:goal" or "groupId:artifactId[:version]:goal"
-
-                lifecyclePluginResolver.resolveMissingPluginVersions(session.getTopLevelProject(), session);
 
                 MojoDescriptor mojoDescriptor =
                         mojoDescriptorCreator.getMojoDescriptor(task, session, session.getTopLevelProject());

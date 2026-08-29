@@ -121,7 +121,9 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
             throws PluginNotFoundException, PluginResolutionException, LifecyclePhaseNotFoundException,
                     PluginDescriptorParsingException, MojoNotFoundException, InvalidPluginDescriptorException,
                     NoPluginFoundForPrefixException, LifecycleNotFoundException, PluginVersionResolutionException {
-        lifecyclePluginResolver.resolveMissingPluginVersions(project, session);
+        if (tasks.stream().anyMatch(LifecycleTask.class::isInstance)) {
+            lifecyclePluginResolver.resolveMissingPluginVersions(project, session);
+        }
 
         final List<MojoExecution> executions = calculateMojoExecutions(session, project, tasks);
 
