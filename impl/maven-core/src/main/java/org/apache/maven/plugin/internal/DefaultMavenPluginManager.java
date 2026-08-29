@@ -106,6 +106,7 @@ import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
@@ -1025,6 +1026,15 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 }
             }
             extensionRecord = extensionRealmCache.put(extensionKey, extensionRealm, extensionDescriptor, artifacts);
+
+            // If another thread already cached a record for this key, dispose the redundant realm
+            if (extensionRecord.getRealm() != extensionRealm) {
+                try {
+                    extensionRealm.getWorld().disposeRealm(extensionRealm.getId());
+                } catch (NoSuchRealmException e) {
+                    // ignore — realm was already disposed
+                }
+            }
         }
         extensionRealmCache.register(project, extensionKey, extensionRecord);
         pluginRealms.put(pluginKey, extensionRecord);

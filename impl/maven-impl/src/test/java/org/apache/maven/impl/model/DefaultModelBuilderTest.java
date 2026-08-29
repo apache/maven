@@ -19,10 +19,14 @@
 package org.apache.maven.impl.model;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -33,6 +37,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Dependency;
@@ -45,9 +50,12 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.Sources;
+import org.apache.maven.impl.DefaultRemoteRepository;
 import org.apache.maven.impl.standalone.ApiRunner;
+import org.eclipse.aether.repository.RepositoryPolicy;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -185,6 +193,20 @@ class DefaultModelBuilderTest {
     }
 
     @Test
+    void testMavenVersionRangeProfileActivation() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("maven-version-range-profile")))
+                .systemProperties(Map.of(Constants.MAVEN_VERSION, "4.1.0"))
+                .build();
+
+        ModelBuilderResult result = builder.newSession().build(request);
+
+        assertEquals("true", result.getEffectiveModel().getProperties().get("maven.range.profile.active"));
+    }
+
+    @Test
     public void testMergeRepositories() throws Exception {
         // this is here only to trigger mainSession creation; unrelated
         ModelBuilderRequest request = ModelBuilderRequest.builder()
@@ -239,6 +261,128 @@ class DefaultModelBuilderTest {
         assertEquals("third", repositories.get(1).getId());
         assertEquals("https://third.repo", repositories.get(1).getUrl()); // interpolated (own model properties)
         assertEquals("central", repositories.get(2).getId()); // default
+    }
+
+    /**
+     * Verifies that when multiple repositories share the same ID (e.g., after mirror injection
+     * maps both "central" and a profile-defined repo to the same mirror ID), their policies are
+     * merged so that SNAPSHOT resolution is not broken.
+     * <p>
+     * This is a regression test for <a href="https://github.com/apache/maven/issues/12769">MNG-12769</a>:
+     * when two mirror-injected repos with the same mirror ID but different snapshot policies
+     * were passed to the resolver, the deduplication logic would drop the snapshot-enabled policy,
+     * making SNAPSHOT parent POM resolution fail.
+     */
+    @Test
+    public void testDuplicateMirrorReposMergedForSnapshotResolution() throws Exception {
+        // Simulate two repos with the same mirror ID but different snapshot policies,
+        // as produced by mirror injection when multiple repos map to the same mirror.
+        org.eclipse.aether.repository.RemoteRepository releasesOnly =
+                new org.eclipse.aether.repository.RemoteRepository.Builder(
+                                "my-mirror", "default", "https://mirror.example.com/maven")
+                        .setReleasePolicy(new RepositoryPolicy(
+                                true, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .setSnapshotPolicy(new RepositoryPolicy(
+                                false, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .build();
+        org.eclipse.aether.repository.RemoteRepository releasesAndSnapshots =
+                new org.eclipse.aether.repository.RemoteRepository.Builder(
+                                "my-mirror", "default", "https://mirror.example.com/maven")
+                        .setReleasePolicy(new RepositoryPolicy(
+                                true, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .setSnapshotPolicy(new RepositoryPolicy(
+                                true, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .build();
+
+        RemoteRepository repo1 = new DefaultRemoteRepository(releasesOnly);
+        RemoteRepository repo2 = new DefaultRemoteRepository(releasesAndSnapshots);
+
+        // Build a request with duplicate mirror repos
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("simple-standalone")))
+                .repositories(List.of(repo1, repo2))
+                .build();
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+        mbs.build(request);
+
+        // Access the internal state to verify repository deduplication
+        DefaultModelBuilder.ModelBuilderSessionState mainState =
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
+        Field repositoriesField = DefaultModelBuilder.ModelBuilderSessionState.class.getDeclaredField("repositories");
+        repositoriesField.setAccessible(true);
+        List<RemoteRepository> repositories = (List<RemoteRepository>) repositoriesField.get(mainState);
+
+        // Should be deduplicated to a single entry
+        long mirrorCount =
+                repositories.stream().filter(r -> "my-mirror".equals(r.getId())).count();
+        assertEquals(1, mirrorCount, "Duplicate mirror repos should be merged into one");
+
+        // The merged repo should have snapshots enabled (most permissive policy wins)
+        RemoteRepository merged = repositories.stream()
+                .filter(r -> "my-mirror".equals(r.getId()))
+                .findFirst()
+                .orElseThrow();
+        DefaultRemoteRepository mergedImpl = (DefaultRemoteRepository) merged;
+        assertTrue(mergedImpl.getRepository().getPolicy(true).isEnabled(), "Merged repo should have snapshots enabled");
+        assertTrue(mergedImpl.getRepository().getPolicy(false).isEnabled(), "Merged repo should have releases enabled");
+    }
+
+    /**
+     * Verifies that repo deduplication also handles the reverse case: dominant has snapshots,
+     * recessive has releases-only. The merge should enable both.
+     */
+    @Test
+    public void testDuplicateMirrorReposMergedReversePolicyOrder() throws Exception {
+        // First repo: snapshots only
+        org.eclipse.aether.repository.RemoteRepository snapshotsOnly =
+                new org.eclipse.aether.repository.RemoteRepository.Builder(
+                                "my-mirror", "default", "https://mirror.example.com/maven")
+                        .setReleasePolicy(new RepositoryPolicy(
+                                false, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .setSnapshotPolicy(new RepositoryPolicy(
+                                true, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .build();
+        // Second repo: releases only
+        org.eclipse.aether.repository.RemoteRepository releasesOnly =
+                new org.eclipse.aether.repository.RemoteRepository.Builder(
+                                "my-mirror", "default", "https://mirror.example.com/maven")
+                        .setReleasePolicy(new RepositoryPolicy(
+                                true, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .setSnapshotPolicy(new RepositoryPolicy(
+                                false, RepositoryPolicy.UPDATE_POLICY_DAILY, RepositoryPolicy.CHECKSUM_POLICY_WARN))
+                        .build();
+
+        RemoteRepository repo1 = new DefaultRemoteRepository(snapshotsOnly);
+        RemoteRepository repo2 = new DefaultRemoteRepository(releasesOnly);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("simple-standalone")))
+                .repositories(List.of(repo1, repo2))
+                .build();
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+        mbs.build(request);
+
+        DefaultModelBuilder.ModelBuilderSessionState mainState =
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
+        Field repositoriesField = DefaultModelBuilder.ModelBuilderSessionState.class.getDeclaredField("repositories");
+        repositoriesField.setAccessible(true);
+        List<RemoteRepository> repositories = (List<RemoteRepository>) repositoriesField.get(mainState);
+
+        RemoteRepository merged = repositories.stream()
+                .filter(r -> "my-mirror".equals(r.getId()))
+                .findFirst()
+                .orElseThrow();
+        DefaultRemoteRepository mergedImpl = (DefaultRemoteRepository) merged;
+        assertTrue(
+                mergedImpl.getRepository().getPolicy(true).isEnabled(),
+                "Merged repo should have snapshots enabled (from dominant)");
+        assertTrue(
+                mergedImpl.getRepository().getPolicy(false).isEnabled(),
+                "Merged repo should have releases enabled (from recessive)");
     }
 
     @Test
@@ -487,6 +631,36 @@ class DefaultModelBuilderTest {
     }
 
     /**
+     * Verify that building a model with BUILD_EFFECTIVE from a resolved source (null pomFile
+     * and null rootDirectory) does not throw a NullPointerException. This simulates the
+     * scenario from GH-12590 where both the session's root directory is unavailable
+     * (throws IllegalStateException) and the model source has no path, leading to a null
+     * rootDirectory in getEnhancedProperties.
+     *
+     * BUILD_EFFECTIVE is used because it goes through {@code buildEffectiveModel()} →
+     * {@code doReadFileModel()} with {@code isBuildRequest() == true}, exercising the
+     * {@code getEnhancedProperties()} call with a null rootDirectory.
+     */
+    @Test
+    public void testBuildEffectiveWithNullRootDirectory() {
+        Path pomPath = getPom("resolved-dependency");
+        // resolvedSource returns null for getPath(), and ApiRunner session throws
+        // IllegalStateException from getRootDirectory(), so rootDirectory will be null
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)
+                .source(Sources.resolvedSource(pomPath, "org.example:resolved-dep:1.0.0"))
+                .build();
+        ModelBuilderResult result = builder.newSession().build(request);
+        assertNotNull(result);
+        assertNotNull(result.getEffectiveModel());
+        assertNull(result.getEffectiveModel().getPomFile(), "pomFile should be null for resolved sources");
+        assertEquals("org.example", result.getEffectiveModel().getGroupId());
+        assertEquals("resolved-dep", result.getEffectiveModel().getArtifactId());
+        assertEquals("1.0.0", result.getEffectiveModel().getVersion());
+    }
+
+    /**
      * Verifies that when a BUILD_CONSUMER derived session is created with explicit
      * repositories, those repositories are propagated to the derived session's
      * {@code repositories} and {@code externalRepositories}.
@@ -627,6 +801,128 @@ class DefaultModelBuilderTest {
         assertNotNull(managedDep, "Managed dependency for the sibling module should be kept");
         assertEquals(
                 "1.0-SNAPSHOT", managedDep.getVersion(), "Version should be inferred from the reactor sibling module");
+    }
+
+    /**
+     * Verifies that {@code getEnhancedProperties} correctly recognizes the root model when
+     * {@code rootDirectory} has a non-normalized representation (e.g., containing {@code /..}
+     * segments) that differs from the normalized {@code model.getProjectDirectory()}.
+     *
+     * <p>Without the fix (GH-12598), the method compares these paths with raw
+     * {@code Objects.equals()}, sees them as different, and incorrectly enters the non-root
+     * branch — which re-reads the root model from disk and uses its properties.  In a real
+     * Maven session this recursive re-read through CachingSupplier re-entrancy leads to
+     * {@code StackOverflowError}.
+     *
+     * <p>With the fix, both paths are compared via {@code toAbsolutePath().normalize()},
+     * they match, and the else-branch is taken — using the model passed to the method
+     * directly.  The test detects which branch was taken by adding a marker property to
+     * the model that does not exist in the POM on disk: the else-branch (fix) uses the
+     * model and includes the marker, while the if-branch (no fix) re-reads from disk and
+     * the marker is absent.
+     *
+     * @see <a href="https://github.com/apache/maven/issues/12598">GH-12598</a>
+     */
+    @Test
+    @SuppressWarnings("unchecked")
+    public void testGetEnhancedPropertiesWithNonNormalizedRootDirectory(@TempDir Path tempDir) throws Exception {
+        // Create a project with a .mvn/ root marker and a subdirectory
+        Path projectDir = tempDir.resolve("project");
+        Files.createDirectories(projectDir.resolve(".mvn"));
+        Files.createDirectories(projectDir.resolve("subdir"));
+
+        // Simple root POM
+        Files.writeString(
+                projectDir.resolve("pom.xml"),
+                "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                        + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\"\n"
+                        + "    xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\"\n"
+                        + "    xsi:schemaLocation=\"http://maven.apache.org/POM/4.0.0"
+                        + " http://maven.apache.org/maven-v4_0_0.xsd\">\n"
+                        + "  <modelVersion>4.1.0</modelVersion>\n"
+                        + "  <groupId>org.test.gh12598</groupId>\n"
+                        + "  <artifactId>root</artifactId>\n"
+                        + "  <version>1.0-SNAPSHOT</version>\n"
+                        + "  <packaging>pom</packaging>\n"
+                        + "  <properties>\n"
+                        + "    <revision>1.0-SNAPSHOT</revision>\n"
+                        + "  </properties>\n"
+                        + "</project>\n");
+
+        // Build the project to get a ModelBuilderSessionState and the root Model
+        Path pomFile = projectDir.resolve("pom.xml");
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(pomFile))
+                .build();
+        ModelBuilder.ModelBuilderSession builderSession = builder.newSession();
+        ModelBuilderResult result = builderSession.build(request);
+        assertNotNull(result);
+        Model model = result.getFileModel();
+        assertNotNull(model);
+        assertEquals("root", model.getArtifactId());
+
+        // model.getProjectDirectory() is normalized by PathSource.
+        // Construct a non-normalized path that refers to the same directory.
+        // This simulates session.getRootDirectory() returning a non-normalized path.
+        Path nonNormalizedRootDir = projectDir.resolve("subdir").resolve("..");
+        assertFalse(
+                nonNormalizedRootDir.equals(model.getProjectDirectory()),
+                "Paths must differ in representation (non-normalized vs normalized)");
+        assertTrue(
+                Files.isSameFile(nonNormalizedRootDir, model.getProjectDirectory()),
+                "Paths must refer to the same directory");
+
+        // Add a marker property to the model that does NOT exist in the POM on disk.
+        // This lets us detect which branch getEnhancedProperties takes:
+        //   - else-branch (fix): uses the model parameter directly → marker present
+        //   - if-branch (no fix): re-reads model from disk → marker absent
+        Map<String, String> modelProps = new HashMap<>(model.getProperties());
+        modelProps.put("gh12598.marker", "from-model");
+        Model markedModel = model.withProperties(modelProps);
+        assertEquals("from-model", markedModel.getProperties().get("gh12598.marker"));
+
+        // Get the ModelBuilderSessionState via reflection (same pattern as testMergeRepositories)
+        Field mainSessionField = DefaultModelBuilder.ModelBuilderSessionImpl.class.getDeclaredField("mainSession");
+        mainSessionField.setAccessible(true);
+        DefaultModelBuilder.ModelBuilderSessionState state =
+                (DefaultModelBuilder.ModelBuilderSessionState) mainSessionField.get(builderSession);
+
+        // Clear the session's request cache so that the if-branch (which calls readFileModel
+        // to re-read the root model from disk) won't get a cache hit from the build() call.
+        Field requestCacheField = session.getClass().getSuperclass().getDeclaredField("requestCache");
+        requestCacheField.setAccessible(true);
+        requestCacheField.set(session, null);
+
+        // Invoke getEnhancedProperties via reflection with the non-normalized rootDirectory
+        // and the marked model.
+        Set<Path> activeModelReads = new HashSet<>();
+        Method getEnhancedProperties = DefaultModelBuilder.ModelBuilderSessionState.class.getDeclaredMethod(
+                "getEnhancedProperties", Model.class, Path.class, Set.class);
+        getEnhancedProperties.setAccessible(true);
+        Map<String, String> properties = (Map<String, String>)
+                getEnhancedProperties.invoke(state, markedModel, nonNormalizedRootDir, activeModelReads);
+
+        assertNotNull(properties);
+        assertTrue(properties.containsKey("project.rootDirectory"), "Result should contain project.rootDirectory");
+
+        // The key assertion: the marker property must be present in the result.
+        // With the fix, getEnhancedProperties recognizes that nonNormalizedRootDir
+        // and projectDirectory refer to the same directory (via toAbsolutePath().normalize()),
+        // takes the else-branch, and uses the passed-in model's properties directly —
+        // including our marker.
+        // Without the fix, it sees them as different (raw Objects.equals), takes the
+        // if-branch, re-reads the root model from disk (which lacks the marker), and
+        // the marker is absent. In a real Maven session, this incorrect branch leads to
+        // recursive readFileModel calls and StackOverflowError.
+        assertEquals(
+                "from-model",
+                properties.get("gh12598.marker"),
+                "getEnhancedProperties should use the passed-in model (else-branch) when "
+                        + "rootDirectory and projectDirectory refer to the same directory. "
+                        + "Marker absent means the if-branch was taken (re-read from disk), "
+                        + "which indicates the path normalization fix (GH-12598) is not working.");
     }
 
     private static DefaultProfileActivationContext.Record recordActiveProfile(

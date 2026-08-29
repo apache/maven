@@ -71,10 +71,7 @@ class LifecycleExecutionPlanCalculatorTest extends AbstractCoreMavenComponentTes
 
     public static MojoDescriptorCreator createMojoDescriptorCreator() {
         return new MojoDescriptorCreator(
-                new PluginVersionResolverStub(),
-                new BuildPluginManagerStub(),
-                new PluginPrefixResolverStub(),
-                new LifecyclePluginResolver(new PluginVersionResolverStub()));
+                new PluginVersionResolverStub(), new BuildPluginManagerStub(), new PluginPrefixResolverStub());
     }
 
     @Override

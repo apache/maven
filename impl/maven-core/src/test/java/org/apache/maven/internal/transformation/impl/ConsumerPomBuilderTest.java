@@ -24,6 +24,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Node;
@@ -275,5 +276,113 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         boolean hasCustomRepo =
                 consumerRequest.getRepositories().stream().anyMatch(r -> "custom-repo".equals(r.getId()));
         assertTrue(hasCustomRepo, "Consumer POM model builder request should include the project's custom repository");
+    }
+
+    /**
+     * Verifies that the consumer POM builder injects properties from the project's
+     * active profiles into the BUILD_CONSUMER request's user properties.
+     * <p>
+     * Without the fix in {@code DefaultConsumerPomBuilder.buildModel()}, the
+     * {@code ModelBuilderRequest} only carries session user properties. When a
+     * dependency version is defined via a profile property (e.g.
+     * {@code <version>${my.version}</version>}), model validation would reject the
+     * unresolved expression as an invalid version.
+     * <p>
+     * Session user properties ({@code -D} flags) must still take precedence over
+     * profile-defined properties.
+     */
+    @Test
+    void testConsumerPomIncludesActiveProfileProperties() throws Exception {
+        setRootDirectory("trivial");
+        Path file = Paths.get("src/test/resources/consumer/trivial/child/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+
+        // Create an active profile with a property, simulating a profile that defines
+        // a dependency version (the scenario fixed by MNG-8709).
+        org.apache.maven.api.model.Profile apiProfile = org.apache.maven.api.model.Profile.newBuilder()
+                .id("version-profile")
+                .properties(Map.of("dep.version", "1.0.0"))
+                .build();
+        org.apache.maven.model.Profile modelProfile = new org.apache.maven.model.Profile(apiProfile);
+        project.setActiveProfiles(List.of(modelProfile));
+
+        // Spy on the ModelBuilderSession to capture the ModelBuilderRequest
+        ModelBuilder.ModelBuilderSession originalMbs = modelBuilder.newSession();
+        ModelBuilder.ModelBuilderSession spyMbs = Mockito.spy(originalMbs);
+        InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), spyMbs);
+
+        // Build the consumer POM
+        builder.build(session, project, Sources.buildSource(file));
+
+        // Capture the ModelBuilderRequest passed to the ModelBuilderSession
+        ArgumentCaptor<ModelBuilderRequest> requestCaptor = ArgumentCaptor.forClass(ModelBuilderRequest.class);
+        Mockito.verify(spyMbs, Mockito.atLeastOnce()).build(requestCaptor.capture());
+
+        // Find the BUILD_CONSUMER request
+        ModelBuilderRequest consumerRequest = requestCaptor.getAllValues().stream()
+                .filter(r -> r.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(consumerRequest, "Expected a BUILD_CONSUMER request to be made");
+
+        // Verify that user properties contain the profile property
+        Map<String, String> userProps = consumerRequest.getUserProperties();
+        assertNotNull(userProps, "User properties should not be null");
+        assertTrue(
+                userProps.containsKey("dep.version"), "User properties should contain properties from active profiles");
+        assertTrue(
+                "1.0.0".equals(userProps.get("dep.version")),
+                "Profile property 'dep.version' should have value '1.0.0'");
+    }
+
+    /**
+     * Verifies that session user properties ({@code -D} flags) take precedence
+     * over profile-defined properties in the BUILD_CONSUMER request.
+     */
+    @Test
+    void testConsumerPomSessionPropertiesOverrideProfileProperties() throws Exception {
+        MavenExecutionRequest execRequest = setRootDirectory("trivial");
+        Path file = Paths.get("src/test/resources/consumer/trivial/child/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+
+        // Create an active profile with a property
+        org.apache.maven.api.model.Profile apiProfile = org.apache.maven.api.model.Profile.newBuilder()
+                .id("version-profile")
+                .properties(Map.of("dep.version", "1.0.0"))
+                .build();
+        org.apache.maven.model.Profile modelProfile = new org.apache.maven.model.Profile(apiProfile);
+        project.setActiveProfiles(List.of(modelProfile));
+
+        // Set the same property as a session user property (simulating -Ddep.version=2.0.0)
+        execRequest.getUserProperties().setProperty("dep.version", "2.0.0");
+
+        // Spy on the ModelBuilderSession to capture the ModelBuilderRequest
+        ModelBuilder.ModelBuilderSession originalMbs = modelBuilder.newSession();
+        ModelBuilder.ModelBuilderSession spyMbs = Mockito.spy(originalMbs);
+        InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), spyMbs);
+
+        // Build the consumer POM
+        builder.build(session, project, Sources.buildSource(file));
+
+        // Capture the BUILD_CONSUMER request
+        ArgumentCaptor<ModelBuilderRequest> requestCaptor = ArgumentCaptor.forClass(ModelBuilderRequest.class);
+        Mockito.verify(spyMbs, Mockito.atLeastOnce()).build(requestCaptor.capture());
+
+        ModelBuilderRequest consumerRequest = requestCaptor.getAllValues().stream()
+                .filter(r -> r.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(consumerRequest, "Expected a BUILD_CONSUMER request to be made");
+
+        // Session user properties must override profile properties
+        Map<String, String> userProps = consumerRequest.getUserProperties();
+        assertTrue(
+                "2.0.0".equals(userProps.get("dep.version")),
+                "Session user property should override profile property; expected '2.0.0' but got '"
+                        + userProps.get("dep.version") + "'");
     }
 }

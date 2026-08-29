@@ -548,6 +548,16 @@ class DefaultModelValidatorTest {
     }
 
     @Test
+    void testBadParentRelativePath() throws Exception {
+        SimpleProblemCollector result = validateFile("bad-parent-relativePath.xml");
+
+        assertViolations(result, 0, 1, 0);
+
+        assertContains(result.getErrors().get(0), "parent.relativePath");
+        assertContains(result.getErrors().get(0), "must not contain any of these characters");
+    }
+
+    @Test
     void testIncompleteParent() throws Exception {
         SimpleProblemCollector result = validateRaw("incomplete-parent.xml");
 

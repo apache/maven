@@ -37,7 +37,6 @@ public class MavenValidatorFactory implements ValidatorFactory {
 
     private final MavenValidator defaultValidator = new MavenValidator(true);
     private final MavenValidator mildValidator = new MavenValidator(false);
-    private final Validator offValidator = new Validator() {};
 
     @Override
     public Validator newInstance(RepositorySystemSession session) {
@@ -45,7 +44,7 @@ public class MavenValidatorFactory implements ValidatorFactory {
                 session, ValidationLevel.class, ValidationLevel.DEFAULT, Constants.MAVEN_RESOLVER_VALIDATION)) {
             case DEFAULT -> defaultValidator;
             case MILD -> mildValidator;
-            case OFF -> offValidator;
+            case OFF -> NOOP;
         };
     }
 }

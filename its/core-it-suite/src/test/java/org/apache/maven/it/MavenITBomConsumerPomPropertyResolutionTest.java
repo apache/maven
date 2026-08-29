@@ -156,6 +156,7 @@ class MavenITBomConsumerPomPropertyResolutionTest extends AbstractMavenIntegrati
 
         // Check the consumer POM in the project-local-repo
         Path consumerPom = basedir.resolve(Path.of(
+                ".mvn",
                 "target",
                 "project-local-repo",
                 "org.apache.maven.its.bom-property",

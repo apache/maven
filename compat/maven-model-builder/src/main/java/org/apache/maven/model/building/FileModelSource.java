@@ -21,6 +21,7 @@ package org.apache.maven.model.building;
 import java.io.File;
 import java.net.URI;
 import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 
 import org.apache.maven.building.FileSource;
@@ -61,7 +62,12 @@ public class FileModelSource extends FileSource implements ModelSource2 {
     public ModelSource2 getRelatedSource(String relPath) {
         relPath = relPath.replace('\\', File.separatorChar).replace('/', File.separatorChar);
 
-        Path relatedPom = getPath().getParent().resolve(relPath);
+        Path relatedPom;
+        try {
+            relatedPom = getPath().getParent().resolve(relPath);
+        } catch (InvalidPathException e) {
+            return null;
+        }
 
         if (Files.isDirectory(relatedPom)) {
             // TODO figure out how to reuse ModelLocator.locatePom(File) here
