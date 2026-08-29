@@ -144,6 +144,7 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
     public void mojoSkipped(ExecutionEvent event) {
         setMdc(event);
         delegate.mojoSkipped(event);
+        ProjectBuildLogAppender.setMojoId(null);
     }
 
     @Override
