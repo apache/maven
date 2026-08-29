@@ -24,6 +24,7 @@ import java.util.Properties;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -37,8 +38,12 @@ public class MavenITRememberModelProblemsTest extends AbstractMavenIntegrationTe
 
         Properties warningProperties = execute(testDir.resolve("warning"));
 
-        assertEquals("true", warningProperties.getProperty("session.hasModelProblems"));
-        assertEquals("true", warningProperties.getProperty("session.session.hasModelProblems"));
+        assertTrue(
+                Integer.parseInt(warningProperties.getProperty("session.modelProblems.size")) > 0,
+                "Expected at least one legacy model problem");
+        assertFalse(
+                warningProperties.getProperty("session.modelProblems.0.message").isEmpty(),
+                "Expected a retained legacy model problem message");
         assertTrue(
                 Integer.parseInt(warningProperties.getProperty(
                                 "session.session.modelProblemCollector.totalProblemsReported"))
@@ -47,8 +52,7 @@ public class MavenITRememberModelProblemsTest extends AbstractMavenIntegrationTe
 
         Properties cleanProperties = execute(testDir.resolve("clean"));
 
-        assertEquals("false", cleanProperties.getProperty("session.hasModelProblems"));
-        assertEquals("false", cleanProperties.getProperty("session.session.hasModelProblems"));
+        assertEquals("0", cleanProperties.getProperty("session.modelProblems.size"));
         assertEquals(
                 "0",
                 cleanProperties.getProperty("session.session.modelProblemCollector.totalProblemsReported"));

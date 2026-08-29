@@ -18,15 +18,21 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
+import org.apache.maven.api.services.ProblemCollector;
+import org.apache.maven.model.building.DefaultModelProblem;
+import org.apache.maven.model.building.ModelProblem;
 
 import static java.util.Objects.requireNonNull;
 
 /**
- * Stores the legacy model-problem flag in session data so that derived sessions see the same state.
+ * Bridges native model problems to the legacy model-building API.
  */
 public final class SessionModelProblemsBridge {
 
@@ -34,13 +40,30 @@ public final class SessionModelProblemsBridge {
 
     private SessionModelProblemsBridge() {}
 
-    public static boolean hasModelProblems(Session session) {
-        return getState(session).legacyFlag.get()
-                || session.getModelProblemCollector().hasWarningProblems();
+    public static List<ModelProblem> getModelProblems(Session session) {
+        ProblemCollector<org.apache.maven.api.services.ModelProblem> collector =
+                requireNonNull(session, "session").getModelProblemCollector();
+        List<ModelProblem> problems = new ArrayList<>();
+        if (collector.problemsOverflow()) {
+            problems.add(new DefaultModelProblem(
+                    "Too many model problems reported (listed problems are just a subset of reported problems)",
+                    ModelProblem.Severity.WARNING,
+                    null,
+                    (String) null,
+                    -1,
+                    -1,
+                    null,
+                    null));
+        }
+        problems.addAll(getState(session).legacyProblems.get());
+        collector.problems().map(SessionModelProblemsBridge::toLegacy).forEach(problems::add);
+        return Collections.unmodifiableList(problems);
     }
 
-    public static void setLegacyFlag(Session session, boolean value) {
-        getState(session).legacyFlag.set(value);
+    public static void setLegacyModelProblems(Session session, List<ModelProblem> problems) {
+        getState(session)
+                .legacyProblems
+                .set(Collections.unmodifiableList(new ArrayList<>(requireNonNull(problems, "problems"))));
     }
 
     private static State getState(Session session) {
@@ -48,8 +71,21 @@ public final class SessionModelProblemsBridge {
         return session.getData().computeIfAbsent(KEY, State::new);
     }
 
+    private static ModelProblem toLegacy(org.apache.maven.api.services.ModelProblem problem) {
+        return new DefaultModelProblem(
+                problem.getMessage(),
+                ModelProblem.Severity.valueOf(problem.getSeverity().name()),
+                ModelProblem.Version.valueOf(problem.getVersion().name()),
+                problem.getSource(),
+                problem.getLineNumber(),
+                problem.getColumnNumber(),
+                problem.getModelId(),
+                problem.getException());
+    }
+
     private static final class State {
 
-        private final AtomicBoolean legacyFlag = new AtomicBoolean();
+        private final AtomicReference<List<ModelProblem>> legacyProblems =
+                new AtomicReference<>(Collections.emptyList());
     }
 }

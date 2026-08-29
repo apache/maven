@@ -840,7 +840,7 @@ class DefaultModelBuilderTest {
 
         session.getModelProblemCollector().reportProblem(problem);
 
-        assertTrue(session.hasModelProblems());
+        assertTrue(session.getModelProblemCollector().hasWarningProblems());
         assertEquals(1, session.getModelProblemCollector().totalProblemsReported());
     }
 
