@@ -932,11 +932,13 @@ class DefaultModelBuilderTest {
     }
 
     /**
-     * BOM-type import-scoped dependencyManagement entries must be processed.
+     * {@code type=bom} dependencyManagement entries must be processed as BOM imports
+     * without requiring {@code scope=import}. The {@code bom} type inherently implies
+     * import semantics (unlike {@code type=pom}, which requires {@code scope=import}).
      * Operator precedence previously skipped {@code type=bom} always (GH-12589).
      */
     @Test
-    public void testImportScopeBomTypeIsProcessed() {
+    public void testBomTypeImpliesImportWithoutScope() {
         Path basedir = Paths.get(System.getProperty("basedir", ""));
         Path localRepoPath = basedir.resolve("target/local-repo-bom-import");
         Path remoteRepoPath = basedir.resolve("src/test/remote-repo");

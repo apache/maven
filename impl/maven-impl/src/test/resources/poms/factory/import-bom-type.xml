@@ -23,12 +23,12 @@
 
     <dependencyManagement>
         <dependencies>
+            <!-- type=bom without scope=import: the bom type inherently implies import -->
             <dependency>
                 <groupId>org.apache.maven.its</groupId>
                 <artifactId>bom</artifactId>
                 <version>0.1</version>
                 <type>bom</type>
-                <scope>import</scope>
             </dependency>
         </dependencies>
     </dependencyManagement>
