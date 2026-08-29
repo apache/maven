@@ -402,8 +402,7 @@ class DefaultGraphBuilderTest {
         Result<ProjectDependencyGraph> result = graphBuilder.build(session);
 
         assertFalse(result.hasErrors(), "Expected result not to have errors");
-        assertTrue(apiSession.hasModelProblems());
-        assertTrue(session.hasModelProblems());
+        assertTrue(modelProblems.hasWarningProblems());
         assertEquals(1, modelProblems.totalProblemsReported());
         ModelProblem problem = modelProblems.problems().findFirst().orElseThrow();
         assertEquals("model warning", problem.getMessage());
@@ -454,8 +453,7 @@ class DefaultGraphBuilderTest {
         Result<ProjectDependencyGraph> result = graphBuilder.build(session);
 
         assertFalse(result.hasErrors(), "Expected result not to have errors");
-        assertFalse(apiSession.hasModelProblems());
-        assertFalse(session.hasModelProblems());
+        assertFalse(modelProblems.hasWarningProblems());
         assertEquals(0, modelProblems.totalProblemsReported());
     }
 
@@ -492,7 +490,7 @@ class DefaultGraphBuilderTest {
         assertFalse(result.hasErrors(), "Expected result not to have errors");
         assertEquals(
                 singletonList(artifactIdProjectMap.get(MODULE_A)), result.get().getSortedProjects());
-        assertTrue(apiSession.hasModelProblems());
+        assertTrue(modelProblems.hasWarningProblems());
         assertEquals(1, modelProblems.totalProblemsReported());
     }
 
@@ -539,8 +537,6 @@ class DefaultGraphBuilderTest {
         when(session.getRequest()).thenReturn(mavenExecutionRequest);
         when(session.getSession()).thenReturn(apiSession);
         when(apiSession.getModelProblemCollector()).thenReturn(modelProblems);
-        when(apiSession.hasModelProblems()).thenAnswer(invocation -> modelProblems.hasWarningProblems());
-        when(session.hasModelProblems()).thenAnswer(invocation -> apiSession.hasModelProblems());
         when(session.getProjects()).thenReturn(null); // needed, otherwise it will be an empty list by default
         when(mavenExecutionRequest.getProjectBuildingRequest()).thenReturn(mock(ProjectBuildingRequest.class));
         List<ProjectBuildingResult> projectBuildingResults =

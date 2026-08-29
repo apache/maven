@@ -106,15 +106,6 @@ public interface Session extends ProtoSession {
     }
 
     /**
-     * Returns whether model problems were encountered while discovering the projects in this session's reactor.
-     *
-     * @return {@code true} if at least one model problem was encountered
-     */
-    default boolean hasModelProblems() {
-        return getModelProblemCollector().hasWarningProblems();
-    }
-
-    /**
      * Default implementation at {@link ProtoSession} level, as the notion of project
      * does not exist there.
      */

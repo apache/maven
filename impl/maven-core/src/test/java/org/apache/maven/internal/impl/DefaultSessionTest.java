@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl;
 import java.nio.file.Paths;
 import java.util.Collections;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelProblem;
@@ -34,7 +35,6 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -89,34 +89,84 @@ public class DefaultSessionTest {
 
         Session derivedSession = session.withRemoteRepositories(Collections.emptyList());
 
-        assertTrue(session.hasModelProblems());
-        assertTrue(derivedSession.hasModelProblems());
-        assertTrue(legacySession.hasModelProblems());
+        assertTrue(session.getModelProblemCollector().hasWarningProblems());
+        assertTrue(derivedSession.getModelProblemCollector().hasWarningProblems());
         assertSame(session.getModelProblemCollector(), derivedSession.getModelProblemCollector());
         assertSame(
                 problem,
                 session.getModelProblemCollector().problems().findFirst().orElseThrow());
+
+        assertEquals(1, legacySession.getModelProblems().size());
+        org.apache.maven.model.building.ModelProblem legacyProblem =
+                legacySession.getModelProblems().get(0);
+        assertEquals(problem.getMessage(), legacyProblem.getMessage());
+        assertEquals(problem.getSeverity().name(), legacyProblem.getSeverity().name());
+        assertEquals(problem.getVersion().name(), legacyProblem.getVersion().name());
+        assertEquals(problem.getSource(), legacyProblem.getSource());
+        assertEquals(problem.getLineNumber(), legacyProblem.getLineNumber());
+        assertEquals(problem.getColumnNumber(), legacyProblem.getColumnNumber());
+        assertEquals(problem.getModelId(), legacyProblem.getModelId());
+        assertThrows(
+                UnsupportedOperationException.class,
+                () -> legacySession.getModelProblems().clear());
     }
 
     @Test
-    void legacyModelProblemSetterIsVisibleThroughNativeSession() {
+    void legacyModelProblemsAreSharedThroughSessionData() {
         RepositorySystemSession rss = new DefaultRepositorySystemSession(h -> false);
         MavenSession legacySession = new MavenSession(null, rss, new DefaultMavenExecutionRequest(), null);
         DefaultSession session = new DefaultSession(
                 legacySession, mock(RepositorySystem.class), Collections.emptyList(), null, null, null);
         legacySession.setSession(session);
 
-        assertFalse(session.hasModelProblems());
-        assertFalse(legacySession.hasModelProblems());
+        assertTrue(legacySession.getModelProblems().isEmpty());
 
-        legacySession.setModelProblems(true);
+        org.apache.maven.model.building.ModelProblem problem = new org.apache.maven.model.building.DefaultModelProblem(
+                "legacy warning",
+                org.apache.maven.model.building.ModelProblem.Severity.WARNING,
+                org.apache.maven.model.building.ModelProblem.Version.BASE,
+                "pom.xml",
+                3,
+                7,
+                "org.example:legacy:1",
+                null);
+        legacySession.setModelProblems(Collections.singletonList(problem));
 
-        assertTrue(session.hasModelProblems());
-        assertTrue(legacySession.hasModelProblems());
+        assertEquals(Collections.singletonList(problem), legacySession.getModelProblems());
+        assertEquals(Collections.singletonList(problem), SessionModelProblemsBridge.getModelProblems(session));
+        Session derivedSession = session.withRemoteRepositories(Collections.emptyList());
+        assertEquals(Collections.singletonList(problem), SessionModelProblemsBridge.getModelProblems(derivedSession));
 
-        legacySession.setModelProblems(false);
+        legacySession.setModelProblems(Collections.emptyList());
 
-        assertFalse(session.hasModelProblems());
-        assertFalse(legacySession.hasModelProblems());
+        assertTrue(legacySession.getModelProblems().isEmpty());
+        assertTrue(SessionModelProblemsBridge.getModelProblems(derivedSession).isEmpty());
+    }
+
+    @Test
+    void legacyModelProblemsReportNativeCollectorOverflow() {
+        RepositorySystemSession rss = new DefaultRepositorySystemSession(h -> false);
+        DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.getUserProperties().setProperty(Constants.MAVEN_BUILDER_MAX_PROBLEMS, "0");
+        MavenSession legacySession = new MavenSession(null, rss, request, null);
+        DefaultSession session = new DefaultSession(
+                legacySession, mock(RepositorySystem.class), Collections.emptyList(), null, null, null);
+        legacySession.setSession(session);
+
+        ModelProblem problem = new DefaultModelProblem(
+                "model warning",
+                BuilderProblem.Severity.WARNING,
+                ModelProblem.Version.BASE,
+                "pom.xml",
+                -1,
+                -1,
+                "org.example:project:1",
+                null);
+        session.getModelProblemCollector().reportProblem(problem);
+
+        assertTrue(session.getModelProblemCollector().problemsOverflow());
+        assertEquals(0, session.getModelProblemCollector().problems().count());
+        assertEquals(1, legacySession.getModelProblems().size());
+        assertTrue(legacySession.getModelProblems().get(0).getMessage().contains("subset"));
     }
 }
