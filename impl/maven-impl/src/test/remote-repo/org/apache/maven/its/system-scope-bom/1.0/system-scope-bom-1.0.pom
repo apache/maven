@@ -1,0 +1,18 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.its</groupId>
+  <artifactId>system-scope-bom</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.apache.maven.its</groupId>
+        <artifactId>system-scope-dep</artifactId>
+        <version>1.0</version>
+        <scope>system</scope>
+        <systemPath>/etc/imaginary-credentials.jar</systemPath>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+</project>

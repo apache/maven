@@ -738,5 +738,23 @@ public final class Constants {
      */
     public static final String MAVEN_LOGGER_LOG_PREFIX = MAVEN_LOGGER_PREFIX + "log.";
 
+    /**
+     * User property for allowing {@code system} scope and {@code systemPath} in dependency
+     * management imported from repository-resolved POMs (BOMs).
+     * <ul>
+     *     <li>When set to <code>false</code> (default), dependency management imported from a
+     * repository-resolved POM may not declare {@code system} scope or a {@code systemPath};
+     * such entries are dropped with a warning.</li>
+     *     <li>When set to <code>true</code>, such entries are imported as in previous Maven
+     * versions, with a warning.</li>
+     * </ul>
+     * Dependency management imported from the local reactor is not affected by this property.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE =
+            "maven.repository.dependencyManagement.allowSystemScope";
+
     private Constants() {}
 }
