@@ -126,11 +126,28 @@ public class ApiRunner {
      * @return a new {@link Session} instance
      */
     public static Session createSession(Consumer<Injector> injectorConsumer, Path localRepo) {
+        return createSession(injectorConsumer, localRepo, true);
+    }
+
+    /**
+     * Creates a new Maven session with custom injector configuration, local repository path
+     * and control over {@code user.home} isolation.
+     *
+     * @param injectorConsumer consumer function to customize the injector
+     * @param localRepo path to the local repository
+     * @param isolateUserHome when {@code true}, the session remaps {@code user.home} to the
+     *        {@code target} directory so the invoking user's {@code settings.xml} and local
+     *        repository cannot interfere with tests; callers that want the operator's real
+     *        configuration honored (such as the mvnup tool) must pass {@code false}
+     * @return a new {@link Session} instance
+     */
+    public static Session createSession(Consumer<Injector> injectorConsumer, Path localRepo, boolean isolateUserHome) {
         Injector injector = Injector.create();
         injector.bindInstance(Injector.class, injector);
         injector.bindImplicit(ApiRunner.class);
         injector.bindImplicit(RepositorySystemSupplier.class);
         injector.bindInstance(LocalRepoProvider.class, () -> localRepo);
+        injector.bindInstance(UserHomeIsolation.class, () -> isolateUserHome);
         injector.discover(ApiRunner.class.getClassLoader());
         if (injectorConsumer != null) {
             injectorConsumer.accept(injector);
@@ -141,6 +158,17 @@ public class ApiRunner {
         scope.seed(Session.class, session);
         injector.bindScope(SessionScoped.class, scope);
         return session;
+    }
+
+    /**
+     * Controls whether the standalone session isolates {@code user.home} from the invoking
+     * user's environment.
+     */
+    interface UserHomeIsolation {
+        /**
+         * @return {@code true} to remap {@code user.home} away from the real user home
+         */
+        boolean isolated();
     }
 
     /**
@@ -365,16 +393,23 @@ public class ApiRunner {
 
     @Provides
     @SuppressWarnings("unused")
-    static Session newSession(RepositorySystem system, Lookup lookup, @Nullable LocalRepoProvider localRepoProvider) {
+    static Session newSession(
+            RepositorySystem system,
+            Lookup lookup,
+            @Nullable LocalRepoProvider localRepoProvider,
+            @Nullable UserHomeIsolation userHomeIsolation) {
         Map<String, String> properties = new HashMap<>();
         // Env variables prefixed with "env."
         System.getenv().forEach((k, v) -> properties.put("env." + k, v));
         // Java System properties
         System.getProperties().forEach((k, v) -> properties.put(k.toString(), v.toString()));
 
-        // Do not allow user settings to interfere with our unit tests
-        // TODO: remove that when this go more public
-        properties.put("user.home", "target");
+        // Test isolation shim: do not let the invoking user's settings interfere with unit
+        // tests. Callers that want the operator's real settings.xml and local repository
+        // honored must create the session with isolateUserHome=false (see createSession).
+        if (userHomeIsolation == null || userHomeIsolation.isolated()) {
+            properties.put("user.home", "target");
+        }
 
         Path userHome = Paths.get(properties.get("user.home"));
         Path mavenUserHome = userHome.resolve(".m2");
