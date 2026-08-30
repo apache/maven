@@ -123,6 +123,26 @@ class FastTerminalReentrancyTest {
     }
 
     /**
+     * Verifies that {@link MessageUtils#getTerminal()} is non-null when called from the builder
+     * callback. Before the fix, the {@code FastTerminal} constructor started its build thread
+     * before returning, so {@code MessageUtils.terminal} was still {@code null} when the build
+     * thread ran the builder callback &mdash; a race between the constructor returning and the
+     * thread scheduling. After the fix, {@code MessageUtils} assigns the field before calling
+     * {@link FastTerminal#start()}, and {@link Thread#start()} provides the happens-before edge.
+     *
+     * @see <a href="https://github.com/apache/maven/issues/12912">#12912</a>
+     */
+    @Test
+    void terminalAssignmentIsVisibleFromBuilderCallback() {
+        assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
+            CompletableFuture<Terminal> observed = new CompletableFuture<>();
+            installAndAwait(builder -> observed.complete(MessageUtils.getTerminal()), terminal -> {});
+            assertNotNull(observed.get(), "MessageUtils.getTerminal() must not return null from the builder callback");
+            assertTrue(observed.get() instanceof FastTerminal, "terminal should be the FastTerminal wrapper");
+        });
+    }
+
+    /**
      * Both terminal calls a single log statement makes, run on the terminal building thread.
      */
     private static String[] probe() {
