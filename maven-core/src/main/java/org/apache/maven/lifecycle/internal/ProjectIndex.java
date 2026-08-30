@@ -18,9 +18,9 @@
  */
 package org.apache.maven.lifecycle.internal;
 
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.project.MavenProject;
@@ -43,8 +43,8 @@ public final class ProjectIndex {
     private final Map<String, Integer> indices;
 
     public ProjectIndex(List<MavenProject> projects) {
-        this.projects = new HashMap<>(projects.size() * 2);
-        this.indices = new HashMap<>(projects.size() * 2);
+        this.projects = new ConcurrentHashMap<>(projects.size() * 2);
+        this.indices = new ConcurrentHashMap<>(projects.size() * 2);
 
         for (int i = 0; i < projects.size(); i++) {
             MavenProject project = projects.get(i);
