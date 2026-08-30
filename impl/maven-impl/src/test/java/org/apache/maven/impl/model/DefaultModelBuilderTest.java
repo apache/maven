@@ -176,6 +176,210 @@ class DefaultModelBuilderTest {
         assertTrue(model.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
     }
 
+    private Map<String, String> parentActivationSystemProperties() {
+        Map<String, String> systemProperties = new HashMap<>();
+        for (String name : System.getProperties().stringPropertyNames()) {
+            systemProperties.put(name, System.getProperty(name));
+        }
+        systemProperties.put("some.dir", System.getProperty("java.io.tmpdir"));
+        systemProperties.put("some.gating.property", "true");
+        systemProperties.put("some.condition.property", "true");
+        return systemProperties;
+    }
+
+    private DefaultProfileActivationContext parentActivationContext(Map<String, String> systemProperties) {
+        org.apache.maven.api.services.Lookup lookup = session.getService(org.apache.maven.api.services.Lookup.class);
+        return new DefaultProfileActivationContext(
+                lookup.lookup(org.apache.maven.api.services.model.PathTranslator.class),
+                lookup.lookup(org.apache.maven.api.services.model.RootLocator.class),
+                lookup.lookup(org.apache.maven.api.services.Interpolator.class),
+                List.of(),
+                List.of(),
+                systemProperties,
+                Map.of(),
+                Model.newInstance());
+    }
+
+    /**
+     * readAsParentModel() caches by (source, tag), where tag depends on externalOrigin, through
+     * a generic per-request cache keyed off the request object itself. To exercise that
+     * partition directly -- independent of how deep a real build's RequestTrace ancestry happens
+     * to be -- both reads below derive from the exact same request instance, differing only in
+     * which parent session state (one already externalOrigin=true, one false) they derive from.
+     * That guarantees both calls address the same underlying per-request cache bucket, so this
+     * proves the tag partition itself separates them, not an accidental difference elsewhere.
+     */
+    @Test
+    public void testResolvedDependencyParentCacheDoesNotShareActivationWithProjectParent() throws Exception {
+        // Trigger mainSession creation with a regular project build.
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("props-and-profiles")))
+                .build();
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+        mbs.build(request);
+        DefaultModelBuilder.ModelBuilderSessionState mainState =
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
+
+        Map<String, String> systemProperties = parentActivationSystemProperties();
+        ModelSource parentSource = Sources.buildSource(getPom("resolved-model-with-profiles"));
+
+        // A session already carrying externalOrigin=true, as a dependency's own session would
+        // after resolving through at least one CONSUMER_DEPENDENCY hop.
+        DefaultModelBuilder.ModelBuilderSessionState dependencyAncestorState =
+                mainState.derive(ModelBuilderRequest.builder(mainState.request)
+                        .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                        .source(Sources.buildSource(getPom("props-and-profiles")))
+                        .build());
+        assertTrue(dependencyAncestorState.externalOrigin);
+
+        // The exact same request instance is then used to derive a parent-lookup session from
+        // each ancestor. Sharing one request object guarantees both reads address the same
+        // per-request cache bucket, regardless of RequestTrace ancestry depth.
+        ModelBuilderRequest sharedParentRequest = ModelBuilderRequest.builder(mainState.request)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_PARENT)
+                .source(parentSource)
+                .systemProperties(systemProperties)
+                .build();
+
+        DefaultModelBuilder.ModelBuilderSessionState projectState = mainState.derive(sharedParentRequest);
+        assertFalse(projectState.externalOrigin, "derived from a BUILD_PROJECT ancestor, must not be external");
+        Model projectParentModel =
+                projectState.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
+
+        assertEquals("activated", projectParentModel.getProperties().get("profile.file"));
+        assertEquals("activated", projectParentModel.getProperties().get("profile.property"));
+        assertEquals("activated", projectParentModel.getProperties().get("profile.condition"));
+        assertEquals("activated", projectParentModel.getProperties().get("profile.jdk"));
+        assertTrue(projectParentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+
+        DefaultModelBuilder.ModelBuilderSessionState dependencyState =
+                dependencyAncestorState.derive(sharedParentRequest);
+        assertTrue(dependencyState.externalOrigin, "derived from a CONSUMER_DEPENDENCY ancestor, must stay external");
+        Model dependencyParentModel =
+                dependencyState.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
+
+        assertNull(dependencyParentModel.getProperties().get("profile.file"));
+        assertNull(dependencyParentModel.getProperties().get("profile.property"));
+        assertNull(dependencyParentModel.getProperties().get("profile.condition"));
+        assertEquals("activated", dependencyParentModel.getProperties().get("profile.jdk"));
+        assertTrue(dependencyParentModel.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+
+        // The first (fully activated) result must not have been altered by the second read.
+        assertEquals("activated", projectParentModel.getProperties().get("profile.file"));
+        assertTrue(projectParentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+
+        // Repeating with a second, fresh shared request -- dependency read first this time --
+        // must not bleed the other way either.
+        ModelBuilderRequest sharedParentRequest2 = ModelBuilderRequest.builder(mainState.request)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_PARENT)
+                .source(parentSource)
+                .systemProperties(systemProperties)
+                .build();
+
+        DefaultModelBuilder.ModelBuilderSessionState dependencyState2 =
+                dependencyAncestorState.derive(sharedParentRequest2);
+        Model dependencyParentModel2 =
+                dependencyState2.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
+        assertNull(dependencyParentModel2.getProperties().get("profile.file"));
+        assertTrue(dependencyParentModel2.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+
+        DefaultModelBuilder.ModelBuilderSessionState projectState2 = mainState.derive(sharedParentRequest2);
+        Model projectParentModel2 =
+                projectState2.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
+        assertEquals("activated", projectParentModel2.getProperties().get("profile.file"));
+        assertTrue(projectParentModel2.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+    }
+
+    /**
+     * The externalOrigin flag must survive more than one {@code derive()} hop: a dependency's
+     * own parent (itself read as a CONSUMER_PARENT session, not CONSUMER_DEPENDENCY) must still
+     * be treated as external, since request.getRequestType() alone cannot carry that distinction
+     * once a parent lookup has overwritten it.
+     */
+    @Test
+    public void testExternalOriginPropagatesThroughGrandparentHop() throws Exception {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("props-and-profiles")))
+                .build();
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+        mbs.build(request);
+        DefaultModelBuilder.ModelBuilderSessionState mainState =
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
+
+        Map<String, String> systemProperties = parentActivationSystemProperties();
+        ModelSource dependencySource = Sources.buildSource(getPom("props-and-profiles"));
+        ModelSource grandparentSource = Sources.buildSource(getPom("resolved-model-with-profiles"));
+
+        // Hop 1: a dependency's own POM. externalOrigin becomes true here.
+        DefaultModelBuilder.ModelBuilderSessionState dependencyState =
+                mainState.derive(ModelBuilderRequest.builder(mainState.request)
+                        .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                        .source(dependencySource)
+                        .systemProperties(systemProperties)
+                        .build());
+        assertTrue(dependencyState.externalOrigin);
+
+        // Hop 2: that dependency's own parent. Its own request type is CONSUMER_PARENT, not
+        // CONSUMER_DEPENDENCY -- externalOrigin must still be true, inherited from hop 1.
+        DefaultModelBuilder.ModelBuilderSessionState grandparentHopState =
+                dependencyState.derive(ModelBuilderRequest.builder(dependencyState.request)
+                        .requestType(ModelBuilderRequest.RequestType.CONSUMER_PARENT)
+                        .source(grandparentSource)
+                        .systemProperties(systemProperties)
+                        .build());
+        assertTrue(
+                grandparentHopState.externalOrigin,
+                "externalOrigin must survive a second derive() hop, not just the first");
+
+        Model grandparentModel =
+                grandparentHopState.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
+
+        assertNull(grandparentModel.getProperties().get("profile.file"));
+        assertNull(grandparentModel.getProperties().get("profile.property"));
+        assertNull(grandparentModel.getProperties().get("profile.condition"));
+        assertEquals("activated", grandparentModel.getProperties().get("profile.jdk"));
+        assertTrue(grandparentModel.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+    }
+
+    /**
+     * {@code BUILD_CONSUMER} requests already skip all profile activation
+     * ({@code isBuildRequestWithActivation()} returns false for that type) -- unrelated to, and
+     * unaffected by, the externalOrigin distinction. Locking that down explicitly since it is
+     * adjacent code this change reads but does not modify.
+     */
+    @Test
+    public void testBuildConsumerSkipsAllProfileActivation() throws Exception {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("props-and-profiles")))
+                .build();
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+        mbs.build(request);
+        DefaultModelBuilder.ModelBuilderSessionState mainState =
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
+
+        Map<String, String> systemProperties = parentActivationSystemProperties();
+        DefaultModelBuilder.ModelBuilderSessionState buildConsumerState =
+                mainState.derive(ModelBuilderRequest.builder(mainState.request)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                        .source(Sources.buildSource(getPom("resolved-model-with-profiles")))
+                        .systemProperties(systemProperties)
+                        .build());
+
+        Model model = buildConsumerState.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
+
+        assertNull(model.getProperties().get("profile.file"));
+        assertNull(model.getProperties().get("profile.property"));
+        assertNull(model.getProperties().get("profile.condition"));
+        assertNull(model.getProperties().get("profile.jdk"));
+        assertTrue(model.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+    }
+
     @Test
     void testMappedSourcesSupportsConcurrentUpdates() throws Exception {
         ModelBuilderRequest request = ModelBuilderRequest.builder()

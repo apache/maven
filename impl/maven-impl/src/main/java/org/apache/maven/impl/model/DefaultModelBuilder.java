@@ -139,6 +139,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private static final String FILE = "file";
     private static final String IMPORT = "import";
     private static final String PARENT = "parent";
+    private static final String PARENT_EXTERNAL = "parent-external";
     private static final String MODEL = "model";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -290,6 +291,14 @@ public class DefaultModelBuilder implements ModelBuilder {
         // Contains both GAV coordinates (groupId:artifactId:version) and file paths
         final Set<String> parentChain;
 
+        // Sticky across derive(): true for a session that is itself resolving a dependency
+        // (ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY), or that was derived, directly
+        // or transitively, from such a session -- for instance a dependency's own parent POM.
+        // Kept separate from request.getRequestType() because a parent lookup always derives a
+        // CONSUMER_PARENT request regardless of what kind of session triggered it, which would
+        // otherwise lose the distinction this flag preserves.
+        final boolean externalOrigin;
+
         ModelBuilderSessionState(ModelBuilderRequest request) {
             this(
                     request.getSession(),
@@ -300,7 +309,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     List.of(),
                     repos(request),
                     repos(request),
-                    new LinkedHashSet<>());
+                    new LinkedHashSet<>(),
+                    request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY);
         }
 
         static List<RemoteRepository> repos(ModelBuilderRequest request) {
@@ -376,7 +386,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 List<RemoteRepository> pomRepositories,
                 List<RemoteRepository> externalRepositories,
                 List<RemoteRepository> repositories,
-                Set<String> parentChain) {
+                Set<String> parentChain,
+                boolean externalOrigin) {
             this.session = session;
             this.request = request;
             this.result = result;
@@ -386,6 +397,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.externalRepositories = externalRepositories;
             this.repositories = repositories;
             this.parentChain = parentChain;
+            this.externalOrigin = externalOrigin;
             this.result.setSource(this.request.getSource());
         }
 
@@ -427,6 +439,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     derivedRepos = repositoryFactory.aggregate(session, pomRepositories, derivedExtRepos, false);
                 }
             }
+            boolean derivedExternalOrigin =
+                    externalOrigin || request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY;
             return new ModelBuilderSessionState(
                     session,
                     request,
@@ -436,7 +450,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     pomRepositories,
                     derivedExtRepos,
                     derivedRepos,
-                    new LinkedHashSet<>());
+                    new LinkedHashSet<>(),
+                    derivedExternalOrigin);
         }
 
         @Override
@@ -1643,8 +1658,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                 Collection<Profile> interpolatedProfiles, DefaultProfileActivationContext profileActivationContext) {
             if (isBuildRequestWithActivation()) {
                 Collection<Profile> eligibleProfiles = interpolatedProfiles;
-                if (request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY) {
-                    // A dependency POM resolved from a repository evaluates only
+                if (externalOrigin) {
+                    // A model resolved to satisfy dependency resolution -- a dependency POM
+                    // itself, or one of its parents, reached transitively -- evaluates only
                     // platform-derived activation (JDK version, operating system,
                     // activeByDefault); its profiles contribute no repositories.
                     eligibleProfiles = interpolatedProfiles.stream()
@@ -2073,8 +2089,23 @@ public class DefaultModelBuilder implements ModelBuilder {
          */
         Model readAsParentModel(DefaultProfileActivationContext profileActivationContext, Set<String> parentChain)
                 throws ModelBuilderException {
+            // Partition the cache by externalOrigin so a parent model resolved while building
+            // the operator's own project never shares an entry with the same source resolved
+            // while resolving a dependency: the two contexts activate profiles differently (see
+            // getActiveProfiles below), and the model built for one must not be reused for the
+            // other, even though both are keyed off the same underlying source.
+            //
+            // This partition is a defensive backstop, not the primary guard: cache(source, tag,
+            // supplier) additionally scopes each entry to the top-level request (see
+            // getOuterRequest()), which falls back to the request object's own identity once its
+            // RequestTrace has no further request-typed ancestor. Two independently-built request
+            // objects therefore land in different buckets regardless of this tag, and never reach
+            // this collision in practice; the tag matters only when two reads end up sharing a
+            // request object (as derive() calls from a common ancestor can), which is why it is
+            // kept even though the getActiveProfiles gate above already decides the correct
+            // activation for each read on its own.
             Map<DefaultProfileActivationContext.Record, ParentModelWithProfiles> parentsPerContext =
-                    cache(request.getSource(), PARENT, ConcurrentHashMap::new);
+                    cache(request.getSource(), externalOrigin ? PARENT_EXTERNAL : PARENT, ConcurrentHashMap::new);
 
             for (Map.Entry<DefaultProfileActivationContext.Record, ParentModelWithProfiles> e :
                     parentsPerContext.entrySet()) {
