@@ -234,7 +234,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     mainSession = new ModelBuilderSessionState(request);
                     session = mainSession;
                 } else {
-                    session = mainSession.derive(
+                    session = mainSession.deriveTopLevel(
                             request,
                             new DefaultModelBuilderResult(request, ProblemCollector.create(mainSession.session)));
                 }
@@ -269,6 +269,8 @@ public class DefaultModelBuilder implements ModelBuilder {
         final DefaultModelBuilderResult result;
         final Graph dag;
         final Map<GAKey, Set<ModelSource>> mappedSources;
+        final Set<ImportWarningKey> reportedImportWarnings;
+        final Map<String, ProblemCollector<ModelProblem>> reactorProblemCollectors;
 
         String source;
         Model sourceModel;
@@ -297,6 +299,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     new DefaultModelBuilderResult(request, ProblemCollector.create(request.getSession())),
                     new Graph(),
                     new ConcurrentHashMap<>(64),
+                    ConcurrentHashMap.newKeySet(),
+                    new ConcurrentHashMap<>(),
                     List.of(),
                     repos(request),
                     repos(request),
@@ -373,6 +377,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 DefaultModelBuilderResult result,
                 Graph dag,
                 Map<GAKey, Set<ModelSource>> mappedSources,
+                Set<ImportWarningKey> reportedImportWarnings,
+                Map<String, ProblemCollector<ModelProblem>> reactorProblemCollectors,
                 List<RemoteRepository> pomRepositories,
                 List<RemoteRepository> externalRepositories,
                 List<RemoteRepository> repositories,
@@ -382,6 +388,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.result = result;
             this.dag = dag;
             this.mappedSources = mappedSources;
+            this.reportedImportWarnings = reportedImportWarnings;
+            this.reactorProblemCollectors = reactorProblemCollectors;
             this.pomRepositories = pomRepositories;
             this.externalRepositories = externalRepositories;
             this.repositories = repositories;
@@ -405,6 +413,18 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         ModelBuilderSessionState derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
+            return derive(request, result, reportedImportWarnings, reactorProblemCollectors);
+        }
+
+        ModelBuilderSessionState deriveTopLevel(ModelBuilderRequest request, DefaultModelBuilderResult result) {
+            return derive(request, result, ConcurrentHashMap.newKeySet(), new ConcurrentHashMap<>());
+        }
+
+        private ModelBuilderSessionState derive(
+                ModelBuilderRequest request,
+                DefaultModelBuilderResult result,
+                Set<ImportWarningKey> reportedImportWarnings,
+                Map<String, ProblemCollector<ModelProblem>> reactorProblemCollectors) {
             if (session != request.getSession()) {
                 throw new IllegalArgumentException("Session mismatch");
             }
@@ -433,6 +453,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     result,
                     dag,
                     mappedSources,
+                    reportedImportWarnings,
+                    reactorProblemCollectors,
                     pomRepositories,
                     derivedExtRepos,
                     derivedRepos,
@@ -986,6 +1008,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                         top,
                         root);
                 mappedSources.clear();
+                reportedImportWarnings.clear();
+                reactorProblemCollectors.clear();
                 loadFromRoot(top, top);
             }
         }
@@ -998,6 +1022,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 Model model = derive(src, r).readFileModel();
                 // keep all loaded file models in memory, those will be needed
                 // during the raw to build transformation
+                registerReactorProblemCollector(src, r.getProblemCollector());
                 putSource(getGroupId(model), model.getArtifactId(), src);
                 Model activated = activateFileModel(model);
                 for (String subproject : getSubprojects(activated)) {
@@ -2178,7 +2203,92 @@ public class DefaultModelBuilder implements ModelBuilder {
             model = model.withDependencyManagement(
                     model.getDependencyManagement().withDependencies(deps));
 
-            return dependencyManagementImporter.importManagement(model, importMgmts, request, this);
+            return dependencyManagementImporter.importManagement(
+                    model, importMgmts, request, deduplicatingImportProblemCollector());
+        }
+
+        private ModelProblemCollector deduplicatingImportProblemCollector() {
+            return new ModelProblemCollector() {
+                @Override
+                public ProblemCollector<ModelProblem> getProblemCollector() {
+                    return ModelBuilderSessionState.this.getProblemCollector();
+                }
+
+                @Override
+                public void add(
+                        BuilderProblem.Severity severity,
+                        ModelProblem.Version version,
+                        String message,
+                        InputLocation location,
+                        Exception exception) {
+                    if (severity == Severity.WARNING && location != null && location.getSource() != null) {
+                        var source = location.getSource();
+                        ImportWarningKey key = new ImportWarningKey(
+                                message,
+                                source.getLocation(),
+                                source.getModelId(),
+                                location.getLineNumber(),
+                                location.getColumnNumber());
+                        if (!reportedImportWarnings.add(key)) {
+                            return;
+                        }
+                        ProblemCollector<ModelProblem> collector = reactorProblemCollectors.get(source.getLocation());
+                        if (collector != null) {
+                            collector.reportProblem(new DefaultModelProblem(
+                                    message,
+                                    severity,
+                                    version,
+                                    source.getLocation(),
+                                    location.getLineNumber(),
+                                    location.getColumnNumber(),
+                                    source.getModelId(),
+                                    exception));
+                            return;
+                        }
+                    }
+                    ModelBuilderSessionState.this.add(severity, version, message, location, exception);
+                }
+
+                @Override
+                public ModelBuilderException newModelBuilderException() {
+                    return ModelBuilderSessionState.this.newModelBuilderException();
+                }
+
+                @Override
+                public void setSource(String location) {
+                    ModelBuilderSessionState.this.setSource(location);
+                }
+
+                @Override
+                public void setSource(Model model) {
+                    ModelBuilderSessionState.this.setSource(model);
+                }
+
+                @Override
+                public String getSource() {
+                    return ModelBuilderSessionState.this.getSource();
+                }
+
+                @Override
+                public void setRootModel(Model model) {
+                    ModelBuilderSessionState.this.setRootModel(model);
+                }
+
+                @Override
+                public Model getRootModel() {
+                    return ModelBuilderSessionState.this.getRootModel();
+                }
+            };
+        }
+
+        private void registerReactorProblemCollector(
+                ModelSource source, ProblemCollector<ModelProblem> problemCollector) {
+            if (source.getLocation() != null) {
+                reactorProblemCollectors.put(source.getLocation(), problemCollector);
+            }
+            if (source.getPath() != null) {
+                reactorProblemCollectors.put(source.getPath().toUri().toString(), problemCollector);
+            }
         }
 
         private DependencyManagement loadDependencyManagement(Dependency dependency, Collection<String> importIds) {
@@ -2251,7 +2361,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                 importMgmt = importMgmt.withDependencies(dependencies);
             }
 
-            return importMgmt;
+            return DependencyManagement.newBuilder(importMgmt, true)
+                    .importedFrom(dependency.getLocation(""))
+                    .build();
         }
 
         @SuppressWarnings("checkstyle:parameternumber")
@@ -2569,6 +2681,9 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     record GAKey(String groupId, String artifactId) {}
+
+    private record ImportWarningKey(
+            String message, String sourceLocation, String sourceModelId, int lineNumber, int columnNumber) {}
 
     public record RgavCacheKey(
             Session session,
