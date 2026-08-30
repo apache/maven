@@ -245,8 +245,12 @@ public class DefaultVersionResolver implements VersionResolver {
 
                     if (metadata.getPath() != null && Files.exists(metadata.getPath())) {
                         try (InputStream in = Files.newInputStream(metadata.getPath())) {
-                            versioning = new Versioning(
+                            Versioning parsed = new Versioning(
                                     new MetadataStaxReader().read(in, false).getVersioning());
+
+                            validateVersioning(parsed);
+
+                            versioning = parsed;
 
                             /*
                             NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
@@ -276,6 +280,44 @@ public class DefaultVersionResolver implements VersionResolver {
         }
 
         return (versioning != null) ? versioning : new Versioning();
+    }
+
+    /**
+     * Version tokens adopted from repository metadata must be valid coordinate components; metadata carrying
+     * anything else is treated as invalid.
+     */
+    private static void validateVersioning(Versioning versioning) throws IOException {
+        if (versioning == null) {
+            return;
+        }
+        validateVersionToken(versioning.getLatest());
+        validateVersionToken(versioning.getRelease());
+        for (SnapshotVersion snapshotVersion : versioning.getSnapshotVersions()) {
+            validateVersionToken(snapshotVersion.getVersion());
+        }
+        Snapshot snapshot = versioning.getSnapshot();
+        if (snapshot != null) {
+            validateVersionToken(snapshot.getTimestamp());
+        }
+    }
+
+    private static void validateVersionToken(String value) throws IOException {
+        if (value == null || value.isEmpty()) {
+            return;
+        }
+        boolean valid = !"..".equals(value);
+        if (valid) {
+            for (int i = 0; i < value.length(); i++) {
+                char c = value.charAt(i);
+                if (c == '/' || c == '\\' || c == ':' || Character.isISOControl(c)) {
+                    valid = false;
+                    break;
+                }
+            }
+        }
+        if (!valid) {
+            throw new IOException("Metadata contains an invalid version token: '" + value + "'");
+        }
     }
 
     private void invalidMetadata(

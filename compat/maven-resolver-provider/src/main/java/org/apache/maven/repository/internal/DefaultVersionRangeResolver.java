@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;
@@ -235,8 +236,12 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
 
                     if (metadata.getPath() != null && Files.exists(metadata.getPath())) {
                         try (InputStream in = Files.newInputStream(metadata.getPath())) {
-                            versioning = new Versioning(
+                            Versioning parsed = new Versioning(
                                     new MetadataStaxReader().read(in, false).getVersioning());
+
+                            validateVersioning(parsed);
+
+                            versioning = parsed;
                         }
                     }
                 }
@@ -247,6 +252,40 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
         }
 
         return (versioning != null) ? versioning : new Versioning();
+    }
+
+    /**
+     * Version tokens adopted from repository metadata must be valid coordinate components; metadata carrying
+     * anything else is treated as invalid.
+     */
+    private static void validateVersioning(Versioning versioning) throws IOException {
+        if (versioning == null) {
+            return;
+        }
+        for (String version : versioning.getVersions()) {
+            validateVersionToken(version);
+        }
+        validateVersionToken(versioning.getLatest());
+        validateVersionToken(versioning.getRelease());
+    }
+
+    private static void validateVersionToken(String value) throws IOException {
+        if (value == null || value.isEmpty()) {
+            return;
+        }
+        boolean valid = !"..".equals(value);
+        if (valid) {
+            for (int i = 0; i < value.length(); i++) {
+                char c = value.charAt(i);
+                if (c == '/' || c == '\\' || c == ':' || Character.isISOControl(c)) {
+                    valid = false;
+                    break;
+                }
+            }
+        }
+        if (!valid) {
+            throw new IOException("Metadata contains an invalid version token: '" + value + "'");
+        }
     }
 
     private Versioning filterVersionsByRepositoryType(Versioning versioning, RemoteRepository remoteRepository) {
