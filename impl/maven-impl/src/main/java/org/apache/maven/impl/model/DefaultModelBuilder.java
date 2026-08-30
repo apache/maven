@@ -310,7 +310,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     repos(request),
                     repos(request),
                     new LinkedHashSet<>(),
-                    request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY);
+                    isExternalOrigin(request));
         }
 
         static List<RemoteRepository> repos(ModelBuilderRequest request) {
@@ -439,8 +439,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     derivedRepos = repositoryFactory.aggregate(session, pomRepositories, derivedExtRepos, false);
                 }
             }
-            boolean derivedExternalOrigin =
-                    externalOrigin || request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY;
+            boolean derivedExternalOrigin = externalOrigin || isExternalOrigin(request);
             return new ModelBuilderSessionState(
                     session,
                     request,
@@ -2592,6 +2591,18 @@ public class DefaultModelBuilder implements ModelBuilder {
             version = model.getParent().getVersion();
         }
         return version;
+    }
+
+    /**
+     * Whether the model this request builds was resolved from a repository rather than supplied to
+     * Maven. {@link org.apache.maven.api.services.Sources#resolvedSource} carries the resolved
+     * model's coordinates and is the only source kind that does; a POM built from a file the caller
+     * pointed at reports none.
+     */
+    static boolean isExternalOrigin(ModelBuilderRequest request) {
+        return request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY
+                && request.getSource() != null
+                && request.getSource().getModelId() != null;
     }
 
     static boolean usesSystemScope(Dependency dependency) {

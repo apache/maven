@@ -167,6 +167,9 @@ class DefaultModelBuilderTest {
     @Test
     public void testDependencyModelActivatesOnlyEnvironmentIndependentProfiles() {
         ModelBuilderRequest request = resolvedProfilesRequest(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.resolvedSource(
+                        getPom("resolved-model-with-profiles"),
+                        "org.apache.maven.test:resolved-model-with-profiles:1.0.0"))
                 .build();
         Model model = builder.newSession().build(request).getEffectiveModel();
 
@@ -175,6 +178,25 @@ class DefaultModelBuilderTest {
         assertNull(model.getProperties().get("profile.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
         assertTrue(model.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+    }
+
+    /**
+     * A model built at {@link ModelBuilderRequest.RequestType#CONSUMER_DEPENDENCY} whose source
+     * is one Maven was merely pointed at -- {@link Sources#buildSource} rather than a source
+     * Maven resolved from a repository -- is not treated as coming from a repository. Every
+     * activator still runs, exactly as for a project build.
+     */
+    @Test
+    public void testCallerSuppliedModelActivatesAllProfiles() {
+        ModelBuilderRequest request = resolvedProfilesRequest(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .build();
+        Model model = builder.newSession().build(request).getEffectiveModel();
+
+        assertEquals("activated", model.getProperties().get("profile.file"));
+        assertEquals("activated", model.getProperties().get("profile.property"));
+        assertEquals("activated", model.getProperties().get("profile.condition"));
+        assertEquals("activated", model.getProperties().get("profile.jdk"));
+        assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
 
     private Map<String, String> parentActivationSystemProperties() {
@@ -231,7 +253,8 @@ class DefaultModelBuilderTest {
         DefaultModelBuilder.ModelBuilderSessionState dependencyAncestorState =
                 mainState.derive(ModelBuilderRequest.builder(mainState.request)
                         .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
-                        .source(Sources.buildSource(getPom("props-and-profiles")))
+                        .source(Sources.resolvedSource(
+                                getPom("props-and-profiles"), "org.apache.maven.test:props-and-profiles:1.0.0"))
                         .build());
         assertTrue(dependencyAncestorState.externalOrigin);
 
@@ -312,10 +335,12 @@ class DefaultModelBuilderTest {
                 ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
 
         Map<String, String> systemProperties = parentActivationSystemProperties();
-        ModelSource dependencySource = Sources.buildSource(getPom("props-and-profiles"));
+        ModelSource dependencySource =
+                Sources.resolvedSource(getPom("props-and-profiles"), "org.apache.maven.test:props-and-profiles:1.0.0");
         ModelSource grandparentSource = Sources.buildSource(getPom("resolved-model-with-profiles"));
 
-        // Hop 1: a dependency's own POM. externalOrigin becomes true here.
+        // Hop 1: a dependency's own POM, resolved from a repository. externalOrigin becomes
+        // true here.
         DefaultModelBuilder.ModelBuilderSessionState dependencyState =
                 mainState.derive(ModelBuilderRequest.builder(mainState.request)
                         .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)

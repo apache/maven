@@ -41,6 +41,7 @@ import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblemCollector;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.model.ModelInterpolator;
 import org.apache.maven.api.services.model.PathTranslator;
 import org.apache.maven.api.services.model.RootLocator;
@@ -256,11 +257,22 @@ public class DefaultModelInterpolator implements ModelInterpolator {
 
     private static boolean restrictExternalModelInterpolation(ModelBuilderRequest request) {
         ModelBuilderRequest.RequestType type = request.getRequestType();
-        boolean externalModel = type == ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY
-                || type == ModelBuilderRequest.RequestType.CONSUMER_PARENT;
+        boolean externalModel = (type == ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY
+                        || type == ModelBuilderRequest.RequestType.CONSUMER_PARENT)
+                && isRepositoryResolved(request.getSource());
         return externalModel
                 && !Boolean.parseBoolean(request.getSystemProperties().get(FULL_EXTERNAL_INTERPOLATION_PROPERTY))
                 && !Boolean.parseBoolean(request.getUserProperties().get(FULL_EXTERNAL_INTERPOLATION_PROPERTY));
+    }
+
+    /**
+     * Whether the given source is one Maven resolved from a repository rather than one supplied to
+     * it. {@link org.apache.maven.api.services.Sources#resolvedSource} carries the resolved model's
+     * coordinates, and it is the only source kind that does; a POM built from a file the caller
+     * pointed at reports none.
+     */
+    private static boolean isRepositoryResolved(ModelSource source) {
+        return source != null && source.getModelId() != null;
     }
 
     /**
