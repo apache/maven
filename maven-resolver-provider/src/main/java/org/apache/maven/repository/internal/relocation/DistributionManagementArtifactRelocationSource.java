@@ -28,6 +28,7 @@ import org.apache.maven.repository.internal.MavenArtifactRelocationSource;
 import org.apache.maven.repository.internal.RelocatedArtifact;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.eclipse.sisu.Priority;
 import org.slf4j.Logger;
@@ -50,11 +51,15 @@ public final class DistributionManagementArtifactRelocationSource implements Mav
 
     @Override
     public Artifact relocatedTarget(
-            RepositorySystemSession session, ArtifactDescriptorResult artifactDescriptorResult, Model model) {
+            RepositorySystemSession session, ArtifactDescriptorResult artifactDescriptorResult, Model model)
+            throws ArtifactDescriptorException {
         DistributionManagement distMgmt = model.getDistributionManagement();
         if (distMgmt != null) {
             Relocation relocation = distMgmt.getRelocation();
             if (relocation != null) {
+                validateCoordinateComponent(relocation.getGroupId(), "groupId", artifactDescriptorResult);
+                validateCoordinateComponent(relocation.getArtifactId(), "artifactId", artifactDescriptorResult);
+                validateCoordinateComponent(relocation.getVersion(), "version", artifactDescriptorResult);
                 Artifact result = new RelocatedArtifact(
                         artifactDescriptorResult.getRequest().getArtifact(),
                         relocation.getGroupId(),
@@ -72,5 +77,37 @@ public final class DistributionManagementArtifactRelocationSource implements Mav
             }
         }
         return null;
+    }
+
+    /**
+     * Checks that a relocation coordinate component is usable as an artifact coordinate. Components outside
+     * the coordinate character set are rejected so that only well-formed coordinates enter resolution.
+     */
+    private static void validateCoordinateComponent(
+            String value, String component, ArtifactDescriptorResult artifactDescriptorResult)
+            throws ArtifactDescriptorException {
+        if (value == null || value.isEmpty()) {
+            return; // component is not relocated: the original artifact's value is kept
+        }
+        if (isInvalidCoordinateComponent(value)) {
+            IllegalArgumentException cause = new IllegalArgumentException("Invalid relocation " + component + " '"
+                    + value + "' in artifact descriptor for "
+                    + artifactDescriptorResult.getRequest().getArtifact()
+                    + ": not a valid artifact coordinate component");
+            artifactDescriptorResult.addException(cause);
+            throw new ArtifactDescriptorException(artifactDescriptorResult, cause.getMessage(), cause);
+        }
+    }
+
+    private static boolean isInvalidCoordinateComponent(String value) {
+        if ("..".equals(value) || value.contains("/") || value.contains("\\") || value.contains(":")) {
+            return true;
+        }
+        for (int i = 0; i < value.length(); i++) {
+            if (Character.isISOControl(value.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 }
