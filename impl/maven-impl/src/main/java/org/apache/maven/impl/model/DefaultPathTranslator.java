@@ -23,17 +23,16 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
-import org.apache.maven.api.services.model.PathTranslator;
 
 /**
  * Resolves relative paths against a specific base directory.
  *
+ * <p>Internal implementation, not part of the public API.
  */
 @Named
 @Singleton
-public class DefaultPathTranslator implements PathTranslator {
+public class DefaultPathTranslator {
 
-    @Override
     public String alignToBaseDirectory(String path, Path basedir) {
         String result = path;
 

@@ -39,7 +39,6 @@ import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ProjectBuilderException;
-import org.apache.maven.api.services.model.PathTranslator;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.RootLocator;
 
@@ -160,7 +159,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
         }
     }
 
-    private final PathTranslator pathTranslator;
+    private final DefaultPathTranslator pathTranslator;
     private final RootLocator rootLocator;
     private final Interpolator interpolator;
 
@@ -172,7 +171,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     final Record record;
 
     public DefaultProfileActivationContext(
-            PathTranslator pathTranslator, RootLocator rootLocator, Interpolator interpolator) {
+            DefaultPathTranslator pathTranslator, RootLocator rootLocator, Interpolator interpolator) {
         this.pathTranslator = pathTranslator;
         this.rootLocator = rootLocator;
         this.interpolator = interpolator;
@@ -181,7 +180,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultProfileActivationContext(
-            PathTranslator pathTranslator,
+            DefaultPathTranslator pathTranslator,
             RootLocator rootLocator,
             Interpolator interpolator,
             List<String> activeProfileIds,
@@ -203,7 +202,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     private DefaultProfileActivationContext(
-            PathTranslator pathTranslator,
+            DefaultPathTranslator pathTranslator,
             RootLocator rootLocator,
             Interpolator interpolator,
             List<String> activeProfileIds,

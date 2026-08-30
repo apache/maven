@@ -34,7 +34,6 @@ import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.model.Source;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.model.ModelPathTranslator;
-import org.apache.maven.api.services.model.PathTranslator;
 
 /**
  * Resolves relative paths within a model against a specific base directory.
@@ -44,10 +43,10 @@ import org.apache.maven.api.services.model.PathTranslator;
 @Singleton
 public class DefaultModelPathTranslator implements ModelPathTranslator {
 
-    private final PathTranslator pathTranslator;
+    private final DefaultPathTranslator pathTranslator;
 
     @Inject
-    public DefaultModelPathTranslator(PathTranslator pathTranslator) {
+    public DefaultModelPathTranslator(DefaultPathTranslator pathTranslator) {
         this.pathTranslator = pathTranslator;
     }
 

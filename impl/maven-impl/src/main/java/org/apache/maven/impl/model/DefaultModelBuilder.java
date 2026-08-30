@@ -106,7 +106,6 @@ import org.apache.maven.api.services.model.ModelResolverException;
 import org.apache.maven.api.services.model.ModelUrlNormalizer;
 import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.api.services.model.ModelVersionParser;
-import org.apache.maven.api.services.model.PathTranslator;
 import org.apache.maven.api.services.model.PluginConfigurationExpander;
 import org.apache.maven.api.services.model.PluginManagementInjector;
 import org.apache.maven.api.services.model.ProfileInjector;
@@ -161,7 +160,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final List<ModelTransformer> transformers;
     private final ModelResolver modelResolver;
     private final Interpolator interpolator;
-    private final PathTranslator pathTranslator;
+    private final DefaultPathTranslator pathTranslator;
     private final RootLocator rootLocator;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
@@ -185,7 +184,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             @Nullable List<ModelTransformer> transformers,
             ModelResolver modelResolver,
             Interpolator interpolator,
-            PathTranslator pathTranslator,
+            DefaultPathTranslator pathTranslator,
             RootLocator rootLocator) {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;

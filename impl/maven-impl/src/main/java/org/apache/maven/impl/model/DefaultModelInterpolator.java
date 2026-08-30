@@ -42,7 +42,6 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ModelInterpolator;
-import org.apache.maven.api.services.model.PathTranslator;
 import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.api.services.model.UrlNormalizer;
 import org.apache.maven.impl.model.reflection.ReflectionValueExtractor;
@@ -78,14 +77,14 @@ public class DefaultModelInterpolator implements ModelInterpolator {
             "project.scm.developerConnection",
             "project.distributionManagement.site.url");
 
-    private final PathTranslator pathTranslator;
+    private final DefaultPathTranslator pathTranslator;
     private final UrlNormalizer urlNormalizer;
     private final RootLocator rootLocator;
     private final Interpolator interpolator;
 
     @Inject
     public DefaultModelInterpolator(
-            PathTranslator pathTranslator,
+            DefaultPathTranslator pathTranslator,
             UrlNormalizer urlNormalizer,
             RootLocator rootLocator,
             Interpolator interpolator) {
