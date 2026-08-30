@@ -74,8 +74,6 @@ public class ProjectModelResolver implements ModelResolver {
 
     private final Set<String> repositoryIds;
 
-    private final Set<String> externalRepositoryIds;
-
     private final ReactorModelPool modelPool;
 
     private final ProjectBuildingRequest.RepositoryMerging repositoryMerging;
@@ -98,11 +96,6 @@ public class ProjectModelResolver implements ModelResolver {
         this.repositories.addAll(externalRepositories);
         this.repositoryMerging = repositoryMerging;
         this.repositoryIds = new HashSet<>();
-        Set<String> externalIds = new HashSet<>();
-        for (RemoteRepository externalRepository : this.externalRepositories) {
-            externalIds.add(externalRepository.getId());
-        }
-        this.externalRepositoryIds = Collections.unmodifiableSet(externalIds);
         this.modelPool = modelPool;
     }
 
@@ -116,7 +109,6 @@ public class ProjectModelResolver implements ModelResolver {
         this.repositories = new ArrayList<>(original.repositories);
         this.repositoryMerging = original.repositoryMerging;
         this.repositoryIds = new HashSet<>(original.repositoryIds);
-        this.externalRepositoryIds = original.externalRepositoryIds;
         this.modelPool = original.modelPool;
     }
 
@@ -128,13 +120,6 @@ public class ProjectModelResolver implements ModelResolver {
     public void addRepository(final Repository repository, boolean replace) throws InvalidRepositoryException {
         if (!repositoryIds.add(repository.getId())) {
             if (!replace) {
-                return;
-            }
-
-            if (externalRepositoryIds.contains(repository.getId())) {
-                // Replacement is meant to refresh a repository this model declared earlier, e.g.
-                // once its URL has been interpolated. Repositories supplied by the request or the
-                // session are not model-declared, so they keep precedence and are left in place.
                 return;
             }
 
