@@ -71,10 +71,24 @@ class DistributionManagementArtifactRelocationSourceTest {
     }
 
     @Test
+    void testRelocationGroupIdWithBackslashIsRejected() {
+        assertThrows(
+                ArtifactDescriptorException.class,
+                () -> source.relocatedTarget(null, newResult(), newModel("a\\b", null, null)));
+    }
+
+    @Test
     void testRelocationWithInvalidArtifactIdIsRejected() {
         assertThrows(
                 ArtifactDescriptorException.class,
                 () -> source.relocatedTarget(null, newResult(), newModel(null, "a/b", null)));
+    }
+
+    @Test
+    void testRelocationArtifactIdWithControlCharacterIsRejected() {
+        assertThrows(
+                ArtifactDescriptorException.class,
+                () -> source.relocatedTarget(null, newResult(), newModel(null, "a\nb", null)));
     }
 
     @Test
