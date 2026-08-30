@@ -320,6 +320,61 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
+    public void testMinimalValidationInterpolationUsesRestrictedPropertySet() throws Exception {
+        context.put("env.HOME", "/path/to/home");
+        context.put("some.property", "other-value");
+        context.put("java.version", "21");
+
+        Map<String, String> modelProperties = new HashMap<>();
+        modelProperties.put("envDir", "${env.HOME}");
+        modelProperties.put("propDir", "${some.property}");
+        modelProperties.put("jdk", "${java.version}");
+
+        Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
+                .properties(modelProperties)
+                .build());
+
+        ModelInterpolator interpolator = createInterpolator();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelBuildingRequest config = createModelBuildingRequest(context);
+        config.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        Model out = interpolator.interpolateModel(model, new File("."), config, collector);
+        assertProblemFree(collector);
+
+        // At minimal validation level (the level used for models built while resolving
+        // dependency, parent and BOM-import POMs) env and arbitrary system/user properties
+        // stay literal...
+        assertEquals("${env.HOME}", out.getProperties().get("envDir"));
+        assertEquals("${some.property}", out.getProperties().get("propDir"));
+        // ...while JVM-defined and other well-known expressions keep resolving.
+        assertEquals("21", out.getProperties().get("jdk"));
+    }
+
+    @Test
+    public void testFullInterpolationOptOutRestoresPreviousBehaviorAtMinimalValidationLevel() throws Exception {
+        context.put("env.HOME", "/path/to/home");
+        context.put(AbstractStringBasedModelInterpolator.FULL_EXTERNAL_INTERPOLATION_PROPERTY, "true");
+
+        Map<String, String> modelProperties = new HashMap<>();
+        modelProperties.put("envDir", "${env.HOME}");
+
+        Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
+                .properties(modelProperties)
+                .build());
+
+        ModelInterpolator interpolator = createInterpolator();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelBuildingRequest config = createModelBuildingRequest(context);
+        config.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        Model out = interpolator.interpolateModel(model, new File("."), config, collector);
+        assertProblemFree(collector);
+
+        assertEquals("/path/to/home", out.getProperties().get("envDir"));
+    }
+
+    @Test
     public void envarExpressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception {
 
         Map<String, String> modelProperties = new HashMap<>();
