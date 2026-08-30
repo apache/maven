@@ -365,13 +365,27 @@ class ImmutableCollections {
 
     private static class ROProperties extends Properties {
         private ROProperties(Properties props) {
-            super();
+            super(copyDefaults(props));
             if (props != null) {
                 // Do not use super.putAll, as it may delegate to put which throws an UnsupportedOperationException
                 for (Map.Entry<Object, Object> e : props.entrySet()) {
                     super.put(e.getKey(), e.getValue());
                 }
             }
+        }
+
+        private static Properties copyDefaults(Properties props) {
+            if (props == null) {
+                return null;
+            }
+            Properties defaults = new Properties();
+            for (String name : props.stringPropertyNames()) {
+                // A direct String shadows its default, while a non-String value does not for getProperty.
+                if (!(props.get(name) instanceof String)) {
+                    defaults.setProperty(name, props.getProperty(name));
+                }
+            }
+            return defaults;
         }
 
         @Override
