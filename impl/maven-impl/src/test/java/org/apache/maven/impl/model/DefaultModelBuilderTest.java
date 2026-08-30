@@ -270,6 +270,67 @@ class DefaultModelBuilderTest {
     }
 
     /**
+     * Repositories contributed by a model resolved from a repository are merged recessively:
+     * the repositories already held by the request or session -- e.g. "central" -- keep their
+     * id and URL. readEffectiveModel() requests replace semantics for every request type, so
+     * this is exercised directly against {@link DefaultModelBuilder.ModelBuilderSessionState}.
+     */
+    @Test
+    public void testResolvedPomRepositoryMergedRecessively() throws Exception {
+        // Trigger mainSession creation with a regular project build.
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("props-and-profiles")))
+                .build();
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+        mbs.build(request);
+        DefaultModelBuilder.ModelBuilderSessionState mainState =
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
+
+        // A model resolved from a repository (e.g. a dependency's POM) derives its own session
+        // state the same way DefaultArtifactDescriptorReader.loadPom does.
+        ModelBuilderRequest dependencyRequest = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .repositoryMerging(ModelBuilderRequest.RepositoryMerging.REQUEST_DOMINANT)
+                .source(Sources.resolvedSource(getPom("props-and-profiles"), "org.example:downloaded:1.0.0"))
+                .build();
+        DefaultModelBuilder.ModelBuilderSessionState state = mainState.derive(dependencyRequest);
+
+        RemoteRepository central = state.getRepositories().stream()
+                .filter(r -> "central".equals(r.getId()))
+                .findFirst()
+                .orElseThrow();
+
+        // The resolved model declares a repository that reuses the "central" id.
+        Model model = Model.newBuilder()
+                .repositories(List.of(Repository.newBuilder()
+                        .id("central")
+                        .url("https://secondary.example/m2")
+                        .build()))
+                .build();
+
+        // readEffectiveModel() requests replace semantics for every request type.
+        state.mergeRepositories(model, true);
+
+        List<RemoteRepository> repositories = state.getRepositories();
+        RemoteRepository mergedCentral = repositories.stream()
+                .filter(r -> "central".equals(r.getId()))
+                .findFirst()
+                .orElseThrow();
+        assertEquals(
+                central.getUrl(),
+                mergedCentral.getUrl(),
+                "repository declared by a resolved model must be merged recessively, keeping the"
+                        + " existing repository's URL under a shared id");
+        assertTrue(
+                repositories.stream().noneMatch(r -> r.getUrl().contains("secondary.example")),
+                "repository declared by a resolved model must not enter the resolution repositories"
+                        + " under an id it does not own");
+    }
+
+    /**
      * Verifies that when multiple repositories share the same ID (e.g., after mirror injection
      * maps both "central" and a profile-defined repo to the same mirror ID), their policies are
      * merged so that SNAPSHOT resolution is not broken.
