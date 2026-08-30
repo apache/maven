@@ -47,13 +47,13 @@ public interface Log {
     }
 
     /**
-     * Sends a message to the user in the <b>trace</b> error level.
+     * Sends a message to the user at the <b>trace</b> error level.
      * <p>
      * Trace is the most verbose level, intended for Maven core internals
      * such as resolver negotiation, model interpolation, and lifecycle
      * ordering details.  Use {@link #debug(CharSequence)} instead for
      * messages that help <em>users</em> investigate their build
-     * (e.g. why a module was recompiled).
+     * (for instance, why a module was recompiled).
      * <p>
      * The default implementation is a no-op for backward compatibility.
      *
@@ -73,7 +73,7 @@ public interface Log {
     default void trace(CharSequence content, Throwable error) {}
 
     /**
-     * Sends an exception to the user in the <b>trace</b> error level.
+     * Sends an exception to the user at the <b>trace</b> error level.
      * The stack trace for this exception will be output when this error level is enabled.
      * <p>
      * The default implementation is a no-op for backward compatibility.
@@ -83,7 +83,7 @@ public interface Log {
     default void trace(Throwable error) {}
 
     /**
-     * Sends a lazily-computed message in the <b>trace</b> error level.
+     * Sends a lazily-computed message at the <b>trace</b> error level.
      * The supplier is only evaluated if trace is enabled.
      * <p>
      * The default implementation is a no-op for backward compatibility.
@@ -93,7 +93,7 @@ public interface Log {
     default void trace(Supplier<String> content) {}
 
     /**
-     * Sends a lazily-computed message (and accompanying exception) in the <b>trace</b> error level.
+     * Sends a lazily-computed message (and accompanying exception) at the <b>trace</b> error level.
      * The supplier is only evaluated if trace is enabled.
      * <p>
      * The default implementation is a no-op for backward compatibility.
