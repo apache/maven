@@ -69,7 +69,7 @@ public class DefaultSessionTest {
     }
 
     @Test
-    void modelProblemsAreSharedWithDerivedAndLegacySessions() {
+    void modelProblemsAreSharedWithDerivedSessions() {
         RepositorySystemSession rss = new DefaultRepositorySystemSession(h -> false);
         MavenSession legacySession = new MavenSession(null, rss, new DefaultMavenExecutionRequest(), null);
         DefaultSession session = new DefaultSession(
@@ -95,56 +95,10 @@ public class DefaultSessionTest {
         assertSame(
                 problem,
                 session.getModelProblemCollector().problems().findFirst().orElseThrow());
-
-        assertEquals(1, legacySession.getModelProblems().size());
-        org.apache.maven.model.building.ModelProblem legacyProblem =
-                legacySession.getModelProblems().get(0);
-        assertEquals(problem.getMessage(), legacyProblem.getMessage());
-        assertEquals(problem.getSeverity().name(), legacyProblem.getSeverity().name());
-        assertEquals(problem.getVersion().name(), legacyProblem.getVersion().name());
-        assertEquals(problem.getSource(), legacyProblem.getSource());
-        assertEquals(problem.getLineNumber(), legacyProblem.getLineNumber());
-        assertEquals(problem.getColumnNumber(), legacyProblem.getColumnNumber());
-        assertEquals(problem.getModelId(), legacyProblem.getModelId());
-        assertThrows(
-                UnsupportedOperationException.class,
-                () -> legacySession.getModelProblems().clear());
     }
 
     @Test
-    void legacyModelProblemsAreSharedThroughSessionData() {
-        RepositorySystemSession rss = new DefaultRepositorySystemSession(h -> false);
-        MavenSession legacySession = new MavenSession(null, rss, new DefaultMavenExecutionRequest(), null);
-        DefaultSession session = new DefaultSession(
-                legacySession, mock(RepositorySystem.class), Collections.emptyList(), null, null, null);
-        legacySession.setSession(session);
-
-        assertTrue(legacySession.getModelProblems().isEmpty());
-
-        org.apache.maven.model.building.ModelProblem problem = new org.apache.maven.model.building.DefaultModelProblem(
-                "legacy warning",
-                org.apache.maven.model.building.ModelProblem.Severity.WARNING,
-                org.apache.maven.model.building.ModelProblem.Version.BASE,
-                "pom.xml",
-                3,
-                7,
-                "org.example:legacy:1",
-                null);
-        legacySession.setModelProblems(Collections.singletonList(problem));
-
-        assertEquals(Collections.singletonList(problem), legacySession.getModelProblems());
-        assertEquals(Collections.singletonList(problem), SessionModelProblemsBridge.getModelProblems(session));
-        Session derivedSession = session.withRemoteRepositories(Collections.emptyList());
-        assertEquals(Collections.singletonList(problem), SessionModelProblemsBridge.getModelProblems(derivedSession));
-
-        legacySession.setModelProblems(Collections.emptyList());
-
-        assertTrue(legacySession.getModelProblems().isEmpty());
-        assertTrue(SessionModelProblemsBridge.getModelProblems(derivedSession).isEmpty());
-    }
-
-    @Test
-    void legacyModelProblemsReportNativeCollectorOverflow() {
+    void modelProblemCollectorReportsOverflow() {
         RepositorySystemSession rss = new DefaultRepositorySystemSession(h -> false);
         DefaultMavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.getUserProperties().setProperty(Constants.MAVEN_BUILDER_MAX_PROBLEMS, "0");
@@ -165,8 +119,7 @@ public class DefaultSessionTest {
         session.getModelProblemCollector().reportProblem(problem);
 
         assertTrue(session.getModelProblemCollector().problemsOverflow());
+        assertEquals(1, session.getModelProblemCollector().totalProblemsReported());
         assertEquals(0, session.getModelProblemCollector().problems().count());
-        assertEquals(1, legacySession.getModelProblems().size());
-        assertTrue(legacySession.getModelProblems().get(0).getMessage().contains("subset"));
     }
 }
