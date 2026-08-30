@@ -2223,22 +2223,24 @@ public class DefaultModelBuilder implements ModelBuilder {
                         Exception exception) {
                     if (severity == Severity.WARNING && location != null && location.getSource() != null) {
                         var source = location.getSource();
+                        String sourceLocation = source.getLocation();
                         ImportWarningKey key = new ImportWarningKey(
                                 message,
-                                source.getLocation(),
+                                sourceLocation,
                                 source.getModelId(),
                                 location.getLineNumber(),
                                 location.getColumnNumber());
                         if (!reportedImportWarnings.add(key)) {
                             return;
                         }
-                        ProblemCollector<ModelProblem> collector = reactorProblemCollectors.get(source.getLocation());
+                        ProblemCollector<ModelProblem> collector =
+                                sourceLocation != null ? reactorProblemCollectors.get(sourceLocation) : null;
                         if (collector != null) {
                             collector.reportProblem(new DefaultModelProblem(
                                     message,
                                     severity,
                                     version,
-                                    source.getLocation(),
+                                    sourceLocation,
                                     location.getLineNumber(),
                                     location.getColumnNumber(),
                                     source.getModelId(),
