@@ -626,7 +626,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                             && (repo.getId() == null || !repo.getId().contains("${")))
                     .map(session::createRemoteRepository)
                     .toList();
-            if (replace) {
+            // Repositories contributed by a model resolved from a repository are merged
+            // recessively; repositories supplied by the request or session keep precedence.
+            if (replace && isBuildRequest()) {
                 Set<String> ids = repos.stream().map(RemoteRepository::getId).collect(Collectors.toSet());
                 repositories = repositories.stream()
                         .filter(r -> !ids.contains(r.getId()))
