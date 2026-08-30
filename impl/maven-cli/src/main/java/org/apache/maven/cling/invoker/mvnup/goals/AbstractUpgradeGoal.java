@@ -192,8 +192,10 @@ public abstract class AbstractUpgradeGoal implements Goal {
         // Perform the upgrade logic
         UpgradeResult result = doUpgrade(context, targetModel, pomMap);
 
-        // Save modifications if this is an apply goal
-        if (shouldSaveModifications() && result.success()) {
+        // Save modifications if this is an apply goal and anything actually changed
+        if (shouldSaveModifications()
+                && result.success()
+                && !result.modifiedPoms().isEmpty()) {
             saveModifications(context, pomMap, result.modifiedPoms());
         }
 
@@ -235,10 +237,6 @@ public abstract class AbstractUpgradeGoal implements Goal {
      * Unmodified POMs are left untouched and are not reported as saved.
      */
     protected void saveModifications(UpgradeContext context, Map<Path, Document> pomMap, Set<Path> modifiedPoms) {
-        if (modifiedPoms.isEmpty()) {
-            return;
-        }
-
         context.info("");
         context.info("Saving modified POMs...");
 
