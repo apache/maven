@@ -80,8 +80,30 @@ public class DefaultArtifactDescriptorReaderRelocationValidationTest {
         request.addRepository(testRepository());
         request.setArtifact(new DefaultArtifact("ut.simple", "dep-invalid-relocation", "pom", "1.0"));
 
-        ArtifactDescriptorException exception = assertThrows(
-                ArtifactDescriptorException.class, () -> reader.readArtifactDescriptor(session, request));
+        ArtifactDescriptorException exception =
+                assertThrows(ArtifactDescriptorException.class, () -> reader.readArtifactDescriptor(session, request));
+        assertTrue(exception.getMessage().contains("artifactId"));
+    }
+
+    @Test
+    void testRelocationWithBackslashIsRejected() throws Exception {
+        ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
+        request.addRepository(testRepository());
+        request.setArtifact(new DefaultArtifact("ut.simple", "dep-backslash-relocation", "pom", "1.0"));
+
+        ArtifactDescriptorException exception =
+                assertThrows(ArtifactDescriptorException.class, () -> reader.readArtifactDescriptor(session, request));
+        assertTrue(exception.getMessage().contains("artifactId"));
+    }
+
+    @Test
+    void testRelocationWithControlCharacterIsRejected() throws Exception {
+        ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
+        request.addRepository(testRepository());
+        request.setArtifact(new DefaultArtifact("ut.simple", "dep-control-char-relocation", "pom", "1.0"));
+
+        ArtifactDescriptorException exception =
+                assertThrows(ArtifactDescriptorException.class, () -> reader.readArtifactDescriptor(session, request));
         assertTrue(exception.getMessage().contains("artifactId"));
     }
 }
