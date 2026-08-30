@@ -828,6 +828,53 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
         return items.hashCode();
     }
 
+    /**
+     * Returns a hash code consistent with the ordering defined by {@link #compareTo(ComparableVersion)}:
+     * two versions that compare as equal get the same value even when their parsed representations
+     * differ, e.g. {@code 1-ga} ({@code [1, [ga]]}) and {@code 1} ({@code [1]}).
+     * <p>
+     * {@link #hashCode()} cannot provide this: it is structural, matching the structural
+     * {@link #equals(Object)} of this class. This method exists for classes such as
+     * {@link DefaultArtifactVersion} whose {@code equals} is defined as {@code compareTo == 0} and
+     * whose {@code hashCode} must therefore follow ordering equality (two equal objects must have
+     * equal hash codes).
+     *
+     * @return a hash code such that {@code a.compareTo(b) == 0} implies {@code a.orderingHashCode() == b.orderingHashCode()}
+     */
+    int orderingHashCode() {
+        return orderingHash(items);
+    }
+
+    private static int orderingHash(Item item) {
+        return switch (item.getType()) {
+            case Item.LIST_ITEM -> {
+                ListItem list = (ListItem) item;
+                int end = list.size();
+                // trailing items that compare as equal to null do not affect ordering: 1-ga == 1
+                while (end > 0 && list.get(end - 1).compareTo(null) == 0) {
+                    end--;
+                }
+                int hash = 1;
+                for (int i = 0; i < end; i++) {
+                    hash = 31 * hash + orderingHash(list.get(i));
+                }
+                yield hash;
+            }
+            // qualifiers that compare as equal ("ga", "final", "release" and the empty qualifier) must hash alike
+            case Item.STRING_ITEM ->
+                StringItem.comparableQualifier(((StringItem) item).value).hashCode();
+            case Item.COMBINATION_ITEM -> {
+                CombinationItem combination = (CombinationItem) item;
+                yield 31
+                                * StringItem.comparableQualifier(combination.stringPart.value)
+                                        .hashCode()
+                        + orderingHash(combination.digitPart);
+            }
+            // numeric items only compare as equal to items of the same type with the same value
+            default -> item.hashCode();
+        };
+    }
+
     // CHECKSTYLE_OFF: LineLength
 
     /**
