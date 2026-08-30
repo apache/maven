@@ -289,33 +289,28 @@ public class DefaultVersionResolver implements VersionResolver {
         if (versioning == null) {
             return;
         }
-        validateVersionToken(versioning.getLatest());
-        validateVersionToken(versioning.getRelease());
+        validateVersionToken(versioning.getLatest(), "latest version");
+        validateVersionToken(versioning.getRelease(), "release version");
         for (SnapshotVersion snapshotVersion : versioning.getSnapshotVersions()) {
-            validateVersionToken(snapshotVersion.getVersion());
+            validateVersionToken(snapshotVersion.getVersion(), "snapshot version");
         }
         Snapshot snapshot = versioning.getSnapshot();
         if (snapshot != null) {
-            validateVersionToken(snapshot.getTimestamp());
+            validateVersionToken(snapshot.getTimestamp(), "snapshot timestamp");
         }
     }
 
-    private static void validateVersionToken(String value) throws IOException {
+    private static void validateVersionToken(String value, String description) throws IOException {
         if (value == null || value.isEmpty()) {
             return;
         }
-        boolean valid = !"..".equals(value);
-        if (valid) {
-            for (int i = 0; i < value.length(); i++) {
-                char c = value.charAt(i);
-                if (c == '/' || c == '\\' || c == ':' || Character.isISOControl(c)) {
-                    valid = false;
-                    break;
-                }
-            }
+        boolean invalid = "..".equals(value) || value.contains("/") || value.contains("\\") || value.contains(":");
+        for (int i = 0; i < value.length() && !invalid; i++) {
+            invalid = Character.isISOControl(value.charAt(i));
         }
-        if (!valid) {
-            throw new IOException("Metadata contains an invalid version token: '" + value + "'");
+        if (invalid) {
+            throw new IOException("Rejecting metadata with invalid " + description + " '" + value
+                    + "': must not contain '..', '/', '\\', ':' or control characters");
         }
     }
 
