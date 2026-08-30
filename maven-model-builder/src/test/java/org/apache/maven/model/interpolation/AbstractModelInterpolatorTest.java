@@ -359,6 +359,91 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
+    public void testMinimalValidationInterpolationUsesRestrictedPropertySet() throws Exception {
+        Properties context = new Properties();
+        context.put("env.SOME_VAR", "some-value");
+        context.put("some.property", "other-value");
+        context.put("java.version", "21");
+
+        Model model = new Model();
+
+        Properties modelProperties = new Properties();
+        modelProperties.setProperty("envDir", "${env.SOME_VAR}");
+        modelProperties.setProperty("propDir", "${some.property}");
+        modelProperties.setProperty("jdk", "${java.version}");
+
+        model.setProperties(modelProperties);
+
+        ModelInterpolator interpolator = createInterpolator();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelBuildingRequest config = createModelBuildingRequest(context);
+        config.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        Model out = interpolator.interpolateModel(model, new File("."), config, collector);
+        assertProblemFree(collector);
+
+        // At minimal validation level (the level used for models built while resolving
+        // dependency, parent and BOM-import POMs) env and arbitrary system/user properties
+        // stay literal...
+        assertEquals("${env.SOME_VAR}", out.getProperties().getProperty("envDir"));
+        assertEquals("${some.property}", out.getProperties().getProperty("propDir"));
+        // ...while JVM-defined and other well-known expressions keep resolving.
+        assertEquals("21", out.getProperties().getProperty("jdk"));
+    }
+
+    @Test
+    public void testFullInterpolationOptOutRestoresPreviousBehaviorAtMinimalValidationLevel() throws Exception {
+        Properties context = new Properties();
+        context.put("env.SOME_VAR", "some-value");
+        context.put(AbstractStringBasedModelInterpolator.FULL_EXTERNAL_INTERPOLATION_PROPERTY, "true");
+
+        Model model = new Model();
+
+        Properties modelProperties = new Properties();
+        modelProperties.setProperty("envDir", "${env.SOME_VAR}");
+
+        model.setProperties(modelProperties);
+
+        ModelInterpolator interpolator = createInterpolator();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelBuildingRequest config = createModelBuildingRequest(context);
+        config.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        Model out = interpolator.interpolateModel(model, new File("."), config, collector);
+        assertProblemFree(collector);
+
+        assertEquals("some-value", out.getProperties().getProperty("envDir"));
+    }
+
+    @Test
+    public void testEnvarsStillInterpolatedAtStrictValidationLevel() throws Exception {
+        Properties context = new Properties();
+        context.put("env.SOME_VAR", "some-value");
+        context.put("some.property", "other-value");
+
+        Model model = new Model();
+
+        Properties modelProperties = new Properties();
+        modelProperties.setProperty("envDir", "${env.SOME_VAR}");
+        modelProperties.setProperty("propDir", "${some.property}");
+
+        model.setProperties(modelProperties);
+
+        ModelInterpolator interpolator = createInterpolator();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelBuildingRequest config = createModelBuildingRequest(context);
+        config.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
+        Model out = interpolator.interpolateModel(model, new File("."), config, collector);
+        assertProblemFree(collector);
+
+        // Operator project builds use strict validation and keep full interpolation,
+        // unchanged from previous behavior.
+        assertEquals("some-value", out.getProperties().getProperty("envDir"));
+        assertEquals("other-value", out.getProperties().getProperty("propDir"));
+    }
+
+    @Test
     public void testEnvarExpressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception {
         Model model = new Model();
 
