@@ -142,6 +142,7 @@ under the License.
     <maven.site.path>ref/4-LATEST</maven.site.path>
     <project.build.outputTimestamp>2025-06-24T20:18:00Z</project.build.outputTimestamp>
     <!-- various versions -->
+    <assertjVersion>3.27.7</assertjVersion>
     <asmVersion>9.10.1</asmVersion>
     <byteBuddyVersion>1.18.12</byteBuddyVersion>
     <classWorldsVersion>2.12.1</classWorldsVersion>
@@ -638,6 +639,11 @@ under the License.
         </exclusions>
       </dependency>
 
+      <dependency>
+        <groupId>org.assertj</groupId>
+        <artifactId>assertj-core</artifactId>
+        <version>${assertjVersion}</version>
+      </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-testing</artifactId>
