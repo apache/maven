@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -50,10 +51,51 @@ class MonotonicClockTest {
         MonotonicClock clock = MonotonicClock.get();
 
         assertEquals(ZoneOffset.UTC, clock.getZone(), "Clock should use UTC timezone");
+    }
 
-        // Verify that attempting to change timezone returns the same instance
+    @Test
+    @DisplayName("withZone() should return a new clock with the specified timezone")
+    void testWithZoneReturnsNewClock() {
+        MonotonicClock clock = MonotonicClock.get();
+
+        // withZone should return a new instance with the requested timezone
         Clock newClock = clock.withZone(ZoneId.systemDefault());
-        assertSame(clock, newClock, "withZone() should return the same clock instance");
+        assertNotNull(newClock, "withZone() should return a non-null clock");
+        assertEquals(ZoneId.systemDefault(), newClock.getZone(), "New clock should have the requested zone");
+        assertNotSame(clock, newClock, "withZone() should return a new instance, not the same clock");
+
+        // Both clocks should report instants that are very close (within 1ms)
+        Instant originalInstant = clock.instant();
+        Instant newClockInstant = newClock.instant();
+        assertEquals(
+                originalInstant.getEpochSecond(),
+                newClockInstant.getEpochSecond(),
+                "Clocks should report the same instant (monotonic time is preserved)");
+        long nanoDiff = Math.abs(originalInstant.getNano() - newClockInstant.getNano());
+        assertTrue(
+                nanoDiff < 1_000_000,
+                "Clocks should report instants within 1ms of each other (diff: " + nanoDiff + "ns)");
+    }
+
+    @Test
+    @DisplayName("withZone() with the same zone should return the same instance")
+    void testWithZoneSameZoneReturnsThis() {
+        MonotonicClock clock = MonotonicClock.get();
+
+        // Requesting UTC from a UTC clock should return the same instance
+        assertSame(
+                clock, clock.withZone(ZoneOffset.UTC), "withZone(UTC) should return this when the zone is already UTC");
+    }
+
+    @Test
+    @DisplayName("withZone() should throw NullPointerException on null zone")
+    void testWithZoneNullThrows() {
+        MonotonicClock clock = MonotonicClock.get();
+
+        org.junit.jupiter.api.Assertions.assertThrows(
+                NullPointerException.class,
+                () -> clock.withZone(null),
+                "withZone(null) should throw NullPointerException");
     }
 
     @Test
@@ -110,14 +152,19 @@ class MonotonicClockTest {
         @DisplayName("Elapsed time should match time difference")
         void testElapsedTimeConsistency() {
             MonotonicClock clock = MonotonicClock.get();
+            // Sandwich the instant() sample between two elapsedTime() samples: since both are
+            // derived from the same monotonic source, the duration computed from the instant
+            // must fall within the surrounding measurements, however long the JVM is paused
+            // between the calls.
+            Duration before = clock.elapsedTime();
             Instant now = clock.instant();
-            Duration elapsed = clock.elapsedTime();
+            Duration after = clock.elapsedTime();
             Duration calculated = Duration.between(clock.startInstant(), now);
 
-            // Allow for small timing differences (1ms) due to execution time between measurements
             assertTrue(
-                    Math.abs(elapsed.toMillis() - calculated.toMillis()) <= 1,
-                    "Elapsed time should match calculated duration between start and now");
+                    calculated.compareTo(before) >= 0 && calculated.compareTo(after) <= 0,
+                    "Elapsed time should match calculated duration between start and now: " + before + " <= "
+                            + calculated + " <= " + after);
         }
     }
 

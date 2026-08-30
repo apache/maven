@@ -21,9 +21,11 @@ package org.apache.maven.internal.transformation.impl;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -195,8 +197,96 @@ class DefaultConsumerPomBuilder implements PomBuilder {
     protected Model buildBom(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
         ModelBuilderResult result = buildModel(session, project, src);
-        Model model = result.getEffectiveModel();
+        Model rawModel = result.getRawModel();
+        Model effectiveModel = result.getEffectiveModel();
+        // The raw model has no inheritance — only entries declared in this POM.
+        // The effective model has fully interpolated values but includes inherited entries.
+        // Filter the effective model's dependency management to only include entries
+        // explicitly declared in this BOM, using the effective model for resolved values.
+        Model model = filterToOwnDependencyManagement(rawModel, effectiveModel, project);
         return transformBom(model, project);
+    }
+
+    /**
+     * Filters the effective model's dependency management to include only entries
+     * that were explicitly declared in this BOM's raw model, not inherited from the
+     * parent chain. For non-import entries, the effective model's fully resolved entry
+     * is used. For import-scoped entries (which are consumed/flattened in the effective
+     * model), the raw entry is preserved as a BOM reference with its version interpolated
+     * from the project's properties.
+     *
+     * @param rawModel the raw model (no inheritance, no interpolation)
+     * @param effectiveModel the effective model (inheritance + interpolation)
+     * @param project the Maven project (provides resolved properties)
+     * @return the effective model with dependency management filtered to own entries
+     */
+    private Model filterToOwnDependencyManagement(Model rawModel, Model effectiveModel, MavenProject project) {
+        if (rawModel.getDependencyManagement() == null
+                || rawModel.getDependencyManagement().getDependencies().isEmpty()) {
+            // Nothing declared in this BOM — strip all inherited entries
+            return effectiveModel.withDependencyManagement(null);
+        }
+
+        List<Dependency> declaredDeps = rawModel.getDependencyManagement().getDependencies();
+
+        // Build lookup from the effective model's resolved dependency management
+        Map<String, Dependency> effectiveLookup = new LinkedHashMap<>();
+        if (effectiveModel.getDependencyManagement() != null) {
+            for (Dependency dep : effectiveModel.getDependencyManagement().getDependencies()) {
+                effectiveLookup.put(getDependencyKey(dep), dep);
+            }
+        }
+
+        // For each declared entry, resolve it against the effective model
+        List<Dependency> resolvedDeps = new ArrayList<>();
+        for (Dependency declared : declaredDeps) {
+            if ("import".equals(declared.getScope())) {
+                // BOM import entries are consumed (flattened) in the effective model,
+                // so they won't be in effectiveLookup. Preserve the import reference
+                // with its version resolved from project properties.
+                String resolvedVersion = interpolateVersion(declared.getVersion(), project);
+                resolvedDeps.add(declared.withVersion(resolvedVersion));
+            } else {
+                // Regular entry: use the effective model's fully resolved entry
+                String key = getDependencyKey(declared);
+                Dependency resolved = effectiveLookup.get(key);
+                resolvedDeps.add(resolved != null ? resolved : declared);
+            }
+        }
+
+        return effectiveModel.withDependencyManagement(
+                effectiveModel.getDependencyManagement() != null
+                        ? effectiveModel.getDependencyManagement().withDependencies(resolvedDeps)
+                        : org.apache.maven.api.model.DependencyManagement.newBuilder()
+                                .dependencies(resolvedDeps)
+                                .build());
+    }
+
+    /**
+     * Resolves property references ({@code ${...}}) in a version string using the
+     * Maven project's fully-resolved properties. Handles model properties, inherited
+     * properties, and CI-friendly properties ({@code ${revision}}, etc.).
+     */
+    private static String interpolateVersion(String version, MavenProject project) {
+        if (version == null || !version.contains("${")) {
+            return version;
+        }
+        String result = version;
+        Properties props = project.getProperties();
+        for (String name : props.stringPropertyNames()) {
+            String placeholder = "${" + name + "}";
+            if (result.contains(placeholder)) {
+                result = result.replace(placeholder, props.getProperty(name));
+            }
+        }
+        // Handle built-in project-coordinate properties
+        if (result.contains("${project.version}") && project.getVersion() != null) {
+            result = result.replace("${project.version}", project.getVersion());
+        }
+        if (result.contains("${project.groupId}") && project.getGroupId() != null) {
+            result = result.replace("${project.groupId}", project.getGroupId());
+        }
+        return result;
     }
 
     protected Model buildNonPom(RepositorySystemSession session, MavenProject project, ModelSource src)
@@ -318,7 +408,16 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         request.source(src);
         request.locationTracking(false);
         request.systemProperties(iSession.getSystemProperties());
-        request.userProperties(iSession.getUserProperties());
+        Map<String, String> userProperties = new LinkedHashMap<>();
+        // BUILD_CONSUMER does not reactivate project profiles, so expose properties from profiles
+        // that were already active when the project model was built.
+        if (project != null && project.getActiveProfiles() != null) {
+            for (org.apache.maven.model.Profile profile : project.getActiveProfiles()) {
+                userProperties.putAll(profile.getDelegate().getProperties());
+            }
+        }
+        userProperties.putAll(iSession.getUserProperties());
+        request.userProperties(userProperties);
         request.lifecycleBindingsInjector(lifecycleBindingsInjector::injectLifecycleBindings);
         // Pass remote repositories so that the model builder can resolve BOM imports
         // from non-central repositories (e.g., repositories defined in settings.xml profiles).

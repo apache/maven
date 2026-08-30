@@ -41,24 +41,17 @@ import java.util.Map;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 public abstract class AbstractCheckMojo extends AbstractMojo {
 
     protected static boolean forkHasRun = false;
 
-    /**
-     * @parameter default-value="${project}"
-     * @required
-     * @readonly
-     */
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
-    /**
-     * @parameter default-value="${executedProject}"
-     * @required
-     * @readonly
-     */
+    @Parameter(defaultValue = "${executedProject}", required = true, readonly = true)
     private MavenProject executionProject;
 
     public void execute() throws MojoExecutionException {

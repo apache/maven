@@ -87,7 +87,7 @@ under the License.
     <proxy.user />
     <proxy.pass />
     <proxy.nonProxyHosts>localhost</proxy.nonProxyHosts>
-    <jetty9Version>9.4.57.v20241219</jetty9Version>
+    <jettyVersion>12.1.12</jettyVersion>
 
     <stubPluginVersion>0.1-stub-SNAPSHOT</stubPluginVersion>
     <!-- Support artifacts version - kept separate from Maven version -->
@@ -116,17 +116,17 @@ under the License.
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>${jetty9Version}</version>
+      <version>${jettyVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-security</artifactId>
-      <version>${jetty9Version}</version>
+      <version>${jettyVersion}</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-util</artifactId>
-      <version>${jetty9Version}</version>
+      <version>${jettyVersion}</version>
     </dependency>
 
     <dependency>
@@ -516,10 +516,10 @@ under the License.
             <configuration>
               <target>
                 <delete dir="${mavenHome}" />
-                <unzip dest="${mavenHome}" src="${sessionRootDirectory}/apache-maven/target/apache-maven-${project.version}-bin.zip">
+                <unzip dest="${mavenHome}" src="${maven.multiModuleProjectDirectory}/apache-maven/target/apache-maven-${project.version}-bin.zip">
                   <regexpmapper from="^([^/]+)/(.*)$" handledirsep="true" to="\2" />
                 </unzip>
-                <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug,mvnenc" perm="ugo+rx" />
+                <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug,mvnenc,mvnup" perm="ugo+rx" />
               </target>
             </configuration>
           </execution>
@@ -584,6 +584,9 @@ under the License.
     </profile>
     <profile>
       <id>run-its</id>
+      <properties>
+        <mavenHome>${project.build.directory}/apache-maven</mavenHome>
+      </properties>
       <dependencies>
         <dependency>
           <groupId>org.apache.maven</groupId>
@@ -628,6 +631,59 @@ under the License.
               <skipTests>false</skipTests>
               <redirectTestOutputToFile>false</redirectTestOutputToFile>
             </configuration>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-dependency-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>download-maven-distro</id>
+                <goals>
+                  <goal>copy</goal>
+                </goals>
+                <phase>process-test-resources</phase>
+                <configuration>
+                  <artifactItems>
+                    <artifactItem>
+                      <groupId>org.apache.maven</groupId>
+                      <artifactId>apache-maven</artifactId>
+                      <version>${maven-version}</version>
+                      <classifier>bin</classifier>
+                      <type>zip</type>
+                      <destFileName>maven-bin.zip</destFileName>
+                    </artifactItem>
+                  </artifactItems>
+                  <outputDirectory>${project.build.directory}</outputDirectory>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-antrun-plugin</artifactId>
+            <executions>
+              <!-- Disable the default distribution extraction -->
+              <execution>
+                <id>unpack-built-maven-distro</id>
+                <phase>none</phase>
+              </execution>
+              <execution>
+                <id>unpack-maven-distro</id>
+                <goals>
+                  <goal>run</goal>
+                </goals>
+                <phase>process-test-resources</phase>
+                <configuration>
+                  <target>
+                    <delete dir="${mavenHome}" />
+                    <unzip dest="${mavenHome}" src="${project.build.directory}/maven-bin.zip">
+                      <globmapper from="apache-maven-${maven-version}/*" handledirsep="true" to="*" />
+                    </unzip>
+                    <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug,mvnenc" perm="ugo+rx" />
+                  </target>
+                </configuration>
+              </execution>
+            </executions>
           </plugin>
         </plugins>
       </build>
@@ -749,7 +805,7 @@ under the License.
                     <unzip dest="${mavenHome}" src="${project.build.directory}/maven-bin.zip">
                       <globmapper from="apache-maven-${mavenVersion}/*" handledirsep="true" to="*" />
                     </unzip>
-                    <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug,mvnenc" perm="ugo+rx" />
+                    <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug,mvnenc,mvnup" perm="ugo+rx" />
                   </target>
                 </configuration>
               </execution>
@@ -804,7 +860,7 @@ under the License.
                     <unzip dest="${mavenHome}" src="${mavenDistro}">
                       <regexpmapper from="^([^/]+)/(.*)$" handledirsep="true" to="\2" />
                     </unzip>
-                    <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug,mvnenc" perm="ugo+rx" />
+                    <chmod dir="${mavenHome}/bin" includes="mvn,mvnDebug,mvnenc,mvnup" perm="ugo+rx" />
                   </target>
                 </configuration>
               </execution>

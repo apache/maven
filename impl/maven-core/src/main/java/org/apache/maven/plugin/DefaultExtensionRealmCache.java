@@ -118,15 +118,11 @@ public class DefaultExtensionRealmCache implements ExtensionRealmCache, Disposab
             Key key, ClassRealm extensionRealm, ExtensionDescriptor extensionDescriptor, List<Artifact> artifacts) {
         Objects.requireNonNull(extensionRealm, "extensionRealm cannot be null");
 
-        if (cache.containsKey(key)) {
-            throw new IllegalStateException("Duplicate extension realm for extension " + key);
-        }
-
         CacheRecord record = new CacheRecord(extensionRealm, extensionDescriptor, artifacts);
 
-        cache.put(key, record);
+        CacheRecord existing = cache.putIfAbsent(key, record);
 
-        return record;
+        return existing != null ? existing : record;
     }
 
     @Override

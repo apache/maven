@@ -42,22 +42,23 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Creates a text file.
  *
- * @goal touch
- * @phase validate
  *
  * @author Benjamin Bentmann
  */
+@Mojo(name = "touch", defaultPhase = LifecyclePhase.VALIDATE)
 public class TouchMojo extends AbstractMojo {
 
     /**
      * The path to the output file, relative to the project base directory.
-     *
-     * @parameter expression="${touch.file}" default-value="target/touch.txt"
      */
+    @Parameter(property = "touch.file", defaultValue = "target/touch.txt")
     private File file;
 
     /**

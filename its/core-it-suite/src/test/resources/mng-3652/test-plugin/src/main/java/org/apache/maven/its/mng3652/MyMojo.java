@@ -35,70 +35,40 @@ import org.apache.maven.artifact.resolver.ArtifactResolver;
 import org.apache.maven.execution.RuntimeInformation;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
+
+import javax.inject.Inject;
 
 /**
  * Goal which attempts to download a dummy artifact from a repository on localhost
  * at the specified port. This is used to allow the unit test class to record the
  * User-Agent HTTP header in use. It will also write the maven version in use to
  * a file in the output directory, for comparison in the unit tests assertions.
- *
- * @goal touch
- *
- * @phase validate
  */
+@Mojo(name = "touch", defaultPhase = LifecyclePhase.VALIDATE)
 public class MyMojo extends AbstractMojo {
 
     private static final String LS = System.getProperty("line.separator");
 
-    /**
-     * @parameter default-value="${project.build.directory}/touch.txt"
-     */
+    @Parameter(defaultValue = "${project.build.directory}/touch.txt")
     private File touchFile;
-
-    /**
-     * @component
-     */
     private ArtifactResolver resolver;
-
-    /**
-     * @component
-     */
     private ArtifactFactory artifactFactory;
-
-    /**
-     * @component
-     */
     private ArtifactRepositoryFactory repositoryFactory;
-
-    /**
-     * @component
-     */
     private ArtifactRepositoryLayout layout;
-
-    /**
-     * @component
-     */
     private RuntimeInformation runtimeInformation;
 
-    /**
-     * @parameter expression="${testProtocol}" default-value="http"
-     * @required
-     */
+    @Parameter(property = "testProtocol", defaultValue = "http", required = true)
     private String testProtocol;
 
-    /**
-     * @parameter expression="${testPort}"
-     * @required
-     */
+    @Parameter(property = "testPort", required = true)
     private String testPort;
 
-    /**
-     * @parameter default-value="${project.build.directory}/local-repo"
-     * @required
-     * @readonly
-     */
+    @Parameter(defaultValue = "${project.build.directory}/local-repo", required = true, readonly = true)
     private File localRepoDir;
 
     public void execute() throws MojoExecutionException {
@@ -179,5 +149,19 @@ public class MyMojo extends AbstractMojo {
         } finally {
             IOUtil.close(w);
         }
+    }
+
+    @Inject
+    public MyMojo(
+            ArtifactResolver resolver,
+            ArtifactFactory artifactFactory,
+            ArtifactRepositoryFactory repositoryFactory,
+            ArtifactRepositoryLayout layout,
+            RuntimeInformation runtimeInformation) {
+        this.resolver = resolver;
+        this.artifactFactory = artifactFactory;
+        this.repositoryFactory = repositoryFactory;
+        this.layout = layout;
+        this.runtimeInformation = runtimeInformation;
     }
 }

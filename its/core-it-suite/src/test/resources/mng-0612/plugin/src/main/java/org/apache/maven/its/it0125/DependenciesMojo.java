@@ -48,23 +48,21 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.plugins.annotations.ResolutionScope;
 
 /**
  * Simple mojo to write the project's resolved dependencies to a file.
  *
  * @author <a href="mailto:markhobson@gmail.com">Mark Hobson</a>
- * @goal dependencies
- * @requiresDependencyResolution test
  */
+@Mojo(name = "dependencies", requiresDependencyResolution = ResolutionScope.TEST)
 public class DependenciesMojo extends AbstractMojo {
-    /**
-     * @parameter expression="${project.artifacts}"
-     */
+    @Parameter(defaultValue = "${project.artifacts}")
     private Set artifacts;
 
-    /**
-     * @parameter expression="${project.build.directory}"
-     */
+    @Parameter(defaultValue = "${project.build.directory}")
     private String buildDirectory;
 
     /*

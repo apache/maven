@@ -47,6 +47,8 @@ import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.prefix.PluginPrefixRequest;
 import org.apache.maven.plugin.prefix.PluginPrefixResolver;
 import org.apache.maven.plugin.prefix.PluginPrefixResult;
+import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
+import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -77,13 +79,18 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
     private final BuildPluginManager pluginManager;
     private final RepositorySystem repositorySystem;
     private final MetadataReader metadataReader;
+    private final PluginVersionResolver pluginVersionResolver;
 
     @Inject
     public DefaultPluginPrefixResolver(
-            BuildPluginManager pluginManager, RepositorySystem repositorySystem, MetadataReader metadataReader) {
+            BuildPluginManager pluginManager,
+            RepositorySystem repositorySystem,
+            MetadataReader metadataReader,
+            PluginVersionResolver pluginVersionResolver) {
         this.pluginManager = pluginManager;
         this.repositorySystem = repositorySystem;
         this.metadataReader = metadataReader;
+        this.pluginVersionResolver = pluginVersionResolver;
     }
 
     @Override
@@ -167,6 +174,13 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
     private PluginPrefixResult doResolveFromProject(PluginPrefixRequest request, Collection<Plugin> plugins) {
         for (Plugin plugin : plugins) {
             try {
+                if (plugin.getVersion() == null) {
+                    DefaultPluginVersionRequest versionRequest = new DefaultPluginVersionRequest(
+                                    plugin, request.getRepositorySession(), request.getRepositories())
+                            .setPom(request.getPom());
+                    plugin.setVersion(
+                            pluginVersionResolver.resolve(versionRequest).getVersion());
+                }
                 PluginDescriptor pluginDescriptor =
                         pluginManager.loadPlugin(plugin, request.getRepositories(), request.getRepositorySession());
 

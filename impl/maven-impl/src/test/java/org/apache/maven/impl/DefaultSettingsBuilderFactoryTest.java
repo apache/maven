@@ -42,6 +42,7 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -158,6 +159,17 @@ class DefaultSettingsBuilderFactoryTest {
         assertEquals(
                 "'servers.server[0].aliases[0]' for server-1 must be unique across all server ids and aliases but found duplicate alias server-2",
                 problems.problems().findFirst().orElseThrow().getMessage());
+    }
+
+    @Test
+    void testRelativeLocalRepositoryIsResolvedToAbsolute() {
+        Settings settings = execute("settings-relative-local-repo").getEffectiveSettings();
+
+        String localRepository = settings.getLocalRepository();
+        assertNotNull(localRepository);
+        assertFalse(localRepository.isEmpty());
+        Path repoPath = Paths.get(localRepository);
+        assertTrue(repoPath.isAbsolute(), "Relative local repository should be resolved to absolute");
     }
 
     private Path getSettings(String name) {

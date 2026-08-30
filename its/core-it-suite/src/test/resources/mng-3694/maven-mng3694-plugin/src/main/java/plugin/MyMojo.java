@@ -39,30 +39,27 @@ import java.util.List;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-/**
- * @goal check
- * @phase validate
- */
+@Mojo(name = "check", defaultPhase = LifecyclePhase.VALIDATE)
 public class MyMojo extends AbstractMojo {
 
     /**
      * Not used, just an offset to place reactorProjects in the middle.
-     * @parameter default-value="${project.build.directory}"
      */
+    @Parameter(defaultValue = "${project.build.directory}")
     private String outputDirectory;
 
-    /**
-     * @parameter expression="${reactorProjects}"
-     * @required
-     */
+    @Parameter(defaultValue = "${reactorProjects}", required = true)
     private List reactorProjects;
 
     /**
      * Not used, just an offset to place reactorProjects in the middle.
-     * @parameter default-value="${project.build.directory}"
      */
+    @Parameter(defaultValue = "${project.build.directory}")
     private String outputDirectory2;
 
     public void execute() throws MojoExecutionException {

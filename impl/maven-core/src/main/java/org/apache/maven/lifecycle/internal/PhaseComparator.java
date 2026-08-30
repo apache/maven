@@ -19,16 +19,19 @@
 package org.apache.maven.lifecycle.internal;
 
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Compares phases within the context of a specific lifecycle with secondary sorting based on the {@link PhaseId}.
  */
 public class PhaseComparator implements Comparator<String> {
     /**
-     * The lifecycle phase ordering.
+     * Map from phase name to its index in the lifecycle, enabling O(1) lookups
+     * instead of O(n) List.indexOf() scans on every comparison.
      */
-    private final List<String> lifecyclePhases;
+    private final Map<String, Integer> phaseIndexMap;
 
     /**
      * Constructor.
@@ -36,24 +39,27 @@ public class PhaseComparator implements Comparator<String> {
      * @param lifecyclePhases the lifecycle phase ordering.
      */
     public PhaseComparator(List<String> lifecyclePhases) {
-        this.lifecyclePhases = lifecyclePhases;
+        this.phaseIndexMap = new HashMap<>(lifecyclePhases.size() * 2);
+        for (int i = 0; i < lifecyclePhases.size(); i++) {
+            phaseIndexMap.put(lifecyclePhases.get(i), i);
+        }
     }
 
     @Override
     public int compare(String o1, String o2) {
         PhaseId p1 = PhaseId.of(o1);
         PhaseId p2 = PhaseId.of(o2);
-        int i1 = lifecyclePhases.indexOf(p1.executionPoint().prefix() + p1.phase());
-        int i2 = lifecyclePhases.indexOf(p2.executionPoint().prefix() + p2.phase());
-        if (i1 == -1 && i2 == -1) {
+        Integer i1 = phaseIndexMap.get(p1.executionPoint().prefix() + p1.phase());
+        Integer i2 = phaseIndexMap.get(p2.executionPoint().prefix() + p2.phase());
+        if (i1 == null && i2 == null) {
             // unknown phases, leave in existing order
             return 0;
         }
-        if (i1 == -1) {
+        if (i1 == null) {
             // second one is known, so it comes first
             return 1;
         }
-        if (i2 == -1) {
+        if (i2 == null) {
             // first one is known, so it comes first
             return -1;
         }

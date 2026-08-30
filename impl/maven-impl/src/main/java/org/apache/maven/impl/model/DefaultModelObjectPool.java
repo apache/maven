@@ -60,6 +60,7 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultModelObjectPool.class);
 
     private final Map<?, ?> properties;
+    private final Set<String> pooledTypes;
 
     public DefaultModelObjectPool() {
         this(System.getProperties());
@@ -67,6 +68,7 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
 
     DefaultModelObjectPool(Map<?, ?> properties) {
         this.properties = properties;
+        this.pooledTypes = parsePooledTypes(properties);
     }
 
     @Override
@@ -79,8 +81,8 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
         Class<?> objectType = object.getClass();
         String simpleClassName = objectType.getSimpleName();
 
-        // Check if this object type should be pooled (read configuration dynamically)
-        if (!getPooledTypes(properties).contains(simpleClassName)) {
+        // Check if this object type should be pooled
+        if (!pooledTypes.contains(simpleClassName)) {
             return object;
         }
 
@@ -96,14 +98,16 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
     }
 
     /**
-     * Gets the set of object types that should be pooled.
+     * Parses the set of object types that should be pooled from properties.
+     * Called once at construction time to avoid re-parsing on every {@link #process} call.
      */
-    private Set<String> getPooledTypes(Map<?, ?> properties) {
-        String pooledTypesProperty = getProperty(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES, "Dependency");
+    private static Set<String> parsePooledTypes(Map<?, ?> properties) {
+        Object value = properties.get(Constants.MAVEN_MODEL_PROCESSOR_POOLED_TYPES);
+        String pooledTypesProperty = value instanceof String str ? str : "Dependency";
         return Arrays.stream(pooledTypesProperty.split(","))
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
-                .collect(Collectors.toSet());
+                .collect(Collectors.toUnmodifiableSet());
     }
 
     /**
@@ -199,6 +203,9 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
             if (!(obj instanceof PoolKey other)) {
                 return false;
             }
+            if (hashCode != other.hashCode) {
+                return false;
+            }
 
             return objectsEqual(object, other.object);
         }
@@ -283,21 +290,23 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
 
         /**
          * Custom hash code for Dependency objects based on all fields.
+         * Inlined to avoid the Object[] varargs allocation from Objects.hash().
          */
         private static int dependencyHashCode(org.apache.maven.api.model.Dependency dep) {
-            return Objects.hash(
-                    dep.getGroupId(),
-                    dep.getArtifactId(),
-                    dep.getVersion(),
-                    dep.getType(),
-                    dep.getClassifier(),
-                    dep.getScope(),
-                    dep.getSystemPath(),
-                    dep.getExclusions(),
-                    dep.getOptional(),
-                    dep.getLocationKeys(),
-                    locationsHashCode(dep),
-                    dep.getImportedFrom());
+            int h = 1;
+            h = 31 * h + Objects.hashCode(dep.getGroupId());
+            h = 31 * h + Objects.hashCode(dep.getArtifactId());
+            h = 31 * h + Objects.hashCode(dep.getVersion());
+            h = 31 * h + Objects.hashCode(dep.getType());
+            h = 31 * h + Objects.hashCode(dep.getClassifier());
+            h = 31 * h + Objects.hashCode(dep.getScope());
+            h = 31 * h + Objects.hashCode(dep.getSystemPath());
+            h = 31 * h + Objects.hashCode(dep.getExclusions());
+            h = 31 * h + Objects.hashCode(dep.getOptional());
+            h = 31 * h + Objects.hashCode(dep.getLocationKeys());
+            h = 31 * h + locationsHashCode(dep);
+            h = 31 * h + Objects.hashCode(dep.getImportedFrom());
+            return h;
         }
 
         /**
