@@ -47,6 +47,7 @@ import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
@@ -1280,6 +1281,75 @@ class DefaultModelBuilderTest {
                 .orElse(null);
         assertNotNull(managed, "Managed dependency from type=bom import should be present");
         assertEquals("0.1", managed.getVersion());
+    }
+
+    /**
+     * Dependency management imported from a repository-resolved POM does not contribute
+     * {@code system} scope or a {@code systemPath}; such entries are dropped with a warning.
+     */
+    @Test
+    public void testSystemScopeIgnoredOutsideProjectDeclaration() throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
+
+        // default: the build succeeds, the offending entry is dropped, and a warning is emitted
+        Path localRepoPath = basedir.resolve("target/local-repo-system-scope-bom-reject");
+        Session rejectSession = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this), localRepoPath);
+        RemoteRepository remoteRepository = rejectSession.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
+        rejectSession = rejectSession.withRemoteRepositories(List.of(remoteRepository));
+        ModelBuilder rejectBuilder = rejectSession.getService(ModelBuilder.class);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(rejectSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("import-system-scope-bom")))
+                .build();
+        ModelBuilderResult rejectResult = rejectBuilder.newSession().build(request);
+        Dependency rejected = rejectResult.getEffectiveModel().getDependencyManagement().getDependencies().stream()
+                .filter(d -> "system-scope-dep".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNull(rejected, "By default the 'system' scope managed entry should not be imported");
+        assertTrue(
+                rejectResult
+                        .getProblemCollector()
+                        .problems()
+                        .anyMatch(p -> p.getSeverity() == BuilderProblem.Severity.WARNING
+                                && p.getMessage().contains("'system' scope or 'systemPath'")
+                                && p.getMessage()
+                                        .contains(Constants.MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE)),
+                "Expected a warning about 'system' scope in the repository-imported BOM");
+
+        // explicit opt-out (fresh session/local repo, so the sanitized import is not served from the cache)
+        Path allowedLocalRepoPath = basedir.resolve("target/local-repo-system-scope-bom-allow");
+        Session allowedSession = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this), allowedLocalRepoPath);
+        allowedSession = allowedSession.withRemoteRepositories(List.of(allowedSession.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString())));
+        ModelBuilder allowedBuilder = allowedSession.getService(ModelBuilder.class);
+
+        ModelBuilderRequest allowed = ModelBuilderRequest.builder()
+                .session(allowedSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .userProperties(Map.of(Constants.MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE, "true"))
+                .source(Sources.buildSource(getPom("import-system-scope-bom")))
+                .build();
+        ModelBuilderResult result = allowedBuilder.newSession().build(allowed);
+        Dependency managed = result.getEffectiveModel().getDependencyManagement().getDependencies().stream()
+                .filter(d -> "system-scope-dep".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(managed, "With the opt-out property the managed entry should be imported");
+        assertEquals("system", managed.getScope());
+        assertTrue(
+                result.getProblemCollector()
+                        .problems()
+                        .anyMatch(p -> p.getSeverity() == BuilderProblem.Severity.WARNING
+                                && p.getMessage()
+                                        .contains(Constants.MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE)),
+                "Opting out should still emit a warning about the imported 'system' scope");
     }
 
     private static DefaultProfileActivationContext.Record recordActiveProfile(
