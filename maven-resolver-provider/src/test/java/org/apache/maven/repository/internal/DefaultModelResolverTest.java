@@ -20,19 +20,25 @@ package org.apache.maven.repository.internal;
 
 import javax.inject.Inject;
 
+import java.io.File;
 import java.net.MalformedURLException;
+import java.nio.file.Path;
 import java.util.Arrays;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.testing.PlexusTest;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.impl.ArtifactResolver;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.impl.VersionRangeResolver;
+import org.eclipse.aether.repository.LocalRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -194,6 +200,41 @@ public final class DefaultModelResolverTest extends AbstractRepositoryTest {
 
     @Inject
     private RemoteRepositoryManager remoteRepositoryManager;
+
+    @Test
+    public void testConstructionSuppliedRepositoryKeepsPrecedence(@TempDir Path localRepository) throws Exception {
+        // An empty local repository, so resolution has to consult the remote repository list
+        // rather than a copy cached by another test in this class.
+        final DefaultRepositorySystemSession isolatedSession = MavenRepositorySystemUtils.newSession();
+        isolatedSession.setLocalRepositoryManager(
+                system.newLocalRepositoryManager(isolatedSession, new LocalRepository(localRepository.toFile())));
+
+        final ModelResolver resolver = new DefaultModelResolver(
+                isolatedSession,
+                null,
+                this.getClass().getName(),
+                artifactResolver,
+                versionRangeResolver,
+                remoteRepositoryManager,
+                Arrays.asList(newTestRepository()));
+
+        // A model-declared repository that reuses the external repository's id; the external
+        // repository must keep its slot.
+        final Repository repository = new Repository();
+        repository.setId("repo");
+        repository.setUrl(new File("target/no-such-repository").toURI().toURL().toString());
+
+        resolver.addRepository(repository);
+        resolver.addRepository(repository, true);
+
+        final Parent parent = new Parent();
+        parent.setGroupId("ut.simple");
+        parent.setArtifactId("artifact");
+        parent.setVersion("1.0");
+
+        // The external repository kept its slot, so the artifact still resolves.
+        assertNotNull(resolver.resolveModel(parent));
+    }
 
     private ModelResolver newModelResolver() throws ComponentLookupException, MalformedURLException {
         return new DefaultModelResolver(
