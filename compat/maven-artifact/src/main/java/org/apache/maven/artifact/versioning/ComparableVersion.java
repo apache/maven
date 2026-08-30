@@ -460,7 +460,14 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
         public int compareTo(Item item) {
             if (item == null) {
                 // 1-rc1 < 1, 1-ga1 > 1
-                return stringPart.compareTo(item);
+                int result = stringPart.compareTo(item);
+                if (result == 0) {
+                    // the string part is equivalent to the release qualifier ("ga", "final", "release"),
+                    // so the digit part decides: 1-ga1 > 1. Returning 0 here would break compareTo
+                    // transitivity, since 1-ga1 < 1-ga2 while both would compare equal to 1.
+                    return digitPart.compareTo(null);
+                }
+                return result;
             }
             int result = 0;
             switch (item.getType()) {
