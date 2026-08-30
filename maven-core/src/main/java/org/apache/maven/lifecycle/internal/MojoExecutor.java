@@ -431,9 +431,27 @@ public class MojoExecutor {
                 for (Map.Entry<String, List<MojoExecution>> fork : forkedExecutions.entrySet()) {
                     String projectId = fork.getKey();
 
-                    int index = projectIndex.getIndices().get(projectId);
+                    Integer idx = projectIndex.getIndices().get(projectId);
+                    if (idx == null) {
+                        throw new LifecycleExecutionException(
+                                "Forked execution references project '" + projectId
+                                        + "' which is not in the reactor. This can happen with parallel builds"
+                                        + " (-T) or when extensions modify the session projects.",
+                                mojoExecution,
+                                project);
+                    }
+                    int index = idx;
 
                     MavenProject forkedProject = projectIndex.getProjects().get(projectId);
+                    if (forkedProject == null) {
+                        throw new LifecycleExecutionException(
+                                "Forked execution references project '" + projectId
+                                        + "' which is not in the reactor (no project instance). This can happen"
+                                        + " with parallel builds (-T) or when extensions modify the session"
+                                        + " projects.",
+                                mojoExecution,
+                                project);
+                    }
 
                     forkedProjects.add(forkedProject);
 
