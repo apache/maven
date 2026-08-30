@@ -40,6 +40,8 @@ import java.util.concurrent.TimeUnit;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
@@ -53,6 +55,10 @@ import org.apache.maven.api.services.Sources;
 import org.apache.maven.impl.DefaultRemoteRepository;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.eclipse.aether.repository.RepositoryPolicy;
+import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
+import org.eclipse.aether.spi.io.PathProcessor;
+import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
+import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -925,6 +931,42 @@ class DefaultModelBuilderTest {
                         + "which indicates the path normalization fix (GH-12598) is not working.");
     }
 
+    /**
+     * {@code type=bom} dependencyManagement entries must be processed as BOM imports
+     * without requiring {@code scope=import}. The {@code bom} type inherently implies
+     * import semantics (unlike {@code type=pom}, which requires {@code scope=import}).
+     * Operator precedence previously skipped {@code type=bom} always (GH-12589).
+     */
+    @Test
+    public void testBomTypeImpliesImportWithoutScope() {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Path localRepoPath = basedir.resolve("target/local-repo-bom-import");
+        Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
+        Session bomSession = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this), localRepoPath);
+        RemoteRepository remoteRepository = bomSession.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
+        bomSession = bomSession.withRemoteRepositories(List.of(remoteRepository));
+        ModelBuilder bomBuilder = bomSession.getService(ModelBuilder.class);
+
+        ModelBuilderResult result = bomBuilder
+                .newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(bomSession)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .source(Sources.buildSource(getPom("import-bom-type")))
+                        .build());
+
+        assertNotNull(result);
+        assertNotNull(result.getEffectiveModel().getDependencyManagement());
+        Dependency managed = result.getEffectiveModel().getDependencyManagement().getDependencies().stream()
+                .filter(d -> "a".equals(d.getArtifactId()) && "org.apache.maven.its".equals(d.getGroupId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(managed, "Managed dependency from type=bom import should be present");
+        assertEquals("0.1", managed.getVersion());
+    }
+
     private static DefaultProfileActivationContext.Record recordActiveProfile(
             List<String> activeIds, String profileId) {
         DefaultProfileActivationContext recording =
@@ -937,6 +979,19 @@ class DefaultModelBuilderTest {
             List<String> activeIds, List<String> inactiveIds) {
         return new DefaultProfileActivationContext(
                 null, null, null, activeIds, inactiveIds, Map.of(), Map.of(), Model.newInstance());
+    }
+
+    @Provides
+    @Named(FileTransporterFactory.NAME)
+    static FileTransporterFactory newFileTransporterFactory() {
+        return new FileTransporterFactory();
+    }
+
+    @Provides
+    @Named(ApacheTransporterFactory.NAME)
+    static ApacheTransporterFactory newApacheTransporterFactory(
+            ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
+        return new ApacheTransporterFactory(checksumExtractor, pathProcessor);
     }
 
     private Path getPom(String name) {
