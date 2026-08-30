@@ -35,6 +35,9 @@ import java.util.function.Consumer;
 
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.ProjectCycleException;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -379,28 +382,20 @@ public class DefaultGraphBuilder implements GraphBuilder {
     }
 
     private Consumer<org.apache.maven.model.building.ModelProblem> getModelProblemConsumer(MavenSession session) {
-        org.apache.maven.api.Session apiSession = session.getSession();
+        Session apiSession = session.getSession();
         if (apiSession == null) {
-            return problem -> {
-                List<org.apache.maven.model.building.ModelProblem> problems =
-                        new ArrayList<>(session.getModelProblems());
-                problems.add(problem);
-                session.setModelProblems(problems);
-            };
+            return problem -> {};
         }
         return problem -> apiSession.getModelProblemCollector().reportProblem(toApiModelProblem(problem));
     }
 
-    private org.apache.maven.api.services.ModelProblem toApiModelProblem(
-            org.apache.maven.model.building.ModelProblem problem) {
+    private ModelProblem toApiModelProblem(org.apache.maven.model.building.ModelProblem problem) {
         return new org.apache.maven.impl.model.DefaultModelProblem(
                 problem.getMessage(),
-                org.apache.maven.api.services.BuilderProblem.Severity.valueOf(
-                        problem.getSeverity().name()),
+                BuilderProblem.Severity.valueOf(problem.getSeverity().name()),
                 problem.getVersion() != null
-                        ? org.apache.maven.api.services.ModelProblem.Version.valueOf(
-                                problem.getVersion().name())
-                        : org.apache.maven.api.services.ModelProblem.Version.BASE,
+                        ? ModelProblem.Version.valueOf(problem.getVersion().name())
+                        : ModelProblem.Version.BASE,
                 problem.getSource(),
                 problem.getLineNumber(),
                 problem.getColumnNumber(),
