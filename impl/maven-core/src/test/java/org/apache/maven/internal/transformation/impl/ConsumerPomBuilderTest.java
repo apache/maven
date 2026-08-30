@@ -26,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Node;
@@ -360,6 +361,68 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         assertNull(transformed.getScm().getChildScmConnectionInheritAppendPath());
         assertNull(transformed.getScm().getChildScmUrlInheritAppendPath());
         assertNull(transformed.getScm().getChildScmDeveloperConnectionInheritAppendPath());
+    }
+
+    /**
+     * Verifies that repositories not declared in the project's own POM file (e.g. inherited from a
+     * parent POM or injected by an active settings.xml profile into the effective model) are pruned
+     * from the consumer POM, while repositories the project itself declares are retained. The central
+     * repository is always removed.
+     */
+    @Test
+    void testConsumerPomKeepsOnlyDeclaredRepositories() {
+        Model model = Model.newBuilder()
+                .groupId("test")
+                .artifactId("test")
+                .version("1.0")
+                .repositories(List.of(
+                        Repository.newBuilder()
+                                .id("central")
+                                .url("https://repo.maven.apache.org/maven2")
+                                .build(),
+                        Repository.newBuilder()
+                                .id("own-repo")
+                                .url("https://repo.example.com/releases")
+                                .build(),
+                        Repository.newBuilder()
+                                .id("corp-nexus")
+                                .url("https://nexus.corp.internal/repo")
+                                .build()))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.transformNonPom(model, null, Set.of("own-repo"));
+
+        assertEquals(
+                List.of("own-repo"),
+                transformed.getRepositories().stream().map(Repository::getId).toList());
+    }
+
+    /**
+     * Verifies the legacy behavior when repository sanitization is disabled (a {@code null} set of
+     * declared repository ids): every repository except central is published in the consumer POM.
+     */
+    @Test
+    void testAllNonCentralRepositoriesKeptWhenSanitizationDisabled() {
+        Model model = Model.newBuilder()
+                .groupId("test")
+                .artifactId("test")
+                .version("1.0")
+                .repositories(List.of(
+                        Repository.newBuilder()
+                                .id("central")
+                                .url("https://repo.maven.apache.org/maven2")
+                                .build(),
+                        Repository.newBuilder()
+                                .id("corp-nexus")
+                                .url("https://nexus.corp.internal/repo")
+                                .build()))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.transformNonPom(model, null, null);
+
+        assertEquals(
+                List.of("corp-nexus"),
+                transformed.getRepositories().stream().map(Repository::getId).toList());
     }
 
     /**

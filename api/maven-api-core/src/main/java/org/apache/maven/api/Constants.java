@@ -550,6 +550,23 @@ public final class Constants {
             "maven.consumer.pom.removeUnusedManagedDependencies";
 
     /**
+     * User property for controlling whether the repositories published in a consumer POM are restricted
+     * to the repositories declared in the project's own POM file.
+     * <ul>
+     *     <li>When set to <code>true</code> (default), repositories that are present in the effective model
+     * only because they were inherited from a (possibly remote) parent POM or injected by an active
+     * {@code settings.xml} profile are removed from the consumer POM before it is published. A warning is
+     * logged for every removed repository, and for every retained repository together with its URL.</li>
+     *     <li>When set to <code>false</code>, every non-central repository of the effective model is
+     * published in the consumer POM, restoring the previous behavior.</li>
+     * </ul>
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_CONSUMER_POM_SANITIZE_REPOSITORIES = "maven.consumer.pom.sanitizeRepositories";
+
+    /**
      * User property for controlling "maven personality". If activated Maven will behave
      * as previous major version, Maven 3.
      *
