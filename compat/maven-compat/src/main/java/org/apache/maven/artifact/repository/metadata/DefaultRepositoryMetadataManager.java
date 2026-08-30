@@ -367,7 +367,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
 
         try {
             wagonManager.getArtifactMetadataFromDeploymentRepository(
-                    metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN);
+                    metadata, remoteRepository, file, getChecksumPolicy(metadata, remoteRepository));
         } catch (ResourceDoesNotExistException e) {
             getLogger()
                     .info(metadata + " could not be found on repository: " + remoteRepository.getId()
@@ -391,6 +391,22 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
             }
         }
         return file;
+    }
+
+    /**
+     * Determines the effective checksum policy for a transfer from the given repository. The
+     * operator-configured policy (e.g. {@code fail} via {@code -C}/{@code --strict-checksums} or a
+     * per-repository {@code checksumPolicy}) must govern every remote transfer, so it must not be
+     * hardcoded at the call sites.
+     */
+    private String getChecksumPolicy(ArtifactMetadata metadata, ArtifactRepository repository) {
+        if (metadata instanceof RepositoryMetadata repositoryMetadata) {
+            ArtifactRepositoryPolicy policy = repositoryMetadata.getPolicy(repository);
+            if (policy != null && policy.getChecksumPolicy() != null) {
+                return policy.getChecksumPolicy();
+            }
+        }
+        return ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN;
     }
 
     @Override
