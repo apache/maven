@@ -116,6 +116,56 @@ class DefaultModelBuilderTest {
         assertEquals("21", result.getEffectiveModel().getProperties().get("maven.compiler.release"));
     }
 
+    /**
+     * Models built at {@link ModelBuilderRequest.RequestType#CONSUMER_DEPENDENCY} come from a
+     * dependency POM resolved from a repository. Their file, property, and condition activators
+     * are not evaluated, and their profiles contribute no repositories. A project build, at
+     * {@link ModelBuilderRequest.RequestType#BUILD_PROJECT}, still evaluates every activator.
+     * Platform-derived activation (JDK version, operating system, activeByDefault) is unaffected
+     * at either level.
+     */
+    private ModelBuilderRequest.ModelBuilderRequestBuilder resolvedProfilesRequest(
+            ModelBuilderRequest.RequestType requestType) {
+        Map<String, String> systemProperties = new HashMap<>();
+        for (String name : System.getProperties().stringPropertyNames()) {
+            systemProperties.put(name, System.getProperty(name));
+        }
+        systemProperties.put("some.dir", System.getProperty("java.io.tmpdir"));
+        systemProperties.put("some.gating.property", "true");
+        systemProperties.put("some.condition.property", "true");
+        return ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(requestType)
+                .systemProperties(systemProperties)
+                .source(Sources.buildSource(getPom("resolved-model-with-profiles")));
+    }
+
+    @Test
+    public void testProjectBuildEvaluatesAllActivators() {
+        ModelBuilderRequest request = resolvedProfilesRequest(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .build();
+        Model model = builder.newSession().build(request).getEffectiveModel();
+
+        assertEquals("activated", model.getProperties().get("profile.file"));
+        assertEquals("activated", model.getProperties().get("profile.property"));
+        assertEquals("activated", model.getProperties().get("profile.condition"));
+        assertEquals("activated", model.getProperties().get("profile.jdk"));
+        assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+    }
+
+    @Test
+    public void testDependencyModelActivatesOnlyEnvironmentIndependentProfiles() {
+        ModelBuilderRequest request = resolvedProfilesRequest(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .build();
+        Model model = builder.newSession().build(request).getEffectiveModel();
+
+        assertNull(model.getProperties().get("profile.file"));
+        assertNull(model.getProperties().get("profile.property"));
+        assertNull(model.getProperties().get("profile.condition"));
+        assertEquals("activated", model.getProperties().get("profile.jdk"));
+        assertTrue(model.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+    }
+
     @Test
     public void testMergeRepositories() throws Exception {
         // this is here only to trigger mainSession creation; unrelated

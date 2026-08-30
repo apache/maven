@@ -1595,10 +1595,34 @@ public class DefaultModelBuilder implements ModelBuilder {
         private List<Profile> getActiveProfiles(
                 Collection<Profile> interpolatedProfiles, DefaultProfileActivationContext profileActivationContext) {
             if (isBuildRequestWithActivation()) {
-                return profileSelector.getActiveProfiles(interpolatedProfiles, profileActivationContext, this);
+                Collection<Profile> eligibleProfiles = interpolatedProfiles;
+                if (request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY) {
+                    // A dependency POM resolved from a repository evaluates only
+                    // platform-derived activation (JDK version, operating system,
+                    // activeByDefault); its profiles contribute no repositories.
+                    eligibleProfiles = interpolatedProfiles.stream()
+                            .filter(profile -> !hasFileOrPropertyOrConditionActivation(profile))
+                            .map(profile -> profile.withRepositories(List.of()).withPluginRepositories(List.of()))
+                            .toList();
+                }
+                return profileSelector.getActiveProfiles(eligibleProfiles, profileActivationContext, this);
             } else {
                 return List.of();
             }
+        }
+
+        /**
+         * Determines whether the given profile's activation depends on file existence, a
+         * property, or a condition expression, as opposed to being a function of the build
+         * platform (JDK version, operating system) or {@code activeByDefault}.
+         */
+        private static boolean hasFileOrPropertyOrConditionActivation(Profile profile) {
+            Activation activation = profile.getActivation();
+            return activation != null
+                    && (activation.getFile() != null
+                            || activation.getProperty() != null
+                            || (activation.getCondition() != null
+                                    && !activation.getCondition().isBlank()));
         }
 
         Model readFileModel() throws ModelBuilderException {
