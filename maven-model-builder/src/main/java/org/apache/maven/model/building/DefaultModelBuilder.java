@@ -288,6 +288,11 @@ public class DefaultModelBuilder implements ModelBuilder {
         Collection<String> parentIds = new LinkedHashSet<>();
         List<ModelData> lineage = new ArrayList<>();
 
+        // Models built to resolve a dependency (a dependency POM, one of its parents, or an
+        // Models resolved for dependency, parent or BOM POMs evaluate only platform-derived
+        // activation (JDK, OS, activeByDefault).
+        boolean externalModel = isExternalModelBuildingRequest(request);
+
         for (ModelData currentData = resultData; currentData != null; ) {
             lineage.add(currentData);
 
@@ -307,8 +312,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             List<Profile> interpolatedProfiles = getInterpolatedProfiles(rawModel, profileActivationContext, problems);
             tmpModel.setProfiles(interpolatedProfiles);
 
-            List<Profile> activePomProfiles =
-                    profileSelector.getActiveProfiles(tmpModel.getProfiles(), profileActivationContext, problems);
+            List<Profile> activePomProfiles = profileSelector.getActiveProfiles(
+                    externalModel ? withoutFileAndPropertyActivation(interpolatedProfiles) : tmpModel.getProfiles(),
+                    profileActivationContext,
+                    problems);
 
             List<Profile> rawProfiles = new ArrayList<>();
             for (Profile activePomProfile : activePomProfiles) {
@@ -318,7 +325,11 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // profile injection
             for (Profile activeProfile : activePomProfiles) {
-                profileInjector.injectProfile(tmpModel, activeProfile, request, problems);
+                profileInjector.injectProfile(
+                        tmpModel,
+                        externalModel ? withoutRepositories(activeProfile) : activeProfile,
+                        request,
+                        problems);
             }
 
             if (currentData == resultData) {
@@ -490,6 +501,45 @@ public class DefaultModelBuilder implements ModelBuilder {
                             .performFor(ja, "jdk", activation::setJdk));
         }
         return interpolatedActivations;
+    }
+
+    /**
+     * Determines whether the given request builds a model to resolve a dependency, i.e. a POM
+     * read from a remote repository (a dependency POM, one of its parents, or an imported BOM)
+     * rather than a POM belonging to the project being built. Such requests use
+     * {@link ModelBuildingRequest#VALIDATION_LEVEL_MINIMAL}, see for instance
+     * {@code DefaultArtifactDescriptorReader#loadPom}; a project build uses
+     * {@link ModelBuildingRequest#VALIDATION_LEVEL_MAVEN_2_0} or higher.
+     */
+    private static boolean isExternalModelBuildingRequest(ModelBuildingRequest request) {
+        return request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
+    }
+
+    /**
+     * Returns the profiles from the given list whose activation does not depend on a file or a
+     * property. Profiles activated by JDK version, operating system, or marked
+     * {@code activeByDefault} are unaffected, since those conditions are a function of the build
+     * platform rather than of the model content.
+     */
+    private static List<Profile> withoutFileAndPropertyActivation(List<Profile> profiles) {
+        List<Profile> eligible = new ArrayList<>(profiles.size());
+        for (Profile profile : profiles) {
+            Activation activation = profile.getActivation();
+            if (activation == null || (activation.getFile() == null && activation.getProperty() == null)) {
+                eligible.add(profile);
+            }
+        }
+        return eligible;
+    }
+
+    /**
+     * Returns a copy of the given profile with its repositories and plugin repositories cleared.
+     */
+    private static Profile withoutRepositories(Profile profile) {
+        Profile stripped = profile.clone();
+        stripped.setRepositories(Collections.emptyList());
+        stripped.setPluginRepositories(Collections.emptyList());
+        return stripped;
     }
 
     @Override
