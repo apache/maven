@@ -23,13 +23,16 @@ import javax.inject.Named;
 
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
@@ -205,7 +208,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         // Filter the effective model's dependency management to only include entries
         // explicitly declared in this BOM, using the effective model for resolved values.
         Model model = filterToOwnDependencyManagement(rawModel, effectiveModel, project);
-        return transformBom(model, project);
+        return transformBom(model, project, declaredRepositoryIds(session, rawModel));
     }
 
     /**
@@ -292,14 +295,14 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
     protected Model buildNonPom(RepositorySystemSession session, MavenProject project, ModelSource src)
             throws ModelBuilderException {
-        Model model = buildEffectiveModel(session, project, src);
-        return transformNonPom(model, project);
+        ModelBuilderResult result = buildModel(session, project, src);
+        Model model = buildEffectiveModel(session, project, result);
+        return transformNonPom(model, project, declaredRepositoryIds(session, result.getRawModel()));
     }
 
-    private Model buildEffectiveModel(RepositorySystemSession session, MavenProject project, ModelSource src)
+    private Model buildEffectiveModel(RepositorySystemSession session, MavenProject project, ModelBuilderResult result)
             throws ModelBuilderException {
         InternalSession iSession = InternalSession.from(session);
-        ModelBuilderResult result = buildModel(session, project, src);
         Model model = result.getEffectiveModel();
         boolean removeUnusedManagedDeps =
                 Features.consumerPomRemoveUnusedManagedDependencies(session.getConfigProperties());
@@ -458,6 +461,10 @@ class DefaultConsumerPomBuilder implements PomBuilder {
     }
 
     static Model transformNonPom(Model model, MavenProject project) {
+        return transformNonPom(model, project, null);
+    }
+
+    static Model transformNonPom(Model model, MavenProject project, Set<String> declaredRepositoryIds) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
 
         Model.Builder builder = prune(
@@ -467,7 +474,9 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                                 .parent(null)
                                 .mixins(null)
                                 .build(null),
-                        model)
+                        model,
+                        declaredRepositoryIds,
+                        project != null ? project.getId() : model.getId())
                 .mailingLists(null)
                 .issueManagement(null)
                 .scm(
@@ -490,7 +499,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         return model;
     }
 
-    private static Model transformBom(Model model, MavenProject project) {
+    private static Model transformBom(Model model, MavenProject project, Set<String> declaredRepositoryIds) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
 
         Model.Builder builder = prune(
@@ -499,7 +508,9 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                         .root(false)
                         .parent(null)
                         .build(null),
-                model);
+                model,
+                declaredRepositoryIds,
+                project != null ? project.getId() : model.getId());
         builder.packaging(POM_PACKAGING);
         builder.profiles(prune(model.getProfiles()));
 
@@ -612,7 +623,12 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         return profiles.stream()
                 .map(p -> {
                     Profile.Builder builder = Profile.newBuilder(p, true);
-                    prune((ModelBase.Builder) builder, p);
+                    // Profile-level repositories in the published POM only ever come from the
+                    // project's own raw profiles (settings.xml profiles are injected into the
+                    // effective model, not appended to the model's own profile list), so the
+                    // legacy central-only filtering remains correct here: pass null to skip
+                    // declared-id filtering.
+                    prune((ModelBase.Builder) builder, p, null, null);
                     builder.activation(stripExecutableCondition(p.getActivation()));
                     return builder.build(null).build();
                 })
@@ -635,7 +651,8 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 && profile.getReporting() == null;
     }
 
-    private static <T extends ModelBase.Builder> T prune(T builder, ModelBase model) {
+    private static <T extends ModelBase.Builder> T prune(
+            T builder, ModelBase model, Set<String> declaredRepositoryIds, String modelId) {
         builder.properties(null).reporting(null);
         if (model.getDistributionManagement() != null
                 && model.getDistributionManagement().getRelocation() != null) {
@@ -644,15 +661,66 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                     .relocation(model.getDistributionManagement().getRelocation())
                     .build());
         }
-        // only keep repositories other than 'central'
-        builder.repositories(pruneRepositories(model.getRepositories()));
+        // only keep repositories other than 'central' that the project's own POM declares
+        builder.repositories(pruneRepositories(model.getRepositories(), declaredRepositoryIds, modelId));
         builder.pluginRepositories(null);
         return builder;
     }
 
-    private static List<Repository> pruneRepositories(List<Repository> repositories) {
-        return repositories.stream()
-                .filter(r -> !org.apache.maven.api.Repository.CENTRAL_ID.equals(r.getId()))
-                .collect(Collectors.toList());
+    /**
+     * Collects the identifiers of the repositories declared by the project's own POM file, either at the
+     * model level or inside one of its profiles. Repositories present in the effective model whose id is
+     * not in this set came from elsewhere in the effective model (a parent POM or an active
+     * {@code settings.xml} profile) and are not published.
+     * <p>
+     * Returns {@code null} when repository sanitization is disabled via
+     * {@link Constants#MAVEN_CONSUMER_POM_SANITIZE_REPOSITORIES}, which restores the legacy behavior of
+     * publishing every non-central repository of the effective model.
+     */
+    private static Set<String> declaredRepositoryIds(RepositorySystemSession session, Model rawModel) {
+        if (rawModel == null || !Features.consumerPomSanitizeRepositories(session.getConfigProperties())) {
+            return null;
+        }
+        Set<String> ids = new LinkedHashSet<>();
+        for (Repository repository : rawModel.getRepositories()) {
+            ids.add(repository.getId());
+        }
+        for (Profile profile : rawModel.getProfiles()) {
+            for (Repository repository : profile.getRepositories()) {
+                ids.add(repository.getId());
+            }
+        }
+        return ids;
+    }
+
+    private static List<Repository> pruneRepositories(
+            List<Repository> repositories, Set<String> declaredRepositoryIds, String modelId) {
+        List<Repository> result = new ArrayList<>();
+        for (Repository repository : repositories) {
+            if (org.apache.maven.api.Repository.CENTRAL_ID.equals(repository.getId())) {
+                continue;
+            }
+            if (declaredRepositoryIds != null && !declaredRepositoryIds.contains(repository.getId())) {
+                LOGGER.warn(
+                        "Consumer POM for {}: dropping repository '{}' ({}) because it is not declared in the"
+                                + " project's own POM file (it was inherited from a parent POM or injected by an"
+                                + " active settings.xml profile). Set the property '{}' to false to restore the"
+                                + " previous behavior of publishing it.",
+                        modelId,
+                        repository.getId(),
+                        repository.getUrl(),
+                        Constants.MAVEN_CONSUMER_POM_SANITIZE_REPOSITORIES);
+                continue;
+            }
+            if (declaredRepositoryIds != null) {
+                LOGGER.info(
+                        "Consumer POM for {}: publishing repository '{}' with URL '{}'.",
+                        modelId,
+                        repository.getId(),
+                        repository.getUrl());
+            }
+            result.add(repository);
+        }
+        return result;
     }
 }
