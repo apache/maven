@@ -37,6 +37,7 @@ import org.jline.terminal.MouseEvent;
 import org.jline.terminal.Size;
 import org.jline.terminal.Sized;
 import org.jline.terminal.Terminal;
+import org.jline.terminal.impl.DumbTerminal;
 import org.jline.terminal.spi.SystemStream;
 import org.jline.terminal.spi.TerminalExt;
 import org.jline.terminal.spi.TerminalProvider;
@@ -68,9 +69,28 @@ public class FastTerminal implements TerminalExt {
      */
     private final OutputStream fallbackOutput;
 
+    /**
+     * A dumb terminal constructed <em>before</em> the build thread starts, used as a stand-in for
+     * every delegate method when the build thread would otherwise wait on its own future. Guarding
+     * only {@code writer()} and {@code getType()} was sufficient for JLine 4.3.x, but JLine 4.4.0's
+     * FFM provider initialization ({@code CLibrary.<clinit>}) reaches back through other terminal
+     * methods, so the fallback must cover all of them. See
+     * <a href="https://github.com/apache/maven/issues/12912">#12912</a>.
+     */
+    private final TerminalExt fallbackTerminal;
+
     public FastTerminal(Callable<Terminal> builder, Consumer<Terminal> consumer) {
         this.terminal = new CompletableFuture<>();
         this.fallbackOutput = System.err;
+        TerminalExt dumbFallback;
+        try {
+            // Construct a DumbTerminal directly instead of going through TerminalBuilder, which
+            // probes for grapheme-cluster support and can block on a null input stream in JLine 4.4.0.
+            dumbFallback = new DumbTerminal(InputStream.nullInputStream(), fallbackOutput);
+        } catch (IOException e) {
+            dumbFallback = null;
+        }
+        this.fallbackTerminal = dumbFallback;
         this.buildThread = new Thread(
                 () -> {
                     try {
@@ -88,6 +108,12 @@ public class FastTerminal implements TerminalExt {
     }
 
     public TerminalExt getTerminal() {
+        if (isBuildThreadWaitingOnItself()) {
+            if (fallbackTerminal != null) {
+                return fallbackTerminal;
+            }
+            throw new IllegalStateException("Terminal not yet available (build in progress on this thread)");
+        }
         try {
             return (TerminalExt) terminal.get();
         } catch (Exception e) {
