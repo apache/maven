@@ -2097,8 +2097,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             for (Iterator<Dependency> it = deps.iterator(); it.hasNext(); ) {
                 Dependency dependency = it.next();
 
-                if (!("pom".equals(dependency.getType()) && "import".equals(dependency.getScope()))
-                        || "bom".equals(dependency.getType())) {
+                if (!(("pom".equals(dependency.getType()) && "import".equals(dependency.getScope()))
+                        || "bom".equals(dependency.getType()))) {
                     continue;
                 }
 
