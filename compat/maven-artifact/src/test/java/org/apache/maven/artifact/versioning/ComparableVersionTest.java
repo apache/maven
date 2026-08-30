@@ -23,6 +23,7 @@ import java.util.Locale;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -446,6 +447,23 @@ class ComparableVersionTest {
         } finally {
             Locale.setDefault(orig);
         }
+    }
+
+    @Test
+    void testVersionLengthIsBounded() {
+        // versions up to the cap parse and compare normally, including deeply nested ones
+        String deep = "1" + "-1".repeat(127); // 255 characters, ~127 nested lists
+        ComparableVersion c1 = new ComparableVersion(deep);
+        ComparableVersion c2 = new ComparableVersion(deep);
+        assertEquals(0, c1.compareTo(c2), "expected a deeply nested version to compare equal to itself");
+        assertTrue(c1.compareTo(new ComparableVersion("1")) > 0, "expected 1-1-... > 1");
+
+        // beyond the cap the parser refuses instead of doing unbounded work
+        // (comparison recurses one frame per '-' level; long digit runs cost quadratic BigInteger parsing)
+        String deepTooLong = "1" + "-1".repeat(150);
+        assertThrows(IllegalArgumentException.class, () -> new ComparableVersion(deepTooLong));
+        String digitsTooLong = "1".repeat(257);
+        assertThrows(IllegalArgumentException.class, () -> new ComparableVersion(digitsTooLong));
     }
 
     @Test

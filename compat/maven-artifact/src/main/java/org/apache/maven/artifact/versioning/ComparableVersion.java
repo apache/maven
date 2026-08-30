@@ -68,6 +68,16 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
     private static final int MAX_LONGITEM_LENGTH = 18;
 
+    /**
+     * Maximum accepted length of a version string. Version strings routinely come from external
+     * repository metadata; without a bound, every {@code -} separator nests another list whose
+     * comparison, equality, hash code and canonicalization recurse one frame per level, and digit
+     * runs longer than {@value #MAX_LONGITEM_LENGTH} characters are parsed into {@link BigInteger}
+     * at quadratic cost. 256 characters is far beyond any real-world version identifier while
+     * keeping the nesting depth (at most about half the length) and numeric items small.
+     */
+    private static final int MAX_VERSION_LENGTH = 256;
+
     private String value;
 
     private String canonical;
@@ -640,8 +650,18 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
         parseVersion(version);
     }
 
+    /**
+     * @throws IllegalArgumentException if the version string is longer than {@value #MAX_VERSION_LENGTH}
+     *         characters, to bound the parsing, comparison and canonicalization cost of arbitrarily large input
+     */
     @SuppressWarnings("checkstyle:innerassignment")
     public final void parseVersion(String version) {
+        if (version.length() > MAX_VERSION_LENGTH) {
+            throw new IllegalArgumentException("Version string is too long (" + version.length() + " > "
+                    + MAX_VERSION_LENGTH + " characters): "
+                    + version.substring(0, 32) + "...");
+        }
+
         this.value = version;
 
         items = new ListItem();
