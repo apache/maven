@@ -1192,11 +1192,46 @@ class DefaultModelBuilderTest {
     /**
      * Dependency management imported from a repository-resolved POM does not contribute
      * {@code system} scope or a {@code systemPath}; such entries are dropped with a warning.
+     *
+     * <p>The imported BOM is written into a temporary remote repository at run time, with a
+     * {@code systemPath} that is a real absolute path on whichever OS the test runs on
+     * (a POSIX-only path such as {@code /etc/...} is not absolute on Windows, which would make
+     * model validation reject the entry before the code under test ever ran).
      */
     @Test
-    public void testSystemScopeIgnoredOutsideProjectDeclaration() throws Exception {
+    public void testSystemScopeIgnoredOutsideProjectDeclaration(@TempDir Path tempDir) throws Exception {
         Path basedir = Paths.get(System.getProperty("basedir", ""));
-        Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
+        Path remoteRepoPath = tempDir.resolve("remote-repo");
+        Path bomDir = remoteRepoPath.resolve("org/apache/maven/its/system-scope-bom/1.0");
+        Files.createDirectories(bomDir);
+
+        Path systemPathFile = tempDir.resolve("provided-tool.jar");
+        Files.createFile(systemPathFile);
+
+        String bomPom = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<project>\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>org.apache.maven.its</groupId>\n"
+                + "  <artifactId>system-scope-bom</artifactId>\n"
+                + "  <version>1.0</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "  <dependencyManagement>\n"
+                + "    <dependencies>\n"
+                + "      <dependency>\n"
+                + "        <groupId>org.apache.maven.its</groupId>\n"
+                + "        <artifactId>system-scope-companion</artifactId>\n"
+                + "        <version>1.0</version>\n"
+                + "      </dependency>\n"
+                + "      <dependency>\n"
+                + "        <groupId>org.apache.maven.its</groupId>\n"
+                + "        <artifactId>system-scope-dep</artifactId>\n"
+                + "        <version>1.0</version>\n"
+                + "        <scope>system</scope>\n"
+                + "        <systemPath>"
+                + systemPathFile.toAbsolutePath() + "</systemPath>\n" + "      </dependency>\n"
+                + "    </dependencies>\n"
+                + "  </dependencyManagement>\n"
+                + "</project>\n";
+        Files.writeString(bomDir.resolve("system-scope-bom-1.0.pom"), bomPom);
 
         // default: the build succeeds, the offending entry is dropped, and a warning is emitted
         Path localRepoPath = basedir.resolve("target/local-repo-system-scope-bom-reject");
@@ -1213,7 +1248,15 @@ class DefaultModelBuilderTest {
                 .source(Sources.buildSource(getPom("import-system-scope-bom")))
                 .build();
         ModelBuilderResult rejectResult = rejectBuilder.newSession().build(request);
-        Dependency rejected = rejectResult.getEffectiveModel().getDependencyManagement().getDependencies().stream()
+        DependencyManagement rejectManagement = rejectResult.getEffectiveModel().getDependencyManagement();
+        assertNotNull(
+                rejectManagement.getDependencies().stream()
+                        .filter(d -> "system-scope-companion".equals(d.getArtifactId()))
+                        .findFirst()
+                        .orElse(null),
+                "The import itself must have happened: the ordinary managed entry from the "
+                        + "imported BOM should be present");
+        Dependency rejected = rejectManagement.getDependencies().stream()
                 .filter(d -> "system-scope-dep".equals(d.getArtifactId()))
                 .findFirst()
                 .orElse(null);
@@ -1243,7 +1286,15 @@ class DefaultModelBuilderTest {
                 .source(Sources.buildSource(getPom("import-system-scope-bom")))
                 .build();
         ModelBuilderResult result = allowedBuilder.newSession().build(allowed);
-        Dependency managed = result.getEffectiveModel().getDependencyManagement().getDependencies().stream()
+        DependencyManagement allowedManagement = result.getEffectiveModel().getDependencyManagement();
+        assertNotNull(
+                allowedManagement.getDependencies().stream()
+                        .filter(d -> "system-scope-companion".equals(d.getArtifactId()))
+                        .findFirst()
+                        .orElse(null),
+                "The import itself must have happened: the ordinary managed entry from the "
+                        + "imported BOM should be present");
+        Dependency managed = allowedManagement.getDependencies().stream()
                 .filter(d -> "system-scope-dep".equals(d.getArtifactId()))
                 .findFirst()
                 .orElse(null);
