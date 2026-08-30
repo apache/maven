@@ -91,6 +91,7 @@ import org.apache.maven.impl.resolver.ArtifactDescriptorUtils;
 import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource2;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.plugin.PluginManagerException;
@@ -376,13 +377,12 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             && modelSource.getLocation().endsWith("/org/apache/maven/project/standalone.xml");
 
                     ModelBuilderRequest.ModelBuilderRequestBuilder builder = getModelBuildingRequest();
-                    // A non-null pomFile means the model is backed by a file the caller pointed at:
-                    // either an explicit build(File, ...) invocation or an artifact that resolved from
-                    // the reactor. A model resolved from a repository arrives as a resolved source with
-                    // no pomFile, so this distinguishes the two. Validation strictness says how closely
-                    // the model is checked, not whose model it is, so it is not part of the test: the
-                    // 2.x project builder API asks for MAVEN_2_0 validation on the caller's own file.
-                    ModelBuilderRequest.RequestType type = reactorMember || isStandalone || pomFile != null
+                    ModelBuilderRequest.RequestType type = reactorMember
+                                    || isStandalone
+                                    || (pomFile != null
+                                            && this.request.isProcessPlugins()
+                                            && this.request.getValidationLevel()
+                                                    == ModelBuildingRequest.VALIDATION_LEVEL_STRICT)
                             ? ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
                             : (parent
                                     ? ModelBuilderRequest.RequestType.CONSUMER_PARENT
