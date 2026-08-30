@@ -79,19 +79,20 @@ class ConsumerPomArtifactTransformer extends TransformerSupport {
             return;
         }
         if (Features.consumerPom(session.getConfigProperties())) {
-            Path buildDir =
-                    project.getBuild() != null ? Paths.get(project.getBuild().getDirectory()) : null;
-            if (buildDir != null) {
-                Files.createDirectories(buildDir);
-            }
-            Path consumer = buildDir != null
-                    ? Files.createTempFile(buildDir, CONSUMER_POM_CLASSIFIER + "-", ".pom")
-                    : Files.createTempFile(CONSUMER_POM_CLASSIFIER + "-", ".pom");
-            deferDeleteFile(consumer);
-
             boolean alreadyAttached = project.getAttachedArtifacts().stream()
                     .anyMatch(a -> CONSUMER_POM_CLASSIFIER.equals(a.getClassifier()) && "pom".equals(a.getType()));
             if (!alreadyAttached) {
+                Path buildDir = project.getBuild() != null
+                        ? Paths.get(project.getBuild().getDirectory())
+                        : null;
+                if (buildDir != null) {
+                    Files.createDirectories(buildDir);
+                }
+                Path consumer = buildDir != null
+                        ? Files.createTempFile(buildDir, CONSUMER_POM_CLASSIFIER + "-", ".pom")
+                        : Files.createTempFile(CONSUMER_POM_CLASSIFIER + "-", ".pom");
+                deferDeleteFile(consumer);
+
                 project.addAttachedArtifact(createConsumerPomArtifact(project, consumer, session));
             }
         } else if (project.getModel().getDelegate().isRoot()) {
