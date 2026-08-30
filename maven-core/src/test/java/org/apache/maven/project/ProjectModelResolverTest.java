@@ -27,6 +27,7 @@ import java.util.List;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
@@ -208,6 +209,34 @@ public class ProjectModelResolverTest {
 
         assertNotNull(this.newModelResolver().resolveModel(dependency));
         assertEquals("1", dependency.getVersion());
+    }
+
+    @Test
+    public void testConstructionSuppliedRepositoryKeepsPrecedenceOverModelDeclaredRepositoryWithSameId()
+            throws Exception {
+        final ModelResolver resolver = this.newModelResolver();
+
+        // A model-declared repository that reuses the id of a repository supplied at construction
+        // time (here, the "central" entry from getRemoteRepositories()) but points elsewhere.
+        final Repository repository = new Repository();
+        repository.setId(org.apache.maven.repository.RepositorySystem.DEFAULT_REMOTE_REPO_ID);
+        repository.setUrl(new File(getBasedir(), "target/no-such-repository")
+                .toURI()
+                .toURL()
+                .toString());
+
+        resolver.addRepository(repository);
+        resolver.addRepository(repository, true);
+
+        final Parent parent = new Parent();
+        parent.setGroupId("org.apache");
+        parent.setArtifactId("apache");
+        parent.setVersion("1");
+
+        // The construction-supplied repository kept its slot, so resolution against it still
+        // succeeds.
+        assertNotNull(resolver.resolveModel(parent));
+        assertEquals("1", parent.getVersion());
     }
 
     private ModelResolver newModelResolver() throws Exception {
