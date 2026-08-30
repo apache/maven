@@ -44,8 +44,6 @@ under the License.
         <configuration>
           <outputFile>target/session.properties</outputFile>
           <expressions>
-            <expression>session/modelProblems/size</expression>
-            <expression>session/modelProblems/0/message</expression>
             <expression>session/session/modelProblemCollector/totalProblemsReported</expression>
           </expressions>
         </configuration>
