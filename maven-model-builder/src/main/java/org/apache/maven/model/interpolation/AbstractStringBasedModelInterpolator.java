@@ -51,6 +51,22 @@ import org.codehaus.plexus.interpolation.ValueSource;
  * @author jdcasey Created on Feb 3, 2005
  */
 public abstract class AbstractStringBasedModelInterpolator implements ModelInterpolator {
+
+    /**
+     * User property for opting back into the previous behavior of interpolating
+     * repository-resolved models (built at {@link ModelBuildingRequest#VALIDATION_LEVEL_MINIMAL})
+     * against the full set of session properties (system, environment and CLI).
+     * When set to {@code "false"} (default), such models are interpolated only against
+     * their own {@code <properties>}, preventing property leaking from the requesting
+     * build into transitive POMs. When set to {@code "true"}, full interpolation is
+     * applied as in previous Maven versions.
+     * <p>
+     * In Maven 4.x this constant is promoted to
+     * {@code org.apache.maven.api.Constants.MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL}
+     * with {@code @Config} so it appears in the auto-generated configuration documentation.
+     */
+    public static final String FULL_EXTERNAL_INTERPOLATION_PROPERTY = "maven.model.dependencyInterpolation.full";
+
     private static final List<String> PROJECT_PREFIXES = Arrays.asList("pom.", "project.");
 
     private static final Collection<String> TRANSLATED_PATH_EXPRESSIONS;
@@ -180,21 +196,34 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
 
         valueSources.add(modelValueSource1);
 
-        valueSources.add(new MapBasedValueSource(config.getUserProperties()));
+        // Models built at VALIDATION_LEVEL_MINIMAL are the models Maven builds while resolving
+        // dependency, parent and BOM-import POMs from a repository, not the operator's own
+        // project. Such models interpolate only against their own properties and a small set
+        // of environment-independent expressions; everything else in the user/system property
+        // space stays uninterpolated. Operator project builds use a higher validation level and
+        // keep the full set of value sources, unchanged from previous behavior.
+        boolean restricted = restrictExternalModelInterpolation(config);
+
+        ValueSource userPropertiesValueSource = new MapBasedValueSource(config.getUserProperties());
+        valueSources.add(restricted ? restrictToSafeExpressions(userPropertiesValueSource) : userPropertiesValueSource);
 
         // Overwrite existing values in model properties. Otherwise it's not possible
         // to define them via command line e.g.: mvn -Drevision=6.5.7 ...
         versionProcessor.overwriteModelProperties(modelProperties, config);
         valueSources.add(new MapBasedValueSource(modelProperties));
 
-        valueSources.add(new MapBasedValueSource(config.getSystemProperties()));
+        ValueSource systemPropertiesValueSource = new MapBasedValueSource(config.getSystemProperties());
+        valueSources.add(
+                restricted ? restrictToSafeExpressions(systemPropertiesValueSource) : systemPropertiesValueSource);
 
-        valueSources.add(new AbstractValueSource(false) {
-            @Override
-            public Object getValue(String expression) {
-                return config.getSystemProperties().getProperty("env." + expression);
-            }
-        });
+        if (!restricted) {
+            valueSources.add(new AbstractValueSource(false) {
+                @Override
+                public Object getValue(String expression) {
+                    return config.getSystemProperties().getProperty("env." + expression);
+                }
+            });
+        }
 
         valueSources.add(modelValueSource2);
 
@@ -202,6 +231,38 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
         valueSources.add(new SingleResponseValueSource(MAVEN_REPO_CENTRAL_KEY, DEFAULT_MAVEN_REPO_CENTRAL_URL));
 
         return valueSources;
+    }
+
+    private static boolean restrictExternalModelInterpolation(ModelBuildingRequest config) {
+        return config.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
+                && !Boolean.parseBoolean(config.getSystemProperties().getProperty(FULL_EXTERNAL_INTERPOLATION_PROPERTY))
+                && !Boolean.parseBoolean(config.getUserProperties().getProperty(FULL_EXTERNAL_INTERPOLATION_PROPERTY));
+    }
+
+    private static ValueSource restrictToSafeExpressions(ValueSource source) {
+        return new AbstractValueSource(false) {
+            @Override
+            public Object getValue(String expression) {
+                return isSafeExternalExpression(expression) ? source.getValue(expression) : null;
+            }
+        };
+    }
+
+    /**
+     * Expressions that models built at {@link ModelBuildingRequest#VALIDATION_LEVEL_MINIMAL}
+     * may still resolve from the session properties: JVM- and Maven-defined properties, plus
+     * the CI-friendly version properties (MNG-5895). All other expressions are left literal.
+     */
+    private static boolean isSafeExternalExpression(String expression) {
+        return expression.startsWith("java.")
+                || expression.startsWith("os.")
+                || expression.startsWith("maven.")
+                || "file.separator".equals(expression)
+                || "path.separator".equals(expression)
+                || "line.separator".equals(expression)
+                || "revision".equals(expression)
+                || "changelist".equals(expression)
+                || "sha1".equals(expression);
     }
 
     protected List<? extends InterpolationPostProcessor> createPostProcessors(
