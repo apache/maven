@@ -199,8 +199,19 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             // Phase 1: Write all modifications to temp directory (keeping project structure)
             Path tempDir = createTempProjectStructure(context, pomMap);
 
-            // Phase 2: For each POM, build effective model using the session and analyze plugins
-            PluginAnalysisResults analysisResults = analyzePluginsUsingEffectiveModels(context, pomMap, tempDir);
+            // Phase 2: For each POM, build effective model using the session and analyze plugins.
+            // Skip when the operator's settings declare a repository posture the standalone
+            // resolver cannot honor (mirrors, proxies, offline): resolving outside that
+            // posture would bypass the operator's configuration, so the remote-model-dependent
+            // analysis is skipped instead.
+            PluginAnalysisResults analysisResults;
+            String unsupportedReason = remoteResolutionUnsupportedReason(context);
+            if (unsupportedReason == null) {
+                analysisResults = analyzePluginsUsingEffectiveModels(context, pomMap, tempDir);
+            } else {
+                context.warning("Skipping effective-model plugin analysis: " + unsupportedReason);
+                analysisResults = new PluginAnalysisResults(Map.of(), Map.of());
+            }
 
             // Collect locally declared plugin keys so we can add comments for remote-parent overrides
             Set<String> localPluginKeys = collectLocallyDeclaredPluginKeys(pomMap);
@@ -427,7 +438,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             // Check for Maven 4 pre-release versions (alpha/beta/rc) that should be
             // upgraded to the latest available pre-release rather than downgraded to 3.x.
             if (isMaven4PreRelease(currentVersion) && upgrade.latestPreRelease != null) {
-                if (isVersionBelow(currentVersion, upgrade.latestPreRelease)) {
+                if (isVersionBelow(context, currentVersion, upgrade.latestPreRelease)) {
                     Editor editor = new Editor(pomDocument);
                     editor.setTextContent(versionElement, upgrade.latestPreRelease);
                     context.detail("Upgraded " + upgrade.groupId + ":" + upgrade.artifactId + " from pre-release "
@@ -441,7 +452,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             }
 
             // Direct version comparison and upgrade (for 3.x versions)
-            if (isVersionBelow(currentVersion, upgrade.minVersion)) {
+            if (isVersionBelow(context, currentVersion, upgrade.minVersion)) {
                 Editor editor = new Editor(pomDocument);
                 editor.setTextContent(versionElement, upgrade.minVersion);
                 context.detail("Upgraded " + upgrade.groupId + ":" + upgrade.artifactId + " from " + currentVersion
@@ -476,7 +487,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 String currentVersion = propertyElement.textContentTrimmed();
                 // For 4.x pre-release versions, upgrade to latest pre-release (not 3.x)
                 if (isMaven4PreRelease(currentVersion) && upgrade.latestPreRelease != null) {
-                    if (isVersionBelow(currentVersion, upgrade.latestPreRelease)) {
+                    if (isVersionBelow(context, currentVersion, upgrade.latestPreRelease)) {
                         editor.setTextContent(propertyElement, upgrade.latestPreRelease);
                         context.detail("Upgraded property " + propertyName + " (for " + upgrade.groupId + ":"
                                 + upgrade.artifactId + ") from pre-release " + currentVersion + " to "
@@ -486,7 +497,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                         context.debug("Property " + propertyName + " version " + currentVersion + " is already >= "
                                 + upgrade.latestPreRelease);
                     }
-                } else if (isVersionBelow(currentVersion, upgrade.minVersion)) {
+                } else if (isVersionBelow(context, currentVersion, upgrade.minVersion)) {
                     editor.setTextContent(propertyElement, upgrade.minVersion);
                     context.detail(
                             "Upgraded property " + propertyName + " (for " + upgrade.groupId + ":" + upgrade.artifactId
@@ -624,11 +635,14 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * Simple version comparison to check if current version is below minimum version. This is a basic implementation
      * that works for most Maven plugin versions.
      */
-    private boolean isVersionBelow(String currentVersion, String minVersion) {
+    private boolean isVersionBelow(UpgradeContext context, String currentVersion, String minVersion) {
         if (currentVersion == null || minVersion == null) {
             return false;
         }
-        return getSession().parseVersion(currentVersion).compareTo(getSession().parseVersion(minVersion)) < 0;
+        return getSession(context)
+                        .parseVersion(currentVersion)
+                        .compareTo(getSession(context).parseVersion(minVersion))
+                < 0;
     }
 
     /**
@@ -709,7 +723,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
     private PluginAnalysis analyzeEffectiveModelForPlugins(
             UpgradeContext context, Path tempPomPath, Map<String, PluginUpgrade> pluginUpgrades) {
-        Model effectiveModel = buildEffectiveModel(tempPomPath);
+        Model effectiveModel = buildEffectiveModel(context, tempPomPath);
         return analyzePluginsFromEffectiveModel(context, effectiveModel, pluginUpgrades);
     }
 
@@ -741,7 +755,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
                 if (upgrade != null) {
                     String effectiveVersion = plugin.getVersion();
-                    if (isVersionBelow(effectiveVersion, upgrade.minVersion())) {
+                    if (isVersionBelow(context, effectiveVersion, upgrade.minVersion())) {
                         needsManagement.add(pluginKey);
                         String managedVersion = managedVersions.get(pluginKey);
                         if (managedVersion == null || !managedVersion.equals(effectiveVersion)) {
@@ -767,7 +781,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
                     if (upgrade != null && !needsManagement.contains(pluginKey)) {
                         String effectiveVersion = plugin.getVersion();
-                        if (isVersionBelow(effectiveVersion, upgrade.minVersion())) {
+                        if (isVersionBelow(context, effectiveVersion, upgrade.minVersion())) {
                             needsManagement.add(pluginKey);
                             context.debug("Managed plugin " + pluginKey + " version " + effectiveVersion
                                     + " needs upgrade to " + upgrade.minVersion());
@@ -803,7 +817,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     private Path findLastLocalParentForPluginManagement(
             UpgradeContext context, Path tempPomPath, Map<Path, Document> pomMap, Path tempDir, Path commonRoot) {
 
-        Model effectiveModel = buildEffectiveModel(tempPomPath);
+        Model effectiveModel = buildEffectiveModel(context, tempPomPath);
 
         // Convert the temp path back to the original path
         Path relativePath = tempDir.relativize(tempPomPath);
@@ -824,7 +838,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 lastLocalParent = parentPath;
 
                 Path parentTempPath = tempDir.resolve(commonRoot.relativize(parentPath));
-                currentModel = buildEffectiveModel(parentTempPath);
+                currentModel = buildEffectiveModel(context, parentTempPath);
             } else {
                 // Parent is external, stop here
                 break;
@@ -1217,7 +1231,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             return false;
         }
 
-        if (!isVersionBelow(currentVersion, upgrade.minVersion)) {
+        if (!isVersionBelow(context, currentVersion, upgrade.minVersion)) {
             context.debug("Quarkus plugin version (via shared property " + sharedPropertyName + ") " + currentVersion
                     + " is already >= " + upgrade.minVersion);
             return false;
