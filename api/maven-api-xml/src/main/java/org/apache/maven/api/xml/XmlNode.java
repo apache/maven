@@ -160,12 +160,10 @@ public interface XmlNode {
      * the {@code mvn → http://maven.apache.org/POM/4.0.0} binding.
      *
      * @return map of namespace prefix to URI, never {@code null}
-     * @since 4.1.0
+     * @since 4.0.0
      */
     @Nonnull
-    default Map<String, String> getNamespaces() {
-        return Map.of();
-    }
+    Map<String, String> getNamespaces();
 
     @Nonnull
     String getPrefix();
@@ -453,6 +451,11 @@ public interface XmlNode {
             @Override
             public String getPrefix() {
                 return prefix();
+            }
+
+            @Override
+            public Map<String, String> getNamespaces() {
+                return namespaces();
             }
 
             @Override

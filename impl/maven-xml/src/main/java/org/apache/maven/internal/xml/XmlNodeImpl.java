@@ -116,6 +116,12 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
     @Override
     @Nonnull
+    public Map<String, String> getNamespaces() {
+        return Map.of();
+    }
+
+    @Override
+    @Nonnull
     public String getName() {
         return name;
     }
