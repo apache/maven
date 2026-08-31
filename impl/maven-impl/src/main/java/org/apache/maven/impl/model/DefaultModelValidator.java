@@ -2556,7 +2556,7 @@ public class DefaultModelValidator implements ModelValidator {
     private interface SourceHint extends Supplier<String> {
         static SourceHint xmlNodeInputLocation(XmlNode xmlNode) {
             return () ->
-                    xmlNode.inputLocation() != null ? xmlNode.inputLocation().toString() : null;
+                    xmlNode.getInputLocation() != null ? xmlNode.getInputLocation().toString() : null;
         }
 
         static SourceHint gav(String gav) {
