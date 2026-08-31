@@ -662,24 +662,24 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             XmlNode defaultConfiguration;
             defaultConfiguration = MojoDescriptorCreator.convert(mojoDescriptor);
             for (Parameter parameter : mojoDescriptor.getParameters()) {
-                XmlNode parameterConfiguration = config.child(parameter.getName());
+                XmlNode parameterConfiguration = config.getChild(parameter.getName());
                 if (parameterConfiguration == null) {
-                    parameterConfiguration = config.child(parameter.getAlias());
+                    parameterConfiguration = config.getChild(parameter.getAlias());
                 }
-                XmlNode parameterDefaults = defaultConfiguration.child(parameter.getName());
+                XmlNode parameterDefaults = defaultConfiguration.getChild(parameter.getName());
                 parameterConfiguration = XmlNode.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
                 if (parameterConfiguration != null) {
-                    Map<String, String> attributes = new HashMap<>(parameterConfiguration.attributes());
+                    Map<String, String> attributes = new HashMap<>(parameterConfiguration.getAttributes());
                     // if (isEmpty(parameterConfiguration.getAttribute("implementation"))
                     //         && !isEmpty(parameter.getImplementation())) {
                     //     attributes.put("implementation", parameter.getImplementation());
                     // }
                     parameterConfiguration = XmlNode.newInstance(
                             parameter.getName(),
-                            parameterConfiguration.value(),
+                            parameterConfiguration.getValue(),
                             attributes,
-                            parameterConfiguration.children(),
-                            parameterConfiguration.inputLocation());
+                            parameterConfiguration.getChildren(),
+                            parameterConfiguration.getInputLocation());
 
                     children.add(parameterConfiguration);
                 }
