@@ -474,7 +474,7 @@ public abstract class AbstractModelInterpolatorTest {
         assertNotNull(out);
         assertCollectorState(0, 1, 0, collector);
         org.apache.maven.api.model.Plugin p = out.getBuild().getPlugins().get(0).getDelegate();
-        assertEquals("${prop}", p.getConfiguration().child("filter").attribute("value"));
+        assertEquals("${prop}", p.getConfiguration().getChild("filter").getAttribute("value"));
     }
 
     protected abstract ModelInterpolator createInterpolator() throws Exception;

@@ -170,8 +170,8 @@ class XmlFactoryTransformerTest {
                         .getToolchains()
                         .get(0)
                         .getConfiguration()
-                        .child("jdkHome")
-                        .value());
+                        .getChild("jdkHome")
+                        .getValue());
 
         // Verify that the transformer was called
         assertFalse(calledContexts.isEmpty(), "Transformer should have been called");
