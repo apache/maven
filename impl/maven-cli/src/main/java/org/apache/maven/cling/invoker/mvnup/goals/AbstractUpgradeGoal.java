@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import eu.maveniverse.domtrip.Document;
 import eu.maveniverse.domtrip.DomTripException;
@@ -189,21 +190,23 @@ public abstract class AbstractUpgradeGoal implements Goal {
         context.info("Found " + pomMap.size() + " POM file(s)");
 
         // Perform the upgrade logic
-        int result = doUpgrade(context, targetModel, pomMap);
+        UpgradeResult result = doUpgrade(context, targetModel, pomMap);
 
-        // Save modifications if this is an apply goal
-        if (shouldSaveModifications() && result == 0) {
-            saveModifications(context, pomMap);
+        // Save modifications if this is an apply goal and anything actually changed
+        if (shouldSaveModifications()
+                && result.success()
+                && !result.modifiedPoms().isEmpty()) {
+            saveModifications(context, pomMap, result.modifiedPoms());
         }
 
-        return result;
+        return result.success() ? 0 : 1;
     }
 
     /**
      * Performs the upgrade logic using the strategy pattern.
      * Delegates to StrategyOrchestrator for coordinated strategy execution.
      */
-    protected int doUpgrade(UpgradeContext context, String targetModel, Map<Path, Document> pomMap) {
+    protected UpgradeResult doUpgrade(UpgradeContext context, String targetModel, Map<Path, Document> pomMap) {
         // Execute strategies using the orchestrator
         try {
             UpgradeResult result = orchestrator.executeStrategies(context, pomMap);
@@ -215,10 +218,11 @@ public abstract class AbstractUpgradeGoal implements Goal {
             // Fix incompatible extensions in .mvn/extensions.xml
             fixIncompatibleExtensions(context);
 
-            return result.errorPoms().isEmpty() ? 0 : 1;
+            return result;
         } catch (Exception e) {
             context.failure("Strategy execution failed: " + e.getMessage());
-            return 1;
+            Set<Path> errorPoms = pomMap.keySet().isEmpty() ? Set.of(Path.of(".")) : pomMap.keySet();
+            return UpgradeResult.failure(pomMap.keySet(), errorPoms);
         }
     }
 
@@ -230,13 +234,17 @@ public abstract class AbstractUpgradeGoal implements Goal {
 
     /**
      * Saves the modified documents to disk using domtrip's perfect formatting preservation.
+     * Unmodified POMs are left untouched and are not reported as saved.
      */
-    protected void saveModifications(UpgradeContext context, Map<Path, Document> pomMap) {
+    protected void saveModifications(UpgradeContext context, Map<Path, Document> pomMap, Set<Path> modifiedPoms) {
         context.info("");
         context.info("Saving modified POMs...");
 
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Path pomPath = entry.getKey();
+            if (!modifiedPoms.contains(pomPath)) {
+                continue;
+            }
             Document document = entry.getValue();
             try {
                 // Use domtrip for perfect formatting preservation
