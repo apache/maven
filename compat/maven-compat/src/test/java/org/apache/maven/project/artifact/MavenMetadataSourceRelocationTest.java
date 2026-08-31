@@ -43,6 +43,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -130,8 +131,8 @@ class MavenMetadataSourceRelocationTest {
 
         ArtifactMetadataRetrievalException exception =
                 assertThrows(ArtifactMetadataRetrievalException.class, () -> source.retrieve(request));
-        assertEquals(true, exception.getMessage().contains("a/b"));
-        assertEquals(true, exception.getMessage().contains("artifactId"));
+        assertTrue(exception.getMessage().contains("a/b"));
+        assertTrue(exception.getMessage().contains("artifactId"));
     }
 
     @Test
