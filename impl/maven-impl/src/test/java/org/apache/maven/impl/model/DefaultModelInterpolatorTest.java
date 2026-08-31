@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Provides;
@@ -522,7 +523,7 @@ class DefaultModelInterpolatorTest {
     @Test
     public void testFullInterpolationOptOutRestoresPreviousBehaviorForResolvedDependencyModel() throws Exception {
         context.put("env.HOME", "/path/to/home");
-        context.put(DefaultModelInterpolator.FULL_EXTERNAL_INTERPOLATION_PROPERTY, "true");
+        context.put(Constants.MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL, "true");
 
         Map<String, String> modelProperties = new HashMap<>();
         modelProperties.put("envDir", "${env.HOME}");

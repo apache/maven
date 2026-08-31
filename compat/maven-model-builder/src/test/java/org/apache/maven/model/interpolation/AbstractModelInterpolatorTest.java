@@ -354,7 +354,7 @@ public abstract class AbstractModelInterpolatorTest {
     @Test
     public void testFullInterpolationOptOutRestoresPreviousBehaviorAtMinimalValidationLevel() throws Exception {
         context.put("env.HOME", "/path/to/home");
-        context.put(AbstractStringBasedModelInterpolator.FULL_EXTERNAL_INTERPOLATION_PROPERTY, "true");
+        context.put("maven.model.dependencyInterpolation.full", "true");
 
         Map<String, String> modelProperties = new HashMap<>();
         modelProperties.put("envDir", "${env.HOME}");
