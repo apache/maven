@@ -43,6 +43,8 @@ import org.apache.maven.cling.invoker.mvn.MavenParser;
 import org.apache.maven.cling.invoker.mvnenc.EncryptInvoker;
 import org.apache.maven.cling.invoker.mvnenc.EncryptParser;
 import org.apache.maven.cling.invoker.mvnenc.Goal;
+import org.apache.maven.cling.invoker.mvnlog.LogInvoker;
+import org.apache.maven.cling.invoker.mvnlog.LogParser;
 import org.apache.maven.cling.invoker.mvnsh.ShellCommandRegistryFactory;
 import org.apache.maven.cling.invoker.mvnup.UpgradeInvoker;
 import org.apache.maven.cling.invoker.mvnup.UpgradeParser;
@@ -75,6 +77,8 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         private final EncryptParser encryptParser;
         private final UpgradeInvoker shellUpgradeInvoker;
         private final UpgradeParser upgradeParser;
+        private final LogInvoker shellLogInvoker;
+        private final LogParser logParser;
 
         private BuiltinShellCommandRegistry(LookupContext shellContext) {
             this.shellContext = requireNonNull(shellContext, "shellContext");
@@ -84,12 +88,15 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
             this.encryptParser = new EncryptParser();
             this.shellUpgradeInvoker = new UpgradeInvoker(shellContext.invokerRequest.lookup(), contextCopier());
             this.upgradeParser = new UpgradeParser();
+            this.shellLogInvoker = new LogInvoker(shellContext.invokerRequest.lookup(), contextCopier());
+            this.logParser = new LogParser();
             Map<String, CommandMethods> commandExecute = new HashMap<>();
             commandExecute.put("!", new CommandMethods(this::shell, this::defaultCompleter));
             commandExecute.put("cd", new CommandMethods(this::cd, this::cdCompleter));
             commandExecute.put("pwd", new CommandMethods(this::pwd, this::defaultCompleter));
             commandExecute.put("mvn", new CommandMethods(this::mvn, this::mvnCompleter));
             commandExecute.put("mvnenc", new CommandMethods(this::mvnenc, this::mvnencCompleter));
+            commandExecute.put("mvnlog", new CommandMethods(this::mvnlog, this::mvnlogCompleter));
             commandExecute.put("mvnup", new CommandMethods(this::mvnup, this::mvnupCompleter));
             registerCommands(commandExecute);
         }
@@ -121,6 +128,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         public void close() throws Exception {
             shellMavenInvoker.close();
             shellEncryptInvoker.close();
+            shellLogInvoker.close();
             shellUpgradeInvoker.close();
         }
 
@@ -253,6 +261,24 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
         private List<Completer> mvnencCompleter(String name) {
             return List.of(new ArgumentCompleter(new StringsCompleter(
                     shellContext.lookup.lookupMap(Goal.class).keySet())));
+        }
+
+        private void mvnlog(CommandInput input) {
+            try {
+                shellLogInvoker.invoke(logParser.parseInvocation(
+                        ParserRequest.mvnlog(input.args(), shellContext.invokerRequest.messageBuilderFactory())
+                                .cwd(shellContext.cwd.get())
+                                .build()));
+            } catch (InvokerException.ExitException e) {
+                shellContext.logger.error("mvnlog command exited with exit code " + e.getExitCode());
+            } catch (Exception e) {
+                saveException(e);
+            }
+        }
+
+        private List<Completer> mvnlogCompleter(String name) {
+            return List.of(
+                    new ArgumentCompleter(new StringsCompleter("--diagnostics", "--failures", "--full", "--list")));
         }
 
         private void mvnup(CommandInput input) {

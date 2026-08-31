@@ -32,6 +32,7 @@ public class MavenITmng7353CliGoalInvocationTest extends AbstractMavenIntegratio
         Path basedir = extractResources("mng-7353-cli-goal-invocation");
         Verifier verifier = newVerifier(basedir);
         verifier.setLogFileName(id + ".txt");
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument(goal);
         verifier.execute();
         verifier.verifyTextInLog("[INFO] --- " + expectedInvocation);
