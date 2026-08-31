@@ -238,22 +238,22 @@ public class DefaultToolchainManager implements ToolchainManager {
                 XmlNode config = plugin.getConfiguration();
                 if (config != null) {
                     // <release> takes precedence over <source>
-                    XmlNode releaseNode = config.child("release");
+                    XmlNode releaseNode = config.getChild("release");
                     if (releaseNode != null
-                            && releaseNode.value() != null
-                            && !releaseNode.value().isBlank()) {
+                            && releaseNode.getValue() != null
+                            && !releaseNode.getValue().isBlank()) {
                         int level = JdkSourceLevelSupport.normalizeSourceLevel(
-                                releaseNode.value().trim());
+                                releaseNode.getValue().trim());
                         if (level > 0) {
                             return level;
                         }
                     }
-                    XmlNode sourceNode = config.child("source");
+                    XmlNode sourceNode = config.getChild("source");
                     if (sourceNode != null
-                            && sourceNode.value() != null
-                            && !sourceNode.value().isBlank()) {
+                            && sourceNode.getValue() != null
+                            && !sourceNode.getValue().isBlank()) {
                         int level = JdkSourceLevelSupport.normalizeSourceLevel(
-                                sourceNode.value().trim());
+                                sourceNode.getValue().trim());
                         if (level > 0) {
                             return level;
                         }
