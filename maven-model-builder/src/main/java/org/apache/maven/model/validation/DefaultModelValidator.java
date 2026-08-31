@@ -157,6 +157,9 @@ public class DefaultModelValidator implements ModelValidator {
         } else if (request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0) {
             Severity errOn30 = getSeverity(request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
 
+            // [MNG-8129] Validate that relativePath does not contain characters reserved on Windows (NTFS).
+            // These cause InvalidPathException in Maven 4 when resolved via java.nio.file.Path, and typically
+            // indicate the user put a GAV coordinate (e.g. "g:a:v") instead of an actual filesystem path.
             if (parent != null
                     && parent.getRelativePath() != null
                     && !parent.getRelativePath().isEmpty()) {
