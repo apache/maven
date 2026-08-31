@@ -42,7 +42,7 @@ public interface Log {
      * The default implementation returns {@code false} for backward
      * compatibility with existing {@code Log} implementations.
      *
-     * @since 4.1.0
+     * @since 4.0.0
      */
     default boolean isTraceEnabled() {
         return false;
@@ -61,7 +61,7 @@ public interface Log {
      * with existing {@code Log} implementations.
      *
      * @param content the message to log
-     * @since 4.1.0
+     * @since 4.0.0
      */
     default void trace(CharSequence content) {}
 
@@ -72,7 +72,7 @@ public interface Log {
      *
      * @param content the message to log
      * @param error the error that caused this log
-     * @since 4.1.0
+     * @since 4.0.0
      */
     default void trace(CharSequence content, Throwable error) {}
 
@@ -83,7 +83,7 @@ public interface Log {
      * The default implementation is a no-op for backward compatibility.
      *
      * @param error the error that caused this log
-     * @since 4.1.0
+     * @since 4.0.0
      */
     default void trace(Throwable error) {}
 
@@ -93,7 +93,7 @@ public interface Log {
      * <p>
      * The default implementation is a no-op for backward compatibility.
      *
-     * @since 4.1.0
+     * @since 4.0.0
      */
     default void trace(Supplier<String> content) {}
 
@@ -103,7 +103,7 @@ public interface Log {
      * <p>
      * The default implementation is a no-op for backward compatibility.
      *
-     * @since 4.1.0
+     * @since 4.0.0
      */
     default void trace(Supplier<String> content, Throwable error) {}
 
@@ -254,7 +254,7 @@ public interface Log {
      *
      * @param name the child logger name segment (must not be {@code null})
      * @return a child {@code Log}, never {@code null}
-     * @since 4.1.0
+     * @since 4.0.0
      */
     default Log child(String name) {
         return this;
