@@ -232,6 +232,54 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
     }
 
     @Test
+    void testImportScopedManagedDepsAreFilteredFromInlinedProfiles() {
+        // Verifies that import-scoped managed dependencies (BOM imports) inside
+        // a packaging-activated profile are NOT re-added to the consumer POM.
+        // Import-scoped entries are flattened during resolution and must not leak.
+        Dependency bomImport = Dependency.newBuilder()
+                .groupId("org.example")
+                .artifactId("some-bom")
+                .version("1.0.0")
+                .type("pom")
+                .scope("import")
+                .build();
+
+        Dependency regularManagedDep = Dependency.newBuilder()
+                .groupId("org.slf4j")
+                .artifactId("slf4j-api")
+                .version("2.0.0")
+                .build();
+
+        Profile profile = Profile.newBuilder()
+                .id("jar-profile")
+                .activation(Activation.newBuilder().packaging("jar").build())
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(bomImport, regularManagedDep))
+                        .build())
+                .build();
+
+        Model model = Model.newBuilder()
+                .groupId("org.test")
+                .artifactId("import-filter-test")
+                .version("1.0.0-SNAPSHOT")
+                .packaging("jar")
+                .profiles(List.of(profile))
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.inlinePackagingActivatedProfiles(model, "jar");
+
+        // Profile should be inlined (removed)
+        assertTrue(result.getProfiles().isEmpty());
+
+        // Managed deps should contain only the regular dep, NOT the import-scoped BOM
+        assertNotNull(result.getDependencyManagement());
+        List<Dependency> managedDeps = result.getDependencyManagement().getDependencies();
+        assertEquals(1, managedDeps.size());
+        assertEquals("slf4j-api", managedDeps.get(0).getArtifactId());
+        assertNull(managedDeps.get(0).getScope());
+    }
+
+    @Test
     void testSimpleConsumer() throws Exception {
         MavenExecutionRequest request = setRootDirectory("simple");
         request.getUserProperties().setProperty("changelist", "MNG6957");

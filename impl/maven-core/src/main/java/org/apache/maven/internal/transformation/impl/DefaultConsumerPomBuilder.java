@@ -576,6 +576,9 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
         // Merge additional managed dependencies into the model, deduplicating by key
         if (!additionalManagedDeps.isEmpty()) {
+            // Filter out import-scoped entries — they are BOM references that get
+            // flattened during resolution and must not reappear in the consumer POM
+            additionalManagedDeps.removeIf(dep -> "import".equals(dep.getScope()));
             DependencyManagement dm = model.getDependencyManagement();
             Map<String, Dependency> mergedManagedDeps = new LinkedHashMap<>();
             if (dm != null) {
