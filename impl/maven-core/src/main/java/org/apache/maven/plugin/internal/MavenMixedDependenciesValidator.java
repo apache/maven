@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.plugin.PluginValidationManager;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -63,7 +64,12 @@ class MavenMixedDependenciesValidator extends AbstractMavenPluginDependenciesVal
                     PluginValidationManager.IssueLocality.EXTERNAL,
                     session,
                     pluginArtifact,
-                    "Plugin mixes multiple Maven versions: " + mavenVersions);
+                    BuilderProblem.builder()
+                            .message("Plugin mixes multiple Maven versions: " + mavenVersions)
+                            .severity(BuilderProblem.Severity.WARNING)
+                            .key("plugin-validation:mixed-maven-versions")
+                            .suggestion("Align all Maven dependencies to a single version to avoid classloading issues")
+                            .build());
         }
     }
 }
