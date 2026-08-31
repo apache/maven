@@ -189,11 +189,6 @@ public class XmlNodeImpl implements Serializable, XmlNode {
         return location;
     }
 
-    @Override
-    public Object inputLocation() {
-        return getInputLocation();
-    }
-
     // ----------------------------------------------------------------------
     // Helpers
     // ----------------------------------------------------------------------

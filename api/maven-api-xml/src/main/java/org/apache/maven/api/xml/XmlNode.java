@@ -149,6 +149,24 @@ public interface XmlNode {
     @Nonnull
     String getNamespaceUri();
 
+    /**
+     * Returns the namespace context for this node — a map of namespace prefix to URI
+     * for all namespace bindings in scope, including those declared on this element
+     * and those inherited from ancestor elements.
+     * <p>
+     * This is used by the write side to properly resolve prefixed attributes.
+     * For example, if an attribute {@code mvn:combine.children} exists on a child element
+     * but {@code xmlns:mvn} was declared on the root element, this map will contain
+     * the {@code mvn → http://maven.apache.org/POM/4.0.0} binding.
+     *
+     * @return map of namespace prefix to URI, never {@code null}
+     * @since 4.1.0
+     */
+    @Nonnull
+    default Map<String, String> getNamespaces() {
+        return Map.of();
+    }
+
     @Nonnull
     String getPrefix();
 
