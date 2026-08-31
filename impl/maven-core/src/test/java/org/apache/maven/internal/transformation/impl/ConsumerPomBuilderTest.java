@@ -33,6 +33,8 @@ import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Activation;
+import org.apache.maven.api.model.ActivationOS;
+import org.apache.maven.api.model.ActivationProperty;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
@@ -677,5 +679,198 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 "1.0",
                 transformed.getDependencies().get(0).getVersion(),
                 "Existing model dependency should take precedence over profile duplicate");
+    }
+
+    // ── executable() condition stripping (GH-12570) ──────────────────────────
+
+    /**
+     * A profile whose only activation trigger is an {@code executable()} condition
+     * should have its activation removed entirely after stripping.
+     */
+    @Test
+    void testStripExecutableConditionsOnlyExecutableRemovesActivation() {
+        Profile profile = Profile.newBuilder()
+                .id("exec-only")
+                .activation(Activation.newBuilder()
+                        .condition("executable('musl-gcc')")
+                        .build())
+                .dependencies(List.of(Dependency.newBuilder()
+                        .groupId("org.example")
+                        .artifactId("some-lib")
+                        .version("1.0")
+                        .build()))
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getActivation(), "Activation should be null when executable() was the only trigger");
+    }
+
+    /**
+     * When a profile has {@code executable()} in its condition but also has another
+     * activation trigger (e.g. OS), the condition should be stripped but the
+     * remaining activation preserved.
+     */
+    @Test
+    void testStripExecutableConditionsMixedActivationPreservesOtherTriggers() {
+        Profile profile = Profile.newBuilder()
+                .id("exec-and-os")
+                .activation(Activation.newBuilder()
+                        .condition("executable('gcc') && ${os.name} == 'linux'")
+                        .os(ActivationOS.newBuilder().name("linux").build())
+                        .build())
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        Activation activation = result.get(0).getActivation();
+        assertNotNull(activation, "Activation should be preserved when other triggers exist");
+        assertNull(activation.getCondition(), "Condition should be stripped");
+        assertNotNull(activation.getOs(), "OS trigger should be preserved");
+    }
+
+    /**
+     * Profiles without {@code executable()} in their condition should pass through
+     * unchanged.
+     */
+    @Test
+    void testStripExecutableConditionsNoExecutableUnchanged() {
+        Activation originalActivation =
+                Activation.newBuilder().condition("${os.name} == 'linux'").build();
+        Profile profile = Profile.newBuilder()
+                .id("no-exec")
+                .activation(originalActivation)
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        Activation activation = result.get(0).getActivation();
+        assertNotNull(activation);
+        assertEquals("${os.name} == 'linux'", activation.getCondition());
+    }
+
+    /**
+     * Profiles with no activation at all should pass through unchanged.
+     */
+    @Test
+    void testStripExecutableConditionsNullActivationUnchanged() {
+        Profile profile = Profile.newBuilder().id("no-activation").build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getActivation());
+    }
+
+    /**
+     * A negated {@code executable()} call (e.g. {@code not(executable(...))})
+     * should also be stripped from the condition.
+     */
+    @Test
+    void testStripExecutableConditionsNegatedExecutableStripped() {
+        Profile profile = Profile.newBuilder()
+                .id("negated-exec")
+                .activation(Activation.newBuilder()
+                        .condition("not(executable('musl-gcc'))")
+                        .build())
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getActivation(), "Negated executable() should also be stripped");
+    }
+
+    /**
+     * When {@code executable()} is combined with a property trigger in the
+     * activation, stripping should remove the condition but preserve the
+     * property trigger.
+     */
+    @Test
+    void testStripExecutableConditionsWithPropertyTriggerPreservesProperty() {
+        Profile profile = Profile.newBuilder()
+                .id("exec-and-property")
+                .activation(Activation.newBuilder()
+                        .condition("executable('docker')")
+                        .property(ActivationProperty.newBuilder()
+                                .name("docker.enabled")
+                                .value("true")
+                                .build())
+                        .build())
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        Activation activation = result.get(0).getActivation();
+        assertNotNull(activation, "Activation should be preserved when property trigger exists");
+        assertNull(activation.getCondition(), "Condition should be stripped");
+        assertNotNull(activation.getProperty(), "Property trigger should be preserved");
+        assertEquals("docker.enabled", activation.getProperty().getName());
+    }
+
+    /**
+     * Verifies that {@code transformNonPom} strips {@code executable()} conditions
+     * from profiles via the {@code prune()} path.
+     */
+    @Test
+    void testTransformNonPomStripsExecutableCondition() {
+        Model model = Model.newBuilder()
+                .profiles(List.of(Profile.newBuilder()
+                        .id("exec-profile")
+                        .activation(Activation.newBuilder()
+                                .condition("executable('tool')")
+                                .build())
+                        .dependencies(List.of(Dependency.newBuilder()
+                                .groupId("org.example")
+                                .artifactId("tool-support")
+                                .version("1.0")
+                                .build()))
+                        .build()))
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.transformNonPom(model, null);
+
+        // The profile had executable() activation and dependencies.
+        // After pruning: activation is stripped (executable-only), build is stripped,
+        // properties stripped, etc. The profile retains dependencies, so it survives
+        // the isEmpty filter, but its activation should be null.
+        if (!result.getProfiles().isEmpty()) {
+            assertNull(
+                    result.getProfiles().get(0).getActivation(),
+                    "executable() condition should be stripped from transformNonPom profiles");
+        }
+    }
+
+    /**
+     * Verifies that {@code transformPom} strips {@code executable()} conditions
+     * from profiles in parent/POM-packaged projects.
+     */
+    @Test
+    void testTransformPomStripsExecutableCondition() throws Exception {
+        setRootDirectory("trivial");
+        Path file = Paths.get("src/test/resources/consumer/trivial/child/pom.xml");
+        MavenProject project = getEffectiveModel(file);
+
+        Model model = project.getModel().getDelegate();
+        // Add a profile with an executable() condition to the model
+        Profile execProfile = Profile.newBuilder()
+                .id("exec-profile")
+                .activation(
+                        Activation.newBuilder().condition("executable('gcc')").build())
+                .properties(Map.of("native.enabled", "true"))
+                .build();
+        model = model.withProfiles(List.of(execProfile));
+
+        Model result = DefaultConsumerPomBuilder.transformPom(model, project);
+
+        // The profile should have its activation stripped
+        assertFalse(result.getProfiles().isEmpty(), "Profile should survive (it has properties)");
+        assertNull(
+                result.getProfiles().get(0).getActivation(),
+                "executable() condition should be stripped from transformPom profiles");
     }
 }
