@@ -92,13 +92,15 @@ public class DefaultModelValidator implements ModelValidator {
     private static final Pattern EXPRESSION_NAME_PATTERN = Pattern.compile("\\$\\{(.+?)}");
     private static final Pattern EXPRESSION_PROJECT_NAME_PATTERN = Pattern.compile("\\$\\{(project.+?)}");
 
-    private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
+    /** Characters that cannot appear in a file or directory name on FAT or NTFS filesystems */
+    private static final String ILLEGAL_NTFS_FILENAME_CHARS = "\\/:\"<>|?*";
 
-    private static final String ILLEGAL_RELATIVE_PATH_CHARS = ":\"<>|?*";
+    /** same as above except that it allows the path separators / and \ */
+    private static final String ILLEGAL_WINDOWS_PATH_CHARS = ":\"<>|?*";
 
-    private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_FS_CHARS;
+    private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_NTFS_FILENAME_CHARS;
 
-    private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_FS_CHARS;
+    private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_NTFS_FILENAME_CHARS;
 
     private static final String EMPTY = "";
 
@@ -498,7 +500,7 @@ public class DefaultModelValidator implements ModelValidator {
                         parent.getRelativePath(),
                         null,
                         parent,
-                        ILLEGAL_RELATIVE_PATH_CHARS);
+                        ILLEGAL_WINDOWS_PATH_CHARS);
             }
 
             boolean isModelVersion41OrMore = !Objects.equals(ModelBuilder.MODEL_VERSION_4_0_0, model.getModelVersion());
