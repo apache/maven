@@ -180,8 +180,8 @@ public class ${className} {
             List<XmlNode> newChildren = transform(oldChildren, this::transform);
             if (oldValue != newValue || oldAttrs != newAttrs || oldChildren != newChildren) {
                 return XmlNode.newBuilder()
-                                .name(node.name())
-                                .prefix(node.prefix())
+                                .name(node.getName())
+                                .prefix(node.getPrefix())
                                 .namespaceUri(node.getNamespaceUri())
                                 .value(newValue)
                                 .attributes(newAttrs)
