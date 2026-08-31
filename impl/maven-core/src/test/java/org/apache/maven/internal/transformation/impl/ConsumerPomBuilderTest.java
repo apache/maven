@@ -194,15 +194,36 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testBomPackagingActivatedProfilesArePreserved() throws Exception {
-        setRootDirectory("packaging-bom-profiles");
-        Path file = Paths.get("src/test/resources/consumer/packaging-bom-profiles/pom.xml");
+    void testBomPackagingActivatedProfilesArePreserved() {
+        // Build the model directly since 'bom' packaging is not supported
+        // by the model builder on the 4.0.x branch
+        Dependency managedDep = Dependency.newBuilder()
+                .groupId("org.slf4j")
+                .artifactId("slf4j-api")
+                .version("2.0.0")
+                .build();
 
-        MavenProject project = getEffectiveModel(file);
-        Model model = DefaultConsumerPomBuilder.transformBom(getConsumerModel(file, true), project);
+        Profile jarProfile = Profile.newBuilder()
+                .id("jar-profile")
+                .activation(Activation.newBuilder().packaging("jar").build())
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(managedDep))
+                        .build())
+                .build();
 
-        assertEquals(1, model.getProfiles().size());
-        Profile profile = model.getProfiles().get(0);
+        Model model = Model.newBuilder()
+                .groupId("org.my.group")
+                .artifactId("packaging-bom-profiles-test")
+                .version("1.0.0-SNAPSHOT")
+                .packaging("pom")
+                .profiles(List.of(jarProfile))
+                .build();
+
+        MavenProject project = new MavenProject(model);
+        Model transformed = DefaultConsumerPomBuilder.transformBom(model, project);
+
+        assertEquals(1, transformed.getProfiles().size());
+        Profile profile = transformed.getProfiles().get(0);
         assertEquals("jar-profile", profile.getId());
         assertEquals("jar", profile.getActivation().getPackaging());
         assertEquals(
