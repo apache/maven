@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -37,6 +38,7 @@ import org.apache.maven.api.SessionData;
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
@@ -406,6 +408,10 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
     static Model transformNonPom(Model model, MavenProject project) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
+        String packaging = model.getPackaging();
+
+        // Inline packaging-activated profiles into the model
+        model = inlinePackagingActivatedProfiles(model, packaging);
 
         Model.Builder builder = prune(
                         Model.newBuilder(model, true)
@@ -436,7 +442,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         return model;
     }
 
-    private static Model transformBom(Model model, MavenProject project) {
+    static Model transformBom(Model model, MavenProject project) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
 
         Model.Builder builder = prune(
@@ -498,6 +504,124 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 + "the features that request a newer model version.  If you're fine with having the "
                 + "consumer POM not consumable with Maven 3, add the `preserve.model.version='true'` "
                 + "attribute on the <project> element of your POM.");
+    }
+
+    /**
+     * Inlines packaging-activated profiles into the model.
+     * <p>
+     * When a profile is activated by packaging and the packaging matches the project's packaging,
+     * the profile's content (dependencies, dependency management, repositories) is merged into
+     * the main model and the profile is removed. This ensures consistent behavior across all
+     * tools consuming the POM, since packaging activation is a 4.1.0+ feature not available
+     * in Maven 3 or other tools like Gradle.
+     * <p>
+     * If the profile has other activation conditions besides packaging, only the packaging
+     * part is stripped from the activation; the profile's content is <b>not</b> inlined to
+     * preserve AND semantics (the content remains gated by the remaining conditions).
+     * <p>
+     * Profiles with a non-matching packaging activation are dropped entirely, since they
+     * can never activate for this artifact's fixed packaging and their presence would block
+     * model version downgrade to 4.0.0.
+     * <p>
+     * Non-transitive scope dependencies (test, provided, system) from inlined profiles are
+     * filtered out to prevent leakage into the consumer POM.
+     *
+     * @param model the model to process
+     * @param packaging the project's packaging type
+     * @return the model with packaging-activated profiles inlined
+     */
+    static Model inlinePackagingActivatedProfiles(Model model, String packaging) {
+        List<Profile> remainingProfiles = new ArrayList<>();
+        List<Dependency> additionalDeps = new ArrayList<>();
+        List<Dependency> additionalManagedDeps = new ArrayList<>();
+        List<Repository> additionalRepos = new ArrayList<>();
+
+        for (Profile profile : model.getProfiles()) {
+            Activation activation = profile.getActivation();
+            if (activation != null && activation.getPackaging() != null) {
+                if (Objects.equals(activation.getPackaging(), packaging)) {
+                    Activation strippedActivation = stripPackagingActivation(activation);
+                    if (strippedActivation != null) {
+                        // Keep the profile but remove the packaging activation part
+                        // Do not inline its contents since it has other activation conditions
+                        remainingProfiles.add(profile.withActivation(strippedActivation));
+                    } else {
+                        // Packaging is the ONLY condition.
+                        // Inline profile content into the model
+                        additionalDeps.addAll(profile.getDependencies());
+                        if (profile.getDependencyManagement() != null) {
+                            additionalManagedDeps.addAll(
+                                    profile.getDependencyManagement().getDependencies());
+                        }
+                        additionalRepos.addAll(profile.getRepositories());
+                    }
+                } else {
+                    // Packaging does not match — drop the profile entirely
+                }
+            } else {
+                // No packaging activation — keep the profile as-is
+                remainingProfiles.add(profile);
+            }
+        }
+
+        // Merge additional dependencies into the model, deduplicating by key
+        if (!additionalDeps.isEmpty()) {
+            additionalDeps.removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
+            Map<String, Dependency> mergedDeps = new LinkedHashMap<>();
+            for (Dependency dep : model.getDependencies()) {
+                mergedDeps.put(getDependencyKey(dep), dep);
+            }
+            for (Dependency dep : additionalDeps) {
+                mergedDeps.putIfAbsent(getDependencyKey(dep), dep);
+            }
+            model = model.withDependencies(mergedDeps.values());
+        }
+
+        // Merge additional managed dependencies into the model, deduplicating by key
+        if (!additionalManagedDeps.isEmpty()) {
+            // Filter out import-scoped entries — they are BOM references that get
+            // flattened during resolution and must not reappear in the consumer POM
+            additionalManagedDeps.removeIf(dep -> "import".equals(dep.getScope()));
+            DependencyManagement dm = model.getDependencyManagement();
+            Map<String, Dependency> mergedManagedDeps = new LinkedHashMap<>();
+            if (dm != null) {
+                for (Dependency dep : dm.getDependencies()) {
+                    mergedManagedDeps.put(getDependencyKey(dep), dep);
+                }
+            }
+            for (Dependency dep : additionalManagedDeps) {
+                mergedManagedDeps.putIfAbsent(getDependencyKey(dep), dep);
+            }
+            model = model.withDependencyManagement((dm != null ? dm : DependencyManagement.newInstance())
+                    .withDependencies(mergedManagedDeps.values()));
+        }
+
+        // Merge additional repositories into the model, deduplicating by id
+        if (!additionalRepos.isEmpty()) {
+            Map<String, Repository> mergedRepos = new LinkedHashMap<>();
+            for (Repository repo : model.getRepositories()) {
+                mergedRepos.put(repo.getId(), repo);
+            }
+            for (Repository repo : additionalRepos) {
+                mergedRepos.putIfAbsent(repo.getId(), repo);
+            }
+            model = model.withRepositories(mergedRepos.values());
+        }
+
+        return model.withProfiles(remainingProfiles);
+    }
+
+    /**
+     * Strips the packaging activation from an activation, returning the remaining activation
+     * or {@code null} if packaging was the only activation condition.
+     */
+    private static Activation stripPackagingActivation(Activation activation) {
+        Activation stripped =
+                Activation.newBuilder(activation, true).packaging(null).build();
+        if (isActivationEmpty(stripped)) {
+            return null;
+        }
+        return stripped;
     }
 
     /**
