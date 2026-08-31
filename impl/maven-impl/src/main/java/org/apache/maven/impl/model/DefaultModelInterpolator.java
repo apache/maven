@@ -31,6 +31,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -57,14 +58,6 @@ public class DefaultModelInterpolator implements ModelInterpolator {
     private static final String PREFIX_POM = "pom.";
     private static final List<String> PROJECT_PREFIXES_3_1 = Arrays.asList(PREFIX_POM, PREFIX_PROJECT);
     private static final List<String> PROJECT_PREFIXES_4_0 = Collections.singletonList(PREFIX_PROJECT);
-
-    /**
-     * The name of the property that opts a build back into the previous behavior of
-     * interpolating models built at {@link ModelBuilderRequest.RequestType#CONSUMER_DEPENDENCY}
-     * or {@link ModelBuilderRequest.RequestType#CONSUMER_PARENT} against the full set of
-     * session (system, environment and CLI) properties. Disabled by default.
-     */
-    public static final String FULL_EXTERNAL_INTERPOLATION_PROPERTY = "maven.model.dependencyInterpolation.full";
 
     // MNG-1927, MNG-2124, MNG-3355:
     // If the build section is present and the project directory is non-null, we should make
@@ -261,8 +254,10 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                         || type == ModelBuilderRequest.RequestType.CONSUMER_PARENT)
                 && isRepositoryResolved(request.getSource());
         return externalModel
-                && !Boolean.parseBoolean(request.getSystemProperties().get(FULL_EXTERNAL_INTERPOLATION_PROPERTY))
-                && !Boolean.parseBoolean(request.getUserProperties().get(FULL_EXTERNAL_INTERPOLATION_PROPERTY));
+                && !Boolean.parseBoolean(
+                        request.getSystemProperties().get(Constants.MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL))
+                && !Boolean.parseBoolean(
+                        request.getUserProperties().get(Constants.MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL));
     }
 
     /**

@@ -52,12 +52,10 @@ import org.codehaus.plexus.interpolation.ValueSource;
 public abstract class AbstractStringBasedModelInterpolator implements ModelInterpolator {
 
     /**
-     * The name of the property that opts a build back into the previous behavior of
-     * interpolating models built at {@link ModelBuildingRequest#VALIDATION_LEVEL_MINIMAL}
-     * against the full set of session (system, environment and CLI) properties. Disabled
-     * by default.
+     * Local mirror of {@code org.apache.maven.api.Constants.MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL}.
+     * This compat module does not depend on {@code maven-api-core}, so the value is duplicated here.
      */
-    public static final String FULL_EXTERNAL_INTERPOLATION_PROPERTY = "maven.model.dependencyInterpolation.full";
+    private static final String FULL_EXTERNAL_INTERPOLATION_PROPERTY = "maven.model.dependencyInterpolation.full";
 
     private static final List<String> PROJECT_PREFIXES = Arrays.asList("pom.", "project.");
 
