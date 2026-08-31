@@ -35,6 +35,7 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.feature.Features;
+import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Model;
@@ -461,7 +462,10 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         boolean preserveModelVersion = model.isPreserveModelVersion();
 
         // raw to consumer transform
-        model = model.withRoot(false).withModules(null).withSubprojects(null);
+        model = model.withRoot(false)
+                .withModules(null)
+                .withSubprojects(null)
+                .withProfiles(stripExecutableConditions(model.getProfiles()));
         Parent parent = model.getParent();
         if (parent != null) {
             model = model.withParent(parent.withRelativePath(null));
@@ -496,11 +500,66 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 + "attribute on the <project> element of your POM.");
     }
 
+    /**
+     * Strips {@code executable()} conditions from profile activations.
+     * <p>
+     * The {@code executable()} function evaluates against the local system {@code PATH},
+     * making it environment-dependent. When such a condition survives into a published
+     * consumer POM, downstream consumers silently evaluate it against <em>their own</em>
+     * {@code PATH}, producing non-reproducible builds. This method removes the entire
+     * {@code condition} string when it contains an {@code executable()} call, and drops
+     * the activation entirely when no other activation triggers remain.
+     *
+     * @param profiles the list of profiles to process
+     * @return a new list with {@code executable()} conditions stripped
+     */
+    static List<Profile> stripExecutableConditions(List<Profile> profiles) {
+        return profiles.stream()
+                .map(p -> p.withActivation(stripExecutableCondition(p.getActivation())))
+                .collect(Collectors.toList());
+    }
+
+    /**
+     * Strips an {@code executable()} condition from a single activation.
+     * Returns {@code null} when the activation has no remaining triggers after stripping.
+     */
+    private static Activation stripExecutableCondition(Activation activation) {
+        if (activation == null) {
+            return null;
+        }
+        String condition = activation.getCondition();
+        if (condition == null || !condition.contains("executable(")) {
+            return activation;
+        }
+        // Remove the entire condition — partial expression surgery could change
+        // the boolean semantics in unexpected ways (e.g. AND vs OR combinations).
+        Activation stripped = activation.withCondition(null);
+        if (isActivationEmpty(stripped)) {
+            return null;
+        }
+        return stripped;
+    }
+
+    /**
+     * Returns {@code true} when the activation carries no triggers at all
+     * (default {@code activeByDefault} is {@code false}).
+     */
+    private static boolean isActivationEmpty(Activation activation) {
+        return !activation.isActiveByDefault()
+                && activation.getJdk() == null
+                && activation.getOs() == null
+                && activation.getProperty() == null
+                && activation.getFile() == null
+                && activation.getPackaging() == null
+                && activation.getCondition() == null;
+    }
+
     private static List<Profile> prune(List<Profile> profiles) {
         return profiles.stream()
                 .map(p -> {
                     Profile.Builder builder = Profile.newBuilder(p, true);
                     prune((ModelBase.Builder) builder, p);
+                    builder.activation(stripExecutableCondition(p.getActivation()));
                     return builder.build(null).build();
                 })
                 .filter(p -> !isEmpty(p))
