@@ -51,8 +51,8 @@ various parts of the system. The main entry point is the
 `${maven.home}/conf/maven.properties` properties file. This file,
 along with any other files loaded from it (see below) are called
 _Maven properties files_ and are Java properties files with a 
-few enhancements. Contrary to standard properties file, those files 
-are UTF-8 encoded.
+few enhancements. Unlike standard properties files, these files are 
+UTF-8 encoded.
  
 ### File Inclusion
 
@@ -90,13 +90,21 @@ from `${session.rootDirectory}/.mvn/maven-user.properties`.
 
 ## Settings
 
+Settings are configured in the `~/.m2/settings.xml` file (user level),
+`${session.rootDirectory}/.mvn/settings.xml` (project level), and
+`${maven.installation.conf}/settings.xml` (Maven installation level). See [Settings Reference](./api/maven-api-settings/settings.html) for details.
+
 ## Extensions
+
+Extensions allow you to add additional functionality to Maven. They are
+configured in the `~/.m2/extensions.xml` file (user level),
+`${session.rootDirectory}/.mvn/extensions.xml` (project level), and `${maven.installation.conf}/extensions.xml` (Maven installation level).
 
 ## Maven Command Line Arguments
 
 Maven is a command line tool, and, as such, accepts various command
-line arguments.  The `MAVEN_ARGS` environment value is used to
-provide additional arguments to Maven.  Those arguments will be
+line arguments.  The `MAVEN_ARGS` environment variable is used to
+provide additional arguments to Maven. These arguments will be
 prepended to the actual list of command line arguments.
 
 For example, options and goals could be defined with the value

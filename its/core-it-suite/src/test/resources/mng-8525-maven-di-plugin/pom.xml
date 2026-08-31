@@ -31,31 +31,9 @@ under the License.
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <javaVersion>17</javaVersion>
-    <guiceVersion>6.0.0</guiceVersion>
-    <mavenVersion>4.0.0-beta-5</mavenVersion>
+    <mavenVersion>4.1.0-SNAPSHOT</mavenVersion>
     <mavenPluginPluginVersion>4.0.0-beta-1</mavenPluginPluginVersion>
-    <mavenPluginTestingVersion>4.0.0-beta-2</mavenPluginTestingVersion>
-    <mavenResolverVersion>2.0.2</mavenResolverVersion>
   </properties>
-
-  <dependencyManagement>
-    <dependencies>
-      <dependency>
-        <groupId>org.junit</groupId>
-        <artifactId>junit-bom</artifactId>
-        <version>5.13.4</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-      <dependency>
-        <groupId>org.mockito</groupId>
-        <artifactId>mockito-bom</artifactId>
-        <version>5.20.0</version>
-        <type>pom</type>
-        <scope>import</scope>
-      </dependency>
-    </dependencies>
-  </dependencyManagement>
 
   <dependencies>
     <dependency>
@@ -70,59 +48,13 @@ under the License.
       <version>${mavenVersion}</version>
       <scope>provided</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-api-meta</artifactId>
-      <version>${mavenVersion}</version>
-      <scope>provided</scope>
-    </dependency>
 
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-core</artifactId>
+      <artifactId>maven-testing</artifactId>
       <version>${mavenVersion}</version>
       <scope>test</scope>
     </dependency>
-    <dependency>
-      <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-api</artifactId>
-      <version>${mavenResolverVersion}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-api-impl</artifactId>
-      <version>${mavenVersion}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>com.google.inject</groupId>
-      <artifactId>guice</artifactId>
-      <version>${guiceVersion}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven.plugin-testing</groupId>
-      <artifactId>maven-plugin-testing-harness</artifactId>
-      <version>${mavenPluginTestingVersion}</version>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.junit.jupiter</groupId>
-      <artifactId>junit-jupiter-api</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-core</artifactId>
-      <scope>test</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.mockito</groupId>
-      <artifactId>mockito-junit-jupiter</artifactId>
-      <scope>test</scope>
-    </dependency>
-
   </dependencies>
 
   <build>

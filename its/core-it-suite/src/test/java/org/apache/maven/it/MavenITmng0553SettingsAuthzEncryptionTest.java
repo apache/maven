@@ -18,28 +18,28 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.UserStore;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.util.security.Password;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 /**
@@ -50,7 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Disabled("Bounds: [2.1.0,3.0-alpha-1),[3.0-alpha-3,4.0.0-beta-4]")
 public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenIntegrationTestCase {
 
-    private File testDir;
+    private Path testDir;
 
     private Server server;
 
@@ -58,14 +58,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = extractResources("/mng-0553");
-
-        Constraint constraint = new Constraint(__BASIC_AUTH, "user");
-        constraint.setAuthenticate(true);
-
-        ConstraintMapping constraintMapping = new ConstraintMapping();
-        constraintMapping.setConstraint(constraint);
-        constraintMapping.setPathSpec("/*");
+        testDir = extractResources("mng-0553");
 
         HashLoginService userRealm = new HashLoginService("TestRealm");
         UserStore userStore = new UserStore();
@@ -73,20 +66,20 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         userRealm.setUserStore(userStore);
 
         server = new Server(0);
-        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+        SecurityHandler.PathMapped securityHandler = new SecurityHandler.PathMapped();
         securityHandler.setLoginService(userRealm);
-        securityHandler.setAuthMethod(__BASIC_AUTH);
-        securityHandler.setConstraintMappings(new ConstraintMapping[] {constraintMapping});
+        securityHandler.setAuthenticator(new BasicAuthenticator());
+        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.SPECIFIC_ROLE, "user"));
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
+        repoHandler.setBaseResource(ResourceFactory.of(server).newResource(testDir.resolve("repo")));
 
-        HandlerList handlerList = new HandlerList();
-        handlerList.addHandler(securityHandler);
+        Handler.Sequence handlerList = new Handler.Sequence();
         handlerList.addHandler(repoHandler);
         handlerList.addHandler(new DefaultHandler());
 
-        server.setHandler(handlerList);
+        securityHandler.setHandler(handlerList);
+        server.setHandler(securityHandler);
         server.start();
         if (server.isFailed()) {
             fail("Couldn't bind the server socket to a free port!");
@@ -110,17 +103,17 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
      */
     @Test
     public void testitBasic() throws Exception {
-        testDir = new File(testDir, "test-1");
+        testDir = testDir.resolve("test-1");
 
         Map<String, String> filterProps = new HashMap<>();
         filterProps.put("@port@", Integer.toString(port));
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng0553");
         verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar");
         verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
-        verifier.setUserHomeDirectory(new File(testDir, "userhome").toPath());
+        verifier.setUserHomeDirectory(testDir.resolve("userhome"));
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
@@ -138,16 +131,16 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
      */
     @Test
     public void testitRelocation() throws Exception {
-        testDir = new File(testDir, "test-2");
+        testDir = testDir.resolve("test-2");
 
         Map<String, String> filterProps = new HashMap<>();
         filterProps.put("@port@", Integer.toString(port));
         // NOTE: The upper-case scheme name is essential part of the test
         String secUrl = "FILE://"
-                + new File(testDir, "relocated-settings-security.xml").toURI().getRawPath();
+                + testDir.resolve("relocated-settings-security.xml").toUri().getRawPath();
         filterProps.put("@relocation@", secUrl);
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng0553");
         verifier.verifyArtifactNotPresent("org.apache.maven.its.mng0553", "a", "0.1-SNAPSHOT", "jar");
@@ -161,8 +154,7 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         // NOTE: The selection of the Turkish language for the JVM locale is essential part of the test
         verifier.setEnvironmentVariable(
                 "MAVEN_OPTS",
-                "-Dsettings.security=" + new File(testDir, "settings~security.xml").getAbsolutePath()
-                        + " -Duser.language=tr");
+                "-Dsettings.security=" + testDir.resolve("settings~security.xml") + " -Duser.language=tr");
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -179,11 +171,11 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
     public void testitEncryption() throws Exception {
         // requiresMavenVersion("[2.1.0,3.0-alpha-1),[3.0-alpha-7,)");
 
-        testDir = new File(testDir, "test-3");
+        testDir = testDir.resolve("test-3");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
-        verifier.setUserHomeDirectory(new File(testDir, "userhome").toPath());
+        verifier.setUserHomeDirectory(testDir.resolve("userhome"));
         verifier.addCliArgument("--encrypt-master-password");
         verifier.addCliArgument("test");
         verifier.setLogFileName("log-emp.txt");
@@ -194,9 +186,9 @@ public class MavenITmng0553SettingsAuthzEncryptionTest extends AbstractMavenInte
         List<String> log = verifier.loadLogLines();
         assertNotNull(findPassword(log));
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
-        verifier.setUserHomeDirectory(new File(testDir, "userhome").toPath());
+        verifier.setUserHomeDirectory(testDir.resolve("userhome"));
         verifier.addCliArgument("--encrypt-password");
         verifier.addCliArgument("testpass");
         verifier.setLogFileName("log-ep.txt");

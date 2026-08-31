@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 
@@ -42,11 +42,12 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     public void testWithPath() throws Exception {
-        File testDir = extractResources("/mng-5102-mixins/path");
+        Path testDir = extractResources("mng-5102-mixins/path");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
+        verifier.deleteDirectory(".mvn/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng5102");
         verifier.addCliArguments("install", "-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
@@ -63,9 +64,9 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
         assertEquals("true", props.getProperty("project.properties.mixin3"));
 
         verifier.verifyFilePresent(
-                "target/project-local-repo/org.apache.maven.its.mng5102/child/0.1/child-0.1-consumer.pom");
+                ".mvn/target/project-local-repo/org.apache.maven.its.mng5102/child/0.1/child-0.1-consumer.pom");
         List<String> lines = verifier.loadLines(
-                "target/project-local-repo/org.apache.maven.its.mng5102/child/0.1/child-0.1-consumer.pom");
+                ".mvn/target/project-local-repo/org.apache.maven.its.mng5102/child/0.1/child-0.1-consumer.pom");
         assertTrue(lines.stream().noneMatch(l -> l.contains("<mixin>")));
     }
 
@@ -76,9 +77,9 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     public void testWithGav() throws Exception {
-        File testDir = extractResources("/mng-5102-mixins/gav");
+        Path testDir = extractResources("mng-5102-mixins/gav");
 
-        Verifier verifier = newVerifier(new File(testDir, "mixin-2").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("mixin-2"));
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -87,9 +88,10 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "project").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("project"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
+        verifier.deleteDirectory(".mvn/target");
         verifier.addCliArguments("install", "-Dmaven.consumer.pom.flatten");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -99,9 +101,9 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
         assertEquals("true", props.getProperty("project.properties.mixin2"));
 
         verifier.verifyFilePresent(
-                "target/project-local-repo/org.apache.maven.its.mng5102/gav/0.1/gav-0.1-consumer.pom");
+                ".mvn/target/project-local-repo/org.apache.maven.its.mng5102/gav/0.1/gav-0.1-consumer.pom");
         List<String> lines = verifier.loadLines(
-                "target/project-local-repo/org.apache.maven.its.mng5102/gav/0.1/gav-0.1-consumer.pom");
+                ".mvn/target/project-local-repo/org.apache.maven.its.mng5102/gav/0.1/gav-0.1-consumer.pom");
         assertTrue(lines.stream().anyMatch(l -> l.contains("<mixin>")));
     }
 
@@ -112,9 +114,9 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     public void testWithClassifier() throws Exception {
-        File testDir = extractResources("/mng-5102-mixins/classifier");
+        Path testDir = extractResources("mng-5102-mixins/classifier");
 
-        Verifier verifier = newVerifier(new File(testDir, "mixin-4").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("mixin-4"));
 
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -123,9 +125,10 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "project").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("project"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
+        verifier.deleteDirectory(".mvn/target");
         verifier.addCliArguments("install", "-Dmaven.consumer.pom.flatten");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -135,9 +138,9 @@ public class MavenITmng5102MixinsTest extends AbstractMavenIntegrationTestCase {
         assertEquals("true", props.getProperty("project.properties.mixin4"));
 
         verifier.verifyFilePresent(
-                "target/project-local-repo/org.apache.maven.its.mng5102/classifier/0.1/classifier-0.1-consumer.pom");
+                ".mvn/target/project-local-repo/org.apache.maven.its.mng5102/classifier/0.1/classifier-0.1-consumer.pom");
         List<String> lines = verifier.loadLines(
-                "target/project-local-repo/org.apache.maven.its.mng5102/classifier/0.1/classifier-0.1-consumer.pom");
+                ".mvn/target/project-local-repo/org.apache.maven.its.mng5102/classifier/0.1/classifier-0.1-consumer.pom");
         assertTrue(lines.stream().anyMatch(l -> l.contains("<mixin>")));
     }
 }

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIf;
@@ -42,8 +42,8 @@ public class MavenIT0009GoalConfigurationTest extends AbstractMavenIntegrationTe
         // Inline version check: [3.1.0,) - current Maven version supports space in XML
         boolean supportSpaceInXml = true;
 
-        File testDir = extractResources("/it0009");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResources("it0009");
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

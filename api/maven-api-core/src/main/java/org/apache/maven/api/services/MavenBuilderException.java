@@ -68,10 +68,11 @@ public abstract class MavenBuilderException extends MavenException {
      */
     protected static String buildMessage(String message, ProblemCollector<BuilderProblem> problems) {
         StringBuilder msg = new StringBuilder(message);
-        problems.problems().forEach(problem -> msg.append("\n * ")
-                .append(problem.getSeverity().name())
-                .append(": ")
-                .append(problem.getMessage()));
+        problems.problems()
+                .forEach(problem -> msg.append("\n * ")
+                        .append(problem.getSeverity().name())
+                        .append(": ")
+                        .append(problem.getMessage()));
         return msg.toString();
     }
 

@@ -106,6 +106,7 @@ import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
@@ -412,7 +413,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         DependencyFilter dependencyFilter = project.getExtensionDependencyFilter();
         dependencyFilter = AndDependencyFilter.newInstance(dependencyFilter, filter);
 
-        DependencyResult result = pluginDependenciesResolver.resolvePlugin(
+        DependencyResult result = pluginDependenciesResolver.resolvePluginAndFlatten(
                 plugin,
                 RepositoryUtils.toArtifact(pluginArtifact),
                 dependencyFilter,
@@ -555,7 +556,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
         org.apache.maven.api.MojoExecution execution = new DefaultMojoExecution(sessionV4, mojoExecution);
         org.apache.maven.api.plugin.Log log = new DefaultLog(
-                LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getFullGoalName()));
+                LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getImplementation()));
         try {
             Injector injector = Injector.create();
             injector.discover(pluginRealm);
@@ -1025,6 +1026,15 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 }
             }
             extensionRecord = extensionRealmCache.put(extensionKey, extensionRealm, extensionDescriptor, artifacts);
+
+            // If another thread already cached a record for this key, dispose the redundant realm
+            if (extensionRecord.getRealm() != extensionRealm) {
+                try {
+                    extensionRealm.getWorld().disposeRealm(extensionRealm.getId());
+                } catch (NoSuchRealmException e) {
+                    // ignore — realm was already disposed
+                }
+            }
         }
         extensionRealmCache.register(project, extensionKey, extensionRecord);
         pluginRealms.put(pluginKey, extensionRecord);
@@ -1036,7 +1046,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             Plugin extensionPlugin, List<RemoteRepository> repositories, RepositorySystemSession session)
             throws PluginResolutionException {
         DependencyResult root =
-                pluginDependenciesResolver.resolvePlugin(extensionPlugin, null, null, repositories, session);
+                pluginDependenciesResolver.resolvePluginAndFlatten(extensionPlugin, null, null, repositories, session);
         return toMavenArtifacts(root);
     }
 }

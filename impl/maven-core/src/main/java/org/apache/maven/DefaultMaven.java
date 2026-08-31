@@ -210,19 +210,22 @@ public class DefaultMaven implements Maven {
         // so that @SessionScoped components can be @Injected into AbstractLifecycleParticipants.
         //
         sessionScope.enter();
-        MavenChainedWorkspaceReader chainedWorkspaceReader =
-                new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader);
-        try (CloseableSession closeableSession = newCloseableSession(request, chainedWorkspaceReader)) {
-            MavenSession session = new MavenSession(closeableSession, request, result);
-            session.setSession(defaultSessionFactory.newSession(session));
+        try {
+            MavenChainedWorkspaceReader chainedWorkspaceReader =
+                    new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader);
+            try (CloseableSession closeableSession = newCloseableSession(request, chainedWorkspaceReader)) {
+                MavenSession session = new MavenSession(closeableSession, request, result);
+                session.setSession(defaultSessionFactory.newSession(session));
 
-            sessionScope.seed(MavenSession.class, session);
-            sessionScope.seed(Session.class, session.getSession());
-            sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(session.getSession()));
+                sessionScope.seed(MavenSession.class, session);
+                sessionScope.seed(RepositorySystemSession.class, closeableSession); // fixed in Maven 3.10.x
+                sessionScope.seed(Session.class, session.getSession());
+                sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(session.getSession()));
 
-            legacySupport.setSession(session);
+                legacySupport.setSession(session);
 
-            return doExecute(request, session, result, chainedWorkspaceReader);
+                return doExecute(request, session, result, chainedWorkspaceReader);
+            }
         } finally {
             sessionScope.exit();
         }
@@ -402,11 +405,11 @@ public class DefaultMaven implements Maven {
     }
 
     /**
-     * Nobody should ever use this method.
-     *
-     * @deprecated If you use this method and your code is not in Maven Core, stop doing this.
+     * This method is part of Maven core internal infrastructure and was never
+     * intended for use outside of Maven Core itself. External consumers should
+     * not rely on this method, as it may change or be removed without notice.
      */
-    @Deprecated
+    @Deprecated(since = "4.0.0")
     public RepositorySystemSession newRepositorySession(MavenExecutionRequest request) {
         if (!Boolean.parseBoolean(System.getProperty("maven.newRepositorySession.warningsDisabled", "false"))) {
             if (logger.isDebugEnabled()) {

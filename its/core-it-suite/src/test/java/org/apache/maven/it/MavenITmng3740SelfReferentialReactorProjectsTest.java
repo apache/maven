@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,18 +39,18 @@ public class MavenITmng3740SelfReferentialReactorProjectsTest extends AbstractMa
 
     @Test
     public void testitMNG3740() throws Exception {
-        File testDir = extractResources("/mng-3740");
-        File v1 = new File(testDir, "projects.v1");
-        File v2 = new File(testDir, "projects.v2");
+        Path testDir = extractResources("mng-3740");
+        Path v1 = testDir.resolve("projects.v1");
+        Path v2 = testDir.resolve("projects.v2");
 
         Verifier verifier;
 
-        verifier = newVerifier(v1.getAbsolutePath());
+        verifier = newVerifier(v1);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(v2.getAbsolutePath());
+        verifier = newVerifier(v2);
         verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();

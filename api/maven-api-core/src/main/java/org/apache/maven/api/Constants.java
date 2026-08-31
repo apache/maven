@@ -333,7 +333,9 @@ public final class Constants {
      * so even plugins will get relocated artifacts) relocation.
      * <br/>
      * For example,
-     * <pre>maven.relocations.entries = org.foo:*:*>, \\<br/>    org.here:*:*>org.there:*:*, \\<br/>    javax.inject:javax.inject:1>>jakarta.inject:jakarta.inject:1.0.5</pre>
+     * <pre>maven.relocations.entries = org.foo:*:*>,\
+     *     org.here:*:*>org.there:*:*,\
+     *     javax.inject:javax.inject:1>>jakarta.inject:jakarta.inject:1.0.5</pre>
      * means: 3 entries, ban <code>org.foo group</code> (exactly, so <code>org.foo.bar</code> is allowed),
      * relocate <code>org.here</code> to <code>org.there</code> and finally globally relocate (see <code>&gt;&gt;</code> above)
      * <code>javax.inject:javax.inject:1</code> to <code>jakarta.inject:jakarta.inject:1.0.5</code>.
@@ -344,26 +346,55 @@ public final class Constants {
     public static final String MAVEN_RELOCATIONS_ENTRIES = "maven.relocations.entries";
 
     /**
-     * User property for version filter expression used in session, applied to resolving ranges: a semicolon separated
-     * list of filters to apply. By default, no version filter is applied (like in Maven 3).
+     * Builds <code>org.eclipse.aether.collection.VersionFilter</code> instances out of input expression string.
+     * <br/>
+     * Expression is a semicolon separated list of filters to apply. By default, no version filter is applied (like in Maven 3).
      * <br/>
      * Supported filters:
      * <ul>
-     *     <li>"h" or "h(num)" - highest version or top list of highest ones filter</li>
-     *     <li>"l" or "l(num)" - lowest version or bottom list of lowest ones filter</li>
-     *     <li>"s" - contextual snapshot filter</li>
-     *     <li>"ns" - unconditional snapshot filter (no snapshots selected from ranges)</li>
-     *     <li>"e(G:A:V)" - predicate filter (leaves out G:A:V from range, if hit, V can be range)</li>
+     *     <li><code>"s"</code> - contextual snapshot filter (project version decides are snapshots allowed or not)</li>
+     *     <li><code>"nosnapshot"</code> - unconditional snapshot filter (no snapshot versions selected from ranges)</li>
+     *     <li><code>"norelease"</code> - unconditional release filter (no release versions selected from ranges)</li>
+     *     <li><code>"nopreview"</code> - unconditional preview filter (no preview versions selected from ranges)</li>
+     *     <li><code>"noprerelease"</code> - unconditional pre-release filter (no preview and rc/cr versions selected from ranges)</li>
+     *     <li><code>"noqualifier"</code> - unconditional any-qualifier filter (no version with any qualifier selected from ranges)</li>
+     *     <li><code>"h"</code> (shorthand of <code>h(1)</code>) or <code>"h(num)"</code> - highest N version (based on version ordering)</li>
+     *     <li><code>"l"</code> (shorthand of <code>l(1)</code>) or <code>"l(num)"</code> - lowest N version (based on version ordering)</li>
+     *     <li><code>"e(V)"</code> - exclusion filter (excludes versions matching V version constraint)</li>
+     *     <li><code>"i(V)"</code> - inclusion filter (includes versions matching V version constraint)</li>
      * </ul>
-     * Example filter expression: <code>"h(5);s;e(org.foo:bar:1)</code> will cause: ranges are filtered for "top 5" (instead
-     * full range), snapshots are banned if root project is not a snapshot, and if range for <code>org.foo:bar</code> is
-     * being processed, version 1 is omitted. Value in this property builds
-     * <code>org.eclipse.aether.collection.VersionFilter</code> instance.
+     * Every filter expression may have "scope" applied, in form of <code>@G[:A]</code>. Presence of "scope" narrows the
+     * application of filter to given G or G:A.
+     * <br/>
+     * In case of multiple "similar" rule scopes, user should enlist rules from "most specific" to "least specific".
+     * <br/>
+     * Example filter expression: <code>"h(5);s;e(1)@org.foo:bar"</code> will cause:
+     * <ul>
+     *     <li>ranges are filtered for "top 5" (instead of full range)</li>
+     *     <li>snapshots are banned if root project is not a snapshot</li>
+     *     <li>if range for <code>org.foo:bar</code> is being processed, version 1 is omitted</li>
+     * </ul>
+     * Values in this property builds <code>org.eclipse.aether.collection.VersionFilter</code> instance.
      *
-     * @since 4.0.0
+     * @since 3.10.0
      */
     @Config
     public static final String MAVEN_VERSION_FILTER = "maven.session.versionFilter";
+
+    /**
+     * User property for overriding the reactor output repository path used by the reactor reader to share
+     * artifacts between modules during a build. This repository enables partial and resumable builds
+     * (e.g. {@code mvn verify -r :module}) without requiring {@code install}.
+     * <p>
+     * The path may be absolute or relative to the root directory. If relative, it is resolved against
+     * the root directory of the project.
+     * </p>
+     * Default value: <code>${maven.rootDirectory}/.mvn/target/project-local-repo</code>.
+     *
+     * @since 4.0.0
+     */
+    @Config(defaultValue = "${maven.rootDirectory}/.mvn/target/project-local-repo")
+    public static final String MAVEN_REACTOR_OUTPUT_REPOSITORY = "maven.reactor.outputRepository";
 
     /**
      * User property for chained LRM: the new "head" local repository to use, and "push" the existing into tail.
@@ -414,7 +445,7 @@ public final class Constants {
      * dependency management entries in transitive dependency POMs. Maven 4 enables "transitivity" by default. Hence
      * unlike Maven 3, it obeys dependency management entries deep in the dependency graph as well.
      * <br/>
-     * Default: <code>"true"</code>.
+     * Default: <code>true</code>.
      *
      * @since 4.0.0
      */
@@ -432,6 +463,17 @@ public final class Constants {
     public static final String MAVEN_RESOLVER_TRANSPORT = "maven.resolver.transport";
 
     /**
+     * Resolver validation control.
+     * Can be <code>default</code> (full validation), <code>mild</code> (only uninterpolated placeholders) or
+     * <code>off</code> (no validation, as in Maven 3.9.x).
+     * This configuration provides "escape hatch" for those projects, that are forced to use non-conformant solutions.
+     *
+     * @since 3.10.0
+     */
+    @Config(defaultValue = "default")
+    public static final String MAVEN_RESOLVER_VALIDATION = "maven.resolver.validation";
+
+    /**
      * Plugin validation level.
      *
      * @since 3.9.2
@@ -446,6 +488,19 @@ public final class Constants {
      */
     @Config
     public static final String MAVEN_PLUGIN_VALIDATION_EXCLUDES = "maven.plugin.validation.excludes";
+
+    /**
+     * User property for enabling/disabling automatic subproject discovery for POM-packaged projects.
+     * When set to {@code true} (default), Maven 4.1+ POM-packaged projects that do not declare
+     * {@code <subprojects>} or {@code <modules>} will automatically discover subprojects
+     * by scanning subdirectories for POM files.
+     * When set to {@code false}, automatic discovery is disabled regardless of whether
+     * {@code <subprojects>} or {@code <modules>} is declared.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_PROJECT_DISCOVER_SUBPROJECTS = "maven.project.discoverSubprojects";
 
     /**
      * ProjectBuilder parallelism.
@@ -465,15 +520,34 @@ public final class Constants {
 
     /**
      * User property for controlling consumer POM flattening behavior.
-     * When set to <code>true</code> (default), consumer POMs are flattened by removing
-     * dependency management and keeping only direct dependencies with transitive scopes.
-     * When set to <code>false</code>, consumer POMs preserve dependency management
-     * like parent POMs, allowing dependency management to be inherited by consumers.
+     * <ul>
+     *     <li>When set to <code>true</code>, consumer POMs are flattened by removing
+     * dependency management and keeping only direct dependencies with transitive scopes.</li>
+     *     <li>When set to <code>false</code> (default), consumer POMs preserve dependency management
+     * like parent POMs, allowing dependency management to be inherited by consumers.</li>
+     * </ul>
      *
      * @since 4.1.0
      */
     @Config(type = "java.lang.Boolean", defaultValue = "false")
     public static final String MAVEN_CONSUMER_POM_FLATTEN = "maven.consumer.pom.flatten";
+
+    /**
+     * User property for controlling removal of unused managed dependencies during consumer POM flattening.
+     * <ul>
+     *     <li>When set to <code>true</code> (default), managed dependencies that do not appear in the resolved
+     * dependency tree are removed from the consumer POM to keep it lean. This is important when using
+     * BOMs like Spring Boot or Quarkus that contain hundreds of managed dependency entries.</li>
+     *     <li>When set to <code>false</code>, all managed dependencies are preserved in the consumer POM,
+     * which may be needed in rare cases where downstream consumers override transitive dependency
+     * versions and rely on the original managed dependencies for alignment.</li>
+     * </ul>
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_CONSUMER_POM_REMOVE_UNUSED_MANAGED_DEPENDENCIES =
+            "maven.consumer.pom.removeUnusedManagedDependencies";
 
     /**
      * User property for controlling "maven personality". If activated Maven will behave
@@ -546,7 +620,7 @@ public final class Constants {
      *     <li>"snapshot" - query only snapshot repositories to discover versions</li>
      * </ul>
      * Default (when unset) is using request carried nature. Hence, this configuration really makes sense with value
-     * {@code "auto"}, while ideally callers needs update and use newly added method on version range request to
+     * <code>auto</code>, while ideally callers needs update and use newly added method on version range request to
      * express preference.
      *
      * @since 4.0.0

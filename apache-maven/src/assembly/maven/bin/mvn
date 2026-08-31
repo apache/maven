@@ -46,13 +46,36 @@ if [ -z "$MAVEN_SKIP_RC" ] ; then
 
 fi
 
+# Note on echo vs printf: several POSIX shells (dash and the other Almquist
+# derivatives commonly installed as /bin/sh) expand backslash escapes in echo.
+# Windows paths are full of backslashes, so C:\tmp\build would be printed with a
+# tab in place of \t. Every value that may hold a path is therefore emitted with
+# printf '%s' rather than echo; plain literals may still use echo.
+
 # OS specific support. $var _must_ be set to either true or false.
+# MINGW* matches the MinGW32/MinGW64 shells (e.g. Git Bash, the shell used by
+# "shell: bash" steps of GitHub Actions Windows runners), MSYS* the MSYS2 shell.
+# All of them run on top of a POSIX emulation layer that mangles POSIX paths
+# passed to native (Windows) processes such as the JVM, so paths have to be
+# converted to their native Windows form explicitly.
 cygwin=false;
 mingw=false;
 case "`uname`" in
   CYGWIN*) cygwin=true;;
-  MINGW*) mingw=true;;
+  MINGW*|MSYS*) mingw=true;;
 esac
+
+# Cygwin and MSYS2 both ship cygpath(1), but bail out of the path conversion if
+# it is unexpectedly missing: substituting empty paths would break the launch in
+# a way that is much harder to diagnose than keeping the POSIX paths.
+if $cygwin || $mingw ; then
+  if ! ( \unset -f command; \command -v cygpath ) > /dev/null 2>&1 ; then
+    echo "Warning: cygpath was not found on the PATH, Apache Maven cannot convert paths to the Windows format." >&2
+    echo "Some plugins may misbehave when they receive POSIX paths." >&2
+    cygwin=false
+    mingw=false
+  fi
+fi
 
 ## resolve links - $0 may be a link to Maven's home
 PRG="$0"
@@ -94,7 +117,7 @@ if [ -n "$JAVA_HOME" ] ; then
 
     if [ ! -x "$JAVACMD" ] ; then
       echo "The JAVA_HOME environment variable is not defined correctly, so Apache Maven cannot be started." >&2
-      echo "JAVA_HOME is set to \"$JAVA_HOME\", but \"\$JAVA_HOME/bin/java\" does not exist." >&2
+      printf 'JAVA_HOME is set to "%s", but "$JAVA_HOME/bin/java" does not exist.\n' "$JAVA_HOME" >&2
       exit 1
     fi
   fi
@@ -131,7 +154,7 @@ find_maven_basedir() {
     fi
     wdir=`cd "$wdir/.."; pwd`
   done
-  echo "$basedir"
+  printf '%s\n' "$basedir"
 )
 }
 
@@ -161,7 +184,7 @@ find_file_argument_basedir() {
       found_file_switch=1
     fi
   done
-  echo "$basedir"
+  printf '%s\n' "$basedir"
 )
 }
 
@@ -177,9 +200,10 @@ concat_lines() {
 
     # Debug logging
     if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
-      echo "[DEBUG] Found jvm.config file at: $1" >&2
-      echo "[DEBUG] Running JvmConfigParser with Java: $JAVACMD" >&2
-      echo "[DEBUG] Parser arguments: $MAVEN_HOME/bin/JvmConfigParser.java $1 $MAVEN_PROJECTBASEDIR" >&2
+      printf '[DEBUG] Found jvm.config file at: %s\n' "$1" >&2
+      printf '[DEBUG] Running JvmConfigParser with Java: %s\n' "$JAVACMD" >&2
+      printf '[DEBUG] Parser arguments: %s %s %s\n' \
+        "$MAVEN_HOME/bin/JvmConfigParser.java" "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" >&2
     fi
 
     # Verify Java is available
@@ -190,30 +214,40 @@ concat_lines() {
 
     # Run the parser using source-launch mode
     # Capture both stdout and stderr for comprehensive error reporting
-    parser_output=$("$JAVACMD" "$MAVEN_HOME/bin/JvmConfigParser.java" "$1" "$MAVEN_PROJECTBASEDIR" 2>&1)
+    parser_output=$("$JAVACMD" "$MAVEN_HOME/bin/JvmConfigParser.java" "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" 2>&1)
     parser_exit=$?
 
     if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
       echo "[DEBUG] JvmConfigParser exit code: $parser_exit" >&2
-      echo "[DEBUG] JvmConfigParser output: $parser_output" >&2
+      printf '[DEBUG] JvmConfigParser output: %s\n' "$parser_output" >&2
     fi
 
     if [ $parser_exit -ne 0 ]; then
       # Parser failed - print comprehensive error information
       echo "ERROR: JvmConfigParser failed with exit code $parser_exit" >&2
-      echo "  jvm.config path: $1" >&2
-      echo "  Maven basedir: $MAVEN_PROJECTBASEDIR" >&2
-      echo "  Java command: $JAVACMD" >&2
+      printf '  jvm.config path: %s\n' "$1" >&2
+      printf '  Maven basedir: %s\n' "$MAVEN_PROJECTBASEDIR" >&2
+      printf '  Java command: %s\n' "$JAVACMD" >&2
       echo "  Parser output:" >&2
-      echo "$parser_output" | sed 's/^/    /' >&2
+      printf '%s\n' "$parser_output" | sed 's/^/    /' >&2
       exit 1
     fi
 
-    echo "$parser_output"
+    printf '%s\n' "$parser_output"
   fi
 }
 
 MAVEN_PROJECTBASEDIR="`find_maven_basedir "$@"`"
+
+# Under Cygwin/MinGW the POSIX form of the project base directory is required by
+# the shell (to locate .mvn/jvm.config), while the JVM and everything it hands
+# the value over to (plugins, jvm.config placeholders) expects the native
+# Windows form. Compute the latter upfront and keep both around.
+MAVEN_PROJECTBASEDIR_NATIVE="$MAVEN_PROJECTBASEDIR"
+if $cygwin || $mingw ; then
+  MAVEN_PROJECTBASEDIR_NATIVE=`cygpath --windows "$MAVEN_PROJECTBASEDIR"`
+fi
+
 # Read JVM config and append to MAVEN_OPTS, preserving special characters
 _jvm_config="`concat_lines "$MAVEN_PROJECTBASEDIR/.mvn/jvm.config"`"
 if [ -n "$_jvm_config" ]; then
@@ -224,10 +258,11 @@ if [ -n "$_jvm_config" ]; then
   fi
 fi
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
-  echo "[DEBUG] Final MAVEN_OPTS: $MAVEN_OPTS" >&2
+  printf '[DEBUG] Final MAVEN_OPTS: %s\n' "$MAVEN_OPTS" >&2
 fi
 LAUNCHER_JAR=`echo "$MAVEN_HOME"/boot/plexus-classworlds-*.jar`
 LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
+JLINE_NATIVE_PATH="$MAVEN_HOME/lib/jline-native"
 
 # For Cygwin and MinGW, switch paths to Windows format before running java(1) command
 if $cygwin || $mingw ; then
@@ -236,8 +271,11 @@ if $cygwin || $mingw ; then
   LAUNCHER_JAR=`cygpath --windows "$LAUNCHER_JAR"`
   CLASSWORLDS_CONF=`cygpath --windows "$CLASSWORLDS_CONF"`
   MAVEN_HOME=`cygpath --windows "$MAVEN_HOME"`
-  MAVEN_PROJECTBASEDIR=`cygpath --windows "$MAVEN_PROJECTBASEDIR"`
+  # converted separately, appending to the already converted MAVEN_HOME would
+  # produce a path mixing both separators, e.g. C:\maven/lib/jline-native
+  JLINE_NATIVE_PATH=`cygpath --windows "$JLINE_NATIVE_PATH"`
 fi
+MAVEN_PROJECTBASEDIR="$MAVEN_PROJECTBASEDIR_NATIVE"
 
 handle_args() {
   while [ $# -gt 0 ]; do
@@ -275,7 +313,7 @@ handle_args() {
 handle_args "$@"
 MAVEN_MAIN_CLASS=${MAVEN_MAIN_CLASS:=org.apache.maven.cling.MavenCling}
 
-# Build command string for eval
+# Build base command string for eval (only contains Maven-controlled values)
 cmd="\"$JAVACMD\" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \
@@ -284,19 +322,26 @@ cmd="\"$JAVACMD\" \
   \"-Dclassworlds.conf=$CLASSWORLDS_CONF\" \
   \"-Dmaven.home=$MAVEN_HOME\" \
   \"-Dmaven.mainClass=$MAVEN_MAIN_CLASS\" \
-  \"-Dlibrary.jline.path=${MAVEN_HOME}/lib/jline-native\" \
+  \"-Dlibrary.jline.path=$JLINE_NATIVE_PATH\" \
   \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\" \
-  $LAUNCHER_CLASS \
-  $MAVEN_ARGS"
-
-# Add remaining arguments with proper quoting
-for arg in "$@"; do
-    cmd="$cmd \"$arg\""
-done
+  $LAUNCHER_CLASS"
 
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
   echo "[DEBUG] Launching JVM with command:" >&2
-  echo "[DEBUG]   $cmd" >&2
+  printf '[DEBUG]   %s' "$cmd" >&2
+  if [ "$MAVEN_MAIN_CLASS" = "org.apache.maven.cling.MavenCling" ]; then
+    printf ' %s' "$MAVEN_ARGS" >&2
+  fi
+  printf ' "%s"' "$@" >&2; echo >&2
 fi
 
-eval exec "$cmd"
+# User arguments ("$@") and MAVEN_ARGS are passed outside the eval'd string
+# to preserve literal values (backslashes, ${...} placeholders) without
+# shell re-parsing. Only the base command uses eval for MAVEN_OPTS word splitting.
+# MAVEN_ARGS is only passed for the default Maven build command (MavenCling),
+# not for sub-commands like --up, --enc, or --shell which have their own options.
+if [ "$MAVEN_MAIN_CLASS" = "org.apache.maven.cling.MavenCling" ]; then
+  eval exec "$cmd" '$MAVEN_ARGS' '"$@"'
+else
+  eval exec "$cmd" '"$@"'
+fi

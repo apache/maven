@@ -18,16 +18,16 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.net.InetAddress;
+import java.nio.file.Path;
 import java.util.Map;
 
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -47,19 +47,21 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
 
     private int proxyPort;
 
-    private File testDir;
+    private Path testDir;
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = extractResources("/mng-2387");
-
-        ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
-
-        HandlerList handlers = new HandlerList();
-        handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
+        testDir = extractResources("mng-2387");
 
         server = new Server(0);
+
+        ResourceHandler resourceHandler = new ResourceHandler();
+        resourceHandler.setBaseResource(
+                ResourceFactory.of(server).newResource(testDir.resolve("repo").toAbsolutePath()));
+
+        Handler.Sequence handlers = new Handler.Sequence();
+        handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
+
         server.setHandler(handlers);
         server.start();
         if (server.isFailed()) {
@@ -68,13 +70,15 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
         port = ((NetworkConnector) server.getConnectors()[0]).getLocalPort();
         System.out.println("Bound server socket to the HTTP port " + port);
 
-        resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase(new File(testDir, "proxy").getAbsolutePath());
+        proxyServer = new Server(0);
 
-        handlers = new HandlerList();
+        resourceHandler = new ResourceHandler();
+        resourceHandler.setBaseResource(ResourceFactory.of(proxyServer)
+                .newResource(testDir.resolve("proxy").toAbsolutePath()));
+
+        handlers = new Handler.Sequence();
         handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
 
-        proxyServer = new Server(0);
         proxyServer.setHandler(handlers);
         proxyServer.start();
         if (proxyServer.isFailed()) {
@@ -103,7 +107,7 @@ public class MavenITmng2387InactiveProxyTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testit() throws Exception {
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
 
         Map<String, String> properties = verifier.newDefaultFilterMap();
         properties.put("@host@", InetAddress.getLoopbackAddress().getCanonicalHostName());

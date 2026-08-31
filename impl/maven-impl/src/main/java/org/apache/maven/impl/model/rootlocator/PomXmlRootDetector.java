@@ -18,7 +18,6 @@
  */
 package org.apache.maven.impl.model.rootlocator;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -29,6 +28,7 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.services.model.RootDetector;
+import org.apache.maven.api.xml.XmlService;
 
 @Named
 public class PomXmlRootDetector implements RootDetector {
@@ -37,7 +37,7 @@ public class PomXmlRootDetector implements RootDetector {
         // we're too early to use the modelProcessor ...
         Path pom = dir.resolve("pom.xml");
         try (InputStream is = Files.newInputStream(pom)) {
-            XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(is);
+            XMLStreamReader parser = XmlService.newXMLInputFactory().createXMLStreamReader(is);
             if (parser.nextTag() == XMLStreamReader.START_ELEMENT
                     && parser.getLocalName().equals("project")) {
                 for (int i = 0; i < parser.getAttributeCount(); i++) {

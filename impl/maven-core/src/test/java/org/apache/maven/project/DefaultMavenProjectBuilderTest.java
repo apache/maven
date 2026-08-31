@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.services.ModelSource;
@@ -662,7 +663,7 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    public void testEmptySubprojectsElementPreventsDiscovery() throws Exception {
+    public void testEmptySubprojectsElementDoesNotPreventDiscovery() throws Exception {
         File pom = getTestFile("src/test/resources/projects/subprojects-empty/pom.xml");
         ProjectBuildingRequest configuration = newBuildingRequest();
         InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
@@ -673,16 +674,12 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
                 .setRootDirectory(pom.toPath().getParent());
 
         List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
-        // Should only build the parent project, not discover the child
-        assertEquals(1, results.size());
-        MavenProject parent = results.get(0).getProject();
-        assertEquals("parent", parent.getArtifactId());
-        // The subprojects list should be empty since we explicitly defined an empty <subprojects /> element
-        assertTrue(parent.getModel().getDelegate().getSubprojects().isEmpty());
+        // Empty <subprojects /> no longer prevents discovery; use the property to opt out
+        assertEquals(2, results.size());
     }
 
     @Test
-    public void testEmptyModulesElementPreventsDiscovery() throws Exception {
+    public void testEmptyModulesElementDoesNotPreventDiscovery() throws Exception {
         File pom = getTestFile("src/test/resources/projects/modules-empty/pom.xml");
         ProjectBuildingRequest configuration = newBuildingRequest();
         InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
@@ -693,11 +690,121 @@ class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase {
                 .setRootDirectory(pom.toPath().getParent());
 
         List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
-        // Should only build the parent project, not discover the child
+        // Empty <modules /> no longer prevents discovery; use the property to opt out
+        assertEquals(2, results.size());
+    }
+
+    @Test
+    public void testDiscoverSubprojectsPropertyDisablesDiscovery() throws Exception {
+        File pom = getTestFile("src/test/resources/projects/subprojects-empty/pom.xml");
+        ProjectBuildingRequest configuration = newBuildingRequest();
+        InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
+        InternalMavenSession mavenSession = InternalMavenSession.from(internalSession);
+        mavenSession
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(pom.toPath().getParent());
+        mavenSession.getMavenSession().getUserProperties().put(Constants.MAVEN_PROJECT_DISCOVER_SUBPROJECTS, "false");
+
+        List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
+        // Discovery disabled via property: only the parent project should be built
         assertEquals(1, results.size());
         MavenProject parent = results.get(0).getProject();
         assertEquals("parent", parent.getArtifactId());
-        // The modules list should be empty since we explicitly defined an empty <modules /> element
-        assertTrue(parent.getModel().getDelegate().getModules().isEmpty());
+        assertTrue(parent.getModel().getDelegate().getSubprojects().isEmpty());
+    }
+
+    @Test
+    void testVersionInheritedFromRemoteParent() throws Exception {
+        File f1 = getTestFile("src/test/resources/projects/parent-version-inherited-from-remote/pom.xml");
+        MavenProject project = getProject(f1);
+
+        assertNotNull(project, "project should not be null");
+        assertEquals("1.0", project.getVersion(), "version should be inherited from remote parent");
+        assertNotNull(project.getArtifact(), "project artifact should not be null");
+        assertEquals("1.0", project.getArtifact().getVersion(), "artifact version should match inherited version");
+        assertEquals("org.different.group", project.getGroupId(), "groupId should be from child POM");
+        assertEquals("child-project", project.getArtifactId(), "artifactId should be from child POM");
+    }
+
+    @Test
+    void testVersionInheritedFromRemoteParentMultiModule() throws Exception {
+        File pom = getTestFile("src/test/resources/projects/parent-version-inherited-from-remote-multimodule/pom.xml");
+        ProjectBuildingRequest configuration = newBuildingRequest();
+        InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
+        InternalMavenSession mavenSession = InternalMavenSession.from(internalSession);
+        mavenSession
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(pom.toPath().getParent());
+
+        List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
+        assertEquals(2, results.size());
+
+        MavenProject child = results.stream()
+                .map(ProjectBuildingResult::getProject)
+                .filter(p -> "child-project".equals(p.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(child, "child project should be found");
+        assertEquals("1.0", child.getVersion(), "version should be inherited from remote parent");
+        assertNotNull(child.getArtifact(), "child project artifact should not be null");
+        assertEquals("1.0", child.getArtifact().getVersion(), "artifact version should match inherited version");
+        assertEquals("org.different.group", child.getGroupId(), "groupId should be from child POM");
+    }
+
+    /**
+     * Tests that parent profile source keys use consistent GAV format (groupId:artifactId:version)
+     * across both cache-miss and cache-hit paths in DefaultModelBuilder.readAsParentModel().
+     *
+     * <p>Before the fix, the cache-miss path used ModelProblemUtils.toId() (GAV) while the cache-hit
+     * path used Model.getId() (GAPV, which includes packaging). This meant the same parent's profiles
+     * could appear under different keys depending on build order.
+     */
+    @Test
+    void testParentProfileSourceKeyConsistentAcrossModules() throws Exception {
+        File pom = getTestFile("src/test/resources/projects/multimodule-parent-profiles/pom.xml");
+        ProjectBuildingRequest configuration = newBuildingRequest();
+        configuration.setLocalRepository(getLocalRepository());
+        InternalSession internalSession = InternalSession.from(configuration.getRepositorySession());
+        InternalMavenSession mavenSession = InternalMavenSession.from(internalSession);
+        mavenSession
+                .getMavenSession()
+                .getRequest()
+                .setRootDirectory(pom.toPath().getParent());
+
+        List<ProjectBuildingResult> results = projectBuilder.build(List.of(pom), true, configuration);
+        assertEquals(3, results.size());
+
+        // The parent GAV key (without packaging) that all children should use
+        String parentGav = "org.apache.maven.test:multimodule-parent-profiles:1.0-SNAPSHOT";
+
+        for (ProjectBuildingResult result : results) {
+            MavenProject project = result.getProject();
+            if ("pom".equals(project.getPackaging()) && "multimodule-parent-profiles".equals(project.getArtifactId())) {
+                continue; // skip the parent itself
+            }
+
+            // Verify that the parent profile source key uses GAV format (no packaging component)
+            assertTrue(
+                    project.getInjectedProfileIds().containsKey(parentGav),
+                    "Profile source key for " + project.getArtifactId()
+                            + " should use GAV format '" + parentGav
+                            + "', but found keys: "
+                            + project.getInjectedProfileIds().keySet());
+
+            // Verify the parent-profile was actually tracked
+            assertTrue(
+                    project.getInjectedProfileIds().get(parentGav).contains("parent-profile"),
+                    "parent-profile should be listed under GAV key for " + project.getArtifactId());
+
+            // Verify no GAPV key exists (would include ":pom:" packaging)
+            for (String key : project.getInjectedProfileIds().keySet()) {
+                assertFalse(
+                        key.contains(":pom:"),
+                        "Profile source key for " + project.getArtifactId()
+                                + " should not contain packaging, but found: " + key);
+            }
+        }
     }
 }

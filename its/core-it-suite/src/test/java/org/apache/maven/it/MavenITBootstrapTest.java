@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,9 +38,9 @@ public class MavenITBootstrapTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     public void testBootstrap() throws Exception {
-        File testDir = extractResources("/bootstrap");
+        Path testDir = extractResources("bootstrap");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "remote");
+        Verifier verifier = newVerifier(testDir.toString(), "remote");
         verifier.setAutoclean(false);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

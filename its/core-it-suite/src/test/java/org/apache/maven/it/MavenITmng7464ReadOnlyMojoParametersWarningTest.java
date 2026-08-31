@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Pattern;
@@ -40,9 +40,9 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
      */
     @Test
     public void testEmptyConfiguration() throws Exception {
-        File testDir = extractResources("/mng-7464-mojo-read-only-params");
+        Path testDir = extractResources("mng-7464-mojo-read-only-params");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-empty-configuration.txt");
@@ -62,9 +62,9 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
      */
     @Test
     public void testReadOnlyProperty() throws Exception {
-        File testDir = extractResources("/mng-7464-mojo-read-only-params");
+        Path testDir = extractResources("mng-7464-mojo-read-only-params");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("-Duser.property=value");
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -89,9 +89,9 @@ public class MavenITmng7464ReadOnlyMojoParametersWarningTest extends AbstractMav
      */
     @Test
     public void testReadOnlyConfig() throws Exception {
-        File testDir = extractResources("/mng-7464-mojo-read-only-params");
+        Path testDir = extractResources("mng-7464-mojo-read-only-params");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.setLogFileName("log-read-only-configuration.txt");

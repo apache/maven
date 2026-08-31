@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>45</version>
+    <version>49</version>
     <relativePath />
   </parent>
 
@@ -142,39 +142,38 @@ under the License.
     <maven.site.path>ref/4-LATEST</maven.site.path>
     <project.build.outputTimestamp>2025-06-24T20:18:00Z</project.build.outputTimestamp>
     <!-- various versions -->
-    <asmVersion>9.9.1</asmVersion>
-    <byteBuddyVersion>1.18.2</byteBuddyVersion>
-    <classWorldsVersion>2.9.0</classWorldsVersion>
+    <asmVersion>9.10.1</asmVersion>
+    <byteBuddyVersion>1.18.12</byteBuddyVersion>
+    <classWorldsVersion>2.12.1</classWorldsVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
-    <domtripVersion>0.4.0</domtripVersion>
+    <domtripVersion>1.6.0</domtripVersion>
     <guiceVersion>5.1.0</guiceVersion>
-    <guavaVersion>33.5.0-jre</guavaVersion>
+    <guavaVersion>33.7.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
 
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
-    <jlineVersion>3.30.6</jlineVersion>
+    <jlineVersion>4.4.0</jlineVersion>
     <jmhVersion>1.37</jmhVersion>
-    <junitVersion>6.0.1</junitVersion>
+    <junitVersion>6.1.3</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
-    <logbackClassicVersion>1.5.22</logbackClassicVersion>
-    <mockitoVersion>5.21.0</mockitoVersion>
-    <plexusInteractivityVersion>1.5.1</plexusInteractivityVersion>
-    <plexusInterpolationVersion>1.29</plexusInterpolationVersion>
-    <plexusTestingVersion>2.0.2</plexusTestingVersion>
-    <plexusXmlVersion>4.1.0</plexusXmlVersion>
-    <resolverVersion>2.0.14</resolverVersion>
-    <securityDispatcherVersion>4.1.0</securityDispatcherVersion>
-    <sisuVersion>0.9.0.M4</sisuVersion>
-    <slf4jVersion>2.0.17</slf4jVersion>
-    <stax2ApiVersion>4.2.2</stax2ApiVersion>
+    <logbackClassicVersion>1.6.3</logbackClassicVersion>
+    <mockitoVersion>5.23.0</mockitoVersion>
+    <plexusInteractivityVersion>1.6.0</plexusInteractivityVersion>
+    <plexusInterpolationVersion>1.30.0</plexusInterpolationVersion>
+    <plexusTestingVersion>2.2.0</plexusTestingVersion>
+    <plexusXmlVersion>4.2.0</plexusXmlVersion>
+    <resolverVersion>2.0.22</resolverVersion>
+    <securityDispatcherVersion>4.2.0</securityDispatcherVersion>
+    <sisuVersion>1.1.0</sisuVersion>
+    <slf4jVersion>2.0.18</slf4jVersion>
+    <stax2ApiVersion>4.3.0</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
-    <woodstoxVersion>7.1.1</woodstoxVersion>
-    <xmlunitVersion>2.11.0</xmlunitVersion>
+    <woodstoxVersion>7.2.2</woodstoxVersion>
+    <xmlunitVersion>2.13.0</xmlunitVersion>
     <jacocoArgLine />
-
-    <version.spotless-maven-plugin>3.0.0</version.spotless-maven-plugin>
-    <version.palantirJavaFormat>2.80.0</version.palantirJavaFormat>
+    <argLine.xmx>-Xmx256m</argLine.xmx>
+    <argLine.mockito />
 
     <!-- Set as system property in surefire/failsafe to propagate to tests and IT Verifier -->
     <toolboxVersion>0.14.1</toolboxVersion>
@@ -510,6 +509,11 @@ under the License.
         <optional>true</optional>
       </dependency>
       <dependency>
+        <groupId>org.slf4j</groupId>
+        <artifactId>jul-to-slf4j</artifactId>
+        <version>${slf4jVersion}</version>
+      </dependency>
+      <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
         <version>${logbackClassicVersion}</version>
@@ -668,7 +672,7 @@ under the License.
       <dependency>
         <groupId>com.google.jimfs</groupId>
         <artifactId>jimfs</artifactId>
-        <version>1.3.1</version>
+        <version>1.3.2</version>
       </dependency>
 
       <dependency>
@@ -681,10 +685,11 @@ under the License.
         <artifactId>jmh-generator-annprocess</artifactId>
         <version>${jmhVersion}</version>
       </dependency>
+      <!-- Keep version in sync with MIMIR_VERSION in .github/workflows/maven.yml -->
       <dependency>
         <groupId>eu.maveniverse.maven.mimir</groupId>
         <artifactId>testing</artifactId>
-        <version>0.10.6</version>
+        <version>0.12.1</version>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
@@ -699,7 +704,7 @@ under the License.
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
             <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
-            <argLine>-Xmx256m @{jacocoArgLine}</argLine>
+            <argLine>${argLine.xmx} @{jacocoArgLine} ${argLine.mockito}</argLine>
             <systemPropertyVariables combine.children="append">
               <version.toolbox>${toolboxVersion}</version.toolbox>
             </systemPropertyVariables>
@@ -710,7 +715,7 @@ under the License.
           <artifactId>maven-failsafe-plugin</artifactId>
           <configuration>
             <forkNode implementation="org.apache.maven.plugin.surefire.extensions.SurefireForkNodeFactory" />
-            <argLine>-Xmx256m @{jacocoArgLine}</argLine>
+            <argLine>${argLine.xmx} @{jacocoArgLine} ${argLine.mockito}</argLine>
             <systemPropertyVariables combine.children="append">
               <version.toolbox>${toolboxVersion}</version.toolbox>
             </systemPropertyVariables>
@@ -720,7 +725,7 @@ under the License.
         <plugin>
           <groupId>com.github.siom79.japicmp</groupId>
           <artifactId>japicmp-maven-plugin</artifactId>
-          <version>0.25.0</version>
+          <version>0.26.1</version>
           <executions>
             <execution>
               <goals>
@@ -746,6 +751,11 @@ under the License.
           <version>3.6.1</version>
         </plugin>
         <plugin>
+          <groupId>org.codehaus.modello</groupId>
+          <artifactId>modello-maven-plugin</artifactId>
+          <version>2.8.0</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
           <configuration>
@@ -755,7 +765,7 @@ under the License.
         <plugin>
           <groupId>org.codehaus.mojo</groupId>
           <artifactId>buildnumber-maven-plugin</artifactId>
-          <version>3.2.1</version>
+          <version>3.3.0</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
@@ -769,7 +779,7 @@ under the License.
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.8.14</version>
+          <version>0.8.15</version>
           <configuration>
             <excludes>
               <exclude>**/org/apache/maven/it/**</exclude>
@@ -788,7 +798,7 @@ under the License.
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-core</artifactId>
-              <version>7.19.0</version>
+              <version>7.26.0</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -803,6 +813,30 @@ under the License.
               <version>${asmVersion}</version>
             </dependency>
           </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.rat</groupId>
+          <artifactId>apache-rat-plugin</artifactId>
+          <configuration>
+            <excludes>
+              <exclude>Jenkinsfile</exclude>
+              <exclude>**/.gitattributes</exclude>
+              <exclude>src/main/resources/META-INF/services/**</exclude>
+              <exclude>src/test/resources*/**</exclude>
+              <exclude>src/test/projects/**</exclude>
+              <exclude>src/test/remote-repo/**</exclude>
+              <exclude>its/**</exclude>
+              <exclude>**/*.odg</exclude>
+              <exclude>**/*.svg</exclude>
+              <exclude>.asf.yaml</exclude>
+              <exclude>.mvn/**</exclude>
+              <exclude>.jbang/**</exclude>
+              <!--
+                ! Excluded the license files itself cause they do not have a license of themselves.
+              -->
+              <exclude>src/main/appended-resources/licenses/**</exclude>
+            </excludes>
+          </configuration>
         </plugin>
       </plugins>
     </pluginManagement>
@@ -825,37 +859,6 @@ under the License.
             lifecycle.</charter>
           </asfExtOptions>
         </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.rat</groupId>
-        <artifactId>apache-rat-plugin</artifactId>
-        <executions>
-          <execution>
-            <id>rat-check</id>
-            <inherited>false</inherited>
-            <configuration>
-              <excludes>
-                <exclude>Jenkinsfile</exclude>
-                <exclude>**/.gitattributes</exclude>
-                <exclude>src/test/resources*/**</exclude>
-                <exclude>src/test/projects/**</exclude>
-                <exclude>src/test/remote-repo/**</exclude>
-                <exclude>its/**</exclude>
-                <exclude>**/*.odg</exclude>
-                <exclude>**/*.svg</exclude>
-                <exclude>.asf.yaml</exclude>
-                <exclude>.mvn/**</exclude>
-                <exclude>.jbang/**</exclude>
-                <!--
-                  ! Excluded the license files itself cause they do not have have a license of themselves.
-                -->
-                <exclude>src/main/appended-resources/licenses/EPL-1.0.txt</exclude>
-                <exclude>src/main/appended-resources/licenses/unrecognized-aopalliance-1.0.txt</exclude>
-                <exclude>src/main/appended-resources/licenses/unrecognized-javax.annotation-api-1.3.2.txt</exclude>
-              </excludes>
-            </configuration>
-          </execution>
-        </executions>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
@@ -954,19 +957,9 @@ under the License.
           <name>org.mockito:mockito-core:jar</name>
         </property>
       </activation>
-      <build>
-        <pluginManagement>
-          <plugins>
-            <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-surefire-plugin</artifactId>
-              <configuration>
-                <argLine>-Xmx256m -javaagent:${org.mockito:mockito-core:jar}</argLine>
-              </configuration>
-            </plugin>
-          </plugins>
-        </pluginManagement>
-      </build>
+      <properties>
+        <argLine.mockito>-javaagent:@{org.mockito:mockito-core:jar}</argLine.mockito>
+      </properties>
     </profile>
     <profile>
       <id>graph</id>
@@ -1021,64 +1014,84 @@ under the License.
               </execution>
             </executions>
           </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>maven-configuration</id>
+      <activation>
+        <property>
+          <name>skipConfiguration</name>
+          <value>!true</value>
+        </property>
+      </activation>
+      <build>
+        <plugins>
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
-            <version>3.6.2</version>
+            <version>3.6.3</version>
             <inherited>false</inherited>
+            <configuration>
+              <additionalClasspathElements>
+                <additionalClasspathElement>${project.basedir}/src/configuration-templates</additionalClasspathElement>
+              </additionalClasspathElements>
+              <includePluginDependencies>true</includePluginDependencies>
+              <!-- https://maven.apache.org/resolver/maven-resolver-tools/apidocs/org/eclipse/aether/tools/CollectConfiguration.html -->
+              <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
+            </configuration>
             <dependencies>
+              <!-- https://maven.apache.org/resolver/maven-resolver-tools/ that contains the invoked class -->
               <dependency>
                 <groupId>org.apache.maven.resolver</groupId>
                 <artifactId>maven-resolver-tools</artifactId>
                 <version>${resolverVersion}</version>
               </dependency>
+              <dependency>
+                <!-- we need a dependency on maven-api-annotations to be able to load org.apache.maven.api.annotations.Config class -->
+                <groupId>org.apache.maven</groupId>
+                <artifactId>maven-api-annotations</artifactId>
+                <!-- use previous version to avoid dependency cycles -->
+                <version>4.0.0-rc-6</version>
+              </dependency>
             </dependencies>
             <executions>
               <execution>
-                <id>render-configuration-page</id>
+                <id>render-maven-configuration-md</id>
                 <goals>
                   <goal>java</goal>
                 </goals>
                 <phase>pre-site</phase>
                 <configuration>
-                  <additionalClasspathElements>
-                    <additionalClasspathElement>${project.basedir}/src/configuration-templates</additionalClasspathElement>
-                  </additionalClasspathElements>
-                  <includePluginDependencies>true</includePluginDependencies>
-                  <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
                   <arguments>
                     <argument>--mode=maven</argument>
                     <!--
                     TODO: templates are loaded from classpath, in "normal" JAR project local template would override docgen one,
                     but in this case the packaging=pom all I could do is use additionalClasspathElement that APPENDS classpath,
-                    hence template is renamed to maven-configuration.md.vm, to avoid conflict (and picking up resolver template)
+                    hence template is renamed to configuration.xml.vm, to avoid conflict (and picking up resolver template)
                     -->
-                    <argument>--templates=maven-configuration.md</argument>
-                    <argument>${project.basedir}</argument>
-                    <argument>${project.build.directory}/generated-site/markdown</argument>
+                    <argument>--templates=configuration.xml</argument>
+                    <!-- only look at maven-api-core, as it only contains configuration class org.apache.maven.api.Constants  -->
+                    <argument>${project.basedir}/api/maven-api-core</argument>
+                    <argument>${project.build.directory}/generated-site/xdoc</argument>
                   </arguments>
                 </configuration>
               </execution>
               <execution>
-                <id>render-configuration-properties</id>
+                <id>render-configuration-properties+yaml</id>
                 <goals>
                   <goal>java</goal>
                 </goals>
                 <phase>pre-site</phase>
                 <configuration>
-                  <additionalClasspathElements>
-                    <additionalClasspathElement>${project.basedir}/src/configuration-templates</additionalClasspathElement>
-                  </additionalClasspathElements>
-                  <includePluginDependencies>true</includePluginDependencies>
-                  <mainClass>org.eclipse.aether.tools.CollectConfiguration</mainClass>
                   <arguments>
                     <argument>--mode=maven</argument>
                     <!--
                     TODO: add feature to resolver-tools to allow multiple output directory for different templates
                     to avoid double execution
                     -->
-                    <argument>--templates=configuration.properties,configuration.yaml</argument>
-                    <argument>${project.basedir}</argument>
+                    <argument>--templates=configuration.yaml</argument>
+                    <argument>${project.basedir}/api/maven-api-core</argument>
                     <argument>${project.build.directory}/generated-site/resources</argument>
                   </arguments>
                 </configuration>
@@ -1101,6 +1114,26 @@ under the License.
                 <configuration>
                   <!-- we have a dedicated distribution module -->
                   <skipAssembly>true</skipAssembly>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>push-to-atr</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.tooling</groupId>
+            <artifactId>atr-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>upload-to-atr</id>
+                <configuration>
+                  <!-- we have a dedicated distribution module -->
+                  <skip>true</skip>
                 </configuration>
               </execution>
             </executions>
@@ -1220,13 +1253,15 @@ under the License.
     </profile>
     <profile>
       <id>jacoco</id>
+      <properties>
+        <argLine.xmx>-Xmx1G</argLine.xmx>
+      </properties>
       <build>
         <plugins>
           <plugin>
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-surefire-plugin</artifactId>
             <configuration>
-              <argLine>-Xmx1G @{jacocoArgLine}</argLine>
               <reportsDirectory>${project.build.directory}/test-results-surefire</reportsDirectory>
             </configuration>
           </plugin>

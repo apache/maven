@@ -134,11 +134,9 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
             if (newDir != oldDir) {
                 source = source.withDirectory(newDir);
             }
-            oldDir = source.getTargetPath();
-            newDir = alignToBaseDirectory(oldDir, basedir);
-            if (newDir != oldDir) {
-                source = source.withTargetPath(newDir);
-            }
+            // Note: targetPath is intentionally NOT aligned to basedir.
+            // It is relative to the output directory (target/classes or target/test-classes),
+            // not to the project base directory. See maven.mdo Source.targetPath documentation.
         }
         return source;
     }

@@ -18,6 +18,7 @@
  */
 package org.apache.maven.toolchain.java;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.toolchain.Toolchain;
 
 /**
@@ -27,4 +28,8 @@ import org.apache.maven.toolchain.Toolchain;
  * @deprecated Use {@link org.apache.maven.api.JavaToolchain} instead.
  */
 @Deprecated(since = "4.0.0")
-public interface JavaToolchain extends Toolchain {}
+public interface JavaToolchain extends Toolchain {
+    String getJavaHome();
+
+    ArtifactVersion getJavaVersion();
+}

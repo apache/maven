@@ -108,7 +108,12 @@ public record DefaultSourceRoot(
         this.includes = (includes != null) ? List.copyOf(includes) : List.of();
         this.excludes = (excludes != null) ? List.copyOf(excludes) : List.of();
         this.stringFiltering = stringFiltering;
-        this.targetPathOrNull = (targetPathOrNull != null) ? targetPathOrNull.normalize() : null;
+        if (targetPathOrNull != null) {
+            Path normalized = targetPathOrNull.normalize();
+            this.targetPathOrNull = normalized.toString().isEmpty() ? null : normalized;
+        } else {
+            this.targetPathOrNull = null;
+        }
         this.enabled = enabled;
     }
 

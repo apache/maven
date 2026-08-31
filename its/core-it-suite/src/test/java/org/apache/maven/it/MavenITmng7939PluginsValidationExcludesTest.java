@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -37,9 +37,9 @@ class MavenITmng7939PluginsValidationExcludesTest extends AbstractMavenIntegrati
 
     @Test
     void warningForPluginValidationIsPresentInProject() throws Exception {
-        File testDir = extractResources("/mng-7939-plugins-validation-excludes");
+        Path testDir = extractResources("mng-7939-plugins-validation-excludes");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName("with-warning-log.txt");
         verifier.deleteDirectory("target");
@@ -63,9 +63,9 @@ class MavenITmng7939PluginsValidationExcludesTest extends AbstractMavenIntegrati
 
     @Test
     void excludePluginFromValidation() throws Exception {
-        File testDir = extractResources("/mng-7939-plugins-validation-excludes");
+        Path testDir = extractResources("mng-7939-plugins-validation-excludes");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName("without-warning-log.txt");
         verifier.deleteDirectory("target");

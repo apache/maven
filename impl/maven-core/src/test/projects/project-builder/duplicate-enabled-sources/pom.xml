@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tests duplicate handling with the enabled discriminator.
+
+  Expected behavior:
+  - Same (lang, scope, module, directory) with enabled=true appearing twice should trigger a WARNING
+  - Same identity with enabled=false is harmless (explicitly disabled)
+  - First enabled=true entry wins and defines the effective configuration
+-->
+<project xmlns="http://maven.apache.org/POM/4.1.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
+
+    <groupId>org.apache.maven.tests</groupId>
+    <artifactId>duplicate-enabled-sources-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <build>
+        <sources>
+            <!-- First enabled source for module (this should win) -->
+            <source>
+                <scope>main</scope>
+                <lang>java</lang>
+                <module>com.example.dup</module>
+                <enabled>true</enabled>
+            </source>
+            <!-- Duplicate enabled source for same module (implicit directory) - should trigger WARNING -->
+            <source>
+                <scope>main</scope>
+                <lang>java</lang>
+                <module>com.example.dup</module>
+                <enabled>true</enabled>
+            </source>
+            <!-- Disabled source for same module - this is harmless -->
+            <source>
+                <scope>main</scope>
+                <lang>java</lang>
+                <module>com.example.dup</module>
+                <enabled>false</enabled>
+            </source>
+            <!-- Different module - should be added normally -->
+            <source>
+                <scope>main</scope>
+                <lang>java</lang>
+                <module>com.example.other</module>
+            </source>
+            <!-- Test scope duplicate scenario -->
+            <source>
+                <scope>test</scope>
+                <lang>java</lang>
+                <module>com.example.dup</module>
+                <enabled>true</enabled>
+            </source>
+            <source>
+                <scope>test</scope>
+                <lang>java</lang>
+                <module>com.example.dup</module>
+                <enabled>true</enabled>
+            </source>
+        </sources>
+    </build>
+</project>

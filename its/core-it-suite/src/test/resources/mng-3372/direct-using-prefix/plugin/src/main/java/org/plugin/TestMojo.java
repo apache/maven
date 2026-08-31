@@ -26,19 +26,14 @@ import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Parameter;
 
-/**
- * @goal test
- */
+@org.apache.maven.plugins.annotations.Mojo(name = "test")
 public class TestMojo implements Mojo {
 
     private Log log;
 
-    /**
-     * @parameter default-value="${project.build.directory}"
-     * @required
-     * @readonly
-     */
+    @Parameter(defaultValue = "${project.build.directory}", required = true, readonly = true)
     private File buildDir;
 
     public void execute() throws MojoExecutionException, MojoFailureException {

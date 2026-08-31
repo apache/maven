@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
@@ -44,9 +44,9 @@ public class MavenITmng4666CoreRealmImportTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4666");
+        Path testDir = extractResources("mng-4666");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven", "maven-model", "0.1-stub");

@@ -51,12 +51,17 @@ public class DefaultReportingConverter implements ReportingConverter {
     private final InputLocation location;
 
     {
-        String modelId = "org.apache.maven:maven-model-builder:"
-                + this.getClass().getPackage().getImplementationVersion() + ":reporting-converter";
+        String modelId =
+                "org.apache.maven:maven-model-builder:" + getImplementationVersion(getClass()) + ":reporting-converter";
         InputSource inputSource = new InputSource();
         inputSource.setModelId(modelId);
         location = new InputLocation(-1, -1, inputSource);
         location.setLocation(0, location);
+    }
+
+    static String getImplementationVersion(Class<?> clazz) {
+        Package packageInfo = clazz.getPackage();
+        return packageInfo != null ? packageInfo.getImplementationVersion() : null;
     }
 
     @Override

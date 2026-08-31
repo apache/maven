@@ -285,6 +285,25 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     @Test
+    void testMultilineLogicalAndCondition() {
+        Profile profile = newProfile("""
+                ${os.name} == 'windows'
+                && ${os.arch} != 'amd64'
+                && inrange(${os.version}, '[99,)')""");
+
+        assertActivation(false, profile, newContext(null, newOsProperties("linux", "6.5.0-1014-aws", "amd64")));
+        assertActivation(false, profile, newContext(null, newOsProperties("windows", "1", "aarch64")));
+        assertActivation(false, profile, newContext(null, newOsProperties("windows", "99", "amd64")));
+        assertActivation(true, profile, newContext(null, newOsProperties("windows", "99", "aarch64")));
+    }
+
+    @Test
+    void testLogicalOperatorsWithWhitespace() {
+        assertActivation(true, newProfile("false\r\n||\ttrue"), newContext(null, null));
+        assertActivation(false, newProfile("true\r\n&&\tfalse"), newContext(null, null));
+    }
+
+    @Test
     public void testOsCapitalName() {
         Profile profile = newProfile("lower(${os.name}) == 'mac os x'");
 
@@ -470,5 +489,81 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
 
     protected ProfileActivationContext newFileContext() {
         return newFileContext(tempDir);
+    }
+
+    // -----------------------------------------------------------------------
+    // executable() tests (MNG-8768)
+    // -----------------------------------------------------------------------
+
+    /**
+     * Puts a fake executable into a temporary directory and activates a profile only when
+     * that directory is on the PATH – confirming the PATH-search logic end-to-end.
+     */
+    @Test
+    void testExecutablePresentInPath() throws Exception {
+        // Create a fake executable in the temp dir
+        Path fakeExec = tempDir.resolve("my-fake-tool");
+        Files.createFile(fakeExec);
+        // Make it executable on POSIX systems; on Windows Files.isExecutable() returns true anyway
+        fakeExec.toFile().setExecutable(true);
+
+        String pathValue = tempDir.toAbsolutePath().toString();
+        Map<String, String> sysProps = Map.of("env.PATH", pathValue);
+
+        Profile profile = newProfile("executable('my-fake-tool')");
+        assertActivation(true, profile, newContext(null, sysProps));
+    }
+
+    /**
+     * Verifies that the function returns false for a name that is definitely not on PATH.
+     */
+    @Test
+    void testExecutableNotInPath() {
+        // Use an empty/nonexistent PATH so that nothing can be found
+        Map<String, String> sysProps = Map.of("env.PATH", "");
+
+        Profile profile = newProfile("executable('this-tool-does-not-exist-anywhere-42')");
+        assertActivation(false, profile, newContext(null, sysProps));
+    }
+
+    /**
+     * An absolute path to an existing executable file must resolve to true.
+     */
+    @Test
+    void testExecutableWithAbsolutePath() throws Exception {
+        Path fakeExec = tempDir.resolve("abs-tool");
+        Files.createFile(fakeExec);
+        fakeExec.toFile().setExecutable(true);
+
+        String absPath = fakeExec.toAbsolutePath().toString();
+        Profile profile = newProfile("executable('" + absPath + "')");
+
+        // PATH content does not matter for absolute paths
+        assertActivation(true, profile, newContext(null, Map.of("env.PATH", "")));
+    }
+
+    /**
+     * An absolute path to a non-existent file must resolve to false.
+     */
+    @Test
+    void testExecutableAbsolutePathMissing() {
+        Profile profile = newProfile("executable('/no/such/executable/path/42/bin/tool')");
+        assertActivation(false, profile, newContext(null, Map.of("env.PATH", "")));
+    }
+
+    /**
+     * not(executable(...)) must invert the result correctly.
+     */
+    @Test
+    void testExecutableNegated() throws Exception {
+        Path fakeExec = tempDir.resolve("neg-tool");
+        Files.createFile(fakeExec);
+        fakeExec.toFile().setExecutable(true);
+
+        String pathValue = tempDir.toAbsolutePath().toString();
+        Map<String, String> sysProps = Map.of("env.PATH", pathValue);
+
+        assertActivation(false, newProfile("not(executable('neg-tool'))"), newContext(null, sysProps));
+        assertActivation(true, newProfile("not(executable('no-such-neg-tool'))"), newContext(null, sysProps));
     }
 }

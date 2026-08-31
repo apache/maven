@@ -36,9 +36,11 @@ import org.apache.maven.api.Dependency;
 import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathType;
+import org.apache.maven.api.Type;
 import org.apache.maven.api.services.DependencyResolverException;
 import org.apache.maven.api.services.DependencyResolverRequest;
 import org.apache.maven.api.services.DependencyResolverResult;
+import org.apache.maven.impl.resolver.artifact.MavenArtifactProperties;
 
 /**
  * The result of collecting dependencies with a dependency resolver.
@@ -320,6 +322,52 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
             }
         }
         addPathElement(cache.selectPathType(pathTypes, filter, path).orElse(PathType.UNRESOLVED), path);
+        // If the artifact is also needed on a processor path (because it's a transitive dep
+        // of a processor AND a direct dep with a different type), add it to the processor path too.
+        addProcessorPathIfNeeded(node, filter, path);
+    }
+
+    /**
+     * Checks if the artifact has a {@link MavenArtifactProperties#PROCESSOR_TYPE} property
+     * and, if so, also adds it to the corresponding processor path. This handles the case
+     * where an artifact is both a regular dependency (e.g., modular-jar on --module-path)
+     * and a transitive dependency of a processor (needs --processor-module-path).
+     */
+    private void addProcessorPathIfNeeded(Node node, Predicate<PathType> filter, Path path) throws IOException {
+        if (!(node instanceof AbstractNode abstractNode)) {
+            return;
+        }
+        org.eclipse.aether.artifact.Artifact aetherArtifact =
+                abstractNode.getDependencyNode().getArtifact();
+        if (aetherArtifact == null) {
+            return;
+        }
+        String processorType = aetherArtifact.getProperty(MavenArtifactProperties.PROCESSOR_TYPE, null);
+        if (processorType == null) {
+            return;
+        }
+        Set<PathType> processorPathTypes = processorPathTypesFor(processorType);
+        if (processorPathTypes != null) {
+            cache.selectPathType(processorPathTypes, filter, path).ifPresent(pt -> addPathElement(pt, path));
+        }
+    }
+
+    // Path type sets for processor types — must stay in sync with DefaultTypeProvider
+    private static final Set<PathType> PROCESSOR_PATH_TYPES =
+            Set.of(JavaPathType.PROCESSOR_CLASSES, JavaPathType.PROCESSOR_MODULES);
+    private static final Set<PathType> CLASSPATH_PROCESSOR_PATH_TYPES = Set.of(JavaPathType.PROCESSOR_CLASSES);
+    private static final Set<PathType> MODULAR_PROCESSOR_PATH_TYPES = Set.of(JavaPathType.PROCESSOR_MODULES);
+
+    /**
+     * Maps a processor type ID to its corresponding path types.
+     */
+    private static Set<PathType> processorPathTypesFor(String processorType) {
+        return switch (processorType) {
+            case Type.PROCESSOR -> PROCESSOR_PATH_TYPES;
+            case Type.CLASSPATH_PROCESSOR -> CLASSPATH_PROCESSOR_PATH_TYPES;
+            case Type.MODULAR_PROCESSOR -> MODULAR_PROCESSOR_PATH_TYPES;
+            default -> null;
+        };
     }
 
     /**

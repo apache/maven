@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,15 +34,15 @@ class MavenITmng8385PropertyContributoSPITest extends AbstractMavenIntegrationTe
      */
     @Test
     void testIt() throws Exception {
-        File testDir = extractResources("/mng-8385");
+        Path testDir = extractResources("mng-8385");
         Verifier verifier;
 
-        verifier = newVerifier(new File(testDir, "spi-extension").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("spi-extension"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "spi-consumer").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("spi-consumer"));
         verifier.addCliArgument("validate");
         verifier.addCliArgument("-X");
         verifier.execute();

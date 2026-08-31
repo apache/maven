@@ -31,6 +31,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
@@ -108,8 +111,103 @@ class DefaultBeanConfiguratorTest {
         assertEquals(new File("test"), bean.file);
     }
 
+    @Test
+    void testSealedTypeImplementationHintCanUseSimpleName() throws BeanConfigurationException {
+        SealedBean bean = new SealedBean();
+
+        Xpp3Dom config = toConfig("<artifact implementation=\"LocalArtifact\"><name>local</name></artifact>");
+
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        configurator.configureBean(request);
+
+        LocalArtifact artifact = assertInstanceOf(LocalArtifact.class, bean.artifact);
+        assertEquals("local", artifact.name);
+    }
+
+    @Test
+    void testSealedTypeImplementationHintCanStillUseClassName() throws BeanConfigurationException {
+        SealedBean bean = new SealedBean();
+
+        Xpp3Dom config = toConfig("<artifact implementation=\"" + RemoteArtifact.class.getName()
+                + "\"><url>https://example.invalid/artifact</url></artifact>");
+
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        configurator.configureBean(request);
+
+        RemoteArtifact artifact = assertInstanceOf(RemoteArtifact.class, bean.artifact);
+        assertEquals("https://example.invalid/artifact", artifact.url);
+    }
+
+    @Test
+    void testSealedTypeImplementationHintMustMatchPermittedSubclass() {
+        SealedBean bean = new SealedBean();
+
+        Xpp3Dom config = toConfig("<artifact implementation=\"MissingArtifact\"><name>missing</name></artifact>");
+
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        BeanConfigurationException e =
+                assertThrows(BeanConfigurationException.class, () -> configurator.configureBean(request));
+        assertTrue(e.getMessage()
+                .contains("Cannot find permitted subclass 'MissingArtifact' for sealed type "
+                        + SealedArtifact.class.getName()));
+    }
+
+    @Test
+    void testSealedTypeAmbiguousSimpleNameThrowsError() {
+        AmbiguousBean bean = new AmbiguousBean();
+
+        Xpp3Dom config = toConfig("<value implementation=\"Ambiguous\"/>");
+
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        BeanConfigurationException e =
+                assertThrows(BeanConfigurationException.class, () -> configurator.configureBean(request));
+        assertTrue(e.getMessage().contains("is ambiguous for sealed type " + AmbiguousSealedType.class.getName()));
+    }
+
     static class SomeBean {
 
         File file;
+    }
+
+    static class SealedBean {
+
+        SealedArtifact artifact;
+    }
+
+    static class AmbiguousBean {
+
+        AmbiguousSealedType value;
+    }
+
+    public sealed interface SealedArtifact permits LocalArtifact, RemoteArtifact {}
+
+    public sealed interface AmbiguousSealedType permits Holder1.Ambiguous, Holder2.Ambiguous {}
+
+    public static final class LocalArtifact implements SealedArtifact {
+
+        String name;
+    }
+
+    public static final class RemoteArtifact implements SealedArtifact {
+
+        String url;
+    }
+
+    public static final class Holder1 {
+
+        public static final class Ambiguous implements AmbiguousSealedType {}
+    }
+
+    public static final class Holder2 {
+
+        public static final class Ambiguous implements AmbiguousSealedType {}
     }
 }

@@ -1,0 +1,31 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.test</groupId>
+  <artifactId>parent-pom</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <repositories>
+    <repository>
+      <id>staging</id>
+      <url>https://repository.example.org/staging</url>
+    </repository>
+  </repositories>
+
+  <profiles>
+    <profile>
+      <id>nightly</id>
+      <activation>
+        <property>
+          <name>nightly</name>
+        </property>
+      </activation>
+      <repositories>
+        <repository>
+          <id>${uninterpolatedRepoId}</id>
+          <url>file://${SNAPSHOTS_PATH}</url>
+        </repository>
+      </repositories>
+    </profile>
+  </profiles>
+</project>

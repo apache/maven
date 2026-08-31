@@ -34,6 +34,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 import java.util.regex.Matcher;
@@ -83,13 +84,17 @@ public class DefaultModelValidator implements ModelValidator {
 
     private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
 
+    private static final String ILLEGAL_RELATIVE_PATH_CHARS = ":\"<>|?*";
+
     private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_FS_CHARS;
 
     private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_FS_CHARS;
 
     private static final String EMPTY = "";
 
-    private final Set<String> validIds = new HashSet<>();
+    // Thread-safe set required because class is @Singleton and validIds is accessed concurrently
+    // See: https://github.com/apache/maven/issues/11618
+    private final Set<String> validIds = ConcurrentHashMap.newKeySet();
 
     private ModelVersionProcessor versionProcessor;
 
@@ -153,6 +158,25 @@ public class DefaultModelValidator implements ModelValidator {
             }
         } else if (request.getValidationLevel() >= ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0) {
             Severity errOn30 = getSeverity(request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
+            Severity errOn31 = getSeverity(request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1);
+
+            // [MNG-8129] Validate that relativePath does not contain characters reserved on Windows (NTFS).
+            // These cause InvalidPathException when resolved via java.nio.file.Path, and typically
+            // indicate the user put a GAV coordinate (e.g. "g:a:v") instead of an actual filesystem path.
+            if (parent != null
+                    && parent.getRelativePath() != null
+                    && !parent.getRelativePath().isEmpty()) {
+                validateBannedCharacters(
+                        "parent.",
+                        "relativePath",
+                        problems,
+                        errOn31,
+                        Version.V20,
+                        parent.getRelativePath(),
+                        null,
+                        parent,
+                        ILLEGAL_RELATIVE_PATH_CHARS);
+            }
 
             // [MNG-6074] Maven should produce an error if no model version has been set in a POM file used to build an
             // effective model.
@@ -1125,7 +1149,7 @@ public class DefaultModelValidator implements ModelValidator {
             String id,
             String sourceHint,
             InputLocationTracker tracker) {
-        if (validIds.contains(id)) {
+        if (id != null && validIds.contains(id)) {
             return true;
         }
         if (!validateStringNotEmpty(prefix, fieldName, problems, severity, version, id, sourceHint, tracker)) {
@@ -1148,6 +1172,9 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private boolean isValidId(String id) {
+        if (isPathTraversalSegment(id)) {
+            return false;
+        }
         for (int i = 0; i < id.length(); i++) {
             char c = id.charAt(i);
             if (!isValidIdCharacter(c)) {
@@ -1155,6 +1182,16 @@ public class DefaultModelValidator implements ModelValidator {
             }
         }
         return true;
+    }
+
+    /**
+     * {@code .} and {@code ..} pass the allowed-character checks, but the default local repository layout uses
+     * ids and versions verbatim as directory names, so these values map onto the {@code .} and {@code ..}
+     * filesystem path segments and escape the coordinate's directory. They are rejected because of that mapping,
+     * not because the names themselves are otherwise invalid.
+     */
+    private static boolean isPathTraversalSegment(String id) {
+        return ".".equals(id) || "..".equals(id);
     }
 
     private boolean isValidIdCharacter(char c) {
@@ -1190,6 +1227,9 @@ public class DefaultModelValidator implements ModelValidator {
     }
 
     private boolean isValidIdWithWildCards(String id) {
+        if (isPathTraversalSegment(id)) {
+            return false;
+        }
         for (int i = 0; i < id.length(); i++) {
             char c = id.charAt(i);
             if (!isValidIdWithWildCardCharacter(c)) {
@@ -1630,6 +1670,18 @@ public class DefaultModelValidator implements ModelValidator {
         }
 
         if (hasExpression(string)) {
+            addViolation(
+                    problems,
+                    severity,
+                    version,
+                    prefix + fieldName,
+                    sourceHint,
+                    "must be a valid version but is '" + string + "'.",
+                    tracker);
+            return false;
+        }
+
+        if (isPathTraversalSegment(string)) {
             addViolation(
                     problems,
                     severity,

@@ -291,8 +291,8 @@ class ModelUpgradeStrategyTest {
             assertNotNull(subprojects);
 
             // Verify module elements were renamed to subproject
-            var moduleElements = subprojects.children("module").toList();
-            var subprojectElements = subprojects.children("subproject").toList();
+            var moduleElements = subprojects.childElements("module").toList();
+            var subprojectElements = subprojects.childElements("subproject").toList();
             assertEquals(0, moduleElements.size());
             assertEquals(2, subprojectElements.size());
 
@@ -473,161 +473,168 @@ class ModelUpgradeStrategyTest {
 
         private void verifyCleanPluginPhases(Document document) {
             Element root = document.root();
-            Element build = root.child("build").orElse(null);
-            Element plugins = build.child("plugins").orElse(null);
+            Element build = root.childElement("build").orElse(null);
+            Element plugins = build.childElement("plugins").orElse(null);
 
-            Element cleanPlugin = plugins.children("plugin")
+            Element cleanPlugin = plugins.childElements("plugin")
                     .filter(p -> "maven-clean-plugin"
-                            .equals(p.child("artifactId").orElse(null).textContent()))
+                            .equals(p.childElement("artifactId").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(cleanPlugin);
 
-            Element cleanExecutions = cleanPlugin.child("executions").orElse(null);
+            Element cleanExecutions = cleanPlugin.childElement("executions").orElse(null);
             Element preCleanExecution = cleanExecutions
-                    .children("execution")
-                    .filter(e ->
-                            "pre-clean-test".equals(e.child("id").orElse(null).textContent()))
+                    .childElements("execution")
+                    .filter(e -> "pre-clean-test"
+                            .equals(e.childElement("id").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(preCleanExecution);
             assertEquals(
                     "before:clean",
-                    preCleanExecution.child("phase").orElse(null).textContent());
+                    preCleanExecution.childElement("phase").orElse(null).textContent());
 
             Element postCleanExecution = cleanExecutions
-                    .children("execution")
-                    .filter(e ->
-                            "post-clean-test".equals(e.child("id").orElse(null).textContent()))
+                    .childElements("execution")
+                    .filter(e -> "post-clean-test"
+                            .equals(e.childElement("id").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(postCleanExecution);
             assertEquals(
                     "after:clean",
-                    postCleanExecution.child("phase").orElse(null).textContent());
+                    postCleanExecution.childElement("phase").orElse(null).textContent());
         }
 
         private void verifyFailsafePluginPhases(Document document) {
             Element root = document.root();
-            Element build = root.child("build").orElse(null);
-            Element plugins = build.child("plugins").orElse(null);
+            Element build = root.childElement("build").orElse(null);
+            Element plugins = build.childElement("plugins").orElse(null);
 
-            Element failsafePlugin = plugins.children("plugin")
+            Element failsafePlugin = plugins.childElements("plugin")
                     .filter(p -> "maven-failsafe-plugin"
-                            .equals(p.child("artifactId").orElse(null).textContent()))
+                            .equals(p.childElement("artifactId").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(failsafePlugin);
 
-            Element failsafeExecutions = failsafePlugin.child("executions").orElse(null);
+            Element failsafeExecutions =
+                    failsafePlugin.childElement("executions").orElse(null);
             Element preIntegrationExecution = failsafeExecutions
-                    .children("execution")
+                    .childElements("execution")
                     .filter(e -> "pre-integration-test-setup"
-                            .equals(e.child("id").orElse(null).textContent()))
+                            .equals(e.childElement("id").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(preIntegrationExecution);
             assertEquals(
                     "before:integration-test",
-                    preIntegrationExecution.child("phase").orElse(null).textContent());
+                    preIntegrationExecution.childElement("phase").orElse(null).textContent());
 
             Element postIntegrationExecution = failsafeExecutions
-                    .children("execution")
+                    .childElements("execution")
                     .filter(e -> "post-integration-test-cleanup"
-                            .equals(e.child("id").orElse(null).textContent()))
+                            .equals(e.childElement("id").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(postIntegrationExecution);
             assertEquals(
                     "after:integration-test",
-                    postIntegrationExecution.child("phase").orElse(null).textContent());
+                    postIntegrationExecution.childElement("phase").orElse(null).textContent());
         }
 
         private void verifySitePluginPhases(Document document) {
             Element root = document.root();
-            Element build = root.child("build").orElse(null);
-            Element plugins = build.child("plugins").orElse(null);
+            Element build = root.childElement("build").orElse(null);
+            Element plugins = build.childElement("plugins").orElse(null);
 
-            Element sitePlugin = plugins.children("plugin")
+            Element sitePlugin = plugins.childElements("plugin")
                     .filter(p -> "maven-site-plugin"
-                            .equals(p.child("artifactId").orElse(null).textContent()))
+                            .equals(p.childElement("artifactId").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(sitePlugin);
 
-            Element siteExecutions = sitePlugin.child("executions").orElse(null);
+            Element siteExecutions = sitePlugin.childElement("executions").orElse(null);
             Element preSiteExecution = siteExecutions
-                    .children("execution")
-                    .filter(e ->
-                            "pre-site-setup".equals(e.child("id").orElse(null).textContent()))
+                    .childElements("execution")
+                    .filter(e -> "pre-site-setup"
+                            .equals(e.childElement("id").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(preSiteExecution);
             assertEquals(
-                    "before:site", preSiteExecution.child("phase").orElse(null).textContent());
+                    "before:site",
+                    preSiteExecution.childElement("phase").orElse(null).textContent());
 
             Element postSiteExecution = siteExecutions
-                    .children("execution")
+                    .childElements("execution")
                     .filter(e -> "post-site-cleanup"
-                            .equals(e.child("id").orElse(null).textContent()))
+                            .equals(e.childElement("id").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(postSiteExecution);
             assertEquals(
-                    "after:site", postSiteExecution.child("phase").orElse(null).textContent());
+                    "after:site",
+                    postSiteExecution.childElement("phase").orElse(null).textContent());
         }
 
         private void verifyPluginManagementPhases(Document document) {
             Element root = document.root();
-            Element build = root.child("build").orElse(null);
-            Element pluginManagement = build.child("pluginManagement").orElse(null);
-            Element managedPlugins = pluginManagement.child("plugins").orElse(null);
+            Element build = root.childElement("build").orElse(null);
+            Element pluginManagement = build.childElement("pluginManagement").orElse(null);
+            Element managedPlugins = pluginManagement.childElement("plugins").orElse(null);
             Element compilerPlugin = managedPlugins
-                    .children("plugin")
+                    .childElements("plugin")
                     .filter(p -> "maven-compiler-plugin"
-                            .equals(p.child("artifactId").orElse(null).textContent()))
+                            .equals(p.childElement("artifactId").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(compilerPlugin);
 
-            Element compilerExecutions = compilerPlugin.child("executions").orElse(null);
+            Element compilerExecutions =
+                    compilerPlugin.childElement("executions").orElse(null);
             Element preCleanCompileExecution = compilerExecutions
-                    .children("execution")
+                    .childElements("execution")
                     .filter(e -> "pre-clean-compile"
-                            .equals(e.child("id").orElse(null).textContent()))
+                            .equals(e.childElement("id").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(preCleanCompileExecution);
             assertEquals(
                     "before:clean",
-                    preCleanCompileExecution.child("phase").orElse(null).textContent());
+                    preCleanCompileExecution.childElement("phase").orElse(null).textContent());
         }
 
         private void verifyProfilePhases(Document document) {
             Element root = document.root();
-            Element profiles = root.child("profiles").orElse(null);
-            Element profile = profiles.child("profile").orElse(null);
-            Element profileBuild = profile.child("build").orElse(null);
-            Element profilePlugins = profileBuild.child("plugins").orElse(null);
+            Element profiles = root.childElement("profiles").orElse(null);
+            Element profile = profiles.childElement("profile").orElse(null);
+            Element profileBuild = profile.childElement("build").orElse(null);
+            Element profilePlugins = profileBuild.childElement("plugins").orElse(null);
             Element antrunPlugin = profilePlugins
-                    .children("plugin")
+                    .childElements("plugin")
                     .filter(p -> "maven-antrun-plugin"
-                            .equals(p.child("artifactId").orElse(null).textContent()))
+                            .equals(p.childElement("artifactId").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(antrunPlugin);
 
-            Element antrunExecutions = antrunPlugin.child("executions").orElse(null);
+            Element antrunExecutions = antrunPlugin.childElement("executions").orElse(null);
             Element profilePreIntegrationExecution = antrunExecutions
-                    .children("execution")
+                    .childElements("execution")
                     .filter(e -> "profile-pre-integration-test"
-                            .equals(e.child("id").orElse(null).textContent()))
+                            .equals(e.childElement("id").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(profilePreIntegrationExecution);
             assertEquals(
                     "before:integration-test",
-                    profilePreIntegrationExecution.child("phase").orElse(null).textContent());
+                    profilePreIntegrationExecution
+                            .childElement("phase")
+                            .orElse(null)
+                            .textContent());
         }
 
         @Test
@@ -677,12 +684,12 @@ class ModelUpgradeStrategyTest {
 
             // Verify phases were NOT upgraded (should remain as pre-clean)
             Element root = document.root();
-            Element build = root.child("build").orElse(null);
-            Element plugins = build.child("plugins").orElse(null);
-            Element cleanPlugin = plugins.child("plugin").orElse(null);
-            Element executions = cleanPlugin.child("executions").orElse(null);
-            Element execution = executions.child("execution").orElse(null);
-            Element phase = execution.child("phase").orElse(null);
+            Element build = root.childElement("build").orElse(null);
+            Element plugins = build.childElement("plugins").orElse(null);
+            Element cleanPlugin = plugins.childElement("plugin").orElse(null);
+            Element executions = cleanPlugin.childElement("executions").orElse(null);
+            Element execution = executions.childElement("execution").orElse(null);
+            Element phase = execution.childElement("phase").orElse(null);
 
             assertEquals("pre-clean", phase.textContent(), "Phase should remain as pre-clean for 4.0.0");
         }
@@ -748,39 +755,43 @@ class ModelUpgradeStrategyTest {
 
             // Verify non-deprecated phases were preserved
             Element root = document.root();
-            Element build = root.child("build").orElse(null);
-            Element plugins = build.child("plugins").orElse(null);
-            Element compilerPlugin = plugins.child("plugin").orElse(null);
-            Element executions = compilerPlugin.child("executions").orElse(null);
+            Element build = root.childElement("build").orElse(null);
+            Element plugins = build.childElement("plugins").orElse(null);
+            Element compilerPlugin = plugins.childElement("plugin").orElse(null);
+            Element executions = compilerPlugin.childElement("executions").orElse(null);
 
             Element compileExecution = executions
-                    .children("execution")
-                    .filter(e ->
-                            "compile-test".equals(e.child("id").orElse(null).textContent()))
+                    .childElements("execution")
+                    .filter(e -> "compile-test"
+                            .equals(e.childElement("id").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(compileExecution);
-            assertEquals("compile", compileExecution.child("phase").orElse(null).textContent());
+            assertEquals(
+                    "compile",
+                    compileExecution.childElement("phase").orElse(null).textContent());
 
             Element testCompileExecution = executions
-                    .children("execution")
+                    .childElements("execution")
                     .filter(e -> "test-compile-test"
-                            .equals(e.child("id").orElse(null).textContent()))
+                            .equals(e.childElement("id").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(testCompileExecution);
             assertEquals(
                     "test-compile",
-                    testCompileExecution.child("phase").orElse(null).textContent());
+                    testCompileExecution.childElement("phase").orElse(null).textContent());
 
             Element packageExecution = executions
-                    .children("execution")
-                    .filter(e ->
-                            "package-test".equals(e.child("id").orElse(null).textContent()))
+                    .childElements("execution")
+                    .filter(e -> "package-test"
+                            .equals(e.childElement("id").orElse(null).textContent()))
                     .findFirst()
                     .orElse(null);
             assertNotNull(packageExecution);
-            assertEquals("package", packageExecution.child("phase").orElse(null).textContent());
+            assertEquals(
+                    "package",
+                    packageExecution.childElement("phase").orElse(null).textContent());
         }
     }
 

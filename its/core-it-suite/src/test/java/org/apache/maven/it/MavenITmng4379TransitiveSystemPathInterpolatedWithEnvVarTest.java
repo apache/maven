@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -40,14 +40,14 @@ public class MavenITmng4379TransitiveSystemPathInterpolatedWithEnvVarTest extend
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4379");
+        Path testDir = extractResources("mng-4379");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4379");
         verifier.filterFile("settings-template.xml", "settings.xml");
-        verifier.setEnvironmentVariable("MNG_4379_HOME", testDir.getAbsolutePath());
+        verifier.setEnvironmentVariable("MNG_4379_HOME", testDir.toString());
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArguments("validate");

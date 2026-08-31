@@ -18,22 +18,21 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
 public class MavenITMissingNamespaceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITMissingNamespaceTest() {
-    }
+    public MavenITMissingNamespaceTest() {}
 
     /**
      * Test when project element does not have an xmlns attribute.
      */
     @Test
     public void testMissingNamespace() throws Exception {
-        File testDir = extractResources("/missing-namespace");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResources("missing-namespace");
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

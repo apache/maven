@@ -36,12 +36,12 @@ package jar;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 
-/**
- * @goal fork1
- * @aggregator
- * @execute phase="compile"
- */
+@Execute(phase = LifecyclePhase.COMPILE)
+@Mojo(name = "fork1", aggregator = true)
 public class Fork1Mojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {}
 }

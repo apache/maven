@@ -17,4 +17,3 @@
  * under the License.
  */
 public class Test {}
-

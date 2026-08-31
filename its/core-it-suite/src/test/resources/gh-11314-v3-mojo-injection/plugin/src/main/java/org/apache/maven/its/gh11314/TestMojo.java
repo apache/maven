@@ -18,14 +18,12 @@
  */
 package org.apache.maven.its.gh11314;
 
-import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.toolchain.ToolchainFactory;
 
 /**

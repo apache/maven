@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,9 +39,9 @@ public class MavenITmng3948ParentResolutionFromProfileReposTest extends Abstract
     public void testitFromPom() throws Exception {
         // requiresMavenVersion("[2.0,3.0-alpha-1),[3.0-beta-1,)");
 
-        File testDir = extractResources("/mng-3948/test-2");
+        Path testDir = extractResources("mng-3948/test-2");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3948");
         verifier.filterFile("pom.xml", "pom.xml");

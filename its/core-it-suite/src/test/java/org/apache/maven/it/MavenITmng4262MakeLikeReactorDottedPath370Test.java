@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -41,9 +41,9 @@ public class MavenITmng4262MakeLikeReactorDottedPath370Test extends AbstractMave
      */
     @Test
     public void testitMakeRoot() throws Exception {
-        File testDir = extractResources("/mng-4262");
+        Path testDir = extractResources("mng-4262");
 
-        Verifier verifier = newVerifier(new File(testDir, "parent").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("parent"));
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
@@ -64,9 +64,9 @@ public class MavenITmng4262MakeLikeReactorDottedPath370Test extends AbstractMave
      */
     @Test
     public void testitMakeModule() throws Exception {
-        File testDir = extractResources("/mng-4262");
+        Path testDir = extractResources("mng-4262");
 
-        Verifier verifier = newVerifier(new File(testDir, "parent").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("parent"));
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");

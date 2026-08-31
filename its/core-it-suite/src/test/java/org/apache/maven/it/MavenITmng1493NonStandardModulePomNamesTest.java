@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,11 +31,11 @@ public class MavenITmng1493NonStandardModulePomNamesTest extends AbstractMavenIn
 
     @Test
     public void testitMNG1493() throws Exception {
-        File testDir = extractResources("/mng-1493");
+        Path testDir = extractResources("mng-1493");
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.addCliArgument("initialize");

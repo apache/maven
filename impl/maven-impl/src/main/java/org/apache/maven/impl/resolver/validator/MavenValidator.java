@@ -24,12 +24,19 @@ import org.eclipse.aether.metadata.Metadata;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.spi.validator.Validator;
+import org.eclipse.aether.util.PathUtils;
 
 /**
  * Simplest Maven specific validator that is meant to prevent un-interpolated
  * elements enter resolver; if it does, is most likely some bug.
  */
 public class MavenValidator implements Validator {
+    private final boolean validatePathComponents;
+
+    public MavenValidator(boolean validatePathComponents) {
+        this.validatePathComponents = validatePathComponents;
+    }
+
     protected boolean containsPlaceholder(String value) {
         return value != null && value.contains("${");
     }
@@ -43,6 +50,9 @@ public class MavenValidator implements Validator {
                 || containsPlaceholder(artifact.getExtension())) {
             throw new IllegalArgumentException("Not fully interpolated artifact " + artifact);
         }
+        if (validatePathComponents) {
+            PathUtils.validateArtifactComponents(artifact);
+        }
     }
 
     @Override
@@ -52,6 +62,9 @@ public class MavenValidator implements Validator {
                 || containsPlaceholder(metadata.getVersion())
                 || containsPlaceholder(metadata.getType())) {
             throw new IllegalArgumentException("Not fully interpolated metadata " + metadata);
+        }
+        if (validatePathComponents) {
+            PathUtils.validateMetadataComponents(metadata);
         }
     }
 
@@ -70,6 +83,9 @@ public class MavenValidator implements Validator {
                                 || containsPlaceholder(e.getClassifier())
                                 || containsPlaceholder(e.getExtension()))) {
             throw new IllegalArgumentException("Not fully interpolated dependency " + dependency);
+        }
+        if (validatePathComponents) {
+            PathUtils.validateArtifactComponents(artifact);
         }
     }
 

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -41,9 +41,9 @@ public class MavenITmng3133UrlNormalizationNotBeforeInterpolationTest extends Ab
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-3133");
+        Path testDir = extractResources("mng-3133");
 
-        Verifier verifier = newVerifier(new File(testDir, "child").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("child"));
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -53,9 +53,9 @@ public class MavenITmng2741PluginMetadataResolutionErrorMessageTest extends Abst
     }
 
     private void testit(String test, String goal) throws Exception {
-        File testDir = extractResources("/mng-2741");
+        Path testDir = extractResources("mng-2741");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-" + test + ".txt");
         verifier.addCliArgument("--settings");

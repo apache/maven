@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -59,9 +59,9 @@ public class MavenITmng3938MergePluginExecutionsTest extends AbstractMavenIntegr
     }
 
     private void testitMNG3938(String project) throws Exception {
-        File testDir = extractResources("/mng-3938/" + project);
+        Path testDir = extractResources("mng-3938/" + project);
 
-        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("sub"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

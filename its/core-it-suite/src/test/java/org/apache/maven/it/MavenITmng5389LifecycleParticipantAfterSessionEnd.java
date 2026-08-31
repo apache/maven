@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,20 +26,20 @@ public class MavenITmng5389LifecycleParticipantAfterSessionEnd extends AbstractM
 
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-5389-lifecycleParticipant-afterSession");
-        File extensionDir = new File(testDir, "extension");
-        File projectDir = new File(testDir, "basic");
+        Path testDir = extractResources("mng-5389-lifecycleParticipant-afterSession");
+        Path extensionDir = testDir.resolve("extension");
+        Path projectDir = testDir.resolve("basic");
 
         Verifier verifier;
 
         // install the test plugin
-        verifier = newVerifier(extensionDir.getAbsolutePath());
+        verifier = newVerifier(extensionDir);
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // build the test project
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
         verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();

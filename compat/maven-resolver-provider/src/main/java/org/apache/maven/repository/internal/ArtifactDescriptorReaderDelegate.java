@@ -57,16 +57,25 @@ public class ArtifactDescriptorReaderDelegate {
         ArtifactTypeRegistry stereotypes = session.getArtifactTypeRegistry();
 
         for (Repository r : model.getRepositories()) {
+            if (containsPlaceholder(r.getId()) || containsPlaceholder(r.getUrl())) {
+                continue;
+            }
             result.addRepository(ArtifactDescriptorUtils.toRemoteRepository(r));
         }
 
         for (org.apache.maven.model.Dependency dependency : model.getDependencies()) {
+            if (hasUninterpolatedExpression(dependency)) {
+                continue;
+            }
             result.addDependency(convert(dependency, stereotypes));
         }
 
         DependencyManagement mgmt = model.getDependencyManagement();
         if (mgmt != null) {
             for (org.apache.maven.model.Dependency dependency : mgmt.getDependencies()) {
+                if (hasUninterpolatedExpression(dependency)) {
+                    continue;
+                }
                 result.addManagedDependency(convert(dependency, stereotypes));
             }
         }
@@ -96,7 +105,8 @@ public class ArtifactDescriptorReaderDelegate {
     private Dependency convert(org.apache.maven.model.Dependency dependency, ArtifactTypeRegistry stereotypes) {
         ArtifactType stereotype = stereotypes.get(dependency.getType());
         if (stereotype == null) {
-            stereotype = new DefaultType(dependency.getType(), Language.NONE, dependency.getType(), null, false);
+            stereotype = new DefaultType(dependency.getType(), Language.NONE, dependency.getType(), null, false)
+                    .toArtifactType();
         }
 
         boolean system = dependency.getSystemPath() != null
@@ -130,6 +140,16 @@ public class ArtifactDescriptorReaderDelegate {
 
     private Exclusion convert(org.apache.maven.model.Exclusion exclusion) {
         return new Exclusion(exclusion.getGroupId(), exclusion.getArtifactId(), "*", "*");
+    }
+
+    private static boolean hasUninterpolatedExpression(org.apache.maven.model.Dependency dependency) {
+        return containsPlaceholder(dependency.getGroupId())
+                || containsPlaceholder(dependency.getArtifactId())
+                || containsPlaceholder(dependency.getVersion());
+    }
+
+    private static boolean containsPlaceholder(String value) {
+        return value != null && value.contains("${");
     }
 
     private void setArtifactProperties(ArtifactDescriptorResult result, Model model) {

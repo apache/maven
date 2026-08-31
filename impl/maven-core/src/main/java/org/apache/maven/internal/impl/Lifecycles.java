@@ -74,6 +74,7 @@ public class Lifecycles {
                 .version(c[2])
                 .executions(Collections.singletonList(PluginExecution.newBuilder()
                         .id("default-" + c[3])
+                        .priority(-1)
                         .phase(phase)
                         .goals(Collections.singletonList(c[3]))
                         .location("", DefaultLifecycleRegistry.DEFAULT_LIFECYCLE_INPUT_LOCATION)

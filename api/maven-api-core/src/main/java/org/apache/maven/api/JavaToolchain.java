@@ -42,4 +42,6 @@ import org.apache.maven.api.annotations.Experimental;
 public interface JavaToolchain extends Toolchain {
 
     String getJavaHome();
+
+    Version getJavaVersion();
 }

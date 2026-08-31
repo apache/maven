@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -38,23 +38,23 @@ public class MavenITmng2739RequiredRepositoryElementsTest extends AbstractMavenI
 
     @Test
     public void testitMNG2739RepositoryId() throws Exception {
-        File testDir = extractResources("/mng-2739/repo-id");
+        Path testDir = extractResources("mng-2739/repo-id");
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         try {
             verifier.addCliArgument("validate");
             verifier.execute();
 
-            fail("POM should NOT validate: repository <id/> element is missing in: " + new File(testDir, "pom.xml"));
+            fail("POM should NOT validate: repository <id/> element is missing in: " + testDir.resolve("pom.xml"));
         } catch (VerificationException e) {
             // expected
         }
 
-        List<String> listing = verifier.loadFile(new File(testDir, "log.txt"), false);
+        List<String> listing = verifier.loadFile(testDir.resolve("log.txt"));
         boolean foundNpe = false;
         for (String line : listing) {
             if (line.contains("NullPointerException")) {
@@ -70,23 +70,23 @@ public class MavenITmng2739RequiredRepositoryElementsTest extends AbstractMavenI
     public void testitMNG2739RepositoryUrl() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = extractResources("/mng-2739/repo-url");
+        Path testDir = extractResources("mng-2739/repo-url");
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         try {
             verifier.addCliArgument("validate");
             verifier.execute();
 
-            fail("POM should NOT validate: repository <url/> element is missing in: " + new File(testDir, "pom.xml"));
+            fail("POM should NOT validate: repository <url/> element is missing in: " + testDir.resolve("pom.xml"));
         } catch (VerificationException e) {
             // expected
         }
 
-        List<String> listing = verifier.loadFile(new File(testDir, "log.txt"), false);
+        List<String> listing = verifier.loadFile(testDir.resolve("log.txt"));
         boolean foundNpe = false;
         for (String line : listing) {
             if (line.contains("NullPointerException")) {

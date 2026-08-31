@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -39,9 +39,9 @@ public class MavenITmng0461TolerateMissingDependencyPomTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-0461");
+        Path testDir = extractResources("mng-0461");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng0461");

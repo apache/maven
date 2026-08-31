@@ -23,12 +23,6 @@ under the License.
   xsi:schemaLocation="http://maven.apache.org/SITE/2.0.0 https://maven.apache.org/xsd/site-2.0.0.xsd"
   name="Apache Maven">
 
-  <bannerLeft href="https://maven.apache.org/">
-    <image src="https://maven.apache.org/images/apache-maven-project.png" alt="Apache Maven" />
-  </bannerLeft>
-
-  <edit>${project.scm.url}</edit>
-
   <body>
     <breadcrumbs>
       <item name="Ref" href="../" />
@@ -39,7 +33,6 @@ under the License.
       <item name="Introduction" href="index.html"/>
       <item name="Javadocs" href="apidocs/index.html"/>
       <item name="Source Xref" href="xref/index.html"/>
-      <!--item name="FAQ" href="faq.html"/-->
       <item name="License" href="https://www.apache.org/licenses/"/>
       <item name="Download" href="../../download.cgi"/>
     </menu>

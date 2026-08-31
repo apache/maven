@@ -102,9 +102,9 @@ class DefaultProjectManagerTest {
 
     /**
      * Verifies that {@code projectManager.attachArtifact(…)} throws an exception,
-     * and that the expecption message contains the expected and actual <abbr>GAV</abbr>.
+     * and that the exception message contains the expected and actual <abbr>GAV</abbr>.
      *
-     * @param expectedGAV the actual <abbr>GAV</abbr> that the exception message should contain
+     * @param expectedGAV the expected <abbr>GAV</abbr> that the exception message should contain
      * @param actualGAV the actual <abbr>GAV</abbr> that the exception message should contain
      */
     private void assertExceptionMessageContains(String expectedGAV, String actualGAV) {

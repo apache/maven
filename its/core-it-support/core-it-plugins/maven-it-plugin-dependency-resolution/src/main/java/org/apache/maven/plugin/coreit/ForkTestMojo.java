@@ -36,7 +36,7 @@ public class ForkTestMojo extends AbstractMojo {
     /**
      * Runs this mojo.
      *
-     * @throws MojoExecutionException If an error occured.
+     * @throws MojoExecutionException If an error occurred.
      */
     public void execute() throws MojoExecutionException {
         getLog().info("[MAVEN-CORE-IT-LOG] Forked test mojo");

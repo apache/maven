@@ -68,7 +68,7 @@ public class InjectMojo extends AbstractMojo {
     /**
      * Runs this mojo.
      *
-     * @throws MojoExecutionException If an error occured.
+     * @throws MojoExecutionException If an error occurred.
      */
     public void execute() throws MojoExecutionException {
         Set artifactKeys = new LinkedHashSet();

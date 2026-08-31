@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -43,9 +43,9 @@ class MavenITgh11196CIFriendlyProfilesTest extends AbstractMavenIntegrationTestC
      */
     @Test
     void testCiFriendlyVersionWithoutProfile() throws Exception {
-        File testDir = extractResources("/gh-11196-ci-friendly-profiles");
+        Path testDir = extractResources("gh-11196-ci-friendly-profiles");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
@@ -65,9 +65,9 @@ class MavenITgh11196CIFriendlyProfilesTest extends AbstractMavenIntegrationTestC
      */
     @Test
     void testCiFriendlyVersionWithReleaseProfile() throws Exception {
-        File testDir = extractResources("/gh-11196-ci-friendly-profiles");
+        Path testDir = extractResources("gh-11196-ci-friendly-profiles");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("-PreleaseBuild");
         verifier.addCliArgument("validate");

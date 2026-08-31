@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,9 +36,9 @@ public class MavenITmng4036ParentResolutionFromSettingsRepoTest extends Abstract
      */
     @Test
     public void testitDefaultLayout() throws Exception {
-        File testDir = extractResources("/mng-4036/default");
+        Path testDir = extractResources("mng-4036/default");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.filterFile("settings.xml", "settings.xml");
         verifier.deleteArtifacts("org.apache.maven.its.mng4036");

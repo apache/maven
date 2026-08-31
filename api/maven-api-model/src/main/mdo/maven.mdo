@@ -92,7 +92,8 @@
           <name>modelVersion</name>
           <version>4.0.0+</version>
           <required>true</required>
-          <description>Declares to which version of project descriptor this POM conforms.</description>
+          <description>Declares which version of the project descriptor this POM conforms to:
+            {@code 4.0.0} for Maven 3, {@code 4.1.0} or {@code 4.2.0} for Maven 4.</description>
           <type>String</type>
         </field>
 
@@ -132,7 +133,6 @@
         <field xdoc.separator="blank">
           <name>groupId</name>
           <version>3.0.0+</version>
-          <required>true</required>
           <description>
             A universally unique identifier for a project. It is normal to
             use a fully-qualified package name to distinguish it from other
@@ -153,7 +153,6 @@
         <field>
           <name>version</name>
           <version>4.0.0+</version>
-          <required>true</required>
           <description>The current version of the artifact produced by this project.</description>
           <type>String</type>
         </field>
@@ -180,7 +179,6 @@
         <field xdoc.separator="blank">
           <name>name</name>
           <version>3.0.0+</version>
-          <required>true</required>
           <description>The full name of the project.</description>
           <type>String</type>
         </field>
@@ -246,7 +244,6 @@
         <field>
           <name>inceptionYear</name>
           <version>3.0.0+</version>
-          <required>true</required>
           <description>The year of the project's inception, specified with 4 digits. This value is
             used when generating copyright notices as well as being informational.</description>
           <type>String</type>
@@ -368,7 +365,6 @@
         <field xdoc.separator="blank" xml.insertParentFieldsUpTo="pluginRepositories">
           <name>build</name>
           <version>3.0.0+</version>
-          <required>true</required>
           <description>Information required to build the project.</description>
           <association>
             <type>Build</type>
@@ -400,13 +396,18 @@
      *
      * @return The POM file from which this model originated or {@code null} if this model does not belong to a local
      *         project (e.g. describes the metadata of some artifact from the repository).
+     *
+     * @deprecated Use {@link #getPomPath()} instead.
      */
-    @Deprecated
+    @Deprecated(since = "4.0.0")
     public java.io.File getPomFile() {
         return (getDelegate().getPomFile() != null) ? getDelegate().getPomFile().toFile() : null;
     }
 
-    @Deprecated
+    /**
+     * @deprecated Use {@link #setPomPath(Path)} instead.
+     */
+    @Deprecated(since = "4.0.0")
     public void setPomFile(java.io.File pomFile) {
         update( getDelegate().withPomFile(pomFile != null ? pomFile.toPath() : null));
     }
@@ -434,6 +435,7 @@
      *
      * @return The base directory for the corresponding project or {@code null} if this model does not belong to a local
      *         project (e.g. describes the metadata of some artifact from the repository).
+     * @deprecated Use {@link #getProjectDirectoryPath()} instead, which returns a {@link java.nio.file.Path}.
      */
     @Deprecated
     public java.io.File getProjectDirectory() {
@@ -640,7 +642,7 @@
           <name>reports</name>
           <version>4.0.0</version>
           <description>
-            @deprecated Now ignored by Maven.
+            @deprecated Now ignored by Maven. Use the {@code reporting} element to configure report plugins instead.
           </description>
           <type>DOM</type>
           <annotations>
@@ -900,7 +902,6 @@
         <field>
           <name>sourceDirectory</name>
           <version>3.0.0+</version>
-          <required>true</required>
           <description>
             This element specifies a directory containing the source of the project. The
             generated build system will compile the sources from this directory when the project is
@@ -917,7 +918,6 @@
         <field>
           <name>scriptSourceDirectory</name>
           <version>4.0.0+</version>
-          <required>true</required>
           <description>
             This element specifies a directory containing the script sources of the
             project. This directory is meant to be different from the sourceDirectory, in that its
@@ -925,7 +925,9 @@
             interpreted rather than compiled).
             The default value is {@code src/main/scripts}.
 
-            @deprecated Replaced by {@code &lt;Source&gt;} with {@code script} language.
+            @deprecated since 4.0.0.
+            Use {@code &lt;source&gt;} elements with {@code script} language
+            to configure script sources.
           </description>
           <type>String</type>
           <annotations>
@@ -935,7 +937,6 @@
         <field>
           <name>testSourceDirectory</name>
           <version>4.0.0+</version>
-          <required>true</required>
           <description>
             This element specifies a directory containing the unit test source of the
             project. The generated build system will compile these directories when the project is
@@ -1078,7 +1079,7 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>
-            @deprecated Where to send the notification to - eg email address.
+            @deprecated Use the {@code configuration} properties map to specify the notification address instead.
           </description>
           <annotations>
             <annotation>@Deprecated(since = "4.0.0")</annotation>
@@ -2597,10 +2598,16 @@
           <version>4.0.0/4.0.99</version>
           <code>
             <![CDATA[
+    /**
+     * @deprecated This method is a no-op and has no replacement.
+     */
     @Deprecated
     public void unsetInheritanceApplied() {
     }
 
+    /**
+     * @deprecated Use {@link #setInherited(String)} instead.
+     */
     @Deprecated
     public void setInherited(boolean value) {
       setInherited(Boolean.toString(value));
@@ -2663,7 +2670,7 @@
           <name>goals</name>
           <version>4.0.0</version>
           <description>
-            @deprecated Unused by Maven.
+            @deprecated Unused by Maven. Use {@code executions} to configure plugin goals instead.
           </description>
           <type>DOM</type>
           <annotations>
@@ -2702,6 +2709,8 @@
 
     /**
      * Reset the {@code executionMap} field to {@code null}
+     *
+     * @deprecated This method is a no-op and has no replacement.
      */
      @Deprecated
     public void flushExecutionMap() {
@@ -2934,6 +2943,8 @@
 
     /**
      * Reset the <code>reportPluginMap</code> field to <code>null</code>
+     *
+     * @deprecated This method is a no-op and has no replacement.
      */
     @Deprecated
     public void flushReportPluginMap() {
@@ -2961,7 +2972,6 @@
       <fields>
         <field>
           <name>id</name>
-          <required>true</required>
           <version>4.0.0+</version>
           <type>String</type>
           <defaultValue>default</defaultValue>
@@ -2981,7 +2991,6 @@
         <field xml.tagName="build">
           <name>build</name>
           <version>4.0.0+</version>
-          <required>true</required>
           <description>Information required to build the project.</description>
           <association>
             <type>BuildBase</type>
@@ -3320,7 +3329,6 @@
           <name>groupId</name>
           <version>4.0.0+</version>
           <type>String</type>
-          <required>true</required>
           <defaultValue>org.apache.maven.plugins</defaultValue>
           <description>The group ID of the reporting plugin in the repository.</description>
         </field>
@@ -3414,7 +3422,6 @@
         <field>
           <name>id</name>
           <type>String</type>
-          <required>true</required>
           <description>The unique id for this report set, to be used during POM inheritance and profile injection
             for merging of report sets.
           </description>
@@ -3423,7 +3430,6 @@
         <field>
           <name>reports</name>
           <version>4.0.0+</version>
-          <required>true</required>
           <description>The list of reports from this plugin which should be generated from this set.</description>
           <association>
             <type>String</type>

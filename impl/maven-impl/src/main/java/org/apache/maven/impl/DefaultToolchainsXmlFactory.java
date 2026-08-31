@@ -23,6 +23,7 @@ import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.Objects;
+import java.util.function.Function;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
@@ -32,6 +33,7 @@ import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.services.xml.XmlWriterException;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
+import org.apache.maven.api.toolchain.InputLocation;
 import org.apache.maven.api.toolchain.InputSource;
 import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.toolchain.v4.MavenToolchainsStaxReader;
@@ -81,10 +83,20 @@ public class DefaultToolchainsXmlFactory implements ToolchainsXmlFactory {
             throw new IllegalArgumentException("writer or outputStream must be non null");
         }
         try {
+            MavenToolchainsStaxWriter xmlWriter = new MavenToolchainsStaxWriter();
+            xmlWriter.setAddLocationInformation(false);
+
+            Function<Object, String> formatter = request.getInputLocationFormatter();
+            if (formatter != null) {
+                xmlWriter.setAddLocationInformation(true);
+                Function<InputLocation, String> adapter = formatter::apply;
+                xmlWriter.setStringFormatter(adapter);
+            }
+
             if (writer != null) {
-                new MavenToolchainsStaxWriter().write(writer, content);
+                xmlWriter.write(writer, content);
             } else {
-                new MavenToolchainsStaxWriter().write(outputStream, content);
+                xmlWriter.write(outputStream, content);
             }
         } catch (Exception e) {
             throw new XmlWriterException("Unable to write toolchains: " + getMessage(e), getLocation(e), e);

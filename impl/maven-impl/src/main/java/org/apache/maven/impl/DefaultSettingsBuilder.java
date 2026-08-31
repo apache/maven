@@ -21,7 +21,6 @@ package org.apache.maven.impl;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 
-import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
@@ -31,6 +30,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
@@ -62,7 +62,6 @@ import org.codehaus.plexus.components.secdispatcher.internal.DefaultSecDispatche
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
- *
  */
 @Named
 public class DefaultSettingsBuilder implements SettingsBuilder {
@@ -128,11 +127,13 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     .build();
         }
 
-        // for the special case of a drive-relative Windows path, make sure it's absolute to save plugins from trouble
+        // resolve relative local repository paths to absolute to save plugins from trouble.
+        // paths containing property placeholders like ${user.home} must be left as-is
+        // so that later interpolation can resolve them.
         String localRepository = effective.getLocalRepository();
         if (localRepository != null && !localRepository.isEmpty()) {
             Path file = Paths.get(localRepository);
-            if (!file.isAbsolute() && file.toString().startsWith(File.separator)) {
+            if (!file.isAbsolute() && !localRepository.contains("${")) {
                 effective = effective.withLocalRepository(file.toAbsolutePath().toString());
             }
         }
@@ -205,7 +206,9 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         settingsValidator.validate(settings, isProjectSettings, problems);
 
-        if (isProjectSettings) {
+        if (!isProjectSettings) {
+            settings = settings.withServers(serversByIds(settings.getServers()));
+        } else {
             settings = Settings.newBuilder(settings, true)
                     .localRepository(null)
                     .interactiveMode(false)
@@ -220,12 +223,24 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                                     .password(null)
                                     .filePermissions(null)
                                     .directoryPermissions(null)
+                                    .aliases(List.of())
                                     .build())
                             .toList())
                     .build();
         }
 
         return settings;
+    }
+
+    private List<Server> serversByIds(List<Server> servers) {
+        return servers.stream()
+                .flatMap(server -> Stream.concat(
+                        Stream.of(server), server.getAliases().stream().map(id -> serverAlias(server, id))))
+                .toList();
+    }
+
+    private Server serverAlias(Server server, String id) {
+        return Server.newBuilder(server, true).id(id).aliases(List.of()).build();
     }
 
     private Settings interpolate(
@@ -348,7 +363,6 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     /**
      * Collects the output of the settings builder.
-     *
      */
     static class DefaultSettingsBuilderResult implements SettingsBuilderResult {
 

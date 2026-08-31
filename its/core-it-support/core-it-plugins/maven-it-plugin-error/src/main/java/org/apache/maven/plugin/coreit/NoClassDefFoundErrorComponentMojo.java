@@ -18,7 +18,7 @@
  */
 package org.apache.maven.plugin.coreit;
 
-import junit.framework.TestCase;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -35,9 +35,9 @@ public class NoClassDefFoundErrorComponentMojo extends AbstractMojo {
     /**
      */
     @Parameter(defaultValue = "foo")
-    private TestCase value;
+    private StringUtils value;
 
     public void execute() throws MojoExecutionException, MojoFailureException {
-        value.getName();
+        value.getClass();
     }
 }

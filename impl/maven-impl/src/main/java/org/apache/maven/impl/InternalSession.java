@@ -21,6 +21,7 @@ package org.apache.maven.impl;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
@@ -48,6 +49,9 @@ import static org.apache.maven.impl.ImplUtils.cast;
 public interface InternalSession extends Session {
 
     static InternalSession from(Session session) {
+        if (session instanceof InternalSession is) {
+            return is;
+        }
         return cast(InternalSession.class, session, "session should be an " + InternalSession.class);
     }
 
@@ -84,7 +88,14 @@ public interface InternalSession extends Session {
 
     WorkspaceRepository getWorkspaceRepository(org.eclipse.aether.repository.WorkspaceRepository repository);
 
-    Repository getRepository(org.eclipse.aether.repository.ArtifactRepository repository);
+    /**
+     * Converts Resolver repository instance to Maven API repository.
+     * <p>
+     * Resolver may throw exception that carries "no repository" sentinel instance from Resolver, denoting no repository
+     * was involved with error. In this case, the {@link Optional} will be empty. This case may happen only when
+     * processing exceptions coming from resolver. Users cannot and should not create such sentinel repositories.
+     */
+    Optional<Repository> getRepository(org.eclipse.aether.repository.ArtifactRepository repository);
 
     Node getNode(org.eclipse.aether.graph.DependencyNode node);
 

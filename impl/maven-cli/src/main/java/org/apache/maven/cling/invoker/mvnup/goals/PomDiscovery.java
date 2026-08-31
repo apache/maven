@@ -104,13 +104,13 @@ public class PomDiscovery {
         }
 
         // Find modules element
-        Element modulesElement = rootElement.child(MODULES).orElse(null);
+        Element modulesElement = rootElement.childElement(MODULES).orElse(null);
         if (modulesElement == null) {
             return;
         }
 
         // Process each module
-        List<Element> moduleElements = modulesElement.children(MODULE).toList();
+        List<Element> moduleElements = modulesElement.childElements(MODULE).toList();
         for (Element moduleElement : moduleElements) {
             String moduleName = moduleElement.textContentTrimmed();
             if (moduleName.isEmpty()) {

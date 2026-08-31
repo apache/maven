@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -39,9 +39,9 @@ public class MavenITmng2140ReactorAwareDepResolutionWhenForkTest extends Abstrac
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-2140");
+        Path testDir = extractResources("mng-2140");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

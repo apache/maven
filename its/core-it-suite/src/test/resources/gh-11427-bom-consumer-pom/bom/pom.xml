@@ -17,9 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <parent>
@@ -33,11 +31,11 @@ under the License.
 
   <name>GH-11427 BOM</name>
 
-    <properties>
-        <junit.version>4.13.2</junit.version>
-    </properties>
+  <properties>
+    <junit.version>4.13.2</junit.version>
+  </properties>
 
-    <dependencyManagement>
+  <dependencyManagement>
     <dependencies>
       <dependency>
         <groupId>org.apache.maven.its.gh-11427</groupId>
@@ -52,4 +50,3 @@ under the License.
     </dependencies>
   </dependencyManagement>
 </project>
-

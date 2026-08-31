@@ -18,6 +18,7 @@
  */
 package org.apache.maven.impl.model.profile;
 
+import java.util.Locale;
 import java.util.Map;
 import java.util.function.UnaryOperator;
 
@@ -94,6 +95,49 @@ class ConditionParserTest {
         assertEquals("world", parser.parse("lower('WORLD')"));
     }
 
+    /**
+     * The result of {@code upper()} and {@code lower()} must not depend on the default locale of
+     * the machine running the build. In the Turkish locale the default case mapping turns
+     * {@code i} into the dotted {@code İ} and {@code I} into the dotless {@code ı}, which would
+     * silently change whether a profile is activated.
+     */
+    @Test
+    void testCaseConversionFunctionsAreLocaleIndependent() {
+        Locale orig = Locale.getDefault();
+        try {
+            Locale[] locales = {Locale.ENGLISH, new Locale("tr")};
+            for (Locale locale : locales) {
+                Locale.setDefault(locale);
+                assertEquals("WINDOWS", parser.parse("upper('windows')"), "upper() in " + locale);
+                assertEquals("LINUX", parser.parse("upper('linux')"), "upper() in " + locale);
+                assertEquals("linux", parser.parse("lower('LINUX')"), "lower() in " + locale);
+                assertEquals("ci", parser.parse("lower('CI')"), "lower() in " + locale);
+            }
+        } finally {
+            Locale.setDefault(orig);
+        }
+    }
+
+    /**
+     * Numbers must render with latin digits regardless of the default locale, otherwise a
+     * condition comparing against a string literal would evaluate differently on a machine
+     * whose locale uses a non-latin numbering system.
+     */
+    @Test
+    void testNumberFormattingIsLocaleIndependent() {
+        Locale orig = Locale.getDefault();
+        try {
+            // this locale's default numbering system is Devanagari rather than latin
+            Locale.setDefault(Locale.forLanguageTag("hi-IN-u-nu-deva"));
+            assertEquals("42", ConditionParser.toString(42.0));
+            assertEquals("42", ConditionParser.toString(42.0f));
+            assertEquals("The answer is 42", parser.parse("'The answer is ' + 42.0"));
+            assertEquals(2, parser.parse("length(42.0)"));
+        } finally {
+            Locale.setDefault(orig);
+        }
+    }
+
     @Test
     void testConcatFunction() {
         assertEquals("HelloWorld", parser.parse("'Hello' + 'World'"));
@@ -157,6 +201,71 @@ class ConditionParserTest {
     void testComplexExpression() {
         String expression = "if(contains(lower('HELLO WORLD'), 'hello'), upper('success') + '!', 'failure')";
         assertEquals("SUCCESS!", parser.parse(expression));
+    }
+
+    /**
+     * The tokenizer emits a bare {@code !} token, so the parser has to be able to consume it.
+     * The {@code contains(..)} cases also cover a {@code !} inside a string literal, which the
+     * tokenizer must leave alone.
+     */
+    @Test
+    void testLogicalNotOperator() {
+        assertFalse((Boolean) parser.parse("!true"));
+        assertTrue((Boolean) parser.parse("!false"));
+        assertTrue((Boolean) parser.parse("!!true"));
+        assertFalse((Boolean) parser.parse("!!!true"));
+        assertTrue((Boolean) parser.parse("!contains('Hello, World!', 'OpenAI')"));
+        assertFalse((Boolean) parser.parse("!contains('Hello, World!', 'World')"));
+    }
+
+    /**
+     * {@code !x} is sugar for the {@code not(x)} function and must agree with it.
+     */
+    @Test
+    void testLogicalNotOperatorMatchesNotFunction() {
+        assertEquals(
+                parser.parse("not(contains('Hello, World!', 'OpenAI'))"),
+                parser.parse("!contains('Hello, World!', 'OpenAI')"));
+        assertEquals(
+                parser.parse("not(contains('Hello, World!', 'World'))"),
+                parser.parse("!contains('Hello, World!', 'World')"));
+        assertEquals(parser.parse("not(true)"), parser.parse("!true"));
+    }
+
+    /**
+     * {@code !} binds tighter than comparison and the logical operators, as it does in Java.
+     */
+    @Test
+    void testLogicalNotOperatorPrecedence() {
+        assertTrue((Boolean) parser.parse("!false && true"));
+        assertFalse((Boolean) parser.parse("!true && false"));
+        assertTrue((Boolean) parser.parse("!true || true"));
+        assertTrue((Boolean) parser.parse("!(true && false)"));
+        assertTrue((Boolean) parser.parse("!(1 > 2)"));
+        assertFalse((Boolean) parser.parse("!('a' != 'b')"));
+    }
+
+    /**
+     * Coercion of non-boolean operands must match what the {@code not()} function does.
+     */
+    @Test
+    void testLogicalNotOperatorCoercion() {
+        assertFalse((Boolean) parser.parse("!'abc'"));
+        assertTrue((Boolean) parser.parse("!''"));
+        assertFalse((Boolean) parser.parse("!length('ab')"));
+        assertTrue((Boolean) parser.parse("!0"));
+        assertFalse((Boolean) parser.parse("!1"));
+    }
+
+    /**
+     * A bare {@code !} must not disturb the {@code !=} operator, which the tokenizer emits as a
+     * single token.
+     */
+    @Test
+    void testNotEqualsStillParsesAsOneOperator() {
+        assertTrue((Boolean) parser.parse("1 != 2"));
+        assertFalse((Boolean) parser.parse("'abc' != 'abc'"));
+        assertTrue((Boolean) parser.parse("'abc' != 'cdf'"));
     }
 
     @Test
@@ -243,6 +352,18 @@ class ConditionParserTest {
     }
 
     @Test
+    void testArithmeticWithoutSpaces() {
+        assertEquals(5.0, parser.parse("2+3"));
+        assertEquals(10.0, parser.parse("15-5"));
+        assertEquals(24.0, parser.parse("6*4"));
+        assertEquals(3.0, parser.parse("9/3"));
+        assertEquals(14.0, parser.parse("2+3*4"));
+        assertEquals(20.0, parser.parse("(2+3)*4"));
+        assertEquals(-5.0, parser.parse("-5"));
+        assertEquals(-5.0, parser.parse("-(2+3)"));
+    }
+
+    @Test
     void testCombinedArithmeticAndLogic() {
         assertTrue((Boolean) parser.parse("(5 > 3) && (10 / 2 == 5)"));
         assertFalse((Boolean) parser.parse("(5 < 3) || (10 / 2 != 5)"));
@@ -260,6 +381,54 @@ class ConditionParserTest {
         assertFalse((Boolean) parser.parse("${os.name} == 'linux'"));
         assertTrue((Boolean) parser.parse("${os.arch} == 'amd64' && ${os.name} == 'windows'"));
         assertThrows(RuntimeException.class, () -> parser.parse("${unclosed"));
+    }
+
+    @Test
+    void testAmpersandAmpersandTokenizerMultiline() {
+        // Regression test for https://github.com/apache/maven/issues/11882
+        // The && operator was not being tokenized correctly when a line break appeared before it.
+        // Uses ${os.name} and ${os.arch} which are set to 'windows' and 'amd64' in the mock context.
+
+        // Case 1: Basic && without line breaks (baseline - always worked)
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64' && ${os.name} == 'windows'"));
+
+        // Case 2: Line break BEFORE && - this was the bug from issue #11882
+        // In the issue, CDATA content had a line break before &&:
+        // <condition><![CDATA[exists( '.profile-2' )\n&& missing( '.profile-1' )]]></condition>
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64'\n&& ${os.name} == 'windows'"));
+
+        // Case 3: Line break AFTER &&
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64' &&\n${os.name} == 'windows'"));
+
+        // Case 4: Line breaks on both sides
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64'\n&&\n${os.name} == 'windows'"));
+
+        // Case 5: Multiple && with line break before first && (like bad-profile-2d in issue)
+        assertTrue(
+                (Boolean) parser.parse("${os.arch} == 'amd64'\n&& ${os.name} == 'windows' && ${os.name} == 'windows'"));
+    }
+
+    @Test
+    void testPipePipeTokenizerMultiline() {
+        // Regression test for https://github.com/apache/maven/issues/11882
+        // The || operator was not being tokenized correctly when a line break appeared before it.
+        // Uses ${os.name} which is set to 'windows' in the mock context.
+
+        // Case 1: Basic || without line breaks (baseline)
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64' || ${os.name} == 'windows'"));
+
+        // Case 2: Line break BEFORE ||
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64'\n|| ${os.name} == 'windows'"));
+
+        // Case 3: Line break AFTER ||
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64' ||\n${os.name} == 'windows'"));
+
+        // Case 4: Line breaks on both sides
+        assertTrue((Boolean) parser.parse("${os.arch} == 'amd64'\n||\n${os.name} == 'windows'"));
+
+        // Case 5: Mixed && and || with line breaks
+        assertTrue(
+                (Boolean) parser.parse("${os.arch} == 'amd64'\n&& ${os.name} == 'windows' || ${os.name} == 'windows'"));
     }
 
     @Test

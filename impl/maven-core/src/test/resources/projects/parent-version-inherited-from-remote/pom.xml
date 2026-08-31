@@ -1,0 +1,12 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <parent>
+    <groupId>org.test</groupId>
+    <artifactId>parent-pom</artifactId>
+    <version>1.0</version>
+    <relativePath/>
+  </parent>
+  <groupId>org.different.group</groupId>
+  <artifactId>child-project</artifactId>
+  <!-- no version - inherited from parent -->
+</project>

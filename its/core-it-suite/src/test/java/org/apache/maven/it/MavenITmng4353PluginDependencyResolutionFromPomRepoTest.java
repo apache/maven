@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Map;
 import java.util.Properties;
 
@@ -40,9 +40,9 @@ public class MavenITmng4353PluginDependencyResolutionFromPomRepoTest extends Abs
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4353").getCanonicalFile();
+        Path testDir = extractResources("mng-4353");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4353");

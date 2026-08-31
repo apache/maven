@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,9 +31,9 @@ class MavenITmng7837ProjectElementInPomTest extends AbstractMavenIntegrationTest
 
     @Test
     void testProjectElementInPom() throws Exception {
-        File testDir = extractResources("/mng-7837-project-element-in-pom");
+        Path testDir = extractResources("mng-7837-project-element-in-pom");
 
-        final Verifier pluginVerifier = newVerifier(testDir.getPath());
+        final Verifier pluginVerifier = newVerifier(testDir);
         pluginVerifier.addCliArgument("validate");
         pluginVerifier.addCliArgument("-V");
         pluginVerifier.execute();

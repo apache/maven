@@ -225,6 +225,46 @@ class DefaultModelValidatorTest {
     }
 
     @Test
+    void testCoordinateIdsWithPathTraversal() throws Exception {
+        SimpleProblemCollector result = validate("coordinate-ids-path-traversal-pom.xml");
+
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(m -> m.contains("'artifactId'")
+                                && m.contains("does not match a valid coordinate id pattern")),
+                "artifactId '..' must be rejected: " + result.getErrors());
+
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(m ->
+                                m.contains("dependencies.dependency.version") && m.contains("must be a valid version")),
+                "dependency version '..' must be rejected: " + result.getErrors());
+    }
+
+    @Test
+    void testCoordinateIdsWithSingleDotPathTraversal() throws Exception {
+        SimpleProblemCollector result = validate("coordinate-ids-path-traversal-dot-pom.xml");
+
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(m ->
+                                m.contains("'groupId'") && m.contains("does not match a valid coordinate id pattern")),
+                "groupId '..' must be rejected: " + result.getErrors());
+
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(m -> m.contains("'artifactId'")
+                                && m.contains("does not match a valid coordinate id pattern")),
+                "artifactId '.' must be rejected: " + result.getErrors());
+
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(m ->
+                                m.contains("dependencies.dependency.version") && m.contains("must be a valid version")),
+                "dependency version '.' must be rejected: " + result.getErrors());
+    }
+
+    @Test
     void testMissingType() throws Exception {
         SimpleProblemCollector result = validate("missing-type-pom.xml");
 
@@ -505,6 +545,16 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 1, 0);
 
         assertTrue(result.getErrors().get(0).contains("distributionManagement.status"));
+    }
+
+    @Test
+    void testBadParentRelativePath() throws Exception {
+        SimpleProblemCollector result = validateFile("bad-parent-relativePath.xml");
+
+        assertViolations(result, 0, 1, 0);
+
+        assertContains(result.getErrors().get(0), "parent.relativePath");
+        assertContains(result.getErrors().get(0), "must not contain any of these characters");
     }
 
     @Test
@@ -915,32 +965,45 @@ class DefaultModelValidatorTest {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-basedir-expression.xml");
         // This test runs on raw model without interpolation, so all expressions appear uninterpolated
         // In the real flow, supported expressions would be interpolated before validation
-        assertViolations(result, 0, 3, 0);
+        assertViolations(result, 0, 0, 3);
     }
 
     @Test
     void repositoryWithUnsupportedExpression() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-unsupported-expression.xml");
-        // Unsupported expressions should cause validation errors
-        assertViolations(result, 0, 1, 0);
+        // Unsupported expressions should cause validation warnings (repos will be skipped at build time)
+        assertViolations(result, 0, 0, 1);
     }
 
     @Test
     void repositoryWithUninterpolatedId() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-uninterpolated-id.xml");
-        // Uninterpolated expressions in repository IDs should cause validation errors
-        assertViolations(result, 0, 3, 0);
+        // Uninterpolated expressions in repository IDs should cause validation warnings
+        // (repos will be skipped at build time)
+        // distributionManagement repositories skip expression check since parent properties
+        // may not be available at file model validation stage
+        assertViolations(result, 0, 0, 2);
 
-        // Check that all three repository ID validation errors are present
-        assertTrue(result.getErrors().stream()
-                .anyMatch(error -> error.contains("repositories.repository.[${repository.id}].id")
-                        && error.contains("contains an uninterpolated expression")));
-        assertTrue(result.getErrors().stream()
-                .anyMatch(error -> error.contains("pluginRepositories.pluginRepository.[${plugin.repository.id}].id")
-                        && error.contains("contains an uninterpolated expression")));
-        assertTrue(result.getErrors().stream()
-                .anyMatch(error -> error.contains("distributionManagement.repository.[${staging.repository.id}].id")
-                        && error.contains("contains an uninterpolated expression")));
+        // Check that repository ID validation warnings are present for repositories and pluginRepositories
+        assertTrue(result.getWarnings().stream()
+                .anyMatch(warning -> warning.contains("repositories.repository.[${repository.id}].id")
+                        && warning.contains("contains an uninterpolated expression")));
+        assertTrue(result.getWarnings().stream()
+                .anyMatch(
+                        warning -> warning.contains("pluginRepositories.pluginRepository.[${plugin.repository.id}].id")
+                                && warning.contains("contains an uninterpolated expression")));
+    }
+
+    @Test
+    void distributionManagementWithChainedPropertyInId() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/dm-with-chained-property-in-id.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void profileWithPropertyInRepositoryUrl() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/profile-with-property-in-repository-url.xml");
+        assertViolations(result, 0, 0, 0);
     }
 
     @Test
@@ -1007,6 +1070,28 @@ class DefaultModelValidatorTest {
         // Test that ${project.basedir} in activation.condition is allowed (no warnings)
         SimpleProblemCollector result = validateRaw(
                 "raw-model/profile-activation-condition-with-basedir.xml", ModelValidator.VALIDATION_LEVEL_STRICT);
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testMissingExtensionCoordinates() throws Exception {
+        SimpleProblemCollector result = validate("missing-extension-coordinates.xml");
+
+        assertViolations(result, 0, 0, 2);
+
+        assertContains(result.getWarnings().get(0), "'build.extensions.extension.groupId' is missing.");
+        assertContains(result.getWarnings().get(1), "'build.extensions.extension.artifactId' is missing.");
+    }
+
+    @Test
+    void minimalWithParent() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/minimal-with-parent.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void minimalWithoutParent() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/minimal-without-parent.xml");
         assertViolations(result, 0, 0, 0);
     }
 }

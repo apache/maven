@@ -26,8 +26,6 @@ import org.apache.maven.api.plugin.annotations.Parameter;
 /**
  * A no-operation Mojo that does nothing. This is just to make the plugin valid.
  * The real functionality is in the TypeProvider.
- *
- * @goal noop
  */
 @org.apache.maven.api.plugin.annotations.Mojo(name = "noop")
 public class NoOpMojo implements Mojo {

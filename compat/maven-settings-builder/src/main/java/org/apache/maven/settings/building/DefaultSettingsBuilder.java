@@ -26,12 +26,15 @@ import java.io.File;
 import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 
 import org.apache.maven.building.FileSource;
 import org.apache.maven.building.Source;
+import org.apache.maven.settings.Server;
 import org.apache.maven.settings.Settings;
 import org.apache.maven.settings.TrackableBase;
 import org.apache.maven.settings.io.SettingsParseException;
@@ -182,6 +185,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
 
         settingsValidator.validate(settings, problems);
+        settings.setServers(new ArrayList<>(serversByIds(settings.getServers())));
 
         return settings;
     }
@@ -250,5 +254,19 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
 
         return result;
+    }
+
+    private List<Server> serversByIds(List<Server> servers) {
+        return servers.stream()
+                .flatMap(server -> Stream.concat(
+                        Stream.of(server), server.getAliases().stream().map(id -> serverAlias(server, id))))
+                .toList();
+    }
+
+    private Server serverAlias(Server server, String id) {
+        return new Server(org.apache.maven.api.settings.Server.newBuilder(server.getDelegate(), true)
+                .id(id)
+                .aliases(List.of())
+                .build());
     }
 }

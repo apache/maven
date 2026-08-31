@@ -1,0 +1,20 @@
+<component-set>
+  <components>
+    <component>
+      <role>org.apache.maven.lifecycle.Lifecycle</role>
+      <role-hint>mng11796</role-hint>
+      <implementation>org.apache.maven.lifecycle.Lifecycle</implementation>
+      <configuration>
+        <id>mng11796</id>
+        <phases>
+          <phase>mng11796-dummy-phase</phase>
+        </phases>
+        <default-phases>
+          <process-sources>
+            org.apache.maven.its.mng11796:extension-plugin:touch
+          </process-sources>
+        </default-phases>
+      </configuration>
+    </component>
+  </components>
+</component-set>

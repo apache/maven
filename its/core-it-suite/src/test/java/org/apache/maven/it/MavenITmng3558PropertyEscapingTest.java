@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -37,9 +37,9 @@ class MavenITmng3558PropertyEscapingTest extends AbstractMavenIntegrationTestCas
 
     @Test
     public void testPropertyEscaping() throws Exception {
-        File testDir = extractResources("/mng-3558-property-escaping");
+        Path testDir = extractResources("mng-3558-property-escaping");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

@@ -84,9 +84,8 @@ public interface ArtifactCoordinates {
                 + getArtifactId()
                 + ':'
                 + getExtension()
+                + (c.isEmpty() ? "" : ":" + c)
                 + ':'
-                + c
-                + (c.isEmpty() ? "" : ":")
                 + getVersionConstraint();
     }
 }

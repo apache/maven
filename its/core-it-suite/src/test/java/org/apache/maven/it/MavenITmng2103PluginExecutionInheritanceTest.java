@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 
@@ -40,9 +40,9 @@ public class MavenITmng2103PluginExecutionInheritanceTest extends AbstractMavenI
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-2103");
+        Path testDir = extractResources("mng-2103");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("child-1/target");
         verifier.deleteDirectory("child-2/target");

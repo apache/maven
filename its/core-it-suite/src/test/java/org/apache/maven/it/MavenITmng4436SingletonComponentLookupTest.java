@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -40,10 +40,10 @@ public class MavenITmng4436SingletonComponentLookupTest extends AbstractMavenInt
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4436");
+        Path testDir = extractResources("mng-4436");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(new File(testDir, "maven-it-plugin-singleton-component").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-singleton-component"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -51,7 +51,7 @@ public class MavenITmng4436SingletonComponentLookupTest extends AbstractMavenInt
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

@@ -142,7 +142,7 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven.resolver</groupId>
-      <artifactId>maven-resolver-transport-jdk</artifactId>
+      <artifactId>maven-resolver-transport-apache</artifactId>
     </dependency>
 
     <dependency>
@@ -194,6 +194,10 @@ under the License.
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jul-to-slf4j</artifactId>
     </dependency>
     <dependency>
       <groupId>commons-cli</groupId>

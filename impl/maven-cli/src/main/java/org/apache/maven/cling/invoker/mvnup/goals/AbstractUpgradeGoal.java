@@ -22,10 +22,15 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import eu.maveniverse.domtrip.Document;
 import eu.maveniverse.domtrip.DomTripException;
+import eu.maveniverse.domtrip.Element;
+import eu.maveniverse.domtrip.Parser;
 import eu.maveniverse.domtrip.maven.MavenPomElements;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.api.di.Inject;
@@ -185,21 +190,23 @@ public abstract class AbstractUpgradeGoal implements Goal {
         context.info("Found " + pomMap.size() + " POM file(s)");
 
         // Perform the upgrade logic
-        int result = doUpgrade(context, targetModel, pomMap);
+        UpgradeResult result = doUpgrade(context, targetModel, pomMap);
 
-        // Save modifications if this is an apply goal
-        if (shouldSaveModifications() && result == 0) {
-            saveModifications(context, pomMap);
+        // Save modifications if this is an apply goal and anything actually changed
+        if (shouldSaveModifications()
+                && result.success()
+                && !result.modifiedPoms().isEmpty()) {
+            saveModifications(context, pomMap, result.modifiedPoms());
         }
 
-        return result;
+        return result.success() ? 0 : 1;
     }
 
     /**
      * Performs the upgrade logic using the strategy pattern.
      * Delegates to StrategyOrchestrator for coordinated strategy execution.
      */
-    protected int doUpgrade(UpgradeContext context, String targetModel, Map<Path, Document> pomMap) {
+    protected UpgradeResult doUpgrade(UpgradeContext context, String targetModel, Map<Path, Document> pomMap) {
         // Execute strategies using the orchestrator
         try {
             UpgradeResult result = orchestrator.executeStrategies(context, pomMap);
@@ -208,10 +215,14 @@ public abstract class AbstractUpgradeGoal implements Goal {
             // This is needed for both 4.0.0 and 4.1.0 to help Maven find the project root
             createMvnDirectoryIfNeeded(context);
 
-            return result.errorPoms().isEmpty() ? 0 : 1;
+            // Fix incompatible extensions in .mvn/extensions.xml
+            fixIncompatibleExtensions(context);
+
+            return result;
         } catch (Exception e) {
             context.failure("Strategy execution failed: " + e.getMessage());
-            return 1;
+            Set<Path> errorPoms = pomMap.keySet().isEmpty() ? Set.of(Path.of(".")) : pomMap.keySet();
+            return UpgradeResult.failure(pomMap.keySet(), errorPoms);
         }
     }
 
@@ -223,13 +234,17 @@ public abstract class AbstractUpgradeGoal implements Goal {
 
     /**
      * Saves the modified documents to disk using domtrip's perfect formatting preservation.
+     * Unmodified POMs are left untouched and are not reported as saved.
      */
-    protected void saveModifications(UpgradeContext context, Map<Path, Document> pomMap) {
+    protected void saveModifications(UpgradeContext context, Map<Path, Document> pomMap, Set<Path> modifiedPoms) {
         context.info("");
         context.info("Saving modified POMs...");
 
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Path pomPath = entry.getKey();
+            if (!modifiedPoms.contains(pomPath)) {
+                continue;
+            }
             Document document = entry.getValue();
             try {
                 // Use domtrip for perfect formatting preservation
@@ -270,6 +285,103 @@ public abstract class AbstractUpgradeGoal implements Goal {
             }
         } catch (Exception e) {
             context.failure("Failed to create .mvn directory: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Fixes incompatible extensions in .mvn/extensions.xml for Maven 4 compatibility.
+     *
+     * <ul>
+     *   <li><strong>os-maven-plugin</strong>: Replaced with Maveniverse Nisse extension
+     *       (compatible with both Maven 3 and 4). Also adds {@code -Dnisse.compat.osDetector}
+     *       to {@code .mvn/maven.config} for drop-in compatibility.</li>
+     *   <li><strong>Develocity/Gradle Enterprise extension</strong>: Removed because it depends
+     *       on {@code org.slf4j.impl.SimpleLogger} which is not available in Maven 4.</li>
+     * </ul>
+     */
+    protected void fixIncompatibleExtensions(UpgradeContext context) {
+        Path startingDirectory = context.options().directory().map(Paths::get).orElse(context.invokerRequest.cwd());
+        Path extensionsXml = startingDirectory.resolve(MVN_DIRECTORY).resolve("extensions.xml");
+
+        if (!Files.exists(extensionsXml)) {
+            return;
+        }
+
+        context.info("");
+        context.info("Checking .mvn/extensions.xml for Maven 4 incompatible extensions...");
+        context.indent();
+
+        try {
+            String content = Files.readString(extensionsXml);
+            Document doc = new Parser().parse(content);
+            Element root = doc.root();
+            boolean modified = false;
+            boolean needsNisseCompat = false;
+
+            List<Element> extensions = root.childElements("extension").toList();
+            List<Element> toRemove = new ArrayList<>();
+
+            for (Element ext : extensions) {
+                String groupId = ext.childTextTrimmed("groupId");
+                String artifactId = ext.childTextTrimmed("artifactId");
+
+                if ("kr.motd.maven".equals(groupId) && "os-maven-plugin".equals(artifactId)) {
+                    DomUtils.updateOrCreateChildElement(ext, "groupId", "eu.maveniverse.maven.nisse");
+                    DomUtils.updateOrCreateChildElement(ext, "artifactId", "extension");
+                    DomUtils.updateOrCreateChildElement(ext, "version", "0.4.4");
+                    context.detail(
+                            "Replaced kr.motd.maven:os-maven-plugin with eu.maveniverse.maven.nisse:extension:0.4.4");
+                    modified = true;
+                    needsNisseCompat = true;
+                } else if ("com.gradle".equals(groupId)
+                        && ("develocity-maven-extension".equals(artifactId)
+                                || "gradle-enterprise-maven-extension".equals(artifactId))) {
+                    toRemove.add(ext);
+                    context.detail("Removed incompatible extension: " + groupId + ":" + artifactId);
+                    modified = true;
+                }
+            }
+
+            for (Element ext : toRemove) {
+                DomUtils.removeElement(ext);
+            }
+
+            if (modified) {
+                if (shouldSaveModifications()) {
+                    String modifiedXml = DomUtils.toXml(doc);
+                    Files.writeString(extensionsXml, modifiedXml);
+                    context.success("Updated .mvn/extensions.xml");
+
+                    if (needsNisseCompat) {
+                        addNisseCompatFlag(startingDirectory, context);
+                    }
+                } else {
+                    context.action("Would update .mvn/extensions.xml");
+                    if (needsNisseCompat) {
+                        context.action("Would add -Dnisse.compat.osDetector to .mvn/maven.config");
+                    }
+                }
+            } else {
+                context.success("No incompatible extensions found");
+            }
+        } catch (Exception e) {
+            context.failure("Failed to process .mvn/extensions.xml: " + e.getMessage());
+        } finally {
+            context.unindent();
+        }
+    }
+
+    private void addNisseCompatFlag(Path startingDirectory, UpgradeContext context) {
+        Path mavenConfig = startingDirectory.resolve(MVN_DIRECTORY).resolve("maven.config");
+        try {
+            String configContent = Files.exists(mavenConfig) ? Files.readString(mavenConfig) : "";
+            if (!configContent.contains("-Dnisse.compat.osDetector")) {
+                String separator = configContent.isEmpty() || configContent.endsWith("\n") ? "" : "\n";
+                Files.writeString(mavenConfig, configContent + separator + "-Dnisse.compat.osDetector\n");
+                context.success("Added -Dnisse.compat.osDetector to .mvn/maven.config");
+            }
+        } catch (IOException e) {
+            context.failure("Failed to update .mvn/maven.config: " + e.getMessage());
         }
     }
 }

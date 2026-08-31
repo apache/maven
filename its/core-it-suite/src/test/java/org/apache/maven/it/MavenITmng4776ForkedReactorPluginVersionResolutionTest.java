@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -38,9 +38,9 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest extends Abst
      */
     @Test
     public void testitLifecycle() throws Exception {
-        File testDir = extractResources("/mng-4776");
+        Path testDir = extractResources("mng-4776");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub/target");
@@ -61,9 +61,9 @@ public class MavenITmng4776ForkedReactorPluginVersionResolutionTest extends Abst
      */
     @Test
     public void testitCmdLine() throws Exception {
-        File testDir = extractResources("/mng-4776");
+        Path testDir = extractResources("mng-4776");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("sub/target");

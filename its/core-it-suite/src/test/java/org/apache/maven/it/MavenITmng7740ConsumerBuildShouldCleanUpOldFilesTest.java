@@ -18,7 +18,6 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
@@ -36,16 +35,16 @@ class MavenITmng7740ConsumerBuildShouldCleanUpOldFilesTest extends AbstractMaven
 
     @Test
     void testConsumerBuildShouldCleanUpOldConsumerFiles() throws Exception {
-        File testDir = extractResources("/mng-7740-consumer-files");
+        Path testDir = extractResources("mng-7740-consumer-files");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("validate");
 
         verifier.execute();
 
         verifier.verifyErrorFreeLog();
 
-        try (Stream<Path> stream = Files.walk(testDir.toPath())) {
+        try (Stream<Path> stream = Files.walk(testDir)) {
             final List<Path> consumerFiles = stream.filter(
                             path -> path.getFileName().toString().contains("consumer")
                                     && path.getFileName().toString().contains("pom"))

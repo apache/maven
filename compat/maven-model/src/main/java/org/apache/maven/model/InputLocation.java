@@ -367,8 +367,9 @@ public final class InputLocation implements java.io.Serializable, Cloneable, Inp
                     columnNumber,
                     source != null ? source.toApiSource() : null,
                     locations != null
-                            ? locations.entrySet().stream().collect(Collectors.toMap(e -> e.getKey(), e -> e.getValue()
-                                    .toApiLocation()))
+                            ? locations.entrySet().stream()
+                                    .collect(Collectors.toMap(
+                                            e -> e.getKey(), e -> e.getValue().toApiLocation()))
                             : null);
         }
     }

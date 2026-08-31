@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -35,8 +35,8 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
 
     @Test
     public void testInclusiveUpperBoundResolvesToHighestVersion() throws Exception {
-        final File testDir = extractResources("/mng-4463/inclusive-upper-bound");
-        final Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        final Path testDir = extractResources("mng-4463/inclusive-upper-bound");
+        final Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -49,8 +49,8 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
 
     @Test
     public void testExclusiveUpperBoundResolvesToHighestVersion() throws Exception {
-        final File testDir = extractResources("/mng-4463/exclusive-upper-bound");
-        final Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        final Path testDir = extractResources("mng-4463/exclusive-upper-bound");
+        final Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -63,8 +63,8 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
 
     @Test
     public void testFailureWithoutUpperBound() throws Exception {
-        final File testDir = extractResources("/mng-4463/no-upper-bound");
-        final Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        final Path testDir = extractResources("mng-4463/no-upper-bound");
+        final Verifier verifier = newVerifier(testDir);
 
         try {
             verifier.setAutoclean(false);
@@ -73,7 +73,7 @@ public class MavenITmng4463DependencyManagementImportVersionRanges extends Abstr
             verifier.execute();
             fail("Expected 'VerificationException' not thrown.");
         } catch (final VerificationException e) {
-            final List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
+            final List<String> lines = verifier.loadFile(testDir.resolve("log.txt"));
             assertTrue(
                     indexOf(lines, ".*dependency version range.*does not specify an upper bound.*") >= 0,
                     "Expected error message not found.");

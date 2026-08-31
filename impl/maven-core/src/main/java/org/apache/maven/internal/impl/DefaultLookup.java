@@ -64,7 +64,7 @@ public class DefaultLookup implements Lookup {
     @Override
     public <T> Optional<T> lookupOptional(Class<T> type) {
         try {
-            return Optional.of(container.lookup(type));
+            return Optional.ofNullable(container.lookup(type));
         } catch (ComponentLookupException e) {
             if (e.getCause() instanceof NoSuchElementException) {
                 return Optional.empty();
@@ -76,7 +76,7 @@ public class DefaultLookup implements Lookup {
     @Override
     public <T> Optional<T> lookupOptional(Class<T> type, String name) {
         try {
-            return Optional.of(container.lookup(type, name));
+            return Optional.ofNullable(container.lookup(type, name));
         } catch (ComponentLookupException e) {
             if (e.getCause() instanceof NoSuchElementException) {
                 return Optional.empty();

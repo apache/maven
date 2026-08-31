@@ -84,9 +84,9 @@ public class DefaultProjectManager implements ProjectManager {
     @Override
     public Collection<ProducedArtifact> getAttachedArtifacts(@Nonnull Project project) {
         requireNonNull(project, "project" + " cannot be null");
-        Collection<ProducedArtifact> attached =
-                map(getMavenProject(project).getAttachedArtifacts(), a -> getSession(project)
-                        .getArtifact(ProducedArtifact.class, RepositoryUtils.toArtifact(a)));
+        Collection<ProducedArtifact> attached = map(
+                getMavenProject(project).getAttachedArtifacts(),
+                a -> getSession(project).getArtifact(ProducedArtifact.class, RepositoryUtils.toArtifact(a)));
         return Collections.unmodifiableCollection(attached);
     }
 

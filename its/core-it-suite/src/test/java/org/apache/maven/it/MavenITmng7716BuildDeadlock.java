@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
@@ -40,9 +40,9 @@ class MavenITmng7716BuildDeadlock extends AbstractMavenIntegrationTestCase {
     @Test
     @Timeout(value = 120, unit = TimeUnit.SECONDS)
     void testNoDeadlockAtVersionUpdate() throws Exception {
-        File testDir = extractResources("/mng-7716");
+        Path testDir = extractResources("mng-7716");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("-f");
         verifier.addCliArgument("settings");
         verifier.addCliArgument("install");
@@ -50,7 +50,7 @@ class MavenITmng7716BuildDeadlock extends AbstractMavenIntegrationTestCase {
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.addCliArgument("-T1C");
         verifier.addCliArgument("org.codehaus.mojo:versions-maven-plugin:2.15.0:set");
         verifier.addCliArgument("-DnewVersion=1.2.3");

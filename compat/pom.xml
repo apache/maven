@@ -28,7 +28,7 @@ under the License.
   <artifactId>maven-compat-modules</artifactId>
   <packaging>pom</packaging>
 
-  <name>Maven Compatibility Modules</name>
+  <name>Maven 3 Compatibility Modules</name>
 
   <modules>
     <module>maven-plugin-api</module>
