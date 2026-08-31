@@ -53,10 +53,17 @@ import org.codehaus.plexus.interpolation.ValueSource;
 public abstract class AbstractStringBasedModelInterpolator implements ModelInterpolator {
 
     /**
-     * The name of the property that opts a build back into the previous behavior of
-     * interpolating models built at {@link ModelBuildingRequest#VALIDATION_LEVEL_MINIMAL}
-     * against the full set of session (system, environment and CLI) properties. Disabled
-     * by default.
+     * User property for opting back into the previous behavior of interpolating
+     * repository-resolved models (built at {@link ModelBuildingRequest#VALIDATION_LEVEL_MINIMAL})
+     * against the full set of session properties (system, environment and CLI).
+     * When set to {@code "false"} (default), such models are interpolated only against
+     * their own {@code <properties>}, preventing property leaking from the requesting
+     * build into transitive POMs. When set to {@code "true"}, full interpolation is
+     * applied as in previous Maven versions.
+     * <p>
+     * In Maven 4.x this constant is promoted to
+     * {@code org.apache.maven.api.Constants.MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL}
+     * with {@code @Config} so it appears in the auto-generated configuration documentation.
      */
     public static final String FULL_EXTERNAL_INTERPOLATION_PROPERTY = "maven.model.dependencyInterpolation.full";
 
