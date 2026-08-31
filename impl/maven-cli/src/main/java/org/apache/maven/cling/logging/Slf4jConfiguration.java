@@ -29,6 +29,7 @@ public interface Slf4jConfiguration {
      * Level
      */
     enum Level {
+        TRACE,
         DEBUG,
         INFO,
         ERROR
