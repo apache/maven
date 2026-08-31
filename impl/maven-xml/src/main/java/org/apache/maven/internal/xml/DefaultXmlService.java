@@ -315,7 +315,7 @@ public class DefaultXmlService extends XmlService {
         if (mergeSelf) {
 
             String value = dominant.getValue();
-            Object location = dominant.inputLocation();
+            Object location = dominant.getInputLocation();
             Map<String, String> attrs = dominant.getAttributes();
             List<XmlNode> children = null;
 
@@ -392,7 +392,7 @@ public class DefaultXmlService extends XmlService {
                         String name = recessiveChild.getName();
                         Iterator<XmlNode> it = commonChildren.computeIfAbsent(
                                 name,
-                                n1 -> Stream.of(dominant.children().stream()
+                                n1 -> Stream.of(dominant.getChildren().stream()
                                                 .filter(n2 -> n2.getName().equals(n1))
                                                 .collect(Collectors.toList()))
                                         .filter(l -> !l.isEmpty())
@@ -442,14 +442,14 @@ public class DefaultXmlService extends XmlService {
                 if (!Objects.equals(value, dominant.getValue())
                         || !Objects.equals(attrs, dominant.getAttributes())
                         || !Objects.equals(children, dominant.getChildren())
-                        || !Objects.equals(location, dominant.inputLocation())) {
+                        || !Objects.equals(location, dominant.getInputLocation())) {
                     return XmlNode.newBuilder()
                             .prefix(dominant.getPrefix())
                             .namespaceUri(dominant.getNamespaceUri())
                             .name(dominant.getName())
                             .value(value != null ? value : dominant.getValue())
                             .attributes(attrs)
-                            .namespaces(dominant.namespaces())
+                            .namespaces(dominant.getNamespaces())
                             .children(children)
                             .inputLocation(location)
                             .build();

@@ -87,7 +87,7 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
                 .children(xmlNode.getChildren())
                 .namespaceUri(xmlNode.getNamespaceUri())
                 .prefix(xmlNode.getPrefix())
-                .inputLocation(xmlNode.inputLocation())
+                .inputLocation(xmlNode.getInputLocation())
                 .build();
         clearCache();
     }
@@ -133,7 +133,7 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
                 .children(xmlNode.getChildren())
                 .namespaceUri(xmlNode.getNamespaceUri())
                 .prefix(xmlNode.getPrefix())
-                .inputLocation(xmlNode.inputLocation())
+                .inputLocation(xmlNode.getInputLocation())
                 .build();
         clearCache();
     }
@@ -186,7 +186,7 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
                         .children(newChildren)
                         .namespaceUri(xmlNode.getNamespaceUri())
                         .prefix(xmlNode.getPrefix())
-                        .inputLocation(xmlNode.inputLocation())
+                        .inputLocation(xmlNode.getInputLocation())
                         .build();
                 clearCache();
 
@@ -232,7 +232,7 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
                 .children(newChildren)
                 .namespaceUri(xmlNode.getNamespaceUri())
                 .prefix(xmlNode.getPrefix())
-                .inputLocation(xmlNode.inputLocation())
+                .inputLocation(xmlNode.getInputLocation())
                 .build();
         clearCache();
     }
@@ -249,7 +249,7 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
                 .children(newChildren)
                 .namespaceUri(xmlNode.getNamespaceUri())
                 .prefix(xmlNode.getPrefix())
-                .inputLocation(xmlNode.inputLocation())
+                .inputLocation(xmlNode.getInputLocation())
                 .build();
         clearCache();
 
@@ -268,7 +268,7 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
                 .children(newChildren)
                 .namespaceUri(xmlNode.getNamespaceUri())
                 .prefix(xmlNode.getPrefix())
-                .inputLocation(xmlNode.inputLocation())
+                .inputLocation(xmlNode.getInputLocation())
                 .build();
         clearCache();
 
