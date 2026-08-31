@@ -45,7 +45,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * builder callable, and the consumer that runs before the terminal is published.
  * <p>
  * JLine 4.4.0's FFM provider initialization ({@code CLibrary.<clinit>}) can reach back through
- * other terminal methods (e.g. {@code getName()}, {@code getWidth()}, {@code encoding()}) on the
+ * other terminal methods (e.g. {@code getName()}, {@code getColumns()}, {@code encoding()}) on the
  * build thread, so the fallback must cover all delegate methods, not just {@code writer()} and
  * {@code getType()}.
  * <p>
