@@ -104,19 +104,71 @@ public class MavenSimpleLogger extends MavenBaseLogger {
     protected void write(int level, String loggerName, String cleanMessage, StringBuilder formattedBuf, Throwable t) {
         LogSink sink = logSink;
         if (sink != null) {
-            // Build the full formatted output including throwable rendering,
-            // reusing the existing writeThrowable/printStackTrace methods
-            // to keep a single rendering path for throwables.
+            // Build the full formatted output including throwable rendering
             String formatted = formattedBuf.toString();
             if (t != null) {
                 StringBuilder full = new StringBuilder(formatted);
                 full.append(System.lineSeparator());
-                writeThrowable(t, line -> full.append(line).append(System.lineSeparator()));
+                appendFormattedThrowable(full, t, "");
                 formatted = full.toString();
             }
             sink.accept(level, loggerName, cleanMessage, formatted, t);
         } else {
             super.write(formattedBuf, t);
+        }
+    }
+
+    /**
+     * Append a colorized throwable rendering to the given builder.
+     * Reuses the existing formatting logic for consistency with console output.
+     */
+    private void appendFormattedThrowable(StringBuilder sb, Throwable t, String prefix) {
+        MessageBuilder builder = builder().a(prefix).failure(t.getClass().getName());
+        if (t.getMessage() != null) {
+            builder.a(": ").failure(t.getMessage());
+        }
+        sb.append(builder.toString()).append(System.lineSeparator());
+        appendStackTrace(sb, t, prefix);
+    }
+
+    private void appendStackTrace(StringBuilder sb, Throwable t, String prefix) {
+        MessageBuilder builder = builder();
+        for (StackTraceElement e : t.getStackTrace()) {
+            builder.a(prefix);
+            builder.a("    ");
+            builder.strong("at");
+            builder.a(" ");
+            builder.a(e.getClassName());
+            builder.a(".");
+            builder.a(e.getMethodName());
+            builder.a("(");
+            builder.strong(getLocation(e));
+            builder.a(")");
+            sb.append(builder.toString()).append(System.lineSeparator());
+            builder.setLength(0);
+        }
+        for (Throwable se : t.getSuppressed()) {
+            builder.a(prefix)
+                    .a("    ")
+                    .strong("Suppressed")
+                    .a(": ")
+                    .a(se.getClass().getName());
+            if (se.getMessage() != null) {
+                builder.a(": ").failure(se.getMessage());
+            }
+            sb.append(builder.toString()).append(System.lineSeparator());
+            builder.setLength(0);
+            appendStackTrace(sb, se, prefix + "    ");
+        }
+        Throwable cause = t.getCause();
+        if (cause != null && t != cause) {
+            builder.a(prefix).strong("Caused by").a(": ").a(cause.getClass().getName());
+            if (cause.getMessage() != null) {
+                builder.a(": ").failure(cause.getMessage());
+            }
+            sb.append(builder.toString()).append(System.lineSeparator());
+            builder.setLength(0);
+            appendStackTrace(sb, cause, prefix);
         }
     }
 

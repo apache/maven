@@ -16,23 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.build;
+
+import java.time.Instant;
+
+import org.apache.maven.api.build.report.FailureReport;
 
 /**
- * Structured build report data model.
- * <p>
- * The {@link org.apache.maven.api.build.report.BuildReport} is the root of a structured
- * representation of a Maven build execution. It is persisted to
- * {@code target/build-report.json} at the end of every build and can be consumed
- * by tools, CI systems, IDEs, and LLM agents without re-running the build or
- * parsing console output.
- * <p>
- * Build problems (warnings, errors) are represented as
- * {@link org.apache.maven.api.services.BuilderProblem} instances and included
- * in the report for downstream analysis.
- *
- * @since 4.1.0
+ * Internal immutable implementation of {@link FailureReport}.
  */
-@Experimental
-package org.apache.maven.api.build.report;
-
-import org.apache.maven.api.annotations.Experimental;
+record DefaultFailureReport(
+        String module, String mojo, Instant timestamp, String exceptionType, String message, String stackTrace)
+        implements FailureReport {}
