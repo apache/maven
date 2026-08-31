@@ -366,7 +366,7 @@ public class ${className} {
     private void writeDom(XmlNode dom, XMLStreamWriter serializer) throws IOException, XMLStreamException {
         if (dom != null) {
             serializer.writeStartElement(namespace, dom.getName());
-            writeXmlNodeAttributes(serializer, dom.getAttributes(), dom.GetNamespaces());
+            writeXmlNodeAttributes(serializer, dom.getAttributes(), dom.getNamespaces());
             for (XmlNode child : dom.getChildren()) {
                 writeDom(child, serializer);
             }
