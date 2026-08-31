@@ -196,20 +196,88 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testBomPackagingActivatedProfilesArePreserved() throws Exception {
-        setRootDirectory("packaging-bom-profiles");
-        Path file = Paths.get("src/test/resources/consumer/packaging-bom-profiles/pom.xml");
+    void testBomPackagingActivatedProfilesArePreserved() {
+        // Build the model directly since 'bom' packaging is not supported
+        // by the model builder on the 4.0.x branch
+        Dependency managedDep = Dependency.newBuilder()
+                .groupId("org.slf4j")
+                .artifactId("slf4j-api")
+                .version("2.0.0")
+                .build();
 
-        MavenProject project = getEffectiveModel(file);
-        Model model = DefaultConsumerPomBuilder.transformBom(getConsumerModel(file, true), project);
+        Profile jarProfile = Profile.newBuilder()
+                .id("jar-profile")
+                .activation(Activation.newBuilder().packaging("jar").build())
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(managedDep))
+                        .build())
+                .build();
 
-        assertEquals(1, model.getProfiles().size());
-        Profile profile = model.getProfiles().get(0);
+        Model model = Model.newBuilder()
+                .groupId("org.my.group")
+                .artifactId("packaging-bom-profiles-test")
+                .version("1.0.0-SNAPSHOT")
+                .packaging("pom")
+                .profiles(List.of(jarProfile))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.transformBom(model, new MavenProject(model));
+
+        assertEquals(1, transformed.getProfiles().size());
+        Profile profile = transformed.getProfiles().get(0);
         assertEquals("jar-profile", profile.getId());
         assertEquals("jar", profile.getActivation().getPackaging());
         assertEquals(
                 "slf4j-api",
                 profile.getDependencyManagement().getDependencies().get(0).getArtifactId());
+    }
+
+    @Test
+    void testImportScopedManagedDepsAreFilteredFromInlinedProfiles() {
+        // Verifies that import-scoped managed dependencies (BOM imports) inside
+        // a packaging-activated profile are NOT re-added to the consumer POM.
+        // Import-scoped entries are flattened during resolution and must not leak.
+        Dependency bomImport = Dependency.newBuilder()
+                .groupId("org.example")
+                .artifactId("some-bom")
+                .version("1.0.0")
+                .type("pom")
+                .scope("import")
+                .build();
+
+        Dependency regularManagedDep = Dependency.newBuilder()
+                .groupId("org.slf4j")
+                .artifactId("slf4j-api")
+                .version("2.0.0")
+                .build();
+
+        Profile profile = Profile.newBuilder()
+                .id("jar-profile")
+                .activation(Activation.newBuilder().packaging("jar").build())
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(bomImport, regularManagedDep))
+                        .build())
+                .build();
+
+        Model model = Model.newBuilder()
+                .groupId("org.test")
+                .artifactId("import-filter-test")
+                .version("1.0.0-SNAPSHOT")
+                .packaging("jar")
+                .profiles(List.of(profile))
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.inlinePackagingActivatedProfiles(model, "jar");
+
+        // Profile should be inlined (removed)
+        assertTrue(result.getProfiles().isEmpty());
+
+        // Managed deps should contain only the regular dep, NOT the import-scoped BOM
+        assertNotNull(result.getDependencyManagement());
+        List<Dependency> managedDeps = result.getDependencyManagement().getDependencies();
+        assertEquals(1, managedDeps.size());
+        assertEquals("slf4j-api", managedDeps.get(0).getArtifactId());
+        assertNull(managedDeps.get(0).getScope());
     }
 
     @Test
