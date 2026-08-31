@@ -71,6 +71,7 @@ class MavenITgh11456MixinsConsumerPomTest extends AbstractMavenIntegrationTestCa
 
         // Verify consumer POM was created
         Path consumerPom = basedir.resolve(Paths.get(
+                ".mvn",
                 "target",
                 "project-local-repo",
                 "org.apache.maven.its.gh11456",
@@ -104,6 +105,7 @@ class MavenITgh11456MixinsConsumerPomTest extends AbstractMavenIntegrationTestCa
 
         // Verify consumer POM was created
         Path consumerPom = basedir.resolve(Paths.get(
+                ".mvn",
                 "target",
                 "project-local-repo",
                 "org.apache.maven.its.gh11456",

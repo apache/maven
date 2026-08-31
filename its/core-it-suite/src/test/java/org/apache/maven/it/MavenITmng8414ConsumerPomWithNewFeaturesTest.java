@@ -53,6 +53,7 @@ class MavenITmng8414ConsumerPomWithNewFeaturesTest extends AbstractMavenIntegrat
                 "The consumer POM for org.apache.maven.its:mng-8414:jar:1.0.0-SNAPSHOT cannot be downgraded to 4.0.0.");
 
         Path consumerPom = basedir.resolve(Paths.get(
+                ".mvn",
                 "target",
                 "project-local-repo",
                 "org.apache.maven.its",
@@ -83,6 +84,7 @@ class MavenITmng8414ConsumerPomWithNewFeaturesTest extends AbstractMavenIntegrat
         verifier.verifyTextNotInLog("cannot be downgraded to 4.0.0.");
 
         Path consumerPom = basedir.resolve(Paths.get(
+                ".mvn",
                 "target",
                 "project-local-repo",
                 "org.apache.maven.its",

@@ -25,6 +25,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Node;
@@ -32,6 +33,8 @@ import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.model.Activation;
+import org.apache.maven.api.model.ActivationOS;
+import org.apache.maven.api.model.ActivationProperty;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
@@ -499,5 +502,306 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 "1.0",
                 transformed.getDependencies().get(0).getVersion(),
                 "Existing model dependency should take precedence over profile duplicate");
+    }
+
+    /**
+     * Verifies that the consumer POM builder injects properties from the project's
+     * active profiles into the BUILD_CONSUMER request's user properties.
+     * <p>
+     * Without the fix in {@code DefaultConsumerPomBuilder.buildModel()}, the
+     * {@code ModelBuilderRequest} only carries session user properties. When a
+     * dependency version is defined via a profile property (e.g.
+     * {@code <version>${my.version}</version>}), model validation would reject the
+     * unresolved expression as an invalid version.
+     * <p>
+     * Session user properties ({@code -D} flags) must still take precedence over
+     * profile-defined properties.
+     */
+    @Test
+    void testConsumerPomIncludesActiveProfileProperties() throws Exception {
+        setRootDirectory("trivial");
+        Path file = Paths.get("src/test/resources/consumer/trivial/child/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+
+        // Create an active profile with a property, simulating a profile that defines
+        // a dependency version (the scenario fixed by MNG-8709).
+        org.apache.maven.api.model.Profile apiProfile = org.apache.maven.api.model.Profile.newBuilder()
+                .id("version-profile")
+                .properties(Map.of("dep.version", "1.0.0"))
+                .build();
+        org.apache.maven.model.Profile modelProfile = new org.apache.maven.model.Profile(apiProfile);
+        project.setActiveProfiles(List.of(modelProfile));
+
+        // Spy on the ModelBuilderSession to capture the ModelBuilderRequest
+        ModelBuilder.ModelBuilderSession originalMbs = modelBuilder.newSession();
+        ModelBuilder.ModelBuilderSession spyMbs = Mockito.spy(originalMbs);
+        InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), spyMbs);
+
+        // Build the consumer POM
+        builder.build(session, project, Sources.buildSource(file));
+
+        // Capture the ModelBuilderRequest passed to the ModelBuilderSession
+        ArgumentCaptor<ModelBuilderRequest> requestCaptor = ArgumentCaptor.forClass(ModelBuilderRequest.class);
+        Mockito.verify(spyMbs, Mockito.atLeastOnce()).build(requestCaptor.capture());
+
+        // Find the BUILD_CONSUMER request
+        ModelBuilderRequest consumerRequest = requestCaptor.getAllValues().stream()
+                .filter(r -> r.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(consumerRequest, "Expected a BUILD_CONSUMER request to be made");
+
+        // Verify that user properties contain the profile property
+        Map<String, String> userProps = consumerRequest.getUserProperties();
+        assertNotNull(userProps, "User properties should not be null");
+        assertTrue(
+                userProps.containsKey("dep.version"), "User properties should contain properties from active profiles");
+        assertTrue(
+                "1.0.0".equals(userProps.get("dep.version")),
+                "Profile property 'dep.version' should have value '1.0.0'");
+    }
+
+    /**
+     * Verifies that session user properties ({@code -D} flags) take precedence
+     * over profile-defined properties in the BUILD_CONSUMER request.
+     */
+    @Test
+    void testConsumerPomSessionPropertiesOverrideProfileProperties() throws Exception {
+        MavenExecutionRequest execRequest = setRootDirectory("trivial");
+        Path file = Paths.get("src/test/resources/consumer/trivial/child/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+
+        // Create an active profile with a property
+        org.apache.maven.api.model.Profile apiProfile = org.apache.maven.api.model.Profile.newBuilder()
+                .id("version-profile")
+                .properties(Map.of("dep.version", "1.0.0"))
+                .build();
+        org.apache.maven.model.Profile modelProfile = new org.apache.maven.model.Profile(apiProfile);
+        project.setActiveProfiles(List.of(modelProfile));
+
+        // Set the same property as a session user property (simulating -Ddep.version=2.0.0)
+        execRequest.getUserProperties().setProperty("dep.version", "2.0.0");
+
+        // Spy on the ModelBuilderSession to capture the ModelBuilderRequest
+        ModelBuilder.ModelBuilderSession originalMbs = modelBuilder.newSession();
+        ModelBuilder.ModelBuilderSession spyMbs = Mockito.spy(originalMbs);
+        InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), spyMbs);
+
+        // Build the consumer POM
+        builder.build(session, project, Sources.buildSource(file));
+
+        // Capture the BUILD_CONSUMER request
+        ArgumentCaptor<ModelBuilderRequest> requestCaptor = ArgumentCaptor.forClass(ModelBuilderRequest.class);
+        Mockito.verify(spyMbs, Mockito.atLeastOnce()).build(requestCaptor.capture());
+
+        ModelBuilderRequest consumerRequest = requestCaptor.getAllValues().stream()
+                .filter(r -> r.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                .findFirst()
+                .orElse(null);
+
+        assertNotNull(consumerRequest, "Expected a BUILD_CONSUMER request to be made");
+
+        // Session user properties must override profile properties
+        Map<String, String> userProps = consumerRequest.getUserProperties();
+        assertTrue(
+                "2.0.0".equals(userProps.get("dep.version")),
+                "Session user property should override profile property; expected '2.0.0' but got '"
+                        + userProps.get("dep.version") + "'");
+    }
+
+    // ── executable() condition stripping (GH-12570) ──────────────────────────
+
+    /**
+     * A profile whose only activation trigger is an {@code executable()} condition
+     * should have its activation removed entirely after stripping.
+     */
+    @Test
+    void testStripExecutableConditionsOnlyExecutableRemovesActivation() {
+        Profile profile = Profile.newBuilder()
+                .id("exec-only")
+                .activation(Activation.newBuilder()
+                        .condition("executable('musl-gcc')")
+                        .build())
+                .dependencies(List.of(Dependency.newBuilder()
+                        .groupId("org.example")
+                        .artifactId("some-lib")
+                        .version("1.0")
+                        .build()))
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getActivation(), "Activation should be null when executable() was the only trigger");
+    }
+
+    /**
+     * When a profile has {@code executable()} in its condition but also has another
+     * activation trigger (e.g. OS), the condition should be stripped but the
+     * remaining activation preserved.
+     */
+    @Test
+    void testStripExecutableConditionsMixedActivationPreservesOtherTriggers() {
+        Profile profile = Profile.newBuilder()
+                .id("exec-and-os")
+                .activation(Activation.newBuilder()
+                        .condition("executable('gcc') && ${os.name} == 'linux'")
+                        .os(ActivationOS.newBuilder().name("linux").build())
+                        .build())
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        Activation activation = result.get(0).getActivation();
+        assertNotNull(activation, "Activation should be preserved when other triggers exist");
+        assertNull(activation.getCondition(), "Condition should be stripped");
+        assertNotNull(activation.getOs(), "OS trigger should be preserved");
+    }
+
+    /**
+     * Profiles without {@code executable()} in their condition should pass through
+     * unchanged.
+     */
+    @Test
+    void testStripExecutableConditionsNoExecutableUnchanged() {
+        Activation originalActivation =
+                Activation.newBuilder().condition("${os.name} == 'linux'").build();
+        Profile profile = Profile.newBuilder()
+                .id("no-exec")
+                .activation(originalActivation)
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        Activation activation = result.get(0).getActivation();
+        assertNotNull(activation);
+        assertEquals("${os.name} == 'linux'", activation.getCondition());
+    }
+
+    /**
+     * Profiles with no activation at all should pass through unchanged.
+     */
+    @Test
+    void testStripExecutableConditionsNullActivationUnchanged() {
+        Profile profile = Profile.newBuilder().id("no-activation").build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getActivation());
+    }
+
+    /**
+     * A negated {@code executable()} call (e.g. {@code not(executable(...))})
+     * should also be stripped from the condition.
+     */
+    @Test
+    void testStripExecutableConditionsNegatedExecutableStripped() {
+        Profile profile = Profile.newBuilder()
+                .id("negated-exec")
+                .activation(Activation.newBuilder()
+                        .condition("not(executable('musl-gcc'))")
+                        .build())
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getActivation(), "Negated executable() should also be stripped");
+    }
+
+    /**
+     * When {@code executable()} is combined with a property trigger in the
+     * activation, stripping should remove the condition but preserve the
+     * property trigger.
+     */
+    @Test
+    void testStripExecutableConditionsWithPropertyTriggerPreservesProperty() {
+        Profile profile = Profile.newBuilder()
+                .id("exec-and-property")
+                .activation(Activation.newBuilder()
+                        .condition("executable('docker')")
+                        .property(ActivationProperty.newBuilder()
+                                .name("docker.enabled")
+                                .value("true")
+                                .build())
+                        .build())
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        Activation activation = result.get(0).getActivation();
+        assertNotNull(activation, "Activation should be preserved when property trigger exists");
+        assertNull(activation.getCondition(), "Condition should be stripped");
+        assertNotNull(activation.getProperty(), "Property trigger should be preserved");
+        assertEquals("docker.enabled", activation.getProperty().getName());
+    }
+
+    /**
+     * Verifies that {@code transformNonPom} strips {@code executable()} conditions
+     * from profiles via the {@code prune()} path.
+     */
+    @Test
+    void testTransformNonPomStripsExecutableCondition() {
+        Model model = Model.newBuilder()
+                .profiles(List.of(Profile.newBuilder()
+                        .id("exec-profile")
+                        .activation(Activation.newBuilder()
+                                .condition("executable('tool')")
+                                .build())
+                        .dependencies(List.of(Dependency.newBuilder()
+                                .groupId("org.example")
+                                .artifactId("tool-support")
+                                .version("1.0")
+                                .build()))
+                        .build()))
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.transformNonPom(model, null);
+
+        // The profile had executable() activation and dependencies.
+        // After pruning: activation is stripped (executable-only), build is stripped,
+        // properties stripped, etc. The profile retains dependencies, so it survives
+        // the isEmpty filter, but its activation should be null.
+        if (!result.getProfiles().isEmpty()) {
+            assertNull(
+                    result.getProfiles().get(0).getActivation(),
+                    "executable() condition should be stripped from transformNonPom profiles");
+        }
+    }
+
+    /**
+     * Verifies that {@code transformPom} strips {@code executable()} conditions
+     * from profiles in parent/POM-packaged projects.
+     */
+    @Test
+    void testTransformPomStripsExecutableCondition() throws Exception {
+        setRootDirectory("trivial");
+        Path file = Paths.get("src/test/resources/consumer/trivial/child/pom.xml");
+        MavenProject project = getEffectiveModel(file);
+
+        Model model = project.getModel().getDelegate();
+        // Add a profile with an executable() condition to the model
+        Profile execProfile = Profile.newBuilder()
+                .id("exec-profile")
+                .activation(
+                        Activation.newBuilder().condition("executable('gcc')").build())
+                .properties(Map.of("native.enabled", "true"))
+                .build();
+        model = model.withProfiles(List.of(execProfile));
+
+        Model result = DefaultConsumerPomBuilder.transformPom(model, project);
+
+        // The profile should have its activation stripped
+        assertFalse(result.getProfiles().isEmpty(), "Profile should survive (it has properties)");
+        assertNull(
+                result.getProfiles().get(0).getActivation(),
+                "executable() condition should be stripped from transformPom profiles");
     }
 }

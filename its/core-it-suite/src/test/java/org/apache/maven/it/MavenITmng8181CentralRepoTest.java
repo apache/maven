@@ -46,6 +46,7 @@ public class MavenITmng8181CentralRepoTest extends AbstractMavenIntegrationTestC
         verifier.addCliArgument("-Dmaven.repo.local.tail=target/null");
         // note: intentionally bad URL, we just want tu ensure that this bad URL is used
         verifier.addCliArgument("-Dmaven.repo.central=https://repo1.maven.org");
+        verifier.addCliArgument("-U");
         verifier.addCliArgument("validate");
         verifier.setHandleLocalRepoTail(false); // we want isolation to have Maven fail due bad URL
         assertThrows(VerificationException.class, verifier::execute);

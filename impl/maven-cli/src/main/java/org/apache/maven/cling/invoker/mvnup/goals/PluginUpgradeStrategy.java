@@ -144,7 +144,18 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     "org.codehaus.gmavenplus",
                     "gmavenplus-plugin",
                     "4.2.0",
-                    "Versions before 4.2.0 call mutating methods on immutable lists returned by Maven 4 API"));
+                    "Versions before 4.2.0 call mutating methods on immutable lists returned by Maven 4 API"),
+            new PluginUpgrade(
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID,
+                    "maven-war-plugin",
+                    "3.4.0",
+                    "Older versions use XStream PropertiesConverter which reflects on Properties.defaults field,"
+                            + " blocked by JDK 17+ module system"),
+            new PluginUpgrade(
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID,
+                    "maven-ear-plugin",
+                    "3.4.0",
+                    "Older versions use plexus-archiver reflection blocked by JDK 17+ module system"));
 
     private static final List<PluginUpgrade> PLUGIN_DEPENDENCY_UPGRADES = List.of(new PluginUpgrade(
             "org.codehaus.mojo",

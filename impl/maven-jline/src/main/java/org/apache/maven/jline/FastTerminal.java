@@ -21,6 +21,7 @@ package org.apache.maven.jline;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.concurrent.Callable;
@@ -36,6 +37,7 @@ import org.jline.terminal.MouseEvent;
 import org.jline.terminal.Size;
 import org.jline.terminal.Sized;
 import org.jline.terminal.Terminal;
+import org.jline.terminal.impl.DumbTerminal;
 import org.jline.terminal.spi.SystemStream;
 import org.jline.terminal.spi.TerminalExt;
 import org.jline.terminal.spi.TerminalProvider;
@@ -47,28 +49,114 @@ public class FastTerminal implements TerminalExt {
 
     private final CompletableFuture<Terminal> terminal;
 
+    /**
+     * The thread running the builder and the consumer. Every method of this class delegates through
+     * {@link #getTerminal()}, so code running on this thread before the terminal is published would
+     * wait on the very future it is itself computing.
+     */
+    private final Thread buildThread;
+
+    /**
+     * Writer handed to {@link #buildThread} while the real terminal is still being built. Created on
+     * demand, and only ever by {@link #buildThread}.
+     */
+    private PrintWriter fallbackWriter;
+
+    /**
+     * Captured before {@link #buildThread} starts, hence before the consumer swaps the system streams
+     * for logging-backed ones. Writing to the live {@code System.err} instead would feed the fallback
+     * output back into the logger it came from.
+     */
+    private final OutputStream fallbackOutput;
+
+    /**
+     * A dumb terminal constructed <em>before</em> the build thread starts, used as a stand-in for
+     * every delegate method when the build thread would otherwise wait on its own future. Guarding
+     * only {@code writer()} and {@code getType()} was sufficient for JLine 4.3.x, but JLine 4.4.0's
+     * FFM provider initialization ({@code CLibrary.<clinit>}) reaches back through other terminal
+     * methods, so the fallback must cover all of them. See
+     * <a href="https://github.com/apache/maven/issues/12912">#12912</a>.
+     */
+    private final TerminalExt fallbackTerminal;
+
     public FastTerminal(Callable<Terminal> builder, Consumer<Terminal> consumer) {
         this.terminal = new CompletableFuture<>();
-        new Thread(
-                        () -> {
-                            try {
-                                Terminal term = builder.call();
-                                consumer.accept(term);
-                                terminal.complete(term);
-                            } catch (Exception e) {
-                                terminal.completeExceptionally(new MavenException(e));
-                            }
-                        },
-                        "fast-terminal-thread")
-                .start();
+        this.fallbackOutput = System.err;
+        TerminalExt dumbFallback;
+        try {
+            // Construct a DumbTerminal directly instead of going through TerminalBuilder, which
+            // probes for grapheme-cluster support and can block on a null input stream in JLine 4.4.0.
+            dumbFallback = new DumbTerminal(InputStream.nullInputStream(), fallbackOutput);
+        } catch (IOException e) {
+            dumbFallback = null;
+        }
+        this.fallbackTerminal = dumbFallback;
+        this.buildThread = new Thread(
+                () -> {
+                    try {
+                        Terminal term = builder.call();
+                        consumer.accept(term);
+                        terminal.complete(term);
+                    } catch (Exception e) {
+                        terminal.completeExceptionally(new MavenException(e));
+                    }
+                },
+                "fast-terminal-thread");
+        // a wedged builder must not keep the JVM alive; everything waits on the future, not the thread
+        this.buildThread.setDaemon(true);
+    }
+
+    /**
+     * Starts the build thread. Must be called <em>after</em> the caller has published this
+     * {@code FastTerminal} (e.g. assigned it to {@link MessageUtils#terminal}) so that code running
+     * on the build thread can obtain a non-null reference through {@link MessageUtils#getTerminal()}.
+     * <p>
+     * {@link Thread#start()} establishes a <em>happens-before</em> edge, so the assignment made by
+     * the caller before this method is visible to the build thread without additional
+     * synchronization.
+     *
+     * @see <a href="https://github.com/apache/maven/issues/12912">#12912</a>
+     */
+    public void start() {
+        this.buildThread.start();
     }
 
     public TerminalExt getTerminal() {
+        if (isBuildThreadWaitingOnItself()) {
+            if (fallbackTerminal != null) {
+                return fallbackTerminal;
+            }
+            throw new IllegalStateException("Terminal not yet available (build in progress on this thread)");
+        }
         try {
             return (TerminalExt) terminal.get();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /**
+     * True when the caller is the thread building the terminal and the terminal is not published yet.
+     * Waiting for the future here would never return, since this thread is the one that completes it.
+     */
+    private boolean isBuildThreadWaitingOnItself() {
+        return Thread.currentThread() == buildThread && !isBuilt();
+    }
+
+    /**
+     * Whether the terminal has been published. {@link MessageUtils#systemUninstall()} waits for the
+     * build to finish, so a caller that must not block has to check this first.
+     */
+    boolean isBuilt() {
+        return terminal.isDone();
+    }
+
+    private PrintWriter fallbackWriter() {
+        // only buildThread reaches this, so no synchronization is needed
+        if (fallbackWriter == null) {
+            fallbackWriter = new PrintWriter(new OutputStreamWriter(fallbackOutput, Charset.defaultCharset()), true);
+        }
+        return fallbackWriter;
     }
 
     @Override
@@ -93,7 +181,8 @@ public class FastTerminal implements TerminalExt {
 
     @Override
     public PrintWriter writer() {
-        return getTerminal().writer();
+        // the log sink writes here, and must not wait for the terminal this thread is building
+        return isBuildThreadWaitingOnItself() ? fallbackWriter() : getTerminal().writer();
     }
 
     @Override
@@ -198,7 +287,11 @@ public class FastTerminal implements TerminalExt {
 
     @Override
     public String getType() {
-        return getTerminal().getType();
+        // AttributedCharSequence.toAnsi asks for the type first and renders plain for a dumb one,
+        // so answering here keeps message rendering off the terminal this thread is building
+        return isBuildThreadWaitingOnItself()
+                ? Terminal.TYPE_DUMB
+                : getTerminal().getType();
     }
 
     @Override
