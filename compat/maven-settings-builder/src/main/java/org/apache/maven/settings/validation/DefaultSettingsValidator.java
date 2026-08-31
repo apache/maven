@@ -119,8 +119,12 @@ public class DefaultSettingsValidator implements SettingsValidator {
                 validateStringNotEmpty(problems, "mirrors.mirror.id", mirror.getId(), mirror.getUrl());
 
                 validateBannedCharacters(
-                        problems, "mirrors.mirror.id", Severity.WARNING, mirror.getId(), null,
-                    ILLEGAL_NTFS_FILENAME_CHARS);
+                        problems,
+                        "mirrors.mirror.id",
+                        Severity.WARNING,
+                        mirror.getId(),
+                        null,
+                        ILLEGAL_NTFS_FILENAME_CHARS);
 
                 if ("local".equals(mirror.getId())) {
                     addViolation(
@@ -188,8 +192,7 @@ public class DefaultSettingsValidator implements SettingsValidator {
             validateStringNotEmpty(problems, prefix + ".id", repository.getId(), repository.getUrl());
 
             validateBannedCharacters(
-                    problems, prefix + ".id", Severity.WARNING, repository.getId(), null,
-                ILLEGAL_NTFS_FILENAME_CHARS);
+                    problems, prefix + ".id", Severity.WARNING, repository.getId(), null, ILLEGAL_NTFS_FILENAME_CHARS);
 
             if ("local".equals(repository.getId())) {
                 addViolation(

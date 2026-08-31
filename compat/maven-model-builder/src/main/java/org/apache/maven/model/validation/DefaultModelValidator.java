@@ -175,7 +175,7 @@ public class DefaultModelValidator implements ModelValidator {
                         parent.getRelativePath(),
                         null,
                         parent,
-                    ILLEGAL_WINDOWS_PATH_CHARS);
+                        ILLEGAL_WINDOWS_PATH_CHARS);
             }
 
             // [MNG-6074] Maven should produce an error if no model version has been set in a POM file used to build an
