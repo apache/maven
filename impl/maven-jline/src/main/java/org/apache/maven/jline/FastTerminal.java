@@ -266,13 +266,13 @@ public class FastTerminal implements TerminalExt {
     }
 
     @Override
-    public int getWidth() {
-        return getTerminal().getWidth();
+    public int getColumns() {
+        return getTerminal().getColumns();
     }
 
     @Override
-    public int getHeight() {
-        return getTerminal().getHeight();
+    public int getRows() {
+        return getTerminal().getRows();
     }
 
     @Override
