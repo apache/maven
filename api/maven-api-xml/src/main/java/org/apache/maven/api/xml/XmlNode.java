@@ -167,9 +167,6 @@ public interface XmlNode {
     @Nullable
     XmlNode getChild(String name);
 
-    @Nullable
-    Object getInputLocation();
-
     /**
      * @deprecated Use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead.
      */
