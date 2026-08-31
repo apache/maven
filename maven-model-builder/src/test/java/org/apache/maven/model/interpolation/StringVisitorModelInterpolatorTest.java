@@ -19,8 +19,14 @@
 package org.apache.maven.model.interpolation;
 
 import org.apache.maven.model.path.PathTranslator;
+import org.junit.jupiter.api.BeforeEach;
 
 public class StringVisitorModelInterpolatorTest extends AbstractModelInterpolatorTest {
+    @BeforeEach
+    protected void setUp() throws Exception {
+        super.setUp();
+    }
+
     @Override
     protected ModelInterpolator createInterpolator(PathTranslator translator) throws Exception {
         return new StringVisitorModelInterpolator().setVersionPropertiesProcessor(new DefaultModelVersionProcessor());
