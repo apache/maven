@@ -52,9 +52,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * The tests force {@code providers("exec")} so that the builder creates a lightweight
  * {@code ExternalTerminal} instead of a {@code PosixPtyTerminal} via FFM. The FFM provider calls
  * {@code CLibrary.openpty()} which creates a real PTY pair; the subsequent grapheme-cluster probe
- * ({@code ensureModesProbed()}) then blocks on the idle PTY master for the full probe timeout,
- * and the PTY's pump threads can stall {@code close()} during teardown &mdash; all of which makes
- * the tests flaky on slow CI machines.
+ * ({@code ensureModesProbed()}) reads from the PTY master via {@code FileInputStream.read0()}, a
+ * native blocking read. Although {@code VMIN=0, VTIME=0} attributes are set before probing, there
+ * is a race where the native read blocks indefinitely instead of respecting the timeout, causing
+ * the test to hang until the 30-second preemptive timeout fires.
  * <p>
  * The timeouts are preemptive on purpose: a regression parks the build thread forever, and only an
  * abandoning timeout turns that into a red test rather than a hung fork.
