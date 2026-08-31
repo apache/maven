@@ -227,10 +227,10 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
 
             if (server.getConfiguration() != null) {
                 XmlNode dom = server.getDelegate().getConfiguration();
-                List<XmlNode> children = dom.children().stream()
-                        .filter(c -> !"wagonProvider".equals(c.name()))
+                List<XmlNode> children = dom.getChildren().stream()
+                        .filter(c -> !"wagonProvider".equals(c.getName()))
                         .collect(Collectors.toList());
-                dom = XmlNode.newInstance(dom.name(), children);
+                dom = XmlNode.newInstance(dom.getName(), children);
                 PlexusConfiguration config = XmlPlexusConfiguration.toPlexusConfiguration(dom);
                 configProps.put("aether.transport.wagon.config." + server.getId(), config);
 
