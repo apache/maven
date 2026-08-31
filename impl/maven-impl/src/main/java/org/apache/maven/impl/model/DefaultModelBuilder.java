@@ -642,6 +642,10 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .toList();
             // Repositories contributed by a model resolved from a repository are merged
             // recessively; repositories supplied by the request or session keep precedence.
+            // Note: the isBuildRequest() guard means any future non-build RequestType will
+            // also use recessive merging (the else branch). This is intentional — only a
+            // build request has a well-defined set of session/request repositories that
+            // should take precedence; dependency and parent resolution do not.
             if (replace && isBuildRequest()) {
                 Set<String> ids = repos.stream().map(RemoteRepository::getId).collect(Collectors.toSet());
                 repositories = repositories.stream()
