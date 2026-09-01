@@ -36,6 +36,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
@@ -990,12 +991,12 @@ class DefaultModelBuilderTest {
                     Set.of(
                             "org.apache.maven.test:mng-8450-parent:${revision}",
                             "org.apache.maven.test:independent:1.0.0"),
-                    warnings.stream().map(ModelProblem::getModelId).collect(java.util.stream.Collectors.toSet()));
+                    warnings.stream().map(ModelProblem::getModelId).collect(Collectors.toSet()));
             assertEquals(
                     Map.of("mng-8450-parent", 1L, "independent", 1L),
                     results(result)
                             .filter(r -> directBomImportWarningCount(r) > 0)
-                            .collect(java.util.stream.Collectors.toMap(
+                            .collect(Collectors.toMap(
                                     r -> r.getEffectiveModel().getArtifactId(), this::directBomImportWarningCount)));
         }
     }
