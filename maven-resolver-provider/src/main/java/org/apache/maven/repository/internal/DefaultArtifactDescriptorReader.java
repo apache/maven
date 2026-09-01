@@ -340,6 +340,9 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
             if (relocation != null) {
                 result.addRelocation(a);
+                requireValidCoordinateComponent(relocation.getGroupId(), "groupId", a, result);
+                requireValidCoordinateComponent(relocation.getArtifactId(), "artifactId", a, result);
+                requireValidCoordinateComponent(relocation.getVersion(), "version", a, result);
                 a = new RelocatedArtifact(
                         a,
                         relocation.getGroupId(),
@@ -371,6 +374,37 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             relocation = distMgmt.getRelocation();
         }
         return relocation;
+    }
+
+    /**
+     * Checks that a relocation coordinate component is usable as an artifact coordinate component before it
+     * is applied to the artifact being resolved. A component outside the coordinate character set is rejected
+     * so that only well-formed coordinates enter resolution.
+     */
+    private static void requireValidCoordinateComponent(
+            String value, String component, Artifact artifact, ArtifactDescriptorResult result)
+            throws ArtifactDescriptorException {
+        if (value == null || value.isEmpty()) {
+            return; // component is not relocated: the original artifact's value is kept
+        }
+        if (isInvalidCoordinateComponent(value)) {
+            IllegalArgumentException cause = new IllegalArgumentException("Invalid relocation " + component + " '"
+                    + value + "' for " + artifact + ": not a valid artifact coordinate component");
+            result.addException(cause);
+            throw new ArtifactDescriptorException(result, cause.getMessage(), cause);
+        }
+    }
+
+    private static boolean isInvalidCoordinateComponent(String value) {
+        if ("..".equals(value) || value.contains("/") || value.contains("\\") || value.contains(":")) {
+            return true;
+        }
+        for (int i = 0; i < value.length(); i++) {
+            if (Character.isISOControl(value.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private void missingDescriptor(
