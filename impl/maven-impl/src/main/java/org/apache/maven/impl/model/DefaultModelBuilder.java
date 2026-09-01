@@ -136,6 +136,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     private static final String FILE = "file";
     private static final String IMPORT = "import";
     private static final String PARENT = "parent";
+    private static final String PARENT_EXTERNAL = "parent-external";
     private static final String MODEL = "model";
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -279,6 +280,14 @@ public class DefaultModelBuilder implements ModelBuilder {
         // Contains both GAV coordinates (groupId:artifactId:version) and file paths
         final Set<String> parentChain;
 
+        // Sticky across derive(): true for a session that is itself resolving a dependency
+        // (ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY), or that was derived, directly
+        // or transitively, from such a session -- for instance a dependency's own parent POM.
+        // Kept separate from request.getRequestType() because a parent lookup always derives a
+        // CONSUMER_PARENT request regardless of what kind of session triggered it, which would
+        // otherwise lose the distinction this flag preserves.
+        final boolean externalOrigin;
+
         ModelBuilderSessionState(ModelBuilderRequest request) {
             this(
                     request.getSession(),
@@ -291,7 +300,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     List.of(),
                     repos(request),
                     repos(request),
-                    new LinkedHashSet<>());
+                    new LinkedHashSet<>(),
+                    isExternalOrigin(request));
         }
 
         static List<RemoteRepository> repos(ModelBuilderRequest request) {
@@ -369,7 +379,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                 List<RemoteRepository> pomRepositories,
                 List<RemoteRepository> externalRepositories,
                 List<RemoteRepository> repositories,
-                Set<String> parentChain) {
+                Set<String> parentChain,
+                boolean externalOrigin) {
             this.session = session;
             this.request = request;
             this.result = result;
@@ -381,6 +392,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             this.externalRepositories = externalRepositories;
             this.repositories = repositories;
             this.parentChain = parentChain;
+            this.externalOrigin = externalOrigin;
             this.result.setSource(this.request.getSource());
         }
 
@@ -434,6 +446,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     derivedRepos = repositoryFactory.aggregate(session, pomRepositories, derivedExtRepos, false);
                 }
             }
+            boolean derivedExternalOrigin = externalOrigin || isExternalOrigin(request);
             return new ModelBuilderSessionState(
                     session,
                     request,
@@ -445,7 +458,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                     pomRepositories,
                     derivedExtRepos,
                     derivedRepos,
-                    new LinkedHashSet<>());
+                    new LinkedHashSet<>(),
+                    derivedExternalOrigin);
         }
 
         @Override
@@ -648,7 +662,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                             && (repo.getId() == null || !repo.getId().contains("${")))
                     .map(session::createRemoteRepository)
                     .toList();
-            if (replace) {
+            // Repositories contributed by a model resolved from a repository are merged
+            // recessively; repositories supplied by the request or session keep precedence.
+            // Note: the isBuildRequest() guard means any future non-build RequestType will
+            // also use recessive merging (the else branch). This is intentional — only a
+            // build request has a well-defined set of session/request repositories that
+            // should take precedence; dependency and parent resolution do not.
+            if (replace && isBuildRequest()) {
                 Set<String> ids = repos.stream().map(RemoteRepository::getId).collect(Collectors.toSet());
                 repositories = repositories.stream()
                         .filter(r -> !ids.contains(r.getId()))
@@ -1618,10 +1638,35 @@ public class DefaultModelBuilder implements ModelBuilder {
         private List<Profile> getActiveProfiles(
                 Collection<Profile> interpolatedProfiles, DefaultProfileActivationContext profileActivationContext) {
             if (isBuildRequestWithActivation()) {
-                return profileSelector.getActiveProfiles(interpolatedProfiles, profileActivationContext, this);
+                Collection<Profile> eligibleProfiles = interpolatedProfiles;
+                if (externalOrigin) {
+                    // A model resolved to satisfy dependency resolution -- a dependency POM
+                    // itself, or one of its parents, reached transitively -- evaluates only
+                    // platform-derived activation (JDK version, operating system,
+                    // activeByDefault); its profiles contribute no repositories.
+                    eligibleProfiles = interpolatedProfiles.stream()
+                            .filter(profile -> !hasFileOrPropertyOrConditionActivation(profile))
+                            .map(profile -> profile.withRepositories(List.of()).withPluginRepositories(List.of()))
+                            .toList();
+                }
+                return profileSelector.getActiveProfiles(eligibleProfiles, profileActivationContext, this);
             } else {
                 return List.of();
             }
+        }
+
+        /**
+         * Determines whether the given profile's activation depends on file existence, a
+         * property, or a condition expression, as opposed to being a function of the build
+         * platform (JDK version, operating system) or {@code activeByDefault}.
+         */
+        private static boolean hasFileOrPropertyOrConditionActivation(Profile profile) {
+            Activation activation = profile.getActivation();
+            return activation != null
+                    && (activation.getFile() != null
+                            || activation.getProperty() != null
+                            || (activation.getCondition() != null
+                                    && !activation.getCondition().isBlank()));
         }
 
         Model readFileModel() throws ModelBuilderException {
@@ -2024,8 +2069,23 @@ public class DefaultModelBuilder implements ModelBuilder {
          */
         Model readAsParentModel(DefaultProfileActivationContext profileActivationContext, Set<String> parentChain)
                 throws ModelBuilderException {
+            // Partition the cache by externalOrigin so a parent model resolved while building
+            // the operator's own project never shares an entry with the same source resolved
+            // while resolving a dependency: the two contexts activate profiles differently (see
+            // getActiveProfiles below), and the model built for one must not be reused for the
+            // other, even though both are keyed off the same underlying source.
+            //
+            // This partition is a defensive backstop, not the primary guard: cache(source, tag,
+            // supplier) additionally scopes each entry to the top-level request (see
+            // getOuterRequest()), which falls back to the request object's own identity once its
+            // RequestTrace has no further request-typed ancestor. Two independently-built request
+            // objects therefore land in different buckets regardless of this tag, and never reach
+            // this collision in practice; the tag matters only when two reads end up sharing a
+            // request object (as derive() calls from a common ancestor can), which is why it is
+            // kept even though the getActiveProfiles gate above already decides the correct
+            // activation for each read on its own.
             Map<DefaultProfileActivationContext.Record, ParentModelWithProfiles> parentsPerContext =
-                    cache(request.getSource(), PARENT, ConcurrentHashMap::new);
+                    cache(request.getSource(), externalOrigin ? PARENT_EXTERNAL : PARENT, ConcurrentHashMap::new);
 
             for (Map.Entry<DefaultProfileActivationContext.Record, ParentModelWithProfiles> e :
                     parentsPerContext.entrySet()) {
@@ -2337,11 +2397,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                 Collection<String> importIds) {
             Model importModel;
             ModelSource importSource;
+            boolean repositoryResolved = false;
             try {
                 importSource = resolveReactorModel(groupId, artifactId, version);
                 if (importSource == null) {
                     importSource = modelResolver.resolveModel(
                             request.getSession(), repositories, dependency, new AtomicReference<>());
+                    repositoryResolved = true;
                 }
             } catch (ModelBuilderException | ModelResolverException e) {
                 StringBuilder buffer = new StringBuilder(256);
@@ -2392,7 +2454,66 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             importModel = importResult.getEffectiveModel();
 
+            if (repositoryResolved) {
+                importModel = rejectSystemScopeFromRepositoryImport(importModel, dependency);
+            }
+
             return importModel;
+        }
+
+        /**
+         * Dependency management imported (as a BOM) from a POM resolved from a repository, rather
+         * than from the local reactor, may not declare {@code system} scope or a
+         * {@code systemPath} for a managed dependency: by default, offending entries are dropped
+         * from the imported management (so a cached import cannot re-introduce them) and a
+         * warning is emitted, unless the
+         * {@code maven.repository.dependencyManagement.allowSystemScope} user property is set to
+         * {@code true}, in which case they are imported as before, with a warning. Dependency
+         * management imported from the local reactor is not affected.
+         */
+        private Model rejectSystemScopeFromRepositoryImport(Model importModel, Dependency dependency) {
+            DependencyManagement importMgmt = importModel != null ? importModel.getDependencyManagement() : null;
+            if (importMgmt == null) {
+                return importModel;
+            }
+            String offending = importMgmt.getDependencies().stream()
+                    .filter(DefaultModelBuilder::usesSystemScope)
+                    .map(Dependency::getManagementKey)
+                    .collect(Collectors.joining(", "));
+            if (offending.isEmpty()) {
+                return importModel;
+            }
+            String allow = request.getUserProperties()
+                    .getOrDefault(
+                            Constants.MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE,
+                            request.getSystemProperties()
+                                    .get(Constants.MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE));
+            if (Boolean.parseBoolean(allow)) {
+                add(
+                        Severity.WARNING,
+                        Version.V41,
+                        "The import POM " + ModelProblemUtils.toId(importModel)
+                                + " declares 'system' scope or 'systemPath' for " + offending
+                                + "; importing it because the '"
+                                + Constants.MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE
+                                + "' user property is set to 'true'.",
+                        dependency.getLocation(""));
+                return importModel;
+            }
+            add(
+                    Severity.WARNING,
+                    Version.V41,
+                    "The import POM " + ModelProblemUtils.toId(importModel)
+                            + " was resolved from a repository and declares 'system' scope or 'systemPath' for "
+                            + offending + "; these entries are not imported. Remove the 'system' scope from the"
+                            + " imported POM, or set the '"
+                            + Constants.MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE
+                            + "' user property to 'true' to import them as before.",
+                    dependency.getLocation(""));
+            List<Dependency> retained = importMgmt.getDependencies().stream()
+                    .filter(d -> !usesSystemScope(d))
+                    .collect(Collectors.toList());
+            return importModel.withDependencyManagement(importMgmt.withDependencies(retained));
         }
 
         ModelSource resolveReactorModel(String groupId, String artifactId, String version)
@@ -2541,6 +2662,24 @@ public class DefaultModelBuilder implements ModelBuilder {
             version = model.getParent().getVersion();
         }
         return version;
+    }
+
+    /**
+     * Whether the model this request builds was resolved from a repository rather than supplied to
+     * Maven. {@link org.apache.maven.api.services.Sources#resolvedSource} carries the resolved
+     * model's coordinates and is the only source kind that does; a POM built from a file the caller
+     * pointed at reports none.
+     */
+    static boolean isExternalOrigin(ModelBuilderRequest request) {
+        return request.getRequestType() == ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY
+                && request.getSource() != null
+                && request.getSource().getModelId() != null;
+    }
+
+    static boolean usesSystemScope(Dependency dependency) {
+        return "system".equals(dependency.getScope())
+                || (dependency.getSystemPath() != null
+                        && !dependency.getSystemPath().isEmpty());
     }
 
     private DefaultProfileActivationContext getProfileActivationContext(ModelBuilderRequest request, Model model) {

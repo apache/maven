@@ -36,6 +36,7 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Provides;
@@ -48,6 +49,7 @@ import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.model.Scm;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ModelBuilderRequest;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.model.ModelInterpolator;
 import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.impl.model.profile.SimpleProblemCollector;
@@ -441,6 +443,101 @@ class DefaultModelInterpolatorTest {
         assertProblemFree(collector);
 
         assertEquals("/path/to/home", out.getProperties().get("outputDirectory"));
+    }
+
+    @Test
+    public void testDependencyModelInterpolationUsesRestrictedPropertySet() throws Exception {
+        context.put("env.HOME", "/path/to/home");
+        context.put("some.property", "other-value");
+        context.put("java.version", "21");
+
+        Map<String, String> modelProperties = new HashMap<>();
+        modelProperties.put("envDir", "${env.HOME}");
+        modelProperties.put("propDir", "${some.property}");
+        modelProperties.put("jdk", "${java.version}");
+
+        Model model = Model.newBuilder().properties(modelProperties).build();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelBuilderRequest request = createModelBuildingRequest(context)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.resolvedSource(Paths.get("."), "org.apache.maven.test:dependency:1.0.0"))
+                .build();
+        Model out = interpolator.interpolateModel(model, Paths.get("."), request, collector);
+        assertProblemFree(collector);
+
+        // A model built while resolving a dependency POM from a repository does not interpolate
+        // environment variables or arbitrary system/user properties...
+        assertEquals("${env.HOME}", out.getProperties().get("envDir"));
+        assertEquals("${some.property}", out.getProperties().get("propDir"));
+        // ...while JVM-defined and other well-known expressions keep resolving.
+        assertEquals("21", out.getProperties().get("jdk"));
+    }
+
+    @Test
+    public void testParentModelInterpolationUsesRestrictedPropertySet() throws Exception {
+        context.put("env.HOME", "/path/to/home");
+
+        Map<String, String> modelProperties = new HashMap<>();
+        modelProperties.put("envDir", "${env.HOME}");
+
+        Model model = Model.newBuilder().properties(modelProperties).build();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelBuilderRequest request = createModelBuildingRequest(context)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_PARENT)
+                .source(Sources.resolvedSource(Paths.get("."), "org.apache.maven.test:parent:1.0.0"))
+                .build();
+        Model out = interpolator.interpolateModel(model, Paths.get("."), request, collector);
+        assertProblemFree(collector);
+
+        assertEquals("${env.HOME}", out.getProperties().get("envDir"));
+    }
+
+    @Test
+    public void testCallerSuppliedModelInterpolationIsNotRestricted() throws Exception {
+        context.put("env.HOME", "/path/to/home");
+        context.put("some.property", "other-value");
+
+        Map<String, String> modelProperties = new HashMap<>();
+        modelProperties.put("envDir", "${env.HOME}");
+        modelProperties.put("propDir", "${some.property}");
+
+        Model model = Model.newBuilder().properties(modelProperties).build();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        // A POM the caller hands to Maven as a file arrives with the same CONSUMER_DEPENDENCY
+        // request type as a dependency POM resolved from a repository, but its source is not
+        // one Maven resolved -- so the restricted property set above does not apply to it.
+        ModelBuilderRequest request = createModelBuildingRequest(context)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.buildSource(Paths.get(".")))
+                .build();
+        Model out = interpolator.interpolateModel(model, Paths.get("."), request, collector);
+        assertProblemFree(collector);
+
+        assertEquals("/path/to/home", out.getProperties().get("envDir"));
+        assertEquals("other-value", out.getProperties().get("propDir"));
+    }
+
+    @Test
+    public void testFullInterpolationOptOutRestoresPreviousBehaviorForResolvedDependencyModel() throws Exception {
+        context.put("env.HOME", "/path/to/home");
+        context.put(Constants.MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL, "true");
+
+        Map<String, String> modelProperties = new HashMap<>();
+        modelProperties.put("envDir", "${env.HOME}");
+
+        Model model = Model.newBuilder().properties(modelProperties).build();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelBuilderRequest request = createModelBuildingRequest(context)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .build();
+        Model out = interpolator.interpolateModel(model, Paths.get("."), request, collector);
+        assertProblemFree(collector);
+
+        assertEquals("/path/to/home", out.getProperties().get("envDir"));
     }
 
     @Test

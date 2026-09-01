@@ -43,6 +43,22 @@ import org.apache.maven.api.annotations.Nullable;
 public interface ModelSource extends Source {
 
     /**
+     * Returns the model identifier in the format {@code groupId:artifactId:version}
+     * if this source represents a resolved artifact with known coordinates.
+     * <p>
+     * This method is primarily used by resolved sources to provide the model ID
+     * without requiring the XML to be parsed. For build sources, this typically
+     * returns {@code null} since the coordinates are determined by parsing the POM.
+     *
+     * @return the model identifier, or {@code null} if not available or not applicable
+     * @since 4.0.0
+     */
+    @Nullable
+    default String getModelId() {
+        return null;
+    }
+
+    /**
      * Interface for locating POM files within a project structure.
      * Implementations of this interface provide the ability to find POM files
      * in various project contexts.

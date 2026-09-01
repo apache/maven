@@ -181,6 +181,12 @@ public final class Sources {
         }
 
         @Override
+        @Nullable
+        public String getModelId() {
+            return location;
+        }
+
+        @Override
         public Source resolve(String relative) {
             return null;
         }
