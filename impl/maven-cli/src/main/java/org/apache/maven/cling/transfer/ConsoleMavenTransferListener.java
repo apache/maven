@@ -78,7 +78,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
             long complete = Math.max(0, entry.transferredBytes);
             long total = Math.max(complete, entry.resource.getContentLength());
 
-            String resourceName = entry.resource.getResourceName();
+            String resourceName = sanitize(entry.resource.getResourceName());
 
             if (printResourceNames) {
                 int idx = resourceName.lastIndexOf('/');
