@@ -273,6 +273,8 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
             ValidatingMetadataXpp3Reader mappingReader = new ValidatingMetadataXpp3Reader();
 
             result = mappingReader.read(reader, false);
+
+            validateVersioning(result);
         } catch (FileNotFoundException e) {
             throw new RepositoryMetadataReadException("Cannot read metadata from '" + mappingFile + "'", e);
         } catch (IOException | XmlPullParserException e) {
@@ -280,6 +282,51 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
                     "Cannot read metadata from '" + mappingFile + "': " + e.getMessage(), e);
         }
         return result;
+    }
+
+    /**
+     * Version tokens adopted from repository metadata must be valid coordinate components; metadata carrying
+     * anything else is treated as invalid.
+     */
+    private static void validateVersioning(Metadata metadata) throws RepositoryMetadataReadException {
+        if (metadata == null) {
+            return;
+        }
+        Versioning versioning = metadata.getVersioning();
+        if (versioning == null) {
+            return;
+        }
+        validateVersionToken(versioning.getLatest());
+        validateVersionToken(versioning.getRelease());
+        for (String version : versioning.getVersions()) {
+            validateVersionToken(version);
+        }
+        for (SnapshotVersion snapshotVersion : versioning.getSnapshotVersions()) {
+            validateVersionToken(snapshotVersion.getVersion());
+        }
+        Snapshot snapshot = versioning.getSnapshot();
+        if (snapshot != null) {
+            validateVersionToken(snapshot.getTimestamp());
+        }
+    }
+
+    private static void validateVersionToken(String value) throws RepositoryMetadataReadException {
+        if (value == null || value.isEmpty()) {
+            return;
+        }
+        boolean valid = !"..".equals(value);
+        if (valid) {
+            for (int i = 0; i < value.length(); i++) {
+                char c = value.charAt(i);
+                if (c == '/' || c == '\\' || c == ':' || Character.isISOControl(c)) {
+                    valid = false;
+                    break;
+                }
+            }
+        }
+        if (!valid) {
+            throw new RepositoryMetadataReadException("Metadata contains an invalid version token: '" + value + "'");
+        }
     }
 
     /**
