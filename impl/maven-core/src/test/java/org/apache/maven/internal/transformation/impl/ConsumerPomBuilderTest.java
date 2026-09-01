@@ -1160,6 +1160,64 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         assertEquals("2.5.0", result.getDependencies().get(0).getVersion());
     }
 
+    /**
+     * Verifies that properties defined in profiles of the raw model are treated as
+     * consumer-resolvable, even when they are absent from the effective model's
+     * properties (because BUILD_CONSUMER does not re-activate profiles and the
+     * model builder's merge() never adds new user-property keys).
+     * This is the exact scenario from MavenITmng8709ProfileDependencyVersionTest:
+     * a profile with {@code <activeByDefault>true</activeByDefault>} defines
+     * {@code junit.version}, and the consumer POM must preserve {@code ${junit.version}}.
+     */
+    @Test
+    void testInterpolatePomVersionsPreservesProfileProperties() {
+        Dependency rawDep = Dependency.newBuilder()
+                .groupId("org.junit.jupiter")
+                .artifactId("junit-jupiter-api")
+                .version("${junit.version}")
+                .build();
+
+        // Raw model has the property in a profile, NOT in top-level <properties>
+        Profile profile = Profile.newBuilder()
+                .id("default-versions")
+                .activation(Activation.newBuilder().activeByDefault(true).build())
+                .properties(Map.of("junit.version", "5.11.0"))
+                .build();
+
+        Model rawModel = Model.newBuilder()
+                .groupId("org.apache.maven.its.mng8709")
+                .artifactId("profile-version")
+                .version("1.0")
+                .profiles(List.of(profile))
+                .dependencies(List.of(rawDep))
+                .build();
+
+        // Effective model: version is resolved, but junit.version is NOT in
+        // effectiveModel.getProperties() because BUILD_CONSUMER didn't activate
+        // the profile and merge() doesn't add new user-property keys
+        Dependency effectiveDep = Dependency.newBuilder()
+                .groupId("org.junit.jupiter")
+                .artifactId("junit-jupiter-api")
+                .version("5.11.0")
+                .build();
+
+        Model effectiveModel = Model.newBuilder()
+                .groupId("org.apache.maven.its.mng8709")
+                .artifactId("profile-version")
+                .version("1.0")
+                // No "junit.version" in properties — simulates BUILD_CONSUMER behavior
+                .dependencies(List.of(effectiveDep))
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
+
+        assertEquals(1, result.getDependencies().size());
+        assertEquals(
+                "${junit.version}",
+                result.getDependencies().get(0).getVersion(),
+                "Profile-defined property should be preserved as ${...} for consumers to resolve");
+    }
+
     // ── hasNonModelProperties unit tests ─────────────────────────────────────
 
     @Test

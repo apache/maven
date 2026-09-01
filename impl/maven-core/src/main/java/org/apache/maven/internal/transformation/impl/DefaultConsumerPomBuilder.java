@@ -226,7 +226,20 @@ class DefaultConsumerPomBuilder implements PomBuilder {
      * @see <a href="https://github.com/apache/maven/issues/12981">GH-12981</a>
      */
     static Model interpolatePomVersions(Model rawModel, Model effectiveModel) {
-        Map<String, String> modelProperties = effectiveModel.getProperties();
+        // Build the set of properties available to downstream consumers.
+        // effectiveModel.getProperties() contains properties from the POM and parent chain.
+        // However, BUILD_CONSUMER does not re-activate profiles, and the model builder's
+        // merge() only overrides existing keys — it never adds new user-property keys.
+        // So profile-defined properties (e.g. from <activeByDefault> profiles) may be
+        // absent from the effective model's properties map even though transformPom()
+        // preserves those profiles in the consumer POM and consumers CAN resolve them.
+        // We must include properties from ALL profiles in the raw model to avoid
+        // incorrectly interpolating resolvable references like ${junit.version}.
+        Map<String, String> consumerProperties = new LinkedHashMap<>(effectiveModel.getProperties());
+        for (Profile profile : rawModel.getProfiles()) {
+            consumerProperties.putAll(profile.getProperties());
+        }
+        Map<String, String> modelProperties = consumerProperties;
 
         // Build lookups from the effective model's resolved dependency entries
         Map<String, Dependency> effectiveManagedDeps = new LinkedHashMap<>();
