@@ -82,13 +82,13 @@ public class DefaultModelValidator implements ModelValidator {
     private static final Pattern CI_FRIENDLY_EXPRESSION = Pattern.compile("\\$\\{(.+?)}");
     private static final Pattern EXPRESSION_PROJECT_NAME_PATTERN = Pattern.compile("\\$\\{(project.+?)}");
 
-    private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
+    private static final String ILLEGAL_NTFS_FILENAME_CHARS = "\\/:\"<>|?*";
 
-    private static final String ILLEGAL_RELATIVE_PATH_CHARS = ":\"<>|?*";
+    private static final String ILLEGAL_WINDOWS_PATH_CHARS = ":\"<>|?*";
 
-    private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_FS_CHARS;
+    private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_NTFS_FILENAME_CHARS;
 
-    private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_FS_CHARS;
+    private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_NTFS_FILENAME_CHARS;
 
     private static final String EMPTY = "";
 
@@ -175,7 +175,7 @@ public class DefaultModelValidator implements ModelValidator {
                         parent.getRelativePath(),
                         null,
                         parent,
-                        ILLEGAL_RELATIVE_PATH_CHARS);
+                        ILLEGAL_WINDOWS_PATH_CHARS);
             }
 
             // [MNG-6074] Maven should produce an error if no model version has been set in a POM file used to build an
