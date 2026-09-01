@@ -37,7 +37,7 @@ class DefaultModelPathTranslatorTest {
 
     @BeforeEach
     void setUp() {
-        translator = new DefaultModelPathTranslator(new DefaultPathTranslator());
+        translator = new DefaultModelPathTranslator();
         basedir = Path.of("/home/user/myproject").toAbsolutePath();
     }
 

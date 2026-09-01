@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
-import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Build;
@@ -42,13 +41,6 @@ import org.apache.maven.api.services.model.ModelPathTranslator;
 @Named
 @Singleton
 public class DefaultModelPathTranslator implements ModelPathTranslator {
-
-    private final DefaultPathTranslator pathTranslator;
-
-    @Inject
-    public DefaultModelPathTranslator(DefaultPathTranslator pathTranslator) {
-        this.pathTranslator = pathTranslator;
-    }
 
     @Override
     public Model alignToBaseDirectory(Model model, Path basedir, ModelBuilderRequest request) {
@@ -172,7 +164,7 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
      * @return relocated path, or {@code null} if the given path was null
      */
     private String alignToBaseDirectory(String path, Path basedir) {
-        String newPath = pathTranslator.alignToBaseDirectory(path, basedir);
+        String newPath = DefaultPathTranslator.alignToBaseDirectory(path, basedir);
         return Objects.equals(path, newPath) ? path : newPath;
     }
 }

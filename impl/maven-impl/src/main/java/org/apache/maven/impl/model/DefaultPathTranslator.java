@@ -21,19 +21,16 @@ package org.apache.maven.impl.model;
 import java.io.File;
 import java.nio.file.Path;
 
-import org.apache.maven.api.di.Named;
-import org.apache.maven.api.di.Singleton;
-
 /**
  * Resolves relative paths against a specific base directory.
  *
- * <p>Internal implementation, not part of the public API.
+ * <p>Internal utility, not part of the public API.
  */
-@Named
-@Singleton
-public class DefaultPathTranslator {
+public final class DefaultPathTranslator {
 
-    public String alignToBaseDirectory(String path, Path basedir) {
+    private DefaultPathTranslator() {}
+
+    public static String alignToBaseDirectory(String path, Path basedir) {
         String result = path;
 
         if (path != null && basedir != null) {

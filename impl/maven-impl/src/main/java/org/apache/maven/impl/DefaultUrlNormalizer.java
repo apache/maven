@@ -18,20 +18,16 @@
  */
 package org.apache.maven.impl;
 
-import org.apache.maven.api.di.Named;
-import org.apache.maven.api.di.Singleton;
-import org.apache.maven.api.services.model.UrlNormalizer;
-
 /**
- * Normalizes a URL.
+ * Normalizes a URL by removing parent directory references ("/../").
  *
+ * <p>Internal utility, not part of the public API.
  */
-@Named
-@Singleton
-public class DefaultUrlNormalizer implements UrlNormalizer {
+public final class DefaultUrlNormalizer {
 
-    @Override
-    public String normalize(String url) {
+    private DefaultUrlNormalizer() {}
+
+    public static String normalize(String url) {
         String result = url;
 
         if (result != null) {

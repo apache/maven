@@ -1076,7 +1076,7 @@ class DefaultModelBuilderTest {
     private static DefaultProfileActivationContext newProfileActivationContext(
             List<String> activeIds, List<String> inactiveIds) {
         return new DefaultProfileActivationContext(
-                null, null, null, activeIds, inactiveIds, Map.of(), Map.of(), Model.newInstance());
+                null, null, activeIds, inactiveIds, Map.of(), Map.of(), Model.newInstance());
     }
 
     @Provides

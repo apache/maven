@@ -31,7 +31,6 @@ import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.impl.DefaultModelVersionParser;
 import org.apache.maven.impl.DefaultVersionParser;
 import org.apache.maven.impl.model.DefaultInterpolator;
-import org.apache.maven.impl.model.DefaultPathTranslator;
 import org.apache.maven.impl.model.DefaultProfileActivationContext;
 import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.BeforeEach;
@@ -480,8 +479,8 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     }
 
     protected ProfileActivationContext newFileContext(Path path) {
-        DefaultProfileActivationContext context = new DefaultProfileActivationContext(
-                new DefaultPathTranslator(), new FakeRootLocator(), new DefaultInterpolator());
+        DefaultProfileActivationContext context =
+                new DefaultProfileActivationContext(new FakeRootLocator(), new DefaultInterpolator());
 
         context.setModel(Model.newBuilder().pomFile(path.resolve("pom.xml")).build());
         return context;

@@ -160,7 +160,6 @@ public class DefaultModelBuilder implements ModelBuilder {
     private final List<ModelTransformer> transformers;
     private final ModelResolver modelResolver;
     private final Interpolator interpolator;
-    private final DefaultPathTranslator pathTranslator;
     private final RootLocator rootLocator;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
@@ -184,7 +183,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             @Nullable List<ModelTransformer> transformers,
             ModelResolver modelResolver,
             Interpolator interpolator,
-            DefaultPathTranslator pathTranslator,
             RootLocator rootLocator) {
         this.modelProcessor = modelProcessor;
         this.modelValidator = modelValidator;
@@ -204,7 +202,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.transformers = transformers;
         this.modelResolver = modelResolver;
         this.interpolator = interpolator;
-        this.pathTranslator = pathTranslator;
         this.rootLocator = rootLocator;
     }
 
@@ -2609,7 +2606,6 @@ public class DefaultModelBuilder implements ModelBuilder {
 
     private DefaultProfileActivationContext getProfileActivationContext(ModelBuilderRequest request, Model model) {
         return new DefaultProfileActivationContext(
-                pathTranslator,
                 rootLocator,
                 interpolator,
                 request.getActiveProfileIds(),
