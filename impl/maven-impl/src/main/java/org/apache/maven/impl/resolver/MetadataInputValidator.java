@@ -88,14 +88,7 @@ public final class MetadataInputValidator {
      * @throws IOException if the token contains path-traversal sequences, separators, or control characters
      */
     public static void validateVersionToken(String value, String description) throws IOException {
-        if (value == null || value.isEmpty()) {
-            return;
-        }
-        boolean invalid = "..".equals(value) || value.contains("/") || value.contains("\\") || value.contains(":");
-        for (int i = 0; i < value.length() && !invalid; i++) {
-            invalid = Character.isISOControl(value.charAt(i));
-        }
-        if (invalid) {
+        if (isInvalidCoordinateComponent(value)) {
             throw new IOException("Rejecting metadata with invalid " + description + " '" + value
                     + "': must not contain '..', '/', '\\', ':' or control characters");
         }
