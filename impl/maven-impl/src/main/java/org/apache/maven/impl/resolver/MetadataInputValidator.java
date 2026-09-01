@@ -33,7 +33,7 @@ import org.apache.maven.api.metadata.Versioning;
  * would map onto filesystem path-traversal segments ({@code ..}), separators ({@code /}, {@code \}),
  * drive-letter delimiters ({@code :}), or ISO control characters are rejected.
  *
- * @since 4.1.0
+ * @since 4.0.0
  */
 public final class MetadataInputValidator {
 
@@ -88,14 +88,7 @@ public final class MetadataInputValidator {
      * @throws IOException if the token contains path-traversal sequences, separators, or control characters
      */
     public static void validateVersionToken(String value, String description) throws IOException {
-        if (value == null || value.isEmpty()) {
-            return;
-        }
-        boolean invalid = "..".equals(value) || value.contains("/") || value.contains("\\") || value.contains(":");
-        for (int i = 0; i < value.length() && !invalid; i++) {
-            invalid = Character.isISOControl(value.charAt(i));
-        }
-        if (invalid) {
+        if (isInvalidCoordinateComponent(value)) {
             throw new IOException("Rejecting metadata with invalid " + description + " '" + value
                     + "': must not contain '..', '/', '\\', ':' or control characters");
         }
