@@ -18,6 +18,8 @@
  */
 package org.apache.maven.impl.standalone;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -29,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -57,6 +60,10 @@ import org.apache.maven.api.services.PackagingRegistry;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.TypeRegistry;
+import org.apache.maven.api.services.VersionParser;
+import org.apache.maven.api.settings.Mirror;
+import org.apache.maven.api.settings.Proxy;
+import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.spi.TypeProvider;
 import org.apache.maven.api.toolchain.ToolchainModel;
@@ -66,6 +73,7 @@ import org.apache.maven.di.impl.DIException;
 import org.apache.maven.impl.AbstractSession;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.di.SessionScope;
+import org.apache.maven.impl.resolver.MavenSessionBuilderSupplier;
 import org.apache.maven.impl.resolver.scopes.Maven4ScopeManagerConfiguration;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -73,15 +81,29 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.internal.impl.scope.ScopeManagerImpl;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
+import org.eclipse.aether.util.repository.AuthenticationBuilder;
+import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
+import org.eclipse.aether.util.repository.DefaultMirrorSelector;
+import org.eclipse.aether.util.repository.DefaultProxySelector;
 
 /**
  * Provides functionality for running Maven API in a standalone mode.
  * <p>
  * This class serves as the main entry point for executing Maven operations outside
  * of the standard Maven build environment. It provides methods for creating and
- * managing Maven sessions in a simplified context, primarily for testing and
- * specialized execution scenarios.
+ * managing Maven sessions in a simplified context, suitable for tools, IDE integrations,
+ * and specialized execution scenarios.
  * </p>
+ *
+ * <p>The standalone session reads and applies the user's {@code settings.xml} including:</p>
+ * <ul>
+ *   <li>Local repository location</li>
+ *   <li>Server authentication (username, password, private key)</li>
+ *   <li>Proxy configuration</li>
+ *   <li>Mirror configuration</li>
+ *   <li>Repository definitions from active profiles</li>
+ *   <li>Offline mode</li>
+ * </ul>
  *
  * <p>Example usage:</p>
  * <pre>
@@ -126,28 +148,11 @@ public class ApiRunner {
      * @return a new {@link Session} instance
      */
     public static Session createSession(Consumer<Injector> injectorConsumer, Path localRepo) {
-        return createSession(injectorConsumer, localRepo, true);
-    }
-
-    /**
-     * Creates a new Maven session with custom injector configuration, local repository path
-     * and control over {@code user.home} isolation.
-     *
-     * @param injectorConsumer consumer function to customize the injector
-     * @param localRepo path to the local repository
-     * @param isolateUserHome when {@code true}, the session remaps {@code user.home} to the
-     *        {@code target} directory so the invoking user's {@code settings.xml} and local
-     *        repository cannot interfere with tests; callers that want the operator's real
-     *        configuration honored (such as the mvnup tool) must pass {@code false}
-     * @return a new {@link Session} instance
-     */
-    public static Session createSession(Consumer<Injector> injectorConsumer, Path localRepo, boolean isolateUserHome) {
         Injector injector = Injector.create();
         injector.bindInstance(Injector.class, injector);
         injector.bindImplicit(ApiRunner.class);
         injector.bindImplicit(RepositorySystemSupplier.class);
         injector.bindInstance(LocalRepoProvider.class, () -> localRepo);
-        injector.bindInstance(UserHomeIsolation.class, () -> isolateUserHome);
         injector.discover(ApiRunner.class.getClassLoader());
         if (injectorConsumer != null) {
             injectorConsumer.accept(injector);
@@ -158,17 +163,6 @@ public class ApiRunner {
         scope.seed(Session.class, session);
         injector.bindScope(SessionScoped.class, scope);
         return session;
-    }
-
-    /**
-     * Controls whether the standalone session isolates {@code user.home} from the invoking
-     * user's environment.
-     */
-    interface UserHomeIsolation {
-        /**
-         * @return {@code true} to remap {@code user.home} away from the real user home
-         */
-        boolean isolated();
     }
 
     /**
@@ -190,6 +184,8 @@ public class ApiRunner {
 
         private final Map<String, String> systemProperties;
         private final Instant startTime = MonotonicClock.now();
+        private Settings settings;
+        private Version mavenVersion;
 
         DefaultSession(RepositorySystemSession session, RepositorySystem repositorySystem, Lookup lookup) {
             this(session, repositorySystem, Collections.emptyList(), null, lookup);
@@ -209,12 +205,24 @@ public class ApiRunner {
 
         @Override
         protected Session newSession(RepositorySystemSession session, List<RemoteRepository> repositories) {
-            return new DefaultSession(session, repositorySystem, repositories, null, lookup);
+            DefaultSession newSession = new DefaultSession(session, repositorySystem, repositories, null, lookup);
+            newSession.settings = this.settings;
+            newSession.mavenVersion = this.mavenVersion;
+            return newSession;
+        }
+
+        void setSettings(Settings settings) {
+            this.settings = settings;
+        }
+
+        void setMavenVersion(Version mavenVersion) {
+            this.mavenVersion = mavenVersion;
         }
 
         @Override
+        @Nonnull
         public Settings getSettings() {
-            return Settings.newInstance();
+            return settings != null ? settings : Settings.newInstance();
         }
 
         @Override
@@ -245,7 +253,7 @@ public class ApiRunner {
 
         @Override
         public Version getMavenVersion() {
-            return null;
+            return mavenVersion;
         }
 
         @Override
@@ -396,20 +404,12 @@ public class ApiRunner {
     static Session newSession(
             RepositorySystem system,
             Lookup lookup,
-            @Nullable LocalRepoProvider localRepoProvider,
-            @Nullable UserHomeIsolation userHomeIsolation) {
+            @Nullable LocalRepoProvider localRepoProvider) {
         Map<String, String> properties = new HashMap<>();
         // Env variables prefixed with "env."
         System.getenv().forEach((k, v) -> properties.put("env." + k, v));
         // Java System properties
         System.getProperties().forEach((k, v) -> properties.put(k.toString(), v.toString()));
-
-        // Test isolation shim: do not let the invoking user's settings interfere with unit
-        // tests. Callers that want the operator's real settings.xml and local repository
-        // honored must create the session with isolateUserHome=false (see createSession).
-        if (userHomeIsolation == null || userHomeIsolation.isolated()) {
-            properties.put("user.home", "target");
-        }
 
         Path userHome = Paths.get(properties.get("user.home"));
         Path mavenUserHome = userHome.resolve(".m2");
@@ -417,8 +417,16 @@ public class ApiRunner {
                 ? Paths.get(properties.get("maven.home"))
                 : properties.containsKey("env.MAVEN_HOME") ? Paths.get(properties.get("env.MAVEN_HOME")) : null;
 
+        // Configure the resolver session with dependency resolution machinery
+        MavenSessionBuilderSupplier sessionBuilderSupplier = new MavenSessionBuilderSupplier(system, false);
         DefaultRepositorySystemSession rsession = new DefaultRepositorySystemSession(h -> false);
         rsession.setScopeManager(new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE));
+        rsession.setDependencyTraverser(sessionBuilderSupplier.getDependencyTraverser());
+        rsession.setDependencyManager(sessionBuilderSupplier.getDependencyManager(true));
+        rsession.setDependencySelector(sessionBuilderSupplier.getDependencySelector());
+        rsession.setDependencyGraphTransformer(sessionBuilderSupplier.getDependencyGraphTransformer());
+        rsession.setArtifactTypeRegistry(sessionBuilderSupplier.getArtifactTypeRegistry());
+        rsession.setArtifactDescriptorPolicy(sessionBuilderSupplier.getArtifactDescriptorPolicy());
         rsession.setSystemProperties(properties);
         rsession.setConfigProperties(properties);
 
@@ -437,6 +445,12 @@ public class ApiRunner {
                         mavenUserHome.resolve("settings.xml"))
                 .getEffectiveSettings();
 
+        // Store the effective settings on the session
+        session.setSettings(settings);
+
+        // Set the Maven version
+        session.setMavenVersion(detectMavenVersion(lookup));
+
         // local repository
         String localRepository = settings.getLocalRepository() != null
                         && !settings.getLocalRepository().isEmpty()
@@ -446,15 +460,56 @@ public class ApiRunner {
                         : mavenUserHome.resolve("repository").toString();
         LocalRepositoryManager llm = system.newLocalRepositoryManager(rsession, new LocalRepository(localRepository));
         rsession.setLocalRepositoryManager(llm);
-        // active proxies
-        // TODO
-        // active profiles
 
-        Profile profile = session.getService(SettingsBuilder.class)
-                .convert(org.apache.maven.api.settings.Profile.newBuilder()
-                        .repositories(settings.getRepositories())
-                        .pluginRepositories(settings.getPluginRepositories())
-                        .build());
+        // Apply offline mode from settings
+        if (settings.isOffline()) {
+            rsession.setOffline(true);
+        }
+
+        // Apply proxy configuration from settings
+        DefaultProxySelector proxySelector = new DefaultProxySelector();
+        for (Proxy proxy : settings.getProxies()) {
+            if (proxy.isActive()) {
+                AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+                authBuilder.addUsername(proxy.getUsername()).addPassword(proxy.getPassword());
+                proxySelector.add(
+                        new org.eclipse.aether.repository.Proxy(
+                                proxy.getProtocol(), proxy.getHost(), proxy.getPort(), authBuilder.build()),
+                        proxy.getNonProxyHosts());
+            }
+        }
+        rsession.setProxySelector(proxySelector);
+
+        // Apply mirror configuration from settings
+        DefaultMirrorSelector mirrorSelector = new DefaultMirrorSelector();
+        for (Mirror mirror : settings.getMirrors()) {
+            mirrorSelector.add(
+                    mirror.getId(),
+                    mirror.getUrl(),
+                    mirror.getLayout(),
+                    false,
+                    mirror.isBlocked(),
+                    mirror.getMirrorOf(),
+                    mirror.getMirrorOfLayouts());
+        }
+        rsession.setMirrorSelector(mirrorSelector);
+
+        // Apply server authentication from settings
+        DefaultAuthenticationSelector authSelector = new DefaultAuthenticationSelector();
+        for (Server server : settings.getServers()) {
+            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+            authBuilder.addUsername(server.getUsername()).addPassword(server.getPassword());
+            authBuilder.addPrivateKey(server.getPrivateKey(), server.getPassphrase());
+            authSelector.add(server.getId(), authBuilder.build());
+        }
+        rsession.setAuthenticationSelector(authSelector);
+
+        // Build repositories from active profiles in settings
+        SettingsBuilder settingsBuilder = session.getService(SettingsBuilder.class);
+        Profile profile = settingsBuilder.convert(org.apache.maven.api.settings.Profile.newBuilder()
+                .repositories(settings.getRepositories())
+                .pluginRepositories(settings.getPluginRepositories())
+                .build());
         RepositoryFactory repositoryFactory = session.getService(RepositoryFactory.class);
         List<RemoteRepository> repositories = profile.getRepositories().stream()
                 .map(repositoryFactory::createRemote)
@@ -462,15 +517,44 @@ public class ApiRunner {
         InternalSession s = (InternalSession) session.withRemoteRepositories(repositories);
         InternalSession.associate(rsession, s);
         return s;
+    }
 
-        // List<RemoteRepository> repositories = repositoryFactory.createRemote();
+    /**
+     * Detects the Maven version by reading the pom.properties resource from the classpath.
+     * Falls back to reading from maven-impl's own pom.properties if maven-core is not available.
+     *
+     * @param lookup the lookup service
+     * @return the detected Maven version, or {@code null} if it cannot be determined
+     */
+    private static Version detectMavenVersion(Lookup lookup) {
+        String version = loadVersionFromProperties("META-INF/maven/org.apache.maven/maven-core/pom.properties");
+        if (version == null) {
+            version = loadVersionFromProperties("META-INF/maven/org.apache.maven/maven-impl/pom.properties");
+        }
+        if (version != null) {
+            try {
+                return lookup.lookup(VersionParser.class).parseVersion(version);
+            } catch (Exception e) {
+                // ignore parse errors
+            }
+        }
+        return null;
+    }
 
-        //        session.getService(SettingsBuilder.class).convert()
-
-        //        settings.getDelegate().getRepositories().stream()
-        //                        .map(r -> SettingsUtilsV4.)
-        //        defaultSession.getService(RepositoryFactory.class).createRemote()
-        //        return defaultSession;
+    private static String loadVersionFromProperties(String resource) {
+        try (InputStream is = ApiRunner.class.getResourceAsStream("/" + resource)) {
+            if (is != null) {
+                Properties props = new Properties();
+                props.load(is);
+                String version = props.getProperty("version", "").trim();
+                if (!version.isEmpty() && !version.startsWith("${")) {
+                    return version;
+                }
+            }
+        } catch (IOException e) {
+            // ignore
+        }
+        return null;
     }
 
     record DumbPackaging(String id, Type type, Map<String, PluginContainer> plugins) implements Packaging {}
