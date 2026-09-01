@@ -24,11 +24,13 @@ import java.util.Map;
 import java.util.Set;
 
 import eu.maveniverse.domtrip.Document;
+import eu.maveniverse.domtrip.Editor;
 import eu.maveniverse.domtrip.Element;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.artifact.versioning.ComparableVersion;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 import org.apache.maven.impl.JdkSourceLevelSupport;
 
@@ -40,6 +42,7 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGINS;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PLUGIN_MANAGEMENT;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROPERTIES;
+import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.VERSION;
 
 /**
  * Strategy for adding the {@code maven-toolchains-plugin} with the {@code select-jdk-toolchain}
@@ -68,6 +71,13 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
     static final String MAVEN_TOOLCHAINS_PLUGIN = "maven-toolchains-plugin";
     static final String TOOLCHAINS_PLUGIN_GROUP_ID = "org.apache.maven.plugins";
     static final String SELECT_JDK_TOOLCHAIN_GOAL = "select-jdk-toolchain";
+
+    /**
+     * Minimum toolchains-plugin version that contains the {@code select-jdk-toolchain} goal.
+     * Older versions (e.g. 1.1) only have {@code help} and {@code toolchain} goals, so adding
+     * a {@code select-jdk-toolchain} execution without upgrading would break the build.
+     */
+    static final String TOOLCHAINS_PLUGIN_MIN_VERSION = "3.2.0";
 
     private static final String MAVEN_COMPILER_RELEASE = "maven.compiler.release";
     private static final String MAVEN_COMPILER_SOURCE = "maven.compiler.source";
@@ -322,6 +332,11 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
      * to the POM's {@code <build><plugins>} section, configured with a version constraint
      * so the plugin selects a JDK that supports the project's source level.
      *
+     * <p>If the plugin already exists in the POM (e.g. with the older {@code toolchain} goal),
+     * the {@code select-jdk-toolchain} execution is appended to the existing entry and its
+     * version is upgraded to at least {@value #TOOLCHAINS_PLUGIN_MIN_VERSION} — the first
+     * version that contains the {@code select-jdk-toolchain} goal.
+     *
      * @param pomDocument the POM document to modify
      * @param maxJdkVersion the latest JDK major version that supports the source level
      */
@@ -330,13 +345,81 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
         Element build = root.childElement(BUILD).orElseGet(() -> DomUtils.insertNewElement(BUILD, root));
         Element plugins = build.childElement(PLUGINS).orElseGet(() -> DomUtils.insertNewElement(PLUGINS, build));
 
-        Element plugin = DomUtils.createPlugin(plugins, TOOLCHAINS_PLUGIN_GROUP_ID, MAVEN_TOOLCHAINS_PLUGIN, null);
-        Element executions = DomUtils.insertNewElement("executions", plugin);
+        // Look for an existing toolchains-plugin entry (may have only the older 'toolchain' goal)
+        Element existingPlugin = findToolchainsPlugin(plugins);
+        final Element plugin;
+        if (existingPlugin != null) {
+            // Existing plugin — ensure version is >= 3.2.0
+            ensureMinimumVersion(pomDocument, existingPlugin);
+            plugin = existingPlugin;
+        } else {
+            // New plugin entry — set version to the minimum that has select-jdk-toolchain
+            plugin = DomUtils.createPlugin(
+                    plugins, TOOLCHAINS_PLUGIN_GROUP_ID, MAVEN_TOOLCHAINS_PLUGIN, TOOLCHAINS_PLUGIN_MIN_VERSION);
+        }
+
+        // Also upgrade version in pluginManagement if present there
+        Element pluginManagement = build.childElement(PLUGIN_MANAGEMENT).orElse(null);
+        if (pluginManagement != null) {
+            Element managedPlugins = pluginManagement.childElement(PLUGINS).orElse(null);
+            if (managedPlugins != null) {
+                Element managedPlugin = findToolchainsPlugin(managedPlugins);
+                if (managedPlugin != null) {
+                    ensureMinimumVersion(pomDocument, managedPlugin);
+                }
+            }
+        }
+
+        Element executions =
+                plugin.childElement("executions").orElseGet(() -> DomUtils.insertNewElement("executions", plugin));
         Element execution = DomUtils.insertNewElement("execution", executions);
         Element goals = DomUtils.insertNewElement("goals", execution);
         DomUtils.insertContentElement(goals, "goal", SELECT_JDK_TOOLCHAIN_GOAL);
         Element configuration = DomUtils.insertNewElement(CONFIGURATION, execution);
         DomUtils.insertContentElement(configuration, "version", "(," + maxJdkVersion + "]");
+    }
+
+    /**
+     * Finds an existing {@code maven-toolchains-plugin} element in a plugins section.
+     *
+     * @return the plugin element, or {@code null} if not found
+     */
+    private Element findToolchainsPlugin(Element pluginsElement) {
+        for (Element plugin : pluginsElement.childElements(PLUGIN).toList()) {
+            String artifactId = plugin.childTextTrimmed(ARTIFACT_ID);
+            String groupId = plugin.childTextTrimmed(GROUP_ID);
+            if (MAVEN_TOOLCHAINS_PLUGIN.equals(artifactId)
+                    && (groupId == null || groupId.isEmpty() || TOOLCHAINS_PLUGIN_GROUP_ID.equals(groupId))) {
+                return plugin;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Ensures the plugin element has a version >= {@value #TOOLCHAINS_PLUGIN_MIN_VERSION}.
+     * If the version is missing or below the minimum, it is set/upgraded.
+     */
+    void ensureMinimumVersion(Document pomDocument, Element plugin) {
+        Element versionElement = plugin.childElement(VERSION).orElse(null);
+        if (versionElement == null) {
+            // No version element — add one with the minimum version
+            DomUtils.insertContentElement(plugin, VERSION, TOOLCHAINS_PLUGIN_MIN_VERSION);
+        } else {
+            String currentVersion = versionElement.textContentTrimmed();
+            if (currentVersion != null && !currentVersion.startsWith("${")) {
+                if (isVersionBelow(currentVersion, TOOLCHAINS_PLUGIN_MIN_VERSION)) {
+                    new Editor(pomDocument).setTextContent(versionElement, TOOLCHAINS_PLUGIN_MIN_VERSION);
+                }
+            }
+        }
+    }
+
+    /**
+     * Checks if {@code currentVersion} is below {@code minVersion} using Maven version semantics.
+     */
+    static boolean isVersionBelow(String currentVersion, String minVersion) {
+        return new ComparableVersion(currentVersion).compareTo(new ComparableVersion(minVersion)) < 0;
     }
 
     /**

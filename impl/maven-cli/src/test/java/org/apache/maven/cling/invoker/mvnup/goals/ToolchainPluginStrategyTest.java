@@ -359,6 +359,8 @@ class ToolchainPluginStrategyTest {
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
             String output = doc.toXml();
             assertTrue(output.contains("<version>(,11]</version>"), "Expected version constraint in output: " + output);
+            assertTrue(
+                    output.contains("<version>3.2.0</version>"), "Expected plugin version 3.2.0 in output: " + output);
         }
 
         @Test
@@ -386,6 +388,219 @@ class ToolchainPluginStrategyTest {
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
             String output = doc.toXml();
             assertTrue(output.contains("<version>(,8]</version>"), "Expected version constraint in output: " + output);
+            assertTrue(
+                    output.contains("<version>3.2.0</version>"), "Expected plugin version 3.2.0 in output: " + output);
+        }
+
+        @Test
+        @DisplayName("should upgrade toolchains-plugin version 1.1 when adding select-jdk-toolchain execution")
+        void upgradeOldToolchainsPlugin() {
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>com.example</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-toolchains-plugin</artifactId>
+                                    <version>1.1</version>
+                                    <executions>
+                                        <execution>
+                                            <goals>
+                                                <goal>toolchain</goal>
+                                            </goals>
+                                        </execution>
+                                    </executions>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+            Document doc = Document.of(pomXml);
+            strategy.addToolchainsPlugin(doc, 11);
+
+            assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
+            String output = doc.toXml();
+            // Version should be upgraded from 1.1 to 3.2.0
+            assertFalse(
+                    output.contains("<version>1.1</version>"), "Old version 1.1 should have been upgraded: " + output);
+            assertTrue(
+                    output.contains("<version>3.2.0</version>"),
+                    "Expected upgraded version 3.2.0 in output: " + output);
+            // Should NOT create a duplicate plugin entry
+            assertEquals(
+                    1,
+                    output.split("maven-toolchains-plugin").length - 1,
+                    "Should have exactly one toolchains-plugin entry: " + output);
+            // Old toolchain goal should still be present
+            assertTrue(
+                    output.contains("<goal>toolchain</goal>"), "Old toolchain goal should still be present: " + output);
+        }
+
+        @Test
+        @DisplayName("should not downgrade toolchains-plugin version when already >= 3.2.0")
+        void noDowngradeWhenSufficient() {
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>com.example</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-toolchains-plugin</artifactId>
+                                    <version>3.3.0</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+            Document doc = Document.of(pomXml);
+            strategy.addToolchainsPlugin(doc, 11);
+
+            String output = doc.toXml();
+            // Version should remain 3.3.0, not downgraded to 3.2.0
+            assertTrue(
+                    output.contains("<version>3.3.0</version>"), "Version 3.3.0 should not be downgraded: " + output);
+        }
+
+        @Test
+        @DisplayName("should add version when existing toolchains-plugin has no version element")
+        void addVersionWhenMissing() {
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>com.example</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-toolchains-plugin</artifactId>
+                                    <executions>
+                                        <execution>
+                                            <goals>
+                                                <goal>toolchain</goal>
+                                            </goals>
+                                        </execution>
+                                    </executions>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+            Document doc = Document.of(pomXml);
+            strategy.addToolchainsPlugin(doc, 11);
+
+            String output = doc.toXml();
+            assertTrue(output.contains("<version>3.2.0</version>"), "Expected version 3.2.0 to be added: " + output);
+        }
+
+        @Test
+        @DisplayName("should upgrade toolchains-plugin version in pluginManagement when adding execution")
+        void upgradeVersionInPluginManagement() {
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>com.example</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0</version>
+                        <build>
+                            <pluginManagement>
+                                <plugins>
+                                    <plugin>
+                                        <groupId>org.apache.maven.plugins</groupId>
+                                        <artifactId>maven-toolchains-plugin</artifactId>
+                                        <version>1.1</version>
+                                    </plugin>
+                                </plugins>
+                            </pluginManagement>
+                        </build>
+                    </project>
+                    """;
+            Document doc = Document.of(pomXml);
+            strategy.addToolchainsPlugin(doc, 11);
+
+            assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
+            String output = doc.toXml();
+            // pluginManagement version should be upgraded
+            assertFalse(
+                    output.contains("<version>1.1</version>"),
+                    "Old version 1.1 in pluginManagement should have been upgraded: " + output);
+            assertTrue(output.contains("<version>3.2.0</version>"), "Expected upgraded version 3.2.0: " + output);
+        }
+
+        @Test
+        @DisplayName("should not touch property-referenced version in existing toolchains-plugin")
+        void skipPropertyVersion() {
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>com.example</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0</version>
+                        <properties>
+                            <toolchains.version>1.1</toolchains.version>
+                        </properties>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-toolchains-plugin</artifactId>
+                                    <version>${toolchains.version}</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+            Document doc = Document.of(pomXml);
+            strategy.addToolchainsPlugin(doc, 11);
+
+            String output = doc.toXml();
+            // Property reference should be left unchanged
+            assertTrue(
+                    output.contains("${toolchains.version}"),
+                    "Property-referenced version should be left unchanged: " + output);
+        }
+    }
+
+    @Nested
+    @DisplayName("Version comparison")
+    class VersionComparisonTests {
+
+        @Test
+        @DisplayName("version 1.1 should be below 3.2.0")
+        void v11BelowV320() {
+            assertTrue(ToolchainPluginStrategy.isVersionBelow("1.1", "3.2.0"));
+        }
+
+        @Test
+        @DisplayName("version 3.1.0 should be below 3.2.0")
+        void v310BelowV320() {
+            assertTrue(ToolchainPluginStrategy.isVersionBelow("3.1.0", "3.2.0"));
+        }
+
+        @Test
+        @DisplayName("version 3.2.0 should not be below 3.2.0")
+        void v320NotBelowV320() {
+            assertFalse(ToolchainPluginStrategy.isVersionBelow("3.2.0", "3.2.0"));
+        }
+
+        @Test
+        @DisplayName("version 3.3.0 should not be below 3.2.0")
+        void v330NotBelowV320() {
+            assertFalse(ToolchainPluginStrategy.isVersionBelow("3.3.0", "3.2.0"));
         }
     }
 
