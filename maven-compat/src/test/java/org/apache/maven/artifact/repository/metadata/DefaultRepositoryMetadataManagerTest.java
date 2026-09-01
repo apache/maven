@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.io.File;
+import java.net.URL;
 import java.util.Collections;
 
 import org.apache.maven.artifact.AbstractArtifactComponentTest;
@@ -33,7 +34,9 @@ import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests {@link DefaultRepositoryMetadataManager}.
@@ -48,6 +51,8 @@ class DefaultRepositoryMetadataManagerTest extends AbstractArtifactComponentTest
     @Inject
     @Named("default")
     private ArtifactRepositoryLayout layout;
+
+    private final DefaultRepositoryMetadataManager manager = new DefaultRepositoryMetadataManager();
 
     @Override
     protected String component() {
@@ -79,5 +84,31 @@ class DefaultRepositoryMetadataManagerTest extends AbstractArtifactComponentTest
         assertThrows(
                 RepositoryMetadataResolutionException.class,
                 () -> repositoryMetadataManager.resolve(metadata, Collections.singletonList(remoteRepo), localRepo));
+    }
+
+    @Test
+    void testMetadataWithInvalidVersionTokenIsRejected() {
+        File metadataFile = testFile("metadata-invalid-token/maven-metadata.xml");
+
+        RepositoryMetadataReadException exception =
+                assertThrows(RepositoryMetadataReadException.class, () -> manager.readMetadata(metadataFile));
+
+        assertTrue(exception.getMessage().contains("invalid version token"), exception.getMessage());
+    }
+
+    @Test
+    void testMetadataWithInvalidSnapshotTimestampIsRejected() {
+        File metadataFile = testFile("metadata-invalid-timestamp/maven-metadata.xml");
+
+        RepositoryMetadataReadException exception =
+                assertThrows(RepositoryMetadataReadException.class, () -> manager.readMetadata(metadataFile));
+
+        assertTrue(exception.getMessage().contains("invalid version token"), exception.getMessage());
+    }
+
+    private static File testFile(String resource) {
+        URL url = Thread.currentThread().getContextClassLoader().getResource(resource);
+        assertNotNull(url, "test resource not found: " + resource);
+        return new File(url.getFile());
     }
 }

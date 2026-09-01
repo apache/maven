@@ -78,4 +78,31 @@ public class DefaultVersionResolverTest extends AbstractRepositoryTest {
         VersionResult resultB = versionResolver.resolveVersion(session, requestB);
         assertEquals(versionB, resultB.getVersion());
     }
+
+    @Test
+    public void testSnapshotVersionFromMetadataWithInvalidTokenIsRejected() throws Exception {
+        VersionRequest request = new VersionRequest();
+        request.addRepository(newTestRepository());
+        Artifact artifact = new DefaultArtifact("org.apache.maven.its", "dep-invalid-sv", "", "jar", "1.0-SNAPSHOT");
+        request.setArtifact(artifact);
+
+        VersionResult result = versionResolver.resolveVersion(session, request);
+
+        // The metadata carries a snapshotVersion value that is not a valid coordinate component, so the
+        // metadata is treated as invalid and resolution falls back to the requested base version.
+        assertEquals("1.0-SNAPSHOT", result.getVersion());
+    }
+
+    @Test
+    public void testSnapshotTimestampFromMetadataWithInvalidTokenIsRejected() throws Exception {
+        VersionRequest request = new VersionRequest();
+        request.addRepository(newTestRepository());
+        Artifact artifact = new DefaultArtifact("org.apache.maven.its", "dep-invalid-ts", "", "jar", "1.0-SNAPSHOT");
+        request.setArtifact(artifact);
+
+        VersionResult result = versionResolver.resolveVersion(session, request);
+
+        // The metadata carries a snapshot timestamp that is not a valid coordinate component, so the
+        assertEquals("1.0-SNAPSHOT", result.getVersion());
+    }
 }

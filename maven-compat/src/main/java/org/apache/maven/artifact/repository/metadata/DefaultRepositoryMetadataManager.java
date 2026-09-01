@@ -285,6 +285,8 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
             ValidatingMetadataXpp3Reader mappingReader = new ValidatingMetadataXpp3Reader();
 
             result = mappingReader.read(reader, false);
+
+            validateVersioning(result);
         } catch (FileNotFoundException e) {
             throw new RepositoryMetadataReadException("Cannot read metadata from '" + mappingFile + "'", e);
         } catch (IOException | XmlPullParserException e) {
