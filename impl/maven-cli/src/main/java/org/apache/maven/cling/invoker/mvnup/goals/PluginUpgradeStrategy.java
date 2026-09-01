@@ -160,16 +160,14 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     "org.apache.felix",
                     "maven-bundle-plugin",
                     "5.1.1",
-                    "Versions before 5.1.1 use bndlib < 5.1.0 whose Jar.putResource() modifies a TreeMap inside"
-                            + " computeIfAbsent(), throwing ConcurrentModificationException on JDK 17.0.13+"
-                            + " (FELIX-6259, JDK-8259535)"),
+                    "Versions before 5.1.1 use bndlib < 5.1.0 which has internal collection mutation bugs"
+                            + " (FELIX-6259) that throw ConcurrentModificationException on JDK 17+"),
             new PluginUpgrade(
                     "biz.aQute.bnd",
                     "bnd-maven-plugin",
                     "5.1.0",
-                    "Versions before 5.1.0 have a Jar.putResource() bug that modifies a TreeMap inside"
-                            + " computeIfAbsent(), throwing ConcurrentModificationException on JDK 17.0.13+"
-                            + " (FELIX-6259, JDK-8259535)"));
+                    "Versions before 5.1.0 have internal collection mutation bugs (FELIX-6259)"
+                            + " that throw ConcurrentModificationException on JDK 17+"));
 
     private static final List<PluginUpgrade> PLUGIN_DEPENDENCY_UPGRADES = List.of(new PluginUpgrade(
             "org.codehaus.mojo",
