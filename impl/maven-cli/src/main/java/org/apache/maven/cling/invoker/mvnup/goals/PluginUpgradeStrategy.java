@@ -42,6 +42,7 @@ import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginManagement;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
+import org.apache.maven.impl.JdkSourceLevelSupport;
 
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.ARTIFACT_ID;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.BUILD;
@@ -169,7 +170,14 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     "bnd-maven-plugin",
                     "5.1.0",
                     "Versions before 5.1.0 have internal collection mutation bugs (FELIX-6259)"
-                            + " that throw ConcurrentModificationException on JDK 17+"));
+                            + " that throw ConcurrentModificationException on JDK 17+"),
+            new PluginUpgrade(
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID,
+                    "maven-checkstyle-plugin",
+                    "3.6.0",
+                    null,
+                    MAVEN_4_COMPATIBILITY_REASON,
+                    21));
 
     private static final List<PluginUpgrade> PLUGIN_DEPENDENCY_UPGRADES = List.of(new PluginUpgrade(
             "org.codehaus.mojo",
@@ -341,7 +349,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                                 upgrade.groupId(),
                                 upgrade.artifactId(),
                                 upgrade.minVersion(),
-                                upgrade.latestPreRelease())));
+                                upgrade.latestPreRelease(),
+                                upgrade.minJdk())));
     }
 
     /**
@@ -450,6 +459,18 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             } else {
                 context.warning("Could not determine Quarkus platform version — if the project uses "
                         + "Quarkus 2.x, the plugin upgrade may cause build failures");
+            }
+        }
+
+        // Check JDK compatibility: if the plugin requires a higher JDK than the project
+        // uses, skip the upgrade to avoid UnsupportedClassVersionError at build time.
+        if (upgrade.minJdk > 0) {
+            int projectJdk = detectProjectJdkVersion(pomDocument);
+            if (projectJdk > 0 && projectJdk < upgrade.minJdk) {
+                context.warning("Skipping " + upgrade.groupId + ":" + upgrade.artifactId + " upgrade to "
+                        + upgrade.minVersion + ": plugin requires JDK " + upgrade.minJdk + " but project targets JDK "
+                        + projectJdk);
+                return false;
             }
         }
 
@@ -699,6 +720,15 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         Map<String, PluginUpgrade> basePluginUpgrades = getPluginUpgradesAsMap();
         String shadePluginKey = DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-shade-plugin";
 
+        // Detect the project JDK version from any POM in the map (typically the root)
+        int projectJdk = -1;
+        for (Document doc : pomMap.values()) {
+            projectJdk = detectProjectJdkVersion(doc);
+            if (projectJdk > 0) {
+                break;
+            }
+        }
+
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Path originalPomPath = entry.getKey();
 
@@ -720,7 +750,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 }
 
                 // Build effective model using Maven 4 API
-                PluginAnalysis analysis = analyzeEffectiveModelForPlugins(context, tempPomPath, pluginUpgrades);
+                PluginAnalysis analysis =
+                        analyzeEffectiveModelForPlugins(context, tempPomPath, pluginUpgrades, projectJdk);
 
                 // Determine where to add plugin management (last local parent)
                 Path targetPom =
@@ -843,9 +874,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     private PluginAnalysis analyzeEffectiveModelForPlugins(
-            UpgradeContext context, Path tempPomPath, Map<String, PluginUpgrade> pluginUpgrades) {
+            UpgradeContext context, Path tempPomPath, Map<String, PluginUpgrade> pluginUpgrades, int projectJdk) {
         Model effectiveModel = buildEffectiveModel(context, tempPomPath);
-        return analyzePluginsFromEffectiveModel(context, effectiveModel, pluginUpgrades);
+        return analyzePluginsFromEffectiveModel(context, effectiveModel, pluginUpgrades, projectJdk);
     }
 
     /**
@@ -854,7 +885,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * explicitly in an inherited parent's build/plugins, not via pluginManagement).
      */
     private PluginAnalysis analyzePluginsFromEffectiveModel(
-            UpgradeContext context, Model effectiveModel, Map<String, PluginUpgrade> pluginUpgrades) {
+            UpgradeContext context, Model effectiveModel, Map<String, PluginUpgrade> pluginUpgrades, int projectJdk) {
         Set<String> needsManagement = new HashSet<>();
         Set<String> needsDirectOverride = new HashSet<>();
 
@@ -875,6 +906,13 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 String pluginKey = getPluginKey(plugin);
                 PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
                 if (upgrade != null) {
+                    // Skip plugins that require a higher JDK than the project targets
+                    if (upgrade.minJdk() > 0 && projectJdk > 0 && projectJdk < upgrade.minJdk()) {
+                        context.warning("Skipping " + pluginKey + " upgrade to " + upgrade.minVersion()
+                                + " in effective model: plugin requires JDK " + upgrade.minJdk()
+                                + " but project targets JDK " + projectJdk);
+                        continue;
+                    }
                     String effectiveVersion = plugin.getVersion();
                     if (isVersionBelow(context, effectiveVersion, upgrade.minVersion())) {
                         needsManagement.add(pluginKey);
@@ -901,6 +939,13 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     String pluginKey = getPluginKey(plugin);
                     PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
                     if (upgrade != null && !needsManagement.contains(pluginKey)) {
+                        // Skip plugins that require a higher JDK than the project targets
+                        if (upgrade.minJdk() > 0 && projectJdk > 0 && projectJdk < upgrade.minJdk()) {
+                            context.warning("Skipping " + pluginKey + " upgrade to " + upgrade.minVersion()
+                                    + " in effective model: plugin requires JDK " + upgrade.minJdk()
+                                    + " but project targets JDK " + projectJdk);
+                            continue;
+                        }
                         String effectiveVersion = plugin.getVersion();
                         if (isVersionBelow(context, effectiveVersion, upgrade.minVersion())) {
                             needsManagement.add(pluginKey);
@@ -1237,6 +1282,101 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
+     * Detects the project's JDK version from the POM document.
+     * Checks the following sources in order:
+     * <ol>
+     *   <li>{@code maven.compiler.release} property</li>
+     *   <li>{@code maven.compiler.source} property</li>
+     *   <li>{@code maven.compiler.target} property</li>
+     *   <li>Compiler plugin configuration ({@code <release>} or {@code <source>})</li>
+     * </ol>
+     *
+     * @param pomDocument the POM document to inspect
+     * @return the detected JDK major version, or {@code -1} if not found
+     */
+    int detectProjectJdkVersion(Document pomDocument) {
+        Element root = pomDocument.root();
+
+        // Check properties: maven.compiler.release takes precedence, then source, then target
+        Element properties = root.childElement(PROPERTIES).orElse(null);
+        if (properties != null) {
+            for (String propName :
+                    List.of("maven.compiler.release", "maven.compiler.source", "maven.compiler.target")) {
+                Element propElement = properties.childElement(propName).orElse(null);
+                if (propElement != null) {
+                    String value = propElement.textContentTrimmed();
+                    if (value != null && !value.isEmpty() && !value.startsWith("${")) {
+                        int level = JdkSourceLevelSupport.normalizeSourceLevel(value);
+                        if (level > 0) {
+                            return level;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Check compiler plugin configuration
+        Element build = root.childElement(BUILD).orElse(null);
+        if (build != null) {
+            int level = detectJdkFromPluginSection(build.childElement(PLUGINS).orElse(null));
+            if (level > 0) {
+                return level;
+            }
+
+            Element pluginManagement = build.childElement(PLUGIN_MANAGEMENT).orElse(null);
+            if (pluginManagement != null) {
+                level = detectJdkFromPluginSection(
+                        pluginManagement.childElement(PLUGINS).orElse(null));
+                if (level > 0) {
+                    return level;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    private int detectJdkFromPluginSection(Element pluginsElement) {
+        if (pluginsElement == null) {
+            return -1;
+        }
+
+        for (Element plugin : pluginsElement.childElements(PLUGIN).toList()) {
+            String artifactId = getChildText(plugin, ARTIFACT_ID);
+            String groupId = getChildText(plugin, GROUP_ID);
+            if ("maven-compiler-plugin".equals(artifactId)
+                    && (groupId == null || groupId.isEmpty() || DEFAULT_MAVEN_PLUGIN_GROUP_ID.equals(groupId))) {
+                Element config = plugin.childElement("configuration").orElse(null);
+                if (config != null) {
+                    // <release> takes precedence
+                    Element releaseNode = config.childElement("release").orElse(null);
+                    if (releaseNode != null) {
+                        String text = releaseNode.textContentTrimmed();
+                        if (text != null && !text.isEmpty() && !text.startsWith("${")) {
+                            int level = JdkSourceLevelSupport.normalizeSourceLevel(text);
+                            if (level > 0) {
+                                return level;
+                            }
+                        }
+                    }
+                    Element sourceNode = config.childElement("source").orElse(null);
+                    if (sourceNode != null) {
+                        String text = sourceNode.textContentTrimmed();
+                        if (text != null && !text.isEmpty() && !text.startsWith("${")) {
+                            int level = JdkSourceLevelSupport.normalizeSourceLevel(text);
+                            if (level > 0) {
+                                return level;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    /**
      * Checks if the given plugin is a Quarkus Maven plugin.
      */
     private boolean isQuarkusPlugin(String groupId, String artifactId) {
@@ -1499,6 +1639,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         /** The latest available 4.x pre-release version, or null if none exists */
         final String latestPreRelease;
 
+        /** The minimum JDK version required by this plugin, or 0 if any JDK works */
+        final int minJdk;
+
         /**
          * Creates a new plugin upgrade information holder.
          *
@@ -1510,16 +1653,23 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
          *            the minimum version required for Maven 4 compatibility
          * @param latestPreRelease
          *            the latest 4.x pre-release version, or null
+         * @param minJdk
+         *            the minimum JDK version required by this plugin, or 0 if any JDK works
          */
-        PluginUpgradeInfo(String groupId, String artifactId, String minVersion, String latestPreRelease) {
+        PluginUpgradeInfo(String groupId, String artifactId, String minVersion, String latestPreRelease, int minJdk) {
             this.groupId = groupId;
             this.artifactId = artifactId;
             this.minVersion = minVersion;
             this.latestPreRelease = latestPreRelease;
+            this.minJdk = minJdk;
+        }
+
+        PluginUpgradeInfo(String groupId, String artifactId, String minVersion, String latestPreRelease) {
+            this(groupId, artifactId, minVersion, latestPreRelease, 0);
         }
 
         PluginUpgradeInfo(String groupId, String artifactId, String minVersion) {
-            this(groupId, artifactId, minVersion, null);
+            this(groupId, artifactId, minVersion, null, 0);
         }
     }
 }
