@@ -507,10 +507,7 @@ public class ApiRunner {
 
     @Provides
     @SuppressWarnings("unused")
-    static Session newSession(
-            RepositorySystem system,
-            Lookup lookup,
-            @Nullable LocalRepoProvider localRepoProvider) {
+    static Session newSession(RepositorySystem system, Lookup lookup, @Nullable LocalRepoProvider localRepoProvider) {
         Map<String, String> properties = new HashMap<>();
         // Env variables prefixed with "env."
         System.getenv().forEach((k, v) -> properties.put("env." + k, v));
