@@ -20,6 +20,7 @@ package org.apache.maven.impl.standalone;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -37,6 +38,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.Packaging;
@@ -73,6 +75,7 @@ import org.apache.maven.di.impl.DIException;
 import org.apache.maven.impl.AbstractSession;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.di.SessionScope;
+import org.apache.maven.impl.model.DefaultInterpolator;
 import org.apache.maven.impl.resolver.MavenSessionBuilderSupplier;
 import org.apache.maven.impl.resolver.scopes.Maven4ScopeManagerConfiguration;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -104,6 +107,12 @@ import org.eclipse.aether.util.repository.DefaultProxySelector;
  *   <li>Repository definitions from active profiles</li>
  *   <li>Offline mode</li>
  * </ul>
+ *
+ * <p>It also loads {@code maven-system.properties} and {@code maven-user.properties} from the
+ * Maven configuration directory ({@code ${maven.home}/conf} or as configured via
+ * {@code maven.installation.conf}/{@code maven.conf}). System properties from the file are
+ * merged into the session's system properties; user properties are available via
+ * {@link Session#getUserProperties()}.</p>
  *
  * <p>Example usage:</p>
  * <pre>
@@ -186,6 +195,7 @@ public class ApiRunner {
         private final Instant startTime = MonotonicClock.now();
         private Settings settings;
         private Version mavenVersion;
+        private Map<String, String> userProperties = Map.of();
 
         DefaultSession(RepositorySystemSession session, RepositorySystem repositorySystem, Lookup lookup) {
             this(session, repositorySystem, Collections.emptyList(), null, lookup);
@@ -208,6 +218,7 @@ public class ApiRunner {
             DefaultSession newSession = new DefaultSession(session, repositorySystem, repositories, null, lookup);
             newSession.settings = this.settings;
             newSession.mavenVersion = this.mavenVersion;
+            newSession.userProperties = this.userProperties;
             return newSession;
         }
 
@@ -217,6 +228,10 @@ public class ApiRunner {
 
         void setMavenVersion(Version mavenVersion) {
             this.mavenVersion = mavenVersion;
+        }
+
+        void setUserProperties(Map<String, String> userProperties) {
+            this.userProperties = userProperties != null ? userProperties : Map.of();
         }
 
         @Override
@@ -233,7 +248,7 @@ public class ApiRunner {
 
         @Override
         public Map<String, String> getUserProperties() {
-            return Map.of();
+            return userProperties;
         }
 
         @Override
@@ -417,6 +432,20 @@ public class ApiRunner {
                 ? Paths.get(properties.get("maven.home"))
                 : properties.containsKey("env.MAVEN_HOME") ? Paths.get(properties.get("env.MAVEN_HOME")) : null;
 
+        // Load maven-system.properties from ${maven.conf}/ into system properties
+        Path mavenConf = resolveMavenConf(properties);
+        if (mavenConf != null) {
+            Map<String, String> systemFileProps =
+                    loadMavenProperties(mavenConf.resolve("maven-system.properties"), properties);
+            properties.putAll(systemFileProps);
+        }
+
+        // Load maven-user.properties from ${maven.conf}/ as user properties
+        Map<String, String> userProperties = new HashMap<>();
+        if (mavenConf != null) {
+            userProperties.putAll(loadMavenProperties(mavenConf.resolve("maven-user.properties"), properties));
+        }
+
         // Configure the resolver session with dependency resolution machinery
         MavenSessionBuilderSupplier sessionBuilderSupplier = new MavenSessionBuilderSupplier(system, false);
         DefaultRepositorySystemSession rsession = new DefaultRepositorySystemSession(h -> false);
@@ -428,6 +457,7 @@ public class ApiRunner {
         rsession.setArtifactTypeRegistry(sessionBuilderSupplier.getArtifactTypeRegistry());
         rsession.setArtifactDescriptorPolicy(sessionBuilderSupplier.getArtifactDescriptorPolicy());
         rsession.setSystemProperties(properties);
+        rsession.setUserProperties(userProperties);
         rsession.setConfigProperties(properties);
 
         DefaultSession session = new DefaultSession(
@@ -445,8 +475,9 @@ public class ApiRunner {
                         mavenUserHome.resolve("settings.xml"))
                 .getEffectiveSettings();
 
-        // Store the effective settings on the session
+        // Store the effective settings and user properties on the session
         session.setSettings(settings);
+        session.setUserProperties(userProperties);
 
         // Set the Maven version
         session.setMavenVersion(detectMavenVersion(lookup));
@@ -517,6 +548,64 @@ public class ApiRunner {
         InternalSession s = (InternalSession) session.withRemoteRepositories(repositories);
         InternalSession.associate(rsession, s);
         return s;
+    }
+
+    /**
+     * Resolves the Maven configuration directory following the same lookup order as the Maven CLI:
+     * {@code maven.installation.conf} → {@code maven.conf} → {@code ${maven.home}/conf} → {@code ${MAVEN_HOME}/conf}.
+     *
+     * @param properties the system properties (env + Java system properties)
+     * @return the maven conf directory path, or {@code null} if it cannot be determined
+     */
+    private static Path resolveMavenConf(Map<String, String> properties) {
+        String installConf = properties.get(Constants.MAVEN_INSTALLATION_CONF);
+        if (installConf != null) {
+            return Paths.get(installConf);
+        }
+        String mavenConf = properties.get("maven.conf");
+        if (mavenConf != null) {
+            return Paths.get(mavenConf);
+        }
+        String mavenHome = properties.get(Constants.MAVEN_HOME);
+        if (mavenHome != null) {
+            return Paths.get(mavenHome).resolve("conf");
+        }
+        String envMavenHome = properties.get("env.MAVEN_HOME");
+        if (envMavenHome != null) {
+            return Paths.get(envMavenHome).resolve("conf");
+        }
+        return null;
+    }
+
+    /**
+     * Loads properties from a file and interpolates {@code ${...}} references against the given
+     * fallback properties. If the file does not exist or cannot be read, an empty map is returned.
+     *
+     * @param path the properties file to load
+     * @param fallback fallback values for interpolation (typically system properties)
+     * @return the loaded and interpolated properties
+     */
+    private static Map<String, String> loadMavenProperties(Path path, Map<String, String> fallback) {
+        if (path == null || !Files.exists(path)) {
+            return new HashMap<>();
+        }
+        Properties fileProps = new Properties();
+        try (InputStream is = Files.newInputStream(path)) {
+            fileProps.load(is);
+        } catch (IOException e) {
+            return new HashMap<>();
+        }
+        Map<String, String> result = new HashMap<>();
+        fileProps.forEach((k, v) -> result.put(k.toString(), v.toString()));
+        // Interpolate ${...} references against the loaded properties + fallback
+        for (Map.Entry<String, String> entry : result.entrySet()) {
+            String value = entry.getValue();
+            if (value != null && value.contains("${")) {
+                entry.setValue(
+                        DefaultInterpolator.substVars(value, entry.getKey(), null, result, fallback::get, null, false));
+            }
+        }
+        return result;
     }
 
     /**
