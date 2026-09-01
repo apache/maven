@@ -24,6 +24,7 @@ import javax.inject.Singleton;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.ConcurrentModificationException;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -155,6 +156,9 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
             } catch (ClassCastException | MavenException e) {
                 // to be processed in the outer catch block
                 throw e;
+            } catch (ConcurrentModificationException e) {
+                throw new PluginExecutionException(
+                        mojoExecution, project, buildConcurrentModificationMessage(mojoExecution, e), e);
             } catch (RuntimeException e) {
                 throw new PluginExecutionException(mojoExecution, project, e);
             }
@@ -229,6 +233,48 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
                     MojoNotFoundException, InvalidPluginDescriptorException {
         return mavenPluginManager.getMojoDescriptor(plugin, goal, repositories, session);
+    }
+
+    /**
+     * Builds a diagnostic message for {@link ConcurrentModificationException} thrown during plugin execution.
+     * <p>
+     * Detects the known BND library bug (FELIX-6259) where {@code Jar.putResource()} uses
+     * {@code TreeMap.computeIfAbsent()} with a mapping function that modifies the same map.
+     * This is detected and rejected by JDK 17.0.13+ / 21+ (JDK-8259535).
+     * Affects bndlib versions prior to 5.1.0, used by maven-bundle-plugin 4.x and bnd-maven-plugin 4.x.
+     */
+    private static String buildConcurrentModificationMessage(
+            MojoExecution mojoExecution, ConcurrentModificationException cause) {
+        StringBuilder message = new StringBuilder();
+        message.append("Execution ").append(mojoExecution.getExecutionId());
+        message.append(" of goal ").append(mojoExecution.getMojoDescriptor().getId());
+        message.append(" failed: ConcurrentModificationException.");
+
+        if (isBndComputeIfAbsentCme(cause)) {
+            message.append(" This is a known bug in bndlib versions prior to 5.1.0 (FELIX-6259):"
+                    + " BND's Jar.putResource() modifies a TreeMap inside its own computeIfAbsent() call,"
+                    + " which JDK 17.0.13+ now correctly detects (JDK-8259535)."
+                    + " To fix this, upgrade maven-bundle-plugin to 5.1.9+"
+                    + " or bnd-maven-plugin to 6.0.0+.");
+        } else {
+            message.append(" This may be caused by a plugin using Map.computeIfAbsent() with a mapping function"
+                    + " that modifies the same map, which newer JDK versions now detect."
+                    + " Check if a newer version of the plugin is available.");
+        }
+        return message.toString();
+    }
+
+    /**
+     * Returns {@code true} if the CME originates from BND's {@code Jar.putResource()} method,
+     * which is the known FELIX-6259 bug pattern.
+     */
+    private static boolean isBndComputeIfAbsentCme(ConcurrentModificationException cause) {
+        for (StackTraceElement frame : cause.getStackTrace()) {
+            if ("aQute.bnd.osgi.Jar".equals(frame.getClassName()) && "putResource".equals(frame.getMethodName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static class MojoWrapper implements Mojo {
