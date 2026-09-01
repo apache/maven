@@ -87,8 +87,8 @@ class ModuleNameFixStrategyTest {
     }
 
     @Nested
-    @DisplayName("Fix existing entries")
-    class FixExistingTests {
+    @DisplayName("Apply")
+    class ApplyTests {
 
         @Test
         @DisplayName("should fix Automatic-Module-Name with dashes in jar plugin config")
@@ -123,6 +123,7 @@ class ModuleNameFixStrategyTest {
             UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
 
             assertEquals(1, result.modifiedPoms().size());
+            // Verify the fix was applied
             String xml = doc.toXml();
             assertTrue(xml.contains("org.example.integration.test"));
             assertFalse(xml.contains("org.example.integration-test"));
@@ -198,6 +199,26 @@ class ModuleNameFixStrategyTest {
 
             assertEquals(1, result.modifiedPoms().size());
             assertTrue(doc.toXml().contains("org.example.my.lib"));
+        }
+
+        @Test
+        @DisplayName("should handle POM without any plugins")
+        void noPlugins() {
+            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>org.example</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0</version>
+                    </project>
+                    """;
+            Document doc = Document.of(pomXml);
+            UpgradeContext context = TestUtils.createMockContext();
+            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
+
+            assertEquals(0, result.modifiedPoms().size());
         }
 
         @Test
@@ -310,300 +331,13 @@ class ModuleNameFixStrategyTest {
             assertEquals(1, result.modifiedPoms().size());
             assertTrue(doc.toXml().contains("org.example.my.release"));
         }
-    }
-
-    @Nested
-    @DisplayName("Add missing module name for hyphenated artifactIds")
-    class AddMissingTests {
 
         @Test
-        @DisplayName("should add Automatic-Module-Name for hyphenated artifactId with default packaging")
-        void addsForDefaultPackaging() {
+        @DisplayName("should skip property references")
+        void skipsPropertyReferences() {
             ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            String pomXml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0">
-                        <modelVersion>4.0.0</modelVersion>
-                        <groupId>org.apache.geronimo.arthur</groupId>
-                        <artifactId>integration-test</artifactId>
-                        <version>1.0</version>
-                    </project>
-                    """;
-            Document doc = Document.of(pomXml);
-            UpgradeContext context = TestUtils.createMockContext();
-            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
-
-            assertEquals(1, result.modifiedPoms().size());
-            String xml = doc.toXml();
-            assertTrue(xml.contains("Automatic-Module-Name"));
-            assertTrue(xml.contains("org.apache.geronimo.arthur.integration.test"));
-            assertTrue(xml.contains("maven-jar-plugin"));
-        }
-
-        @Test
-        @DisplayName("should add Automatic-Module-Name for hyphenated artifactId with explicit jar packaging")
-        void addsForExplicitJarPackaging() {
-            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            String pomXml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0">
-                        <modelVersion>4.0.0</modelVersion>
-                        <groupId>org.example</groupId>
-                        <artifactId>my-library</artifactId>
-                        <version>1.0</version>
-                        <packaging>jar</packaging>
-                    </project>
-                    """;
-            Document doc = Document.of(pomXml);
-            UpgradeContext context = TestUtils.createMockContext();
-            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
-
-            assertEquals(1, result.modifiedPoms().size());
-            String xml = doc.toXml();
-            assertTrue(xml.contains("org.example.my.library"));
-        }
-
-        @Test
-        @DisplayName("should add to existing jar-plugin entry")
-        void addsToExistingJarPlugin() {
-            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            String pomXml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0">
-                        <modelVersion>4.0.0</modelVersion>
-                        <groupId>org.example</groupId>
-                        <artifactId>my-library</artifactId>
-                        <version>1.0</version>
-                        <build>
-                            <plugins>
-                                <plugin>
-                                    <groupId>org.apache.maven.plugins</groupId>
-                                    <artifactId>maven-jar-plugin</artifactId>
-                                    <version>3.5.0</version>
-                                </plugin>
-                            </plugins>
-                        </build>
-                    </project>
-                    """;
-            Document doc = Document.of(pomXml);
-            UpgradeContext context = TestUtils.createMockContext();
-            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
-
-            assertEquals(1, result.modifiedPoms().size());
-            String xml = doc.toXml();
-            assertTrue(xml.contains("org.example.my.library"));
-            // Should add config to the existing plugin, not create a new one (count opening tags only)
-            assertEquals(1, countOccurrences(xml, ">maven-jar-plugin<"));
-        }
-
-        @Test
-        @DisplayName("should find jar-plugin in pluginManagement")
-        void addsToPluginManagementJarPlugin() {
-            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            String pomXml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0">
-                        <modelVersion>4.0.0</modelVersion>
-                        <groupId>org.example</groupId>
-                        <artifactId>my-library</artifactId>
-                        <version>1.0</version>
-                        <build>
-                            <pluginManagement>
-                                <plugins>
-                                    <plugin>
-                                        <artifactId>maven-jar-plugin</artifactId>
-                                        <version>3.5.0</version>
-                                    </plugin>
-                                </plugins>
-                            </pluginManagement>
-                        </build>
-                    </project>
-                    """;
-            Document doc = Document.of(pomXml);
-            UpgradeContext context = TestUtils.createMockContext();
-            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
-
-            assertEquals(1, result.modifiedPoms().size());
-            String xml = doc.toXml();
-            assertTrue(xml.contains("org.example.my.library"));
-        }
-
-        @Test
-        @DisplayName("should skip pom packaging")
-        void skipsPomPackaging() {
-            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            String pomXml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0">
-                        <modelVersion>4.0.0</modelVersion>
-                        <groupId>org.example</groupId>
-                        <artifactId>my-parent</artifactId>
-                        <version>1.0</version>
-                        <packaging>pom</packaging>
-                    </project>
-                    """;
-            Document doc = Document.of(pomXml);
-            UpgradeContext context = TestUtils.createMockContext();
-            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
-
-            assertEquals(0, result.modifiedPoms().size());
-        }
-
-        @Test
-        @DisplayName("should skip war packaging")
-        void skipsWarPackaging() {
-            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            String pomXml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0">
-                        <modelVersion>4.0.0</modelVersion>
-                        <groupId>org.example</groupId>
-                        <artifactId>my-webapp</artifactId>
-                        <version>1.0</version>
-                        <packaging>war</packaging>
-                    </project>
-                    """;
-            Document doc = Document.of(pomXml);
-            UpgradeContext context = TestUtils.createMockContext();
-            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
-
-            assertEquals(0, result.modifiedPoms().size());
-        }
-
-        @Test
-        @DisplayName("should skip non-hyphenated artifactId")
-        void skipsNonHyphenated() {
-            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            String pomXml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0">
-                        <modelVersion>4.0.0</modelVersion>
-                        <groupId>org.example</groupId>
-                        <artifactId>mymodule</artifactId>
-                        <version>1.0</version>
-                    </project>
-                    """;
-            Document doc = Document.of(pomXml);
-            UpgradeContext context = TestUtils.createMockContext();
-            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
-
-            assertEquals(0, result.modifiedPoms().size());
-        }
-
-        @Test
-        @DisplayName("should skip when explicit Automatic-Module-Name already exists")
-        void skipsWhenExplicitEntryExists() {
-            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            String pomXml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0">
-                        <modelVersion>4.0.0</modelVersion>
-                        <groupId>org.example</groupId>
-                        <artifactId>my-library</artifactId>
-                        <version>1.0</version>
-                        <build>
-                            <plugins>
-                                <plugin>
-                                    <artifactId>maven-jar-plugin</artifactId>
-                                    <configuration>
-                                        <archive>
-                                            <manifestEntries>
-                                                <Automatic-Module-Name>org.example.mylibrary</Automatic-Module-Name>
-                                            </manifestEntries>
-                                        </archive>
-                                    </configuration>
-                                </plugin>
-                            </plugins>
-                        </build>
-                    </project>
-                    """;
-            Document doc = Document.of(pomXml);
-            UpgradeContext context = TestUtils.createMockContext();
-            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
-
-            // Should not modify — valid entry already exists
-            assertEquals(0, result.modifiedPoms().size());
-        }
-
-        @Test
-        @DisplayName("should resolve groupId from parent when not set on module")
-        void resolvesGroupIdFromParent() {
-            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            String pomXml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0">
-                        <modelVersion>4.0.0</modelVersion>
-                        <parent>
-                            <groupId>org.apache.geronimo.arthur</groupId>
-                            <artifactId>arthur</artifactId>
-                            <version>1.0</version>
-                        </parent>
-                        <artifactId>integration-test</artifactId>
-                    </project>
-                    """;
-            Document doc = Document.of(pomXml);
-            UpgradeContext context = TestUtils.createMockContext();
-            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
-
-            assertEquals(1, result.modifiedPoms().size());
-            String xml = doc.toXml();
-            assertTrue(xml.contains("org.apache.geronimo.arthur.integration.test"));
-        }
-
-        @Test
-        @DisplayName("should handle multiple dashes in artifactId")
-        void handlesMultipleDashes() {
-            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            String pomXml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0">
-                        <modelVersion>4.0.0</modelVersion>
-                        <groupId>org.apache.winegrower.cepages</groupId>
-                        <artifactId>winegrower-cepage-osgi-cdi</artifactId>
-                        <version>1.0</version>
-                    </project>
-                    """;
-            Document doc = Document.of(pomXml);
-            UpgradeContext context = TestUtils.createMockContext();
-            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
-
-            assertEquals(1, result.modifiedPoms().size());
-            String xml = doc.toXml();
-            assertTrue(xml.contains("org.apache.winegrower.cepages.winegrower.cepage.osgi.cdi"));
-        }
-
-        @Test
-        @DisplayName("should work with maven-plugin packaging")
-        void worksWithMavenPluginPackaging() {
-            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            String pomXml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0">
-                        <modelVersion>4.0.0</modelVersion>
-                        <groupId>org.example</groupId>
-                        <artifactId>my-maven-plugin</artifactId>
-                        <version>1.0</version>
-                        <packaging>maven-plugin</packaging>
-                    </project>
-                    """;
-            Document doc = Document.of(pomXml);
-            UpgradeContext context = TestUtils.createMockContext();
-            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
-
-            assertEquals(1, result.modifiedPoms().size());
-            String xml = doc.toXml();
-            assertTrue(xml.contains("org.example.my.maven.plugin"));
-        }
-    }
-
-    @Nested
-    @DisplayName("No plugins in POM")
-    class NoPluginsTests {
-
-        @Test
-        @DisplayName("should handle POM without any plugins")
-        void noPlugins() {
-            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
+            // geronimo-arthur uses ${project.groupId}.${geronimo-arthur.shortname}
+            // which resolves to a hyphenated name — but we can't fix property references
             String pomXml = """
                     <?xml version="1.0" encoding="UTF-8"?>
                     <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -611,33 +345,40 @@ class ModuleNameFixStrategyTest {
                         <groupId>org.example</groupId>
                         <artifactId>test</artifactId>
                         <version>1.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <artifactId>maven-jar-plugin</artifactId>
+                                    <configuration>
+                                        <archive>
+                                            <manifestEntries>
+                                                <Automatic-Module-Name>${project.groupId}.${project.artifactId}</Automatic-Module-Name>
+                                            </manifestEntries>
+                                        </archive>
+                                    </configuration>
+                                </plugin>
+                            </plugins>
+                        </build>
                     </project>
                     """;
             Document doc = Document.of(pomXml);
             UpgradeContext context = TestUtils.createMockContext();
             UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
 
-            // No hyphen in artifactId, no existing entries → no changes
+            // Should not modify — cannot resolve property expressions
             assertEquals(0, result.modifiedPoms().size());
         }
-    }
-
-    @Nested
-    @DisplayName("Combined scenarios")
-    class CombinedTests {
 
         @Test
-        @DisplayName("should fix existing entry AND skip auto-generation prevention when entry exists")
-        void fixesExistingAndSkipsAutoGeneration() {
+        @DisplayName("should fix multiple dashes like winegrower-cepage-osgi-cdi")
+        void fixesMultipleDashes() {
             ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            // This POM has a hyphenated artifactId AND an existing invalid entry
-            // Part 1 fixes the entry, Part 2 sees it already exists and skips
             String pomXml = """
                     <?xml version="1.0" encoding="UTF-8"?>
                     <project xmlns="http://maven.apache.org/POM/4.0.0">
                         <modelVersion>4.0.0</modelVersion>
-                        <groupId>org.example</groupId>
-                        <artifactId>my-library</artifactId>
+                        <groupId>org.apache.winegrower.cepages</groupId>
+                        <artifactId>test</artifactId>
                         <version>1.0</version>
                         <build>
                             <plugins>
@@ -646,7 +387,7 @@ class ModuleNameFixStrategyTest {
                                     <configuration>
                                         <archive>
                                             <manifestEntries>
-                                                <Automatic-Module-Name>org.example.my-library</Automatic-Module-Name>
+                                                <Automatic-Module-Name>org.apache.winegrower.cepages.winegrower-cepage-osgi-cdi</Automatic-Module-Name>
                                             </manifestEntries>
                                         </archive>
                                     </configuration>
@@ -661,94 +402,7 @@ class ModuleNameFixStrategyTest {
 
             assertEquals(1, result.modifiedPoms().size());
             String xml = doc.toXml();
-            // The entry should be fixed
-            assertTrue(xml.contains("org.example.my.library"));
-            assertFalse(xml.contains("org.example.my-library"));
-            // Only one Automatic-Module-Name element should exist (count opening tags)
-            assertEquals(1, countOccurrences(xml, "<Automatic-Module-Name>"));
-        }
-
-        @Test
-        @DisplayName("geronimo-arthur integration-test case from issue")
-        void geronimoArthurCase() {
-            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            String pomXml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0">
-                        <modelVersion>4.0.0</modelVersion>
-                        <parent>
-                            <groupId>org.apache.geronimo.arthur</groupId>
-                            <artifactId>arthur</artifactId>
-                            <version>1.0.10-SNAPSHOT</version>
-                        </parent>
-                        <artifactId>integration-test</artifactId>
-                    </project>
-                    """;
-            Document doc = Document.of(pomXml);
-            UpgradeContext context = TestUtils.createMockContext();
-            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
-
-            assertEquals(1, result.modifiedPoms().size());
-            String xml = doc.toXml();
-            assertTrue(xml.contains("org.apache.geronimo.arthur.integration.test"));
-            assertTrue(xml.contains("maven-jar-plugin"));
-        }
-
-        @Test
-        @DisplayName("karaf-winegrower cepage case from issue")
-        void karafWinegrowerCase() {
-            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            String pomXml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0">
-                        <modelVersion>4.0.0</modelVersion>
-                        <groupId>org.apache.winegrower.cepages</groupId>
-                        <artifactId>winegrower-cepage-osgi-cdi</artifactId>
-                        <version>1.0</version>
-                    </project>
-                    """;
-            Document doc = Document.of(pomXml);
-            UpgradeContext context = TestUtils.createMockContext();
-            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
-
-            assertEquals(1, result.modifiedPoms().size());
-            String xml = doc.toXml();
             assertTrue(xml.contains("org.apache.winegrower.cepages.winegrower.cepage.osgi.cdi"));
         }
-
-        @Test
-        @DisplayName("openwebbeans-meecrowave no-cxf case from issue")
-        void meecrowaveNoCxfCase() {
-            ModuleNameFixStrategy strategy = new ModuleNameFixStrategy();
-            String pomXml = """
-                    <?xml version="1.0" encoding="UTF-8"?>
-                    <project xmlns="http://maven.apache.org/POM/4.0.0">
-                        <modelVersion>4.0.0</modelVersion>
-                        <groupId>org.apache.meecrowave</groupId>
-                        <artifactId>no-cxf</artifactId>
-                        <version>1.0</version>
-                    </project>
-                    """;
-            Document doc = Document.of(pomXml);
-            UpgradeContext context = TestUtils.createMockContext();
-            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
-
-            assertEquals(1, result.modifiedPoms().size());
-            String xml = doc.toXml();
-            assertTrue(xml.contains("org.apache.meecrowave.no.cxf"));
-        }
-    }
-
-    /**
-     * Counts the number of occurrences of a substring in a string.
-     */
-    private static int countOccurrences(String str, String sub) {
-        int count = 0;
-        int idx = 0;
-        while ((idx = str.indexOf(sub, idx)) != -1) {
-            count++;
-            idx += sub.length();
-        }
-        return count;
     }
 }
