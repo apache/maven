@@ -144,7 +144,12 @@ class DefaultModelResolver implements ModelResolver {
         List<RemoteRepository> newRepositories =
                 Collections.singletonList(ArtifactDescriptorUtils.toRemoteRepository(repository));
 
-        this.repositories = remoteRepositoryManager.aggregateRepositories(session, repositories, newRepositories, true);
+        // The model being built is an artifact descriptor resolved from a repository, so the
+        // repositories it declares are remotely supplied input: they are merged recessively and
+        // flagged as descriptor-declared, which lets the repository manager withhold session
+        // authentication from them unless an operator-defined mirror captures them.
+        this.repositories =
+                remoteRepositoryManager.aggregateRepositories(session, repositories, newRepositories, true, true);
     }
 
     private static void removeMatchingRepository(Iterable<RemoteRepository> repositories, final String id) {
