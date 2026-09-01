@@ -207,7 +207,7 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         }
 
         public String getLocalFilename(ArtifactRepository repository) {
-            return insertRepositoryKey(getRemoteFilename(), repository.getKey());
+            return insertRepositoryKey(getRemoteFilename(), validateRepositoryKey(repository.getKey()));
         }
 
         private String insertRepositoryKey(String filename, String repositoryKey) {
@@ -219,6 +219,32 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
                 result = filename.substring(0, idx) + '-' + repositoryKey + filename.substring(idx);
             }
             return result;
+        }
+
+        /**
+         * The repository key (its id) is used verbatim as part of a local file name, so it must lie within
+         * the usual coordinate character set.
+         */
+        private static String validateRepositoryKey(String key) {
+            if (key == null || key.isEmpty()) {
+                return key;
+            }
+            if (isInvalidPathToken(key)) {
+                throw new IllegalArgumentException("Invalid repository key '" + key + "'");
+            }
+            return key;
+        }
+
+        private static boolean isInvalidPathToken(String value) {
+            if ("..".equals(value) || value.indexOf('/') >= 0 || value.indexOf('\\') >= 0 || value.indexOf(':') >= 0) {
+                return true;
+            }
+            for (int i = 0; i < value.length(); i++) {
+                if (Character.isISOControl(value.charAt(i))) {
+                    return true;
+                }
+            }
+            return false;
         }
 
         public void merge(org.apache.maven.repository.legacy.metadata.ArtifactMetadata metadata) {
