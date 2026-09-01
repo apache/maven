@@ -20,12 +20,14 @@ package org.apache.maven.internal.transformation.impl;
 
 import javax.inject.Inject;
 
+import java.io.StringWriter;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Node;
@@ -57,6 +59,7 @@ import org.apache.maven.impl.cache.DefaultRequestCacheFactory;
 import org.apache.maven.impl.resolver.MavenVersionScheme;
 import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.internal.transformation.AbstractRepositoryTestCase;
+import org.apache.maven.model.v4.MavenStaxWriter;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.Test;
@@ -222,7 +225,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 .build();
 
         MavenProject project = new MavenProject(model);
-        Model transformed = DefaultConsumerPomBuilder.transformBom(model, project);
+        Model transformed = DefaultConsumerPomBuilder.transformBom(model, project, Collections.emptySet());
 
         assertEquals(1, transformed.getProfiles().size());
         Profile profile = transformed.getProfiles().get(0);
@@ -296,6 +299,44 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         assertTrue(model.getProfiles().isEmpty());
     }
 
+    /**
+     * End-to-end check that the repository restriction actually reaches the published consumer
+     * POM. Uses a bom-packaged child (whose parent declares repository 'corp-nexus' and which
+     * declares its own repository 'own-repo'): bom packaging always goes through the
+     * effective-model (buildBom) path regardless of maven.consumer.pom.flatten, whereas a
+     * non-bom, non-flattened project publishes the raw model via buildPom/transformPom and was
+     * never affected by this issue (the raw model has no parent-inherited repositories to begin
+     * with). Builds through the real public entry point used by the deploy/install path, then
+     * serializes the resulting model with the same {@link MavenStaxWriter} the production
+     * {@code ConsumerPomArtifactTransformer} uses, and asserts on the generated XML text itself
+     * rather than on an intermediate model object.
+     */
+    @Test
+    void testConsumerPomRepositoriesRestrictedToOwnPomEndToEnd() throws Exception {
+        setRootDirectory("bom-repo-scope");
+        Path file = Paths.get("src/test/resources/consumer/bom-repo-scope/child/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+        Model model = builder.build(session, project, Sources.buildSource(file));
+
+        StringWriter sw = new StringWriter();
+        MavenStaxWriter staxWriter = new MavenStaxWriter();
+        staxWriter.setNamespace(String.format("http://maven.apache.org/POM/%s", model.getModelVersion()));
+        staxWriter.write(sw, model);
+        String xml = sw.toString();
+
+        assertTrue(xml.contains("own-repo"), "the project's own declared repository must be published:\n" + xml);
+        assertTrue(
+                xml.contains("repo.example.com"),
+                "the project's own declared repository URL must be published:\n" + xml);
+        assertFalse(
+                xml.contains("corp-nexus"),
+                "the parent-only repository id must not appear in the published consumer POM:\n" + xml);
+        assertFalse(
+                xml.contains("nexus.corp.internal"),
+                "the parent-only repository URL must not appear in the published consumer POM:\n" + xml);
+    }
+
     @Test
     void testMultiModuleConsumer() throws Exception {
         setRootDirectory("multi-module");
@@ -360,6 +401,68 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         assertNull(transformed.getScm().getChildScmConnectionInheritAppendPath());
         assertNull(transformed.getScm().getChildScmUrlInheritAppendPath());
         assertNull(transformed.getScm().getChildScmDeveloperConnectionInheritAppendPath());
+    }
+
+    /**
+     * Verifies that repositories not declared in the project's own POM file (e.g. inherited from a
+     * parent POM or injected by an active settings.xml profile into the effective model) are pruned
+     * from the consumer POM, while repositories the project itself declares are retained. The central
+     * repository is always removed.
+     */
+    @Test
+    void testConsumerPomKeepsOnlyDeclaredRepositories() {
+        Model model = Model.newBuilder()
+                .groupId("test")
+                .artifactId("test")
+                .version("1.0")
+                .repositories(List.of(
+                        Repository.newBuilder()
+                                .id("central")
+                                .url("https://repo.maven.apache.org/maven2")
+                                .build(),
+                        Repository.newBuilder()
+                                .id("own-repo")
+                                .url("https://repo.example.com/releases")
+                                .build(),
+                        Repository.newBuilder()
+                                .id("corp-nexus")
+                                .url("https://nexus.corp.internal/repo")
+                                .build()))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.transformNonPom(model, null, Set.of("own-repo"));
+
+        assertEquals(
+                List.of("own-repo"),
+                transformed.getRepositories().stream().map(Repository::getId).toList());
+    }
+
+    /**
+     * Verifies the legacy behavior when repository sanitization is disabled (a {@code null} set of
+     * declared repository ids): every repository except central is published in the consumer POM.
+     */
+    @Test
+    void testAllNonCentralRepositoriesKeptWhenRestrictionDisabled() {
+        Model model = Model.newBuilder()
+                .groupId("test")
+                .artifactId("test")
+                .version("1.0")
+                .repositories(List.of(
+                        Repository.newBuilder()
+                                .id("central")
+                                .url("https://repo.maven.apache.org/maven2")
+                                .build(),
+                        Repository.newBuilder()
+                                .id("corp-nexus")
+                                .url("https://nexus.corp.internal/repo")
+                                .build()))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.transformNonPom(model, null, null);
+
+        assertEquals(
+                List.of("corp-nexus"),
+                transformed.getRepositories().stream().map(Repository::getId).toList());
     }
 
     /**

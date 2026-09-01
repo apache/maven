@@ -142,7 +142,17 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
         Set<Path> errorPoms = new HashSet<>();
 
         Set<String> allDefinedProperties = collectAllDefinedProperties(pomMap);
-        allDefinedProperties.addAll(collectEffectiveProperties(context, pomMap));
+        // Skip when the operator's settings declare a repository posture the standalone
+        // resolver cannot honor (mirrors, proxies, offline): properties defined only in
+        // remote parent POMs cannot be verified in that case, so the undefined-property
+        // fixes below are skipped instead of guessing and commenting out valid elements.
+        String unsupportedReason = remoteResolutionUnsupportedReason(context);
+        if (unsupportedReason == null) {
+            allDefinedProperties.addAll(collectEffectiveProperties(context, pomMap));
+        } else {
+            context.warning("Cannot resolve parent POMs remotely: " + unsupportedReason
+                    + ". Skipping undefined-property compatibility fixes.");
+        }
 
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Path pomPath = entry.getKey();
@@ -160,8 +170,11 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 hasIssues |= fixUnsupportedRepositoryExpressions(pomDocument, context);
                 hasIssues |= fixDeprecatedPropertyExpressions(pomDocument, context);
                 hasIssues |= fixIncorrectParentRelativePaths(pomDocument, pomPath, pomMap, context);
-                hasIssues |= fixUndefinedPropertyExpressions(pomDocument, allDefinedProperties, context);
-                hasIssues |= fixUndefinedPropertyExpressionsInRepositories(pomDocument, allDefinedProperties, context);
+                if (unsupportedReason == null) {
+                    hasIssues |= fixUndefinedPropertyExpressions(pomDocument, allDefinedProperties, context);
+                    hasIssues |=
+                            fixUndefinedPropertyExpressionsInRepositories(pomDocument, allDefinedProperties, context);
+                }
 
                 // Warning-only checks: emit warnings for issues that cannot be auto-fixed
                 // These do not modify the POM and do not affect hasIssues
@@ -321,7 +334,7 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
         Set<String> properties = new HashSet<>();
         for (Path pomPath : pomMap.keySet()) {
             try {
-                org.apache.maven.api.model.Model effectiveModel = buildEffectiveModel(pomPath);
+                org.apache.maven.api.model.Model effectiveModel = buildEffectiveModel(context, pomPath);
                 properties.addAll(effectiveModel.getProperties().keySet());
             } catch (Exception e) {
                 context.debug("Failed to build effective model for " + pomPath + ": " + e.getMessage());

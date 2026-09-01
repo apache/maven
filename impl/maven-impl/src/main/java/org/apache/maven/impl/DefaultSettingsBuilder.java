@@ -26,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -51,6 +52,7 @@ import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.settings.Activation;
 import org.apache.maven.api.settings.IdentifiableBase;
 import org.apache.maven.api.settings.Profile;
+import org.apache.maven.api.settings.Proxy;
 import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.RepositoryPolicy;
 import org.apache.maven.api.settings.Server;
@@ -279,43 +281,8 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
         SecDispatcher secDispatcher = new DefaultSecDispatcher(dispatchers, getSecuritySettings(request.getSession()));
         final AtomicInteger preMaven4Passwords = new AtomicInteger(0);
-        UnaryOperator<String> decryptFunction = str -> {
-            if (str != null && !str.isEmpty() && !str.contains("${") && secDispatcher.isAnyEncryptedString(str)) {
-                if (secDispatcher.isLegacyEncryptedString(str)) {
-                    // the call above return true for too broad types of strings, original idea with 2.x sec-dispatcher
-                    // was to make it possible to add "descriptions" to encrypted passwords. Maven 4 is
-                    // limiting itself to decryption of ONLY the simplest cases of legacy passwords, those having form
-                    // as documented on page: https://maven.apache.org/guides/mini/guide-encryption.html
-                    // Examples of decrypted legacy passwords:
-                    // <password>{COQLCE6DU6GtcS5P=}</password>
-                    // <password>Oleg reset this password on 2009-03-11 {COQLCE6DU6GtcS5P=}</password>
-
-                    // In short, secDispatcher#isLegacyEncryptedString(str) did return true, but we apply more scrutiny
-                    // and check does string start with "{" or contains " {" (whitespace before opening curly braces),
-                    // and that it ends with "}" strictly. Otherwise, we refuse it.
-                    if ((!str.startsWith("{") && !str.contains(" {")) || !str.endsWith("}")) {
-                        // this is not a legacy password we care for
-                        return str;
-                    }
-
-                    // add a problem
-                    preMaven4Passwords.incrementAndGet();
-                }
-                try {
-                    return secDispatcher.decrypt(str);
-                } catch (Exception e) {
-                    problems.reportProblem(new DefaultBuilderProblem(
-                            settingsSource.getLocation(),
-                            -1,
-                            -1,
-                            e,
-                            "Could not decrypt password (fix the corrupted password or remove it, if unused) " + str,
-                            BuilderProblem.Severity.FATAL));
-                }
-            }
-            return str;
-        };
-        Settings result = new SettingsTransformer(decryptFunction).visit(settings);
+        Settings result = new DecryptingSettingsTransformer(settingsSource, secDispatcher, preMaven4Passwords, problems)
+                .visit(settings);
         if (preMaven4Passwords.get() > 0) {
             problems.reportProblem(new DefaultBuilderProblem(
                     settingsSource.getLocation(),
@@ -327,6 +294,124 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     BuilderProblem.Severity.WARNING));
         }
         return result;
+    }
+
+    /**
+     * Decrypts every encrypted-looking string value found in the settings, reporting a problem
+     * for any value that cannot be decrypted. Unlike a plain string transform, this keeps track
+     * of which server, proxy or profile property is currently being decrypted so a failure can be
+     * reported by that reference rather than by echoing the encrypted value itself.
+     */
+    private static class DecryptingSettingsTransformer extends SettingsTransformer {
+        private final Source settingsSource;
+        private final SecDispatcher secDispatcher;
+        private final AtomicInteger preMaven4Passwords;
+        private final ProblemCollector<BuilderProblem> problems;
+        private String currentReference;
+
+        DecryptingSettingsTransformer(
+                Source settingsSource,
+                SecDispatcher secDispatcher,
+                AtomicInteger preMaven4Passwords,
+                ProblemCollector<BuilderProblem> problems) {
+            super(UnaryOperator.identity());
+            this.settingsSource = settingsSource;
+            this.secDispatcher = secDispatcher;
+            this.preMaven4Passwords = preMaven4Passwords;
+            this.problems = problems;
+        }
+
+        @Override
+        protected String transform(String str) {
+            if (str == null || str.isEmpty() || str.contains("${") || !secDispatcher.isAnyEncryptedString(str)) {
+                return str;
+            }
+            if (secDispatcher.isLegacyEncryptedString(str)) {
+                // the call above return true for too broad types of strings, original idea with 2.x sec-dispatcher
+                // was to make it possible to add "descriptions" to encrypted passwords. Maven 4 is
+                // limiting itself to decryption of ONLY the simplest cases of legacy passwords, those having form
+                // as documented on page: https://maven.apache.org/guides/mini/guide-encryption.html
+                // Examples of decrypted legacy passwords:
+                // <password>{COQLCE6DU6GtcS5P=}</password>
+                // <password>Oleg reset this password on 2009-03-11 {COQLCE6DU6GtcS5P=}</password>
+
+                // In short, secDispatcher#isLegacyEncryptedString(str) did return true, but we apply more scrutiny
+                // and check does string start with "{" or contains " {" (whitespace before opening curly braces),
+                // and that it ends with "}" strictly. Otherwise, we refuse it.
+                if ((!str.startsWith("{") && !str.contains(" {")) || !str.endsWith("}")) {
+                    // this is not a legacy password we care for
+                    return str;
+                }
+
+                // add a problem
+                preMaven4Passwords.incrementAndGet();
+            }
+            try {
+                return secDispatcher.decrypt(str);
+            } catch (Exception e) {
+                problems.reportProblem(new DefaultBuilderProblem(
+                        settingsSource.getLocation(),
+                        -1,
+                        -1,
+                        e,
+                        "Could not decrypt password (fix the corrupted password or remove it, if unused)"
+                                + (currentReference != null ? " for " + currentReference : ""),
+                        BuilderProblem.Severity.FATAL));
+                return str;
+            }
+        }
+
+        @Override
+        protected Server.Builder transformServer_Password(
+                Supplier<? extends Server.Builder> creator, Server.Builder builder, Server target) {
+            return withReference(
+                    "server " + target.getId(), () -> super.transformServer_Password(creator, builder, target));
+        }
+
+        @Override
+        protected Server.Builder transformServer_Passphrase(
+                Supplier<? extends Server.Builder> creator, Server.Builder builder, Server target) {
+            return withReference(
+                    "server " + target.getId(), () -> super.transformServer_Passphrase(creator, builder, target));
+        }
+
+        @Override
+        protected Proxy.Builder transformProxy_Password(
+                Supplier<? extends Proxy.Builder> creator, Proxy.Builder builder, Proxy target) {
+            return withReference(
+                    "proxy " + target.getId(), () -> super.transformProxy_Password(creator, builder, target));
+        }
+
+        @Override
+        protected Profile.Builder transformProfile_Properties(
+                Supplier<? extends Profile.Builder> creator, Profile.Builder builder, Profile target) {
+            Map<String, String> props = target.getProperties();
+            Map<String, String> newProps = null;
+            for (Map.Entry<String, String> entry : props.entrySet()) {
+                String newVal = withReference(
+                        "property " + entry.getKey() + " in profile " + target.getId(),
+                        () -> transform(entry.getValue()));
+                if (newVal != null && newVal != entry.getValue()) {
+                    if (newProps == null) {
+                        newProps = new HashMap<>(props);
+                        builder = builder != null ? builder : creator.get();
+                        builder.properties(newProps);
+                    }
+                    newProps.put(entry.getKey(), newVal);
+                }
+            }
+            return builder;
+        }
+
+        private <T> T withReference(String reference, Supplier<T> action) {
+            String previous = currentReference;
+            currentReference = reference;
+            try {
+                return action.get();
+            } finally {
+                currentReference = previous;
+            }
+        }
     }
 
     private Path getSecuritySettings(ProtoSession session) {
