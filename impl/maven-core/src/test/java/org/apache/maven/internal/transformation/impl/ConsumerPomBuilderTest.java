@@ -876,20 +876,19 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
     // ── GH-12981: extension-contributed user property interpolation ──────────
 
     /**
-     * Verifies that {@code interpolatePomVersions} resolves unresolved property
-     * references in dependency management versions using the effective model.
+     * Verifies that {@code interpolatePomVersions} resolves extension-contributed
+     * property references (not present in the effective model's properties) in
+     * dependency management versions.
      * <p>
-     * This is the core fix for GH-12981: when a Maven extension contributes user
-     * properties via {@code PropertyContributor} (e.g. Nisse's
-     * {@code nisse.jgit.dynamicVersion}), the raw model retains {@code ${...}}
-     * references because those properties are not in any POM's
-     * {@code <properties>} section. The effective model has them resolved, so
-     * {@code interpolatePomVersions} should replace the raw references with
-     * the effective model's literal values.
+     * This is the core fix for GH-12981: properties from {@code PropertyContributor}
+     * extensions are NOT added to the model's {@code <properties>} (the model
+     * builder's merge only overrides existing keys). Downstream consumers cannot
+     * resolve them through the parent chain, so they must be interpolated.
      */
     @Test
-    void testInterpolatePomVersionsResolvesDependencyManagement() {
-        // Raw model: versions contain unresolved property references
+    void testInterpolatePomVersionsResolvesExtensionProperties() {
+        // Raw model: versions reference an extension-contributed property
+        // that is NOT in the effective model's properties
         Dependency rawDep1 = Dependency.newBuilder()
                 .groupId("com.example")
                 .artifactId("common")
@@ -911,7 +910,8 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                         .build())
                 .build();
 
-        // Effective model: versions are fully resolved
+        // Effective model: versions resolved, but properties does NOT contain ext.dynamicVersion
+        // (it came from an extension, not the POM)
         Dependency effectiveDep1 = Dependency.newBuilder()
                 .groupId("com.example")
                 .artifactId("common")
@@ -935,19 +935,197 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
         Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
 
-        // Versions must be resolved
         List<Dependency> deps = result.getDependencyManagement().getDependencies();
         assertEquals(2, deps.size());
-        assertEquals("1.0.0", deps.get(0).getVersion(), "common version should be interpolated");
-        assertEquals("1.0.0", deps.get(1).getVersion(), "app version should be interpolated");
+        assertEquals("1.0.0", deps.get(0).getVersion(), "Extension property should be interpolated");
+        assertEquals("1.0.0", deps.get(1).getVersion(), "Extension property should be interpolated");
     }
 
     /**
-     * Verifies that {@code interpolatePomVersions} resolves unresolved property
-     * references in direct dependency versions.
+     * Verifies that properties defined in the POM or parent chain are NOT
+     * interpolated — downstream consumers can resolve them through the parent
+     * reference preserved in the consumer POM.
      */
     @Test
-    void testInterpolatePomVersionsResolvesDirectDependencies() {
+    void testInterpolatePomVersionsPreservesModelProperties() {
+        // Raw model: version references a property defined in the POM
+        Dependency rawDep = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("lib")
+                .version("${my.version}")
+                .build();
+
+        Model rawModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .properties(Map.of("my.version", "2.0.0"))
+                .dependencies(List.of(rawDep))
+                .build();
+
+        // Effective model: version resolved, AND the property IS in properties
+        Dependency effectiveDep = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("lib")
+                .version("2.0.0")
+                .build();
+
+        Model effectiveModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .properties(Map.of("my.version", "2.0.0"))
+                .dependencies(List.of(effectiveDep))
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
+
+        assertEquals(1, result.getDependencies().size());
+        assertEquals(
+                "${my.version}",
+                result.getDependencies().get(0).getVersion(),
+                "Model-defined property should be preserved as ${...} for consumers to resolve");
+    }
+
+    /**
+     * Verifies that {@code project.*} built-in properties are treated as
+     * resolvable and left as {@code ${...}} references.
+     */
+    @Test
+    void testInterpolatePomVersionsPreservesBuiltInProperties() {
+        Dependency rawDep = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("sibling")
+                .version("${project.version}")
+                .build();
+
+        Model rawModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(rawDep))
+                        .build())
+                .build();
+
+        Dependency effectiveDep = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("sibling")
+                .version("1.0.0")
+                .build();
+
+        Model effectiveModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(effectiveDep))
+                        .build())
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
+
+        assertEquals(
+                "${project.version}",
+                result.getDependencyManagement().getDependencies().get(0).getVersion(),
+                "Built-in ${project.version} should be preserved");
+    }
+
+    /**
+     * Verifies that mixed dependencies — some using model-defined properties,
+     * some using extension properties — are handled correctly: only extension
+     * properties are interpolated.
+     */
+    @Test
+    void testInterpolatePomVersionsMixedModelAndExtensionProperties() {
+        Dependency rawModelProp = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("stable")
+                .version("${my.version}")
+                .build();
+        Dependency rawExtProp = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("dynamic")
+                .version("${ext.version}")
+                .build();
+
+        Model rawModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(rawModelProp, rawExtProp))
+                        .build())
+                .build();
+
+        Dependency effectiveModelProp = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("stable")
+                .version("3.0.0")
+                .build();
+        Dependency effectiveExtProp = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("dynamic")
+                .version("4.2.1")
+                .build();
+
+        // Effective model has "my.version" in properties (from POM/parent)
+        // but NOT "ext.version" (from extension)
+        Model effectiveModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .properties(Map.of("my.version", "3.0.0"))
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(effectiveModelProp, effectiveExtProp))
+                        .build())
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
+
+        List<Dependency> deps = result.getDependencyManagement().getDependencies();
+        assertEquals(2, deps.size());
+        assertEquals("${my.version}", deps.get(0).getVersion(), "Model-defined property should be preserved");
+        assertEquals("4.2.1", deps.get(1).getVersion(), "Extension property should be interpolated");
+    }
+
+    /**
+     * Verifies that an empty model is handled without errors.
+     */
+    @Test
+    void testInterpolatePomVersionsEmptyModel() {
+        Model rawModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("empty")
+                .version("1.0.0")
+                .packaging("pom")
+                .build();
+
+        Model effectiveModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("empty")
+                .version("1.0.0")
+                .packaging("pom")
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
+
+        assertTrue(result.getDependencies().isEmpty());
+        assertNull(result.getDependencyManagement());
+    }
+
+    /**
+     * Verifies that extension-contributed properties in direct dependencies
+     * are interpolated.
+     */
+    @Test
+    void testInterpolatePomVersionsResolvesDirectDependencyExtensionProperties() {
         Dependency rawDep = Dependency.newBuilder()
                 .groupId("com.example")
                 .artifactId("lib")
@@ -982,116 +1160,42 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         assertEquals("2.5.0", result.getDependencies().get(0).getVersion());
     }
 
-    /**
-     * Verifies that already-resolved versions in the raw model are left unchanged.
-     */
+    // ── hasNonModelProperties unit tests ─────────────────────────────────────
+
     @Test
-    void testInterpolatePomVersionsLeavesResolvedVersionsUnchanged() {
-        Dependency rawDep = Dependency.newBuilder()
-                .groupId("com.example")
-                .artifactId("lib")
-                .version("1.0.0")
-                .build();
-
-        Model rawModel = Model.newBuilder()
-                .groupId("com.example")
-                .artifactId("parent")
-                .version("1.0.0")
-                .packaging("pom")
-                .dependencies(List.of(rawDep))
-                .build();
-
-        Model effectiveModel = Model.newBuilder()
-                .groupId("com.example")
-                .artifactId("parent")
-                .version("1.0.0")
-                .packaging("pom")
-                .dependencies(List.of(rawDep))
-                .build();
-
-        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
-
-        assertEquals(1, result.getDependencies().size());
-        assertEquals("1.0.0", result.getDependencies().get(0).getVersion());
+    void testHasNonModelPropertiesReturnsTrueForExtensionProperty() {
+        assertTrue(
+                DefaultConsumerPomBuilder.hasNonModelProperties("${ext.version}", Map.of()),
+                "Extension property not in model should return true");
     }
 
-    /**
-     * Verifies that mixed dependencies (some resolved, some not) are handled correctly.
-     */
     @Test
-    void testInterpolatePomVersionsMixedDependencies() {
-        Dependency rawResolved = Dependency.newBuilder()
-                .groupId("com.example")
-                .artifactId("stable")
-                .version("3.0.0")
-                .build();
-        Dependency rawUnresolved = Dependency.newBuilder()
-                .groupId("com.example")
-                .artifactId("dynamic")
-                .version("${ext.version}")
-                .build();
-
-        Model rawModel = Model.newBuilder()
-                .groupId("com.example")
-                .artifactId("parent")
-                .version("1.0.0")
-                .packaging("pom")
-                .dependencyManagement(DependencyManagement.newBuilder()
-                        .dependencies(List.of(rawResolved, rawUnresolved))
-                        .build())
-                .build();
-
-        Dependency effectiveResolved = Dependency.newBuilder()
-                .groupId("com.example")
-                .artifactId("stable")
-                .version("3.0.0")
-                .build();
-        Dependency effectiveUnresolved = Dependency.newBuilder()
-                .groupId("com.example")
-                .artifactId("dynamic")
-                .version("4.2.1")
-                .build();
-
-        Model effectiveModel = Model.newBuilder()
-                .groupId("com.example")
-                .artifactId("parent")
-                .version("1.0.0")
-                .packaging("pom")
-                .dependencyManagement(DependencyManagement.newBuilder()
-                        .dependencies(List.of(effectiveResolved, effectiveUnresolved))
-                        .build())
-                .build();
-
-        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
-
-        List<Dependency> deps = result.getDependencyManagement().getDependencies();
-        assertEquals(2, deps.size());
-        assertEquals("3.0.0", deps.get(0).getVersion(), "Already-resolved version should be unchanged");
-        assertEquals("4.2.1", deps.get(1).getVersion(), "Unresolved version should be interpolated");
+    void testHasNonModelPropertiesReturnsFalseForModelProperty() {
+        assertFalse(
+                DefaultConsumerPomBuilder.hasNonModelProperties("${my.version}", Map.of("my.version", "1.0")),
+                "Property defined in model should return false");
     }
 
-    /**
-     * Verifies that an empty model is handled without errors.
-     */
     @Test
-    void testInterpolatePomVersionsEmptyModel() {
-        Model rawModel = Model.newBuilder()
-                .groupId("com.example")
-                .artifactId("empty")
-                .version("1.0.0")
-                .packaging("pom")
-                .build();
+    void testHasNonModelPropertiesReturnsFalseForBuiltInProjectProperty() {
+        assertFalse(
+                DefaultConsumerPomBuilder.hasNonModelProperties("${project.version}", Map.of()),
+                "Built-in project.version should return false");
+    }
 
-        Model effectiveModel = Model.newBuilder()
-                .groupId("com.example")
-                .artifactId("empty")
-                .version("1.0.0")
-                .packaging("pom")
-                .build();
+    @Test
+    void testHasNonModelPropertiesReturnsTrueForMixedProperties() {
+        assertTrue(
+                DefaultConsumerPomBuilder.hasNonModelProperties(
+                        "${my.version}-${ext.qualifier}", Map.of("my.version", "1.0")),
+                "Should return true when at least one property is not in model");
+    }
 
-        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
-
-        assertTrue(result.getDependencies().isEmpty());
-        assertNull(result.getDependencyManagement());
+    @Test
+    void testHasNonModelPropertiesReturnsFalseForAllModelProperties() {
+        assertFalse(
+                DefaultConsumerPomBuilder.hasNonModelProperties(
+                        "${major}.${minor}", Map.of("major", "1", "minor", "0")),
+                "Should return false when all properties are in model");
     }
 }

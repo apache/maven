@@ -200,24 +200,35 @@ class DefaultConsumerPomBuilder implements PomBuilder {
     }
 
     /**
-     * Interpolates unresolved version references in the raw model's dependencies and
-     * dependency management using the effective model's fully-resolved values.
+     * Interpolates version references in the raw model's dependencies and dependency
+     * management that cannot be resolved by downstream consumers through the POM's
+     * own {@code <properties>} section or parent chain.
      * <p>
      * The {@code buildPom()} path uses the raw model to preserve the parent reference
-     * in the consumer POM, allowing downstream consumers to resolve inheritance. However,
-     * properties contributed by Maven extensions (via {@code PropertyContributor} SPI) are
-     * only available as user properties during the build session — they are not part of any
-     * POM's {@code <properties>} section or parent chain. Without this interpolation step,
-     * such property references (e.g. {@code ${nisse.jgit.dynamicVersion}}) would remain
+     * in the consumer POM. Properties defined in the POM or inherited from the parent
+     * chain are available to consumers and should be left as {@code ${...}} references.
+     * However, properties contributed by Maven extensions (via {@code PropertyContributor}
+     * SPI) exist only as user properties during the build session — they are not part of
+     * any POM's {@code <properties>} section or parent chain. Without this interpolation
+     * step, such references (e.g. {@code ${nisse.jgit.dynamicVersion}}) would remain
      * unresolved in the installed/deployed consumer POM, making it unusable.
+     * <p>
+     * The effective model's {@code getProperties()} returns exactly the properties from the
+     * POM and parent chain (the model builder's {@code merge()} method only overrides
+     * existing model properties — it never adds new user-property keys). A version
+     * reference is interpolated only when it contains at least one property name that
+     * is absent from that set, meaning a downstream consumer would be unable to resolve
+     * it.
      *
      * @param rawModel the raw model (no inheritance, no interpolation)
      * @param effectiveModel the effective model (inheritance + full interpolation)
-     * @return the raw model with version references resolved from the effective model
+     * @return the raw model with non-resolvable version references resolved
      * @see <a href="https://github.com/apache/maven/issues/12981">GH-12981</a>
      */
     static Model interpolatePomVersions(Model rawModel, Model effectiveModel) {
-        // Build lookups from the effective model
+        Map<String, String> modelProperties = effectiveModel.getProperties();
+
+        // Build lookups from the effective model's resolved dependency entries
         Map<String, Dependency> effectiveManagedDeps = new LinkedHashMap<>();
         if (effectiveModel.getDependencyManagement() != null) {
             for (Dependency dep : effectiveModel.getDependencyManagement().getDependencies()) {
@@ -235,7 +246,9 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             List<Dependency> interpolatedDeps = new ArrayList<>();
             boolean dmChanged = false;
             for (Dependency dep : rawModel.getDependencyManagement().getDependencies()) {
-                if (dep.getVersion() != null && dep.getVersion().contains("${")) {
+                if (dep.getVersion() != null
+                        && dep.getVersion().contains("${")
+                        && hasNonModelProperties(dep.getVersion(), modelProperties)) {
                     String key = getDependencyKey(dep);
                     Dependency effectiveDep = effectiveManagedDeps.get(key);
                     if (effectiveDep != null && !effectiveDep.getVersion().contains("${")) {
@@ -256,7 +269,9 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             List<Dependency> interpolatedDeps = new ArrayList<>();
             boolean depsChanged = false;
             for (Dependency dep : rawModel.getDependencies()) {
-                if (dep.getVersion() != null && dep.getVersion().contains("${")) {
+                if (dep.getVersion() != null
+                        && dep.getVersion().contains("${")
+                        && hasNonModelProperties(dep.getVersion(), modelProperties)) {
                     String key = getDependencyKey(dep);
                     Dependency effectiveDep = effectiveDeps.get(key);
                     if (effectiveDep != null && !effectiveDep.getVersion().contains("${")) {
@@ -272,6 +287,36 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         }
 
         return rawModel;
+    }
+
+    /**
+     * Returns {@code true} when the given version string contains at least one
+     * {@code ${name}} reference whose {@code name} is <em>not</em> a key in the
+     * supplied model properties and is not a well-known built-in property
+     * (e.g. {@code project.version}, {@code project.groupId}).
+     * <p>
+     * Such references originate from extension-contributed user properties
+     * (e.g. {@code PropertyContributor}) and would be unresolvable by downstream
+     * consumers that do not have the extension installed.
+     */
+    static boolean hasNonModelProperties(String version, Map<String, String> modelProperties) {
+        int start = 0;
+        while ((start = version.indexOf("${", start)) >= 0) {
+            int end = version.indexOf('}', start + 2);
+            if (end < 0) {
+                break;
+            }
+            String name = version.substring(start + 2, end);
+            if (!modelProperties.containsKey(name) && !isBuiltInProperty(name)) {
+                return true;
+            }
+            start = end + 1;
+        }
+        return false;
+    }
+
+    private static boolean isBuiltInProperty(String name) {
+        return name.startsWith("project.") || name.startsWith("pom.") || name.equals("version");
     }
 
     protected Model buildBom(RepositorySystemSession session, MavenProject project, ModelSource src)
