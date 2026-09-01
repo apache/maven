@@ -52,4 +52,36 @@ public interface RepositoryFactory extends Service {
             @Nonnull List<RemoteRepository> dominant,
             @Nonnull List<RemoteRepository> recessive,
             boolean processRecessive);
+
+    /**
+     * Aggregates repository definitions by merging duplicate repositories and optionally applying mirror, proxy and
+     * authentication settings from the session, additionally distinguishing the provenance of the recessive
+     * repository definitions. Repositories declared by a model that was resolved from a repository (a dependency
+     * POM, or one of its parents or imports) are remotely supplied input: session authentication is applied to them
+     * only when an operator-defined mirror has been selected for them. Repositories supplied by the build itself
+     * (the project's own POM and parents, request or settings repositories) keep receiving mirror, proxy and
+     * authentication settings as documented for {@link #aggregate(Session, List, List, boolean)}.
+     * <p>
+     * The default implementation ignores the provenance hint and delegates to
+     * {@link #aggregate(Session, List, List, boolean)}.
+     *
+     * @param session the session during which the repositories will be accessed
+     * @param dominant the current list of remote repositories to merge the new definitions into
+     * @param recessive the remote repositories to merge into the existing list
+     * @param processRecessive {@code true} if the recessive repository definitions have not yet been subjected to
+     *            mirror, proxy and authentication settings, {@code false} otherwise
+     * @param recessiveFromDescriptor {@code true} if the recessive repository definitions were declared by a model
+     *            resolved from a repository rather than by the build itself, {@code false} otherwise
+     * @return the aggregated list of remote repositories
+     * @since 4.1.0
+     */
+    @Nonnull
+    default List<RemoteRepository> aggregate(
+            @Nonnull Session session,
+            @Nonnull List<RemoteRepository> dominant,
+            @Nonnull List<RemoteRepository> recessive,
+            boolean processRecessive,
+            boolean recessiveFromDescriptor) {
+        return aggregate(session, dominant, recessive, processRecessive);
+    }
 }

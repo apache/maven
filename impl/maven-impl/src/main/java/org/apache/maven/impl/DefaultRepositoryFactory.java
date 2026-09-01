@@ -71,12 +71,23 @@ public class DefaultRepositoryFactory implements RepositoryFactory {
             List<RemoteRepository> dominant,
             List<RemoteRepository> recessive,
             boolean processRecessive) {
+        return aggregate(session, dominant, recessive, processRecessive, false);
+    }
+
+    @Override
+    public List<RemoteRepository> aggregate(
+            Session session,
+            List<RemoteRepository> dominant,
+            List<RemoteRepository> recessive,
+            boolean processRecessive,
+            boolean recessiveFromDescriptor) {
         InternalSession internalSession = InternalSession.from(requireNonNull(session, "session"));
         List<org.eclipse.aether.repository.RemoteRepository> repos = remoteRepositoryManager.aggregateRepositories(
                 internalSession.getSession(),
                 internalSession.toRepositories(requireNonNull(dominant, "dominant")),
                 internalSession.toRepositories(requireNonNull(recessive, "recessive")),
-                processRecessive);
+                processRecessive,
+                recessiveFromDescriptor);
         return repos.stream()
                 .<RemoteRepository>map(DefaultRemoteRepository::new)
                 .toList();
