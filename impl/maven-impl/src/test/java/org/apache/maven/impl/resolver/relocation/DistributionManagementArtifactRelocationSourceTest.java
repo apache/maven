@@ -30,6 +30,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
@@ -57,6 +58,13 @@ class DistributionManagementArtifactRelocationSourceTest {
                 DistributionManagement.newBuilder().relocation(relocation).build();
 
         return Model.newBuilder().distributionManagement(distMgmt).build();
+    }
+
+    @Test
+    void noRelocationReturnsNull() {
+        Model model = Model.newBuilder().build();
+        Artifact result = source.relocatedTarget(null, newResult(), model);
+        assertNull(result);
     }
 
     @Test

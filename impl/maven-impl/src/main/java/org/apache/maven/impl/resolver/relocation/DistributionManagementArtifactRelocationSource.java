@@ -25,6 +25,7 @@ import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Relocation;
 import org.apache.maven.impl.resolver.MavenArtifactRelocationSource;
+import org.apache.maven.impl.resolver.MetadataInputValidator;
 import org.apache.maven.impl.resolver.RelocatedArtifact;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -56,22 +57,19 @@ public final class DistributionManagementArtifactRelocationSource implements Mav
         if (distMgmt != null) {
             Relocation relocation = distMgmt.getRelocation();
             if (relocation != null) {
+                Artifact original = artifactDescriptorResult.getRequest().getArtifact();
                 validateCoordinateComponent(relocation.getGroupId(), "groupId", artifactDescriptorResult);
                 validateCoordinateComponent(relocation.getArtifactId(), "artifactId", artifactDescriptorResult);
                 validateCoordinateComponent(relocation.getVersion(), "version", artifactDescriptorResult);
                 Artifact result = new RelocatedArtifact(
-                        artifactDescriptorResult.getRequest().getArtifact(),
+                        original,
                         relocation.getGroupId(),
                         relocation.getArtifactId(),
                         null,
                         null,
                         relocation.getVersion(),
                         relocation.getMessage());
-                LOGGER.debug(
-                        "The artifact {} has been relocated to {}: {}",
-                        artifactDescriptorResult.getRequest().getArtifact(),
-                        result,
-                        relocation.getMessage());
+                LOGGER.debug("The artifact {} has been relocated to {}: {}", original, result, relocation.getMessage());
                 return result;
             }
         }
@@ -88,7 +86,7 @@ public final class DistributionManagementArtifactRelocationSource implements Mav
         if (value == null || value.isEmpty()) {
             return; // component is not relocated: the original artifact's value is kept
         }
-        if (isInvalidCoordinateComponent(value)) {
+        if (MetadataInputValidator.isInvalidCoordinateComponent(value)) {
             IllegalArgumentException cause = new IllegalArgumentException("Invalid relocation " + component + " '"
                     + value + "' in artifact descriptor for "
                     + artifactDescriptorResult.getRequest().getArtifact()
@@ -96,17 +94,5 @@ public final class DistributionManagementArtifactRelocationSource implements Mav
             artifactDescriptorResult.addException(cause);
             throw new ArtifactDescriptorException(artifactDescriptorResult, cause.getMessage(), cause);
         }
-    }
-
-    private static boolean isInvalidCoordinateComponent(String value) {
-        if ("..".equals(value) || value.contains("/") || value.contains("\\") || value.contains(":")) {
-            return true;
-        }
-        for (int i = 0; i < value.length(); i++) {
-            if (Character.isISOControl(value.charAt(i))) {
-                return true;
-            }
-        }
-        return false;
     }
 }
