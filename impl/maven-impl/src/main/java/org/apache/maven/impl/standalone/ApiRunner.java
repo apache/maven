@@ -598,6 +598,10 @@ public class ApiRunner {
         try (InputStream is = Files.newInputStream(path)) {
             fileProps.load(is);
         } catch (IOException e) {
+            // Silently ignore: properties files are optional configuration and the standalone
+            // API has no logger.  Failing to read a file (permissions, concurrent deletion)
+            // should not prevent session creation — callers get the same behavior as if the
+            // file did not exist.
             return new HashMap<>();
         }
         Map<String, String> result = new HashMap<>();
@@ -616,23 +620,27 @@ public class ApiRunner {
     /**
      * Detects the Maven version by reading the pom.properties resource from the classpath.
      * Falls back to reading from maven-impl's own pom.properties if maven-core is not available.
+     * If no version can be determined, returns {@code 0.0.0} as a sentinel value so that
+     * {@link Session#getMavenVersion()} is never null.
      *
      * @param lookup the lookup service
-     * @return the detected Maven version, or {@code null} if it cannot be determined
+     * @return the detected Maven version, never {@code null}
      */
+    @Nonnull
     private static Version detectMavenVersion(Lookup lookup) {
         String version = loadVersionFromProperties("META-INF/maven/org.apache.maven/maven-core/pom.properties");
         if (version == null) {
             version = loadVersionFromProperties("META-INF/maven/org.apache.maven/maven-impl/pom.properties");
         }
-        if (version != null) {
-            try {
-                return lookup.lookup(VersionParser.class).parseVersion(version);
-            } catch (Exception e) {
-                // ignore parse errors
-            }
+        if (version == null) {
+            version = "0.0.0";
         }
-        return null;
+        try {
+            return lookup.lookup(VersionParser.class).parseVersion(version);
+        } catch (Exception e) {
+            // Should not happen with "0.0.0", but be safe
+            return lookup.lookup(VersionParser.class).parseVersion("0.0.0");
+        }
     }
 
     private static String loadVersionFromProperties(String resource) {
