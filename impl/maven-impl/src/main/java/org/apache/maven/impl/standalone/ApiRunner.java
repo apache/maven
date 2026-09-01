@@ -33,6 +33,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Properties;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
@@ -50,6 +51,7 @@ import org.apache.maven.api.Type;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.model.PluginContainer;
@@ -72,12 +74,23 @@ import org.apache.maven.api.toolchain.ToolchainModel;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
+import org.apache.maven.di.impl.InjectorImpl;
 import org.apache.maven.impl.AbstractSession;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.di.SessionScope;
 import org.apache.maven.impl.model.DefaultInterpolator;
 import org.apache.maven.impl.resolver.MavenSessionBuilderSupplier;
 import org.apache.maven.impl.resolver.scopes.Maven4ScopeManagerConfiguration;
+import org.codehaus.plexus.components.secdispatcher.Cipher;
+import org.codehaus.plexus.components.secdispatcher.Dispatcher;
+import org.codehaus.plexus.components.secdispatcher.MasterSource;
+import org.codehaus.plexus.components.secdispatcher.internal.cipher.AESGCMNoPadding;
+import org.codehaus.plexus.components.secdispatcher.internal.dispatchers.LegacyDispatcher;
+import org.codehaus.plexus.components.secdispatcher.internal.dispatchers.MasterDispatcher;
+import org.codehaus.plexus.components.secdispatcher.internal.sources.EnvMasterSource;
+import org.codehaus.plexus.components.secdispatcher.internal.sources.GpgAgentMasterSource;
+import org.codehaus.plexus.components.secdispatcher.internal.sources.PinEntryMasterSource;
+import org.codehaus.plexus.components.secdispatcher.internal.sources.SystemPropertyMasterSource;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -131,6 +144,27 @@ import org.eclipse.aether.util.repository.DefaultProxySelector;
 public class ApiRunner {
 
     /**
+     * Controls how the standalone session handles settings encryption/decryption.
+     *
+     * <p>Maven settings ({@code settings.xml}) may contain encrypted server passwords.
+     * Decryption requires the {@code plexus-sec-dispatcher} library on the classpath.
+     * This enum lets callers control the behavior when dispatchers are (or are not) available.</p>
+     */
+    public enum SecurityMode {
+        /** Do not attempt to configure security dispatchers. Encrypted passwords are passed through as-is. */
+        NONE,
+        /** Try to configure security dispatchers; silently skip if the required classes are not on the classpath. */
+        IF_AVAILABLE,
+        /**
+         * Try to configure security dispatchers; warn to {@code System.err} if the required classes
+         * are not on the classpath. This is the default.
+         */
+        IF_AVAILABLE_WARN,
+        /** Security dispatchers are required; throw {@link MavenException} if they cannot be configured. */
+        REQUIRED
+    }
+
+    /**
      * Creates a new Maven session with default configuration.
      *
      * @return a new {@link Session} instance
@@ -157,12 +191,27 @@ public class ApiRunner {
      * @return a new {@link Session} instance
      */
     public static Session createSession(Consumer<Injector> injectorConsumer, Path localRepo) {
+        return createSession(injectorConsumer, localRepo, SecurityMode.IF_AVAILABLE_WARN);
+    }
+
+    /**
+     * Creates a new Maven session with custom injector configuration, local repository path,
+     * and security mode.
+     *
+     * @param injectorConsumer consumer function to customize the injector
+     * @param localRepo path to the local repository
+     * @param securityMode controls how encrypted passwords in settings are handled
+     * @return a new {@link Session} instance
+     */
+    public static Session createSession(
+            Consumer<Injector> injectorConsumer, Path localRepo, SecurityMode securityMode) {
         Injector injector = Injector.create();
         injector.bindInstance(Injector.class, injector);
         injector.bindImplicit(ApiRunner.class);
         injector.bindImplicit(RepositorySystemSupplier.class);
         injector.bindInstance(LocalRepoProvider.class, () -> localRepo);
         injector.discover(ApiRunner.class.getClassLoader());
+        configureSecurityDispatchers(injector, securityMode != null ? securityMode : SecurityMode.IF_AVAILABLE_WARN);
         if (injectorConsumer != null) {
             injectorConsumer.accept(injector);
         }
@@ -172,6 +221,48 @@ public class ApiRunner {
         scope.seed(Session.class, session);
         injector.bindScope(SessionScoped.class, scope);
         return session;
+    }
+
+    /**
+     * Attempts to bind security dispatcher classes for settings password decryption.
+     * The dispatchers (legacy and master) are loaded from the {@code plexus-sec-dispatcher}
+     * library. If the library is not on the classpath, the behavior depends on the
+     * {@link SecurityMode}.
+     *
+     * <p>If dispatchers are already bound (e.g., via {@code discover()} in tests or by a
+     * custom {@code injectorConsumer}), this method is a no-op to avoid duplicate bindings.</p>
+     */
+    private static void configureSecurityDispatchers(Injector injector, SecurityMode mode) {
+        if (mode == SecurityMode.NONE) {
+            return;
+        }
+        try {
+            Class.forName("org.codehaus.plexus.components.secdispatcher.Dispatcher");
+            // Skip if dispatchers are already bound (e.g., from discover() scanning test classes)
+            if (!hasExistingDispatchers(injector)) {
+                injector.bindImplicit(SecDispatcherBindings.class);
+            }
+        } catch (ClassNotFoundException | NoClassDefFoundError e) {
+            switch (mode) {
+                case REQUIRED:
+                    throw new MavenException(
+                            "Security dispatchers required but plexus-sec-dispatcher is not on the classpath", e);
+                case IF_AVAILABLE_WARN:
+                    System.err.println("WARNING: plexus-sec-dispatcher not available on classpath; "
+                            + "encrypted passwords in settings.xml will not be decrypted");
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+
+    private static boolean hasExistingDispatchers(Injector injector) {
+        if (injector instanceof InjectorImpl impl) {
+            Set<?> bindings = impl.getAllBindings(Dispatcher.class);
+            return bindings != null && !bindings.isEmpty();
+        }
+        return false;
     }
 
     /**
@@ -660,4 +751,57 @@ public class ApiRunner {
     }
 
     record DumbPackaging(String id, Type type, Map<String, PluginContainer> plugins) implements Packaging {}
+
+    /**
+     * Provides the security dispatcher bindings needed for decrypting encrypted passwords
+     * in settings.xml. This class is only loaded when {@code plexus-sec-dispatcher} is confirmed
+     * to be on the classpath (see {@link #configureSecurityDispatchers}).
+     *
+     * <p>Supports both legacy ({@code {...}}) and Maven 4 master-key-based encrypted passwords.</p>
+     */
+    @SuppressWarnings("unused")
+    static class SecDispatcherBindings {
+
+        @Provides
+        @Named(LegacyDispatcher.NAME)
+        static Dispatcher legacyDispatcher() {
+            return new LegacyDispatcher();
+        }
+
+        @Provides
+        @Named(MasterDispatcher.NAME)
+        static Dispatcher masterDispatcher(Map<String, Cipher> ciphers, Map<String, MasterSource> sources) {
+            return new MasterDispatcher(ciphers, sources);
+        }
+
+        @Provides
+        @Named(AESGCMNoPadding.CIPHER_ALG)
+        static Cipher aesCipher() {
+            return new AESGCMNoPadding();
+        }
+
+        @Provides
+        @Named(EnvMasterSource.NAME)
+        static MasterSource envSource() {
+            return new EnvMasterSource();
+        }
+
+        @Provides
+        @Named(GpgAgentMasterSource.NAME)
+        static MasterSource gpgAgentSource() {
+            return new GpgAgentMasterSource();
+        }
+
+        @Provides
+        @Named(PinEntryMasterSource.NAME)
+        static MasterSource pinEntrySource() {
+            return new PinEntryMasterSource();
+        }
+
+        @Provides
+        @Named(SystemPropertyMasterSource.NAME)
+        static MasterSource systemPropertySource() {
+            return new SystemPropertyMasterSource();
+        }
+    }
 }
