@@ -872,4 +872,226 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 result.getProfiles().get(0).getActivation(),
                 "executable() condition should be stripped from transformPom profiles");
     }
+
+    // ── GH-12981: extension-contributed user property interpolation ──────────
+
+    /**
+     * Verifies that {@code interpolatePomVersions} resolves unresolved property
+     * references in dependency management versions using the effective model.
+     * <p>
+     * This is the core fix for GH-12981: when a Maven extension contributes user
+     * properties via {@code PropertyContributor} (e.g. Nisse's
+     * {@code nisse.jgit.dynamicVersion}), the raw model retains {@code ${...}}
+     * references because those properties are not in any POM's
+     * {@code <properties>} section. The effective model has them resolved, so
+     * {@code interpolatePomVersions} should replace the raw references with
+     * the effective model's literal values.
+     */
+    @Test
+    void testInterpolatePomVersionsResolvesDependencyManagement() {
+        // Raw model: versions contain unresolved property references
+        Dependency rawDep1 = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("common")
+                .version("${ext.dynamicVersion}")
+                .build();
+        Dependency rawDep2 = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("app")
+                .version("${ext.dynamicVersion}")
+                .build();
+
+        Model rawModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("bom")
+                .version("1.0.0")
+                .packaging("pom")
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(rawDep1, rawDep2))
+                        .build())
+                .build();
+
+        // Effective model: versions are fully resolved
+        Dependency effectiveDep1 = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("common")
+                .version("1.0.0")
+                .build();
+        Dependency effectiveDep2 = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("app")
+                .version("1.0.0")
+                .build();
+
+        Model effectiveModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("bom")
+                .version("1.0.0")
+                .packaging("pom")
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(effectiveDep1, effectiveDep2))
+                        .build())
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
+
+        // Versions must be resolved
+        List<Dependency> deps = result.getDependencyManagement().getDependencies();
+        assertEquals(2, deps.size());
+        assertEquals("1.0.0", deps.get(0).getVersion(), "common version should be interpolated");
+        assertEquals("1.0.0", deps.get(1).getVersion(), "app version should be interpolated");
+    }
+
+    /**
+     * Verifies that {@code interpolatePomVersions} resolves unresolved property
+     * references in direct dependency versions.
+     */
+    @Test
+    void testInterpolatePomVersionsResolvesDirectDependencies() {
+        Dependency rawDep = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("lib")
+                .version("${ext.version}")
+                .build();
+
+        Model rawModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .dependencies(List.of(rawDep))
+                .build();
+
+        Dependency effectiveDep = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("lib")
+                .version("2.5.0")
+                .build();
+
+        Model effectiveModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .dependencies(List.of(effectiveDep))
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
+
+        assertEquals(1, result.getDependencies().size());
+        assertEquals("2.5.0", result.getDependencies().get(0).getVersion());
+    }
+
+    /**
+     * Verifies that already-resolved versions in the raw model are left unchanged.
+     */
+    @Test
+    void testInterpolatePomVersionsLeavesResolvedVersionsUnchanged() {
+        Dependency rawDep = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("lib")
+                .version("1.0.0")
+                .build();
+
+        Model rawModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .dependencies(List.of(rawDep))
+                .build();
+
+        Model effectiveModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .dependencies(List.of(rawDep))
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
+
+        assertEquals(1, result.getDependencies().size());
+        assertEquals("1.0.0", result.getDependencies().get(0).getVersion());
+    }
+
+    /**
+     * Verifies that mixed dependencies (some resolved, some not) are handled correctly.
+     */
+    @Test
+    void testInterpolatePomVersionsMixedDependencies() {
+        Dependency rawResolved = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("stable")
+                .version("3.0.0")
+                .build();
+        Dependency rawUnresolved = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("dynamic")
+                .version("${ext.version}")
+                .build();
+
+        Model rawModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(rawResolved, rawUnresolved))
+                        .build())
+                .build();
+
+        Dependency effectiveResolved = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("stable")
+                .version("3.0.0")
+                .build();
+        Dependency effectiveUnresolved = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("dynamic")
+                .version("4.2.1")
+                .build();
+
+        Model effectiveModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(effectiveResolved, effectiveUnresolved))
+                        .build())
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
+
+        List<Dependency> deps = result.getDependencyManagement().getDependencies();
+        assertEquals(2, deps.size());
+        assertEquals("3.0.0", deps.get(0).getVersion(), "Already-resolved version should be unchanged");
+        assertEquals("4.2.1", deps.get(1).getVersion(), "Unresolved version should be interpolated");
+    }
+
+    /**
+     * Verifies that an empty model is handled without errors.
+     */
+    @Test
+    void testInterpolatePomVersionsEmptyModel() {
+        Model rawModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("empty")
+                .version("1.0.0")
+                .packaging("pom")
+                .build();
+
+        Model effectiveModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("empty")
+                .version("1.0.0")
+                .packaging("pom")
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
+
+        assertTrue(result.getDependencies().isEmpty());
+        assertNull(result.getDependencyManagement());
+    }
 }

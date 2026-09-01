@@ -194,7 +194,84 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             throws ModelBuilderException {
         ModelBuilderResult result = buildModel(session, project, src);
         Model model = result.getRawModel();
+        Model effectiveModel = result.getEffectiveModel();
+        model = interpolatePomVersions(model, effectiveModel);
         return transformPom(model, project);
+    }
+
+    /**
+     * Interpolates unresolved version references in the raw model's dependencies and
+     * dependency management using the effective model's fully-resolved values.
+     * <p>
+     * The {@code buildPom()} path uses the raw model to preserve the parent reference
+     * in the consumer POM, allowing downstream consumers to resolve inheritance. However,
+     * properties contributed by Maven extensions (via {@code PropertyContributor} SPI) are
+     * only available as user properties during the build session — they are not part of any
+     * POM's {@code <properties>} section or parent chain. Without this interpolation step,
+     * such property references (e.g. {@code ${nisse.jgit.dynamicVersion}}) would remain
+     * unresolved in the installed/deployed consumer POM, making it unusable.
+     *
+     * @param rawModel the raw model (no inheritance, no interpolation)
+     * @param effectiveModel the effective model (inheritance + full interpolation)
+     * @return the raw model with version references resolved from the effective model
+     * @see <a href="https://github.com/apache/maven/issues/12981">GH-12981</a>
+     */
+    static Model interpolatePomVersions(Model rawModel, Model effectiveModel) {
+        // Build lookups from the effective model
+        Map<String, Dependency> effectiveManagedDeps = new LinkedHashMap<>();
+        if (effectiveModel.getDependencyManagement() != null) {
+            for (Dependency dep : effectiveModel.getDependencyManagement().getDependencies()) {
+                effectiveManagedDeps.put(getDependencyKey(dep), dep);
+            }
+        }
+        Map<String, Dependency> effectiveDeps = new LinkedHashMap<>();
+        for (Dependency dep : effectiveModel.getDependencies()) {
+            effectiveDeps.put(getDependencyKey(dep), dep);
+        }
+
+        // Interpolate dependency management versions
+        if (rawModel.getDependencyManagement() != null
+                && !rawModel.getDependencyManagement().getDependencies().isEmpty()) {
+            List<Dependency> interpolatedDeps = new ArrayList<>();
+            boolean dmChanged = false;
+            for (Dependency dep : rawModel.getDependencyManagement().getDependencies()) {
+                if (dep.getVersion() != null && dep.getVersion().contains("${")) {
+                    String key = getDependencyKey(dep);
+                    Dependency effectiveDep = effectiveManagedDeps.get(key);
+                    if (effectiveDep != null && !effectiveDep.getVersion().contains("${")) {
+                        dep = dep.withVersion(effectiveDep.getVersion());
+                        dmChanged = true;
+                    }
+                }
+                interpolatedDeps.add(dep);
+            }
+            if (dmChanged) {
+                rawModel = rawModel.withDependencyManagement(
+                        rawModel.getDependencyManagement().withDependencies(interpolatedDeps));
+            }
+        }
+
+        // Interpolate direct dependency versions
+        if (!rawModel.getDependencies().isEmpty()) {
+            List<Dependency> interpolatedDeps = new ArrayList<>();
+            boolean depsChanged = false;
+            for (Dependency dep : rawModel.getDependencies()) {
+                if (dep.getVersion() != null && dep.getVersion().contains("${")) {
+                    String key = getDependencyKey(dep);
+                    Dependency effectiveDep = effectiveDeps.get(key);
+                    if (effectiveDep != null && !effectiveDep.getVersion().contains("${")) {
+                        dep = dep.withVersion(effectiveDep.getVersion());
+                        depsChanged = true;
+                    }
+                }
+                interpolatedDeps.add(dep);
+            }
+            if (depsChanged) {
+                rawModel = rawModel.withDependencies(interpolatedDeps);
+            }
+        }
+
+        return rawModel;
     }
 
     protected Model buildBom(RepositorySystemSession session, MavenProject project, ModelSource src)
