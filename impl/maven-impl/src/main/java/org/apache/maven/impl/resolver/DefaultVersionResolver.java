@@ -281,6 +281,8 @@ public class DefaultVersionResolver implements VersionResolver {
         return (versioning != null) ? versioning : Versioning.newInstance();
     }
 
+
+
     private void invalidMetadata(
             RepositorySystemSession session,
             RequestTrace trace,

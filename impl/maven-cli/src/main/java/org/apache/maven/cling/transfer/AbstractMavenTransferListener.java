@@ -44,6 +44,34 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         this.out = out;
     }
 
+    /**
+     * Escapes control characters so that transfer messages render literally on a terminal.
+     * Tab and newline are preserved; every other C0 control, DEL and the C1 controls are escaped.
+     *
+     * @param str the string to escape, may be {@code null}
+     * @return the escaped string, or {@code null} if the input was {@code null}
+     */
+    static String sanitize(String str) {
+        if (str == null) {
+            return null;
+        }
+        StringBuilder sb = null;
+        for (int i = 0; i < str.length(); i++) {
+            char c = str.charAt(i);
+            boolean escape = (c < 0x20 && c != '\t' && c != '\n') || (c >= 0x7F && c <= 0x9F);
+            if (escape) {
+                if (sb == null) {
+                    sb = new StringBuilder(str.length() + 8);
+                    sb.append(str, 0, i);
+                }
+                sb.append(String.format("\\u%04x", (int) c));
+            } else if (sb != null) {
+                sb.append(c);
+            }
+        }
+        return sb != null ? sb.toString() : str;
+    }
+
     @Override
     public void transferInitiated(TransferEvent event) {
         String action = event.getRequestType() == TransferEvent.RequestType.PUT ? "Uploading" : "Downloading";
@@ -52,9 +80,9 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
         TransferResource resource = event.getResource();
         MessageBuilder message = messageBuilderFactory.builder();
         message.style(STYLE).append(action).append(' ').append(direction).append(' ');
-        message.resetStyle().append(resource.getRepositoryId());
-        message.style(STYLE).append(": ").append(resource.getRepositoryUrl());
-        message.resetStyle().append(resource.getResourceName());
+        message.resetStyle().append(sanitize(resource.getRepositoryId()));
+        message.style(STYLE).append(": ").append(sanitize(resource.getRepositoryUrl()));
+        message.resetStyle().append(sanitize(resource.getResourceName()));
 
         out.println(message);
     }
@@ -63,8 +91,9 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
     public void transferCorrupted(TransferEvent event) throws TransferCancelledException {
         TransferResource resource = event.getResource();
         // TODO This needs to be colorized
-        out.println("[WARNING] " + event.getException().getMessage() + " from " + resource.getRepositoryId() + " for "
-                + resource.getRepositoryUrl() + resource.getResourceName());
+        out.println("[WARNING] " + sanitize(event.getException().getMessage()) + " from "
+                + sanitize(resource.getRepositoryId()) + " for " + sanitize(resource.getRepositoryUrl())
+                + sanitize(resource.getResourceName()));
     }
 
     @Override
@@ -78,9 +107,9 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
 
         MessageBuilder message = messageBuilderFactory.builder();
         message.append(action).style(STYLE).append(' ').append(direction).append(' ');
-        message.resetStyle().append(resource.getRepositoryId());
-        message.style(STYLE).append(": ").append(resource.getRepositoryUrl());
-        message.resetStyle().append(resource.getResourceName());
+        message.resetStyle().append(sanitize(resource.getRepositoryId()));
+        message.style(STYLE).append(": ").append(sanitize(resource.getRepositoryUrl()));
+        message.resetStyle().append(sanitize(resource.getResourceName()));
         message.style(STYLE).append(" (").append(format.format(contentLength));
 
         Duration duration = Duration.between(resource.getStartTime(), MonotonicClock.now());

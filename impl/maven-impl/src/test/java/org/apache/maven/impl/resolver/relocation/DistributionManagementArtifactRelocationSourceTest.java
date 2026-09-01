@@ -23,93 +23,94 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Relocation;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * Tests {@link DistributionManagementArtifactRelocationSource}.
+ * Test cases for {@code DistributionManagementArtifactRelocationSource} coordinate handling.
  */
 class DistributionManagementArtifactRelocationSourceTest {
 
     private final DistributionManagementArtifactRelocationSource source =
             new DistributionManagementArtifactRelocationSource();
 
-    @Test
-    void validRelocationReturnsRelocatedArtifact() {
-        Model model = Model.newBuilder()
-                .distributionManagement(DistributionManagement.newBuilder()
-                        .relocation(Relocation.newBuilder()
-                                .groupId("org.apache.new")
-                                .artifactId("new-artifact")
-                                .version("2.0.0")
-                                .build())
-                        .build())
+    private static ArtifactDescriptorResult newResult() {
+        final ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
+        request.setArtifact(new DefaultArtifact("ut.simple:artifact:1.0"));
+        return new ArtifactDescriptorResult(request);
+    }
+
+    private static Model newModel(String groupId, String artifactId, String version) {
+        final Relocation relocation = Relocation.newBuilder()
+                .groupId(groupId)
+                .artifactId(artifactId)
+                .version(version)
                 .build();
 
-        Artifact result = source.relocatedTarget(null, descriptorResult(), model);
-        assertNotNull(result);
+        final DistributionManagement distMgmt =
+                DistributionManagement.newBuilder().relocation(relocation).build();
+
+        return Model.newBuilder().distributionManagement(distMgmt).build();
     }
 
     @Test
     void noRelocationReturnsNull() {
         Model model = Model.newBuilder().build();
-        Artifact result = source.relocatedTarget(null, descriptorResult(), model);
+        Artifact result = source.relocatedTarget(null, newResult(), model);
         assertNull(result);
     }
 
     @Test
-    void pathTraversalGroupIdThrows() {
-        Model model = modelWithRelocation("..", "new-artifact", "1.0");
-        assertThrows(IllegalArgumentException.class, () -> source.relocatedTarget(null, descriptorResult(), model));
+    void testWellFormedRelocationIsApplied() throws Exception {
+        final Artifact relocated = source.relocatedTarget(null, newResult(), newModel("ut.moved", "artifact", "2.0"));
+
+        assertNotNull(relocated);
+        assertEquals("ut.moved", relocated.getGroupId());
+        assertEquals("artifact", relocated.getArtifactId());
+        assertEquals("2.0", relocated.getVersion());
     }
 
     @Test
-    void pathTraversalArtifactIdThrows() {
-        Model model = modelWithRelocation("org.apache", "../../../etc/passwd", "1.0");
-        assertThrows(IllegalArgumentException.class, () -> source.relocatedTarget(null, descriptorResult(), model));
+    void testRelocationGroupIdWithBackslashIsRejected() {
+        assertThrows(
+                ArtifactDescriptorException.class,
+                () -> source.relocatedTarget(null, newResult(), newModel("a\\b", null, null)));
     }
 
     @Test
-    void pathTraversalVersionThrows() {
-        Model model = modelWithRelocation("org.apache", "artifact", "../../evil");
-        assertThrows(IllegalArgumentException.class, () -> source.relocatedTarget(null, descriptorResult(), model));
+    void testRelocationWithInvalidArtifactIdIsRejected() {
+        assertThrows(
+                ArtifactDescriptorException.class,
+                () -> source.relocatedTarget(null, newResult(), newModel(null, "a/b", null)));
     }
 
     @Test
-    void colonInGroupIdThrows() {
-        Model model = modelWithRelocation("C:", "artifact", "1.0");
-        assertThrows(IllegalArgumentException.class, () -> source.relocatedTarget(null, descriptorResult(), model));
+    void testRelocationArtifactIdWithControlCharacterIsRejected() {
+        assertThrows(
+                ArtifactDescriptorException.class,
+                () -> source.relocatedTarget(null, newResult(), newModel(null, "a\nb", null)));
     }
 
     @Test
-    void emptyRelocationFieldsAreAccepted() {
-        // Empty fields mean "keep the original coordinate"
-        Model model = modelWithRelocation("", "", "");
-        Artifact result = source.relocatedTarget(null, descriptorResult(), model);
-        assertNotNull(result);
+    void testRelocationWithInvalidVersionIsRejected() {
+        assertThrows(
+                ArtifactDescriptorException.class,
+                () -> source.relocatedTarget(null, newResult(), newModel(null, null, "1.0:2.0")));
     }
 
-    private static Model modelWithRelocation(String groupId, String artifactId, String version) {
-        return Model.newBuilder()
-                .distributionManagement(DistributionManagement.newBuilder()
-                        .relocation(Relocation.newBuilder()
-                                .groupId(groupId)
-                                .artifactId(artifactId)
-                                .version(version)
-                                .build())
-                        .build())
-                .build();
-    }
+    @Test
+    void testVersionWithTrailingDotsIsAccepted() throws Exception {
+        // only the exact ".." token is rejected; "1.." is an unusual but valid version string
+        final Artifact relocated = source.relocatedTarget(null, newResult(), newModel(null, null, "1.."));
 
-    private static ArtifactDescriptorResult descriptorResult() {
-        Artifact artifact = new DefaultArtifact("org.example", "old-artifact", "jar", "1.0");
-        ArtifactDescriptorRequest request = new ArtifactDescriptorRequest();
-        request.setArtifact(artifact);
-        return new ArtifactDescriptorResult(request);
+        assertNotNull(relocated);
+        assertEquals("1..", relocated.getVersion());
     }
 }

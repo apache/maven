@@ -18,6 +18,7 @@
  */
 package org.apache.maven.impl.resolver;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.util.ArrayList;

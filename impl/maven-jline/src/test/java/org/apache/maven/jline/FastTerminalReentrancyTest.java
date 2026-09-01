@@ -32,15 +32,30 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * {@link MessageUtils#systemInstall} publishes the terminal before the background thread has built
  * it, so anything that thread logs is rendered through a terminal that same thread is still
- * producing. See <a href="https://github.com/apache/maven/issues/12761">#12761</a>.
+ * producing. See <a href="https://github.com/apache/maven/issues/12761">#12761</a> and
+ * <a href="https://github.com/apache/maven/issues/12912">#12912</a>.
  * <p>
  * A single log statement asks the terminal for two things, its type while rendering the message and
  * its writer while emitting the line, so both are exercised from both halves of the window: the
  * builder callable, and the consumer that runs before the terminal is published.
+ * <p>
+ * JLine 4.4.0's FFM provider initialization ({@code CLibrary.<clinit>}) can reach back through
+ * other terminal methods (e.g. {@code getName()}, {@code getColumns()}, {@code encoding()}) on the
+ * build thread, so the fallback must cover all delegate methods, not just {@code writer()} and
+ * {@code getType()}.
+ * <p>
+ * The tests force {@code providers("exec")} so that the builder creates a lightweight
+ * {@code ExternalTerminal} instead of a {@code PosixPtyTerminal} via FFM. The FFM provider calls
+ * {@code CLibrary.openpty()} which creates a real PTY pair; the subsequent grapheme-cluster probe
+ * ({@code ensureModesProbed()}) reads from the PTY master via {@code FileInputStream.read0()}, a
+ * native blocking read. Although {@code VMIN=0, VTIME=0} attributes are set before probing, there
+ * is a race where the native read blocks indefinitely instead of respecting the timeout, causing
+ * the test to hang until the 30-second preemptive timeout fires.
  * <p>
  * The timeouts are preemptive on purpose: a regression parks the build thread forever, and only an
  * abandoning timeout turns that into a red test rather than a hung fork.
@@ -78,6 +93,64 @@ class FastTerminalReentrancyTest {
     }
 
     /**
+     * Exercises terminal methods beyond {@code writer()} and {@code getType()} that JLine's FFM
+     * provider initialization can reach on the build thread. Before the fallback terminal was added,
+     * these would deadlock. See <a href="https://github.com/apache/maven/issues/12912">#12912</a>.
+     */
+    @Test
+    void arbitraryTerminalMethodsFromTheBuilderDoNotDeadlock() {
+        assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
+            CompletableFuture<int[]> probed = new CompletableFuture<>();
+            installAndAwait(
+                    builder -> {
+                        Terminal t = MessageUtils.getTerminal();
+                        probed.complete(
+                                new int[] {t.getSize().getColumns(), t.getSize().getRows()});
+                    },
+                    terminal -> {});
+            int[] dims = probed.get();
+            assertTrue(dims[0] >= 0, "width should be non-negative");
+            assertTrue(dims[1] >= 0, "height should be non-negative");
+        });
+    }
+
+    /**
+     * Exercises terminal methods beyond {@code writer()} and {@code getType()} from the consumer
+     * callback. See <a href="https://github.com/apache/maven/issues/12912">#12912</a>.
+     */
+    @Test
+    void arbitraryTerminalMethodsFromTheConsumerDoNotDeadlock() {
+        assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
+            CompletableFuture<String> probed = new CompletableFuture<>();
+            installAndAwait(builder -> {}, terminal -> {
+                Terminal t = MessageUtils.getTerminal();
+                probed.complete(t.getName());
+            });
+            assertNotNull(probed.get());
+        });
+    }
+
+    /**
+     * Verifies that {@link MessageUtils#getTerminal()} is non-null when called from the builder
+     * callback. Before the fix, the {@code FastTerminal} constructor started its build thread
+     * before returning, so {@code MessageUtils.terminal} was still {@code null} when the build
+     * thread ran the builder callback &mdash; a race between the constructor returning and the
+     * thread scheduling. After the fix, {@code MessageUtils} assigns the field before calling
+     * {@link FastTerminal#start()}, and {@link Thread#start()} provides the happens-before edge.
+     *
+     * @see <a href="https://github.com/apache/maven/issues/12912">#12912</a>
+     */
+    @Test
+    void terminalAssignmentIsVisibleFromBuilderCallback() {
+        assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
+            CompletableFuture<Terminal> observed = new CompletableFuture<>();
+            installAndAwait(builder -> observed.complete(MessageUtils.getTerminal()), terminal -> {});
+            assertNotNull(observed.get(), "MessageUtils.getTerminal() must not return null from the builder callback");
+            assertTrue(observed.get() instanceof FastTerminal, "terminal should be the FastTerminal wrapper");
+        });
+    }
+
+    /**
      * Both terminal calls a single log statement makes, run on the terminal building thread.
      */
     private static String[] probe() {
@@ -98,6 +171,7 @@ class FastTerminalReentrancyTest {
                     onBuilder.accept(builder);
                     builder.dumb(true)
                             .system(false)
+                            .providers("exec")
                             .streams(InputStream.nullInputStream(), OutputStream.nullOutputStream());
                 },
                 onTerminal);

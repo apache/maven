@@ -82,13 +82,13 @@ public class DefaultModelValidator implements ModelValidator {
     private static final Pattern CI_FRIENDLY_EXPRESSION = Pattern.compile("\\$\\{(.+?)}");
     private static final Pattern EXPRESSION_PROJECT_NAME_PATTERN = Pattern.compile("\\$\\{(project.+?)}");
 
-    private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
+    private static final String ILLEGAL_NTFS_FILENAME_CHARS = "\\/:\"<>|?*";
 
-    private static final String ILLEGAL_RELATIVE_PATH_CHARS = ":\"<>|?*";
+    private static final String ILLEGAL_WINDOWS_PATH_CHARS = ":\"<>|?*";
 
-    private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_FS_CHARS;
+    private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_NTFS_FILENAME_CHARS;
 
-    private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_FS_CHARS;
+    private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_NTFS_FILENAME_CHARS;
 
     private static final String EMPTY = "";
 
@@ -160,7 +160,9 @@ public class DefaultModelValidator implements ModelValidator {
             Severity errOn30 = getSeverity(request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_0);
             Severity errOn31 = getSeverity(request, ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_3_1);
 
-            // [MNG-8129] Validate that relativePath does not contain characters that are illegal in filesystem paths
+            // [MNG-8129] Validate that relativePath does not contain characters reserved on Windows (NTFS).
+            // These cause InvalidPathException when resolved via java.nio.file.Path, and typically
+            // indicate the user put a GAV coordinate (e.g. "g:a:v") instead of an actual filesystem path.
             if (parent != null
                     && parent.getRelativePath() != null
                     && !parent.getRelativePath().isEmpty()) {
@@ -173,7 +175,7 @@ public class DefaultModelValidator implements ModelValidator {
                         parent.getRelativePath(),
                         null,
                         parent,
-                        ILLEGAL_RELATIVE_PATH_CHARS);
+                        ILLEGAL_WINDOWS_PATH_CHARS);
             }
 
             // [MNG-6074] Maven should produce an error if no model version has been set in a POM file used to build an

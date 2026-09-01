@@ -39,7 +39,7 @@ public class DefaultSettingsValidator {
     private static final String ID = "[\\w.-]+";
     private static final Pattern ID_REGEX = Pattern.compile(ID);
 
-    private static final String ILLEGAL_REPO_ID_CHARS = "\\/:\"<>|?*"; // ILLEGAL_FS_CHARS
+    private static final String ILLEGAL_NTFS_FILENAME_CHARS = "\\/:\"<>|?*";
 
     @SuppressWarnings("checkstyle:MethodLength")
     public void validate(Settings settings, boolean isProjectSettings, ProblemCollector<BuilderProblem> problems) {
@@ -157,7 +157,7 @@ public class DefaultSettingsValidator {
                         BuilderProblem.Severity.WARNING,
                         mirror.getId(),
                         null,
-                        ILLEGAL_REPO_ID_CHARS);
+                        ILLEGAL_NTFS_FILENAME_CHARS);
 
                 if ("local".equals(mirror.getId())) {
                     addViolation(
@@ -242,7 +242,7 @@ public class DefaultSettingsValidator {
                     BuilderProblem.Severity.WARNING,
                     repository.getId(),
                     null,
-                    ILLEGAL_REPO_ID_CHARS);
+                    ILLEGAL_NTFS_FILENAME_CHARS);
 
             if ("local".equals(repository.getId())) {
                 addViolation(
