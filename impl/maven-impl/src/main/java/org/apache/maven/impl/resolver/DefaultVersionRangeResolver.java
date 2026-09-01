@@ -235,7 +235,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
                             Versioning parsed =
                                     new MetadataStaxReader().read(in, false).getVersioning();
 
-                            validateVersioning(parsed);
+                            MetadataInputValidator.validateVersioning(parsed);
 
                             versioning = parsed;
                         }
@@ -248,35 +248,6 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
         }
 
         return (versioning != null) ? versioning : Versioning.newInstance();
-    }
-
-    /**
-     * Version tokens adopted from repository metadata must be valid coordinate components; metadata carrying
-     * anything else is treated as invalid.
-     */
-    private static void validateVersioning(Versioning versioning) throws IOException {
-        if (versioning == null) {
-            return;
-        }
-        for (String version : versioning.getVersions()) {
-            validateVersionToken(version, "version");
-        }
-        validateVersionToken(versioning.getLatest(), "latest version");
-        validateVersionToken(versioning.getRelease(), "release version");
-    }
-
-    private static void validateVersionToken(String value, String description) throws IOException {
-        if (value == null || value.isEmpty()) {
-            return;
-        }
-        boolean invalid = "..".equals(value) || value.contains("/") || value.contains("\\") || value.contains(":");
-        for (int i = 0; i < value.length() && !invalid; i++) {
-            invalid = Character.isISOControl(value.charAt(i));
-        }
-        if (invalid) {
-            throw new IOException("Rejecting metadata with invalid " + description + " '" + value
-                    + "': must not contain '..', '/', '\\', ':' or control characters");
-        }
     }
 
     private Versioning filterVersionsByRepositoryType(Versioning versioning, RemoteRepository remoteRepository) {
