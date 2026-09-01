@@ -108,10 +108,10 @@ import org.eclipse.aether.util.repository.DefaultProxySelector;
  *   <li>Offline mode</li>
  * </ul>
  *
- * <p>It also loads {@code maven-system.properties} and {@code maven-user.properties} from the
- * Maven configuration directory ({@code ${maven.home}/conf} or as configured via
- * {@code maven.installation.conf}/{@code maven.conf}). System properties from the file are
- * merged into the session's system properties; user properties are available via
+ * <p>It also loads {@code maven-system.properties} from the Maven configuration directory
+ * ({@code ${maven.home}/conf} or as configured via {@code maven.installation.conf}/{@code maven.conf})
+ * and from the user's Maven home ({@code ~/.m2/}), merging both into the session's system properties.
+ * User properties are loaded from {@code ~/.m2/maven-user.properties} and exposed via
  * {@link Session#getUserProperties()}.</p>
  *
  * <p>Example usage:</p>
@@ -432,19 +432,24 @@ public class ApiRunner {
                 ? Paths.get(properties.get("maven.home"))
                 : properties.containsKey("env.MAVEN_HOME") ? Paths.get(properties.get("env.MAVEN_HOME")) : null;
 
-        // Load maven-system.properties from ${maven.conf}/ into system properties
+        // Load maven-system.properties: installation-level first (sets paths like maven.user.conf),
+        // then user-level (~/.m2/) for custom overrides.  The installation-level file is a bootstrapper
+        // that in the CLI includes user and project-level files via ${includes}; since we don't support
+        // that directive, we load the user-level file explicitly.
         Path mavenConf = resolveMavenConf(properties);
         if (mavenConf != null) {
             Map<String, String> systemFileProps =
                     loadMavenProperties(mavenConf.resolve("maven-system.properties"), properties);
             properties.putAll(systemFileProps);
         }
+        properties.putAll(loadMavenProperties(mavenUserHome.resolve("maven-system.properties"), properties));
 
-        // Load maven-user.properties from ${maven.conf}/ as user properties
+        // Load maven-user.properties from the user-level location (~/.m2/) only.
+        // The installation-level maven-user.properties (in ${maven.conf}/) contains Maven-internal
+        // configuration (cache config, conflict resolver) that is not appropriate for standalone use;
+        // it is a CLI bootstrapper that includes user and project-level files via ${includes}.
         Map<String, String> userProperties = new HashMap<>();
-        if (mavenConf != null) {
-            userProperties.putAll(loadMavenProperties(mavenConf.resolve("maven-user.properties"), properties));
-        }
+        userProperties.putAll(loadMavenProperties(mavenUserHome.resolve("maven-user.properties"), properties));
 
         // Configure the resolver session with dependency resolution machinery
         MavenSessionBuilderSupplier sessionBuilderSupplier = new MavenSessionBuilderSupplier(system, false);
