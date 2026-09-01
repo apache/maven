@@ -29,6 +29,8 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
@@ -44,6 +46,7 @@ import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
+import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.impl.DefaultRemoteRepository;
@@ -1332,6 +1335,101 @@ class DefaultModelBuilderTest {
                                 && p.getMessage()
                                         .contains(Constants.MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE)),
                 "Opting out should still emit a warning about the imported 'system' scope");
+    }
+
+    @Test
+    void testBomImportWarningsReportedWhereImportsAreDeclared() {
+        Path pom = Paths.get("src/test/resources/poms/factory/mng-8450/pom.xml").toAbsolutePath();
+        for (String parallelism : List.of("1", "4")) {
+            ModelBuilderResult result = builder.newSession()
+                    .build(ModelBuilderRequest.builder()
+                            .session(session)
+                            .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                            .recursive(true)
+                            .userProperties(
+                                    Map.of(Constants.MAVEN_MODEL_BUILDER_PARALLELISM, parallelism, "revision", "1.0.0"))
+                            .source(Sources.buildSource(pom))
+                            .build());
+
+            List<ModelProblem> warnings = bomImportWarnings(result);
+
+            assertEquals(2, warnings.size(), warnings.toString());
+            assertEquals(
+                    Set.of(
+                            "org.apache.maven.test:mng-8450-parent:${revision}",
+                            "org.apache.maven.test:independent:1.0.0"),
+                    warnings.stream().map(ModelProblem::getModelId).collect(Collectors.toSet()));
+            assertEquals(
+                    Map.of("mng-8450-parent", 1L, "independent", 1L),
+                    results(result)
+                            .filter(r -> directBomImportWarningCount(r) > 0)
+                            .collect(Collectors.toMap(
+                                    r -> r.getEffectiveModel().getArtifactId(), this::directBomImportWarningCount)));
+        }
+    }
+
+    @Test
+    void testBomImportWarningFromNonReactorParentIsPreserved() {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Path fixture = basedir.resolve("src/test/resources/poms/factory/mng-8450-standalone");
+        Session standaloneSession = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this),
+                basedir.resolve("target/local-repo-mng-8450"));
+        standaloneSession = standaloneSession.withRemoteRepositories(List.of(standaloneSession.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, fixture.resolve("repo").toUri().toString())));
+
+        var modelBuilderSession =
+                standaloneSession.getService(ModelBuilder.class).newSession();
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(standaloneSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(fixture.resolve("child/pom.xml")))
+                .build();
+
+        for (int build = 0; build < 2; build++) {
+            ModelBuilderResult result = modelBuilderSession.build(request);
+            List<ModelProblem> warnings = bomImportWarnings(result);
+            assertEquals(1, warnings.size(), warnings.toString());
+            assertEquals(
+                    "org.apache.maven.test:standalone-parent:1.0.0",
+                    warnings.get(0).getModelId());
+        }
+    }
+
+    @Test
+    void testBomImportWarningFromParentProfileActivatedForChild() {
+        Path pom = Paths.get("src/test/resources/poms/factory/mng-8450-profile-context/pom.xml")
+                .toAbsolutePath();
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .recursive(true)
+                        .source(Sources.buildSource(pom))
+                        .build());
+
+        List<ModelProblem> warnings = bomImportWarnings(result);
+        assertEquals(1, warnings.size(), warnings.toString());
+        assertEquals(
+                "org.apache.maven.test:profile-parent:1.0.0", warnings.get(0).getModelId());
+    }
+
+    private List<ModelProblem> bomImportWarnings(ModelBuilderResult result) {
+        return results(result)
+                .flatMap(r -> r.getProblemCollector().problems())
+                .filter(p -> p.getMessage().startsWith("Ignored POM import for:"))
+                .toList();
+    }
+
+    private long directBomImportWarningCount(ModelBuilderResult result) {
+        return result.getProblemCollector()
+                .problems()
+                .filter(p -> p.getMessage().startsWith("Ignored POM import for:"))
+                .count();
+    }
+
+    private Stream<ModelBuilderResult> results(ModelBuilderResult result) {
+        return Stream.concat(Stream.of(result), result.getChildren().stream().flatMap(this::results));
     }
 
     private static DefaultProfileActivationContext.Record recordActiveProfile(

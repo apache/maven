@@ -104,6 +104,20 @@ public class FastTerminal implements TerminalExt {
                 "fast-terminal-thread");
         // a wedged builder must not keep the JVM alive; everything waits on the future, not the thread
         this.buildThread.setDaemon(true);
+    }
+
+    /**
+     * Starts the build thread. Must be called <em>after</em> the caller has published this
+     * {@code FastTerminal} (e.g. assigned it to {@link MessageUtils#terminal}) so that code running
+     * on the build thread can obtain a non-null reference through {@link MessageUtils#getTerminal()}.
+     * <p>
+     * {@link Thread#start()} establishes a <em>happens-before</em> edge, so the assignment made by
+     * the caller before this method is visible to the build thread without additional
+     * synchronization.
+     *
+     * @see <a href="https://github.com/apache/maven/issues/12912">#12912</a>
+     */
+    public void start() {
         this.buildThread.start();
     }
 
@@ -252,13 +266,13 @@ public class FastTerminal implements TerminalExt {
     }
 
     @Override
-    public int getWidth() {
-        return getTerminal().getWidth();
+    public int getColumns() {
+        return getTerminal().getColumns();
     }
 
     @Override
-    public int getHeight() {
-        return getTerminal().getHeight();
+    public int getRows() {
+        return getTerminal().getRows();
     }
 
     @Override

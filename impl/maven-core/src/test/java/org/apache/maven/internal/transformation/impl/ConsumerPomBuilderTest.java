@@ -23,6 +23,7 @@ import javax.inject.Inject;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +32,14 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
+import org.apache.maven.api.model.Activation;
+import org.apache.maven.api.model.ActivationOS;
+import org.apache.maven.api.model.ActivationProperty;
+import org.apache.maven.api.model.Dependency;
+import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.model.Scm;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
@@ -55,6 +63,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -124,6 +133,17 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         return project;
     }
 
+    private Model getConsumerModel(Path file, boolean raw) {
+        ModelBuilder.ModelBuilderSession mbs = modelBuilder.newSession();
+        InternalSession.from(session).getData().set(SessionData.key(ModelBuilder.ModelBuilderSession.class), mbs);
+        var result = mbs.build(ModelBuilderRequest.builder()
+                .session(InternalSession.from(session))
+                .source(Sources.buildSource(file))
+                .requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                .build());
+        return raw ? result.getRawModel() : result.getEffectiveModel();
+    }
+
     @Test
     void testTrivialConsumer() throws Exception {
         setRootDirectory("trivial");
@@ -134,6 +154,131 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
         assertNotNull(model);
         assertNotNull(model.getDependencies());
+    }
+
+    @Test
+    void testPackagingActivatedProfiles() throws Exception {
+        setRootDirectory("packaging-profiles");
+        Path file = Paths.get("src/test/resources/consumer/packaging-profiles/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+
+        Model model = DefaultConsumerPomBuilder.transformNonPom(getConsumerModel(file, false), project);
+
+        assertNotNull(model);
+
+        assertEquals(1, model.getProfiles().size());
+        org.apache.maven.api.model.Profile mixedProfile = model.getProfiles().get(0);
+        assertEquals("mixed-profile", mixedProfile.getId());
+        assertNotNull(mixedProfile.getActivation());
+        assertNull(mixedProfile.getActivation().getPackaging());
+        assertNotNull(mixedProfile.getActivation().getProperty());
+        assertEquals("foo", mixedProfile.getActivation().getProperty().getName());
+
+        assertNotNull(model.getDependencies());
+        assertEquals(1, model.getDependencies().size());
+        assertEquals("slf4j-api", model.getDependencies().get(0).getArtifactId());
+    }
+
+    @Test
+    void testParentPomPackagingActivatedProfilesArePreserved() throws Exception {
+        setRootDirectory("packaging-parent-profiles");
+        Path file = Paths.get("src/test/resources/consumer/packaging-parent-profiles/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+        Model model = DefaultConsumerPomBuilder.transformPom(getConsumerModel(file, true), project);
+
+        assertEquals(1, model.getProfiles().size());
+        Profile profile = model.getProfiles().get(0);
+        assertEquals("jar-profile", profile.getId());
+        assertEquals("jar", profile.getActivation().getPackaging());
+        assertEquals("slf4j-api", profile.getDependencies().get(0).getArtifactId());
+    }
+
+    @Test
+    void testBomPackagingActivatedProfilesArePreserved() {
+        // Build the model directly since 'bom' packaging is not supported
+        // by the model builder on the 4.0.x branch
+        Dependency managedDep = Dependency.newBuilder()
+                .groupId("org.slf4j")
+                .artifactId("slf4j-api")
+                .version("2.0.0")
+                .build();
+
+        Profile jarProfile = Profile.newBuilder()
+                .id("jar-profile")
+                .activation(Activation.newBuilder().packaging("jar").build())
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(managedDep))
+                        .build())
+                .build();
+
+        Model model = Model.newBuilder()
+                .groupId("org.my.group")
+                .artifactId("packaging-bom-profiles-test")
+                .version("1.0.0-SNAPSHOT")
+                .packaging("pom")
+                .profiles(List.of(jarProfile))
+                .build();
+
+        MavenProject project = new MavenProject(model);
+        Model transformed = DefaultConsumerPomBuilder.transformBom(model, project);
+
+        assertEquals(1, transformed.getProfiles().size());
+        Profile profile = transformed.getProfiles().get(0);
+        assertEquals("jar-profile", profile.getId());
+        assertEquals("jar", profile.getActivation().getPackaging());
+        assertEquals(
+                "slf4j-api",
+                profile.getDependencyManagement().getDependencies().get(0).getArtifactId());
+    }
+
+    @Test
+    void testImportScopedManagedDepsAreFilteredFromInlinedProfiles() {
+        // Verifies that import-scoped managed dependencies (BOM imports) inside
+        // a packaging-activated profile are NOT re-added to the consumer POM.
+        // Import-scoped entries are flattened during resolution and must not leak.
+        Dependency bomImport = Dependency.newBuilder()
+                .groupId("org.example")
+                .artifactId("some-bom")
+                .version("1.0.0")
+                .type("pom")
+                .scope("import")
+                .build();
+
+        Dependency regularManagedDep = Dependency.newBuilder()
+                .groupId("org.slf4j")
+                .artifactId("slf4j-api")
+                .version("2.0.0")
+                .build();
+
+        Profile profile = Profile.newBuilder()
+                .id("jar-profile")
+                .activation(Activation.newBuilder().packaging("jar").build())
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(bomImport, regularManagedDep))
+                        .build())
+                .build();
+
+        Model model = Model.newBuilder()
+                .groupId("org.test")
+                .artifactId("import-filter-test")
+                .version("1.0.0-SNAPSHOT")
+                .packaging("jar")
+                .profiles(List.of(profile))
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.inlinePackagingActivatedProfiles(model, "jar");
+
+        // Profile should be inlined (removed)
+        assertTrue(result.getProfiles().isEmpty());
+
+        // Managed deps should contain only the regular dep, NOT the import-scoped BOM
+        assertNotNull(result.getDependencyManagement());
+        List<Dependency> managedDeps = result.getDependencyManagement().getDependencies();
+        assertEquals(1, managedDeps.size());
+        assertEquals("slf4j-api", managedDeps.get(0).getArtifactId());
+        assertNull(managedDeps.get(0).getScope());
     }
 
     @Test
@@ -334,7 +479,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 userProps.containsKey("dep.version"), "User properties should contain properties from active profiles");
         assertTrue(
                 "1.0.0".equals(userProps.get("dep.version")),
-                "Profile property 'dep.version' should have value '1.0.0'");
+                "Profile property \'dep.version\' should have value \'1.0.0\'");
     }
 
     /**
@@ -382,7 +527,350 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         Map<String, String> userProps = consumerRequest.getUserProperties();
         assertTrue(
                 "2.0.0".equals(userProps.get("dep.version")),
-                "Session user property should override profile property; expected '2.0.0' but got '"
-                        + userProps.get("dep.version") + "'");
+                "Session user property should override profile property; expected \'2.0.0\' but got \'"
+                        + userProps.get("dep.version") + "\'");
+    }
+
+    @Test
+    void testInlinePackagingActivatedProfiles() {
+        Dependency dep1 = Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("a1")
+                .version("1")
+                .build();
+        Dependency dep2 = Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("a2")
+                .version("2")
+                .build();
+
+        Profile profileMatching = Profile.newBuilder()
+                .id("matching")
+                .activation(Activation.newBuilder().packaging("jar").build())
+                .dependencies(List.of(dep1))
+                .build();
+
+        Profile profileNotMatching = Profile.newBuilder()
+                .id("not-matching")
+                .activation(Activation.newBuilder().packaging("war").build())
+                .dependencies(List.of(dep2))
+                .build();
+
+        Profile profileMixed = Profile.newBuilder()
+                .id("mixed")
+                .activation(Activation.newBuilder().packaging("jar").jdk("11").build())
+                .dependencies(List.of(dep2))
+                .build();
+
+        Model model = Model.newBuilder()
+                .packaging("jar")
+                .profiles(List.of(profileMatching, profileNotMatching, profileMixed))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.inlinePackagingActivatedProfiles(model, "jar");
+
+        // matching profile should be removed and its deps added to model
+        // not-matching profile should be dropped entirely since its packaging condition can never be met
+        // mixed profile should be kept but packaging activation stripped
+        assertEquals(1, transformed.getProfiles().size());
+
+        assertEquals("mixed", transformed.getProfiles().get(0).getId());
+        assertNull(transformed.getProfiles().get(0).getActivation().getPackaging());
+        assertEquals("11", transformed.getProfiles().get(0).getActivation().getJdk());
+
+        assertEquals(1, transformed.getDependencies().size());
+        assertEquals("a1", transformed.getDependencies().get(0).getArtifactId());
+    }
+
+    @Test
+    void testInlinePackagingActivatedProfilesDependencyManagement() {
+        Dependency managedDep = Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("managed1")
+                .version("1.0")
+                .build();
+
+        Profile profileWithDM = Profile.newBuilder()
+                .id("dm-profile")
+                .activation(Activation.newBuilder().packaging("jar").build())
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(Collections.singletonList(managedDep))
+                        .build())
+                .build();
+
+        Model model = Model.newBuilder()
+                .packaging("jar")
+                .profiles(List.of(profileWithDM))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.inlinePackagingActivatedProfiles(model, "jar");
+
+        // Profile should be removed
+        assertTrue(transformed.getProfiles().isEmpty());
+
+        // Managed dependency should be inlined
+        assertNotNull(transformed.getDependencyManagement());
+        assertEquals(1, transformed.getDependencyManagement().getDependencies().size());
+        assertEquals(
+                "managed1",
+                transformed.getDependencyManagement().getDependencies().get(0).getArtifactId());
+    }
+
+    @Test
+    void testInlinePackagingActivatedProfilesRepositories() {
+        Repository repo = Repository.newBuilder()
+                .id("custom-repo")
+                .url("https://repo.example.com/maven2")
+                .build();
+
+        Profile profileWithRepo = Profile.newBuilder()
+                .id("repo-profile")
+                .activation(Activation.newBuilder().packaging("jar").build())
+                .repositories(Collections.singletonList(repo))
+                .build();
+
+        Model model = Model.newBuilder()
+                .packaging("jar")
+                .profiles(List.of(profileWithRepo))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.inlinePackagingActivatedProfiles(model, "jar");
+
+        // Profile should be removed
+        assertTrue(transformed.getProfiles().isEmpty());
+
+        // Repository should be inlined
+        assertEquals(1, transformed.getRepositories().size());
+        assertEquals("custom-repo", transformed.getRepositories().get(0).getId());
+    }
+
+    @Test
+    void testInlinePackagingActivatedProfilesDeduplication() {
+        Dependency existingDep = Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("a1")
+                .version("1.0")
+                .build();
+
+        // Profile re-declares the same dependency with a different version
+        Dependency duplicateDep = Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("a1")
+                .version("2.0")
+                .build();
+
+        Profile profileWithDuplicate = Profile.newBuilder()
+                .id("dup-profile")
+                .activation(Activation.newBuilder().packaging("jar").build())
+                .dependencies(List.of(duplicateDep))
+                .build();
+
+        Model model = Model.newBuilder()
+                .packaging("jar")
+                .dependencies(List.of(existingDep))
+                .profiles(List.of(profileWithDuplicate))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.inlinePackagingActivatedProfiles(model, "jar");
+
+        // Should NOT have duplicates — existing model dependency takes precedence
+        assertEquals(1, transformed.getDependencies().size());
+        assertEquals(
+                "1.0",
+                transformed.getDependencies().get(0).getVersion(),
+                "Existing model dependency should take precedence over profile duplicate");
+    }
+
+    // ── executable() condition stripping (GH-12570) ──────────────────────────
+
+    /**
+     * A profile whose only activation trigger is an {@code executable()} condition
+     * should have its activation removed entirely after stripping.
+     */
+    @Test
+    void testStripExecutableConditionsOnlyExecutableRemovesActivation() {
+        Profile profile = Profile.newBuilder()
+                .id("exec-only")
+                .activation(Activation.newBuilder()
+                        .condition("executable('musl-gcc')")
+                        .build())
+                .dependencies(List.of(Dependency.newBuilder()
+                        .groupId("org.example")
+                        .artifactId("some-lib")
+                        .version("1.0")
+                        .build()))
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getActivation(), "Activation should be null when executable() was the only trigger");
+    }
+
+    /**
+     * When a profile has {@code executable()} in its condition but also has another
+     * activation trigger (e.g. OS), the condition should be stripped but the
+     * remaining activation preserved.
+     */
+    @Test
+    void testStripExecutableConditionsMixedActivationPreservesOtherTriggers() {
+        Profile profile = Profile.newBuilder()
+                .id("exec-and-os")
+                .activation(Activation.newBuilder()
+                        .condition("executable('gcc') && ${os.name} == 'linux'")
+                        .os(ActivationOS.newBuilder().name("linux").build())
+                        .build())
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        Activation activation = result.get(0).getActivation();
+        assertNotNull(activation, "Activation should be preserved when other triggers exist");
+        assertNull(activation.getCondition(), "Condition should be stripped");
+        assertNotNull(activation.getOs(), "OS trigger should be preserved");
+    }
+
+    /**
+     * Profiles without {@code executable()} in their condition should pass through
+     * unchanged.
+     */
+    @Test
+    void testStripExecutableConditionsNoExecutableUnchanged() {
+        Activation originalActivation =
+                Activation.newBuilder().condition("${os.name} == 'linux'").build();
+        Profile profile = Profile.newBuilder()
+                .id("no-exec")
+                .activation(originalActivation)
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        Activation activation = result.get(0).getActivation();
+        assertNotNull(activation);
+        assertEquals("${os.name} == 'linux'", activation.getCondition());
+    }
+
+    /**
+     * Profiles with no activation at all should pass through unchanged.
+     */
+    @Test
+    void testStripExecutableConditionsNullActivationUnchanged() {
+        Profile profile = Profile.newBuilder().id("no-activation").build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getActivation());
+    }
+
+    /**
+     * A negated {@code executable()} call (e.g. {@code not(executable(...))})
+     * should also be stripped from the condition.
+     */
+    @Test
+    void testStripExecutableConditionsNegatedExecutableStripped() {
+        Profile profile = Profile.newBuilder()
+                .id("negated-exec")
+                .activation(Activation.newBuilder()
+                        .condition("not(executable('musl-gcc'))")
+                        .build())
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        assertNull(result.get(0).getActivation(), "Negated executable() should also be stripped");
+    }
+
+    /**
+     * When {@code executable()} is combined with a property trigger in the
+     * activation, stripping should remove the condition but preserve the
+     * property trigger.
+     */
+    @Test
+    void testStripExecutableConditionsWithPropertyTriggerPreservesProperty() {
+        Profile profile = Profile.newBuilder()
+                .id("exec-and-property")
+                .activation(Activation.newBuilder()
+                        .condition("executable('docker')")
+                        .property(ActivationProperty.newBuilder()
+                                .name("docker.enabled")
+                                .value("true")
+                                .build())
+                        .build())
+                .build();
+
+        List<Profile> result = DefaultConsumerPomBuilder.stripExecutableConditions(List.of(profile));
+
+        assertEquals(1, result.size());
+        Activation activation = result.get(0).getActivation();
+        assertNotNull(activation, "Activation should be preserved when property trigger exists");
+        assertNull(activation.getCondition(), "Condition should be stripped");
+        assertNotNull(activation.getProperty(), "Property trigger should be preserved");
+        assertEquals("docker.enabled", activation.getProperty().getName());
+    }
+
+    /**
+     * Verifies that {@code transformNonPom} strips {@code executable()} conditions
+     * from profiles via the {@code prune()} path.
+     */
+    @Test
+    void testTransformNonPomStripsExecutableCondition() {
+        Model model = Model.newBuilder()
+                .profiles(List.of(Profile.newBuilder()
+                        .id("exec-profile")
+                        .activation(Activation.newBuilder()
+                                .condition("executable('tool')")
+                                .build())
+                        .dependencies(List.of(Dependency.newBuilder()
+                                .groupId("org.example")
+                                .artifactId("tool-support")
+                                .version("1.0")
+                                .build()))
+                        .build()))
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.transformNonPom(model, null);
+
+        // The profile had executable() activation and dependencies.
+        // After pruning: activation is stripped (executable-only), build is stripped,
+        // properties stripped, etc. The profile retains dependencies, so it survives
+        // the isEmpty filter, but its activation should be null.
+        if (!result.getProfiles().isEmpty()) {
+            assertNull(
+                    result.getProfiles().get(0).getActivation(),
+                    "executable() condition should be stripped from transformNonPom profiles");
+        }
+    }
+
+    /**
+     * Verifies that {@code transformPom} strips {@code executable()} conditions
+     * from profiles in parent/POM-packaged projects.
+     */
+    @Test
+    void testTransformPomStripsExecutableCondition() throws Exception {
+        setRootDirectory("trivial");
+        Path file = Paths.get("src/test/resources/consumer/trivial/child/pom.xml");
+        MavenProject project = getEffectiveModel(file);
+
+        Model model = project.getModel().getDelegate();
+        // Add a profile with an executable() condition to the model
+        Profile execProfile = Profile.newBuilder()
+                .id("exec-profile")
+                .activation(
+                        Activation.newBuilder().condition("executable('gcc')").build())
+                .properties(Map.of("native.enabled", "true"))
+                .build();
+        model = model.withProfiles(List.of(execProfile));
+
+        Model result = DefaultConsumerPomBuilder.transformPom(model, project);
+
+        // The profile should have its activation stripped
+        assertFalse(result.getProfiles().isEmpty(), "Profile should survive (it has properties)");
+        assertNull(
+                result.getProfiles().get(0).getActivation(),
+                "executable() condition should be stripped from transformPom profiles");
     }
 }

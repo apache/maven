@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.1.0</modelVersion>
+  <groupId>org.apache.maven.test</groupId>
+  <artifactId>profile-parent</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+  <profiles>
+    <profile>
+      <id>child-imports</id>
+      <activation>
+        <packaging>jar</packaging>
+      </activation>
+      <dependencyManagement>
+        <dependencies>
+          <dependency>
+            <groupId>org.apache.maven.test</groupId>
+            <artifactId>profile-bom-one</artifactId>
+            <version>1.0.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+          <dependency>
+            <groupId>org.apache.maven.test</groupId>
+            <artifactId>profile-bom-two</artifactId>
+            <version>1.0.0</version>
+            <type>pom</type>
+            <scope>import</scope>
+          </dependency>
+        </dependencies>
+      </dependencyManagement>
+    </profile>
+  </profiles>
+</project>
