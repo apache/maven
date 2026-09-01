@@ -504,6 +504,72 @@ class PluginUpgradeStrategyTest {
         }
 
         @Test
+        @DisplayName("should upgrade maven-bundle-plugin when below minimum")
+        void shouldUpgradeBundlePluginWhenBelowMinimum() throws Exception {
+            Document doc = PomBuilder.create()
+                    .plugin("org.apache.felix", "maven-bundle-plugin", "4.2.1")
+                    .buildDocument();
+            UpgradeResult result = strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
+
+            assertTrue(result.success() && result.modifiedCount() > 0, "Should have upgraded maven-bundle-plugin");
+            String version = new Editor(doc)
+                    .root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("5.1.1", version, "maven-bundle-plugin should be upgraded to 5.1.1");
+        }
+
+        @Test
+        @DisplayName("should not upgrade maven-bundle-plugin when version is already sufficient")
+        void shouldNotUpgradeBundlePluginWhenSufficient() throws Exception {
+            Document doc = PomBuilder.create()
+                    .plugin("org.apache.felix", "maven-bundle-plugin", "5.1.9")
+                    .buildDocument();
+            strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
+
+            String version = new Editor(doc)
+                    .root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("5.1.9", version, "maven-bundle-plugin 5.1.9 should not be downgraded");
+        }
+
+        @Test
+        @DisplayName("should upgrade bnd-maven-plugin when below minimum")
+        void shouldUpgradeBndMavenPluginWhenBelowMinimum() throws Exception {
+            Document doc = PomBuilder.create()
+                    .plugin("biz.aQute.bnd", "bnd-maven-plugin", "4.1.0")
+                    .buildDocument();
+            UpgradeResult result = strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
+
+            assertTrue(result.success() && result.modifiedCount() > 0, "Should have upgraded bnd-maven-plugin");
+            String version = new Editor(doc)
+                    .root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("5.1.0", version, "bnd-maven-plugin should be upgraded to 5.1.0");
+        }
+
+        @Test
+        @DisplayName("should not upgrade bnd-maven-plugin when version is already sufficient")
+        void shouldNotUpgradeBndMavenPluginWhenSufficient() throws Exception {
+            Document doc = PomBuilder.create()
+                    .plugin("biz.aQute.bnd", "bnd-maven-plugin", "7.0.0")
+                    .buildDocument();
+            strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
+
+            String version = new Editor(doc)
+                    .root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals("7.0.0", version, "bnd-maven-plugin 7.0.0 should not be downgraded");
+        }
+
+        @Test
         @DisplayName("should not upgrade when version is already higher")
         void shouldNotUpgradeWhenVersionAlreadyHigher() throws Exception {
             String pomXml = """
@@ -813,7 +879,9 @@ class PluginUpgradeStrategyTest {
                     "maven-failsafe-plugin",
                     "maven-surefire-report-plugin",
                     "maven-war-plugin",
-                    "maven-ear-plugin")) {
+                    "maven-ear-plugin",
+                    "maven-bundle-plugin",
+                    "bnd-maven-plugin")) {
                 assertTrue(
                         upgrades.stream().anyMatch(u -> expected.equals(u.artifactId())),
                         "Should include " + expected + " upgrade");
