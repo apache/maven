@@ -19,12 +19,14 @@
 package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import eu.maveniverse.domtrip.Document;
 import eu.maveniverse.domtrip.Editor;
@@ -406,6 +408,20 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             return false;
         }
 
+        // For shade-plugin, check for custom ResourceTransformer implementations before upgrading.
+        // Custom transformers may depend on transitive dependencies (e.g. org.jdom:jdom) that
+        // are no longer present in newer shade-plugin versions, breaking the build.
+        if (isShadePlugin(upgrade.groupId, upgrade.artifactId)) {
+            List<String> customTransformers = findCustomTransformerClasses(pluginElement);
+            if (!customTransformers.isEmpty()) {
+                context.warning("Skipping maven-shade-plugin upgrade: plugin configuration uses custom "
+                        + "ResourceTransformer(s) " + customTransformers
+                        + " that may depend on transitive dependencies not available in version "
+                        + upgrade.minVersion + ". Upgrade manually after verifying compatibility.");
+                return false;
+            }
+        }
+
         // For Quarkus plugins, check the platform version before upgrading.
         // Upgrading quarkus-maven-plugin to 3.x when the project uses Quarkus 2.x
         // causes NoSuchMethodError and build failures.
@@ -670,6 +686,15 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         Map<Path, Set<String>> directOverrideResult = new HashMap<>();
         Map<String, PluginUpgrade> pluginUpgrades = getPluginUpgradesAsMap();
 
+        // Pre-check: if any local POM has shade-plugin with custom transformers,
+        // exclude it from effective model upgrades to avoid breaking the build
+        String shadePluginKey = DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-shade-plugin";
+        boolean shadeHasCustomTransformers = hasCustomTransformersInAnyPom(pomMap);
+        if (shadeHasCustomTransformers) {
+            pluginUpgrades = new HashMap<>(pluginUpgrades);
+            pluginUpgrades.remove(shadePluginKey);
+        }
+
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Path originalPomPath = entry.getKey();
 
@@ -710,6 +735,50 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         }
 
         return new PluginAnalysisResults(managementResult, directOverrideResult);
+    }
+
+    /**
+     * Checks if any POM document in the project contains a shade-plugin configuration
+     * with custom ResourceTransformer implementations.
+     */
+    private boolean hasCustomTransformersInAnyPom(Map<Path, Document> pomMap) {
+        for (Document doc : pomMap.values()) {
+            Element root = doc.root();
+            Element buildElement = root.childElement(BUILD).orElse(null);
+            if (buildElement != null) {
+                // Check both build/plugins and build/pluginManagement/plugins
+                boolean found = Stream.concat(
+                                collectShadePluginElements(
+                                        buildElement.childElement(PLUGINS).orElse(null)),
+                                collectShadePluginElements(buildElement
+                                        .childElement(PLUGIN_MANAGEMENT)
+                                        .flatMap(pm -> pm.childElement(PLUGINS))
+                                        .orElse(null)))
+                        .anyMatch(pluginElement ->
+                                !findCustomTransformerClasses(pluginElement).isEmpty());
+                if (found) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Collects shade-plugin {@code <plugin>} elements from a {@code <plugins>} element.
+     */
+    private Stream<Element> collectShadePluginElements(Element pluginsElement) {
+        if (pluginsElement == null) {
+            return Stream.empty();
+        }
+        return pluginsElement.childElements(PLUGIN).filter(pluginElement -> {
+            String groupId = getChildText(pluginElement, GROUP_ID);
+            String artifactId = getChildText(pluginElement, ARTIFACT_ID);
+            if (groupId == null && artifactId != null && artifactId.startsWith(MAVEN_PLUGIN_PREFIX)) {
+                groupId = DEFAULT_MAVEN_PLUGIN_GROUP_ID;
+            }
+            return isShadePlugin(groupId, artifactId);
+        });
     }
 
     /**
@@ -1052,6 +1121,68 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
     private record PluginAnalysisResults(
             Map<Path, Set<String>> pluginsNeedingManagement, Map<Path, Set<String>> pluginsNeedingDirectOverride) {}
+
+    /**
+     * Checks if the given plugin is the maven-shade-plugin.
+     */
+    private boolean isShadePlugin(String groupId, String artifactId) {
+        return "maven-shade-plugin".equals(artifactId) && DEFAULT_MAVEN_PLUGIN_GROUP_ID.equals(groupId);
+    }
+
+    /**
+     * The package prefix for standard ResourceTransformer implementations shipped with maven-shade-plugin.
+     * Any transformer class not starting with this prefix is considered custom and may depend on
+     * transitive dependencies that differ between shade-plugin versions.
+     */
+    private static final String SHADE_RESOURCE_PACKAGE = "org.apache.maven.plugins.shade.resource.";
+
+    /**
+     * Finds custom (non-standard) ResourceTransformer implementation classes in a shade-plugin
+     * configuration. Inspects both top-level {@code <configuration>} and per-execution
+     * {@code <executions>/<execution>/<configuration>} blocks.
+     *
+     * <p>A transformer is considered "custom" if its {@code implementation} attribute does not
+     * start with {@code org.apache.maven.plugins.shade.resource.}.</p>
+     *
+     * @param pluginElement the shade-plugin {@code <plugin>} element
+     * @return a list of fully-qualified class names of custom transformers, empty if none found
+     */
+    List<String> findCustomTransformerClasses(Element pluginElement) {
+        List<String> customClasses = new ArrayList<>();
+
+        // Check top-level <configuration>
+        pluginElement
+                .childElement("configuration")
+                .ifPresent(config -> collectCustomTransformers(config, customClasses));
+
+        // Check <executions>/<execution>/<configuration>
+        pluginElement
+                .childElement("executions")
+                .ifPresent(executions -> executions
+                        .childElements("execution")
+                        .forEach(execution -> execution
+                                .childElement("configuration")
+                                .ifPresent(config -> collectCustomTransformers(config, customClasses))));
+
+        return customClasses;
+    }
+
+    /**
+     * Collects custom transformer class names from a {@code <configuration>} element.
+     * Looks for {@code <transformers>/<transformer implementation="...">} entries.
+     */
+    private void collectCustomTransformers(Element configElement, List<String> customClasses) {
+        configElement
+                .childElement("transformers")
+                .ifPresent(transformers -> transformers
+                        .childElements("transformer")
+                        .forEach(transformer -> {
+                            String impl = transformer.attribute("implementation");
+                            if (impl != null && !impl.isEmpty() && !impl.startsWith(SHADE_RESOURCE_PACKAGE)) {
+                                customClasses.add(impl);
+                            }
+                        }));
+    }
 
     /**
      * Checks if the given plugin is a Quarkus Maven plugin.
