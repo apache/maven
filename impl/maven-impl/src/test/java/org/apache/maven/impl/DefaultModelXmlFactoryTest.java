@@ -74,6 +74,47 @@ class DefaultModelXmlFactoryTest {
     }
 
     @Test
+    void testGeneratedSourceRoundTrip() throws Exception {
+        String xml = """
+                <project xmlns="http://maven.apache.org/POM/4.2.0">
+                  <modelVersion>4.2.0</modelVersion>
+                  <groupId>g</groupId>
+                  <artifactId>a</artifactId>
+                  <version>1</version>
+                  <build>
+                    <sources>
+                      <source>
+                        <directory>target/generated-sources/java</directory>
+                        <generated>true</generated>
+                      </source>
+                      <source>
+                        <directory>src/main/java</directory>
+                      </source>
+                    </sources>
+                  </build>
+                </project>""";
+
+        Model model = factory.read(XmlReaderRequest.builder()
+                .reader(new StringReader(xml))
+                .strict(true)
+                .build());
+
+        assertTrue(model.getBuild().getSources().get(0).isGenerated());
+        assertFalse(model.getBuild().getSources().get(1).isGenerated());
+
+        StringWriter out = new StringWriter();
+        factory.write(
+                XmlWriterRequest.<Model>builder().writer(out).content(model).build());
+        Model roundTripped = factory.read(XmlReaderRequest.builder()
+                .reader(new StringReader(out.toString()))
+                .strict(true)
+                .build());
+
+        assertTrue(roundTripped.getBuild().getSources().get(0).isGenerated());
+        assertFalse(roundTripped.getBuild().getSources().get(1).isGenerated());
+    }
+
+    @Test
     void testInvalidNamespaceWithModelVersion410() {
         String xml = """
                 <project xmlns="http://invalid.namespace/4.1.0">

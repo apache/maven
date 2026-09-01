@@ -214,6 +214,19 @@ class MavenProjectTest extends AbstractMavenProjectTestCase {
         project.addCompileSourceRoot(".");
 
         assertEquals(1, project.getCompileSourceRoots().size());
+        assertTrue(project.getSourceRoots().stream().noneMatch(source -> source.generated()));
+    }
+
+    @Test
+    void testLegacySourceRootsAreNotGenerated() {
+        MavenProject project = new MavenProject();
+        project.setFile(Path.of("target", "project", "pom.xml").toAbsolutePath().toFile());
+
+        project.addCompileSourceRoot("target/generated-sources/main");
+        project.addTestCompileSourceRoot("target/generated-test-sources/test");
+
+        assertEquals(2, project.getSourceRoots().size());
+        assertTrue(project.getSourceRoots().stream().noneMatch(source -> source.generated()));
     }
 
     @Test

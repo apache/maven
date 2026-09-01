@@ -188,6 +188,8 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
 
         assertNotNull(transformed);
         assertNotNull(transformed.getBuild());
+        assertTrue(transformed.getBuild().getSources().get(0).isGenerated());
+        assertFalse(transformed.getBuild().getSources().get(1).isGenerated());
         assertTrue(transformed.getDependencies().isEmpty());
         assertFalse(transformed.getDependencyManagement().getDependencies().isEmpty());
     }

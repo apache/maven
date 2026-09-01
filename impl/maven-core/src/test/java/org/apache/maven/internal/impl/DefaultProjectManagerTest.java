@@ -20,12 +20,14 @@ package org.apache.maven.internal.impl;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.Language;
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
+import org.apache.maven.api.SourceRoot;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.impl.DefaultModelVersionParser;
 import org.apache.maven.impl.DefaultSourceRoot;
@@ -35,6 +37,8 @@ import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -48,6 +52,30 @@ class DefaultProjectManagerTest {
     private ProducedArtifact artifact;
 
     private Path artifactPath;
+
+    @Test
+    void addGeneratedSourceRoots() {
+        InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
+        MavenProject mavenProject = new MavenProject();
+        mavenProject.setFile(
+                Path.of("target", "project", "pom.xml").toAbsolutePath().toFile());
+        Project project = new DefaultProject(session, mavenProject);
+        DefaultProjectManager projectManager = new DefaultProjectManager(session, Mockito.mock(ArtifactManager.class));
+
+        projectManager.addSourceRoot(
+                project, ProjectScope.MAIN, Language.JAVA_FAMILY, Path.of("target/generated-sources/main"), true);
+        projectManager.addSourceRoot(
+                project, ProjectScope.TEST, Language.JAVA_FAMILY, Path.of("target/generated-test-sources/test"), true);
+        projectManager.addSourceRoot(project, ProjectScope.MAIN, Language.JAVA_FAMILY, Path.of("src/main/java"));
+        projectManager.addSourceRoot(
+                project, ProjectScope.MAIN, Language.JAVA_FAMILY, Path.of("target/generated-sources/main"), false);
+
+        List<SourceRoot> roots = projectManager.getSourceRoots(project).stream().toList();
+        assertEquals(3, roots.size());
+        assertTrue(roots.get(0).generated());
+        assertTrue(roots.get(1).generated());
+        assertFalse(roots.get(2).generated());
+    }
 
     @Test
     void attachArtifact() {
