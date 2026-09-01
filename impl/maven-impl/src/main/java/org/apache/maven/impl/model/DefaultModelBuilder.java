@@ -1698,7 +1698,19 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
                 return profileSelector.getActiveProfiles(eligibleProfiles, profileActivationContext, this);
             } else {
-                return List.of();
+                // BUILD_CONSUMER: activate only deterministic profiles whose activation is a
+                // function of the build platform (OS, JDK version, activeByDefault) rather than
+                // of environment-specific state (file existence, property values, condition
+                // expressions).  This ensures that platform-dependent properties (e.g.
+                // ${swt.artifactId} from an OS-activated profile) are resolved before the
+                // coordinate validator runs, while keeping the consumer POM reproducible across
+                // environments.  Repositories from these profiles are stripped — they must not
+                // leak into the published consumer POM.  See GH-13004.
+                Collection<Profile> deterministicProfiles = interpolatedProfiles.stream()
+                        .filter(profile -> !hasFileOrPropertyOrConditionActivation(profile))
+                        .map(profile -> profile.withRepositories(List.of()).withPluginRepositories(List.of()))
+                        .toList();
+                return profileSelector.getActiveProfiles(deterministicProfiles, profileActivationContext, this);
             }
         }
 

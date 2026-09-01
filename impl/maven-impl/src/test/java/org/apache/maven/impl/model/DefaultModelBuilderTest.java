@@ -375,13 +375,13 @@ class DefaultModelBuilderTest {
     }
 
     /**
-     * {@code BUILD_CONSUMER} requests already skip all profile activation
-     * ({@code isBuildRequestWithActivation()} returns false for that type) -- unrelated to, and
-     * unaffected by, the externalOrigin distinction. Locking that down explicitly since it is
-     * adjacent code this change reads but does not modify.
+     * {@code BUILD_CONSUMER} requests activate only deterministic profiles (JDK version,
+     * operating system, activeByDefault) and skip file-, property- and condition-activated
+     * profiles.  Repositories contributed by deterministic profiles are stripped so they
+     * do not leak into the published consumer POM.  See GH-13004.
      */
     @Test
-    public void testBuildConsumerSkipsAllProfileActivation() throws Exception {
+    public void testBuildConsumerActivatesOnlyDeterministicProfiles() throws Exception {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
@@ -402,10 +402,14 @@ class DefaultModelBuilderTest {
 
         Model model = buildConsumerState.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
 
+        // File, property, and condition profiles must still be skipped
         assertNull(model.getProperties().get("profile.file"));
         assertNull(model.getProperties().get("profile.property"));
         assertNull(model.getProperties().get("profile.condition"));
-        assertNull(model.getProperties().get("profile.jdk"));
+        // JDK profile IS activated — deterministic, platform-derived activation (GH-13004)
+        assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // Repositories from activated profiles must be stripped — they must not leak
+        // into the published consumer POM
         assertTrue(model.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
     }
 
