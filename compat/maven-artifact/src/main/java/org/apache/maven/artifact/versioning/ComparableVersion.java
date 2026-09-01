@@ -70,8 +70,8 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
     /**
      * Maximum accepted length of a version string. Version strings routinely come from external
-     * repository metadata; without a bound, every {@code -} separator nests another list whose
-     * comparison, equality, hash code and canonicalization recurse one frame per level, and digit
+     * repository metadata. Without a bound, every {@code -} separator nests another list whose
+     * comparison, equality, hash code, and canonicalization recurse one frame per level, and digit
      * runs longer than {@value #MAX_LONGITEM_LENGTH} characters are parsed into {@link BigInteger}
      * at quadratic cost. 256 characters is far beyond any real-world version identifier while
      * keeping the nesting depth (at most about half the length) and numeric items small.
