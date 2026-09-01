@@ -46,7 +46,7 @@ public class DefaultSettingsValidator implements SettingsValidator {
     private static final String ID = "[\\w.-]+";
     private static final Pattern ID_REGEX = Pattern.compile(ID);
 
-    private static final String ILLEGAL_REPO_ID_CHARS = "\\/:\"<>|?*"; // ILLEGAL_FS_CHARS
+    private static final String ILLEGAL_NTFS_FILENAME_CHARS = "\\/:\"<>|?*";
 
     @Override
     public void validate(Settings settings, SettingsProblemCollector problems) {
@@ -119,7 +119,12 @@ public class DefaultSettingsValidator implements SettingsValidator {
                 validateStringNotEmpty(problems, "mirrors.mirror.id", mirror.getId(), mirror.getUrl());
 
                 validateBannedCharacters(
-                        problems, "mirrors.mirror.id", Severity.WARNING, mirror.getId(), null, ILLEGAL_REPO_ID_CHARS);
+                        problems,
+                        "mirrors.mirror.id",
+                        Severity.WARNING,
+                        mirror.getId(),
+                        null,
+                        ILLEGAL_NTFS_FILENAME_CHARS);
 
                 if ("local".equals(mirror.getId())) {
                     addViolation(
@@ -187,7 +192,7 @@ public class DefaultSettingsValidator implements SettingsValidator {
             validateStringNotEmpty(problems, prefix + ".id", repository.getId(), repository.getUrl());
 
             validateBannedCharacters(
-                    problems, prefix + ".id", Severity.WARNING, repository.getId(), null, ILLEGAL_REPO_ID_CHARS);
+                    problems, prefix + ".id", Severity.WARNING, repository.getId(), null, ILLEGAL_NTFS_FILENAME_CHARS);
 
             if ("local".equals(repository.getId())) {
                 addViolation(
