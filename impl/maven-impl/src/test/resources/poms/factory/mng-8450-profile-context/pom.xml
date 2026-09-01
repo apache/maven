@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.test</groupId>
+  <artifactId>mng-8450-profile-context</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+  <modules>
+    <module>bom-one</module>
+    <module>bom-two</module>
+    <module>parent</module>
+    <module>child</module>
+  </modules>
+</project>
