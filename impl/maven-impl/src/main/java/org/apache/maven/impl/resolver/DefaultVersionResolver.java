@@ -243,8 +243,12 @@ public class DefaultVersionResolver implements VersionResolver {
 
                     if (metadata.getPath() != null && Files.exists(metadata.getPath())) {
                         try (InputStream in = Files.newInputStream(metadata.getPath())) {
-                            versioning =
+                            Versioning parsed =
                                     new MetadataStaxReader().read(in, false).getVersioning();
+
+                            validateVersioning(parsed);
+
+                            versioning = parsed;
 
                             /*
                             NOTE: Users occasionally misuse the id "local" for remote repos which screws up the metadata
@@ -275,6 +279,39 @@ public class DefaultVersionResolver implements VersionResolver {
         }
 
         return (versioning != null) ? versioning : Versioning.newInstance();
+    }
+
+    /**
+     * Version tokens adopted from repository metadata must be valid coordinate components; metadata carrying
+     * anything else is treated as invalid.
+     */
+    private static void validateVersioning(Versioning versioning) throws IOException {
+        if (versioning == null) {
+            return;
+        }
+        validateVersionToken(versioning.getLatest(), "latest version");
+        validateVersionToken(versioning.getRelease(), "release version");
+        for (SnapshotVersion snapshotVersion : versioning.getSnapshotVersions()) {
+            validateVersionToken(snapshotVersion.getVersion(), "snapshot version");
+        }
+        Snapshot snapshot = versioning.getSnapshot();
+        if (snapshot != null) {
+            validateVersionToken(snapshot.getTimestamp(), "snapshot timestamp");
+        }
+    }
+
+    private static void validateVersionToken(String value, String description) throws IOException {
+        if (value == null || value.isEmpty()) {
+            return;
+        }
+        boolean invalid = "..".equals(value) || value.contains("/") || value.contains("\\") || value.contains(":");
+        for (int i = 0; i < value.length() && !invalid; i++) {
+            invalid = Character.isISOControl(value.charAt(i));
+        }
+        if (invalid) {
+            throw new IOException("Rejecting metadata with invalid " + description + " '" + value
+                    + "': must not contain '..', '/', '\\', ':' or control characters");
+        }
     }
 
     private void invalidMetadata(
