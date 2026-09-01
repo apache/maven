@@ -29,6 +29,7 @@ import org.apache.maven.api.cli.mvnup.UpgradeOptions;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 import org.apache.maven.impl.JdkSourceLevelSupport;
 
@@ -48,9 +49,10 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROPERTIES;
  *
  * <p>This strategy detects the project's source level from:
  * <ol>
- *   <li>{@code maven.compiler.release} property</li>
- *   <li>{@code maven.compiler.source} property</li>
- *   <li>Compiler plugin {@code <configuration><release>} or {@code <source>}</li>
+ *   <li>{@code maven.compiler.release} property (local POM)</li>
+ *   <li>{@code maven.compiler.source} property (local POM)</li>
+ *   <li>Compiler plugin {@code <configuration><release>} or {@code <source>} (local POM)</li>
+ *   <li>Effective model resolution (inherited properties from parent POMs)</li>
  * </ol>
  *
  * <p>If the running JDK does not support the detected source level (per JEP 182 retirement
@@ -132,7 +134,11 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
             try {
                 int sourceLevel = detectSourceLevel(pomDocument);
                 if (sourceLevel <= 0) {
-                    context.success("No source level configured");
+                    // Try effective model resolution (handles inherited properties from parent POMs)
+                    sourceLevel = detectEffectiveSourceLevel(context, pomPath);
+                }
+                if (sourceLevel <= 0) {
+                    context.success("No source level configured (local or inherited)");
                     continue;
                 }
 
@@ -337,6 +343,69 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
         DomUtils.insertContentElement(goals, "goal", SELECT_JDK_TOOLCHAIN_GOAL);
         Element configuration = DomUtils.insertNewElement(CONFIGURATION, execution);
         DomUtils.insertContentElement(configuration, "version", "(," + maxJdkVersion + "]");
+    }
+
+    /**
+     * Detects the project's source level by building the effective Maven model,
+     * which resolves inherited properties from parent POMs.
+     *
+     * <p>This is the fallback path used when the fast DOM-based detection
+     * ({@link #detectSourceLevel(Document)}) finds no source level in the local POM.
+     * It handles cases like projects inheriting {@code maven.compiler.source=1.5}
+     * from a parent POM (e.g., geronimo-genesis).
+     *
+     * @param context the upgrade context for logging
+     * @param pomPath the path to the POM file on disk
+     * @return the source level as a major version, or {@code -1} if none is configured
+     */
+    int detectEffectiveSourceLevel(UpgradeContext context, Path pomPath) {
+        try {
+            Model effectiveModel = buildEffectiveModel(pomPath);
+            int level = detectSourceLevelFromEffectiveModel(effectiveModel);
+            if (level > 0) {
+                context.detail("Detected inherited source level " + level + " from effective model");
+            }
+            return level;
+        } catch (Exception e) {
+            context.debug("Could not resolve effective model for " + pomPath + ": " + e.getMessage());
+            return -1;
+        }
+    }
+
+    /**
+     * Extracts the source level from an effective Maven model's properties.
+     *
+     * <p>Checks (in order of precedence):
+     * <ol>
+     *   <li>{@code maven.compiler.release}</li>
+     *   <li>{@code maven.compiler.source}</li>
+     * </ol>
+     *
+     * @param effectiveModel the resolved effective model
+     * @return the source level as a major version, or {@code -1} if none is configured
+     */
+    static int detectSourceLevelFromEffectiveModel(Model effectiveModel) {
+        Map<String, String> properties = effectiveModel.getProperties();
+
+        // Check maven.compiler.release first (takes precedence)
+        String release = properties.get(MAVEN_COMPILER_RELEASE);
+        if (release != null && !release.isBlank()) {
+            int level = JdkSourceLevelSupport.normalizeSourceLevel(release.trim());
+            if (level > 0) {
+                return level;
+            }
+        }
+
+        // Check maven.compiler.source
+        String source = properties.get(MAVEN_COMPILER_SOURCE);
+        if (source != null && !source.isBlank()) {
+            int level = JdkSourceLevelSupport.normalizeSourceLevel(source.trim());
+            if (level > 0) {
+                return level;
+            }
+        }
+
+        return -1;
     }
 
     /**
