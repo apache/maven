@@ -193,7 +193,7 @@ class ComparableVersionTest {
         // a release qualifier followed by a digit sorts above the bare version ("1-rc1 < 1, 1-ga1 > 1")
         // and must not compare equal to it: otherwise 1-ga1 == 1 == 1-ga2 while 1-ga1 < 1-ga2,
         // breaking compareTo transitivity, and an exact pin [1] would admit 1-gaN
-        checkVersionsOrder(new String[] {"1-rc1", "1", "1-ga1", "1-final2", "1-ga3", "1-release9", "1-sp"});
+        checkVersionsOrder(new String[] {"1-rc1", "1", "1-ga1", "1-final2", "1-ga3", "1-release9", "1-ga11", "1-sp"});
 
         // a release qualifier without a digit (or with a zero digit) still sorts as the bare version
         checkVersionsHaveSameOrder("1-ga", "1");
