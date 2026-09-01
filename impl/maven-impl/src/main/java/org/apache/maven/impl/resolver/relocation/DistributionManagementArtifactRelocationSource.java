@@ -29,6 +29,7 @@ import org.apache.maven.impl.resolver.MetadataInputValidator;
 import org.apache.maven.impl.resolver.RelocatedArtifact;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,16 +51,16 @@ public final class DistributionManagementArtifactRelocationSource implements Mav
 
     @Override
     public Artifact relocatedTarget(
-            RepositorySystemSession session, ArtifactDescriptorResult artifactDescriptorResult, Model model) {
+            RepositorySystemSession session, ArtifactDescriptorResult artifactDescriptorResult, Model model)
+            throws ArtifactDescriptorException {
         DistributionManagement distMgmt = model.getDistributionManagement();
         if (distMgmt != null) {
             Relocation relocation = distMgmt.getRelocation();
             if (relocation != null) {
                 Artifact original = artifactDescriptorResult.getRequest().getArtifact();
-                validateRelocationCoordinate(relocation.getGroupId(), "groupId", original);
-                validateRelocationCoordinate(relocation.getArtifactId(), "artifactId", original);
-                validateRelocationCoordinate(relocation.getVersion(), "version", original);
-
+                validateCoordinateComponent(relocation.getGroupId(), "groupId", artifactDescriptorResult);
+                validateCoordinateComponent(relocation.getArtifactId(), "artifactId", artifactDescriptorResult);
+                validateCoordinateComponent(relocation.getVersion(), "version", artifactDescriptorResult);
                 Artifact result = new RelocatedArtifact(
                         original,
                         relocation.getGroupId(),
@@ -75,10 +76,23 @@ public final class DistributionManagementArtifactRelocationSource implements Mav
         return null;
     }
 
-    private static void validateRelocationCoordinate(String value, String component, Artifact artifact) {
-        if (value != null && !value.isEmpty() && MetadataInputValidator.isInvalidCoordinateComponent(value)) {
-            throw new IllegalArgumentException("Invalid relocation " + component + " '" + value + "' for " + artifact
+    /**
+     * Checks that a relocation coordinate component is usable as an artifact coordinate. Components outside
+     * the coordinate character set are rejected so that only well-formed coordinates enter resolution.
+     */
+    private static void validateCoordinateComponent(
+            String value, String component, ArtifactDescriptorResult artifactDescriptorResult)
+            throws ArtifactDescriptorException {
+        if (value == null || value.isEmpty()) {
+            return; // component is not relocated: the original artifact's value is kept
+        }
+        if (MetadataInputValidator.isInvalidCoordinateComponent(value)) {
+            IllegalArgumentException cause = new IllegalArgumentException("Invalid relocation " + component + " '"
+                    + value + "' in artifact descriptor for "
+                    + artifactDescriptorResult.getRequest().getArtifact()
                     + ": not a valid artifact coordinate component");
+            artifactDescriptorResult.addException(cause);
+            throw new ArtifactDescriptorException(artifactDescriptorResult, cause.getMessage(), cause);
         }
     }
 }

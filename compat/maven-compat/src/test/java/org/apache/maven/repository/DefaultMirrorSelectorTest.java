@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @Deprecated
 class DefaultMirrorSelectorTest {
@@ -31,5 +32,40 @@ class DefaultMirrorSelectorTest {
         ArtifactRepository repository = new DefaultArtifactRepository("snapshots.repo", "http://whatever", null);
         String pattern = "external:*, !snapshots.repo";
         assertFalse(DefaultMirrorSelector.matchPattern(repository, pattern));
+    }
+
+    @Test
+    void testExternalHttpRepoMatchesDavProtocols() {
+        assertTrue(DefaultMirrorSelector.isExternalHttpRepo(repo("http://repo.example.com/m2/")));
+        assertTrue(DefaultMirrorSelector.isExternalHttpRepo(repo("dav:http://repo.example.com/m2/")));
+        assertTrue(DefaultMirrorSelector.isExternalHttpRepo(repo("dav+http://repo.example.com/m2/")));
+        assertTrue(DefaultMirrorSelector.isExternalHttpRepo(repo("dav://repo.example.com/m2/")));
+    }
+
+    @Test
+    void testExternalHttpRepoClassificationForNonHttpUrls() {
+        assertFalse(DefaultMirrorSelector.isExternalHttpRepo(repo("https://repo.example.com/m2/")));
+        assertFalse(DefaultMirrorSelector.isExternalHttpRepo(repo("http://localhost:8080/m2/")));
+        assertFalse(DefaultMirrorSelector.isExternalHttpRepo(repo("http://127.0.0.1/m2/")));
+        assertFalse(DefaultMirrorSelector.isExternalHttpRepo(repo("file:///tmp/repo")));
+    }
+
+    @Test
+    void testUnparseableUrlClassification() {
+        assertTrue(DefaultMirrorSelector.isExternalRepo(repo("not a url")));
+        assertTrue(DefaultMirrorSelector.isExternalHttpRepo(repo("not a url")));
+    }
+
+    @Test
+    void testExternalRepoClassification() {
+        assertTrue(DefaultMirrorSelector.isExternalRepo(repo("https://repo.example.com/m2/")));
+        assertTrue(DefaultMirrorSelector.isExternalRepo(repo("dav:http://repo.example.com/m2/")));
+        assertFalse(DefaultMirrorSelector.isExternalRepo(repo("file:///tmp/repo")));
+        assertFalse(DefaultMirrorSelector.isExternalRepo(repo("http://localhost/m2/")));
+        assertFalse(DefaultMirrorSelector.isExternalRepo(repo("http://127.0.0.1/m2/")));
+    }
+
+    private static ArtifactRepository repo(String url) {
+        return new DefaultArtifactRepository("test", url, null);
     }
 }
