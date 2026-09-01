@@ -451,7 +451,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         return model;
     }
 
-    private static Model transformBom(Model model, MavenProject project, Set<String> declaredRepositoryIds) {
+    static Model transformBom(Model model, MavenProject project, Set<String> declaredRepositoryIds) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
 
         Model.Builder builder = prune(

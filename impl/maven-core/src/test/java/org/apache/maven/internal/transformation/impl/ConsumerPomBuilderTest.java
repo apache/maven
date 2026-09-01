@@ -225,7 +225,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 .build();
 
         MavenProject project = new MavenProject(model);
-        Model transformed = DefaultConsumerPomBuilder.transformBom(model, project);
+        Model transformed = DefaultConsumerPomBuilder.transformBom(model, project, Collections.emptySet());
 
         assertEquals(1, transformed.getProfiles().size());
         Profile profile = transformed.getProfiles().get(0);
