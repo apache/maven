@@ -18,22 +18,73 @@
  */
 package org.apache.maven.artifact.repository.metadata;
 
+import javax.inject.Inject;
+import javax.inject.Named;
+
 import java.io.File;
 import java.net.URL;
+import java.util.Collections;
 
+import org.apache.maven.artifact.AbstractArtifactComponentTest;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
+import org.codehaus.plexus.testing.PlexusTest;
+import org.codehaus.plexus.util.FileUtils;
 import org.junit.jupiter.api.Test;
 
+import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests that {@link DefaultRepositoryMetadataManager} rejects repository metadata carrying version tokens that
- * are not valid coordinate components, on the legacy read path used when metadata is loaded for merging.
+ * Tests {@link DefaultRepositoryMetadataManager}.
  */
-public class DefaultRepositoryMetadataManagerTest {
+@PlexusTest
+@Deprecated
+class DefaultRepositoryMetadataManagerTest extends AbstractArtifactComponentTest {
+
+    @Inject
+    private RepositoryMetadataManager repositoryMetadataManager;
+
+    @Inject
+    @Named("default")
+    private ArtifactRepositoryLayout layout;
 
     private final DefaultRepositoryMetadataManager manager = new DefaultRepositoryMetadataManager();
+
+    @Override
+    protected String component() {
+        return "repositoryMetadataManager";
+    }
+
+    @Test
+    void testResolveHonorsConfiguredFailChecksumPolicy() throws Exception {
+        RepositoryMetadata metadata = new GroupRepositoryMetadata("checksum-policy-test-group");
+
+        ArtifactRepositoryPolicy failPolicy = new ArtifactRepositoryPolicy(
+                true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL);
+
+        File remoteBase = new File(getBasedir(), "target/test-repositories/" + component() + "/remote-repository");
+        FileUtils.deleteDirectory(remoteBase);
+
+        ArtifactRepository remoteRepo = artifactRepositoryFactory.createArtifactRepository(
+                "test", "file://" + remoteBase.getPath(), layout, failPolicy, failPolicy);
+
+        String remotePath = remoteRepo.pathOfRemoteRepositoryMetadata(metadata);
+        File remoteFile = new File(remoteBase, remotePath);
+        remoteFile.getParentFile().mkdirs();
+        FileUtils.fileWrite(remoteFile.getAbsolutePath(), "<metadata/>");
+        FileUtils.fileWrite(remoteFile.getAbsolutePath() + ".sha1", "0000000000000000000000000000000000000000");
+
+        ArtifactRepository localRepo = localRepository();
+        FileUtils.deleteDirectory(new File(localRepo.getBasedir()));
+
+        assertThrows(
+                RepositoryMetadataResolutionException.class,
+                () -> repositoryMetadataManager.resolve(metadata, Collections.singletonList(remoteRepo), localRepo));
+    }
 
     @Test
     void testMetadataWithInvalidVersionTokenIsRejected() {

@@ -35,6 +35,7 @@ import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Writer;
 import org.apache.maven.repository.internal.metadata.ValidatingMetadataXpp3Reader;
+import org.apache.maven.repository.legacy.ChecksumFailedException;
 import org.apache.maven.repository.legacy.UpdateCheckManager;
 import org.apache.maven.repository.legacy.WagonManager;
 import org.apache.maven.wagon.ResourceDoesNotExistException;
@@ -114,6 +115,17 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
                     getLogger().info(metadata.getKey() + ": checking for updates from " + repository.getId());
                     try {
                         wagonManager.getArtifactMetadata(metadata, repository, file, policy.getChecksumPolicy());
+                        updateCheckManager.touch(metadata, repository, file);
+                    } catch (ChecksumFailedException e) {
+                        // ChecksumFailedException is only thrown by the wagon manager under
+                        // CHECKSUM_POLICY_FAIL: honor the strict policy by failing metadata resolution
+                        // instead of downgrading the integrity failure to a warning. The update
+                        // tracking file is deliberately not touched, so the next build retries
+                        // immediately instead of trusting stale metadata for a full update interval.
+                        throw new RepositoryMetadataResolutionException(
+                                metadata + " failed checksum verification against repository: " + repository.getId()
+                                        + " due to an error: " + e.getMessage(),
+                                e);
                     } catch (ResourceDoesNotExistException e) {
                         getLogger().debug(metadata + " could not be found on repository: " + repository.getId());
 
@@ -129,12 +141,12 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
                                 file.delete(); // if this fails, forget about it
                             }
                         }
+                        updateCheckManager.touch(metadata, repository, file);
                     } catch (TransferFailedException e) {
                         getLogger()
                                 .warn(metadata + " could not be retrieved from repository: " + repository.getId()
                                         + " due to an error: " + e.getMessage());
                         getLogger().debug("Exception", e);
-                    } finally {
                         updateCheckManager.touch(metadata, repository, file);
                     }
                 }
@@ -281,6 +293,9 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
             throw new RepositoryMetadataReadException(
                     "Cannot read metadata from '" + mappingFile + "': " + e.getMessage(), e);
         }
+
+        validateVersioning(result);
+
         return result;
     }
 
@@ -401,7 +416,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
 
         try {
             wagonManager.getArtifactMetadataFromDeploymentRepository(
-                    metadata, remoteRepository, file, ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN);
+                    metadata, remoteRepository, file, getChecksumPolicy(metadata, remoteRepository));
         } catch (ResourceDoesNotExistException e) {
             getLogger()
                     .info(metadata + " could not be found on repository: " + remoteRepository.getId()
@@ -425,6 +440,22 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
             }
         }
         return file;
+    }
+
+    /**
+     * Determines the effective checksum policy for a transfer from the given repository. The
+     * operator-configured policy (e.g. {@code fail} via {@code -C}/{@code --strict-checksums} or a
+     * per-repository {@code checksumPolicy}) must govern every remote transfer, so it must not be
+     * hardcoded at the call sites.
+     */
+    private String getChecksumPolicy(ArtifactMetadata metadata, ArtifactRepository repository) {
+        if (metadata instanceof RepositoryMetadata) {
+            ArtifactRepositoryPolicy policy = ((RepositoryMetadata) metadata).getPolicy(repository);
+            if (policy != null && policy.getChecksumPolicy() != null) {
+                return policy.getChecksumPolicy();
+            }
+        }
+        return ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN;
     }
 
     public void deploy(
