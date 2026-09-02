@@ -494,5 +494,43 @@ public abstract class AbstractModelInterpolatorTest {
                 collector.getErrors().get(0));
     }
 
+    @Test
+    public void testRecursiveExpressionCycleInPluginConfiguration() throws Exception {
+        // MNG-8174: a self-referencing property used in a plugin configuration attribute must not
+        // cause an NPE while interpolating the plugin configuration
+        Map<String, String> props = new HashMap<>();
+        props.put("prop", "${prop}");
+
+        org.apache.maven.api.xml.XmlNode filter = org.apache.maven.api.xml.XmlNode.newBuilder()
+                .name("filter")
+                .attributes(Map.of("token", "key", "value", "${prop}"))
+                .build();
+        org.apache.maven.api.xml.XmlNode configuration = org.apache.maven.api.xml.XmlNode.newBuilder()
+                .name("configuration")
+                .children(List.of(filter))
+                .build();
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+
+        Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
+                .properties(props)
+                .build(org.apache.maven.api.model.Build.newBuilder()
+                        .plugins(List.of(org.apache.maven.api.model.Plugin.newBuilder()
+                                .artifactId("maven-antrun-plugin")
+                                .configuration(configuration)
+                                .build()))
+                        .build())
+                .build());
+
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelInterpolator interpolator = createInterpolator();
+        Model out = interpolator.interpolateModel(model, null, request, collector);
+
+        assertNotNull(out);
+        assertCollectorState(0, 1, 0, collector);
+        org.apache.maven.api.model.Plugin p = out.getBuild().getPlugins().get(0).getDelegate();
+        assertEquals("${prop}", p.getConfiguration().child("filter").attribute("value"));
+    }
+
     protected abstract ModelInterpolator createInterpolator() throws Exception;
 }
