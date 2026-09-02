@@ -1198,11 +1198,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         // Check <executions>/<execution>/<configuration>
         pluginElement
                 .childElement("executions")
-                .ifPresent(executions -> executions
-                        .childElements("execution")
-                        .forEach(execution -> execution
-                                .childElement("configuration")
-                                .ifPresent(config -> collectCustomTransformers(config, customClasses))));
+                .ifPresent(executions -> executions.childElements("execution").forEach(execution -> execution
+                        .childElement("configuration")
+                        .ifPresent(config -> collectCustomTransformers(config, customClasses))));
 
         return customClasses;
     }
@@ -1212,16 +1210,14 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * Looks for {@code <transformers>/<transformer implementation="...">} entries.
      */
     private void collectCustomTransformers(Element configElement, List<String> customClasses) {
-        configElement
-                .childElement("transformers")
-                .ifPresent(transformers -> transformers
-                        .childElements("transformer")
-                        .forEach(transformer -> {
-                            String impl = transformer.attribute("implementation");
-                            if (impl != null && !impl.isEmpty() && !impl.startsWith(SHADE_RESOURCE_PACKAGE)) {
-                                customClasses.add(impl);
-                            }
-                        }));
+        configElement.childElement("transformers").ifPresent(transformers -> transformers
+                .childElements("transformer")
+                .forEach(transformer -> {
+                    String impl = transformer.attribute("implementation");
+                    if (impl != null && !impl.isEmpty() && !impl.startsWith(SHADE_RESOURCE_PACKAGE)) {
+                        customClasses.add(impl);
+                    }
+                }));
     }
 
     /**
