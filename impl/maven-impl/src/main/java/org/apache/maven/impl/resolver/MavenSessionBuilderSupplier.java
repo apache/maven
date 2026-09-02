@@ -78,7 +78,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
                         : Maven4ScopeManagerConfiguration.INSTANCE);
     }
 
-    protected DependencyTraverser getDependencyTraverser() {
+    public DependencyTraverser getDependencyTraverser() {
         return new FatArtifactTraverser();
     }
 
@@ -97,7 +97,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
         return new ClassicDependencyManager(getScopeManager());
     }
 
-    protected DependencySelector getDependencySelector() {
+    public DependencySelector getDependencySelector() {
         return new AndDependencySelector(
                 ScopeDependencySelector.legacy(
                         null, Arrays.asList(DependencyScope.TEST.id(), DependencyScope.PROVIDED.id())),
@@ -105,7 +105,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
                 new ExclusionDependencySelector());
     }
 
-    protected DependencyGraphTransformer getDependencyGraphTransformer() {
+    public DependencyGraphTransformer getDependencyGraphTransformer() {
         return new ChainedDependencyGraphTransformer(
                 new ConflictResolver(
                         new ConfigurableVersionSelector(), new ManagedScopeSelector(getScopeManager()),
@@ -122,13 +122,13 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
      * <p>
      * Important: this "static" list of types should be in-sync with core provided types.
      */
-    protected ArtifactTypeRegistry getArtifactTypeRegistry() {
+    public ArtifactTypeRegistry getArtifactTypeRegistry() {
         DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
         new DefaultTypeProvider().types().forEach(stereotypes::add);
         return stereotypes;
     }
 
-    protected ArtifactDescriptorPolicy getArtifactDescriptorPolicy() {
+    public ArtifactDescriptorPolicy getArtifactDescriptorPolicy() {
         return new SimpleArtifactDescriptorPolicy(true, true);
     }
 

@@ -46,8 +46,6 @@ import org.apache.maven.api.settings.Proxy;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 import org.apache.maven.impl.standalone.ApiRunner;
-import org.codehaus.plexus.components.secdispatcher.Dispatcher;
-import org.codehaus.plexus.components.secdispatcher.internal.dispatchers.LegacyDispatcher;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
 import org.eclipse.aether.spi.io.PathProcessor;
@@ -257,18 +255,9 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
     }
 
     private Session createMaven4Session(UpgradeContext context) {
-        // Reuse the operator's real user home (settings.xml) and local repository so remote
-        // resolution follows the configured repository posture instead of the standalone
-        // test defaults. When settings were never loaded (unit tests, embedding), keep the
-        // isolated test user home.
-        boolean settingsLoaded = context.effectiveSettings != null;
-        Session session = ApiRunner.createSession(
-                injector -> {
-                    injector.bindInstance(Dispatcher.class, new LegacyDispatcher());
-                    injector.bindImplicit(TransporterFactoryConfig.class);
-                },
-                context.localRepositoryPath,
-                !settingsLoaded);
+        Session session = ApiRunner.createSession(injector -> {
+            injector.bindImplicit(TransporterFactoryConfig.class);
+        });
 
         if (remoteResolutionUnsupportedReason(context) != null) {
             // No remote repositories at all, rather than resolving from hardcoded public
