@@ -53,6 +53,7 @@ import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.toolchain.ToolchainModel;
 
@@ -189,6 +190,11 @@ public class SessionStub implements Session {
 
     @Override
     public Session withRemoteRepositories(List<RemoteRepository> repositories) {
+        return null;
+    }
+
+    @Override
+    public Session withContext(RequestTrace trace) {
         return null;
     }
 
