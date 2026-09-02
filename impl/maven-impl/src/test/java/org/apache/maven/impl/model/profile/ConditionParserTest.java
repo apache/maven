@@ -27,7 +27,6 @@ import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.impl.DefaultModelVersionParser;
 import org.apache.maven.impl.DefaultVersionParser;
 import org.apache.maven.impl.model.DefaultInterpolator;
-import org.apache.maven.impl.model.DefaultPathTranslator;
 import org.apache.maven.impl.model.DefaultProfileActivationContext;
 import org.apache.maven.impl.model.profile.ConditionParser.ExpressionFunction;
 import org.eclipse.aether.util.version.GenericVersionScheme;
@@ -59,9 +58,7 @@ class ConditionParserTest {
 
     private ProfileActivationContext createMockContext() {
         DefaultProfileActivationContext context = new DefaultProfileActivationContext(
-                new DefaultPathTranslator(),
-                new AbstractProfileActivatorTest.FakeRootLocator(),
-                new DefaultInterpolator());
+                new AbstractProfileActivatorTest.FakeRootLocator(), new DefaultInterpolator());
         context.setSystemProperties(Map.of(
                 "os.name", "windows",
                 "os.arch", "amd64",

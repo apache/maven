@@ -44,9 +44,8 @@ import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.model.ModelInterpolator;
-import org.apache.maven.api.services.model.PathTranslator;
 import org.apache.maven.api.services.model.RootLocator;
-import org.apache.maven.api.services.model.UrlNormalizer;
+import org.apache.maven.impl.DefaultUrlNormalizer;
 import org.apache.maven.impl.model.reflection.ReflectionValueExtractor;
 import org.apache.maven.model.v4.MavenTransformer;
 
@@ -80,19 +79,11 @@ public class DefaultModelInterpolator implements ModelInterpolator {
             "project.scm.developerConnection",
             "project.distributionManagement.site.url");
 
-    private final PathTranslator pathTranslator;
-    private final UrlNormalizer urlNormalizer;
     private final RootLocator rootLocator;
     private final Interpolator interpolator;
 
     @Inject
-    public DefaultModelInterpolator(
-            PathTranslator pathTranslator,
-            UrlNormalizer urlNormalizer,
-            RootLocator rootLocator,
-            Interpolator interpolator) {
-        this.pathTranslator = pathTranslator;
-        this.urlNormalizer = urlNormalizer;
+    public DefaultModelInterpolator(RootLocator rootLocator, Interpolator interpolator) {
         this.rootLocator = rootLocator;
         this.interpolator = interpolator;
     }
@@ -171,11 +162,11 @@ public class DefaultModelInterpolator implements ModelInterpolator {
         // path translation
         String exp = unprefix(expression, getProjectPrefixes(request));
         if (TRANSLATED_PATH_EXPRESSIONS.contains(exp)) {
-            value = pathTranslator.alignToBaseDirectory(value, projectDir);
+            value = DefaultPathTranslator.alignToBaseDirectory(value, projectDir);
         }
         // normalize url
         if (URL_EXPRESSIONS.contains(expression)) {
-            value = urlNormalizer.normalize(value);
+            value = DefaultUrlNormalizer.normalize(value);
         }
         return value;
     }

@@ -80,7 +80,6 @@ import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.model.DefaultModelPathTranslator;
-import org.apache.maven.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.DefaultLog;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
@@ -243,7 +242,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                     try (Reader r = openPomUrl(holder, pom, new Path[1])) {
                         Model localModel = new MavenStaxReader().read(r);
                         model = new MavenMerger().merge(localModel, model, false, null);
-                        model = new DefaultModelPathTranslator(new DefaultPathTranslator())
+                        model = new DefaultModelPathTranslator()
                                 .alignToBaseDirectory(model, Paths.get(getBasedir()), null);
                     }
                 }
@@ -437,8 +436,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         } else {
             model = new MavenMerger().merge(tmodel, defaultModel, false, null);
         }
-        final Model alignedModel = new DefaultModelPathTranslator(new DefaultPathTranslator())
-                .alignToBaseDirectory(model, Paths.get(getBasedir()), null);
+        final Model alignedModel =
+                new DefaultModelPathTranslator().alignToBaseDirectory(model, Paths.get(getBasedir()), null);
         context.getStore(MOJO_EXTENSION).put(Model.class, alignedModel);
 
         // mojo execution
