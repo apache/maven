@@ -373,9 +373,7 @@ public class DefaultModelValidator implements ModelValidator {
             for (Parent mixin : model.getMixins()) {
                 if (mixin.getRelativePath() != null
                         && !mixin.getRelativePath().isEmpty()
-                        && (mixin.getGroupId() != null && !mixin.getGroupId().isEmpty()
-                                || mixin.getArtifactId() != null
-                                        && !mixin.getArtifactId().isEmpty())
+                        && (mixin.getLocation("groupId") != null || mixin.getLocation("artifactId") != null)
                         && validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0
                         && ModelBuilder.KNOWN_MODEL_VERSIONS.contains(model.getModelVersion())
                         && !Objects.equals(model.getModelVersion(), ModelBuilder.MODEL_VERSION_4_0_0)) {

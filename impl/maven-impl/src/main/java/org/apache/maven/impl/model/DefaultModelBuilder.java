@@ -661,6 +661,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             String version = parentModel.getVersion();
             InputLocation versionLocation = parentModel.getLocation("version");
             if (version == null && parentModel.getParent() != null) {
+                // Parent model inherits its version from its own parent (grandparent).
+                // versionLocation may be null if the grandparent has no explicit <version>;
+                // Builder.location() silently ignores null values, which is safe here.
                 version = parentModel.getParent().getVersion();
                 versionLocation = parentModel.getParent().getLocation("version");
             }
