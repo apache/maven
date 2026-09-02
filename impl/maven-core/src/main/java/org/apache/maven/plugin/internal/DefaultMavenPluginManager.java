@@ -34,11 +34,16 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
 import java.util.function.Supplier;
 import java.util.jar.JarFile;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 
@@ -596,6 +601,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             validator.validate(session, mojoDescriptor, mojo.getClass(), pomConfiguration, expressionEvaluator);
         }
 
+        // MNG-8765: Pre-interpolate configuration values before the ComponentConfigurator
+        // processes them. See interpolateConfiguration() javadoc for details.
+        pomConfiguration = interpolateConfiguration(pomConfiguration, expressionEvaluator, session);
+
         populateMojoExecutionFields(
                 mojo,
                 mojoExecution.getExecutionId(),
@@ -773,6 +782,14 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             validator.validate(session, mojoDescriptor, mojo.getClass(), pomConfiguration, expressionEvaluator);
         }
 
+        // MNG-8765: Pre-interpolate configuration values using the expression evaluator before
+        // the ComponentConfigurator processes them. This ensures that ${...} property references
+        // are fully resolved before type converters (like UriConverter) attempt to parse the values.
+        // Without this, properties that are not available during model interpolation (e.g., set
+        // dynamically at runtime by scripts) would reach type converters unresolved, causing
+        // failures like URISyntaxException for URI-typed parameters containing ${...}.
+        pomConfiguration = interpolateConfiguration(pomConfiguration, expressionEvaluator, session);
+
         populateMojoExecutionFields(
                 mojo,
                 mojoExecution.getExecutionId(),
@@ -871,6 +888,167 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 }
             }
         }
+    }
+
+    /** Pattern to extract property names from {@code ${propName}} expressions. */
+    private static final Pattern EXPRESSION_PATTERN = Pattern.compile("\\$\\{([^}]+)}");
+
+    /**
+     * Pre-interpolates a plugin configuration tree by resolving {@code ${...}} property references
+     * that were set dynamically at runtime (not available during model interpolation). Returns a new
+     * {@link PlexusConfiguration} backed by a fully-interpolated {@link XmlNode} tree.
+     *
+     * <p>This is necessary because {@link XmlNode} is immutable — mutating transient
+     * {@link XmlPlexusConfiguration} wrappers does not propagate changes back to the underlying
+     * tree. Instead, this method rebuilds the {@code XmlNode} tree bottom-up with interpolated
+     * values, ensuring that all access paths ({@code getChild(int)}, {@code getChildren()}, etc.)
+     * see the resolved values.</p>
+     *
+     * <p>Only expressions referencing properties that were NOT available during model interpolation
+     * are resolved. Properties from the POM's {@code <properties>}, user properties ({@code -D}),
+     * and system properties are skipped because model interpolation already had a chance to resolve
+     * them — any surviving {@code ${...}} for those properties was intentionally escaped (MNG-3558).</p>
+     *
+     * @param configuration the plugin configuration to interpolate
+     * @param evaluator the expression evaluator to resolve {@code ${...}} references
+     * @param session the Maven session, used to determine model-time properties
+     * @return a new {@link PlexusConfiguration} wrapping an interpolated {@link XmlNode} tree
+     */
+    private PlexusConfiguration interpolateConfiguration(
+            PlexusConfiguration configuration, ExpressionEvaluator evaluator, MavenSession session) {
+        if (!(configuration instanceof XmlPlexusConfiguration xmlConfig)) {
+            return configuration;
+        }
+
+        Set<String> modelTimePropertyNames = collectModelTimePropertyNames(session);
+
+        XmlNode original = xmlConfig.toXmlNode();
+        XmlNode interpolated = interpolateXmlNode(original, evaluator, modelTimePropertyNames);
+        if (interpolated == original) {
+            return configuration;
+        }
+        return new XmlPlexusConfiguration(interpolated);
+    }
+
+    /**
+     * Collects the set of property names that were available during model interpolation.
+     * Properties in this set should NOT be re-interpolated, because any surviving {@code ${...}}
+     * reference to them was intentionally escaped.
+     */
+    private Set<String> collectModelTimePropertyNames(MavenSession session) {
+        Set<String> names = new HashSet<>();
+        // User properties (from -D on CLI)
+        Properties userProps = session.getUserProperties();
+        if (userProps != null) {
+            names.addAll(userProps.stringPropertyNames());
+        }
+        // System properties
+        Properties sysProps = session.getSystemProperties();
+        if (sysProps != null) {
+            names.addAll(sysProps.stringPropertyNames());
+        }
+        // POM properties from the original model (before runtime additions)
+        MavenProject project = session.getCurrentProject();
+        if (project != null && project.getOriginalModel() != null) {
+            Properties origProps = project.getOriginalModel().getProperties();
+            if (origProps != null) {
+                names.addAll(origProps.stringPropertyNames());
+            }
+        }
+        return names;
+    }
+
+    /**
+     * Checks whether a string value contains any {@code ${propName}} expression where
+     * {@code propName} is NOT in the model-time property set. Only such expressions need
+     * pre-interpolation (they were set at runtime and model interpolation couldn't see them).
+     */
+    private boolean containsRuntimeExpression(String value, Set<String> modelTimePropertyNames) {
+        Matcher matcher = EXPRESSION_PATTERN.matcher(value);
+        while (matcher.find()) {
+            String propName = matcher.group(1);
+            if (!modelTimePropertyNames.contains(propName)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Recursively interpolates an {@link XmlNode} tree, resolving only {@code ${...}} expressions
+     * that reference runtime properties (not available at model interpolation time). Returns the
+     * original node if no interpolation was needed, or a new node with resolved values otherwise.
+     */
+    private XmlNode interpolateXmlNode(
+            XmlNode node, ExpressionEvaluator evaluator, Set<String> modelTimePropertyNames) {
+        boolean changed = false;
+
+        // Interpolate the text value (only if it contains runtime expressions)
+        String value = node.value();
+        String newValue = value;
+        if (value != null && value.contains("${") && containsRuntimeExpression(value, modelTimePropertyNames)) {
+            try {
+                Object evaluated = evaluator.evaluate(value);
+                if (evaluated instanceof String evaluatedStr && !evaluatedStr.equals(value)) {
+                    newValue = evaluatedStr;
+                    changed = true;
+                }
+            } catch (ExpressionEvaluationException e) {
+                logger.debug("Failed to interpolate configuration value '{}': {}", value, e.getMessage());
+            }
+        }
+
+        // Interpolate the default-value attribute if present (only if it contains runtime expressions)
+        Map<String, String> attributes = node.attributes();
+        Map<String, String> newAttributes = attributes;
+        String defaultValue = attributes.get("default-value");
+        if (defaultValue != null
+                && defaultValue.contains("${")
+                && containsRuntimeExpression(defaultValue, modelTimePropertyNames)) {
+            try {
+                Object evaluated = evaluator.evaluate(defaultValue);
+                if (evaluated instanceof String evaluatedStr && !evaluatedStr.equals(defaultValue)) {
+                    newAttributes = new HashMap<>(attributes);
+                    newAttributes.put("default-value", evaluatedStr);
+                    changed = true;
+                }
+            } catch (ExpressionEvaluationException e) {
+                logger.debug(
+                        "Failed to interpolate configuration default-value '{}': {}", defaultValue, e.getMessage());
+            }
+        }
+
+        // Recurse into children
+        List<XmlNode> children = node.children();
+        List<XmlNode> newChildren = children;
+        for (int i = 0; i < children.size(); i++) {
+            XmlNode child = children.get(i);
+            XmlNode newChild = interpolateXmlNode(child, evaluator, modelTimePropertyNames);
+            if (newChild != child && newChildren == children) {
+                newChildren = new ArrayList<>(children.size());
+                for (int j = 0; j < i; j++) {
+                    newChildren.add(children.get(j));
+                }
+                changed = true;
+            }
+            if (newChildren != children) {
+                newChildren.add(newChild);
+            }
+        }
+
+        if (!changed) {
+            return node;
+        }
+
+        return XmlNode.newBuilder()
+                .name(node.name())
+                .value(newValue)
+                .attributes(newAttributes)
+                .children(newChildren)
+                .namespaceUri(node.namespaceUri())
+                .prefix(node.prefix())
+                .inputLocation(node.inputLocation())
+                .build();
     }
 
     private void validateParameters(
