@@ -365,6 +365,8 @@ class ToolchainPluginStrategyTest {
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
             String output = doc.toXml();
             assertTrue(output.contains("<version>(,11]</version>"), "Expected version constraint in output: " + output);
+            assertTrue(
+                    output.contains("<version>3.2.0</version>"), "Expected plugin version 3.2.0 in output: " + output);
         }
 
         @Test
@@ -392,6 +394,85 @@ class ToolchainPluginStrategyTest {
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
             String output = doc.toXml();
             assertTrue(output.contains("<version>(,8]</version>"), "Expected version constraint in output: " + output);
+            assertTrue(
+                    output.contains("<version>3.2.0</version>"), "Expected plugin version 3.2.0 in output: " + output);
+        }
+
+        @Test
+        @DisplayName("should reuse existing toolchains-plugin and not create a duplicate")
+        void reuseExistingToolchainsPlugin() {
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>com.example</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-toolchains-plugin</artifactId>
+                                    <version>3.2.0</version>
+                                    <executions>
+                                        <execution>
+                                            <goals>
+                                                <goal>toolchain</goal>
+                                            </goals>
+                                        </execution>
+                                    </executions>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+            Document doc = Document.of(pomXml);
+            strategy.addToolchainsPlugin(doc, 11);
+
+            assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
+            String output = doc.toXml();
+            // Should NOT create a duplicate plugin entry
+            assertEquals(
+                    1,
+                    output.split("maven-toolchains-plugin").length - 1,
+                    "Should have exactly one toolchains-plugin entry: " + output);
+            // Old toolchain goal should still be present
+            assertTrue(
+                    output.contains("<goal>toolchain</goal>"), "Old toolchain goal should still be present: " + output);
+            // New select-jdk-toolchain goal should be added
+            assertTrue(
+                    output.contains("<goal>select-jdk-toolchain</goal>"),
+                    "New select-jdk-toolchain goal should be present: " + output);
+        }
+
+        @Test
+        @DisplayName("should not change existing version when reusing plugin")
+        void preserveExistingVersion() {
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>com.example</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-toolchains-plugin</artifactId>
+                                    <version>3.3.0</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+            Document doc = Document.of(pomXml);
+            strategy.addToolchainsPlugin(doc, 11);
+
+            String output = doc.toXml();
+            // Version should remain 3.3.0 — ToolchainPluginStrategy does not touch versions;
+            // version upgrades are handled by PluginUpgradeStrategy
+            assertTrue(output.contains("<version>3.3.0</version>"), "Version 3.3.0 should not be changed: " + output);
         }
     }
 
