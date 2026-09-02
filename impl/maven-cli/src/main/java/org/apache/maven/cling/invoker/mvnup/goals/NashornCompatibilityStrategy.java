@@ -60,6 +60,10 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Plugins.DEFAULT_MAVE
  * The standalone OpenJDK Nashorn ({@code org.openjdk.nashorn:nashorn-core}) provides a drop-in
  * replacement that registers via {@code ServiceLoader} and restores JavaScript support.
  *
+ * <p>This strategy both <strong>injects</strong> the Nashorn dependency as a quick fix and
+ * <strong>warns</strong> that users should consider migrating to GraalVM JavaScript
+ * ({@code org.graalvm.js:js-scriptengine}) for long-term support.
+ *
  * @see <a href="https://github.com/apache/maven/issues/12988">#12988</a>
  */
 @Named
@@ -163,6 +167,10 @@ public class NashornCompatibilityStrategy extends AbstractUpgradeStrategy {
         boolean modified = false;
         for (Element pluginElement : antrunPlugins) {
             if (!hasNashornDependency(pluginElement)) {
+                context.warning("maven-antrun-plugin uses inline JavaScript which requires a standalone"
+                        + " script engine on JDK 17+. Adding org.openjdk.nashorn:nashorn-core as a"
+                        + " quick fix. Consider migrating to GraalVM JavaScript"
+                        + " (org.graalvm.js:js-scriptengine + org.graalvm.js:js) for long-term support.");
                 addNashornDependency(pluginElement, context);
                 modified = true;
             } else {
