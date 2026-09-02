@@ -216,7 +216,6 @@ class DefaultModelBuilderTest {
     private DefaultProfileActivationContext parentActivationContext(Map<String, String> systemProperties) {
         org.apache.maven.api.services.Lookup lookup = session.getService(org.apache.maven.api.services.Lookup.class);
         return new DefaultProfileActivationContext(
-                lookup.lookup(org.apache.maven.api.services.model.PathTranslator.class),
                 lookup.lookup(org.apache.maven.api.services.model.RootLocator.class),
                 lookup.lookup(org.apache.maven.api.services.Interpolator.class),
                 List.of(),
