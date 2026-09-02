@@ -164,7 +164,7 @@ class NashornCompatibilityStrategyTest {
             String xml = DomUtils.toXml(document);
             assertTrue(xml.contains("org.openjdk.nashorn"), "Should contain nashorn groupId");
             assertTrue(xml.contains("nashorn-core"), "Should contain nashorn artifactId");
-            assertTrue(xml.contains("15.4"), "Should contain nashorn version");
+            assertTrue(xml.contains("15.7"), "Should contain nashorn version");
         }
 
         @Test
@@ -485,7 +485,7 @@ class NashornCompatibilityStrategyTest {
                                     <dependency>
                                         <groupId>org.openjdk.nashorn</groupId>
                                         <artifactId>nashorn-core</artifactId>
-                                        <version>15.4</version>
+                                        <version>15.7</version>
                                     </dependency>
                                 </dependencies>
                                 <configuration>
@@ -638,7 +638,7 @@ class NashornCompatibilityStrategyTest {
             String xml = DomUtils.toXml(document);
             assertTrue(xml.contains("org.openjdk.nashorn"), "Should contain nashorn groupId");
             assertTrue(xml.contains("nashorn-core"), "Should contain nashorn artifactId");
-            assertTrue(xml.contains("15.4"), "Should contain nashorn version");
+            assertTrue(xml.contains("15.7"), "Should contain nashorn version");
         }
 
         @Test

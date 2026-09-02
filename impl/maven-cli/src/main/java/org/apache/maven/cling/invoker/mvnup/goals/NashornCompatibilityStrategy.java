@@ -74,7 +74,7 @@ public class NashornCompatibilityStrategy extends AbstractUpgradeStrategy {
     static final String ANTRUN_ARTIFACT_ID = "maven-antrun-plugin";
     static final String NASHORN_GROUP_ID = "org.openjdk.nashorn";
     static final String NASHORN_ARTIFACT_ID = "nashorn-core";
-    static final String NASHORN_VERSION = "15.4";
+    static final String NASHORN_VERSION = "15.7";
 
     private static final String SCRIPT = "script";
     private static final String LANGUAGE = "language";
