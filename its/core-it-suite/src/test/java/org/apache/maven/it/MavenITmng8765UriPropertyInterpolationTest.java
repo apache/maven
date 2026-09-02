@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.nio.file.Path;
+import java.io.File;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -41,6 +41,10 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
  */
 public class MavenITmng8765UriPropertyInterpolationTest extends AbstractMavenIntegrationTestCase {
 
+    public MavenITmng8765UriPropertyInterpolationTest() {
+        super("[4.0.0-rc-1,)");
+    }
+
     /**
      * Verify that property interpolation resolves ${...} in URI-typed plugin
      * parameters before type conversion, including when properties are
@@ -50,9 +54,9 @@ public class MavenITmng8765UriPropertyInterpolationTest extends AbstractMavenInt
      */
     @Test
     public void testitPomProperty() throws Exception {
-        Path testDir = extractResources("mng-8765-uri-property-interpolation");
+        File testDir = extractResources("/mng-8765-uri-property-interpolation");
 
-        Verifier verifier = newVerifier(testDir);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("child/target");
@@ -81,9 +85,9 @@ public class MavenITmng8765UriPropertyInterpolationTest extends AbstractMavenInt
      */
     @Test
     public void testitCliProperty() throws Exception {
-        Path testDir = extractResources("mng-8765-uri-property-interpolation/cli-property");
+        File testDir = extractResources("/mng-8765-uri-property-interpolation/cli-property");
 
-        Verifier verifier = newVerifier(testDir);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dcli.version=2.0.0");
@@ -110,9 +114,9 @@ public class MavenITmng8765UriPropertyInterpolationTest extends AbstractMavenInt
      */
     @Test
     public void testitRuntimeProperty() throws Exception {
-        Path testDir = extractResources("mng-8765-uri-property-interpolation/runtime-property");
+        File testDir = extractResources("/mng-8765-uri-property-interpolation/runtime-property");
 
-        Verifier verifier = newVerifier(testDir);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("process-sources");
