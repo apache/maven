@@ -707,9 +707,11 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         //
         // Transform raw model to build pom.
-        // Infer inner reactor dependencies version
+        // Infer missing coordinates from models in the reactor
         //
         Model transformFileToRaw(Model model) {
+            Parent newParent = inferParentVersion(model);
+
             List<Dependency> newDeps = null;
             boolean depsChanged = false;
             if (!model.getDependencies().isEmpty()) {
@@ -725,10 +727,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                 managedDepsChanged = inferDependencies(model, depMgmt.getDependencies(), newManagedDeps);
             }
 
-            if (!depsChanged && !managedDepsChanged) {
+            if (newParent == null && !depsChanged && !managedDepsChanged) {
                 return model;
             }
             Model.Builder builder = Model.newBuilder(model);
+            if (newParent != null) {
+                builder.parent(newParent);
+            }
             if (depsChanged) {
                 builder.dependencies(newDeps);
             }
@@ -736,6 +741,37 @@ public class DefaultModelBuilder implements ModelBuilder {
                 builder.dependencyManagement(depMgmt.withDependencies(newManagedDeps));
             }
             return builder.build();
+        }
+
+        private Parent inferParentVersion(Model model) {
+            Parent parent = model.getParent();
+            if (parent == null
+                    || parent.getVersion() != null
+                    || parent.getGroupId() == null
+                    || parent.getArtifactId() == null) {
+                return null;
+            }
+
+            Model parentModel = getRawModel(model.getPomFile(), parent.getGroupId(), parent.getArtifactId());
+            if (parentModel == null) {
+                return null;
+            }
+
+            String version = parentModel.getVersion();
+            InputLocation versionLocation = parentModel.getLocation("version");
+            if (version == null && parentModel.getParent() != null) {
+                // Parent model inherits its version from its own parent (grandparent).
+                // versionLocation may be null if the grandparent has no explicit <version>;
+                // Builder.location() silently ignores null values, which is safe here.
+                version = parentModel.getParent().getVersion();
+                versionLocation = parentModel.getParent().getLocation("version");
+            }
+            return version != null
+                    ? parent.with()
+                            .version(version)
+                            .location("version", versionLocation)
+                            .build()
+                    : null;
         }
 
         /**
