@@ -194,7 +194,7 @@ public class CLIManager {
                 .build());
         options.addOption(Option.builder(Character.toString(BATCH_MODE))
                 .longOpt("batch-mode")
-                .desc("Run in non-interactive mode. Alias for --non-interactive (kept for backwards compatability)")
+                .desc("Run in non-interactive mode. Alias for --non-interactive (kept for backwards compatibility)")
                 .build());
         options.addOption(Option.builder()
                 .longOpt(NON_INTERACTIVE)
