@@ -277,8 +277,8 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
      * This resolves inherited configuration from parent POMs on Maven Central.
      *
      * <p>The Session's request cache ensures that effective model builds are deduplicated
-     * across strategies — if {@code PluginUpgradeStrategy} already built the effective model
-     * for this POM, the cached result is returned immediately.
+     * within this strategy — if this strategy already built the effective model for the
+     * same POM path, the cached result is returned immediately.
      *
      * @param context the upgrade context for logging
      * @param pomPath the path to the POM file
@@ -343,7 +343,9 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
 
     private int detectFromEffectivePlugins(List<Plugin> plugins) {
         for (Plugin plugin : plugins) {
-            if (MAVEN_COMPILER_PLUGIN.equals(plugin.getArtifactId())) {
+            String groupId = plugin.getGroupId();
+            if (MAVEN_COMPILER_PLUGIN.equals(plugin.getArtifactId())
+                    && (groupId == null || groupId.isEmpty() || TOOLCHAINS_PLUGIN_GROUP_ID.equals(groupId))) {
                 XmlNode config = plugin.getConfiguration();
                 if (config != null) {
                     // <release> takes precedence

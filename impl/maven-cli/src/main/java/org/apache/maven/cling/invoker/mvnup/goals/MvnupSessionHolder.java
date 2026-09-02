@@ -42,10 +42,9 @@ import org.eclipse.aether.transport.file.FileTransporterFactory;
  * {@link UpgradeStrategy} implementations in mvnup.
  *
  * <p>The {@code @Provides @Singleton} method ensures a single Session instance is
- * shared across all strategies, enabling the Session's
- * {@link org.apache.maven.api.cache.RequestCache} to deduplicate effective model
- * builds — if {@code PluginUpgradeStrategy} already built the effective model for
- * a POM, {@code ToolchainPluginStrategy} gets the cached result immediately.
+ * shared across all strategies. The Session's
+ * {@link org.apache.maven.api.cache.RequestCache} deduplicates effective model
+ * builds when the same POM path is resolved more than once within a strategy.
  *
  * <p>The Session is created via {@link ApiRunner#createSession} (which bootstraps
  * its own standalone DI container for resolver services), then configured with

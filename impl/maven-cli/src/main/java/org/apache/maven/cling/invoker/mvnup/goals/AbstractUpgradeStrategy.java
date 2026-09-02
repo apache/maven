@@ -42,7 +42,6 @@ import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.settings.Proxy;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.apache.maven.impl.InternalSession;
 
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
 
@@ -62,8 +61,10 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
 
     /**
      * DI-injected standalone Maven 4 API Session, produced by {@link MvnupSessionHolder}.
-     * Sharing the session enables the Session's {@link org.apache.maven.api.cache.RequestCache}
-     * to deduplicate effective model builds across strategies.
+     * Sharing the session avoids recreating the heavyweight standalone DI container
+     * for each strategy. The Session's {@link org.apache.maven.api.cache.RequestCache}
+     * deduplicates effective model builds when the same POM path is resolved more
+     * than once within a strategy.
      *
      * <p>When running outside a DI container (e.g. unit tests), this field is {@code null}
      * and {@link #getSession()} falls back to creating a session via
