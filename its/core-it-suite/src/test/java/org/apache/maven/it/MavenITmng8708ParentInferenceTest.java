@@ -43,6 +43,23 @@ class MavenITmng8708ParentInferenceTest extends AbstractMavenIntegrationTestCase
         verifier.verifyTextNotInLog(PARENT_DECLARATION_WARNING);
     }
 
+    /**
+     * Three-level hierarchy: grandparent (with version) → versionless mid parent → child.
+     * The child specifies only groupId/artifactId for the mid parent, which itself
+     * inherits its version from the grandparent. Exercises the fallback path in
+     * {@code inferParentVersion} where the parent model's version comes from its own parent.
+     */
+    @Test
+    void testThreeLevelParentInference() throws Exception {
+        Path testDir = extractResources("mng-8708-parent-inference/three-level");
+
+        Verifier verifier = newVerifier(testDir);
+        verifier.addCliArgument("validate");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+        verifier.verifyTextNotInLog(PARENT_DECLARATION_WARNING);
+    }
+
     @Test
     void testExplicitPathAndCoordinatesStillWarn() throws Exception {
         Path testDir = extractResources("mng-8708-parent-inference/explicit-both");
