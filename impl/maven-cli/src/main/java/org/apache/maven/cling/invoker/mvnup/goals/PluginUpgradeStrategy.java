@@ -178,7 +178,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     "3.6.0",
                     null,
                     MAVEN_4_COMPATIBILITY_REASON,
-                    21));
+                    21),
+            new PluginUpgrade(
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID,
+                    "maven-toolchains-plugin",
+                    "3.2.0",
+                    "Versions before 3.2.0 do not have the select-jdk-toolchain goal"));
 
     private static final List<PluginUpgrade> PLUGIN_DEPENDENCY_UPGRADES = List.of(new PluginUpgrade(
             "org.codehaus.mojo",
