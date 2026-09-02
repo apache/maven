@@ -693,10 +693,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         if (currentVersion == null || minVersion == null) {
             return false;
         }
-        return getSession(context)
-                        .parseVersion(currentVersion)
-                        .compareTo(getSession(context).parseVersion(minVersion))
-                < 0;
+        return getSession().parseVersion(currentVersion).compareTo(getSession().parseVersion(minVersion)) < 0;
     }
 
     /**
