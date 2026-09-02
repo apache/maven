@@ -46,6 +46,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITgh13004ConsumerPomProfileArtifactIdTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh13004ConsumerPomProfileArtifactIdTest() {
+        super("[4.0.0-rc-7,)");
+    }
+
     /**
      * Test that the build succeeds when a parent POM defines OS-activated profiles
      * with properties used in child dependency artifactIds. The default (non-flattened)
@@ -54,16 +58,18 @@ class MavenITgh13004ConsumerPomProfileArtifactIdTest extends AbstractMavenIntegr
      */
     @Test
     void testConsumerPomResolvesOsProfilePropertyInArtifactId() throws Exception {
-        Path basedir = extractResources("/gh-13004-consumer-pom-profile-artifactid");
+        Path basedir = extractResources("/gh-13004-consumer-pom-profile-artifactid")
+                .getAbsoluteFile()
+                .toPath();
 
-        Verifier verifier = newVerifier(basedir);
+        Verifier verifier = newVerifier(basedir.toString());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // Verify the parent consumer POM preserves the OS-activated profiles
-        Path parentConsumerPom = verifier.getArtifactPath(
-                "org.apache.maven.its.gh13004", "parent", "1.0-SNAPSHOT", "pom");
+        Path parentConsumerPom = Path.of(verifier.getArtifactPath(
+                "org.apache.maven.its.gh13004", "parent", "1.0-SNAPSHOT", "pom"));
         assertTrue(Files.exists(parentConsumerPom), "Parent consumer POM should exist");
         String parentContent = Files.readString(parentConsumerPom);
         assertTrue(
@@ -82,9 +88,11 @@ class MavenITgh13004ConsumerPomProfileArtifactIdTest extends AbstractMavenIntegr
      */
     @Test
     void testFlattenedConsumerPomResolvesOsProfilePropertyInArtifactId() throws Exception {
-        Path basedir = extractResources("/gh-13004-consumer-pom-profile-artifactid");
+        Path basedir = extractResources("/gh-13004-consumer-pom-profile-artifactid")
+                .getAbsoluteFile()
+                .toPath();
 
-        Verifier verifier = newVerifier(basedir);
+        Verifier verifier = newVerifier(basedir.toString());
         verifier.addCliArgument("-Dmaven.consumer.pom.flatten=true");
         verifier.addCliArgument("install");
         verifier.execute();
@@ -92,8 +100,8 @@ class MavenITgh13004ConsumerPomProfileArtifactIdTest extends AbstractMavenIntegr
 
         // With flattening, the consumer POM uses the effective model:
         // ${platform.artifactId} must be resolved to "lib"
-        Path childConsumerPom = verifier.getArtifactPath(
-                "org.apache.maven.its.gh13004", "child", "1.0-SNAPSHOT", "pom");
+        Path childConsumerPom = Path.of(verifier.getArtifactPath(
+                "org.apache.maven.its.gh13004", "child", "1.0-SNAPSHOT", "pom"));
         assertTrue(Files.exists(childConsumerPom), "Child consumer POM should exist");
         String childContent = Files.readString(childConsumerPom);
         assertFalse(
