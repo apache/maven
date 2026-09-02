@@ -283,6 +283,35 @@ class BuildPlanCreatorTest {
         // "test" scope expands to all scopes
         List<MavenProject> testFiltered = BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "test");
         assertEquals(6, testFiltered.size());
+
+        // "compile+runtime" scope expands to compile + provided + system + runtime (and null-scope)
+        List<MavenProject> compileRuntimeFiltered =
+                BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "compile+runtime");
+        assertEquals(5, compileRuntimeFiltered.size());
+        assertTrue(compileRuntimeFiltered.contains(compileDep));
+        assertTrue(compileRuntimeFiltered.contains(providedDep));
+        assertTrue(compileRuntimeFiltered.contains(systemDep));
+        assertTrue(compileRuntimeFiltered.contains(runtimeDep));
+        assertTrue(compileRuntimeFiltered.contains(nullScopeDep));
+
+        // "runtime+system" scope expands to compile + system + runtime (and null-scope)
+        List<MavenProject> runtimeSystemFiltered =
+                BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "runtime+system");
+        assertEquals(4, runtimeSystemFiltered.size());
+        assertTrue(runtimeSystemFiltered.contains(compileDep));
+        assertTrue(runtimeSystemFiltered.contains(systemDep));
+        assertTrue(runtimeSystemFiltered.contains(runtimeDep));
+        assertTrue(runtimeSystemFiltered.contains(nullScopeDep));
+
+        // "test-only" scope matches only test-scoped dependencies
+        List<MavenProject> testOnlyFiltered =
+                BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "test-only");
+        assertEquals(1, testOnlyFiltered.size());
+        assertTrue(testOnlyFiltered.contains(testDep));
+
+        // unknown scope (e.g. "import") matches only dependencies with that exact scope — none here
+        List<MavenProject> importFiltered = BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "import");
+        assertEquals(0, importFiltered.size());
     }
 
     /**

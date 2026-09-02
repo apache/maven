@@ -135,16 +135,10 @@ public class LifecycleDependencyResolver {
             Map<String, MavenProject> reactorGavMap =
                     new HashMap<>(session.getProjects().size());
             for (MavenProject reactorProject : session.getProjects()) {
-                File file = reactorProject.getArtifact().getFile();
                 // In the concurrent builder, a reactor project may have compiled (output directory
                 // exists) but not yet been packaged (artifact file is null).  Use the output
                 // directory as a fallback so that downstream projects see the compiled classes.
-                if (file == null) {
-                    File outputDir = new File(reactorProject.getBuild().getOutputDirectory());
-                    if (outputDir.isDirectory()) {
-                        file = outputDir;
-                    }
-                }
+                File file = resolveReactorProjectFile(reactorProject);
                 reactorProjects.put(reactorProject.getArtifact(), file);
                 String gavKey = ArtifactUtils.key(reactorProject.getArtifact());
                 reactorGavMap.put(gavKey, reactorProject);
@@ -161,18 +155,15 @@ public class LifecycleDependencyResolver {
                 if (reactorProjectFile != null) {
                     artifact.setFile(reactorProjectFile);
                 } else if (artifact.getFile() == null) {
-                    // Fallback: try matching reactor projects by GAV (handles type/classifier
-                    // mismatches) or look up the artifact in the local repository.
+                    // Fallback: try matching reactor projects by GAV only (groupId:artifactId:version).
+                    // This intentionally ignores classifier and type, which means a tests-jar dependency
+                    // (classifier="tests") will match the main project and receive target/classes instead
+                    // of target/test-classes.  This is still better than a null file (which would cause
+                    // a build failure), but is a known limitation of the concurrent builder's fallback.
                     String gavKey = ArtifactUtils.key(artifact);
                     MavenProject reactorProject = reactorGavMap.get(gavKey);
                     if (reactorProject != null) {
-                        File fallback = reactorProject.getArtifact().getFile();
-                        if (fallback == null) {
-                            File outputDir = new File(reactorProject.getBuild().getOutputDirectory());
-                            if (outputDir.isDirectory()) {
-                                fallback = outputDir;
-                            }
-                        }
+                        File fallback = resolveReactorProjectFile(reactorProject);
                         if (fallback != null) {
                             artifact.setFile(fallback);
                         }
@@ -391,6 +382,22 @@ public class LifecycleDependencyResolver {
         }
 
         return result;
+    }
+
+    /**
+     * Returns the artifact file for a reactor project, falling back to the output directory
+     * when the artifact has not yet been packaged (e.g. in a concurrent build where compilation
+     * has finished but the jar phase has not run yet).
+     */
+    private static File resolveReactorProjectFile(MavenProject project) {
+        File file = project.getArtifact().getFile();
+        if (file == null) {
+            File outputDir = new File(project.getBuild().getOutputDirectory());
+            if (outputDir.isDirectory()) {
+                file = outputDir;
+            }
+        }
+        return file;
     }
 
     private static class ReactorDependencyFilter implements DependencyFilter {
