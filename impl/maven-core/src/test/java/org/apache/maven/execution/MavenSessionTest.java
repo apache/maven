@@ -18,6 +18,10 @@
  */
 package org.apache.maven.execution;
 
+import java.util.Collections;
+import java.util.List;
+import java.util.Map;
+
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.aether.RepositorySystemSession;
@@ -123,5 +127,29 @@ class MavenSessionTest {
         MavenSession session = createSessionWithContainer(container);
 
         assertEquals(expected, session.lookup("role", "hint"));
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    void testLookupListWithContainerDelegates() throws ComponentLookupException {
+        PlexusContainer container = mock(PlexusContainer.class);
+        List<Object> expected = Collections.singletonList(new Object());
+        when(container.lookupList("role")).thenReturn(expected);
+
+        MavenSession session = createSessionWithContainer(container);
+
+        assertEquals(expected, session.lookupList("role"));
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    void testLookupMapWithContainerDelegates() throws ComponentLookupException {
+        PlexusContainer container = mock(PlexusContainer.class);
+        Map<String, Object> expected = Collections.singletonMap("key", new Object());
+        when(container.lookupMap("role")).thenReturn(expected);
+
+        MavenSession session = createSessionWithContainer(container);
+
+        assertEquals(expected, session.lookupMap("role"));
     }
 }
