@@ -700,7 +700,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 // has shade-plugin with custom transformers, exclude shade-plugin
                 // from upgrades for this module only
                 Map<String, PluginUpgrade> pluginUpgrades = basePluginUpgrades;
-                if (hasCustomTransformersInPomOrParents(originalPomPath, pomMap, tempDir, commonRoot)) {
+                if (hasCustomTransformersInPomOrParents(context, originalPomPath, pomMap, tempDir, commonRoot)) {
                     pluginUpgrades = new HashMap<>(basePluginUpgrades);
                     pluginUpgrades.remove(shadePluginKey);
                     context.warning("Skipping maven-shade-plugin in effective-model analysis for " + originalPomPath
@@ -746,7 +746,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * This is a per-module check, unlike a global check across all POMs.
      */
     private boolean hasCustomTransformersInPomOrParents(
-            Path pomPath, Map<Path, Document> pomMap, Path tempDir, Path commonRoot) {
+            UpgradeContext context, Path pomPath, Map<Path, Document> pomMap, Path tempDir, Path commonRoot) {
         // Check the current POM
         Document doc = pomMap.get(pomPath);
         if (doc != null && hasCustomTransformersInDocument(doc)) {
@@ -757,7 +757,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         if (doc != null) {
             try {
                 Path tempPomPath = tempDir.resolve(commonRoot.relativize(pomPath));
-                Model effectiveModel = buildEffectiveModel(tempPomPath);
+                Model effectiveModel = buildEffectiveModel(context, tempPomPath);
                 Model currentModel = effectiveModel;
 
                 while (currentModel.getParent() != null) {
@@ -769,7 +769,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                             return true;
                         }
                         Path parentTempPath = tempDir.resolve(commonRoot.relativize(parentPath));
-                        currentModel = buildEffectiveModel(parentTempPath);
+                        currentModel = buildEffectiveModel(context, parentTempPath);
                     } else {
                         break;
                     }
