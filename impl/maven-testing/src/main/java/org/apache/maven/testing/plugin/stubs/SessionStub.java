@@ -43,6 +43,7 @@ import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.RepositoryListener;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
@@ -200,6 +201,17 @@ public class SessionStub implements Session {
 
     @Override
     public Collection<Listener> getListeners() {
+        return null;
+    }
+
+    @Override
+    public void registerListener(RepositoryListener listener) {}
+
+    @Override
+    public void unregisterListener(RepositoryListener listener) {}
+
+    @Override
+    public Collection<RepositoryListener> getRepositoryListeners() {
         return null;
     }
 

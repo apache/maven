@@ -65,6 +65,7 @@ import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.impl.AbstractSession;
 import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.MavenRepositoryListener;
 import org.apache.maven.impl.di.SessionScope;
 import org.apache.maven.impl.resolver.scopes.Maven4ScopeManagerConfiguration;
 import org.eclipse.aether.DefaultRepositorySystemSession;
@@ -383,6 +384,7 @@ public class ApiRunner {
                 : properties.containsKey("env.MAVEN_HOME") ? Paths.get(properties.get("env.MAVEN_HOME")) : null;
 
         DefaultRepositorySystemSession rsession = new DefaultRepositorySystemSession(h -> false);
+        rsession.setRepositoryListener(new MavenRepositoryListener());
         rsession.setScopeManager(new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE));
         rsession.setSystemProperties(properties);
         rsession.setConfigProperties(properties);

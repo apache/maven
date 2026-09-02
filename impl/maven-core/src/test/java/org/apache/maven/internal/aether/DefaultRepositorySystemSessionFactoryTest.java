@@ -26,13 +26,18 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.maven.api.RepositoryEvent;
+import org.apache.maven.api.RepositoryEventType;
+import org.apache.maven.api.RepositoryListener;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.impl.InternalSession;
 import org.apache.maven.internal.impl.DefaultTypeRegistry;
 import org.apache.maven.rtinfo.RuntimeInformation;
 import org.apache.maven.settings.Server;
@@ -50,6 +55,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * UT for {@link DefaultRepositorySystemSessionFactory}.
@@ -76,6 +83,40 @@ public class DefaultRepositorySystemSessionFactoryTest {
 
     @Inject
     protected VersionFilterBuilder versionFilterBuilder;
+
+    @Test
+    void exposesRepositoryEventsThroughMavenApi() throws InvalidRepositoryException {
+        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Collections.emptyMap(),
+                versionFilterBuilder);
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        org.eclipse.aether.RepositorySystemSession resolverSession = systemSessionFactory.newRepositorySession(request);
+        InternalSession session = mock(InternalSession.class);
+        AtomicReference<RepositoryEvent> received = new AtomicReference<>();
+        RepositoryListener listener = new RepositoryListener() {
+            @Override
+            public void artifactResolved(RepositoryEvent event) {
+                received.set(event);
+            }
+        };
+        when(session.getRepositoryListeners()).thenReturn(List.of(listener));
+        InternalSession.associate(resolverSession, session);
+
+        resolverSession
+                .getRepositoryListener()
+                .artifactResolved(new org.eclipse.aether.RepositoryEvent.Builder(
+                                resolverSession, org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_RESOLVED)
+                        .build());
+
+        assertNotNull(received.get());
+        assertEquals(RepositoryEventType.ARTIFACT_RESOLVED, received.get().getType());
+    }
 
     @Test
     void isNoSnapshotUpdatesTest() throws InvalidRepositoryException {

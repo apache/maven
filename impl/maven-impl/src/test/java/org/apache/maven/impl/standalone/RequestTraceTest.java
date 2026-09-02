@@ -28,6 +28,8 @@ import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
+import org.apache.maven.api.RepositoryEvent;
+import org.apache.maven.api.RepositoryListener;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
@@ -38,11 +40,6 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.Sources;
-import org.apache.maven.impl.InternalSession;
-import org.apache.maven.impl.RequestTraceHelper;
-import org.eclipse.aether.AbstractRepositoryListener;
-import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
 import org.eclipse.aether.spi.io.PathProcessor;
 import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
@@ -76,13 +73,13 @@ class RequestTraceTest {
         assertNotNull(result.getEffectiveModel());
 
         List<RepositoryEvent> events = new CopyOnWriteArrayList<>();
-        ((DefaultRepositorySystemSession) InternalSession.from(session).getSession())
-                .setRepositoryListener(new AbstractRepositoryListener() {
-                    @Override
-                    public void artifactResolved(RepositoryEvent event) {
-                        events.add(event);
-                    }
-                });
+        RepositoryListener listener = new RepositoryListener() {
+            @Override
+            public void artifactResolved(RepositoryEvent event) {
+                events.add(event);
+            }
+        };
+        session.registerListener(listener);
 
         ArtifactCoordinates coords =
                 session.createArtifactCoordinates("org.apache.maven:maven-api-core:4.0.0-alpha-13");
@@ -105,14 +102,15 @@ class RequestTraceTest {
                 .next();
 
         for (RepositoryEvent event : events) {
-            org.eclipse.aether.RequestTrace trace = event.getTrace();
-            assertNotNull(trace);
-
-            RequestTrace rTrace = RequestTraceHelper.toMaven("collect", trace);
-            assertNotNull(rTrace);
+            RequestTrace rTrace = event.getTrace().orElseThrow();
             assertNotNull(rTrace.parent());
         }
 
+        Session derived = session.withRemoteRepositories(session.getRemoteRepositories());
+        assertTrue(derived.getRepositoryListeners().contains(listener));
+        derived.unregisterListener(listener);
+        assertTrue(session.getRepositoryListeners().isEmpty());
+        assertTrue(derived.getRepositoryListeners().isEmpty());
         assertNotNull(node);
         assertEquals(6, node.getChildren().size());
     }

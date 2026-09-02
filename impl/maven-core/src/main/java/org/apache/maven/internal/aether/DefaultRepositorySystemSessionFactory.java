@@ -38,6 +38,7 @@ import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.impl.MavenRepositoryListener;
 import org.apache.maven.impl.resolver.MavenSessionBuilderSupplier;
 import org.apache.maven.impl.resolver.type.TypeRegistryAdapter;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
@@ -342,7 +343,8 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
 
         sessionBuilder.setTransferListener(request.getTransferListener());
 
-        RepositoryListener repositoryListener = eventSpyDispatcher.chainListener(new LoggingRepositoryListener(logger));
+        RepositoryListener repositoryListener = eventSpyDispatcher.chainListener(
+                new ChainedRepositoryListener(new LoggingRepositoryListener(logger), new MavenRepositoryListener()));
 
         boolean recordReverseTree = Boolean.parseBoolean(
                 mergedProps.getOrDefault(Constants.MAVEN_REPO_LOCAL_RECORD_REVERSE_TREE, Boolean.FALSE.toString()));
