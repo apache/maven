@@ -684,16 +684,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             UpgradeContext context, Map<Path, Document> pomMap, Path tempDir) {
         Map<Path, Set<String>> managementResult = new HashMap<>();
         Map<Path, Set<String>> directOverrideResult = new HashMap<>();
-        Map<String, PluginUpgrade> pluginUpgrades = getPluginUpgradesAsMap();
-
-        // Pre-check: if any local POM has shade-plugin with custom transformers,
-        // exclude it from effective model upgrades to avoid breaking the build
+        Map<String, PluginUpgrade> basePluginUpgrades = getPluginUpgradesAsMap();
         String shadePluginKey = DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-shade-plugin";
-        boolean shadeHasCustomTransformers = hasCustomTransformersInAnyPom(pomMap);
-        if (shadeHasCustomTransformers) {
-            pluginUpgrades = new HashMap<>(pluginUpgrades);
-            pluginUpgrades.remove(shadePluginKey);
-        }
 
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Path originalPomPath = entry.getKey();
@@ -703,6 +695,17 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 Path commonRoot = findCommonRoot(pomMap.keySet());
                 Path relativePath = commonRoot.relativize(originalPomPath);
                 Path tempPomPath = tempDir.resolve(relativePath);
+
+                // Per-module check: if this POM or any of its local parent POMs
+                // has shade-plugin with custom transformers, exclude shade-plugin
+                // from upgrades for this module only
+                Map<String, PluginUpgrade> pluginUpgrades = basePluginUpgrades;
+                if (hasCustomTransformersInPomOrParents(originalPomPath, pomMap, tempDir, commonRoot)) {
+                    pluginUpgrades = new HashMap<>(basePluginUpgrades);
+                    pluginUpgrades.remove(shadePluginKey);
+                    context.warning("Skipping maven-shade-plugin in effective-model analysis for " + originalPomPath
+                            + ": custom ResourceTransformer(s) found in project POMs");
+                }
 
                 // Build effective model using Maven 4 API
                 PluginAnalysis analysis = analyzeEffectiveModelForPlugins(context, tempPomPath, pluginUpgrades);
@@ -738,28 +741,65 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
-     * Checks if any POM document in the project contains a shade-plugin configuration
+     * Checks if a specific POM or any of its local parent POMs (within pomMap)
+     * contains a shade-plugin configuration with custom ResourceTransformer implementations.
+     * This is a per-module check, unlike a global check across all POMs.
+     */
+    private boolean hasCustomTransformersInPomOrParents(
+            Path pomPath, Map<Path, Document> pomMap, Path tempDir, Path commonRoot) {
+        // Check the current POM
+        Document doc = pomMap.get(pomPath);
+        if (doc != null && hasCustomTransformersInDocument(doc)) {
+            return true;
+        }
+
+        // Walk up the parent hierarchy within the local pomMap
+        if (doc != null) {
+            try {
+                Path tempPomPath = tempDir.resolve(commonRoot.relativize(pomPath));
+                Model effectiveModel = buildEffectiveModel(tempPomPath);
+                Model currentModel = effectiveModel;
+
+                while (currentModel.getParent() != null) {
+                    Parent parent = currentModel.getParent();
+                    Path parentPath = findParentInPomMap(parent, pomMap);
+                    if (parentPath != null) {
+                        Document parentDoc = pomMap.get(parentPath);
+                        if (parentDoc != null && hasCustomTransformersInDocument(parentDoc)) {
+                            return true;
+                        }
+                        Path parentTempPath = tempDir.resolve(commonRoot.relativize(parentPath));
+                        currentModel = buildEffectiveModel(parentTempPath);
+                    } else {
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                // If we can't resolve parents, be conservative and check just this POM
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if a single POM document contains a shade-plugin configuration
      * with custom ResourceTransformer implementations.
      */
-    private boolean hasCustomTransformersInAnyPom(Map<Path, Document> pomMap) {
-        for (Document doc : pomMap.values()) {
-            Element root = doc.root();
-            Element buildElement = root.childElement(BUILD).orElse(null);
-            if (buildElement != null) {
-                // Check both build/plugins and build/pluginManagement/plugins
-                boolean found = Stream.concat(
-                                collectShadePluginElements(
-                                        buildElement.childElement(PLUGINS).orElse(null)),
-                                collectShadePluginElements(buildElement
-                                        .childElement(PLUGIN_MANAGEMENT)
-                                        .flatMap(pm -> pm.childElement(PLUGINS))
-                                        .orElse(null)))
-                        .anyMatch(pluginElement ->
-                                !findCustomTransformerClasses(pluginElement).isEmpty());
-                if (found) {
-                    return true;
-                }
-            }
+    private boolean hasCustomTransformersInDocument(Document doc) {
+        Element root = doc.root();
+        Element buildElement = root.childElement(BUILD).orElse(null);
+        if (buildElement != null) {
+            // Check both build/plugins and build/pluginManagement/plugins
+            return Stream.concat(
+                            collectShadePluginElements(
+                                    buildElement.childElement(PLUGINS).orElse(null)),
+                            collectShadePluginElements(buildElement
+                                    .childElement(PLUGIN_MANAGEMENT)
+                                    .flatMap(pm -> pm.childElement(PLUGINS))
+                                    .orElse(null)))
+                    .anyMatch(pluginElement ->
+                            !findCustomTransformerClasses(pluginElement).isEmpty());
         }
         return false;
     }
