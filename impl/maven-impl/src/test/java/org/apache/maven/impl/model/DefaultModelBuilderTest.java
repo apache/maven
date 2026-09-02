@@ -367,13 +367,13 @@ class DefaultModelBuilderTest {
     }
 
     /**
-     * {@code BUILD_CONSUMER} requests already skip all profile activation
-     * ({@code isBuildRequestWithActivation()} returns false for that type) -- unrelated to, and
-     * unaffected by, the externalOrigin distinction. Locking that down explicitly since it is
-     * adjacent code this change reads but does not modify.
+     * {@code BUILD_CONSUMER} requests activate only deterministic profiles (JDK version,
+     * operating system, activeByDefault) and skip file-, property- and condition-activated
+     * profiles.  Repositories contributed by deterministic profiles are stripped so they
+     * do not leak into the published consumer POM.  See GH-13004.
      */
     @Test
-    public void testBuildConsumerSkipsAllProfileActivation() throws Exception {
+    public void testBuildConsumerActivatesOnlyDeterministicProfiles() throws Exception {
         ModelBuilderRequest request = ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
@@ -394,10 +394,14 @@ class DefaultModelBuilderTest {
 
         Model model = buildConsumerState.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
 
+        // File, property, and condition profiles must still be skipped
         assertNull(model.getProperties().get("profile.file"));
         assertNull(model.getProperties().get("profile.property"));
         assertNull(model.getProperties().get("profile.condition"));
-        assertNull(model.getProperties().get("profile.jdk"));
+        // JDK profile IS activated — deterministic, platform-derived activation (GH-13004)
+        assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // Repositories from activated profiles must be stripped — they must not leak
+        // into the published consumer POM
         assertTrue(model.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
     }
 
@@ -1010,6 +1014,170 @@ class DefaultModelBuilderTest {
                 "1.2.3",
                 managedDep.getVersion(),
                 "Managed dependency version should be interpolated, not ${managed.version}");
+    }
+
+    /**
+     * Verifies that BUILD_CONSUMER resolves properties defined in parent POM profiles
+     * when those properties are used in dependency artifactId fields.
+     * This reproduces GH-13004: the effective model coordinate validation rejects
+     * ${swt.artifactId} because profiles are not activated for BUILD_CONSUMER.
+     */
+    @Test
+    public void testBuildConsumerResolvesParentProfilePropertyInArtifactId() {
+        Path parentPom = getPom("consumer-profile-artifactid-parent");
+        Path childPom = getPom("consumer-profile-artifactid-child");
+
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+
+        mbs.build(ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(parentPom))
+                .build());
+
+        ModelBuilderResult consumerResult = assertDoesNotThrow(
+                () -> mbs.build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                        .source(Sources.buildSource(childPom))
+                        .build()),
+                "BUILD_CONSUMER should not fail when parent profile property is used in dependency artifactId");
+
+        assertNotNull(consumerResult);
+        Model effectiveModel = consumerResult.getEffectiveModel();
+        assertNotNull(effectiveModel);
+
+        // The property from the parent's profile should be inherited and available
+        assertEquals(
+                "org.eclipse.swt.gtk.linux.x86-64",
+                effectiveModel.getProperties().get("swt.artifactId"),
+                "Property from parent's profile should be resolved in BUILD_CONSUMER effective model");
+
+        // The dependency artifactId should be interpolated (not ${swt.artifactId})
+        Dependency dep = effectiveModel.getDependencies().stream()
+                .filter(d -> "org.eclipse.platform".equals(d.getGroupId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(dep, "Dependency with org.eclipse.platform groupId should exist");
+        assertEquals(
+                "org.eclipse.swt.gtk.linux.x86-64",
+                dep.getArtifactId(),
+                "Dependency artifactId should be interpolated from parent profile property");
+    }
+
+    /**
+     * Same as above but builds the child as BUILD_PROJECT first (simulating
+     * the full reactor build), then builds BUILD_CONSUMER for the child.
+     * This is closer to what happens in a real Maven build.
+     */
+    @Test
+    public void testBuildConsumerAfterBuildProjectResolvesParentProfilePropertyInArtifactId() {
+        Path parentPom = getPom("consumer-profile-artifactid-parent");
+        Path childPom = getPom("consumer-profile-artifactid-child");
+
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+
+        // Build parent as BUILD_PROJECT
+        mbs.build(ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(parentPom))
+                .build());
+
+        // Build child as BUILD_PROJECT (as in reactor build)
+        mbs.build(ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(childPom))
+                .build());
+
+        // Now build child as BUILD_CONSUMER (as in consumer POM generation)
+        ModelBuilderResult consumerResult = assertDoesNotThrow(
+                () -> mbs.build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                        .source(Sources.buildSource(childPom))
+                        .build()),
+                "BUILD_CONSUMER should not fail after BUILD_PROJECT when parent profile property is used in artifactId");
+
+        assertNotNull(consumerResult);
+        Model effectiveModel = consumerResult.getEffectiveModel();
+        assertNotNull(effectiveModel);
+
+        assertEquals(
+                "org.eclipse.swt.gtk.linux.x86-64",
+                effectiveModel.getProperties().get("swt.artifactId"),
+                "Property from parent's profile should be resolved in BUILD_CONSUMER effective model");
+
+        Dependency dep = effectiveModel.getDependencies().stream()
+                .filter(d -> "org.eclipse.platform".equals(d.getGroupId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(dep, "Dependency with org.eclipse.platform groupId should exist");
+        assertEquals(
+                "org.eclipse.swt.gtk.linux.x86-64",
+                dep.getArtifactId(),
+                "Dependency artifactId should be interpolated from parent profile property");
+    }
+
+    /**
+     * Verifies that BUILD_CONSUMER resolves properties defined in parent POM
+     * OS-activated profiles when those properties are used in dependency artifactId fields.
+     * This is the exact scenario from GH-13004 (Apache Hop).
+     */
+    @Test
+    public void testBuildConsumerResolvesOsActivatedProfilePropertyInArtifactId() {
+        Path parentPom = getPom("consumer-os-profile-parent");
+        Path childPom = getPom("consumer-os-profile-child");
+
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+
+        // Build parent as BUILD_PROJECT first
+        mbs.build(ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(parentPom))
+                .build());
+
+        // Build child as BUILD_PROJECT (reactor build)
+        mbs.build(ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(childPom))
+                .build());
+
+        // Now build child as BUILD_CONSUMER
+        ModelBuilderResult consumerResult = assertDoesNotThrow(
+                () -> mbs.build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                        .source(Sources.buildSource(childPom))
+                        .build()),
+                "BUILD_CONSUMER should not fail when parent defines OS-activated profile property used in artifactId");
+
+        assertNotNull(consumerResult);
+        Model effectiveModel = consumerResult.getEffectiveModel();
+        assertNotNull(effectiveModel);
+
+        // The platform.artifactId property should be resolved from one of the OS profiles
+        String platformArtifactId = effectiveModel.getProperties().get("platform.artifactId");
+        assertNotNull(
+                platformArtifactId,
+                "Property from parent's OS profile should be resolved in BUILD_CONSUMER effective model");
+
+        // The dependency artifactId should be interpolated
+        Dependency dep = effectiveModel.getDependencies().stream()
+                .filter(d -> "org.example".equals(d.getGroupId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(dep, "Dependency with org.example groupId should exist");
+        assertFalse(
+                dep.getArtifactId().contains("${"),
+                "Dependency artifactId should be interpolated, got: " + dep.getArtifactId());
+        assertEquals(
+                platformArtifactId,
+                dep.getArtifactId(),
+                "Dependency artifactId should match the platform property value");
     }
 
     /**
