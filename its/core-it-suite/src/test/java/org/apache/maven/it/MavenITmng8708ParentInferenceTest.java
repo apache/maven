@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.nio.file.Path;
+import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
@@ -29,14 +29,18 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITmng8708ParentInferenceTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITmng8708ParentInferenceTest() {
+        super("[4.0.0-rc-7,)");
+    }
+
     private static final String PARENT_DECLARATION_WARNING =
             "'parent.relativePath' only specify relativePath or groupId/artifactId in modelVersion 4.1.0";
 
     @Test
     void testSupportedParentInference() throws Exception {
-        Path testDir = extractResources("mng-8708-parent-inference/supported");
+        File testDir = extractResources("/mng-8708-parent-inference/supported");
 
-        Verifier verifier = newVerifier(testDir);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -51,9 +55,9 @@ class MavenITmng8708ParentInferenceTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testThreeLevelParentInference() throws Exception {
-        Path testDir = extractResources("mng-8708-parent-inference/three-level");
+        File testDir = extractResources("/mng-8708-parent-inference/three-level");
 
-        Verifier verifier = newVerifier(testDir);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -62,9 +66,9 @@ class MavenITmng8708ParentInferenceTest extends AbstractMavenIntegrationTestCase
 
     @Test
     void testExplicitPathAndCoordinatesStillWarn() throws Exception {
-        Path testDir = extractResources("mng-8708-parent-inference/explicit-both");
+        File testDir = extractResources("/mng-8708-parent-inference/explicit-both");
 
-        Verifier verifier = newVerifier(testDir);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
