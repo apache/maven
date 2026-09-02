@@ -601,16 +601,19 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
 
                     if (relocation != null) {
                         if (relocation.getGroupId() != null) {
+                            requireValidCoordinateComponent(relocation.getGroupId(), "groupId", artifact);
                             artifact.setGroupId(relocation.getGroupId());
                             relocatedArtifact = artifact;
                             project.setGroupId(relocation.getGroupId());
                         }
                         if (relocation.getArtifactId() != null) {
+                            requireValidCoordinateComponent(relocation.getArtifactId(), "artifactId", artifact);
                             artifact.setArtifactId(relocation.getArtifactId());
                             relocatedArtifact = artifact;
                             project.setArtifactId(relocation.getArtifactId());
                         }
                         if (relocation.getVersion() != null) {
+                            requireValidCoordinateComponent(relocation.getVersion(), "version", artifact);
                             // note: see MNG-3454. This causes a problem, but fixing it may break more.
                             artifact.setVersionRange(VersionRange.createFromVersion(relocation.getVersion()));
                             relocatedArtifact = artifact;
@@ -664,6 +667,34 @@ public class MavenMetadataSource implements ArtifactMetadataSource {
         rel.relocatedArtifact = relocatedArtifact;
 
         return rel;
+    }
+
+    /**
+     * Checks that a relocation coordinate component is usable as an artifact coordinate component before it
+     * is applied to the artifact and project. A component outside the coordinate character set is rejected so
+     * that only well-formed coordinates enter resolution.
+     */
+    private static void requireValidCoordinateComponent(String value, String component, Artifact artifact)
+            throws ArtifactMetadataRetrievalException {
+        if (isInvalidCoordinateComponent(value)) {
+            throw new ArtifactMetadataRetrievalException(
+                    "Invalid relocation " + component + " '" + value + "' for " + artifact.getId()
+                            + ": not a valid artifact coordinate component",
+                    null,
+                    artifact);
+        }
+    }
+
+    private static boolean isInvalidCoordinateComponent(String value) {
+        if ("..".equals(value) || value.contains("/") || value.contains("\\") || value.contains(":")) {
+            return true;
+        }
+        for (int i = 0; i < value.length(); i++) {
+            if (Character.isISOControl(value.charAt(i))) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private ModelProblem hasMissingParentPom(ProjectBuildingException e) {

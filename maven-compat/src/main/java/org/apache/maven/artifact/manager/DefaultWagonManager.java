@@ -75,7 +75,10 @@ public class DefaultWagonManager extends org.apache.maven.repository.legacy.Defa
 
                 if (servers != null) {
                     for (Server server : servers) {
-                        if (id.equalsIgnoreCase(server.getId())) {
+                        // Server ids are matched exactly, consistent with
+                        // LegacyRepositorySystem.injectAuthentication and the resolver's
+                        // authentication selector.
+                        if (id.equals(server.getId())) {
                             SettingsDecryptionResult result =
                                     settingsDecrypter.decrypt(new DefaultSettingsDecryptionRequest(server));
                             server = result.getServer();
