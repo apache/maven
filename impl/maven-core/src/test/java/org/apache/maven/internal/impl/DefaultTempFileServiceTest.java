@@ -91,6 +91,48 @@ class DefaultTempFileServiceTest {
     }
 
     @Test
+    void createsFileInSpecifiedDirectory() throws IOException {
+        final TempFileService svc = new DefaultTempFileService();
+        final SessionData data = new MapBackedSessionData();
+        final Session session = mock(Session.class);
+        when(session.getData()).thenReturn(data);
+
+        final Path customDir = Files.createTempDirectory("custom-dir-");
+        try {
+            final Path f = svc.createTempFile(session, "dir-", ".tmp", customDir);
+            assertTrue(Files.exists(f), "temp file must exist");
+            assertTrue(f.startsWith(customDir), "temp file must be inside the specified directory");
+
+            svc.cleanup(session);
+
+            assertFalse(Files.exists(f), "temp file must be deleted");
+        } finally {
+            Files.deleteIfExists(customDir);
+        }
+    }
+
+    @Test
+    void createsDirectoryInSpecifiedParent() throws IOException {
+        final TempFileService svc = new DefaultTempFileService();
+        final SessionData data = new MapBackedSessionData();
+        final Session session = mock(Session.class);
+        when(session.getData()).thenReturn(data);
+
+        final Path parentDir = Files.createTempDirectory("parent-dir-");
+        try {
+            final Path d = svc.createTempDirectory(session, "nested-", parentDir);
+            assertTrue(Files.exists(d), "temp directory must exist");
+            assertTrue(d.startsWith(parentDir), "temp directory must be inside the specified parent");
+
+            svc.cleanup(session);
+
+            assertFalse(Files.exists(d), "temp directory must be deleted");
+        } finally {
+            Files.deleteIfExists(parentDir);
+        }
+    }
+
+    @Test
     void keepPropertySkipsCleanup() throws IOException {
         final TempFileService svc = new DefaultTempFileService();
         final SessionData data = new MapBackedSessionData();

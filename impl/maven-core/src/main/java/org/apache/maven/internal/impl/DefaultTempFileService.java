@@ -153,6 +153,8 @@ public final class DefaultTempFileService implements TempFileService {
             return;
         }
         // Walk depth-first and delete files, then directories.
+        // Best-effort: locked or inaccessible entries are logged and skipped
+        // so the rest of the tree is still cleaned up.
         Files.walkFileTree(
                 path, EnumSet.noneOf(FileVisitOption.class), Integer.MAX_VALUE, new SimpleFileVisitor<Path>() {
                     @Override
@@ -163,9 +165,18 @@ public final class DefaultTempFileService implements TempFileService {
                     }
 
                     @Override
-                    public FileVisitResult postVisitDirectory(final Path dir, final IOException exc)
-                            throws IOException {
-                        Files.deleteIfExists(dir);
+                    public FileVisitResult visitFileFailed(final Path file, final IOException exc) {
+                        LOGGER.debug("Could not access temp file for deletion: {}", file, exc);
+                        return FileVisitResult.CONTINUE;
+                    }
+
+                    @Override
+                    public FileVisitResult postVisitDirectory(final Path dir, final IOException exc) {
+                        try {
+                            Files.deleteIfExists(dir);
+                        } catch (final IOException e) {
+                            LOGGER.debug("Could not delete temp directory: {}", dir, e);
+                        }
                         return FileVisitResult.CONTINUE;
                     }
                 });
