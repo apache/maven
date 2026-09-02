@@ -354,7 +354,7 @@ class ToolchainPluginStrategyTest {
                     </project>
                     """;
             Document doc = Document.of(pomXml);
-            strategy.addToolchainsPlugin(doc, 11);
+            strategy.addToolchainsPlugin(TestUtils.createMockContext(), doc, 11);
 
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
             String output = doc.toXml();
@@ -383,7 +383,7 @@ class ToolchainPluginStrategyTest {
                     </project>
                     """;
             Document doc = Document.of(pomXml);
-            strategy.addToolchainsPlugin(doc, 8);
+            strategy.addToolchainsPlugin(TestUtils.createMockContext(), doc, 8);
 
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
             String output = doc.toXml();
@@ -421,7 +421,7 @@ class ToolchainPluginStrategyTest {
                     </project>
                     """;
             Document doc = Document.of(pomXml);
-            strategy.addToolchainsPlugin(doc, 11);
+            strategy.addToolchainsPlugin(TestUtils.createMockContext(), doc, 11);
 
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
             String output = doc.toXml();
@@ -463,7 +463,7 @@ class ToolchainPluginStrategyTest {
                     </project>
                     """;
             Document doc = Document.of(pomXml);
-            strategy.addToolchainsPlugin(doc, 11);
+            strategy.addToolchainsPlugin(TestUtils.createMockContext(), doc, 11);
 
             String output = doc.toXml();
             // Version should remain 3.3.0, not downgraded to 3.2.0
@@ -499,7 +499,7 @@ class ToolchainPluginStrategyTest {
                     </project>
                     """;
             Document doc = Document.of(pomXml);
-            strategy.addToolchainsPlugin(doc, 11);
+            strategy.addToolchainsPlugin(TestUtils.createMockContext(), doc, 11);
 
             String output = doc.toXml();
             assertTrue(output.contains("<version>3.2.0</version>"), "Expected version 3.2.0 to be added: " + output);
@@ -529,7 +529,7 @@ class ToolchainPluginStrategyTest {
                     </project>
                     """;
             Document doc = Document.of(pomXml);
-            strategy.addToolchainsPlugin(doc, 11);
+            strategy.addToolchainsPlugin(TestUtils.createMockContext(), doc, 11);
 
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
             String output = doc.toXml();
@@ -565,7 +565,7 @@ class ToolchainPluginStrategyTest {
                     </project>
                     """;
             Document doc = Document.of(pomXml);
-            strategy.addToolchainsPlugin(doc, 11);
+            strategy.addToolchainsPlugin(TestUtils.createMockContext(), doc, 11);
 
             String output = doc.toXml();
             // Property reference should be left unchanged
