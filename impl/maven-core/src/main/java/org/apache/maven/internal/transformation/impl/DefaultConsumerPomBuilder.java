@@ -299,6 +299,75 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             }
         }
 
+        // Interpolate profile-level dependency and dependency management versions.
+        // Profiles are preserved in the consumer POM (transformPom keeps them), but
+        // extension-contributed property references in profile dependencies would remain
+        // unresolvable for downstream consumers. We use the same effectiveDeps /
+        // effectiveManagedDeps lookups because the effective model merges active profile
+        // deps into the main sections — giving us the resolved values we need.
+        if (!rawModel.getProfiles().isEmpty()) {
+            List<Profile> updatedProfiles = new ArrayList<>();
+            boolean profilesChanged = false;
+            for (Profile profile : rawModel.getProfiles()) {
+                Profile updatedProfile = profile;
+
+                // Interpolate profile dependency management
+                if (profile.getDependencyManagement() != null
+                        && !profile.getDependencyManagement().getDependencies().isEmpty()) {
+                    List<Dependency> interpolatedDeps = new ArrayList<>();
+                    boolean dmChanged = false;
+                    for (Dependency dep : profile.getDependencyManagement().getDependencies()) {
+                        if (dep.getVersion() != null
+                                && dep.getVersion().contains("${")
+                                && hasNonModelProperties(dep.getVersion(), modelProperties)) {
+                            String key = getDependencyKey(dep);
+                            Dependency effectiveDep = effectiveManagedDeps.get(key);
+                            if (effectiveDep != null
+                                    && !effectiveDep.getVersion().contains("${")) {
+                                dep = dep.withVersion(effectiveDep.getVersion());
+                                dmChanged = true;
+                            }
+                        }
+                        interpolatedDeps.add(dep);
+                    }
+                    if (dmChanged) {
+                        updatedProfile = updatedProfile.withDependencyManagement(
+                                updatedProfile.getDependencyManagement().withDependencies(interpolatedDeps));
+                        profilesChanged = true;
+                    }
+                }
+
+                // Interpolate profile direct dependencies
+                if (!profile.getDependencies().isEmpty()) {
+                    List<Dependency> interpolatedDeps = new ArrayList<>();
+                    boolean depsChanged = false;
+                    for (Dependency dep : profile.getDependencies()) {
+                        if (dep.getVersion() != null
+                                && dep.getVersion().contains("${")
+                                && hasNonModelProperties(dep.getVersion(), modelProperties)) {
+                            String key = getDependencyKey(dep);
+                            Dependency effectiveDep = effectiveDeps.get(key);
+                            if (effectiveDep != null
+                                    && !effectiveDep.getVersion().contains("${")) {
+                                dep = dep.withVersion(effectiveDep.getVersion());
+                                depsChanged = true;
+                            }
+                        }
+                        interpolatedDeps.add(dep);
+                    }
+                    if (depsChanged) {
+                        updatedProfile = updatedProfile.withDependencies(interpolatedDeps);
+                        profilesChanged = true;
+                    }
+                }
+
+                updatedProfiles.add(updatedProfile);
+            }
+            if (profilesChanged) {
+                rawModel = rawModel.withProfiles(updatedProfiles);
+            }
+        }
+
         return rawModel;
     }
 
@@ -328,8 +397,33 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         return false;
     }
 
+    /**
+     * Returns {@code true} when the given property name is a Maven built-in that
+     * downstream consumers can always resolve without any additional POM properties.
+     * <p>
+     * The intentionally scoped set of recognized prefixes is:
+     * <ul>
+     *   <li>{@code project.*} — standard project coordinate properties
+     *       (e.g. {@code project.version}, {@code project.groupId})</li>
+     *   <li>{@code pom.*} — legacy alias for {@code project.*}</li>
+     *   <li>{@code version} — bare alias for {@code project.version}</li>
+     *   <li>{@code env.*} — environment variables (e.g. {@code env.PATH});
+     *       always available from the consumer's runtime environment</li>
+     *   <li>{@code settings.*} — Maven settings properties
+     *       (e.g. {@code settings.localRepository}); always available from
+     *       the consumer's Maven installation</li>
+     * </ul>
+     * Properties contributed by Maven extensions via {@code PropertyContributor}
+     * are NOT built-ins — they must be interpolated before the consumer POM is
+     * published, because consumers that do not have the extension installed cannot
+     * resolve them.
+     */
     private static boolean isBuiltInProperty(String name) {
-        return name.startsWith("project.") || name.startsWith("pom.") || name.equals("version");
+        return name.startsWith("project.")
+                || name.startsWith("pom.")
+                || name.equals("version")
+                || name.startsWith("env.")
+                || name.startsWith("settings.");
     }
 
     protected Model buildBom(RepositorySystemSession session, MavenProject project, ModelSource src)

@@ -1256,4 +1256,141 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                         "${major}.${minor}", Map.of("major", "1", "minor", "0")),
                 "Should return false when all properties are in model");
     }
+
+    // ── Profile-level dependency interpolation (fix: handle profile deps) ────
+
+    /**
+     * Verifies that a profile-level direct dependency whose version uses an
+     * extension-contributed property gets interpolated. The effective model merges
+     * active profile deps into the top-level dependencies list, so
+     * {@code effectiveDeps} is used as the lookup source.
+     */
+    @Test
+    void testInterpolatePomVersionsResolvesProfileDirectDependencyExtensionProperty() {
+        Dependency profileDep = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("profile-lib")
+                .version("${ext.dynamicVersion}")
+                .build();
+
+        Profile profile = Profile.newBuilder()
+                .id("ext-profile")
+                .dependencies(List.of(profileDep))
+                .build();
+
+        Model rawModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .profiles(List.of(profile))
+                .build();
+
+        // The effective model merges active profile deps into the top-level deps list
+        Dependency effectiveDep = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("profile-lib")
+                .version("3.7.0")
+                .build();
+
+        Model effectiveModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .dependencies(List.of(effectiveDep))
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
+
+        assertEquals(1, result.getProfiles().size());
+        List<Dependency> profileDeps = result.getProfiles().get(0).getDependencies();
+        assertEquals(1, profileDeps.size());
+        assertEquals(
+                "3.7.0",
+                profileDeps.get(0).getVersion(),
+                "Extension property in profile direct dependency should be interpolated");
+    }
+
+    /**
+     * Verifies that a profile-level dependency management entry whose version uses
+     * an extension-contributed property gets interpolated. The effective model merges
+     * active profile depMgmt into the top-level dependency management, so
+     * {@code effectiveManagedDeps} is used as the lookup source.
+     */
+    @Test
+    void testInterpolatePomVersionsResolvesProfileDependencyManagementExtensionProperty() {
+        Dependency profileManagedDep = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("profile-managed")
+                .version("${ext.dynamicVersion}")
+                .build();
+
+        Profile profile = Profile.newBuilder()
+                .id("ext-profile")
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(profileManagedDep))
+                        .build())
+                .build();
+
+        Model rawModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .profiles(List.of(profile))
+                .build();
+
+        // The effective model merges active profile depMgmt into top-level depMgmt
+        Dependency effectiveManagedDep = Dependency.newBuilder()
+                .groupId("com.example")
+                .artifactId("profile-managed")
+                .version("5.2.1")
+                .build();
+
+        Model effectiveModel = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("parent")
+                .version("1.0.0")
+                .packaging("pom")
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(effectiveManagedDep))
+                        .build())
+                .build();
+
+        Model result = DefaultConsumerPomBuilder.interpolatePomVersions(rawModel, effectiveModel);
+
+        assertEquals(1, result.getProfiles().size());
+        assertNotNull(result.getProfiles().get(0).getDependencyManagement());
+        List<Dependency> managedDeps =
+                result.getProfiles().get(0).getDependencyManagement().getDependencies();
+        assertEquals(1, managedDeps.size());
+        assertEquals(
+                "5.2.1",
+                managedDeps.get(0).getVersion(),
+                "Extension property in profile dependency management should be interpolated");
+    }
+
+    // ── isBuiltInProperty: env.* and settings.* coverage ────────────────────
+
+    /**
+     * Verifies that {@code env.*} and {@code settings.*} properties are treated as
+     * built-in (i.e. always resolvable by consumers) and are therefore NOT
+     * interpolated.
+     */
+    @Test
+    void testHasNonModelPropertiesReturnsFalseForEnvAndSettingsProperties() {
+        assertFalse(
+                DefaultConsumerPomBuilder.hasNonModelProperties("${env.JAVA_HOME}", Map.of()),
+                "env.* property should be treated as built-in and not interpolated");
+
+        assertFalse(
+                DefaultConsumerPomBuilder.hasNonModelProperties("${settings.localRepository}", Map.of()),
+                "settings.* property should be treated as built-in and not interpolated");
+
+        // Mixed: one env.* and one extension property — should return true because ext.foo is NOT built-in
+        assertTrue(
+                DefaultConsumerPomBuilder.hasNonModelProperties("${env.HOME}-${ext.qualifier}", Map.of()),
+                "Should return true when at least one property is not built-in or in the model");
+    }
 }
