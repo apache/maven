@@ -20,6 +20,7 @@ package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -466,10 +467,14 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         // uses, skip the upgrade to avoid UnsupportedClassVersionError at build time.
         if (upgrade.minJdk > 0) {
             int projectJdk = detectProjectJdkVersion(pomDocument);
-            if (projectJdk > 0 && projectJdk < upgrade.minJdk) {
-                context.warning("Skipping " + upgrade.groupId + ":" + upgrade.artifactId + " upgrade to "
-                        + upgrade.minVersion + ": plugin requires JDK " + upgrade.minJdk + " but project targets JDK "
-                        + projectJdk);
+            if (shouldSkipForJdkIncompatibility(
+                    context,
+                    upgrade.groupId,
+                    upgrade.artifactId,
+                    upgrade.minVersion,
+                    upgrade.minJdk,
+                    projectJdk,
+                    sectionName)) {
                 return false;
             }
         }
@@ -720,10 +725,15 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         Map<String, PluginUpgrade> basePluginUpgrades = getPluginUpgradesAsMap();
         String shadePluginKey = DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-shade-plugin";
 
-        // Detect the project JDK version from any POM in the map (typically the root)
+        // Detect the project JDK version, preferring the root POM (shortest path depth).
+        // In multi-module projects, child modules may declare a different JDK level,
+        // so we sort by path depth to check the root POM first.
         int projectJdk = -1;
-        for (Document doc : pomMap.values()) {
-            projectJdk = detectProjectJdkVersion(doc);
+        List<Map.Entry<Path, Document>> sortedEntries = pomMap.entrySet().stream()
+                .sorted(Comparator.comparingInt(e -> e.getKey().getNameCount()))
+                .toList();
+        for (Map.Entry<Path, Document> jdkEntry : sortedEntries) {
+            projectJdk = detectProjectJdkVersion(jdkEntry.getValue());
             if (projectJdk > 0) {
                 break;
             }
@@ -906,11 +916,14 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 String pluginKey = getPluginKey(plugin);
                 PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
                 if (upgrade != null) {
-                    // Skip plugins that require a higher JDK than the project targets
-                    if (upgrade.minJdk() > 0 && projectJdk > 0 && projectJdk < upgrade.minJdk()) {
-                        context.warning("Skipping " + pluginKey + " upgrade to " + upgrade.minVersion()
-                                + " in effective model: plugin requires JDK " + upgrade.minJdk()
-                                + " but project targets JDK " + projectJdk);
+                    if (shouldSkipForJdkIncompatibility(
+                            context,
+                            upgrade.groupId(),
+                            upgrade.artifactId(),
+                            upgrade.minVersion(),
+                            upgrade.minJdk(),
+                            projectJdk,
+                            "effective model")) {
                         continue;
                     }
                     String effectiveVersion = plugin.getVersion();
@@ -939,11 +952,14 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     String pluginKey = getPluginKey(plugin);
                     PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
                     if (upgrade != null && !needsManagement.contains(pluginKey)) {
-                        // Skip plugins that require a higher JDK than the project targets
-                        if (upgrade.minJdk() > 0 && projectJdk > 0 && projectJdk < upgrade.minJdk()) {
-                            context.warning("Skipping " + pluginKey + " upgrade to " + upgrade.minVersion()
-                                    + " in effective model: plugin requires JDK " + upgrade.minJdk()
-                                    + " but project targets JDK " + projectJdk);
+                        if (shouldSkipForJdkIncompatibility(
+                                context,
+                                upgrade.groupId(),
+                                upgrade.artifactId(),
+                                upgrade.minVersion(),
+                                upgrade.minJdk(),
+                                projectJdk,
+                                "effective model")) {
                             continue;
                         }
                         String effectiveVersion = plugin.getVersion();
@@ -1382,6 +1398,36 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     private boolean isQuarkusPlugin(String groupId, String artifactId) {
         return "quarkus-maven-plugin".equals(artifactId)
                 && ("io.quarkus".equals(groupId) || "io.quarkus.platform".equals(groupId));
+    }
+
+    /**
+     * Checks whether a plugin upgrade should be skipped because the plugin requires a higher JDK
+     * than the project targets. If the plugin has a {@code minJdk} constraint and the project's
+     * detected JDK is below it, emits a warning and returns {@code true}.
+     *
+     * @param context the upgrade context for logging
+     * @param groupId the plugin's groupId
+     * @param artifactId the plugin's artifactId
+     * @param minVersion the target upgrade version
+     * @param minJdk the minimum JDK version required by the plugin, or {@code 0} if unrestricted
+     * @param projectJdk the project's detected JDK major version, or {@code -1} if unknown
+     * @param location description of where the plugin was found (for logging)
+     * @return {@code true} if the upgrade should be skipped, {@code false} otherwise
+     */
+    private boolean shouldSkipForJdkIncompatibility(
+            UpgradeContext context,
+            String groupId,
+            String artifactId,
+            String minVersion,
+            int minJdk,
+            int projectJdk,
+            String location) {
+        if (minJdk > 0 && projectJdk > 0 && projectJdk < minJdk) {
+            context.warning("Skipping " + groupId + ":" + artifactId + " upgrade to " + minVersion + " in " + location
+                    + ": plugin requires JDK " + minJdk + " but project targets JDK " + projectJdk);
+            return true;
+        }
+        return false;
     }
 
     /**
