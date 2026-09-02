@@ -51,6 +51,7 @@ class UpgradeWorkflowIntegrationTest {
         List<UpgradeStrategy> strategies = List.of(
                 new ModelUpgradeStrategy(),
                 new CompatibilityFixStrategy(),
+                new NashornCompatibilityStrategy(),
                 new PluginUpgradeStrategy(),
                 new InferenceStrategy());
 
@@ -209,6 +210,156 @@ class UpgradeWorkflowIntegrationTest {
             // Verify both POMs exist (they may or may not be modified depending on strategies)
             assertTrue(Files.exists(parentPom), "Parent POM should exist");
             assertTrue(Files.exists(modulePom), "Module POM should exist");
+        }
+    }
+
+    @Nested
+    @DisplayName("Nashorn Compatibility")
+    class NashornCompatibilityTests {
+
+        @Test
+        @DisplayName("should inject nashorn-core when antrun uses JavaScript")
+        void shouldInjectNashornForAntrunJavaScript() throws Exception {
+            Path pomFile = tempDir.resolve("pom.xml");
+            String originalPom = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>com.example</groupId>
+                        <artifactId>test-project</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <artifactId>maven-antrun-plugin</artifactId>
+                                    <executions>
+                                        <execution>
+                                            <id>run-js</id>
+                                            <phase>validate</phase>
+                                            <configuration>
+                                                <target>
+                                                    <script language="javascript">
+                                                        self.log("hello from antrun");
+                                                    </script>
+                                                </target>
+                                            </configuration>
+                                            <goals>
+                                                <goal>run</goal>
+                                            </goals>
+                                        </execution>
+                                    </executions>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+            Files.writeString(pomFile, originalPom);
+
+            UpgradeContext context = TestUtils.createMockContext(tempDir);
+
+            int result = applyGoal.execute(context);
+
+            assertEquals(0, result, "Apply should succeed");
+
+            String upgradedPom = Files.readString(pomFile);
+            assertTrue(
+                    upgradedPom.contains("nashorn-core"), "POM should contain nashorn-core dependency after upgrade");
+            assertTrue(upgradedPom.contains("org.openjdk.nashorn"), "POM should contain org.openjdk.nashorn groupId");
+        }
+
+        @Test
+        @DisplayName("should not modify POM when antrun has no JavaScript")
+        void shouldNotModifyPomWithoutJavaScript() throws Exception {
+            Path pomFile = tempDir.resolve("pom.xml");
+            String originalPom = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>com.example</groupId>
+                        <artifactId>test-project</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <artifactId>maven-antrun-plugin</artifactId>
+                                    <executions>
+                                        <execution>
+                                            <id>copy-files</id>
+                                            <phase>process-resources</phase>
+                                            <configuration>
+                                                <target>
+                                                    <copy file="src/a.txt" tofile="target/a.txt"/>
+                                                </target>
+                                            </configuration>
+                                            <goals>
+                                                <goal>run</goal>
+                                            </goals>
+                                        </execution>
+                                    </executions>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+            Files.writeString(pomFile, originalPom);
+
+            UpgradeContext context = TestUtils.createMockContext(tempDir);
+
+            int result = applyGoal.execute(context);
+
+            assertEquals(0, result, "Apply should succeed");
+
+            String upgradedPom = Files.readString(pomFile);
+            assertTrue(
+                    !upgradedPom.contains("nashorn-core"),
+                    "POM should not contain nashorn-core when no JavaScript is used");
+        }
+
+        @Test
+        @DisplayName("check goal should detect but not modify antrun JavaScript POM")
+        void checkShouldDetectButNotModifyAntrunJavaScript() throws Exception {
+            Path pomFile = tempDir.resolve("pom.xml");
+            String originalPom = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>com.example</groupId>
+                        <artifactId>test-project</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <artifactId>maven-antrun-plugin</artifactId>
+                                    <executions>
+                                        <execution>
+                                            <id>run-js</id>
+                                            <configuration>
+                                                <target>
+                                                    <script language="javascript">
+                                                        self.log("hello");
+                                                    </script>
+                                                </target>
+                                            </configuration>
+                                            <goals>
+                                                <goal>run</goal>
+                                            </goals>
+                                        </execution>
+                                    </executions>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+            Files.writeString(pomFile, originalPom);
+
+            UpgradeContext context = TestUtils.createMockContext(tempDir);
+
+            int result = checkGoal.execute(context);
+
+            assertEquals(0, result, "Check should succeed");
+
+            String pomContent = Files.readString(pomFile);
+            assertEquals(originalPom, pomContent, "Check should not modify POM files");
         }
     }
 
