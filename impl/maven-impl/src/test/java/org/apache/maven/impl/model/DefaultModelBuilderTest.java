@@ -36,23 +36,33 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
+import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.impl.DefaultRemoteRepository;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.eclipse.aether.repository.RepositoryPolicy;
+import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
+import org.eclipse.aether.spi.io.PathProcessor;
+import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
+import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -118,6 +128,285 @@ class DefaultModelBuilderTest {
         ModelBuilderResult result = builder.newSession().build(request);
         assertNotNull(result);
         assertEquals("21", result.getEffectiveModel().getProperties().get("maven.compiler.release"));
+    }
+
+    /**
+     * Models built at {@link ModelBuilderRequest.RequestType#CONSUMER_DEPENDENCY} come from a
+     * dependency POM resolved from a repository. Their file, property, and condition activators
+     * are not evaluated, and their profiles contribute no repositories. A project build, at
+     * {@link ModelBuilderRequest.RequestType#BUILD_PROJECT}, still evaluates every activator.
+     * Platform-derived activation (JDK version, operating system, activeByDefault) is unaffected
+     * at either level.
+     */
+    private ModelBuilderRequest.ModelBuilderRequestBuilder resolvedProfilesRequest(
+            ModelBuilderRequest.RequestType requestType) {
+        Map<String, String> systemProperties = new HashMap<>();
+        for (String name : System.getProperties().stringPropertyNames()) {
+            systemProperties.put(name, System.getProperty(name));
+        }
+        systemProperties.put("some.dir", System.getProperty("java.io.tmpdir"));
+        systemProperties.put("some.gating.property", "true");
+        systemProperties.put("some.condition.property", "true");
+        return ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(requestType)
+                .systemProperties(systemProperties)
+                .source(Sources.buildSource(getPom("resolved-model-with-profiles")));
+    }
+
+    @Test
+    public void testProjectBuildEvaluatesAllActivators() {
+        ModelBuilderRequest request = resolvedProfilesRequest(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .build();
+        Model model = builder.newSession().build(request).getEffectiveModel();
+
+        assertEquals("activated", model.getProperties().get("profile.file"));
+        assertEquals("activated", model.getProperties().get("profile.property"));
+        assertEquals("activated", model.getProperties().get("profile.condition"));
+        assertEquals("activated", model.getProperties().get("profile.jdk"));
+        assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+    }
+
+    @Test
+    public void testDependencyModelActivatesOnlyEnvironmentIndependentProfiles() {
+        ModelBuilderRequest request = resolvedProfilesRequest(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.resolvedSource(
+                        getPom("resolved-model-with-profiles"),
+                        "org.apache.maven.test:resolved-model-with-profiles:1.0.0"))
+                .build();
+        Model model = builder.newSession().build(request).getEffectiveModel();
+
+        assertNull(model.getProperties().get("profile.file"));
+        assertNull(model.getProperties().get("profile.property"));
+        assertNull(model.getProperties().get("profile.condition"));
+        assertEquals("activated", model.getProperties().get("profile.jdk"));
+        assertTrue(model.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+    }
+
+    /**
+     * A model built at {@link ModelBuilderRequest.RequestType#CONSUMER_DEPENDENCY} whose source
+     * is one Maven was merely pointed at -- {@link Sources#buildSource} rather than a source
+     * Maven resolved from a repository -- is not treated as coming from a repository. Every
+     * activator still runs, exactly as for a project build.
+     */
+    @Test
+    public void testCallerSuppliedModelActivatesAllProfiles() {
+        ModelBuilderRequest request = resolvedProfilesRequest(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .build();
+        Model model = builder.newSession().build(request).getEffectiveModel();
+
+        assertEquals("activated", model.getProperties().get("profile.file"));
+        assertEquals("activated", model.getProperties().get("profile.property"));
+        assertEquals("activated", model.getProperties().get("profile.condition"));
+        assertEquals("activated", model.getProperties().get("profile.jdk"));
+        assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+    }
+
+    private Map<String, String> parentActivationSystemProperties() {
+        Map<String, String> systemProperties = new HashMap<>();
+        for (String name : System.getProperties().stringPropertyNames()) {
+            systemProperties.put(name, System.getProperty(name));
+        }
+        systemProperties.put("some.dir", System.getProperty("java.io.tmpdir"));
+        systemProperties.put("some.gating.property", "true");
+        systemProperties.put("some.condition.property", "true");
+        return systemProperties;
+    }
+
+    private DefaultProfileActivationContext parentActivationContext(Map<String, String> systemProperties) {
+        org.apache.maven.api.services.Lookup lookup = session.getService(org.apache.maven.api.services.Lookup.class);
+        return new DefaultProfileActivationContext(
+                lookup.lookup(org.apache.maven.api.services.model.PathTranslator.class),
+                lookup.lookup(org.apache.maven.api.services.model.RootLocator.class),
+                lookup.lookup(org.apache.maven.api.services.Interpolator.class),
+                List.of(),
+                List.of(),
+                systemProperties,
+                Map.of(),
+                Model.newInstance());
+    }
+
+    /**
+     * readAsParentModel() caches by (source, tag), where tag depends on externalOrigin, through
+     * a generic per-request cache keyed off the request object itself. To exercise that
+     * partition directly -- independent of how deep a real build's RequestTrace ancestry happens
+     * to be -- both reads below derive from the exact same request instance, differing only in
+     * which parent session state (one already externalOrigin=true, one false) they derive from.
+     * That guarantees both calls address the same underlying per-request cache bucket, so this
+     * proves the tag partition itself separates them, not an accidental difference elsewhere.
+     */
+    @Test
+    public void testResolvedDependencyParentCacheDoesNotShareActivationWithProjectParent() throws Exception {
+        // Trigger mainSession creation with a regular project build.
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("props-and-profiles")))
+                .build();
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+        mbs.build(request);
+        DefaultModelBuilder.ModelBuilderSessionState mainState =
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
+
+        Map<String, String> systemProperties = parentActivationSystemProperties();
+        ModelSource parentSource = Sources.buildSource(getPom("resolved-model-with-profiles"));
+
+        // A session already carrying externalOrigin=true, as a dependency's own session would
+        // after resolving through at least one CONSUMER_DEPENDENCY hop.
+        DefaultModelBuilder.ModelBuilderSessionState dependencyAncestorState =
+                mainState.derive(ModelBuilderRequest.builder(mainState.request)
+                        .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                        .source(Sources.resolvedSource(
+                                getPom("props-and-profiles"), "org.apache.maven.test:props-and-profiles:1.0.0"))
+                        .build());
+        assertTrue(dependencyAncestorState.externalOrigin);
+
+        // The exact same request instance is then used to derive a parent-lookup session from
+        // each ancestor. Sharing one request object guarantees both reads address the same
+        // per-request cache bucket, regardless of RequestTrace ancestry depth.
+        ModelBuilderRequest sharedParentRequest = ModelBuilderRequest.builder(mainState.request)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_PARENT)
+                .source(parentSource)
+                .systemProperties(systemProperties)
+                .build();
+
+        DefaultModelBuilder.ModelBuilderSessionState projectState = mainState.derive(sharedParentRequest);
+        assertFalse(projectState.externalOrigin, "derived from a BUILD_PROJECT ancestor, must not be external");
+        Model projectParentModel =
+                projectState.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
+
+        assertEquals("activated", projectParentModel.getProperties().get("profile.file"));
+        assertEquals("activated", projectParentModel.getProperties().get("profile.property"));
+        assertEquals("activated", projectParentModel.getProperties().get("profile.condition"));
+        assertEquals("activated", projectParentModel.getProperties().get("profile.jdk"));
+        assertTrue(projectParentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+
+        DefaultModelBuilder.ModelBuilderSessionState dependencyState =
+                dependencyAncestorState.derive(sharedParentRequest);
+        assertTrue(dependencyState.externalOrigin, "derived from a CONSUMER_DEPENDENCY ancestor, must stay external");
+        Model dependencyParentModel =
+                dependencyState.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
+
+        assertNull(dependencyParentModel.getProperties().get("profile.file"));
+        assertNull(dependencyParentModel.getProperties().get("profile.property"));
+        assertNull(dependencyParentModel.getProperties().get("profile.condition"));
+        assertEquals("activated", dependencyParentModel.getProperties().get("profile.jdk"));
+        assertTrue(dependencyParentModel.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+
+        // The first (fully activated) result must not have been altered by the second read.
+        assertEquals("activated", projectParentModel.getProperties().get("profile.file"));
+        assertTrue(projectParentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+
+        // Repeating with a second, fresh shared request -- dependency read first this time --
+        // must not bleed the other way either.
+        ModelBuilderRequest sharedParentRequest2 = ModelBuilderRequest.builder(mainState.request)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_PARENT)
+                .source(parentSource)
+                .systemProperties(systemProperties)
+                .build();
+
+        DefaultModelBuilder.ModelBuilderSessionState dependencyState2 =
+                dependencyAncestorState.derive(sharedParentRequest2);
+        Model dependencyParentModel2 =
+                dependencyState2.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
+        assertNull(dependencyParentModel2.getProperties().get("profile.file"));
+        assertTrue(dependencyParentModel2.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+
+        DefaultModelBuilder.ModelBuilderSessionState projectState2 = mainState.derive(sharedParentRequest2);
+        Model projectParentModel2 =
+                projectState2.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
+        assertEquals("activated", projectParentModel2.getProperties().get("profile.file"));
+        assertTrue(projectParentModel2.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+    }
+
+    /**
+     * The externalOrigin flag must survive more than one {@code derive()} hop: a dependency's
+     * own parent (itself read as a CONSUMER_PARENT session, not CONSUMER_DEPENDENCY) must still
+     * be treated as external, since request.getRequestType() alone cannot carry that distinction
+     * once a parent lookup has overwritten it.
+     */
+    @Test
+    public void testExternalOriginPropagatesThroughGrandparentHop() throws Exception {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("props-and-profiles")))
+                .build();
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+        mbs.build(request);
+        DefaultModelBuilder.ModelBuilderSessionState mainState =
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
+
+        Map<String, String> systemProperties = parentActivationSystemProperties();
+        ModelSource dependencySource =
+                Sources.resolvedSource(getPom("props-and-profiles"), "org.apache.maven.test:props-and-profiles:1.0.0");
+        ModelSource grandparentSource = Sources.buildSource(getPom("resolved-model-with-profiles"));
+
+        // Hop 1: a dependency's own POM, resolved from a repository. externalOrigin becomes
+        // true here.
+        DefaultModelBuilder.ModelBuilderSessionState dependencyState =
+                mainState.derive(ModelBuilderRequest.builder(mainState.request)
+                        .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                        .source(dependencySource)
+                        .systemProperties(systemProperties)
+                        .build());
+        assertTrue(dependencyState.externalOrigin);
+
+        // Hop 2: that dependency's own parent. Its own request type is CONSUMER_PARENT, not
+        // CONSUMER_DEPENDENCY -- externalOrigin must still be true, inherited from hop 1.
+        DefaultModelBuilder.ModelBuilderSessionState grandparentHopState =
+                dependencyState.derive(ModelBuilderRequest.builder(dependencyState.request)
+                        .requestType(ModelBuilderRequest.RequestType.CONSUMER_PARENT)
+                        .source(grandparentSource)
+                        .systemProperties(systemProperties)
+                        .build());
+        assertTrue(
+                grandparentHopState.externalOrigin,
+                "externalOrigin must survive a second derive() hop, not just the first");
+
+        Model grandparentModel =
+                grandparentHopState.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
+
+        assertNull(grandparentModel.getProperties().get("profile.file"));
+        assertNull(grandparentModel.getProperties().get("profile.property"));
+        assertNull(grandparentModel.getProperties().get("profile.condition"));
+        assertEquals("activated", grandparentModel.getProperties().get("profile.jdk"));
+        assertTrue(grandparentModel.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+    }
+
+    /**
+     * {@code BUILD_CONSUMER} requests already skip all profile activation
+     * ({@code isBuildRequestWithActivation()} returns false for that type) -- unrelated to, and
+     * unaffected by, the externalOrigin distinction. Locking that down explicitly since it is
+     * adjacent code this change reads but does not modify.
+     */
+    @Test
+    public void testBuildConsumerSkipsAllProfileActivation() throws Exception {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("props-and-profiles")))
+                .build();
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+        mbs.build(request);
+        DefaultModelBuilder.ModelBuilderSessionState mainState =
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
+
+        Map<String, String> systemProperties = parentActivationSystemProperties();
+        DefaultModelBuilder.ModelBuilderSessionState buildConsumerState =
+                mainState.derive(ModelBuilderRequest.builder(mainState.request)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_CONSUMER)
+                        .source(Sources.buildSource(getPom("resolved-model-with-profiles")))
+                        .systemProperties(systemProperties)
+                        .build());
+
+        Model model = buildConsumerState.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
+
+        assertNull(model.getProperties().get("profile.file"));
+        assertNull(model.getProperties().get("profile.property"));
+        assertNull(model.getProperties().get("profile.condition"));
+        assertNull(model.getProperties().get("profile.jdk"));
+        assertTrue(model.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
     }
 
     @Test
@@ -261,6 +550,67 @@ class DefaultModelBuilderTest {
         assertEquals("third", repositories.get(1).getId());
         assertEquals("https://third.repo", repositories.get(1).getUrl()); // interpolated (own model properties)
         assertEquals("central", repositories.get(2).getId()); // default
+    }
+
+    /**
+     * Repositories contributed by a model resolved from a repository are merged recessively:
+     * the repositories already held by the request or session -- e.g. "central" -- keep their
+     * id and URL. readEffectiveModel() requests replace semantics for every request type, so
+     * this is exercised directly against {@link DefaultModelBuilder.ModelBuilderSessionState}.
+     */
+    @Test
+    public void testResolvedPomRepositoryMergedRecessively() throws Exception {
+        // Trigger mainSession creation with a regular project build.
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("props-and-profiles")))
+                .build();
+        ModelBuilder.ModelBuilderSession mbs = builder.newSession();
+        mbs.build(request);
+        DefaultModelBuilder.ModelBuilderSessionState mainState =
+                ((DefaultModelBuilder.ModelBuilderSessionImpl) mbs).mainSession;
+
+        // A model resolved from a repository (e.g. a dependency's POM) derives its own session
+        // state the same way DefaultArtifactDescriptorReader.loadPom does.
+        ModelBuilderRequest dependencyRequest = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .repositoryMerging(ModelBuilderRequest.RepositoryMerging.REQUEST_DOMINANT)
+                .source(Sources.resolvedSource(getPom("props-and-profiles"), "org.example:downloaded:1.0.0"))
+                .build();
+        DefaultModelBuilder.ModelBuilderSessionState state = mainState.derive(dependencyRequest);
+
+        RemoteRepository central = state.getRepositories().stream()
+                .filter(r -> "central".equals(r.getId()))
+                .findFirst()
+                .orElseThrow();
+
+        // The resolved model declares a repository that reuses the "central" id.
+        Model model = Model.newBuilder()
+                .repositories(List.of(Repository.newBuilder()
+                        .id("central")
+                        .url("https://secondary.example/m2")
+                        .build()))
+                .build();
+
+        // readEffectiveModel() requests replace semantics for every request type.
+        state.mergeRepositories(model, true);
+
+        List<RemoteRepository> repositories = state.getRepositories();
+        RemoteRepository mergedCentral = repositories.stream()
+                .filter(r -> "central".equals(r.getId()))
+                .findFirst()
+                .orElseThrow();
+        assertEquals(
+                central.getUrl(),
+                mergedCentral.getUrl(),
+                "repository declared by a resolved model must be merged recessively, keeping the"
+                        + " existing repository's URL under a shared id");
+        assertTrue(
+                repositories.stream().noneMatch(r -> r.getUrl().contains("secondary.example")),
+                "repository declared by a resolved model must not enter the resolution repositories"
+                        + " under an id it does not own");
     }
 
     /**
@@ -925,6 +1275,257 @@ class DefaultModelBuilderTest {
                         + "which indicates the path normalization fix (GH-12598) is not working.");
     }
 
+    /**
+     * {@code type=bom} dependencyManagement entries must be processed as BOM imports
+     * without requiring {@code scope=import}. The {@code bom} type inherently implies
+     * import semantics (unlike {@code type=pom}, which requires {@code scope=import}).
+     * Operator precedence previously skipped {@code type=bom} always (GH-12589).
+     */
+    @Test
+    public void testBomTypeImpliesImportWithoutScope() {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Path localRepoPath = basedir.resolve("target/local-repo-bom-import");
+        Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
+        Session bomSession = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this), localRepoPath);
+        RemoteRepository remoteRepository = bomSession.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
+        bomSession = bomSession.withRemoteRepositories(List.of(remoteRepository));
+        ModelBuilder bomBuilder = bomSession.getService(ModelBuilder.class);
+
+        ModelBuilderResult result = bomBuilder
+                .newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(bomSession)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .source(Sources.buildSource(getPom("import-bom-type")))
+                        .build());
+
+        assertNotNull(result);
+        assertNotNull(result.getEffectiveModel().getDependencyManagement());
+        Dependency managed = result.getEffectiveModel().getDependencyManagement().getDependencies().stream()
+                .filter(d -> "a".equals(d.getArtifactId()) && "org.apache.maven.its".equals(d.getGroupId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(managed, "Managed dependency from type=bom import should be present");
+        assertEquals("0.1", managed.getVersion());
+    }
+
+    /**
+     * Dependency management imported from a repository-resolved POM does not contribute
+     * {@code system} scope or a {@code systemPath}; such entries are dropped with a warning.
+     *
+     * <p>The imported BOM is written into a temporary remote repository at run time, with a
+     * {@code systemPath} that is a real absolute path on whichever OS the test runs on
+     * (a POSIX-only path such as {@code /etc/...} is not absolute on Windows, which would make
+     * model validation reject the entry before the code under test ever ran).
+     */
+    @Test
+    public void testSystemScopeIgnoredOutsideProjectDeclaration(@TempDir Path tempDir) throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Path remoteRepoPath = tempDir.resolve("remote-repo");
+        Path bomDir = remoteRepoPath.resolve("org/apache/maven/its/system-scope-bom/1.0");
+        Files.createDirectories(bomDir);
+
+        Path systemPathFile = tempDir.resolve("provided-tool.jar");
+        Files.createFile(systemPathFile);
+
+        String bomPom = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n" + "<project>\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>org.apache.maven.its</groupId>\n"
+                + "  <artifactId>system-scope-bom</artifactId>\n"
+                + "  <version>1.0</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "  <dependencyManagement>\n"
+                + "    <dependencies>\n"
+                + "      <dependency>\n"
+                + "        <groupId>org.apache.maven.its</groupId>\n"
+                + "        <artifactId>system-scope-companion</artifactId>\n"
+                + "        <version>1.0</version>\n"
+                + "      </dependency>\n"
+                + "      <dependency>\n"
+                + "        <groupId>org.apache.maven.its</groupId>\n"
+                + "        <artifactId>system-scope-dep</artifactId>\n"
+                + "        <version>1.0</version>\n"
+                + "        <scope>system</scope>\n"
+                + "        <systemPath>"
+                + systemPathFile.toAbsolutePath() + "</systemPath>\n" + "      </dependency>\n"
+                + "    </dependencies>\n"
+                + "  </dependencyManagement>\n"
+                + "</project>\n";
+        Files.writeString(bomDir.resolve("system-scope-bom-1.0.pom"), bomPom);
+
+        // default: the build succeeds, the offending entry is dropped, and a warning is emitted
+        Path localRepoPath = basedir.resolve("target/local-repo-system-scope-bom-reject");
+        Session rejectSession = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this), localRepoPath);
+        RemoteRepository remoteRepository = rejectSession.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
+        rejectSession = rejectSession.withRemoteRepositories(List.of(remoteRepository));
+        ModelBuilder rejectBuilder = rejectSession.getService(ModelBuilder.class);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(rejectSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("import-system-scope-bom")))
+                .build();
+        ModelBuilderResult rejectResult = rejectBuilder.newSession().build(request);
+        DependencyManagement rejectManagement = rejectResult.getEffectiveModel().getDependencyManagement();
+        assertNotNull(
+                rejectManagement.getDependencies().stream()
+                        .filter(d -> "system-scope-companion".equals(d.getArtifactId()))
+                        .findFirst()
+                        .orElse(null),
+                "The import itself must have happened: the ordinary managed entry from the "
+                        + "imported BOM should be present");
+        Dependency rejected = rejectManagement.getDependencies().stream()
+                .filter(d -> "system-scope-dep".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNull(rejected, "By default the 'system' scope managed entry should not be imported");
+        assertTrue(
+                rejectResult
+                        .getProblemCollector()
+                        .problems()
+                        .anyMatch(p -> p.getSeverity() == BuilderProblem.Severity.WARNING
+                                && p.getMessage().contains("'system' scope or 'systemPath'")
+                                && p.getMessage()
+                                        .contains(Constants.MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE)),
+                "Expected a warning about 'system' scope in the repository-imported BOM");
+
+        // explicit opt-out (fresh session/local repo, so the sanitized import is not served from the cache)
+        Path allowedLocalRepoPath = basedir.resolve("target/local-repo-system-scope-bom-allow");
+        Session allowedSession = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this), allowedLocalRepoPath);
+        allowedSession = allowedSession.withRemoteRepositories(List.of(allowedSession.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString())));
+        ModelBuilder allowedBuilder = allowedSession.getService(ModelBuilder.class);
+
+        ModelBuilderRequest allowed = ModelBuilderRequest.builder()
+                .session(allowedSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .userProperties(Map.of(Constants.MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE, "true"))
+                .source(Sources.buildSource(getPom("import-system-scope-bom")))
+                .build();
+        ModelBuilderResult result = allowedBuilder.newSession().build(allowed);
+        DependencyManagement allowedManagement = result.getEffectiveModel().getDependencyManagement();
+        assertNotNull(
+                allowedManagement.getDependencies().stream()
+                        .filter(d -> "system-scope-companion".equals(d.getArtifactId()))
+                        .findFirst()
+                        .orElse(null),
+                "The import itself must have happened: the ordinary managed entry from the "
+                        + "imported BOM should be present");
+        Dependency managed = allowedManagement.getDependencies().stream()
+                .filter(d -> "system-scope-dep".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(managed, "With the opt-out property the managed entry should be imported");
+        assertEquals("system", managed.getScope());
+        assertTrue(
+                result.getProblemCollector()
+                        .problems()
+                        .anyMatch(p -> p.getSeverity() == BuilderProblem.Severity.WARNING
+                                && p.getMessage()
+                                        .contains(Constants.MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE)),
+                "Opting out should still emit a warning about the imported 'system' scope");
+    }
+
+    @Test
+    void testBomImportWarningsReportedWhereImportsAreDeclared() {
+        Path pom = Paths.get("src/test/resources/poms/factory/mng-8450/pom.xml").toAbsolutePath();
+        for (String parallelism : List.of("1", "4")) {
+            ModelBuilderResult result = builder.newSession()
+                    .build(ModelBuilderRequest.builder()
+                            .session(session)
+                            .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                            .recursive(true)
+                            .userProperties(
+                                    Map.of(Constants.MAVEN_MODEL_BUILDER_PARALLELISM, parallelism, "revision", "1.0.0"))
+                            .source(Sources.buildSource(pom))
+                            .build());
+
+            List<ModelProblem> warnings = bomImportWarnings(result);
+
+            assertEquals(2, warnings.size(), warnings.toString());
+            assertEquals(
+                    Set.of(
+                            "org.apache.maven.test:mng-8450-parent:${revision}",
+                            "org.apache.maven.test:independent:1.0.0"),
+                    warnings.stream().map(ModelProblem::getModelId).collect(Collectors.toSet()));
+            assertEquals(
+                    Map.of("mng-8450-parent", 1L, "independent", 1L),
+                    results(result)
+                            .filter(r -> directBomImportWarningCount(r) > 0)
+                            .collect(Collectors.toMap(
+                                    r -> r.getEffectiveModel().getArtifactId(), this::directBomImportWarningCount)));
+        }
+    }
+
+    @Test
+    void testBomImportWarningFromNonReactorParentIsPreserved() {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Path fixture = basedir.resolve("src/test/resources/poms/factory/mng-8450-standalone");
+        Session standaloneSession = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this),
+                basedir.resolve("target/local-repo-mng-8450"));
+        standaloneSession = standaloneSession.withRemoteRepositories(List.of(standaloneSession.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, fixture.resolve("repo").toUri().toString())));
+
+        var modelBuilderSession =
+                standaloneSession.getService(ModelBuilder.class).newSession();
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(standaloneSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(fixture.resolve("child/pom.xml")))
+                .build();
+
+        for (int build = 0; build < 2; build++) {
+            ModelBuilderResult result = modelBuilderSession.build(request);
+            List<ModelProblem> warnings = bomImportWarnings(result);
+            assertEquals(1, warnings.size(), warnings.toString());
+            assertEquals(
+                    "org.apache.maven.test:standalone-parent:1.0.0",
+                    warnings.get(0).getModelId());
+        }
+    }
+
+    @Test
+    void testBomImportWarningFromParentProfileActivatedForChild() {
+        Path pom = Paths.get("src/test/resources/poms/factory/mng-8450-profile-context/pom.xml")
+                .toAbsolutePath();
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .recursive(true)
+                        .source(Sources.buildSource(pom))
+                        .build());
+
+        List<ModelProblem> warnings = bomImportWarnings(result);
+        assertEquals(1, warnings.size(), warnings.toString());
+        assertEquals(
+                "org.apache.maven.test:profile-parent:1.0.0", warnings.get(0).getModelId());
+    }
+
+    private List<ModelProblem> bomImportWarnings(ModelBuilderResult result) {
+        return results(result)
+                .flatMap(r -> r.getProblemCollector().problems())
+                .filter(p -> p.getMessage().startsWith("Ignored POM import for:"))
+                .toList();
+    }
+
+    private long directBomImportWarningCount(ModelBuilderResult result) {
+        return result.getProblemCollector()
+                .problems()
+                .filter(p -> p.getMessage().startsWith("Ignored POM import for:"))
+                .count();
+    }
+
+    private Stream<ModelBuilderResult> results(ModelBuilderResult result) {
+        return Stream.concat(Stream.of(result), result.getChildren().stream().flatMap(this::results));
+    }
+
     private static DefaultProfileActivationContext.Record recordActiveProfile(
             List<String> activeIds, String profileId) {
         DefaultProfileActivationContext recording =
@@ -937,6 +1538,19 @@ class DefaultModelBuilderTest {
             List<String> activeIds, List<String> inactiveIds) {
         return new DefaultProfileActivationContext(
                 null, null, null, activeIds, inactiveIds, Map.of(), Map.of(), Model.newInstance());
+    }
+
+    @Provides
+    @Named(FileTransporterFactory.NAME)
+    static FileTransporterFactory newFileTransporterFactory() {
+        return new FileTransporterFactory();
+    }
+
+    @Provides
+    @Named(ApacheTransporterFactory.NAME)
+    static ApacheTransporterFactory newApacheTransporterFactory(
+            ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
+        return new ApacheTransporterFactory(checksumExtractor, pathProcessor);
     }
 
     private Path getPom(String name) {

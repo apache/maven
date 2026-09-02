@@ -81,7 +81,19 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
                                 Version.V40,
                                 "Ignored POM import for: " + toString(dependency) + " as already imported "
                                         + toString(present) + ". Add the conflicting managed dependency directly "
-                                        + "to the dependencyManagement section of the POM.");
+                                        + "to the dependencyManagement section of the POM.",
+                                source.getImportedFrom());
+                    }
+                    if (present != null
+                            && directDependencies.contains(key)
+                            && present.getVersion() == null
+                            && dependency.getVersion() != null) {
+                        dependencies.put(
+                                key,
+                                Dependency.newBuilder(present)
+                                        .version(dependency.getVersion())
+                                        .location("version", dependency.getLocation("version"))
+                                        .build());
                     }
                     if (present == null && request.isLocationTracking()) {
                         Dependency updatedDependency = updateWithImportedFrom(dependency, source);

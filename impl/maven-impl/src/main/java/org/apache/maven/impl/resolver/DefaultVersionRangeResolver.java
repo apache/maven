@@ -231,8 +231,12 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
 
                     if (metadata.getPath() != null && Files.exists(metadata.getPath())) {
                         try (InputStream in = Files.newInputStream(metadata.getPath())) {
-                            versioning =
+                            Versioning parsed =
                                     new MetadataStaxReader().read(in, false).getVersioning();
+
+                            MetadataInputValidator.validateVersioning(parsed);
+
+                            versioning = parsed;
                         }
                     }
                 }
