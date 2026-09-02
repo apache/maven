@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng8765</groupId>
+  <artifactId>runtime-property-test</artifactId>
+  <version>1.0-SNAPSHOT</version>
+
+  <name>Maven Integration Test :: MNG-8765 :: Runtime Property</name>
+  <description>
+    Verify that a property set dynamically at runtime via
+    project.getProperties().setProperty() is resolved in a URI-typed
+    plugin parameter. This is the actual MNG-8765 scenario: a plugin
+    (like GMaven/gmavenplus) sets a property during the build lifecycle
+    that was NOT available during model interpolation. Without the fix,
+    the unresolved ${...} in the URI causes a URISyntaxException.
+  </description>
+
+  <build>
+    <plugins>
+      <!--
+        First execution: set a project property at runtime (initialize phase).
+        This simulates Groovy scripts calling project.properties.setProperty().
+        The property is NOT in <properties> and NOT passed via -D, so model
+        interpolation cannot resolve it.
+      -->
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-configuration</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <executions>
+          <execution>
+            <id>set-runtime-property</id>
+            <goals>
+              <goal>set-property</goal>
+            </goals>
+            <phase>initialize</phase>
+            <configuration>
+              <propertyName>runtime.version</propertyName>
+              <propertyValue>3.0.0</propertyValue>
+            </configuration>
+          </execution>
+          <!--
+            Second execution: use the runtime property in URI-typed parameters.
+            This runs AFTER the property has been set. The expression evaluator
+            should resolve ${runtime.version} even though model interpolation
+            could not.
+          -->
+          <execution>
+            <id>dump-config</id>
+            <goals>
+              <goal>config</goal>
+            </goals>
+            <phase>process-sources</phase>
+            <configuration>
+              <propertiesFile>target/plugin-config.properties</propertiesFile>
+              <uriParam>https://example.com/${runtime.version}/path</uriParam>
+              <urlParam>https://example.com/${runtime.version}/path</urlParam>
+              <stringParam>${runtime.version}</stringParam>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>

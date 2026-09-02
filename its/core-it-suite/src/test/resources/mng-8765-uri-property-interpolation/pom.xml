@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.mng8765</groupId>
+  <artifactId>parent</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>pom</packaging>
+
+  <name>Maven Integration Test :: MNG-8765</name>
+  <description>
+    Verify that property interpolation runs before type conversion for URI-typed
+    plugin parameters. When a URI parameter contains a property reference like
+    https://example.com/${my.version}/path, the ${my.version} must be resolved
+    before the string is converted to java.net.URI. Otherwise, the curly braces
+    cause a URISyntaxException.
+  </description>
+
+  <properties>
+    <test.version>1.2.3</test.version>
+  </properties>
+
+  <modules>
+    <module>child</module>
+  </modules>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.its.plugins</groupId>
+        <artifactId>maven-it-plugin-configuration</artifactId>
+        <version>2.1-SNAPSHOT</version>
+        <configuration>
+          <propertiesFile>target/plugin-config.properties</propertiesFile>
+          <!-- Property from POM <properties> -->
+          <uriParam>https://example.com/${test.version}/path</uriParam>
+          <urlParam>https://example.com/${test.version}/path</urlParam>
+          <!-- Property from command line -D (not in POM properties) -->
+          <stringParam>${test.version}</stringParam>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>config</goal>
+            </goals>
+            <phase>validate</phase>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
+</project>
