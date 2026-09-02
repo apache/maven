@@ -61,7 +61,7 @@ class DistributionManagementArtifactRelocationSourceTest {
     }
 
     @Test
-    void noRelocationReturnsNull() {
+    void noRelocationReturnsNull() throws Exception {
         Model model = Model.newBuilder().build();
         Artifact result = source.relocatedTarget(null, newResult(), model);
         assertNull(result);
