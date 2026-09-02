@@ -157,7 +157,19 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-ear-plugin",
                     "3.4.0",
-                    "Older versions use plexus-archiver reflection blocked by JDK 17+ module system"));
+                    "Older versions use plexus-archiver reflection blocked by JDK 17+ module system"),
+            new PluginUpgrade(
+                    "org.apache.felix",
+                    "maven-bundle-plugin",
+                    "5.1.1",
+                    "Versions before 5.1.1 use bndlib < 5.1.0 which has internal collection mutation bugs"
+                            + " (FELIX-6259) that throw ConcurrentModificationException on JDK 17+"),
+            new PluginUpgrade(
+                    "biz.aQute.bnd",
+                    "bnd-maven-plugin",
+                    "5.1.0",
+                    "Versions before 5.1.0 have internal collection mutation bugs (FELIX-6259)"
+                            + " that throw ConcurrentModificationException on JDK 17+"));
 
     private static final List<PluginUpgrade> PLUGIN_DEPENDENCY_UPGRADES = List.of(new PluginUpgrade(
             "org.codehaus.mojo",
