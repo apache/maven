@@ -24,7 +24,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.function.BiFunction;
 
-import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Build;
@@ -34,7 +33,6 @@ import org.apache.maven.api.model.Resource;
 import org.apache.maven.api.model.Source;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.model.ModelPathTranslator;
-import org.apache.maven.api.services.model.PathTranslator;
 
 /**
  * Resolves relative paths within a model against a specific base directory.
@@ -43,13 +41,6 @@ import org.apache.maven.api.services.model.PathTranslator;
 @Named
 @Singleton
 public class DefaultModelPathTranslator implements ModelPathTranslator {
-
-    private final PathTranslator pathTranslator;
-
-    @Inject
-    public DefaultModelPathTranslator(PathTranslator pathTranslator) {
-        this.pathTranslator = pathTranslator;
-    }
 
     @Override
     public void alignToBaseDirectory(Model.Builder builder, Path basedir, ModelBuilderRequest request) {
@@ -222,7 +213,7 @@ public class DefaultModelPathTranslator implements ModelPathTranslator {
      * @return relocated path, or {@code null} if the given path was null
      */
     private String alignToBaseDirectory(String path, Path basedir) {
-        String newPath = pathTranslator.alignToBaseDirectory(path, basedir);
+        String newPath = DefaultPathTranslator.alignToBaseDirectory(path, basedir);
         return Objects.equals(path, newPath) ? path : newPath;
     }
 }

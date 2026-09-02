@@ -19,12 +19,15 @@
 package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import eu.maveniverse.domtrip.Document;
 import eu.maveniverse.domtrip.Editor;
@@ -40,6 +43,7 @@ import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginManagement;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
+import org.apache.maven.impl.JdkSourceLevelSupport;
 
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.ARTIFACT_ID;
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.BUILD;
@@ -155,7 +159,31 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-ear-plugin",
                     "3.4.0",
-                    "Older versions use plexus-archiver reflection blocked by JDK 17+ module system"));
+                    "Older versions use plexus-archiver reflection blocked by JDK 17+ module system"),
+            new PluginUpgrade(
+                    "org.apache.felix",
+                    "maven-bundle-plugin",
+                    "5.1.1",
+                    "Versions before 5.1.1 use bndlib < 5.1.0 which has internal collection mutation bugs"
+                            + " (FELIX-6259) that throw ConcurrentModificationException on JDK 17+"),
+            new PluginUpgrade(
+                    "biz.aQute.bnd",
+                    "bnd-maven-plugin",
+                    "5.1.0",
+                    "Versions before 5.1.0 have internal collection mutation bugs (FELIX-6259)"
+                            + " that throw ConcurrentModificationException on JDK 17+"),
+            new PluginUpgrade(
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID,
+                    "maven-checkstyle-plugin",
+                    "3.6.0",
+                    null,
+                    MAVEN_4_COMPATIBILITY_REASON,
+                    21),
+            new PluginUpgrade(
+                    DEFAULT_MAVEN_PLUGIN_GROUP_ID,
+                    "maven-toolchains-plugin",
+                    "3.2.0",
+                    "Versions before 3.2.0 do not have the select-jdk-toolchain goal"));
 
     private static final List<PluginUpgrade> PLUGIN_DEPENDENCY_UPGRADES = List.of(new PluginUpgrade(
             "org.codehaus.mojo",
@@ -199,8 +227,19 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             // Phase 1: Write all modifications to temp directory (keeping project structure)
             Path tempDir = createTempProjectStructure(context, pomMap);
 
-            // Phase 2: For each POM, build effective model using the session and analyze plugins
-            PluginAnalysisResults analysisResults = analyzePluginsUsingEffectiveModels(context, pomMap, tempDir);
+            // Phase 2: For each POM, build effective model using the session and analyze plugins.
+            // Skip when the operator's settings declare a repository posture the standalone
+            // resolver cannot honor (mirrors, proxies, offline): resolving outside that
+            // posture would bypass the operator's configuration, so the remote-model-dependent
+            // analysis is skipped instead.
+            PluginAnalysisResults analysisResults;
+            String unsupportedReason = remoteResolutionUnsupportedReason(context);
+            if (unsupportedReason == null) {
+                analysisResults = analyzePluginsUsingEffectiveModels(context, pomMap, tempDir);
+            } else {
+                context.warning("Skipping effective-model plugin analysis: " + unsupportedReason);
+                analysisResults = new PluginAnalysisResults(Map.of(), Map.of());
+            }
 
             // Collect locally declared plugin keys so we can add comments for remote-parent overrides
             Set<String> localPluginKeys = collectLocallyDeclaredPluginKeys(pomMap);
@@ -316,7 +355,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                                 upgrade.groupId(),
                                 upgrade.artifactId(),
                                 upgrade.minVersion(),
-                                upgrade.latestPreRelease())));
+                                upgrade.latestPreRelease(),
+                                upgrade.minJdk())));
     }
 
     /**
@@ -395,6 +435,20 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             return false;
         }
 
+        // For shade-plugin, check for custom ResourceTransformer implementations before upgrading.
+        // Custom transformers may depend on transitive dependencies (e.g. org.jdom:jdom) that
+        // are no longer present in newer shade-plugin versions, breaking the build.
+        if (isShadePlugin(upgrade.groupId, upgrade.artifactId)) {
+            List<String> customTransformers = findCustomTransformerClasses(pluginElement);
+            if (!customTransformers.isEmpty()) {
+                context.warning("Skipping maven-shade-plugin upgrade: plugin configuration uses custom "
+                        + "ResourceTransformer(s) " + customTransformers
+                        + " that may depend on transitive dependencies not available in version "
+                        + upgrade.minVersion + ". Upgrade manually after verifying compatibility.");
+                return false;
+            }
+        }
+
         // For Quarkus plugins, check the platform version before upgrading.
         // Upgrading quarkus-maven-plugin to 3.x when the project uses Quarkus 2.x
         // causes NoSuchMethodError and build failures.
@@ -414,6 +468,22 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             }
         }
 
+        // Check JDK compatibility: if the plugin requires a higher JDK than the project
+        // uses, skip the upgrade to avoid UnsupportedClassVersionError at build time.
+        if (upgrade.minJdk > 0) {
+            int projectJdk = detectProjectJdkVersion(pomDocument);
+            if (shouldSkipForJdkIncompatibility(
+                    context,
+                    upgrade.groupId,
+                    upgrade.artifactId,
+                    upgrade.minVersion,
+                    upgrade.minJdk,
+                    projectJdk,
+                    sectionName)) {
+                return false;
+            }
+        }
+
         if (isProperty) {
             // For Quarkus plugins, check if the property is shared with a Quarkus BOM
             if (isQuarkusPlugin(upgrade.groupId, upgrade.artifactId)
@@ -427,7 +497,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             // Check for Maven 4 pre-release versions (alpha/beta/rc) that should be
             // upgraded to the latest available pre-release rather than downgraded to 3.x.
             if (isMaven4PreRelease(currentVersion) && upgrade.latestPreRelease != null) {
-                if (isVersionBelow(currentVersion, upgrade.latestPreRelease)) {
+                if (isVersionBelow(context, currentVersion, upgrade.latestPreRelease)) {
                     Editor editor = new Editor(pomDocument);
                     editor.setTextContent(versionElement, upgrade.latestPreRelease);
                     context.detail("Upgraded " + upgrade.groupId + ":" + upgrade.artifactId + " from pre-release "
@@ -441,7 +511,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             }
 
             // Direct version comparison and upgrade (for 3.x versions)
-            if (isVersionBelow(currentVersion, upgrade.minVersion)) {
+            if (isVersionBelow(context, currentVersion, upgrade.minVersion)) {
                 Editor editor = new Editor(pomDocument);
                 editor.setTextContent(versionElement, upgrade.minVersion);
                 context.detail("Upgraded " + upgrade.groupId + ":" + upgrade.artifactId + " from " + currentVersion
@@ -476,7 +546,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 String currentVersion = propertyElement.textContentTrimmed();
                 // For 4.x pre-release versions, upgrade to latest pre-release (not 3.x)
                 if (isMaven4PreRelease(currentVersion) && upgrade.latestPreRelease != null) {
-                    if (isVersionBelow(currentVersion, upgrade.latestPreRelease)) {
+                    if (isVersionBelow(context, currentVersion, upgrade.latestPreRelease)) {
                         editor.setTextContent(propertyElement, upgrade.latestPreRelease);
                         context.detail("Upgraded property " + propertyName + " (for " + upgrade.groupId + ":"
                                 + upgrade.artifactId + ") from pre-release " + currentVersion + " to "
@@ -486,7 +556,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                         context.debug("Property " + propertyName + " version " + currentVersion + " is already >= "
                                 + upgrade.latestPreRelease);
                     }
-                } else if (isVersionBelow(currentVersion, upgrade.minVersion)) {
+                } else if (isVersionBelow(context, currentVersion, upgrade.minVersion)) {
                     editor.setTextContent(propertyElement, upgrade.minVersion);
                     context.detail(
                             "Upgraded property " + propertyName + " (for " + upgrade.groupId + ":" + upgrade.artifactId
@@ -624,7 +694,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * Simple version comparison to check if current version is below minimum version. This is a basic implementation
      * that works for most Maven plugin versions.
      */
-    private boolean isVersionBelow(String currentVersion, String minVersion) {
+    private boolean isVersionBelow(UpgradeContext context, String currentVersion, String minVersion) {
         if (currentVersion == null || minVersion == null) {
             return false;
         }
@@ -654,7 +724,22 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             UpgradeContext context, Map<Path, Document> pomMap, Path tempDir) {
         Map<Path, Set<String>> managementResult = new HashMap<>();
         Map<Path, Set<String>> directOverrideResult = new HashMap<>();
-        Map<String, PluginUpgrade> pluginUpgrades = getPluginUpgradesAsMap();
+        Map<String, PluginUpgrade> basePluginUpgrades = getPluginUpgradesAsMap();
+        String shadePluginKey = DEFAULT_MAVEN_PLUGIN_GROUP_ID + ":maven-shade-plugin";
+
+        // Detect the project JDK version, preferring the root POM (shortest path depth).
+        // In multi-module projects, child modules may declare a different JDK level,
+        // so we sort by path depth to check the root POM first.
+        int projectJdk = -1;
+        List<Map.Entry<Path, Document>> sortedEntries = pomMap.entrySet().stream()
+                .sorted(Comparator.comparingInt(e -> e.getKey().getNameCount()))
+                .toList();
+        for (Map.Entry<Path, Document> jdkEntry : sortedEntries) {
+            projectJdk = detectProjectJdkVersion(jdkEntry.getValue());
+            if (projectJdk > 0) {
+                break;
+            }
+        }
 
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Path originalPomPath = entry.getKey();
@@ -665,8 +750,20 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 Path relativePath = commonRoot.relativize(originalPomPath);
                 Path tempPomPath = tempDir.resolve(relativePath);
 
+                // Per-module check: if this POM or any of its local parent POMs
+                // has shade-plugin with custom transformers, exclude shade-plugin
+                // from upgrades for this module only
+                Map<String, PluginUpgrade> pluginUpgrades = basePluginUpgrades;
+                if (hasCustomTransformersInPomOrParents(context, originalPomPath, pomMap, tempDir, commonRoot)) {
+                    pluginUpgrades = new HashMap<>(basePluginUpgrades);
+                    pluginUpgrades.remove(shadePluginKey);
+                    context.warning("Skipping maven-shade-plugin in effective-model analysis for " + originalPomPath
+                            + ": custom ResourceTransformer(s) found in project POMs");
+                }
+
                 // Build effective model using Maven 4 API
-                PluginAnalysis analysis = analyzeEffectiveModelForPlugins(context, tempPomPath, pluginUpgrades);
+                PluginAnalysis analysis =
+                        analyzeEffectiveModelForPlugins(context, tempPomPath, pluginUpgrades, projectJdk);
 
                 // Determine where to add plugin management (last local parent)
                 Path targetPom =
@@ -699,6 +796,87 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     /**
+     * Checks if a specific POM or any of its local parent POMs (within pomMap)
+     * contains a shade-plugin configuration with custom ResourceTransformer implementations.
+     * This is a per-module check, unlike a global check across all POMs.
+     */
+    private boolean hasCustomTransformersInPomOrParents(
+            UpgradeContext context, Path pomPath, Map<Path, Document> pomMap, Path tempDir, Path commonRoot) {
+        // Check the current POM
+        Document doc = pomMap.get(pomPath);
+        if (doc != null && hasCustomTransformersInDocument(doc)) {
+            return true;
+        }
+
+        // Walk up the parent hierarchy within the local pomMap
+        if (doc != null) {
+            try {
+                Path tempPomPath = tempDir.resolve(commonRoot.relativize(pomPath));
+                Model effectiveModel = buildEffectiveModel(context, tempPomPath);
+                Model currentModel = effectiveModel;
+
+                while (currentModel.getParent() != null) {
+                    Parent parent = currentModel.getParent();
+                    Path parentPath = findParentInPomMap(parent, pomMap);
+                    if (parentPath != null) {
+                        Document parentDoc = pomMap.get(parentPath);
+                        if (parentDoc != null && hasCustomTransformersInDocument(parentDoc)) {
+                            return true;
+                        }
+                        Path parentTempPath = tempDir.resolve(commonRoot.relativize(parentPath));
+                        currentModel = buildEffectiveModel(context, parentTempPath);
+                    } else {
+                        break;
+                    }
+                }
+            } catch (Exception e) {
+                // If we can't resolve parents, be conservative and check just this POM
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Checks if a single POM document contains a shade-plugin configuration
+     * with custom ResourceTransformer implementations.
+     */
+    private boolean hasCustomTransformersInDocument(Document doc) {
+        Element root = doc.root();
+        Element buildElement = root.childElement(BUILD).orElse(null);
+        if (buildElement != null) {
+            // Check both build/plugins and build/pluginManagement/plugins
+            return Stream.concat(
+                            collectShadePluginElements(
+                                    buildElement.childElement(PLUGINS).orElse(null)),
+                            collectShadePluginElements(buildElement
+                                    .childElement(PLUGIN_MANAGEMENT)
+                                    .flatMap(pm -> pm.childElement(PLUGINS))
+                                    .orElse(null)))
+                    .anyMatch(pluginElement ->
+                            !findCustomTransformerClasses(pluginElement).isEmpty());
+        }
+        return false;
+    }
+
+    /**
+     * Collects shade-plugin {@code <plugin>} elements from a {@code <plugins>} element.
+     */
+    private Stream<Element> collectShadePluginElements(Element pluginsElement) {
+        if (pluginsElement == null) {
+            return Stream.empty();
+        }
+        return pluginsElement.childElements(PLUGIN).filter(pluginElement -> {
+            String groupId = getChildText(pluginElement, GROUP_ID);
+            String artifactId = getChildText(pluginElement, ARTIFACT_ID);
+            if (groupId == null && artifactId != null && artifactId.startsWith(MAVEN_PLUGIN_PREFIX)) {
+                groupId = DEFAULT_MAVEN_PLUGIN_GROUP_ID;
+            }
+            return isShadePlugin(groupId, artifactId);
+        });
+    }
+
+    /**
      * Converts PluginUpgradeInfo map to PluginUpgrade map for compatibility.
      */
     private Map<String, PluginUpgrade> getPluginUpgradesAsMap() {
@@ -708,9 +886,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     private PluginAnalysis analyzeEffectiveModelForPlugins(
-            UpgradeContext context, Path tempPomPath, Map<String, PluginUpgrade> pluginUpgrades) {
-        Model effectiveModel = buildEffectiveModel(tempPomPath);
-        return analyzePluginsFromEffectiveModel(context, effectiveModel, pluginUpgrades);
+            UpgradeContext context, Path tempPomPath, Map<String, PluginUpgrade> pluginUpgrades, int projectJdk) {
+        Model effectiveModel = buildEffectiveModel(context, tempPomPath);
+        return analyzePluginsFromEffectiveModel(context, effectiveModel, pluginUpgrades, projectJdk);
     }
 
     /**
@@ -719,7 +897,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * explicitly in an inherited parent's build/plugins, not via pluginManagement).
      */
     private PluginAnalysis analyzePluginsFromEffectiveModel(
-            UpgradeContext context, Model effectiveModel, Map<String, PluginUpgrade> pluginUpgrades) {
+            UpgradeContext context, Model effectiveModel, Map<String, PluginUpgrade> pluginUpgrades, int projectJdk) {
         Set<String> needsManagement = new HashSet<>();
         Set<String> needsDirectOverride = new HashSet<>();
 
@@ -740,8 +918,18 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 String pluginKey = getPluginKey(plugin);
                 PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
                 if (upgrade != null) {
+                    if (shouldSkipForJdkIncompatibility(
+                            context,
+                            upgrade.groupId(),
+                            upgrade.artifactId(),
+                            upgrade.minVersion(),
+                            upgrade.minJdk(),
+                            projectJdk,
+                            "effective model")) {
+                        continue;
+                    }
                     String effectiveVersion = plugin.getVersion();
-                    if (isVersionBelow(effectiveVersion, upgrade.minVersion())) {
+                    if (isVersionBelow(context, effectiveVersion, upgrade.minVersion())) {
                         needsManagement.add(pluginKey);
                         String managedVersion = managedVersions.get(pluginKey);
                         if (managedVersion == null || !managedVersion.equals(effectiveVersion)) {
@@ -766,8 +954,18 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     String pluginKey = getPluginKey(plugin);
                     PluginUpgrade upgrade = pluginUpgrades.get(pluginKey);
                     if (upgrade != null && !needsManagement.contains(pluginKey)) {
+                        if (shouldSkipForJdkIncompatibility(
+                                context,
+                                upgrade.groupId(),
+                                upgrade.artifactId(),
+                                upgrade.minVersion(),
+                                upgrade.minJdk(),
+                                projectJdk,
+                                "effective model")) {
+                            continue;
+                        }
                         String effectiveVersion = plugin.getVersion();
-                        if (isVersionBelow(effectiveVersion, upgrade.minVersion())) {
+                        if (isVersionBelow(context, effectiveVersion, upgrade.minVersion())) {
                             needsManagement.add(pluginKey);
                             context.debug("Managed plugin " + pluginKey + " version " + effectiveVersion
                                     + " needs upgrade to " + upgrade.minVersion());
@@ -803,7 +1001,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     private Path findLastLocalParentForPluginManagement(
             UpgradeContext context, Path tempPomPath, Map<Path, Document> pomMap, Path tempDir, Path commonRoot) {
 
-        Model effectiveModel = buildEffectiveModel(tempPomPath);
+        Model effectiveModel = buildEffectiveModel(context, tempPomPath);
 
         // Convert the temp path back to the original path
         Path relativePath = tempDir.relativize(tempPomPath);
@@ -824,7 +1022,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 lastLocalParent = parentPath;
 
                 Path parentTempPath = tempDir.resolve(commonRoot.relativize(parentPath));
-                currentModel = buildEffectiveModel(parentTempPath);
+                currentModel = buildEffectiveModel(context, parentTempPath);
             } else {
                 // Parent is external, stop here
                 break;
@@ -1040,11 +1238,198 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             Map<Path, Set<String>> pluginsNeedingManagement, Map<Path, Set<String>> pluginsNeedingDirectOverride) {}
 
     /**
+     * Checks if the given plugin is the maven-shade-plugin.
+     */
+    private boolean isShadePlugin(String groupId, String artifactId) {
+        return "maven-shade-plugin".equals(artifactId) && DEFAULT_MAVEN_PLUGIN_GROUP_ID.equals(groupId);
+    }
+
+    /**
+     * The package prefix for standard ResourceTransformer implementations shipped with maven-shade-plugin.
+     * Any transformer class not starting with this prefix is considered custom and may depend on
+     * transitive dependencies that differ between shade-plugin versions.
+     */
+    private static final String SHADE_RESOURCE_PACKAGE = "org.apache.maven.plugins.shade.resource.";
+
+    /**
+     * Finds custom (non-standard) ResourceTransformer implementation classes in a shade-plugin
+     * configuration. Inspects both top-level {@code <configuration>} and per-execution
+     * {@code <executions>/<execution>/<configuration>} blocks.
+     *
+     * <p>A transformer is considered "custom" if its {@code implementation} attribute does not
+     * start with {@code org.apache.maven.plugins.shade.resource.}.</p>
+     *
+     * @param pluginElement the shade-plugin {@code <plugin>} element
+     * @return a list of fully-qualified class names of custom transformers, empty if none found
+     */
+    List<String> findCustomTransformerClasses(Element pluginElement) {
+        List<String> customClasses = new ArrayList<>();
+
+        // Check top-level <configuration>
+        pluginElement
+                .childElement("configuration")
+                .ifPresent(config -> collectCustomTransformers(config, customClasses));
+
+        // Check <executions>/<execution>/<configuration>
+        pluginElement
+                .childElement("executions")
+                .ifPresent(executions -> executions
+                        .childElements("execution")
+                        .forEach(execution -> execution
+                                .childElement("configuration")
+                                .ifPresent(config -> collectCustomTransformers(config, customClasses))));
+
+        return customClasses;
+    }
+
+    /**
+     * Collects custom transformer class names from a {@code <configuration>} element.
+     * Looks for {@code <transformers>/<transformer implementation="...">} entries.
+     */
+    private void collectCustomTransformers(Element configElement, List<String> customClasses) {
+        configElement
+                .childElement("transformers")
+                .ifPresent(transformers -> transformers
+                        .childElements("transformer")
+                        .forEach(transformer -> {
+                            String impl = transformer.attribute("implementation");
+                            if (impl != null && !impl.isEmpty() && !impl.startsWith(SHADE_RESOURCE_PACKAGE)) {
+                                customClasses.add(impl);
+                            }
+                        }));
+    }
+
+    /**
+     * Detects the project's JDK version from the POM document.
+     * Checks the following sources in order:
+     * <ol>
+     *   <li>{@code maven.compiler.release} property</li>
+     *   <li>{@code maven.compiler.source} property</li>
+     *   <li>{@code maven.compiler.target} property</li>
+     *   <li>Compiler plugin configuration ({@code <release>} or {@code <source>})</li>
+     * </ol>
+     *
+     * @param pomDocument the POM document to inspect
+     * @return the detected JDK major version, or {@code -1} if not found
+     */
+    int detectProjectJdkVersion(Document pomDocument) {
+        Element root = pomDocument.root();
+
+        // Check properties: maven.compiler.release takes precedence, then source, then target
+        Element properties = root.childElement(PROPERTIES).orElse(null);
+        if (properties != null) {
+            for (String propName :
+                    List.of("maven.compiler.release", "maven.compiler.source", "maven.compiler.target")) {
+                Element propElement = properties.childElement(propName).orElse(null);
+                if (propElement != null) {
+                    String value = propElement.textContentTrimmed();
+                    if (value != null && !value.isEmpty() && !value.startsWith("${")) {
+                        int level = JdkSourceLevelSupport.normalizeSourceLevel(value);
+                        if (level > 0) {
+                            return level;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Check compiler plugin configuration
+        Element build = root.childElement(BUILD).orElse(null);
+        if (build != null) {
+            int level = detectJdkFromPluginSection(build.childElement(PLUGINS).orElse(null));
+            if (level > 0) {
+                return level;
+            }
+
+            Element pluginManagement = build.childElement(PLUGIN_MANAGEMENT).orElse(null);
+            if (pluginManagement != null) {
+                level = detectJdkFromPluginSection(
+                        pluginManagement.childElement(PLUGINS).orElse(null));
+                if (level > 0) {
+                    return level;
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    private int detectJdkFromPluginSection(Element pluginsElement) {
+        if (pluginsElement == null) {
+            return -1;
+        }
+
+        for (Element plugin : pluginsElement.childElements(PLUGIN).toList()) {
+            String artifactId = getChildText(plugin, ARTIFACT_ID);
+            String groupId = getChildText(plugin, GROUP_ID);
+            if ("maven-compiler-plugin".equals(artifactId)
+                    && (groupId == null || groupId.isEmpty() || DEFAULT_MAVEN_PLUGIN_GROUP_ID.equals(groupId))) {
+                Element config = plugin.childElement("configuration").orElse(null);
+                if (config != null) {
+                    // <release> takes precedence
+                    Element releaseNode = config.childElement("release").orElse(null);
+                    if (releaseNode != null) {
+                        String text = releaseNode.textContentTrimmed();
+                        if (text != null && !text.isEmpty() && !text.startsWith("${")) {
+                            int level = JdkSourceLevelSupport.normalizeSourceLevel(text);
+                            if (level > 0) {
+                                return level;
+                            }
+                        }
+                    }
+                    Element sourceNode = config.childElement("source").orElse(null);
+                    if (sourceNode != null) {
+                        String text = sourceNode.textContentTrimmed();
+                        if (text != null && !text.isEmpty() && !text.startsWith("${")) {
+                            int level = JdkSourceLevelSupport.normalizeSourceLevel(text);
+                            if (level > 0) {
+                                return level;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return -1;
+    }
+
+    /**
      * Checks if the given plugin is a Quarkus Maven plugin.
      */
     private boolean isQuarkusPlugin(String groupId, String artifactId) {
         return "quarkus-maven-plugin".equals(artifactId)
                 && ("io.quarkus".equals(groupId) || "io.quarkus.platform".equals(groupId));
+    }
+
+    /**
+     * Checks whether a plugin upgrade should be skipped because the plugin requires a higher JDK
+     * than the project targets. If the plugin has a {@code minJdk} constraint and the project's
+     * detected JDK is below it, emits a warning and returns {@code true}.
+     *
+     * @param context the upgrade context for logging
+     * @param groupId the plugin's groupId
+     * @param artifactId the plugin's artifactId
+     * @param minVersion the target upgrade version
+     * @param minJdk the minimum JDK version required by the plugin, or {@code 0} if unrestricted
+     * @param projectJdk the project's detected JDK major version, or {@code -1} if unknown
+     * @param location description of where the plugin was found (for logging)
+     * @return {@code true} if the upgrade should be skipped, {@code false} otherwise
+     */
+    private boolean shouldSkipForJdkIncompatibility(
+            UpgradeContext context,
+            String groupId,
+            String artifactId,
+            String minVersion,
+            int minJdk,
+            int projectJdk,
+            String location) {
+        if (minJdk > 0 && projectJdk > 0 && projectJdk < minJdk) {
+            context.warning("Skipping " + groupId + ":" + artifactId + " upgrade to " + minVersion + " in " + location
+                    + ": plugin requires JDK " + minJdk + " but project targets JDK " + projectJdk);
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -1217,7 +1602,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             return false;
         }
 
-        if (!isVersionBelow(currentVersion, upgrade.minVersion)) {
+        if (!isVersionBelow(context, currentVersion, upgrade.minVersion)) {
             context.debug("Quarkus plugin version (via shared property " + sharedPropertyName + ") " + currentVersion
                     + " is already >= " + upgrade.minVersion);
             return false;
@@ -1302,6 +1687,9 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         /** The latest available 4.x pre-release version, or null if none exists */
         final String latestPreRelease;
 
+        /** The minimum JDK version required by this plugin, or 0 if any JDK works */
+        final int minJdk;
+
         /**
          * Creates a new plugin upgrade information holder.
          *
@@ -1313,16 +1701,23 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
          *            the minimum version required for Maven 4 compatibility
          * @param latestPreRelease
          *            the latest 4.x pre-release version, or null
+         * @param minJdk
+         *            the minimum JDK version required by this plugin, or 0 if any JDK works
          */
-        PluginUpgradeInfo(String groupId, String artifactId, String minVersion, String latestPreRelease) {
+        PluginUpgradeInfo(String groupId, String artifactId, String minVersion, String latestPreRelease, int minJdk) {
             this.groupId = groupId;
             this.artifactId = artifactId;
             this.minVersion = minVersion;
             this.latestPreRelease = latestPreRelease;
+            this.minJdk = minJdk;
+        }
+
+        PluginUpgradeInfo(String groupId, String artifactId, String minVersion, String latestPreRelease) {
+            this(groupId, artifactId, minVersion, latestPreRelease, 0);
         }
 
         PluginUpgradeInfo(String groupId, String artifactId, String minVersion) {
-            this(groupId, artifactId, minVersion, null);
+            this(groupId, artifactId, minVersion, null, 0);
         }
     }
 }

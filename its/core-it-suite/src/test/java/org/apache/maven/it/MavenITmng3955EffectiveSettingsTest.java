@@ -46,6 +46,7 @@ public class MavenITmng3955EffectiveSettingsTest extends AbstractMavenIntegratio
         Verifier verifier = newVerifier(testDir);
         Path localRepo = verifier.getLocalRepository();
         verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dmaven.repo.local.tail=" + localRepo);
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");

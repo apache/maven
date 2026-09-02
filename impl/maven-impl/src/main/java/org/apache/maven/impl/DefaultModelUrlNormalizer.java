@@ -18,7 +18,6 @@
  */
 package org.apache.maven.impl;
 
-import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.DistributionManagement;
@@ -27,7 +26,6 @@ import org.apache.maven.api.model.Scm;
 import org.apache.maven.api.model.Site;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.model.ModelUrlNormalizer;
-import org.apache.maven.api.services.model.UrlNormalizer;
 
 /**
  * Normalizes URLs to remove the ugly parent references "../" that got potentially inserted by URL adjustment during
@@ -37,13 +35,6 @@ import org.apache.maven.api.services.model.UrlNormalizer;
 @Named
 @Singleton
 public class DefaultModelUrlNormalizer implements ModelUrlNormalizer {
-
-    private final UrlNormalizer urlNormalizer;
-
-    @Inject
-    public DefaultModelUrlNormalizer(UrlNormalizer urlNormalizer) {
-        this.urlNormalizer = urlNormalizer;
-    }
 
     @Override
     public Model normalize(Model model, ModelBuilderRequest request) {
@@ -75,6 +66,6 @@ public class DefaultModelUrlNormalizer implements ModelUrlNormalizer {
     }
 
     private String normalize(String url) {
-        return urlNormalizer.normalize(url);
+        return DefaultUrlNormalizer.normalize(url);
     }
 }

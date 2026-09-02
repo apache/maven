@@ -34,25 +34,46 @@ import org.eclipse.aether.spi.connector.transport.Transporter;
 import static java.util.Objects.requireNonNull;
 
 public class DefaultTransport implements Transport {
+    /** The repository base URI, normalized to end with a slash. */
     private final URI baseURI;
+
     private final Transporter transporter;
 
     public DefaultTransport(URI baseURI, Transporter transporter) {
-        this.baseURI = requireNonNull(baseURI);
+        requireNonNull(baseURI, "baseURI is null");
+        // Normalize the base to end with '/' so that URI.resolve() keeps the base's last
+        // path segment and the containment check in resolveWithinBase() compares whole
+        // path segments instead of raw strings. Without this, a base of ".../repo" would
+        // resolve "foo" to ".../foo", and the previous plain-string prefix check would also
+        // accept a sibling tree that merely shares a string prefix, such as ".../repo-other/".
+        String base = baseURI.toASCIIString();
+        this.baseURI = base.endsWith("/") ? baseURI : URI.create(base + "/");
         this.transporter = requireNonNull(transporter);
+    }
+
+    /**
+     * Resolves the given relative URI against the repository base and checks that the
+     * result stays inside the repository root as a path hierarchy. Because the comparison
+     * is made against the slash-terminated base, the base can only be a whole-segment
+     * prefix of a passing result, so sibling trees that merely share a string prefix are
+     * rejected along with absolute and dot-dot-escaping references.
+     */
+    private URI resolveWithinBase(URI relative) {
+        if (relative.isAbsolute()) {
+            throw new IllegalArgumentException("Supplied URI is not relative");
+        }
+        URI resolved = baseURI.resolve(relative);
+        if (!resolved.toASCIIString().startsWith(baseURI.toASCIIString())) {
+            throw new IllegalArgumentException("Supplied relative URI escapes baseUrl");
+        }
+        return resolved;
     }
 
     @Override
     public boolean get(URI relativeSource, Path target) {
         requireNonNull(relativeSource, "relativeSource is null");
         requireNonNull(target, "target is null");
-        if (relativeSource.isAbsolute()) {
-            throw new IllegalArgumentException("Supplied URI is not relative");
-        }
-        URI source = baseURI.resolve(relativeSource);
-        if (!source.toASCIIString().startsWith(baseURI.toASCIIString())) {
-            throw new IllegalArgumentException("Supplied relative URI escapes baseUrl");
-        }
+        URI source = resolveWithinBase(relativeSource);
         GetTask getTask = new GetTask(source);
         getTask.setDataPath(target);
         try {
@@ -101,14 +122,7 @@ public class DefaultTransport implements Transport {
         if (!Files.isRegularFile(source)) {
             throw new IllegalArgumentException("source file does not exist or is not a file");
         }
-        if (relativeTarget.isAbsolute()) {
-            throw new IllegalArgumentException("Supplied URI is not relative");
-        }
-        URI target = baseURI.resolve(relativeTarget);
-        if (!target.toASCIIString().startsWith(baseURI.toASCIIString())) {
-            throw new IllegalArgumentException("Supplied relative URI escapes baseUrl");
-        }
-
+        URI target = resolveWithinBase(relativeTarget);
         PutTask putTask = new PutTask(target);
         putTask.setDataPath(source);
         try {

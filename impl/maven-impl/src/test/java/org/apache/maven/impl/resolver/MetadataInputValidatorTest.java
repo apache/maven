@@ -1,0 +1,155 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.maven.impl.resolver;
+
+import java.io.IOException;
+
+import org.apache.maven.api.metadata.Snapshot;
+import org.apache.maven.api.metadata.SnapshotVersion;
+import org.apache.maven.api.metadata.Versioning;
+import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+/**
+ * Tests {@link MetadataInputValidator}.
+ */
+class MetadataInputValidatorTest {
+
+    // --- isInvalidCoordinateComponent ---
+
+    @Test
+    void validCoordinateComponents() {
+        assertFalse(MetadataInputValidator.isInvalidCoordinateComponent("commons-lang3"));
+        assertFalse(MetadataInputValidator.isInvalidCoordinateComponent("1.0.0"));
+        assertFalse(MetadataInputValidator.isInvalidCoordinateComponent("org.apache.maven"));
+        assertFalse(MetadataInputValidator.isInvalidCoordinateComponent(".hidden"));
+        assertFalse(MetadataInputValidator.isInvalidCoordinateComponent("a..b"));
+    }
+
+    @Test
+    void nullAndEmptyAreValid() {
+        assertFalse(MetadataInputValidator.isInvalidCoordinateComponent(null));
+        assertFalse(MetadataInputValidator.isInvalidCoordinateComponent(""));
+    }
+
+    @Test
+    void dotDotIsInvalid() {
+        assertTrue(MetadataInputValidator.isInvalidCoordinateComponent(".."));
+    }
+
+    @Test
+    void slashIsInvalid() {
+        assertTrue(MetadataInputValidator.isInvalidCoordinateComponent("a/b"));
+        assertTrue(MetadataInputValidator.isInvalidCoordinateComponent("a\\b"));
+    }
+
+    @Test
+    void colonIsInvalid() {
+        assertTrue(MetadataInputValidator.isInvalidCoordinateComponent("C:"));
+    }
+
+    @Test
+    void controlCharacterIsInvalid() {
+        assertTrue(MetadataInputValidator.isInvalidCoordinateComponent("abc\0def"));
+        assertTrue(MetadataInputValidator.isInvalidCoordinateComponent("\t"));
+    }
+
+    // --- validateVersionToken ---
+
+    @Test
+    void validVersionTokensPass() {
+        assertDoesNotThrow(() -> MetadataInputValidator.validateVersionToken("1.0.0", "version"));
+        assertDoesNotThrow(() -> MetadataInputValidator.validateVersionToken("20250101.123456", "timestamp"));
+        assertDoesNotThrow(() -> MetadataInputValidator.validateVersionToken(null, "version"));
+        assertDoesNotThrow(() -> MetadataInputValidator.validateVersionToken("", "version"));
+    }
+
+    @Test
+    void dotDotVersionTokenThrows() {
+        assertThrows(IOException.class, () -> MetadataInputValidator.validateVersionToken("..", "version"));
+    }
+
+    @Test
+    void slashVersionTokenThrows() {
+        assertThrows(
+                IOException.class, () -> MetadataInputValidator.validateVersionToken("../../../etc/passwd", "version"));
+    }
+
+    @Test
+    void controlCharVersionTokenThrows() {
+        assertThrows(IOException.class, () -> MetadataInputValidator.validateVersionToken("1.0\0", "version"));
+    }
+
+    // --- validateVersioning ---
+
+    @Test
+    void validVersioningPasses() {
+        Versioning versioning = Versioning.newBuilder()
+                .latest("2.0.0")
+                .release("1.0.0")
+                .versions(java.util.List.of("1.0.0", "2.0.0"))
+                .build();
+        assertDoesNotThrow(() -> MetadataInputValidator.validateVersioning(versioning));
+    }
+
+    @Test
+    void nullVersioningPasses() {
+        assertDoesNotThrow(() -> MetadataInputValidator.validateVersioning(null));
+    }
+
+    @Test
+    void invalidLatestVersionThrows() {
+        Versioning versioning = Versioning.newBuilder().latest("..").build();
+        assertThrows(IOException.class, () -> MetadataInputValidator.validateVersioning(versioning));
+    }
+
+    @Test
+    void invalidReleaseVersionThrows() {
+        Versioning versioning = Versioning.newBuilder().release("../evil").build();
+        assertThrows(IOException.class, () -> MetadataInputValidator.validateVersioning(versioning));
+    }
+
+    @Test
+    void invalidVersionInListThrows() {
+        Versioning versioning = Versioning.newBuilder()
+                .versions(java.util.List.of("1.0.0", ".."))
+                .build();
+        assertThrows(IOException.class, () -> MetadataInputValidator.validateVersioning(versioning));
+    }
+
+    @Test
+    void invalidSnapshotVersionThrows() {
+        SnapshotVersion sv =
+                SnapshotVersion.newBuilder().version("1.0-../../../passwd").build();
+        Versioning versioning =
+                Versioning.newBuilder().snapshotVersions(java.util.List.of(sv)).build();
+        assertThrows(IOException.class, () -> MetadataInputValidator.validateVersioning(versioning));
+    }
+
+    @Test
+    void invalidSnapshotTimestampThrows() {
+        Snapshot snapshot = Snapshot.newBuilder().timestamp("..").buildNumber(1).build();
+        Versioning versioning = Versioning.newBuilder().snapshot(snapshot).build();
+        assertThrows(IOException.class, () -> MetadataInputValidator.validateVersioning(versioning));
+    }
+}

@@ -62,6 +62,22 @@ public final class Features {
     }
 
     /**
+     * Check if consumer POM repository sanitization is enabled: when active, only repositories
+     * declared in the project's own POM file are published in the consumer POM, while repositories
+     * inherited from parent POMs or injected by active settings.xml profiles are removed.
+     */
+    public static boolean consumerPomSanitizeRepositories(@Nullable Map<String, ?> userProperties) {
+        return doGet(userProperties, Constants.MAVEN_CONSUMER_POM_SANITIZE_REPOSITORIES, true);
+    }
+
+    /**
+     * Check if automatic subproject discovery is enabled for POM-packaged projects.
+     */
+    public static boolean discoverSubprojects(@Nullable Map<String, ?> userProperties) {
+        return doGet(userProperties, Constants.MAVEN_PROJECT_DISCOVER_SUBPROJECTS, true);
+    }
+
+    /**
      * Check if build POM deployment is enabled.
      */
     public static boolean deployBuildPom(@Nullable Map<String, ?> userProperties) {

@@ -716,14 +716,14 @@ public class StringVisitorModelInterpolator extends AbstractStringBasedModelInte
                 // Content
                 org = dom.getValue();
                 val = interpolate(org);
-                if (org != val) {
+                if (org != val && val != null) {
                     dom.setValue(val);
                 }
                 // Attributes
                 for (String attr : dom.getAttributeNames()) {
                     org = dom.getAttribute(attr);
                     val = interpolate(org);
-                    if (org != val) {
+                    if (org != val && val != null) {
                         dom.setAttribute(attr, val);
                     }
                 }
