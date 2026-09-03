@@ -212,7 +212,7 @@ public class SessionStub implements Session {
 
     @Override
     public Collection<RepositoryListener> getRepositoryListeners() {
-        return null;
+        return List.of();
     }
 
     @Override
