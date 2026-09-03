@@ -315,7 +315,7 @@ under the License.
                   <goal>upload</goal>
                 </goals>
                 <configuration>
-                  <directory>${project.version}/source</directory>
+                  <directory>source</directory>
                   <files>
                     <file>${project.build.directory}/${project.artifactId}-${project.version}-src.tar.gz</file>
                     <file>${project.build.directory}/${project.artifactId}-${project.version}-src.tar.gz.sha512</file>
@@ -332,7 +332,7 @@ under the License.
                   <goal>upload</goal>
                 </goals>
                 <configuration>
-                  <directory>${project.version}/binaries</directory>
+                  <directory>binaries</directory>
                   <files>
                     <file>${project.build.directory}/${project.artifactId}-${project.version}-bin.tar.gz</file>
                     <file>${project.build.directory}/${project.artifactId}-${project.version}-bin.tar.gz.sha512</file>
