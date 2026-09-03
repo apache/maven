@@ -97,10 +97,10 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
         return ArtifactCoordinatesFactoryRequest.builder()
                 .session(requireNonNull(session, "session"))
                 .groupId(requireNonNull(coordinates, "coordinates").getGroupId())
-                .artifactId(coordinates.getArtifactId())
-                .classifier(coordinates.getClassifier())
-                .version(coordinates.getVersionConstraint().toString())
-                .extension(coordinates.getExtension())
+                .artifactId(coordinates.artifactId())
+                .classifier(coordinates.classifier())
+                .version(coordinates.versionConstraint().toString())
+                .extension(coordinates.extension())
                 .build();
     }
 

@@ -45,30 +45,30 @@ public class DefaultArtifactCoordinates implements ArtifactCoordinates {
 
     @Nonnull
     @Override
-    public String getGroupId() {
+    public String groupId() {
         return coordinates.getGroupId();
     }
 
     @Nonnull
     @Override
-    public String getArtifactId() {
+    public String artifactId() {
         return coordinates.getArtifactId();
     }
 
     @Nonnull
     @Override
-    public VersionConstraint getVersionConstraint() {
+    public VersionConstraint versionConstraint() {
         return session.parseVersionConstraint(coordinates.getVersion());
     }
 
     @Override
-    public String getExtension() {
+    public String extension() {
         return coordinates.getExtension();
     }
 
     @Nonnull
     @Override
-    public String getClassifier() {
+    public String classifier() {
         return coordinates.getClassifier();
     }
 
@@ -81,16 +81,16 @@ public class DefaultArtifactCoordinates implements ArtifactCoordinates {
             return false;
         }
         DefaultArtifactCoordinates that = (DefaultArtifactCoordinates) o;
-        return Objects.equals(this.getGroupId(), that.getGroupId())
-                && Objects.equals(this.getArtifactId(), that.getArtifactId())
-                && Objects.equals(this.getVersionConstraint(), that.getVersionConstraint())
-                && Objects.equals(this.getExtension(), that.getExtension())
-                && Objects.equals(this.getClassifier(), that.getClassifier());
+        return Objects.equals(this.groupId(), that.groupId())
+                && Objects.equals(this.artifactId(), that.artifactId())
+                && Objects.equals(this.versionConstraint(), that.versionConstraint())
+                && Objects.equals(this.extension(), that.extension())
+                && Objects.equals(this.classifier(), that.classifier());
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(getGroupId(), getArtifactId(), getVersionConstraint(), getExtension(), getClassifier());
+        return Objects.hash(groupId(), artifactId(), versionConstraint(), extension(), classifier());
     }
 
     @Override
