@@ -43,7 +43,11 @@ public class SimpleBuildEventListener implements BuildEventListener {
     }
 
     @Override
-    public void projectFinished(String projectId) {}
+    public void projectFinished(String projectId, String status) {}
+
+    @Override
+    public void mojoFinished(ExecutionEvent event, String status) {}
+
 
     @Override
     public void executionFailure(String projectId, boolean halted, String exception) {}
