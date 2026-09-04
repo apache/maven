@@ -96,7 +96,7 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
     static ArtifactCoordinatesFactoryRequest build(@Nonnull Session session, @Nonnull ArtifactCoordinates coordinates) {
         return ArtifactCoordinatesFactoryRequest.builder()
                 .session(requireNonNull(session, "session"))
-                .groupId(requireNonNull(coordinates, "coordinates").getGroupId())
+                .groupId(requireNonNull(coordinates, "coordinates").groupId())
                 .artifactId(coordinates.artifactId())
                 .classifier(coordinates.classifier())
                 .version(coordinates.versionConstraint().toString())
