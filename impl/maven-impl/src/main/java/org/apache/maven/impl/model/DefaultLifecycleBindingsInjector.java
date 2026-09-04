@@ -168,9 +168,7 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
                             Object key = getPluginKey().apply(managedPlugin);
                             Plugin addedPlugin = added.get(key);
                             if (addedPlugin != null) {
-                                Plugin plugin =
-                                        mergePlugin(managedPlugin, addedPlugin, sourceDominant, Collections.emptyMap());
-                                merged.put(key, plugin);
+                                merged.put(key, mergePluginManagement(addedPlugin, managedPlugin));
                             }
                         }
                     }
@@ -180,6 +178,14 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
 
                 builder.plugins(result);
             }
+        }
+
+        private Plugin mergePluginManagement(Plugin lifecyclePlugin, Plugin managedPlugin) {
+            Plugin.Builder builder = Plugin.newBuilder(lifecyclePlugin);
+            Map<Object, Object> context = Collections.emptyMap();
+            mergePlugin_Version(builder, lifecyclePlugin, managedPlugin, true, context);
+            mergeConfigurationContainer_Configuration(builder, lifecyclePlugin, managedPlugin, true, context);
+            return builder.build();
         }
 
         @Override
