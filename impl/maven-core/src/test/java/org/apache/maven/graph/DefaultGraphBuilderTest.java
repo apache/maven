@@ -29,6 +29,10 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.MavenExecutionException;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.ModelProblem;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -65,6 +69,7 @@ import static org.apache.maven.execution.MavenExecutionRequest.REACTOR_MAKE_UPST
 import static org.apache.maven.graph.DefaultGraphBuilderTest.ScenarioBuilder.scenario;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
@@ -99,7 +104,9 @@ class DefaultGraphBuilderTest {
 
     private final ProjectBuilder projectBuilder = mock(ProjectBuilder.class);
     private final MavenSession session = mock(MavenSession.class);
+    private final Session apiSession = mock(Session.class);
     private final MavenExecutionRequest mavenExecutionRequest = mock(MavenExecutionRequest.class);
+    private final ProblemCollector<ModelProblem> modelProblems = ProblemCollector.create(100);
 
     private final ProjectsSelector projectsSelector = new DefaultProjectsSelector(projectBuilder);
 
@@ -372,6 +379,121 @@ class DefaultGraphBuilderTest {
         assertEquals("pom", actualReactorProjects.get(1).getPackaging());
     }
 
+    @Test
+    void selectedReactorModelProblemsAreRetainedInSession() throws ProjectBuildingException {
+        Exception cause = new IllegalStateException("model problem cause");
+        org.apache.maven.model.building.ModelProblem legacyProblem =
+                new org.apache.maven.model.building.DefaultModelProblem(
+                        "model warning",
+                        org.apache.maven.model.building.ModelProblem.Severity.WARNING,
+                        org.apache.maven.model.building.ModelProblem.Version.V40,
+                        "module-parent/pom.xml",
+                        12,
+                        4,
+                        "unittest:module-parent:1.0",
+                        cause);
+        List<ProjectBuildingResult> projectBuildingResults =
+                createProjectBuildingResultMocks(artifactIdProjectMap.values());
+        when(projectBuildingResults.get(0).getProblems()).thenReturn(singletonList(legacyProblem));
+        when(projectBuilder.build(anyList(), anyBoolean(), any(ProjectBuildingRequest.class)))
+                .thenReturn(projectBuildingResults);
+        configureFullReactorRequest();
+
+        Result<ProjectDependencyGraph> result = graphBuilder.build(session);
+
+        assertFalse(result.hasErrors(), "Expected result not to have errors");
+        assertTrue(modelProblems.hasWarningProblems());
+        assertEquals(1, modelProblems.totalProblemsReported());
+        ModelProblem problem = modelProblems.problems().findFirst().orElseThrow();
+        assertEquals("model warning", problem.getMessage());
+        assertEquals(BuilderProblem.Severity.WARNING, problem.getSeverity());
+        assertEquals(ModelProblem.Version.V40, problem.getVersion());
+        assertEquals("module-parent/pom.xml", problem.getSource());
+        assertEquals(12, problem.getLineNumber());
+        assertEquals(4, problem.getColumnNumber());
+        assertEquals("unittest:module-parent:1.0", problem.getModelId());
+        assertSame(cause, problem.getException());
+    }
+
+    @Test
+    void discardedMultiModuleCollectionProblemsAreNotRetained() throws ProjectBuildingException {
+        MavenProject requestedProject = artifactIdProjectMap.get(MODULE_A);
+        MavenProject unrelatedProject = artifactIdProjectMap.get(PARENT_MODULE);
+        ProjectBuildingResult discardedResult = createProjectBuildingResultMocks(singletonList(unrelatedProject))
+                .get(0);
+        when(discardedResult.getProblems())
+                .thenReturn(singletonList(new org.apache.maven.model.building.DefaultModelProblem(
+                        "discarded warning",
+                        org.apache.maven.model.building.ModelProblem.Severity.WARNING,
+                        org.apache.maven.model.building.ModelProblem.Version.V40,
+                        "pom.xml",
+                        1,
+                        1,
+                        "unittest:discarded:1.0",
+                        null)));
+        List<ProjectBuildingResult> selectedResults = createProjectBuildingResultMocks(singletonList(requestedProject));
+        when(projectBuilder.build(anyList(), anyBoolean(), any(ProjectBuildingRequest.class)))
+                .thenReturn(singletonList(discardedResult), selectedResults);
+        ModelProcessor testModelProcessor = mock(ModelProcessor.class);
+        when(testModelProcessor.locateExistingPom(Paths.get("reactor-root")))
+                .thenReturn(Paths.get("reactor-root/pom.xml"));
+        MultiModuleCollectionStrategy testMultiModuleCollectionStrategy =
+                new MultiModuleCollectionStrategy(testModelProcessor, projectsSelector);
+        graphBuilder = new DefaultGraphBuilder(
+                mock(BuildResumptionDataRepository.class),
+                pomlessCollectionStrategy,
+                testMultiModuleCollectionStrategy,
+                requestPomCollectionStrategy);
+        when(mavenExecutionRequest.getPom()).thenReturn(requestedProject.getFile());
+        when(mavenExecutionRequest.getRootDirectory()).thenReturn(Paths.get("reactor-root"));
+        when(mavenExecutionRequest.getMakeBehavior()).thenReturn(REACTOR_MAKE_UPSTREAM);
+        when(mavenExecutionRequest.getProjectActivation()).thenReturn(new ProjectActivation());
+        when(mavenExecutionRequest.isRecursive()).thenReturn(true);
+
+        Result<ProjectDependencyGraph> result = graphBuilder.build(session);
+
+        assertFalse(result.hasErrors(), "Expected result not to have errors");
+        assertFalse(modelProblems.hasWarningProblems());
+        assertEquals(0, modelProblems.totalProblemsReported());
+    }
+
+    @Test
+    void problemsFromProjectsRemovedAfterDiscoveryAreRetained() throws ProjectBuildingException {
+        List<ProjectBuildingResult> projectBuildingResults =
+                createProjectBuildingResultMocks(artifactIdProjectMap.values());
+        ProjectBuildingResult removedProjectResult = projectBuildingResults.stream()
+                .filter(projectResult ->
+                        MODULE_B.equals(projectResult.getProject().getArtifactId()))
+                .findFirst()
+                .orElseThrow();
+        when(removedProjectResult.getProblems())
+                .thenReturn(singletonList(new org.apache.maven.model.building.DefaultModelProblem(
+                        "warning from project removed after discovery",
+                        org.apache.maven.model.building.ModelProblem.Severity.WARNING,
+                        org.apache.maven.model.building.ModelProblem.Version.V40,
+                        "module-b/pom.xml",
+                        1,
+                        1,
+                        "unittest:module-b:1.0",
+                        null)));
+        when(projectBuilder.build(anyList(), anyBoolean(), any(ProjectBuildingRequest.class)))
+                .thenReturn(projectBuildingResults);
+        ProjectActivation projectActivation = new ProjectActivation();
+        projectActivation.activateRequiredProject(":" + MODULE_A);
+        when(mavenExecutionRequest.getPom()).thenReturn(new File(PARENT_MODULE, "pom.xml"));
+        when(mavenExecutionRequest.getRootDirectory()).thenReturn(Paths.get(PARENT_MODULE));
+        when(mavenExecutionRequest.getProjectActivation()).thenReturn(projectActivation);
+        when(mavenExecutionRequest.isRecursive()).thenReturn(true);
+
+        Result<ProjectDependencyGraph> result = graphBuilder.build(session);
+
+        assertFalse(result.hasErrors(), "Expected result not to have errors");
+        assertEquals(
+                singletonList(artifactIdProjectMap.get(MODULE_A)), result.get().getSortedProjects());
+        assertTrue(modelProblems.hasWarningProblems());
+        assertEquals(1, modelProblems.totalProblemsReported());
+    }
+
     @BeforeEach
     void before() throws Exception {
         graphBuilder = new DefaultGraphBuilder(
@@ -413,6 +535,8 @@ class DefaultGraphBuilderTest {
 
         // Set up needed mocks
         when(session.getRequest()).thenReturn(mavenExecutionRequest);
+        when(session.getSession()).thenReturn(apiSession);
+        when(apiSession.getModelProblemCollector()).thenReturn(modelProblems);
         when(session.getProjects()).thenReturn(null); // needed, otherwise it will be an empty list by default
         when(mavenExecutionRequest.getProjectBuildingRequest()).thenReturn(mock(ProjectBuildingRequest.class));
         List<ProjectBuildingResult> projectBuildingResults =
@@ -420,6 +544,12 @@ class DefaultGraphBuilderTest {
         when(projectBuilder.build(anyList(), anyBoolean(), any(ProjectBuildingRequest.class)))
                 .thenReturn(projectBuildingResults);
         when(mavenExecutionRequest.getRootDirectory()).thenReturn(null);
+    }
+
+    private void configureFullReactorRequest() {
+        when(mavenExecutionRequest.getPom()).thenReturn(new File(PARENT_MODULE, "pom.xml"));
+        when(mavenExecutionRequest.getProjectActivation()).thenReturn(new ProjectActivation());
+        when(mavenExecutionRequest.isRecursive()).thenReturn(true);
     }
 
     private MavenProject getMavenProject(String artifactId, MavenProject parentProject) {
