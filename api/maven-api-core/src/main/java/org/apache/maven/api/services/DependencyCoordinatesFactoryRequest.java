@@ -76,7 +76,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
         return builder()
                 .session(requireNonNull(session, "session cannot be null"))
                 .groupId(requireNonNull(coordinates, "coordinates cannot be null")
-                        .getGroupId())
+                        .groupId())
                 .artifactId(coordinates.artifactId())
                 .version(coordinates.versionConstraint().toString())
                 .classifier(coordinates.classifier())
@@ -88,7 +88,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
     static DependencyCoordinatesFactoryRequest build(@Nonnull Session session, @Nonnull Dependency dependency) {
         return builder()
                 .session(requireNonNull(session, "session cannot be null"))
-                .groupId(requireNonNull(dependency, "dependency").getGroupId())
+                .groupId(requireNonNull(dependency, "dependency").groupId())
                 .artifactId(dependency.artifactId())
                 .version(dependency.version().toString())
                 .classifier(dependency.classifier())
