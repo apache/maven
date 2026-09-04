@@ -113,6 +113,25 @@ public class ProjectSorter {
                         false);
             }
 
+            org.apache.maven.model.Model originalModel = project.getOriginalModel();
+            if (originalModel != null && originalModel.getDependencyManagement() != null) {
+                for (org.apache.maven.model.Dependency dependency :
+                        originalModel.getDependencyManagement().getDependencies()) {
+                    if ("import".equals(dependency.getScope()) && "pom".equals(dependency.getType())) {
+                        addEdge(
+                                projectMap,
+                                vertexMap,
+                                project,
+                                projectVertex,
+                                dependency.getGroupId(),
+                                dependency.getArtifactId(),
+                                resolveImportVersion(project, dependency.getVersion()),
+                                false,
+                                false);
+                    }
+                }
+            }
+
             Parent parent = project.getModel().getDelegate().getParent();
 
             if (parent != null) {
@@ -178,6 +197,19 @@ public class ProjectSorter {
         this.sortedProjects = sortedProjectLabels.stream()
                 .map(id -> projectMap.get(id))
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
+    }
+
+    private String resolveImportVersion(MavenProject project, String version) {
+        if ("${project.version}".equals(version) || "${pom.version}".equals(version)) {
+            return project.getVersion();
+        }
+        if (version != null && version.startsWith("${") && version.endsWith("}")) {
+            String property = project.getProperties().getProperty(version.substring(2, version.length() - 1));
+            if (property != null) {
+                return property;
+            }
+        }
+        return version;
     }
 
     @SuppressWarnings("checkstyle:parameternumber")
