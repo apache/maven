@@ -262,6 +262,15 @@ public class ${class.name}
     }
 
     /**
+     * Gets the locations map directly for bulk comparison and hashing.
+     *
+     * @return an unmodifiable map of locations, never {@code null}
+     */
+    public Map<Object, InputLocation> getLocations() {
+        return locations;
+    }
+
+    /**
      * Gets the input location that caused this model to be read.
      */
     public InputLocation getImportedFrom() {
@@ -510,14 +519,16 @@ public class ${class.name}
             Map<Object, InputLocation> newlocs = locations != null ? locations : Map.of();
             Map<Object, InputLocation> oldlocs = base != null ? base.locations : Map.of();
             if (newlocs.isEmpty()) {
-                return Map.copyOf(oldlocs);
+                return oldlocs;
             }
             if (oldlocs.isEmpty()) {
                 return Map.copyOf(newlocs);
             }
-            return Stream.concat(newlocs.entrySet().stream(), oldlocs.entrySet().stream())
-                    // Keep value from newlocs in case of duplicates
-                    .collect(Collectors.toUnmodifiableMap(Map.Entry::getKey, Map.Entry::getValue, (v1, v2) -> v1));
+            // Use HashMap.putAll instead of Stream.concat().collect() to avoid
+            // Stream allocation and intermediate Map.Entry iteration overhead
+            HashMap<Object, InputLocation> merged = new HashMap<>(oldlocs);
+            merged.putAll(newlocs); // newlocs entries override oldlocs (same semantics as before)
+            return Map.copyOf(merged);
         }
     #end
     }
