@@ -691,12 +691,17 @@ public class DefaultModelBuilder implements ModelBuilder {
                 repos = repos.stream().filter(r -> !ids.contains(r.getId())).toList();
             }
 
+            // Repositories declared by a model resolved from a repository (a dependency POM, or a
+            // parent or import reached from one) are remotely supplied input; flag them so that
+            // session authentication is applied to them only through an operator-defined mirror.
+            // Repositories declared by the project's own POM and its parents are build-supplied
+            // and keep receiving session authentication.
             RepositoryFactory repositoryFactory = session.getService(RepositoryFactory.class);
             if (request.getRepositoryMerging() == ModelBuilderRequest.RepositoryMerging.REQUEST_DOMINANT) {
-                repositories = repositoryFactory.aggregate(session, repositories, repos, true);
+                repositories = repositoryFactory.aggregate(session, repositories, repos, true, externalOrigin);
                 pomRepositories = repositories;
             } else {
-                pomRepositories = repositoryFactory.aggregate(session, pomRepositories, repos, true);
+                pomRepositories = repositoryFactory.aggregate(session, pomRepositories, repos, true, externalOrigin);
                 repositories = repositoryFactory.aggregate(session, pomRepositories, externalRepositories, false);
             }
         }
