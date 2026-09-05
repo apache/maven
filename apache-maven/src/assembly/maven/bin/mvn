@@ -130,11 +130,196 @@ else
   fi
 fi
 
-if ! "$JAVACMD" --enable-native-access=ALL-UNNAMED -version >/dev/null 2>&1; then
-  echo "Error: Apache Maven 4.x requires Java 17 or newer to run." >&2
-  "$JAVACMD" -version >&2
-  echo "Please upgrade your Java installation or set JAVA_HOME to point to a compatible JDK." >&2
-  exit 1
+# Early scan of the CLI arguments so that version-only invocations can be
+# answered straight from this script, without booting the full Maven JVM. The
+# banner is assembled to match org.apache.maven.cling.utils.CLIReportingUtils
+# #showVersion (see print_fast_version below). Compact single-dash tokens
+# (e.g. -qv, -qV) are honoured, but only when composed exclusively of the safe
+# chars q/v/V/X/e, mirroring the relevant Commons CLI short options.
+VERSION_AND_EXIT=false
+SHOW_VERSION=false
+QUIET=false
+VERBOSE=false
+MAIN_CLASS_OVERRIDE=false
+FAST_VERSION_PRINTED=false
+for arg in "$@"; do
+  if [ "$arg" = "--" ] ; then
+    break
+  fi
+  case $arg in
+    -v|--version) VERSION_AND_EXIT=true ;;
+    -V|--show-version) SHOW_VERSION=true ;;
+    -q|--quiet) QUIET=true ;;
+    -X|--debug) VERBOSE=true ;;
+    --enc|--shell|--up) MAIN_CLASS_OVERRIDE=true ;;
+    -[qvVXe]*)
+      case $arg in
+        *v*) VERSION_AND_EXIT=true ;;
+        *V*) SHOW_VERSION=true ;;
+      esac
+      case $arg in
+        *q*) QUIET=true ;;
+        *X*) VERBOSE=true ;;
+      esac
+      ;;
+    *) ;;
+  esac
+done
+
+# Read a single `key=value` from a properties file. Unresolved `${...}`
+# placeholders are treated as absent, mirroring the reduce() logic used by the
+# JVM version reporting.
+read_property() {
+  _file=$1
+  _key=$2
+  if [ -f "$_file" ] ; then
+    _value=`sed -n "s/^$_key=//p" "$_file"`
+    case $_value in
+      \$\{*|"") ;;
+      *) printf '%s\n' "$_value" ;;
+    esac
+  fi
+}
+
+# Extract a JVM system property value from a `java -XshowSettings:properties`
+# dump (the properties are emitted on stderr as `    java.version = 17.0.10`).
+show_settings_property() {
+  _settings=$1
+  _key=$2
+  if [ -n "$_settings" ] ; then
+    printf '%s\n' "$_settings" | sed -n "s/^ *$_key *= *//p" | head -n 1
+  fi
+}
+
+# Render the version banner. When quiet, only the bare version is printed,
+# matching CLIReportingUtils#showVersionMinimal.
+print_fast_version() {
+  _settings=$1
+  _quiet=$2
+
+  _version_file="$MAVEN_HOME/bin/maven.version.properties"
+
+  _mvn_name=`read_property "$_version_file" distributionName`
+  _mvn_short=`read_property "$_version_file" distributionShortName`
+  _mvn_version=`read_property "$_version_file" version`
+  _mvn_build=`read_property "$_version_file" buildNumber`
+
+  if [ -z "$_mvn_version" ] ; then
+    # Fallback to the (versioned) core jar filename when the version file is
+    # not present, e.g. when running straight from a source checkout.
+    for _jar in "$MAVEN_HOME"/lib/maven-core-*.jar ; do
+      if [ -f "$_jar" ] ; then
+        _mvn_version=`printf '%s' "$_jar" | sed -e 's#.*maven-core-##' -e 's#\.jar$##'`
+        break
+      fi
+    done
+  fi
+
+  if [ -z "$_mvn_name" ] ; then
+    _mvn_name="Apache Maven"
+  fi
+  if [ -z "$_mvn_short" ] ; then
+    _mvn_short="Maven"
+  fi
+  if [ -z "$_mvn_version" ] ; then
+    _mvn_version="<version unknown>"
+  fi
+
+  if $_quiet ; then
+    printf '%s\n' "$_mvn_version"
+    return 0
+  fi
+
+  printf '%s %s' "$_mvn_name" "$_mvn_version"
+  if [ -n "$_mvn_build" ] ; then
+    printf ' (%s)' "$_mvn_build"
+  fi
+  printf '\n'
+
+  printf '%s home: %s\n' "$_mvn_short" "$MAVEN_HOME"
+
+  _java_version=`show_settings_property "$_settings" java.version`
+  _java_vendor=`show_settings_property "$_settings" java.vendor`
+  _java_home=`show_settings_property "$_settings" java.home`
+  printf 'Java version: %s, vendor: %s, runtime: %s\n' \
+    "${_java_version:-<unknown Java version>}" "${_java_vendor:-<unknown vendor>}" "${_java_home:-<unknown runtime>}"
+
+  _lang=`show_settings_property "$_settings" user.language`
+  _country=`show_settings_property "$_settings" user.country`
+  _encoding=`show_settings_property "$_settings" file.encoding`
+  _timezone=`show_settings_property "$_settings" user.timezone`
+  if [ -z "$_timezone" ] ; then
+    # The settings dump does not carry the time zone; derive it the same way
+    # the JVM does (TZ wins, then /etc/localtime) when possible.
+    if [ -n "$TZ" ] && [ -r "/usr/share/zoneinfo/$TZ" ] ; then
+      _timezone="$TZ"
+    elif [ -h /etc/localtime ] ; then
+      _timezone=`readlink /etc/localtime`
+      _timezone=`printf '%s' "$_timezone" | sed 's#^.*zoneinfo/##'`
+    elif [ -r /etc/timezone ] ; then
+      _timezone=`cat /etc/timezone`
+    fi
+  fi
+  _locale="$_lang"
+  if [ -n "$_country" ] ; then
+    _locale="$_lang"_"$_country"
+  fi
+  printf 'Default locale: %s, platform encoding: %s, time zone: %s\n' \
+    "$_locale" "${_encoding:-<unknown encoding>}" "${_timezone:-<unknown>}"
+
+  _os_name=`show_settings_property "$_settings" os.name`
+  _os_version=`show_settings_property "$_settings" os.version`
+  _os_arch=`show_settings_property "$_settings" os.arch`
+  _os_name=`printf '%s' "$_os_name" | tr '[:upper:]' '[:lower:]'`
+  _os_version=`printf '%s' "$_os_version" | tr '[:upper:]' '[:lower:]'`
+  _os_arch=`printf '%s' "$_os_arch" | tr '[:upper:]' '[:lower:]'`
+
+  _os_family="unknown"
+  case "$_os_name" in
+    *windows*) _os_family="windows" ;;
+    *mac*|darwin) _os_family="mac" ;;
+    *os/2*) _os_family="os/2" ;;
+    *dos*) _os_family="dos" ;;
+    *)
+      if [ -n "$_os_name" ] ; then
+        _os_family="unix"
+      fi
+      ;;
+  esac
+  printf 'OS name: "%s", version: "%s", arch: "%s", family: "%s"\n' \
+    "$_os_name" "$_os_version" "$_os_arch" "$_os_family"
+}
+
+# Combined Java 17 gate and JVM settings probe. Version invocations reuse the
+# settings dump to render the banner without starting Maven itself; every other
+# invocation only relies on the exit status, exactly like the former probe.
+HAS_SETTINGS=false
+VERSION_SETTINGS=
+if $VERSION_AND_EXIT || $SHOW_VERSION ; then
+  if ! $VERBOSE && ! $MAIN_CLASS_OVERRIDE ; then
+    if VERSION_SETTINGS=`"$JAVACMD" --enable-native-access=ALL-UNNAMED -XshowSettings:properties -version 2>&1` ; then
+      HAS_SETTINGS=true
+    fi
+  fi
+fi
+if ! $HAS_SETTINGS ; then
+  if ! "$JAVACMD" --enable-native-access=ALL-UNNAMED -version >/dev/null 2>&1; then
+    echo "Error: Apache Maven 4.x requires Java 17 or newer to run." >&2
+    "$JAVACMD" -version >&2
+    echo "Please upgrade your Java installation or set JAVA_HOME to point to a compatible JDK." >&2
+    exit 1
+  fi
+fi
+
+if $HAS_SETTINGS ; then
+  if $VERSION_AND_EXIT ; then
+    print_fast_version "$VERSION_SETTINGS" $QUIET
+    exit 0
+  fi
+  # -V/--show-version: print the banner now and let the JVM run the build
+  # without printing it a second time.
+  print_fast_version "$VERSION_SETTINGS" $QUIET
+  FAST_VERSION_PRINTED=true
 fi
 
 # traverses directory structure from process work directory to filesystem root
@@ -323,8 +508,15 @@ cmd="\"$JAVACMD\" \
   \"-Dmaven.home=$MAVEN_HOME\" \
   \"-Dmaven.mainClass=$MAVEN_MAIN_CLASS\" \
   \"-Dlibrary.jline.path=$JLINE_NATIVE_PATH\" \
-  \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\" \
-  $LAUNCHER_CLASS"
+  \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\""
+
+# The JVM option must precede the main class on the command line, otherwise it
+# would be treated as a plain Maven argument rather than a system property.
+if [ "$FAST_VERSION_PRINTED" = "true" ] ; then
+  cmd="$cmd \"-Dmaven.version.printed=true\""
+fi
+
+cmd="$cmd $LAUNCHER_CLASS"
 
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
   echo "[DEBUG] Launching JVM with command:" >&2
