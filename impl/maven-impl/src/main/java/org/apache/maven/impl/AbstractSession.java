@@ -1058,7 +1058,7 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public void setCurrentTrace(RequestTrace trace) {
-        if (trace == context) {
+        if (trace == null || trace == context) {
             getTraceHolder().remove();
         } else {
             getTraceHolder().set(trace);
