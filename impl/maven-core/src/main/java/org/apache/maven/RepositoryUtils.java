@@ -19,14 +19,17 @@
 package org.apache.maven;
 
 import java.io.File;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Deque;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.handler.ArtifactHandler;
@@ -64,6 +67,50 @@ import org.eclipse.aether.util.repository.AuthenticationBuilder;
  *
  */
 public class RepositoryUtils {
+
+    @FunctionalInterface
+    private interface ArtifactOrderingStrategy {
+        void apply(
+                Collection<org.apache.maven.artifact.Artifact> artifacts,
+                Collection<? extends DependencyNode> nodes,
+                List<String> trail,
+                DependencyFilter filter);
+    }
+
+    public enum ArtifactOrdering {
+        /**
+         * Depth-first traversal of the dependency graph to convert nodes to artifacts. This is the original behavior.
+         */
+        DFS(RepositoryUtils::toArtifactsDFS),
+        /**
+         * Breadth-first traversal of the dependency graph to convert nodes to artifacts, using TreeMap to store artifacts by depth. This is the new behavior.
+         */
+        BFS(RepositoryUtils::toArtifactsBFS),
+        /**
+         * Breadth-first traversal of the dependency graph, using a List of List to store artifacts by depth, and a stack to keep the dependency trail. This is the new behavior.
+         */
+        BFS2(RepositoryUtils::toArtifactsBFS2);
+
+        private ArtifactOrderingStrategy strategy;
+
+        ArtifactOrdering(ArtifactOrderingStrategy strategy) {
+            this.strategy = strategy;
+        }
+
+        public ArtifactOrderingStrategy getStrategy() {
+            return strategy;
+        }
+    }
+
+    private static ArtifactOrdering artifactOrdering = ArtifactOrdering.BFS2;
+
+    public static void setArtifactOrdering(ArtifactOrdering ordering) {
+        artifactOrdering = ordering;
+    }
+
+    public static ArtifactOrdering getArtifactOrdering() {
+        return artifactOrdering;
+    }
 
     private static String nullify(String string) {
         return (string == null || string.isEmpty()) ? null : string;
@@ -116,6 +163,14 @@ public class RepositoryUtils {
             Collection<? extends DependencyNode> nodes,
             List<String> trail,
             DependencyFilter filter) {
+        artifactOrdering.getStrategy().apply(artifacts, nodes, trail, filter);
+    }
+
+    private static void toArtifactsDFS(
+            Collection<org.apache.maven.artifact.Artifact> artifacts,
+            Collection<? extends DependencyNode> nodes,
+            List<String> trail,
+            DependencyFilter filter) {
         for (DependencyNode node : nodes) {
             org.apache.maven.artifact.Artifact artifact = toArtifact(node.getDependency());
 
@@ -129,6 +184,97 @@ public class RepositoryUtils {
             }
 
             toArtifacts(artifacts, node.getChildren(), nodeTrail, filter);
+        }
+    }
+
+    private static void toArtifactsBFS(
+            Collection<org.apache.maven.artifact.Artifact> artifacts,
+            Collection<? extends DependencyNode> nodes,
+            List<String> trail,
+            DependencyFilter filter) {
+        Map<Integer, List<org.apache.maven.artifact.Artifact>> artifactsByDepth = new TreeMap<>();
+
+        List<org.apache.maven.artifact.Artifact> firstLevelArtifacts = new ArrayList<>(nodes.size());
+        // we know there are at least direct dependencies
+        artifactsByDepth.put(1, firstLevelArtifacts);
+
+        toArtifactsBFS(artifactsByDepth, 1, nodes, trail, filter);
+
+        // list of artifacts ordered by depth level
+        for (List<org.apache.maven.artifact.Artifact> artifactsInDepth : artifactsByDepth.values()) {
+            artifacts.addAll(artifactsInDepth);
+        }
+    }
+
+    private static void toArtifactsBFS(
+            Map<Integer, List<org.apache.maven.artifact.Artifact>> artifactsByDepth,
+            int currentDepth,
+            Collection<? extends DependencyNode> nodes,
+            List<String> trail,
+            DependencyFilter filter) {
+        for (DependencyNode node : nodes) {
+            org.apache.maven.artifact.Artifact artifact = toArtifact(node.getDependency());
+
+            List<String> nodeTrail = new ArrayList<>(trail.size() + 1);
+            nodeTrail.addAll(trail);
+            nodeTrail.add(artifact.getId());
+
+            if (filter == null || filter.accept(node, Collections.emptyList())) {
+                artifact.setDependencyTrail(nodeTrail);
+
+                // add artifact in the list of the current depth
+                List<org.apache.maven.artifact.Artifact> artifactsCurrentDepth = artifactsByDepth.get(currentDepth);
+                if (artifactsCurrentDepth == null) {
+                    artifactsCurrentDepth = new ArrayList<>();
+                    artifactsByDepth.put(currentDepth, artifactsCurrentDepth);
+                }
+                artifactsCurrentDepth.add(artifact);
+            }
+
+            toArtifactsBFS(artifactsByDepth, currentDepth + 1, node.getChildren(), nodeTrail, filter);
+        }
+    }
+
+    public static void toArtifactsBFS2(
+            Collection<org.apache.maven.artifact.Artifact> artifacts,
+            Collection<? extends DependencyNode> nodes,
+            List<String> trail,
+            DependencyFilter filter) {
+        List<List<org.apache.maven.artifact.Artifact>> artifactsByDepth = new ArrayList<>();
+        artifactsByDepth.add(new ArrayList<>(nodes.size())); // depth 1 -> index 0
+
+        Deque<String> trailStack = new ArrayDeque<>(trail);
+        toArtifactsBFS2(artifactsByDepth, 0, nodes, trailStack, filter);
+
+        for (List<org.apache.maven.artifact.Artifact> artifactsInDepth : artifactsByDepth) {
+            artifacts.addAll(artifactsInDepth);
+        }
+    }
+
+    private static void toArtifactsBFS2(
+            List<List<org.apache.maven.artifact.Artifact>> artifactsByDepth,
+            int currentDepthIndex,
+            Collection<? extends DependencyNode> nodes,
+            Deque<String> trailStack,
+            DependencyFilter filter) {
+
+        // ensure the list of artifacts at the current depth exists
+        while (currentDepthIndex >= artifactsByDepth.size()) {
+            artifactsByDepth.add(new ArrayList<>());
+        }
+        List<org.apache.maven.artifact.Artifact> artifactsAtDepth = artifactsByDepth.get(currentDepthIndex);
+
+        for (DependencyNode node : nodes) {
+            org.apache.maven.artifact.Artifact artifact = toArtifact(node.getDependency());
+            trailStack.addLast(artifact.getId());
+
+            if (filter == null || filter.accept(node, Collections.emptyList())) {
+                artifact.setDependencyTrail(new ArrayList<>(trailStack));
+                artifactsAtDepth.add(artifact);
+            }
+
+            toArtifactsBFS2(artifactsByDepth, currentDepthIndex + 1, node.getChildren(), trailStack, filter);
+            trailStack.removeLast();
         }
     }
 
