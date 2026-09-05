@@ -401,9 +401,9 @@ public class BuildPlanExecutor {
                             try {
                                 executeStep(step);
                                 executePlan();
-                            } catch (Exception e) {
+                            } catch (Throwable e) {
                                 step.status.compareAndSet(SKIPPED, FAILED);
-                                // Store the exception in the step for handling in the TEARDOWN phase
+                                // Store the failure in the step for handling in the TEARDOWN phase
                                 step.exception = e;
                                 logger.debug("Stored exception for step {} to be handled in TEARDOWN phase", step, e);
                                 // Let the scheduler handle after:* phases and TEARDOWN in the next cycle
@@ -438,10 +438,10 @@ public class BuildPlanExecutor {
                             }
                         }
                         executePlan();
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         step.status.compareAndSet(SCHEDULED, FAILED);
 
-                        // Store the exception in the step for handling in the TEARDOWN phase
+                        // Store the failure in the step for handling in the TEARDOWN phase
                         step.exception = e;
                         logger.debug("Stored exception for step {} to be handled in TEARDOWN phase", step, e);
 
@@ -525,7 +525,7 @@ public class BuildPlanExecutor {
                     List<Throwable> failures = null;
                     boolean allWorkExecuted = true;
                     for (BuildStep projectStep : plan.steps(step.project).toList()) {
-                        Exception exception = projectStep.exception;
+                        Throwable exception = projectStep.exception;
                         if (exception != null) {
                             if (failures == null) {
                                 failures = new ArrayList<>();
