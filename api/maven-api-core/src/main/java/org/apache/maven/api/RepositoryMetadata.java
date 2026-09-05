@@ -35,30 +35,59 @@ import org.apache.maven.api.annotations.Nonnull;
 @Immutable
 public interface RepositoryMetadata {
 
+    /**
+     * Describes which artifact versions a metadata item applies to.
+     */
     enum Nature {
+        /** Metadata that applies only to release versions. */
         RELEASE,
+
+        /** Metadata that applies only to snapshot versions. */
         SNAPSHOT,
+
+        /** Metadata that applies to both release and snapshot versions. */
         RELEASE_OR_SNAPSHOT,
     }
 
+    /**
+     * {@return the group identifier, or an empty string if the metadata applies to the entire repository}
+     */
     @Nonnull
     String getGroupId();
 
+    /**
+     * {@return the artifact identifier, or an empty string if the metadata applies at group level}
+     */
     @Nonnull
     String getArtifactId();
 
+    /**
+     * {@return the version, or an empty string if the metadata applies at artifact level}
+     */
     @Nonnull
     String getVersion();
 
+    /**
+     * {@return the metadata filename, such as {@code maven-metadata.xml}}
+     */
     @Nonnull
     String getType();
 
+    /**
+     * {@return the artifact version nature to which the metadata applies}
+     */
     @Nonnull
     Nature getNature();
 
+    /**
+     * {@return the local path of the metadata file if it has been resolved}
+     */
     @Nonnull
     Optional<Path> getPath();
 
+    /**
+     * {@return the read-only properties associated with the metadata}
+     */
     @Nonnull
     Map<String, String> getProperties();
 }
