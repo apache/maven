@@ -25,10 +25,12 @@ import javax.inject.Singleton;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
@@ -51,13 +53,13 @@ import org.apache.maven.model.merge.MavenModelMerger;
 @Singleton
 public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInjector {
 
-    private final LifecycleBindingsMerger merger = new LifecycleBindingsMerger();
-
     private final LifeCyclePluginAnalyzer lifecycle;
+    private final DefaultLifecycles lifecycles;
 
     @Inject
-    public DefaultLifecycleBindingsInjector(LifeCyclePluginAnalyzer lifecycle) {
+    public DefaultLifecycleBindingsInjector(LifeCyclePluginAnalyzer lifecycle, DefaultLifecycles lifecycles) {
         this.lifecycle = lifecycle;
+        this.lifecycles = lifecycles;
     }
 
     @Override
@@ -75,8 +77,16 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
             lifecycleModel.setBuild(new Build());
             lifecycleModel.getBuild().getPlugins().addAll(defaultPlugins);
 
-            merger.merge(model, lifecycleModel);
+            new LifecycleBindingsMerger(getPhaseToLifecycleMap()).merge(model, lifecycleModel);
         }
+    }
+
+    private Map<String, String> getPhaseToLifecycleMap() {
+        Map<String, String> phaseToLifecycle = new HashMap<>();
+        lifecycles
+                .getPhaseToLifecycleMap()
+                .forEach((phase, lifecycle) -> phaseToLifecycle.put(phase, lifecycle.getId()));
+        return phaseToLifecycle;
     }
 
     /**
@@ -85,6 +95,12 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
     protected static class LifecycleBindingsMerger extends MavenModelMerger {
 
         private static final String PLUGIN_MANAGEMENT = "plugin-management";
+
+        private final Map<String, String> phaseToLifecycle;
+
+        LifecycleBindingsMerger(Map<String, String> phaseToLifecycle) {
+            this.phaseToLifecycle = phaseToLifecycle;
+        }
 
         public void merge(Model target, Model source) {
             if (target.getBuild() == null) {
@@ -132,9 +148,7 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
                             Object key = getPluginKey(managedPlugin);
                             Plugin addedPlugin = added.get(key);
                             if (addedPlugin != null) {
-                                Plugin plugin = managedPlugin.clone();
-                                mergePlugin(plugin, addedPlugin, sourceDominant, Collections.emptyMap());
-                                merged.put(key, plugin);
+                                merged.put(key, mergePluginManagement(addedPlugin, managedPlugin, sourceDominant));
                             }
                         }
                     }
@@ -144,6 +158,26 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
 
                 target.setPlugins(result);
             }
+        }
+
+        private Plugin mergePluginManagement(Plugin lifecyclePlugin, Plugin managedPlugin, boolean sourceDominant) {
+            Plugin plugin = managedPlugin.clone();
+            plugin.getExecutions().removeIf(execution -> !isFromSameLifecycle(lifecyclePlugin, execution));
+            mergePlugin(plugin, lifecyclePlugin, sourceDominant, Collections.emptyMap());
+            return plugin;
+        }
+
+        private boolean isFromSameLifecycle(Plugin lifecyclePlugin, PluginExecution managedExecution) {
+            String managedPhase = managedExecution.getPhase();
+            if (managedPhase == null) {
+                return true;
+            }
+
+            String managedLifecycle = phaseToLifecycle.get(managedPhase);
+            return lifecyclePlugin.getExecutions().stream()
+                    .anyMatch(execution -> managedPhase.equals(execution.getPhase())
+                            || managedLifecycle != null
+                                    && managedLifecycle.equals(phaseToLifecycle.get(execution.getPhase())));
         }
 
         @Override

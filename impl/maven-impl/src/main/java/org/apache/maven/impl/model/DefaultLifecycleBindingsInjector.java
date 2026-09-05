@@ -51,8 +51,6 @@ import org.apache.maven.api.services.model.LifecycleBindingsInjector;
 @Singleton
 public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInjector {
 
-    private final LifecycleBindingsMerger merger = new LifecycleBindingsMerger();
-
     private final LifecycleRegistry lifecycleRegistry;
     private final PackagingRegistry packagingRegistry;
 
@@ -86,8 +84,17 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
             Model lifecycleModel = Model.newBuilder()
                     .build(Build.newBuilder().plugins(allPlugins.values()).build())
                     .build();
-            return merger.merge(model, lifecycleModel);
+            return new LifecycleBindingsMerger(getPhaseToLifecycleMap()).merge(model, lifecycleModel);
         }
+    }
+
+    private Map<String, String> getPhaseToLifecycleMap() {
+        Map<String, String> phaseToLifecycle = new HashMap<>();
+        lifecycleRegistry.stream().forEach(lifecycle -> {
+            lifecycleRegistry.computePhases(lifecycle).forEach(phase -> phaseToLifecycle.put(phase, lifecycle.id()));
+            lifecycle.aliases().forEach(alias -> phaseToLifecycle.put(alias.v3Phase(), lifecycle.id()));
+        });
+        return phaseToLifecycle;
     }
 
     private void addPlugin(Map<Plugin, Plugin> plugins, Plugin plugin) {
@@ -113,6 +120,12 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
     protected static class LifecycleBindingsMerger extends MavenModelMerger {
 
         private static final String PLUGIN_MANAGEMENT = "plugin-management";
+
+        private final Map<String, String> phaseToLifecycle;
+
+        LifecycleBindingsMerger(Map<String, String> phaseToLifecycle) {
+            this.phaseToLifecycle = phaseToLifecycle;
+        }
 
         public Model merge(Model target, Model source) {
             Build targetBuild = target.getBuild();
@@ -168,9 +181,7 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
                             Object key = getPluginKey().apply(managedPlugin);
                             Plugin addedPlugin = added.get(key);
                             if (addedPlugin != null) {
-                                Plugin plugin =
-                                        mergePlugin(managedPlugin, addedPlugin, sourceDominant, Collections.emptyMap());
-                                merged.put(key, plugin);
+                                merged.put(key, mergePluginManagement(addedPlugin, managedPlugin, sourceDominant));
                             }
                         }
                     }
@@ -180,6 +191,26 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
 
                 builder.plugins(result);
             }
+        }
+
+        private Plugin mergePluginManagement(Plugin lifecyclePlugin, Plugin managedPlugin, boolean sourceDominant) {
+            Plugin filteredManagedPlugin = managedPlugin.withExecutions(managedPlugin.getExecutions().stream()
+                    .filter(execution -> isFromSameLifecycle(lifecyclePlugin, execution))
+                    .toList());
+            return mergePlugin(filteredManagedPlugin, lifecyclePlugin, sourceDominant, Collections.emptyMap());
+        }
+
+        private boolean isFromSameLifecycle(Plugin lifecyclePlugin, PluginExecution managedExecution) {
+            String managedPhase = managedExecution.getPhase();
+            if (managedPhase == null) {
+                return true;
+            }
+
+            String managedLifecycle = phaseToLifecycle.get(managedPhase);
+            return lifecyclePlugin.getExecutions().stream()
+                    .anyMatch(execution -> managedPhase.equals(execution.getPhase())
+                            || managedLifecycle != null
+                                    && managedLifecycle.equals(phaseToLifecycle.get(execution.getPhase())));
         }
 
         @Override
