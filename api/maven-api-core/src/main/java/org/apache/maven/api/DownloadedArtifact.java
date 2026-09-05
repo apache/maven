@@ -35,5 +35,15 @@ public interface DownloadedArtifact extends Artifact {
     /**
      * {@return the a path to the file that has been downloaded to the file system}.
      */
-    Path getPath();
+    Path path();
+
+    /**
+     * {@return the a path to the file that has been downloaded to the file system}.
+     *
+     * @deprecated Use {@link #path()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    default Path getPath() {
+        return path();
+    }
 }

@@ -77,9 +77,9 @@ public class SourceRootTest implements SourceRoot {
         when(build.getTestOutputDirectory()).thenReturn("target/test-classes");
 
         Project project = mock(Project.class);
-        when(project.getBuild()).thenReturn(build);
-        when(project.getBasedir()).thenReturn(Path.of("myproject"));
-        when(project.getOutputDirectory(any(ProjectScope.class))).thenCallRealMethod();
+        when(project.build()).thenReturn(build);
+        when(project.basedir()).thenReturn(Path.of("myproject"));
+        when(project.outputDirectory(any(ProjectScope.class))).thenCallRealMethod();
 
         assertEquals(Path.of("myproject", "target", "classes"), targetPath(project));
 
