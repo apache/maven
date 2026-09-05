@@ -46,14 +46,18 @@ public class DefaultArtifactDeployer implements ArtifactDeployer {
         InternalSession session = InternalSession.from(request.getSession());
         Collection<ProducedArtifact> artifacts = requireNonNull(request.getArtifacts(), "request.artifacts");
         RemoteRepository repository = requireNonNull(request.getRepository(), "request.repository");
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
             DeployRequest deployRequest = new DeployRequest()
                     .setRepository(session.toRepository(repository))
-                    .setArtifacts(session.toArtifacts(artifacts));
+                    .setArtifacts(session.toArtifacts(artifacts))
+                    .setTrace(trace.trace());
 
             session.getRepositorySystem().deploy(session.getSession(), deployRequest);
         } catch (DeploymentException e) {
             throw new ArtifactDeployerException("Unable to deploy artifacts", e);
+        } finally {
+            RequestTraceHelper.exit(trace);
         }
     }
 }
