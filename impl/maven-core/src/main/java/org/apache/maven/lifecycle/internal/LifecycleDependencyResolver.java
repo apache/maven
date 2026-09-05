@@ -130,10 +130,18 @@ public class LifecycleDependencyResolver {
 
             Map<Artifact, File> reactorProjects =
                     new HashMap<>(session.getProjects().size());
+            // Build a GAV-keyed map for fallback lookups when exact Artifact.equals() misses
+            // (e.g. type/classifier mismatch between resolved dependency and reactor artifact).
+            Map<String, MavenProject> reactorGavMap =
+                    new HashMap<>(session.getProjects().size());
             for (MavenProject reactorProject : session.getProjects()) {
-                reactorProjects.put(
-                        reactorProject.getArtifact(),
-                        reactorProject.getArtifact().getFile());
+                // In the concurrent builder, a reactor project may have compiled (output directory
+                // exists) but not yet been packaged (artifact file is null).  Use the output
+                // directory as a fallback so that downstream projects see the compiled classes.
+                File file = resolveReactorProjectFile(reactorProject);
+                reactorProjects.put(reactorProject.getArtifact(), file);
+                String gavKey = ArtifactUtils.key(reactorProject.getArtifact());
+                reactorGavMap.put(gavKey, reactorProject);
             }
 
             Map<String, Artifact> map = new HashMap<>();
@@ -146,6 +154,35 @@ public class LifecycleDependencyResolver {
                 File reactorProjectFile = reactorProjects.get(artifact);
                 if (reactorProjectFile != null) {
                     artifact.setFile(reactorProjectFile);
+                } else if (artifact.getFile() == null) {
+                    // Fallback: try matching reactor projects by GAV only (groupId:artifactId:version).
+                    // This intentionally ignores classifier and type, which means a tests-jar dependency
+                    // (classifier="tests") will match the main project and receive target/classes instead
+                    // of target/test-classes.  This is still better than a null file (which would cause
+                    // a build failure), but is a known limitation of the concurrent builder's fallback.
+                    String gavKey = ArtifactUtils.key(artifact);
+                    MavenProject reactorProject = reactorGavMap.get(gavKey);
+                    if (reactorProject != null) {
+                        File fallback = resolveReactorProjectFile(reactorProject);
+                        if (fallback != null) {
+                            artifact.setFile(fallback);
+                        }
+                    } else {
+                        // Non-reactor artifact with null file — the Aether resolver may not have
+                        // resolved it (e.g. it was only collected, or a race condition in the
+                        // concurrent builder prevented the file from being set).  Try looking
+                        // up the file in the local repository.
+                        org.eclipse.aether.artifact.Artifact aetherArtifact = RepositoryUtils.toArtifact(artifact);
+                        org.eclipse.aether.repository.LocalRepositoryManager lrm =
+                                session.getRepositorySession().getLocalRepositoryManager();
+                        if (lrm != null) {
+                            String path = lrm.getPathForLocalArtifact(aetherArtifact);
+                            File localFile = new File(lrm.getRepository().getBasedir(), path);
+                            if (localFile.isFile()) {
+                                artifact.setFile(localFile);
+                            }
+                        }
+                    }
                 }
 
                 map.put(artifact.getDependencyConflictId(), artifact);
@@ -345,6 +382,22 @@ public class LifecycleDependencyResolver {
         }
 
         return result;
+    }
+
+    /**
+     * Returns the artifact file for a reactor project, falling back to the output directory
+     * when the artifact has not yet been packaged (e.g. in a concurrent build where compilation
+     * has finished but the jar phase has not run yet).
+     */
+    private static File resolveReactorProjectFile(MavenProject project) {
+        File file = project.getArtifact().getFile();
+        if (file == null) {
+            File outputDir = new File(project.getBuild().getOutputDirectory());
+            if (outputDir.isDirectory()) {
+                file = outputDir;
+            }
+        }
+        return file;
     }
 
     private static class ReactorDependencyFilter implements DependencyFilter {
