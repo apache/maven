@@ -195,6 +195,26 @@ class ResourceIncludeTest {
         assertTrue(sourceRoot.includes().contains("*.xml"), "Underlying SourceRoot should contain the include");
     }
 
+    @Test
+    void testGeneratedStatePreservedWhenResourceIsUpdated() {
+        project.addSourceRoot(new DefaultSourceRoot(
+                ProjectScope.MAIN, Language.RESOURCES, Path.of("target/generated-resources"), true));
+
+        Resource generatedResource = project.getResources().stream()
+                .filter(resource -> resource.getDirectory().endsWith("generated-resources"))
+                .findFirst()
+                .orElseThrow();
+        generatedResource.addInclude("*.properties");
+
+        org.apache.maven.api.SourceRoot generatedSource = project.getEnabledSourceRoots(
+                        ProjectScope.MAIN, Language.RESOURCES)
+                .filter(source -> source.directory().endsWith("generated-resources"))
+                .findFirst()
+                .orElseThrow();
+        assertTrue(generatedSource.generated());
+        assertTrue(generatedSource.includes().contains("*.properties"));
+    }
+
     /*MNG-11062*/
     @Test
     void testTargetPathPreservedWithConnectedResource() {
