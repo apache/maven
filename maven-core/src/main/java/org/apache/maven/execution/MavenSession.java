@@ -73,6 +73,8 @@ public class MavenSession implements Cloneable {
 
     private boolean parallel;
 
+    private boolean modelProblems;
+
     private final Map<String, Map<String, Map<String, Object>>> pluginContextsByProjectAndPluginKey =
             new ConcurrentHashMap<>();
 
@@ -251,6 +253,26 @@ public class MavenSession implements Cloneable {
 
     public void setParallel(boolean parallel) {
         this.parallel = parallel;
+    }
+
+    /**
+     * Indicates whether any problems were detected while building the Maven models.
+     *
+     * @return {@code true} if model problems were detected, {@code false} otherwise
+     * @since 3.10.0
+     */
+    public boolean hasModelProblems() {
+        return modelProblems;
+    }
+
+    /**
+     * Records whether any problems were detected while building the Maven models.
+     *
+     * @param modelProblems whether model problems were detected
+     * @since 3.10.0
+     */
+    public void setModelProblems(boolean modelProblems) {
+        this.modelProblems = modelProblems;
     }
 
     public RepositorySystemSession getRepositorySession() {
