@@ -545,6 +545,12 @@ under the License.
     <pluginManagement>
       <plugins>
         <plugin>
+          <!-- Remove with next parent version -->
+          <groupId>eu.maveniverse.maven.plugins</groupId>
+          <artifactId>checksum-plugin3</artifactId>
+          <version>0.2.2</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
           <configuration>
