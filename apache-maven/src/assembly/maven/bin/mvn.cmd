@@ -74,13 +74,26 @@ if not exist "%JAVACMD%" (
   goto error
 )
 
-@REM Check Java version by testing the Java 17+ flag
-"%JAVACMD%" --enable-native-access=ALL-UNNAMED -version >nul 2>&1
-if ERRORLEVEL 1 (
-    echo Error: Apache Maven 4.x requires Java 17 or newer to run. >&2
-    "%JAVACMD%" -version >&2
-    echo Please upgrade your Java installation or set JAVA_HOME to point to a compatible JDK. >&2
-    goto error
+@REM Scan the arguments for version/quiet flags so that version-only
+@REM invocations can be answered without starting Maven itself; the Java-17
+@REM gate below then doubles as the settings probe used to render the banner.
+set "IS_VERSION_AND_EXIT="
+set "IS_SHOW_VERSION="
+set "IS_QUIET="
+set "IS_VERBOSE="
+set "IS_MAIN_OVERRIDE="
+for %%a in (%*) do (
+  if "%%~a"=="-v" set "IS_VERSION_AND_EXIT=1"
+  if "%%~a"=="--version" set "IS_VERSION_AND_EXIT=1"
+  if "%%~a"=="-V" set "IS_SHOW_VERSION=1"
+  if "%%~a"=="--show-version" set "IS_SHOW_VERSION=1"
+  if "%%~a"=="-q" set "IS_QUIET=1"
+  if "%%~a"=="--quiet" set "IS_QUIET=1"
+  if "%%~a"=="-X" set "IS_VERBOSE=1"
+  if "%%~a"=="--debug" set "IS_VERBOSE=1"
+  if "%%~a"=="--enc" set "IS_MAIN_OVERRIDE=1"
+  if "%%~a"=="--shell" set "IS_MAIN_OVERRIDE=1"
+  if "%%~a"=="--up" set "IS_MAIN_OVERRIDE=1"
 )
 
 :chkMHome
@@ -90,6 +103,46 @@ if "%MAVEN_HOME%"=="" goto error
 
 :checkMCmd
 if not exist "%MAVEN_HOME%\bin\mvn.cmd" goto error
+
+@REM ==== FAST VERSION PATH ====
+@REM When only version info is requested, render the banner from a single
+@REM lightweight JVM (-XshowSettings) without starting Maven itself.
+set "FAST_VERSION=0"
+set "VERSION_SETTINGS_TEMP="
+if defined IS_VERSION_AND_EXIT goto tryFastVersion
+if defined IS_SHOW_VERSION goto tryFastVersion
+goto javaGate
+
+:tryFastVersion
+if defined IS_VERBOSE goto javaGate
+if defined IS_MAIN_OVERRIDE goto javaGate
+set "VERSION_SETTINGS_TEMP=%TEMP%\mvn-version-%RANDOM%-%RANDOM%.txt"
+"%JAVACMD%" --enable-native-access=ALL-UNNAMED -XshowSettings:properties -version 2> "%VERSION_SETTINGS_TEMP%"
+if ERRORLEVEL 1 (
+  del "%VERSION_SETTINGS_TEMP%" 2>nul
+  set "VERSION_SETTINGS_TEMP="
+  goto javaGate
+)
+set "FAST_VERSION=1"
+goto versionPrint
+
+:javaGate
+"%JAVACMD%" --enable-native-access=ALL-UNNAMED -version >nul 2>&1
+if ERRORLEVEL 1 (
+    echo Error: Apache Maven 4.x requires Java 17 or newer to run. >&2
+    "%JAVACMD%" -version >&2
+    echo Please upgrade your Java installation or set JAVA_HOME to point to a compatible JDK. >&2
+    goto error
+)
+if "%FAST_VERSION%"=="1" goto versionPrint
+goto fastVersionDone
+
+:versionPrint
+call :printFastVersion "%VERSION_SETTINGS_TEMP%"
+if defined VERSION_SETTINGS_TEMP del "%VERSION_SETTINGS_TEMP%" 2>nul
+if defined IS_VERSION_AND_EXIT goto end
+set "MAVEN_VERSION_PRINTED=-Dmaven.version.printed=true"
+:fastVersionDone
 
 @REM ==== END VALIDATION ====
 
@@ -297,7 +350,7 @@ if not "%MAVEN_MAIN_CLASS%"=="org.apache.maven.cling.MavenCling" set "MAVEN_ARGS
 
 if defined MAVEN_DEBUG_SCRIPT (
   echo [DEBUG] Launching JVM with command:
-  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS% %MAVEN_DEBUG_OPTS% --enable-native-access=ALL-UNNAMED -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %LAUNCHER_CLASS% %MAVEN_ARGS% %*
+  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS% %MAVEN_DEBUG_OPTS% --enable-native-access=ALL-UNNAMED -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %MAVEN_VERSION_PRINTED% %LAUNCHER_CLASS% %MAVEN_ARGS% %*
 )
 
 "%JAVACMD%" ^
@@ -312,6 +365,7 @@ if defined MAVEN_DEBUG_SCRIPT (
   "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" ^
   "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" ^
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
+  %MAVEN_VERSION_PRINTED% ^
   %LAUNCHER_CLASS% ^
   %MAVEN_ARGS% ^
   %*
@@ -336,3 +390,95 @@ if exist "%USERPROFILE%\mavenrc_post.cmd" call "%USERPROFILE%\mavenrc_post.cmd"
 if "%MAVEN_BATCH_PAUSE%"=="on" pause
 
 exit /b %ERROR_CODE%
+
+:printFastVersion
+@REM Renders the Maven version banner without starting Maven itself.
+@REM %1 = path to the java -XshowSettings dump file (may be empty when absent)
+set "_SETTINGS=%~1"
+set "_MVN_NAME="
+set "_MVN_SHORT="
+set "_MVN_VERSION="
+set "_MVN_BUILD="
+set "_VFILE=%MAVEN_HOME%\bin\maven.version.properties"
+if exist "%_VFILE%" (
+  for /f "tokens=1,* delims==" %%a in ('findstr /b /c:"distributionName=" "%_VFILE%"') do set "_MVN_NAME=%%b"
+  for /f "tokens=1,* delims==" %%a in ('findstr /b /c:"distributionShortName=" "%_VFILE%"') do set "_MVN_SHORT=%%b"
+  for /f "tokens=1,* delims==" %%a in ('findstr /b /c:"version=" "%_VFILE%"') do set "_MVN_VERSION=%%b"
+  for /f "tokens=1,* delims==" %%a in ('findstr /b /c:"buildNumber=" "%_VFILE%"') do set "_MVN_BUILD=%%b"
+)
+if not defined _MVN_NAME set "_MVN_NAME=Apache Maven"
+if not defined _MVN_SHORT set "_MVN_SHORT=Maven"
+if not defined _MVN_VERSION set "_MVN_VERSION=<version unknown>"
+
+set "_JAVA_VERSION="
+set "_JAVA_VENDOR="
+set "_JAVA_HOME="
+set "_LANG="
+set "_COUNTRY="
+set "_ENCODING="
+set "_TIMEZONE="
+set "_OS_NAME="
+set "_OS_VERSION="
+set "_OS_ARCH="
+
+if not defined _SETTINGS goto printFastVersionOutput
+for /f "tokens=1,* delims==" %%a in ('findstr /c:"java.version =" "%_SETTINGS%"') do set "_JAVA_VERSION=%%b"
+for /f "tokens=1,* delims==" %%a in ('findstr /c:"java.vendor =" "%_SETTINGS%"') do set "_JAVA_VENDOR=%%b"
+for /f "tokens=1,* delims==" %%a in ('findstr /c:"java.home =" "%_SETTINGS%"') do set "_JAVA_HOME=%%b"
+for /f "tokens=1,* delims==" %%a in ('findstr /c:"user.language =" "%_SETTINGS%"') do set "_LANG=%%b"
+for /f "tokens=1,* delims==" %%a in ('findstr /c:"user.country =" "%_SETTINGS%"') do set "_COUNTRY=%%b"
+for /f "tokens=1,* delims==" %%a in ('findstr /c:"file.encoding =" "%_SETTINGS%"') do set "_ENCODING=%%b"
+for /f "tokens=1,* delims==" %%a in ('findstr /c:"user.timezone =" "%_SETTINGS%"') do set "_TIMEZONE=%%b"
+for /f "tokens=1,* delims==" %%a in ('findstr /c:"os.name =" "%_SETTINGS%"') do set "_OS_NAME=%%b"
+for /f "tokens=1,* delims==" %%a in ('findstr /c:"os.version =" "%_SETTINGS%"') do set "_OS_VERSION=%%b"
+for /f "tokens=1,* delims==" %%a in ('findstr /c:"os.arch =" "%_SETTINGS%"') do set "_OS_ARCH=%%b"
+
+@REM The "key = value" format adds one leading space after '='; strip it.
+if defined _JAVA_VERSION set "_JAVA_VERSION=%_JAVA_VERSION:~1%"
+if defined _JAVA_VENDOR set "_JAVA_VENDOR=%_JAVA_VENDOR:~1%"
+if defined _JAVA_HOME set "_JAVA_HOME=%_JAVA_HOME:~1%"
+if defined _LANG set "_LANG=%_LANG:~1%"
+if defined _COUNTRY set "_COUNTRY=%_COUNTRY:~1%"
+if defined _ENCODING set "_ENCODING=%_ENCODING:~1%"
+if defined _TIMEZONE set "_TIMEZONE=%_TIMEZONE:~1%"
+if defined _OS_NAME set "_OS_NAME=%_OS_NAME:~1%"
+if defined _OS_VERSION set "_OS_VERSION=%_OS_VERSION:~1%"
+if defined _OS_ARCH set "_OS_ARCH=%_OS_ARCH:~1%"
+
+if not defined _JAVA_VERSION set "_JAVA_VERSION=<unknown Java version>"
+if not defined _JAVA_VENDOR set "_JAVA_VENDOR=<unknown vendor>"
+if not defined _JAVA_HOME set "_JAVA_HOME=<unknown runtime>"
+if not defined _ENCODING set "_ENCODING=<unknown encoding>"
+if defined _COUNTRY (
+  set "_LOCALE=%_LANG%_%_COUNTRY%"
+) else (
+  set "_LOCALE=%_LANG%"
+)
+if not defined _LOCALE set "_LOCALE=<unknown>"
+
+@REM Time zone: not in -XshowSettings; try TZ env, else Windows registry not portable.
+if not defined _TIMEZONE (
+  if defined TZ (set "_TIMEZONE=%TZ%") else (set "_TIMEZONE=unknown")
+)
+
+@REM OS family: derived from os.name (case-insensitive substring).
+set "_OS_FAMILY="
+echo %_OS_NAME% | findstr /i "windows" >nul 2>&1 && set "_OS_FAMILY=windows"
+echo %_OS_NAME% | findstr /i "mac" >nul 2>&1 && set "_OS_FAMILY=mac"
+if not defined _OS_FAMILY if defined _OS_NAME set "_OS_FAMILY=unix"
+
+:printFastVersionOutput
+if defined IS_QUIET (
+  echo %_MVN_VERSION%
+  exit /b 0
+)
+if defined _MVN_BUILD (
+  echo %_MVN_NAME% %_MVN_VERSION% (%_MVN_BUILD%)
+) else (
+  echo %_MVN_NAME% %_MVN_VERSION%
+)
+echo %_MVN_SHORT% home: %MAVEN_HOME%
+echo Java version: %_JAVA_VERSION%, vendor: %_JAVA_VENDOR%, runtime: %_JAVA_HOME%
+echo Default locale: %_LOCALE%, platform encoding: %_ENCODING%, time zone: %_TIMEZONE%
+echo OS name: "%_OS_NAME%", version: "%_OS_VERSION%", arch: "%_OS_ARCH%", family: "%_OS_FAMILY%"
+exit /b 0
