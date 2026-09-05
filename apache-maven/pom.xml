@@ -377,17 +377,21 @@ under the License.
           </plugin>
           <!-- calculate checksums of source release for Apache dist area -->
           <plugin>
-            <groupId>net.nicoulaj.maven.plugins</groupId>
-            <artifactId>checksum-maven-plugin</artifactId>
-            <version>1.11</version>
+            <groupId>eu.maveniverse.maven.plugins</groupId>
+            <artifactId>checksum-plugin3</artifactId>
             <executions>
               <execution>
                 <id>source-release-checksum</id>
                 <goals>
-                  <goal>artifacts</goal>
+                  <goal>project</goal>
                 </goals>
+                <phase>post-integration-test</phase>
                 <configuration>
-                  <includeClassifiers>bin,src</includeClassifiers>
+                  <alg>SHA-512</alg>
+                  <includedClassifiers>
+                    <includedClassifier>src</includedClassifier>
+                    <includedClassifier>bin</includedClassifier>
+                  </includedClassifiers>
                 </configuration>
               </execution>
             </executions>
