@@ -77,6 +77,7 @@ import org.apache.maven.di.impl.DIException;
 import org.apache.maven.di.impl.InjectorImpl;
 import org.apache.maven.impl.AbstractSession;
 import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.MavenRepositoryListener;
 import org.apache.maven.impl.di.SessionScope;
 import org.apache.maven.impl.model.DefaultInterpolator;
 import org.apache.maven.impl.resolver.MavenSessionBuilderSupplier;
@@ -542,6 +543,7 @@ public class ApiRunner {
         // Configure the resolver session with dependency resolution machinery
         MavenSessionBuilderSupplier sessionBuilderSupplier = new MavenSessionBuilderSupplier(system, false);
         DefaultRepositorySystemSession rsession = new DefaultRepositorySystemSession(h -> false);
+        rsession.setRepositoryListener(new MavenRepositoryListener());
         rsession.setScopeManager(new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE));
         rsession.setDependencyTraverser(sessionBuilderSupplier.getDependencyTraverser());
         rsession.setDependencyManager(sessionBuilderSupplier.getDependencyManager(true));

@@ -56,6 +56,7 @@ import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.RemoteRepository;
+import org.apache.maven.api.RepositoryListener;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
@@ -123,6 +124,7 @@ public abstract class AbstractSession implements InternalSession {
     protected final Injector injector;
     private final Map<Class<? extends Service>, Service> services = new ConcurrentHashMap<>();
     private final List<Listener> listeners = new CopyOnWriteArrayList<>();
+    private final List<RepositoryListener> repositoryListeners;
     private final Cache<org.eclipse.aether.graph.DependencyNode, Node> allNodes =
             Cache.newCache(Cache.ReferenceType.WEAK, "AbstractSession-Nodes");
     private final Map<Class<? extends Artifact>, Cache<org.eclipse.aether.artifact.Artifact, Artifact>> allArtifacts =
@@ -148,6 +150,14 @@ public abstract class AbstractSession implements InternalSession {
         this.repositories = getRepositories(repositories, resolverRepositories);
         this.lookup = lookup;
         this.injector = lookup != null ? lookup.lookupOptional(Injector.class).orElse(null) : null;
+        this.repositoryListeners = getRepositoryListeners(session);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<RepositoryListener> getRepositoryListeners(RepositorySystemSession session) {
+        // Resolver events are scoped to RepositorySystemSession, so derived Maven sessions share this listener set.
+        return (List<RepositoryListener>)
+                session.getData().computeIfAbsent(RepositoryListener.class, CopyOnWriteArrayList::new);
     }
 
     @SuppressWarnings("unchecked")
@@ -529,6 +539,22 @@ public abstract class AbstractSession implements InternalSession {
     @Override
     public Collection<Listener> getListeners() {
         return Collections.unmodifiableCollection(listeners);
+    }
+
+    @Override
+    public void registerListener(@Nonnull RepositoryListener listener) {
+        repositoryListeners.add(requireNonNull(listener));
+    }
+
+    @Override
+    public void unregisterListener(@Nonnull RepositoryListener listener) {
+        repositoryListeners.remove(requireNonNull(listener));
+    }
+
+    @Nonnull
+    @Override
+    public Collection<RepositoryListener> getRepositoryListeners() {
+        return Collections.unmodifiableCollection(repositoryListeners);
     }
 
     //
