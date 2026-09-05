@@ -19,6 +19,9 @@
 package org.apache.maven.model.plugin;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
@@ -32,12 +35,11 @@ import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 
 class DefaultLifecycleBindingsInjectorTest {
 
     @Test
-    void mergePluginManagementDoesNotActivateManagedExecutions() {
+    void mergePluginManagementOnlyActivatesExecutionsFromTheSameLifecycle() {
         InputSource lifecycleSource = inputSource("lifecycle");
         InputSource managementSource = inputSource("plugin-management");
 
@@ -45,8 +47,15 @@ class DefaultLifecycleBindingsInjectorTest {
         Plugin lifecyclePlugin = plugin("lifecycle-version", lifecycleExecution, lifecycleSource);
         lifecyclePlugin.setConfiguration(configuration("shared", "lifecycle", "lifecycle", "default"));
 
-        PluginExecution managedExecution = execution("custom-clean", "initialize", managementSource);
-        Plugin managedPlugin = plugin("managed-version", managedExecution, managementSource);
+        PluginExecution sameLifecycleExecution = execution("managed-clean", "clean", managementSource);
+        PluginExecution crossLifecycleExecution = execution("managed-initialize", "initialize", managementSource);
+        PluginExecution defaultPhaseExecution = execution("managed-default-phase", null, managementSource);
+        Plugin managedPlugin = plugin(
+                "managed-version",
+                managementSource,
+                sameLifecycleExecution,
+                crossLifecycleExecution,
+                defaultPhaseExecution);
         managedPlugin.setConfiguration(configuration("shared", "managed", "managed", "configured"));
         managedPlugin.setExtensions(true);
         managedPlugin.setInherited(false);
@@ -55,7 +64,8 @@ class DefaultLifecycleBindingsInjectorTest {
         Model target = modelWithPluginManagement(managedPlugin);
         Model source = modelWithPlugin(lifecyclePlugin);
 
-        new DefaultLifecycleBindingsInjector.LifecycleBindingsMerger().merge(target, source);
+        new DefaultLifecycleBindingsInjector.LifecycleBindingsMerger(Map.of("clean", "clean", "initialize", "default"))
+                .merge(target, source);
 
         Plugin result = target.getBuild().getPlugins().get(0);
         Xpp3Dom resultConfiguration = (Xpp3Dom) result.getConfiguration();
@@ -64,18 +74,27 @@ class DefaultLifecycleBindingsInjectorTest {
         assertEquals("managed", resultConfiguration.getChild("shared").getValue());
         assertEquals("configured", resultConfiguration.getChild("managed").getValue());
         assertEquals("default", resultConfiguration.getChild("lifecycle").getValue());
+        assertEquals(3, result.getExecutions().size());
         assertEquals(
-                List.of("default-clean"),
-                result.getExecutions().stream().map(PluginExecution::getId).toList());
-        assertEquals(List.of(), result.getDependencies());
-        assertNull(result.getExtensions());
-        assertNull(result.getInherited());
-        assertEquals("lifecycle", result.getLocation("").getSource().getModelId());
+                Set.of("default-clean", "managed-clean", "managed-default-phase"),
+                result.getExecutions().stream().map(PluginExecution::getId).collect(Collectors.toSet()));
+        assertEquals(
+                List.of("managed-dependency"),
+                result.getDependencies().stream().map(Dependency::getArtifactId).toList());
+        assertEquals("true", result.getExtensions());
+        assertEquals("false", result.getInherited());
+        assertEquals("plugin-management", result.getLocation("").getSource().getModelId());
         assertEquals(
                 "plugin-management", result.getLocation("version").getSource().getModelId());
         assertEquals(
                 "lifecycle",
-                result.getExecutions().get(0).getLocation("").getSource().getModelId());
+                result.getExecutions().stream()
+                        .filter(execution -> "default-clean".equals(execution.getId()))
+                        .findFirst()
+                        .orElseThrow()
+                        .getLocation("")
+                        .getSource()
+                        .getModelId());
     }
 
     private static Model modelWithPlugin(Plugin plugin) {
@@ -97,10 +116,16 @@ class DefaultLifecycleBindingsInjectorTest {
     }
 
     private static Plugin plugin(String version, PluginExecution execution, InputSource source) {
+        return plugin(version, source, execution);
+    }
+
+    private static Plugin plugin(String version, InputSource source, PluginExecution... executions) {
         Plugin plugin = new Plugin();
         plugin.setArtifactId("maven-clean-plugin");
         plugin.setVersion(version);
-        plugin.addExecution(execution);
+        for (PluginExecution execution : executions) {
+            plugin.addExecution(execution);
+        }
         plugin.setLocation("", new InputLocation(1, 1, source));
         plugin.setLocation("version", new InputLocation(2, 1, source));
         return plugin;
