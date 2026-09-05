@@ -65,7 +65,7 @@ class XmlNodeImplTest {
                 + "                        <groupId>org.apache.maven.plugins</groupId>\n"
                 + "                        <artifactId>maven-surefire-plugin</artifactId>\n"
                 + "                        <foo>\n"
-                + "                            <properties combine.children=\"append\">\n"
+                + "                            <properties combine.getChildren=\"append\">\n"
                 + "                                <property>\n"
                 + "                                    <name>prop2</name>\n"
                 + "                                    <value>value2</value>\n"
@@ -129,7 +129,7 @@ class XmlNodeImplTest {
                 + "                        <groupId>org.apache.maven.plugins</groupId>\n"
                 + "                        <artifactId>maven-surefire-plugin</artifactId>\n"
                 + "                        <foo>\n"
-                + "                            <properties combine.children=\"append\">\n"
+                + "                            <properties combine.getChildren=\"append\">\n"
                 + "                                <property>\n"
                 + "                                    <name>prop1</name>\n"
                 + "                                    <value>value1</value>\n"
@@ -160,7 +160,7 @@ class XmlNodeImplTest {
     void testAppend() throws Exception {
         String lhs = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <compilerArgs combine.children="append">
+                <compilerArgs combine.getChildren="append">
                     <arg>-Xmaxerrs</arg>
                     <arg>100</arg>
                     <arg>-Xmaxwarns</arg>
@@ -169,7 +169,7 @@ class XmlNodeImplTest {
                 """;
         String result = """
                 <?xml version="1.0" encoding="UTF-8"?>
-                <compilerArgs combine.children="append">
+                <compilerArgs combine.getChildren="append">
                   <arg>-Xmaxerrs</arg>
                   <arg>100</arg>
                   <arg>-Xmaxwarns</arg>
@@ -213,28 +213,28 @@ class XmlNodeImplTest {
         assertEquals(3, getChildren(mergeResult, "property").size());
 
         XmlNode p0 = getNthChild(mergeResult, "property", 0);
-        assertEquals("LHS-ONLY", p0.child("name").value());
-        assertEquals("left", p0.child("name").inputLocation());
-        assertEquals("LHS", p0.child("value").value());
-        assertEquals("left", p0.child("value").inputLocation());
+        assertEquals("LHS-ONLY", p0.getChild("name").getValue());
+        assertEquals("left", p0.getChild("name").getInputLocation());
+        assertEquals("LHS", p0.getChild("value").getValue());
+        assertEquals("left", p0.getChild("value").getInputLocation());
 
         XmlNode p1 = getNthChild(mergeResult, "property", 1);
         assertEquals(
                 "TOOVERWRITE",
-                getNthChild(mergeResult, "property", 1).child("name").value());
-        assertEquals("left", p1.child("name").inputLocation());
+                getNthChild(mergeResult, "property", 1).getChild("name").getValue());
+        assertEquals("left", p1.getChild("name").getInputLocation());
         assertEquals(
-                "LHS", getNthChild(mergeResult, "property", 1).child("value").value());
-        assertEquals("left", p1.child("value").inputLocation());
+                "LHS", getNthChild(mergeResult, "property", 1).getChild("value").getValue());
+        assertEquals("left", p1.getChild("value").getInputLocation());
 
         XmlNode p2 = getNthChild(mergeResult, "property", 2);
         assertEquals(
                 "RHS-ONLY",
-                getNthChild(mergeResult, "property", 2).child("name").value());
-        assertEquals("right", p2.child("name").inputLocation());
+                getNthChild(mergeResult, "property", 2).getChild("name").getValue());
+        assertEquals("right", p2.getChild("name").getInputLocation());
         assertEquals(
-                "RHS", getNthChild(mergeResult, "property", 2).child("value").value());
-        assertEquals("right", p2.child("value").inputLocation());
+                "RHS", getNthChild(mergeResult, "property", 2).getChild("value").getValue());
+        assertEquals("right", p2.getChild("value").getInputLocation());
     }
 
     /**
@@ -259,28 +259,28 @@ class XmlNodeImplTest {
         assertEquals(3, getChildren(mergeResult, "property").size());
 
         XmlNode p0 = getNthChild(mergeResult, "property", 0);
-        assertEquals("LHS-ONLY", p0.child("name").value());
-        assertEquals("left", p0.child("name").inputLocation());
-        assertEquals("LHS", p0.child("value").value());
-        assertEquals("left", p0.child("value").inputLocation());
+        assertEquals("LHS-ONLY", p0.getChild("name").getValue());
+        assertEquals("left", p0.getChild("name").getInputLocation());
+        assertEquals("LHS", p0.getChild("value").getValue());
+        assertEquals("left", p0.getChild("value").getInputLocation());
 
         XmlNode p1 = getNthChild(mergeResult, "property", 1);
         assertEquals(
                 "TOOVERWRITE",
-                getNthChild(mergeResult, "property", 1).child("name").value());
-        assertEquals("left", p1.child("name").inputLocation());
+                getNthChild(mergeResult, "property", 1).getChild("name").getValue());
+        assertEquals("left", p1.getChild("name").getInputLocation());
         assertEquals(
-                "LHS", getNthChild(mergeResult, "property", 1).child("value").value());
-        assertEquals("left", p1.child("value").inputLocation());
+                "LHS", getNthChild(mergeResult, "property", 1).getChild("value").getValue());
+        assertEquals("left", p1.getChild("value").getInputLocation());
 
         XmlNode p2 = getNthChild(mergeResult, "property", 2);
         assertEquals(
                 "RHS-ONLY",
-                getNthChild(mergeResult, "property", 2).child("name").value());
-        assertEquals("right", p2.child("name").inputLocation());
+                getNthChild(mergeResult, "property", 2).getChild("name").getValue());
+        assertEquals("right", p2.getChild("name").getInputLocation());
         assertEquals(
-                "RHS", getNthChild(mergeResult, "property", 2).child("value").value());
-        assertEquals("right", p2.child("value").inputLocation());
+                "RHS", getNthChild(mergeResult, "property", 2).getChild("value").getValue());
+        assertEquals("right", p2.getChild("value").getInputLocation());
     }
 
     @Test
@@ -293,7 +293,7 @@ class XmlNodeImplTest {
         XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
         XmlNode mergeResult = XmlService.merge(leftDom, rightDom, true);
-        assertEquals(" ", mergeResult.value());
+        assertEquals(" ", mergeResult.getValue());
     }
 
     @Test
@@ -306,7 +306,7 @@ class XmlNodeImplTest {
         XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
         XmlNode mergeResult = XmlService.merge(leftDom, rightDom, true);
-        assertEquals("", mergeResult.value());
+        assertEquals("", mergeResult.getValue());
     }
 
     @Test
@@ -319,7 +319,7 @@ class XmlNodeImplTest {
         XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
 
         XmlNode mergeResult = XmlService.merge(leftDom, rightDom, true);
-        assertNull(mergeResult.value());
+        assertNull(mergeResult.getValue());
     }
 
     /**
@@ -328,7 +328,7 @@ class XmlNodeImplTest {
     @Test
     void testShouldPerformAppendAtFirstSubElementLevel() throws XMLStreamException {
         String lhs = """
-                <top combine.children="append">
+                <top combine.getChildren="append">
                   <topsub1>t1s1Value</topsub1>
                   <topsub1>t1s2Value</topsub1>
                 </top>
@@ -344,16 +344,16 @@ class XmlNodeImplTest {
 
         XmlNode result = XmlService.merge(leftDom, rightDom);
         assertEquals(4, getChildren(result, "topsub1").size());
-        assertEquals("t2s1Value", getChildren(result, "topsub1").get(0).value());
-        assertEquals("t2s2Value", getChildren(result, "topsub1").get(1).value());
-        assertEquals("t1s1Value", getChildren(result, "topsub1").get(2).value());
-        assertEquals("t1s2Value", getChildren(result, "topsub1").get(3).value());
+        assertEquals("t2s1Value", getChildren(result, "topsub1").get(0).getValue());
+        assertEquals("t2s2Value", getChildren(result, "topsub1").get(1).getValue());
+        assertEquals("t1s1Value", getChildren(result, "topsub1").get(2).getValue());
+        assertEquals("t1s2Value", getChildren(result, "topsub1").get(3).getValue());
 
-        assertEquals("left", result.inputLocation());
-        assertEquals("right", getChildren(result, "topsub1").get(0).inputLocation());
-        assertEquals("right", getChildren(result, "topsub1").get(1).inputLocation());
-        assertEquals("left", getChildren(result, "topsub1").get(2).inputLocation());
-        assertEquals("left", getChildren(result, "topsub1").get(3).inputLocation());
+        assertEquals("left", result.getInputLocation());
+        assertEquals("right", getChildren(result, "topsub1").get(0).getInputLocation());
+        assertEquals("right", getChildren(result, "topsub1").get(1).getInputLocation());
+        assertEquals("left", getChildren(result, "topsub1").get(2).getInputLocation());
+        assertEquals("left", getChildren(result, "topsub1").get(3).getInputLocation());
     }
 
     /**
@@ -504,7 +504,7 @@ class XmlNodeImplTest {
         attributes.put("differentAttribute", "differentValue");
         List<XmlNode> childList = new ArrayList<>();
         childList.add(XmlNode.newInstance("differentChild", "differentValue", null, null, null));
-        Xpp3Dom dom2 = new Xpp3Dom(XmlNode.newInstance(dom.name(), "differentValue", attributes, childList, null));
+        Xpp3Dom dom2 = new Xpp3Dom(XmlNode.newInstance(dom.getName(), "differentValue", attributes, childList, null));
 
         assertNotEquals(dom, dom2);
         assertNotEquals(dom2, dom);
@@ -522,13 +522,13 @@ class XmlNodeImplTest {
         XmlNode childConfig = toXmlNode(childConfigStr, new FixedInputLocationBuilder("child"));
 
         XmlNode result = XmlService.merge(childConfig, parentConfig);
-        XmlNode items = result.child("items");
+        XmlNode items = result.getChild("items");
 
-        assertEquals(1, items.children().size());
+        assertEquals(1, items.getChildren().size());
 
-        XmlNode item = items.children().get(0);
-        assertEquals("three", item.value());
-        assertEquals("child", item.inputLocation());
+        XmlNode item = items.getChildren().get(0);
+        assertEquals("three", item.getValue());
+        assertEquals("child", item.getInputLocation());
     }
 
     /**
@@ -540,22 +540,22 @@ class XmlNodeImplTest {
         XmlNode parentConfig = toXmlNode(parentConfigStr, new FixedInputLocationBuilder("parent"));
 
         String childConfigStr =
-                "<configuration><items combine.children=\"append\"><item>three</item></items></configuration>";
+                "<configuration><items combine.getChildren=\"append\"><item>three</item></items></configuration>";
         XmlNode childConfig = toXmlNode(childConfigStr, new FixedInputLocationBuilder("child"));
 
         XmlNode result = XmlService.merge(childConfig, parentConfig);
         assertNotNull(result);
-        XmlNode items = result.child("items");
+        XmlNode items = result.getChild("items");
         assertNotNull(result);
 
-        XmlNode[] item = items.children().toArray(new XmlNode[0]);
+        XmlNode[] item = items.getChildren().toArray(new XmlNode[0]);
         assertEquals(3, item.length);
-        assertEquals("one", item[0].value());
-        assertEquals("parent", item[0].inputLocation());
-        assertEquals("two", item[1].value());
-        assertEquals("parent", item[1].inputLocation());
-        assertEquals("three", item[2].value());
-        assertEquals("child", item[2].inputLocation());
+        assertEquals("one", item[0].getValue());
+        assertEquals("parent", item[0].getInputLocation());
+        assertEquals("two", item[1].getValue());
+        assertEquals("parent", item[1].getInputLocation());
+        assertEquals("three", item[2].getValue());
+        assertEquals("child", item[2].getInputLocation());
     }
 
     /**
@@ -570,13 +570,13 @@ class XmlNodeImplTest {
         XmlNode recessiveConfig = toXmlNode(configStr);
 
         XmlNode result = XmlService.merge(dominantConfig, recessiveConfig);
-        XmlNode items = result.child("items");
+        XmlNode items = result.getChild("items");
 
-        assertEquals(3, items.children().size());
+        assertEquals(3, items.getChildren().size());
 
-        assertNull(items.children().get(0).value());
-        assertEquals("test", items.children().get(1).value());
-        assertNull(items.children().get(2).value());
+        assertNull(items.getChildren().get(0).getValue());
+        assertEquals("test", items.getChildren().get(1).getValue());
+        assertNull(items.getChildren().get(2).getValue());
     }
 
     /**
@@ -608,7 +608,7 @@ class XmlNodeImplTest {
         String dupes = "<configuration><foo>x</foo><foo>y</foo></configuration>";
         XmlNode dom = toXmlNode(new StringReader(dupes));
         assertNotNull(dom);
-        assertEquals("y", dom.child("foo").value());
+        assertEquals("y", dom.getChild("foo").getValue());
     }
 
     /**
@@ -654,13 +654,13 @@ class XmlNodeImplTest {
                 + "    <shadedPattern>org.apache.shiro.crypto.cipher.CipherService</shadedPattern>\n"
                 + "  </relocation>\n"
                 + "</relocations>";
-        String recessive = "<relocations combine.children=\"append\">\n"
+        String recessive = "<relocations combine.getChildren=\"append\">\n"
                 + "  <relocation>\n"
                 + "    <pattern>javax.faces</pattern>\n"
                 + "    <shadedPattern>jakarta.faces</shadedPattern>\n"
                 + "  </relocation>\n"
                 + "</relocations>";
-        String expected = "<relocations combine.children=\"append\">\n"
+        String expected = "<relocations combine.getChildren=\"append\">\n"
                 + "  <relocation>\n"
                 + "    <pattern>javax.faces</pattern>\n"
                 + "    <shadedPattern>jakarta.faces</shadedPattern>\n"
@@ -678,12 +678,12 @@ class XmlNodeImplTest {
     }
 
     private static List<XmlNode> getChildren(XmlNode node, String name) {
-        return node.children().stream().filter(n -> n.name().equals(name)).toList();
+        return node.getChildren().stream().filter(n -> n.getName().equals(name)).toList();
     }
 
     private static XmlNode getNthChild(XmlNode node, String name, int nth) {
-        return node.children().stream()
-                .filter(n -> n.name().equals(name))
+        return node.getChildren().stream()
+                .filter(n -> n.getName().equals(name))
                 .skip(nth)
                 .findFirst()
                 .orElse(null);
@@ -732,7 +732,7 @@ class XmlNodeImplTest {
                 </root>
                 """;
         XmlNode node = toXmlNode(xml);
-        assertEquals("http://maven.apache.org/POM/4.0.0", node.namespaces().get("mvn"));
+        assertEquals("http://maven.apache.org/POM/4.0.0", node.getNamespaces().get("mvn"));
     }
 
     @Test
@@ -745,10 +745,10 @@ class XmlNodeImplTest {
                 </root>
                 """;
         XmlNode node = toXmlNode(xml);
-        assertEquals(3, node.namespaces().size());
-        assertEquals("http://maven.apache.org/POM/4.0.0", node.namespaces().get("mvn"));
-        assertEquals("http://example.com/custom", node.namespaces().get("custom"));
-        assertEquals("http://example.com/other", node.namespaces().get("other"));
+        assertEquals(3, node.getNamespaces().size());
+        assertEquals("http://maven.apache.org/POM/4.0.0", node.getNamespaces().get("mvn"));
+        assertEquals("http://example.com/custom", node.getNamespaces().get("custom"));
+        assertEquals("http://example.com/other", node.getNamespaces().get("other"));
     }
 
     @Test
@@ -759,12 +759,12 @@ class XmlNodeImplTest {
                 </root>
                 """;
         XmlNode node = toXmlNode(xml);
-        XmlNode child = node.child("child");
+        XmlNode child = node.getChild("child");
         assertNotNull(child);
         // Child inherits parent's namespace context
-        assertEquals("http://maven.apache.org/POM/4.0.0", child.namespaces().get("mvn"));
+        assertEquals("http://maven.apache.org/POM/4.0.0", child.getNamespaces().get("mvn"));
         // Child does NOT have xmlns:mvn in its own attributes
-        assertNull(child.attribute("xmlns:mvn"));
+        assertNull(child.getAttribute("xmlns:mvn"));
     }
 
     @Test
@@ -779,25 +779,25 @@ class XmlNodeImplTest {
                 </root>
                 """;
         XmlNode root = toXmlNode(xml);
-        XmlNode level1 = root.child("level1");
-        XmlNode level2 = level1.child("level2");
-        XmlNode leaf = level2.child("leaf");
+        XmlNode level1 = root.getChild("level1");
+        XmlNode level2 = level1.getChild("level2");
+        XmlNode leaf = level2.getChild("leaf");
 
         // root has only "a"
-        assertEquals("http://example.com/a", root.namespaces().get("a"));
-        assertNull(root.namespaces().get("b"));
+        assertEquals("http://example.com/a", root.getNamespaces().get("a"));
+        assertNull(root.getNamespaces().get("b"));
 
         // level1 has both "a" (inherited) and "b" (own)
-        assertEquals("http://example.com/a", level1.namespaces().get("a"));
-        assertEquals("http://example.com/b", level1.namespaces().get("b"));
+        assertEquals("http://example.com/a", level1.getNamespaces().get("a"));
+        assertEquals("http://example.com/b", level1.getNamespaces().get("b"));
 
         // level2 inherits both
-        assertEquals("http://example.com/a", level2.namespaces().get("a"));
-        assertEquals("http://example.com/b", level2.namespaces().get("b"));
+        assertEquals("http://example.com/a", level2.getNamespaces().get("a"));
+        assertEquals("http://example.com/b", level2.getNamespaces().get("b"));
 
         // leaf also inherits both
-        assertEquals("http://example.com/a", leaf.namespaces().get("a"));
-        assertEquals("http://example.com/b", leaf.namespaces().get("b"));
+        assertEquals("http://example.com/a", leaf.getNamespaces().get("a"));
+        assertEquals("http://example.com/b", leaf.getNamespaces().get("b"));
     }
 
     @Test
@@ -810,10 +810,10 @@ class XmlNodeImplTest {
         XmlNode node = toXmlNode(xml);
         // Default namespace (no prefix) should NOT be in the namespaces map
         // since namespaces() tracks prefix→URI bindings for resolving prefixed attributes
-        assertNull(node.namespaces().get(""));
-        assertNull(node.namespaces().get("xmlns"));
+        assertNull(node.getNamespaces().get(""));
+        assertNull(node.getNamespaces().get("xmlns"));
         // The default namespace is stored as an attribute instead
-        assertEquals("http://maven.apache.org/POM/4.0.0", node.attribute("xmlns"));
+        assertEquals("http://maven.apache.org/POM/4.0.0", node.getAttribute("xmlns"));
     }
 
     @Test
@@ -826,25 +826,25 @@ class XmlNodeImplTest {
                 </root>
                 """;
         XmlNode root = toXmlNode(xml);
-        XmlNode child = root.child("child");
-        XmlNode grandchild = child.child("grandchild");
+        XmlNode child = root.getChild("child");
+        XmlNode grandchild = child.getChild("grandchild");
 
         // Root has original binding
-        assertEquals("http://example.com/original", root.namespaces().get("ns"));
+        assertEquals("http://example.com/original", root.getNamespaces().get("ns"));
         // Child overrides
-        assertEquals("http://example.com/overridden", child.namespaces().get("ns"));
+        assertEquals("http://example.com/overridden", child.getNamespaces().get("ns"));
         // Grandchild inherits the overridden version
-        assertEquals("http://example.com/overridden", grandchild.namespaces().get("ns"));
+        assertEquals("http://example.com/overridden", grandchild.getNamespaces().get("ns"));
     }
 
     @Test
     void testParseNoNamespaceDeclarationsProducesEmptyMap() throws Exception {
         String xml = "<root><child attr=\"value\"/></root>";
         XmlNode root = toXmlNode(xml);
-        assertTrue(root.namespaces().isEmpty());
-        XmlNode child = root.child("child");
+        assertTrue(root.getNamespaces().isEmpty());
+        XmlNode child = root.getChild("child");
         assertNotNull(child);
-        assertTrue(child.namespaces().isEmpty());
+        assertTrue(child.getNamespaces().isEmpty());
     }
 
     @Test
@@ -856,7 +856,7 @@ class XmlNodeImplTest {
                 """;
         XmlNode node = toXmlNode(xml);
         assertThrows(
-                UnsupportedOperationException.class, () -> node.namespaces().put("foo", "bar"));
+                UnsupportedOperationException.class, () -> node.getNamespaces().put("foo", "bar"));
     }
 
     // ========================================================================================
@@ -874,7 +874,7 @@ class XmlNodeImplTest {
                 """;
 
         XmlNode node = toXmlNode(xml);
-        assertEquals("http://maven.apache.org/POM/4.0.0", node.attribute("xmlns:mvn"));
+        assertEquals("http://maven.apache.org/POM/4.0.0", node.getAttribute("xmlns:mvn"));
 
         StringWriter writer = new StringWriter();
         XmlService.write(node, writer);
@@ -904,7 +904,7 @@ class XmlNodeImplTest {
 
         XmlNode reRead = toXmlNode(output);
         assertNotNull(reRead);
-        assertEquals("append", reRead.attribute("combine.children"));
+        assertEquals("append", reRead.getAttribute("combine.children"));
     }
 
     @Test
@@ -926,8 +926,8 @@ class XmlNodeImplTest {
 
         XmlNode reRead = toXmlNode(output);
         assertNotNull(reRead);
-        assertEquals("value", reRead.attribute("custom:myattr"));
-        assertEquals("http://example.com/custom", reRead.attribute("xmlns:custom"));
+        assertEquals("value", reRead.getAttribute("custom:myattr"));
+        assertEquals("http://example.com/custom", reRead.getAttribute("xmlns:custom"));
     }
 
     @Test
@@ -941,11 +941,11 @@ class XmlNodeImplTest {
                 """;
 
         XmlNode node = toXmlNode(xml);
-        XmlNode compilerArgs = node.child("compilerArgs");
+        XmlNode compilerArgs = node.getChild("compilerArgs");
         assertNotNull(compilerArgs);
-        assertEquals("value", compilerArgs.attribute("custom:myattr"));
-        assertNull(compilerArgs.attribute("xmlns:custom"), "xmlns:custom should be on parent, not child");
-        assertEquals("http://example.com/custom", compilerArgs.namespaces().get("custom"));
+        assertEquals("value", compilerArgs.getAttribute("custom:myattr"));
+        assertNull(compilerArgs.getAttribute("xmlns:custom"), "xmlns:custom should be on parent, not child");
+        assertEquals("http://example.com/custom", compilerArgs.getNamespaces().get("custom"));
 
         StringWriter writer = new StringWriter();
         XmlService.write(compilerArgs, writer);
@@ -953,7 +953,7 @@ class XmlNodeImplTest {
 
         XmlNode reRead = toXmlNode(output);
         assertNotNull(reRead);
-        assertEquals("value", reRead.attribute("custom:myattr"));
+        assertEquals("value", reRead.getAttribute("custom:myattr"));
     }
 
     @Test
@@ -967,7 +967,7 @@ class XmlNodeImplTest {
                         .build()))
                 .build();
 
-        assertTrue(node.namespaces().isEmpty(), "No namespace context");
+        assertTrue(node.getNamespaces().isEmpty(), "No namespace context");
 
         StringWriter writer = new StringWriter();
         XmlService.write(node, writer);
@@ -978,7 +978,7 @@ class XmlNodeImplTest {
 
         XmlNode reRead = toXmlNode(output);
         assertNotNull(reRead);
-        assertEquals("append", reRead.attribute("combine.children"));
+        assertEquals("append", reRead.getAttribute("combine.children"));
     }
 
     @Test
@@ -989,7 +989,7 @@ class XmlNodeImplTest {
                 </root>
                 """;
         XmlNode root = toXmlNode(xml);
-        XmlNode child = root.child("child");
+        XmlNode child = root.getChild("child");
         assertNotNull(child);
 
         // Write only the child (which has prefixed attrs but no local xmlns:)
@@ -1003,8 +1003,8 @@ class XmlNodeImplTest {
 
         // Round-trip should preserve attributes
         XmlNode reRead = toXmlNode(output);
-        assertEquals("1", reRead.attribute("a:x"));
-        assertEquals("2", reRead.attribute("b:y"));
+        assertEquals("1", reRead.getAttribute("a:x"));
+        assertEquals("2", reRead.getAttribute("b:y"));
     }
 
     @Test
@@ -1028,8 +1028,8 @@ class XmlNodeImplTest {
         assertTrue(output.contains("http://example.com/local"), "Local xmlns: should take precedence");
 
         XmlNode reRead = toXmlNode(output);
-        assertEquals("value", reRead.attribute("ns:attr"));
-        assertEquals("http://example.com/local", reRead.attribute("xmlns:ns"));
+        assertEquals("value", reRead.getAttribute("ns:attr"));
+        assertEquals("http://example.com/local", reRead.getAttribute("xmlns:ns"));
     }
 
     @Test
@@ -1038,7 +1038,7 @@ class XmlNodeImplTest {
                 <root xml:space="preserve">  content with spaces  </root>
                 """;
         XmlNode node = toXmlNode(xml);
-        assertEquals("preserve", node.attribute("xml:space"));
+        assertEquals("preserve", node.getAttribute("xml:space"));
 
         StringWriter writer = new StringWriter();
         XmlService.write(node, writer);
@@ -1047,8 +1047,8 @@ class XmlNodeImplTest {
         // xml: prefix should be handled without explicit declaration
         assertFalse(output.contains("xmlns:xml"), "xml: prefix must not be declared");
         XmlNode reRead = toXmlNode(output);
-        assertEquals("preserve", reRead.attribute("xml:space"));
-        assertEquals("  content with spaces  ", reRead.value());
+        assertEquals("preserve", reRead.getAttribute("xml:space"));
+        assertEquals("  content with spaces  ", reRead.getValue());
     }
 
     @Test
@@ -1063,8 +1063,8 @@ class XmlNodeImplTest {
         String output = writer.toString();
 
         XmlNode reRead = toXmlNode(output);
-        assertEquals("value", reRead.attribute("simple"));
-        assertEquals("val2", reRead.attribute("another"));
+        assertEquals("value", reRead.getAttribute("simple"));
+        assertEquals("val2", reRead.getAttribute("another"));
     }
 
     @Test
@@ -1093,7 +1093,7 @@ class XmlNodeImplTest {
         assertEquals(1, count, "xmlns:mvn should be declared exactly once");
 
         XmlNode reRead = toXmlNode(output);
-        assertEquals("append", reRead.attribute("mvn:combine.children"));
+        assertEquals("append", reRead.getAttribute("mvn:combine.children"));
     }
 
     @Test
@@ -1107,16 +1107,16 @@ class XmlNodeImplTest {
                 </root>
                 """;
         XmlNode root = toXmlNode(xml);
-        XmlNode leaf = root.child("mid").child("leaf");
+        XmlNode leaf = root.getChild("mid").getChild("leaf");
 
         StringWriter writer = new StringWriter();
         XmlService.write(leaf, writer);
         String output = writer.toString();
 
         XmlNode reRead = toXmlNode(output);
-        assertEquals("1", reRead.attribute("a:x"));
-        assertEquals("2", reRead.attribute("b:y"));
-        assertEquals("3", reRead.attribute("plain"));
+        assertEquals("1", reRead.getAttribute("a:x"));
+        assertEquals("2", reRead.getAttribute("b:y"));
+        assertEquals("3", reRead.getAttribute("plain"));
     }
 
     // ========================================================================================
@@ -1142,12 +1142,12 @@ class XmlNodeImplTest {
         XmlNode merged = XmlService.merge(toXmlNode(dominant), toXmlNode(recessive));
 
         // The merged root should keep dominant's namespace context
-        assertEquals("http://maven.apache.org/POM/4.0.0", merged.namespaces().get("mvn"));
+        assertEquals("http://maven.apache.org/POM/4.0.0", merged.getNamespaces().get("mvn"));
 
         // The merged child should also have the namespace context
-        XmlNode child = merged.child("child");
+        XmlNode child = merged.getChild("child");
         assertNotNull(child);
-        assertEquals("http://maven.apache.org/POM/4.0.0", child.namespaces().get("mvn"));
+        assertEquals("http://maven.apache.org/POM/4.0.0", child.getNamespaces().get("mvn"));
     }
 
     @Test
@@ -1167,11 +1167,11 @@ class XmlNodeImplTest {
                 </root>
                 """;
         XmlNode merged = XmlService.merge(toXmlNode(dominant), toXmlNode(recessive));
-        XmlNode items = merged.child("items");
+        XmlNode items = merged.getChild("items");
 
-        assertEquals(2, items.children().size(), "append should merge children");
+        assertEquals(2, items.getChildren().size(), "append should merge children");
         // Namespace context should be preserved on the merged element
-        assertEquals("http://maven.apache.org/POM/4.0.0", items.namespaces().get("mvn"));
+        assertEquals("http://maven.apache.org/POM/4.0.0", items.getNamespaces().get("mvn"));
     }
 
     @Test
@@ -1192,13 +1192,13 @@ class XmlNodeImplTest {
                 </root>
                 """;
         XmlNode merged = XmlService.merge(toXmlNode(dominant), toXmlNode(recessive));
-        XmlNode child = merged.child("child");
+        XmlNode child = merged.getChild("child");
 
         // override means dominant completely replaces recessive
-        assertEquals(1, child.children().size());
-        assertEquals("dom", child.children().get(0).value());
+        assertEquals(1, child.getChildren().size());
+        assertEquals("dom", child.getChildren().get(0).getValue());
         // Namespace context preserved
-        assertEquals("http://example.com/ns", child.namespaces().get("ns"));
+        assertEquals("http://example.com/ns", child.getNamespaces().get("ns"));
     }
 
     @Test
@@ -1221,7 +1221,7 @@ class XmlNodeImplTest {
 
         // Write the merged child alone - it should produce valid XML
         // because it has the namespace context from the dominant
-        XmlNode child = merged.child("child");
+        XmlNode child = merged.getChild("child");
         StringWriter writer = new StringWriter();
         XmlService.write(child, writer);
         String output = writer.toString();
@@ -1231,7 +1231,7 @@ class XmlNodeImplTest {
         assertTrue(output.contains("xmlns:mvn="), "Namespace should be auto-declared");
 
         XmlNode reRead = toXmlNode(output);
-        assertEquals("append", reRead.attribute("mvn:combine.children"));
+        assertEquals("append", reRead.getAttribute("mvn:combine.children"));
     }
 
     // ========================================================================================
@@ -1246,7 +1246,7 @@ class XmlNodeImplTest {
                 .namespaces(Map.of("ns", "http://example.com/ns"))
                 .build();
 
-        assertEquals("http://example.com/ns", node.namespaces().get("ns"));
+        assertEquals("http://example.com/ns", node.getNamespaces().get("ns"));
 
         StringWriter writer = new StringWriter();
         XmlService.write(node, writer);
@@ -1254,14 +1254,14 @@ class XmlNodeImplTest {
 
         assertTrue(output.contains("xmlns:ns="), "Namespace should be auto-declared from builder context");
         XmlNode reRead = toXmlNode(output);
-        assertEquals("value", reRead.attribute("ns:attr"));
+        assertEquals("value", reRead.getAttribute("ns:attr"));
     }
 
     @Test
     void testBuilderWithNullNamespacesDefaultsToEmpty() {
         XmlNode node = XmlNode.newBuilder().name("elem").build();
-        assertNotNull(node.namespaces());
-        assertTrue(node.namespaces().isEmpty());
+        assertNotNull(node.getNamespaces());
+        assertTrue(node.getNamespaces().isEmpty());
     }
 
     @Test
@@ -1271,11 +1271,11 @@ class XmlNodeImplTest {
 
         // Mutating the original map should not affect the node
         mutableNs.put("other", "http://other.com");
-        assertNull(node.namespaces().get("other"));
+        assertNull(node.getNamespaces().get("other"));
 
         // The namespaces map itself should be immutable
         assertThrows(
-                UnsupportedOperationException.class, () -> node.namespaces().put("foo", "bar"));
+                UnsupportedOperationException.class, () -> node.getNamespaces().put("foo", "bar"));
     }
 
     @Test
@@ -1283,8 +1283,8 @@ class XmlNodeImplTest {
         // XmlNode built with newInstance (which doesn't set namespaces)
         // should return empty map from the default namespaces() method
         XmlNode node = XmlNode.newInstance("test");
-        assertNotNull(node.namespaces());
-        assertTrue(node.namespaces().isEmpty());
+        assertNotNull(node.getNamespaces());
+        assertTrue(node.getNamespaces().isEmpty());
     }
 
     // ========================================================================================
@@ -1305,14 +1305,16 @@ class XmlNodeImplTest {
         XmlNode reRead = toXmlNode(writer.toString());
 
         // Root namespace context should be preserved
-        assertEquals(original.namespaces().get("a"), reRead.namespaces().get("a"));
-        assertEquals(original.namespaces().get("b"), reRead.namespaces().get("b"));
+        assertEquals(original.getNamespaces().get("a"), reRead.getNamespaces().get("a"));
+        assertEquals(original.getNamespaces().get("b"), reRead.getNamespaces().get("b"));
 
         // Child namespace context should be preserved
-        XmlNode origChild = original.child("child");
-        XmlNode reReadChild = reRead.child("child");
-        assertEquals(origChild.namespaces().get("a"), reReadChild.namespaces().get("a"));
-        assertEquals(origChild.namespaces().get("b"), reReadChild.namespaces().get("b"));
+        XmlNode origChild = original.getChild("child");
+        XmlNode reReadChild = reRead.getChild("child");
+        assertEquals(
+                origChild.getNamespaces().get("a"), reReadChild.getNamespaces().get("a"));
+        assertEquals(
+                origChild.getNamespaces().get("b"), reReadChild.getNamespaces().get("b"));
     }
 
     @Test
@@ -1332,10 +1334,10 @@ class XmlNodeImplTest {
         XmlService.write(original, writer);
         XmlNode reRead = toXmlNode(writer.toString());
 
-        XmlNode level3 = reRead.child("level1").child("level2").child("level3");
-        assertEquals("value", level3.attribute("ns:deep"));
-        assertEquals("text", level3.value());
-        assertEquals("http://example.com/ns", level3.namespaces().get("ns"));
+        XmlNode level3 = reRead.getChild("level1").getChild("level2").getChild("level3");
+        assertEquals("value", level3.getAttribute("ns:deep"));
+        assertEquals("text", level3.getValue());
+        assertEquals("http://example.com/ns", level3.getNamespaces().get("ns"));
     }
 
     @Test
@@ -1346,16 +1348,16 @@ class XmlNodeImplTest {
                 </root>
                 """;
         XmlNode original = toXmlNode(xml);
-        XmlNode child = original.child("child");
-        assertEquals("http://example.com/v2", child.namespaces().get("ns"));
+        XmlNode child = original.getChild("child");
+        assertEquals("http://example.com/v2", child.getNamespaces().get("ns"));
 
         // Write and re-read just the child
         StringWriter writer = new StringWriter();
         XmlService.write(child, writer);
         XmlNode reRead = toXmlNode(writer.toString());
 
-        assertEquals("val", reRead.attribute("ns:attr"));
-        assertEquals("http://example.com/v2", reRead.namespaces().get("ns"));
+        assertEquals("val", reRead.getAttribute("ns:attr"));
+        assertEquals("http://example.com/v2", reRead.getNamespaces().get("ns"));
     }
 
     // ========================================================================================
@@ -1381,26 +1383,28 @@ class XmlNodeImplTest {
                 </project>
                 """;
         XmlNode project = toXmlNode(xml);
-        XmlNode compilerArgs = project.child("build")
-                .child("plugins")
-                .child("plugin")
-                .child("configuration")
-                .child("compilerArgs");
+        XmlNode compilerArgs = project.getChild("build")
+                .getChild("plugins")
+                .getChild("plugin")
+                .getChild("configuration")
+                .getChild("compilerArgs");
         assertNotNull(compilerArgs);
-        assertEquals("append", compilerArgs.attribute("mvn:combine.children"));
+        assertEquals("append", compilerArgs.getAttribute("mvn:combine.children"));
         assertEquals(
-                "http://maven.apache.org/POM/4.0.0", compilerArgs.namespaces().get("mvn"));
+                "http://maven.apache.org/POM/4.0.0",
+                compilerArgs.getNamespaces().get("mvn"));
 
         // Simulate consumer POM: write only the configuration subtree
-        XmlNode config = project.child("build").child("plugins").child("plugin").child("configuration");
+        XmlNode config =
+                project.getChild("build").getChild("plugins").getChild("plugin").getChild("configuration");
         StringWriter writer = new StringWriter();
         XmlService.write(config, writer);
         String output = writer.toString();
 
         // Should produce valid XML with auto-declared xmlns:mvn
         XmlNode reRead = toXmlNode(output);
-        XmlNode reReadArgs = reRead.child("compilerArgs");
-        assertEquals("append", reReadArgs.attribute("mvn:combine.children"));
+        XmlNode reReadArgs = reRead.getChild("compilerArgs");
+        assertEquals("append", reReadArgs.getAttribute("mvn:combine.children"));
     }
 
     @Test
@@ -1424,7 +1428,7 @@ class XmlNodeImplTest {
         // Without namespace context, prefix should be stripped
         assertFalse(output.contains("mvn:"), "No mvn: prefix without context");
         XmlNode reRead = toXmlNode(output);
-        assertEquals("append", reRead.child("compilerArgs").attribute("combine.children"));
+        assertEquals("append", reRead.getChild("compilerArgs").getAttribute("combine.children"));
     }
 
     // ========================================================================================
@@ -1453,11 +1457,11 @@ class XmlNodeImplTest {
         XmlNode recessiveNode = toXmlNode(recessive);
         XmlNode merged = XmlService.merge(dominantNode, recessiveNode);
 
-        XmlNode compilerArgs = merged.child("compilerArgs");
+        XmlNode compilerArgs = merged.getChild("compilerArgs");
         assertNotNull(compilerArgs);
         assertEquals(
                 1,
-                compilerArgs.children().size(),
+                compilerArgs.getChildren().size(),
                 "mvn:combine.children should not trigger append; only unprefixed combine.children works");
     }
 
@@ -1483,9 +1487,9 @@ class XmlNodeImplTest {
         XmlNode recessiveNode = toXmlNode(recessive);
         XmlNode merged = XmlService.merge(dominantNode, recessiveNode);
 
-        XmlNode compilerArgs = merged.child("compilerArgs");
+        XmlNode compilerArgs = merged.getChild("compilerArgs");
         assertNotNull(compilerArgs);
-        assertEquals(2, compilerArgs.children().size(), "Unprefixed combine.children=append should work");
+        assertEquals(2, compilerArgs.getChildren().size(), "Unprefixed combine.children=append should work");
     }
 
     @Test
@@ -1506,13 +1510,13 @@ class XmlNodeImplTest {
                 </root>
                 """;
         XmlNode merged = XmlService.merge(toXmlNode(dominant), toXmlNode(recessive));
-        XmlNode child = merged.child("child");
+        XmlNode child = merged.getChild("child");
 
         // mvn:combine.self should NOT trigger override (only unprefixed combine.self works)
         // Default merge behavior merges children by name
-        assertEquals("dom", child.child("item").value());
+        assertEquals("dom", child.getChild("item").getValue());
         // The "extra" child from recessive should survive since combine.self wasn't triggered
-        assertNotNull(child.child("extra"), "Recessive children should survive since mvn:combine.self is ignored");
+        assertNotNull(child.getChild("extra"), "Recessive children should survive since mvn:combine.self is ignored");
     }
 
     public static Xpp3Dom build(Reader reader) throws XmlPullParserException, IOException {

@@ -52,7 +52,7 @@ class Xpp3DomNodePointer extends NodePointer {
         if (node1 == node2) {
             return 0;
         }
-        for (XmlNode child : node.children()) {
+        for (XmlNode child : node.getChildren()) {
             if (child == node1) {
                 return -1;
             }
@@ -69,11 +69,11 @@ class Xpp3DomNodePointer extends NodePointer {
     }
 
     private static Object getValue(XmlNode node) {
-        if (node.value() != null) {
-            return node.value();
+        if (node.getValue() != null) {
+            return node.getValue();
         } else {
             List<Object> children = new ArrayList<>();
-            for (XmlNode child : node.children()) {
+            for (XmlNode child : node.getChildren()) {
                 children.add(getValue(child));
             }
             return children;
@@ -97,7 +97,7 @@ class Xpp3DomNodePointer extends NodePointer {
 
     @Override
     public QName getName() {
-        return new QName(null, node.name());
+        return new QName(null, node.getName());
     }
 
     @Override
@@ -107,7 +107,7 @@ class Xpp3DomNodePointer extends NodePointer {
 
     @Override
     public boolean isLeaf() {
-        return node.children().isEmpty();
+        return node.getChildren().isEmpty();
     }
 
     @Override
