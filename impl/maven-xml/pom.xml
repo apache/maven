@@ -30,6 +30,10 @@ under the License.
   <name>Maven 4 XML Implementation</name>
   <description>Provides the implementation classes for the Maven XML</description>
 
+  <properties>
+    <javaModuleName>org.apache.maven.internal.xml</javaModuleName>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
