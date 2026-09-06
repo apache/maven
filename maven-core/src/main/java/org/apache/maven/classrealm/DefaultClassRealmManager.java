@@ -33,6 +33,7 @@ import java.util.Objects;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
@@ -156,10 +157,14 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         Set<String> artifactIds = new LinkedHashSet<>();
 
         List<ClassRealmConstituent> constituents = new ArrayList<>();
+        List<Artifact> coreOverrides = new ArrayList<>();
 
         if (artifacts != null) {
             for (Artifact artifact : artifacts) {
                 if (!isProvidedArtifact(artifact)) {
+                    if (isCoreOverrideArtifact(artifact)) {
+                        coreOverrides.add(artifact);
+                    }
                     artifactIds.add(getId(artifact));
                     if (artifact.getFile() != null) {
                         constituents.add(new ArtifactClassRealmConstituent(artifact));
@@ -189,6 +194,24 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         callDelegates(classRealm, type, parent, parentImports, foreignImports, constituents);
 
         wireRealm(classRealm, parentImports, foreignImports);
+
+        if (!coreOverrides.isEmpty()) {
+            ClassRealm overrideClassRealm = newRealm(baseRealmId + "-core-override");
+            for (Artifact coreOverride : coreOverrides) {
+                try {
+                    overrideClassRealm.addURL(coreOverride.getFile().toURI().toURL());
+                } catch (MalformedURLException e) {
+                    // Not going to happen
+                    logger.error(e.getMessage(), e);
+                }
+            }
+            // collect Gs (and assume packages == G for the experiment sake)
+            Set<String> packages =
+                    coreOverrides.stream().map(Artifact::getGroupId).collect(Collectors.toSet());
+            for (String pkg : packages) {
+                classRealm.importFrom(overrideClassRealm, pkg);
+            }
+        }
 
         Set<String> includedIds = populateRealm(classRealm, constituents);
 
@@ -229,8 +252,13 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         return createRealm(getKey(plugin, true), RealmType.Extension, parent, null, foreignImports, artifacts);
     }
 
+    private boolean isCoreOverrideArtifact(Artifact artifact) {
+        return "core-override-jar".equals(artifact.getProperties().get("type"));
+    }
+
     private boolean isProvidedArtifact(Artifact artifact) {
-        return providedArtifacts.contains(artifact.getGroupId() + ":" + artifact.getArtifactId());
+        return !isCoreOverrideArtifact(artifact)
+                && providedArtifacts.contains(artifact.getGroupId() + ":" + artifact.getArtifactId());
     }
 
     public ClassRealm createPluginRealm(
