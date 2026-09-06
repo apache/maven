@@ -21,14 +21,15 @@ package org.apache.maven.api;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- * The possible types of execution events.
+ * The possible types of execution events during the Maven build lifecycle.
  *
+ * @see ExecutionEvent
+ * @see ExecutionListener
  * @since 4.0.0
- * @deprecated Use {@link ExecutionEventType} instead.
+ * @since 4.1.0 (renamed from {@link EventType})
  */
-@Deprecated(since = "4.1.0", forRemoval = true)
 @Experimental
-public enum EventType {
+public enum ExecutionEventType {
     PROJECT_DISCOVERY_STARTED,
     SESSION_STARTED,
     SESSION_ENDED,
@@ -45,24 +46,5 @@ public enum EventType {
     FORK_FAILED,
     FORKED_PROJECT_STARTED,
     FORKED_PROJECT_SUCCEEDED,
-    FORKED_PROJECT_FAILED;
-
-    /**
-     * Converts this deprecated {@code EventType} to the new {@link ExecutionEventType}.
-     *
-     * @return the corresponding {@link ExecutionEventType}, never {@code null}
-     */
-    public ExecutionEventType toExecutionEventType() {
-        return ExecutionEventType.values()[ordinal()];
-    }
-
-    /**
-     * Converts an {@link ExecutionEventType} to the deprecated {@code EventType}.
-     *
-     * @param type the {@link ExecutionEventType} to convert, must not be {@code null}
-     * @return the corresponding {@code EventType}, never {@code null}
-     */
-    public static EventType fromExecutionEventType(ExecutionEventType type) {
-        return values()[type.ordinal()];
-    }
+    FORKED_PROJECT_FAILED,
 }

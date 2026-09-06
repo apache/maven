@@ -20,46 +20,48 @@ package org.apache.maven.internal.impl;
 
 import java.util.Optional;
 
-import org.apache.maven.api.Event;
-import org.apache.maven.api.EventType;
+import org.apache.maven.api.ExecutionEvent;
+import org.apache.maven.api.ExecutionEventType;
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
-import org.apache.maven.execution.ExecutionEvent;
 
-public class DefaultEvent implements Event {
+public class DefaultEvent implements ExecutionEvent {
     private final InternalMavenSession session;
-    private final ExecutionEvent delegate;
-    private final EventType eventType;
+    private final org.apache.maven.execution.ExecutionEvent delegate;
+    private final ExecutionEventType eventType;
 
-    public DefaultEvent(InternalMavenSession session, ExecutionEvent delegate, EventType eventType) {
+    public DefaultEvent(
+            InternalMavenSession session,
+            org.apache.maven.execution.ExecutionEvent delegate,
+            ExecutionEventType eventType) {
         this.session = session;
         this.delegate = delegate;
         this.eventType = eventType;
     }
 
     @Override
-    public EventType getType() {
+    public ExecutionEventType type() {
         return eventType;
     }
 
     @Override
-    public Session getSession() {
+    public Session session() {
         return session;
     }
 
     @Override
-    public Optional<Project> getProject() {
+    public Optional<Project> project() {
         return Optional.ofNullable(session.getProject(delegate.getProject()));
     }
 
     @Override
-    public Optional<MojoExecution> getMojoExecution() {
+    public Optional<MojoExecution> mojoExecution() {
         return Optional.ofNullable(delegate.getMojoExecution()).map(me -> new DefaultMojoExecution(session, me));
     }
 
     @Override
-    public Optional<Exception> getException() {
+    public Optional<Exception> exception() {
         return Optional.ofNullable(delegate.getException());
     }
 }

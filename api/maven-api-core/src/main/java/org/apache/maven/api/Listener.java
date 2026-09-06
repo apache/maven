@@ -23,14 +23,27 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * A listener for session events.
- * TODO: open this to other events like similar to {@code org.apache.maven.eventspy.EventSpy}
+ * Base marker interface for all Maven event listeners.
+ * Specific listener sub-interfaces (such as {@link ExecutionListener}) provide typed callbacks
+ * for particular event families.
+ * Register listeners via {@link Session#registerListener(Listener)}.
  *
+ * @see ExecutionListener
  * @since 4.0.0
  */
 @Experimental
-@FunctionalInterface
 @Consumer
 public interface Listener {
-    void onEvent(@Nonnull Event event);
+
+    /**
+     * Called when an event occurs.
+     * <p>
+     * This generic callback is provided for backward compatibility. Prefer implementing
+     * {@link ExecutionListener} or another typed sub-interface for type-safe event handling.
+     *
+     * @param event the event
+     * @deprecated Implement {@link ExecutionListener} or a specific listener sub-interface instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    default void onEvent(@Nonnull Event event) {}
 }
