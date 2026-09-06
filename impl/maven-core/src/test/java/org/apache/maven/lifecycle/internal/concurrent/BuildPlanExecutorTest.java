@@ -21,7 +21,9 @@ package org.apache.maven.lifecycle.internal.concurrent;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Consumer;
 
+import org.apache.maven.api.Lifecycle;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -31,6 +33,7 @@ import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.internal.transformation.TransformerManager;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
 import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
 import org.apache.maven.lifecycle.internal.ReactorContext;
@@ -90,14 +93,79 @@ class BuildPlanExecutorTest {
         assertTrue(session.getResult().getBuildSummary(project) instanceof org.apache.maven.execution.BuildFailure);
     }
 
-    private void execute(MavenSession session, MavenProject project, BeforeProjectExecution listener) throws Exception {
-        ReactorContext reactorContext = new ReactorContext(
+    /**
+     * A project can end up with more than one failure: when a build step fails, the matching after:* step is
+     * still run for cleanup and may fail on its own. Those failures are reported through a wrapper exception,
+     * and the wrapper is a checked exception, so reading the severity off the wrapper hides the {@link Error}
+     * that is inside it. A cleanup step failing after an Error must not downgrade the build from "halt" to a
+     * plain per-project failure.
+     */
+    @Test
+    void errorIsStillFatalWhenASecondFailureJoinsIt() throws Exception {
+        Error thrown = new NoClassDefFoundError("some/Class");
+        MavenProject project = newProject();
+        MavenSession session = newSession(project);
+        // with fail-fast the build halts whatever happens, so the downgrade is only observable with fail-at-end
+        session.getRequest().setReactorFailureBehavior(MavenExecutionRequest.REACTOR_FAIL_AT_END);
+
+        ReactorContext reactorContext = execute(
+                session,
+                project,
+                event -> {
+                    throw thrown;
+                },
+                plan -> {
+                    BuildStep cleanup = plan.step(project, Lifecycle.AFTER + "validate")
+                            .orElseThrow(() -> new IllegalStateException("no after:validate step in the plan"));
+                    // stands in for the cleanup step failing after the Error, the way processStep records it
+                    cleanup.exception = new LifecycleExecutionException("cleanup failed");
+                });
+
+        assertTrue(
+                reactorContext.getReactorBuildStatus().isHalted(),
+                "an Error must halt the reactor even when a second failure is recorded for the same project, but"
+                        + " the build was not halted; recorded exceptions: "
+                        + session.getResult().getExceptions());
+    }
+
+    private ReactorContext execute(MavenSession session, MavenProject project, BeforeProjectExecution listener)
+            throws Exception {
+        ReactorContext reactorContext = newReactorContext(session);
+        newExecutor(listener).execute(session, reactorContext, List.of(newTaskSegment()));
+        return reactorContext;
+    }
+
+    /**
+     * Same, but the plan is handed to {@code planCustomizer} after it is created and before it is executed.
+     * A step that runs no mojo cannot be made to fail from the outside, so this is the only way to put a
+     * second failure on the project.
+     */
+    private ReactorContext execute(
+            MavenSession session,
+            MavenProject project,
+            BeforeProjectExecution listener,
+            Consumer<BuildPlan> planCustomizer)
+            throws Exception {
+        ReactorContext reactorContext = newReactorContext(session);
+        try (BuildPlanExecutor.BuildContext context =
+                newExecutor(listener).new BuildContext(session, reactorContext, List.of(newTaskSegment()))) {
+            planCustomizer.accept(context.plan);
+            context.execute();
+        }
+        return reactorContext;
+    }
+
+    private ReactorContext newReactorContext(MavenSession session) {
+        return new ReactorContext(
                 session.getResult(),
                 Thread.currentThread().getContextClassLoader(),
                 new ReactorBuildStatus(session.getProjectDependencyGraph()));
+    }
+
+    private TaskSegment newTaskSegment() {
         TaskSegment taskSegment = new TaskSegment(false);
         taskSegment.getTasks().add(new LifecycleTask("validate"));
-        newExecutor(listener).execute(session, reactorContext, List.of(taskSegment));
+        return taskSegment;
     }
 
     private BuildPlanExecutor newExecutor(ProjectExecutionListener listener) {
