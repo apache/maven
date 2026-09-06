@@ -152,6 +152,11 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
                 modifiedPoms.add(pomPath);
                 context.success("Added maven-toolchains-plugin with " + SELECT_JDK_TOOLCHAIN_GOAL + " goal (--source "
                         + sourceLevel + " requires JDK <= " + latestJdk + ")");
+                context.warning("A JDK <= " + latestJdk
+                        + " must be installed and discoverable by the toolchains plugin"
+                        + " for the build to succeed. If no matching JDK is found,"
+                        + " the build will fail with a toolchain resolution error."
+                        + " See https://maven.apache.org/plugins/maven-toolchains-plugin/");
             } catch (Exception e) {
                 context.failure("Failed to add toolchains plugin: " + e.getMessage());
                 errorPoms.add(pomPath);

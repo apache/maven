@@ -111,7 +111,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             new PluginUpgrade(
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-jar-plugin",
-                    "3.5.0",
+                    "3.4.2",
                     "4.0.0-beta-1",
                     "Pre-release versions compiled against different Maven 4 API signatures"),
             new PluginUpgrade(

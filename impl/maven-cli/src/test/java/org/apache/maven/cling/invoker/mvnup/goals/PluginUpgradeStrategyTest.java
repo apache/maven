@@ -1569,6 +1569,160 @@ class PluginUpgradeStrategyTest {
         }
 
         @Test
+        @DisplayName("should upgrade exec-maven-plugin in submodule with explicit version")
+        void shouldUpgradeExecPluginInSubmodule() throws Exception {
+            // Simulates hbase-assembly declaring exec-maven-plugin:3.1.0 explicitly
+            String parentPomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>org.example</groupId>
+                        <artifactId>parent</artifactId>
+                        <version>1.0.0</version>
+                        <packaging>pom</packaging>
+                        <modules>
+                            <module>assembly</module>
+                        </modules>
+                    </project>
+                    """;
+
+            String submodulePomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <parent>
+                            <groupId>org.example</groupId>
+                            <artifactId>parent</artifactId>
+                            <version>1.0.0</version>
+                        </parent>
+                        <artifactId>assembly</artifactId>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>exec-maven-plugin</artifactId>
+                                    <version>3.1.0</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+
+            Path tempDir = Files.createTempDirectory("mvnup-test-");
+            try {
+                Files.createDirectories(tempDir.resolve(".mvn"));
+                Path parentPomPath = tempDir.resolve("pom.xml");
+                Files.writeString(parentPomPath, parentPomXml);
+                Path assemblyDir = tempDir.resolve("assembly");
+                Files.createDirectories(assemblyDir);
+                Path submodulePomPath = assemblyDir.resolve("pom.xml");
+                Files.writeString(submodulePomPath, submodulePomXml);
+
+                Document parentDoc = Document.of(parentPomXml);
+                Document submoduleDoc = Document.of(submodulePomXml);
+                Map<Path, Document> pomMap = Map.of(
+                        parentPomPath, parentDoc,
+                        submodulePomPath, submoduleDoc);
+
+                UpgradeContext context = createMockContext();
+                UpgradeResult result = strategy.doApply(context, pomMap);
+
+                assertTrue(result.success(), "Plugin upgrade should succeed");
+
+                // The submodule's exec-maven-plugin should be upgraded to 3.5.0
+                Editor editor = new Editor(submoduleDoc);
+                String version = editor.root()
+                        .path("build", "plugins", "plugin", "version")
+                        .map(Element::textContentTrimmed)
+                        .orElse(null);
+                assertEquals("3.5.0", version, "exec-maven-plugin 3.1.0 should be upgraded to 3.5.0 in submodule");
+                assertFalse(submoduleDoc.toXml().contains("3.1.0"), "Old version 3.1.0 should not remain");
+            } finally {
+                // Cleanup
+                Files.walk(tempDir)
+                        .sorted(java.util.Comparator.reverseOrder())
+                        .map(Path::toFile)
+                        .forEach(java.io.File::delete);
+            }
+        }
+
+        @Test
+        @DisplayName("maven-jar-plugin upgrade target should be 3.4.2 not 3.5.0")
+        void jarPluginTargetShouldBe342() throws Exception {
+            // maven-jar-plugin 3.5.0 has a plexus-archiver regression (JarToolModularJarArchiver
+            // fails with "Could not create modular JAR file"). Target 3.4.2 until 3.5.1 is released.
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-jar-plugin</artifactId>
+                                    <version>3.3.0</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            UpgradeResult result = strategy.doApply(context, pomMap);
+
+            assertTrue(result.success(), "Plugin upgrade should succeed");
+            assertTrue(result.modifiedCount() > 0, "Should have upgraded maven-jar-plugin");
+
+            Editor editor = new Editor(document);
+            String version = editor.root()
+                    .path("build", "plugins", "plugin", "version")
+                    .map(Element::textContentTrimmed)
+                    .orElse(null);
+            assertEquals(
+                    "3.4.2",
+                    version,
+                    "maven-jar-plugin should be upgraded to 3.4.2 (not 3.5.0 due to plexus-archiver regression)");
+        }
+
+        @Test
+        @DisplayName("maven-jar-plugin 3.4.2 should not be upgraded further")
+        void jarPlugin342ShouldNotBeUpgraded() throws Exception {
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>test</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-jar-plugin</artifactId>
+                                    <version>3.4.2</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+
+            Document document = Document.of(pomXml);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), document);
+
+            UpgradeContext context = createMockContext();
+            strategy.doApply(context, pomMap);
+
+            String xml = document.toXml();
+            assertTrue(xml.contains("3.4.2"), "Version 3.4.2 should be preserved");
+        }
+
+        @Test
         @DisplayName("should have predefined plugin migrations")
         void shouldHavePredefinedPluginMigrations() {
             List<PluginMigration> migrations = PluginUpgradeStrategy.getPluginMigrations();
