@@ -62,6 +62,7 @@ public interface Event {
      * Gets the type of the event.
      *
      * @return the type of the event, never {@code null}
+     * @throws UnsupportedOperationException if this event is not an {@link ExecutionEvent}
      * @deprecated Use {@link ExecutionEvent#type()} instead.
      */
     @Deprecated(since = "4.1.0", forRemoval = true)

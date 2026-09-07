@@ -43,13 +43,6 @@ public interface RepositoryEvent extends Event {
     RepositoryEventType type();
 
     /**
-     * Returns the Maven session associated with the underlying repository system session.
-     * Sessions derived from it share the same repository event and listener scope.
-     */
-    @Nonnull
-    Session session();
-
-    /**
      * Returns the artifact involved in the event, if any.
      */
     @Nonnull
