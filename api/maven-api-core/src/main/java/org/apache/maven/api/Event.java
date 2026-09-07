@@ -31,7 +31,12 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.0.0
  */
 @Experimental
-public interface Event {
+public interface Event extends SessionEvent {
+
+    @Override
+    default Session session() {
+        return getSession();
+    }
 
     /**
      * Gets the type of the event.

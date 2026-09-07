@@ -50,7 +50,7 @@ import static org.mockito.Mockito.when;
 class MavenRepositoryListenerTest {
 
     @Test
-    void repositoryListenerOverloadDoesNotMakeBuildListenerLambdaAmbiguous() {
+    void unifiedRegistrationPreservesBuildListenerLambdas() {
         Session session = mock(Session.class);
 
         session.registerListener(event -> {});
@@ -72,7 +72,7 @@ class MavenRepositoryListenerTest {
     void dispatchesAllRepositoryEventTypes() {
         TestContext context = new TestContext();
         RecordingListener listener = new RecordingListener();
-        when(context.session.getRepositoryListeners()).thenReturn(List.of(listener));
+        when(context.session.getListeners()).thenReturn(List.of(listener));
 
         for (org.eclipse.aether.RepositoryEvent.EventType type :
                 org.eclipse.aether.RepositoryEvent.EventType.values()) {
@@ -88,7 +88,7 @@ class MavenRepositoryListenerTest {
     void convertsArtifactRepositoryFailurePathAndTrace() {
         TestContext context = new TestContext();
         RecordingListener listener = new RecordingListener();
-        when(context.session.getRepositoryListeners()).thenReturn(List.of(listener));
+        when(context.session.getListeners()).thenReturn(List.of(listener));
 
         org.eclipse.aether.artifact.Artifact resolverArtifact =
                 new org.eclipse.aether.artifact.DefaultArtifact("org.example:demo:jar:1.0");
@@ -112,24 +112,24 @@ class MavenRepositoryListenerTest {
                 .build());
 
         RepositoryEvent event = listener.events.get(0);
-        assertEquals(RepositoryEventType.ARTIFACT_RESOLVED, event.getType());
-        assertSame(context.session, event.getSession());
-        assertSame(artifact, event.getArtifact().orElseThrow());
-        assertSame(repository, event.getRepository().orElseThrow());
-        assertEquals(path, event.getPath().orElseThrow());
-        assertSame(failure, event.getException().orElseThrow());
-        assertEquals(List.of(failure), event.getExceptions());
-        assertEquals("request", event.getTrace().orElseThrow().data());
-        assertTrue(event.getMetadata().isEmpty());
+        assertEquals(RepositoryEventType.ARTIFACT_RESOLVED, event.type());
+        assertSame(context.session, event.session());
+        assertSame(artifact, event.artifact().orElseThrow());
+        assertSame(repository, event.repository().orElseThrow());
+        assertEquals(path, event.path().orElseThrow());
+        assertSame(failure, event.exception().orElseThrow());
+        assertEquals(List.of(failure), event.exceptions());
+        assertEquals("request", event.trace().orElseThrow().data());
+        assertTrue(event.metadata().isEmpty());
         assertThrows(
-                UnsupportedOperationException.class, () -> event.getExceptions().add(new Exception()));
+                UnsupportedOperationException.class, () -> event.exceptions().add(new Exception()));
     }
 
     @Test
     void convertsMetadataWithoutExposingResolverMetadata() {
         TestContext context = new TestContext();
         RecordingListener listener = new RecordingListener();
-        when(context.session.getRepositoryListeners()).thenReturn(List.of(listener));
+        when(context.session.getListeners()).thenReturn(List.of(listener));
         Path path = Path.of("target", "maven-metadata.xml");
         Metadata metadata = new DefaultMetadata(
                 "org.example",
@@ -145,7 +145,7 @@ class MavenRepositoryListenerTest {
                 .setMetadata(metadata)
                 .build());
 
-        RepositoryMetadata converted = listener.events.get(0).getMetadata().orElseThrow();
+        RepositoryMetadata converted = listener.events.get(0).metadata().orElseThrow();
         assertEquals("org.example", converted.getGroupId());
         assertEquals("demo", converted.getArtifactId());
         assertEquals("1.0-SNAPSHOT", converted.getVersion());
@@ -174,7 +174,7 @@ class MavenRepositoryListenerTest {
                 notifications.incrementAndGet();
             }
         };
-        when(context.session.getRepositoryListeners()).thenReturn(List.of(failing, succeeding));
+        when(context.session.getListeners()).thenReturn(List.of(failing, succeeding));
 
         context.bridge.artifactResolving(new org.eclipse.aether.RepositoryEvent.Builder(
                         context.resolverSession, org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_RESOLVING)
@@ -193,7 +193,7 @@ class MavenRepositoryListenerTest {
                 notifications.incrementAndGet();
             }
         };
-        when(context.session.getRepositoryListeners()).thenReturn(List.of(listener));
+        when(context.session.getListeners()).thenReturn(List.of(listener));
 
         IntStream.range(0, 100)
                 .parallel()
@@ -245,7 +245,7 @@ class MavenRepositoryListenerTest {
         private final List<RepositoryEvent> events = new ArrayList<>();
 
         private void record(RepositoryEvent event) {
-            types.add(event.getType());
+            types.add(event.type());
             events.add(event);
         }
 

@@ -102,15 +102,15 @@ class RequestTraceTest {
                 .next();
 
         for (RepositoryEvent event : events) {
-            RequestTrace rTrace = event.getTrace().orElseThrow();
+            RequestTrace rTrace = event.trace().orElseThrow();
             assertNotNull(rTrace.parent());
         }
 
         Session derived = session.withRemoteRepositories(session.getRemoteRepositories());
-        assertTrue(derived.getRepositoryListeners().contains(listener));
+        assertTrue(derived.getListeners().contains(listener));
         derived.unregisterListener(listener);
-        assertTrue(session.getRepositoryListeners().isEmpty());
-        assertTrue(derived.getRepositoryListeners().isEmpty());
+        assertTrue(session.getListeners().isEmpty());
+        assertTrue(derived.getListeners().isEmpty());
         assertNotNull(node);
         assertEquals(6, node.getChildren().size());
     }

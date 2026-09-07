@@ -20,46 +20,52 @@ package org.apache.maven.internal.impl;
 
 import java.util.Optional;
 
-import org.apache.maven.api.Event;
 import org.apache.maven.api.EventType;
+import org.apache.maven.api.ExecutionEventType;
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
 import org.apache.maven.execution.ExecutionEvent;
 
-public class DefaultEvent implements Event {
+public class DefaultEvent implements org.apache.maven.api.ExecutionEvent {
     private final InternalMavenSession session;
-    private final ExecutionEvent delegate;
+    private final Project project;
+    private final MojoExecution mojoExecution;
+    private final Exception exception;
     private final EventType eventType;
 
     public DefaultEvent(InternalMavenSession session, ExecutionEvent delegate, EventType eventType) {
         this.session = session;
-        this.delegate = delegate;
+        this.project = session.getProject(delegate.getProject());
+        this.mojoExecution = delegate.getMojoExecution() != null
+                ? new DefaultMojoExecution(session, delegate.getMojoExecution())
+                : null;
+        this.exception = delegate.getException();
         this.eventType = eventType;
     }
 
     @Override
-    public EventType getType() {
-        return eventType;
+    public ExecutionEventType type() {
+        return ExecutionEventType.valueOf(eventType.name());
     }
 
     @Override
-    public Session getSession() {
+    public Session session() {
         return session;
     }
 
     @Override
-    public Optional<Project> getProject() {
-        return Optional.ofNullable(session.getProject(delegate.getProject()));
+    public Optional<Project> project() {
+        return Optional.ofNullable(project);
     }
 
     @Override
-    public Optional<MojoExecution> getMojoExecution() {
-        return Optional.ofNullable(delegate.getMojoExecution()).map(me -> new DefaultMojoExecution(session, me));
+    public Optional<MojoExecution> mojoExecution() {
+        return Optional.ofNullable(mojoExecution);
     }
 
     @Override
-    public Optional<Exception> getException() {
-        return Optional.ofNullable(delegate.getException());
+    public Optional<Exception> exception() {
+        return Optional.ofNullable(exception);
     }
 }

@@ -21,6 +21,7 @@ package org.apache.maven.impl;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 
+import org.apache.maven.api.Listener;
 import org.apache.maven.api.RepositoryEvent;
 import org.apache.maven.api.RepositoryListener;
 import org.slf4j.Logger;
@@ -39,10 +40,16 @@ public final class MavenRepositoryListener extends org.eclipse.aether.AbstractRe
         if (!(associatedSession instanceof InternalSession session)) {
             return;
         }
-        Collection<RepositoryListener> listeners = session.getRepositoryListeners();
+        Collection<Listener> listeners = session.getListeners();
         if (!listeners.isEmpty()) {
-            RepositoryEvent repositoryEvent = new DefaultRepositoryEvent(session, event);
-            for (RepositoryListener listener : listeners) {
+            RepositoryEvent repositoryEvent = null;
+            for (Listener registered : listeners) {
+                if (!(registered instanceof RepositoryListener listener)) {
+                    continue;
+                }
+                if (repositoryEvent == null) {
+                    repositoryEvent = new DefaultRepositoryEvent(session, event);
+                }
                 try {
                     consumer.accept(listener, repositoryEvent);
                 } catch (RuntimeException e) {

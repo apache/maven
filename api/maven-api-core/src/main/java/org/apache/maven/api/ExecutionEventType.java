@@ -18,25 +18,30 @@
  */
 package org.apache.maven.api;
 
-import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * A listener for session events.
- * Existing implementations and lambdas receive execution events through {@link #onEvent(Event)}.
- * Implement {@link ExecutionListener} or {@link RepositoryListener} for typed callbacks.
+ * The possible types of build execution events.
  *
- * @since 4.0.0
+ * @since 4.1.0
  */
 @Experimental
-@FunctionalInterface
-@Consumer
-public interface Listener {
-    /**
-     * Receives a build execution event.
-     *
-     * @param event the execution event
-     */
-    void onEvent(@Nonnull Event event);
+public enum ExecutionEventType {
+    PROJECT_DISCOVERY_STARTED,
+    SESSION_STARTED,
+    SESSION_ENDED,
+    PROJECT_SKIPPED,
+    PROJECT_STARTED,
+    PROJECT_SUCCEEDED,
+    PROJECT_FAILED,
+    MOJO_SKIPPED,
+    MOJO_STARTED,
+    MOJO_SUCCEEDED,
+    MOJO_FAILED,
+    FORK_STARTED,
+    FORK_SUCCEEDED,
+    FORK_FAILED,
+    FORKED_PROJECT_STARTED,
+    FORKED_PROJECT_SUCCEEDED,
+    FORKED_PROJECT_FAILED,
 }

@@ -31,7 +31,7 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 @Consumer
-public interface RepositoryListener {
+public interface RepositoryListener extends TypedListener {
 
     /**
      * Called when an artifact descriptor could not be parsed.

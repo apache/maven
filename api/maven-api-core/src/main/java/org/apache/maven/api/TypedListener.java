@@ -23,20 +23,20 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * A listener for session events.
- * Existing implementations and lambdas receive execution events through {@link #onEvent(Event)}.
- * Implement {@link ExecutionListener} or {@link RepositoryListener} for typed callbacks.
+ * Base for listeners notified through event-specific callbacks.
+ * Implement {@link ExecutionListener}, {@link RepositoryListener}, or both.
+ * The shared default implementation allows both interfaces to be implemented without conflicting defaults.
  *
- * @since 4.0.0
+ * @since 4.1.0
  */
 @Experimental
-@FunctionalInterface
 @Consumer
-public interface Listener {
+public interface TypedListener extends Listener {
     /**
-     * Receives a build execution event.
+     * Does nothing. Typed listeners are notified through their event-specific callbacks.
      *
-     * @param event the execution event
+     * @param event the legacy execution event
      */
-    void onEvent(@Nonnull Event event);
+    @Override
+    default void onEvent(@Nonnull Event event) {}
 }

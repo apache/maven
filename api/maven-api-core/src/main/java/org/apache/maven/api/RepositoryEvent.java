@@ -34,60 +34,60 @@ import org.apache.maven.api.services.RequestTrace;
  */
 @Experimental
 @Immutable
-public interface RepositoryEvent {
+public interface RepositoryEvent extends SessionEvent {
 
     /**
      * Returns the kind of repository operation represented by this event.
      */
     @Nonnull
-    RepositoryEventType getType();
+    RepositoryEventType type();
 
     /**
      * Returns the Maven session associated with the underlying repository system session.
      * Sessions derived from it share the same repository event and listener scope.
      */
     @Nonnull
-    Session getSession();
+    Session session();
 
     /**
      * Returns the artifact involved in the event, if any.
      */
     @Nonnull
-    Optional<Artifact> getArtifact();
+    Optional<Artifact> artifact();
 
     /**
      * Returns the metadata involved in the event, if any.
      */
     @Nonnull
-    Optional<RepositoryMetadata> getMetadata();
+    Optional<RepositoryMetadata> metadata();
 
     /**
      * Returns the local path involved in the event, if any.
      */
     @Nonnull
-    Optional<Path> getPath();
+    Optional<Path> path();
 
     /**
      * Returns the repository involved in the event, if any.
      */
     @Nonnull
-    Optional<Repository> getRepository();
+    Optional<Repository> repository();
 
     /**
      * Returns the primary failure associated with the event, if any.
      */
     @Nonnull
-    Optional<Exception> getException();
+    Optional<Exception> exception();
 
     /**
      * Returns all failures associated with the event.
      */
     @Nonnull
-    List<Exception> getExceptions();
+    List<Exception> exceptions();
 
     /**
      * Returns the request trace associated with the event, if any.
      */
     @Nonnull
-    Optional<RequestTrace> getTrace();
+    Optional<RequestTrace> trace();
 }

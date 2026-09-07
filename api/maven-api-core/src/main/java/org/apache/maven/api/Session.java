@@ -180,7 +180,9 @@ public interface Session extends ProtoSession {
     Session withRemoteRepositories(@Nonnull List<RemoteRepository> repositories);
 
     /**
-     * Register the given listener which will receive all events.
+     * Registers a listener for execution events, repository events, or both.
+     * Typed listeners receive only their event-specific callbacks. Legacy listeners receive execution events.
+     * Registration is shared by Maven sessions using the same underlying repository system session.
      *
      * @param listener the listener to register
      * @throws NullPointerException if {@code listener} is null
@@ -202,34 +204,6 @@ public interface Session extends ProtoSession {
      */
     @Nonnull
     Collection<Listener> getListeners();
-
-    /**
-     * Registers a listener for repository events.
-     * Repository listener registration is scoped to the underlying repository system session and is therefore
-     * shared with sessions derived from this session.
-     *
-     * @param listener the listener to register
-     * @throws NullPointerException if {@code listener} is null
-     */
-    void registerListener(@Nonnull RepositoryListener listener);
-
-    /**
-     * Unregisters a previously registered repository listener.
-     * The listener is removed from the scope shared by sessions derived from the same repository system session.
-     *
-     * @param listener the listener to unregister
-     * @throws NullPointerException if {@code listener} is null
-     */
-    void unregisterListener(@Nonnull RepositoryListener listener);
-
-    /**
-     * Returns the registered repository listeners.
-     * The returned listeners belong to the scope shared by sessions derived from the same repository system session.
-     *
-     * @return an immutable collection of listeners, never {@code null}
-     */
-    @Nonnull
-    Collection<RepositoryListener> getRepositoryListeners();
 
     /**
      * Shortcut for {@code getService(RepositoryFactory.class).createLocal(...)}.

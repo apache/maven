@@ -59,47 +59,47 @@ final class DefaultRepositoryEvent implements RepositoryEvent {
     }
 
     @Override
-    public RepositoryEventType getType() {
+    public RepositoryEventType type() {
         return type;
     }
 
     @Override
-    public Session getSession() {
+    public Session session() {
         return session;
     }
 
     @Override
-    public Optional<Artifact> getArtifact() {
+    public Optional<Artifact> artifact() {
         return Optional.ofNullable(artifact);
     }
 
     @Override
-    public Optional<RepositoryMetadata> getMetadata() {
+    public Optional<RepositoryMetadata> metadata() {
         return Optional.ofNullable(metadata);
     }
 
     @Override
-    public Optional<Path> getPath() {
+    public Optional<Path> path() {
         return Optional.ofNullable(path);
     }
 
     @Override
-    public Optional<Repository> getRepository() {
+    public Optional<Repository> repository() {
         return Optional.ofNullable(repository);
     }
 
     @Override
-    public Optional<Exception> getException() {
+    public Optional<Exception> exception() {
         return Optional.ofNullable(exception);
     }
 
     @Override
-    public List<Exception> getExceptions() {
+    public List<Exception> exceptions() {
         return exceptions;
     }
 
     @Override
-    public Optional<RequestTrace> getTrace() {
+    public Optional<RequestTrace> trace() {
         return Optional.ofNullable(trace);
     }
 

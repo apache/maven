@@ -105,7 +105,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 received.set(event);
             }
         };
-        when(session.getRepositoryListeners()).thenReturn(List.of(listener));
+        when(session.getListeners()).thenReturn(List.of(listener));
         InternalSession.associate(resolverSession, session);
 
         resolverSession
@@ -115,7 +115,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
                         .build());
 
         assertNotNull(received.get());
-        assertEquals(RepositoryEventType.ARTIFACT_RESOLVED, received.get().getType());
+        assertEquals(RepositoryEventType.ARTIFACT_RESOLVED, received.get().type());
     }
 
     @Test

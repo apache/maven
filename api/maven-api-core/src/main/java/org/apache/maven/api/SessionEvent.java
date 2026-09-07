@@ -18,25 +18,20 @@
  */
 package org.apache.maven.api;
 
-import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * A listener for session events.
- * Existing implementations and lambdas receive execution events through {@link #onEvent(Event)}.
- * Implement {@link ExecutionListener} or {@link RepositoryListener} for typed callbacks.
+ * An event associated with a Maven session.
+ * Execution and repository events expose their own operation-specific details.
  *
- * @since 4.0.0
+ * @since 4.1.0
  */
 @Experimental
-@FunctionalInterface
-@Consumer
-public interface Listener {
+public interface SessionEvent {
     /**
-     * Receives a build execution event.
-     *
-     * @param event the execution event
+     * {@return the session associated with this event}
      */
-    void onEvent(@Nonnull Event event);
+    @Nonnull
+    Session session();
 }
