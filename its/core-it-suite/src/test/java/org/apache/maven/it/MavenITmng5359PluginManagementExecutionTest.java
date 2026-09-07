@@ -18,12 +18,14 @@
  */
 package org.apache.maven.it;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 
 import org.junit.jupiter.api.Test;
 
 /**
- * Verifies that executions declared only in {@code pluginManagement} are not activated by default lifecycle bindings.
+ * Verifies that cross-lifecycle executions in {@code pluginManagement} require an explicit plugin declaration.
  *
  * @see <a href="https://github.com/apache/maven/issues/6918">MNG-5359</a>
  * @since 4.1.0
@@ -31,9 +33,9 @@ import org.junit.jupiter.api.Test;
 class MavenITmng5359PluginManagementExecutionTest extends AbstractMavenIntegrationTestCase {
 
     @Test
-    void testManagedExecutionRequiresPluginDeclaration() throws Exception {
-        Path testDir = extractResources("mng-5359");
-
+    void testManagedExecutionNotActivatedWithoutDeclaration() throws Exception {
+        Path testDir = prepareProject("management-only");
+        // The clean plugin is introduced by the clean lifecycle, but the managed execution targets package.
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -41,8 +43,12 @@ class MavenITmng5359PluginManagementExecutionTest extends AbstractMavenIntegrati
         verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyFileNotPresent("target/managed-clean.txt");
+    }
 
-        verifier = newVerifier(testDir);
+    @Test
+    void testManagedExecutionActivatedWithExplicitDeclaration() throws Exception {
+        Path testDir = prepareProject("explicit-plugin");
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Pactivate-clean-plugin");
@@ -50,5 +56,13 @@ class MavenITmng5359PluginManagementExecutionTest extends AbstractMavenIntegrati
         verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyFilePresent("target/managed-clean.txt");
+    }
+
+    private Path prepareProject(String scenario) throws Exception {
+        Path testDir = extractResources("mng-5359");
+        Path project = testDir.resolve(scenario);
+        Files.createDirectories(project);
+        Files.copy(testDir.resolve("pom.xml"), project.resolve("pom.xml"), StandardCopyOption.REPLACE_EXISTING);
+        return project;
     }
 }

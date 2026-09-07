@@ -82,6 +82,8 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
     }
 
     private Map<String, String> getPhaseToLifecycleMap() {
+        // Extensions may register lifecycles after this injector is constructed, so do not cache this map.
+        // DefaultLifecycles includes both computed phases and aliases from its LifecycleRegistry delegate.
         Map<String, String> phaseToLifecycle = new HashMap<>();
         lifecycles
                 .getPhaseToLifecycleMap()
@@ -174,6 +176,7 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
             }
 
             String managedLifecycle = phaseToLifecycle.get(managedPhase);
+            // An unregistered phase has no known lifecycle; retain it only for an exact phase match.
             return lifecyclePlugin.getExecutions().stream()
                     .anyMatch(execution -> managedPhase.equals(execution.getPhase())
                             || managedLifecycle != null

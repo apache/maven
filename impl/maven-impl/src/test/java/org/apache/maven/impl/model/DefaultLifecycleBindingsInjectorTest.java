@@ -20,21 +20,31 @@ package org.apache.maven.impl.model;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.Packaging;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.model.PluginExecution;
 import org.apache.maven.api.model.PluginManagement;
+import org.apache.maven.api.services.LifecycleRegistry;
+import org.apache.maven.api.services.PackagingRegistry;
 import org.apache.maven.api.xml.XmlNode;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class DefaultLifecycleBindingsInjectorTest {
 
@@ -89,6 +99,9 @@ class DefaultLifecycleBindingsInjectorTest {
         assertEquals("configured", resultConfiguration.child("managed").value());
         assertEquals("default", resultConfiguration.child("lifecycle").value());
         assertEquals(3, result.getExecutions().size());
+        assertFalse(
+                result.getExecutions().stream().anyMatch(e -> "managed-initialize".equals(e.getId())),
+                "Cross-lifecycle managed execution should be filtered out");
         assertEquals(
                 Set.of("default-clean", "managed-clean", "managed-default-phase"),
                 result.getExecutions().stream().map(PluginExecution::getId).collect(Collectors.toSet()));
@@ -109,6 +122,93 @@ class DefaultLifecycleBindingsInjectorTest {
                         .getLocation("")
                         .getSource()
                         .getModelId());
+    }
+
+    @Test
+    void retainsDifferentPhasesInRegisteredLifecycle() {
+        assertManagedPhaseRetained("custom-prepare", "custom-finish", true, true);
+    }
+
+    @Test
+    void excludesNonmatchingUnknownPhase() {
+        assertManagedPhaseRetained("custom-prepare", "custom-finish", false, false);
+    }
+
+    @Test
+    void retainsMatchingUnknownPhase() {
+        assertManagedPhaseRetained("custom-prepare", "custom-prepare", false, true);
+    }
+
+    private void assertManagedPhaseRetained(
+            String boundPhase, String managedPhase, boolean registered, boolean retained) {
+        Map<String, String> phases =
+                registered ? Map.of("custom-prepare", "custom", "custom-finish", "custom") : Map.of();
+        InputSource source = InputSource.of("test", "test.xml");
+        Model target = Model.newBuilder()
+                .build(Build.newBuilder()
+                        .pluginManagement(PluginManagement.newBuilder()
+                                .plugins(List.of(plugin("1", execution("managed", managedPhase, source), source)))
+                                .build())
+                        .build())
+                .build();
+        Model lifecycleModel = Model.newBuilder()
+                .build(Build.newBuilder()
+                        .plugins(List.of(plugin("1", execution("lifecycle", boundPhase, source), source)))
+                        .build())
+                .build();
+        Model result =
+                new DefaultLifecycleBindingsInjector.LifecycleBindingsMerger(phases).merge(target, lifecycleModel);
+        assertEquals(
+                retained,
+                result.getBuild().getPlugins().get(0).getExecutions().stream()
+                        .anyMatch(e -> "managed".equals(e.getId())));
+    }
+
+    @Test
+    void readsAliasesAndNewlyRegisteredPhases() {
+        Lifecycle lifecycle = mock(Lifecycle.class);
+        Lifecycle.Alias alias = mock(Lifecycle.Alias.class);
+        LifecycleRegistry registry = mock(LifecycleRegistry.class);
+        when(lifecycle.id()).thenReturn("custom");
+        when(lifecycle.aliases()).thenReturn(List.of(alias));
+        when(alias.v3Phase()).thenReturn("custom-alias");
+        when(registry.stream()).thenAnswer(invocation -> Stream.of(lifecycle));
+        when(registry.computePhases(lifecycle)).thenReturn(List.of("custom-start"));
+        InputSource source = InputSource.of("test", "test.xml");
+        Plugin lifecyclePlugin = plugin("1", execution("lifecycle", "custom-start", source), source);
+        Plugin managedPlugin = plugin(
+                "1", source, execution("alias", "custom-alias", source), execution("late", "custom-finish", source));
+        Packaging packaging = mock(Packaging.class);
+        PackagingRegistry packagingRegistry = mock(PackagingRegistry.class);
+        when(packagingRegistry.lookup("jar")).thenReturn(Optional.of(packaging));
+        when(packaging.plugins())
+                .thenReturn(Map.of(
+                        "custom",
+                        PluginContainer.newBuilder()
+                                .plugins(List.of(lifecyclePlugin))
+                                .build()));
+        DefaultLifecycleBindingsInjector injector = new DefaultLifecycleBindingsInjector(registry, packagingRegistry);
+        Model model = Model.newBuilder()
+                .packaging("jar")
+                .build(Build.newBuilder()
+                        .pluginManagement(PluginManagement.newBuilder()
+                                .plugins(List.of(managedPlugin))
+                                .build())
+                        .build())
+                .build();
+        Model first = injector.injectLifecycleBindings(model, null, null);
+        when(registry.computePhases(lifecycle)).thenReturn(List.of("custom-start", "custom-finish"));
+        Model second = injector.injectLifecycleBindings(model, null, null);
+        assertEquals(
+                Set.of("lifecycle", "alias"),
+                first.getBuild().getPlugins().get(0).getExecutions().stream()
+                        .map(PluginExecution::getId)
+                        .collect(Collectors.toSet()));
+        assertEquals(
+                Set.of("lifecycle", "alias", "late"),
+                second.getBuild().getPlugins().get(0).getExecutions().stream()
+                        .map(PluginExecution::getId)
+                        .collect(Collectors.toSet()));
     }
 
     private static Plugin plugin(String version, PluginExecution execution, InputSource source) {
