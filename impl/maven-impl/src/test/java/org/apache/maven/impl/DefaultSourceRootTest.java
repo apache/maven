@@ -86,6 +86,22 @@ public class DefaultSourceRootTest {
         assertEquals(Language.JAVA_FAMILY, source.language());
         assertEquals(Path.of("myproject", "src", "main", "java"), source.directory());
         assertTrue(source.targetVersion().isEmpty());
+        assertFalse(source.generated());
+    }
+
+    @Test
+    void testGeneratedSource() {
+        var source = DefaultSourceRoot.fromModel(
+                session,
+                Path.of("myproject"),
+                outputDirectory(),
+                Source.newBuilder()
+                        .directory("target/generated-sources/java")
+                        .generated(true)
+                        .build());
+
+        assertEquals(Path.of("myproject", "target", "generated-sources", "java"), source.directory());
+        assertTrue(source.generated());
     }
 
     @Test
@@ -198,6 +214,7 @@ public class DefaultSourceRootTest {
         assertEquals(Path.of("myproject", "src", "test", "resources"), sourceRoot.directory());
         assertEquals(ProjectScope.TEST, sourceRoot.scope());
         assertEquals(Language.RESOURCES, sourceRoot.language());
+        assertFalse(sourceRoot.generated());
     }
 
     /*MNG-11062*/
