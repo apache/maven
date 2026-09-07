@@ -53,41 +53,41 @@ public interface RepositoryMetadata {
      * {@return the group identifier, or an empty string if the metadata applies to the entire repository}
      */
     @Nonnull
-    String getGroupId();
+    String groupId();
 
     /**
      * {@return the artifact identifier, or an empty string if the metadata applies at group level}
      */
     @Nonnull
-    String getArtifactId();
+    String artifactId();
 
     /**
      * {@return the version, or an empty string if the metadata applies at artifact level}
      */
     @Nonnull
-    String getVersion();
+    String version();
 
     /**
      * {@return the metadata filename, such as {@code maven-metadata.xml}}
      */
     @Nonnull
-    String getType();
+    String type();
 
     /**
      * {@return the artifact version nature to which the metadata applies}
      */
     @Nonnull
-    Nature getNature();
+    Nature nature();
 
     /**
      * {@return the local path of the metadata file if it has been resolved}
      */
     @Nonnull
-    Optional<Path> getPath();
+    Optional<Path> path();
 
     /**
      * {@return the read-only properties associated with the metadata}
      */
     @Nonnull
-    Map<String, String> getProperties();
+    Map<String, String> properties();
 }

@@ -146,16 +146,16 @@ class MavenRepositoryListenerTest {
                 .build());
 
         RepositoryMetadata converted = listener.events.get(0).metadata().orElseThrow();
-        assertEquals("org.example", converted.getGroupId());
-        assertEquals("demo", converted.getArtifactId());
-        assertEquals("1.0-SNAPSHOT", converted.getVersion());
-        assertEquals("maven-metadata.xml", converted.getType());
-        assertEquals(RepositoryMetadata.Nature.SNAPSHOT, converted.getNature());
-        assertEquals(path, converted.getPath().orElseThrow());
-        assertEquals(Map.of("source", "test"), converted.getProperties());
+        assertEquals("org.example", converted.groupId());
+        assertEquals("demo", converted.artifactId());
+        assertEquals("1.0-SNAPSHOT", converted.version());
+        assertEquals("maven-metadata.xml", converted.type());
+        assertEquals(RepositoryMetadata.Nature.SNAPSHOT, converted.nature());
+        assertEquals(path, converted.path().orElseThrow());
+        assertEquals(Map.of("source", "test"), converted.properties());
         assertThrows(
                 UnsupportedOperationException.class,
-                () -> converted.getProperties().put("key", "value"));
+                () -> converted.properties().put("key", "value"));
     }
 
     @Test

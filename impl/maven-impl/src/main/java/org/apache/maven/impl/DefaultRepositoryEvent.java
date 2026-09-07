@@ -124,37 +124,37 @@ final class DefaultRepositoryEvent implements RepositoryEvent {
         }
 
         @Override
-        public String getGroupId() {
+        public String groupId() {
             return groupId;
         }
 
         @Override
-        public String getArtifactId() {
+        public String artifactId() {
             return artifactId;
         }
 
         @Override
-        public String getVersion() {
+        public String version() {
             return version;
         }
 
         @Override
-        public String getType() {
+        public String type() {
             return type;
         }
 
         @Override
-        public Nature getNature() {
+        public Nature nature() {
             return nature;
         }
 
         @Override
-        public Optional<Path> getPath() {
+        public Optional<Path> path() {
             return Optional.ofNullable(path);
         }
 
         @Override
-        public Map<String, String> getProperties() {
+        public Map<String, String> properties() {
             return properties;
         }
     }
