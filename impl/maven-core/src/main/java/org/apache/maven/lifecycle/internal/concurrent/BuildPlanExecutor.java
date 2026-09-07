@@ -702,18 +702,23 @@ public class BuildPlanExecutor {
          * all upstream projects are returned. Otherwise, only projects that the given
          * project depends on with a matching scope are included.
          * <p>
-         * Matching is exact on the dependency's declared scope string (e.g. "compile",
-         * "provided", "test"). Maven's default dependency scope is "compile" (when no
-         * scope is declared), so a null scope in the model is treated as "compile" for
-         * matching purposes. Note that this does <em>not</em> perform path-scope
-         * resolution — for example, filtering by "compile" will not include
-         * "provided"-scoped dependencies even though they contribute to
-         * {@code PathScope.MAIN_COMPILE}. This keeps the filter simple and predictable;
-         * broader scope-aware filtering can be added in a follow-up if needed.
+         * The scope parameter is a lifecycle dependency scope (as declared in
+         * {@link org.apache.maven.api.DependencyScope}). It is expanded to match all
+         * artifact scopes that contribute to that dependency scope for build ordering:
+         * <ul>
+         *   <li>{@code "compile"} matches compile, provided, system, and null-scoped
+         *       (Maven default) dependencies</li>
+         *   <li>{@code "runtime"} matches compile, runtime, and null-scoped dependencies</li>
+         *   <li>{@code "test"} matches all scopes</li>
+         *   <li>{@code "test-only"} matches only test-scoped dependencies</li>
+         * </ul>
+         * This ensures that reactor dependencies contributing to a given classpath are
+         * properly ordered in the build plan (e.g. a provided-scope reactor dependency
+         * is built before the consumer's compile phase).
          *
          * @param project the project whose dependencies to check
          * @param upstreamProjects the list of upstream reactor projects
-         * @param scope the dependency scope to filter by, or null/empty for all
+         * @param scope the lifecycle dependency scope to filter by, or null/empty for all
          * @return the filtered list of upstream projects
          */
         static List<MavenProject> filterByScope(
@@ -721,12 +726,27 @@ public class BuildPlanExecutor {
             if (scope == null || scope.isEmpty()) {
                 return upstreamProjects;
             }
+            Set<String> matchingScopes = expandScope(scope);
             return upstreamProjects.stream()
                     .filter(dep -> project.getDependencies().stream()
                             .anyMatch(d -> dep.getGroupId().equals(d.getGroupId())
                                     && dep.getArtifactId().equals(d.getArtifactId())
-                                    && scope.equals(d.getScope() != null ? d.getScope() : "compile")))
+                                    && matchingScopes.contains(d.getScope() != null ? d.getScope() : "compile")))
                     .collect(Collectors.toList());
+        }
+
+        /**
+         * Expands a lifecycle dependency scope to the set of artifact scopes that
+         * contribute to it for build ordering purposes.
+         */
+        private static Set<String> expandScope(String scope) {
+            return switch (scope) {
+                case "compile" -> Set.of("compile", "provided", "system");
+                case "runtime" -> Set.of("compile", "runtime");
+                case "test" -> Set.of("compile", "provided", "system", "runtime", "test");
+                case "test-only" -> Set.of("test");
+                default -> Set.of(scope);
+            };
         }
 
         protected BuildPlan computeForkPlan(BuildStep step, MojoExecution execution, BuildPlan buildPlan) {
