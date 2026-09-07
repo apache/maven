@@ -32,6 +32,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for the {@link ToolchainPluginStrategy} class.
@@ -463,7 +465,8 @@ class ToolchainPluginStrategyTest {
             // The output should contain the toolchains plugin and version constraint
             String xml = doc.toXml();
             assertTrue(xml.contains("select-jdk-toolchain"), "POM should contain select-jdk-toolchain goal");
-            // The warning is emitted through the context logger — verified by integration tests
+            // Verify the warning about JDK availability was emitted
+            verify(context.logger).warn(contains("must be installed"));
         }
 
         @Test

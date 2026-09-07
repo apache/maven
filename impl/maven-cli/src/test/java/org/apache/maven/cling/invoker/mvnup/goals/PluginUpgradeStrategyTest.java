@@ -1639,10 +1639,14 @@ class PluginUpgradeStrategyTest {
                 assertFalse(submoduleDoc.toXml().contains("3.1.0"), "Old version 3.1.0 should not remain");
             } finally {
                 // Cleanup
-                Files.walk(tempDir)
-                        .sorted(java.util.Comparator.reverseOrder())
-                        .map(Path::toFile)
-                        .forEach(java.io.File::delete);
+                try (var walk = Files.walk(tempDir)) {
+                    walk.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
+                        try {
+                            Files.delete(p);
+                        } catch (IOException ignored) {
+                        }
+                    });
+                }
             }
         }
 
