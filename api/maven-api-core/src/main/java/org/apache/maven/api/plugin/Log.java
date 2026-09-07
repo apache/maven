@@ -55,7 +55,8 @@ public interface Log {
      * messages that help <em>users</em> investigate their build
      * (for instance, why a module was recompiled).
      * <p>
-     * The default implementation is a no-op for backward compatibility.
+     * The default implementation is a no-op for backward compatibility
+     * with existing {@code Log} implementations.
      *
      * @param content the message to log
      */
@@ -63,7 +64,6 @@ public interface Log {
 
     /**
      * Sends a message (and accompanying exception) to the user at the <b>trace</b> error level.
-     * The error's stacktrace will be output when this error level is enabled.
      * <p>
      * The default implementation is a no-op for backward compatibility.
      *
@@ -87,8 +87,6 @@ public interface Log {
      * The supplier is only evaluated if trace is enabled.
      * <p>
      * The default implementation is a no-op for backward compatibility.
-     *
-     * @param content the message supplier
      */
     default void trace(Supplier<String> content) {}
 
@@ -97,9 +95,6 @@ public interface Log {
      * The supplier is only evaluated if trace is enabled.
      * <p>
      * The default implementation is a no-op for backward compatibility.
-     *
-     * @param content the message supplier
-     * @param error the error that caused this log
      */
     default void trace(Supplier<String> content, Throwable error) {}
 
@@ -111,10 +106,9 @@ public interface Log {
     /**
      * Sends a message to the user in the <b>debug</b> error level.
      * <p>
-     * Debug is intended for messages that help <em>users</em> investigate
-     * their build — for example, why a module was recompiled or what
-     * classpath was resolved.  For Maven core internals, use
-     * {@link #trace(CharSequence)} instead.
+     * Debug is the recommended level for diagnostic output that helps
+     * plugin users troubleshoot build problems (e.g. resolved paths,
+     * computed values).  For Maven core internals, prefer {@link #trace}.
      *
      * @param content the message to log
      */
@@ -242,22 +236,15 @@ public interface Log {
 
     /**
      * Returns a child logger whose name is derived from this logger's name
-     * by appending a dot and the given suffix.
+     * by appending {@code "." + name}.  This allows plugins to create
+     * sub-loggers for different concerns while keeping hierarchical level
+     * control (e.g. setting the level for the parent silences the children).
+     * <p>
+     * The default implementation returns {@code this} so that existing
+     * implementations continue to work without changes.
      *
-     * <p>For example, if a plugin's logger is named
-     * {@code "org.apache.maven.plugins.compiler.CompilerMojo"},
-     * then {@code child("diagnostics")} returns a logger named
-     * {@code "org.apache.maven.plugins.compiler.CompilerMojo.diagnostics"}.
-     * This lets sub-components log under an independently filterable name
-     * without requiring a separate injection point.</p>
-     *
-     * <p>The default implementation returns {@code this}, so existing
-     * {@code Log} implementations continue to work without changes.
-     * Implementations that wrap a hierarchical logging backend (such as
-     * SLF4J) should override this to create a real child logger.</p>
-     *
-     * @param name the suffix to append (must not be {@code null} or blank)
-     * @return a child logger — never {@code null}
+     * @param name the child logger name segment (must not be {@code null})
+     * @return a child {@code Log}, never {@code null}
      */
     default Log child(String name) {
         return this;
