@@ -21,16 +21,21 @@ package org.apache.maven.repository.legacy;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.util.Arrays;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.Authentication;
+import org.apache.maven.repository.ArtifactTransferFailedException;
 import org.apache.maven.settings.Server;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * Tests {@link LegacyRepositorySystem}.
@@ -63,5 +68,25 @@ class LegacyRepositorySystemTest {
         assertNotNull(authentication);
         assertEquals("jason", authentication.getUsername());
         assertEquals("abc123", authentication.getPassword());
+    }
+
+    @Test
+    void testRetrieveHonorsConfiguredFailChecksumPolicy(@TempDir File tempDir) throws Exception {
+        File remoteBase = new File(tempDir, "remote");
+        remoteBase.mkdirs();
+        File remoteFile = new File(remoteBase, "sample.txt");
+        Files.writeString(remoteFile.toPath(), "content");
+        Files.writeString(new File(remoteBase, "sample.txt.sha1").toPath(), "0000000000000000000000000000000000000000");
+
+        ArtifactRepositoryPolicy failPolicy = new ArtifactRepositoryPolicy(
+                true, ArtifactRepositoryPolicy.UPDATE_POLICY_ALWAYS, ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL);
+        ArtifactRepository repository = repositorySystem.createArtifactRepository(
+                "test", "file://" + remoteBase.getAbsolutePath(), null, failPolicy, failPolicy);
+
+        File destination = new File(tempDir, "sample.txt");
+
+        assertThrows(
+                ArtifactTransferFailedException.class,
+                () -> repositorySystem.retrieve(repository, destination, "sample.txt", null));
     }
 }

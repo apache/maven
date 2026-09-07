@@ -18,9 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -43,11 +43,11 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
     @Test
     public void testitTestPhase() throws Exception {
         Path testDir = extractResources("mng-3043");
-        Files.createDirectories(testDir.resolve(".mvn"));
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
+        verifier.deleteDirectory(".mvn/target");
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
         verifier.deleteDirectory("consumer-c/target");
@@ -104,6 +104,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
+        verifier.deleteDirectory(".mvn/target");
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
         verifier.deleteDirectory("consumer-c/target");
@@ -164,6 +165,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
+        verifier.deleteDirectory(".mvn/target");
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
         verifier.deleteDirectory("consumer-c/target");

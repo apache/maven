@@ -98,7 +98,7 @@ public class ConsoleMavenTransferListener extends AbstractMavenTransferListener 
         StringBuilder status = new StringBuilder();
 
         if (printResourceNames) {
-            status.append(resourceName(resourceName));
+            status.append(sanitize(resourceName(resourceName)));
             status.append(" (");
         }
 

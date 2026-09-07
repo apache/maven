@@ -181,6 +181,43 @@ class DefaultModelValidatorTest {
     }
 
     @Test
+    void testCoordinateIdsWithPathTraversal() throws Exception {
+        SimpleProblemCollector result = validate("coordinate-ids-path-traversal-pom.xml");
+
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(m -> m.contains("'artifactId'") && m.contains("does not match a valid id pattern")),
+                "artifactId '..' must be rejected: " + result.getErrors());
+
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(m ->
+                                m.contains("dependencies.dependency.version") && m.contains("must be a valid version")),
+                "dependency version '..' must be rejected: " + result.getErrors());
+    }
+
+    @Test
+    void testCoordinateIdsWithSingleDotPathTraversal() throws Exception {
+        SimpleProblemCollector result = validate("coordinate-ids-path-traversal-dot-pom.xml");
+
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(m -> m.contains("'groupId'") && m.contains("does not match a valid id pattern")),
+                "groupId '..' must be rejected: " + result.getErrors());
+
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(m -> m.contains("'artifactId'") && m.contains("does not match a valid id pattern")),
+                "artifactId '.' must be rejected: " + result.getErrors());
+
+        assertTrue(
+                result.getErrors().stream()
+                        .anyMatch(m ->
+                                m.contains("dependencies.dependency.version") && m.contains("must be a valid version")),
+                "dependency version '.' must be rejected: " + result.getErrors());
+    }
+
+    @Test
     void testMissingType() throws Exception {
         SimpleProblemCollector result = validate("missing-type-pom.xml");
 
@@ -438,6 +475,16 @@ class DefaultModelValidatorTest {
         assertViolations(result, 0, 1, 0);
 
         assertTrue(result.getErrors().get(0).contains("distributionManagement.status"));
+    }
+
+    @Test
+    void testBadParentRelativePath() throws Exception {
+        SimpleProblemCollector result = validateRaw("bad-parent-relativePath.xml");
+
+        assertViolations(result, 0, 0, 1);
+
+        assertContains(result.getWarnings().get(0), "parent.relativePath");
+        assertContains(result.getWarnings().get(0), "must not contain any of these characters");
     }
 
     @Test
@@ -965,5 +1012,17 @@ class DefaultModelValidatorTest {
             throw new AssertionError(
                     "Concurrent validation failed: " + failure.get().getMessage(), failure.get());
         }
+    }
+
+    @Test
+    void testMinimalWithParent() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/minimal-with-parent.xml");
+        assertViolations(result, 0, 0, 0);
+    }
+
+    @Test
+    void testMinimalWithoutParent() throws Exception {
+        SimpleProblemCollector result = validateRaw("raw-model/minimal-without-parent.xml");
+        assertViolations(result, 0, 0, 0);
     }
 }

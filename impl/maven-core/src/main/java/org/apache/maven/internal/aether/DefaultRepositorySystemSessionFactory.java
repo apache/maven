@@ -27,6 +27,7 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Constants;
@@ -36,6 +37,7 @@ import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.xml.XmlNode;
+import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.resolver.MavenSessionBuilderSupplier;
@@ -54,6 +56,7 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
 import org.eclipse.aether.collection.VersionFilterBuilder;
+import org.eclipse.aether.repository.AuthenticationSelector;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.resolution.ResolutionErrorPolicy;
 import org.eclipse.aether.util.listener.ChainedRepositoryListener;
@@ -96,6 +99,24 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
     private static final String MAVEN_RESOLVER_TRANSPORT_NATIVE = "native";
 
     public static final String MAVEN_RESOLVER_TRANSPORT_AUTO = "auto";
+
+    /**
+     * User property selecting how server credentials configured in settings are scoped to repositories:
+     * <ul>
+     *     <li>{@code origin} (default): credentials for a server id are only used with a repository whose
+     *     origin (protocol, host and port) matches a repository or mirror declared with the same id in
+     *     settings or on the command line. For server ids without any such declared repository (for
+     *     example pure deployment servers whose URL comes from the project's
+     *     {@code distributionManagement}), credentials are used as before, but a warning identifying the
+     *     target origin is emitted.</li>
+     *     <li>{@code strict}: like {@code origin}, but credentials are refused for server ids that have no
+     *     repository or mirror declared in settings or on the command line.</li>
+     *     <li>{@code id}: legacy behavior, credentials are matched by server id only.</li>
+     * </ul>
+     *
+     * @since 4.0.0
+     */
+    public static final String MAVEN_REPOSITORY_CREDENTIAL_SCOPE = "maven.repository.credentialScope";
 
     private static final String WAGON_TRANSPORTER_PRIORITY_KEY = "aether.priority.WagonTransporterFactory";
 
@@ -192,6 +213,10 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
                 .buildVersionFilter(mergedProps.get(Constants.MAVEN_VERSION_FILTER), this::parseVersionConstraint)
                 .ifPresent(sessionBuilder::setVersionFilter);
 
+        // origins of the repositories and mirrors the operator declared for a given server id, used below
+        // to scope that id's credentials to the origin(s) it was actually configured for
+        Map<String, Set<String>> declaredRepositoryOrigins = new HashMap<>();
+
         DefaultMirrorSelector mirrorSelector = new DefaultMirrorSelector();
         for (Mirror mirror : request.getMirrors()) {
             mirrorSelector.add(
@@ -202,8 +227,17 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
                     mirror.isBlocked(),
                     mirror.getMirrorOf(),
                     mirror.getMirrorOfLayouts());
+            OriginBoundAuthenticationSelector.addOrigin(declaredRepositoryOrigins, mirror.getId(), mirror.getUrl());
         }
         sessionBuilder.setMirrorSelector(mirrorSelector);
+        for (ArtifactRepository repository : request.getRemoteRepositories()) {
+            OriginBoundAuthenticationSelector.addOrigin(
+                    declaredRepositoryOrigins, repository.getId(), repository.getUrl());
+        }
+        for (ArtifactRepository repository : request.getPluginArtifactRepositories()) {
+            OriginBoundAuthenticationSelector.addOrigin(
+                    declaredRepositoryOrigins, repository.getId(), repository.getUrl());
+        }
 
         DefaultProxySelector proxySelector = new DefaultProxySelector();
         for (Proxy proxy : request.getProxies()) {
@@ -307,7 +341,11 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
             configProps.put("aether.transport.wagon.perms.fileMode." + server.getId(), server.getFilePermissions());
             configProps.put("aether.transport.wagon.perms.dirMode." + server.getId(), server.getDirectoryPermissions());
         }
-        sessionBuilder.setAuthenticationSelector(authSelector);
+        String credentialScope = mergedProps.getOrDefault(
+                MAVEN_REPOSITORY_CREDENTIAL_SCOPE, OriginBoundAuthenticationSelector.SCOPE_ORIGIN);
+        AuthenticationSelector effectiveAuthSelector = OriginBoundAuthenticationSelector.wrap(
+                authSelector, credentialScope, declaredRepositoryOrigins, logger);
+        sessionBuilder.setAuthenticationSelector(effectiveAuthSelector);
 
         Object transport =
                 mergedProps.getOrDefault(Constants.MAVEN_RESOLVER_TRANSPORT, MAVEN_RESOLVER_TRANSPORT_DEFAULT);

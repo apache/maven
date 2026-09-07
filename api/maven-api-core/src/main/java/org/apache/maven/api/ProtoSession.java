@@ -116,8 +116,8 @@ public interface ProtoSession {
     }
 
     class Builder {
-        private Map<String, String> userProperties;
-        private Map<String, String> systemProperties;
+        private Map<String, String> userProperties = Map.of();
+        private Map<String, String> systemProperties = Map.of();
         private Instant startTime;
         private Path topDirectory;
         private Path rootDirectory;

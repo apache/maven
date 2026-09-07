@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.nio.file.Path;
 import java.util.Properties;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -50,8 +51,7 @@ public class MavenITmng2201PluginConfigInterpolationTest extends AbstractMavenIn
         ItUtils.assertCanonicalFileEquals(testDir.resolve("target"), Path.of(props.getProperty("stringParam")));
         ItUtils.assertCanonicalFileEquals(
                 testDir.resolve("target"), Path.of(props.getProperty("propertiesParam.buildDir")));
-        ItUtils.assertCanonicalFileEquals(
-                testDir.resolve("target"), Path.of(props.getProperty("mapParam.buildDir")));
+        ItUtils.assertCanonicalFileEquals(testDir.resolve("target"), Path.of(props.getProperty("mapParam.buildDir")));
         assertEquals("4.0.0", props.getProperty("domParam.children.modelVersion.0.value"));
         assertEquals("org.apache.maven.its.it0104", props.getProperty("domParam.children.groupId.0.value"));
         assertEquals("1.0-SNAPSHOT", props.getProperty("domParam.children.version.0.value"));

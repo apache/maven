@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.nio.file.Path;
 import java.util.Properties;
+
 import org.codehaus.plexus.util.Os;
 import org.junit.jupiter.api.Test;
 

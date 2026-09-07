@@ -39,7 +39,7 @@ public class DefaultSettingsValidator {
     private static final String ID = "[\\w.-]+";
     private static final Pattern ID_REGEX = Pattern.compile(ID);
 
-    private static final String ILLEGAL_REPO_ID_CHARS = "\\/:\"<>|?*"; // ILLEGAL_FS_CHARS
+    private static final String ILLEGAL_NTFS_FILENAME_CHARS = "\\/:\"<>|?*";
 
     @SuppressWarnings("checkstyle:MethodLength")
     public void validate(Settings settings, boolean isProjectSettings, ProblemCollector<BuilderProblem> problems) {
@@ -73,6 +73,9 @@ public class DefaultSettingsValidator {
                 validateStringEmpty(problems, serverField + ".filePermissions", server.getFilePermissions(), msgS);
                 validateStringEmpty(
                         problems, serverField + ".directoryPermissions", server.getDirectoryPermissions(), msgS);
+                if (!server.getAliases().isEmpty()) {
+                    addViolation(problems, BuilderProblem.Severity.WARNING, serverField + ".aliases", null, msgP);
+                }
             }
         }
 
@@ -123,6 +126,23 @@ public class DefaultSettingsValidator {
                             "must be unique but found duplicate server with id " + server.getId());
                 }
             }
+
+            for (int i = 0; i < servers.size(); i++) {
+                Server server = servers.get(i);
+                for (int a = 0; a < server.getAliases().size(); a++) {
+                    String alias = server.getAliases().get(a);
+                    validateStringNotEmpty(
+                            problems, "servers.server[" + i + "].aliases[" + a + "]", alias, server.getId());
+                    if (!serverIds.add(alias)) {
+                        addViolation(
+                                problems,
+                                BuilderProblem.Severity.WARNING,
+                                "servers.server[" + i + "].aliases[" + a + "]",
+                                server.getId(),
+                                "must be unique across all server ids and aliases but found duplicate alias " + alias);
+                    }
+                }
+            }
         }
 
         List<Mirror> mirrors = settings.getMirrors();
@@ -137,7 +157,7 @@ public class DefaultSettingsValidator {
                         BuilderProblem.Severity.WARNING,
                         mirror.getId(),
                         null,
-                        ILLEGAL_REPO_ID_CHARS);
+                        ILLEGAL_NTFS_FILENAME_CHARS);
 
                 if ("local".equals(mirror.getId())) {
                     addViolation(
@@ -222,7 +242,7 @@ public class DefaultSettingsValidator {
                     BuilderProblem.Severity.WARNING,
                     repository.getId(),
                     null,
-                    ILLEGAL_REPO_ID_CHARS);
+                    ILLEGAL_NTFS_FILENAME_CHARS);
 
             if ("local".equals(repository.getId())) {
                 addViolation(

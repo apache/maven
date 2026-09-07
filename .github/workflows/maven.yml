@@ -33,24 +33,29 @@ permissions: {}
 
 env:
   # Keep in sync with mimir testing version in pom.xml
-  MIMIR_VERSION: 0.12.0
+  MIMIR_VERSION: 0.12.3
   MIMIR_BASEDIR: ~/.mimir
   MIMIR_LOCAL: ~/.mimir/local
   MAVEN_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/java_heapdump.hprof
-  MVNW_REPOURL: https://maven-central.storage-download.googleapis.com/maven2
+  # The Google Cloud mirror of Central lags a fresh release: 4.0.0-rc-6 was
+  # still a 404 there days after Central served it, so the wrapper could not
+  # fetch the distribution this workflow had just asked for. Unset, the
+  # wrapper downloads from Central. Uncomment to put the mirror back once its
+  # sync latency stops breaking release-day builds.
+  # MVNW_REPOURL: https://maven-central.storage-download.googleapis.com/maven2
 
 jobs:
   initial-build:
     runs-on: ubuntu-latest
     steps:
       - name: Set up JDK
-        uses: actions/setup-java@ad2b38190b15e4d6bdf0c97fb4fca8412226d287 # v5.3.0
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
         with:
           java-version: 17
           distribution: 'temurin'
 
       - name: Checkout maven
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -72,7 +77,7 @@ jobs:
           cp .github/ci-extensions.xml .mvn/extensions.xml
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.MIMIR_LOCAL }}
           key: master-${{ runner.os }}-${{ github.run_id }}
@@ -82,7 +87,7 @@ jobs:
 
       - name: Set up Maven
         shell: bash
-        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=4.0.0-rc-5"
+        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=4.0.0-rc-6"
 
       - name: Prepare Mimir for Maven 4.x
         shell: bash
@@ -145,7 +150,7 @@ jobs:
         java: ['17', '21', '25']
     steps:
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@ad2b38190b15e4d6bdf0c97fb4fca8412226d287 # v5.3.0
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
@@ -163,7 +168,7 @@ jobs:
         run: choco install graphviz
 
       - name: Checkout maven
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -177,7 +182,7 @@ jobs:
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.MIMIR_LOCAL }}
           key: master-${{ runner.os }}-${{ github.run_id }}
@@ -258,13 +263,13 @@ jobs:
         java: ['17', '21', '25']
     steps:
       - name: Set up JDK ${{ matrix.java }}
-        uses: actions/setup-java@ad2b38190b15e4d6bdf0c97fb4fca8412226d287 # v5.3.0
+        uses: actions/setup-java@dd06d9cba3e5552c54d9f8ea23572deb30010f7c # v6.0.0
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
 
       - name: Checkout maven
-        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
 
@@ -278,7 +283,7 @@ jobs:
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Restore Mimir caches
-        uses: actions/cache/restore@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.MIMIR_LOCAL }}
           key: master-${{ runner.os }}-${{ github.run_id }}
@@ -364,7 +369,7 @@ jobs:
           pattern: 'cache-${{ runner.os }}*'
           path: ${{ env.MIMIR_LOCAL }}
       - name: Publish cache
-        uses: actions/cache/save@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
         with:
           path: ${{ env.MIMIR_LOCAL }}

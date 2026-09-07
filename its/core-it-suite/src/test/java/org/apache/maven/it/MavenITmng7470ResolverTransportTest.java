@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

@@ -21,6 +21,7 @@ package org.apache.maven.api.plugin.annotations;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Inherited;
+import java.lang.annotation.Repeatable;
 import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
@@ -37,6 +38,7 @@ import org.apache.maven.api.annotations.Experimental;
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
 @Inherited
+@Repeatable(Afters.class)
 public @interface After {
 
     /**
@@ -57,7 +59,7 @@ public @interface After {
     /**
      * The type of this pointer.
      */
-    Type type();
+    Type type() default Type.PROJECT;
 
     /**
      * The scope for dependencies, only if {@code type() == Type.Dependencies}.

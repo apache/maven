@@ -24,13 +24,13 @@ import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Singleton;
-import org.apache.maven.testing.plugin.stubs.SessionMock;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.OsService;
 import org.apache.maven.api.services.ToolchainManager;
 import org.apache.maven.impl.DefaultToolchainManager;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.model.DefaultOsService;
+import org.apache.maven.testing.plugin.stubs.SessionMock;
 import org.mockito.Mockito;
 
 import static org.apache.maven.testing.plugin.MojoExtension.getBasedir;

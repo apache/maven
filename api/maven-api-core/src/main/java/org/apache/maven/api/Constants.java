@@ -333,7 +333,9 @@ public final class Constants {
      * so even plugins will get relocated artifacts) relocation.
      * <br/>
      * For example,
-     * <pre>maven.relocations.entries = org.foo:*:*>, \\<br/>    org.here:*:*>org.there:*:*, \\<br/>    javax.inject:javax.inject:1>>jakarta.inject:jakarta.inject:1.0.5</pre>
+     * <pre>maven.relocations.entries = org.foo:*:*>,\
+     *     org.here:*:*>org.there:*:*,\
+     *     javax.inject:javax.inject:1>>jakarta.inject:jakarta.inject:1.0.5</pre>
      * means: 3 entries, ban <code>org.foo group</code> (exactly, so <code>org.foo.bar</code> is allowed),
      * relocate <code>org.here</code> to <code>org.there</code> and finally globally relocate (see <code>&gt;&gt;</code> above)
      * <code>javax.inject:javax.inject:1</code> to <code>jakarta.inject:jakarta.inject:1.0.5</code>.
@@ -378,6 +380,21 @@ public final class Constants {
      */
     @Config
     public static final String MAVEN_VERSION_FILTER = "maven.session.versionFilter";
+
+    /**
+     * User property for overriding the reactor output repository path used by the reactor reader to share
+     * artifacts between modules during a build. This repository enables partial and resumable builds
+     * (e.g. {@code mvn verify -r :module}) without requiring {@code install}.
+     * <p>
+     * The path may be absolute or relative to the root directory. If relative, it is resolved against
+     * the root directory of the project.
+     * </p>
+     * Default value: <code>${maven.rootDirectory}/.mvn/target/project-local-repo</code>.
+     *
+     * @since 4.0.0
+     */
+    @Config(defaultValue = "${maven.rootDirectory}/.mvn/target/project-local-repo")
+    public static final String MAVEN_REACTOR_OUTPUT_REPOSITORY = "maven.reactor.outputRepository";
 
     /**
      * User property for chained LRM: the new "head" local repository to use, and "push" the existing into tail.
@@ -428,7 +445,7 @@ public final class Constants {
      * dependency management entries in transitive dependency POMs. Maven 4 enables "transitivity" by default. Hence
      * unlike Maven 3, it obeys dependency management entries deep in the dependency graph as well.
      * <br/>
-     * Default: <code>"true"</code>.
+     * Default: <code>true</code>.
      *
      * @since 4.0.0
      */
@@ -446,6 +463,17 @@ public final class Constants {
     public static final String MAVEN_RESOLVER_TRANSPORT = "maven.resolver.transport";
 
     /**
+     * Resolver validation control.
+     * Can be <code>default</code> (full validation), <code>mild</code> (only uninterpolated placeholders) or
+     * <code>off</code> (no validation, as in Maven 3.9.x).
+     * This configuration provides "escape hatch" for those projects, that are forced to use non-conformant solutions.
+     *
+     * @since 3.10.0
+     */
+    @Config(defaultValue = "default")
+    public static final String MAVEN_RESOLVER_VALIDATION = "maven.resolver.validation";
+
+    /**
      * Plugin validation level.
      *
      * @since 3.9.2
@@ -460,6 +488,19 @@ public final class Constants {
      */
     @Config
     public static final String MAVEN_PLUGIN_VALIDATION_EXCLUDES = "maven.plugin.validation.excludes";
+
+    /**
+     * User property for enabling/disabling automatic subproject discovery for POM-packaged projects.
+     * When set to {@code true} (default), Maven 4.1+ POM-packaged projects that do not declare
+     * {@code <subprojects>} or {@code <modules>} will automatically discover subprojects
+     * by scanning subdirectories for POM files.
+     * When set to {@code false}, automatic discovery is disabled regardless of whether
+     * {@code <subprojects>} or {@code <modules>} is declared.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_PROJECT_DISCOVER_SUBPROJECTS = "maven.project.discoverSubprojects";
 
     /**
      * ProjectBuilder parallelism.
@@ -479,10 +520,12 @@ public final class Constants {
 
     /**
      * User property for controlling consumer POM flattening behavior.
-     * When set to <code>true</code> (default), consumer POMs are flattened by removing
-     * dependency management and keeping only direct dependencies with transitive scopes.
-     * When set to <code>false</code>, consumer POMs preserve dependency management
-     * like parent POMs, allowing dependency management to be inherited by consumers.
+     * <ul>
+     *     <li>When set to <code>true</code>, consumer POMs are flattened by removing
+     * dependency management and keeping only direct dependencies with transitive scopes.</li>
+     *     <li>When set to <code>false</code> (default), consumer POMs preserve dependency management
+     * like parent POMs, allowing dependency management to be inherited by consumers.</li>
+     * </ul>
      *
      * @since 4.1.0
      */
@@ -491,18 +534,37 @@ public final class Constants {
 
     /**
      * User property for controlling removal of unused managed dependencies during consumer POM flattening.
-     * When set to {@code true} (default), managed dependencies that do not appear in the resolved
+     * <ul>
+     *     <li>When set to <code>true</code> (default), managed dependencies that do not appear in the resolved
      * dependency tree are removed from the consumer POM to keep it lean. This is important when using
-     * BOMs like Spring Boot or Quarkus that contain hundreds of managed dependency entries.
-     * When set to {@code false}, all managed dependencies are preserved in the consumer POM,
+     * BOMs like Spring Boot or Quarkus that contain hundreds of managed dependency entries.</li>
+     *     <li>When set to <code>false</code>, all managed dependencies are preserved in the consumer POM,
      * which may be needed in rare cases where downstream consumers override transitive dependency
-     * versions and rely on the original managed dependencies for alignment.
+     * versions and rely on the original managed dependencies for alignment.</li>
+     * </ul>
      *
      * @since 4.1.0
      */
     @Config(type = "java.lang.Boolean", defaultValue = "true")
     public static final String MAVEN_CONSUMER_POM_REMOVE_UNUSED_MANAGED_DEPENDENCIES =
             "maven.consumer.pom.removeUnusedManagedDependencies";
+
+    /**
+     * User property for controlling whether the repositories published in a consumer POM are restricted
+     * to the repositories declared in the project's own POM file.
+     * <ul>
+     *     <li>When set to <code>true</code> (default), repositories that are present in the effective model
+     * only because they were inherited from a (possibly remote) parent POM or injected by an active
+     * {@code settings.xml} profile are removed from the consumer POM before it is published. A warning is
+     * logged for every removed repository, and for every retained repository together with its URL.</li>
+     *     <li>When set to <code>false</code>, every non-central repository of the effective model is
+     * published in the consumer POM, restoring the previous behavior.</li>
+     * </ul>
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_CONSUMER_POM_SANITIZE_REPOSITORIES = "maven.consumer.pom.sanitizeRepositories";
 
     /**
      * User property for controlling "maven personality". If activated Maven will behave
@@ -575,7 +637,7 @@ public final class Constants {
      *     <li>"snapshot" - query only snapshot repositories to discover versions</li>
      * </ul>
      * Default (when unset) is using request carried nature. Hence, this configuration really makes sense with value
-     * {@code "auto"}, while ideally callers needs update and use newly added method on version range request to
+     * <code>auto</code>, while ideally callers needs update and use newly added method on version range request to
      * express preference.
      *
      * @since 4.0.0
@@ -770,6 +832,41 @@ public final class Constants {
      * @since 4.1.0
      */
     public static final String MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX = "maven.model.processor.referenceType.";
+
+    /**
+     * User property for allowing {@code system} scope and {@code systemPath} in dependency
+     * management imported from repository-resolved POMs (BOMs).
+     * <ul>
+     *     <li>When set to <code>false</code> (default), dependency management imported from a
+     * repository-resolved POM may not declare {@code system} scope or a {@code systemPath};
+     * such entries are dropped with a warning.</li>
+     *     <li>When set to <code>true</code>, such entries are imported as in previous Maven
+     * versions, with a warning.</li>
+     * </ul>
+     * Dependency management imported from the local reactor is not affected by this property.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE =
+            "maven.repository.dependencyManagement.allowSystemScope";
+
+    /**
+     * User property for opting back into the previous behavior of interpolating
+     * repository-resolved models (dependencies and parents) against the full set of
+     * session properties (system, environment and CLI).
+     * <ul>
+     *     <li>When set to <code>false</code> (default), models resolved from a
+     * repository are interpolated only against their own {@code <properties>},
+     * preventing property leaking from the requesting build into transitive POMs.</li>
+     *     <li>When set to <code>true</code>, full interpolation is applied as in
+     * previous Maven versions.</li>
+     * </ul>
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL = "maven.model.dependencyInterpolation.full";
 
     private Constants() {}
 }

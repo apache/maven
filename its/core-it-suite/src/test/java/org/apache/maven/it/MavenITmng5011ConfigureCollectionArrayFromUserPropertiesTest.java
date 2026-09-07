@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.nio.file.Path;
 import java.util.Properties;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,12 +54,8 @@ public class MavenITmng5011ConfigureCollectionArrayFromUserPropertiesTest extend
         assertEquals("0", props.getProperty("stringParams"));
 
         assertEquals("2", props.getProperty("fileParams"));
-        ItUtils.assertCanonicalFileEquals(
-                testDir.resolve("foo"),
-                Path.of(props.getProperty("fileParams.0")));
-        assertEquals(
-                testDir.resolve("bar"),
-                Path.of(props.getProperty("fileParams.1")));
+        ItUtils.assertCanonicalFileEquals(testDir.resolve("foo"), Path.of(props.getProperty("fileParams.0")));
+        assertEquals(testDir.resolve("bar"), Path.of(props.getProperty("fileParams.1")));
 
         assertEquals("5", props.getProperty("listParam"));
         assertEquals("", props.getProperty("listParam.0", ""));

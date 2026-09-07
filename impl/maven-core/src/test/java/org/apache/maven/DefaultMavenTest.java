@@ -78,13 +78,23 @@ class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
-    void testThatErrorDuringProjectDependencyGraphCreationAreStored() throws Exception {
+    void testThatErrorsDuringProjectDependencyGraphCreationAreStored() throws Exception {
         MavenExecutionRequest request =
                 createMavenExecutionRequest(getProject("cyclic-reference")).setGoals(asList("validate"));
 
         MavenExecutionResult result = maven.execute(request);
 
         assertEquals(ProjectCycleException.class, result.getExceptions().get(0).getClass());
+    }
+
+    @Test
+    void testThatNamespacePrefixesAreAllowed() throws Exception {
+        MavenExecutionRequest request =
+                createMavenExecutionRequest(getProject("prefix")).setGoals(asList("validate"));
+
+        MavenExecutionResult result = maven.execute(request);
+
+        assertTrue(result.getExceptions().isEmpty());
     }
 
     @Test

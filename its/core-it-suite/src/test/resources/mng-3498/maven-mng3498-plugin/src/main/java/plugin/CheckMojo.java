@@ -24,18 +24,15 @@ import org.apache.maven.plugin.Mojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugin.logging.Log;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Parameter;
 
-/**
- * @goal check
- * @phase validate
- * @execute goal="touch"
- */
+@Execute(goal = "touch")
+@org.apache.maven.plugins.annotations.Mojo(name = "check", defaultPhase = LifecyclePhase.VALIDATE)
 public class CheckMojo implements Mojo {
 
-    /**
-     * @parameter default-value="${project.build.directory}/touch.txt"
-     * @required
-     */
+    @Parameter(defaultValue = "${project.build.directory}/touch.txt", required = true)
     private File touchFile;
 
     private Log log;

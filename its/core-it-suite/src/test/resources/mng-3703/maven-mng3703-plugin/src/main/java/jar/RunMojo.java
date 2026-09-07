@@ -35,12 +35,11 @@ package jar;
  */
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.MavenProject;
 
-/**
- * @goal run
- * @phase validate
- */
+@Mojo(name = "run", defaultPhase = LifecyclePhase.VALIDATE)
 public class RunMojo extends AbstractCheckMojo {
 
     @Override

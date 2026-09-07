@@ -315,9 +315,19 @@ public final class InputLocation implements Serializable, InputLocationTracker {
             locations.putAll(sourceDominant ? sourceLocations : targetLocations);
         }
 
+#if ( $isMavenModel )
+        InputLocation location = sourceDominant ? source : target;
+        if (location.getLineNumber() < 0 && location.getColumnNumber() < 0) {
+            location = sourceDominant ? target : source;
+        }
+#end
+
         return new InputLocation(
 #if ( $isMavenModel )
-                -1, -1, InputSource.merge(source.getSource(), target.getSource()), locations);
+                location.getLineNumber(),
+                location.getColumnNumber(),
+                InputSource.merge(source.getSource(), target.getSource()),
+                locations);
 #else
                 target.getLineNumber(), target.getColumnNumber(), target.getSource(), locations);
 #end
@@ -359,9 +369,19 @@ public final class InputLocation implements Serializable, InputLocationTracker {
             }
         }
 
+#if ( $isMavenModel )
+        InputLocation location = target;
+        if (location.getLineNumber() < 0 && location.getColumnNumber() < 0) {
+            location = source;
+        }
+#end
+
         return new InputLocation(
 #if ( $isMavenModel )
-                -1, -1, InputSource.merge(source.getSource(), target.getSource()), locations);
+                location.getLineNumber(),
+                location.getColumnNumber(),
+                InputSource.merge(source.getSource(), target.getSource()),
+                locations);
 #else
                 target.getLineNumber(), target.getColumnNumber(), target.getSource(), locations);
 #end

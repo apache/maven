@@ -31,7 +31,6 @@ import org.apache.maven.plugin.MojoNotFoundException;
 import org.apache.maven.plugin.PluginDescriptorParsingException;
 import org.apache.maven.plugin.PluginNotFoundException;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
@@ -60,7 +59,7 @@ public interface LifecycleExecutionPlanCalculator {
             MavenSession session,
             MavenProject project,
             MojoExecution mojoExecution,
-            Set<MojoDescriptor> alreadyPlannedExecutions)
+            Set<String> alreadyPlannedExecutions)
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
                     MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
                     LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException;

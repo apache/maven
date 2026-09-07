@@ -1,0 +1,118 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: stale-branches-report
+
+on:
+  schedule:
+    - cron: '0 6 1 * *'   # monthly, on the 1st at 06:00 UTC
+  workflow_dispatch:       # allows maintainers to run it on demand
+                           # (Actions → stale-branches-report → Run workflow)
+    inputs:
+      months:
+        description: 'Report branches with no commits newer than this many months'
+        required: false
+        default: '6'
+      dry_run:
+        description: 'Only show the report in the run log (do not post to the issue)'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: read
+
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    env:
+      MONTHS: ${{ inputs.months || '6' }}
+      DRY_RUN: ${{ inputs.dry_run == true }}
+    steps:
+      - name: Report stale branches to #11858
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ISSUE: '11858'
+        run: |
+          set -euo pipefail
+          cutoff=$(date -d "$MONTHS months ago" +%s)
+          echo "Branches with no commits since $(date -d "$MONTHS months ago" +%Y-%m-%d) and no open PR:"
+
+          # collect all branch names
+          : > branches.txt
+          page=1
+          while : ; do
+            gh api "repos/$REPO/branches?per_page=100&page=$page" > page.json
+            [ "$(jq length page.json)" -eq 0 ] && break
+            jq -r '.[].name' page.json >> branches.txt
+            page=$((page+1))
+          done
+
+          : > stale.txt
+          while IFS= read -r branch; do
+            # skip protected branches (release / maintenance lines)
+            protected=$(gh api "repos/$REPO/branches/$branch" --jq '.protected' 2>/dev/null || echo true)
+            [ "$protected" = "true" ] && continue
+            # skip branches that are the head of an open PR
+            open_prs=$(gh pr list --repo "$REPO" --state open --head "$branch" --json number --jq 'length')
+            [ "$open_prs" -gt 0 ] && continue
+            last=$(gh api "repos/$REPO/commits/$branch" --jq '.commit.committer.date' 2>/dev/null || true)
+            [ -z "$last" ] && continue
+            [ "$(date -d "$last" +%s)" -gt "$cutoff" ] && continue
+            echo "- \`$branch\` — last commit \`${last:0:10}\`" >> stale.txt
+          done < branches.txt
+
+          {
+            echo "### Monthly stale-branch report — $(date +%Y-%m-%d)"
+            echo
+            echo "<i>Threshold: branches with no commits in the last ${MONTHS} months and no open PR.</i>"
+            echo
+            if [ -s stale.txt ]; then
+              echo "Branches with no commits in the last ${MONTHS} months **and** no open PR:"
+              echo
+              cat stale.txt
+              echo
+              echo "<details><summary>Tip: deleting a stale branch</summary>"
+              echo
+              echo '```'
+              echo "gh api -X DELETE repos/$REPO/git/refs/heads/<branch-name>"
+              echo '```'
+              echo
+              echo "</details>"
+            else
+              echo "No stale branches found. 🎉"
+            fi
+          } > report.md
+
+          if [ "$DRY_RUN" = "true" ]; then
+            echo "DRY RUN — report not posted to the issue. Output:"
+            cat report.md
+            exit 0
+          fi
+
+          # update the latest existing report comment if present, otherwise create a new one
+          comment_id=$(gh api "repos/$REPO/issues/$ISSUE/comments?per_page=100" \
+            --jq '.[] | select(.user.login == "github-actions[bot]") | select(.body | startswith("### Monthly stale-branch report")) | .id' \
+            | tail -1 || true)
+          if [ -n "${comment_id:-}" ]; then
+            gh api -X PATCH "repos/$REPO/issues/comments/$comment_id" -F body=@report.md --jq '.html_url'
+          else
+            gh issue comment "$ISSUE" --repo "$REPO" --body-file report.md
+          fi

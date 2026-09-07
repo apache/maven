@@ -40,18 +40,18 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Goal which touches a timestamp file.
- *
- * @goal touch
  */
+@Mojo(name = "touch")
 public class TouchMojo extends AbstractMojo {
     /**
      * Location of the file.
-     * @parameter expression="${project.build.directory}"
-     * @required
      */
+    @Parameter(defaultValue = "${project.build.directory}", required = true)
     private File outputDirectory;
 
     public void execute() throws MojoExecutionException {

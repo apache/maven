@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.io.File;
 import java.nio.file.Path;
 import java.util.Properties;
+
 import org.junit.jupiter.api.Test;
 
 /**
@@ -65,10 +66,8 @@ public class MavenITmng3951AbsolutePathsTest extends AbstractMavenIntegrationTes
         verifier.verifyFilePresent("target/path.properties");
         Properties props = verifier.loadProperties("target/path.properties");
 
-        ItUtils.assertCanonicalFileEquals(
-                testDir.resolve("tmp"), Path.of(props.getProperty("fileParams.0")));
-        ItUtils.assertCanonicalFileEquals(
-                getRoot(testDir).resolve("tmp"), Path.of(props.getProperty("fileParams.1")));
+        ItUtils.assertCanonicalFileEquals(testDir.resolve("tmp"), Path.of(props.getProperty("fileParams.0")));
+        ItUtils.assertCanonicalFileEquals(getRoot(testDir).resolve("tmp"), Path.of(props.getProperty("fileParams.1")));
         ItUtils.assertCanonicalFileEquals(repoDir, Path.of(props.getProperty("stringParams.0")));
     }
 

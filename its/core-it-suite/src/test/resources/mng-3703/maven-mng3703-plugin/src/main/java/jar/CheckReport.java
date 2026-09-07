@@ -42,34 +42,25 @@ import java.util.Map;
 
 import org.apache.maven.doxia.siterenderer.DefaultSiteRenderer;
 import org.apache.maven.doxia.siterenderer.Renderer;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 
-/**
- * @goal check-report
- * @execute phase="compile"
- */
+@Execute(phase = LifecyclePhase.COMPILE)
+@Mojo(name = "check-report")
 public class CheckReport extends AbstractMavenReport {
 
-    /**
-     * @parameter default-value="${project}"
-     * @required
-     * @readonly
-     */
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
-    /**
-     * @parameter default-value="${executedProject}"
-     * @required
-     * @readonly
-     */
+    @Parameter(defaultValue = "${executedProject}", required = true, readonly = true)
     private MavenProject executionProject;
 
-    /**
-     * @parameter default-value="${project.build.directory}/generated-site/mng3703"
-     * @readonly
-     */
+    @Parameter(defaultValue = "${project.build.directory}/generated-site/mng3703", readonly = true)
     private String outputDirectory;
 
     protected void executeReport(Locale locale) throws MavenReportException {

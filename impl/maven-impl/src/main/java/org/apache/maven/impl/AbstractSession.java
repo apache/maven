@@ -108,6 +108,7 @@ import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.repository.ArtifactRepository;
+import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.transfer.TransferResource;
 
 import static java.util.Objects.requireNonNull;
@@ -220,13 +221,15 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public org.apache.maven.api.Repository getRepository(ArtifactRepository repository) {
+    public Optional<org.apache.maven.api.Repository> getRepository(ArtifactRepository repository) {
         if (repository instanceof org.eclipse.aether.repository.RemoteRepository remote) {
-            return getRemoteRepository(remote);
+            return Optional.of(getRemoteRepository(remote));
         } else if (repository instanceof org.eclipse.aether.repository.LocalRepository local) {
-            return getLocalRepository(local);
+            return Optional.of(getLocalRepository(local));
         } else if (repository instanceof org.eclipse.aether.repository.WorkspaceRepository workspace) {
-            return getWorkspaceRepository(workspace);
+            return Optional.of(getWorkspaceRepository(workspace));
+        } else if (repository == ArtifactResult.NO_REPOSITORY) {
+            return Optional.empty();
         } else {
             throw new IllegalArgumentException("Unsupported repository type: " + repository.getClass());
         }

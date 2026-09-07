@@ -46,6 +46,15 @@ public class XmlPlexusConfiguration implements PlexusConfiguration {
     }
 
     /**
+     * Returns the underlying immutable {@link XmlNode} wrapped by this configuration.
+     *
+     * @return the wrapped XmlNode, never {@code null}
+     */
+    public XmlNode toXmlNode() {
+        return xmlNode;
+    }
+
+    /**
      * Clears the internal cache when the XML structure is modified.
      */
     private synchronized void clearCache() {

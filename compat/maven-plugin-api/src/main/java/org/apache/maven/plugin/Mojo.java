@@ -53,9 +53,7 @@ public interface Mojo {
      *
      * @param log a new logger
      *
-     * @deprecated Use SLF4J directly
      */
-    @Deprecated
     void setLog(Log log);
 
     /**
@@ -63,8 +61,6 @@ public interface Mojo {
      *
      * @return a log4j-like logger object which allows plugins to create messages at levels of <code>"debug"</code>,
      * <code>"info"</code>, <code>"warn"</code>, and <code>"error"</code>.
-     * @deprecated Use SLF4J directly
      */
-    @Deprecated
     Log getLog();
 }

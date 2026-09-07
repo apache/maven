@@ -25,8 +25,10 @@ import javax.inject.Singleton;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,6 +47,8 @@ import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.prefix.PluginPrefixRequest;
 import org.apache.maven.plugin.prefix.PluginPrefixResolver;
 import org.apache.maven.plugin.prefix.PluginPrefixResult;
+import org.apache.maven.plugin.version.DefaultPluginVersionRequest;
+import org.apache.maven.plugin.version.PluginVersionResolver;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositoryEvent.EventType;
@@ -75,13 +79,18 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
     private final BuildPluginManager pluginManager;
     private final RepositorySystem repositorySystem;
     private final MetadataReader metadataReader;
+    private final PluginVersionResolver pluginVersionResolver;
 
     @Inject
     public DefaultPluginPrefixResolver(
-            BuildPluginManager pluginManager, RepositorySystem repositorySystem, MetadataReader metadataReader) {
+            BuildPluginManager pluginManager,
+            RepositorySystem repositorySystem,
+            MetadataReader metadataReader,
+            PluginVersionResolver pluginVersionResolver) {
         this.pluginManager = pluginManager;
         this.repositorySystem = repositorySystem;
         this.metadataReader = metadataReader;
+        this.pluginVersionResolver = pluginVersionResolver;
     }
 
     @Override
@@ -107,16 +116,20 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
                         LinkedHashMap::new,
                         Collectors.mapping(Plugin::getArtifactId, Collectors.toSet())));
         request.getPluginGroups().forEach(g -> candidates.put(g, null));
-        PluginPrefixResult result = resolveFromRepository(request, candidates);
-
-        // If we haven't been able to resolve the plugin from the repository,
-        // as a last resort, we go through all declared plugins, load them
+        PluginPrefixResult result = null;
+        // First, we go through all declared plugins, load them
         // one by one, and try to find a matching prefix.
-        if (result == null && build != null) {
-            result = resolveFromProject(request, build.getPlugins());
-            if (result == null && management != null) {
-                result = resolveFromProject(request, management.getPlugins());
-            }
+        if (build != null) {
+            result = resolveFromProject(
+                    request,
+                    build.getPlugins(),
+                    management != null ? management.getPlugins() : Collections.emptyList());
+        }
+
+        // Second, we use G level metadata to discover prefix
+        // This order allows user managed clashing prefixes (they can declare them in POM)
+        if (result == null) {
+            result = resolveFromRepository(request, candidates);
         }
 
         if (result == null) {
@@ -137,9 +150,37 @@ public class DefaultPluginPrefixResolver implements PluginPrefixResolver {
         return result;
     }
 
-    private PluginPrefixResult resolveFromProject(PluginPrefixRequest request, List<Plugin> plugins) {
+    private PluginPrefixResult resolveFromProject(
+            PluginPrefixRequest request, List<Plugin> plugins, List<Plugin> pluginMgmt) {
+        if (plugins.isEmpty() && pluginMgmt.isEmpty()) {
+            return null;
+        }
+        PluginPrefixResult result = null;
+        Set<Plugin> candidates = new LinkedHashSet<>();
+        Stream.concat(plugins.stream(), pluginMgmt.stream())
+                .filter(p -> p.getArtifactId().contains(request.getPrefix()))
+                .forEach(candidates::add);
+        if (!candidates.isEmpty()) {
+            result = doResolveFromProject(request, candidates);
+        }
+        if (result == null) {
+            Set<Plugin> remainder = new LinkedHashSet<>(plugins);
+            remainder.removeAll(candidates);
+            result = doResolveFromProject(request, remainder);
+        }
+        return result;
+    }
+
+    private PluginPrefixResult doResolveFromProject(PluginPrefixRequest request, Collection<Plugin> plugins) {
         for (Plugin plugin : plugins) {
             try {
+                if (plugin.getVersion() == null) {
+                    DefaultPluginVersionRequest versionRequest = new DefaultPluginVersionRequest(
+                                    plugin, request.getRepositorySession(), request.getRepositories())
+                            .setPom(request.getPom());
+                    plugin.setVersion(
+                            pluginVersionResolver.resolve(versionRequest).getVersion());
+                }
                 PluginDescriptor pluginDescriptor =
                         pluginManager.loadPlugin(plugin, request.getRepositories(), request.getRepositorySession());
 

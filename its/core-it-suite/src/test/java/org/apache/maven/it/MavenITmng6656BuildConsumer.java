@@ -21,6 +21,7 @@ package org.apache.maven.it;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -69,8 +70,7 @@ public class MavenITmng6656BuildConsumer extends AbstractMavenIntegrationTestCas
 
         assertTextEquals(
                 testDir.resolve("expected/parent.pom"),
-                verifier.getArtifactPath(
-                        "org.sonatype.mavenbook.multi", "parent", "0.9-MNG6656-SNAPSHOT", "pom"));
+                verifier.getArtifactPath("org.sonatype.mavenbook.multi", "parent", "0.9-MNG6656-SNAPSHOT", "pom"));
 
         assertTextEquals(
                 testDir.resolve("expected/parent-build.pom"),
@@ -107,14 +107,10 @@ public class MavenITmng6656BuildConsumer extends AbstractMavenIntegrationTestCas
         assertEquals(
                 String.join(
                         "\n",
-                        Files.readAllLines(file1).stream()
-                                .map(String::trim)
-                                .toList()),
+                        Files.readAllLines(file1).stream().map(String::trim).toList()),
                 String.join(
                         "\n",
-                        Files.readAllLines(file2).stream()
-                                .map(String::trim)
-                                .toList()),
+                        Files.readAllLines(file2).stream().map(String::trim).toList()),
                 "pom files differ " + file1 + " " + file2);
     }
 }

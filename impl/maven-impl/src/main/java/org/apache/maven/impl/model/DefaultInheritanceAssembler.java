@@ -105,7 +105,8 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
              * repository. In other words, modules where artifactId != moduleDirName will see different effective URLs
              * depending on how the model was constructed (from filesystem or from repository).
              */
-            if (child.getProjectDirectory() != null) {
+            if (child.getProjectDirectory() != null
+                    && child.getProjectDirectory().getFileName() != null) {
                 childName = child.getProjectDirectory().getFileName().toString();
             }
 

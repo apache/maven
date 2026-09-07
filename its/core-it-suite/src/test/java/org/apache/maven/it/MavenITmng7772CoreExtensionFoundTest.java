@@ -21,9 +21,10 @@ package org.apache.maven.it;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrationTestCase {
 
@@ -61,7 +62,7 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
         Path jarPath = extensionBasedir.resolve("target").resolve("maven-it-core-extensions-0.1.jar");
 
-        assertTrue("Jar output path was not built", Files.isRegularFile(jarPath));
+        assertTrue(Files.isRegularFile(jarPath), "Jar output path was not built");
 
         verifier = newVerifier(testDir);
         verifier.setUserHomeDirectory(Paths.get(testDir.toString(), "home-lib-ext"));

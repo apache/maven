@@ -18,7 +18,6 @@
  */
 package org.apache.maven.impl.standalone;
 
-import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Nullable;
@@ -295,12 +294,14 @@ public class RepositorySystemSupplier {
             RepositoryKeyFunctionFactory repositoryKeyFunctionFactory,
             MetadataResolver metadataResolver,
             RemoteRepositoryManager remoteRepositoryManager,
-            RepositoryLayoutProvider repositoryLayoutProvider) {
+            RepositoryLayoutProvider repositoryLayoutProvider,
+            TransporterProvider transporterProvider) {
         return new PrefixesRemoteRepositoryFilterSource(
                 repositoryKeyFunctionFactory,
                 () -> metadataResolver,
                 () -> remoteRepositoryManager,
-                repositoryLayoutProvider);
+                repositoryLayoutProvider,
+                transporterProvider);
     }
 
     @Singleton
@@ -311,13 +312,13 @@ public class RepositorySystemSupplier {
 
     @Singleton
     @Provides
-    static List<ValidatorFactory> newValidatorFactories() {
-        return List.of(new MavenValidatorFactory());
+    static Map<String, ValidatorFactory> newValidatorFactories() {
+        return Map.of("maven", new MavenValidatorFactory());
     }
 
     @Singleton
     @Provides
-    static RepositorySystemValidator newRepositorySystemValidator(List<ValidatorFactory> validatorFactories) {
+    static RepositorySystemValidator newRepositorySystemValidator(Map<String, ValidatorFactory> validatorFactories) {
         return new DefaultRepositorySystemValidator(validatorFactories);
     }
 

@@ -181,6 +181,19 @@ class DefaultArtifactVersionTest {
     }
 
     @Test
+    void testHashCodeConsistentWithEquals() {
+        // equals is defined as compareTo == 0, so every compareTo-equal spelling
+        // must produce the same hash code (Object contract)
+        assertEqualsAndHash("1", "1-ga");
+        assertEqualsAndHash("1", "1-final");
+        assertEqualsAndHash("1", "1-release");
+        assertEqualsAndHash("1", "1.0-ga");
+        assertEqualsAndHash("1", "1-0");
+        assertEqualsAndHash("1", "1.0.0");
+        assertEqualsAndHash("1-SNAPSHOT", "1.0-SNAPSHOT");
+    }
+
+    @Test
     void testEqualsNullSafe() {
         assertFalse(newArtifactVersion("1").equals(null));
     }
@@ -188,6 +201,13 @@ class DefaultArtifactVersionTest {
     @Test
     void testEqualsTypeSafe() {
         assertFalse(newArtifactVersion("1").equals("non-an-artifact-version-instance"));
+    }
+
+    private void assertEqualsAndHash(String left, String right) {
+        ArtifactVersion v1 = newArtifactVersion(left);
+        ArtifactVersion v2 = newArtifactVersion(right);
+        assertTrue(v1.equals(v2), left + " and " + right + " should be equal");
+        assertEquals(v1.hashCode(), v2.hashCode(), left + " and " + right + " should have the same hash code");
     }
 
     private void assertVersionOlder(String left, String right) {

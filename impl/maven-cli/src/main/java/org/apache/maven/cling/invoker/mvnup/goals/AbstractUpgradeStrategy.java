@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -32,27 +31,17 @@ import eu.maveniverse.domtrip.Document;
 import eu.maveniverse.domtrip.Element;
 import eu.maveniverse.domtrip.maven.Coordinates;
 import eu.maveniverse.domtrip.maven.MavenPomElements;
-import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
+import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
-import org.apache.maven.api.di.Provides;
-import org.apache.maven.api.model.Repository;
-import org.apache.maven.api.model.RepositoryPolicy;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.Sources;
+import org.apache.maven.api.settings.Proxy;
+import org.apache.maven.api.settings.Settings;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.apache.maven.impl.standalone.ApiRunner;
-import org.codehaus.plexus.components.secdispatcher.Dispatcher;
-import org.codehaus.plexus.components.secdispatcher.internal.dispatchers.LegacyDispatcher;
-import org.eclipse.aether.spi.connector.transport.TransporterFactory;
-import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
-import org.eclipse.aether.spi.io.PathProcessor;
-import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
-import org.eclipse.aether.transport.file.FileTransporterFactory;
 
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
 
@@ -70,6 +59,19 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
  */
 public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
 
+    /**
+     * DI-injected standalone Maven 4 API Session, produced by {@link MvnupSessionHolder}.
+     * Sharing the session avoids recreating the heavyweight standalone DI container
+     * for each strategy. The Session's {@link org.apache.maven.api.cache.RequestCache}
+     * deduplicates effective model builds when the same POM path is resolved more
+     * than once within a strategy.
+     *
+     * <p>When running outside a DI container (e.g. unit tests), this field is {@code null}
+     * and {@link #getSession()} falls back to creating a session via
+     * {@link MvnupSessionHolder#createSession()}.
+     */
+    @Inject
+    @Named("mvnup")
     private Session session;
 
     /**
@@ -211,31 +213,66 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
         return new HashSet<>(coordinatesByGAV.values());
     }
 
+    /**
+     * Fallback session for unit tests that instantiate strategies directly (without DI).
+     */
+    private static volatile Session fallbackSession;
+
     protected Session getSession() {
-        if (session == null) {
-            session = createMaven4Session();
+        Session s = session;
+        if (s != null) {
+            return s;
         }
-        return session;
+        // Fallback for unit tests that instantiate strategies directly (without DI)
+        s = fallbackSession;
+        if (s == null) {
+            synchronized (AbstractUpgradeStrategy.class) {
+                s = fallbackSession;
+                if (s == null) {
+                    s = MvnupSessionHolder.createSession();
+                    fallbackSession = s;
+                }
+            }
+        }
+        return s;
     }
 
-    private Session createMaven4Session() {
-        Session session = ApiRunner.createSession(injector -> {
-            injector.bindInstance(Dispatcher.class, new LegacyDispatcher());
-            injector.bindImplicit(TransporterFactoryConfig.class);
-        });
-
-        // TODO: we should read settings
-        RemoteRepository central =
-                session.createRemoteRepository(RemoteRepository.CENTRAL_ID, "https://repo.maven.apache.org/maven2");
-        RemoteRepository snapshots = session.getService(RepositoryFactory.class)
-                .createRemote(Repository.newBuilder()
-                        .id("apache-snapshots")
-                        .url("https://repository.apache.org/content/repositories/snapshots/")
-                        .releases(RepositoryPolicy.newBuilder().enabled("false").build())
-                        .snapshots(RepositoryPolicy.newBuilder().enabled("true").build())
-                        .build());
-
-        return session.withRemoteRepositories(List.of(central, snapshots));
+    /**
+     * Returns the reason why remote resolution cannot honor the operator's configured
+     * repository posture, or {@code null} if remote resolution may proceed.
+     *
+     * <p>The standalone resolver session used by mvnup does not apply mirrors, proxies or
+     * offline mode from the effective settings. Rather than silently resolving remote POMs
+     * while ignoring that configuration, strategies must call this method and skip the
+     * remote-model-dependent work whenever a posture is configured that the standalone
+     * session cannot honor.</p>
+     *
+     * <p>Blocked mirrors (such as the default {@code external:http:*} blocker shipped in the
+     * Maven installation settings) do not redirect traffic and therefore do not disable
+     * remote resolution by themselves.</p>
+     *
+     * @param context the upgrade context
+     * @return a human-readable reason to skip remote resolution, or {@code null} if allowed
+     */
+    protected static String remoteResolutionUnsupportedReason(UpgradeContext context) {
+        Settings settings = context.effectiveSettings;
+        if (settings == null) {
+            // Settings were never loaded (embedded or test use): there is no operator
+            // repository posture declared that could be violated.
+            return null;
+        }
+        if (settings.isOffline()) {
+            return "offline mode is enabled in settings";
+        }
+        boolean hasRedirectingMirror = settings.getMirrors().stream().anyMatch(mirror -> !mirror.isBlocked());
+        if (hasRedirectingMirror) {
+            return "settings declare mirror(s) that the mvnup standalone resolver cannot honor";
+        }
+        boolean hasActiveProxy = settings.getProxies().stream().anyMatch(Proxy::isActive);
+        if (hasActiveProxy) {
+            return "settings declare an active proxy that the mvnup standalone resolver cannot honor";
+        }
+        return null;
     }
 
     protected Path createTempProjectStructure(UpgradeContext context, Map<Path, Document> pomMap) throws Exception {
@@ -292,7 +329,7 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
         }
     }
 
-    protected org.apache.maven.api.model.Model buildEffectiveModel(Path pomPath) {
+    protected org.apache.maven.api.model.Model buildEffectiveModel(UpgradeContext context, Path pomPath) {
         Session session = getSession();
         ModelBuilder modelBuilder = session.getService(ModelBuilder.class);
 
@@ -305,20 +342,5 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
 
         ModelBuilderResult result = modelBuilder.newSession().build(request);
         return result.getEffectiveModel();
-    }
-
-    static class TransporterFactoryConfig {
-        @Provides
-        @Named(ApacheTransporterFactory.NAME)
-        static TransporterFactory apacheTransporterFactory(
-                ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
-            return new ApacheTransporterFactory(checksumExtractor, pathProcessor);
-        }
-
-        @Provides
-        @Named(FileTransporterFactory.NAME)
-        static TransporterFactory fileTransporterFactory() {
-            return new FileTransporterFactory();
-        }
     }
 }

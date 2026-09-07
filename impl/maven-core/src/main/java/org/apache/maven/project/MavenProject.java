@@ -632,7 +632,6 @@ public class MavenProject implements Cloneable {
     }
 
     public String getName() {
-        // TODO this should not be allowed to be null.
         if (getModel().getName() != null) {
             return getModel().getName();
         } else {
@@ -1218,7 +1217,11 @@ public class MavenProject implements Cloneable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getGroupId(), getArtifactId(), getVersion());
+        // Inlined hash avoids Object[] varargs allocation from Objects.hash()
+        int result = 31 + Objects.hashCode(getGroupId());
+        result = 31 * result + Objects.hashCode(getArtifactId());
+        result = 31 * result + Objects.hashCode(getVersion());
+        return result;
     }
 
     public List<Extension> getBuildExtensions() {

@@ -19,6 +19,7 @@
 package org.apache.maven.it;
 
 import java.nio.file.Path;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,7 +41,8 @@ class MavenITgh2576ItrNotHonoredTest extends AbstractMavenIntegrationTestCase {
         verifier.deleteArtifacts("org.apache.maven.its.gh2576");
 
         verifier = newVerifier(testDir.resolve("parent"));
-        verifier.addCliArguments("install:install-file", "-Dfile=pom.xml", "-DpomFile=pom.xml", "-DlocalRepositoryPath=../repo/");
+        verifier.addCliArguments(
+                "install:install-file", "-Dfile=pom.xml", "-DpomFile=pom.xml", "-DlocalRepositoryPath=../repo/");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

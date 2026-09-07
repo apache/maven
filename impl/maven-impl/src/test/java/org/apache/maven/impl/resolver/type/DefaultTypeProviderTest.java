@@ -20,6 +20,7 @@ package org.apache.maven.impl.resolver.type;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -44,23 +45,28 @@ class DefaultTypeProviderTest {
             "processor modules", JavaPathType.PROCESSOR_MODULES);
 
     @Test
-    void testAptConsistency() throws Exception {
+    void testDocumentationConsistency() throws Exception {
         Map<String, DefaultType> types =
                 new DefaultTypeProvider().types().stream().collect(Collectors.toMap(DefaultType::id, t -> t));
 
-        Path apt = Path.of(System.getProperty("basedir", ""), "src/site/apt/dependency-types.apt");
-        List<String> lines = Files.readAllLines(apt);
+        Path doc = Path.of(System.getProperty("basedir", ""), "src/site/markdown/dependency-types.md");
+        List<String> lines = Files.readAllLines(doc);
 
         Set<String> documentedTypes = new LinkedHashSet<>();
 
         for (String line : lines) {
-            if (line.startsWith("||") || !line.startsWith("|")) {
-                continue;
+            if (!line.startsWith("|") || line.startsWith("|type|") || line.startsWith("|:-")) {
+                continue; // not a row, or the header row, or the alignment row beneath it
             }
 
             String[] cols = line.split("\\|");
             String typeId = trimApt(cols[1]);
             if (typeId == null) {
+                continue;
+            }
+            // a row carrying only a label groups the rows beneath it; APT wrote those as a
+            // second header row, which a Markdown table cannot express
+            if (Arrays.stream(cols).skip(2).allMatch(c -> trimApt(c) == null)) {
                 continue;
             }
 
@@ -89,7 +95,7 @@ class DefaultTypeProviderTest {
 
         Set<String> undocumented = new LinkedHashSet<>(types.keySet());
         undocumented.removeAll(documentedTypes);
-        assertTrue(undocumented.isEmpty(), "Types in provider but not in APT doc: " + undocumented);
+        assertTrue(undocumented.isEmpty(), "Types in provider but not documented: " + undocumented);
     }
 
     private Set<PathType> parsePathTypes(String pathTypesStr) {
@@ -106,8 +112,14 @@ class DefaultTypeProviderTest {
         return result;
     }
 
+    /** Strips the Markdown emphasis and code markers the table uses around a cell value. */
     private String trimApt(String content) {
-        content = content.replace('<', ' ').replace('>', ' ').replace('*', ' ').trim();
+        content = content.replace('`', ' ')
+                .replace('_', ' ')
+                .replace('<', ' ')
+                .replace('>', ' ')
+                .replace('*', ' ')
+                .trim();
         return content.isEmpty() ? null : content;
     }
 }

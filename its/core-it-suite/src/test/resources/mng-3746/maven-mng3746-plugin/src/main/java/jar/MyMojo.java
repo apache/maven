@@ -38,31 +38,21 @@ import java.util.Properties;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
-/**
- * @goal test
- */
+@Mojo(name = "test")
 public class MyMojo extends AbstractMojo {
-    /**
-     * @parameter
-     * @required
-     */
+    @Parameter(required = true)
     private String check;
 
-    /**
-     * @parameter expression="${test.verification}"
-     */
+    @Parameter(property = "test.verification")
     private String verification;
 
-    /**
-     * @parameter expression="${test.usingCliValue}" default-value="false"
-     */
+    @Parameter(property = "test.usingCliValue", defaultValue = "false")
     private boolean usingCliValue;
 
-    /**
-     * @parameter default-value="${project.properties}"
-     * @readonly
-     */
+    @Parameter(defaultValue = "${project.properties}", readonly = true)
     private Properties properties;
 
     public void execute() throws MojoExecutionException {

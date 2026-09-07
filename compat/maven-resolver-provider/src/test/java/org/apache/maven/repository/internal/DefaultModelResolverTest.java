@@ -18,18 +18,23 @@
  */
 package org.apache.maven.repository.internal;
 
+import java.io.File;
 import java.net.MalformedURLException;
 import java.util.Arrays;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
+import org.apache.maven.model.Repository;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.impl.ArtifactResolver;
 import org.eclipse.aether.impl.RemoteRepositoryManager;
 import org.eclipse.aether.impl.VersionRangeResolver;
+import org.eclipse.aether.repository.LocalRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -179,6 +184,46 @@ final class DefaultModelResolverTest extends AbstractRepositoryTestCase {
 
         assertNotNull(this.newModelResolver().resolveModel(dependency));
         assertEquals("1.0", dependency.getVersion());
+    }
+
+    @Test
+    void testConstructionSuppliedRepositoryKeepsPrecedence(@TempDir File localRepository) throws Exception {
+        // An isolated local repository, so resolution has to consult the remote repository list
+        // rather than a copy cached by another test in this class.
+        final RepositorySystemSession isolatedSession = newMavenRepositorySystemSession(system, localRepository);
+
+        final ModelResolver resolver = new DefaultModelResolver(
+                isolatedSession,
+                null,
+                this.getClass().getName(),
+                getContainer().lookup(ArtifactResolver.class),
+                getContainer().lookup(VersionRangeResolver.class),
+                getContainer().lookup(RemoteRepositoryManager.class),
+                Arrays.asList(newTestRepository()));
+
+        // A model-declared repository that reuses the external repository's id; the external
+        // repository must keep its slot.
+        final Repository repository = new Repository();
+        repository.setId("repo");
+        repository.setUrl(new File("target/no-such-repository").toURI().toURL().toString());
+
+        resolver.addRepository(repository);
+        resolver.addRepository(repository, true);
+
+        final Parent parent = new Parent();
+        parent.setGroupId("ut.simple");
+        parent.setArtifactId("artifact");
+        parent.setVersion("1.0");
+
+        // The external repository kept its slot, so the artifact still resolves.
+        assertNotNull(resolver.resolveModel(parent));
+    }
+
+    private static RepositorySystemSession newMavenRepositorySystemSession(
+            org.eclipse.aether.RepositorySystem system, File localRepository) {
+        RepositorySystemSession.SessionBuilder builder = new MavenSessionBuilderSupplier(system).get();
+        builder.withLocalRepositories(new LocalRepository(localRepository, "simple"));
+        return builder.build();
     }
 
     private ModelResolver newModelResolver() throws ComponentLookupException, MalformedURLException {

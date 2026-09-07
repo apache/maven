@@ -18,7 +18,6 @@
  */
 package org.apache.maven.testing.plugin.stubs;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -32,7 +31,6 @@ import org.apache.maven.impl.DefaultModelVersionParser;
 import org.apache.maven.impl.DefaultModelXmlFactory;
 import org.apache.maven.impl.DefaultPluginConfigurationExpander;
 import org.apache.maven.impl.DefaultSuperPomProvider;
-import org.apache.maven.impl.DefaultUrlNormalizer;
 import org.apache.maven.impl.model.DefaultDependencyManagementImporter;
 import org.apache.maven.impl.model.DefaultDependencyManagementInjector;
 import org.apache.maven.impl.model.DefaultInheritanceAssembler;
@@ -43,7 +41,6 @@ import org.apache.maven.impl.model.DefaultModelNormalizer;
 import org.apache.maven.impl.model.DefaultModelPathTranslator;
 import org.apache.maven.impl.model.DefaultModelProcessor;
 import org.apache.maven.impl.model.DefaultModelValidator;
-import org.apache.maven.impl.model.DefaultPathTranslator;
 import org.apache.maven.impl.model.DefaultPluginManagementInjector;
 import org.apache.maven.impl.model.DefaultProfileInjector;
 import org.apache.maven.impl.model.DefaultProfileSelector;
@@ -608,7 +605,8 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
                         getRepositoryKeyFunctionFactory(),
                         this::getMetadataResolver,
                         this::getRemoteRepositoryManager,
-                        getRepositoryLayoutProvider()));
+                        getRepositoryLayoutProvider(),
+                        getTransporterProvider()));
         return result;
     }
 
@@ -1157,13 +1155,9 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
                 modelProcessor,
                 new DefaultModelValidator(),
                 new DefaultModelNormalizer(),
-                new DefaultModelInterpolator(
-                        new DefaultPathTranslator(),
-                        new DefaultUrlNormalizer(),
-                        new DefaultRootLocator(),
-                        new DefaultInterpolator()),
-                new DefaultModelPathTranslator(new DefaultPathTranslator()),
-                new DefaultModelUrlNormalizer(new DefaultUrlNormalizer()),
+                new DefaultModelInterpolator(new DefaultRootLocator(), new DefaultInterpolator()),
+                new DefaultModelPathTranslator(),
+                new DefaultModelUrlNormalizer(),
                 new DefaultSuperPomProvider(modelProcessor),
                 new DefaultInheritanceAssembler(),
                 new DefaultProfileSelector(),
@@ -1176,7 +1170,6 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
                 List.of(),
                 new DefaultModelResolver(),
                 new DefaultInterpolator(),
-                new DefaultPathTranslator(),
                 new DefaultRootLocator());
     }
 
@@ -1194,9 +1187,9 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
         return new DefaultRepositorySystemValidator(getValidatorFactories());
     }
 
-    private List<ValidatorFactory> validatorFactories;
+    private Map<String, ValidatorFactory> validatorFactories;
 
-    public final List<ValidatorFactory> getValidatorFactories() {
+    public final Map<String, ValidatorFactory> getValidatorFactories() {
         checkClosed();
         if (validatorFactories == null) {
             validatorFactories = createValidatorFactories();
@@ -1204,9 +1197,9 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
         return validatorFactories;
     }
 
-    protected List<ValidatorFactory> createValidatorFactories() {
-        List<ValidatorFactory> result = new ArrayList<>();
-        result.add(new MavenValidatorFactory());
+    protected Map<String, ValidatorFactory> createValidatorFactories() {
+        HashMap<String, ValidatorFactory> result = new HashMap<>();
+        result.put("maven", new MavenValidatorFactory());
         return result;
     }
 

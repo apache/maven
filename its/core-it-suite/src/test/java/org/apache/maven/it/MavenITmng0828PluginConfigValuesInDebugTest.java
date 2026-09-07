@@ -22,6 +22,7 @@ import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -87,10 +88,7 @@ public class MavenITmng0828PluginConfigValuesInDebugTest extends AbstractMavenIn
 
         // Map items order is not guaranteed, so only check begin of params ...
         checkLog(log, "[DEBUG]   (f) mapParam = {key");
-        checkLog(
-                log,
-                "[DEBUG]   (f) propertiesFile = "
-                        + testDir.resolve("target/plugin-config.properties"));
+        checkLog(log, "[DEBUG]   (f) propertiesFile = " + testDir.resolve("target/plugin-config.properties"));
 
         // Properties item order is not guaranteed, so only check begin of params ...
         checkLog(log, "[DEBUG]   (f) propertiesParam = {key");

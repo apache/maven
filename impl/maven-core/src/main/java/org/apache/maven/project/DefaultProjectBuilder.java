@@ -563,9 +563,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     File pom = r.getSource().getPath().toFile();
                     MavenProject project =
                             projectIndex.get(r.getEffectiveModel().getId());
-                    Path rootDirectory =
-                            rootLocator.findRoot(pom.getParentFile().toPath());
-                    project.setRootDirectory(rootDirectory);
+                    project.setRootDirectory(
+                            rootLocator.findRoot(pom.getParentFile().toPath()));
                     project.setFile(pom);
                     project.setExecutionRoot(pom.equals(pomFile));
                     initProject(project, r);
@@ -802,7 +801,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 // Fallback to old behavior if map is empty
                 // This happens when no profiles are active or there's an issue with profile tracking
                 project.setInjectedProfileIds(
-                        result.getEffectiveModel().getId(), getProfileIds(result.getActivePomProfiles()));
+                        getModelDataId(result.getEffectiveModel()), getProfileIds(result.getActivePomProfiles()));
             } else {
                 for (Map.Entry<String, List<org.apache.maven.api.model.Profile>> entry : profilesByModel.entrySet()) {
                     project.setInjectedProfileIds(entry.getKey(), getProfileIds(entry.getValue()));
@@ -953,6 +952,16 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                                 e));
             }
             project.setRemoteArtifactRepositories(remoteRepositories);
+        }
+
+        /**
+         * Emulates Maven 3.x {@code ModelData#getId} method, that unlike model, returned {@code GAV} and not {@code GAPV}.
+         */
+        private static String getModelDataId(Model model) {
+            return ((model.getGroupId() == null) ? "[inherited]" : model.getGroupId()) + ":"
+                    + model.getArtifactId()
+                    + ":"
+                    + ((model.getVersion() == null) ? "[inherited]" : model.getVersion());
         }
 
         /**

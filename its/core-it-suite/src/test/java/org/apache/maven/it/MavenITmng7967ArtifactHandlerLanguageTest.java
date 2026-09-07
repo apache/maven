@@ -41,6 +41,7 @@ class MavenITmng7967ArtifactHandlerLanguageTest extends AbstractMavenIntegration
         Verifier verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("org.apache.maven.plugins:maven-javadoc-plugin:3.6.3:jar");
+        verifier.addCliArgument("-Ddoclint=all");
 
         boolean invocationFailed = false;
         // whatever outcome we do not fail here, but later

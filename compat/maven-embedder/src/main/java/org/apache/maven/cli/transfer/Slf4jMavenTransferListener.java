@@ -49,9 +49,14 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
 
         TransferResource resource = event.getResource();
         StringBuilder message = new StringBuilder();
-        message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
+        message.append(action)
+                .append(' ')
+                .append(direction)
+                .append(' ')
+                .append(AbstractMavenTransferListener.sanitize(resource.getRepositoryId()));
         message.append(": ");
-        message.append(resource.getRepositoryUrl()).append(resource.getResourceName());
+        message.append(AbstractMavenTransferListener.sanitize(resource.getRepositoryUrl()))
+                .append(AbstractMavenTransferListener.sanitize(resource.getResourceName()));
 
         out.info(message.toString());
     }
@@ -61,10 +66,10 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
         TransferResource resource = event.getResource();
         out.warn(
                 "{} from {} for {}{}",
-                event.getException().getMessage(),
-                resource.getRepositoryId(),
-                resource.getRepositoryUrl(),
-                resource.getResourceName());
+                AbstractMavenTransferListener.sanitize(event.getException().getMessage()),
+                AbstractMavenTransferListener.sanitize(resource.getRepositoryId()),
+                AbstractMavenTransferListener.sanitize(resource.getRepositoryUrl()),
+                AbstractMavenTransferListener.sanitize(resource.getResourceName()));
     }
 
     @Override
@@ -77,10 +82,14 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
         FileSizeFormat format = new FileSizeFormat();
 
         StringBuilder message = new StringBuilder();
-        message.append(action).append(' ').append(direction).append(' ').append(resource.getRepositoryId());
+        message.append(action)
+                .append(' ')
+                .append(direction)
+                .append(' ')
+                .append(AbstractMavenTransferListener.sanitize(resource.getRepositoryId()));
         message.append(": ");
-        message.append(resource.getRepositoryUrl())
-                .append(resource.getResourceName())
+        message.append(AbstractMavenTransferListener.sanitize(resource.getRepositoryUrl()))
+                .append(AbstractMavenTransferListener.sanitize(resource.getResourceName()))
                 .append(" (");
         format.format(message, contentLength);
 

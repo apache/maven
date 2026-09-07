@@ -22,10 +22,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.StandardOpenOption;
 import java.nio.file.attribute.FileTime;
 import java.security.DigestInputStream;
 import java.security.MessageDigest;
+
 import org.codehaus.plexus.util.FileUtils;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -63,6 +63,7 @@ class ItUtils {
     }
 
     public static void createFile(Path path) throws IOException {
+        Files.deleteIfExists(path);
         Files.createFile(path);
     }
 

@@ -78,6 +78,7 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.SettingsUtilsV4;
 import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
+import org.apache.maven.logging.AsyncDrainWriter;
 import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingOutputStream;
 import org.apache.maven.logging.ProjectBuildLogAppender;
@@ -89,7 +90,9 @@ import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.AbstractPosixTerminal;
 import org.jline.terminal.spi.TerminalExt;
+import org.jline.utils.OSUtils;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.slf4j.spi.LocationAwareLogger;
 
 import static java.util.Objects.requireNonNull;
@@ -102,6 +105,8 @@ import static org.apache.maven.cling.invoker.CliUtils.toProperties;
  * @param <C> The context type.
  */
 public abstract class LookupInvoker<C extends LookupContext> implements Invoker {
+    private static final int SIGINT_EXIT_CODE = 130;
+
     protected final Lookup protoLookup;
 
     @Nullable
@@ -311,9 +316,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected final void createTerminal(C context) {
         if (context.terminal == null) {
-            MessageUtils.systemInstall(
-                    builder -> doCreateTerminal(context, builder),
-                    terminal -> doConfigureWithTerminal(context, terminal));
+            MessageUtils.systemInstall(builder -> doCreateTerminal(context, builder), terminal -> {
+                if (OSUtils.IS_WINDOWS && !context.invokerRequest.embedded()) {
+                    // JLine may consume Ctrl+C as terminal input, bypassing the JVM's shutdown hooks.
+                    terminal.handle(Terminal.Signal.INT, signal -> System.exit(SIGINT_EXIT_CODE));
+                }
+                doConfigureWithTerminal(context, terminal);
+            });
 
             context.terminal = MessageUtils.getTerminal();
             context.closeables.add(MessageUtils::systemUninstall);
@@ -362,7 +371,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 context.coloredOutput != null ? context.coloredOutput : !Terminal.TYPE_DUMB.equals(terminal.getType()));
 
         // handle rawStreams: some would like to act on true, some on false
-        if (context.options().rawStreams().orElse(false)) {
+        // quiet mode implies raw streams — plugins that write to System.out (e.g. help:evaluate
+        // -DforceStdout) must not be decorated with "[INFO] [stdout]" prefix, otherwise scripting
+        // use cases like $(mvn -q help:evaluate ...) break (see GH-12730)
+        if (context.options().rawStreams().orElse(false)
+                || context.options().quiet().orElse(false)) {
             doConfigureWithTerminalWithRawStreamsEnabled(context);
         } else {
             doConfigureWithTerminalWithRawStreamsDisabled(context);
@@ -407,27 +420,38 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected Consumer<String> doDetermineWriter(C context) {
+        Consumer<String> raw;
         if (context.options().logFile().isPresent()) {
             Path logFile = context.cwd.resolve(context.options().logFile().get());
             try {
                 PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile), true);
                 context.closeables.add(printWriter);
-                return printWriter::println;
+                raw = printWriter::println;
             } catch (IOException e) {
                 throw new MavenException("Unable to redirect logging to " + logFile, e);
             }
         } else {
             // Given the terminal creation has been offloaded to a different thread,
             // do not pass directly the terminal writer
-            return msg -> {
+            raw = msg -> {
                 PrintWriter pw = context.terminal.writer();
                 pw.println(msg);
                 pw.flush();
             };
         }
+        // Wrap with lock-free async drain to eliminate PrintWriter synchronized contention
+        // when multiple PhasingExecutor threads log concurrently during parallel model building.
+        AsyncDrainWriter asyncWriter = new AsyncDrainWriter(raw);
+        context.closeables.add(asyncWriter);
+        return asyncWriter;
     }
 
     protected void activateLogging(C context) throws Exception {
+        if (!SLF4JBridgeHandler.isInstalled()) {
+            SLF4JBridgeHandler.removeHandlersForRootLogger();
+            SLF4JBridgeHandler.install();
+        }
+
         context.slf4jConfiguration.activate();
         if (context.options().failOnSeverity().isPresent()) {
             String logLevelThreshold = context.options().failOnSeverity().get();
@@ -503,7 +527,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void preCommands(C context) throws Exception {
         boolean verbose = context.invokerRequest.effectiveVerbose();
-        boolean version = context.options().showVersion().orElse(false);
+        boolean version = context.options().showVersion().orElse(false) && !Boolean.getBoolean("maven.version.printed");
         if (verbose || version) {
             showVersion(context);
         }

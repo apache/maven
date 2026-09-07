@@ -33,6 +33,7 @@ import java.util.Map;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.api.xml.XmlService;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
+import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Test;
 
@@ -485,7 +486,7 @@ class XmlNodeImplTest {
     void testEqualsComplex() throws XMLStreamException, XmlPullParserException, IOException {
         String testDom = "<configuration><items thing='blah'><item>one</item><item>two</item></items></configuration>";
         XmlNode dom1 = XmlService.read(new StringReader(testDom));
-        XmlNode dom2 = XmlNodeBuilder.build(new StringReader(testDom));
+        XmlNode dom2 = Xpp3DomBuilder.build(new StringReader(testDom)).getDom();
 
         assertEquals(dom1, dom2);
     }
@@ -1515,8 +1516,6 @@ class XmlNodeImplTest {
     }
 
     public static Xpp3Dom build(Reader reader) throws XmlPullParserException, IOException {
-        try (Reader closeMe = reader) {
-            return new Xpp3Dom(XmlNodeBuilder.build(reader, true, null));
-        }
+        return Xpp3DomBuilder.build(reader);
     }
 }

@@ -18,8 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.nio.file.Path;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
 

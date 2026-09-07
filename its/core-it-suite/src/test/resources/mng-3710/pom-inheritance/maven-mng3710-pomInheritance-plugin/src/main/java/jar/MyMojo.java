@@ -40,20 +40,19 @@ import java.io.IOException;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 
 /**
  * Goal which touches a timestamp file.
- *
- * @goal touch
- *
- * @phase process-sources
  */
+@Mojo(name = "touch", defaultPhase = LifecyclePhase.PROCESS_SOURCES)
 public class MyMojo extends AbstractMojo {
     /**
      * Location of the file.
-     * @parameter expression="${project.build.directory}/touch.txt"
-     * @required
      */
+    @Parameter(defaultValue = "${project.build.directory}/touch.txt", required = true)
     private File touchFile;
 
     public void execute() throws MojoExecutionException {

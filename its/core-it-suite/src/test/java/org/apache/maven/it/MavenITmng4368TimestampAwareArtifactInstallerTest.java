@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -62,8 +63,7 @@ public class MavenITmng4368TimestampAwareArtifactInstallerTest extends AbstractM
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Path installedPom =
-                verifier.getArtifactPath("org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "pom");
+        Path installedPom = verifier.getArtifactPath("org.apache.maven.its.mng4368", "test", "0.1-SNAPSHOT", "pom");
 
         String pom = Files.readString(installedPom);
         assertTrue(pom.indexOf("Branch-A") > 0);

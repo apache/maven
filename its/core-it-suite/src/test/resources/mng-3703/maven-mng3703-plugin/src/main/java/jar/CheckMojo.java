@@ -34,12 +34,13 @@ package jar;
  * limitations under the License.
  */
 
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.project.MavenProject;
 
-/**
- * @goal check
- * @execute phase="compile"
- */
+@Execute(phase = LifecyclePhase.COMPILE)
+@Mojo(name = "check")
 public class CheckMojo extends AbstractCheckMojo {
 
     @Override

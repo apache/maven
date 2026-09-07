@@ -25,13 +25,13 @@ import java.nio.file.StandardCopyOption;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
+
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.Callback;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -162,17 +162,18 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
 
         final Deque<String> requestUris = new ConcurrentLinkedDeque<>();
 
-        Handler repoHandler = new AbstractHandler() {
+        Handler repoHandler = new Handler.Abstract() {
             @Override
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
-                System.out.println("Handling " + request.getMethod() + " " + request.getRequestURL());
+            public boolean handle(Request request, Response response, Callback callback) throws Exception {
+                System.out.println("Handling " + request.getMethod() + " "
+                        + request.getHttpURI().toString());
 
-                requestUris.add(request.getRequestURI());
+                requestUris.add(Request.getPathInContext(request));
 
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setStatus(404);
 
-                ((Request) request).setHandled(true);
+                callback.succeeded();
+                return true;
             }
         };
 
@@ -240,9 +241,7 @@ public class MavenITmng3415JunkRepositoryMetadataTest extends AbstractMavenInteg
     private void assertMetadataMissing(Verifier verifier) {
         Path metadata = getMetadataFile(verifier);
 
-        assertFalse(
-                Files.exists(metadata),
-                "Metadata file should NOT be present in local repository: " + metadata);
+        assertFalse(Files.exists(metadata), "Metadata file should NOT be present in local repository: " + metadata);
     }
 
     private void setupDummyDependency(Verifier verifier, Path testDir, boolean resetUpdateInterval) throws IOException {

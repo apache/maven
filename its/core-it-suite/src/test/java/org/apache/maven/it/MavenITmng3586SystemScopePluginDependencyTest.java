@@ -24,6 +24,7 @@ import java.util.Properties;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-3586">MNG-3586</a>.
@@ -52,6 +53,7 @@ public class MavenITmng3586SystemScopePluginDependencyTest extends AbstractMaven
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
+        verifier.addCliArgument("-Dmaven.model.dependencyInterpolation.full=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -79,5 +81,34 @@ public class MavenITmng3586SystemScopePluginDependencyTest extends AbstractMaven
 
         Properties props = verifier.loadProperties("target/pcl.properties");
         assertEquals("1", props.getProperty("maven-core-it.properties.count"));
+    }
+
+    /**
+     * Test that by default a plugin POM resolved from a repository does not interpolate the path of
+     * its system-scope dependency from the session properties, so the expression is left as written
+     * and reported as an invalid path.
+     *
+     * @throws Exception in case of failure
+     */
+    @Test
+    public void testitFromPluginDefaultLeavesPropertyUnresolved() throws Exception {
+        Path testDir = extractResources("mng-3586/test-1");
+
+        Verifier verifier = newVerifier(testDir);
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng3586");
+        verifier.getSystemProperties().setProperty("test.home", testDir.toString());
+        verifier.filterFile("settings-template.xml", "settings.xml");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
+        try {
+            verifier.execute();
+            verifier.verifyErrorFreeLog();
+            fail("Build should not succeed");
+        } catch (VerificationException e) {
+            verifier.verifyTextInLog("must specify an absolute path but is ${test.home}/tools.jar");
+        }
     }
 }

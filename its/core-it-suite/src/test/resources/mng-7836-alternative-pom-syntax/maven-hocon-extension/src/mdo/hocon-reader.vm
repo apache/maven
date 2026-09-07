@@ -94,7 +94,6 @@ public class ${className} {
                         ${classLcapName}.${field.name}(getIntegerValue(v));
                         break;
       #elseif ( $field.type == "DOM" )
-//                        ${classLcapName}.${field.name}(XmlNodeBuilder.build(parser, true));
                         break;
       #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
                         ${classLcapName}.${field.name}(getStringList(v));

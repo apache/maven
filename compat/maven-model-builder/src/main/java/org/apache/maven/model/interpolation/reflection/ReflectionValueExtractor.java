@@ -24,6 +24,7 @@ import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -51,7 +52,8 @@ public class ReflectionValueExtractor {
      * This approach prevents permgen space overflows due to retention of discarded
      * classloaders.
      */
-    private static final Map<Class<?>, WeakReference<ClassMap>> CLASS_MAPS = new WeakHashMap<>();
+    private static final Map<Class<?>, WeakReference<ClassMap>> CLASS_MAPS =
+            Collections.synchronizedMap(new WeakHashMap<>());
 
     static final int EOF = -1;
 

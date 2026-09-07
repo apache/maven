@@ -35,8 +35,8 @@ class MavenITgh11181CoreExtensionsMetaVersionsTest extends AbstractMavenIntegrat
      */
     @Test
     void pwMetaVersionIsInvalid() throws Exception {
-        Path testDir = extractResources("gh-11181-core-extensions-meta-versions")
-                .resolve("pw-metaversion-is-invalid");
+        Path testDir =
+                extractResources("gh-11181-core-extensions-meta-versions").resolve("pw-metaversion-is-invalid");
         Verifier verifier = newVerifier(testDir);
         verifier.setUserHomeDirectory(testDir.resolve("HOME"));
         verifier.setAutoclean(false);
@@ -55,8 +55,8 @@ class MavenITgh11181CoreExtensionsMetaVersionsTest extends AbstractMavenIntegrat
      */
     @Test
     void uwMetaVersionIsValid() throws Exception {
-        Path testDir = extractResources("gh-11181-core-extensions-meta-versions")
-                .resolve("uw-metaversion-is-valid");
+        Path testDir =
+                extractResources("gh-11181-core-extensions-meta-versions").resolve("uw-metaversion-is-valid");
         Verifier verifier = newVerifier(testDir);
         verifier.setUserHomeDirectory(testDir.resolve("HOME"));
         verifier.setHandleLocalRepoTail(false);
