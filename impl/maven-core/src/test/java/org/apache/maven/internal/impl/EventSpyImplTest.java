@@ -86,11 +86,6 @@ class EventSpyImplTest {
             public void artifactResolving(RepositoryEvent event) {
                 repositoryOnlyCalls.incrementAndGet();
             }
-
-            @Override
-            public void onEvent(Event event) {
-                throw new AssertionError("Repository-only listener received an execution event");
-            }
         };
         context.session.registerListener(combined);
         context.session.registerListener(legacy);
@@ -146,6 +141,12 @@ class EventSpyImplTest {
         class CombinedListener implements ExecutionListener, RepositoryListener {
             int executionCalls;
             int repositoryCalls;
+
+            @Override
+            public void onEvent(Event event) {
+                ExecutionListener.super.onEvent(event);
+                RepositoryListener.super.onEvent(event);
+            }
 
             @Override
             public void sessionStarted(ExecutionEvent event) {
@@ -222,7 +223,8 @@ class EventSpyImplTest {
 
         @Override
         public void onEvent(Event event) {
-            throw new AssertionError("Typed listener received a duplicate legacy callback");
+            ExecutionListener.super.onEvent(event);
+            RepositoryListener.super.onEvent(event);
         }
 
         @Override

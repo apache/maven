@@ -24,13 +24,53 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Receives build execution events through typed callbacks.
+ * Each method corresponds to a specific {@link ExecutionEventType} and has a no-op default implementation,
+ * so implementations only need to override the methods they care about.
+ * <p>
+ * Register an {@code ExecutionListener} via {@link Session#registerListener(Listener)}.
  * Implementations must support concurrent notification during parallel builds.
  *
+ * @see ExecutionEvent
+ * @see ExecutionEventType
  * @since 4.1.0
  */
 @Experimental
 @Consumer
-public interface ExecutionListener extends TypedListener {
+public interface ExecutionListener extends Listener {
+
+    /**
+     * Dispatches the given event to the appropriate typed callback.
+     * This default implementation routes {@link ExecutionEvent}s to the matching method
+     * and ignores other event types.
+     *
+     * @param event the event to dispatch
+     */
+    @Override
+    default void onEvent(@Nonnull Event event) {
+        if (event instanceof ExecutionEvent ee) {
+            switch (ee.type()) {
+                case PROJECT_DISCOVERY_STARTED -> projectDiscoveryStarted(ee);
+                case SESSION_STARTED -> sessionStarted(ee);
+                case SESSION_ENDED -> sessionEnded(ee);
+                case PROJECT_SKIPPED -> projectSkipped(ee);
+                case PROJECT_STARTED -> projectStarted(ee);
+                case PROJECT_SUCCEEDED -> projectSucceeded(ee);
+                case PROJECT_FAILED -> projectFailed(ee);
+                case MOJO_SKIPPED -> mojoSkipped(ee);
+                case MOJO_STARTED -> mojoStarted(ee);
+                case MOJO_SUCCEEDED -> mojoSucceeded(ee);
+                case MOJO_FAILED -> mojoFailed(ee);
+                case FORK_STARTED -> forkStarted(ee);
+                case FORK_SUCCEEDED -> forkSucceeded(ee);
+                case FORK_FAILED -> forkFailed(ee);
+                case FORKED_PROJECT_STARTED -> forkedProjectStarted(ee);
+                case FORKED_PROJECT_SUCCEEDED -> forkedProjectSucceeded(ee);
+                case FORKED_PROJECT_FAILED -> forkedProjectFailed(ee);
+                default -> {}
+            }
+        }
+    }
+
     /**
      * Called when project discovery has started.
      *

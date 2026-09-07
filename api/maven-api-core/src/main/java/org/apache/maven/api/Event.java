@@ -21,59 +21,99 @@ package org.apache.maven.api;
 import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Event sent by maven during various phases of the build process.
- * Such events can be listened to using {@link Listener}s objects
- * registered in the {@link Session}.
+ * Base interface for all Maven events.
+ * Specific event families extend this interface to provide typed event data.
+ * Events can be listened to using {@link Listener} objects registered in the {@link Session}.
  *
+ * @see ExecutionEvent
+ * @see RepositoryEvent
+ * @see Listener
  * @since 4.0.0
  */
 @Experimental
-public interface Event extends SessionEvent {
+@Immutable
+public interface Event {
 
-    @Override
-    default Session session() {
-        return getSession();
+    /**
+     * Returns the session from which this event originates.
+     *
+     * @return the current session, never {@code null}
+     */
+    @Nonnull
+    Session session();
+
+    /**
+     * Gets the session from which this event originates.
+     *
+     * @return the current session, never {@code null}
+     * @deprecated Use {@link #session()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default Session getSession() {
+        return session();
     }
 
     /**
      * Gets the type of the event.
      *
      * @return the type of the event, never {@code null}
+     * @deprecated Use {@link ExecutionEvent#type()} instead.
      */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     @Nonnull
-    EventType getType();
-
-    /**
-     * Gets the session from which this event originates.
-     *
-     * @return the current session, never {@code null}
-     */
-    @Nonnull
-    Session getSession();
+    default EventType getType() {
+        if (this instanceof ExecutionEvent ee) {
+            return EventType.valueOf(ee.type().name());
+        }
+        throw new UnsupportedOperationException("getType() is only supported on ExecutionEvent instances");
+    }
 
     /**
      * Gets the current project (if any).
      *
      * @return the current project or {@code empty()} if not applicable
+     * @deprecated Use {@link ExecutionEvent#project()} instead.
      */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     @Nonnull
-    Optional<Project> getProject();
+    default Optional<Project> getProject() {
+        if (this instanceof ExecutionEvent ee) {
+            return ee.project();
+        }
+        return Optional.empty();
+    }
 
     /**
      * Gets the current mojo execution (if any).
      *
      * @return the current mojo execution or {@code empty()} if not applicable
+     * @deprecated Use {@link ExecutionEvent#mojoExecution()} instead.
      */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     @Nonnull
-    Optional<MojoExecution> getMojoExecution();
+    default Optional<MojoExecution> getMojoExecution() {
+        if (this instanceof ExecutionEvent ee) {
+            return ee.mojoExecution();
+        }
+        return Optional.empty();
+    }
 
     /**
      * Gets the exception that caused the event (if any).
      *
      * @return the exception or {@code empty()} if none
+     * @deprecated Use {@link ExecutionEvent#exception()} instead.
      */
-    Optional<Exception> getException();
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    default Optional<Exception> getException() {
+        if (this instanceof ExecutionEvent ee) {
+            return ee.exception();
+        }
+        return Optional.empty();
+    }
 }

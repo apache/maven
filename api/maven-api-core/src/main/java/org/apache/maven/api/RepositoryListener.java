@@ -24,14 +24,55 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Receives repository events emitted while resolving, installing, and deploying artifacts and metadata.
+ * Each method corresponds to a specific {@link RepositoryEventType} and has a no-op default implementation,
+ * so implementations only need to override the methods they care about.
+ * <p>
+ * Register a {@code RepositoryListener} via {@link Session#registerListener(Listener)}.
  * Implementations must be thread-safe because callbacks may occur concurrently.
  * Runtime exceptions thrown by a listener do not stop repository processing or notification of other listeners.
  *
+ * @see RepositoryEvent
+ * @see RepositoryEventType
  * @since 4.1.0
  */
 @Experimental
 @Consumer
-public interface RepositoryListener extends TypedListener {
+public interface RepositoryListener extends Listener {
+
+    /**
+     * Dispatches the given event to the appropriate typed callback.
+     * This default implementation routes {@link RepositoryEvent}s to the matching method
+     * and ignores other event types.
+     *
+     * @param event the event to dispatch
+     */
+    @Override
+    default void onEvent(@Nonnull Event event) {
+        if (event instanceof RepositoryEvent re) {
+            switch (re.type()) {
+                case ARTIFACT_DESCRIPTOR_INVALID -> artifactDescriptorInvalid(re);
+                case ARTIFACT_DESCRIPTOR_MISSING -> artifactDescriptorMissing(re);
+                case METADATA_INVALID -> metadataInvalid(re);
+                case ARTIFACT_RESOLVING -> artifactResolving(re);
+                case ARTIFACT_RESOLVED -> artifactResolved(re);
+                case METADATA_RESOLVING -> metadataResolving(re);
+                case METADATA_RESOLVED -> metadataResolved(re);
+                case ARTIFACT_DOWNLOADING -> artifactDownloading(re);
+                case ARTIFACT_DOWNLOADED -> artifactDownloaded(re);
+                case METADATA_DOWNLOADING -> metadataDownloading(re);
+                case METADATA_DOWNLOADED -> metadataDownloaded(re);
+                case ARTIFACT_INSTALLING -> artifactInstalling(re);
+                case ARTIFACT_INSTALLED -> artifactInstalled(re);
+                case METADATA_INSTALLING -> metadataInstalling(re);
+                case METADATA_INSTALLED -> metadataInstalled(re);
+                case ARTIFACT_DEPLOYING -> artifactDeploying(re);
+                case ARTIFACT_DEPLOYED -> artifactDeployed(re);
+                case METADATA_DEPLOYING -> metadataDeploying(re);
+                case METADATA_DEPLOYED -> metadataDeployed(re);
+                default -> {}
+            }
+        }
+    }
 
     /**
      * Called when an artifact descriptor could not be parsed.

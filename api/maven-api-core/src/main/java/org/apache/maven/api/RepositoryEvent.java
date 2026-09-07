@@ -34,7 +34,7 @@ import org.apache.maven.api.services.RequestTrace;
  */
 @Experimental
 @Immutable
-public interface RepositoryEvent extends SessionEvent {
+public interface RepositoryEvent extends Event {
 
     /**
      * Returns the kind of repository operation represented by this event.

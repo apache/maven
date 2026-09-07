@@ -28,11 +28,14 @@ import org.apache.maven.api.annotations.Nonnull;
  * A build execution event with noun-style accessors.
  * Extends {@link Event} so existing execution listeners can consume the same event.
  *
+ * @see ExecutionListener
+ * @see ExecutionEventType
  * @since 4.1.0
  */
 @Experimental
 @Immutable
 public interface ExecutionEvent extends Event {
+
     /** {@return the kind of execution operation} */
     @Nonnull
     ExecutionEventType type();
@@ -48,33 +51,4 @@ public interface ExecutionEvent extends Event {
     /** {@return the failure associated with this event, if any} */
     @Nonnull
     Optional<Exception> exception();
-
-    @Override
-    @Nonnull
-    Session session();
-
-    @Override
-    default EventType getType() {
-        return EventType.valueOf(type().name());
-    }
-
-    @Override
-    default Session getSession() {
-        return session();
-    }
-
-    @Override
-    default Optional<Project> getProject() {
-        return project();
-    }
-
-    @Override
-    default Optional<MojoExecution> getMojoExecution() {
-        return mojoExecution();
-    }
-
-    @Override
-    default Optional<Exception> getException() {
-        return exception();
-    }
 }
