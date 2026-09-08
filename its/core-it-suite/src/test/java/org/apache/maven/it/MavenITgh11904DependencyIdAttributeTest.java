@@ -40,9 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITgh11904DependencyIdAttributeTest extends AbstractMavenIntegrationTestCase {
 
-    MavenITgh11904DependencyIdAttributeTest() {
-        super("[4.0.0-rc-3-SNAPSHOT,)");
-    }
+    MavenITgh11904DependencyIdAttributeTest() {}
 
     @Test
     void testConsumerPomDoesNotContainIdAttributes() throws Exception {

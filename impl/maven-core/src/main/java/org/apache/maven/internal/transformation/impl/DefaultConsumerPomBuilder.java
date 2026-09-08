@@ -43,6 +43,7 @@ import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DistributionManagement;
+import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Parent;
@@ -699,6 +700,9 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         boolean preserveModelVersion = model.isPreserveModelVersion();
         String packaging = model.getPackaging();
 
+        // Expand dependency and exclusion id attributes to individual GAV fields
+        model = expandDependencyIds(model);
+
         // Inline packaging-activated profiles into the model
         model = inlinePackagingActivatedProfiles(model, packaging);
 
@@ -761,6 +765,9 @@ class DefaultConsumerPomBuilder implements PomBuilder {
     static Model transformPom(Model model, MavenProject project) {
         boolean preserveModelVersion = model.isPreserveModelVersion();
 
+        // Expand dependency and exclusion id attributes to individual GAV fields
+        model = expandDependencyIds(model);
+
         // raw to consumer transform
         model = model.withRoot(false)
                 .withModules(null)
@@ -798,6 +805,197 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 + "the features that request a newer model version.  If you're fine with having the "
                 + "consumer POM not consumable with Maven 3, add the `preserve.model.version='true'` "
                 + "attribute on the <project> element of your POM.");
+    }
+
+    /**
+     * Expands {@code id} attributes on {@code <dependency>} and {@code <exclusion>}
+     * elements into their individual GAV fields, then clears the {@code id} attribute.
+     * This mirrors the expansion performed by {@code DefaultModelNormalizer} during
+     * model building and ensures the consumer POM does not contain compact-form
+     * {@code id} attributes that downstream consumers (Maven 3, Gradle) cannot parse.
+     *
+     * @param model the model to expand
+     * @return the model with all dependency/exclusion {@code id} attributes expanded
+     */
+    static Model expandDependencyIds(Model model) {
+        Model.Builder mb = null;
+        List<Dependency> deps = expandDependencyIdList(model.getDependencies());
+        if (deps != null) {
+            mb = Model.newBuilder(model, true);
+            mb.dependencies(deps);
+        }
+        DependencyManagement mgmt = model.getDependencyManagement();
+        if (mgmt != null) {
+            List<Dependency> mgmtDeps = expandDependencyIdList(mgmt.getDependencies());
+            if (mgmtDeps != null) {
+                if (mb == null) {
+                    mb = Model.newBuilder(model, true);
+                }
+                mb.dependencyManagement(DependencyManagement.newBuilder(mgmt, true)
+                        .dependencies(mgmtDeps)
+                        .build());
+            }
+        }
+        List<Profile> profiles = model.getProfiles();
+        if (!profiles.isEmpty()) {
+            List<Profile> expandedProfiles = null;
+            for (int i = 0; i < profiles.size(); i++) {
+                Profile profile = profiles.get(i);
+                Profile.Builder pb = null;
+                List<Dependency> pdeps = expandDependencyIdList(profile.getDependencies());
+                if (pdeps != null) {
+                    pb = Profile.newBuilder(profile, true);
+                    pb.dependencies(pdeps);
+                }
+                DependencyManagement pmgmt = profile.getDependencyManagement();
+                if (pmgmt != null) {
+                    List<Dependency> pmgmtDeps = expandDependencyIdList(pmgmt.getDependencies());
+                    if (pmgmtDeps != null) {
+                        if (pb == null) {
+                            pb = Profile.newBuilder(profile, true);
+                        }
+                        pb.dependencyManagement(DependencyManagement.newBuilder(pmgmt, true)
+                                .dependencies(pmgmtDeps)
+                                .build());
+                    }
+                }
+                if (pb != null) {
+                    if (expandedProfiles == null) {
+                        expandedProfiles = new ArrayList<>(profiles);
+                    }
+                    expandedProfiles.set(i, pb.build());
+                }
+            }
+            if (expandedProfiles != null) {
+                if (mb == null) {
+                    mb = Model.newBuilder(model, true);
+                }
+                mb.profiles(expandedProfiles);
+            }
+        }
+        return mb != null ? mb.build() : model;
+    }
+
+    private static List<Dependency> expandDependencyIdList(List<Dependency> dependencies) {
+        List<Dependency> result = null;
+        for (int i = 0; i < dependencies.size(); i++) {
+            Dependency dep = dependencies.get(i);
+            Dependency expanded = expandSingleDependencyId(dep);
+            if (expanded != dep) {
+                if (result == null) {
+                    result = new ArrayList<>(dependencies);
+                }
+                result.set(i, expanded);
+            }
+        }
+        return result;
+    }
+
+    private static Dependency expandSingleDependencyId(Dependency d) {
+        String id = d.getId();
+        if (id == null || id.isEmpty()) {
+            // Still need to check exclusions
+            List<Exclusion> expanded = expandExclusionIdList(d.getExclusions());
+            return expanded != null ? d.withExclusions(expanded) : d;
+        }
+
+        String remaining = id;
+        boolean optional = false;
+        if (remaining.endsWith("?")) {
+            optional = true;
+            remaining = remaining.substring(0, remaining.length() - 1);
+        }
+
+        String scope = null;
+        int atIndex = remaining.lastIndexOf('@');
+        if (atIndex >= 0) {
+            scope = remaining.substring(atIndex + 1);
+            remaining = remaining.substring(0, atIndex);
+        }
+
+        String[] parts = remaining.split(":", -1);
+        if (parts.length < 2 || parts.length > 5) {
+            return d;
+        }
+        Dependency.Builder builder = Dependency.newBuilder(d, true);
+        builder.id(null);
+        if (!parts[0].isEmpty() && isNullOrEmpty(d.getGroupId())) {
+            builder.groupId(parts[0]);
+        }
+        if (!parts[1].isEmpty() && isNullOrEmpty(d.getArtifactId())) {
+            builder.artifactId(parts[1]);
+        }
+        switch (parts.length) {
+            case 2:
+                break;
+            case 3:
+                if (!parts[2].isEmpty() && isNullOrEmpty(d.getVersion())) {
+                    builder.version(parts[2]);
+                }
+                break;
+            case 4:
+                if (!parts[2].isEmpty() && isNullOrEmpty(d.getType())) {
+                    builder.type(parts[2]);
+                }
+                if (!parts[3].isEmpty() && isNullOrEmpty(d.getVersion())) {
+                    builder.version(parts[3]);
+                }
+                break;
+            case 5:
+                if (!parts[2].isEmpty() && isNullOrEmpty(d.getType())) {
+                    builder.type(parts[2]);
+                }
+                if (!parts[3].isEmpty() && isNullOrEmpty(d.getClassifier())) {
+                    builder.classifier(parts[3]);
+                }
+                if (!parts[4].isEmpty() && isNullOrEmpty(d.getVersion())) {
+                    builder.version(parts[4]);
+                }
+                break;
+            default:
+                break;
+        }
+        if (scope != null && isNullOrEmpty(d.getScope())) {
+            builder.scope(scope);
+        }
+        if (optional && isNullOrEmpty(d.getOptional())) {
+            builder.optional("true");
+        }
+        List<Exclusion> expandedExclusions = expandExclusionIdList(d.getExclusions());
+        if (expandedExclusions != null) {
+            builder.exclusions(expandedExclusions);
+        }
+        return builder.build();
+    }
+
+    private static List<Exclusion> expandExclusionIdList(List<Exclusion> exclusions) {
+        List<Exclusion> result = null;
+        for (int i = 0; i < exclusions.size(); i++) {
+            Exclusion e = exclusions.get(i);
+            String eid = e.getId();
+            if (eid != null && !eid.isEmpty()) {
+                String[] parts = eid.split(":", -1);
+                if (parts.length == 2) {
+                    Exclusion.Builder eb = Exclusion.newBuilder(e, true);
+                    eb.id(null);
+                    if (!parts[0].isEmpty() && isNullOrEmpty(e.getGroupId())) {
+                        eb.groupId(parts[0]);
+                    }
+                    if (!parts[1].isEmpty() && isNullOrEmpty(e.getArtifactId())) {
+                        eb.artifactId(parts[1]);
+                    }
+                    if (result == null) {
+                        result = new ArrayList<>(exclusions);
+                    }
+                    result.set(i, eb.build());
+                }
+            }
+        }
+        return result;
+    }
+
+    private static boolean isNullOrEmpty(String s) {
+        return s == null || s.isEmpty();
     }
 
     /**
