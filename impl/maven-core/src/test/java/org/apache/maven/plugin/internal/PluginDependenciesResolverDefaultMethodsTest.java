@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
 
 /**
  * {@link PluginDependenciesResolver} is documented as internal, but tools that embed Maven — most visibly
@@ -100,14 +101,15 @@ class PluginDependenciesResolverDefaultMethodsTest {
         Artifact artifact = new DefaultArtifact("g:a:1.0");
         DependencyFilter filter = (node, parents) -> true;
         List<RemoteRepository> repositories = List.of();
+        RepositorySystemSession session = mock(RepositorySystemSession.class);
 
-        assertSame(RESULT, resolver.resolvePluginAndFlatten(plugin, artifact, filter, repositories, null));
+        assertSame(RESULT, resolver.resolvePluginAndFlatten(plugin, artifact, filter, repositories, session));
 
         assertSame(plugin, resolver.plugin);
         assertSame(artifact, resolver.pluginArtifact);
         assertSame(filter, resolver.dependencyFilter);
         assertSame(repositories, resolver.repositories);
-        assertNull(resolver.session);
+        assertSame(session, resolver.session);
     }
 
     @Test
@@ -116,13 +118,15 @@ class PluginDependenciesResolverDefaultMethodsTest {
         Plugin plugin = new Plugin();
         DependencyFilter filter = (node, parents) -> true;
         List<RemoteRepository> repositories = List.of();
+        RepositorySystemSession session = mock(RepositorySystemSession.class);
 
-        assertSame(RESULT, resolver.resolveCoreExtensionAndFlatten(plugin, filter, repositories, null));
+        assertSame(RESULT, resolver.resolveCoreExtensionAndFlatten(plugin, filter, repositories, session));
 
         assertSame(plugin, resolver.plugin);
         assertNull(resolver.pluginArtifact, "the extension's main artifact is resolved from the plugin GAV");
         assertSame(filter, resolver.dependencyFilter);
         assertSame(repositories, resolver.repositories);
+        assertSame(session, resolver.session);
     }
 
     /**
