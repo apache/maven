@@ -416,7 +416,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     static class CleanLifecycle implements Lifecycle {
 
-        private static final String MAVEN_CLEAN_PLUGIN_VERSION = "3.4.0";
+        private static final String MAVEN_CLEAN_PLUGIN_VERSION = "3.5.0";
 
         @Override
         public String id() {
@@ -529,7 +529,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     static class SiteLifecycle implements Lifecycle {
 
-        private static final String MAVEN_SITE_PLUGIN_VERSION = "3.21.0";
+        private static final String MAVEN_SITE_PLUGIN_VERSION = "3.22.0";
         private static final String MAVEN_SITE_PLUGIN =
                 MAVEN_PLUGINS + "maven-site-plugin:" + MAVEN_SITE_PLUGIN_VERSION + ":";
         private static final String PHASE_SITE = "site";
