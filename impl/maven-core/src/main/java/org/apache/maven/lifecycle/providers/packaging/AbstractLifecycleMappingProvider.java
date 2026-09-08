@@ -23,6 +23,7 @@ import javax.inject.Provider;
 import java.util.Collections;
 import java.util.HashMap;
 
+import org.apache.maven.lifecycle.PluginVersions;
 import org.apache.maven.lifecycle.mapping.DefaultLifecycleMapping;
 import org.apache.maven.lifecycle.mapping.Lifecycle;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
@@ -35,29 +36,29 @@ import static java.util.Objects.requireNonNull;
  */
 public abstract class AbstractLifecycleMappingProvider implements Provider<LifecycleMapping> {
     // START SNIPPET: versions
-    protected static final String RESOURCES_PLUGIN_VERSION = "3.3.1";
+    protected static final String RESOURCES_PLUGIN_VERSION = PluginVersions.RESOURCES;
 
-    protected static final String COMPILER_PLUGIN_VERSION = "3.13.0";
+    protected static final String COMPILER_PLUGIN_VERSION = PluginVersions.COMPILER;
 
-    protected static final String SUREFIRE_PLUGIN_VERSION = "3.5.2";
+    protected static final String SUREFIRE_PLUGIN_VERSION = PluginVersions.SUREFIRE;
 
-    protected static final String INSTALL_PLUGIN_VERSION = "3.1.3";
+    protected static final String INSTALL_PLUGIN_VERSION = PluginVersions.INSTALL;
 
-    protected static final String DEPLOY_PLUGIN_VERSION = "3.1.3";
+    protected static final String DEPLOY_PLUGIN_VERSION = PluginVersions.DEPLOY;
 
     // packaging
 
-    protected static final String JAR_PLUGIN_VERSION = "3.4.2";
+    protected static final String JAR_PLUGIN_VERSION = PluginVersions.JAR;
 
-    protected static final String EAR_PLUGIN_VERSION = "3.3.0";
+    protected static final String EAR_PLUGIN_VERSION = PluginVersions.EAR;
 
-    protected static final String EJB_PLUGIN_VERSION = "3.2.1";
+    protected static final String EJB_PLUGIN_VERSION = PluginVersions.EJB;
 
-    protected static final String PLUGIN_PLUGIN_VERSION = "3.15.1";
+    protected static final String PLUGIN_PLUGIN_VERSION = PluginVersions.PLUGIN;
 
-    protected static final String RAR_PLUGIN_VERSION = "3.0.0";
+    protected static final String RAR_PLUGIN_VERSION = PluginVersions.RAR;
 
-    protected static final String WAR_PLUGIN_VERSION = "3.4.0";
+    protected static final String WAR_PLUGIN_VERSION = PluginVersions.WAR;
     // END SNIPPET: versions
 
     private final LifecycleMapping lifecycleMapping;
