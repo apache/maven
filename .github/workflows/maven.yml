@@ -353,6 +353,14 @@ jobs:
             ~/.mimir/*.log
 
   consolidate-caches:
+    # This job downloads the per-job cache artifacts to publish a single consolidated
+    # cache. The "Publish cache" step below is already gated to non-PR events, so on a
+    # pull_request the job has nothing to publish and only risks a flaky ~2 GB artifact
+    # download (actions/download-artifact "failed after 5 retries"). Skip it on PRs, and
+    # keep it non-fatal elsewhere: the consolidated cache is best-effort (the next run
+    # rebuilds it), so a transient download flake must never fail the whole run.
+    if: ${{ github.event_name != 'pull_request' }}
+    continue-on-error: true
     runs-on: ${{ matrix.os }}
     strategy:
       fail-fast: false
