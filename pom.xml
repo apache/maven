@@ -167,7 +167,7 @@ under the License.
     <resolverVersion>2.0.22</resolverVersion>
     <securityDispatcherVersion>4.2.0</securityDispatcherVersion>
     <sisuVersion>1.1.0</sisuVersion>
-    <slf4jVersion>2.0.18</slf4jVersion>
+    <slf4jVersion>2.0.19</slf4jVersion>
     <stax2ApiVersion>4.3.0</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
     <woodstoxVersion>7.2.2</woodstoxVersion>
