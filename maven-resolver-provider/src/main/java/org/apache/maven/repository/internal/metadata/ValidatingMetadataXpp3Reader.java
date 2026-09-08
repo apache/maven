@@ -23,6 +23,8 @@ import java.io.InputStream;
 import java.io.Reader;
 
 import org.apache.maven.artifact.repository.metadata.Metadata;
+import org.apache.maven.artifact.repository.metadata.Plugin;
+import org.apache.maven.artifact.repository.metadata.SnapshotVersion;
 import org.apache.maven.artifact.repository.metadata.Versioning;
 import org.apache.maven.artifact.repository.metadata.io.xpp3.MetadataXpp3Reader;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
@@ -40,22 +42,33 @@ public final class ValidatingMetadataXpp3Reader {
      * Delegates to {@link MetadataXpp3Reader#read(Reader, boolean)}
      */
     public Metadata read(Reader reader, boolean strict) throws IOException, XmlPullParserException {
-        return validate(mr.read(reader, strict));
+        try {
+            return validate(mr.read(reader, strict));
+        } catch (IllegalArgumentException e) {
+            throw new IOException("Invalid metadata detected: " + e.getMessage(), e);
+        }
     }
 
     /**
      * Delegates to {@link MetadataXpp3Reader#read(InputStream, boolean)}
      */
     public Metadata read(InputStream in, boolean strict) throws IOException, XmlPullParserException {
-        return validate(mr.read(in, strict));
+        try {
+            return validate(mr.read(in, strict));
+        } catch (IllegalArgumentException e) {
+            throw new IOException("Invalid metadata detected: " + e.getMessage(), e);
+        }
     }
 
     /**
      * Validates {@link Metadata}.
      */
-    public static Metadata validate(Metadata metadata) {
+    private static Metadata validate(Metadata metadata) {
         if (metadata != null) {
             PathUtils.validatePathComponent(metadata.getVersion(), "version");
+            for (Plugin plugin : metadata.getPlugins()) {
+                PathUtils.validatePathComponent(plugin.getArtifactId(), "plugin/artifactId");
+            }
             Versioning versioning = metadata.getVersioning();
             if (versioning != null) {
                 PathUtils.validatePathComponent(versioning.getLatest(), "versioning/latest");
@@ -63,10 +76,15 @@ public final class ValidatingMetadataXpp3Reader {
                 for (int i = 0; i < versioning.getVersions().size(); i++) {
                     PathUtils.validatePathComponent(versioning.getVersions().get(i), "versioning/versions[" + i + "]");
                 }
-                for (int i = 0; i < versioning.getSnapshotVersions().size(); i++) {
+                if (versioning.getSnapshot() != null) {
                     PathUtils.validatePathComponent(
-                            versioning.getSnapshotVersions().get(i).getVersion(),
-                            "versioning/snapshotVersions[" + i + "]/version");
+                            versioning.getSnapshot().getTimestamp(), "versioning/snapshot/timestamp");
+                }
+                for (int i = 0; i < versioning.getSnapshotVersions().size(); i++) {
+                    SnapshotVersion snapshotVersion =
+                            versioning.getSnapshotVersions().get(i);
+                    PathUtils.validatePathComponent(
+                            snapshotVersion.getVersion(), "versioning/snapshotVersions[" + i + "]/version");
                 }
             }
         }
