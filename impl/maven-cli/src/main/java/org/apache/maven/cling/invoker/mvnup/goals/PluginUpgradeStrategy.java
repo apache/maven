@@ -541,7 +541,15 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             return true;
         }
 
-        // Property not found or not upgradable in current POM — search other POMs in the project
+        // Check if property exists in the current POM but is already at/above minimum (no upgrade needed).
+        // In that case, skip the cross-POM search and the warning — the property IS defined.
+        Element currentRoot = pomDocument.root();
+        Element currentProps = currentRoot.childElement(PROPERTIES).orElse(null);
+        if (currentProps != null && currentProps.childElement(propertyName).isPresent()) {
+            return false; // Found in current POM, no upgrade needed
+        }
+
+        // Property not in current POM — search other POMs in the project (e.g., parent POM)
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Document otherDoc = entry.getValue();
             if (otherDoc == pomDocument) {
@@ -549,6 +557,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             }
             if (upgradePropertyInDocument(otherDoc, propertyName, upgrade, sectionName, context)) {
                 return true;
+            }
+            // Check if property exists in this POM but already at/above minimum
+            Element otherRoot = otherDoc.root();
+            Element otherProps = otherRoot.childElement(PROPERTIES).orElse(null);
+            if (otherProps != null && otherProps.childElement(propertyName).isPresent()) {
+                return false; // Found in another POM, no upgrade needed
             }
         }
 

@@ -41,8 +41,10 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -759,16 +761,10 @@ class PluginUpgradeStrategyTest {
 
             Path tempDir = Files.createTempDirectory("mvnup-test-");
             try {
-                Files.createDirectories(tempDir.resolve(".mvn"));
-                Path parentPomPath = tempDir.resolve("pom.xml");
-                Files.writeString(parentPomPath, parentPomXml);
-                Path assemblyDir = tempDir.resolve("assembly");
-                Files.createDirectories(assemblyDir);
-                Path submodulePomPath = assemblyDir.resolve("pom.xml");
-                Files.writeString(submodulePomPath, submodulePomXml);
-
                 Document parentDoc = Document.of(parentPomXml);
                 Document submoduleDoc = Document.of(submodulePomXml);
+                Path parentPomPath = tempDir.resolve("pom.xml");
+                Path submodulePomPath = tempDir.resolve("assembly/pom.xml");
                 Map<Path, Document> pomMap = Map.of(
                         parentPomPath, parentDoc,
                         submodulePomPath, submoduleDoc);
@@ -801,6 +797,88 @@ class PluginUpgradeStrategyTest {
                         "${exec.maven.version}",
                         version,
                         "Submodule should still reference the property, not a hardcoded version");
+            } finally {
+                try (var walk = Files.walk(tempDir)) {
+                    walk.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
+                        try {
+                            Files.delete(p);
+                        } catch (IOException ignored) {
+                        }
+                    });
+                }
+            }
+        }
+
+        @Test
+        @DisplayName("should not emit spurious warning when property is already at target version")
+        void shouldNotWarnWhenPropertyAlreadyAtTargetVersion() throws Exception {
+            // Root POM has exec.maven.version=3.5.0 (already at target)
+            // Submodule uses ${exec.maven.version} — no upgrade needed, no warning expected
+            String parentPomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>org.example</groupId>
+                        <artifactId>parent</artifactId>
+                        <version>1.0.0</version>
+                        <packaging>pom</packaging>
+                        <properties>
+                            <exec.maven.version>3.5.0</exec.maven.version>
+                        </properties>
+                        <modules>
+                            <module>assembly</module>
+                        </modules>
+                    </project>
+                    """;
+
+            String submodulePomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <parent>
+                            <groupId>org.example</groupId>
+                            <artifactId>parent</artifactId>
+                            <version>1.0.0</version>
+                        </parent>
+                        <artifactId>assembly</artifactId>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>exec-maven-plugin</artifactId>
+                                    <version>${exec.maven.version}</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+
+            Path tempDir = Files.createTempDirectory("mvnup-test-");
+            try {
+                Document parentDoc = Document.of(parentPomXml);
+                Document submoduleDoc = Document.of(submodulePomXml);
+                Path parentPomPath = tempDir.resolve("pom.xml");
+                Path submodulePomPath = tempDir.resolve("assembly/pom.xml");
+                Map<Path, Document> pomMap = Map.of(
+                        parentPomPath, parentDoc,
+                        submodulePomPath, submoduleDoc);
+
+                UpgradeContext context = createMockContext();
+                UpgradeResult result = strategy.doApply(context, pomMap);
+
+                assertTrue(result.success(), "Plugin upgrade should succeed");
+
+                // Property should not have been modified (already at target)
+                Editor parentEditor = new Editor(parentDoc);
+                String propertyValue = parentEditor
+                        .root()
+                        .path("properties", "exec.maven.version")
+                        .map(Element::textContentTrimmed)
+                        .orElse(null);
+                assertEquals("3.5.0", propertyValue, "Property should remain at 3.5.0 (no upgrade needed)");
+
+                // No spurious "not found" warning should have been emitted
+                verify(context.logger, never()).warn(contains("not found"));
             } finally {
                 try (var walk = Files.walk(tempDir)) {
                     walk.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
@@ -1710,16 +1788,10 @@ class PluginUpgradeStrategyTest {
 
             Path tempDir = Files.createTempDirectory("mvnup-test-");
             try {
-                Files.createDirectories(tempDir.resolve(".mvn"));
-                Path parentPomPath = tempDir.resolve("pom.xml");
-                Files.writeString(parentPomPath, parentPomXml);
-                Path assemblyDir = tempDir.resolve("assembly");
-                Files.createDirectories(assemblyDir);
-                Path submodulePomPath = assemblyDir.resolve("pom.xml");
-                Files.writeString(submodulePomPath, submodulePomXml);
-
                 Document parentDoc = Document.of(parentPomXml);
                 Document submoduleDoc = Document.of(submodulePomXml);
+                Path parentPomPath = tempDir.resolve("pom.xml");
+                Path submodulePomPath = tempDir.resolve("assembly/pom.xml");
                 Map<Path, Document> pomMap = Map.of(
                         parentPomPath, parentDoc,
                         submodulePomPath, submoduleDoc);
@@ -1738,7 +1810,6 @@ class PluginUpgradeStrategyTest {
                 assertEquals("3.5.0", version, "exec-maven-plugin 3.1.0 should be upgraded to 3.5.0 in submodule");
                 assertFalse(submoduleDoc.toXml().contains("3.1.0"), "Old version 3.1.0 should not remain");
             } finally {
-                // Cleanup
                 try (var walk = Files.walk(tempDir)) {
                     walk.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
                         try {
