@@ -712,6 +712,106 @@ class PluginUpgradeStrategyTest {
             assertTrue(result.success(), "Plugin upgrade should succeed");
             // Note: POM might still be modified due to plugin management additions
         }
+
+        @Test
+        @DisplayName("should upgrade plugin with property version defined in parent POM")
+        void shouldUpgradePluginWithPropertyVersionInParentPom() throws Exception {
+            // Simulates hbase pattern: root POM defines <exec.maven.version>3.1.0</exec.maven.version>
+            // and submodule uses <version>${exec.maven.version}</version>
+            String parentPomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>org.example</groupId>
+                        <artifactId>parent</artifactId>
+                        <version>1.0.0</version>
+                        <packaging>pom</packaging>
+                        <properties>
+                            <exec.maven.version>3.1.0</exec.maven.version>
+                        </properties>
+                        <modules>
+                            <module>assembly</module>
+                        </modules>
+                    </project>
+                    """;
+
+            String submodulePomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <parent>
+                            <groupId>org.example</groupId>
+                            <artifactId>parent</artifactId>
+                            <version>1.0.0</version>
+                        </parent>
+                        <artifactId>assembly</artifactId>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.codehaus.mojo</groupId>
+                                    <artifactId>exec-maven-plugin</artifactId>
+                                    <version>${exec.maven.version}</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+
+            Path tempDir = Files.createTempDirectory("mvnup-test-");
+            try {
+                Files.createDirectories(tempDir.resolve(".mvn"));
+                Path parentPomPath = tempDir.resolve("pom.xml");
+                Files.writeString(parentPomPath, parentPomXml);
+                Path assemblyDir = tempDir.resolve("assembly");
+                Files.createDirectories(assemblyDir);
+                Path submodulePomPath = assemblyDir.resolve("pom.xml");
+                Files.writeString(submodulePomPath, submodulePomXml);
+
+                Document parentDoc = Document.of(parentPomXml);
+                Document submoduleDoc = Document.of(submodulePomXml);
+                Map<Path, Document> pomMap = Map.of(
+                        parentPomPath, parentDoc,
+                        submodulePomPath, submoduleDoc);
+
+                UpgradeContext context = createMockContext();
+                UpgradeResult result = strategy.doApply(context, pomMap);
+
+                assertTrue(result.success(), "Plugin upgrade should succeed");
+
+                // The parent POM's property should be upgraded to 3.5.0
+                Editor parentEditor = new Editor(parentDoc);
+                String propertyValue = parentEditor
+                        .root()
+                        .path("properties", "exec.maven.version")
+                        .map(Element::textContentTrimmed)
+                        .orElse(null);
+                assertEquals(
+                        "3.5.0",
+                        propertyValue,
+                        "Parent POM property exec.maven.version should be upgraded from 3.1.0 to 3.5.0");
+
+                // The submodule's version element should still reference the property
+                Editor submoduleEditor = new Editor(submoduleDoc);
+                String version = submoduleEditor
+                        .root()
+                        .path("build", "plugins", "plugin", "version")
+                        .map(Element::textContentTrimmed)
+                        .orElse(null);
+                assertEquals(
+                        "${exec.maven.version}",
+                        version,
+                        "Submodule should still reference the property, not a hardcoded version");
+            } finally {
+                try (var walk = Files.walk(tempDir)) {
+                    walk.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
+                        try {
+                            Files.delete(p);
+                        } catch (IOException ignored) {
+                        }
+                    });
+                }
+            }
+        }
     }
 
     @Nested
