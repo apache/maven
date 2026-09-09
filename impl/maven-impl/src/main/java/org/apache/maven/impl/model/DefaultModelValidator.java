@@ -500,6 +500,7 @@ public class DefaultModelValidator implements ModelValidator {
             }
 
             boolean isModelVersion41OrMore = !Objects.equals(ModelBuilder.MODEL_VERSION_4_0_0, model.getModelVersion());
+            boolean isModelVersion42OrMore = Objects.equals(ModelBuilder.MODEL_VERSION_4_2_0, model.getModelVersion());
             if (isModelVersion41OrMore) {
                 validateStringNoExpression("groupId", problems, Severity.FATAL, Version.V41, model.getGroupId(), model);
 
@@ -547,6 +548,7 @@ public class DefaultModelValidator implements ModelValidator {
                     "dependencies.dependency.",
                     EMPTY,
                     isModelVersion41OrMore,
+                    isModelVersion42OrMore,
                     validationLevel);
 
             validate20RawDependenciesSelfReferencing(
@@ -559,6 +561,7 @@ public class DefaultModelValidator implements ModelValidator {
                         "dependencyManagement.dependencies.dependency.",
                         EMPTY,
                         isModelVersion41OrMore,
+                        isModelVersion42OrMore,
                         validationLevel);
             }
 
@@ -603,6 +606,7 @@ public class DefaultModelValidator implements ModelValidator {
                         prefix,
                         "dependencies.dependency.",
                         isModelVersion41OrMore,
+                        isModelVersion42OrMore,
                         validationLevel);
 
                 if (profile.getDependencyManagement() != null) {
@@ -612,6 +616,7 @@ public class DefaultModelValidator implements ModelValidator {
                             prefix,
                             "dependencyManagement.dependencies.dependency.",
                             isModelVersion41OrMore,
+                            isModelVersion42OrMore,
                             validationLevel);
                 }
 
@@ -1183,6 +1188,7 @@ public class DefaultModelValidator implements ModelValidator {
             String prefix,
             String prefix2,
             boolean is41OrBeyond,
+            boolean is42OrBeyond,
             int validationLevel) {
         Severity errOn30 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_0);
         Severity errOn31 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_1);
@@ -1258,8 +1264,7 @@ public class DefaultModelValidator implements ModelValidator {
                 String scope = dependency.getScope();
                 if (DependencyScope.COMPILE_ONLY.id().equals(scope)
                         || DependencyScope.TEST_ONLY.id().equals(scope)
-                        || DependencyScope.TEST_RUNTIME.id().equals(scope)
-                        || DependencyScope.API.id().equals(scope)) {
+                        || DependencyScope.TEST_RUNTIME.id().equals(scope)) {
                     addViolation(
                             problems,
                             Severity.ERROR,
@@ -1268,6 +1273,22 @@ public class DefaultModelValidator implements ModelValidator {
                             SourceHint.dependencyManagementKey(dependency),
                             "scope '" + scope + "' is not supported with modelVersion 4.0.0; "
                                     + "use modelVersion 4.1.0 or remove this scope.",
+                            dependency);
+                }
+            }
+            // MNG-8099: api and implementation scopes require modelVersion 4.2.0+
+            if (!is42OrBeyond) {
+                String scope = dependency.getScope();
+                if (DependencyScope.API.id().equals(scope)
+                        || DependencyScope.IMPLEMENTATION.id().equals(scope)) {
+                    addViolation(
+                            problems,
+                            Severity.ERROR,
+                            Version.V20,
+                            prefix + prefix2 + "scope",
+                            SourceHint.dependencyManagementKey(dependency),
+                            "scope '" + scope + "' is not supported with modelVersion 4.0.0 or 4.1.0; "
+                                    + "use modelVersion 4.2.0 or remove this scope.",
                             dependency);
                 }
             }

@@ -77,20 +77,32 @@ class MavenModelVersionTest {
     }
 
     @Test
-    void testApiScopeDependencyRequires410() {
-        // A model with an api-scoped dependency should require modelVersion 4.1.0
+    void testApiScopeDependencyRequires420() {
+        // A model with an api-scoped dependency should require modelVersion 4.2.0
         Model m = model.withDependencies(List.of(Dependency.newBuilder()
                 .groupId("org.example")
                 .artifactId("api-lib")
                 .version("1.0")
                 .scope("api")
                 .build()));
-        assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m));
+        assertEquals("4.2.0", new MavenModelVersion().getModelVersion(m));
     }
 
     @Test
-    void testApiScopeInDependencyManagementRequires410() {
-        // A model with an api-scoped dependency in dependencyManagement should require 4.1.0
+    void testImplementationScopeDependencyRequires420() {
+        // A model with an implementation-scoped dependency should require modelVersion 4.2.0
+        Model m = model.withDependencies(List.of(Dependency.newBuilder()
+                .groupId("org.example")
+                .artifactId("impl-lib")
+                .version("1.0")
+                .scope("implementation")
+                .build()));
+        assertEquals("4.2.0", new MavenModelVersion().getModelVersion(m));
+    }
+
+    @Test
+    void testApiScopeInDependencyManagementRequires420() {
+        // A model with an api-scoped dependency in dependencyManagement should require 4.2.0
         Model m = model.withDependencyManagement(DependencyManagement.newBuilder()
                 .dependencies(List.of(Dependency.newBuilder()
                         .groupId("org.example")
@@ -99,7 +111,7 @@ class MavenModelVersionTest {
                         .scope("api")
                         .build()))
                 .build());
-        assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m));
+        assertEquals("4.2.0", new MavenModelVersion().getModelVersion(m));
     }
 
     @Test
@@ -115,8 +127,8 @@ class MavenModelVersionTest {
     }
 
     @Test
-    void testApiScopeInProfileRequires410() {
-        // A model with an api-scoped dependency in a profile should require 4.1.0
+    void testApiScopeInProfileRequires420() {
+        // A model with an api-scoped dependency in a profile should require 4.2.0
         Model m = model.withProfiles(List.of(org.apache.maven.api.model.Profile.newBuilder()
                 .id("my-profile")
                 .dependencies(List.of(Dependency.newBuilder()
@@ -126,6 +138,6 @@ class MavenModelVersionTest {
                         .scope("api")
                         .build()))
                 .build()));
-        assertEquals("4.1.0", new MavenModelVersion().getModelVersion(m));
+        assertEquals("4.2.0", new MavenModelVersion().getModelVersion(m));
     }
 }

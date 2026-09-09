@@ -345,12 +345,6 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
     private void populateResult(InternalSession session, ArtifactDescriptorResult result, Model model) {
         ArtifactTypeRegistry stereotypes = session.getSession().getArtifactTypeRegistry();
 
-        // Compute once whether compile-scoped dependencies should be remapped to api (transitive)
-        // for backward compatibility. Use the declared modelVersion rather than feature detection
-        // to respect the developer's explicit intent.
-        String declaredModelVersion = model.getModelVersion();
-        boolean remapCompileToApi = declaredModelVersion == null || declaredModelVersion.startsWith("4.0.");
-
         for (Repository repository : model.getRepositories()) {
             result.addRepository(session.toRepository(
                     session.getService(RepositoryFactory.class).createRemote(repository)));
@@ -361,7 +355,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 logger.debug("Filtered dependency with uninterpolated expression: {}", dependency);
                 continue;
             }
-            result.addDependency(convert(dependency, stereotypes, remapCompileToApi));
+            result.addDependency(convert(dependency, stereotypes));
         }
 
         DependencyManagement dependencyManagement = model.getDependencyManagement();
@@ -371,7 +365,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                     logger.debug("Filtered managed dependency with uninterpolated expression: {}", dependency);
                     continue;
                 }
-                result.addManagedDependency(convert(dependency, stereotypes, remapCompileToApi));
+                result.addManagedDependency(convert(dependency, stereotypes));
             }
         }
 
@@ -397,10 +391,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         setArtifactProperties(result, model);
     }
 
-    private Dependency convert(
-            org.apache.maven.api.model.Dependency dependency,
-            ArtifactTypeRegistry stereotypes,
-            boolean remapCompileToApi) {
+    private Dependency convert(org.apache.maven.api.model.Dependency dependency, ArtifactTypeRegistry stereotypes) {
         ArtifactType stereotype = stereotypes.get(dependency.getType());
         if (stereotype == null) {
             stereotype = new DefaultType(dependency.getType(), Language.NONE, dependency.getType(), null, false)
@@ -429,13 +420,11 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
             exclusions.add(convert(exclusion));
         }
 
-        String scope = dependency.getScope() != null ? dependency.getScope() : "";
-        if (remapCompileToApi && ("compile".equals(scope) || scope.isEmpty())) {
-            scope = "api";
-        }
-
         return new Dependency(
-                artifact, scope, dependency.getOptional() != null ? dependency.isOptional() : null, exclusions);
+                artifact,
+                dependency.getScope(),
+                dependency.getOptional() != null ? dependency.isOptional() : null,
+                exclusions);
     }
 
     private Exclusion convert(org.apache.maven.api.model.Exclusion exclusion) {
