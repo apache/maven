@@ -106,12 +106,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-resources-plugin",
                     "3.3.1",
-                    "4.0.0-beta-1",
-                    "Pre-release versions compiled against different Maven 4 API signatures"),
+                    "maven-resources-plugin 4.0.0-beta-1 has API incompatibilities at runtime"
+                            + " (NoSuchMethodError: ProjectManager.getResources); use stable 3.3.1"),
             new PluginUpgrade(
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-jar-plugin",
-                    "3.4.2",
+                    "3.3.1",
                     "4.0.0-beta-1",
                     "Pre-release versions compiled against different Maven 4 API signatures"),
             new PluginUpgrade(
@@ -492,18 +492,30 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             // Update property value if it's below minimum version
             return upgradePropertyVersion(pomDocument, pomMap, propertyName, upgrade, sectionName, context);
         } else {
-            // Check for Maven 4 pre-release versions (alpha/beta/rc) that should be
-            // upgraded to the latest available pre-release rather than downgraded to 3.x.
-            if (isMaven4PreRelease(currentVersion) && upgrade.latestPreRelease != null) {
-                if (isVersionBelow(context, currentVersion, upgrade.latestPreRelease)) {
-                    Editor editor = new Editor(pomDocument);
-                    editor.setTextContent(versionElement, upgrade.latestPreRelease);
-                    context.detail("Upgraded " + upgrade.groupId + ":" + upgrade.artifactId + " from pre-release "
-                            + currentVersion + " to " + upgrade.latestPreRelease + " in " + sectionName);
-                    return true;
+            // Check for Maven 4 pre-release versions (alpha/beta/rc).
+            if (isMaven4PreRelease(currentVersion)) {
+                if (upgrade.latestPreRelease != null) {
+                    // Upgrade to the latest pre-release (don't downgrade to 3.x).
+                    if (isVersionBelow(context, currentVersion, upgrade.latestPreRelease)) {
+                        Editor editor = new Editor(pomDocument);
+                        editor.setTextContent(versionElement, upgrade.latestPreRelease);
+                        context.detail("Upgraded " + upgrade.groupId + ":" + upgrade.artifactId + " from pre-release "
+                                + currentVersion + " to " + upgrade.latestPreRelease + " in " + sectionName);
+                        return true;
+                    } else {
+                        context.debug("Plugin " + upgrade.groupId + ":" + upgrade.artifactId + " version "
+                                + currentVersion + " is already >= " + upgrade.latestPreRelease);
+                    }
                 } else {
-                    context.debug("Plugin " + upgrade.groupId + ":" + upgrade.artifactId + " version " + currentVersion
-                            + " is already >= " + upgrade.latestPreRelease);
+                    // No stable 4.x pre-release line — downgrade to the stable minVersion.
+                    // 4.0.0-beta-x versions compiled against a different API snapshot are
+                    // incompatible at runtime; they must be pinned to the stable release.
+                    Editor editor = new Editor(pomDocument);
+                    editor.setTextContent(versionElement, upgrade.minVersion);
+                    context.detail("Downgraded " + upgrade.groupId + ":" + upgrade.artifactId + " from incompatible "
+                            + "pre-release " + currentVersion + " to stable " + upgrade.minVersion
+                            + " in " + sectionName);
+                    return true;
                 }
                 return false;
             }
@@ -595,18 +607,29 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
         Editor editor = new Editor(document);
         String currentVersion = propertyElement.textContentTrimmed();
-        // For 4.x pre-release versions, upgrade to latest pre-release (not 3.x)
-        if (isMaven4PreRelease(currentVersion) && upgrade.latestPreRelease != null) {
-            if (isVersionBelow(context, currentVersion, upgrade.latestPreRelease)) {
-                editor.setTextContent(propertyElement, upgrade.latestPreRelease);
-                context.detail("Upgraded property " + propertyName + " (for " + upgrade.groupId + ":"
-                        + upgrade.artifactId + ") from pre-release " + currentVersion + " to "
-                        + upgrade.latestPreRelease + " in " + sectionName);
-                return true;
+        // For 4.x pre-release versions, handle specially
+        if (isMaven4PreRelease(currentVersion)) {
+            if (upgrade.latestPreRelease != null) {
+                // Upgrade to the latest pre-release (don't downgrade to 3.x)
+                if (isVersionBelow(context, currentVersion, upgrade.latestPreRelease)) {
+                    editor.setTextContent(propertyElement, upgrade.latestPreRelease);
+                    context.detail("Upgraded property " + propertyName + " (for " + upgrade.groupId + ":"
+                            + upgrade.artifactId + ") from pre-release " + currentVersion + " to "
+                            + upgrade.latestPreRelease + " in " + sectionName);
+                    return true;
+                } else {
+                    context.debug("Property " + propertyName + " version " + currentVersion + " is already >= "
+                            + upgrade.latestPreRelease);
+                }
             } else {
-                context.debug("Property " + propertyName + " version " + currentVersion + " is already >= "
-                        + upgrade.latestPreRelease);
+                // No stable 4.x pre-release line — downgrade to the stable minVersion
+                editor.setTextContent(propertyElement, upgrade.minVersion);
+                context.detail("Downgraded property " + propertyName + " (for " + upgrade.groupId + ":"
+                        + upgrade.artifactId + ") from incompatible pre-release " + currentVersion
+                        + " to stable " + upgrade.minVersion + " in " + sectionName);
+                return true;
             }
+            return false;
         } else if (isVersionBelow(context, currentVersion, upgrade.minVersion)) {
             editor.setTextContent(propertyElement, upgrade.minVersion);
             context.detail("Upgraded property " + propertyName + " (for " + upgrade.groupId + ":" + upgrade.artifactId
@@ -985,7 +1008,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                         continue;
                     }
                     String effectiveVersion = plugin.getVersion();
-                    if (isVersionBelow(context, effectiveVersion, upgrade.minVersion())) {
+                    if (isVersionBelow(context, effectiveVersion, upgrade.minVersion())
+                            || (isMaven4PreRelease(effectiveVersion) && upgrade.latestPreRelease() == null)) {
                         needsManagement.add(pluginKey);
                         String managedVersion = managedVersions.get(pluginKey);
                         if (managedVersion == null || !managedVersion.equals(effectiveVersion)) {
@@ -1021,7 +1045,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                             continue;
                         }
                         String effectiveVersion = plugin.getVersion();
-                        if (isVersionBelow(context, effectiveVersion, upgrade.minVersion())) {
+                        if (isVersionBelow(context, effectiveVersion, upgrade.minVersion())
+                                || (isMaven4PreRelease(effectiveVersion) && upgrade.latestPreRelease() == null)) {
                             needsManagement.add(pluginKey);
                             context.debug("Managed plugin " + pluginKey + " version " + effectiveVersion
                                     + " needs upgrade to " + upgrade.minVersion());

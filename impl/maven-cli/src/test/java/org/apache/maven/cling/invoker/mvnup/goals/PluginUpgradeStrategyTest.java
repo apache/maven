@@ -1583,6 +1583,34 @@ class PluginUpgradeStrategyTest {
                     DomUtils.toXml(doc).contains(">4.0.0-beta-4</"),
                     "Should upgrade property to latest pre-release, not 3.x");
         }
+
+        @Test
+        @DisplayName("should downgrade 4.0.0-beta-1 resources-plugin to stable 3.3.1")
+        void shouldDowngradePreReleaseResourcesPluginToStable() throws Exception {
+            // maven-resources-plugin 4.0.0-beta-1 has API incompatibilities at runtime with
+            // Maven 4 rc-5 builds. Since there is no latestPreRelease for this plugin,
+            // mvnup must downgrade to the stable minVersion (3.3.1).
+            Document doc = PomBuilder.create()
+                    .plugin("org.apache.maven.plugins", "maven-resources-plugin", "4.0.0-beta-1")
+                    .buildDocument();
+            strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
+            assertTrue(
+                    DomUtils.toXml(doc).contains("<version>3.3.1</version>"),
+                    "maven-resources-plugin 4.0.0-beta-1 should be downgraded to stable 3.3.1");
+        }
+
+        @Test
+        @DisplayName("should downgrade 4.0.0-beta-1 resources-plugin property to stable 3.3.1")
+        void shouldDowngradePreReleaseResourcesPluginPropertyToStable() throws Exception {
+            Document doc = PomBuilder.create()
+                    .property("resources.version", "4.0.0-beta-1")
+                    .plugin("org.apache.maven.plugins", "maven-resources-plugin", "${resources.version}")
+                    .buildDocument();
+            strategy.doApply(createMockContext(), Map.of(Paths.get("pom.xml"), doc));
+            assertTrue(
+                    DomUtils.toXml(doc).contains(">3.3.1</"),
+                    "Property holding maven-resources-plugin 4.0.0-beta-1 should be downgraded to 3.3.1");
+        }
     }
 
     @Nested
@@ -1822,10 +1850,12 @@ class PluginUpgradeStrategyTest {
         }
 
         @Test
-        @DisplayName("maven-jar-plugin upgrade target should be 3.4.2 not 3.5.0")
-        void jarPluginTargetShouldBe342() throws Exception {
-            // maven-jar-plugin 3.5.0 has a plexus-archiver regression (JarToolModularJarArchiver
-            // fails with "Could not create modular JAR file"). Target 3.4.2 until 3.5.1 is released.
+        @DisplayName("maven-jar-plugin upgrade target should be 3.3.1 not 3.5.0")
+        void jarPluginTargetShouldBe331() throws Exception {
+            // maven-jar-plugin 3.4.2 has timestamp range validation and stricter automatic module
+            // name checks that break many projects. 3.5.0 has a plexus-archiver regression
+            // (JarToolModularJarArchiver fails with "Could not create modular JAR file").
+            // Target 3.3.1 until a clean 3.5.x release is available.
             String pomXml = """
                     <?xml version="1.0" encoding="UTF-8"?>
                     <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -1860,9 +1890,10 @@ class PluginUpgradeStrategyTest {
                     .map(Element::textContentTrimmed)
                     .orElse(null);
             assertEquals(
-                    "3.4.2",
+                    "3.3.1",
                     version,
-                    "maven-jar-plugin should be upgraded to 3.4.2 (not 3.5.0 due to plexus-archiver regression)");
+                    "maven-jar-plugin should be upgraded to 3.3.1 (3.4.2 has timestamp/module-name regressions,"
+                            + " 3.5.0 has plexus-archiver modular JAR regression)");
         }
 
         @Test
@@ -1894,7 +1925,7 @@ class PluginUpgradeStrategyTest {
             strategy.doApply(context, pomMap);
 
             String xml = document.toXml();
-            assertTrue(xml.contains("3.4.2"), "Version 3.4.2 should be preserved");
+            assertTrue(xml.contains("3.4.2"), "Version 3.4.2 should be preserved (already above min 3.3.1)");
         }
 
         @Test
