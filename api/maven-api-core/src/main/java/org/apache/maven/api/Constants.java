@@ -868,5 +868,17 @@ public final class Constants {
     @Config(type = "java.lang.Boolean", defaultValue = "false")
     public static final String MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL = "maven.model.dependencyInterpolation.full";
 
+    /**
+     * System property to keep temp material for diagnostics.
+     * When set to {@code true} via {@code -Dmaven.tempfile.keep=true}, temporary files and directories
+     * created by {@link org.apache.maven.api.services.TempFileService} are not deleted at session end.
+     * This is a JVM system property only (read via {@link Boolean#getBoolean(String)});
+     * it is not resolved through Maven's property mechanism (pom.xml, profiles, settings.xml).
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_TEMPFILE_KEEP = "maven.tempfile.keep";
+
     private Constants() {}
 }
