@@ -31,9 +31,13 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.ProjectCycleException;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -358,22 +362,45 @@ public class DefaultGraphBuilder implements GraphBuilder {
     private List<MavenProject> getProjectsForMavenReactor(MavenSession session) throws ProjectBuildingException {
         MavenExecutionRequest request = session.getRequest();
         request.getProjectBuildingRequest().setRepositorySession(session.getRepositorySession());
+        Consumer<org.apache.maven.model.building.ModelProblem> modelProblemConsumer = getModelProblemConsumer(session);
 
         // 1. Collect project for invocation without a POM.
         if (request.getPom() == null) {
-            return pomlessCollectionStrategy.collectProjects(request);
+            return pomlessCollectionStrategy.collectProjects(request, modelProblemConsumer);
         }
 
         // 2. Collect projects for all modules in the multi-module project.
         if (request.getMakeBehavior() != null || !request.getProjectActivation().isEmpty()) {
-            List<MavenProject> projects = multiModuleCollectionStrategy.collectProjects(request);
+            List<MavenProject> projects = multiModuleCollectionStrategy.collectProjects(request, modelProblemConsumer);
             if (!projects.isEmpty()) {
                 return projects;
             }
         }
 
         // 3. Collect projects for explicitly requested POM.
-        return requestPomCollectionStrategy.collectProjects(request);
+        return requestPomCollectionStrategy.collectProjects(request, modelProblemConsumer);
+    }
+
+    private Consumer<org.apache.maven.model.building.ModelProblem> getModelProblemConsumer(MavenSession session) {
+        Session apiSession = session.getSession();
+        if (apiSession == null) {
+            return problem -> {};
+        }
+        return problem -> apiSession.getModelProblemCollector().reportProblem(toApiModelProblem(problem));
+    }
+
+    private ModelProblem toApiModelProblem(org.apache.maven.model.building.ModelProblem problem) {
+        return new org.apache.maven.impl.model.DefaultModelProblem(
+                problem.getMessage(),
+                BuilderProblem.Severity.valueOf(problem.getSeverity().name()),
+                problem.getVersion() != null
+                        ? ModelProblem.Version.valueOf(problem.getVersion().name())
+                        : ModelProblem.Version.BASE,
+                problem.getSource(),
+                problem.getLineNumber(),
+                problem.getColumnNumber(),
+                problem.getModelId(),
+                problem.getException());
     }
 
     private void validateProjects(List<MavenProject> projects, MavenExecutionRequest request)
