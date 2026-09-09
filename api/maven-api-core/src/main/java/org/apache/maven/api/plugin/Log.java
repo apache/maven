@@ -37,12 +37,84 @@ import org.apache.maven.api.annotations.Provider;
 @Provider
 public interface Log {
     /**
+     * {@return true if the <b>trace</b> error level is enabled}
+     * <p>
+     * The default implementation returns {@code false} for backward
+     * compatibility with existing {@code Log} implementations.
+     */
+    default boolean isTraceEnabled() {
+        return false;
+    }
+
+    /**
+     * Sends a message to the user at the <b>trace</b> error level.
+     * <p>
+     * Trace is the most verbose level, intended for Maven core internals
+     * such as resolver negotiation, model interpolation, and lifecycle
+     * ordering details.  Use {@link #debug(CharSequence)} instead for
+     * messages that help <em>users</em> investigate their build
+     * (for instance, why a module was recompiled).
+     * <p>
+     * The default implementation is a no-op for backward compatibility.
+     *
+     * @param content the message to log
+     */
+    default void trace(CharSequence content) {}
+
+    /**
+     * Sends a message (and accompanying exception) to the user at the <b>trace</b> error level.
+     * The error's stacktrace will be output when this error level is enabled.
+     * <p>
+     * The default implementation is a no-op for backward compatibility.
+     *
+     * @param content the message to log
+     * @param error the error that caused this log
+     */
+    default void trace(CharSequence content, Throwable error) {}
+
+    /**
+     * Sends an exception to the user at the <b>trace</b> error level.
+     * The stack trace for this exception will be output when this error level is enabled.
+     * <p>
+     * The default implementation is a no-op for backward compatibility.
+     *
+     * @param error the error that caused this log
+     */
+    default void trace(Throwable error) {}
+
+    /**
+     * Sends a lazily-computed message at the <b>trace</b> error level.
+     * The supplier is only evaluated if trace is enabled.
+     * <p>
+     * The default implementation is a no-op for backward compatibility.
+     *
+     * @param content the message supplier
+     */
+    default void trace(Supplier<String> content) {}
+
+    /**
+     * Sends a lazily-computed message (and accompanying exception) at the <b>trace</b> error level.
+     * The supplier is only evaluated if trace is enabled.
+     * <p>
+     * The default implementation is a no-op for backward compatibility.
+     *
+     * @param content the message supplier
+     * @param error the error that caused this log
+     */
+    default void trace(Supplier<String> content, Throwable error) {}
+
+    /**
      * {@return true if the <b>debug</b> error level is enabled}
      */
     boolean isDebugEnabled();
 
     /**
      * Sends a message to the user in the <b>debug</b> error level.
+     * <p>
+     * Debug is intended for messages that help <em>users</em> investigate
+     * their build — for example, why a module was recompiled or what
+     * classpath was resolved.  For Maven core internals, use
+     * {@link #trace(CharSequence)} instead.
      *
      * @param content the message to log
      */
@@ -167,4 +239,27 @@ public interface Log {
     void error(Supplier<String> content);
 
     void error(Supplier<String> content, Throwable error);
+
+    /**
+     * Returns a child logger whose name is derived from this logger's name
+     * by appending a dot and the given suffix.
+     *
+     * <p>For example, if a plugin's logger is named
+     * {@code "org.apache.maven.plugins.compiler.CompilerMojo"},
+     * then {@code child("diagnostics")} returns a logger named
+     * {@code "org.apache.maven.plugins.compiler.CompilerMojo.diagnostics"}.
+     * This lets sub-components log under an independently filterable name
+     * without requiring a separate injection point.</p>
+     *
+     * <p>The default implementation returns {@code this}, so existing
+     * {@code Log} implementations continue to work without changes.
+     * Implementations that wrap a hierarchical logging backend (such as
+     * SLF4J) should override this to create a real child logger.</p>
+     *
+     * @param name the suffix to append (must not be {@code null} or blank)
+     * @return a child logger — never {@code null}
+     */
+    default Log child(String name) {
+        return this;
+    }
 }

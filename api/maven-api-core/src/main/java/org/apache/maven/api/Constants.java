@@ -550,6 +550,23 @@ public final class Constants {
             "maven.consumer.pom.removeUnusedManagedDependencies";
 
     /**
+     * User property for controlling whether the repositories published in a consumer POM are restricted
+     * to the repositories declared in the project's own POM file.
+     * <ul>
+     *     <li>When set to <code>true</code> (default), repositories that are present in the effective model
+     * only because they were inherited from a (possibly remote) parent POM or injected by an active
+     * {@code settings.xml} profile are removed from the consumer POM before it is published. A warning is
+     * logged for every removed repository, and for every retained repository together with its URL.</li>
+     *     <li>When set to <code>false</code>, every non-central repository of the effective model is
+     * published in the consumer POM, restoring the previous behavior.</li>
+     * </ul>
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_CONSUMER_POM_SANITIZE_REPOSITORIES = "maven.consumer.pom.sanitizeRepositories";
+
+    /**
      * User property for controlling "maven personality". If activated Maven will behave
      * like the previous major version, Maven 3.
      *
@@ -815,6 +832,41 @@ public final class Constants {
      * @since 4.1.0
      */
     public static final String MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX = "maven.model.processor.referenceType.";
+
+    /**
+     * User property for allowing {@code system} scope and {@code systemPath} in dependency
+     * management imported from repository-resolved POMs (BOMs).
+     * <ul>
+     *     <li>When set to <code>false</code> (default), dependency management imported from a
+     * repository-resolved POM may not declare {@code system} scope or a {@code systemPath};
+     * such entries are dropped with a warning.</li>
+     *     <li>When set to <code>true</code>, such entries are imported as in previous Maven
+     * versions, with a warning.</li>
+     * </ul>
+     * Dependency management imported from the local reactor is not affected by this property.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE =
+            "maven.repository.dependencyManagement.allowSystemScope";
+
+    /**
+     * User property for opting back into the previous behavior of interpolating
+     * repository-resolved models (dependencies and parents) against the full set of
+     * session properties (system, environment and CLI).
+     * <ul>
+     *     <li>When set to <code>false</code> (default), models resolved from a
+     * repository are interpolated only against their own {@code <properties>},
+     * preventing property leaking from the requesting build into transitive POMs.</li>
+     *     <li>When set to <code>true</code>, full interpolation is applied as in
+     * previous Maven versions.</li>
+     * </ul>
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL = "maven.model.dependencyInterpolation.full";
 
     private Constants() {}
 }

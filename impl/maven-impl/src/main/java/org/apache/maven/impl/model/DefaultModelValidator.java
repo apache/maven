@@ -92,13 +92,15 @@ public class DefaultModelValidator implements ModelValidator {
     private static final Pattern EXPRESSION_NAME_PATTERN = Pattern.compile("\\$\\{(.+?)}");
     private static final Pattern EXPRESSION_PROJECT_NAME_PATTERN = Pattern.compile("\\$\\{(project.+?)}");
 
-    private static final String ILLEGAL_FS_CHARS = "\\/:\"<>|?*";
+    /** Characters that cannot appear in a file or directory name on FAT or NTFS filesystems */
+    private static final String ILLEGAL_NTFS_FILENAME_CHARS = "\\/:\"<>|?*";
 
-    private static final String ILLEGAL_RELATIVE_PATH_CHARS = ":\"<>|?*";
+    /** same as above except that it allows the path separators / and \ */
+    private static final String ILLEGAL_WINDOWS_PATH_CHARS = ":\"<>|?*";
 
-    private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_FS_CHARS;
+    private static final String ILLEGAL_VERSION_CHARS = ILLEGAL_NTFS_FILENAME_CHARS;
 
-    private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_FS_CHARS;
+    private static final String ILLEGAL_REPO_ID_CHARS = ILLEGAL_NTFS_FILENAME_CHARS;
 
     private static final String EMPTY = "";
 
@@ -341,9 +343,7 @@ public class DefaultModelValidator implements ModelValidator {
 
             if (parent.getRelativePath() != null
                     && !parent.getRelativePath().isEmpty()
-                    && (parent.getGroupId() != null && !parent.getGroupId().isEmpty()
-                            || parent.getArtifactId() != null
-                                    && !parent.getArtifactId().isEmpty())
+                    && (parent.getLocation("groupId") != null || parent.getLocation("artifactId") != null)
                     && validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0
                     && ModelBuilder.KNOWN_MODEL_VERSIONS.contains(model.getModelVersion())
                     && !Objects.equals(model.getModelVersion(), ModelBuilder.MODEL_VERSION_4_0_0)) {
@@ -377,9 +377,7 @@ public class DefaultModelValidator implements ModelValidator {
             for (Parent mixin : model.getMixins()) {
                 if (mixin.getRelativePath() != null
                         && !mixin.getRelativePath().isEmpty()
-                        && (mixin.getGroupId() != null && !mixin.getGroupId().isEmpty()
-                                || mixin.getArtifactId() != null
-                                        && !mixin.getArtifactId().isEmpty())
+                        && (mixin.getLocation("groupId") != null || mixin.getLocation("artifactId") != null)
                         && validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_4_0
                         && ModelBuilder.KNOWN_MODEL_VERSIONS.contains(model.getModelVersion())
                         && !Objects.equals(model.getModelVersion(), ModelBuilder.MODEL_VERSION_4_0_0)) {
@@ -483,7 +481,9 @@ public class DefaultModelValidator implements ModelValidator {
             Severity errOn30 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_0);
             Severity errOn31 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_1);
 
-            // [MNG-8129] Validate that relativePath does not contain characters that are illegal in filesystem paths
+            // [MNG-8129] Validate that relativePath does not contain characters reserved on Windows (NTFS).
+            // These cause InvalidPathException when resolved via java.nio.file.Path, and typically
+            // indicate the user put a GAV coordinate (e.g. "g:a:v") instead of an actual filesystem path.
             if (parent != null
                     && parent.getRelativePath() != null
                     && !parent.getRelativePath().isEmpty()) {
@@ -496,7 +496,7 @@ public class DefaultModelValidator implements ModelValidator {
                         parent.getRelativePath(),
                         null,
                         parent,
-                        ILLEGAL_RELATIVE_PATH_CHARS);
+                        ILLEGAL_WINDOWS_PATH_CHARS);
             }
 
             boolean isModelVersion41OrMore = !Objects.equals(ModelBuilder.MODEL_VERSION_4_0_0, model.getModelVersion());

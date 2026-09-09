@@ -39,7 +39,6 @@ import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ProjectBuilderException;
-import org.apache.maven.api.services.model.PathTranslator;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.RootLocator;
 
@@ -160,7 +159,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
         }
     }
 
-    private final PathTranslator pathTranslator;
     private final RootLocator rootLocator;
     private final Interpolator interpolator;
 
@@ -171,9 +169,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     private Model model;
     final Record record;
 
-    public DefaultProfileActivationContext(
-            PathTranslator pathTranslator, RootLocator rootLocator, Interpolator interpolator) {
-        this.pathTranslator = pathTranslator;
+    public DefaultProfileActivationContext(RootLocator rootLocator, Interpolator interpolator) {
         this.rootLocator = rootLocator;
         this.interpolator = interpolator;
         this.record = null;
@@ -181,7 +177,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultProfileActivationContext(
-            PathTranslator pathTranslator,
             RootLocator rootLocator,
             Interpolator interpolator,
             List<String> activeProfileIds,
@@ -190,7 +185,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
             Map<String, String> userProperties,
             Model model) {
         this(
-                pathTranslator,
                 rootLocator,
                 interpolator,
                 activeProfileIds,
@@ -203,7 +197,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     private DefaultProfileActivationContext(
-            PathTranslator pathTranslator,
             RootLocator rootLocator,
             Interpolator interpolator,
             List<String> activeProfileIds,
@@ -212,7 +205,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
             Map<String, String> userProperties,
             Model model,
             Record record) {
-        this.pathTranslator = pathTranslator;
         this.rootLocator = rootLocator;
         this.interpolator = interpolator;
         this.activeProfileIds = activeProfileIds;
@@ -225,7 +217,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     DefaultProfileActivationContext start() {
         return new DefaultProfileActivationContext(
-                pathTranslator,
                 rootLocator,
                 interpolator,
                 activeProfileIds,
@@ -385,7 +376,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
             }
             return r;
         });
-        return pathTranslator.alignToBaseDirectory(absolutePath, model.getProjectDirectory());
+        return DefaultPathTranslator.alignToBaseDirectory(absolutePath, model.getProjectDirectory());
     }
 
     @Override

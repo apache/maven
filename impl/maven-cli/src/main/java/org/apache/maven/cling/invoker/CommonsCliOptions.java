@@ -373,7 +373,7 @@ public class CommonsCliOptions implements Options {
                     .get());
             options.addOption(Option.builder(BATCH_MODE)
                     .longOpt("batch-mode")
-                    .desc("Run in non-interactive mode. Alias for --non-interactive (kept for backwards compatability)")
+                    .desc("Run in non-interactive mode. Alias for --non-interactive (kept for backwards compatibility)")
                     .get());
             options.addOption(Option.builder()
                     .longOpt(NON_INTERACTIVE)

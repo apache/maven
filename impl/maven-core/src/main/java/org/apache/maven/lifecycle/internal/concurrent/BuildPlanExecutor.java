@@ -401,9 +401,9 @@ public class BuildPlanExecutor {
                             try {
                                 executeStep(step);
                                 executePlan();
-                            } catch (Exception e) {
+                            } catch (Throwable e) {
                                 step.status.compareAndSet(SKIPPED, FAILED);
-                                // Store the exception in the step for handling in the TEARDOWN phase
+                                // Store the failure in the step for handling in the TEARDOWN phase
                                 step.exception = e;
                                 logger.debug("Stored exception for step {} to be handled in TEARDOWN phase", step, e);
                                 // Let the scheduler handle after:* phases and TEARDOWN in the next cycle
@@ -438,10 +438,10 @@ public class BuildPlanExecutor {
                             }
                         }
                         executePlan();
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         step.status.compareAndSet(SCHEDULED, FAILED);
 
-                        // Store the exception in the step for handling in the TEARDOWN phase
+                        // Store the failure in the step for handling in the TEARDOWN phase
                         step.exception = e;
                         logger.debug("Stored exception for step {} to be handled in TEARDOWN phase", step, e);
 
@@ -525,7 +525,7 @@ public class BuildPlanExecutor {
                     List<Throwable> failures = null;
                     boolean allWorkExecuted = true;
                     for (BuildStep projectStep : plan.steps(step.project).toList()) {
-                        Exception exception = projectStep.exception;
+                        Throwable exception = projectStep.exception;
                         if (exception != null) {
                             if (failures == null) {
                                 failures = new ArrayList<>();
@@ -560,7 +560,7 @@ public class BuildPlanExecutor {
                             failure = new LifecycleExecutionException("Error building project");
                             failures.forEach(failure::addSuppressed);
                         }
-                        handleBuildError(reactorContext, session, step.project, failure);
+                        handleBuildError(reactorContext, session, step.project, failure, isFatal(failures));
                     } else if (projectStarted && allWorkExecuted) {
                         // If there were no failures, report success
                         projectExecutionListener.afterProjectExecutionSuccess(
@@ -591,6 +591,18 @@ public class BuildPlanExecutor {
                     break;
             }
             step.status.compareAndSet(SCHEDULED, EXECUTED);
+        }
+
+        /**
+         * Tells whether any of the failures collected for a project must halt the build. Several failures are
+         * reported through a wrapper, and a wrapper is always a checked exception, so an {@link Error} among
+         * them can only be seen by looking at the failures themselves.
+         *
+         * @param failures The failures collected for a single project
+         * @return {@code true} if the build must be halted
+         */
+        private static boolean isFatal(List<Throwable> failures) {
+            return failures.stream().anyMatch(t -> t instanceof RuntimeException || !(t instanceof Exception));
         }
 
         private void attachToThread(BuildStep step) {
@@ -717,18 +729,23 @@ public class BuildPlanExecutor {
          * all upstream projects are returned. Otherwise, only projects that the given
          * project depends on with a matching scope are included.
          * <p>
-         * Matching is exact on the dependency's declared scope string (e.g. "compile",
-         * "provided", "test"). Maven's default dependency scope is "compile" (when no
-         * scope is declared), so a null scope in the model is treated as "compile" for
-         * matching purposes. Note that this does <em>not</em> perform path-scope
-         * resolution — for example, filtering by "compile" will not include
-         * "provided"-scoped dependencies even though they contribute to
-         * {@code PathScope.MAIN_COMPILE}. This keeps the filter simple and predictable;
-         * broader scope-aware filtering can be added in a follow-up if needed.
+         * The scope parameter is a lifecycle dependency scope (as declared in
+         * {@link org.apache.maven.api.DependencyScope}). It is expanded to match all
+         * artifact scopes that contribute to that dependency scope for build ordering:
+         * <ul>
+         *   <li>{@code "compile"} matches compile, provided, system, and null-scoped
+         *       (Maven default) dependencies</li>
+         *   <li>{@code "runtime"} matches compile, runtime, and null-scoped dependencies</li>
+         *   <li>{@code "test"} matches all scopes</li>
+         *   <li>{@code "test-only"} matches only test-scoped dependencies</li>
+         * </ul>
+         * This ensures that reactor dependencies contributing to a given classpath are
+         * properly ordered in the build plan (e.g. a provided-scope reactor dependency
+         * is built before the consumer's compile phase).
          *
          * @param project the project whose dependencies to check
          * @param upstreamProjects the list of upstream reactor projects
-         * @param scope the dependency scope to filter by, or null/empty for all
+         * @param scope the lifecycle dependency scope to filter by, or null/empty for all
          * @return the filtered list of upstream projects
          */
         static List<MavenProject> filterByScope(
@@ -736,12 +753,27 @@ public class BuildPlanExecutor {
             if (scope == null || scope.isEmpty()) {
                 return upstreamProjects;
             }
+            Set<String> matchingScopes = expandScope(scope);
             return upstreamProjects.stream()
                     .filter(dep -> project.getDependencies().stream()
                             .anyMatch(d -> dep.getGroupId().equals(d.getGroupId())
                                     && dep.getArtifactId().equals(d.getArtifactId())
-                                    && scope.equals(d.getScope() != null ? d.getScope() : "compile")))
+                                    && matchingScopes.contains(d.getScope() != null ? d.getScope() : "compile")))
                     .collect(Collectors.toList());
+        }
+
+        /**
+         * Expands a lifecycle dependency scope to the set of artifact scopes that
+         * contribute to it for build ordering purposes.
+         */
+        private static Set<String> expandScope(String scope) {
+            return switch (scope) {
+                case "compile" -> Set.of("compile", "provided", "system");
+                case "runtime" -> Set.of("compile", "runtime");
+                case "test" -> Set.of("compile", "provided", "system", "runtime", "test");
+                case "test-only" -> Set.of("test");
+                default -> Set.of(scope);
+            };
         }
 
         protected BuildPlan computeForkPlan(BuildStep step, MojoExecution execution, BuildPlan buildPlan) {
@@ -863,13 +895,16 @@ public class BuildPlanExecutor {
          * @param buildContext The reactor context
          * @param session The Maven session
          * @param mavenProject The project that failed
-         * @param t The exception that caused the failure
+         * @param t The exception that caused the failure, possibly a wrapper around several failures
+         * @param fatal Whether the failure must halt the build. This cannot be read off {@code t}, because a
+         *              wrapper around several failures hides what is inside it. See {@link #isFatal(List)}.
          */
         protected void handleBuildError(
                 final ReactorContext buildContext,
                 final MavenSession session,
                 final MavenProject mavenProject,
-                Throwable t) {
+                Throwable t,
+                boolean fatal) {
             // record the error and mark the project as failed
             Clock clock = getClock(mavenProject);
             buildContext.getResult().addException(t);
@@ -878,12 +913,12 @@ public class BuildPlanExecutor {
                     .addBuildSummary(new BuildFailure(mavenProject, clock.execTime(), clock.wallTime(), t));
 
             // notify listeners about "soft" project build failures only
-            if (t instanceof Exception exception && !(t instanceof RuntimeException)) {
+            if (!fatal && t instanceof Exception exception) {
                 eventCatapult.fire(ExecutionEvent.Type.ProjectFailed, session, null, exception);
             }
 
             // reactor failure modes
-            if (t instanceof RuntimeException || !(t instanceof Exception)) {
+            if (fatal) {
                 // fail fast on RuntimeExceptions, Errors and "other" Throwables
                 // assume these are system errors and further build is meaningless
                 buildContext.getReactorBuildStatus().halt();

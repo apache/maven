@@ -164,7 +164,30 @@ under the License.
   </pluginRepositories>
 
   <build>
+    <resources>
+      <resource>
+        <filtering>true</filtering>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-buildnumber</id>
+            <goals>
+              <goal>create</goal>
+            </goals>
+            <configuration>
+              <doCheck>false</doCheck>
+              <doUpdate>false</doUpdate>
+              <revisionOnScmFailure>NON_CANONICAL</revisionOnScmFailure>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -377,17 +400,21 @@ under the License.
           </plugin>
           <!-- calculate checksums of source release for Apache dist area -->
           <plugin>
-            <groupId>net.nicoulaj.maven.plugins</groupId>
-            <artifactId>checksum-maven-plugin</artifactId>
-            <version>1.11</version>
+            <groupId>eu.maveniverse.maven.plugins</groupId>
+            <artifactId>checksum-plugin3</artifactId>
             <executions>
               <execution>
                 <id>source-release-checksum</id>
                 <goals>
-                  <goal>artifacts</goal>
+                  <goal>project</goal>
                 </goals>
+                <phase>post-integration-test</phase>
                 <configuration>
-                  <includeClassifiers>bin,src</includeClassifiers>
+                  <alg>SHA-512</alg>
+                  <includedClassifiers>
+                    <includedClassifier>src</includedClassifier>
+                    <includedClassifier>bin</includedClassifier>
+                  </includedClassifiers>
                 </configuration>
               </execution>
             </executions>
@@ -413,7 +440,7 @@ under the License.
                   <goal>upload</goal>
                 </goals>
                 <configuration>
-                  <directory>${project.version}/source</directory>
+                  <directory>source</directory>
                   <files>
                     <file>${project.build.directory}/${project.artifactId}-${project.version}-src.tar.gz</file>
                     <file>${project.build.directory}/${project.artifactId}-${project.version}-src.tar.gz.sha512</file>
@@ -430,7 +457,7 @@ under the License.
                   <goal>upload</goal>
                 </goals>
                 <configuration>
-                  <directory>${project.version}/binaries</directory>
+                  <directory>binaries</directory>
                   <files>
                     <file>${project.build.directory}/${project.artifactId}-${project.version}-bin.tar.gz</file>
                     <file>${project.build.directory}/${project.artifactId}-${project.version}-bin.tar.gz.sha512</file>
@@ -480,6 +507,20 @@ under the License.
                   <executable>sh</executable>
                   <arguments>
                     <argument>${project.basedir}/src/test/scripts/test-mvn-path-conversion.sh</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>test-mvn-fast-version</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <skip>${skipTests}</skip>
+                  <executable>sh</executable>
+                  <arguments>
+                    <argument>${project.basedir}/src/test/scripts/test-mvn-fast-version.sh</argument>
                   </arguments>
                 </configuration>
               </execution>

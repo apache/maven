@@ -253,29 +253,8 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
                     && Objects.equals(dep1.getSystemPath(), dep2.getSystemPath())
                     && Objects.equals(dep1.getExclusions(), dep2.getExclusions())
                     && Objects.equals(dep1.getOptional(), dep2.getOptional())
-                    && Objects.equals(dep1.getLocationKeys(), dep2.getLocationKeys())
-                    && locationsEqual(dep1, dep2)
+                    && Objects.equals(dep1.getLocations(), dep2.getLocations())
                     && Objects.equals(dep1.getImportedFrom(), dep2.getImportedFrom());
-        }
-
-        /**
-         * Compare locations maps for two dependencies.
-         */
-        private static boolean locationsEqual(
-                org.apache.maven.api.model.Dependency dep1, org.apache.maven.api.model.Dependency dep2) {
-            var keys1 = dep1.getLocationKeys();
-            var keys2 = dep2.getLocationKeys();
-
-            if (!Objects.equals(keys1, keys2)) {
-                return false;
-            }
-
-            for (Object key : keys1) {
-                if (!Objects.equals(dep1.getLocation(key), dep2.getLocation(key))) {
-                    return false;
-                }
-            }
-            return true;
         }
 
         /**
@@ -303,22 +282,9 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
             h = 31 * h + Objects.hashCode(dep.getSystemPath());
             h = 31 * h + Objects.hashCode(dep.getExclusions());
             h = 31 * h + Objects.hashCode(dep.getOptional());
-            h = 31 * h + Objects.hashCode(dep.getLocationKeys());
-            h = 31 * h + locationsHashCode(dep);
+            h = 31 * h + Objects.hashCode(dep.getLocations());
             h = 31 * h + Objects.hashCode(dep.getImportedFrom());
             return h;
-        }
-
-        /**
-         * Compute hash code for locations map.
-         */
-        private static int locationsHashCode(org.apache.maven.api.model.Dependency dep) {
-            int hash = 1;
-            for (Object key : dep.getLocationKeys()) {
-                hash = 31 * hash + Objects.hashCode(key);
-                hash = 31 * hash + Objects.hashCode(dep.getLocation(key));
-            }
-            return hash;
         }
     }
 

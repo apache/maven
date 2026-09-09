@@ -22,11 +22,14 @@ import java.net.URI;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
+import org.eclipse.aether.spi.connector.transport.GetTask;
 import org.eclipse.aether.spi.connector.transport.PutTask;
 import org.eclipse.aether.spi.connector.transport.Transporter;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.ArgumentCaptor;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -61,5 +64,36 @@ class DefaultTransportTest {
         URI dest = URI.create("dest.txt");
         transport.putBytes("test content".getBytes(), dest);
         verify(transporter).put(any(PutTask.class));
+    }
+
+    @Test
+    void testRelativeUriResolvesInsideBaseWithoutTrailingSlash(@TempDir Path tempDir) throws Exception {
+        Transporter transporter = mock(Transporter.class);
+        // base deliberately configured without a trailing slash
+        DefaultTransport transport = new DefaultTransport(URI.create("http://example.com/repo"), transporter);
+        transport.get(URI.create("repo-other/artifact.jar"), tempDir.resolve("out.jar"));
+
+        ArgumentCaptor<GetTask> task = ArgumentCaptor.forClass(GetTask.class);
+        verify(transporter).get(task.capture());
+        // must resolve under the repository root, not to the sibling ".../repo-other/" tree
+        assertEquals(
+                "http://example.com/repo/repo-other/artifact.jar",
+                task.getValue().getLocation().toString());
+    }
+
+    @Test
+    void testRelativeUriOutsideBaseIsRejected(@TempDir Path tempDir) throws Exception {
+        Transporter transporter = mock(Transporter.class);
+        DefaultTransport transport = new DefaultTransport(URI.create("http://example.com/repo/"), transporter);
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> transport.get(URI.create("../other/artifact.jar"), tempDir.resolve("out.jar")));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> transport.get(URI.create("//other.example.com/artifact.jar"), tempDir.resolve("out.jar")));
+
+        Path source = tempDir.resolve("source.txt");
+        Files.writeString(source, "content");
+        assertThrows(IllegalArgumentException.class, () -> transport.put(source, URI.create("../other/artifact.jar")));
     }
 }

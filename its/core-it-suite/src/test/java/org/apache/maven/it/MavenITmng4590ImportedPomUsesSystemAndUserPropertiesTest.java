@@ -51,6 +51,8 @@ public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest extends Ab
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArgument("validate");
+        verifier.addCliArgument("-Dmaven.repository.dependencyManagement.allowSystemScope=true");
+        verifier.addCliArgument("-Dmaven.model.dependencyInterpolation.full=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -60,5 +62,32 @@ public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest extends Ab
         assertEquals(
                 testDir.resolve("pom.xml"),
                 Path.of(props.getProperty("project.dependencyManagement.dependencies.0.systemPath")));
+    }
+
+    /**
+     * Verify that by default a POM imported from a repository contributes no managed dependency
+     * that declares {@code system} scope or a {@code systemPath}.
+     *
+     * @throws Exception in case of failure
+     */
+    @Test
+    public void testitDefaultOmitsSystemScopedManagedDependency() throws Exception {
+        Path testDir = extractResources("mng-4590");
+
+        Verifier verifier = newVerifier(testDir);
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4590");
+        verifier.filterFile("settings-template.xml", "settings.xml");
+        verifier.setEnvironmentVariable("MAVEN_OPTS", "-Dtest.file=pom.xml");
+        verifier.addCliArgument("-Dtest.dir=" + testDir.toString());
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("validate");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        Properties props = verifier.loadProperties("target/pom.properties");
+        assertEquals("0", props.getProperty("project.dependencyManagement.dependencies"));
     }
 }

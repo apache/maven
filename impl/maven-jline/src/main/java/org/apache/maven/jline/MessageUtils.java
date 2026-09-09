@@ -119,7 +119,7 @@ public class MessageUtils {
     }
 
     public static int getTerminalWidth() {
-        return terminal != null ? terminal.getWidth() : -1;
+        return terminal != null ? terminal.getColumns() : -1;
     }
 
     public static MessageBuilder builder() {

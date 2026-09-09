@@ -78,6 +78,9 @@ class MavenITMvnupToolchainPluginStrategyTest extends AbstractMavenIntegrationTe
         assertTrue(
                 pomContent.contains("<version>(,8]</version>"),
                 "POM should contain version constraint (,8] for source 5 after mvnup apply");
+        assertTrue(
+                pomContent.contains("<version>3.2.0</version>"),
+                "POM should contain plugin version 3.2.0 (minimum for select-jdk-toolchain goal)");
 
         // Second run — should be idempotent (skip, already present)
         verifier = newVerifier(testDir);

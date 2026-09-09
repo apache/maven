@@ -36,51 +36,35 @@ import org.apache.maven.api.services.RequestTrace;
 @Immutable
 public interface RepositoryEvent extends Event {
 
-    /**
-     * Returns the kind of repository operation represented by this event.
-     */
+    /** {@return the kind of repository operation represented by this event} */
     @Nonnull
     RepositoryEventType type();
 
-    /**
-     * Returns the artifact involved in the event, if any.
-     */
+    /** {@return the artifact involved in the event, if any} */
     @Nonnull
     Optional<Artifact> artifact();
 
-    /**
-     * Returns the metadata involved in the event, if any.
-     */
+    /** {@return the metadata involved in the event, if any} */
     @Nonnull
     Optional<RepositoryMetadata> metadata();
 
-    /**
-     * Returns the local path involved in the event, if any.
-     */
+    /** {@return the local path involved in the event, if any} */
     @Nonnull
     Optional<Path> path();
 
-    /**
-     * Returns the repository involved in the event, if any.
-     */
+    /** {@return the repository involved in the event, if any} */
     @Nonnull
     Optional<Repository> repository();
 
-    /**
-     * Returns the primary failure associated with the event, if any.
-     */
+    /** {@return the primary failure associated with the event, if any} */
     @Nonnull
     Optional<Exception> exception();
 
-    /**
-     * Returns all failures associated with the event.
-     */
+    /** {@return all failures associated with the event} */
     @Nonnull
     List<Exception> exceptions();
 
-    /**
-     * Returns the request trace associated with the event, if any.
-     */
+    /** {@return the request trace associated with the event, if any} */
     @Nonnull
     Optional<RequestTrace> trace();
 }

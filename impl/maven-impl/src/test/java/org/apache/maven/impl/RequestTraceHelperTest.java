@@ -28,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -74,16 +75,37 @@ class RequestTraceHelperTest {
     @Test
     void testExitResetsParentTrace() {
         InternalSession session = mock(InternalSession.class);
-        org.apache.maven.api.services.RequestTrace parentTrace =
-                new org.apache.maven.api.services.RequestTrace(null, "parent");
+        org.apache.maven.api.services.RequestTrace previousTrace =
+                new org.apache.maven.api.services.RequestTrace(null, "previous");
         org.apache.maven.api.services.RequestTrace currentTrace =
-                new org.apache.maven.api.services.RequestTrace(parentTrace, "current");
+                new org.apache.maven.api.services.RequestTrace(null, "current");
 
         RequestTraceHelper.ResolverTrace resolverTrace =
-                new RequestTraceHelper.ResolverTrace(session, "test", null, currentTrace);
+                new RequestTraceHelper.ResolverTrace(session, "test", null, currentTrace, previousTrace);
 
         RequestTraceHelper.exit(resolverTrace);
 
-        verify(session).setCurrentTrace(parentTrace);
+        verify(session).setCurrentTrace(previousTrace);
+    }
+
+    @Test
+    void testExplicitRequestTraceRestoresPreviousSessionTrace() {
+        InternalSession session = mock(InternalSession.class);
+        Request<?> request = mock(Request.class);
+        org.apache.maven.api.services.RequestTrace previousTrace =
+                new org.apache.maven.api.services.RequestTrace("context");
+        org.apache.maven.api.services.RequestTrace explicitParent =
+                new org.apache.maven.api.services.RequestTrace("explicit-parent");
+        org.apache.maven.api.services.RequestTrace explicitTrace =
+                new org.apache.maven.api.services.RequestTrace(explicitParent, "explicit");
+        when(session.getCurrentTrace()).thenReturn(previousTrace);
+        when(request.getTrace()).thenReturn(explicitTrace);
+
+        RequestTraceHelper.ResolverTrace resolverTrace = RequestTraceHelper.enter(session, request);
+        RequestTraceHelper.exit(resolverTrace);
+
+        verify(session).setCurrentTrace(explicitTrace);
+        verify(session).setCurrentTrace(previousTrace);
+        verify(session, times(2)).setCurrentTrace(org.mockito.ArgumentMatchers.any());
     }
 }

@@ -30,14 +30,24 @@ package org.apache.maven.cling.invoker.mvnup.goals;
  *     the plugin has no 4.x pre-release line. Used to upgrade old 4.x alpha/beta/RC versions
  *     to the latest pre-release rather than downgrading to a 3.x version.
  * @param reason the reason why this plugin needs to be upgraded
+ * @param minJdk the minimum JDK version required by this plugin version, or {@code 0} if
+ *     the plugin works with any JDK. When the project's detected JDK is below this value,
+ *     the upgrade is skipped to avoid {@code UnsupportedClassVersionError}.
  */
 public record PluginUpgrade(
-        String groupId, String artifactId, String minVersion, String latestPreRelease, String reason) {
+        String groupId, String artifactId, String minVersion, String latestPreRelease, String reason, int minJdk) {
 
     /**
-     * Convenience constructor for plugins without a 4.x pre-release line.
+     * Convenience constructor for plugins without a 4.x pre-release line and no JDK requirement.
      */
     public PluginUpgrade(String groupId, String artifactId, String minVersion, String reason) {
-        this(groupId, artifactId, minVersion, null, reason);
+        this(groupId, artifactId, minVersion, null, reason, 0);
+    }
+
+    /**
+     * Convenience constructor for plugins with a 4.x pre-release line but no JDK requirement.
+     */
+    public PluginUpgrade(String groupId, String artifactId, String minVersion, String latestPreRelease, String reason) {
+        this(groupId, artifactId, minVersion, latestPreRelease, reason, 0);
     }
 }

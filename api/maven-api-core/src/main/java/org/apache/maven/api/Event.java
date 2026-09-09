@@ -61,7 +61,7 @@ public interface Event {
     /**
      * Gets the type of the event.
      *
-     * @return the type of the event, never {@code null}
+     * @return the execution event type, never {@code null}; only meaningful when this event is an {@link ExecutionEvent}
      * @throws UnsupportedOperationException if this event is not an {@link ExecutionEvent}
      * @deprecated Use {@link ExecutionEvent#type()} instead.
      */

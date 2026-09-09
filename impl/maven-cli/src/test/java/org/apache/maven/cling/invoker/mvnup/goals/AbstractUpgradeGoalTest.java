@@ -20,8 +20,10 @@ package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import eu.maveniverse.domtrip.Document;
@@ -41,6 +43,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -533,6 +537,80 @@ class AbstractUpgradeGoalTest {
         }
     }
 
+    @Nested
+    @DisplayName("POM Saving")
+    class PomSavingTests {
+
+        @Test
+        @DisplayName("should not rewrite or report POMs when none were modified")
+        void shouldNotRewriteOrReportWhenNoneModified() throws Exception {
+            Path pom = tempDir.resolve("pom.xml");
+            Files.writeString(pom, minimalPom("root"));
+            Files.createDirectories(tempDir.resolve(".mvn"));
+            Files.setLastModifiedTime(pom, FileTime.fromMillis(0));
+
+            UpgradeContext context = createMockContext(tempDir);
+            when(mockOrchestrator.executeStrategies(Mockito.any(), Mockito.any()))
+                    .thenReturn(UpgradeResult.success(Set.of(pom), Set.of()));
+
+            int result = upgradeGoal.execute(context);
+
+            assertEquals(0, result);
+            assertEquals(0, Files.getLastModifiedTime(pom).toMillis(), "Unmodified POM must not be rewritten");
+            verify(context.logger, never()).info("Saving modified POMs...");
+        }
+
+        @Test
+        @DisplayName("should write and report only the POMs that were modified")
+        void shouldWriteOnlyModifiedPoms() throws Exception {
+            Path parentPom = tempDir.resolve("pom.xml");
+            Path childDir = tempDir.resolve("child");
+            Path childPom = childDir.resolve("pom.xml");
+            Files.createDirectories(childDir);
+            Files.writeString(parentPom, """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project>
+                      <modelVersion>4.0.0</modelVersion>
+                      <groupId>test</groupId>
+                      <artifactId>parent</artifactId>
+                      <version>1.0.0</version>
+                      <packaging>pom</packaging>
+                      <modules>
+                        <module>child</module>
+                      </modules>
+                    </project>
+                    """);
+            Files.writeString(childPom, minimalPom("child"));
+            Files.createDirectories(tempDir.resolve(".mvn"));
+            Files.setLastModifiedTime(parentPom, FileTime.fromMillis(0));
+            Files.setLastModifiedTime(childPom, FileTime.fromMillis(0));
+
+            UpgradeContext context = createMockContext(tempDir);
+            when(mockOrchestrator.executeStrategies(Mockito.any(), Mockito.any()))
+                    .thenReturn(UpgradeResult.success(Set.of(parentPom, childPom), Set.of(childPom)));
+
+            int result = upgradeGoal.execute(context);
+
+            assertEquals(0, result);
+            assertEquals(
+                    0, Files.getLastModifiedTime(parentPom).toMillis(), "Unmodified parent POM must not be rewritten");
+            assertTrue(Files.getLastModifiedTime(childPom).toMillis() > 0, "Modified child POM must be saved");
+            verify(context.logger).info("Saving modified POMs...");
+        }
+
+        private String minimalPom(String artifactId) {
+            return """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project>
+                      <modelVersion>4.0.0</modelVersion>
+                      <groupId>test</groupId>
+                      <artifactId>%s</artifactId>
+                      <version>1.0.0</version>
+                    </project>
+                    """.formatted(artifactId);
+        }
+    }
+
     /**
      * Testable subclass that exposes protected methods for testing.
      */
@@ -567,7 +645,7 @@ class AbstractUpgradeGoalTest {
         public int testExecuteWithTargetModel(UpgradeContext context, String targetModel) {
             try {
                 Map<Path, Document> pomMap = Map.of(); // Empty for this test
-                return doUpgrade(context, targetModel, pomMap);
+                return doUpgrade(context, targetModel, pomMap).success() ? 0 : 1;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

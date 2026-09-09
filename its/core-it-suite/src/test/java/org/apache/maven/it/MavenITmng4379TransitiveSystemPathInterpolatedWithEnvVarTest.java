@@ -24,6 +24,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4379">MNG-4379</a>.
@@ -51,10 +52,40 @@ public class MavenITmng4379TransitiveSystemPathInterpolatedWithEnvVarTest extend
         verifier.addCliArgument("-s");
         verifier.addCliArgument("settings.xml");
         verifier.addCliArguments("validate");
+        verifier.addCliArgument("-Dmaven.model.dependencyInterpolation.full=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         List<String> classpath = verifier.loadLines("target/classpath.txt");
         assertTrue(classpath.contains("pom.xml"), classpath.toString());
+    }
+
+    /**
+     * Test that by default the path of a system-scope dependency declared by a POM resolved from a
+     * repository is not interpolated using environment variables, so the expression is left as
+     * written and reported as an invalid path.
+     *
+     * @throws Exception in case of failure
+     */
+    @Test
+    public void testitDefaultLeavesEnvironmentVariableUnresolved() throws Exception {
+        Path testDir = extractResources("mng-4379");
+
+        Verifier verifier = newVerifier(testDir);
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.mng4379");
+        verifier.filterFile("settings-template.xml", "settings.xml");
+        verifier.setEnvironmentVariable("MNG_4379_HOME", testDir.toString());
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument("settings.xml");
+        verifier.addCliArguments("validate");
+        try {
+            verifier.execute();
+            verifier.verifyErrorFreeLog();
+            fail("Build should not succeed");
+        } catch (VerificationException e) {
+            verifier.verifyTextInLog("must specify an absolute path but is ${env.MNG_4379_HOME}/pom.xml");
+        }
     }
 }

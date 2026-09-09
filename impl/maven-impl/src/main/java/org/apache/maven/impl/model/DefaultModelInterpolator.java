@@ -31,6 +31,7 @@ import java.util.function.BinaryOperator;
 import java.util.function.Function;
 import java.util.function.UnaryOperator;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -41,10 +42,10 @@ import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblemCollector;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.model.ModelInterpolator;
-import org.apache.maven.api.services.model.PathTranslator;
 import org.apache.maven.api.services.model.RootLocator;
-import org.apache.maven.api.services.model.UrlNormalizer;
+import org.apache.maven.impl.DefaultUrlNormalizer;
 import org.apache.maven.impl.model.reflection.ReflectionValueExtractor;
 import org.apache.maven.model.v4.MavenTransformer;
 
@@ -78,19 +79,11 @@ public class DefaultModelInterpolator implements ModelInterpolator {
             "project.scm.developerConnection",
             "project.distributionManagement.site.url");
 
-    private final PathTranslator pathTranslator;
-    private final UrlNormalizer urlNormalizer;
     private final RootLocator rootLocator;
     private final Interpolator interpolator;
 
     @Inject
-    public DefaultModelInterpolator(
-            PathTranslator pathTranslator,
-            UrlNormalizer urlNormalizer,
-            RootLocator rootLocator,
-            Interpolator interpolator) {
-        this.pathTranslator = pathTranslator;
-        this.urlNormalizer = urlNormalizer;
+    public DefaultModelInterpolator(RootLocator rootLocator, Interpolator interpolator) {
         this.rootLocator = rootLocator;
         this.interpolator = interpolator;
     }
@@ -169,11 +162,11 @@ public class DefaultModelInterpolator implements ModelInterpolator {
         // path translation
         String exp = unprefix(expression, getProjectPrefixes(request));
         if (TRANSLATED_PATH_EXPRESSIONS.contains(exp)) {
-            value = pathTranslator.alignToBaseDirectory(value, projectDir);
+            value = DefaultPathTranslator.alignToBaseDirectory(value, projectDir);
         }
         // normalize url
         if (URL_EXPRESSIONS.contains(expression)) {
-            value = urlNormalizer.normalize(value);
+            value = DefaultUrlNormalizer.normalize(value);
         }
         return value;
     }
@@ -202,8 +195,19 @@ public class DefaultModelInterpolator implements ModelInterpolator {
             return new MavenBuildTimestamp(request.getSession().getStartTime(), model.getProperties())
                     .formattedTimestamp();
         }
+        // Models built at ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY are the models
+        // Maven builds while resolving a dependency POM from a repository, not the operator's
+        // own project (see DefaultModelBuilder#resolveAndReadParentExternally and
+        // DefaultArtifactDescriptorReader for the equivalent path used before this builder is
+        // invoked). Such models interpolate their user/system properties only against a small,
+        // environment-independent allowlist; everything else, including environment variables
+        // and arbitrary -D properties, is left as a literal unresolved expression.
+        boolean restricted = restrictExternalModelInterpolation(request);
+
         // user properties
-        String value = request.getUserProperties().get(expression);
+        String value = (!restricted || isSafeExternalExpression(expression))
+                ? request.getUserProperties().get(expression)
+                : null;
         // model properties (check before prefixed model reflection to avoid recursion)
         if (value == null) {
             value = model.getProperties().get(expression);
@@ -221,11 +225,11 @@ public class DefaultModelInterpolator implements ModelInterpolator {
             }
         }
         // system properties
-        if (value == null) {
+        if (value == null && (!restricted || isSafeExternalExpression(expression))) {
             value = request.getSystemProperties().get(expression);
         }
         // environment variables
-        if (value == null) {
+        if (value == null && !restricted) {
             value = request.getSystemProperties().get("env." + expression);
         }
         // un-prefixed model reflection
@@ -233,6 +237,46 @@ public class DefaultModelInterpolator implements ModelInterpolator {
             value = projectProperty(model, projectDir, expression, false);
         }
         return value;
+    }
+
+    private static boolean restrictExternalModelInterpolation(ModelBuilderRequest request) {
+        ModelBuilderRequest.RequestType type = request.getRequestType();
+        boolean externalModel = (type == ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY
+                        || type == ModelBuilderRequest.RequestType.CONSUMER_PARENT)
+                && isRepositoryResolved(request.getSource());
+        return externalModel
+                && !Boolean.parseBoolean(
+                        request.getSystemProperties().get(Constants.MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL))
+                && !Boolean.parseBoolean(
+                        request.getUserProperties().get(Constants.MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL));
+    }
+
+    /**
+     * Whether the given source is one Maven resolved from a repository rather than one supplied to
+     * it. {@link org.apache.maven.api.services.Sources#resolvedSource} carries the resolved model's
+     * coordinates, and it is the only source kind that does; a POM built from a file the caller
+     * pointed at reports none.
+     */
+    private static boolean isRepositoryResolved(ModelSource source) {
+        return source != null && source.getModelId() != null;
+    }
+
+    /**
+     * Expressions that models built at {@link ModelBuilderRequest.RequestType#CONSUMER_DEPENDENCY}
+     * or {@link ModelBuilderRequest.RequestType#CONSUMER_PARENT} may still resolve from the
+     * session properties: JVM- and Maven-defined properties, plus the CI-friendly version
+     * properties (MNG-5895). All other expressions are left literal.
+     */
+    private static boolean isSafeExternalExpression(String expression) {
+        return expression.startsWith("java.")
+                || expression.startsWith("os.")
+                || expression.startsWith("maven.")
+                || "file.separator".equals(expression)
+                || "path.separator".equals(expression)
+                || "line.separator".equals(expression)
+                || "revision".equals(expression)
+                || "changelist".equals(expression)
+                || "sha1".equals(expression);
     }
 
     String projectProperty(Model model, Path projectDir, String subExpr, boolean prefixed) {

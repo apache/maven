@@ -25,45 +25,49 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 
 class DefaultUrlNormalizerTest {
 
-    private final DefaultUrlNormalizer sut = new DefaultUrlNormalizer();
-
     @Test
     void normalizeShouldHandleNullAndEdgeCases() {
-        assertNull(sut.normalize(null));
-        assertEquals("", sut.normalize(""));
-        assertEquals("/", sut.normalize("/../"));
-        assertEquals("", sut.normalize("a/../"));
-        assertEquals("b", sut.normalize("a/../b"));
-        assertEquals("b/d", sut.normalize("a/../b/c/../d"));
-        assertEquals("b/c/d", sut.normalize("a/../b/c/d"));
-        assertEquals("b/c", sut.normalize("a/../b/c"));
-        assertEquals("b/", sut.normalize("a/../b/c/../"));
-        assertEquals("../", sut.normalize("../"));
+        assertNull(DefaultUrlNormalizer.normalize(null));
+        assertEquals("", DefaultUrlNormalizer.normalize(""));
+        assertEquals("/", DefaultUrlNormalizer.normalize("/../"));
+        assertEquals("", DefaultUrlNormalizer.normalize("a/../"));
+        assertEquals("b", DefaultUrlNormalizer.normalize("a/../b"));
+        assertEquals("b/d", DefaultUrlNormalizer.normalize("a/../b/c/../d"));
+        assertEquals("b/c/d", DefaultUrlNormalizer.normalize("a/../b/c/d"));
+        assertEquals("b/c", DefaultUrlNormalizer.normalize("a/../b/c"));
+        assertEquals("b/", DefaultUrlNormalizer.normalize("a/../b/c/../"));
+        assertEquals("../", DefaultUrlNormalizer.normalize("../"));
     }
 
     @Test
     void normalizeShouldPreserveHttpUrlTrailingSlash() {
-        assertEquals("https://example.com/path", sut.normalize("https://example.com/path"));
-        assertEquals("https://example.com/path/", sut.normalize("https://example.com/path/"));
+        assertEquals("https://example.com/path", DefaultUrlNormalizer.normalize("https://example.com/path"));
+        assertEquals("https://example.com/path/", DefaultUrlNormalizer.normalize("https://example.com/path/"));
     }
 
     @Test
     void normalizeShouldCollapseParentReferencesInUrl() {
-        assertEquals("https://example.com/child", sut.normalize("https://example.com/parent/../child"));
-        assertEquals("https://example.com/child", sut.normalize("https://example.com/grand/parent/../../child"));
+        assertEquals(
+                "https://example.com/child", DefaultUrlNormalizer.normalize("https://example.com/parent/../child"));
+        assertEquals(
+                "https://example.com/child",
+                DefaultUrlNormalizer.normalize("https://example.com/grand/parent/../../child"));
     }
 
     @Test
     void normalizeHandlesDoubleSlashesAfterParent() {
-        assertEquals("https://example.com//child", sut.normalize("https://example.com/parent/..//child"));
-        assertEquals("https://example.com/child", sut.normalize("https://example.com/parent//../child"));
+        assertEquals(
+                "https://example.com//child", DefaultUrlNormalizer.normalize("https://example.com/parent/..//child"));
+        assertEquals(
+                "https://example.com/child", DefaultUrlNormalizer.normalize("https://example.com/parent//../child"));
     }
 
     @Test
     void normalizeShouldPreserveOriginalUrlStructure() {
-        assertEquals("file:////some/server", sut.normalize("file:////some/server"));
-        assertEquals("https://example.com/a%20b/c%20d", sut.normalize("https://example.com/a%20b/c%20d"));
-        assertEquals("https://example.com/a b/c d", sut.normalize("https://example.com/a b/c d"));
-        assertEquals("ht!tps:/bad_url", sut.normalize("ht!tps:/bad_url"));
+        assertEquals("file:////some/server", DefaultUrlNormalizer.normalize("file:////some/server"));
+        assertEquals(
+                "https://example.com/a%20b/c%20d", DefaultUrlNormalizer.normalize("https://example.com/a%20b/c%20d"));
+        assertEquals("https://example.com/a b/c d", DefaultUrlNormalizer.normalize("https://example.com/a b/c d"));
+        assertEquals("ht!tps:/bad_url", DefaultUrlNormalizer.normalize("ht!tps:/bad_url"));
     }
 }
