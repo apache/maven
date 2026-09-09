@@ -934,7 +934,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 }
                 break;
             case 4:
-                if (!parts[2].isEmpty() && isNullOrEmpty(d.getType())) {
+                if (!parts[2].isEmpty() && isNullOrEmptyOrDefault(d.getType())) {
                     builder.type(parts[2]);
                 }
                 if (!parts[3].isEmpty() && isNullOrEmpty(d.getVersion())) {
@@ -942,7 +942,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 }
                 break;
             case 5:
-                if (!parts[2].isEmpty() && isNullOrEmpty(d.getType())) {
+                if (!parts[2].isEmpty() && isNullOrEmptyOrDefault(d.getType())) {
                     builder.type(parts[2]);
                 }
                 if (!parts[3].isEmpty() && isNullOrEmpty(d.getClassifier())) {
@@ -996,6 +996,10 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
     private static boolean isNullOrEmpty(String s) {
         return s == null || s.isEmpty();
+    }
+
+    private static boolean isNullOrEmptyOrDefault(String type) {
+        return type == null || type.isEmpty() || "jar".equals(type);
     }
 
     /**
