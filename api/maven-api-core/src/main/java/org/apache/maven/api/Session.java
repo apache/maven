@@ -32,6 +32,7 @@ import org.apache.maven.api.annotations.ThreadSafe;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.DependencyCoordinatesFactory;
+import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.VersionResolverException;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.toolchain.ToolchainModel;
@@ -178,6 +179,17 @@ public interface Session extends ProtoSession {
      */
     @Nonnull
     Session withRemoteRepositories(@Nonnull List<RemoteRepository> repositories);
+
+    /**
+     * Creates a derived session using the given request trace as its context.
+     * Requests made through the derived session inherit this trace unless they provide an explicit trace.
+     *
+     * @param trace the request trace to use as context
+     * @return the derived session
+     * @throws NullPointerException if {@code trace} or its context is null
+     */
+    @Nonnull
+    Session withContext(@Nonnull RequestTrace trace);
 
     /**
      * Register the given listener which will receive all events.
