@@ -86,7 +86,7 @@ public class DefaultModelNormalizer implements ModelNormalizer {
 
         DependencyManagement mgmt = model.getDependencyManagement();
         if (mgmt != null) {
-            List<Dependency> expandedMgmt = expandAndDeduplicateDependencies(mgmt.getDependencies());
+            List<Dependency> expandedMgmt = expandDependencyIds(mgmt.getDependencies());
             if (expandedMgmt != null) {
                 builder.dependencyManagement(DependencyManagement.newBuilder(mgmt)
                         .dependencies(expandedMgmt)
@@ -157,6 +157,10 @@ public class DefaultModelNormalizer implements ModelNormalizer {
         return newList;
     }
 
+    private List<Dependency> expandDependencyIds(List<Dependency> dependencies) {
+        return injectList(dependencies, this::expandDependencyId);
+    }
+
     private List<Dependency> expandAndDeduplicateDependencies(List<Dependency> dependencies) {
         List<Dependency> expanded = injectList(dependencies, this::expandDependencyId);
         if (expanded != null) {
@@ -183,7 +187,7 @@ public class DefaultModelNormalizer implements ModelNormalizer {
 
         DependencyManagement mgmt = profile.getDependencyManagement();
         if (mgmt != null) {
-            List<Dependency> mgmtDeps = expandAndDeduplicateDependencies(mgmt.getDependencies());
+            List<Dependency> mgmtDeps = expandDependencyIds(mgmt.getDependencies());
             if (mgmtDeps != null) {
                 if (pb == null) {
                     pb = Profile.newBuilder(profile);
