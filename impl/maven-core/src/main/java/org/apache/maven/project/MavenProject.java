@@ -632,7 +632,6 @@ public class MavenProject implements Cloneable {
     }
 
     public String getName() {
-        // TODO this should not be allowed to be null.
         if (getModel().getName() != null) {
             return getModel().getName();
         } else {
@@ -838,19 +837,31 @@ public class MavenProject implements Cloneable {
 
     private void addResource(ProjectScope scope, Resource resource) {
         addSourceRoot(new DefaultSourceRoot(getBaseDirectory(), scope, resource.getDelegate()));
+        // Also update the model's Build to maintain compatibility with code that
+        // accesses resources via project.getBuild().getResources()
+        if (scope == ProjectScope.MAIN) {
+            getModelBuild().addResource(resource);
+        } else {
+            getModelBuild().addTestResource(resource);
+        }
     }
 
     /**
-     * @deprecated {@link Resource} is replaced by {@link SourceRoot}.
+     * Syncs {@code Build.resources/testResources} from the {@code sources} set
+     * for Maven 3 plugin compatibility (e.g. when resources come from {@code <sources>}).
      */
+    void syncBuildResources() {
+        getModelBuild().setResources(new java.util.ArrayList<>(getResources()));
+        getModelBuild().setTestResources(new java.util.ArrayList<>(getTestResources()));
+    }
+
+    /** @deprecated {@link Resource} is replaced by {@link SourceRoot}. */
     @Deprecated(since = "4.0.0")
     public void addResource(Resource resource) {
         addResource(ProjectScope.MAIN, resource);
     }
 
-    /**
-     * @deprecated {@link Resource} is replaced by {@link SourceRoot}.
-     */
+    /** @deprecated {@link Resource} is replaced by {@link SourceRoot}. */
     @Deprecated(since = "4.0.0")
     public void addTestResource(Resource testResource) {
         addResource(ProjectScope.TEST, testResource);
@@ -1206,7 +1217,11 @@ public class MavenProject implements Cloneable {
 
     @Override
     public int hashCode() {
-        return Objects.hash(getGroupId(), getArtifactId(), getVersion());
+        // Inlined hash avoids Object[] varargs allocation from Objects.hash()
+        int result = 31 + Objects.hashCode(getGroupId());
+        result = 31 * result + Objects.hashCode(getArtifactId());
+        result = 31 * result + Objects.hashCode(getVersion());
+        return result;
     }
 
     public List<Extension> getBuildExtensions() {

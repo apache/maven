@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -40,13 +40,11 @@ public class MavenITmng0680ParentBasedirTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testitMNG680() throws Exception {
-        File testDir = extractResources("/mng-0680");
+        Path testDir = extractResources("mng-0680");
 
-        testDir = testDir.getCanonicalFile();
+        Path subDir = testDir.resolve("subproject");
 
-        File subDir = new File(testDir, "subproject");
-
-        Verifier verifier = newVerifier(subDir.getAbsolutePath());
+        Verifier verifier = newVerifier(subDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
@@ -54,7 +52,7 @@ public class MavenITmng0680ParentBasedirTest extends AbstractMavenIntegrationTes
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties("target/basedir.properties");
-        assertEquals(subDir, new File(props.getProperty("project.basedir")));
-        assertEquals(testDir, new File(props.getProperty("project.parent.basedir")));
+        assertEquals(subDir, Path.of(props.getProperty("project.basedir")));
+        assertEquals(testDir, Path.of(props.getProperty("project.parent.basedir")));
     }
 }

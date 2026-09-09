@@ -61,6 +61,7 @@ import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
 import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
+import org.eclipse.aether.internal.impl.DefaultRepositoryKeyFunctionFactory;
 import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
 import org.eclipse.aether.internal.impl.SimpleLocalRepositoryManagerFactory;
 import org.eclipse.aether.repository.LocalRepository;
@@ -151,7 +152,9 @@ class LegacyRepositorySystemTest {
                 new SimpleLookup(List.of(
                         new DefaultRequestCacheFactory(),
                         new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
-                                new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider())),
+                                new DefaultUpdatePolicyAnalyzer(),
+                                new DefaultChecksumPolicyProvider(),
+                                new DefaultRepositoryKeyFunctionFactory())),
                         new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme())),
                         new DefaultArtifactCoordinatesFactory(),
                         new DefaultArtifactResolver(),

@@ -43,24 +43,16 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Resource;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-/**
- * @goal check
- */
+@Mojo(name = "check")
 public class MyMojo extends AbstractMojo {
-    /**
-     * @parameter default-value="${project.build}"
-     * @required
-     * @readonly
-     */
+    @Parameter(defaultValue = "${project.build}", required = true, readonly = true)
     private Build build;
 
-    /**
-     * @parameter default-value="${project}"
-     * @required
-     * @readonly
-     */
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
     public void execute() throws MojoExecutionException {

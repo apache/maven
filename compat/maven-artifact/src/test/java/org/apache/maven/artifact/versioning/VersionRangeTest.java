@@ -156,6 +156,16 @@ class VersionRangeTest {
     }
 
     @Test
+    void testExactRangeMatchesOnlyTheExactVersion() throws InvalidVersionSpecificationException {
+        // an exact-version pin must only match the pinned version, not a differently spelled
+        // one that happens to compare equal to it (see ComparableVersionTest#testReleaseQualifierWithDigitOrdering)
+        VersionRange range = VersionRange.createFromVersionSpec("[1.2.3]");
+        assertTrue(range.containsVersion(new DefaultArtifactVersion("1.2.3")));
+        assertFalse(range.containsVersion(new DefaultArtifactVersion("1.2.3-ga2")));
+        assertFalse(range.containsVersion(new DefaultArtifactVersion("1.2.3-final1")));
+    }
+
+    @Test
     void testSameUpperAndLowerBoundRoundtrip() throws InvalidVersionSpecificationException {
         VersionRange range = VersionRange.createFromVersionSpec("[1.0]");
         VersionRange range2 = VersionRange.createFromVersionSpec(range.toString());

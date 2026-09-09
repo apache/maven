@@ -18,17 +18,13 @@
  */
 package org.apache.maven.repository.legacy;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.RandomAccessFile;
-import java.nio.channels.Channels;
-import java.nio.channels.FileChannel;
-import java.nio.channels.FileLock;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Properties;
 
 import org.apache.maven.artifact.Artifact;
@@ -39,6 +35,7 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadata;
 import org.apache.maven.repository.Proxy;
 import org.codehaus.plexus.logging.AbstractLogEnabled;
 import org.codehaus.plexus.logging.Logger;
+import org.eclipse.aether.internal.impl.TrackingFileManager;
 
 /**
  * DefaultUpdateCheckManager
@@ -47,13 +44,21 @@ import org.codehaus.plexus.logging.Logger;
 @Singleton
 @Deprecated
 public class DefaultUpdateCheckManager extends AbstractLogEnabled implements UpdateCheckManager {
+    private final TrackingFileManager trackingFileManager;
 
     private static final String ERROR_KEY_SUFFIX = ".error";
 
-    public DefaultUpdateCheckManager() {}
+    @Inject
+    public DefaultUpdateCheckManager(TrackingFileManager trackingFileManager) {
+        this.trackingFileManager = trackingFileManager;
+    }
 
-    public DefaultUpdateCheckManager(Logger logger) {
+    /**
+     * For testing purposes.
+     */
+    public DefaultUpdateCheckManager(Logger logger, TrackingFileManager trackingFileManager) {
         enableLogging(logger);
+        this.trackingFileManager = trackingFileManager;
     }
 
     public static final String LAST_UPDATE_TAG = ".lastUpdated";
@@ -156,7 +161,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
         File touchfile = getTouchfile(artifact);
 
         if (file.exists()) {
-            touchfile.delete();
+            trackingFileManager.delete(touchfile);
         } else {
             writeLastUpdated(touchfile, getRepositoryKey(repository), error);
         }
@@ -201,70 +206,10 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
     }
 
     private void writeLastUpdated(File touchfile, String key, String error) {
-        synchronized (touchfile.getAbsolutePath().intern()) {
-            if (!touchfile.getParentFile().exists()
-                    && !touchfile.getParentFile().mkdirs()) {
-                getLogger()
-                        .debug("Failed to create directory: " + touchfile.getParent()
-                                + " for tracking artifact metadata resolution.");
-                return;
-            }
-
-            FileChannel channel = null;
-            FileLock lock = null;
-            try {
-                Properties props = new Properties();
-
-                channel = new RandomAccessFile(touchfile, "rw").getChannel();
-                lock = channel.lock();
-
-                if (touchfile.canRead()) {
-                    getLogger().debug("Reading resolution-state from: " + touchfile);
-                    props.load(Channels.newInputStream(channel));
-                }
-
-                props.setProperty(key, Long.toString(System.currentTimeMillis()));
-
-                if (error != null) {
-                    props.setProperty(key + ERROR_KEY_SUFFIX, error);
-                } else {
-                    props.remove(key + ERROR_KEY_SUFFIX);
-                }
-
-                getLogger().debug("Writing resolution-state to: " + touchfile);
-                channel.truncate(0);
-                props.store(Channels.newOutputStream(channel), "Last modified on: " + new Date());
-
-                lock.release();
-                lock = null;
-
-                channel.close();
-                channel = null;
-            } catch (IOException e) {
-                getLogger()
-                        .debug(
-                                "Failed to record lastUpdated information for resolution.\nFile: " + touchfile
-                                        + "; key: " + key,
-                                e);
-            } finally {
-                if (lock != null) {
-                    try {
-                        lock.release();
-                    } catch (IOException e) {
-                        getLogger()
-                                .debug("Error releasing exclusive lock for resolution tracking file: " + touchfile, e);
-                    }
-                }
-
-                if (channel != null) {
-                    try {
-                        channel.close();
-                    } catch (IOException e) {
-                        getLogger().debug("Error closing FileChannel for resolution tracking file: " + touchfile, e);
-                    }
-                }
-            }
-        }
+        HashMap<String, String> update = new HashMap<>();
+        update.put(key, Long.toString(System.currentTimeMillis()));
+        update.put(key + ERROR_KEY_SUFFIX, error); // error==null => remove mapping
+        trackingFileManager.update(touchfile, update);
     }
 
     Date readLastUpdated(File touchfile, String key) {
@@ -293,30 +238,7 @@ public class DefaultUpdateCheckManager extends AbstractLogEnabled implements Upd
     }
 
     private Properties read(File touchfile) {
-        if (!touchfile.canRead()) {
-            getLogger().debug("Skipped unreadable resolution tracking file: " + touchfile);
-            return null;
-        }
-
-        synchronized (touchfile.getAbsolutePath().intern()) {
-            try {
-                Properties props = new Properties();
-
-                try (FileInputStream in = new FileInputStream(touchfile)) {
-                    try (FileLock lock = in.getChannel().lock(0, Long.MAX_VALUE, true)) {
-                        getLogger().debug("Reading resolution-state from: " + touchfile);
-                        props.load(in);
-
-                        return props;
-                    }
-                }
-
-            } catch (IOException e) {
-                getLogger().debug("Failed to read resolution tracking file: " + touchfile, e);
-
-                return null;
-            }
-        }
+        return trackingFileManager.read(touchfile);
     }
 
     File getTouchfile(Artifact artifact) {

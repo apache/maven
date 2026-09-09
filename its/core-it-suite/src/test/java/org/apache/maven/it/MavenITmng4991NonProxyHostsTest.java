@@ -18,8 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.net.InetAddress;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -27,8 +27,8 @@ import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -47,15 +47,16 @@ public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTes
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4991");
-
-        ResourceHandler resourceHandler = new ResourceHandler();
-        resourceHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
-
-        HandlerList handlers = new HandlerList();
-        handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
+        Path testDir = extractResources("mng-4991");
 
         Server server = new Server(0);
+
+        ResourceHandler resourceHandler = new ResourceHandler();
+        resourceHandler.setBaseResource(ResourceFactory.of(server).newResource(testDir.resolve("repo")));
+
+        Handler.Sequence handlers = new Handler.Sequence();
+        handlers.setHandlers(new Handler[] {resourceHandler, new DefaultHandler()});
+
         server.setHandler(handlers);
 
         /*
@@ -65,7 +66,7 @@ public class MavenITmng4991NonProxyHostsTest extends AbstractMavenIntegrationTes
         Server proxy = new Server(0);
         proxy.setHandler(new DefaultHandler());
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         try {
             server.start();
             if (server.isFailed()) {

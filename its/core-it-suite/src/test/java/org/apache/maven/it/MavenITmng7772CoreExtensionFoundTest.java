@@ -18,30 +18,29 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     public void testWithExtensionsXmlCoreExtensionsFound() throws Exception {
-        File testDir = extractResources("/mng-7772-core-extensions-found");
+        Path testDir = extractResources("mng-7772-core-extensions-found");
 
-        Verifier verifier = newVerifier(new File(testDir, "extension").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("extension"));
         verifier.setLogFileName("extension-install.txt");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        String installedToLocalRepo = verifier.getLocalRepository();
+        Path installedToLocalRepo = verifier.getLocalRepository();
 
-        verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setUserHomeDirectory(Paths.get(testDir.toPath().toString(), "home-extensions-xml"));
+        verifier = newVerifier(testDir);
+        verifier.setUserHomeDirectory(testDir.resolve("home-extensions-xml"));
         verifier.addCliArgument("-Dmaven.repo.local=" + installedToLocalRepo);
 
         verifier.addCliArgument("validate");
@@ -52,10 +51,10 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
     @Test
     public void testWithLibExtCoreExtensionsFound() throws Exception {
-        File testDir = extractResources("/mng-7772-core-extensions-found");
+        Path testDir = extractResources("mng-7772-core-extensions-found");
 
-        Path extensionBasedir = new File(testDir, "extension").getAbsoluteFile().toPath();
-        Verifier verifier = newVerifier(extensionBasedir.toString());
+        Path extensionBasedir = testDir.resolve("extension");
+        Verifier verifier = newVerifier(extensionBasedir);
         verifier.setLogFileName("extension-package.txt");
         verifier.addCliArgument("package");
         verifier.execute();
@@ -63,10 +62,10 @@ public class MavenITmng7772CoreExtensionFoundTest extends AbstractMavenIntegrati
 
         Path jarPath = extensionBasedir.resolve("target").resolve("maven-it-core-extensions-0.1.jar");
 
-        assertTrue("Jar output path was not built", Files.isRegularFile(jarPath));
+        assertTrue(Files.isRegularFile(jarPath), "Jar output path was not built");
 
-        verifier = newVerifier(testDir.getAbsolutePath());
-        verifier.setUserHomeDirectory(Paths.get(testDir.toPath().toString(), "home-lib-ext"));
+        verifier = newVerifier(testDir);
+        verifier.setUserHomeDirectory(Paths.get(testDir.toString(), "home-lib-ext"));
         verifier.addCliArgument("-Dmaven.ext.class.path=" + jarPath);
         verifier.addCliArgument("validate");
         verifier.execute();

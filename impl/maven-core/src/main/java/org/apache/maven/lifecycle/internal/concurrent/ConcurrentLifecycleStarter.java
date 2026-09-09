@@ -35,7 +35,6 @@ import org.apache.maven.lifecycle.MissingProjectException;
 import org.apache.maven.lifecycle.NoGoalSpecifiedException;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.GoalTask;
-import org.apache.maven.lifecycle.internal.LifecyclePluginResolver;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
@@ -61,7 +60,6 @@ public class ConcurrentLifecycleStarter implements LifecycleStarter {
     private final ExecutionEventCatapult eventCatapult;
     private final DefaultLifecycles defaultLifeCycles;
     private final BuildPlanExecutor executor;
-    private final LifecyclePluginResolver lifecyclePluginResolver;
     private final MojoDescriptorCreator mojoDescriptorCreator;
 
     @Inject
@@ -69,12 +67,10 @@ public class ConcurrentLifecycleStarter implements LifecycleStarter {
             ExecutionEventCatapult eventCatapult,
             DefaultLifecycles defaultLifeCycles,
             BuildPlanExecutor executor,
-            LifecyclePluginResolver lifecyclePluginResolver,
             MojoDescriptorCreator mojoDescriptorCreator) {
         this.eventCatapult = eventCatapult;
         this.defaultLifeCycles = defaultLifeCycles;
         this.executor = executor;
-        this.lifecyclePluginResolver = lifecyclePluginResolver;
         this.mojoDescriptorCreator = mojoDescriptorCreator;
     }
 
@@ -148,8 +144,6 @@ public class ConcurrentLifecycleStarter implements LifecycleStarter {
             }
             if (isGoalSpecification(task)) {
                 // "pluginPrefix[:version]:goal" or "groupId:artifactId[:version]:goal"
-
-                lifecyclePluginResolver.resolveMissingPluginVersions(session.getTopLevelProject(), session);
 
                 MojoDescriptor mojoDescriptor =
                         mojoDescriptorCreator.getMojoDescriptor(task, session, session.getTopLevelProject());

@@ -61,7 +61,9 @@ public interface PluginDependenciesResolver {
      * @param session The repository session to use for resolving the plugin artifacts, must not be {@code null}.
      * @return The dependency tree denoting the resolved plugin class path, never {@code null}.
      * @throws PluginResolutionException If any dependency could not be resolved.
+     * @deprecated This method should be avoided, as it requires manual flattening; use {@link #resolvePluginAndFlatten(Plugin, Artifact, DependencyFilter, List, RepositorySystemSession)} instead to let Resolver handle it.
      */
+    @Deprecated
     DependencyNode resolve(
             Plugin plugin,
             Artifact pluginArtifact,
@@ -70,11 +72,81 @@ public interface PluginDependenciesResolver {
             RepositorySystemSession session)
             throws PluginResolutionException;
 
+    /**
+     * Resolves the runtime dependencies of the specified core extension (as {@link Plugin} as GAV carrier).
+     * <p>
+     * The default implementation delegates to
+     * {@link #resolvePlugin(Plugin, Artifact, DependencyFilter, List, RepositorySystemSession)} so that
+     * implementations written against Maven 4.0.0-rc-5 and earlier keep working. Implementations should override
+     * this method: unlike the default, a dedicated implementation is expected to read the extension's artifact
+     * descriptor first, applying relocations and dependency validation.
+     *
+     * @param plugin The plugin for which to resolve the dependencies, must not be {@code null}.
+     * @param dependencyFilter A filter to exclude artifacts from resolution (but not collection), may be {@code null}.
+     * @param repositories The plugin repositories to use for resolving the plugin artifacts, must not be {@code null}.
+     * @param session The repository session to use for resolving the plugin artifacts, must not be {@code null}.
+     * @return The dependency resolution result having the resolved extension class path but also the tree, never {@code null}.
+     * @throws PluginResolutionException If any dependency could not be resolved.
+     * @since 3.10.0
+     */
+    default DependencyResult resolveCoreExtensionAndFlatten(
+            Plugin plugin,
+            DependencyFilter dependencyFilter,
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session)
+            throws PluginResolutionException {
+        return resolvePlugin(plugin, null, dependencyFilter, repositories, session);
+    }
+
+    /**
+     * Resolves the runtime dependencies of the specified plugin.
+     * <p>
+     * Implementations must not delegate to
+     * {@link #resolvePluginAndFlatten(Plugin, Artifact, DependencyFilter, List, RepositorySystemSession)} without
+     * also overriding it: the default implementation of that method delegates back here.
+     *
+     * @param plugin The plugin for which to resolve the dependencies, must not be {@code null}.
+     * @param artifact The plugin's main artifact, may be {@code null}.
+     * @param dependencyFilter A filter to exclude artifacts from resolution (but not collection), may be {@code null}.
+     * @param repositories The plugin repositories to use for resolving the plugin artifacts, must not be {@code null}.
+     * @param session The repository session to use for resolving the plugin artifacts, must not be {@code null}.
+     * @return The dependency resolution result having the resolved plugin class path but also the tree, never {@code null}.
+     * @throws PluginResolutionException If any dependency could not be resolved.
+     * @since 4.0.0-beta-2
+     * @deprecated Use {@link #resolvePluginAndFlatten(Plugin, Artifact, DependencyFilter, List, RepositorySystemSession)} instead.
+     */
+    @Deprecated
     DependencyResult resolvePlugin(
             Plugin plugin,
             Artifact artifact,
             DependencyFilter dependencyFilter,
-            List<RemoteRepository> remotePluginRepositories,
-            RepositorySystemSession repositorySession)
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session)
             throws PluginResolutionException;
+
+    /**
+     * Resolves the runtime dependencies of the specified plugin.
+     * <p>
+     * The default implementation delegates to
+     * {@link #resolvePlugin(Plugin, Artifact, DependencyFilter, List, RepositorySystemSession)}, which this method
+     * supersedes, so that implementations written against Maven 4.0.0-rc-5 and earlier keep working.
+     *
+     * @param plugin The plugin for which to resolve the dependencies, must not be {@code null}.
+     * @param pluginArtifact The plugin's main artifact, may be {@code null}.
+     * @param dependencyFilter A filter to exclude artifacts from resolution (but not collection), may be {@code null}.
+     * @param repositories The plugin repositories to use for resolving the plugin artifacts, must not be {@code null}.
+     * @param session The repository session to use for resolving the plugin artifacts, must not be {@code null}.
+     * @return The dependency resolution result having the resolved plugin class path but also the tree, never {@code null}.
+     * @throws PluginResolutionException If any dependency could not be resolved.
+     * @since 3.10.0
+     */
+    default DependencyResult resolvePluginAndFlatten(
+            Plugin plugin,
+            Artifact pluginArtifact,
+            DependencyFilter dependencyFilter,
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session)
+            throws PluginResolutionException {
+        return resolvePlugin(plugin, pluginArtifact, dependencyFilter, repositories, session);
+    }
 }

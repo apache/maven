@@ -195,6 +195,26 @@ class ResourceIncludeTest {
         assertTrue(sourceRoot.includes().contains("*.xml"), "Underlying SourceRoot should contain the include");
     }
 
+    @Test
+    void testGeneratedStatePreservedWhenResourceIsUpdated() {
+        project.addSourceRoot(new DefaultSourceRoot(
+                ProjectScope.MAIN, Language.RESOURCES, Path.of("target/generated-resources"), true));
+
+        Resource generatedResource = project.getResources().stream()
+                .filter(resource -> resource.getDirectory().endsWith("generated-resources"))
+                .findFirst()
+                .orElseThrow();
+        generatedResource.addInclude("*.properties");
+
+        org.apache.maven.api.SourceRoot generatedSource = project.getEnabledSourceRoots(
+                        ProjectScope.MAIN, Language.RESOURCES)
+                .filter(source -> source.directory().endsWith("generated-resources"))
+                .findFirst()
+                .orElseThrow();
+        assertTrue(generatedSource.generated());
+        assertTrue(generatedSource.includes().contains("*.properties"));
+    }
+
     /*MNG-11062*/
     @Test
     void testTargetPathPreservedWithConnectedResource() {
@@ -280,5 +300,63 @@ class ResourceIncludeTest {
                 "${project.build.directory}" + File.separator + "custom",
                 placeholderResult.getTargetPath(),
                 "Property placeholder in targetPath should be preserved");
+    }
+
+    /**
+     * Verifies that resources added via {@code project.addResource()} or
+     * {@code project.getResources().add()} are visible through both
+     * {@code project.getResources()} and {@code project.getBuild().getResources()}.
+     * This is important for Maven 3 compatibility, since plugins may access
+     * resources through either path.
+     *
+     * @see <a href="https://github.com/apache/maven-source-plugin/pull/281">maven-source-plugin#281</a>
+     */
+    @Test
+    void testAddResourceVisibleViaBuildGetResources() {
+        // Initial state: one resource in sources, none added dynamically
+        assertEquals(1, project.getResources().size());
+        int initialBuildResources = project.getBuild().getResources().size();
+
+        // Add a resource dynamically (simulating what maven-remote-resources-plugin does)
+        Resource dynamicResource = new Resource();
+        dynamicResource.setDirectory("target/maven-shared-archive-resources");
+        project.addResource(dynamicResource);
+
+        // Verify visible via project.getResources()
+        List<Resource> projectResources = project.getResources();
+        assertEquals(2, projectResources.size(), "Dynamic resource should be visible via project.getResources()");
+
+        // Verify ALSO visible via project.getBuild().getResources()
+        List<Resource> buildResources = project.getBuild().getResources();
+        assertEquals(
+                initialBuildResources + 1,
+                buildResources.size(),
+                "Dynamic resource should also be visible via project.getBuild().getResources()");
+
+        boolean found =
+                buildResources.stream().anyMatch(r -> r.getDirectory().contains("maven-shared-archive-resources"));
+        assertTrue(found, "getBuild().getResources() should contain the dynamically added resource");
+    }
+
+    /**
+     * Same as above but using {@code project.getResources().add()} path.
+     */
+    @Test
+    void testAddResourceViaListVisibleViaBuildGetResources() {
+        int initialBuildResources = project.getBuild().getResources().size();
+
+        Resource dynamicResource = new Resource();
+        dynamicResource.setDirectory("target/maven-shared-archive-resources");
+        project.getResources().add(dynamicResource);
+
+        List<Resource> buildResources = project.getBuild().getResources();
+        assertEquals(
+                initialBuildResources + 1,
+                buildResources.size(),
+                "Resource added via getResources().add() should be visible via getBuild().getResources()");
+
+        boolean found =
+                buildResources.stream().anyMatch(r -> r.getDirectory().contains("maven-shared-archive-resources"));
+        assertTrue(found, "getBuild().getResources() should contain the resource added via getResources().add()");
     }
 }

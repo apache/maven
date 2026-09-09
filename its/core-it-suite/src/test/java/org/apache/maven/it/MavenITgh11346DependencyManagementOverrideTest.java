@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.apache.maven.api.Constants;
@@ -57,9 +57,9 @@ public class MavenITgh11346DependencyManagementOverrideTest extends AbstractMave
      */
     @Test
     public void testDependencyManagementOverride() throws Exception {
-        File testDir = extractResources("/gh-11346-dependency-management-override");
+        Path testDir = extractResources("gh-11346-dependency-management-override");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteArtifacts("org.apache.maven.its.mng.depman");
         // Test with dependency manager transitivity disabled instead of consumer POM flattening
         verifier.addCliArgument("-D" + Constants.MAVEN_CONSUMER_POM_FLATTEN + "=false");
@@ -89,9 +89,9 @@ public class MavenITgh11346DependencyManagementOverrideTest extends AbstractMave
 
     @Test
     public void testDependencyManagementOverrideNoTransitive() throws Exception {
-        File testDir = extractResources("/gh-11346-dependency-management-override");
+        Path testDir = extractResources("gh-11346-dependency-management-override");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteArtifacts("org.apache.maven.its.mng.depman");
         // Test with dependency manager transitivity disabled instead of consumer POM flattening
         verifier.addCliArgument("-D" + Constants.MAVEN_CONSUMER_POM_FLATTEN + "=false");

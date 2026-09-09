@@ -18,8 +18,8 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Disabled;
@@ -46,7 +46,7 @@ class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
     @Test
     @Disabled
     void testJvmConfigFileCR() throws Exception {
-        runWithLineEndings("\r");
+        runWithLineEndings("\r", "cr");
     }
 
     /**
@@ -56,7 +56,7 @@ class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testJvmConfigFileLF() throws Exception {
-        runWithLineEndings("\n");
+        runWithLineEndings("\n", "lf");
     }
 
     /**
@@ -66,30 +66,31 @@ class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testJvmConfigFileCRLF() throws Exception {
-        runWithLineEndings("\r\n");
+        runWithLineEndings("\r\n", "crlf");
     }
 
-    protected void runWithLineEndings(String lineEndings) throws Exception {
-        File baseDir = extractResources("/mng-6255");
-        File mvnDir = new File(baseDir, ".mvn");
+    protected void runWithLineEndings(String lineEndings, String test) throws Exception {
+        Path baseDir = extractResources("mng-6255");
+        Path mvnDir = baseDir.resolve(".mvn");
 
-        File jvmConfig = new File(mvnDir, "jvm.config");
+        Path jvmConfig = mvnDir.resolve("jvm.config");
         createJvmConfigFile(jvmConfig, lineEndings, "-Djvm.config=ok", "-Xms256m", "-Xmx512m");
 
-        Verifier verifier = newVerifier(baseDir.getAbsolutePath());
-        verifier.addCliArgument(
-                "-Dexpression.outputFile=" + new File(baseDir, "expression.properties").getAbsolutePath());
+        Verifier verifier = newVerifier(baseDir);
+        verifier.setLogFileName("log-" + test + ".txt");
+        verifier.addCliArgument("-Dexpression.outputFile="
+                + baseDir.resolve("expression-" + test + ".properties").toAbsolutePath());
         verifier.setForkJvm(true); // custom .mvn/jvm.config
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Properties props = verifier.loadProperties("expression.properties");
+        Properties props = verifier.loadProperties("expression-" + test + ".properties");
         assertEquals("ok", props.getProperty("project.properties.jvm-config"));
     }
 
-    protected void createJvmConfigFile(File jvmConfig, String lineEndings, String... lines) throws Exception {
+    protected void createJvmConfigFile(Path jvmConfig, String lineEndings, String... lines) throws Exception {
         String content = String.join(lineEndings, lines);
-        Files.writeString(jvmConfig.toPath(), content);
+        Files.writeString(jvmConfig, content);
     }
 }

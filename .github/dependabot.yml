@@ -39,6 +39,27 @@ updates:
     labels:
       - "mvn3"
       - "dependencies"
+    ignore:
+      - dependency-name: "ch.qos.logback:*"
+        versions: [ "[1.3.0,)" ]
+      - dependency-name: "org.codehaus.plexus:plexus-cipher"
+        versions: [ ">=2.1.0" ]
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "maven-3.10.x"
+    labels:
+      - "mvn3"
+      - "dependencies"
+    ignore:
+      - dependency-name: "org.jline:*"
+        versions: [ "[4.0.0,)" ]
+      - dependency-name: "ch.qos.logback:*"
+        versions: [ "[1.3.0,)" ]
+      - dependency-name: "org.codehaus.plexus:plexus-cipher"
+        versions: [ ">=2.1.0" ]
 
   - package-ecosystem: "github-actions"
     directory: "/"
@@ -60,6 +81,16 @@ updates:
     schedule:
       interval: "daily"
     target-branch: "maven-3.9.x"
+    labels:
+      - "mvn3"
+      - "dependencies"
+      - "github_actions"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "maven-3.10.x"
     labels:
       - "mvn3"
       - "dependencies"

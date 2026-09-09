@@ -76,6 +76,8 @@ class DefaultModelResolver implements ModelResolver {
 
     private final Set<String> repositoryIds;
 
+    private final Set<String> externalRepositoryIds;
+
     DefaultModelResolver(
             RepositorySystemSession session,
             RequestTrace trace,
@@ -94,6 +96,11 @@ class DefaultModelResolver implements ModelResolver {
         this.externalRepositories = Collections.unmodifiableList(new ArrayList<>(repositories));
 
         this.repositoryIds = new HashSet<>();
+        Set<String> externalIds = new HashSet<>();
+        for (RemoteRepository externalRepository : this.externalRepositories) {
+            externalIds.add(externalRepository.getId());
+        }
+        this.externalRepositoryIds = Collections.unmodifiableSet(externalIds);
     }
 
     private DefaultModelResolver(DefaultModelResolver original) {
@@ -106,6 +113,7 @@ class DefaultModelResolver implements ModelResolver {
         this.repositories = new ArrayList<>(original.repositories);
         this.externalRepositories = original.externalRepositories;
         this.repositoryIds = new HashSet<>(original.repositoryIds);
+        this.externalRepositoryIds = original.externalRepositoryIds;
     }
 
     @Override
@@ -121,6 +129,13 @@ class DefaultModelResolver implements ModelResolver {
 
         if (!repositoryIds.add(repository.getId())) {
             if (!replace) {
+                return;
+            }
+
+            if (externalRepositoryIds.contains(repository.getId())) {
+                // Replacement is meant to refresh a repository this model declared earlier, e.g.
+                // once its URL has been interpolated. Repositories supplied by the request or the
+                // session are not model-declared, so they keep precedence and are left in place.
                 return;
             }
 

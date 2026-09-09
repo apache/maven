@@ -82,6 +82,18 @@ under the License.
           <!-- reportSet with inherited=false is not here -->
         </reportSets>
       </plugin>
+      <plugin>
+        <artifactId>MNG-5115-2</artifactId>
+        <reportSets>
+          <reportSet>
+            <id>inherited-append</id>
+            <reports>
+              <report>from-child</report>
+              <report>to-be-inherited</report>
+            </reports>
+          </reportSet>
+        </reportSets>
+      </plugin>
     </plugins>
   </reporting>
 </project>

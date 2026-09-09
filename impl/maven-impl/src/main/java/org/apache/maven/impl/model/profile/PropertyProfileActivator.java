@@ -18,6 +18,8 @@
  */
 package org.apache.maven.impl.model.profile;
 
+import org.apache.maven.api.Constants;
+import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Activation;
@@ -26,6 +28,8 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelProblemCollector;
+import org.apache.maven.api.services.VersionParserException;
+import org.apache.maven.api.services.model.ModelVersionParser;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileActivator;
 
@@ -37,6 +41,13 @@ import org.apache.maven.api.services.model.ProfileActivator;
 @Named("property")
 @Singleton
 public class PropertyProfileActivator implements ProfileActivator {
+
+    private final ModelVersionParser versionParser;
+
+    @Inject
+    public PropertyProfileActivator(ModelVersionParser versionParser) {
+        this.versionParser = versionParser;
+    }
 
     @Override
     public boolean isActive(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
@@ -85,11 +96,38 @@ public class PropertyProfileActivator implements ProfileActivator {
                 propValue = propValue.substring(1);
             }
 
-            // we have a value, so it has to match the system value...
-            return reverseValue != propValue.equals(sysValue);
+            boolean result;
+            if (Constants.MAVEN_VERSION.equals(name) && isVersionRange(propValue)) {
+                if (sysValue == null || sysValue.isEmpty()) {
+                    result = false;
+                } else {
+                    try {
+                        result = versionParser
+                                .parseVersionRange(propValue)
+                                .contains(versionParser.parseVersion(sysValue));
+                    } catch (VersionParserException e) {
+                        problems.add(
+                                BuilderProblem.Severity.WARNING,
+                                ModelProblem.Version.BASE,
+                                "Failed to determine Maven version activation for profile " + profile.getId()
+                                        + " due to invalid version range: '" + propValue + "'",
+                                property.getLocation("value"),
+                                e);
+                        return false;
+                    }
+                }
+            } else {
+                // we have a value, so it has to match the system value...
+                result = propValue.equals(sysValue);
+            }
+            return reverseValue != result;
         } else {
             return reverseName != (sysValue != null && !sysValue.isEmpty());
         }
+    }
+
+    private static boolean isVersionRange(String value) {
+        return value.startsWith("[") || value.startsWith("(");
     }
 
     @Override

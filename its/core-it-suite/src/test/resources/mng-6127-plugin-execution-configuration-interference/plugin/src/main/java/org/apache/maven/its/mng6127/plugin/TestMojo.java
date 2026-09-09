@@ -45,33 +45,31 @@ import java.io.Writer;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
 /**
  * Test mojo.
- *
- * @goal test
  */
+@Mojo(name = "test")
 public class TestMojo extends AbstractMojo {
     /**
      * The Maven project.
-     *
-     * @parameter expression="${project}"
      */
+    @Parameter(defaultValue = "${project}")
     private MavenProject project;
 
     /**
      * The name to write.
-     *
-     * @parameter
      */
+    @Parameter
     private String name;
 
     /**
      * The second name to write.
-     *
-     * @parameter
      */
+    @Parameter
     private String secondName;
 
     public void execute() throws MojoExecutionException {

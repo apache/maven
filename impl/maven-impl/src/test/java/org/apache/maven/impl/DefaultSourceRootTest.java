@@ -86,6 +86,22 @@ public class DefaultSourceRootTest {
         assertEquals(Language.JAVA_FAMILY, source.language());
         assertEquals(Path.of("myproject", "src", "main", "java"), source.directory());
         assertTrue(source.targetVersion().isEmpty());
+        assertFalse(source.generated());
+    }
+
+    @Test
+    void testGeneratedSource() {
+        var source = DefaultSourceRoot.fromModel(
+                session,
+                Path.of("myproject"),
+                outputDirectory(),
+                Source.newBuilder()
+                        .directory("target/generated-sources/java")
+                        .generated(true)
+                        .build());
+
+        assertEquals(Path.of("myproject", "target", "generated-sources", "java"), source.directory());
+        assertTrue(source.generated());
     }
 
     @Test
@@ -198,6 +214,7 @@ public class DefaultSourceRootTest {
         assertEquals(Path.of("myproject", "src", "test", "resources"), sourceRoot.directory());
         assertEquals(ProjectScope.TEST, sourceRoot.scope());
         assertEquals(Language.RESOURCES, sourceRoot.language());
+        assertFalse(sourceRoot.generated());
     }
 
     /*MNG-11062*/
@@ -227,6 +244,34 @@ public class DefaultSourceRootTest {
 
         Optional<Path> targetPath = sourceRoot.targetPath();
         assertFalse(targetPath.isPresent(), "targetPath should be empty for empty string");
+    }
+
+    /** GH-12306: {@code targetPath="."} normalizes to an empty path and must be treated as absent. */
+    @Test
+    void testHandlesDotTargetPathFromResource() {
+        Resource resource = Resource.newBuilder()
+                .directory("src/main/resources")
+                .targetPath(".")
+                .build();
+
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.MAIN, resource);
+
+        assertFalse(sourceRoot.targetPath().isPresent(), "targetPath \".\" should be treated as absent");
+    }
+
+    /** GH-12306: {@code targetPath="./subdir"} normalizes to {@code "subdir"} and must be preserved. */
+    @Test
+    void testHandlesDotRelativeTargetPathFromResource() {
+        Resource resource = Resource.newBuilder()
+                .directory("src/main/resources")
+                .targetPath("./subdir")
+                .build();
+
+        DefaultSourceRoot sourceRoot = new DefaultSourceRoot(Path.of("myproject"), ProjectScope.MAIN, resource);
+
+        assertTrue(
+                sourceRoot.targetPath().isPresent(), "targetPath \"./subdir\" should be present after normalization");
+        assertEquals(Path.of("subdir"), sourceRoot.targetPath().orElseThrow());
     }
 
     /*MNG-11062*/

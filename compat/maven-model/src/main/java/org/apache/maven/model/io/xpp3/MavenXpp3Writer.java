@@ -26,6 +26,7 @@ import java.io.Writer;
 
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Model;
+import org.apache.maven.model.v4.MavenModelVersion;
 import org.apache.maven.model.v4.MavenStaxWriter;
 
 /**
@@ -33,6 +34,10 @@ import org.apache.maven.model.v4.MavenStaxWriter;
  */
 @Deprecated
 public class MavenXpp3Writer {
+    private static final String NAMESPACE_FORMAT = "http://maven.apache.org/POM/%s";
+
+    private static final String SCHEMA_LOCATION_FORMAT = "https://maven.apache.org/xsd/maven-%s.xsd";
+
     // --------------------------/
     // - Class/Member Variables -/
     // --------------------------/
@@ -79,6 +84,7 @@ public class MavenXpp3Writer {
      */
     public void write(Writer writer, Model model) throws IOException {
         try {
+            configureDelegate(model);
             delegate.write(writer, model.getDelegate());
         } catch (XMLStreamException e) {
             throw new IOException(e);
@@ -94,9 +100,19 @@ public class MavenXpp3Writer {
      */
     public void write(OutputStream stream, Model model) throws IOException {
         try {
+            configureDelegate(model);
             delegate.write(stream, model.getDelegate());
         } catch (XMLStreamException e) {
             throw new IOException(e);
         }
     } // -- void write( OutputStream, Model )
+
+    private void configureDelegate(Model model) {
+        String version = model.getModelVersion();
+        if (version == null || version.isBlank()) {
+            version = new MavenModelVersion().getModelVersion(model.getDelegate());
+        }
+        delegate.setNamespace(String.format(NAMESPACE_FORMAT, version));
+        delegate.setSchemaLocation(String.format(SCHEMA_LOCATION_FORMAT, version));
+    }
 }

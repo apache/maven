@@ -21,9 +21,12 @@ package org.apache.maven.toolchain.java;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
+import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.toolchain.MisconfiguredToolchainException;
 import org.apache.maven.toolchain.RequirementMatcher;
 import org.apache.maven.toolchain.RequirementMatcherFactory;
@@ -93,6 +96,14 @@ public class JavaToolchainFactory implements ToolchainFactory {
                     "Non-existing JDK home configuration at " + normal.toAbsolutePath());
         }
 
+        ArtifactVersion javaVersion = model.getProvides().entrySet().stream()
+                .filter(entry -> "version".equals(entry.getKey()))
+                .map(Map.Entry::getValue)
+                .map(v -> new DefaultArtifactVersion((String) v))
+                .findAny()
+                .orElse(null);
+
+        jtc.setJavaVersion(javaVersion);
         return jtc;
     }
 

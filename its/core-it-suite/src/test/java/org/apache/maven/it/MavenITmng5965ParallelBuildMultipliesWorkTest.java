@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -35,9 +35,9 @@ public class MavenITmng5965ParallelBuildMultipliesWorkTest extends AbstractMaven
 
     @Test
     public void testItShouldOnlyRunEachTaskOnce() throws Exception {
-        File testDir = extractResources("/mng-5965-parallel-build-multiplies-work");
+        Path testDir = extractResources("mng-5965-parallel-build-multiplies-work");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.setLogFileName("log-only.txt");

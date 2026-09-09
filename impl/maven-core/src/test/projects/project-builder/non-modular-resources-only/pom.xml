@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tests AC9: Non-modular project with only resources in <sources>.
+
+  Expected behavior:
+  - Resources from <sources> are used
+  - Legacy sourceDirectory/testSourceDirectory are used as implicit fallback (AC9)
+  - No errors since <sources> doesn't have Java for these scopes
+-->
+<project xmlns="http://maven.apache.org/POM/4.1.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
+
+    <groupId>org.apache.maven.tests</groupId>
+    <artifactId>non-modular-resources-only-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <build>
+        <sources>
+            <!-- Only resources configured - no Java sources -->
+            <source>
+                <scope>main</scope>
+                <lang>resources</lang>
+                <directory>src/main/custom-resources</directory>
+            </source>
+            <source>
+                <scope>test</scope>
+                <lang>resources</lang>
+                <directory>src/test/custom-resources</directory>
+            </source>
+            <!-- No <source lang="java"> elements -->
+        </sources>
+        <!-- Legacy directories should be used as fallback (AC9) -->
+        <!-- Using Super POM defaults: src/main/java and src/test/java -->
+    </build>
+</project>

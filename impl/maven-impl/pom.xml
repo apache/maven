@@ -170,6 +170,11 @@ under the License.
       <artifactId>jmh-generator-annprocess</artifactId>
       <scope>test</scope>
     </dependency>
+    <dependency>
+      <groupId>org.xmlunit</groupId>
+      <artifactId>xmlunit-core</artifactId>
+      <scope>test</scope>
+    </dependency>
   </dependencies>
 
   <build>

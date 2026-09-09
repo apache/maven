@@ -18,26 +18,25 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.eclipse.jetty.security.ConstraintMapping;
-import org.eclipse.jetty.security.ConstraintSecurityHandler;
+import org.eclipse.jetty.security.Constraint;
 import org.eclipse.jetty.security.HashLoginService;
+import org.eclipse.jetty.security.SecurityHandler;
 import org.eclipse.jetty.security.UserStore;
+import org.eclipse.jetty.security.authentication.BasicAuthenticator;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.handler.DefaultHandler;
-import org.eclipse.jetty.server.handler.HandlerList;
 import org.eclipse.jetty.server.handler.ResourceHandler;
-import org.eclipse.jetty.util.security.Constraint;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 import org.eclipse.jetty.util.security.Password;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-
-import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4068">MNG-4068</a>.
@@ -47,7 +46,7 @@ import static org.eclipse.jetty.util.security.Constraint.__BASIC_AUTH;
  */
 public class MavenITmng4068AuthenticatedMirrorTest extends AbstractMavenIntegrationTestCase {
 
-    private File testDir;
+    private Path testDir;
 
     private Server server;
 
@@ -55,16 +54,7 @@ public class MavenITmng4068AuthenticatedMirrorTest extends AbstractMavenIntegrat
 
     @BeforeEach
     protected void setUp() throws Exception {
-        testDir = extractResources("/mng-4068");
-
-        Constraint constraint = new Constraint();
-        constraint.setName(Constraint.__BASIC_AUTH);
-        constraint.setRoles(new String[] {"user"});
-        constraint.setAuthenticate(true);
-
-        ConstraintMapping constraintMapping = new ConstraintMapping();
-        constraintMapping.setConstraint(constraint);
-        constraintMapping.setPathSpec("/*");
+        testDir = extractResources("mng-4068");
 
         HashLoginService userRealm = new HashLoginService("TestRealm");
         UserStore userStore = new UserStore();
@@ -72,20 +62,20 @@ public class MavenITmng4068AuthenticatedMirrorTest extends AbstractMavenIntegrat
         userRealm.setUserStore(userStore);
 
         server = new Server(0);
-        ConstraintSecurityHandler securityHandler = new ConstraintSecurityHandler();
+        SecurityHandler.PathMapped securityHandler = new SecurityHandler.PathMapped();
         securityHandler.setLoginService(userRealm);
-        securityHandler.setAuthMethod(__BASIC_AUTH);
-        securityHandler.setConstraintMappings(new ConstraintMapping[] {constraintMapping});
+        securityHandler.setAuthenticator(new BasicAuthenticator());
+        securityHandler.put("/*", Constraint.from("auth", Constraint.Authorization.SPECIFIC_ROLE, "user"));
 
         ResourceHandler repoHandler = new ResourceHandler();
-        repoHandler.setResourceBase(new File(testDir, "repo").getAbsolutePath());
+        repoHandler.setBaseResource(ResourceFactory.of(server).newResource(testDir.resolve("repo")));
 
-        HandlerList handlerList = new HandlerList();
-        handlerList.addHandler(securityHandler);
+        Handler.Sequence handlerList = new Handler.Sequence();
         handlerList.addHandler(repoHandler);
         handlerList.addHandler(new DefaultHandler());
 
-        server.setHandler(handlerList);
+        securityHandler.setHandler(handlerList);
+        server.setHandler(securityHandler);
         server.start();
         if (server.isFailed()) {
             fail("Couldn't bind the server socket to a free port!");
@@ -113,7 +103,7 @@ public class MavenITmng4068AuthenticatedMirrorTest extends AbstractMavenIntegrat
         Map<String, String> filterProps = new HashMap<>();
         filterProps.put("@mirrorPort@", Integer.toString(port));
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.filterFile("settings-template.xml", "settings.xml", filterProps);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng4068");

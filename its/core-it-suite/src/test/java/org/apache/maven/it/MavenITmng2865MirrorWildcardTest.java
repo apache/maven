@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -71,9 +71,9 @@ public class MavenITmng2865MirrorWildcardTest extends AbstractMavenIntegrationTe
     }
 
     private void testit(String project) throws Exception {
-        File testDir = extractResources("/mng-2865");
+        Path testDir = extractResources("mng-2865");
 
-        Verifier verifier = newVerifier(new File(testDir, project).getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve(project));
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng2865");
         verifier.filterFile("settings-template.xml", "settings.xml");

@@ -43,26 +43,18 @@ import java.util.Map;
 import org.apache.maven.doxia.siterenderer.Renderer;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Resource;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.reporting.AbstractMavenReport;
 import org.apache.maven.reporting.MavenReportException;
 
-/**
- * @goal check-report
- */
+@Mojo(name = "check-report")
 public class MyReport extends AbstractMavenReport {
-    /**
-     * @parameter default-value="${project.build}"
-     * @required
-     * @readonly
-     */
+    @Parameter(defaultValue = "${project.build}", required = true, readonly = true)
     private Build build;
 
-    /**
-     * @parameter default-value="${project}"
-     * @required
-     * @readonly
-     */
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
     private void runChecks() throws MavenReportException {

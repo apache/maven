@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,9 +37,9 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest extends Abstract
      */
     @Test
     public void testitAM() throws Exception {
-        File testDir = extractResources("/mng-4890");
+        Path testDir = extractResources("mng-4890");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("mod-a/target");
@@ -65,9 +65,9 @@ public class MavenITmng4890MakeLikeReactorConsidersVersionsTest extends Abstract
      */
     @Test
     public void testitAMD() throws Exception {
-        File testDir = extractResources("/mng-4890");
+        Path testDir = extractResources("mng-4890");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteDirectory("mod-a/target");

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Collections;
 
 import org.junit.jupiter.api.Test;
@@ -38,11 +38,11 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest extends Abst
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4465");
+        Path testDir = extractResources("mng-4465");
 
         // phase 1: get the metadata into the local repo
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4465");
@@ -58,7 +58,7 @@ public class MavenITmng4465PluginPrefixFromLocalCacheOfDownRepoTest extends Abst
 
         // phase 2: re-try with the remote repo being inaccessible (due to bad URL)
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.filterFile(

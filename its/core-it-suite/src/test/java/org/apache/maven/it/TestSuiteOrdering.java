@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import java.util.Comparator;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import org.junit.jupiter.api.ClassDescriptor;
 import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.ClassOrdererContext;
@@ -59,7 +60,7 @@ public class TestSuiteOrdering implements ClassOrderer {
             System.clearProperty("classworlds.conf");
 
             // Set maven.version system property (needed by some tests)
-            Verifier verifier = new Verifier("", false);
+            Verifier verifier = new Verifier(Paths.get(""), false);
             String mavenVersion = verifier.getMavenVersion();
             System.setProperty("maven.version", mavenVersion);
 

@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.xml;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -40,12 +39,12 @@ public class XmlNodeStaxBuilder {
 
     public static XmlNode build(InputStream stream, InputLocationBuilderStax locationBuilder)
             throws XMLStreamException {
-        XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(stream);
+        XMLStreamReader parser = XmlService.newXMLInputFactory().createXMLStreamReader(stream);
         return build(parser, DEFAULT_TRIM, locationBuilder);
     }
 
     public static XmlNode build(Reader reader, InputLocationBuilderStax locationBuilder) throws XMLStreamException {
-        XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(reader);
+        XMLStreamReader parser = XmlService.newXMLInputFactory().createXMLStreamReader(reader);
         return build(parser, DEFAULT_TRIM, locationBuilder);
     }
 

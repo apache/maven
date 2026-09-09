@@ -20,7 +20,6 @@ package org.apache.maven.it;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Stream;
 
@@ -40,16 +39,15 @@ class MavenITmng8523ModelPropertiesTest extends AbstractMavenIntegrationTestCase
      */
     @Test
     void testIt() throws Exception {
-        Path basedir =
-                extractResources("/mng-8523-model-properties").getAbsoluteFile().toPath();
+        Path basedir = extractResources("mng-8523-model-properties");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.addCliArguments("install", "-DmavenVersion=4.0.0-rc-2", "-Dmaven.consumer.pom.flatten=true");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         Path consumerPomPath =
-                Paths.get(verifier.getArtifactPath("org.apache.maven.its.mng-8523", "jar", "1.0.0-SNAPSHOT", "pom"));
+                verifier.getArtifactPath("org.apache.maven.its.mng-8523", "jar", "1.0.0-SNAPSHOT", "pom");
         assertTrue(Files.exists(consumerPomPath), "consumer pom not found at " + consumerPomPath);
 
         List<String> consumerPomLines;

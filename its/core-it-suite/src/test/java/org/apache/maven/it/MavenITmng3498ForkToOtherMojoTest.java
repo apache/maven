@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -37,12 +37,12 @@ public class MavenITmng3498ForkToOtherMojoTest extends AbstractMavenIntegrationT
     public void testitMNG3498() throws Exception {
         // The testdir is computed from the location of this
         // file.
-        File testDir = extractResources("/mng-3498");
+        Path testDir = extractResources("mng-3498");
 
-        File pluginDir = new File(testDir, "maven-mng3498-plugin");
-        File projectDir = new File(testDir, "mng-3498-project");
+        Path pluginDir = testDir.resolve("maven-mng3498-plugin");
+        Path projectDir = testDir.resolve("mng-3498-project");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir);
         verifier.deleteArtifact("org.apache.maven.its.mng3498", "mavenit-mng3498-plugin", "1", "pom");
 
         verifier.addCliArgument("install");
@@ -50,7 +50,7 @@ public class MavenITmng3498ForkToOtherMojoTest extends AbstractMavenIntegrationT
 
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("validate");
         verifier.execute();

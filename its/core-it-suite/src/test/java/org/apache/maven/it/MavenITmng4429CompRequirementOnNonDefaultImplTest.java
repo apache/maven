@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -39,10 +39,10 @@ public class MavenITmng4429CompRequirementOnNonDefaultImplTest extends AbstractM
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4429");
+        Path testDir = extractResources("mng-4429");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(new File(testDir, "maven-it-plugin-no-default-comp").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-no-default-comp"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -50,7 +50,7 @@ public class MavenITmng4429CompRequirementOnNonDefaultImplTest extends AbstractM
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");

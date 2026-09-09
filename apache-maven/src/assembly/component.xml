@@ -68,6 +68,7 @@ under the License.
       <includes>
         <include>*.cmd</include>
         <include>*.conf</include>
+        <include>*.java</include>
       </includes>
       <lineEnding>dos</lineEnding>
     </fileSet>
@@ -103,6 +104,14 @@ under the License.
     <fileSet>
       <directory>src/assembly/maven/lib</directory>
       <outputDirectory>lib</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>target/classes/org/apache/maven/messages</directory>
+      <outputDirectory>bin</outputDirectory>
+      <includes>
+        <include>maven.version.properties</include>
+      </includes>
+      <fileMode>0444</fileMode>
     </fileSet>
   </fileSets>
 </component>

@@ -19,23 +19,23 @@ under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
 
-    <groupId>org.apache.maven.reproducer</groupId>
-    <artifactId>reproducer-debezium</artifactId>
-    <version>1.0-SNAPSHOT</version>
-    <packaging>jar</packaging>
+  <groupId>org.apache.maven.reproducer</groupId>
+  <artifactId>reproducer-debezium</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
 
-    <properties>
-        <maven.compiler.source>11</maven.compiler.source>
-        <maven.compiler.target>11</maven.compiler.target>
-        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <debezium-version>3.3.1.Final</debezium-version>
-    </properties>
+  <properties>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <debezium-version>3.3.1.Final</debezium-version>
+  </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>io.debezium</groupId>
-            <artifactId>debezium-connector-db2</artifactId>
-            <version>${debezium-version}</version>
-        </dependency>
-    </dependencies>
+  <dependencies>
+    <dependency>
+      <groupId>io.debezium</groupId>
+      <artifactId>debezium-connector-db2</artifactId>
+      <version>${debezium-version}</version>
+    </dependency>
+  </dependencies>
 </project>

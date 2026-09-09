@@ -18,7 +18,11 @@
  */
 package org.apache.maven.cling.invoker.mvnup.goals;
 
+import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Comparator;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -27,7 +31,16 @@ import eu.maveniverse.domtrip.Document;
 import eu.maveniverse.domtrip.Element;
 import eu.maveniverse.domtrip.maven.Coordinates;
 import eu.maveniverse.domtrip.maven.MavenPomElements;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.services.ModelBuilder;
+import org.apache.maven.api.services.ModelBuilderRequest;
+import org.apache.maven.api.services.ModelBuilderResult;
+import org.apache.maven.api.services.Sources;
+import org.apache.maven.api.settings.Proxy;
+import org.apache.maven.api.settings.Settings;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
@@ -45,6 +58,21 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
  * </pre>
  */
 public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
+
+    /**
+     * DI-injected standalone Maven 4 API Session, produced by {@link MvnupSessionHolder}.
+     * Sharing the session avoids recreating the heavyweight standalone DI container
+     * for each strategy. The Session's {@link org.apache.maven.api.cache.RequestCache}
+     * deduplicates effective model builds when the same POM path is resolved more
+     * than once within a strategy.
+     *
+     * <p>When running outside a DI container (e.g. unit tests), this field is {@code null}
+     * and {@link #getSession()} falls back to creating a session via
+     * {@link MvnupSessionHolder#createSession()}.
+     */
+    @Inject
+    @Named("mvnup")
+    private Session session;
 
     /**
      * Template method that handles common logging and error handling.
@@ -129,7 +157,7 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
 
         // If groupId or version is missing, try to get from parent
         if (groupId == null || version == null) {
-            Element parentElement = root.child(PARENT).orElse(null);
+            Element parentElement = root.childElement(PARENT).orElse(null);
             if (parentElement != null) {
                 if (groupId == null) {
                     groupId = parentElement.childTextTrimmed(MavenPomElements.Elements.GROUP_ID);
@@ -164,7 +192,7 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
      * @return set of all Artifacts in the project
      */
     public static Set<Coordinates> computeAllArtifactCoordinates(UpgradeContext context, Map<Path, Document> pomMap) {
-        Set<Coordinates> coordinates = new HashSet<>();
+        Map<String, Coordinates> coordinatesByGAV = new HashMap<>();
 
         context.info("Computing artifacts for inference from " + pomMap.size() + " POM(s)...");
 
@@ -176,12 +204,143 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
             Coordinates coordinate =
                     AbstractUpgradeStrategy.extractArtifactCoordinatesWithParentResolution(context, pomDocument);
             if (coordinate != null) {
-                coordinates.add(coordinate);
+                coordinatesByGAV.putIfAbsent(coordinate.toGAV(), coordinate);
                 context.debug("Found artifact: " + coordinate.toGAV() + " from " + pomPath);
             }
         }
 
-        context.info("Computed " + coordinates.size() + " unique artifact(s) for inference");
-        return coordinates;
+        context.info("Computed " + coordinatesByGAV.size() + " unique artifact(s) for inference");
+        return new HashSet<>(coordinatesByGAV.values());
+    }
+
+    /**
+     * Fallback session for unit tests that instantiate strategies directly (without DI).
+     */
+    private static volatile Session fallbackSession;
+
+    protected Session getSession() {
+        Session s = session;
+        if (s != null) {
+            return s;
+        }
+        // Fallback for unit tests that instantiate strategies directly (without DI)
+        s = fallbackSession;
+        if (s == null) {
+            synchronized (AbstractUpgradeStrategy.class) {
+                s = fallbackSession;
+                if (s == null) {
+                    s = MvnupSessionHolder.createSession();
+                    fallbackSession = s;
+                }
+            }
+        }
+        return s;
+    }
+
+    /**
+     * Returns the reason why remote resolution cannot honor the operator's configured
+     * repository posture, or {@code null} if remote resolution may proceed.
+     *
+     * <p>The standalone resolver session used by mvnup does not apply mirrors, proxies or
+     * offline mode from the effective settings. Rather than silently resolving remote POMs
+     * while ignoring that configuration, strategies must call this method and skip the
+     * remote-model-dependent work whenever a posture is configured that the standalone
+     * session cannot honor.</p>
+     *
+     * <p>Blocked mirrors (such as the default {@code external:http:*} blocker shipped in the
+     * Maven installation settings) do not redirect traffic and therefore do not disable
+     * remote resolution by themselves.</p>
+     *
+     * @param context the upgrade context
+     * @return a human-readable reason to skip remote resolution, or {@code null} if allowed
+     */
+    protected static String remoteResolutionUnsupportedReason(UpgradeContext context) {
+        Settings settings = context.effectiveSettings;
+        if (settings == null) {
+            // Settings were never loaded (embedded or test use): there is no operator
+            // repository posture declared that could be violated.
+            return null;
+        }
+        if (settings.isOffline()) {
+            return "offline mode is enabled in settings";
+        }
+        boolean hasRedirectingMirror = settings.getMirrors().stream().anyMatch(mirror -> !mirror.isBlocked());
+        if (hasRedirectingMirror) {
+            return "settings declare mirror(s) that the mvnup standalone resolver cannot honor";
+        }
+        boolean hasActiveProxy = settings.getProxies().stream().anyMatch(Proxy::isActive);
+        if (hasActiveProxy) {
+            return "settings declare an active proxy that the mvnup standalone resolver cannot honor";
+        }
+        return null;
+    }
+
+    protected Path createTempProjectStructure(UpgradeContext context, Map<Path, Document> pomMap) throws Exception {
+        Path tempDir = Files.createTempDirectory("mvnup-project-");
+        context.debug("Created temp project directory: " + tempDir);
+
+        Path commonRoot = findCommonRoot(pomMap.keySet());
+        context.debug("Common root: " + commonRoot);
+
+        for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
+            Path originalPath = entry.getKey();
+            Document document = entry.getValue();
+
+            Path relativePath = commonRoot.relativize(originalPath);
+            Path tempPomPath = tempDir.resolve(relativePath);
+
+            Files.createDirectories(tempPomPath.getParent());
+            Files.writeString(tempPomPath, document.toXml());
+            context.debug("Wrote POM to temp location: " + tempPomPath);
+        }
+
+        return tempDir;
+    }
+
+    protected Path findCommonRoot(Set<Path> pomPaths) {
+        Path commonRoot = null;
+        for (Path pomPath : pomPaths) {
+            Path parent = pomPath.getParent();
+            if (parent == null) {
+                parent = Path.of(".");
+            }
+            if (commonRoot == null) {
+                commonRoot = parent;
+            } else {
+                while (!parent.startsWith(commonRoot)) {
+                    commonRoot = commonRoot.getParent();
+                    if (commonRoot == null) {
+                        break;
+                    }
+                }
+            }
+        }
+        return commonRoot;
+    }
+
+    protected void cleanupTempDirectory(Path tempDir) {
+        try {
+            Files.walk(tempDir)
+                    .sorted(Comparator.reverseOrder())
+                    .map(Path::toFile)
+                    .forEach(File::delete);
+        } catch (Exception e) {
+            // Best effort cleanup
+        }
+    }
+
+    protected org.apache.maven.api.model.Model buildEffectiveModel(UpgradeContext context, Path pomPath) {
+        Session session = getSession();
+        ModelBuilder modelBuilder = session.getService(ModelBuilder.class);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .source(Sources.buildSource(pomPath))
+                .requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)
+                .recursive(false)
+                .build();
+
+        ModelBuilderResult result = modelBuilder.newSession().build(request);
+        return result.getEffectiveModel();
     }
 }

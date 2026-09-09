@@ -20,8 +20,10 @@ package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.attribute.FileTime;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Stream;
 
 import eu.maveniverse.domtrip.Document;
@@ -38,8 +40,11 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -272,6 +277,340 @@ class AbstractUpgradeGoalTest {
         }
     }
 
+    @Nested
+    @DisplayName("Incompatible Extension Fixes")
+    class IncompatibleExtensionFixTests {
+
+        @Test
+        @DisplayName("should replace os-maven-plugin with Maveniverse Nisse")
+        void shouldReplaceOsMavenPluginWithNisse() throws Exception {
+            Path projectDir = tempDir.resolve("project");
+            Path mvnDir = projectDir.resolve(".mvn");
+            Files.createDirectories(mvnDir);
+
+            String extensionsXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <extensions>
+                        <extension>
+                            <groupId>kr.motd.maven</groupId>
+                            <artifactId>os-maven-plugin</artifactId>
+                            <version>1.7.1</version>
+                        </extension>
+                    </extensions>
+                    """;
+            Files.writeString(mvnDir.resolve("extensions.xml"), extensionsXml);
+
+            UpgradeContext context = createMockContext(projectDir);
+            when(mockOrchestrator.executeStrategies(Mockito.any(), Mockito.any()))
+                    .thenReturn(UpgradeResult.empty());
+
+            upgradeGoal.testExecuteWithTargetModel(context, "4.0.0");
+
+            String result = Files.readString(mvnDir.resolve("extensions.xml"));
+            assertTrue(result.contains("eu.maveniverse.maven.nisse"), "Should contain Nisse groupId");
+            assertTrue(result.contains("<artifactId>extension</artifactId>"), "Should contain Nisse artifactId");
+            assertTrue(result.contains("0.4.4"), "Should contain Nisse version");
+            assertFalse(result.contains("kr.motd.maven"), "Should not contain os-maven-plugin groupId");
+            assertFalse(result.contains("os-maven-plugin"), "Should not contain os-maven-plugin artifactId");
+
+            // Should also create maven.config with Nisse compat flag
+            Path mavenConfig = mvnDir.resolve("maven.config");
+            assertTrue(Files.exists(mavenConfig), "maven.config should be created");
+            String configContent = Files.readString(mavenConfig);
+            assertTrue(
+                    configContent.contains("-Dnisse.compat.osDetector"),
+                    "maven.config should contain Nisse compat flag");
+        }
+
+        @Test
+        @DisplayName("should remove Develocity extension")
+        void shouldRemoveDevelocityExtension() throws Exception {
+            Path projectDir = tempDir.resolve("project");
+            Path mvnDir = projectDir.resolve(".mvn");
+            Files.createDirectories(mvnDir);
+
+            String extensionsXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <extensions>
+                        <extension>
+                            <groupId>com.gradle</groupId>
+                            <artifactId>develocity-maven-extension</artifactId>
+                            <version>1.21</version>
+                        </extension>
+                    </extensions>
+                    """;
+            Files.writeString(mvnDir.resolve("extensions.xml"), extensionsXml);
+
+            UpgradeContext context = createMockContext(projectDir);
+            when(mockOrchestrator.executeStrategies(Mockito.any(), Mockito.any()))
+                    .thenReturn(UpgradeResult.empty());
+
+            upgradeGoal.testExecuteWithTargetModel(context, "4.0.0");
+
+            String result = Files.readString(mvnDir.resolve("extensions.xml"));
+            assertFalse(result.contains("develocity-maven-extension"), "Should not contain Develocity extension");
+            assertFalse(result.contains("com.gradle"), "Should not contain com.gradle groupId");
+        }
+
+        @Test
+        @DisplayName("should remove Gradle Enterprise extension")
+        void shouldRemoveGradleEnterpriseExtension() throws Exception {
+            Path projectDir = tempDir.resolve("project");
+            Path mvnDir = projectDir.resolve(".mvn");
+            Files.createDirectories(mvnDir);
+
+            String extensionsXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <extensions>
+                        <extension>
+                            <groupId>com.gradle</groupId>
+                            <artifactId>gradle-enterprise-maven-extension</artifactId>
+                            <version>1.18</version>
+                        </extension>
+                    </extensions>
+                    """;
+            Files.writeString(mvnDir.resolve("extensions.xml"), extensionsXml);
+
+            UpgradeContext context = createMockContext(projectDir);
+            when(mockOrchestrator.executeStrategies(Mockito.any(), Mockito.any()))
+                    .thenReturn(UpgradeResult.empty());
+
+            upgradeGoal.testExecuteWithTargetModel(context, "4.0.0");
+
+            String result = Files.readString(mvnDir.resolve("extensions.xml"));
+            assertFalse(
+                    result.contains("gradle-enterprise-maven-extension"),
+                    "Should not contain Gradle Enterprise extension");
+        }
+
+        @Test
+        @DisplayName("should handle both os-maven-plugin and Develocity together")
+        void shouldHandleBothOsMavenPluginAndDevelocity() throws Exception {
+            Path projectDir = tempDir.resolve("project");
+            Path mvnDir = projectDir.resolve(".mvn");
+            Files.createDirectories(mvnDir);
+
+            String extensionsXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <extensions>
+                        <extension>
+                            <groupId>kr.motd.maven</groupId>
+                            <artifactId>os-maven-plugin</artifactId>
+                            <version>1.7.1</version>
+                        </extension>
+                        <extension>
+                            <groupId>com.gradle</groupId>
+                            <artifactId>develocity-maven-extension</artifactId>
+                            <version>1.21</version>
+                        </extension>
+                        <extension>
+                            <groupId>org.apache.maven.extensions</groupId>
+                            <artifactId>maven-build-cache-extension</artifactId>
+                            <version>1.0.0</version>
+                        </extension>
+                    </extensions>
+                    """;
+            Files.writeString(mvnDir.resolve("extensions.xml"), extensionsXml);
+
+            UpgradeContext context = createMockContext(projectDir);
+            when(mockOrchestrator.executeStrategies(Mockito.any(), Mockito.any()))
+                    .thenReturn(UpgradeResult.empty());
+
+            upgradeGoal.testExecuteWithTargetModel(context, "4.0.0");
+
+            String result = Files.readString(mvnDir.resolve("extensions.xml"));
+            assertTrue(result.contains("eu.maveniverse.maven.nisse"), "Should contain Nisse replacement");
+            assertFalse(result.contains("develocity-maven-extension"), "Should not contain Develocity");
+            assertTrue(result.contains("maven-build-cache-extension"), "Should preserve compatible extensions");
+        }
+
+        @Test
+        @DisplayName("should append to existing maven.config")
+        void shouldAppendToExistingMavenConfig() throws Exception {
+            Path projectDir = tempDir.resolve("project");
+            Path mvnDir = projectDir.resolve(".mvn");
+            Files.createDirectories(mvnDir);
+
+            String extensionsXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <extensions>
+                        <extension>
+                            <groupId>kr.motd.maven</groupId>
+                            <artifactId>os-maven-plugin</artifactId>
+                            <version>1.7.1</version>
+                        </extension>
+                    </extensions>
+                    """;
+            Files.writeString(mvnDir.resolve("extensions.xml"), extensionsXml);
+            Files.writeString(mvnDir.resolve("maven.config"), "-Xmx2g\n");
+
+            UpgradeContext context = createMockContext(projectDir);
+            when(mockOrchestrator.executeStrategies(Mockito.any(), Mockito.any()))
+                    .thenReturn(UpgradeResult.empty());
+
+            upgradeGoal.testExecuteWithTargetModel(context, "4.0.0");
+
+            String configContent = Files.readString(mvnDir.resolve("maven.config"));
+            assertTrue(configContent.contains("-Xmx2g"), "Should preserve existing config");
+            assertTrue(configContent.contains("-Dnisse.compat.osDetector"), "Should add Nisse compat flag");
+        }
+
+        @Test
+        @DisplayName("should not duplicate Nisse compat flag in maven.config")
+        void shouldNotDuplicateNisseCompatFlag() throws Exception {
+            Path projectDir = tempDir.resolve("project");
+            Path mvnDir = projectDir.resolve(".mvn");
+            Files.createDirectories(mvnDir);
+
+            String extensionsXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <extensions>
+                        <extension>
+                            <groupId>kr.motd.maven</groupId>
+                            <artifactId>os-maven-plugin</artifactId>
+                            <version>1.7.1</version>
+                        </extension>
+                    </extensions>
+                    """;
+            Files.writeString(mvnDir.resolve("extensions.xml"), extensionsXml);
+            Files.writeString(mvnDir.resolve("maven.config"), "-Dnisse.compat.osDetector\n");
+
+            UpgradeContext context = createMockContext(projectDir);
+            when(mockOrchestrator.executeStrategies(Mockito.any(), Mockito.any()))
+                    .thenReturn(UpgradeResult.empty());
+
+            upgradeGoal.testExecuteWithTargetModel(context, "4.0.0");
+
+            String configContent = Files.readString(mvnDir.resolve("maven.config"));
+            int count = configContent.split("-Dnisse.compat.osDetector", -1).length - 1;
+            assertEquals(1, count, "Should not duplicate Nisse compat flag");
+        }
+
+        @Test
+        @DisplayName("should be no-op when no extensions.xml exists")
+        void shouldBeNoOpWhenNoExtensionsXml() throws Exception {
+            Path projectDir = tempDir.resolve("project");
+            Files.createDirectories(projectDir);
+
+            UpgradeContext context = createMockContext(projectDir);
+            when(mockOrchestrator.executeStrategies(Mockito.any(), Mockito.any()))
+                    .thenReturn(UpgradeResult.empty());
+
+            int result = upgradeGoal.testExecuteWithTargetModel(context, "4.0.0");
+
+            assertEquals(0, result, "Should succeed with no extensions.xml");
+            assertFalse(
+                    Files.exists(projectDir.resolve(".mvn/maven.config")),
+                    "Should not create maven.config when no extensions needed fixing");
+        }
+
+        @Test
+        @DisplayName("should be no-op when no incompatible extensions found")
+        void shouldBeNoOpWhenNoIncompatibleExtensions() throws Exception {
+            Path projectDir = tempDir.resolve("project");
+            Path mvnDir = projectDir.resolve(".mvn");
+            Files.createDirectories(mvnDir);
+
+            String extensionsXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <extensions>
+                        <extension>
+                            <groupId>org.apache.maven.extensions</groupId>
+                            <artifactId>maven-build-cache-extension</artifactId>
+                            <version>1.0.0</version>
+                        </extension>
+                    </extensions>
+                    """;
+            Files.writeString(mvnDir.resolve("extensions.xml"), extensionsXml);
+
+            UpgradeContext context = createMockContext(projectDir);
+            when(mockOrchestrator.executeStrategies(Mockito.any(), Mockito.any()))
+                    .thenReturn(UpgradeResult.empty());
+
+            upgradeGoal.testExecuteWithTargetModel(context, "4.0.0");
+
+            String result = Files.readString(mvnDir.resolve("extensions.xml"));
+            assertTrue(result.contains("maven-build-cache-extension"), "Should preserve compatible extensions");
+            assertFalse(
+                    Files.exists(mvnDir.resolve("maven.config")),
+                    "Should not create maven.config when no extensions needed fixing");
+        }
+    }
+
+    @Nested
+    @DisplayName("POM Saving")
+    class PomSavingTests {
+
+        @Test
+        @DisplayName("should not rewrite or report POMs when none were modified")
+        void shouldNotRewriteOrReportWhenNoneModified() throws Exception {
+            Path pom = tempDir.resolve("pom.xml");
+            Files.writeString(pom, minimalPom("root"));
+            Files.createDirectories(tempDir.resolve(".mvn"));
+            Files.setLastModifiedTime(pom, FileTime.fromMillis(0));
+
+            UpgradeContext context = createMockContext(tempDir);
+            when(mockOrchestrator.executeStrategies(Mockito.any(), Mockito.any()))
+                    .thenReturn(UpgradeResult.success(Set.of(pom), Set.of()));
+
+            int result = upgradeGoal.execute(context);
+
+            assertEquals(0, result);
+            assertEquals(0, Files.getLastModifiedTime(pom).toMillis(), "Unmodified POM must not be rewritten");
+            verify(context.logger, never()).info("Saving modified POMs...");
+        }
+
+        @Test
+        @DisplayName("should write and report only the POMs that were modified")
+        void shouldWriteOnlyModifiedPoms() throws Exception {
+            Path parentPom = tempDir.resolve("pom.xml");
+            Path childDir = tempDir.resolve("child");
+            Path childPom = childDir.resolve("pom.xml");
+            Files.createDirectories(childDir);
+            Files.writeString(parentPom, """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project>
+                      <modelVersion>4.0.0</modelVersion>
+                      <groupId>test</groupId>
+                      <artifactId>parent</artifactId>
+                      <version>1.0.0</version>
+                      <packaging>pom</packaging>
+                      <modules>
+                        <module>child</module>
+                      </modules>
+                    </project>
+                    """);
+            Files.writeString(childPom, minimalPom("child"));
+            Files.createDirectories(tempDir.resolve(".mvn"));
+            Files.setLastModifiedTime(parentPom, FileTime.fromMillis(0));
+            Files.setLastModifiedTime(childPom, FileTime.fromMillis(0));
+
+            UpgradeContext context = createMockContext(tempDir);
+            when(mockOrchestrator.executeStrategies(Mockito.any(), Mockito.any()))
+                    .thenReturn(UpgradeResult.success(Set.of(parentPom, childPom), Set.of(childPom)));
+
+            int result = upgradeGoal.execute(context);
+
+            assertEquals(0, result);
+            assertEquals(
+                    0, Files.getLastModifiedTime(parentPom).toMillis(), "Unmodified parent POM must not be rewritten");
+            assertTrue(Files.getLastModifiedTime(childPom).toMillis() > 0, "Modified child POM must be saved");
+            verify(context.logger).info("Saving modified POMs...");
+        }
+
+        private String minimalPom(String artifactId) {
+            return """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project>
+                      <modelVersion>4.0.0</modelVersion>
+                      <groupId>test</groupId>
+                      <artifactId>%s</artifactId>
+                      <version>1.0.0</version>
+                    </project>
+                    """.formatted(artifactId);
+        }
+    }
+
     /**
      * Testable subclass that exposes protected methods for testing.
      */
@@ -306,7 +645,7 @@ class AbstractUpgradeGoalTest {
         public int testExecuteWithTargetModel(UpgradeContext context, String targetModel) {
             try {
                 Map<Path, Document> pomMap = Map.of(); // Empty for this test
-                return doUpgrade(context, targetModel, pomMap);
+                return doUpgrade(context, targetModel, pomMap).success() ? 0 : 1;
             } catch (Exception e) {
                 throw new RuntimeException(e);
             }

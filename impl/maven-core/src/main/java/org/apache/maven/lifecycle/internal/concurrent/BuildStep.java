@@ -61,7 +61,7 @@ public class BuildStep {
     final Collection<BuildStep> successors = new HashSet<>();
     final AtomicInteger status = new AtomicInteger();
     final AtomicBoolean skip = new AtomicBoolean();
-    volatile Exception exception;
+    volatile Throwable exception;
 
     public BuildStep(String name, MavenProject project, Lifecycle.Phase phase) {
         this.name = Objects.requireNonNull(name, "name cannot be null");
@@ -128,6 +128,16 @@ public class BuildStep {
 
     public Stream<MojoExecution> executions() {
         return mojos.values().stream().flatMap(m -> m.values().stream());
+    }
+
+    /**
+     * Indicates whether executing this step performs any actual work.
+     * Steps without mojo executions are pure ordering nodes: this is the case for the
+     * {@code before:} and {@code after:} steps of a phase, and for every phase that lies
+     * outside the scope of the tasks the user requested.
+     */
+    public boolean hasExecutions() {
+        return !mojos.isEmpty();
     }
 
     @Override

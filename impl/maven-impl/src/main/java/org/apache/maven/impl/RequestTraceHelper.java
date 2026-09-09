@@ -44,9 +44,14 @@ public final class RequestTraceHelper {
      * @param context The trace context
      * @param trace The Resolver-specific trace
      * @param mvnTrace The Maven-specific trace
+     * @param previousMvnTrace The Maven trace to restore when leaving this scope
      */
     public record ResolverTrace(
-            Session session, String context, RequestTrace trace, org.apache.maven.api.services.RequestTrace mvnTrace) {}
+            Session session,
+            String context,
+            RequestTrace trace,
+            org.apache.maven.api.services.RequestTrace mvnTrace,
+            org.apache.maven.api.services.RequestTrace previousMvnTrace) {}
 
     /**
      * Creates a new trace entry and updates the session's current trace
@@ -56,20 +61,21 @@ public final class RequestTraceHelper {
      */
     public static ResolverTrace enter(Session session, Object data) {
         InternalSession iSession = InternalSession.from(session);
+        org.apache.maven.api.services.RequestTrace previousTrace = iSession.getCurrentTrace();
         org.apache.maven.api.services.RequestTrace trace = data instanceof Request<?> req && req.getTrace() != null
                 ? req.getTrace()
-                : new org.apache.maven.api.services.RequestTrace(iSession.getCurrentTrace(), data);
+                : new org.apache.maven.api.services.RequestTrace(previousTrace, data);
         iSession.setCurrentTrace(trace);
-        return new ResolverTrace(session, trace.context(), toResolver(trace), trace);
+        return new ResolverTrace(session, trace.context(), toResolver(trace), trace, previousTrace);
     }
 
     /**
-     * Restores the parent trace as the current trace in the session
+     * Restores the trace that was current before entering this scope.
      * @param trace The current resolver trace to exit from
      */
     public static void exit(ResolverTrace trace) {
         InternalSession iSession = InternalSession.from(trace.session());
-        iSession.setCurrentTrace(trace.mvnTrace().parent());
+        iSession.setCurrentTrace(trace.previousMvnTrace());
     }
 
     /**

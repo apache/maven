@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,9 +36,9 @@ public class MavenITmng4404UniqueProfileIdTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4404");
+        Path testDir = extractResources("mng-4404");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         try {

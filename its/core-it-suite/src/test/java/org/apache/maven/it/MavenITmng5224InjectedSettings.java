@@ -18,8 +18,9 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.io.FileReader;
+import java.io.Reader;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,10 +49,10 @@ class MavenITmng5224InjectedSettings extends AbstractMavenIntegrationTestCase {
      */
     @Test
     public void testmng5224ReadSettings() throws Exception {
-        File testDir = extractResources("/mng-5224");
+        Path testDir = extractResources("mng-5224");
 
         // First, build the test plugin
-        Verifier verifier = newVerifier(new File(testDir, "maven-it-plugin-settings").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("maven-it-plugin-settings"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("install");
@@ -59,7 +60,7 @@ class MavenITmng5224InjectedSettings extends AbstractMavenIntegrationTestCase {
         verifier.verifyErrorFreeLog();
 
         // Then, run the test project that uses the plugin
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
 
         verifier.addCliArgument("--settings");
         verifier.addCliArgument("settings.xml");
@@ -67,9 +68,9 @@ class MavenITmng5224InjectedSettings extends AbstractMavenIntegrationTestCase {
         verifier.addCliArgument("validate");
         verifier.execute();
 
-        File settingsFile = new File(verifier.getBasedir(), "target/settings-dump.xml");
+        Path settingsFile = verifier.getBasedir().resolve("target/settings-dump.xml");
 
-        FileReader fr = new FileReader(settingsFile);
+        Reader fr = Files.newBufferedReader(settingsFile);
 
         Xpp3Dom dom = Xpp3DomBuilder.build(fr);
 

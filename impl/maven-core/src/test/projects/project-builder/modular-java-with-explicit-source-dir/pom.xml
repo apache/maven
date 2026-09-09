@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Tests AC8 scenario 2: Modular project with Java in <sources> for MAIN scope
+  and explicit legacy <sourceDirectory> that differs from default.
+
+  Expected behavior:
+  - ERROR for <sourceDirectory> (modular project, <sources> has Java for MAIN)
+  - Modular Java sources are used, not legacy
+-->
+<project xmlns="http://maven.apache.org/POM/4.1.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
+
+    <groupId>org.apache.maven.tests</groupId>
+    <artifactId>modular-java-with-explicit-source-dir-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <build>
+        <!-- Explicit legacy sourceDirectory - triggers ERROR (AC8) -->
+        <sourceDirectory>src/custom/main/java</sourceDirectory>
+
+        <sources>
+            <!-- Modular main Java source -->
+            <source>
+                <scope>main</scope>
+                <lang>java</lang>
+                <module>org.foo.app</module>
+            </source>
+        </sources>
+    </build>
+</project>

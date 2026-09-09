@@ -18,8 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
-import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -43,12 +42,12 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
      */
     @Test
     public void testitTestPhase() throws Exception {
-        File testDir = extractResources("/mng-3043");
-        Files.createDirectories(testDir.toPath().resolve(".mvn"));
+        Path testDir = extractResources("mng-3043");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
+        verifier.deleteDirectory(".mvn/target");
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
         verifier.deleteDirectory("consumer-c/target");
@@ -100,11 +99,12 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
      */
     @Test
     public void testitPackagePhase() throws Exception {
-        File testDir = extractResources("/mng-3043");
+        Path testDir = extractResources("mng-3043");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
+        verifier.deleteDirectory(".mvn/target");
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
         verifier.deleteDirectory("consumer-c/target");
@@ -160,11 +160,12 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
     public void testitPackagePhasesSlitted() throws Exception {
         // requiresMavenVersion("[4.0.0-beta-4,)");
 
-        File testDir = extractResources("/mng-3043");
+        Path testDir = extractResources("mng-3043");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
+        verifier.deleteDirectory(".mvn/target");
         verifier.deleteDirectory("consumer-a/target");
         verifier.deleteDirectory("consumer-b/target");
         verifier.deleteDirectory("consumer-c/target");
@@ -174,7 +175,7 @@ public class MavenITmng3043BestEffortReactorResolutionTest extends AbstractMaven
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-package-pre.txt");
         verifier.addCliArguments("--projects", ":consumer-a,:consumer-b,:consumer-c", "package");

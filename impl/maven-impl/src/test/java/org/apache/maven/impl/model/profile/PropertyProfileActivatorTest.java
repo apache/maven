@@ -20,11 +20,18 @@ package org.apache.maven.impl.model.profile;
 
 import java.util.Map;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationProperty;
 import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.services.model.ProfileActivationContext;
+import org.apache.maven.impl.DefaultModelVersionParser;
+import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 /**
  * Tests {@link PropertyProfileActivator}.
@@ -35,7 +42,7 @@ class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<Property
     @BeforeEach
     @Override
     void setUp() throws Exception {
-        activator = new PropertyProfileActivator();
+        activator = new PropertyProfileActivator(new DefaultModelVersionParser(new GenericVersionScheme()));
     }
 
     private Profile newProfile(String key, String value) {
@@ -162,5 +169,101 @@ class PropertyProfileActivatorTest extends AbstractProfileActivatorTest<Property
         assertActivation(true, profile, newContext(props1, props2));
 
         assertActivation(false, profile, newContext(props2, props1));
+    }
+
+    @Test
+    void testMavenVersionRange() {
+        Profile profile = newProfile(Constants.MAVEN_VERSION, "[4.0.0-rc-5,4.0.0)");
+
+        assertActivation(true, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "4.0.0-rc-5")));
+        assertActivation(
+                true, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "4.0.0-rc-6-SNAPSHOT")));
+        assertActivation(false, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "4.0.0")));
+        assertActivation(false, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "3.9.11")));
+        assertActivation(false, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "")));
+        assertActivation(false, profile, newContext(null, Map.of()));
+    }
+
+    @Test
+    void testMavenVersionLowerBoundedRange() {
+        Profile profile = newProfile(Constants.MAVEN_VERSION, "[4.0.0,)");
+
+        assertActivation(false, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "4.0.0-rc-5")));
+        assertActivation(true, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "4.0.0")));
+        assertActivation(true, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "4.1.0")));
+    }
+
+    @Test
+    void testMavenVersionUpperBoundedRange() {
+        Profile profile = newProfile(Constants.MAVEN_VERSION, "(,4.0.0)");
+
+        assertActivation(true, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "3.9.11")));
+        assertActivation(true, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "4.0.0-rc-5")));
+        assertActivation(false, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "4.0.0")));
+    }
+
+    @Test
+    void testMavenVersionRangeBoundaries() {
+        Profile inclusive = newProfile(Constants.MAVEN_VERSION, "[4.0.0,5.0.0]");
+        Profile exclusive = newProfile(Constants.MAVEN_VERSION, "(4.0.0,5.0.0)");
+
+        assertActivation(true, inclusive, newContext(null, newProperties(Constants.MAVEN_VERSION, "4.0.0")));
+        assertActivation(true, inclusive, newContext(null, newProperties(Constants.MAVEN_VERSION, "5.0.0")));
+        assertActivation(false, exclusive, newContext(null, newProperties(Constants.MAVEN_VERSION, "4.0.0")));
+        assertActivation(true, exclusive, newContext(null, newProperties(Constants.MAVEN_VERSION, "4.1.0")));
+        assertActivation(false, exclusive, newContext(null, newProperties(Constants.MAVEN_VERSION, "5.0.0")));
+    }
+
+    @Test
+    void testNegatedMavenVersionRange() {
+        Profile profile = newProfile(Constants.MAVEN_VERSION, "![4.0.0,5.0.0)");
+
+        assertActivation(false, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "4.1.0")));
+        assertActivation(true, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "5.0.0")));
+        assertActivation(true, profile, newContext(null, Map.of()));
+    }
+
+    @Test
+    void testMavenVersionExactMatchIsPreserved() {
+        Profile profile = newProfile(Constants.MAVEN_VERSION, "4.0.0-rc-5");
+
+        assertActivation(true, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "4.0.0-rc-5")));
+        assertActivation(false, profile, newContext(null, newProperties(Constants.MAVEN_VERSION, "4.0.0-rc-6")));
+    }
+
+    @Test
+    void testRangeSyntaxRemainsAnExactMatchForOtherProperties() {
+        Profile profile = newProfile("prop", "[1,2)");
+
+        assertActivation(true, profile, newContext(null, newProperties("prop", "[1,2)")));
+        assertActivation(false, profile, newContext(null, newProperties("prop", "1.5")));
+    }
+
+    @Test
+    void testMalformedMavenVersionRangeDoesNotActivate() {
+        Profile profile = newProfile(Constants.MAVEN_VERSION, "[4.0.0,");
+        ProfileActivationContext context = newContext(null, newProperties(Constants.MAVEN_VERSION, "4.1.0"));
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+
+        assertFalse(activator.isActive(profile, context, problems));
+        assertEquals(0, problems.getErrors().size());
+        assertEquals(1, problems.getWarnings().size());
+        assertEquals(
+                "Failed to determine Maven version activation for profile default due to invalid version range: '[4.0.0,'",
+                problems.getWarnings().get(0));
+    }
+
+    @Test
+    void testMalformedNegatedMavenVersionRangeDoesNotActivate() {
+        Profile profile = newProfile(Constants.MAVEN_VERSION, "![4.0.0,");
+        ProfileActivationContext context = newContext(null, newProperties(Constants.MAVEN_VERSION, "4.1.0"));
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+
+        assertFalse(activator.isActive(profile, context, problems));
+        assertEquals(0, problems.getErrors().size());
+        assertEquals(1, problems.getWarnings().size());
+        assertEquals(
+                "Failed to determine Maven version activation for profile default due to invalid version range: '[4.0.0,'",
+                problems.getWarnings().get(0));
     }
 }

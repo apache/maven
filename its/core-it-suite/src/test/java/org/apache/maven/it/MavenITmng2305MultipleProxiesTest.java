@@ -18,24 +18,23 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.File;
-import java.io.IOException;
 import java.io.PrintWriter;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
+import org.eclipse.jetty.io.Content;
+import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.HttpConfiguration;
 import org.eclipse.jetty.server.HttpConnectionFactory;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.SecureRequestCustomizer;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.SslConnectionFactory;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.Callback;
 import org.eclipse.jetty.util.ssl.SslContextFactory;
 import org.junit.jupiter.api.Test;
 
@@ -57,16 +56,16 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-2305");
+        Path testDir = extractResources("mng-2305");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
 
         // NOTE: trust store cannot be reliably configured for the current JVM
         verifier.setForkJvm(true);
 
         // keytool -genkey -alias https.mngit -keypass key-passwd -keystore keystore -storepass store-passwd \
         //   -validity 4096 -dname "cn=https.mngit, ou=None, L=Seattle, ST=Washington, o=ExampleOrg, c=US" -keyalg RSA
-        String storePath = new File(testDir, "keystore").getAbsolutePath();
+        Path storePath = testDir.resolve("keystore");
         String storePwd = "store-passwd";
         String keyPwd = "key-passwd";
 
@@ -117,8 +116,9 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
         assertTrue(cp.contains("https-0.1.jar"), cp.toString());
     }
 
-    private void addHttpsConnector(Server server, String keyStorePath, String keyStorePassword, String keyPassword) {
-        SslContextFactory sslContextFactory = new SslContextFactory(keyStorePath);
+    private void addHttpsConnector(Server server, Path keyStorePath, String keyStorePassword, String keyPassword) {
+        SslContextFactory.Server sslContextFactory = new SslContextFactory.Server();
+        sslContextFactory.setKeyStorePath(keyStorePath.toString());
         sslContextFactory.setKeyStorePassword(keyStorePassword);
         sslContextFactory.setKeyManagerPassword(keyPassword);
         HttpConfiguration httpConfiguration = new HttpConfiguration();
@@ -132,32 +132,35 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
         server.addConnector(httpsConnector);
     }
 
-    static class RepoHandler extends AbstractHandler {
-        public void handle(String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response)
-                throws IOException {
-            PrintWriter writer = response.getWriter();
+    static class RepoHandler extends Handler.Abstract {
+        public boolean handle(Request request, Response response, Callback callback) throws Exception {
+            String uri = Request.getPathInContext(request);
+            String scheme = request.getHttpURI().getScheme();
 
-            String uri = request.getRequestURI();
-
-            if (!uri.startsWith("/repo/org/apache/maven/its/mng2305/" + request.getScheme() + "/")) {
+            if (!uri.startsWith("/repo/org/apache/maven/its/mng2305/" + scheme + "/")) {
                 // HTTP connector serves only http-0.1.jar and HTTPS connector serves only https-0.1.jar
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setStatus(404);
             } else if (uri.endsWith(".pom")) {
+                PrintWriter writer = new PrintWriter(Content.Sink.asOutputStream(response));
                 writer.println("<project xmlns=\"http://maven.apache.org/POM/4.0.0\">");
                 writer.println("  <modelVersion>4.0.0</modelVersion>");
                 writer.println("  <groupId>org.apache.maven.its.mng2305</groupId>");
-                writer.println("  <artifactId>" + request.getScheme() + "</artifactId>");
+                writer.println("  <artifactId>" + scheme + "</artifactId>");
                 writer.println("  <version>0.1</version>");
                 writer.println("</project>");
-                response.setStatus(HttpServletResponse.SC_OK);
+                writer.flush();
+                response.setStatus(200);
             } else if (uri.endsWith(".jar")) {
+                PrintWriter writer = new PrintWriter(Content.Sink.asOutputStream(response));
                 writer.println("empty");
-                response.setStatus(HttpServletResponse.SC_OK);
+                writer.flush();
+                response.setStatus(200);
             } else {
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
+                response.setStatus(404);
             }
 
-            ((Request) request).setHandled(true);
+            callback.succeeded();
+            return true;
         }
     }
 }

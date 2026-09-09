@@ -526,13 +526,14 @@ public class LegacyRepositorySystem implements RepositorySystem {
                     repo = new RemoteRepository.Builder(repo)
                             .setAuthentication(auth)
                             .build();
-                    AuthenticationContext authCtx = AuthenticationContext.forRepository(session, repo);
-                    Authentication result = new Authentication(
-                            authCtx.get(AuthenticationContext.USERNAME), authCtx.get(AuthenticationContext.PASSWORD));
-                    result.setPrivateKey(authCtx.get(AuthenticationContext.PRIVATE_KEY_PATH));
-                    result.setPassphrase(authCtx.get(AuthenticationContext.PRIVATE_KEY_PASSPHRASE));
-                    authCtx.close();
-                    return result;
+                    try (AuthenticationContext authCtx = AuthenticationContext.forRepository(session, repo)) {
+                        Authentication result = new Authentication(
+                                authCtx.get(AuthenticationContext.USERNAME),
+                                authCtx.get(AuthenticationContext.PASSWORD));
+                        result.setPrivateKey(authCtx.get(AuthenticationContext.PRIVATE_KEY_PATH));
+                        result.setPassphrase(authCtx.get(AuthenticationContext.PRIVATE_KEY_PASSPHRASE));
+                        return result;
+                    }
                 }
             }
         }
@@ -623,12 +624,12 @@ public class LegacyRepositorySystem implements RepositorySystem {
                         repo = new RemoteRepository.Builder(repo)
                                 .setProxy(proxy)
                                 .build();
-                        AuthenticationContext authCtx = AuthenticationContext.forProxy(session, repo);
-                        p.setUserName(authCtx.get(AuthenticationContext.USERNAME));
-                        p.setPassword(authCtx.get(AuthenticationContext.PASSWORD));
-                        p.setNtlmDomain(authCtx.get(AuthenticationContext.NTLM_DOMAIN));
-                        p.setNtlmHost(authCtx.get(AuthenticationContext.NTLM_WORKSTATION));
-                        authCtx.close();
+                        try (AuthenticationContext authCtx = AuthenticationContext.forProxy(session, repo)) {
+                            p.setUserName(authCtx.get(AuthenticationContext.USERNAME));
+                            p.setPassword(authCtx.get(AuthenticationContext.PASSWORD));
+                            p.setNtlmDomain(authCtx.get(AuthenticationContext.NTLM_DOMAIN));
+                            p.setNtlmHost(authCtx.get(AuthenticationContext.NTLM_WORKSTATION));
+                        }
                     }
                     return p;
                 }
@@ -659,12 +660,45 @@ public class LegacyRepositorySystem implements RepositorySystem {
                     destination,
                     remotePath,
                     TransferListenerAdapter.newAdapter(transferListener),
-                    ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN,
+                    getChecksumPolicy(repository),
                     true);
         } catch (org.apache.maven.wagon.TransferFailedException e) {
             throw new ArtifactTransferFailedException(getMessage(e, "Error transferring artifact."), e);
         } catch (org.apache.maven.wagon.ResourceDoesNotExistException e) {
             throw new ArtifactDoesNotExistException(getMessage(e, "Requested artifact does not exist."), e);
+        }
+    }
+
+    /**
+     * Determines the effective checksum policy for a generic retrieval from the given repository.
+     * The operator-configured policy (e.g. {@code fail} via {@code -C}/{@code --strict-checksums})
+     * must govern every remote transfer instead of a hardcoded lenient default. A generic remote
+     * path cannot be classified as release or snapshot, so the stricter of the two configured
+     * policies applies.
+     */
+    private static String getChecksumPolicy(ArtifactRepository repository) {
+        String releases =
+                (repository.getReleases() != null) ? repository.getReleases().getChecksumPolicy() : null;
+        String snapshots =
+                (repository.getSnapshots() != null) ? repository.getSnapshots().getChecksumPolicy() : null;
+        String policy;
+        if (releases == null) {
+            policy = snapshots;
+        } else if (snapshots == null || checksumRank(releases) >= checksumRank(snapshots)) {
+            policy = releases;
+        } else {
+            policy = snapshots;
+        }
+        return (policy != null) ? policy : ArtifactRepositoryPolicy.CHECKSUM_POLICY_WARN;
+    }
+
+    private static int checksumRank(String policy) {
+        if (ArtifactRepositoryPolicy.CHECKSUM_POLICY_FAIL.equals(policy)) {
+            return 2;
+        } else if (ArtifactRepositoryPolicy.CHECKSUM_POLICY_IGNORE.equals(policy)) {
+            return 0;
+        } else {
+            return 1;
         }
     }
 

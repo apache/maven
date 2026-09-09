@@ -110,12 +110,12 @@ public class LegacyRepositorySystemSessionExtender implements RepositorySystemSe
                 p.setPort(proxy.getPort());
                 if (proxy.getAuthentication() != null) {
                     repo = new RemoteRepository.Builder(repo).setProxy(proxy).build();
-                    AuthenticationContext authCtx = AuthenticationContext.forProxy(null, repo);
-                    p.setUserName(authCtx.get(AuthenticationContext.USERNAME));
-                    p.setPassword(authCtx.get(AuthenticationContext.PASSWORD));
-                    p.setNtlmDomain(authCtx.get(AuthenticationContext.NTLM_DOMAIN));
-                    p.setNtlmHost(authCtx.get(AuthenticationContext.NTLM_WORKSTATION));
-                    authCtx.close();
+                    try (AuthenticationContext authCtx = AuthenticationContext.forProxy(null, repo)) {
+                        p.setUserName(authCtx.get(AuthenticationContext.USERNAME));
+                        p.setPassword(authCtx.get(AuthenticationContext.PASSWORD));
+                        p.setNtlmDomain(authCtx.get(AuthenticationContext.NTLM_DOMAIN));
+                        p.setNtlmHost(authCtx.get(AuthenticationContext.NTLM_WORKSTATION));
+                    }
                 }
                 return p;
             }
@@ -139,13 +139,13 @@ public class LegacyRepositorySystemSessionExtender implements RepositorySystemSe
                 repo = new RemoteRepository.Builder(repo)
                         .setAuthentication(auth)
                         .build();
-                AuthenticationContext authCtx = AuthenticationContext.forRepository(null, repo);
-                Authentication result = new Authentication(
-                        authCtx.get(AuthenticationContext.USERNAME), authCtx.get(AuthenticationContext.PASSWORD));
-                result.setPrivateKey(authCtx.get(AuthenticationContext.PRIVATE_KEY_PATH));
-                result.setPassphrase(authCtx.get(AuthenticationContext.PRIVATE_KEY_PASSPHRASE));
-                authCtx.close();
-                return result;
+                try (AuthenticationContext authCtx = AuthenticationContext.forRepository(null, repo)) {
+                    Authentication result = new Authentication(
+                            authCtx.get(AuthenticationContext.USERNAME), authCtx.get(AuthenticationContext.PASSWORD));
+                    result.setPrivateKey(authCtx.get(AuthenticationContext.PRIVATE_KEY_PATH));
+                    result.setPassphrase(authCtx.get(AuthenticationContext.PRIVATE_KEY_PASSPHRASE));
+                    return result;
+                }
             }
         }
         return null;

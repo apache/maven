@@ -18,20 +18,34 @@
  */
 package org.apache.maven.exception;
 
+import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.model.Plugin;
+import org.apache.maven.model.building.DefaultModelProblem;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.ProjectBuildingException;
+import org.apache.maven.project.ProjectBuildingResult;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.transfer.ArtifactFilteredOutException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  */
@@ -125,6 +139,40 @@ class DefaultExceptionHandlerTest {
     }
 
     @Test
+    void testArtifactFilteredOutException() {
+        RemoteRepository repo =
+                new RemoteRepository.Builder("my-repo", "default", "https://repo.example.com/maven").build();
+        ArtifactFilteredOutException filterEx = new ArtifactFilteredOutException(
+                new DefaultArtifact("com.example:my-lib:jar:1.0"),
+                repo,
+                "Prefix com/example/my-lib/1.0/my-lib-1.0.jar NOT allowed from my-repo"
+                        + " (https://repo.example.com/maven, default, releases)");
+        ArtifactResult artifactResult = new ArtifactResult(new org.eclipse.aether.resolution.ArtifactRequest(
+                new DefaultArtifact("com.example:my-lib:jar:1.0"), java.util.List.of(repo), null));
+        artifactResult.addException(filterEx);
+        ArtifactResolutionException resolutionEx =
+                new ArtifactResolutionException(java.util.List.of(artifactResult), "Could not resolve artifact");
+        MojoExecutionException mojoEx = new MojoExecutionException("Resolution failed", resolutionEx);
+
+        DefaultExceptionHandler handler = new DefaultExceptionHandler();
+        ExceptionSummary summary = handler.handleException(mojoEx);
+
+        assertTrue(
+                summary.getMessage().contains("-Daether.remoteRepositoryFilter.prefixes=false"),
+                "Message should contain the prefixes workaround property");
+        assertTrue(
+                summary.getMessage().contains("-Daether.remoteRepositoryFilter.groupId=false"),
+                "Message should contain the groupId workaround property");
+        assertTrue(
+                summary.getMessage().contains("remote repository filter"),
+                "Message should explain the filtering cause");
+        assertEquals(
+                "https://maven.apache.org/resolver/remote-repository-filtering.html",
+                summary.getReference(),
+                "Reference should point to the RRF documentation");
+    }
+
+    @Test
     void testHandleExceptionSelfReferencing() {
         RuntimeException boom3 = new RuntimeException("BOOM3");
         RuntimeException boom2 = new RuntimeException("BOOM2", boom3);
@@ -138,5 +186,83 @@ class DefaultExceptionHandlerTest {
         assertEquals("", summary.getReference());
         assertEquals(0, summary.getChildren().size());
         assertEquals(boom1, summary.getException());
+    }
+
+    @Test
+    void testProjectBuildingExceptionNotRenderedTwice() {
+        ModelProblem problem1 = new DefaultModelProblem(
+                "Malformed POM test.xml: unexpected element",
+                ModelProblem.Severity.FATAL,
+                null,
+                "test.xml",
+                8,
+                3,
+                null,
+                null);
+
+        ModelProblem problem2 = new DefaultModelProblem(
+                "Malformed POM test.xml: missing artifactId",
+                ModelProblem.Severity.ERROR,
+                null,
+                "test.xml",
+                12,
+                5,
+                null,
+                null);
+
+        ProjectBuildingResult result = mock(ProjectBuildingResult.class);
+        when(result.getProjectId()).thenReturn("test:fail-build:0.1-SNAPSHOT");
+        when(result.getPomFile()).thenReturn(new File("test.xml"));
+        when(result.getProblems()).thenReturn(List.of(problem1, problem2));
+
+        ProjectBuildingException exception = new ProjectBuildingException(List.of(result));
+
+        assertEquals(
+                "Encountered 2 problem(s) while processing the POMs",
+                exception.getMessage(),
+                "exception message must report the total number of problems");
+
+        ExceptionSummary summary = new DefaultExceptionHandler().handleException(exception);
+
+        ExceptionSummary projectSummary = summary.getChildren().get(0);
+        ExceptionSummary problemSummary = projectSummary.getChildren().get(0);
+
+        assertTrue(
+                problemSummary.getMessage().contains("Malformed POM test.xml"),
+                "the handler's own tree should still render the problem detail exactly once");
+
+        assertEquals(1, countOccurrences(flatten(summary), "Malformed POM test.xml: unexpected element"));
+    }
+
+    private static String flatten(ExceptionSummary summary) {
+        if (summary == null) {
+            return "";
+        }
+
+        StringBuilder sb = new StringBuilder();
+        if (summary.getMessage() != null) {
+            sb.append(summary.getMessage());
+        }
+
+        for (ExceptionSummary child : summary.getChildren()) {
+            if (!sb.isEmpty()) {
+                sb.append('\n');
+            }
+            sb.append(flatten(child));
+        }
+
+        return sb.toString();
+    }
+
+    private static int countOccurrences(String text, String substring) {
+        int count = 0;
+        int index = 0;
+
+        while ((index = text.indexOf(substring, index)) != -1) {
+            count++;
+            index += substring.length();
+        }
+
+        return count;
     }
 }

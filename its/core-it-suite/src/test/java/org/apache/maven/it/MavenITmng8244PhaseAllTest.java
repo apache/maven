@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,9 +34,9 @@ class MavenITmng8244PhaseAllTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testPhaseAllWihConcurrentBuilder() throws Exception {
-        File testDir = extractResources("/mng-8244-phase-all");
+        Path testDir = extractResources("mng-8244-phase-all");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("build-concurrent.txt");
         verifier.addCliArguments("-b", "concurrent", "build");
         verifier.execute();
@@ -50,9 +50,9 @@ class MavenITmng8244PhaseAllTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testPhaseAllWithLegacyBuilder() throws Exception {
-        File testDir = extractResources("/mng-8244-phase-all");
+        Path testDir = extractResources("mng-8244-phase-all");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("build-legacy.txt");
         verifier.addCliArguments("build");
         verifier.execute();

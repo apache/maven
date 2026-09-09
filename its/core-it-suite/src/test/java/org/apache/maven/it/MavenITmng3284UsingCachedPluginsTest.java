@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,7 +36,7 @@ public class MavenITmng3284UsingCachedPluginsTest extends AbstractMavenIntegrati
      */
     @Test
     public void testitMNG3284() throws Exception {
-        File testDir = extractResources("/mng-3284");
+        Path testDir = extractResources("mng-3284");
 
         /*
          * Phase 1: Ensure both plugin versions are already in the local repo. This is a crucial prerequisite for the
@@ -44,7 +44,7 @@ public class MavenITmng3284UsingCachedPluginsTest extends AbstractMavenIntegrati
          * reloading of the plugin container by the DefaultPluginManager in Maven 2.x, thereby hiding the bug we want
          * to expose here.
          */
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.mng3284");
         verifier.filterFile("settings-template.xml", "settings.xml");
@@ -57,7 +57,7 @@ public class MavenITmng3284UsingCachedPluginsTest extends AbstractMavenIntegrati
         /*
          * Phase 2: Now that the plugin versions have been downloaded to the local repo, run the actual test.
          */
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("mod-a/target");
         verifier.deleteDirectory("mod-b/target");

@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.1.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.1.0 https://maven.apache.org/xsd/maven-4.1.0.xsd">
+    <modelVersion>4.1.0</modelVersion>
+
+    <groupId>org.apache.maven.tests</groupId>
+    <artifactId>modular-sources-test</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <packaging>jar</packaging>
+
+    <build>
+        <sources>
+            <!-- Module A - main java -->
+            <source>
+                <scope>main</scope>
+                <lang>java</lang>
+                <module>org.foo.moduleA</module>
+            </source>
+            <!-- Module A - test java -->
+            <source>
+                <scope>test</scope>
+                <lang>java</lang>
+                <module>org.foo.moduleA</module>
+            </source>
+            <!-- Module B - main java -->
+            <source>
+                <scope>main</scope>
+                <lang>java</lang>
+                <module>org.foo.moduleB</module>
+            </source>
+            <!-- Module B - test java -->
+            <source>
+                <scope>test</scope>
+                <lang>java</lang>
+                <module>org.foo.moduleB</module>
+            </source>
+        </sources>
+    </build>
+</project>

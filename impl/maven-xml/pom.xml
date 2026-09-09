@@ -58,9 +58,8 @@ under the License.
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
       <version>${plexusXmlVersion}</version>
-      <scope>provided</scope>
+      <scope>test</scope>
       <exclusions>
-        <!-- we need the exclusion to be able to release, else we have a cycle -->
         <exclusion>
           <groupId>*</groupId>
           <artifactId>*</artifactId>

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Properties;
 
@@ -42,9 +42,9 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
      */
     @Test
     public void testContinuousDeliveryFriendlyVersionsAreWarningFreeWithoutBuildConsumer() throws Exception {
-        File testDir = extractResources("/mng-5576-cd-friendly-versions");
+        Path testDir = extractResources("mng-5576-cd-friendly-versions");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Dchangelist=changelist");
@@ -56,7 +56,7 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
         Properties props = verifier.loadProperties("target/pom.properties");
         assertEquals("1.0.0.changelist", props.getProperty("project.version"));
 
-        List<String> lines = verifier.loadFile(new File(testDir, "log.txt"), false);
+        List<String> lines = verifier.loadFile(testDir.resolve("log.txt"));
         boolean seenScanning = false;
         for (String line : lines) {
             seenScanning |= line.contains("Scanning for projects");
@@ -74,9 +74,9 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
      */
     @Test
     public void testContinuousDeliveryFriendlyVersionsAreWarningFreeWithBuildConsumer() throws Exception {
-        File testDir = extractResources("/mng-5576-cd-friendly-versions");
+        Path testDir = extractResources("mng-5576-cd-friendly-versions");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setLogFileName("log-bc.txt");
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
@@ -89,7 +89,7 @@ public class MavenITmng5576CdFriendlyVersions extends AbstractMavenIntegrationTe
         Properties props = verifier.loadProperties("target/pom.properties");
         assertEquals("1.0.0.changelist", props.getProperty("project.version"));
 
-        List<String> lines = verifier.loadFile(new File(testDir, "log-bc.txt"), false);
+        List<String> lines = verifier.loadFile(testDir.resolve("log-bc.txt"));
         boolean seenScanning = false;
         for (String line : lines) {
             seenScanning |= line.contains("Scanning for projects");

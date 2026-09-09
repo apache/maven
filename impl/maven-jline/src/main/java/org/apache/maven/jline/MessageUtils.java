@@ -47,7 +47,11 @@ public class MessageUtils {
     }
 
     public static void systemInstall(Consumer<TerminalBuilder> builderConsumer, Consumer<Terminal> terminalConsumer) {
-        MessageUtils.terminal = new FastTerminal(
+        // Assign the FastTerminal to the field BEFORE starting the build thread so that code
+        // running on that thread (e.g. JLine's FFM provider init, logger calls) sees a non-null
+        // reference when it calls MessageUtils.getTerminal().  Thread.start() provides the
+        // happens-before edge that makes the assignment visible to the new thread.
+        FastTerminal ft = new FastTerminal(
                 () -> {
                     TerminalBuilder builder =
                             TerminalBuilder.builder().name("Maven").dumb(true);
@@ -64,6 +68,8 @@ public class MessageUtils {
                         terminalConsumer.accept(terminal);
                     }
                 });
+        MessageUtils.terminal = ft;
+        ft.start();
     }
 
     private static LineReader createReader(Terminal terminal) {
@@ -113,7 +119,7 @@ public class MessageUtils {
     }
 
     public static int getTerminalWidth() {
-        return terminal != null ? terminal.getWidth() : -1;
+        return terminal != null ? terminal.getColumns() : -1;
     }
 
     public static MessageBuilder builder() {

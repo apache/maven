@@ -50,6 +50,7 @@ import org.apache.maven.plugin.PluginManagerException;
 import org.apache.maven.plugin.PluginResolutionException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.util.filter.ExclusionsDependencyFilter;
@@ -92,6 +93,13 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
         List<ArtifactRepository> internalRepositories = new ArrayList<>();
 
         for (Repository repository : pomRepositories) {
+            if (containsExpression(repository.getId()) || containsExpression(repository.getUrl())) {
+                logger.warn(
+                        "Skipping repository '{}' (url: '{}') containing an uninterpolated property expression",
+                        repository.getId(),
+                        repository.getUrl());
+                continue;
+            }
             internalRepositories.add(MavenRepositorySystem.buildArtifactRepository(repository));
         }
 
@@ -136,7 +144,7 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
     }
 
     @Override
-    public synchronized ProjectRealmCache.CacheRecord createProjectRealm(
+    public ProjectRealmCache.CacheRecord createProjectRealm(
             MavenProject project, Model model, ProjectBuildingRequest request)
             throws PluginResolutionException, PluginVersionResolutionException, PluginManagerException {
         ClassRealm projectRealm;
@@ -249,11 +257,24 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
             }
 
             record = projectRealmCache.put(projectRealmKey, projectRealm, extensionArtifactFilter);
+
+            // If another thread already cached a record for this key, dispose the redundant realm
+            if (record.getRealm() != projectRealm) {
+                disposeRealm(projectRealm);
+            }
         }
 
         projectRealmCache.register(project, projectRealmKey, record);
 
         return record;
+    }
+
+    private void disposeRealm(ClassRealm realm) {
+        try {
+            realm.getWorld().disposeRealm(realm.getId());
+        } catch (NoSuchRealmException e) {
+            // ignore — realm was already disposed
+        }
     }
 
     @Override
@@ -265,6 +286,10 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
         }
 
         Thread.currentThread().setContextClassLoader(projectRealm);
+    }
+
+    private static boolean containsExpression(String value) {
+        return value != null && value.contains("${");
     }
 
     private List<org.eclipse.aether.artifact.Artifact> toAetherArtifacts(final List<Artifact> pluginArtifacts) {

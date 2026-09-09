@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -48,9 +48,9 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest extends AbstractMaven
      */
     @Test
     public void testitShouldResolveTheDependenciesWithoutBuildConsumer() throws Exception {
-        File testDir = extractResources("/mng-5895-ci-friendly-usage-with-property");
+        Path testDir = extractResources("mng-5895-ci-friendly-usage-with-property");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         // verifier.setLogFileName( "log-only.txt" );
@@ -65,9 +65,9 @@ public class MavenITmng5895CIFriendlyUsageWithPropertyTest extends AbstractMaven
 
     @Test
     public void testitShouldResolveTheDependenciesWithBuildConsumer() throws Exception {
-        File testDir = extractResources("/mng-5895-ci-friendly-usage-with-property");
+        Path testDir = extractResources("mng-5895-ci-friendly-usage-with-property");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
 
         verifier.setLogFileName("log-bc.txt");

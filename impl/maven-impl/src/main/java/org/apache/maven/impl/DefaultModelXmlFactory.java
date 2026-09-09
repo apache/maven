@@ -18,7 +18,6 @@
  */
 package org.apache.maven.impl;
 
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamConstants;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
@@ -47,6 +46,7 @@ import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.services.xml.XmlWriterException;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
+import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.model.v4.MavenStaxWriter;
 
@@ -97,7 +97,6 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             throw new IllegalArgumentException("path, url, reader or inputStream must be non null");
         }
         try {
-            // If modelId is not provided and we're reading from a file, try to extract it
             String modelId = request.getModelId();
             String location = request.getLocation();
 
@@ -132,6 +131,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                     ? new MavenStaxReader(request.getTransformer()::transform)
                     : new MavenStaxReader();
             xml.setAddDefaultEntities(request.isAddDefaultEntities());
+            xml.setAddLocationInformation(request.isAddLocationInformation());
             if (inputStream != null) {
                 return xml.read(inputStream, request.isStrict(), source);
             } else if (reader != null) {
@@ -187,17 +187,6 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         }
     }
 
-    static class InputFactoryHolder {
-        static final XMLInputFactory XML_INPUT_FACTORY;
-
-        static {
-            XMLInputFactory factory = XMLInputFactory.newFactory();
-            factory.setProperty(XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, true);
-            factory.setProperty(XMLInputFactory.IS_COALESCING, true);
-            XML_INPUT_FACTORY = factory;
-        }
-    }
-
     /**
      * Extracts the modelId (groupId:artifactId:version) from a POM XML stream
      * by parsing just enough XML to get the GAV coordinates.
@@ -205,33 +194,28 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
      * @param inputStream the input stream to read from
      * @return the modelId in format "groupId:artifactId:version" or null if not determinable
      */
-    private String extractModelId(InputStream inputStream) {
+    private static String extractModelId(InputStream inputStream) {
         try {
-            XMLStreamReader reader = InputFactoryHolder.XML_INPUT_FACTORY.createXMLStreamReader(inputStream);
-            try {
-                return extractModelId(reader);
-            } finally {
-                reader.close();
-            }
-        } catch (Exception e) {
-            // If extraction fails, return null and let the normal parsing handle it
-            // This is not a critical failure
-            return null;
-        }
-    }
-
-    private String extractModelId(Reader reader) {
-        try {
-            // Use a buffered stream to allow efficient reading
-            XMLStreamReader xmlReader = InputFactoryHolder.XML_INPUT_FACTORY.createXMLStreamReader(reader);
+            XMLStreamReader xmlReader = XmlService.newXMLInputFactory().createXMLStreamReader(inputStream);
             try {
                 return extractModelId(xmlReader);
             } finally {
                 xmlReader.close();
             }
         } catch (Exception e) {
-            // If extraction fails, return null and let the normal parsing handle it
-            // This is not a critical failure
+            return null;
+        }
+    }
+
+    private static String extractModelId(Reader reader) {
+        try {
+            XMLStreamReader xmlReader = XmlService.newXMLInputFactory().createXMLStreamReader(reader);
+            try {
+                return extractModelId(xmlReader);
+            } finally {
+                xmlReader.close();
+            }
+        } catch (Exception e) {
             return null;
         }
     }
@@ -243,6 +227,7 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
         String parentGroupId = null;
         String parentVersion = null;
 
+        int depth = 0;
         boolean inProject = false;
         boolean inParent = false;
         String currentElement = null;
@@ -251,13 +236,15 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             int event = reader.next();
 
             if (event == XMLStreamConstants.START_ELEMENT) {
+                depth++;
                 String localName = reader.getLocalName();
 
-                if ("project".equals(localName)) {
+                if (depth == 1 && "project".equals(localName)) {
                     inProject = true;
-                } else if ("parent".equals(localName) && inProject) {
+                } else if (inProject && depth == 2 && "parent".equals(localName)) {
                     inParent = true;
                 } else if (inProject
+                        && (depth == 2 || (depth == 3 && inParent))
                         && ("groupId".equals(localName)
                                 || "artifactId".equals(localName)
                                 || "version".equals(localName))) {
@@ -269,9 +256,10 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                 if ("parent".equals(localName)) {
                     inParent = false;
                 } else if ("project".equals(localName)) {
-                    break; // We've processed the main project element
+                    break;
                 }
                 currentElement = null;
+                depth--;
             } else if (event == XMLStreamConstants.CHARACTERS && currentElement != null) {
                 String text = reader.getText().trim();
                 if (!text.isEmpty()) {
@@ -284,7 +272,6 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                                 parentVersion = text;
                                 break;
                             default:
-                                // Ignore other elements
                                 break;
                         }
                     } else {
@@ -299,20 +286,17 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
                                 version = text;
                                 break;
                             default:
-                                // Ignore other elements
                                 break;
                         }
                     }
                 }
             }
 
-            // Early exit if we have enough information
-            if (artifactId != null && groupId != null && version != null) {
+            if (groupId != null && artifactId != null && version != null) {
                 break;
             }
         }
 
-        // Use parent values as fallback
         if (groupId == null) {
             groupId = parentGroupId;
         }
@@ -320,7 +304,6 @@ public class DefaultModelXmlFactory implements ModelXmlFactory {
             version = parentVersion;
         }
 
-        // Return modelId if we have all required components
         if (groupId != null && artifactId != null && version != null) {
             return groupId + ":" + artifactId + ":" + version;
         }

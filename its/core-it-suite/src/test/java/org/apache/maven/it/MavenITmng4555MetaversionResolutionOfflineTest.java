@@ -18,10 +18,7 @@
  */
 package org.apache.maven.it;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Deque;
 import java.util.Map;
 import java.util.concurrent.ConcurrentLinkedDeque;
@@ -29,8 +26,9 @@ import java.util.concurrent.ConcurrentLinkedDeque;
 import org.eclipse.jetty.server.Handler;
 import org.eclipse.jetty.server.NetworkConnector;
 import org.eclipse.jetty.server.Request;
+import org.eclipse.jetty.server.Response;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.server.handler.AbstractHandler;
+import org.eclipse.jetty.util.Callback;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -49,22 +47,22 @@ public class MavenITmng4555MetaversionResolutionOfflineTest extends AbstractMave
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4555");
+        Path testDir = extractResources("mng-4555");
 
         final Deque<String> uris = new ConcurrentLinkedDeque<>();
 
-        Handler repoHandler = new AbstractHandler() {
+        Handler repoHandler = new Handler.Abstract() {
             @Override
-            public void handle(
-                    String target, Request baseRequest, HttpServletRequest request, HttpServletResponse response) {
-                String uri = request.getRequestURI();
+            public boolean handle(Request request, Response response, Callback callback) throws Exception {
+                String uri = Request.getPathInContext(request);
 
                 if (uri.startsWith("/repo/org/apache/maven/its/mng4555")) {
                     uris.add(uri.substring(34));
                 }
 
-                response.setStatus(HttpServletResponse.SC_NOT_FOUND);
-                ((Request) request).setHandled(true);
+                response.setStatus(404);
+                callback.succeeded();
+                return true;
             }
         };
 
@@ -72,7 +70,7 @@ public class MavenITmng4555MetaversionResolutionOfflineTest extends AbstractMave
         server.setHandler(repoHandler);
         server.start();
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng4555");

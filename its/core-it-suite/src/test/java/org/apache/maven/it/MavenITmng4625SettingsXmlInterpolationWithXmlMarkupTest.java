@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.codehaus.plexus.util.Os;
@@ -41,9 +41,9 @@ public class MavenITmng4625SettingsXmlInterpolationWithXmlMarkupTest extends Abs
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4625");
+        Path testDir = extractResources("mng-4625");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
 

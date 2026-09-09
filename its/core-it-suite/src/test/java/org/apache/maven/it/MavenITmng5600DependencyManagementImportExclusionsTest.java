@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -36,9 +36,9 @@ class MavenITmng5600DependencyManagementImportExclusionsTest extends AbstractMav
 
     @Test
     public void testCanExcludeDependenciesFromImport() throws Exception {
-        final File testDir = extractResources("/mng-5600/exclusions");
+        final Path testDir = extractResources("mng-5600/exclusions");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.filterFile("../settings-template.xml", "settings.xml", verifier.newDefaultFilterMap());
 

@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 @Singleton
-@Named
+@Named("dumb1")
 final class DumbModelParser1 implements ModelParser {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());

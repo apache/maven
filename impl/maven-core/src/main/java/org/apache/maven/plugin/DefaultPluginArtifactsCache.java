@@ -140,15 +140,17 @@ public class DefaultPluginArtifactsCache implements PluginArtifactsCache {
     public CacheRecord put(Key key, List<Artifact> pluginArtifacts) {
         Objects.requireNonNull(pluginArtifacts, "pluginArtifacts cannot be null");
 
-        assertUniqueKey(key);
-
         CacheRecord record = new CacheRecord(Collections.unmodifiableList(new ArrayList<>(pluginArtifacts)));
 
-        cache.put(key, record);
+        CacheRecord existing = cache.putIfAbsent(key, record);
 
-        return record;
+        return existing != null ? existing : record;
     }
 
+    /**
+     * @deprecated No longer used. The put methods now use {@link ConcurrentHashMap#putIfAbsent} directly.
+     */
+    @Deprecated
     protected void assertUniqueKey(Key key) {
         if (cache.containsKey(key)) {
             throw new IllegalStateException("Duplicate artifact resolution result for plugin " + key);
@@ -159,13 +161,11 @@ public class DefaultPluginArtifactsCache implements PluginArtifactsCache {
     public CacheRecord put(Key key, PluginResolutionException exception) {
         Objects.requireNonNull(exception, "exception cannot be null");
 
-        assertUniqueKey(key);
-
         CacheRecord record = new CacheRecord(exception);
 
-        cache.put(key, record);
+        CacheRecord existing = cache.putIfAbsent(key, record);
 
-        return record;
+        return existing != null ? existing : record;
     }
 
     @Override

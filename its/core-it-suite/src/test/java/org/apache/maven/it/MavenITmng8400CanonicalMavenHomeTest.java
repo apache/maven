@@ -27,7 +27,7 @@ import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8400">MNG-8400</a>.
@@ -41,7 +41,7 @@ class MavenITmng8400CanonicalMavenHomeTest extends AbstractMavenIntegrationTestC
      */
     @Test
     void testIt() throws Exception {
-        Path basedir = extractResources("/mng-8400").getAbsoluteFile().toPath();
+        Path basedir = extractResources("mng-8400");
         Path tempDir = basedir.resolve("tmp");
         Files.createDirectories(tempDir);
 

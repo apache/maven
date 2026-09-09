@@ -21,6 +21,7 @@ package org.apache.maven.cling.utils;
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 import java.util.Locale;
@@ -73,6 +74,8 @@ public final class CLIReportingUtils {
                 .append(Locale.getDefault())
                 .append(", platform encoding: ")
                 .append(System.getProperty("file.encoding", "<unknown encoding>"))
+                .append(", time zone: ")
+                .append(ZoneId.systemDefault().getId())
                 .append(ls);
         version.append("OS name: \"")
                 .append(Os.OS_NAME)

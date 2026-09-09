@@ -26,6 +26,8 @@ import org.apache.maven.impl.resolver.artifact.FatArtifactTraverser;
 import org.apache.maven.impl.resolver.scopes.Maven3ScopeManagerConfiguration;
 import org.apache.maven.impl.resolver.scopes.Maven4ScopeManagerConfiguration;
 import org.apache.maven.impl.resolver.type.DefaultTypeProvider;
+import org.apache.maven.impl.resolver.type.TypeCollector;
+import org.apache.maven.impl.resolver.type.TypeDeriver;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
 import org.eclipse.aether.RepositorySystemSession.SessionBuilder;
@@ -78,7 +80,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
                         : Maven4ScopeManagerConfiguration.INSTANCE);
     }
 
-    protected DependencyTraverser getDependencyTraverser() {
+    public DependencyTraverser getDependencyTraverser() {
         return new FatArtifactTraverser();
     }
 
@@ -97,7 +99,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
         return new ClassicDependencyManager(getScopeManager());
     }
 
-    protected DependencySelector getDependencySelector() {
+    public DependencySelector getDependencySelector() {
         return new AndDependencySelector(
                 ScopeDependencySelector.legacy(
                         null, Arrays.asList(DependencyScope.TEST.id(), DependencyScope.PROVIDED.id())),
@@ -105,12 +107,14 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
                 new ExclusionDependencySelector());
     }
 
-    protected DependencyGraphTransformer getDependencyGraphTransformer() {
+    public DependencyGraphTransformer getDependencyGraphTransformer() {
         return new ChainedDependencyGraphTransformer(
+                new TypeCollector(),
                 new ConflictResolver(
                         new ConfigurableVersionSelector(), new ManagedScopeSelector(getScopeManager()),
                         new SimpleOptionalitySelector(), new ManagedScopeDeriver(getScopeManager())),
-                new ManagedDependencyContextRefiner(getScopeManager()));
+                new ManagedDependencyContextRefiner(getScopeManager()),
+                new TypeDeriver());
     }
 
     /**
@@ -122,13 +126,13 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
      * <p>
      * Important: this "static" list of types should be in-sync with core provided types.
      */
-    protected ArtifactTypeRegistry getArtifactTypeRegistry() {
+    public ArtifactTypeRegistry getArtifactTypeRegistry() {
         DefaultArtifactTypeRegistry stereotypes = new DefaultArtifactTypeRegistry();
-        new DefaultTypeProvider().types().forEach(stereotypes::add);
+        new DefaultTypeProvider().types().forEach(t -> stereotypes.add(t.toArtifactType()));
         return stereotypes;
     }
 
-    protected ArtifactDescriptorPolicy getArtifactDescriptorPolicy() {
+    public ArtifactDescriptorPolicy getArtifactDescriptorPolicy() {
         return new SimpleArtifactDescriptorPolicy(true, true);
     }
 

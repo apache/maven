@@ -22,6 +22,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Reader;
 import java.io.Writer;
+import java.util.function.Function;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
@@ -31,6 +32,7 @@ import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.services.xml.XmlWriterException;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
+import org.apache.maven.api.settings.InputLocation;
 import org.apache.maven.api.settings.InputSource;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.settings.v4.SettingsStaxReader;
@@ -79,10 +81,20 @@ public class DefaultSettingsXmlFactory implements SettingsXmlFactory {
             throw new IllegalArgumentException("writer or outputStream must be non null");
         }
         try {
+            SettingsStaxWriter xmlWriter = new SettingsStaxWriter();
+            xmlWriter.setAddLocationInformation(false);
+
+            Function<Object, String> formatter = request.getInputLocationFormatter();
+            if (formatter != null) {
+                xmlWriter.setAddLocationInformation(true);
+                Function<InputLocation, String> adapter = formatter::apply;
+                xmlWriter.setStringFormatter(adapter);
+            }
+
             if (writer != null) {
-                new SettingsStaxWriter().write(writer, content);
+                xmlWriter.write(writer, content);
             } else {
-                new SettingsStaxWriter().write(outputStream, content);
+                xmlWriter.write(outputStream, content);
             }
         } catch (Exception e) {
             throw new XmlWriterException("Unable to write settings: " + getMessage(e), getLocation(e), e);

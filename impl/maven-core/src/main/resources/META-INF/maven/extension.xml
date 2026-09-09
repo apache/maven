@@ -70,6 +70,7 @@ under the License.
     <exportedPackage>org.eclipse.aether.metadata</exportedPackage>
     <exportedPackage>org.eclipse.aether.repository</exportedPackage>
     <exportedPackage>org.eclipse.aether.resolution</exportedPackage>
+    <exportedPackage>org.eclipse.aether.scope</exportedPackage>
     <exportedPackage>org.eclipse.aether.spi</exportedPackage>
     <exportedPackage>org.eclipse.aether.transfer</exportedPackage>
     <exportedPackage>org.eclipse.aether.transform</exportedPackage>

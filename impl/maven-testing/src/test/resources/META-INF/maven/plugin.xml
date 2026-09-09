@@ -73,7 +73,7 @@ under the License.
         </parameter>
         <parameter>
           <name>beanParam</name>
-          <type>org.apache.maven.api.plugin.testing.ExpressionEvaluatorTest$TestBean</type>
+          <type>org.apache.maven.testing.plugin.ExpressionEvaluatorTest$TestBean</type>
         </parameter>
         <parameter>
           <name>intValue</name>

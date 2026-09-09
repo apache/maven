@@ -114,6 +114,11 @@ public class DefaultSettingsDecrypter implements SettingsDecrypter {
         List<Proxy> proxies = new ArrayList<>();
 
         for (Proxy proxy : request.getProxies()) {
+            // Clone the proxy (mirroring the server handling above) so that decrypted
+            // plaintext only ever lands in the SettingsDecryptionResult copies and never
+            // mutates the caller's live Settings object.
+            proxy = proxy.clone();
+
             String password = proxy.getPassword();
             if (securityDispatcher.isAnyEncryptedString(password)) {
                 try {

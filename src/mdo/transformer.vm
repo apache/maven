@@ -71,7 +71,7 @@ public class ${className} {
      * The transformation function.
      */
     protected String transform(String value) {
-        return transformer.apply(value);
+        return value != null ? transformer.apply(value) : null;
     }
 
 #foreach ( $class in $model.allClasses )

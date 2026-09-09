@@ -40,19 +40,13 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
-import org.eclipse.aether.collection.VersionFilter;
+import org.eclipse.aether.collection.VersionFilterBuilder;
 import org.eclipse.aether.repository.RepositoryPolicy;
-import org.eclipse.aether.util.graph.version.ChainedVersionFilter;
-import org.eclipse.aether.util.graph.version.ContextualSnapshotVersionFilter;
-import org.eclipse.aether.util.graph.version.HighestVersionFilter;
-import org.eclipse.aether.util.graph.version.LowestVersionFilter;
-import org.eclipse.aether.util.graph.version.PredicateVersionFilter;
 import org.eclipse.aether.version.VersionScheme;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrowsExactly;
@@ -80,6 +74,9 @@ public class DefaultRepositorySystemSessionFactoryTest {
     @Inject
     protected VersionScheme versionScheme;
 
+    @Inject
+    protected VersionFilterBuilder versionFilterBuilder;
+
     @Test
     void isNoSnapshotUpdatesTest() throws InvalidRepositoryException {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
@@ -88,7 +85,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
-                Collections.emptyMap());
+                Collections.emptyMap(),
+                versionFilterBuilder);
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepository(getLocalRepository());
@@ -110,7 +108,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
-                Collections.emptyMap());
+                Collections.emptyMap(),
+                versionFilterBuilder);
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepository(getLocalRepository());
@@ -144,7 +143,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
-                Collections.emptyMap());
+                Collections.emptyMap(),
+                versionFilterBuilder);
 
         PlexusConfiguration plexusConfiguration = (PlexusConfiguration) systemSessionFactory
                 .newRepositorySession(request)
@@ -186,7 +186,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
-                Collections.emptyMap());
+                Collections.emptyMap(),
+                versionFilterBuilder);
 
         Map<String, String> headers = (Map<String, String>) systemSessionFactory
                 .newRepositorySession(request)
@@ -222,7 +223,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
-                Collections.emptyMap());
+                Collections.emptyMap(),
+                versionFilterBuilder);
 
         int connectionTimeout = (Integer) systemSessionFactory
                 .newRepositorySession(request)
@@ -262,7 +264,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
-                Collections.emptyMap());
+                Collections.emptyMap(),
+                versionFilterBuilder);
 
         int connectionTimeout = (Integer) systemSessionFactory
                 .newRepositorySession(request)
@@ -296,7 +299,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
-                Collections.emptyMap());
+                Collections.emptyMap(),
+                versionFilterBuilder);
 
         int requestTimeout = (Integer) systemSessionFactory
                 .newRepositorySession(request)
@@ -336,7 +340,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
-                Collections.emptyMap());
+                Collections.emptyMap(),
+                versionFilterBuilder);
 
         int requestTimeout = (Integer) systemSessionFactory
                 .newRepositorySession(request)
@@ -353,7 +358,8 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 information,
                 defaultTypeRegistry,
                 versionScheme,
-                Collections.emptyMap());
+                Collections.emptyMap(),
+                versionFilterBuilder);
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepository(getLocalRepository());
@@ -388,64 +394,6 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 "Unknown resolver transport 'illegal'. Supported transports are: wagon, apache, jdk, auto",
                 exception.getMessage());
         properties.remove("maven.resolver.transport");
-    }
-
-    @Test
-    void versionFilteringTest() throws InvalidRepositoryException {
-        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
-                aetherRepositorySystem,
-                eventSpyDispatcher,
-                information,
-                defaultTypeRegistry,
-                versionScheme,
-                Collections.emptyMap());
-
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-        request.setLocalRepository(getLocalRepository());
-
-        VersionFilter versionFilter;
-
-        // single one
-        request.getUserProperties().put("maven.session.versionFilter", "s");
-        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
-        assertNotNull(versionFilter);
-        assertInstanceOf(ContextualSnapshotVersionFilter.class, versionFilter);
-
-        request.getUserProperties().put("maven.session.versionFilter", "h");
-        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
-        assertNotNull(versionFilter);
-        assertInstanceOf(HighestVersionFilter.class, versionFilter);
-
-        request.getUserProperties().put("maven.session.versionFilter", "h(5)");
-        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
-        assertNotNull(versionFilter);
-        assertInstanceOf(HighestVersionFilter.class, versionFilter);
-
-        request.getUserProperties().put("maven.session.versionFilter", "l");
-        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
-        assertNotNull(versionFilter);
-        assertInstanceOf(LowestVersionFilter.class, versionFilter);
-
-        request.getUserProperties().put("maven.session.versionFilter", "l(5)");
-        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
-        assertNotNull(versionFilter);
-        assertInstanceOf(LowestVersionFilter.class, versionFilter);
-
-        request.getUserProperties().put("maven.session.versionFilter", "e(g:a:v)");
-        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
-        assertNotNull(versionFilter);
-        assertInstanceOf(PredicateVersionFilter.class, versionFilter);
-
-        request.getUserProperties().put("maven.session.versionFilter", "e(g:a:[1,2])");
-        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
-        assertNotNull(versionFilter);
-        assertInstanceOf(PredicateVersionFilter.class, versionFilter);
-
-        // chained
-        request.getUserProperties().put("maven.session.versionFilter", "h(5);s;e(org.foo:bar:1)");
-        versionFilter = systemSessionFactory.newRepositorySession(request).getVersionFilter();
-        assertNotNull(versionFilter);
-        assertInstanceOf(ChainedVersionFilter.class, versionFilter);
     }
 
     protected ArtifactRepository getLocalRepository() throws InvalidRepositoryException {

@@ -32,7 +32,7 @@ under the License.
 
   <dependencies>
     <dependency>
-      <groupId>org.apache.maven</groupId>
+      <groupId>org.apache.maven.executor</groupId>
       <artifactId>maven-executor</artifactId>
       <!-- Version inherited from parent dependency management -->
     </dependency>

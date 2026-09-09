@@ -19,7 +19,6 @@
 package org.apache.maven.model.root;
 
 import javax.inject.Named;
-import javax.xml.stream.XMLInputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamReader;
 
@@ -27,6 +26,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
+
+import org.apache.maven.api.xml.XmlService;
 
 /**
  * @deprecated use {@code org.apache.maven.api.services.model.RootLocator} instead
@@ -43,7 +44,7 @@ public class DefaultRootLocator implements RootLocator {
         // we're too early to use the modelProcessor ...
         Path pom = dir.resolve("pom.xml");
         try (InputStream is = Files.newInputStream(pom)) {
-            XMLStreamReader parser = XMLInputFactory.newFactory().createXMLStreamReader(is);
+            XMLStreamReader parser = XmlService.newXMLInputFactory().createXMLStreamReader(is);
             if (parser.nextTag() == XMLStreamReader.START_ELEMENT
                     && parser.getLocalName().equals("project")) {
                 for (int i = 0; i < parser.getAttributeCount(); i++) {

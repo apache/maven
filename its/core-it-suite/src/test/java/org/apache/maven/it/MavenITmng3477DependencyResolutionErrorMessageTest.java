@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -44,9 +44,9 @@ class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIn
      * @throws Exception in case of failure
      */
     void testit(int port, String[] logExpectPatterns, String projectFile) throws Exception {
-        File testDir = extractResources("/mng-3477");
+        Path testDir = extractResources("mng-3477");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), "");
+        Verifier verifier = newVerifier(testDir.toString(), "");
 
         Map<String, String> filterProps = new HashMap<>();
         filterProps.put("@port@", Integer.toString(port));
@@ -92,9 +92,11 @@ class MavenITmng3477DependencyResolutionErrorMessageTest extends AbstractMavenIn
         testit(
                 54312,
                 new String[] { // JDK "Connection to..." Apache "Connect to..."
+                    // with removal of connector hack https://github.com/apache/maven-resolver/pull/1676
+                    // the order is not stable anymore, so repoId may be any of two
                     ".*The following artifacts could not be resolved: org.apache.maven.its.plugins:maven-it-plugin-not-exists:pom:1.2.3 \\(absent\\): "
                             + "Could not transfer artifact org.apache.maven.its.plugins:maven-it-plugin-not-exists:pom:1.2.3 from/to "
-                            + "central \\(http://localhost:.*/repo\\):.*Connect.*refused.*"
+                            + "(central|maven-core-it) \\(http://localhost:.*/repo\\):.*Connect.*refused.*"
                 },
                 "pom-plugin.xml");
     }

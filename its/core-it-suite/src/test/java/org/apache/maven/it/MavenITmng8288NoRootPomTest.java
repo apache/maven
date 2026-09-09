@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -34,9 +34,9 @@ class MavenITmng8288NoRootPomTest extends AbstractMavenIntegrationTestCase {
      */
     @Test
     void testitNoRootPomCanBeLoaded() throws Exception {
-        File testDir = extractResources("/mng-8288-no-root-pom");
+        Path testDir = extractResources("mng-8288-no-root-pom");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("-f");
         verifier.addCliArgument("project");
         verifier.addCliArgument("validate");

@@ -18,7 +18,10 @@
  */
 package org.apache.maven.api.services;
 
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+
+import static java.util.Objects.requireNonNull;
 
 /**
  * Represents a hierarchical trace of nested requests within a session, enabling correlation between
@@ -58,6 +61,10 @@ public record RequestTrace(
     public static final String CONTEXT_PLUGIN = "plugin";
     public static final String CONTEXT_PROJECT = "project";
     public static final String CONTEXT_BOOTSTRAP = "bootstrap";
+
+    public RequestTrace(@Nonnull String context) {
+        this(requireNonNull(context, "context cannot be null"), null, null);
+    }
 
     public RequestTrace(RequestTrace parent, Object data) {
         this(parent != null ? parent.context() : null, parent, data);

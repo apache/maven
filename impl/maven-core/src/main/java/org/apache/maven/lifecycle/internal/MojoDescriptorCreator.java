@@ -67,18 +67,15 @@ public class MojoDescriptorCreator {
     private final PluginVersionResolver pluginVersionResolver;
     private final BuildPluginManager pluginManager;
     private final PluginPrefixResolver pluginPrefixResolver;
-    private final LifecyclePluginResolver lifecyclePluginResolver;
 
     @Inject
     public MojoDescriptorCreator(
             PluginVersionResolver pluginVersionResolver,
             BuildPluginManager pluginManager,
-            PluginPrefixResolver pluginPrefixResolver,
-            LifecyclePluginResolver lifecyclePluginResolver) {
+            PluginPrefixResolver pluginPrefixResolver) {
         this.pluginVersionResolver = pluginVersionResolver;
         this.pluginManager = pluginManager;
         this.pluginPrefixResolver = pluginPrefixResolver;
-        this.lifecyclePluginResolver = lifecyclePluginResolver;
     }
 
     private Plugin findPlugin(String groupId, String artifactId, Collection<Plugin> plugins) {
@@ -236,15 +233,6 @@ public class MojoDescriptorCreator {
 
     public Plugin findPluginForPrefix(String prefix, MavenSession session) throws NoPluginFoundForPrefixException {
         // [prefix]:[goal]
-
-        if (session.getCurrentProject() != null) {
-            try {
-                lifecyclePluginResolver.resolveMissingPluginVersions(session.getCurrentProject(), session);
-            } catch (PluginVersionResolutionException e) {
-                // not critical here
-                logger.debug(e.getMessage(), e);
-            }
-        }
 
         PluginPrefixRequest prefixRequest = new DefaultPluginPrefixRequest(prefix, session);
         PluginPrefixResult prefixResult = pluginPrefixResolver.resolve(prefixRequest);

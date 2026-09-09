@@ -39,17 +39,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-/**
- * @goal phase2
- */
+@Mojo(name = "phase2")
 public class Phase2GeneratorMojo extends AbstractMng2734Mojo {
-    /**
-     * @parameter default-value="${project}"
-     * @required
-     * @readonly
-     */
+    @Parameter(defaultValue = "${project}", required = true, readonly = true)
     private MavenProject project;
 
     public void execute() throws MojoExecutionException {

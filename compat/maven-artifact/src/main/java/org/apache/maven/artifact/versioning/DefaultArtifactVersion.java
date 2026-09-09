@@ -41,7 +41,10 @@ public class DefaultArtifactVersion implements ArtifactVersion {
 
     @Override
     public int hashCode() {
-        return 11 + comparable.hashCode();
+        // equals is defined as compareTo == 0, so the hash must follow ordering equality:
+        // "1-ga" and "1" are equal here and must hash alike, which the structural
+        // ComparableVersion.hashCode() does not guarantee
+        return 11 + comparable.orderingHashCode();
     }
 
     @Override

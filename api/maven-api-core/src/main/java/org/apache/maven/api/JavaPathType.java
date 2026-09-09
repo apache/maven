@@ -282,7 +282,7 @@ public enum JavaPathType implements PathType {
      */
     @Override
     public String toString() {
-        return "PathType[" + id() + "]";
+        return "PathType[" + id() + ']';
     }
 
     /**
@@ -326,7 +326,7 @@ public enum JavaPathType implements PathType {
          */
         @Override
         public String id() {
-            return JavaPathType.this.name() + ":" + moduleName;
+            return JavaPathType.this.name() + ':' + moduleName;
         }
 
         /**
@@ -407,7 +407,7 @@ public enum JavaPathType implements PathType {
         @Nonnull
         @Override
         public String toString() {
-            return "PathType[" + id() + "]";
+            return "PathType[" + id() + ']';
         }
     }
 }

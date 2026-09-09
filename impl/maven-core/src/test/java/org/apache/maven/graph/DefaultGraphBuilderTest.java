@@ -105,7 +105,7 @@ class DefaultGraphBuilderTest {
 
     // Not using mocks for these strategies - a mock would just copy the actual implementation.
 
-    private final ModelProcessor modelProcessor = new DefaultModelProcessor(null, List.of());
+    private final ModelProcessor modelProcessor = new DefaultModelProcessor(null, Map.of());
     private final PomlessCollectionStrategy pomlessCollectionStrategy = new PomlessCollectionStrategy(projectBuilder);
     private final MultiModuleCollectionStrategy multiModuleCollectionStrategy =
             new MultiModuleCollectionStrategy(modelProcessor, projectsSelector);

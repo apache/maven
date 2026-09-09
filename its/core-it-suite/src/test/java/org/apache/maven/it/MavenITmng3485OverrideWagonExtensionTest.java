@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -31,11 +31,11 @@ public class MavenITmng3485OverrideWagonExtensionTest extends AbstractMavenInteg
 
     @Test
     public void testitMNG3485() throws Exception {
-        File testDir = extractResources("/mng-3485");
+        Path testDir = extractResources("mng-3485");
 
         Verifier verifier;
 
-        verifier = newVerifier(testDir.getAbsolutePath());
+        verifier = newVerifier(testDir);
 
         verifier.addCliArgument("deploy");
         verifier.execute();

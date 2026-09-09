@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -40,9 +40,9 @@ public class MavenITmng4009InheritProfileEffectsTest extends AbstractMavenIntegr
      */
     @Test
     public void testitMNG4009() throws Exception {
-        File testDir = extractResources("/mng-4009");
+        Path testDir = extractResources("mng-4009");
 
-        Verifier verifier = newVerifier(new File(testDir, "sub").getAbsolutePath());
+        Verifier verifier = newVerifier(testDir.resolve("sub"));
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("-Pparent-profile");

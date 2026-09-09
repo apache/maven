@@ -21,9 +21,9 @@ package org.apache.maven.repository;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -122,19 +122,31 @@ public class DefaultMirrorSelector implements MirrorSelector {
     }
 
     /**
-     * Checks the URL to see if this repository refers to an external repository
+     * Pattern matching the protocol (scheme) and host of a repository URL textually, the way the
+     * resolver's {@code RemoteRepository} does. {@code java.net.URL} must not be used here: it
+     * rejects any scheme without a registered JDK stream handler (e.g. {@code dav}, {@code
+     * dav:http}, {@code dav+http}), which would make such repositories silently bypass {@code
+     * external:*} and {@code external:http:*} mirror matching below.
+     */
+    private static final Pattern URL_PROTOCOL_AND_HOST =
+            Pattern.compile("([^:/]+(:[^:/]{2,}+(?=://))?):(//([^@/]*@)?([^/:]+))?.*");
+
+    /**
+     * Checks the URL to see if this repository refers to an external repository. A URL that
+     * cannot be parsed is treated as external, so that {@code external:*} mirror rules apply to
+     * it rather than silently skipping it.
      *
      * @param originalRepository
      * @return true if external.
      */
     static boolean isExternalRepo(ArtifactRepository originalRepository) {
-        try {
-            URL url = new URL(originalRepository.getUrl());
-            return !(isLocal(url.getHost()) || url.getProtocol().equals("file"));
-        } catch (MalformedURLException e) {
-            // bad url just skip it here. It should have been validated already, but the wagon lookup will deal with it
-            return false;
+        String url = originalRepository.getUrl();
+        Matcher m = url != null ? URL_PROTOCOL_AND_HOST.matcher(url) : null;
+        if (m == null || !m.matches()) {
+            // an unparseable url is not exempt from external:* mirror rules; treat it as external
+            return true;
         }
+        return !(isLocal(m.group(5)) || "file".equalsIgnoreCase(m.group(1)));
     }
 
     private static boolean isLocal(String host) {
@@ -143,22 +155,25 @@ public class DefaultMirrorSelector implements MirrorSelector {
 
     /**
      * Checks the URL to see if this repository refers to a non-localhost repository using HTTP.
+     * A URL that cannot be parsed is treated as external, so that the shipped {@code
+     * external:http:*} mirror rule applies to it rather than silently skipping it.
      *
      * @param originalRepository
      * @return true if external.
      */
     static boolean isExternalHttpRepo(ArtifactRepository originalRepository) {
-        try {
-            URL url = new URL(originalRepository.getUrl());
-            return ("http".equalsIgnoreCase(url.getProtocol())
-                            || "dav".equalsIgnoreCase(url.getProtocol())
-                            || "dav:http".equalsIgnoreCase(url.getProtocol())
-                            || "dav+http".equalsIgnoreCase(url.getProtocol()))
-                    && !isLocal(url.getHost());
-        } catch (MalformedURLException e) {
-            // bad url just skip it here. It should have been validated already, but the wagon lookup will deal with it
-            return false;
+        String url = originalRepository.getUrl();
+        Matcher m = url != null ? URL_PROTOCOL_AND_HOST.matcher(url) : null;
+        if (m == null || !m.matches()) {
+            // an unparseable url is not exempt from the external:http:* mirror rule; treat it as external
+            return true;
         }
+        String protocol = m.group(1);
+        return ("http".equalsIgnoreCase(protocol)
+                        || "dav".equalsIgnoreCase(protocol)
+                        || "dav:http".equalsIgnoreCase(protocol)
+                        || "dav+http".equalsIgnoreCase(protocol))
+                && !isLocal(m.group(5));
     }
 
     static boolean matchesLayout(ArtifactRepository repository, Mirror mirror) {

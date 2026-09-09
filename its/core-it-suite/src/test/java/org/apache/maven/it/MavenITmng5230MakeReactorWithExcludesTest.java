@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -43,9 +43,9 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
      */
     @Test
     public void testitMakeWithExclude() throws Exception {
-        File testDir = extractResources("/mng-5230-make-reactor-with-excludes");
+        Path testDir = extractResources("mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.addCliArgument("-X");
         verifier.setAutoclean(false);
         clean(verifier);
@@ -70,9 +70,9 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
      */
     @Test
     public void testitMakeUpstreamExclude() throws Exception {
-        File testDir = extractResources("/mng-5230-make-reactor-with-excludes");
+        Path testDir = extractResources("mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
@@ -97,9 +97,9 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
      */
     @Test
     public void testitMakeDownstreamExclude() throws Exception {
-        File testDir = extractResources("/mng-5230-make-reactor-with-excludes");
+        Path testDir = extractResources("mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
@@ -124,9 +124,9 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
      */
     @Test
     public void testitMakeBothExclude() throws Exception {
-        File testDir = extractResources("/mng-5230-make-reactor-with-excludes");
+        Path testDir = extractResources("mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
@@ -152,9 +152,9 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
      */
     @Test
     public void testitMatchesByBasedirExclamationExclude() throws Exception {
-        File testDir = extractResources("/mng-5230-make-reactor-with-excludes");
+        Path testDir = extractResources("mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.verifyFileNotPresent("mod-d/pom.xml");
@@ -179,9 +179,9 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
      */
     @Test
     public void testitMatchesByBasedirMinusExclude() throws Exception {
-        File testDir = extractResources("/mng-5230-make-reactor-with-excludes");
+        Path testDir = extractResources("mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.verifyFileNotPresent("mod-d/pom.xml");
@@ -206,9 +206,9 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
      */
     @Test
     public void testitMatchesByIdExclude() throws Exception {
-        File testDir = extractResources("/mng-5230-make-reactor-with-excludes");
+        Path testDir = extractResources("mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
@@ -232,9 +232,9 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
      */
     @Test
     public void testitMatchesByArtifactIdExclude() throws Exception {
-        File testDir = extractResources("/mng-5230-make-reactor-with-excludes");
+        Path testDir = extractResources("mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-pl");
@@ -258,9 +258,9 @@ public class MavenITmng5230MakeReactorWithExcludesTest extends AbstractMavenInte
      */
     @Test
     public void testitResumeFromExclude() throws Exception {
-        File testDir = extractResources("/mng-5230-make-reactor-with-excludes");
+        Path testDir = extractResources("mng-5230-make-reactor-with-excludes");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         clean(verifier);
         verifier.addCliArgument("-rf");

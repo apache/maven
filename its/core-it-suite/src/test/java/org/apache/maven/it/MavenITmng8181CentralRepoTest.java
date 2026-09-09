@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -36,16 +36,17 @@ public class MavenITmng8181CentralRepoTest extends AbstractMavenIntegrationTestC
      */
     @Test
     public void testitModel() throws Exception {
-        File testDir = extractResources("/mng-8181-central-repo");
+        Path testDir = extractResources("mng-8181-central-repo");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath(), null);
+        Verifier verifier = newVerifier(testDir.toString(), null);
         verifier.setAutoclean(false);
         verifier.addCliArgument("--install-settings=install-settings.xml");
         verifier.addCliArgument("--settings=settings.xml");
-        verifier.addCliArgument("-Dmaven.repo.local=" + testDir.toPath().resolve("target/local-repo"));
+        verifier.addCliArgument("-Dmaven.repo.local=" + testDir.resolve("target/local-repo"));
         verifier.addCliArgument("-Dmaven.repo.local.tail=target/null");
         // note: intentionally bad URL, we just want tu ensure that this bad URL is used
         verifier.addCliArgument("-Dmaven.repo.central=https://repo1.maven.org");
+        verifier.addCliArgument("-U");
         verifier.addCliArgument("validate");
         verifier.setHandleLocalRepoTail(false); // we want isolation to have Maven fail due bad URL
         assertThrows(VerificationException.class, verifier::execute);

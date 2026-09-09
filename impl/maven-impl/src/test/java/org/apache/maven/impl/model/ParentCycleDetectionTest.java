@@ -187,6 +187,69 @@ class ParentCycleDetectionTest {
         }
     }
 
+    /**
+     * Reproduces GH-12074: dependency-reduced-pom.xml from shade plugin causes false parent cycle.
+     *
+     * When a POM's parent relative path resolves to a POM with a different GA (e.g., the
+     * default ".." from dependency-reduced-pom.xml resolves to a sibling project POM), the model
+     * builder should detect the GA mismatch early and skip local resolution — not recursively
+     * read the candidate's parents and trigger a false cycle.
+     */
+    @Test
+    void testNoFalseCycleWhenRelativePathResolvesToWrongPom(@TempDir Path tempDir) throws IOException {
+        Files.createDirectories(tempDir.resolve(".mvn"));
+
+        // Root POM found by resolving ".." from the project directory.
+        // It has a different GA than the expected parent but shares the same parent reference.
+        Path rootPom = tempDir.resolve("pom.xml");
+        Files.writeString(rootPom, """
+            <project xmlns="http://maven.apache.org/POM/4.0.0">
+                <modelVersion>4.0.0</modelVersion>
+                <parent>
+                    <groupId>test</groupId>
+                    <artifactId>parent</artifactId>
+                    <version>1.0</version>
+                    <relativePath/>
+                </parent>
+                <artifactId>root</artifactId>
+            </project>
+            """);
+
+        // Project POM in a subdirectory, referencing the same parent.
+        // Default relativePath ".." resolves to rootPom above, which has GA test:root (not test:parent).
+        Path projectPom = tempDir.resolve("project").resolve("pom.xml");
+        Files.createDirectories(projectPom.getParent());
+        Files.writeString(projectPom, """
+            <project xmlns="http://maven.apache.org/POM/4.0.0">
+                <modelVersion>4.0.0</modelVersion>
+                <parent>
+                    <groupId>test</groupId>
+                    <artifactId>parent</artifactId>
+                    <version>1.0</version>
+                </parent>
+                <artifactId>project</artifactId>
+            </project>
+            """);
+
+        // Use BUILD_EFFECTIVE to match what the shade plugin triggers via compat ProjectBuilder
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .source(Sources.buildSource(projectPom))
+                .requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)
+                .build();
+
+        try {
+            modelBuilder.newSession().build(request);
+        } catch (StackOverflowError error) {
+            fail("StackOverflowError — cycle detection not working");
+        } catch (ModelBuilderException exception) {
+            // Parent not found externally is expected; a cycle error is not
+            if (exception.getMessage().contains("cycle")) {
+                fail("False parent cycle detected: " + exception.getMessage());
+            }
+        }
+    }
+
     @Test
     void testMultipleModulesWithSameParentDoNotCauseCycle(@TempDir Path tempDir) throws IOException {
         // Create .mvn directory to mark root

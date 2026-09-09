@@ -320,6 +320,61 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
+    public void testMinimalValidationInterpolationUsesRestrictedPropertySet() throws Exception {
+        context.put("env.HOME", "/path/to/home");
+        context.put("some.property", "other-value");
+        context.put("java.version", "21");
+
+        Map<String, String> modelProperties = new HashMap<>();
+        modelProperties.put("envDir", "${env.HOME}");
+        modelProperties.put("propDir", "${some.property}");
+        modelProperties.put("jdk", "${java.version}");
+
+        Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
+                .properties(modelProperties)
+                .build());
+
+        ModelInterpolator interpolator = createInterpolator();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelBuildingRequest config = createModelBuildingRequest(context);
+        config.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        Model out = interpolator.interpolateModel(model, new File("."), config, collector);
+        assertProblemFree(collector);
+
+        // At minimal validation level (the level used for models built while resolving
+        // dependency, parent and BOM-import POMs) env and arbitrary system/user properties
+        // stay literal...
+        assertEquals("${env.HOME}", out.getProperties().get("envDir"));
+        assertEquals("${some.property}", out.getProperties().get("propDir"));
+        // ...while JVM-defined and other well-known expressions keep resolving.
+        assertEquals("21", out.getProperties().get("jdk"));
+    }
+
+    @Test
+    public void testFullInterpolationOptOutRestoresPreviousBehaviorAtMinimalValidationLevel() throws Exception {
+        context.put("env.HOME", "/path/to/home");
+        context.put("maven.model.dependencyInterpolation.full", "true");
+
+        Map<String, String> modelProperties = new HashMap<>();
+        modelProperties.put("envDir", "${env.HOME}");
+
+        Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
+                .properties(modelProperties)
+                .build());
+
+        ModelInterpolator interpolator = createInterpolator();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelBuildingRequest config = createModelBuildingRequest(context);
+        config.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        Model out = interpolator.interpolateModel(model, new File("."), config, collector);
+        assertProblemFree(collector);
+
+        assertEquals("/path/to/home", out.getProperties().get("envDir"));
+    }
+
+    @Test
     public void envarExpressionThatEvaluatesToNullReturnsTheLiteralString() throws Exception {
 
         Map<String, String> modelProperties = new HashMap<>();
@@ -437,6 +492,44 @@ public abstract class AbstractModelInterpolatorTest {
         assertEquals(
                 "Resolving expression: '${basedir}': Detected the following recursive expression cycle in 'basedir': [basedir]",
                 collector.getErrors().get(0));
+    }
+
+    @Test
+    public void testRecursiveExpressionCycleInPluginConfiguration() throws Exception {
+        // MNG-8174: a self-referencing property used in a plugin configuration attribute must not
+        // cause an NPE while interpolating the plugin configuration
+        Map<String, String> props = new HashMap<>();
+        props.put("prop", "${prop}");
+
+        org.apache.maven.api.xml.XmlNode filter = org.apache.maven.api.xml.XmlNode.newBuilder()
+                .name("filter")
+                .attributes(Map.of("token", "key", "value", "${prop}"))
+                .build();
+        org.apache.maven.api.xml.XmlNode configuration = org.apache.maven.api.xml.XmlNode.newBuilder()
+                .name("configuration")
+                .children(List.of(filter))
+                .build();
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+
+        Model model = new Model(org.apache.maven.api.model.Model.newBuilder()
+                .properties(props)
+                .build(org.apache.maven.api.model.Build.newBuilder()
+                        .plugins(List.of(org.apache.maven.api.model.Plugin.newBuilder()
+                                .artifactId("maven-antrun-plugin")
+                                .configuration(configuration)
+                                .build()))
+                        .build())
+                .build());
+
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelInterpolator interpolator = createInterpolator();
+        Model out = interpolator.interpolateModel(model, null, request, collector);
+
+        assertNotNull(out);
+        assertCollectorState(0, 1, 0, collector);
+        org.apache.maven.api.model.Plugin p = out.getBuild().getPlugins().get(0).getDelegate();
+        assertEquals("${prop}", p.getConfiguration().child("filter").attribute("value"));
     }
 
     protected abstract ModelInterpolator createInterpolator() throws Exception;

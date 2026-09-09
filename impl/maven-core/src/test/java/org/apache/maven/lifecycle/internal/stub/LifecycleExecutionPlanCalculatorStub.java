@@ -159,7 +159,7 @@ public class LifecycleExecutionPlanCalculatorStub implements LifecycleExecutionP
             MavenSession session,
             MavenProject project,
             MojoExecution mojoExecution,
-            Set<MojoDescriptor> alreadyForkedExecutions)
+            Set<String> alreadyForkedExecutions)
             throws PluginNotFoundException, PluginResolutionException, PluginDescriptorParsingException,
                     MojoNotFoundException, InvalidPluginDescriptorException, NoPluginFoundForPrefixException,
                     LifecyclePhaseNotFoundException, LifecycleNotFoundException, PluginVersionResolutionException {}

@@ -39,6 +39,12 @@ under the License.
       <artifactId>maven-resolver-provider</artifactId>
       <version>${maven-version}</version>
     </dependency>
+    <dependency>
+      <groupId>org.apache.maven.plugin-tools</groupId>
+      <artifactId>maven-plugin-annotations</artifactId>
+      <version>3.15.2</version>
+      <scope>provided</scope>
+    </dependency>
   </dependencies>
 
   <build>

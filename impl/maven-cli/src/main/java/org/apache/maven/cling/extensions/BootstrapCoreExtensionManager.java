@@ -42,6 +42,7 @@ import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionRangeResolver;
 import org.apache.maven.cling.invoker.ProtoLookup;
@@ -62,7 +63,7 @@ import org.apache.maven.impl.model.DefaultInterpolator;
 import org.apache.maven.internal.impl.DefaultArtifactManager;
 import org.apache.maven.internal.impl.DefaultSession;
 import org.apache.maven.plugin.PluginResolutionException;
-import org.apache.maven.plugin.internal.DefaultPluginDependenciesResolver;
+import org.apache.maven.plugin.internal.PluginDependenciesResolver;
 import org.apache.maven.resolver.MavenChainedWorkspaceReader;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.codehaus.plexus.DefaultPlexusContainer;
@@ -76,6 +77,7 @@ import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.internal.impl.DefaultChecksumPolicyProvider;
 import org.eclipse.aether.internal.impl.DefaultRemoteRepositoryManager;
+import org.eclipse.aether.internal.impl.DefaultRepositoryKeyFunctionFactory;
 import org.eclipse.aether.internal.impl.DefaultUpdatePolicyAnalyzer;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceReader;
@@ -97,7 +99,7 @@ public class BootstrapCoreExtensionManager {
 
     private final Logger log = LoggerFactory.getLogger(getClass());
 
-    private final DefaultPluginDependenciesResolver pluginDependenciesResolver;
+    private final PluginDependenciesResolver pluginDependenciesResolver;
 
     private final RepositorySystemSessionFactory repositorySystemSessionFactory;
 
@@ -115,7 +117,7 @@ public class BootstrapCoreExtensionManager {
 
     @Inject
     public BootstrapCoreExtensionManager(
-            DefaultPluginDependenciesResolver pluginDependenciesResolver,
+            PluginDependenciesResolver pluginDependenciesResolver,
             RepositorySystemSessionFactory repositorySystemSessionFactory,
             CoreExports coreExports,
             PlexusContainer container,
@@ -217,7 +219,7 @@ public class BootstrapCoreExtensionManager {
             throws ExtensionResolutionException {
         try {
             /* TODO: Enhance the PluginDependenciesResolver to provide a
-             * resolveCoreExtension method which uses a CoreExtension
+             * resolveCoreExtensionAndFlatten method which uses a CoreExtension
              * object instead of a Plugin as this makes no sense.
              */
             Plugin plugin = Plugin.newBuilder()
@@ -226,7 +228,7 @@ public class BootstrapCoreExtensionManager {
                     .version(interpolator.apply(extension.getVersion()))
                     .build();
 
-            DependencyResult result = pluginDependenciesResolver.resolveCoreExtension(
+            DependencyResult result = pluginDependenciesResolver.resolveCoreExtensionAndFlatten(
                     new org.apache.maven.model.Plugin(plugin), dependencyFilter, repositories, repoSession);
             return result.getArtifactResults().stream()
                     .filter(ArtifactResult::isResolved)
@@ -253,6 +255,14 @@ public class BootstrapCoreExtensionManager {
                 MavenSession session,
                 RepositorySystem repositorySystem,
                 List<org.apache.maven.api.RemoteRepository> repositories) {
+            this(session, repositorySystem, repositories, null);
+        }
+
+        private SimpleSession(
+                MavenSession session,
+                RepositorySystem repositorySystem,
+                List<org.apache.maven.api.RemoteRepository> repositories,
+                RequestTrace context) {
             super(
                     session,
                     repositorySystem,
@@ -261,15 +271,19 @@ public class BootstrapCoreExtensionManager {
                     ProtoLookup.builder()
                             .addMapping(RequestCacheFactory.class, new DefaultRequestCacheFactory())
                             .build(),
-                    null);
+                    null,
+                    context);
         }
 
         @Override
         protected Session newSession(
-                MavenSession mavenSession, List<org.apache.maven.api.RemoteRepository> repositories) {
-            return new SimpleSession(mavenSession, getRepositorySystem(), repositories);
+                MavenSession mavenSession,
+                List<org.apache.maven.api.RemoteRepository> repositories,
+                RequestTrace context) {
+            return new SimpleSession(mavenSession, getRepositorySystem(), repositories, context);
         }
 
+        @SuppressWarnings("unchecked")
         @Override
         public <T extends Service> T getService(Class<T> clazz) throws NoSuchElementException {
             if (clazz == ArtifactCoordinatesFactory.class) {
@@ -284,7 +298,9 @@ public class BootstrapCoreExtensionManager {
                 return (T) new DefaultArtifactManager(this);
             } else if (clazz == RepositoryFactory.class) {
                 return (T) new DefaultRepositoryFactory(new DefaultRemoteRepositoryManager(
-                        new DefaultUpdatePolicyAnalyzer(), new DefaultChecksumPolicyProvider()));
+                        new DefaultUpdatePolicyAnalyzer(),
+                        new DefaultChecksumPolicyProvider(),
+                        new DefaultRepositoryKeyFunctionFactory()));
             } else if (clazz == Interpolator.class) {
                 return (T) new DefaultInterpolator();
                 // } else if (clazz == ModelResolver.class) {

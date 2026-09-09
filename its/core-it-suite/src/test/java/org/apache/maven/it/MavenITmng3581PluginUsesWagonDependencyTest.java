@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -41,9 +41,9 @@ public class MavenITmng3581PluginUsesWagonDependencyTest extends AbstractMavenIn
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-3581");
+        Path testDir = extractResources("mng-3581");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("initialize");
         verifier.execute();

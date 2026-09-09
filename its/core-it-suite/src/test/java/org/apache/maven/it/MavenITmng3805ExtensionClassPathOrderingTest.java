@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Test;
@@ -42,8 +42,8 @@ public class MavenITmng3805ExtensionClassPathOrderingTest extends AbstractMavenI
      */
     @Test
     public void testitMNG3805() throws Exception {
-        File testDir = extractResources("/mng-3805");
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Path testDir = extractResources("mng-3805");
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.deleteArtifacts("org.apache.maven.its.mng3805");

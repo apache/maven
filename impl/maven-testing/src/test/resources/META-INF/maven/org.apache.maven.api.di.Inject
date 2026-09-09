@@ -16,4 +16,4 @@
 # specific language governing permissions and limitations
 # under the License.
 #
-org.apache.maven.api.plugin.testing.ExpressionEvaluatorTest$ExpressionEvaluatorMojo
+org.apache.maven.testing.plugin.ExpressionEvaluatorTest$ExpressionEvaluatorMojo

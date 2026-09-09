@@ -21,9 +21,12 @@ package org.apache.maven.its.it0121.A;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 
-import junit.framework.TestCase;
+import org.junit.jupiter.api.Test;
 
-public class AppTest extends TestCase {
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+public class AppTest {
+    @Test
     public void testOutput() {
         App app = new App();
         StringWriter actual = new StringWriter();

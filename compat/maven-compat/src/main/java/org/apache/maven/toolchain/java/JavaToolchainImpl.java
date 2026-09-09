@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.maven.artifact.versioning.ArtifactVersion;
 import org.apache.maven.toolchain.DefaultToolchain;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.apache.maven.utils.Os;
@@ -39,12 +40,23 @@ public class JavaToolchainImpl extends DefaultToolchain implements JavaToolchain
 
     public static final String KEY_JAVAHOME = "jdkHome"; // NOI18N
 
+    private ArtifactVersion javaVersion;
+
     JavaToolchainImpl(ToolchainModel model, Logger logger) {
         super(model, "jdk", logger);
     }
 
     public String getJavaHome() {
         return javaHome;
+    }
+
+    @Override
+    public ArtifactVersion getJavaVersion() {
+        return javaVersion;
+    }
+
+    public void setJavaVersion(ArtifactVersion javaVersion) {
+        this.javaVersion = javaVersion;
     }
 
     public void setJavaHome(String javaHome) {

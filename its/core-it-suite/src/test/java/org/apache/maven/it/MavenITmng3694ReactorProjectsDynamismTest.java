@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
@@ -33,18 +33,18 @@ public class MavenITmng3694ReactorProjectsDynamismTest extends AbstractMavenInte
 
     @Test
     public void testitMNG3694() throws Exception {
-        File testDir = extractResources("/mng-3694");
+        Path testDir = extractResources("mng-3694");
 
-        File pluginDir = new File(testDir, "maven-mng3694-plugin");
-        File projectDir = new File(testDir, "projects");
+        Path pluginDir = testDir.resolve("maven-mng3694-plugin");
+        Path projectDir = testDir.resolve("projects");
 
-        Verifier verifier = newVerifier(pluginDir.getAbsolutePath());
+        Verifier verifier = newVerifier(pluginDir);
 
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(projectDir.getAbsolutePath());
+        verifier = newVerifier(projectDir);
 
         verifier.addCliArgument("validate");
         verifier.execute();

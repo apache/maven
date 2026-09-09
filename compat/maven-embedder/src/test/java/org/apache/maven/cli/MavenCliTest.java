@@ -421,8 +421,9 @@ class MavenCliTest {
                 container.addComponent(mock(Maven.class), "org.apache.maven.Maven");
 
                 ((DefaultPlexusContainer) container)
-                        .addPlexusInjector(Collections.emptyList(), binder -> binder.bind(EventSpyDispatcher.class)
-                                .toInstance(eventSpyDispatcherMock));
+                        .addPlexusInjector(
+                                Collections.emptyList(),
+                                binder -> binder.bind(EventSpyDispatcher.class).toInstance(eventSpyDispatcherMock));
             }
         };
 

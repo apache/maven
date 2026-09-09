@@ -41,9 +41,9 @@ class MavenITgh11456MixinsConsumerPomTest extends AbstractMavenIntegrationTestCa
      */
     @Test
     void testMixinsWithoutFlattening() throws Exception {
-        Path basedir = extractResources("/gh-11456-mixins-consumer-pom/non-flattened").toPath();
+        Path basedir = extractResources("/gh-11456-mixins-consumer-pom/non-flattened");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.addCliArgument("-Dmaven.repo.local=" + basedir.resolve("repo"));
         verifier.addCliArgument("package");
         try {
@@ -61,9 +61,9 @@ class MavenITgh11456MixinsConsumerPomTest extends AbstractMavenIntegrationTestCa
      */
     @Test
     void testMixinsWithFlattening() throws Exception {
-        Path basedir = extractResources("/gh-11456-mixins-consumer-pom/flattened").toPath();
+        Path basedir = extractResources("/gh-11456-mixins-consumer-pom/flattened");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.addCliArgument("-Dmaven.repo.local=" + basedir.resolve("repo").toString());
         verifier.addCliArgument("package");
         verifier.execute();
@@ -71,6 +71,7 @@ class MavenITgh11456MixinsConsumerPomTest extends AbstractMavenIntegrationTestCa
 
         // Verify consumer POM was created
         Path consumerPom = basedir.resolve(Paths.get(
+                ".mvn",
                 "target",
                 "project-local-repo",
                 "org.apache.maven.its.gh11456",
@@ -94,9 +95,9 @@ class MavenITgh11456MixinsConsumerPomTest extends AbstractMavenIntegrationTestCa
      */
     @Test
     void testMixinsWithPreserveModelVersion() throws Exception {
-        Path basedir = extractResources("/gh-11456-mixins-consumer-pom/preserve-model-version").toPath();
+        Path basedir = extractResources("/gh-11456-mixins-consumer-pom/preserve-model-version");
 
-        Verifier verifier = newVerifier(basedir.toString());
+        Verifier verifier = newVerifier(basedir);
         verifier.addCliArgument("-Dmaven.repo.local=" + basedir.resolve("repo").toString());
         verifier.addCliArgument("package");
         verifier.execute();
@@ -104,6 +105,7 @@ class MavenITgh11456MixinsConsumerPomTest extends AbstractMavenIntegrationTestCa
 
         // Verify consumer POM was created
         Path consumerPom = basedir.resolve(Paths.get(
+                ".mvn",
                 "target",
                 "project-local-repo",
                 "org.apache.maven.its.gh11456",
@@ -122,4 +124,3 @@ class MavenITgh11456MixinsConsumerPomTest extends AbstractMavenIntegrationTestCa
                 "Mixins should be kept in consumer POM when preserveModelVersion is enabled");
     }
 }
-

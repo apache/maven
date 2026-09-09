@@ -38,17 +38,16 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 
-/**
- * @goal phase3
- * @execute phase="validate"
- */
+@Execute(phase = LifecyclePhase.VALIDATE)
+@Mojo(name = "phase3")
 public class Phase3ForkVerifierMojo extends AbstractMng2734Mojo {
-    /**
-     * @parameter expression="${executedProject}"
-     * @required
-     */
+    @Parameter(defaultValue = "${executedProject}", required = true)
     private MavenProject executedProject;
 
     public void execute() throws MojoExecutionException {

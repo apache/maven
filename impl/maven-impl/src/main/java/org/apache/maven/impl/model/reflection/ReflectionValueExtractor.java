@@ -23,7 +23,7 @@ import java.lang.ref.WeakReference;
 import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -42,12 +42,15 @@ import org.apache.maven.api.annotations.Nullable;
 public class ReflectionValueExtractor {
     private static final Object[] OBJECT_ARGS = new Object[0];
 
+    private static final List<String> ACCESSOR_PREFIXES = List.of("get", "is", "to", "as");
+
     /**
      * Use a WeakHashMap here, so the keys (Class objects) can be garbage collected.
      * This approach prevents permgen space overflows due to retention of discarded
      * classloaders.
      */
-    private static final Map<Class<?>, WeakReference<ClassMap>> CLASS_MAPS = new WeakHashMap<>();
+    private static final Map<Class<?>, WeakReference<ClassMap>> CLASS_MAPS =
+            Collections.synchronizedMap(new WeakHashMap<>());
 
     static final int EOF = -1;
 
@@ -271,7 +274,7 @@ public class ReflectionValueExtractor {
         ClassMap classMap = getClassMap(value.getClass());
         String methodBase = Character.toTitleCase(property.charAt(0)) + property.substring(1);
         try {
-            for (String prefix : Arrays.asList("get", "is", "to", "as")) {
+            for (String prefix : ACCESSOR_PREFIXES) {
                 Method method = classMap.findMethod(prefix + methodBase);
                 if (method != null) {
                     return method.invoke(value, OBJECT_ARGS);

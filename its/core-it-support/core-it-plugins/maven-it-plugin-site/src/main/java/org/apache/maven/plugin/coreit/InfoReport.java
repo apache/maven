@@ -29,6 +29,7 @@ import org.apache.maven.doxia.sink.Sink;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
+import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.reporting.MavenReport;
 import org.apache.maven.reporting.MavenReportException;
@@ -36,11 +37,10 @@ import org.apache.maven.reporting.MavenReportException;
 /**
  * Creates a properties file in the site output directory.
  *
- * @goal info
  *
  * @author Benjamin Bentmann
- *
  */
+@Mojo(name = "info")
 public class InfoReport extends AbstractMojo implements MavenReport {
 
     /**

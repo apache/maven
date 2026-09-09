@@ -1,0 +1,12 @@
+---
+title: About
+author: 
+  - Hervé Boutemy
+date: 2012-10-13
+---
+
+# ${project.name}
+
+About ${project.description}
+
+See [Project Modules](./modules.html) report for a complete list with description.

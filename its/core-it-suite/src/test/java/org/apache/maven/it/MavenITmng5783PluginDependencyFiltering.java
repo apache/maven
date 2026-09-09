@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 
 import org.junit.jupiter.api.Test;
@@ -29,13 +29,13 @@ public class MavenITmng5783PluginDependencyFiltering extends AbstractMavenIntegr
 
     @Test
     public void testSLF4j() throws Exception {
-        File testDir = extractResources("/mng-5783-plugin-dependency-filtering");
-        Verifier verifier = newVerifier(new File(testDir, "plugin").getAbsolutePath());
+        Path testDir = extractResources("mng-5783-plugin-dependency-filtering");
+        Verifier verifier = newVerifier(testDir.resolve("plugin"));
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(new File(testDir, "slf4j").getAbsolutePath());
+        verifier = newVerifier(testDir.resolve("slf4j"));
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();

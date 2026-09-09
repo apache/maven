@@ -27,6 +27,9 @@ import org.apache.maven.api.Type;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.spi.TypeProvider;
 
+/**
+ * Maven 4 default {@link TypeProvider} implementation.
+ */
 @Named
 public class DefaultTypeProvider implements TypeProvider {
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -57,6 +60,7 @@ public class DefaultTypeProvider implements TypeProvider {
                 new DefaultType(Type.TEST_JAVA_SOURCE, Language.JAVA_FAMILY, "jar", "test-sources", false),
                 new DefaultType(Type.MODULAR_JAR, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.MODULES),
                 new DefaultType(Type.CLASSPATH_JAR, Language.JAVA_FAMILY, "jar", null, false, JavaPathType.CLASSES),
+                new DefaultType(Type.FATJAR, Language.JAVA_FAMILY, "jar", null, true, JavaPathType.CLASSES),
                 new DefaultType(
                         Type.PROCESSOR,
                         Language.JAVA_FAMILY,

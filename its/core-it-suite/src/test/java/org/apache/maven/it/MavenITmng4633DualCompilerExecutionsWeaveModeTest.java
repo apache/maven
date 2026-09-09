@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
@@ -59,9 +59,9 @@ public class MavenITmng4633DualCompilerExecutionsWeaveModeTest extends AbstractM
      */
     @Test
     public void testit() throws Exception {
-        File testDir = extractResources("/mng-4633");
+        Path testDir = extractResources("mng-4633");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.addCliArgument("-T");
         verifier.addCliArgument("2W");

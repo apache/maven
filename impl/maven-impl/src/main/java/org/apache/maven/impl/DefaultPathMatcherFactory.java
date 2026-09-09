@@ -66,9 +66,7 @@ public class DefaultPathMatcherFactory implements PathMatcherFactory {
     @Override
     public PathMatcher deriveDirectoryMatcher(@Nonnull PathMatcher fileMatcher) {
         if (Objects.requireNonNull(fileMatcher) instanceof PathSelector selector) {
-            if (selector.canFilterDirectories()) {
-                return selector::couldHoldSelected;
-            }
+            return selector.createDirectoryMatcher();
         }
         return PathSelector.INCLUDES_ALL;
     }

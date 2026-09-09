@@ -18,7 +18,7 @@
  */
 package org.apache.maven.plugin.coreit;
 
-import junit.framework.TestCase;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
@@ -32,7 +32,7 @@ public class RequirementComponentLookupExceptionMojo extends AbstractMojo {
 
     /**
      */
-    @Component(role = TestCase.class, hint = "triggers-error")
+    @Component(role = StringUtils.class, hint = "triggers-error")
     private org.apache.maven.plugin.Mojo dependency;
 
     public void execute() throws MojoExecutionException, MojoFailureException {

@@ -29,6 +29,7 @@ import java.util.Map;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.services.Sources;
+import org.apache.maven.model.Build;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.project.MavenProject;
@@ -39,6 +40,7 @@ import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.installation.InstallRequest;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mockito;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
@@ -278,5 +280,46 @@ class ConsumerPomArtifactTransformerTest {
                 );
         request.setArtifacts(artifacts);
         return request;
+    }
+
+    @Test
+    void injectTransformedArtifactsTwiceShouldNotDuplicate(@TempDir Path tempDir) throws IOException {
+        // Set up a minimal POM file
+        Path pomFile = tempDir.resolve("pom.xml");
+        Files.writeString(
+                pomFile,
+                "<project><modelVersion>4.0.0</modelVersion>"
+                        + "<groupId>test</groupId><artifactId>test</artifactId>"
+                        + "<version>1.0</version></project>");
+
+        // Create project with the POM file and a build directory
+        Model model = new Model();
+        model.setGroupId("test");
+        model.setArtifactId("test");
+        model.setVersion("1.0");
+        Build build = new Build();
+        build.setDirectory(tempDir.resolve("target").toString());
+        model.setBuild(build);
+        MavenProject project = new MavenProject(model);
+        project.setFile(pomFile.toFile());
+
+        // Mock session with consumer POM feature enabled (default for Maven 4)
+        RepositorySystemSession session = Mockito.mock(RepositorySystemSession.class);
+        SessionData sessionData = Mockito.mock(SessionData.class);
+        when(session.getData()).thenReturn(sessionData);
+        when(session.getConfigProperties()).thenReturn(Map.of());
+
+        ConsumerPomArtifactTransformer transformer =
+                new ConsumerPomArtifactTransformer((s, p, src) -> p.getModel().getDelegate());
+
+        // First invocation should attach the consumer POM
+        transformer.injectTransformedArtifacts(session, project);
+        assertEquals(1, project.getAttachedArtifacts().size());
+        assertEquals("consumer", project.getAttachedArtifacts().get(0).getClassifier());
+        assertEquals("pom", project.getAttachedArtifacts().get(0).getType());
+
+        // Second invocation should be a no-op (not duplicate the artifact)
+        transformer.injectTransformedArtifacts(session, project);
+        assertEquals(1, project.getAttachedArtifacts().size());
     }
 }

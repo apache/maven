@@ -20,13 +20,10 @@ package org.apache.maven.plugin.coreit;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 
-/**
- *
- * @phase process-sources
- */
-@Mojo(name = "test")
+@Mojo(name = "test", defaultPhase = LifecyclePhase.PROCESS_SOURCES)
 public class CoreItMojo extends AbstractMojo {
     public void execute() throws MojoExecutionException {
         throw new MojoExecutionException("Should not be run");

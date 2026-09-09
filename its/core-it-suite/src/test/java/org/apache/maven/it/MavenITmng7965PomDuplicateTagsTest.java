@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -35,9 +35,9 @@ class MavenITmng7965PomDuplicateTagsTest extends AbstractMavenIntegrationTestCas
 
     @Test
     void javadocIsExecutedAndFailed() throws Exception {
-        File testDir = extractResources("/mng-7965-pom-duplicate-tags");
+        Path testDir = extractResources("mng-7965-pom-duplicate-tags");
 
-        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        Verifier verifier = newVerifier(testDir);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("validate");
 
