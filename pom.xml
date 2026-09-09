@@ -51,7 +51,7 @@ under the License.
     <maven.compiler.target>1.7</maven.compiler.target>
     <classWorldsVersion>2.6.0</classWorldsVersion>
     <commonsCliVersion>1.4</commonsCliVersion>
-    <commonsLangVersion>3.8.1</commonsLangVersion>
+    <commonsLangVersion>3.18.0</commonsLangVersion>
     <junitVersion>4.13.2</junitVersion>
     <mockitoVersion>2.21.0</mockitoVersion>
     <plexusVersion>2.1.0</plexusVersion>
@@ -630,6 +630,23 @@ under the License.
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-enforcer-plugin</artifactId>
         <executions>
+          <execution>
+            <id>enforce-bytecode-version</id>
+            <goals>
+              <goal>enforce</goal>
+            </goals>
+            <configuration>
+              <rules>
+                <enforceBytecodeVersion>
+                  <maxJdkVersion>${maven.compiler.target}</maxJdkVersion>
+                  <excludes>
+                    <exclude>org.apache.commons:commons-lang3</exclude>
+                  </excludes>
+                </enforceBytecodeVersion>
+              </rules>
+              <fail>true</fail>
+            </configuration>
+          </execution>
           <execution>
             <goals>
               <goal>enforce</goal>
