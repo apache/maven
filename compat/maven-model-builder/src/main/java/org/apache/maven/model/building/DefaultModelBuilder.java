@@ -970,10 +970,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             version = candidateModel.getParent().getVersion();
         }
 
-        if (groupId == null
-                || !groupId.equals(parent.getGroupId())
-                || artifactId == null
-                || !artifactId.equals(parent.getArtifactId())) {
+        if (parent.getRelativePath() != null
+                && (groupId == null
+                        || !groupId.equals(parent.getGroupId())
+                        || artifactId == null
+                        || !artifactId.equals(parent.getArtifactId()))) {
             StringBuilder buffer = new StringBuilder(256);
             buffer.append("'parent.relativePath'");
             if (childModel != problems.getRootModel()) {
