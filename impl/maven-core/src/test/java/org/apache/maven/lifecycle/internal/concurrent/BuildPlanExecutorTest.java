@@ -94,6 +94,34 @@ class BuildPlanExecutorTest {
     }
 
     /**
+     * A checked exception thrown by a build step is a soft failure: the reactor must not be halted, and
+     * other projects must still be built when {@code REACTOR_FAIL_AT_END} is in effect. This pins the
+     * soft-failure path of {@code isFatal} so a future change does not silently break {@code --fail-at-end}
+     * for ordinary plugin failures.
+     */
+    @Test
+    void checkedExceptionThrownByBuildStepDoesNotHaltReactor() throws Exception {
+        MavenProject project = newProject();
+        MavenSession session = newSession(project);
+        session.getRequest().setReactorFailureBehavior(MavenExecutionRequest.REACTOR_FAIL_AT_END);
+
+        ReactorContext reactorContext = execute(session, project, event -> {}, plan -> {
+            BuildStep step = plan.step(project, "validate")
+                    .orElseThrow(() -> new IllegalStateException("no validate step in the plan"));
+            // LifecycleExecutionException is a checked exception — the soft-failure case for isFatal.
+            step.exception = new LifecycleExecutionException("plugin failure");
+            step.status.set(BuildStep.FAILED);
+        });
+
+        assertTrue(
+                session.getResult().getBuildSummary(project) instanceof org.apache.maven.execution.BuildFailure,
+                "the project must be recorded as a failure");
+        assertTrue(
+                !reactorContext.getReactorBuildStatus().isHalted(),
+                "a checked exception must not halt the reactor when REACTOR_FAIL_AT_END is set");
+    }
+
+    /**
      * A project can end up with more than one failure: when a build step fails, the matching after:* step is
      * still run for cleanup and may fail on its own. Those failures are reported through a wrapper exception,
      * and the wrapper is a checked exception, so reading the severity off the wrapper hides the {@link Error}

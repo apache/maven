@@ -599,7 +599,9 @@ public class BuildPlanExecutor {
          * them can only be seen by looking at the failures themselves.
          *
          * @param failures The failures collected for a single project
-         * @return {@code true} if the build must be halted
+         * @return {@code true} if the build must be halted; checked exceptions (ordinary plugin failures) are
+         *         soft and allow the reactor to continue with other projects, while {@link RuntimeException}s
+         *         and {@link Error}s indicate an unexpected JVM or framework state and halt the build
          */
         private static boolean isFatal(List<Throwable> failures) {
             return failures.stream().anyMatch(t -> t instanceof RuntimeException || !(t instanceof Exception));
