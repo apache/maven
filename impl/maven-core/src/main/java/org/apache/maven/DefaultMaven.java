@@ -112,8 +112,6 @@ public class DefaultMaven implements Maven {
 
     private final WorkspaceReader ideWorkspaceReader;
 
-    private final List<org.apache.maven.api.spi.WorkspaceReader> spiWorkspaceReaders;
-
     private final ProjectSelector projectSelector;
 
     @Inject
@@ -129,8 +127,7 @@ public class DefaultMaven implements Maven {
             BuildResumptionDataRepository buildResumptionDataRepository,
             SuperPomProvider superPomProvider,
             DefaultSessionFactory defaultSessionFactory,
-            @Nullable @Named("ide") WorkspaceReader ideWorkspaceReader,
-            List<org.apache.maven.api.spi.WorkspaceReader> spiWorkspaceReaders) {
+            @Nullable @Named("ide") WorkspaceReader ideWorkspaceReader) {
         this.lookup = lookup;
         this.eventCatapult = eventCatapult;
         this.legacySupport = legacySupport;
@@ -141,7 +138,6 @@ public class DefaultMaven implements Maven {
         this.buildResumptionDataRepository = buildResumptionDataRepository;
         this.superPomProvider = superPomProvider;
         this.ideWorkspaceReader = ideWorkspaceReader;
-        this.spiWorkspaceReaders = spiWorkspaceReaders;
         this.defaultSessionFactory = defaultSessionFactory;
         this.projectSelector = new ProjectSelector(); // if necessary switch to DI
     }
@@ -218,8 +214,12 @@ public class DefaultMaven implements Maven {
         try {
             MavenChainedWorkspaceReader chainedWorkspaceReader =
                     new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader);
-            // Add SPI workspace readers to the chain
-            for (org.apache.maven.api.spi.WorkspaceReader spiReader : spiWorkspaceReaders) {
+            // Add SPI workspace readers to the chain — looked up dynamically so that
+            // implementations discovered from core extensions are included (extensions
+            // are loaded after the container is bootstrapped, so constructor injection
+            // would miss them).
+            for (org.apache.maven.api.spi.WorkspaceReader spiReader :
+                    lookup.lookupList(org.apache.maven.api.spi.WorkspaceReader.class)) {
                 chainedWorkspaceReader.addReader(new SpiWorkspaceReaderAdapter(spiReader));
             }
             try (CloseableSession closeableSession = newCloseableSession(request, chainedWorkspaceReader)) {
