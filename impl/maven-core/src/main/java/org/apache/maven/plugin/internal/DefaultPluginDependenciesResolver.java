@@ -36,6 +36,8 @@ import org.apache.maven.impl.resolver.RelocatedArtifact;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
+import org.apache.maven.resolver.MavenChainedWorkspaceReader;
+import org.apache.maven.resolver.SpiWorkspaceReaderAdapter;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -48,6 +50,7 @@ import org.eclipse.aether.collection.VersionFilterBuilder;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.resolution.ArtifactDescriptorException;
 import org.eclipse.aether.resolution.ArtifactDescriptorRequest;
 import org.eclipse.aether.resolution.ArtifactDescriptorResult;
@@ -108,6 +111,9 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         try {
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession(session);
             pluginSession.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, false));
+
+            // Filter out SPI workspace readers that opt out of plugin resolution
+            filterWorkspaceReadersForPluginResolution(session, pluginSession);
 
             ArtifactDescriptorRequest request =
                     new ArtifactDescriptorRequest(pluginArtifact, repositories, REPOSITORY_CONTEXT);
@@ -267,6 +273,9 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             pluginSession.setDependencySelector(session.getDependencySelector());
             pluginSession.setDependencyGraphTransformer(session.getDependencyGraphTransformer());
 
+            // Filter out SPI workspace readers that opt out of plugin resolution
+            filterWorkspaceReadersForPluginResolution(session, pluginSession);
+
             CollectRequest request = new CollectRequest();
             request.setRequestContext(REPOSITORY_CONTEXT);
             request.setRepositories(repositories);
@@ -305,6 +314,25 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             throw new PluginResolutionException(plugin, exceptions, e);
         } finally {
             RequestTraceHelper.exit(trace);
+        }
+    }
+
+    /**
+     * Filters workspace readers in the plugin session, removing SPI workspace readers
+     * that have opted out of plugin resolution via
+     * {@link org.apache.maven.api.spi.WorkspaceReader#isApplicableForPluginResolution()}.
+     */
+    private void filterWorkspaceReadersForPluginResolution(
+            RepositorySystemSession session, DefaultRepositorySystemSession pluginSession) {
+        WorkspaceReader workspaceReader = session.getWorkspaceReader();
+        if (workspaceReader instanceof MavenChainedWorkspaceReader chainedReader) {
+            List<WorkspaceReader> filtered = chainedReader.getReaders().stream()
+                    .filter(r -> !(r instanceof SpiWorkspaceReaderAdapter adapter)
+                            || adapter.isApplicableForPluginResolution())
+                    .collect(Collectors.toList());
+            if (filtered.size() != chainedReader.getReaders().size()) {
+                pluginSession.setWorkspaceReader(MavenChainedWorkspaceReader.of(filtered));
+            }
         }
     }
 }
