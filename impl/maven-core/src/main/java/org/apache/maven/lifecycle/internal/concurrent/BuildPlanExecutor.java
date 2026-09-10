@@ -386,9 +386,9 @@ public class BuildPlanExecutor {
                             try {
                                 executeStep(step);
                                 executePlan();
-                            } catch (Exception e) {
+                            } catch (Throwable e) {
                                 step.status.compareAndSet(SKIPPED, FAILED);
-                                // Store the exception in the step for handling in the TEARDOWN phase
+                                // Store the failure in the step for handling in the TEARDOWN phase
                                 step.exception = e;
                                 logger.debug("Stored exception for step {} to be handled in TEARDOWN phase", step, e);
                                 // Let the scheduler handle after:* phases and TEARDOWN in the next cycle
@@ -423,10 +423,10 @@ public class BuildPlanExecutor {
                             }
                         }
                         executePlan();
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         step.status.compareAndSet(SCHEDULED, FAILED);
 
-                        // Store the exception in the step for handling in the TEARDOWN phase
+                        // Store the failure in the step for handling in the TEARDOWN phase
                         step.exception = e;
                         logger.debug("Stored exception for step {} to be handled in TEARDOWN phase", step, e);
 
@@ -510,7 +510,7 @@ public class BuildPlanExecutor {
                     List<Throwable> failures = null;
                     boolean allWorkExecuted = true;
                     for (BuildStep projectStep : plan.steps(step.project).toList()) {
-                        Exception exception = projectStep.exception;
+                        Throwable exception = projectStep.exception;
                         if (exception != null) {
                             if (failures == null) {
                                 failures = new ArrayList<>();
@@ -545,7 +545,7 @@ public class BuildPlanExecutor {
                             failure = new LifecycleExecutionException("Error building project");
                             failures.forEach(failure::addSuppressed);
                         }
-                        handleBuildError(reactorContext, session, step.project, failure);
+                        handleBuildError(reactorContext, session, step.project, failure, isFatal(failures));
                     } else if (projectStarted && allWorkExecuted) {
                         // If there were no failures, report success
                         projectExecutionListener.afterProjectExecutionSuccess(
@@ -576,6 +576,20 @@ public class BuildPlanExecutor {
                     break;
             }
             step.status.compareAndSet(SCHEDULED, EXECUTED);
+        }
+
+        /**
+         * Tells whether any of the failures collected for a project must halt the build. Several failures are
+         * reported through a wrapper, and a wrapper is always a checked exception, so an {@link Error} among
+         * them can only be seen by looking at the failures themselves.
+         *
+         * @param failures The failures collected for a single project
+         * @return {@code true} if the build must be halted; checked exceptions (ordinary plugin failures) are
+         *         soft and allow the reactor to continue with other projects, while {@link RuntimeException}s
+         *         and {@link Error}s indicate an unexpected JVM or framework state and halt the build
+         */
+        private static boolean isFatal(List<Throwable> failures) {
+            return failures.stream().anyMatch(t -> t instanceof RuntimeException || !(t instanceof Exception));
         }
 
         private void attachToThread(BuildStep step) {
@@ -868,13 +882,16 @@ public class BuildPlanExecutor {
          * @param buildContext The reactor context
          * @param session The Maven session
          * @param mavenProject The project that failed
-         * @param t The exception that caused the failure
+         * @param t The exception that caused the failure, possibly a wrapper around several failures
+         * @param fatal Whether the failure must halt the build. This cannot be read off {@code t}, because a
+         *              wrapper around several failures hides what is inside it. See {@link #isFatal(List)}.
          */
         protected void handleBuildError(
                 final ReactorContext buildContext,
                 final MavenSession session,
                 final MavenProject mavenProject,
-                Throwable t) {
+                Throwable t,
+                boolean fatal) {
             // record the error and mark the project as failed
             Clock clock = getClock(mavenProject);
             buildContext.getResult().addException(t);
@@ -883,12 +900,12 @@ public class BuildPlanExecutor {
                     .addBuildSummary(new BuildFailure(mavenProject, clock.execTime(), clock.wallTime(), t));
 
             // notify listeners about "soft" project build failures only
-            if (t instanceof Exception exception && !(t instanceof RuntimeException)) {
+            if (!fatal && t instanceof Exception exception) {
                 eventCatapult.fire(ExecutionEvent.Type.ProjectFailed, session, null, exception);
             }
 
             // reactor failure modes
-            if (t instanceof RuntimeException || !(t instanceof Exception)) {
+            if (fatal) {
                 // fail fast on RuntimeExceptions, Errors and "other" Throwables
                 // assume these are system errors and further build is meaningless
                 buildContext.getReactorBuildStatus().halt();
