@@ -36,28 +36,50 @@ import static java.util.Objects.requireNonNull;
  */
 public abstract class AbstractLifecycleMappingProvider implements Provider<LifecycleMapping> {
     // START SNIPPET: versions
+    /** @deprecated Use {@link PluginVersions#RESOURCES} instead. */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     protected static final String RESOURCES_PLUGIN_VERSION = PluginVersions.RESOURCES;
 
+    /** @deprecated Use {@link PluginVersions#COMPILER} instead. */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     protected static final String COMPILER_PLUGIN_VERSION = PluginVersions.COMPILER;
 
+    /** @deprecated Use {@link PluginVersions#SUREFIRE} instead. */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     protected static final String SUREFIRE_PLUGIN_VERSION = PluginVersions.SUREFIRE;
 
+    /** @deprecated Use {@link PluginVersions#INSTALL} instead. */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     protected static final String INSTALL_PLUGIN_VERSION = PluginVersions.INSTALL;
 
+    /** @deprecated Use {@link PluginVersions#DEPLOY} instead. */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     protected static final String DEPLOY_PLUGIN_VERSION = PluginVersions.DEPLOY;
 
     // packaging
 
+    /** @deprecated Use {@link PluginVersions#JAR} instead. */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     protected static final String JAR_PLUGIN_VERSION = PluginVersions.JAR;
 
+    /** @deprecated Use {@link PluginVersions#EAR} instead. */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     protected static final String EAR_PLUGIN_VERSION = PluginVersions.EAR;
 
+    /** @deprecated Use {@link PluginVersions#EJB} instead. */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     protected static final String EJB_PLUGIN_VERSION = PluginVersions.EJB;
 
+    /** @deprecated Use {@link PluginVersions#PLUGIN} instead. */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     protected static final String PLUGIN_PLUGIN_VERSION = PluginVersions.PLUGIN;
 
+    /** @deprecated Use {@link PluginVersions#RAR} instead. */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     protected static final String RAR_PLUGIN_VERSION = PluginVersions.RAR;
 
+    /** @deprecated Use {@link PluginVersions#WAR} instead. */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     protected static final String WAR_PLUGIN_VERSION = PluginVersions.WAR;
     // END SNIPPET: versions
 

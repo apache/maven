@@ -49,19 +49,16 @@ public final class PluginVersions {
 
     private PluginVersions() {}
 
-    /**
-     * Returns the default version for the given plugin.
-     *
-     * @param pluginArtifactId the artifact id, e.g. {@code "maven-compiler-plugin"}
-     * @return the version string, never {@code null}
-     * @throws IllegalArgumentException if the plugin is not listed in the properties file
-     */
-    public static String version(String pluginArtifactId) {
-        String key = pluginArtifactId + ".version";
+    private static String version(String pluginArtifactId) {
+        String key = "version." + pluginArtifactId;
         String version = VERSIONS.getProperty(key);
         if (version == null) {
             throw new IllegalArgumentException("No default version defined for " + pluginArtifactId + "; add " + key
                     + " to plugin-versions.properties");
+        }
+        if (version.startsWith("${")) {
+            throw new ExceptionInInitializerError("plugin-versions.properties was not filtered at build time; " + key
+                    + " still contains placeholder: " + version);
         }
         return version;
     }
