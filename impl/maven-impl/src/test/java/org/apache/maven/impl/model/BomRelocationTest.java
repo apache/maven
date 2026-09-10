@@ -144,6 +144,15 @@ class BomRelocationTest {
     }
 
     @Test
+    void detectsDirectImportCycle() {
+        ModelBuilderException exception =
+                assertThrows(ModelBuilderException.class, () -> build(Map.of(), management(bom("consumer"))));
+        assertTrue(
+                exception.getMessage().contains("The import POMs form a cycle: test:consumer:1 -> test:consumer:1"),
+                exception.getMessage());
+    }
+
+    @Test
     void reportsUnresolvableRelocationTarget() {
         Map<String, String> poms =
                 Map.of("test:old:1", pom("test", "old", "1", relocation("<artifactId>missing</artifactId>")));
@@ -379,7 +388,7 @@ class BomRelocationTest {
     private void assertCycle(Map<String, String> poms, String cycle) {
         ModelBuilderException exception =
                 assertThrows(ModelBuilderException.class, () -> build(poms, management(bom("old"))));
-        assertTrue(exception.getMessage().contains("form a cycle: " + cycle), exception.getMessage());
+        assertTrue(exception.getMessage().contains("The import POMs form a cycle: " + cycle), exception.getMessage());
     }
 
     private ModelBuilderResult build(Map<String, String> poms, String content) throws Exception {

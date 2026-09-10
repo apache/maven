@@ -2501,8 +2501,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             String imported = groupId + ':' + artifactId + ':' + version;
 
             if (importIds.contains(imported)) {
-                StringBuilder message =
-                        new StringBuilder("The dependencies of type=pom and with scope=import form a cycle: ");
+                StringBuilder message = new StringBuilder("The import POMs form a cycle: ");
                 for (String modelId : importIds) {
                     message.append(modelId).append(" -> ");
                 }
