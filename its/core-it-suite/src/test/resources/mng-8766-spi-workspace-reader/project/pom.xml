@@ -25,7 +25,7 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: mng-8766</name>
-  <description>Verify that SPI WorkspaceReader is used for dependency resolution but not for plugin resolution.</description>
+  <description>Verify that SPI WorkspaceReader is discovered and consulted for artifact resolution.</description>
 
   <dependencies>
     <dependency>

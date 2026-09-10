@@ -25,7 +25,7 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: spi-workspace-reader</name>
-  <description>SPI WorkspaceReader extension that opts out of plugin resolution</description>
+  <description>SPI WorkspaceReader extension for IDE workspace artifact resolution</description>
 
   <dependencies>
     <dependency>
