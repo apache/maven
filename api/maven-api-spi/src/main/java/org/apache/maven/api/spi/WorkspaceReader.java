@@ -62,20 +62,4 @@ public interface WorkspaceReader extends SpiService {
      * @return list of available versions, may be empty
      */
     List<String> findVersions(Artifact artifact);
-
-    /**
-     * Whether this workspace reader should participate in plugin resolution.
-     *
-     * <p>IDE workspace readers should return {@code false} here: plugin realms are cached
-     * by {@code DefaultPluginRealmCache} (which is {@code @Singleton}) and cannot be purged
-     * within a session, so resolving plugins from the workspace can lead to stale classloaders
-     * when workspace sources change.
-     *
-     * <p>Defaults to {@code true} (participates in plugin resolution).
-     *
-     * @return {@code true} if this reader should be consulted during plugin resolution
-     */
-    default boolean isApplicableForPluginResolution() {
-        return true;
-    }
 }

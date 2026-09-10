@@ -23,21 +23,27 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Integration test for the {@code WorkspaceReader} SPI in maven-api-spi.
+ * Integration test for the {@code WorkspaceReader} SPI in maven-api-spi (MNG-8766).
  *
- * <p>Verifies that SPI workspace readers with {@code isApplicableForPluginResolution() == false}
- * are discovered and active, but are <em>not</em> consulted during plugin resolution.
+ * <p>Verifies that SPI workspace readers are:
+ * <ol>
+ *   <li>Discovered via DI and active during the build session</li>
+ *   <li>Consulted for regular artifact resolution (dependency resolution, model building, etc.)</li>
+ * </ol>
+ *
+ * <p>The {@code PluginRealmCache.invalidate(Artifact)} SPI allows IDE integrators to purge
+ * stale plugin realms when workspace artifacts are rebuilt, rather than opting out of plugin
+ * resolution entirely.
  *
  * @since 4.1.0
  */
 class MavenITmng8766SpiWorkspaceReaderTest extends AbstractMavenIntegrationTestCase {
 
     @Test
-    void testSpiWorkspaceReaderFilteredFromPluginResolution() throws Exception {
+    void testSpiWorkspaceReaderDiscoveredAndConsulted() throws Exception {
         Path testDir = extractResources("mng-8766-spi-workspace-reader");
 
         // First, install the extension
@@ -46,34 +52,22 @@ class MavenITmng8766SpiWorkspaceReaderTest extends AbstractMavenIntegrationTestC
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        // Run the project that uses the extension — process-resources triggers plugin resolution
+        // Run the project that uses the extension — process-resources triggers artifact resolution
         verifier = newVerifier(testDir.resolve("project"));
         verifier.addCliArgument("process-resources");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        // Verify the SPI workspace reader was created (proves discovery works)
+        // Verify the SPI workspace reader was created (proves DI discovery works)
         verifier.verifyTextInLog("[SPI-WR] created");
 
-        // The SPI workspace reader should be called for artifact resolution in the main session
-        // (e.g., during project dependency resolution, model building, etc.)
+        // Verify the SPI workspace reader was consulted during artifact resolution
+        // (findArtifact is called for dependencies, model resolution, etc.)
         List<String> logLines = verifier.loadLogLines();
         boolean hasFindArtifactCalls =
                 logLines.stream().anyMatch(line -> line.contains("[SPI-WR] findArtifact("));
         assertTrue(
                 hasFindArtifactCalls,
-                "SPI workspace reader should be consulted during regular artifact resolution");
-
-        // Verify it was NOT called for plugin resolution
-        // When isApplicableForPluginResolution() returns false, the reader is removed from
-        // the plugin session's workspace reader chain, so it should not see any findArtifact
-        // calls for plugins like maven-resources-plugin
-        boolean hasPluginCalls = logLines.stream()
-                .anyMatch(line ->
-                        line.contains("[SPI-WR] findArtifact(") && line.contains("maven-resources-plugin"));
-        assertFalse(
-                hasPluginCalls,
-                "SPI workspace reader with isApplicableForPluginResolution()=false "
-                        + "should NOT be called for plugin resolution");
+                "SPI workspace reader should be consulted during artifact resolution");
     }
 }

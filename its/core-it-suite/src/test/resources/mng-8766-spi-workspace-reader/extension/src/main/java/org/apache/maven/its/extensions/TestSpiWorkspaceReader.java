@@ -49,9 +49,4 @@ public class TestSpiWorkspaceReader implements WorkspaceReader {
         log.info("[SPI-WR] findVersions({})", artifact.key());
         return Collections.emptyList();
     }
-
-    @Override
-    public boolean isApplicableForPluginResolution() {
-        return false;
-    }
 }

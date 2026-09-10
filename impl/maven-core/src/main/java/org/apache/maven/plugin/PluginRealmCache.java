@@ -95,6 +95,26 @@ public interface PluginRealmCache {
     void flush();
 
     /**
+     * Invalidates all cache entries whose resolved artifacts include the given artifact.
+     *
+     * <p>IDE integrators and other workspace-aware tools can call this method when a workspace
+     * artifact changes on disk, so that subsequent builds will re-resolve the affected plugin
+     * realms from the updated sources rather than using a stale cached classloader.
+     *
+     * <p>Implementations may choose to match on {@code groupId:artifactId:version} only, ignoring
+     * classifier and extension, to maximize the chance of invalidating related entries.
+     *
+     * <p>The default implementation is a no-op (safe for existing implementations that do not
+     * track artifact-to-entry mappings).
+     *
+     * @param artifact the workspace artifact that has changed, never {@code null}
+     * @since 4.1.0
+     */
+    default void invalidate(org.apache.maven.api.Artifact artifact) {
+        // no-op by default
+    }
+
+    /**
      * Registers the specified cache record for usage with the given project. Integrators can use the information
      * collected from this method in combination with a custom cache implementation to dispose unused records from the
      * cache.
