@@ -6,6 +6,7 @@
   <artifactId>test</artifactId>
   <version>1.0</version>
   <dependencies>
+    <!-- EXPECT: valid — 5-part g:a:type:classifier:v -->
     <dependency id="org.example:lib-c:jar:sources:1.0"/>
   </dependencies>
 </project>

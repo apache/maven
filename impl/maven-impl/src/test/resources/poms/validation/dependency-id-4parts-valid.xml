@@ -6,6 +6,7 @@
   <artifactId>test</artifactId>
   <version>1.0</version>
   <dependencies>
+    <!-- EXPECT: valid — 4-part g:a:type:v -->
     <dependency id="org.example:lib-b:pom:1.0"/>
   </dependencies>
 </project>

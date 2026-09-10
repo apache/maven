@@ -8,6 +8,7 @@
   <dependencies>
     <dependency id="org.example:lib-a:1.0">
       <exclusions>
+        <!-- EXPECT: valid — 2-part g:a exclusion id -->
         <exclusion id="org.unwanted:bad-lib"/>
       </exclusions>
     </dependency>

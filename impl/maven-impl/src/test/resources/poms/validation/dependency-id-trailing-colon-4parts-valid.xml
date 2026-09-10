@@ -6,6 +6,7 @@
   <artifactId>test</artifactId>
   <version>1.0</version>
   <dependencies>
+    <!-- EXPECT: valid — 4-part g:a:type: (trailing colon = version managed) -->
     <dependency id="org.example:lib-b:pom:"/>
   </dependencies>
 </project>

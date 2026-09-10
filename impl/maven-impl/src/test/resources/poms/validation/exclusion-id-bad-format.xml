@@ -8,6 +8,7 @@
   <dependencies>
     <dependency id="org.example:lib-a:1.0">
       <exclusions>
+        <!-- EXPECT: 1 error — "invalid format": exclusion id must be g:a -->
         <exclusion id="only-one-part"/>
       </exclusions>
     </dependency>

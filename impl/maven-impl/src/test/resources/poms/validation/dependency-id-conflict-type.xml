@@ -6,6 +6,7 @@
   <artifactId>test</artifactId>
   <version>1.0</version>
   <dependencies>
+    <!-- EXPECT: 1 error — <type> must not be specified when 'id' attribute includes type (4+ parts) -->
     <dependency id="org.example:lib:war:1.0">
       <type>pom</type>
     </dependency>

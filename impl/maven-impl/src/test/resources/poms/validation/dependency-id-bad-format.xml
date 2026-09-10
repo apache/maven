@@ -6,6 +6,7 @@
   <artifactId>test</artifactId>
   <version>1.0</version>
   <dependencies>
+    <!-- EXPECT: 1 error — "invalid format": id must contain at least one colon (g:a or g:a:v) -->
     <dependency id="invalid-no-colons"/>
   </dependencies>
 </project>

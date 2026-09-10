@@ -6,6 +6,7 @@
   <artifactId>test</artifactId>
   <version>1.0</version>
   <dependencies>
+    <!-- EXPECT: valid — 2-part g:a (version managed, resolved from dependencyManagement) -->
     <dependency id="org.example:lib-a"/>
   </dependencies>
 </project>

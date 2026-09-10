@@ -6,6 +6,7 @@
   <artifactId>test</artifactId>
   <version>1.0</version>
   <dependencies>
+    <!-- EXPECT: 1 error — <groupId> must not be specified when 'id' attribute is used -->
     <dependency id="org.example:lib:1.0">
       <groupId>org.other</groupId>
     </dependency>

@@ -5,6 +5,7 @@
   <version>0.1</version>
 
   <dependencies>
+    <!-- EXPECT: 1 error — <optional> must not be specified when 'id' attribute contains '?' -->
     <dependency id="commons-io:commons-io:2.11.0?">
       <optional>true</optional>
     </dependency>

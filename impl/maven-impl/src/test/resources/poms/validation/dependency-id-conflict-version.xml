@@ -5,6 +5,7 @@
   <version>0.1</version>
 
   <dependencies>
+    <!-- EXPECT: 1 error — <version> must not be specified when 'id' attribute is used -->
     <dependency id="org.slf4j:slf4j-api:2.0.17">
       <version>2.0.17</version>
     </dependency>

@@ -5,6 +5,7 @@
   <version>0.1</version>
 
   <dependencies>
+    <!-- EXPECT: valid — @provided sets scope and ? marks optional; both child elements forbidden -->
     <dependency id="org.apache.maven:maven-core:3.9.0@provided?"/>
   </dependencies>
 </project>

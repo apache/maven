@@ -5,6 +5,7 @@
   <version>0.1</version>
 
   <dependencies>
+    <!-- EXPECT: valid — @test suffix sets scope; <scope> child forbidden when @scope is in id -->
     <dependency id="org.junit.jupiter:junit-jupiter-api:5.0@test"/>
   </dependencies>
 </project>

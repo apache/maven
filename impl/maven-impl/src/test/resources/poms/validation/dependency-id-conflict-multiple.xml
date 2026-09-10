@@ -5,6 +5,7 @@
   <version>0.1</version>
 
   <dependencies>
+    <!-- EXPECT: 2 errors — <groupId> and <artifactId> must not be specified when 'id' attribute is used -->
     <dependency id="org.slf4j:slf4j-api:2.0.17">
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
