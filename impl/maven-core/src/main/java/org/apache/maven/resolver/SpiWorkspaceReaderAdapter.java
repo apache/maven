@@ -68,15 +68,6 @@ public class SpiWorkspaceReaderAdapter implements WorkspaceReader {
     }
 
     /**
-     * Whether the underlying SPI reader should participate in plugin resolution.
-     *
-     * @return {@code true} if applicable for plugin resolution
-     */
-    public boolean isApplicableForPluginResolution() {
-        return delegate.isApplicableForPluginResolution();
-    }
-
-    /**
      * Returns the underlying SPI workspace reader.
      */
     public org.apache.maven.api.spi.WorkspaceReader getDelegate() {
