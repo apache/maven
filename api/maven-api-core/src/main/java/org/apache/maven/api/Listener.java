@@ -26,6 +26,19 @@ import org.apache.maven.api.annotations.Nonnull;
  * A listener for session events.
  * Existing implementations and lambdas receive execution events through {@link #onEvent(Event)}.
  * Implement {@link ExecutionListener} or {@link RepositoryListener} for typed callbacks.
+ * <p>
+ * A listener implementing both interfaces must override {@link #onEvent(Event)} to resolve
+ * their conflicting default methods. Delegate to both defaults to receive typed callbacks
+ * for both event families; each default ignores events from the other family:
+ * <pre>{@code
+ * class CombinedListener implements ExecutionListener, RepositoryListener {
+ *     @Override
+ *     public void onEvent(Event event) {
+ *         ExecutionListener.super.onEvent(event);
+ *         RepositoryListener.super.onEvent(event);
+ *     }
+ * }
+ * }</pre>
  *
  * @since 4.0.0
  */
