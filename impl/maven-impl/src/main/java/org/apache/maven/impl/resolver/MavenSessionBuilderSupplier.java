@@ -100,11 +100,13 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     }
 
     public DependencySelector getDependencySelector() {
+        DependencySelector scopeSelector = ScopeDependencySelector.legacy(
+                null, Arrays.asList(DependencyScope.TEST.id(), DependencyScope.PROVIDED.id()));
+        if (!mavenMaven3Personality) {
+            scopeSelector = new TestJarDependencySelector(scopeSelector);
+        }
         return new AndDependencySelector(
-                ScopeDependencySelector.legacy(
-                        null, Arrays.asList(DependencyScope.TEST.id(), DependencyScope.PROVIDED.id())),
-                OptionalDependencySelector.fromDirect(),
-                new ExclusionDependencySelector());
+                scopeSelector, OptionalDependencySelector.fromDirect(), new ExclusionDependencySelector());
     }
 
     public DependencyGraphTransformer getDependencyGraphTransformer() {
