@@ -500,7 +500,8 @@ public class DefaultModelValidator implements ModelValidator {
             }
 
             boolean isModelVersion41OrMore = !Objects.equals(ModelBuilder.MODEL_VERSION_4_0_0, model.getModelVersion());
-            boolean isModelVersion42OrMore = Objects.equals(ModelBuilder.MODEL_VERSION_4_2_0, model.getModelVersion());
+            boolean isModelVersion42OrMore = isModelVersion41OrMore
+                    && !Objects.equals(ModelBuilder.MODEL_VERSION_4_1_0, model.getModelVersion());
             if (isModelVersion41OrMore) {
                 validateStringNoExpression("groupId", problems, Severity.FATAL, Version.V41, model.getGroupId(), model);
 
