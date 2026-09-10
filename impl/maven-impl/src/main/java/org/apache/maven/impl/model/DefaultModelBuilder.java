@@ -62,6 +62,7 @@ import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Activation;
+import org.apache.maven.api.model.ActivationProperty;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DeploymentRepository;
@@ -1757,11 +1758,29 @@ public class DefaultModelBuilder implements ModelBuilder {
          */
         private static boolean hasFileOrPropertyOrConditionActivation(Profile profile) {
             Activation activation = profile.getActivation();
-            return activation != null
-                    && (activation.getFile() != null
-                            || activation.getProperty() != null
-                            || (activation.getCondition() != null
-                                    && !activation.getCondition().isBlank()));
+            if (activation == null) {
+                return false;
+            }
+            if (activation.getFile() != null) {
+                return true;
+            }
+            if (activation.getCondition() != null && !activation.getCondition().isBlank()) {
+                return true;
+            }
+            // A negated-name-only property activation ("!foo", no value) fires when the property is
+            // absent — it is on by default and can only be suppressed, not injected. Allow it through
+            // so that models relying on the common "opt-out flag" pattern (e.g. resteasy-default in
+            // JBoss projects) continue to work in external model builds. All other property conditions
+            // (positive name, or a required value) can be forced on via -D and remain blocked.
+            ActivationProperty prop = activation.getProperty();
+            if (prop == null) {
+                return false;
+            }
+            String name = prop.getName();
+            boolean negatedAbsenceCheck = name != null
+                    && name.startsWith("!")
+                    && (prop.getValue() == null || prop.getValue().isEmpty());
+            return !negatedAbsenceCheck;
         }
 
         /**

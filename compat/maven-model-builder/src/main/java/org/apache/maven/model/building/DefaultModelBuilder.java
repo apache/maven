@@ -42,6 +42,7 @@ import org.apache.maven.artifact.versioning.DefaultArtifactVersion;
 import org.apache.maven.artifact.versioning.InvalidVersionSpecificationException;
 import org.apache.maven.artifact.versioning.VersionRange;
 import org.apache.maven.model.Activation;
+import org.apache.maven.model.ActivationProperty;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -522,16 +523,48 @@ public class DefaultModelBuilder implements ModelBuilder {
      * property. Profiles activated by JDK version, operating system, or marked
      * {@code activeByDefault} are unaffected, since those conditions are a function of the build
      * platform rather than of the model content.
+     * <p>
+     * An exception is made for <em>negated</em> property activation ({@code <name>!foo</name>}
+     * with no {@code <value>}): such a profile fires when the property is <em>absent</em> and is
+     * therefore on by default. It cannot be injected by supplying a property — only suppressed —
+     * which is the safer direction. Filtering it out silently breaks models that rely on the
+     * common "opt-out flag" pattern (e.g. {@code resteasy-default} in JBoss/RESTEasy projects).
+     * The existing repository-stripping step still applies, preserving the security property that
+     * external models cannot inject new repositories.
      */
     private static List<Profile> withoutFileAndPropertyActivation(List<Profile> profiles) {
         List<Profile> eligible = new ArrayList<>(profiles.size());
         for (Profile profile : profiles) {
             Activation activation = profile.getActivation();
-            if (activation == null || (activation.getFile() == null && activation.getProperty() == null)) {
+            if (activation == null
+                    || (activation.getFile() == null && isSafePropertyActivation(activation.getProperty()))) {
                 eligible.add(profile);
             }
         }
         return eligible;
+    }
+
+    /**
+     * Returns {@code true} if the given property activation condition is safe for use in external
+     * model builds — i.e. it cannot be toggled <em>on</em> by a user-supplied {@code -D} property.
+     * <p>
+     * A negated property condition ({@code <name>!foo</name>}, no value) activates when the
+     * property is absent, making it on by default. An attacker can only suppress it (by setting
+     * the property), not inject it. All other property conditions (positive name, or a required
+     * value) can be forced on externally and are therefore unsafe.
+     *
+     * @param prop the property activation element, or {@code null} if none
+     * @return {@code true} if the condition is absent or is a negated-name-only condition
+     */
+    private static boolean isSafePropertyActivation(ActivationProperty prop) {
+        if (prop == null) {
+            return true; // no property condition — always safe
+        }
+        String name = prop.getName();
+        // "!foo" with no value = active when 'foo' is absent = default-on, cannot be injected
+        return name != null
+                && name.startsWith("!")
+                && (prop.getValue() == null || prop.getValue().isEmpty());
     }
 
     /**
