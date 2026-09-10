@@ -58,6 +58,11 @@ class MavenITmng8766SpiWorkspaceReaderTest extends AbstractMavenIntegrationTestC
         // The SPI workspace reader should be called for artifact resolution in the main session
         // (e.g., during project dependency resolution, model building, etc.)
         List<String> logLines = verifier.loadLogLines();
+        boolean hasFindArtifactCalls =
+                logLines.stream().anyMatch(line -> line.contains("[SPI-WR] findArtifact("));
+        assertTrue(
+                hasFindArtifactCalls,
+                "SPI workspace reader should be consulted during regular artifact resolution");
 
         // Verify it was NOT called for plugin resolution
         // When isApplicableForPluginResolution() returns false, the reader is removed from

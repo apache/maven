@@ -19,7 +19,6 @@
 package org.apache.maven;
 
 import java.io.File;
-import java.util.List;
 
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.execution.BuildResumptionAnalyzer;
@@ -78,8 +77,7 @@ class DefaultMavenSessionScopeTest {
                 mock(BuildResumptionDataRepository.class),
                 null,
                 mock(DefaultSessionFactory.class),
-                null,
-                List.of());
+                null);
 
         MavenExecutionResult result = defaultMaven.execute(request);
 
