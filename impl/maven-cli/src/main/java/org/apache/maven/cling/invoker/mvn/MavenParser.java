@@ -30,6 +30,7 @@ import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.BaseParser;
+import org.apache.maven.cling.invoker.CleanArgument;
 
 public class MavenParser extends BaseParser {
     @Override
@@ -78,8 +79,9 @@ public class MavenParser extends BaseParser {
 
     protected MavenOptions parseMavenConfigOptions(Path configFile) {
         try (Stream<String> lines = Files.lines(configFile, StandardCharsets.UTF_8)) {
-            List<String> args =
-                    lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#")).toList();
+            List<String> args = lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#"))
+                    .flatMap(line -> CleanArgument.splitLine(line).stream())
+                    .toList();
             MavenOptions options = parseArgs("maven.config", args);
             if (options.goals().isPresent()) {
                 // This file can only contain options, not args (goals or phases)
