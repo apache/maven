@@ -33,19 +33,19 @@ public class DefaultDependencyCoordinates extends AetherDependencyWrapper implem
     }
 
     @Override
-    public VersionConstraint getVersionConstraint() {
+    public VersionConstraint versionConstraint() {
         return session.parseVersionConstraint(dependency.getArtifact().getVersion());
     }
 
     @Nullable
     @Override
-    public Boolean getOptional() {
+    public Boolean optional() {
         return dependency.getOptional();
     }
 
     @Nonnull
     @Override
-    public Collection<Exclusion> getExclusions() {
+    public Collection<Exclusion> exclusions() {
         return new MappedCollection<>(dependency.getExclusions(), this::toExclusion);
     }
 
@@ -53,13 +53,13 @@ public class DefaultDependencyCoordinates extends AetherDependencyWrapper implem
         return new Exclusion() {
             @Nullable
             @Override
-            public String getGroupId() {
+            public String groupId() {
                 return exclusion.getGroupId();
             }
 
             @Nullable
             @Override
-            public String getArtifactId() {
+            public String artifactId() {
                 return exclusion.getArtifactId();
             }
         };

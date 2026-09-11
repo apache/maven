@@ -63,19 +63,19 @@ public class ProjectStub implements Project {
 
     @Nonnull
     @Override
-    public String getGroupId() {
+    public String groupId() {
         return model.getGroupId();
     }
 
     @Nonnull
     @Override
-    public String getArtifactId() {
+    public String artifactId() {
         return model.getArtifactId();
     }
 
     @Nonnull
     @Override
-    public String getVersion() {
+    public String version() {
         return model.getVersion();
     }
 
@@ -85,7 +85,7 @@ public class ProjectStub implements Project {
 
     @Nonnull
     @Override
-    public Packaging getPackaging() {
+    public Packaging packaging() {
         return new Packaging() {
             @Override
             public String id() {
@@ -135,42 +135,42 @@ public class ProjectStub implements Project {
     }
 
     @Override
-    public List<ProducedArtifact> getArtifacts() {
-        ProducedArtifact pomArtifact = new ProducedArtifactStub(getGroupId(), getArtifactId(), "", getVersion(), "pom");
+    public List<ProducedArtifact> artifacts() {
+        ProducedArtifact pomArtifact = new ProducedArtifactStub(groupId(), artifactId(), "", version(), "pom");
         return mainArtifact != null ? Arrays.asList(pomArtifact, mainArtifact) : Arrays.asList(pomArtifact);
     }
 
     @Nonnull
     @Override
-    public Model getModel() {
+    public Model model() {
         return model;
     }
 
     @Nonnull
     @Override
-    public Path getPomPath() {
+    public Path pomPath() {
         return pomPath;
     }
 
     @Nonnull
     @Override
-    public List<DependencyCoordinates> getDependencies() {
+    public List<DependencyCoordinates> dependencies() {
         return null;
     }
 
     @Nonnull
     @Override
-    public List<DependencyCoordinates> getManagedDependencies() {
+    public List<DependencyCoordinates> managedDependencies() {
         return null;
     }
 
     @Override
-    public Path getBasedir() {
+    public Path basedir() {
         return basedir;
     }
 
     @Override
-    public Optional<Project> getParent() {
+    public Optional<Project> parent() {
         return Optional.empty();
     }
 
@@ -185,7 +185,7 @@ public class ProjectStub implements Project {
     }
 
     @Override
-    public Path getRootDirectory() {
+    public Path rootDirectory() {
         return rootDirectory;
     }
 
@@ -262,7 +262,7 @@ public class ProjectStub implements Project {
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because list is unmodifiable.
-    public List<Profile> getDeclaredProfiles() {
+    public List<Profile> declaredProfiles() {
         return declaredProfiles;
     }
 
@@ -272,7 +272,7 @@ public class ProjectStub implements Project {
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because list is unmodifiable.
-    public List<Profile> getEffectiveProfiles() {
+    public List<Profile> effectiveProfiles() {
         return effectiveProfiles;
     }
 
@@ -282,7 +282,7 @@ public class ProjectStub implements Project {
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because list is unmodifiable.
-    public List<Profile> getDeclaredActiveProfiles() {
+    public List<Profile> declaredActiveProfiles() {
         return declaredActiveProfiles;
     }
 
@@ -292,7 +292,7 @@ public class ProjectStub implements Project {
 
     @Override
     @SuppressWarnings("ReturnOfCollectionOrArrayField") // Safe because list is unmodifiable.
-    public List<Profile> getEffectiveActiveProfiles() {
+    public List<Profile> effectiveActiveProfiles() {
         return effectiveActiveProfiles;
     }
 

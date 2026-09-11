@@ -80,11 +80,11 @@ public interface ArtifactCoordinatesFactory extends Service {
     default ArtifactCoordinates create(@Nonnull Session session, Artifact artifact) {
         return create(ArtifactCoordinatesFactoryRequest.build(
                 session,
-                artifact.getGroupId(),
-                artifact.getArtifactId(),
-                artifact.getVersion().toString(),
-                artifact.getClassifier(),
-                artifact.getExtension(),
+                artifact.groupId(),
+                artifact.artifactId(),
+                artifact.version().toString(),
+                artifact.classifier(),
+                artifact.extension(),
                 null));
     }
 }

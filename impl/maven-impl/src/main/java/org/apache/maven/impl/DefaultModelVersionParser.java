@@ -152,14 +152,14 @@ public class DefaultModelVersionParser implements ModelVersionParser {
         }
 
         @Override
-        public Boundary getUpperBoundary() {
+        public Boundary upperBoundary() {
             org.eclipse.aether.version.VersionRange.Bound bound = delegate.getUpperBound();
             if (bound == null) {
                 return null;
             }
             return new Boundary() {
                 @Override
-                public Version getVersion() {
+                public Version version() {
                     return new DefaultVersion(versionScheme, bound.getVersion());
                 }
 
@@ -171,14 +171,14 @@ public class DefaultModelVersionParser implements ModelVersionParser {
         }
 
         @Override
-        public Boundary getLowerBoundary() {
+        public Boundary lowerBoundary() {
             org.eclipse.aether.version.VersionRange.Bound bound = delegate.getLowerBound();
             if (bound == null) {
                 return null;
             }
             return new Boundary() {
                 @Override
-                public Version getVersion() {
+                public Version version() {
                     return new DefaultVersion(versionScheme, bound.getVersion());
                 }
 
@@ -236,7 +236,7 @@ public class DefaultModelVersionParser implements ModelVersionParser {
         }
 
         @Override
-        public VersionRange getVersionRange() {
+        public VersionRange versionRange() {
             if (delegate.getRange() == null) {
                 return null;
             }
@@ -244,7 +244,7 @@ public class DefaultModelVersionParser implements ModelVersionParser {
         }
 
         @Override
-        public Version getRecommendedVersion() {
+        public Version recommendedVersion() {
             if (delegate.getVersion() == null) {
                 return null;
             }

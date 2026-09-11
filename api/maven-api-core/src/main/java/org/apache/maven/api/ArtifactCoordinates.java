@@ -36,13 +36,35 @@ public interface ArtifactCoordinates {
      * {@return the group identifier of the artifact}.
      */
     @Nonnull
-    String getGroupId();
+    String groupId();
+
+    /**
+     * {@return the group identifier of the artifact}.
+     *
+     * @deprecated Use {@link #groupId()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default String getGroupId() {
+        return groupId();
+    }
 
     /**
      * {@return the identifier of the artifact}.
      */
     @Nonnull
-    String getArtifactId();
+    String artifactId();
+
+    /**
+     * {@return the identifier of the artifact}.
+     *
+     * @deprecated Use {@link #artifactId()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default String getArtifactId() {
+        return artifactId();
+    }
 
     /**
      * Returns the classifier of the artifact.
@@ -50,14 +72,38 @@ public interface ArtifactCoordinates {
      * @return the classifier or an empty string if none, never {@code null}
      */
     @Nonnull
-    String getClassifier();
+    String classifier();
+
+    /**
+     * Returns the classifier of the artifact.
+     *
+     * @return the classifier or an empty string if none, never {@code null}
+     * @deprecated Use {@link #classifier()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default String getClassifier() {
+        return classifier();
+    }
 
     /**
      * {@return the specific version, range of versions, or meta-version of the artifact}.
      * A meta-version is a version suffixed with the {@code SNAPSHOT} keyword.
      */
     @Nonnull
-    VersionConstraint getVersionConstraint();
+    VersionConstraint versionConstraint();
+
+    /**
+     * {@return the specific version, range of versions, or meta-version of the artifact}.
+     * A meta-version is a version suffixed with the {@code SNAPSHOT} keyword.
+     *
+     * @deprecated Use {@link #versionConstraint()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default VersionConstraint getVersionConstraint() {
+        return versionConstraint();
+    }
 
     /**
      * Returns the file extension of the artifact.
@@ -66,7 +112,20 @@ public interface ArtifactCoordinates {
      * @return the file extension or an empty string if none, never {@code null}
      */
     @Nonnull
-    String getExtension();
+    String extension();
+
+    /**
+     * Returns the file extension of the artifact.
+     * The dot separator is <em>not</em> included in the returned string.
+     *
+     * @return the file extension or an empty string if none, never {@code null}
+     * @deprecated Use {@link #extension()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default String getExtension() {
+        return extension();
+    }
 
     /**
      * {@return a unique string identifying this artifact}.
@@ -78,14 +137,14 @@ public interface ArtifactCoordinates {
      */
     @Nonnull
     default String getId() {
-        String c = getClassifier();
-        return getGroupId()
+        String c = classifier();
+        return groupId()
                 + ':'
-                + getArtifactId()
+                + artifactId()
                 + ':'
-                + getExtension()
+                + extension()
                 + (c.isEmpty() ? "" : ":" + c)
                 + ':'
-                + getVersionConstraint();
+                + versionConstraint();
     }
 }
