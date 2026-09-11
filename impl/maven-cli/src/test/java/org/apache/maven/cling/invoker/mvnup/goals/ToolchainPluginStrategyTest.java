@@ -38,6 +38,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for the {@link ToolchainPluginStrategy} class.
@@ -510,6 +512,48 @@ class ToolchainPluginStrategyTest {
 
             assertEquals(1, result.modifiedPoms().size());
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
+
+            // Verify that a warning about toolchain JDK availability was emitted
+            String xml = doc.toXml();
+            assertTrue(xml.contains("select-jdk-toolchain"), "POM should contain select-jdk-toolchain goal");
+        }
+
+        @Test
+        @DisplayName("should emit warning about JDK availability when adding toolchains plugin")
+        void shouldEmitJdkAvailabilityWarning() {
+            // Simulate running JDK 21, project targets source 6
+            ToolchainPluginStrategy strategy = new ToolchainPluginStrategy() {
+                @Override
+                int getRunningJdkMajor() {
+                    return 21;
+                }
+            };
+
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>com.example</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0</version>
+                        <properties>
+                            <maven.compiler.release>6</maven.compiler.release>
+                        </properties>
+                    </project>
+                    """;
+            Document doc = Document.of(pomXml);
+            UpgradeContext context = TestUtils.createMockContext();
+
+            UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
+
+            assertEquals(1, result.modifiedPoms().size());
+            assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
+
+            // The output should contain the toolchains plugin and version constraint
+            String xml = doc.toXml();
+            assertTrue(xml.contains("select-jdk-toolchain"), "POM should contain select-jdk-toolchain goal");
+            // Verify the warning about JDK availability was emitted
+            verify(context.logger).warn(contains("must be installed"));
         }
 
         @Test

@@ -106,12 +106,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-resources-plugin",
                     "3.3.1",
-                    "4.0.0-beta-1",
-                    "Pre-release versions compiled against different Maven 4 API signatures"),
+                    "maven-resources-plugin 4.0.0-beta-1 has API incompatibilities at runtime"
+                            + " (NoSuchMethodError: ProjectManager.getResources); use stable 3.3.1"),
             new PluginUpgrade(
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-jar-plugin",
-                    "3.5.0",
+                    "3.3.1",
                     "4.0.0-beta-1",
                     "Pre-release versions compiled against different Maven 4 API signatures"),
             new PluginUpgrade(
@@ -257,7 +257,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     boolean hasUpgrades = false;
 
                     // Apply direct plugin upgrades in the document
-                    hasUpgrades |= upgradePluginsInDocument(pomDocument, context);
+                    hasUpgrades |= upgradePluginsInDocument(pomDocument, pomMap, context);
 
                     // Add plugin management based on effective model analysis
                     Set<String> pluginsForManagement =
@@ -308,7 +308,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * Upgrades plugins in the document. Checks both build/plugins and build/pluginManagement/plugins sections. Only
      * processes plugins explicitly defined in the current POM document.
      */
-    private boolean upgradePluginsInDocument(Document pomDocument, UpgradeContext context) {
+    private boolean upgradePluginsInDocument(Document pomDocument, Map<Path, Document> pomMap, UpgradeContext context) {
         Element root = pomDocument.root();
         boolean hasUpgrades = false;
 
@@ -321,7 +321,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             Element pluginsElement = buildElement.childElement(PLUGINS).orElse(null);
             if (pluginsElement != null) {
                 hasUpgrades |= upgradePluginsInSection(
-                        pluginsElement, pluginUpgrades, pomDocument, BUILD + "/" + PLUGINS, context);
+                        pluginsElement, pluginUpgrades, pomDocument, pomMap, BUILD + "/" + PLUGINS, context);
             }
 
             // Check build/pluginManagement/plugins
@@ -335,6 +335,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                             managedPluginsElement,
                             pluginUpgrades,
                             pomDocument,
+                            pomMap,
                             BUILD + "/" + PLUGIN_MANAGEMENT + "/" + PLUGINS,
                             context);
                 }
@@ -366,6 +367,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             Element pluginsElement,
             Map<String, PluginUpgradeInfo> pluginUpgrades,
             Document pomDocument,
+            Map<Path, Document> pomMap,
             String sectionName,
             UpgradeContext context) {
 
@@ -394,13 +396,13 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                             PluginUpgradeInfo upgrade = pluginUpgrades.get(pluginKey);
 
                             if (upgrade != null) {
-                                upgraded =
-                                        upgradePluginVersion(pluginElement, upgrade, pomDocument, sectionName, context);
+                                upgraded = upgradePluginVersion(
+                                        pluginElement, upgrade, pomDocument, pomMap, sectionName, context);
                             }
                         }
                     }
 
-                    upgraded |= upgradePluginDependencies(pluginElement, pomDocument, sectionName, context);
+                    upgraded |= upgradePluginDependencies(pluginElement, pomDocument, pomMap, sectionName, context);
 
                     return upgraded;
                 })
@@ -414,6 +416,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             Element pluginElement,
             PluginUpgradeInfo upgrade,
             Document pomDocument,
+            Map<Path, Document> pomMap,
             String sectionName,
             UpgradeContext context) {
         Element versionElement = pluginElement.childElement(VERSION).orElse(null);
@@ -492,20 +495,32 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                         pomDocument, versionElement, propertyName, upgrade, sectionName, context);
             }
             // Update property value if it's below minimum version
-            return upgradePropertyVersion(pomDocument, propertyName, upgrade, sectionName, context);
+            return upgradePropertyVersion(pomDocument, pomMap, propertyName, upgrade, sectionName, context);
         } else {
-            // Check for Maven 4 pre-release versions (alpha/beta/rc) that should be
-            // upgraded to the latest available pre-release rather than downgraded to 3.x.
-            if (isMaven4PreRelease(currentVersion) && upgrade.latestPreRelease != null) {
-                if (isVersionBelow(context, currentVersion, upgrade.latestPreRelease)) {
-                    Editor editor = new Editor(pomDocument);
-                    editor.setTextContent(versionElement, upgrade.latestPreRelease);
-                    context.detail("Upgraded " + upgrade.groupId + ":" + upgrade.artifactId + " from pre-release "
-                            + currentVersion + " to " + upgrade.latestPreRelease + " in " + sectionName);
-                    return true;
+            // Check for Maven 4 pre-release versions (alpha/beta/rc).
+            if (isMaven4PreRelease(currentVersion)) {
+                if (upgrade.latestPreRelease != null) {
+                    // Upgrade to the latest pre-release (don't downgrade to 3.x).
+                    if (isVersionBelow(context, currentVersion, upgrade.latestPreRelease)) {
+                        Editor editor = new Editor(pomDocument);
+                        editor.setTextContent(versionElement, upgrade.latestPreRelease);
+                        context.detail("Upgraded " + upgrade.groupId + ":" + upgrade.artifactId + " from pre-release "
+                                + currentVersion + " to " + upgrade.latestPreRelease + " in " + sectionName);
+                        return true;
+                    } else {
+                        context.debug("Plugin " + upgrade.groupId + ":" + upgrade.artifactId + " version "
+                                + currentVersion + " is already >= " + upgrade.latestPreRelease);
+                    }
                 } else {
-                    context.debug("Plugin " + upgrade.groupId + ":" + upgrade.artifactId + " version " + currentVersion
-                            + " is already >= " + upgrade.latestPreRelease);
+                    // No stable 4.x pre-release line — downgrade to the stable minVersion.
+                    // 4.0.0-beta-x versions compiled against a different API snapshot are
+                    // incompatible at runtime; they must be pinned to the stable release.
+                    Editor editor = new Editor(pomDocument);
+                    editor.setTextContent(versionElement, upgrade.minVersion);
+                    context.detail("Downgraded " + upgrade.groupId + ":" + upgrade.artifactId + " from incompatible "
+                            + "pre-release " + currentVersion + " to stable " + upgrade.minVersion
+                            + " in " + sectionName);
+                    return true;
                 }
                 return false;
             }
@@ -528,49 +543,106 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
     /**
      * Upgrades a property value if it represents a plugin version below the minimum.
+     * First checks the current POM's properties, then searches other POMs in the project
+     * (e.g., parent POMs) if the property is not found locally.
      */
     private boolean upgradePropertyVersion(
             Document pomDocument,
+            Map<Path, Document> pomMap,
             String propertyName,
             PluginUpgradeInfo upgrade,
             String sectionName,
             UpgradeContext context) {
-        Editor editor = new Editor(pomDocument);
-        Element root = editor.root();
-        Element propertiesElement = root.childElement(PROPERTIES).orElse(null);
+        // First, try the current POM's properties
+        if (upgradePropertyInDocument(pomDocument, propertyName, upgrade, sectionName, context)) {
+            return true;
+        }
 
-        if (propertiesElement != null) {
-            Element propertyElement =
-                    propertiesElement.childElement(propertyName).orElse(null);
-            if (propertyElement != null) {
-                String currentVersion = propertyElement.textContentTrimmed();
-                // For 4.x pre-release versions, upgrade to latest pre-release (not 3.x)
-                if (isMaven4PreRelease(currentVersion) && upgrade.latestPreRelease != null) {
-                    if (isVersionBelow(context, currentVersion, upgrade.latestPreRelease)) {
-                        editor.setTextContent(propertyElement, upgrade.latestPreRelease);
-                        context.detail("Upgraded property " + propertyName + " (for " + upgrade.groupId + ":"
-                                + upgrade.artifactId + ") from pre-release " + currentVersion + " to "
-                                + upgrade.latestPreRelease + " in " + sectionName);
-                        return true;
-                    } else {
-                        context.debug("Property " + propertyName + " version " + currentVersion + " is already >= "
-                                + upgrade.latestPreRelease);
-                    }
-                } else if (isVersionBelow(context, currentVersion, upgrade.minVersion)) {
-                    editor.setTextContent(propertyElement, upgrade.minVersion);
-                    context.detail(
-                            "Upgraded property " + propertyName + " (for " + upgrade.groupId + ":" + upgrade.artifactId
-                                    + ") from " + currentVersion + " to " + upgrade.minVersion + " in " + sectionName);
+        // Check if property exists in the current POM but is already at/above minimum (no upgrade needed).
+        // In that case, skip the cross-POM search and the warning — the property IS defined.
+        Element currentRoot = pomDocument.root();
+        Element currentProps = currentRoot.childElement(PROPERTIES).orElse(null);
+        if (currentProps != null && currentProps.childElement(propertyName).isPresent()) {
+            return false; // Found in current POM, no upgrade needed
+        }
+
+        // Property not in current POM — search other POMs in the project (e.g., parent POM)
+        for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
+            Document otherDoc = entry.getValue();
+            if (otherDoc == pomDocument) {
+                continue; // Skip the current POM, already checked
+            }
+            if (upgradePropertyInDocument(otherDoc, propertyName, upgrade, sectionName, context)) {
+                return true;
+            }
+            // Check if property exists in this POM but already at/above minimum
+            Element otherRoot = otherDoc.root();
+            Element otherProps = otherRoot.childElement(PROPERTIES).orElse(null);
+            if (otherProps != null && otherProps.childElement(propertyName).isPresent()) {
+                return false; // Found in another POM, no upgrade needed
+            }
+        }
+
+        // Property not found anywhere in the project
+        context.warning("Property " + propertyName + " not found in any project POM properties");
+        return false;
+    }
+
+    /**
+     * Attempts to upgrade a property value in a single document's properties section.
+     * Returns {@code true} if the property was found and upgraded, {@code false} otherwise
+     * (property not found, or already at/above minimum version).
+     */
+    private boolean upgradePropertyInDocument(
+            Document document,
+            String propertyName,
+            PluginUpgradeInfo upgrade,
+            String sectionName,
+            UpgradeContext context) {
+        Element root = document.root();
+        Element propertiesElement = root.childElement(PROPERTIES).orElse(null);
+        if (propertiesElement == null) {
+            return false;
+        }
+
+        Element propertyElement = propertiesElement.childElement(propertyName).orElse(null);
+        if (propertyElement == null) {
+            return false;
+        }
+
+        Editor editor = new Editor(document);
+        String currentVersion = propertyElement.textContentTrimmed();
+        // For 4.x pre-release versions, handle specially
+        if (isMaven4PreRelease(currentVersion)) {
+            if (upgrade.latestPreRelease != null) {
+                // Upgrade to the latest pre-release (don't downgrade to 3.x)
+                if (isVersionBelow(context, currentVersion, upgrade.latestPreRelease)) {
+                    editor.setTextContent(propertyElement, upgrade.latestPreRelease);
+                    context.detail("Upgraded property " + propertyName + " (for " + upgrade.groupId + ":"
+                            + upgrade.artifactId + ") from pre-release " + currentVersion + " to "
+                            + upgrade.latestPreRelease + " in " + sectionName);
                     return true;
                 } else {
                     context.debug("Property " + propertyName + " version " + currentVersion + " is already >= "
-                            + upgrade.minVersion);
+                            + upgrade.latestPreRelease);
                 }
             } else {
-                context.warning("Property " + propertyName + " not found in POM properties");
+                // No stable 4.x pre-release line — downgrade to the stable minVersion
+                editor.setTextContent(propertyElement, upgrade.minVersion);
+                context.detail("Downgraded property " + propertyName + " (for " + upgrade.groupId + ":"
+                        + upgrade.artifactId + ") from incompatible pre-release " + currentVersion
+                        + " to stable " + upgrade.minVersion + " in " + sectionName);
+                return true;
             }
+            return false;
+        } else if (isVersionBelow(context, currentVersion, upgrade.minVersion)) {
+            editor.setTextContent(propertyElement, upgrade.minVersion);
+            context.detail("Upgraded property " + propertyName + " (for " + upgrade.groupId + ":" + upgrade.artifactId
+                    + ") from " + currentVersion + " to " + upgrade.minVersion + " in " + sectionName);
+            return true;
         } else {
-            context.warning("No properties section found in POM for property " + propertyName);
+            context.debug(
+                    "Property " + propertyName + " version " + currentVersion + " is already >= " + upgrade.minVersion);
         }
 
         return false;
@@ -637,7 +709,11 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * Upgrades plugin dependencies (e.g., extra-enforcer-rules inside maven-enforcer-plugin).
      */
     private boolean upgradePluginDependencies(
-            Element pluginElement, Document pomDocument, String sectionName, UpgradeContext context) {
+            Element pluginElement,
+            Document pomDocument,
+            Map<Path, Document> pomMap,
+            String sectionName,
+            UpgradeContext context) {
         Element dependenciesElement = pluginElement.childElement(DEPENDENCIES).orElse(null);
         if (dependenciesElement == null) {
             return false;
@@ -657,7 +733,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
                         if (upgrade != null) {
                             return upgradePluginVersion(
-                                    depElement, upgrade, pomDocument, sectionName + "/plugin/dependencies", context);
+                                    depElement,
+                                    upgrade,
+                                    pomDocument,
+                                    pomMap,
+                                    sectionName + "/plugin/dependencies",
+                                    context);
                         }
                     }
                     return false;
@@ -929,7 +1010,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                         continue;
                     }
                     String effectiveVersion = plugin.getVersion();
-                    if (isVersionBelow(context, effectiveVersion, upgrade.minVersion())) {
+                    if (isVersionBelow(context, effectiveVersion, upgrade.minVersion())
+                            || (isMaven4PreRelease(effectiveVersion) && upgrade.latestPreRelease() == null)) {
                         needsManagement.add(pluginKey);
                         String managedVersion = managedVersions.get(pluginKey);
                         if (managedVersion == null || !managedVersion.equals(effectiveVersion)) {
@@ -939,10 +1021,11 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                             needsDirectOverride.add(pluginKey);
                             context.debug("Plugin " + pluginKey + " version " + effectiveVersion
                                     + " has explicit version in inherited build/plugins"
-                                    + " — needs direct override to " + upgrade.minVersion());
+                                    + " — needs direct version override to " + upgrade.minVersion());
                         } else {
                             context.debug("Plugin " + pluginKey + " version " + effectiveVersion
-                                    + " is managed via pluginManagement — needs upgrade to " + upgrade.minVersion());
+                                    + " is managed via pluginManagement — needs version change to "
+                                    + upgrade.minVersion());
                         }
                     }
                 }
@@ -965,10 +1048,11 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                             continue;
                         }
                         String effectiveVersion = plugin.getVersion();
-                        if (isVersionBelow(context, effectiveVersion, upgrade.minVersion())) {
+                        if (isVersionBelow(context, effectiveVersion, upgrade.minVersion())
+                                || (isMaven4PreRelease(effectiveVersion) && upgrade.latestPreRelease() == null)) {
                             needsManagement.add(pluginKey);
                             context.debug("Managed plugin " + pluginKey + " version " + effectiveVersion
-                                    + " needs upgrade to " + upgrade.minVersion());
+                                    + " needs version change to " + upgrade.minVersion());
                         }
                     }
                 }
