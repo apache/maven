@@ -205,6 +205,24 @@ class MavenCliTest {
         assertEquals("foobar", request.commandLine.getOptionValue("builder"));
     }
 
+    /**
+     * {@code --define 'revision=1.0-SNAPSHOT'} on one maven.config line must parse
+     * the same way as the equivalent CLI tokens (issue #13092).
+     */
+    @Test
+    void testMavenConfigQuotedLongDefine() throws Exception {
+        System.setProperty(
+                MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                new File("src/test/projects/mavenConfigDefine").getCanonicalPath());
+        CliRequest request = new CliRequest(new String[0], null);
+
+        cli.initialize(request);
+        cli.cli(request);
+        cli.properties(request);
+
+        assertEquals("1.0-SNAPSHOT", request.getUserProperties().getProperty("revision"));
+    }
+
     @Test
     void testMavenConfigInvalid() throws Exception {
         System.setProperty(

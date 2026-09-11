@@ -26,6 +26,50 @@ import java.util.List;
  */
 @Deprecated
 public class CleanArgument {
+    /**
+     * Split a {@code maven.config} line into CLI arguments, honouring single and
+     * double quotes the way a POSIX shell would for this limited case. Unquoted
+     * whitespace separates arguments; quote characters are not included in the
+     * resulting tokens.
+     */
+    public static List<String> splitLine(String line) {
+        List<String> tokens = new ArrayList<>();
+        StringBuilder current = new StringBuilder();
+        boolean inSingle = false;
+        boolean inDouble = false;
+        for (int i = 0; i < line.length(); i++) {
+            char c = line.charAt(i);
+            if (inSingle) {
+                if (c == '\'') {
+                    inSingle = false;
+                } else {
+                    current.append(c);
+                }
+            } else if (inDouble) {
+                if (c == '"') {
+                    inDouble = false;
+                } else {
+                    current.append(c);
+                }
+            } else if (c == '\'') {
+                inSingle = true;
+            } else if (c == '"') {
+                inDouble = true;
+            } else if (Character.isWhitespace(c)) {
+                if (!current.isEmpty()) {
+                    tokens.add(current.toString());
+                    current.setLength(0);
+                }
+            } else {
+                current.append(c);
+            }
+        }
+        if (!current.isEmpty()) {
+            tokens.add(current.toString());
+        }
+        return tokens;
+    }
+
     public static String[] cleanArgs(String[] args) {
         try {
             return doCleanArgs(args);
