@@ -1022,7 +1022,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                                     + " — needs direct version override to " + upgrade.minVersion());
                         } else {
                             context.debug("Plugin " + pluginKey + " version " + effectiveVersion
-                                    + " is managed via pluginManagement — needs version change to " + upgrade.minVersion());
+                                    + " is managed via pluginManagement — needs version change to "
+                                    + upgrade.minVersion());
                         }
                     }
                 }
