@@ -122,7 +122,7 @@ public abstract class AbstractSession implements InternalSession {
     protected final Lookup lookup;
     protected final Injector injector;
     private final Map<Class<? extends Service>, Service> services = new ConcurrentHashMap<>();
-    private final List<Listener> listeners = new CopyOnWriteArrayList<>();
+    private final List<Listener> listeners;
     private final Cache<org.eclipse.aether.graph.DependencyNode, Node> allNodes =
             Cache.newCache(Cache.ReferenceType.WEAK, "AbstractSession-Nodes");
     private final Map<Class<? extends Artifact>, Cache<org.eclipse.aether.artifact.Artifact, Artifact>> allArtifacts =
@@ -159,7 +159,14 @@ public abstract class AbstractSession implements InternalSession {
         this.repositories = getRepositories(repositories, resolverRepositories);
         this.lookup = lookup;
         this.injector = lookup != null ? lookup.lookupOptional(Injector.class).orElse(null) : null;
+        this.listeners = getListeners(session);
         this.context = context;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Listener> getListeners(RepositorySystemSession session) {
+        // Both event families share the registration scope of the underlying repository system session.
+        return (List<Listener>) session.getData().computeIfAbsent(Listener.class, CopyOnWriteArrayList::new);
     }
 
     @SuppressWarnings("unchecked")

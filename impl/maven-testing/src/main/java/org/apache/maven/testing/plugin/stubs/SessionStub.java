@@ -206,7 +206,7 @@ public class SessionStub implements Session {
 
     @Override
     public Collection<Listener> getListeners() {
-        return null;
+        return List.of();
     }
 
     @Override
