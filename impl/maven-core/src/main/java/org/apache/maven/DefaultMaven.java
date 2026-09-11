@@ -71,6 +71,7 @@ import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.resolver.MavenChainedWorkspaceReader;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
+import org.apache.maven.resolver.SpiWorkspaceReaderAdapter;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
@@ -213,6 +214,14 @@ public class DefaultMaven implements Maven {
         try {
             MavenChainedWorkspaceReader chainedWorkspaceReader =
                     new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader);
+            // Add SPI workspace readers to the chain — looked up dynamically so that
+            // implementations discovered from core extensions are included (extensions
+            // are loaded after the container is bootstrapped, so constructor injection
+            // would miss them).
+            for (org.apache.maven.api.spi.WorkspaceReader spiReader :
+                    lookup.lookupList(org.apache.maven.api.spi.WorkspaceReader.class)) {
+                chainedWorkspaceReader.addReader(new SpiWorkspaceReaderAdapter(spiReader));
+            }
             try (CloseableSession closeableSession = newCloseableSession(request, chainedWorkspaceReader)) {
                 MavenSession session = new MavenSession(closeableSession, request, result);
                 session.setSession(defaultSessionFactory.newSession(session));
