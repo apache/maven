@@ -1019,10 +1019,10 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                             needsDirectOverride.add(pluginKey);
                             context.debug("Plugin " + pluginKey + " version " + effectiveVersion
                                     + " has explicit version in inherited build/plugins"
-                                    + " — needs direct override to " + upgrade.minVersion());
+                                    + " — needs direct version override to " + upgrade.minVersion());
                         } else {
                             context.debug("Plugin " + pluginKey + " version " + effectiveVersion
-                                    + " is managed via pluginManagement — needs upgrade to " + upgrade.minVersion());
+                                    + " is managed via pluginManagement — needs version change to " + upgrade.minVersion());
                         }
                     }
                 }
@@ -1049,7 +1049,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                                 || (isMaven4PreRelease(effectiveVersion) && upgrade.latestPreRelease() == null)) {
                             needsManagement.add(pluginKey);
                             context.debug("Managed plugin " + pluginKey + " version " + effectiveVersion
-                                    + " needs upgrade to " + upgrade.minVersion());
+                                    + " needs version change to " + upgrade.minVersion());
                         }
                     }
                 }
