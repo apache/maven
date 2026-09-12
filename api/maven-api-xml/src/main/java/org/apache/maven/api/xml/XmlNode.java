@@ -139,6 +139,7 @@ public interface XmlNode {
      *
      * @return the node name, never {@code null}
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     String name();
 
@@ -147,6 +148,7 @@ public interface XmlNode {
      *
      * @return the namespace URI, never {@code null} (empty string if no namespace)
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     String namespaceUri();
 
@@ -155,6 +157,7 @@ public interface XmlNode {
      *
      * @return the namespace prefix, never {@code null} (empty string if no prefix)
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     String prefix();
 
@@ -163,6 +166,7 @@ public interface XmlNode {
      *
      * @return the node's text value, or {@code null} if none exists
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     String value();
 
@@ -171,6 +175,7 @@ public interface XmlNode {
      *
      * @return map of attribute names to values, never {@code null}
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     Map<String, String> attributes();
 
@@ -181,6 +186,7 @@ public interface XmlNode {
      * @return the attribute value, or {@code null} if the attribute doesn't exist
      * @throws NullPointerException if name is null
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     String attribute(@Nonnull String name);
 
@@ -197,6 +203,7 @@ public interface XmlNode {
      * @return map of namespace prefix to URI, never {@code null}
      * @since 4.1.0
      */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     @Nonnull
     default Map<String, String> namespaces() {
         return Map.of();
@@ -207,6 +214,7 @@ public interface XmlNode {
      *
      * @return list of child nodes, never {@code null}
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     List<XmlNode> children();
 
@@ -216,6 +224,7 @@ public interface XmlNode {
      * @param name the name of the child node to find
      * @return the first matching child node, or {@code null} if none found
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     XmlNode child(String name);
 
@@ -225,85 +234,50 @@ public interface XmlNode {
      *
      * @return the input location object, or {@code null} if not available
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     Object inputLocation();
 
-    /**
-     * @deprecated Use {@link #name()} instead.
-     */
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default String getName() {
         return name();
     }
 
-    /**
-     * @deprecated Use {@link #namespaceUri()} instead.
-     */
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default String getNamespaceUri() {
         return namespaceUri();
     }
 
-    /**
-     * @deprecated Use {@link #prefix()} instead.
-     */
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default String getPrefix() {
         return prefix();
     }
 
-    /**
-     * @deprecated Use {@link #value()} instead.
-     */
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default String getValue() {
         return value();
     }
 
-    /**
-     * @deprecated Use {@link #attributes()} instead.
-     */
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default Map<String, String> getAttributes() {
         return attributes();
     }
 
-    /**
-     * @deprecated Use {@link #attribute(String)} instead.
-     */
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default String getAttribute(@Nonnull String name) {
         return attribute(name);
     }
 
-    /**
-     * @deprecated Use {@link #children()} instead.
-     */
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default List<XmlNode> getChildren() {
         return children();
     }
 
-    /**
-     * @deprecated Use {@link #child(String)} instead.
-     */
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default XmlNode getChild(String name) {
         return child(name);
     }
 
-    /**
-     * @deprecated Use {@link #inputLocation()} instead.
-     */
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default Object getInputLocation() {
         return inputLocation();
