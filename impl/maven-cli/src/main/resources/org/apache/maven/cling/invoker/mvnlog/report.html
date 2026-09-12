@@ -1,0 +1,1108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Maven Build Report Explorer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-primary: #0f172a;
+      --bg-secondary: #1e293b;
+      --bg-tertiary: #334155;
+      --text-primary: #f8fafc;
+      --text-secondary: #94a3b8;
+      --accent-color: #3b82f6;
+      --accent-hover: #2563eb;
+      --success-color: #10b981;
+      --success-bg: rgba(16, 185, 129, 0.15);
+      --failure-color: #ef4444;
+      --failure-bg: rgba(239, 68, 68, 0.15);
+      --warning-color: #f59e0b;
+      --warning-bg: rgba(245, 158, 11, 0.15);
+      --info-color: #06b6d4;
+      --border-color: #334155;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    @media (prefers-color-scheme: light) {
+      :root {
+        --bg-primary: #f8fafc;
+        --bg-secondary: #ffffff;
+        --bg-tertiary: #f1f5f9;
+        --text-primary: #0f172a;
+        --text-secondary: #64748b;
+        --accent-color: #2563eb;
+        --accent-hover: #1d4ed8;
+        --success-color: #059669;
+        --success-bg: rgba(5, 150, 105, 0.1);
+        --failure-color: #dc2626;
+        --failure-bg: rgba(220, 38, 38, 0.1);
+        --warning-color: #d97706;
+        --warning-bg: rgba(217, 119, 6, 0.1);
+        --info-color: #0891b2;
+        --border-color: #cbd5e1;
+      }
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      font-family: var(--font-sans);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+    }
+
+    /* Sidebar Styles */
+    .sidebar {
+      width: 280px;
+      background-color: var(--bg-secondary);
+      border-right: 1px solid var(--border-color);
+      display: flex;
+      flex-direction: flex-direction;
+      flex-direction: column;
+      flex-shrink: 0;
+    }
+
+    .sidebar-header {
+      padding: 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .sidebar-header h2 {
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+
+    .report-list {
+      flex: 1;
+      overflow-y: auto;
+      padding: 10px;
+    }
+
+    .report-item {
+      padding: 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: all 0.2s ease;
+      border: 1px solid transparent;
+    }
+
+    .report-item:hover {
+      background-color: var(--bg-tertiary);
+    }
+
+    .report-item.active {
+      background-color: var(--bg-tertiary);
+      border-color: var(--accent-color);
+    }
+
+    .report-item-title {
+      font-weight: 500;
+      font-size: 0.85rem;
+      margin-bottom: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .report-item-meta {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+    }
+
+    .badge {
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+      font-size: 0.7rem;
+      text-transform: uppercase;
+    }
+
+    .badge-success {
+      background-color: var(--success-bg);
+      color: var(--success-color);
+    }
+
+    .badge-failure {
+      background-color: var(--failure-bg);
+      color: var(--failure-color);
+    }
+
+    /* Main Area Styles */
+    .main-content {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    /* Header Panel */
+    .header-panel {
+      background-color: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 20px 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .build-title-area {
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .build-title-area h1 {
+      font-size: 1.4rem;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+    }
+
+    .build-meta-grid {
+      display: flex;
+      gap: 20px;
+      font-size: 0.85rem;
+      color: var(--text-secondary);
+      margin-top: 6px;
+    }
+
+    .build-meta-grid span strong {
+      color: var(--text-primary);
+    }
+
+    /* Tabs Navigation */
+    .tabs-nav {
+      display: flex;
+      gap: 5px;
+      background-color: var(--bg-secondary);
+      border-bottom: 1px solid var(--border-color);
+      padding: 0 30px;
+      flex-shrink: 0;
+    }
+
+    .tab-btn {
+      padding: 14px 20px;
+      background: none;
+      border: none;
+      color: var(--text-secondary);
+      font-weight: 500;
+      font-size: 0.9rem;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s ease;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-primary);
+    }
+
+    .tab-btn.active {
+      color: var(--accent-color);
+      border-bottom-color: var(--accent-color);
+    }
+
+    /* Panels Layout */
+    .panels-container {
+      flex: 1;
+      overflow: hidden;
+      position: relative;
+    }
+
+    .panel {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: none;
+      flex-direction: column;
+      padding: 30px;
+      overflow-y: auto;
+    }
+
+    .panel.active {
+      display: flex;
+    }
+
+    /* Dashboard Layout */
+    .dashboard-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 30px;
+      height: 100%;
+      min-height: 0;
+    }
+
+    .dashboard-left {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    .card {
+      background-color: var(--bg-secondary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      padding: 24px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-size: 1rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    /* Gantt Chart */
+    .gantt-chart {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      margin-top: 10px;
+    }
+
+    .gantt-row {
+      display: grid;
+      grid-template-columns: 180px 1fr;
+      align-items: center;
+      gap: 15px;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 6px;
+      transition: background 0.2s;
+    }
+
+    .gantt-row:hover {
+      background-color: var(--bg-tertiary);
+    }
+
+    .gantt-label {
+      font-size: 0.85rem;
+      font-weight: 500;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .gantt-track {
+      height: 24px;
+      background-color: var(--bg-tertiary);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .gantt-bar {
+      height: 100%;
+      border-radius: 4px;
+      position: absolute;
+      min-width: 4px;
+      display: flex;
+      align-items: center;
+      padding-left: 8px;
+      font-size: 0.7rem;
+      color: #fff;
+      font-weight: 600;
+      text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+    }
+
+    .gantt-bar-success {
+      background: linear-gradient(90deg, #10b981, #059669);
+    }
+
+    .gantt-bar-failed {
+      background: linear-gradient(90deg, #ef4444, #dc2626);
+    }
+
+    .gantt-bar-skipped {
+      background: linear-gradient(90deg, #94a3b8, #64748b);
+    }
+
+    /* Mojo Breakdown */
+    .mojo-detail-panel {
+      overflow-y: auto;
+    }
+
+    .mojo-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mojo-item {
+      background-color: var(--bg-tertiary);
+      border-radius: 8px;
+      padding: 14px;
+      border-left: 4px solid var(--accent-color);
+    }
+
+    .mojo-item.failed {
+      border-left-color: var(--failure-color);
+    }
+
+    .mojo-header {
+      display: flex;
+      justify-content: space-between;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+    }
+
+    .mojo-meta {
+      font-size: 0.75rem;
+      color: var(--text-secondary);
+      display: flex;
+      gap: 15px;
+    }
+
+    .mojo-logs-toggle {
+      background: none;
+      border: none;
+      color: var(--accent-color);
+      font-size: 0.75rem;
+      cursor: pointer;
+      margin-top: 8px;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .mojo-logs-toggle:hover {
+      text-decoration: underline;
+    }
+
+    .mojo-logs {
+      display: none;
+      background-color: var(--bg-primary);
+      padding: 10px;
+      border-radius: 6px;
+      margin-top: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      max-height: 200px;
+      overflow-y: auto;
+      white-space: pre-wrap;
+    }
+
+    /* Problems Panel Styles */
+    .problems-filters {
+      display: flex;
+      gap: 15px;
+      margin-bottom: 20px;
+      align-items: center;
+    }
+
+    .search-input {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      flex: 1;
+    }
+
+    .search-input:focus {
+      outline: 1px solid var(--accent-color);
+    }
+
+    .filter-select {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      color: var(--text-primary);
+      padding: 8px 14px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .problem-table {
+      width: 100%;
+      border-collapse: collapse;
+      background-color: var(--bg-secondary);
+      border-radius: 8px;
+      overflow: hidden;
+      border: 1px solid var(--border-color);
+    }
+
+    .problem-table th, .problem-table td {
+      padding: 14px 20px;
+      text-align: left;
+      border-bottom: 1px solid var(--border-color);
+    }
+
+    .problem-table th {
+      background-color: var(--bg-tertiary);
+      font-size: 0.8rem;
+      text-transform: uppercase;
+      font-weight: 600;
+      color: var(--text-secondary);
+      cursor: pointer;
+    }
+
+    .problem-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .problem-table tr:hover td {
+      background-color: rgba(255,255,255,0.02);
+    }
+
+    /* Failures Panel */
+    .failures-list {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .failure-item {
+      background-color: var(--bg-secondary);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+    }
+
+    .failure-header {
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: var(--failure-color);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .failure-stack {
+      background-color: var(--bg-primary);
+      padding: 15px;
+      border-radius: 8px;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.5;
+      overflow-x: auto;
+      max-height: 400px;
+      border: 1px solid var(--border-color);
+    }
+
+    /* Log Viewer Panel */
+    .log-viewer-container {
+      display: flex;
+      flex-direction: column;
+      flex: 1;
+      height: 100%;
+      background-color: var(--bg-secondary);
+      border-radius: 12px;
+      border: 1px solid var(--border-color);
+      overflow: hidden;
+    }
+
+    .log-toolbar {
+      padding: 15px 20px;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      background-color: var(--bg-tertiary);
+    }
+
+    .log-lines-window {
+      flex: 1;
+      overflow-y: auto;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      line-height: 1.6;
+      background-color: var(--bg-primary);
+      position: relative;
+    }
+
+    .log-line {
+      padding: 2px 20px;
+      white-space: pre-wrap;
+    }
+
+    .log-line.level-ERROR {
+      color: #f87171;
+      background-color: rgba(239, 68, 68, 0.05);
+    }
+
+    .log-line.level-WARN {
+      color: #fbbf24;
+      background-color: rgba(245, 158, 11, 0.05);
+    }
+
+    .log-line.level-DEBUG {
+      color: #64748b;
+    }
+
+    .highlight-search {
+      background-color: rgba(245, 158, 11, 0.4);
+      color: #fff;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <div class="sidebar-header">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-activity"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+      <h2>Build Reports</h2>
+    </div>
+    <div class="report-list" id="reportList">
+      <!-- Dyn list -->
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="main-content">
+    <!-- Header -->
+    <div class="header-panel">
+      <div>
+        <div class="build-title-area">
+          <h1 id="headerProjectName">Loading Project...</h1>
+          <span class="badge" id="headerStatusBadge">SUCCESS</span>
+        </div>
+        <div class="build-meta-grid">
+          <span>Goals: <strong id="headerGoals">-</strong></span>
+          <span>Duration: <strong id="headerDuration">-</strong></span>
+          <span>Threads: <strong id="headerThreads">-</strong></span>
+        </div>
+      </div>
+      <div style="font-size: 0.8rem; color: var(--text-secondary); text-align: right;">
+        <div>Maven: <span id="headerMavenVer" style="color: var(--text-primary)">-</span></div>
+        <div>Java: <span id="headerJavaVer" style="color: var(--text-primary)">-</span></div>
+      </div>
+    </div>
+
+    <!-- Tabs Nav -->
+    <div class="tabs-nav">
+      <button class="tab-btn active" onclick="switchTab('dashboard')">Dashboard</button>
+      <button class="tab-btn" onclick="switchTab('problems')">Problems <span id="problemsCountBadge"></span></button>
+      <button class="tab-btn" onclick="switchTab('failures')">Failures <span id="failuresCountBadge"></span></button>
+      <button class="tab-btn" onclick="switchTab('logs')">Full Build Log</button>
+    </div>
+
+    <!-- Panels Container -->
+    <div class="panels-container">
+      <!-- Dashboard -->
+      <div class="panel active" id="dashboardPanel">
+        <div class="dashboard-grid">
+          <!-- Timeline Card -->
+          <div class="card">
+            <div class="card-title">Module Build Timeline (Gantt Chart)</div>
+            <div class="gantt-chart" id="ganttChart">
+              <!-- Dyn Gantt -->
+            </div>
+          </div>
+          <!-- Mojo Details -->
+          <div class="card mojo-detail-panel">
+            <div class="card-title" id="mojoPanelTitle">Mojo Executions</div>
+            <div class="mojo-list" id="mojoList">
+              <div style="color: var(--text-secondary); text-align: center; margin-top: 40px;">Click a module in the timeline to view its execution details.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Problems -->
+      <div class="panel" id="problemsPanel">
+        <div class="problems-filters">
+          <input type="text" class="search-input" placeholder="Search problems..." id="problemSearch" oninput="filterProblems()">
+          <select class="filter-select" id="problemSeverityFilter" onchange="filterProblems()">
+            <option value="ALL">All Severities</option>
+            <option value="ERROR">Errors Only</option>
+            <option value="WARN">Warnings Only</option>
+          </select>
+        </div>
+        <table class="problem-table">
+          <thead>
+            <tr>
+              <th onclick="sortProblems('severity')">Severity</th>
+              <th onclick="sortProblems('source')">Source</th>
+              <th onclick="sortProblems('key')">Key</th>
+              <th>Message</th>
+              <th>Suggestion</th>
+            </tr>
+          </thead>
+          <tbody id="problemsTableBody">
+            <!-- Dyn items -->
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Failures -->
+      <div class="panel" id="failuresPanel">
+        <div class="failures-list" id="failuresList">
+          <!-- Dyn items -->
+        </div>
+      </div>
+
+      <!-- Full Log Viewer -->
+      <div class="panel" id="logsPanel" style="padding: 20px;">
+        <div class="log-viewer-container">
+          <div class="log-toolbar">
+            <input type="text" class="search-input" placeholder="Search log lines..." id="logSearch" oninput="filterLogs()">
+            <select class="filter-select" id="logModuleFilter" onchange="filterLogs()">
+              <option value="ALL">All Modules</option>
+            </select>
+            <select class="filter-select" id="logLevelFilter" onchange="filterLogs()">
+              <option value="ALL">All Levels</option>
+              <option value="ERROR">ERROR</option>
+              <option value="WARN">WARN</option>
+              <option value="INFO">INFO</option>
+              <option value="DEBUG">DEBUG</option>
+            </select>
+          </div>
+          <div class="log-lines-window" id="logLinesWindow">
+            <div id="logLinesScrollHeight" style="position: relative;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let reportData = null;
+    let currentTab = 'dashboard';
+    let selectedModuleId = null;
+
+    // Problems sorting state
+    let problemsSortField = 'severity';
+    let problemsSortAsc = true;
+
+    // Fetch and load reports list
+    async function loadReportsList() {
+      try {
+        const res = await fetch('/api/reports');
+        const list = await res.json();
+        const container = document.getElementById('reportList');
+        container.innerHTML = '';
+        list.forEach((r, idx) => {
+          const div = document.createElement('div');
+          div.className = `report-item ${idx === 0 ? 'active' : ''}`;
+          div.onclick = () => {
+            document.querySelectorAll('.report-item').forEach(el => el.classList.remove('active'));
+            div.classList.add('active');
+            loadReport(r.id);
+          };
+
+          const title = document.createElement('div');
+          title.className = 'report-item-title';
+          title.innerText = r.id;
+
+          const meta = document.createElement('div');
+          meta.className = 'report-item-meta';
+          
+          const badge = document.createElement('span');
+          badge.className = `badge ${r.status === 'SUCCESS' ? 'badge-success' : 'badge-failure'}`;
+          badge.innerText = r.status;
+
+          const time = document.createElement('span');
+          time.innerText = formatDuration(r.durationMs);
+
+          meta.appendChild(badge);
+          meta.appendChild(time);
+          div.appendChild(title);
+          div.appendChild(meta);
+          container.appendChild(div);
+        });
+
+        if (list.length > 0) {
+          loadReport(list[0].id);
+        }
+      } catch (e) {
+        console.error('Failed to load reports list', e);
+      }
+    }
+
+    async function loadReport(id) {
+      try {
+        const res = await fetch(`/api/report?id=${id}`);
+        reportData = await res.json();
+        renderReport();
+      } catch (e) {
+        console.error('Failed to load report data', e);
+      }
+    }
+
+    function renderReport() {
+      // Header
+      const projectName = reportData.modules.length > 0 ? reportData.modules[reportData.modules.length - 1].id : "Root Project";
+      document.getElementById('headerProjectName').innerText = projectName;
+      
+      const statusBadge = document.getElementById('headerStatusBadge');
+      statusBadge.innerText = reportData.metadata.status;
+      statusBadge.className = `badge ${reportData.metadata.status === 'SUCCESS' ? 'badge-success' : 'badge-failure'}`;
+
+      document.getElementById('headerGoals').innerText = reportData.metadata.goals.join(', ') || 'none';
+      document.getElementById('headerDuration').innerText = formatDuration(reportData.metadata.durationMs);
+      document.getElementById('headerThreads').innerText = reportData.metadata.threadCount;
+      document.getElementById('headerMavenVer').innerText = reportData.metadata.mavenVersion;
+      document.getElementById('headerJavaVer').innerText = reportData.metadata.javaVersion;
+
+      // Badges count
+      const warningsCount = reportData.problems.filter(p => p.severity === 'WARN').length;
+      const errorsCount = reportData.problems.filter(p => p.severity === 'ERROR').length;
+      document.getElementById('problemsCountBadge').innerText = warningsCount + errorsCount > 0 ? `(${warningsCount + errorsCount})` : '';
+      document.getElementById('failuresCountBadge').innerText = reportData.failures.length > 0 ? `(${reportData.failures.length})` : '';
+
+      // Populate log filters
+      const moduleFilter = document.getElementById('logModuleFilter');
+      moduleFilter.innerHTML = '<option value="ALL">All Modules</option>';
+      reportData.modules.forEach(m => {
+        const opt = document.createElement('option');
+        opt.value = m.id;
+        opt.innerText = m.id;
+        moduleFilter.appendChild(opt);
+      });
+
+      renderTimeline();
+      filterProblems();
+      renderFailures();
+      setupVirtualScroll();
+    }
+
+    function renderTimeline() {
+      const container = document.getElementById('ganttChart');
+      container.innerHTML = '';
+
+      if (reportData.modules.length === 0) return;
+
+      const buildStart = reportData.metadata.startTime;
+      const buildEnd = reportData.metadata.endTime;
+      const buildDur = buildEnd - buildStart || 1;
+
+      reportData.modules.forEach(m => {
+        const row = document.createElement('div');
+        row.className = 'gantt-row';
+        row.onclick = () => showMojoDetails(m.id);
+
+        const label = document.createElement('div');
+        label.className = 'gantt-label';
+        label.innerText = m.id;
+        label.title = m.id;
+
+        const track = document.createElement('div');
+        track.className = 'gantt-track';
+
+        const leftPct = ((m.startTime - buildStart) / buildDur) * 100;
+        const widthPct = ((m.endTime - m.startTime) / buildDur) * 100;
+
+        const bar = document.createElement('div');
+        bar.className = `gantt-bar gantt-bar-${m.status.toLowerCase()}`;
+        bar.style.left = `${Math.max(0, Math.min(leftPct, 100))}%`;
+        bar.style.width = `${Math.max(1, Math.min(widthPct, 100))}%`;
+        bar.innerText = formatDuration(m.endTime - m.startTime);
+
+        track.appendChild(bar);
+        row.appendChild(label);
+        row.appendChild(track);
+        container.appendChild(row);
+      });
+    }
+
+    function showMojoDetails(moduleId) {
+      selectedModuleId = moduleId;
+      const module = reportData.modules.find(m => m.id === moduleId);
+      const title = document.getElementById('mojoPanelTitle');
+      const list = document.getElementById('mojoList');
+
+      title.innerText = `Mojo Executions: ${moduleId}`;
+      list.innerHTML = '';
+
+      if (!module || module.mojos.length === 0) {
+        list.innerHTML = '<div style="color: var(--text-secondary); text-align: center; margin-top: 40px;">No mojo executions recorded for this module.</div>';
+        return;
+      }
+
+      module.mojos.forEach((mojo, idx) => {
+        const item = document.createElement('div');
+        item.className = `mojo-item ${mojo.status === 'FAILED' ? 'failed' : ''}`;
+
+        const header = document.createElement('div');
+        header.className = 'mojo-header';
+        header.innerHTML = `<span>${mojo.goal}</span><span style="color: var(--text-secondary); font-weight: 500">${formatDuration(mojo.endTime - mojo.startTime)}</span>`;
+
+        const meta = document.createElement('div');
+        meta.className = 'mojo-meta';
+        meta.innerHTML = `<span>Phase: <strong>${mojo.phase}</strong></span><span>Plugin: <strong>${mojo.pluginArtifactId}</strong></span>`;
+
+        item.appendChild(header);
+        item.appendChild(meta);
+
+        // Find mojo logs
+        const mojoId = `${mojo.pluginGroupId}:${mojo.pluginArtifactId}:${mojo.pluginVersion}:${mojo.goal}:${mojo.executionId}`;
+        const mojoLogs = reportData.logs.filter(l => l.mojoId === mojoId);
+        if (mojoLogs.length > 0) {
+          const toggle = document.createElement('button');
+          toggle.className = 'mojo-logs-toggle';
+          toggle.innerText = 'View Logs';
+          toggle.onclick = () => {
+            const logsBox = item.querySelector('.mojo-logs');
+            if (logsBox.style.display === 'block') {
+              logsBox.style.display = 'none';
+              toggle.innerText = 'View Logs';
+            } else {
+              logsBox.style.display = 'block';
+              toggle.innerText = 'Hide Logs';
+            }
+          };
+          item.appendChild(toggle);
+
+          const logsDiv = document.createElement('div');
+          logsDiv.className = 'mojo-logs';
+          logsDiv.innerText = mojoLogs.map(l => l.message).join('\n');
+          item.appendChild(logsDiv);
+        }
+
+        list.appendChild(item);
+      });
+    }
+
+    function filterProblems() {
+      if (!reportData) return;
+
+      const search = document.getElementById('problemSearch').value.toLowerCase();
+      const severity = document.getElementById('problemSeverityFilter').value;
+
+      let filtered = reportData.problems.filter(p => {
+        const matchesSearch = p.message.toLowerCase().includes(search) || p.key.toLowerCase().includes(search);
+        const matchesSeverity = severity === 'ALL' || p.severity === severity;
+        return matchesSearch && matchesSeverity;
+      });
+
+      // Sort
+      filtered.sort((a, b) => {
+        let valA = a[problemsSortField];
+        let valB = b[problemsSortField];
+        if (problemsSortAsc) {
+          return valA.localeCompare(valB);
+        } else {
+          return valB.localeCompare(valA);
+        }
+      });
+
+      const tbody = document.getElementById('problemsTableBody');
+      tbody.innerHTML = '';
+
+      if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-secondary)">No problems found.</td></tr>';
+        return;
+      }
+
+      filtered.forEach(p => {
+        const tr = document.createElement('tr');
+        
+        const sevTd = document.createElement('td');
+        const badge = document.createElement('span');
+        badge.className = `badge ${p.severity === 'ERROR' ? 'badge-failure' : 'badge-warning'}`;
+        badge.innerText = p.severity;
+        sevTd.appendChild(badge);
+
+        const srcTd = document.createElement('td');
+        srcTd.innerText = p.source;
+
+        const keyTd = document.createElement('td');
+        if (p.documentationUrl) {
+          const a = document.createElement('a');
+          a.href = p.documentationUrl;
+          a.target = '_blank';
+          a.style.color = 'var(--accent-color)';
+          a.style.textDecoration = 'none';
+          a.innerText = p.key;
+          keyTd.appendChild(a);
+        } else {
+          keyTd.innerText = p.key;
+        }
+
+        const msgTd = document.createElement('td');
+        msgTd.innerText = p.message;
+
+        const sugTd = document.createElement('td');
+        sugTd.innerText = p.suggestion;
+
+        tr.appendChild(sevTd);
+        tr.appendChild(srcTd);
+        tr.appendChild(keyTd);
+        tr.appendChild(msgTd);
+        tr.appendChild(sugTd);
+        tbody.appendChild(tr);
+      });
+    }
+
+    function sortProblems(field) {
+      if (problemsSortField === field) {
+        problemsSortAsc = !problemsSortAsc;
+      } else {
+        problemsSortField = field;
+        problemsSortAsc = true;
+      }
+      filterProblems();
+    }
+
+    function renderFailures() {
+      const container = document.getElementById('failuresList');
+      container.innerHTML = '';
+
+      if (reportData.failures.length === 0) {
+        container.innerHTML = '<div style="color: var(--text-secondary); text-align: center; margin-top: 40px;">No critical failures recorded.</div>';
+        return;
+      }
+
+      reportData.failures.forEach(f => {
+        const div = document.createElement('div');
+        div.className = 'failure-item';
+
+        const header = document.createElement('div');
+        header.className = 'failure-header';
+        header.innerHTML = `<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><line x1="12" y1="8" x2="12" y2="12"></line><line x1="12" y1="16" x2="12.01" y2="16"></line></svg>
+                            <span>${f.moduleId}${f.mojo ? ' @ ' + f.mojo : ''}</span>`;
+
+        const stack = document.createElement('pre');
+        stack.className = 'failure-stack';
+        stack.innerHTML = highlightStackTrace(f.message);
+
+        div.appendChild(header);
+        div.appendChild(stack);
+        container.appendChild(div);
+      });
+    }
+
+    function highlightStackTrace(stack) {
+      // Basic styling for stack trace
+      return stack.replace(/at\s+([a-zA-Z0-9_$.]+\.[a-zA-Z0-9_$]+)\(([^)]+)\)/g, (match, method, location) => {
+        return `at <span style="color: #60a5fa">${method}</span>(<span style="color: #34d399">${location}</span>)`;
+      });
+    }
+
+    // High Performance Virtual Scrolling Log Viewer
+    let logLines = [];
+    const LINE_HEIGHT = 22;
+    const VISIBLE_BUFFER = 15;
+    
+    function setupVirtualScroll() {
+      if (!reportData) return;
+      logLines = reportData.logs;
+      filterLogs();
+      
+      const windowEl = document.getElementById('logLinesWindow');
+      windowEl.removeEventListener('scroll', handleLogScroll);
+      windowEl.addEventListener('scroll', handleLogScroll);
+    }
+
+    let filteredLogs = [];
+    function filterLogs() {
+      const search = document.getElementById('logSearch').value.toLowerCase();
+      const mod = document.getElementById('logModuleFilter').value;
+      const level = document.getElementById('logLevelFilter').value;
+
+      filteredLogs = logLines.filter(l => {
+        const matchesSearch = l.message.toLowerCase().includes(search);
+        const matchesModule = mod === 'ALL' || l.moduleId === mod;
+        const matchesLevel = level === 'ALL' || l.level === level;
+        return matchesSearch && matchesModule && matchesLevel;
+      });
+
+      const scroller = document.getElementById('logLinesScrollHeight');
+      scroller.style.height = `${filteredLogs.length * LINE_HEIGHT}px`;
+      
+      const windowEl = document.getElementById('logLinesWindow');
+      windowEl.scrollTop = 0;
+      handleLogScroll();
+    }
+
+    function handleLogScroll() {
+      const windowEl = document.getElementById('logLinesWindow');
+      const scroller = document.getElementById('logLinesScrollHeight');
+      const scrollTop = windowEl.scrollTop;
+      const clientHeight = windowEl.clientHeight;
+
+      const startIndex = Math.max(0, Math.floor(scrollTop / LINE_HEIGHT) - VISIBLE_BUFFER);
+      const endIndex = Math.min(filteredLogs.length, Math.ceil((scrollTop + clientHeight) / LINE_HEIGHT) + VISIBLE_BUFFER);
+
+      // Remove existing lines and add visible ones
+      const oldLines = scroller.querySelectorAll('.log-line');
+      oldLines.forEach(l => l.remove());
+
+      const search = document.getElementById('logSearch').value;
+
+      for (let i = startIndex; i < endIndex; i++) {
+        const entry = filteredLogs[i];
+        const div = document.createElement('div');
+        div.className = `log-line level-${entry.level}`;
+        div.style.position = 'absolute';
+        div.style.top = `${i * LINE_HEIGHT}px`;
+        div.style.height = `${LINE_HEIGHT}px`;
+        div.style.left = '0';
+        div.style.right = '0';
+        div.style.overflow = 'hidden';
+
+        let msg = entry.message;
+        if (search) {
+          const regex = new RegExp(`(${escapeRegExp(search)})`, 'gi');
+          msg = msg.replace(regex, '<span class="highlight-search">$1</span>');
+        }
+
+        div.innerHTML = msg;
+        scroller.appendChild(div);
+      }
+    }
+
+    function escapeRegExp(string) {
+      return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    function formatDuration(ms) {
+      const s = ms / 1000;
+      const m = s / 60;
+      if (m >= 1) {
+        return `${Math.floor(m)}m ${Math.floor(s % 60)}s`;
+      }
+      return `${s.toFixed(2)}s`;
+    }
+
+    function switchTab(tabId) {
+      currentTab = tabId;
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.panel').forEach(panel => panel.classList.remove('active'));
+
+      // Find btn based on text
+      const btn = Array.from(document.querySelectorAll('.tab-btn')).find(b => b.innerText.toLowerCase().startsWith(tabId));
+      if (btn) btn.classList.add('active');
+
+      document.getElementById(`${tabId}Panel`).classList.add('active');
+
+      if (tabId === 'logs') {
+        handleLogScroll();
+      }
+    }
+
+    // Init
+    loadReportsList();
+  </script>
+</body>
+</html>

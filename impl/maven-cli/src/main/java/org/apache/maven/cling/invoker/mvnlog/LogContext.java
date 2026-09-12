@@ -16,36 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.logging;
+package org.apache.maven.cling.invoker.mvnlog;
 
-import org.apache.maven.execution.ExecutionEvent;
-import org.eclipse.aether.transfer.TransferEvent;
+import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.api.cli.mvnlog.LogOptions;
+import org.apache.maven.cling.invoker.LookupContext;
 
-/**
- * An abstract build event sink.
- */
-public interface BuildEventListener {
+public class LogContext extends LookupContext {
+    public LogContext(InvokerRequest invokerRequest, LogOptions logOptions) {
+        super(invokerRequest, true, logOptions);
+    }
 
-    void sessionStarted(ExecutionEvent event);
-
-    void projectStarted(String projectId);
-
-    void projectLogMessage(String projectId, String event);
-
-    void projectFinished(String projectId, String status);
-
-    void executionFailure(String projectId, boolean halted, String exception);
-
-    void mojoStarted(ExecutionEvent event);
-
-    void mojoFinished(ExecutionEvent event, String status);
-
-
-    void finish(int exitCode) throws Exception;
-
-    void fail(Throwable t) throws Exception;
-
-    void log(String msg);
-
-    void transfer(String projectId, TransferEvent e);
+    @Nonnull
+    public LogOptions options() {
+        return (LogOptions) super.options();
+    }
 }
