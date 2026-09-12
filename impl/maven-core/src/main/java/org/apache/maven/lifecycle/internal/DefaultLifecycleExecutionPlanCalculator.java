@@ -295,13 +295,13 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
         List<XmlNode> children = new ArrayList<>();
         if (mojoDescriptor.getParameters() != null) {
             for (Parameter parameter : mojoDescriptor.getParameters()) {
-                XmlNode parameterConfiguration = executionConfiguration.child(parameter.getName());
+                XmlNode parameterConfiguration = executionConfiguration.getChild(parameter.getName());
 
                 if (parameterConfiguration == null) {
-                    parameterConfiguration = executionConfiguration.child(parameter.getAlias());
+                    parameterConfiguration = executionConfiguration.getChild(parameter.getAlias());
                 }
 
-                XmlNode parameterDefaults = defaultConfiguration.child(parameter.getName());
+                XmlNode parameterDefaults = defaultConfiguration.getChild(parameter.getName());
 
                 if (parameterConfiguration != null) {
                     parameterConfiguration = XmlService.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
@@ -310,9 +310,9 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                 }
 
                 if (parameterConfiguration != null) {
-                    Map<String, String> attributes = new HashMap<>(parameterConfiguration.attributes());
+                    Map<String, String> attributes = new HashMap<>(parameterConfiguration.getAttributes());
 
-                    String attributeForImplementation = parameterConfiguration.attribute("implementation");
+                    String attributeForImplementation = parameterConfiguration.getAttribute("implementation");
                     String parameterForImplementation = parameter.getImplementation();
                     if ((attributeForImplementation == null || attributeForImplementation.isEmpty())
                             && ((parameterForImplementation != null) && !parameterForImplementation.isEmpty())) {
@@ -321,10 +321,10 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
 
                     parameterConfiguration = XmlNode.newInstance(
                             parameter.getName(),
-                            parameterConfiguration.value(),
+                            parameterConfiguration.getValue(),
                             attributes,
-                            parameterConfiguration.children(),
-                            parameterConfiguration.inputLocation());
+                            parameterConfiguration.getChildren(),
+                            parameterConfiguration.getInputLocation());
 
                     children.add(parameterConfiguration);
                 }

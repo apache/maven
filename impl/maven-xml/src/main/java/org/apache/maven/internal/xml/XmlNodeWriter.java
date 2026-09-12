@@ -45,14 +45,14 @@ public class XmlNodeWriter {
     @Deprecated
     public static void write(XMLStreamWriter xmlWriter, XmlNode node) throws XMLStreamException {
         // Keep the old direct implementation for backward compatibility
-        xmlWriter.writeStartElement(node.prefix(), node.name(), node.namespaceUri());
-        for (Map.Entry<String, String> attr : node.attributes().entrySet()) {
+        xmlWriter.writeStartElement(node.getPrefix(), node.getName(), node.getNamespaceUri());
+        for (Map.Entry<String, String> attr : node.getAttributes().entrySet()) {
             xmlWriter.writeAttribute(attr.getKey(), attr.getValue());
         }
-        for (XmlNode child : node.children()) {
+        for (XmlNode child : node.getChildren()) {
             write(xmlWriter, child);
         }
-        String value = node.value();
+        String value = node.getValue();
         if (value != null) {
             xmlWriter.writeCharacters(value);
         }

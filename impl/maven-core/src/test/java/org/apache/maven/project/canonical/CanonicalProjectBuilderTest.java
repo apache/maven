@@ -72,13 +72,14 @@ class CanonicalProjectBuilderTest extends AbstractMavenProjectTestCase {
 
         assertEquals(
                 "src/conf/plexus.conf",
-                configuration.child("plexusConfiguration").value());
+                configuration.getChild("plexusConfiguration").getValue());
 
         assertEquals(
                 "src/conf/plexus.properties",
-                configuration.child("plexusConfigurationPropertiesFile").value());
+                configuration.getChild("plexusConfigurationPropertiesFile").getValue());
 
-        assertEquals("Continuum", configuration.child("plexusApplicationName").value());
+        assertEquals(
+                "Continuum", configuration.getChild("plexusApplicationName").getValue());
 
         // ----------------------------------------------------------------------
         // Goal specific configuration
@@ -95,7 +96,7 @@ class CanonicalProjectBuilderTest extends AbstractMavenProjectTestCase {
         configuration = execution.getDelegate().getConfiguration();
 
         assertEquals(
-                "ContinuumPro", configuration.child("plexusApplicationName").value());
+                "ContinuumPro", configuration.getChild("plexusApplicationName").getValue());
 
         // Plugin1 [antlr]
     }

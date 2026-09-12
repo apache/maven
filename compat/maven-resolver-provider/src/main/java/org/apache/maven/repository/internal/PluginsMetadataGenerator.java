@@ -168,9 +168,9 @@ class PluginsMetadataGenerator implements MetadataGenerator {
     }
 
     private static String mayGetChild(XmlNode node, String child) {
-        XmlNode c = node.child(child);
+        XmlNode c = node.getChild(child);
         if (c != null) {
-            return c.value();
+            return c.getValue();
         }
         return null;
     }
