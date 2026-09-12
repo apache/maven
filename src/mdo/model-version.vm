@@ -161,11 +161,35 @@ public class ${className} {
             #end
             #set ( $pfx = "||" )
         #end
+        #if ( $v == "4_2_0" && $class.name == "Model" )
+            $pfx hasNewScopes(${var}) // Dependency scopes api / implementation
+        #end
         );
     }
     #end
 
 #end
+    private boolean hasNewScopes(Model model) {
+        return hasNewScopes((ModelBase) model)
+                || model.getProfiles().stream().anyMatch(this::hasNewScopes);
+    }
+
+    private boolean hasNewScopes(Profile profile) {
+        return hasNewScopes((ModelBase) profile);
+    }
+
+    private boolean hasNewScopes(ModelBase model) {
+        return model != null
+                && (model.getDependencies().stream().anyMatch(dependency ->
+                        "api".equals(dependency.getScope()) || "implementation".equals(dependency.getScope()))
+                        || (model.getDependencyManagement() != null
+                                && model.getDependencyManagement().getDependencies().stream()
+                                        .anyMatch(dependency ->
+                                                "api".equals(dependency.getScope())
+                                                        || "implementation".equals(dependency.getScope()))));
+    }
+    }
+
     private boolean has(String str) {
         return str != null;
     }

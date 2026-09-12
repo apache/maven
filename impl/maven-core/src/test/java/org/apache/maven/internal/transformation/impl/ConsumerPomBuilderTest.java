@@ -1499,4 +1499,110 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 DefaultConsumerPomBuilder.hasNonModelProperties("${env.HOME}-${ext.qualifier}", Map.of()),
                 "Should return true when at least one property is not built-in or in the model");
     }
+
+    @Test
+    void testConsumerPomRetainsCompileApiRuntimeDeps() throws Exception {
+        // Consumer POMs must retain compile, api, and runtime dependencies
+        org.apache.maven.api.model.Dependency compileDep = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("compile-dep")
+                .version("1")
+                .scope("compile")
+                .build();
+        org.apache.maven.api.model.Dependency apiDep = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("api-dep")
+                .version("1")
+                .scope("api")
+                .build();
+        org.apache.maven.api.model.Dependency runtimeDep = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("runtime-dep")
+                .version("1")
+                .scope("runtime")
+                .build();
+        org.apache.maven.api.model.Dependency unscopedDep = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("unscoped-dep")
+                .version("1")
+                .build();
+
+        Model model = Model.newBuilder()
+                .groupId("test")
+                .artifactId("test")
+                .version("1.0")
+                .dependencies(List.of(compileDep, apiDep, runtimeDep, unscopedDep))
+                .build();
+
+        Model transformed = DefaultConsumerPomBuilder.transformNonPom(model, null);
+        assertNotNull(transformed.getDependencies());
+        // All four should be retained
+        assertTrue(
+                transformed.getDependencies().stream().anyMatch(d -> "compile-dep".equals(d.getArtifactId())),
+                "compile-scoped dep should be retained");
+        assertTrue(
+                transformed.getDependencies().stream().anyMatch(d -> "api-dep".equals(d.getArtifactId())),
+                "api-scoped dep should be retained");
+        assertTrue(
+                transformed.getDependencies().stream().anyMatch(d -> "runtime-dep".equals(d.getArtifactId())),
+                "runtime-scoped dep should be retained");
+        assertTrue(
+                transformed.getDependencies().stream().anyMatch(d -> "unscoped-dep".equals(d.getArtifactId())),
+                "unscoped (default compile) dep should be retained");
+    }
+
+    @Test
+    void testConsumerPomScopeFilter() {
+        // hasDependencyScope returns true for deps to REMOVE
+        // compile/runtime/api/implementation should be KEPT (returns false)
+        assertFalse(DefaultConsumerPomBuilder.hasDependencyScope(dep("compile")), "compile should be kept");
+        assertFalse(DefaultConsumerPomBuilder.hasDependencyScope(dep("runtime")), "runtime should be kept");
+        assertFalse(DefaultConsumerPomBuilder.hasDependencyScope(dep("api")), "api should be kept");
+        assertFalse(
+                DefaultConsumerPomBuilder.hasDependencyScope(dep("implementation")), "implementation should be kept");
+        assertFalse(
+                DefaultConsumerPomBuilder.hasDependencyScope(dep(null)),
+                "unscoped (defaults to compile) should be kept");
+        assertFalse(
+                DefaultConsumerPomBuilder.hasDependencyScope(dep("")),
+                "empty scope (defaults to compile) should be kept");
+        // provided/test/system should be STRIPPED (returns true)
+        assertTrue(DefaultConsumerPomBuilder.hasDependencyScope(dep("provided")), "provided should be stripped");
+        assertTrue(DefaultConsumerPomBuilder.hasDependencyScope(dep("test")), "test should be stripped");
+        assertTrue(DefaultConsumerPomBuilder.hasDependencyScope(dep("system")), "system should be stripped");
+        assertTrue(DefaultConsumerPomBuilder.hasDependencyScope(dep("test-only")), "test-only should be stripped");
+    }
+
+    @Test
+    void testConsumerPomScopeMappings() {
+        // api → compile, implementation → runtime, others unchanged
+        assertEquals(
+                "compile",
+                DefaultConsumerPomBuilder.mapScopeForConsumerPom(dep("api")).getScope(),
+                "api should map to compile in consumer POM");
+        assertEquals(
+                "runtime",
+                DefaultConsumerPomBuilder.mapScopeForConsumerPom(dep("implementation"))
+                        .getScope(),
+                "implementation should map to runtime in consumer POM");
+        assertEquals(
+                "compile",
+                DefaultConsumerPomBuilder.mapScopeForConsumerPom(dep("compile")).getScope(),
+                "compile should remain compile");
+        assertEquals(
+                "runtime",
+                DefaultConsumerPomBuilder.mapScopeForConsumerPom(dep("runtime")).getScope(),
+                "runtime should remain runtime");
+    }
+
+    private static org.apache.maven.api.model.Dependency dep(String scope) {
+        org.apache.maven.api.model.Dependency.Builder b = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("a")
+                .version("1");
+        if (scope != null) {
+            b.scope(scope);
+        }
+        return b.build();
+    }
 }

@@ -582,8 +582,10 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 }
                 return dependency;
             });
-            // Only keep transitive scopes (null/empty => COMPILE)
+            // Only keep consumer-visible scopes (compile, api, runtime, implementation)
             directDependencies.values().removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
+            // Map 4.2.0 scopes to their 4.0.0 consumer POM equivalents (api→compile, implementation→runtime)
+            directDependencies.replaceAll((k, v) -> mapScopeForConsumerPom(v));
             managedDependencies.keySet().removeAll(directDependencies.keySet());
 
             model = model.withDependencyManagement(
@@ -600,15 +602,17 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                             Function.identity(),
                             this::merge,
                             LinkedHashMap::new));
-            // Only keep transitive scopes
+            // Only keep consumer-visible scopes (compile, api, runtime, implementation)
             directDependencies.values().removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
+            // Map 4.2.0 scopes to their 4.0.0 consumer POM equivalents (api→compile, implementation→runtime)
+            directDependencies.replaceAll((k, v) -> mapScopeForConsumerPom(v));
             model = model.withDependencies(directDependencies.isEmpty() ? null : directDependencies.values());
         }
 
         return model;
     }
 
-    private static boolean hasDependencyScope(Dependency dependency) {
+    static boolean hasDependencyScope(Dependency dependency) {
         String scopeId = dependency.getScope();
         DependencyScope scope;
         if (scopeId == null || scopeId.isEmpty()) {
@@ -616,7 +620,27 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         } else {
             scope = DependencyScope.forId(scopeId);
         }
-        return scope == null || !scope.isTransitive();
+        return scope != DependencyScope.COMPILE
+                && scope != DependencyScope.RUNTIME
+                && scope != DependencyScope.API
+                && scope != DependencyScope.IMPLEMENTATION;
+    }
+
+    /**
+     * Maps a 4.2.0 dependency scope to its 4.0.0 consumer POM equivalent.
+     * <ul>
+     *   <li>{@code api} → {@code compile} (semantically identical, expresses intent)</li>
+     *   <li>{@code implementation} → {@code runtime} (consumers cannot compile against it, present at runtime)</li>
+     * </ul>
+     */
+    static Dependency mapScopeForConsumerPom(Dependency dependency) {
+        String scope = dependency.getScope();
+        if (DependencyScope.API.id().equals(scope)) {
+            return dependency.withScope("compile");
+        } else if (DependencyScope.IMPLEMENTATION.id().equals(scope)) {
+            return dependency.withScope("runtime");
+        }
+        return dependency;
     }
 
     private Dependency merge(Dependency dep1, Dependency dep2) {
