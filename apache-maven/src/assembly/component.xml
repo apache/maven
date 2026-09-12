@@ -24,6 +24,7 @@ under the License.
       <outputDirectory>boot</outputDirectory>
       <includes>
         <include>org.codehaus.plexus:plexus-classworlds</include>
+        <include>org.slf4j:*</include>
       </includes>
     </dependencySet>
     <dependencySet>
@@ -31,6 +32,7 @@ under the License.
       <outputDirectory>lib</outputDirectory>
       <excludes>
         <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
+        <exclude>org.slf4j:*</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
