@@ -372,7 +372,7 @@ under the License.
                   <pluginExecutionFilter>
                     <groupId>org.apache.rat</groupId>
                     <artifactId>apache-rat-plugin</artifactId>
-                    <versionRange>[0.11,)</versionRange>
+                    <versionRange>[0.18,)</versionRange>
                     <goals>
                       <goal>check</goal>
                     </goals>
