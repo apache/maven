@@ -74,7 +74,7 @@ public class DefaultModelProcessor implements ModelProcessor {
     @Inject
     public DefaultModelProcessor(ModelXmlFactory modelXmlFactory, @Nullable Map<String, ModelParser> modelParsers) {
         this.modelXmlFactory = modelXmlFactory;
-        this.modelParsers = modelParsers;
+        this.modelParsers = modelParsers != null ? modelParsers : Map.of();
     }
 
     @Override

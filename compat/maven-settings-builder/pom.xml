@@ -37,6 +37,10 @@ under the License.
     </contributor>
   </contributors>
 
+  <properties>
+    <javaModuleName>org.apache.maven.settings.builder</javaModuleName>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

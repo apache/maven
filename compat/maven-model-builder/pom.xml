@@ -32,6 +32,7 @@ under the License.
   <description>The effective model builder, with inheritance, profile activation, interpolation, ...</description>
 
   <properties>
+    <javaModuleName>org.apache.maven.model.builder</javaModuleName>
     <!-- in: DefaultModelValidator, DefaultModelBuilder -->
     <checkstyle.violation.ignore>FileLength</checkstyle.violation.ignore>
   </properties>
@@ -159,6 +160,15 @@ under the License.
               <!--              <exclude>org.apache.maven.model.validation.ModelValidator#validateExternalProfiles(java.util.List,org.apache.maven.model.Model,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_NEW_DEFAULT</exclude>-->
             </excludes>
           </parameter>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <additionalJOptions>
+            <additionalJOption>--add-exports=org.codehaus.plexus.interpolation/org.codehaus.plexus.interpolation.util=org.apache.maven.model.builder</additionalJOption>
+          </additionalJOptions>
         </configuration>
       </plugin>
     </plugins>
