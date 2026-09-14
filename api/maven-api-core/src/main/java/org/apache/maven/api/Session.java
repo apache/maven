@@ -192,7 +192,9 @@ public interface Session extends ProtoSession {
     Session withContext(@Nonnull RequestTrace trace);
 
     /**
-     * Register the given listener which will receive all events.
+     * Registers a listener for execution events, repository events, or both.
+     * Typed listeners receive only their event-specific callbacks. Legacy listeners receive execution events.
+     * Registration is shared by Maven sessions using the same underlying repository system session.
      *
      * @param listener the listener to register
      * @throws NullPointerException if {@code listener} is null
