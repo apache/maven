@@ -214,14 +214,6 @@ public class DefaultMaven implements Maven {
         try {
             MavenChainedWorkspaceReader chainedWorkspaceReader =
                     new MavenChainedWorkspaceReader(request.getWorkspaceReader(), ideWorkspaceReader);
-            // Add SPI workspace readers to the chain — looked up dynamically so that
-            // implementations discovered from core extensions are included (extensions
-            // are loaded after the container is bootstrapped, so constructor injection
-            // would miss them).
-            for (org.apache.maven.api.spi.WorkspaceReader spiReader :
-                    lookup.lookupList(org.apache.maven.api.spi.WorkspaceReader.class)) {
-                chainedWorkspaceReader.addReader(new SpiWorkspaceReaderAdapter(spiReader));
-            }
             try (CloseableSession closeableSession = newCloseableSession(request, chainedWorkspaceReader)) {
                 MavenSession session = new MavenSession(closeableSession, request, result);
                 session.setSession(defaultSessionFactory.newSession(session));
@@ -357,8 +349,15 @@ public class DefaultMaven implements Maven {
                 workspaceReaders.add(repoWorkspaceReader);
             }
         }
-        // 3) .. n) Project-scoped workspace readers
+        // 3) .. n) Project-scoped legacy workspace readers (org.eclipse.aether)
         workspaceReaders.addAll(getProjectScopedExtensionComponents(session.getProjects(), WorkspaceReader.class));
+        // n+1) SPI workspace readers (org.apache.maven.api.spi) — discovered here, after buildGraph()
+        //      has loaded core extensions into the container so they are visible via lookupList.
+        for (org.apache.maven.api.spi.WorkspaceReader spiReader :
+                getProjectScopedExtensionComponents(
+                        session.getProjects(), org.apache.maven.api.spi.WorkspaceReader.class)) {
+            workspaceReaders.add(new SpiWorkspaceReaderAdapter(spiReader));
+        }
         chainedWorkspaceReader.setReaders(workspaceReaders);
     }
 
