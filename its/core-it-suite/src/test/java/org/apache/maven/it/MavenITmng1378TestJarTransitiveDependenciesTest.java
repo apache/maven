@@ -54,6 +54,17 @@ public class MavenITmng1378TestJarTransitiveDependenciesTest extends AbstractMav
         assertTrue(testClasspath.contains("test-jar-1.0-tests.jar"), testClasspath.toString());
         assertTrue(testClasspath.contains("support-1.0.jar"), testClasspath.toString());
 
+        Verifier disabledConsumer = newVerifier(testDir.resolve("consumer"));
+        disabledConsumer.setAutoclean(false);
+        disabledConsumer.addCliArgument("-Dmaven.testJarTransitiveDeps=false");
+        disabledConsumer.addCliArgument("validate");
+        disabledConsumer.execute();
+        disabledConsumer.verifyErrorFreeLog();
+
+        List<String> disabledClasspath = disabledConsumer.loadLines("target/test.txt");
+        assertTrue(disabledClasspath.contains("test-jar-1.0-tests.jar"), disabledClasspath.toString());
+        assertFalse(disabledClasspath.contains("support-1.0.jar"), disabledClasspath.toString());
+
         Verifier regularConsumer = newVerifier(testDir.resolve("regular-consumer"));
         regularConsumer.setAutoclean(false);
         regularConsumer.addCliArgument("validate");

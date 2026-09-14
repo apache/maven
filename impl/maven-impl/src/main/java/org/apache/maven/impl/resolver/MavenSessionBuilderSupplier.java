@@ -69,11 +69,18 @@ import static java.util.Objects.requireNonNull;
 public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     protected final RepositorySystem repositorySystem;
     protected final boolean mavenMaven3Personality;
+    protected final boolean testJarTransitiveDeps;
     protected final InternalScopeManager scopeManager;
 
     public MavenSessionBuilderSupplier(RepositorySystem repositorySystem, boolean mavenMaven3Personality) {
+        this(repositorySystem, mavenMaven3Personality, !mavenMaven3Personality);
+    }
+
+    public MavenSessionBuilderSupplier(
+            RepositorySystem repositorySystem, boolean mavenMaven3Personality, boolean testJarTransitiveDeps) {
         this.repositorySystem = requireNonNull(repositorySystem);
         this.mavenMaven3Personality = mavenMaven3Personality;
+        this.testJarTransitiveDeps = testJarTransitiveDeps;
         this.scopeManager = new ScopeManagerImpl(
                 mavenMaven3Personality
                         ? Maven3ScopeManagerConfiguration.INSTANCE
@@ -102,7 +109,7 @@ public class MavenSessionBuilderSupplier implements Supplier<SessionBuilder> {
     public DependencySelector getDependencySelector() {
         DependencySelector scopeSelector = ScopeDependencySelector.legacy(
                 null, Arrays.asList(DependencyScope.TEST.id(), DependencyScope.PROVIDED.id()));
-        if (!mavenMaven3Personality) {
+        if (testJarTransitiveDeps) {
             scopeSelector = new TestJarDependencySelector(scopeSelector);
         }
         return new AndDependencySelector(

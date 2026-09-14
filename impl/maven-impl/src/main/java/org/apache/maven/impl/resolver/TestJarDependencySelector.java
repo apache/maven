@@ -62,8 +62,8 @@ final class TestJarDependencySelector implements DependencySelector {
 
         DependencySelector childDelegate = delegate.deriveChildSelector(context);
         Dependency parent = context.getDependency();
-        boolean childOfTestJar = parent != null
-                && Type.TEST_JAR.equals(parent.getArtifact().getProperty(ArtifactProperties.TYPE, ""));
+        boolean childOfTestJar =
+                parent != null && Type.TEST_JAR.equals(parent.getArtifact().getProperty(ArtifactProperties.TYPE, ""));
 
         if (childDelegate == delegate && childOfTestJar == testJarParent) {
             return this;
