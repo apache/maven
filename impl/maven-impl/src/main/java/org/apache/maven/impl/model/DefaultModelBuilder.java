@@ -1722,11 +1722,16 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // A model resolved to satisfy dependency resolution -- a dependency POM
                     // itself, or one of its parents, reached transitively -- evaluates profiles
                     // against a sandboxed activation context.  The sandbox:
-                    //  - preserves system properties (so JDK/OS activation works),
-                    //  - preserves model properties (so POM-declared <properties> drive activation),
+                    //  - merges model properties into system property lookups (so POM-declared
+                    //    <properties> drive activation via the existing property lookup chain),
                     //  - suppresses user properties (consumer -D flags must not activate
                     //    dependency profiles — they were not set for that artifact),
                     //  - disables file existence checks (publisher paths don't exist here).
+                    // Model properties are merged into system properties rather than adding
+                    // a separate lookup step in PropertyProfileActivator, because changing the
+                    // activator would affect ALL profile evaluations (including the build's own
+                    // project) and cause unintended profile activation when a POM declares a
+                    // property that matches a profile's activation condition.
                     // File-activated profiles are pre-filtered (not just sandboxed) because
                     // returning false from exists() would incorrectly activate <missing> profiles.
                     // Repository contributions from external profiles are always stripped.

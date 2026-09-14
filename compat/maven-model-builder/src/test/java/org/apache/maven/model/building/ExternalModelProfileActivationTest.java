@@ -194,10 +194,13 @@ class ExternalModelProfileActivationTest {
                 "activated",
                 model.getProperties().get("profile.sys.property"),
                 "system-property profile must fire in project build");
-        assertEquals(
-                "activated",
+        // POM-declared property activation is only supported in external (sandbox) builds.
+        // In project builds, the PropertyProfileActivator does not check model properties
+        // because doing so would cause unintended profile activation when a POM declares
+        // a property that also matches a profile's activation condition (see IT proxy profile).
+        assertNull(
                 model.getProperties().get("profile.pom.property"),
-                "POM-declared-property profile must fire in project build");
+                "POM-declared-property profile must NOT fire in project build (only in external)");
         assertEquals(
                 "activated",
                 model.getProperties().get("profile.negated.property"),

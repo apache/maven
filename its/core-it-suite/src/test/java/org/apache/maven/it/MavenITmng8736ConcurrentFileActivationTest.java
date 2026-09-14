@@ -51,7 +51,7 @@ class MavenITmng8736ConcurrentFileActivationTest extends AbstractMavenIntegratio
         verifier.addCliArgument("4");
         verifier.addCliArgument("-Dmaven.modelBuilder.parallelism=4"); // Use 4 threads for concurrent execution
         // verifier.addCliArgument("-X"); // Enable debug logging to see detailed traces
-        verifier.addCliArgument("help:active-profiles");
+        verifier.addCliArgument("org.apache.maven.plugins:maven-help-plugin:3.5.1:active-profiles");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 

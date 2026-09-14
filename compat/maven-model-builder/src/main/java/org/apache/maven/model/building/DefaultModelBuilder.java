@@ -524,21 +524,18 @@ public class DefaultModelBuilder implements ModelBuilder {
      * repository-resolved (external) models — dependency POMs, parent POMs, and imported BOMs.
      * <p>
      * The sandboxed context preserves system properties (so JDK/OS activation works) and
-     * project {@code <properties>} (part of the artifact's published identity), while suppressing
-     * user properties (consumer {@code -D} flags must not activate dependency profiles).
+     * merges the POM's own {@code <properties>} into the system properties map so that
+     * property-activated profiles that depend on POM-declared values still work.
+     * User properties (consumer {@code -D} flags) are suppressed because they were not
+     * set for the dependency and must not accidentally activate its profiles.
      * File-based profiles are pre-filtered via {@link #withoutFileActivation(List)} before
      * reaching this context, so {@code getProjectDirectory()} is not relied on for file checks.
      * <p>
-     * This replaces the old type-based pre-filter approach for property activation: rather than
-     * removing property-activated profiles by type, all non-file profiles are evaluated against
-     * this restricted context. The result is strictly more correct:
-     * <ul>
-     *   <li>A profile conditioned on a POM-declared property ({@code <properties><foo>bar</foo>
-     *       </properties>}) now activates correctly in external builds.</li>
-     *   <li>A negated-property default-on profile ({@code !foo}) still fires because {@code foo}
-     *       is absent from the sandboxed context (consumer -D is suppressed).</li>
-     *   <li>A positively-conditioned profile on a consumer-only {@code -D} flag is suppressed.</li>
-     * </ul>
+     * Model properties are merged into system properties (with system properties taking
+     * precedence) rather than changing the {@code PropertyProfileActivator} lookup chain,
+     * because changing the activator would affect ALL profile evaluations — including the
+     * build's own project — which can cause unintended profile activation when a POM declares
+     * a property that matches a profile's activation condition.
      *
      * @param delegate the original full context for this model build
      * @return a sandboxed context suitable for external model profile activation
@@ -555,9 +552,20 @@ public class DefaultModelBuilder implements ModelBuilder {
                 return delegate.getInactiveProfileIds();
             }
 
+            /**
+             * System properties merged with project properties (system wins on conflict).
+             * This makes POM-declared properties visible to the PropertyProfileActivator
+             * without modifying the activator's lookup chain for non-external models.
+             */
             @Override
             public Map<String, String> getSystemProperties() {
-                return delegate.getSystemProperties();
+                Map<String, String> projectProps = delegate.getProjectProperties();
+                if (projectProps == null || projectProps.isEmpty()) {
+                    return delegate.getSystemProperties();
+                }
+                Map<String, String> merged = new HashMap<>(projectProps);
+                merged.putAll(delegate.getSystemProperties()); // system wins
+                return merged;
             }
 
             /** User properties are suppressed: consumer -D flags do not activate dependency profiles. */
