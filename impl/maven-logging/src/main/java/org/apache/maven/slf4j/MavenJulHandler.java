@@ -84,6 +84,17 @@ public class MavenJulHandler extends Handler {
     private static final ConcurrentMap<String, org.slf4j.Logger> LOGGER_CACHE = new ConcurrentHashMap<>();
 
     /**
+     * Re-entrancy guard: set to {@code true} while {@link #publish} is routing
+     * a JUL event through SLF4J on this thread.  Prevents recursive JUL events
+     * (e.g. JLine's {@code StyleResolver} calling {@code java.util.logging.Logger}
+     * while inside {@link MavenSimpleLogger#renderLevel} lazy-initialisation,
+     * which in turn is triggered by a JUL event during terminal construction)
+     * from re-entering {@code publish} and crashing with
+     * {@code ConcurrentHashMap.computeIfAbsent IllegalStateException("Recursive update")}.
+     */
+    private static final ThreadLocal<Boolean> IN_PUBLISH = new ThreadLocal<>();
+
+    /**
      * Returns the JUL metadata for the current log event being processed,
      * or {@code null} if the current log event did not originate from JUL.
      * <p>
@@ -138,6 +149,17 @@ public class MavenJulHandler extends Handler {
             return;
         }
 
+        // Re-entrancy guard: drop recursive JUL events that originate from
+        // within SLF4J/JLine processing triggered by this very publish() call.
+        // Example: MavenSimpleLogger.renderLevel() lazily initialises ANSI
+        // colour strings by calling JLine's StyleResolver, which logs DEBUG
+        // events via java.util.logging — re-entering publish() on the same
+        // thread and crashing ConcurrentHashMap.computeIfAbsent with
+        // IllegalStateException("Recursive update").
+        if (Boolean.TRUE.equals(IN_PUBLISH.get())) {
+            return;
+        }
+
         // Guard against null logger name (allowed by JUL spec)
         String loggerName = record.getLoggerName();
         if (loggerName == null) {
@@ -184,9 +206,11 @@ public class MavenJulHandler extends Handler {
         // JUL or SLF4J — fixing the format inconsistency.
         METADATA.set(
                 new JulMetadata(record.getSourceClassName(), record.getSourceMethodName(), record.getLongThreadID()));
+        IN_PUBLISH.set(Boolean.TRUE);
         try {
             logToSlf4j(slf4jLogger, slf4jLevel, message, throwable);
         } finally {
+            IN_PUBLISH.remove();
             METADATA.remove();
         }
     }

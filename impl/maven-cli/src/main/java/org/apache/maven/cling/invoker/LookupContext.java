@@ -78,6 +78,17 @@ public class LookupContext implements AutoCloseable {
 
     public Logger logger;
 
+    /**
+     * Early log entries accumulated before {@link #createTerminal()} wires up
+     * the {@link org.apache.maven.slf4j.MavenSimpleLogger} log-sink and any
+     * {@code -l} log-file writer.  Set by {@code activateLogging()} (which
+     * runs before {@code createTerminal()}) and drained in
+     * {@code createTerminal()} after the sink is installed, so that early
+     * messages such as "Enabled to break the build on log level WARN." reach
+     * the log file rather than going to stdout via {@code super.write()}.
+     */
+    public List<Logger.Entry> pendingEarlyLogs;
+
     // this one "evolves" as process progresses (instance is immutable but instances are replaced)
     public ProtoSession protoSession;
     // here we track which user properties we pushed to Java System Properties (internal only)
