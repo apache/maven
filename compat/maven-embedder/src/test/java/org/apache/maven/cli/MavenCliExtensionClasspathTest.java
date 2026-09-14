@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-@Deprecated
+@SuppressWarnings("deprecation")
 class MavenCliExtensionClasspathTest {
     @TempDir
     Path directory;
