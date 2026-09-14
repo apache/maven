@@ -71,6 +71,8 @@ import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.resolver.MavenChainedWorkspaceReader;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
+import org.apache.maven.resolver.SpiWorkspaceReaderAdapter;
+import org.apache.maven.resolver.SpiWorkspaceReadersHolder;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
@@ -348,8 +350,18 @@ public class DefaultMaven implements Maven {
                 workspaceReaders.add(repoWorkspaceReader);
             }
         }
-        // 3) .. n) Project-scoped workspace readers
+        // 3) .. n) Project-scoped legacy workspace readers (org.eclipse.aether)
         workspaceReaders.addAll(getProjectScopedExtensionComponents(session.getProjects(), WorkspaceReader.class));
+        // n+1) SPI workspace readers (org.apache.maven.api.spi).
+        //      SPI components use the maven-di layer (@org.apache.maven.api.di.Named), not Plexus, so
+        //      container.lookupList() cannot find them. SpiWorkspaceReadersHolder is a maven-di
+        //      @Named @Singleton bridged to Guice/SISU via SisuDiBridgeModule, making it accessible
+        //      via lookup.lookup(). It receives all named WorkspaceReader bindings injected as a Map
+        //      at first instantiation — here, after buildGraph() has loaded core extensions.
+        for (org.apache.maven.api.spi.WorkspaceReader spiReader :
+                lookup.lookup(SpiWorkspaceReadersHolder.class).getReaders()) {
+            workspaceReaders.add(new SpiWorkspaceReaderAdapter(spiReader));
+        }
         chainedWorkspaceReader.setReaders(workspaceReaders);
     }
 
