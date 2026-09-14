@@ -42,7 +42,7 @@ class DefaultRepositoryMetadataManagerValidationTest {
         RepositoryMetadataReadException exception =
                 assertThrows(RepositoryMetadataReadException.class, () -> manager.readMetadata(metadataFile));
 
-        assertTrue(exception.getMessage().contains("invalid version token"), exception.getMessage());
+        assertTrue(exception.getMessage().contains("Invalid versioning/release"), exception.getMessage());
     }
 
     @Test
@@ -52,7 +52,7 @@ class DefaultRepositoryMetadataManagerValidationTest {
         RepositoryMetadataReadException exception =
                 assertThrows(RepositoryMetadataReadException.class, () -> manager.readMetadata(metadataFile));
 
-        assertTrue(exception.getMessage().contains("invalid version token"), exception.getMessage());
+        assertTrue(exception.getMessage().contains("Invalid versioning/snapshot/timestamp"), exception.getMessage());
     }
 
     private static File testFile(String resource) {
