@@ -52,6 +52,50 @@ class VersionRangeTest {
     private static final String CHECK_SELECTED_VERSION = "check selected version";
 
     @Test
+    void testZeroPrefixedQualifierRange() throws InvalidVersionSpecificationException {
+        VersionRange range = VersionRange.createFromVersionSpec("[0-alpha,x]");
+        for (String version : new String[] {"alpha", "0-alpha", "0-0-alpha", "0-beta", "0", "x", "0-x"}) {
+            assertTrue(range.containsVersion(new DefaultArtifactVersion(version)), version);
+        }
+        assertFalse(range.containsVersion(new DefaultArtifactVersion("alpha-snapshot")));
+        assertFalse(range.containsVersion(new DefaultArtifactVersion("y")));
+
+        ArtifactVersion alpha = new DefaultArtifactVersion("0-alpha");
+        ArtifactVersion zero = new DefaultArtifactVersion("0");
+        ArtifactVersion x = new DefaultArtifactVersion("x");
+        for (List<ArtifactVersion> versions : List.of(
+                List.of(alpha, zero, x),
+                List.of(alpha, x, zero),
+                List.of(zero, alpha, x),
+                List.of(zero, x, alpha),
+                List.of(x, alpha, zero),
+                List.of(x, zero, alpha))) {
+            assertEquals(x, range.matchVersion(versions));
+        }
+
+        VersionRange exact = VersionRange.createFromVersionSpec("[alpha]");
+        assertTrue(exact.containsVersion(new DefaultArtifactVersion("0-alpha")));
+        assertTrue(exact.containsVersion(new DefaultArtifactVersion("0-0-alpha")));
+        assertFalse(exact.containsVersion(zero));
+        VersionRange intersection = range.restrict(VersionRange.createFromVersionSpec("[alpha,0]"));
+        assertTrue(intersection.containsVersion(alpha));
+        assertTrue(intersection.containsVersion(zero));
+        assertFalse(intersection.containsVersion(x));
+    }
+
+    @Test
+    void testZeroPrefixedReleaseQualifierRange() throws InvalidVersionSpecificationException {
+        for (String release : new String[] {"ga", "final", "release"}) {
+            VersionRange range = VersionRange.createFromVersionSpec("[1,1-0-" + release + ".1]");
+            assertTrue(range.containsVersion(new DefaultArtifactVersion("1-" + release + "0")));
+            assertTrue(range.containsVersion(new DefaultArtifactVersion("1-" + release + "0".repeat(19))));
+            assertFalse(range.containsVersion(new DefaultArtifactVersion("1-" + release + "1")));
+            VersionRange exact = VersionRange.createFromVersionSpec("[1-" + release + "]");
+            assertTrue(exact.containsVersion(new DefaultArtifactVersion("1-" + release + "0")));
+        }
+    }
+
+    @Test
     void testRange() throws InvalidVersionSpecificationException, OverConstrainedVersionException {
         Artifact artifact = null;
 
