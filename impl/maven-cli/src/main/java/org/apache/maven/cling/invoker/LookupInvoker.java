@@ -156,8 +156,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         pushUserProperties(context);
         setupGuiceClassLoading(context);
         configureLogging(context);
-        createTerminal(context);
         activateLogging(context);
+        createTerminal(context);
         helpOrVersionAndMayExit(context);
         preCommands(context);
         container(context);
@@ -453,11 +453,25 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
         context.slf4jConfiguration.activate();
 
-        // Now that SLF4J is fully initialized, open the JUL root logger
-        // to all levels so that filtering is done by SLF4J.  This must
-        // happen AFTER install() + activate() to avoid flooding JUL events
-        // during SLF4J bootstrap (ConcurrentHashMap reentrancy).
-        java.util.logging.LogManager.getLogManager().getLogger("").setLevel(java.util.logging.Level.ALL);
+        // Now that SLF4J is fully initialized, set the JUL root logger level
+        // to match the effective log level.  This must happen AFTER install()
+        // + activate() to avoid flooding JUL events during SLF4J bootstrap
+        // (ConcurrentHashMap.computeIfAbsent reentrancy).
+        // In quiet mode keep the JUL root at WARNING so that INFO/DEBUG JUL
+        // events are suppressed at source — relying solely on the SLF4J-level
+        // check in MavenJulHandler.isLevelEnabled() is racy: newly created
+        // SLF4J loggers may briefly see the default INFO level before
+        // quiet-mode propagation completes, leaking output that
+        // MavenITmng4387QuietLoggingTest detects as a flaky failure.
+        java.util.logging.Level julRootLevel;
+        if (context.options().quiet().orElse(false)) {
+            julRootLevel = java.util.logging.Level.WARNING;
+        } else if (context.invokerRequest.effectiveVerbose()) {
+            julRootLevel = java.util.logging.Level.ALL;
+        } else {
+            julRootLevel = java.util.logging.Level.INFO;
+        }
+        java.util.logging.LogManager.getLogManager().getLogger("").setLevel(julRootLevel);
         if (context.options().failOnSeverity().isPresent()) {
             String logLevelThreshold = context.options().failOnSeverity().get();
             if (context.loggerFactory instanceof LogLevelRecorder recorder) {
