@@ -355,6 +355,90 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
         return this;
     }
 
+    /**
+     * Returns a sandboxed copy of this context suitable for evaluating profiles in
+     * repository-resolved (external) models — dependency POMs, parent POMs, and imported BOMs.
+     * <p>
+     * The sandboxed context:
+     * <ul>
+     *   <li><b>Preserves system properties</b> ({@code java.version}, {@code os.name}, …) so
+     *       that JDK- and OS-activated profiles continue to work.</li>
+     *   <li><b>Preserves model properties</b> (the POM's own {@code <properties>} section),
+     *       because those are part of the artifact's published identity, not the consumer's
+     *       build environment.</li>
+     *   <li><b>Suppresses user properties</b> (consumer {@code -D} flags): they were not
+     *       set for the dependency and must not accidentally activate its profiles.</li>
+     *   <li><b>Disables file existence checks</b>: the publisher's file system paths do not
+     *       exist in the consumer's environment, so file-activated profiles always return
+     *       {@code false}.</li>
+     * </ul>
+     *
+     * @return a sandboxed {@link ProfileActivationContext} for external model evaluation
+     */
+    public ProfileActivationContext withoutUserPropertiesAndFilesystem() {
+        return new ProfileActivationContext() {
+            @Override
+            public boolean isProfileActive(String profileId) {
+                return DefaultProfileActivationContext.this.isProfileActive(profileId);
+            }
+
+            @Override
+            public boolean isProfileInactive(String profileId) {
+                return DefaultProfileActivationContext.this.isProfileInactive(profileId);
+            }
+
+            @Override
+            public String getSystemProperty(String key) {
+                return DefaultProfileActivationContext.this.getSystemProperty(key);
+            }
+
+            /** User properties are suppressed: consumer {@code -D} flags do not activate dependency profiles. */
+            @Override
+            public String getUserProperty(String key) {
+                return null;
+            }
+
+            @Override
+            public String getModelProperty(String key) {
+                return DefaultProfileActivationContext.this.getModelProperty(key);
+            }
+
+            @Override
+            public String getModelArtifactId() {
+                return DefaultProfileActivationContext.this.getModelArtifactId();
+            }
+
+            @Override
+            public String getModelPackaging() {
+                return DefaultProfileActivationContext.this.getModelPackaging();
+            }
+
+            @Override
+            public String getModelRootDirectory() {
+                return DefaultProfileActivationContext.this.getModelRootDirectory();
+            }
+
+            @Override
+            public String getModelBaseDirectory() {
+                return DefaultProfileActivationContext.this.getModelBaseDirectory();
+            }
+
+            @Override
+            public String interpolatePath(String path) throws InterpolatorException {
+                return DefaultProfileActivationContext.this.interpolatePath(path);
+            }
+
+            /**
+             * File existence checks are disabled for external models: publisher paths do not
+             * exist in the consumer's environment, so file-activated profiles always return false.
+             */
+            @Override
+            public boolean exists(String path, boolean glob) {
+                return false;
+            }
+        };
+    }
+
     @Override
     public String interpolatePath(String path) throws InterpolatorException {
         if (path == null) {
