@@ -173,6 +173,13 @@ public class SpiWorkspaceReaderAdapter implements WorkspaceReader {
 
     /**
      * Simple {@link Version} implementation that wraps a version string.
+     *
+     * <p><b>Note on ordering:</b> {@link #compareTo(Version)} uses lexicographic string
+     * comparison, which does <em>not</em> give correct semantic version ordering for
+     * multi-digit components (e.g. {@code "10"} sorts before {@code "9"}).  This wrapper
+     * is used solely to pass artifact coordinates to SPI workspace readers; callers should
+     * not rely on {@code compareTo} for correct Maven version ordering.  Use a proper
+     * {@link org.apache.maven.api.services.VersionParser} when version ordering matters.</p>
      */
     private record StringVersion(String version) implements Version {
         @Override

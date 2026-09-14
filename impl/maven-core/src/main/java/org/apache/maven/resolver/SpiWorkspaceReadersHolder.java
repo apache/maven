@@ -62,6 +62,6 @@ public class SpiWorkspaceReadersHolder {
     }
 
     public List<WorkspaceReader> getReaders() {
-        return readers;
+        return Collections.unmodifiableList(readers);
     }
 }
