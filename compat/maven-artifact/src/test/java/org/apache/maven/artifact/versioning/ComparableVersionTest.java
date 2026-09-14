@@ -18,6 +18,8 @@
  */
 package org.apache.maven.artifact.versioning;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 import org.junit.jupiter.api.Test;
@@ -25,6 +27,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.fail;
 
 /**
  * Test ComparableVersion.
@@ -235,6 +238,174 @@ class ComparableVersionTest {
     void testLeadingZeroes() {
         checkVersionsOrder("0.7", "2");
         checkVersionsOrder("0.2", "1.0.7");
+    }
+
+    @Test
+    void testMng6568() {
+        checkVersionsOrder(new String[] {"0-alpha", "0", "x"});
+    }
+
+    @Test
+    void testReleaseZeroMixedQualifierTransitivity() {
+        checkVersionsOrder(new String[] {"1-0-ga0-alpha", "1-ga0", "1-ga.x.1"});
+    }
+
+    @Test
+    void testNestedQualifierListOrdering() {
+        checkVersionsOrder(new String[] {"1.alpha", "1", "1.ga.1"});
+        checkVersionsOrder(new String[] {"b.m.alpha", "b.m", "b.m.sp", "b.y"});
+        checkVersionsOrder(new String[] {"1-0-alpha1-beta", "1-alpha1", "1-alpha2"});
+        checkVersionsHaveSameOrder("b.m", "b.m.final");
+        checkVersionsHaveSameOrder("b.y", "b.y.0");
+    }
+
+    @Test
+    void testNumericListPrecedenceOverQualifiers() {
+        checkVersionsOrder(new String[] {
+            "1-alpha",
+            "1-alpha1",
+            "1",
+            "1-sp",
+            "1-sp1",
+            "1-x",
+            "1-x1",
+            "1-1",
+            "1-1000000000",
+            "1-1000000000000000000",
+            "1.1"
+        });
+        checkVersionsOrder("1.0.x", "1-1");
+        checkVersionsOrder("1.0.x", "1-1000000000");
+        checkVersionsOrder("1.0.x", "1-1000000000000000000");
+    }
+
+    @Test
+    void testZeroPrefixedReleaseQualifierWithZeroDigit() {
+        for (String release : new String[] {"ga", "final", "release"}) {
+            checkVersionsHaveSameOrder("1", "1-" + release + "0");
+            checkVersionsHaveSameOrder("1-" + release, "1-" + release + "0");
+            checkVersionsOrder(new String[] {"1", "1-0-" + release + ".1", "1-" + release + "1"});
+            checkVersionsOrder(new String[] {"1-" + release + "0", "1-0-" + release + ".1", "1-" + release + "1"});
+        }
+        checkVersionsOrder("1-alpha", "1-alpha0");
+        checkVersionsOrder("1-x", "1-x0");
+    }
+
+    @Test
+    void testQualifierWithLongZeroDigit() {
+        for (String qualifier : new String[] {"alpha", "ga", "final", "release", "x"}) {
+            for (int length : new int[] {9, 10, 18, 19}) {
+                String zero = "1-" + qualifier + "0".repeat(length);
+                checkVersionsEqual("1-" + qualifier + "0", zero);
+                checkVersionsOrder(zero, "1-" + qualifier + "1");
+            }
+        }
+    }
+
+    @Test
+    void testZeroPrefixedQualifiers() {
+        for (String prefix : new String[] {"", "1-", "1.2-"}) {
+            for (String qualifier : new String[] {
+                "alpha",
+                "a1",
+                "beta",
+                "b2",
+                "milestone",
+                "m11",
+                "rc",
+                "cr1",
+                "snapshot",
+                "ga",
+                "final",
+                "release",
+                "ga0",
+                "ga1",
+                "final0",
+                "final2",
+                "release0",
+                "release9",
+                "sp",
+                "sp1",
+                "x",
+                "x1"
+            }) {
+                for (String zero : new String[] {"0-", "0.", "0.0-", "0-0-", "0-0.0-"}) {
+                    checkVersionsEqual(prefix + qualifier, prefix + zero + qualifier);
+                }
+            }
+        }
+    }
+
+    @Test
+    void testZeroPrefixedQualifierOrderingProperties() {
+        List<ComparableVersion> versions = new ArrayList<>();
+        for (String prefix : new String[] {"", "0-", "0.", "0-0-", "1-", "1.0-", "1-0-", "1-0."}) {
+            for (String qualifier : new String[] {
+                "alpha", "a1", "beta", "b2", "milestone", "m11", "rc", "cr1", "snapshot",
+                "ga", "final", "release", "ga0", "ga1", "final0", "final2", "release0", "release9",
+                "ga0000000000", "ga0000000000000000000", "sp", "sp1", "x", "x1"
+            }) {
+                versions.add(newComparable(prefix + qualifier));
+            }
+        }
+        for (String version : new String[] {
+            "",
+            "0",
+            "1",
+            "1-1",
+            "1.1",
+            "2",
+            "999999999",
+            "1000000000",
+            "999999999999999999",
+            "1000000000000000000",
+            "1-ga.x.1",
+            "1-0-ga0-alpha",
+            "1-ga0",
+            "1.ga.1",
+            "1.alpha",
+            "b.m.alpha",
+            "b.m",
+            "b.m.final",
+            "b.m.sp",
+            "b.y",
+            "b.y.0",
+            "1-0-alpha1-beta",
+            "1-alpha1",
+            "1-alpha2",
+            "1-1000000000",
+            "1-1000000000000000000",
+            "1.0.x"
+        }) {
+            versions.add(new ComparableVersion(version));
+        }
+
+        int size = versions.size();
+        int[][] order = new int[size][size];
+        for (int i = 0; i < size; i++) {
+            ComparableVersion left = versions.get(i);
+            for (int j = 0; j < size; j++) {
+                ComparableVersion right = versions.get(j);
+                order[i][j] = Integer.signum(left.compareTo(right));
+                assertEquals(order[i][j], -Integer.signum(right.compareTo(left)), left + " / " + right);
+                if (left.equals(right)) {
+                    assertEquals(0, order[i][j], left + " / " + right);
+                    assertEquals(left.hashCode(), right.hashCode(), left + " / " + right);
+                }
+            }
+        }
+        for (int i = 0; i < size; i++) {
+            for (int j = 0; j < size; j++) {
+                for (int k = 0; k < size; k++) {
+                    if (order[i][j] <= 0 && order[j][k] <= 0 && order[i][k] > 0) {
+                        fail(versions.get(i) + " <= " + versions.get(j) + " <= " + versions.get(k));
+                    }
+                    if (order[i][j] == 0 && order[i][k] != order[j][k]) {
+                        fail(versions.get(i) + " == " + versions.get(j) + ", compared with " + versions.get(k));
+                    }
+                }
+            }
+        }
     }
 
     @Test
