@@ -199,7 +199,7 @@ public class ProjectSorter {
                 .collect(Collectors.collectingAndThen(Collectors.toList(), Collections::unmodifiableList));
     }
 
-    private String resolveImportVersion(MavenProject project, String version) {
+    private static String resolveImportVersion(MavenProject project, String version) {
         if ("${project.version}".equals(version) || "${pom.version}".equals(version)) {
             return project.getVersion();
         }
