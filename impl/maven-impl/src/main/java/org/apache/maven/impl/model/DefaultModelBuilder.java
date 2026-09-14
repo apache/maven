@@ -1727,11 +1727,17 @@ public class DefaultModelBuilder implements ModelBuilder {
                     //  - suppresses user properties (consumer -D flags must not activate
                     //    dependency profiles — they were not set for that artifact),
                     //  - disables file existence checks (publisher paths don't exist here).
+                    // File-activated profiles are pre-filtered (not just sandboxed) because
+                    // returning false from exists() would incorrectly activate <missing> profiles.
                     // Repository contributions from external profiles are always stripped.
+                    Collection<Profile> nonFileProfiles = interpolatedProfiles.stream()
+                            .filter(p -> p.getActivation() == null
+                                    || p.getActivation().getFile() == null)
+                            .toList();
                     ProfileActivationContext externalContext =
                             profileActivationContext.withoutUserPropertiesAndFilesystem();
                     List<Profile> activeProfiles =
-                            profileSelector.getActiveProfiles(interpolatedProfiles, externalContext, this);
+                            profileSelector.getActiveProfiles(nonFileProfiles, externalContext, this);
                     return activeProfiles.stream()
                             .map(profile -> profile.withRepositories(List.of()).withPluginRepositories(List.of()))
                             .toList();

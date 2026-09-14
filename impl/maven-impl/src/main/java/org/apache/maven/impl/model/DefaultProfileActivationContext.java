@@ -369,8 +369,10 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
      *   <li><b>Suppresses user properties</b> (consumer {@code -D} flags): they were not
      *       set for the dependency and must not accidentally activate its profiles.</li>
      *   <li><b>Disables file existence checks</b>: the publisher's file system paths do not
-     *       exist in the consumer's environment, so file-activated profiles always return
-     *       {@code false}.</li>
+     *       exist in the consumer's environment.  File-activated profiles should be
+     *       pre-filtered by the caller before reaching this context (the sandbox's
+     *       {@code exists()} returns {@code false} as a safety net, but that alone would
+     *       incorrectly activate {@code <missing>} profiles).</li>
      * </ul>
      *
      * @return a sandboxed {@link ProfileActivationContext} for external model evaluation
@@ -430,7 +432,9 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
             /**
              * File existence checks are disabled for external models: publisher paths do not
-             * exist in the consumer's environment, so file-activated profiles always return false.
+             * exist in the consumer's environment.  File-activated profiles are pre-filtered
+             * before reaching this context (see {@code getActiveProfiles}), so this method
+             * should not normally be called; it returns {@code false} as a safety net.
              */
             @Override
             public boolean exists(String path, boolean glob) {

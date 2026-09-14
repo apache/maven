@@ -73,7 +73,7 @@ public class PropertyProfileActivator implements ProfileActivator {
 
         // Lookup order: user (-D) → system (java.version, os.name, …) → project <properties>.
         // In external model builds the caller suppresses user properties via a sandboxed context
-        // (see DefaultModelBuilder.getExternalActivationContext()), so consumer -D flags cannot
+        // (see DefaultModelBuilder.externalActivationContext()), so consumer -D flags cannot
         // activate dependency profiles. Project properties are always consulted because they are
         // part of the artifact's published identity.
         String sysValue = context.getUserProperties().get(name);
