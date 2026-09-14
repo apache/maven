@@ -352,7 +352,7 @@ public class DefaultMaven implements Maven {
         // 3) .. n) Project-scoped legacy workspace readers (org.eclipse.aether)
         workspaceReaders.addAll(getProjectScopedExtensionComponents(session.getProjects(), WorkspaceReader.class));
         // n+1) SPI workspace readers (org.apache.maven.api.spi) — discovered here, after buildGraph()
-        //      has loaded core extensions into the container so they are visible via lookupList.
+        //      has loaded core extensions into the container so they are visible via getProjectScopedExtensionComponents.
         for (org.apache.maven.api.spi.WorkspaceReader spiReader : getProjectScopedExtensionComponents(
                 session.getProjects(), org.apache.maven.api.spi.WorkspaceReader.class)) {
             workspaceReaders.add(new SpiWorkspaceReaderAdapter(spiReader));
