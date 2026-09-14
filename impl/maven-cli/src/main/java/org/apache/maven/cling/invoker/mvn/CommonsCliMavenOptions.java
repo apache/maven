@@ -103,6 +103,14 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     }
 
     @Override
+    public Optional<Boolean> printBuildOrder() {
+        if (commandLine.hasOption(CLIManager.PRINT_BUILD_ORDER)) {
+            return Optional.of(Boolean.TRUE);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<Boolean> failAtEnd() {
         if (commandLine.hasOption(CLIManager.FAIL_AT_END)) {
             return Optional.of(Boolean.TRUE);
@@ -238,6 +246,7 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
         public static final String CHECKSUM_FAILURE_POLICY = "C";
         public static final String CHECKSUM_WARNING_POLICY = "c";
         public static final String FAIL_FAST = "ff";
+        public static final String PRINT_BUILD_ORDER = "pbo";
         public static final String FAIL_AT_END = "fae";
         public static final String FAIL_NEVER = "fn";
         public static final String RESUME = "r";
@@ -359,6 +368,10 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
                     .hasArg()
                     .desc(
                             "If set, Maven will load command line options from the specified file and merge with CLI specified ones.")
+                    .get());
+            options.addOption(Option.builder(PRINT_BUILD_ORDER)
+                    .longOpt("print-build-order")
+                    .desc("Print the reactor build order and exit without building")
                     .get());
         }
     }
