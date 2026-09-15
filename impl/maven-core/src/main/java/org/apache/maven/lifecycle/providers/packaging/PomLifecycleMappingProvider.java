@@ -22,6 +22,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.lifecycle.PluginVersions;
+
 /**
  * {@code pom} packaging plugins bindings provider for {@code default} lifecycle.
  */
@@ -30,8 +32,8 @@ import javax.inject.Singleton;
 public final class PomLifecycleMappingProvider extends AbstractLifecycleMappingProvider {
     // START SNIPPET: pom
     private static final String[] BINDINGS = {
-        "install", "org.apache.maven.plugins:maven-install-plugin:" + INSTALL_PLUGIN_VERSION + ":install",
-        "deploy", "org.apache.maven.plugins:maven-deploy-plugin:" + DEPLOY_PLUGIN_VERSION + ":deploy"
+        "install", "org.apache.maven.plugins:maven-install-plugin:" + PluginVersions.INSTALL + ":install",
+        "deploy", "org.apache.maven.plugins:maven-deploy-plugin:" + PluginVersions.DEPLOY + ":deploy"
     };
     // END SNIPPET: pom
 
