@@ -185,6 +185,41 @@ class ConditionParserTest {
         assertEquals("short", parser.parse("if(length('hi') > 3, 'long', 'short')"));
     }
 
+    /**
+     * Only the selected branch of {@code if(..)} is evaluated. The other one may not be valid for
+     * the current input, as in the example from the {@code condition} documentation: with a
+     * {@code java.version} that has no {@code -}, the unselected {@code substring(..)} would get an
+     * end index of -1.
+     */
+    @Test
+    void testIfFunctionOnlyEvaluatesSelectedBranch() {
+        assertEquals(
+                "1.8.0_292",
+                parser.parse("if(contains(${java.version}, '-'), "
+                        + "substring(${java.version}, 0, indexOf(${java.version}, '-')), ${java.version})"));
+        assertEquals(
+                "21",
+                parser.parse("if(contains('21-ea', '-'), substring('21-ea', 0, indexOf('21-ea', '-')), '21-ea')"));
+        assertThrows(RuntimeException.class, () -> parser.parse("if(true, 'a')"));
+        assertThrows(RuntimeException.class, () -> parser.parse("if(false, 'a')"));
+        assertThrows(RuntimeException.class, () -> parser.parse("if(false, substring('a', 0, 5), 'b'"));
+    }
+
+    /**
+     * {@code &&} and {@code ||} do not evaluate their right operand when the left one already decides
+     * the result, so a guard such as {@code length(..) >= 3} can protect the call that follows it.
+     */
+    @Test
+    void testLogicalOperatorsShortCircuit() {
+        assertFalse((Boolean) parser.parse("length('ab') >= 3 && substring('ab', 0, 3) == 'abc'"));
+        assertTrue((Boolean) parser.parse("length('ab') < 3 || substring('ab', 0, 3) == 'abc'"));
+        assertTrue((Boolean) parser.parse("false && substring('ab', 0, 3) == 'abc' || true"));
+        assertFalse((Boolean) parser.parse("false && (substring('ab', 0, 3) == 'abc' || true) && true"));
+        assertTrue((Boolean) parser.parse("true && (false || substring('abc', 0, 3) == 'abc')"));
+        assertThrows(RuntimeException.class, () -> parser.parse("false &&"));
+        assertThrows(RuntimeException.class, () -> parser.parse("true || (false"));
+    }
+
     @Test
     void testContainsFunction() {
         assertTrue((Boolean) parser.parse("contains('Hello, World!', 'World')"));
