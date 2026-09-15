@@ -53,10 +53,12 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -159,6 +161,81 @@ class DefaultSettingsParserTest {
     }
 
     @Test
+    void strictWarningSurvivesFailedLenientParsing() throws Exception {
+        SettingsParser parser = mock(SettingsParser.class);
+        when(parser.supports(any())).thenReturn(true);
+        var strict = new SettingsParserException("Unknown setting", 3, 7, null);
+        var lenient = new SettingsParserException("Invalid value", 5, 2, null);
+        when(parser.parse(any(), any())).thenThrow(strict).thenThrow(lenient);
+        var error = assertThrows(
+                SettingsBuilderException.class,
+                () -> build(source("settings.properties", ""), Map.of("properties", parser)));
+        var warnings = error.getProblemCollector()
+                .problems(BuilderProblem.Severity.WARNING)
+                .toList();
+        assertEquals(1, warnings.size());
+        var warning = warnings.get(0);
+        assertEquals("Unknown setting", warning.getMessage());
+        assertEquals("settings.properties", warning.getSource());
+        assertEquals(3, warning.getLineNumber());
+        assertEquals(7, warning.getColumnNumber());
+        assertSame(strict, warning.getException());
+        var fatals = error.getProblemCollector()
+                .problems(BuilderProblem.Severity.FATAL)
+                .toList();
+        assertEquals(1, fatals.size());
+        var fatal = fatals.get(0);
+        assertEquals("Non-parseable settings settings.properties: Invalid value", fatal.getMessage());
+        assertEquals(5, fatal.getLineNumber());
+        assertEquals(2, fatal.getColumnNumber());
+        assertSame(lenient, fatal.getException());
+        verify(parser).parse(any(), eq(Map.of(SettingsParser.STRICT, true)));
+        verify(parser).parse(any(), eq(Map.of(SettingsParser.STRICT, false)));
+    }
+
+    @Test
+    void strictWarningSurvivesUnreadableLenientInput() throws Exception {
+        SettingsParser parser = mock(SettingsParser.class);
+        when(parser.supports(any())).thenReturn(true);
+        var strict = new SettingsParserException("Unknown setting", 3, 7, null);
+        var unreadable = new IOException("Read failed");
+        when(parser.parse(any(), any())).thenThrow(strict).thenThrow(unreadable);
+        var error = assertThrows(
+                SettingsBuilderException.class,
+                () -> build(source("settings.properties", ""), Map.of("properties", parser)));
+        var warnings = error.getProblemCollector()
+                .problems(BuilderProblem.Severity.WARNING)
+                .toList();
+        assertEquals(1, warnings.size());
+        assertSame(strict, warnings.get(0).getException());
+        var fatals = error.getProblemCollector()
+                .problems(BuilderProblem.Severity.FATAL)
+                .toList();
+        assertEquals(1, fatals.size());
+        assertEquals(
+                "Non-readable settings settings.properties: Read failed",
+                fatals.get(0).getMessage());
+        assertSame(unreadable, fatals.get(0).getException());
+        verify(parser, times(2)).parse(any(), any());
+    }
+
+    @Test
+    void causeOnlyParserFailureHasUsefulDiagnostic() throws Exception {
+        SettingsParser parser = mock(SettingsParser.class);
+        when(parser.supports(any())).thenReturn(true);
+        when(parser.parse(any(), any()))
+                .thenThrow(new SettingsParserException(new IllegalArgumentException("Invalid value")));
+        var error = assertThrows(
+                SettingsBuilderException.class,
+                () -> build(source("settings.properties", ""), Map.of("properties", parser)));
+        var fatal = error.getProblemCollector()
+                .problems(BuilderProblem.Severity.FATAL)
+                .findFirst()
+                .orElseThrow();
+        assertEquals("Non-parseable settings settings.properties: Invalid value", fatal.getMessage());
+    }
+
+    @Test
     void conflictingParsersAreReportedBeforeParsing() throws Exception {
         SettingsParser first = mock(SettingsParser.class);
         SettingsParser second = mock(SettingsParser.class);
@@ -167,7 +244,16 @@ class DefaultSettingsParserTest {
         var error = assertThrows(
                 SettingsBuilderException.class,
                 () -> build(source("settings.properties", "<settings/>"), Map.of("second", second, "first", first)));
-        assertTrue(error.getMessage().contains("Multiple settings parsers support this source: first, second"));
+        var fatals = error.getProblemCollector()
+                .problems(BuilderProblem.Severity.FATAL)
+                .toList();
+        assertEquals(1, fatals.size());
+        var fatal = fatals.get(0);
+        assertEquals("Multiple settings parsers support this source: first, second", fatal.getMessage());
+        assertEquals("settings.properties", fatal.getSource());
+        assertEquals(-1, fatal.getLineNumber());
+        assertEquals(-1, fatal.getColumnNumber());
+        assertEquals(0, error.getProblemCollector().problemsReportedFor(BuilderProblem.Severity.WARNING));
         verify(first, never()).parse(any(), any());
         verify(second, never()).parse(any(), any());
     }
@@ -332,7 +418,11 @@ class DefaultSettingsParserTest {
         parsers.put("properties", new PropertiesSettingsParser());
         var error =
                 assertThrows(SettingsBuilderException.class, () -> build(source("settings.properties", ""), parsers));
-        assertTrue(error.getMessage().contains("Multiple settings parsers support this source: <unnamed>, properties"));
+        var fatal = error.getProblemCollector()
+                .problems(BuilderProblem.Severity.FATAL)
+                .findFirst()
+                .orElseThrow();
+        assertEquals("Multiple settings parsers support this source: <unnamed>, properties", fatal.getMessage());
     }
 
     private String propertiesSettings() throws IOException {

@@ -167,11 +167,13 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         Settings settings;
 
         try {
-            SettingsParser parser = selectParser(settingsSource);
+            SettingsParser parser = selectParser(settingsSource, problems);
+            if (parser == null) {
+                return Settings.newInstance();
+            }
             try {
                 settings = parser.parse(settingsSource, Map.of(SettingsParser.STRICT, true));
             } catch (SettingsParserException e) {
-                settings = parser.parse(settingsSource, Map.of(SettingsParser.STRICT, false));
                 problems.reportProblem(new DefaultBuilderProblem(
                         settingsSource.getLocation(),
                         e.getLineNumber(),
@@ -179,6 +181,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                         e,
                         e.getMessage(),
                         BuilderProblem.Severity.WARNING));
+                settings = parser.parse(settingsSource, Map.of(SettingsParser.STRICT, false));
             }
         } catch (SettingsParserException e) {
             problems.reportProblem(new DefaultBuilderProblem(
@@ -242,18 +245,26 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         return Server.newBuilder(server, true).id(id).aliases(List.of()).build();
     }
 
-    private SettingsParser selectParser(Source source) {
+    @Nullable
+    private SettingsParser selectParser(Source source, ProblemCollector<BuilderProblem> problems) {
         List<Map.Entry<String, SettingsParser>> matches = settingsParsers.entrySet().stream()
                 .filter(entry -> entry.getValue().supports(source))
                 .toList();
         if (matches.size() > 1) {
-            throw new SettingsParserException("Multiple settings parsers support this source: "
-                    + String.join(
-                            ", ",
-                            matches.stream()
-                                    .map(entry -> entry.getKey() != null ? entry.getKey() : "<unnamed>")
-                                    .sorted()
-                                    .toList()));
+            problems.reportProblem(new DefaultBuilderProblem(
+                    source.getLocation(),
+                    -1,
+                    -1,
+                    null,
+                    "Multiple settings parsers support this source: "
+                            + String.join(
+                                    ", ",
+                                    matches.stream()
+                                            .map(entry -> entry.getKey() != null ? entry.getKey() : "<unnamed>")
+                                            .sorted()
+                                            .toList()),
+                    BuilderProblem.Severity.FATAL));
+            return null;
         }
         return matches.isEmpty() ? xmlSettingsParser : matches.get(0).getValue();
     }

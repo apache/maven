@@ -23,6 +23,9 @@ import org.apache.maven.api.services.MavenException;
 
 /**
  * A syntax error in a settings source, with optional one-based line and column numbers.
+ * If no message is supplied, the cause's message is used when available, otherwise a
+ * default message is used. Messages, including those from causes, should not contain
+ * credentials from the input.
  *
  * @since 4.1.0
  */
@@ -52,13 +55,23 @@ public class SettingsParserException extends MavenException {
     }
 
     public SettingsParserException(String message, int lineNumber, int columnNumber, Throwable cause) {
-        super(message, cause);
+        super(messageOrDefault(message, cause), cause);
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
     }
 
     public SettingsParserException(Throwable cause) {
         this(null, cause);
+    }
+
+    private static String messageOrDefault(String message, Throwable cause) {
+        if (message != null) {
+            return message;
+        }
+        if (cause != null && cause.getMessage() != null) {
+            return cause.getMessage();
+        }
+        return "Unknown settings parsing error";
     }
 
     public int getLineNumber() {

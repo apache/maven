@@ -46,9 +46,6 @@ import org.apache.maven.api.settings.Settings;
 @Named
 public interface SettingsParser extends SpiService {
     /**
-     * Boolean parsing option indicating whether unknown input should be rejected.
-     */
-    /**
      * Option that can be specified in the options map. The value should be a {@code Boolean};
      * when {@code true} or absent, unknown input is rejected.
      */
@@ -67,8 +64,8 @@ public interface SettingsParser extends SpiService {
      * Parses settings without interpolating, decrypting or merging them. The parser is
      * responsible for opening and closing any streams it obtains from the source.
      * Maven first requests strict parsing and, on a {@link SettingsParserException}, retries
-     * with {@link #STRICT} set to {@code false}. A successful retry produces a warning for
-     * the original problem. An I/O failure is not retried.
+     * with {@link #STRICT} set to {@code false}. The original problem is reported as a warning even if
+     * the retry fails. An I/O failure is not retried.
      *
      * @param source the settings source, never {@code null}
      * @param options parsing options, may be {@code null}; strict parsing is the default
