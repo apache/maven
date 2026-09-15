@@ -48,6 +48,10 @@ public interface SettingsParser extends SpiService {
     /**
      * Boolean parsing option indicating whether unknown input should be rejected.
      */
+    /**
+     * Option that can be specified in the options map. The value should be a {@code Boolean};
+     * when {@code true} or absent, unknown input is rejected.
+     */
     String STRICT = "strict";
 
     /**
