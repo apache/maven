@@ -43,6 +43,10 @@ public interface ProjectsSelector {
     /**
      * Select Maven projects from a list of POM files and report model problems encountered while building them.
      *
+     * <p>The default implementation delegates to {@link #selectProjects(List, MavenExecutionRequest)}
+     * for compatibility with existing implementations and does not invoke {@code problemConsumer}.
+     * Implementations must override this method to report model problems to the consumer.
+     *
      * @param files List of POM files.
      * @param request The {@link MavenExecutionRequest}
      * @param problemConsumer Consumer for model problems encountered while building the selected projects.
