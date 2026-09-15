@@ -30,7 +30,7 @@ import org.apache.maven.api.annotations.Nullable;
  * This information includes the dependency type (main classes, test classes, <i>etc.</i>),
  * a scope (compile, runtime <i>etc.</i>), an obligation (whether the dependency
  * is optional or mandatory), and possible exclusions for transitive dependencies.
- * The {@linkplain #getVersionConstraint() version} and the {@linkplain #getOptional() obligation}
+ * The {@linkplain #versionConstraint() version} and the {@linkplain #optional() obligation}
  * may not be defined precisely.
  *
  * @since 4.0.0
@@ -45,14 +45,40 @@ public interface DependencyCoordinates extends ArtifactCoordinates {
      * a <abbr>JAR</abbr> containing test classes, a POM file, <i>etc.</i>
      */
     @Nonnull
-    Type getType();
+    Type type();
+
+    /**
+     * {@return the type of the dependency}
+     * A dependency can be a <abbr>JAR</abbr> file,
+     * a modular-<abbr>JAR</abbr> if it is intended to be placed on the module path,
+     * a <abbr>JAR</abbr> containing test classes, a POM file, <i>etc.</i>
+     *
+     * @deprecated Use {@link #type()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default Type getType() {
+        return type();
+    }
 
     /**
      * {@return the time at which the dependency will be used}
      * It may be, for example, at compile time only, at run time, or at test time.
      */
     @Nonnull
-    DependencyScope getScope();
+    DependencyScope scope();
+
+    /**
+     * {@return the time at which the dependency will be used}
+     * It may be, for example, at compile time only, at run time, or at test time.
+     *
+     * @deprecated Use {@link #scope()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default DependencyScope getScope() {
+        return scope();
+    }
 
     /**
      * Returns whether the dependency is optional, mandatory, or of unspecified obligation.
@@ -60,11 +86,34 @@ public interface DependencyCoordinates extends ArtifactCoordinates {
      * @return {@code Boolean.TRUE} and {@code Boolean.FALSE} if optional, or {@code null} if unspecified
      */
     @Nullable
-    Boolean getOptional();
+    Boolean optional();
+
+    /**
+     * Returns whether the dependency is optional, mandatory, or of unspecified obligation.
+     *
+     * @return {@code Boolean.TRUE} and {@code Boolean.FALSE} if optional, or {@code null} if unspecified
+     * @deprecated Use {@link #optional()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nullable
+    default Boolean getOptional() {
+        return optional();
+    }
 
     /**
      * {@return transitive dependencies to exclude}
      */
     @Nonnull
-    Collection<Exclusion> getExclusions();
+    Collection<Exclusion> exclusions();
+
+    /**
+     * {@return transitive dependencies to exclude}
+     *
+     * @deprecated Use {@link #exclusions()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default Collection<Exclusion> getExclusions() {
+        return exclusions();
+    }
 }
