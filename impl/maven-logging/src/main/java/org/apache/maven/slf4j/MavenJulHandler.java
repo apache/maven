@@ -85,12 +85,12 @@ public class MavenJulHandler extends Handler {
 
     /**
      * Re-entrancy guard: set to {@code true} while {@link #publish} is routing
-     * a JUL event through SLF4J on this thread.  Prevents recursive JUL events
-     * (e.g. JLine's {@code StyleResolver} calling {@code java.util.logging.Logger}
-     * while inside {@link MavenSimpleLogger#renderLevel} lazy-initialisation,
-     * which in turn is triggered by a JUL event during terminal construction)
-     * from re-entering {@code publish} and crashing with
-     * {@code ConcurrentHashMap.computeIfAbsent IllegalStateException("Recursive update")}.
+     * a JUL event through SLF4J on this thread.  Acts as defence-in-depth to
+     * drop recursive JUL events (e.g. JLine's {@code StyleResolver} logging via
+     * {@code java.util.logging.Logger} during terminal construction while a JUL
+     * event is already being dispatched through {@code publish}).  The primary
+     * reentrancy fix is in {@code MavenStyleResolver.resolve()}, which uses a
+     * lock-free get+putIfAbsent pattern instead of {@code computeIfAbsent}.
      */
     private static final ThreadLocal<Boolean> IN_PUBLISH = new ThreadLocal<>();
 
@@ -151,11 +151,9 @@ public class MavenJulHandler extends Handler {
 
         // Re-entrancy guard: drop recursive JUL events that originate from
         // within SLF4J/JLine processing triggered by this very publish() call.
-        // Example: MavenSimpleLogger.renderLevel() lazily initialises ANSI
-        // colour strings by calling JLine's StyleResolver, which logs DEBUG
-        // events via java.util.logging — re-entering publish() on the same
-        // thread and crashing ConcurrentHashMap.computeIfAbsent with
-        // IllegalStateException("Recursive update").
+        // Defence-in-depth: the primary reentrancy fix is in MavenStyleResolver.resolve()
+        // which uses get+putIfAbsent instead of computeIfAbsent, but this guard
+        // prevents any other re-entrant JUL logging from causing issues.
         if (Boolean.TRUE.equals(IN_PUBLISH.get())) {
             return;
         }
@@ -197,16 +195,14 @@ public class MavenJulHandler extends Handler {
         String message = formatMessage(record);
         Throwable throwable = record.getThrown();
 
-        // Set the JUL metadata before routing through SLF4J so that
-        // downstream consumers (e.g. ProjectBuildLogAppender) can read
-        // it when constructing a structured LogEvent.  By always going
-        // through SLF4J, the formattedMessage is produced by
-        // MavenSimpleLogger (with proper timestamp, logger name, and
-        // ANSI styling) regardless of whether the event originated from
-        // JUL or SLF4J — fixing the format inconsistency.
+        // Set the re-entrancy guard before routing through SLF4J.  This prevents
+        // recursive JUL events fired during SLF4J/JLine processing (e.g. from
+        // MavenSimpleLogger.renderLevel() -> StyleResolver) from re-entering publish()
+        // on the same thread.  The primary fix is in MavenStyleResolver.resolve() which
+        // uses get+putIfAbsent instead of computeIfAbsent; this guard is defense-in-depth.
+        IN_PUBLISH.set(Boolean.TRUE);
         METADATA.set(
                 new JulMetadata(record.getSourceClassName(), record.getSourceMethodName(), record.getLongThreadID()));
-        IN_PUBLISH.set(Boolean.TRUE);
         try {
             logToSlf4j(slf4jLogger, slf4jLevel, message, throwable);
         } finally {
