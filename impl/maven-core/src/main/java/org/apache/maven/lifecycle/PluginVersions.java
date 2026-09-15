@@ -30,7 +30,7 @@ import java.util.Properties;
  * Centralising them in the POM makes them visible to dependency-update bots
  * such as Dependabot and Renovate.
  *
- * @since 4.1.0
+ * @since 4.0.0
  */
 public final class PluginVersions {
 
