@@ -30,6 +30,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.AbstractMap;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -357,14 +358,86 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
         ProjectBuildingResult build(boolean parent, Path pomFile, ModelSource modelSource)
                 throws ProjectBuildingException {
-            ClassLoader oldContextClassLoader = Thread.currentThread().getContextClassLoader();
+            return buildProjectFrames(new ProjectFrame(parent, pomFile, modelSource));
+        }
 
+        private ProjectBuildingResult buildProjectFrames(ProjectFrame first) throws ProjectBuildingException {
+            ArrayDeque<ProjectFrame> frames = new ArrayDeque<>();
+            frames.push(first);
             try {
-                MavenProject project = request.getProject();
+                while (!frames.isEmpty()) {
+                    ProjectFrame frame = frames.peek();
+                    try {
+                        if (!frame.initialized) {
+                            frame.prepare();
+                            frame.initialized = true;
+                            ProjectFrame parent;
+                            try {
+                                parent = frame.model != null ? prepareParent(frame.project, frame.model) : null;
+                            } catch (ProjectBuildingException e) {
+                                frame.parentFailed(e);
+                                parent = null;
+                            }
+                            if (parent != null) {
+                                frames.push(parent);
+                                continue;
+                            }
+                        }
+                        ProjectBuildingResult built = frame.finish();
+                        frames.pop().close();
+                        if (frames.isEmpty()) {
+                            return built;
+                        }
+                        setParent(frames.peek().project, built.getProject());
+                    } catch (ProjectBuildingException e) {
+                        frames.pop().close();
+                        if (frames.isEmpty()) {
+                            throw e;
+                        }
+                        frames.peek().parentFailed(e);
+                    }
+                }
+                throw new IllegalStateException("No project produced");
+            } finally {
+                while (!frames.isEmpty()) {
+                    frames.pop().close();
+                }
+            }
+        }
 
-                ProblemCollector<ModelProblem> problemCollector = null;
-                Throwable error = null;
+        private class ProjectFrame {
+            private final boolean parent;
+            private final Path pomFile;
+            private final ModelSource source;
+            private final boolean standalone;
+            private final ClassLoader contextClassLoader;
+            private MavenProject project;
+            private ModelBuilderResult model;
+            private Throwable error;
+            private boolean initialized;
 
+            ProjectFrame(boolean parent, Path pomFile, ModelSource source) {
+                this.parent = parent;
+                this.pomFile = pomFile;
+                this.source = source;
+                this.standalone = true;
+                this.contextClassLoader = Thread.currentThread().getContextClassLoader();
+            }
+
+            ProjectFrame(MavenProject project, ModelBuilderResult model) {
+                this.parent = false;
+                this.pomFile = null;
+                this.source = null;
+                this.standalone = false;
+                this.contextClassLoader = null;
+                this.project = project;
+                this.model = model;
+            }
+
+            void prepare() throws ProjectBuildingException {
+                if (standalone) {
+                    project = request.getProject();
+                }
                 if (project == null) {
                     project = new MavenProject();
                     project.setFile(pomFile != null ? pomFile.toFile() : null);
@@ -375,51 +448,58 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                                     .anyMatch(
                                             p -> p.getPomPath().toAbsolutePath().equals(pomFile.toAbsolutePath()));
                     boolean isStandalone = pomFile == null
-                            && modelSource != null
-                            && modelSource.getLocation().startsWith("jar:")
-                            && modelSource.getLocation().endsWith("/org/apache/maven/project/standalone.xml");
+                            && source != null
+                            && source.getLocation().startsWith("jar:")
+                            && source.getLocation().endsWith("/org/apache/maven/project/standalone.xml");
 
                     ModelBuilderRequest.ModelBuilderRequestBuilder builder = getModelBuildingRequest();
                     ModelBuilderRequest.RequestType type = reactorMember
                                     || isStandalone
                                     || (pomFile != null
-                                            && this.request.isProcessPlugins()
-                                            && this.request.getValidationLevel()
+                                            && request.isProcessPlugins()
+                                            && request.getValidationLevel()
                                                     == ModelBuildingRequest.VALIDATION_LEVEL_STRICT)
                             ? ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
                             : (parent
                                     ? ModelBuilderRequest.RequestType.CONSUMER_PARENT
                                     : ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY);
                     MavenProject theProject = project;
-                    ModelBuilderRequest request = builder.source(modelSource)
+                    ModelBuilderRequest modelRequest = builder.source(source)
                             .requestType(type)
                             .locationTracking(true)
                             .lifecycleBindingsInjector(
-                                    (m, r, p) -> injectLifecycleBindings(m, r, p, theProject, this.request))
+                                    (m, r, p) -> injectLifecycleBindings(m, r, p, theProject, request))
                             .build();
 
                     if (pomFile != null) {
                         project.setRootDirectory(rootLocator.findRoot(pomFile.getParent()));
                     }
 
-                    ModelBuilderResult result;
                     try {
-                        result = modelBuilderSession.build(request);
+                        model = modelBuilderSession.build(modelRequest);
                     } catch (ModelBuilderException e) {
-                        result = e.getResult();
-                        if (result == null || result.getEffectiveModel() == null) {
+                        model = e.getResult();
+                        if (model == null || model.getEffectiveModel() == null) {
                             throw new ProjectBuildingException(
                                     e.getModelId(), e.getMessage(), pomFile != null ? pomFile.toFile() : null, e);
                         }
                         // validation error, continue project building and delay failing to help IDEs
                         error = e;
                     }
-
-                    problemCollector = result.getProblemCollector();
-
-                    initProject(project, result);
                 }
+                if (model != null) {
+                    project.setModel(new org.apache.maven.model.Model(model.getEffectiveModel()));
+                    project.setOriginalModel(new org.apache.maven.model.Model(model.getFileModel()));
+                }
+            }
 
+            ProjectBuildingResult finish() throws ProjectBuildingException {
+                if (model != null) {
+                    finishProjectInitialization(project, model);
+                }
+                if (!standalone) {
+                    return null;
+                }
                 DependencyResolutionResult resolutionResult = null;
 
                 if (request.isResolveDependencies()) {
@@ -427,8 +507,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     resolutionResult = resolveDependencies(project);
                 }
 
-                ProjectBuildingResult result =
-                        new DefaultProjectBuildingResult(project, convert(problemCollector), resolutionResult);
+                ProjectBuildingResult result = new DefaultProjectBuildingResult(
+                        project, convert(model != null ? model.getProblemCollector() : null), resolutionResult);
 
                 if (error != null) {
                     ProjectBuildingException e = new ProjectBuildingException(List.of(result));
@@ -437,13 +517,36 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 }
 
                 return result;
-            } finally {
-                Thread.currentThread().setContextClassLoader(oldContextClassLoader);
+            }
+
+            void parentFailed(ProjectBuildingException e) {
+                // MNG-4488: a parent project can fail even when the child's effective model is usable.
+                if (logger.isDebugEnabled()) {
+                    logger.warn("Failed to build parent project for " + project.getId(), e);
+                } else {
+                    logger.warn("Failed to build parent project for " + project.getId());
+                }
+                setParent(project, null);
+            }
+
+            void close() {
+                if (standalone) {
+                    Thread.currentThread().setContextClassLoader(contextClassLoader);
+                }
             }
         }
 
         ProjectBuildingResult build(
                 boolean parent, Artifact artifact, boolean allowStubModel, List<ArtifactRepository> repositories)
+                throws ProjectBuildingException {
+            ProjectSource source = resolveProjectSource(artifact, allowStubModel, repositories);
+            return build(parent, source.pomFile(), source.source());
+        }
+
+        private record ProjectSource(Path pomFile, ModelSource source) {}
+
+        private ProjectSource resolveProjectSource(
+                Artifact artifact, boolean allowStubModel, List<ArtifactRepository> repositories)
                 throws ProjectBuildingException {
             org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact(artifact);
             pomArtifact = ArtifactDescriptorUtils.toPomArtifact(pomArtifact);
@@ -469,7 +572,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 localProject = resItem.getRepository() instanceof org.apache.maven.api.WorkspaceRepository;
             } catch (ArtifactResolverException e) {
                 if (e.getResult().getResults().values().iterator().next().isMissing() && allowStubModel) {
-                    return build(parent, null, createStubModelSource(artifact));
+                    return new ProjectSource(null, createStubModelSource(artifact));
                 }
                 throw new ProjectBuildingException(
                         artifact.getId(), "Error resolving project artifact: " + e.getMessage(), e);
@@ -484,10 +587,9 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
 
             if (localProject) {
-                return build(parent, pomFile, Sources.buildSource(pomFile));
+                return new ProjectSource(pomFile, Sources.buildSource(pomFile));
             } else {
-                return build(
-                        parent,
+                return new ProjectSource(
                         null,
                         Sources.resolvedSource(
                                 pomFile,
@@ -642,11 +744,16 @@ public class DefaultProjectBuilder implements ProjectBuilder {
 
         @SuppressWarnings({"checkstyle:methodlength", "deprecation"})
         private void initProject(MavenProject project, ModelBuilderResult result) {
-            project.setModel(new org.apache.maven.model.Model(result.getEffectiveModel()));
-            project.setOriginalModel(new org.apache.maven.model.Model(result.getFileModel()));
+            try {
+                buildProjectFrames(new ProjectFrame(project, result));
+            } catch (ProjectBuildingException e) {
+                // Only standalone frames can throw checked build failures; their caller handles them.
+                throw new IllegalStateException(e);
+            }
+        }
 
-            initParent(project, result);
-
+        @SuppressWarnings({"checkstyle:methodlength", "deprecation"})
+        private void finishProjectInitialization(MavenProject project, ModelBuilderResult result) {
             Artifact projectArtifact = repositorySystem.createArtifact(
                     project.getGroupId(), project.getArtifactId(), project.getVersion(), null, project.getPackaging());
             project.setArtifact(projectArtifact);
@@ -1023,7 +1130,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
         }
 
-        private void initParent(MavenProject project, ModelBuilderResult result) {
+        private ProjectFrame prepareParent(MavenProject project, ModelBuilderResult result)
+                throws ProjectBuildingException {
             Model parentModel = result.getParentModel();
 
             if (parentModel != null) {
@@ -1068,40 +1176,23 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     Path parentPomFile = parentModel.getPomFile();
                     if (parentPomFile != null) {
                         project.setParentFile(parentPomFile.toFile());
-                        try {
-                            parent = build(true, parentPomFile, Sources.buildSource(parentPomFile))
-                                    .getProject();
-                        } catch (ProjectBuildingException e) {
-                            // MNG-4488 where let invalid parents slide on by
-                            if (logger.isDebugEnabled()) {
-                                // Message below is checked for in the MNG-2199 core IT.
-                                logger.warn("Failed to build parent project for " + project.getId(), e);
-                            } else {
-                                // Message below is checked for in the MNG-2199 core IT.
-                                logger.warn("Failed to build parent project for " + project.getId());
-                            }
-                        }
+                        return new ProjectFrame(true, parentPomFile, Sources.buildSource(parentPomFile));
                     } else {
                         Artifact parentArtifact = project.getParentArtifact();
-                        try {
-                            parent = build(true, parentArtifact, false, getEffectiveRepositories(project.getId()))
-                                    .getProject();
-                        } catch (ProjectBuildingException e) {
-                            // MNG-4488 where let invalid parents slide on by
-                            if (logger.isDebugEnabled()) {
-                                // Message below is checked for in the MNG-2199 core IT.
-                                logger.warn("Failed to build parent project for " + project.getId(), e);
-                            } else {
-                                // Message below is checked for in the MNG-2199 core IT.
-                                logger.warn("Failed to build parent project for " + project.getId());
-                            }
-                        }
+                        ProjectSource source =
+                                resolveProjectSource(parentArtifact, false, getEffectiveRepositories(project.getId()));
+                        return new ProjectFrame(true, source.pomFile(), source.source());
                     }
                 }
-                project.setParent(parent);
-                if (project.getParentFile() == null && parent != null) {
-                    project.setParentFile(parent.getFile());
-                }
+                setParent(project, parent);
+            }
+            return null;
+        }
+
+        private void setParent(MavenProject project, MavenProject parent) {
+            project.setParent(parent);
+            if (project.getParentFile() == null && parent != null) {
+                project.setParentFile(parent.getFile());
             }
         }
 
