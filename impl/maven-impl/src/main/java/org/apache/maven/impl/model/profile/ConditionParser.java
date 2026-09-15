@@ -438,7 +438,7 @@ public class ConditionParser {
             int index = args.size();
             if (IF_FUNCTION.equals(functionName)
                     && (index == 1 || index == 2)
-                    && toBoolean(args.get(0)) != (index == 1)) {
+                    && toBoolean(args.get(0)) == (index == 2)) {
                 skipOperand(Set.of(",", ")"));
                 args.add(null);
             } else {
