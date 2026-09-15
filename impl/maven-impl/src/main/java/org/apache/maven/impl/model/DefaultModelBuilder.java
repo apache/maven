@@ -1430,38 +1430,30 @@ public class DefaultModelBuilder implements ModelBuilder {
             boolean maven3Mode = Features.mavenMaven3Personality(
                     InternalSession.from(session).getSession().getConfigProperties());
 
-            StringBuilder buffer = new StringBuilder(256);
+            String actual = groupId + ':' + artifactId;
+            String declared = parent.getGroupId() + ':' + parent.getArtifactId();
+            String sourceHint = (childModel != getRootModel()) ? ModelProblemUtils.toSourceHint(childModel) : null;
+
+            String message;
             if (defaultPath) {
                 // <relativePath> was omitted — Maven probed ../pom.xml on its own
-                buffer.append("Maven probed the default location '../pom.xml'");
-                if (childModel != getRootModel()) {
-                    buffer.append(" for POM ").append(ModelProblemUtils.toSourceHint(childModel));
-                }
-                buffer.append(" and found ").append(groupId).append(':').append(artifactId);
-                buffer.append(" instead of the declared parent ")
-                        .append(parent.getGroupId())
-                        .append(':');
-                buffer.append(parent.getArtifactId());
-                buffer.append(
-                        ". Maven will fall back to repository resolution. To suppress this warning, add <relativePath/> to your <parent> declaration.");
+                message = "Maven probed the default location '../pom.xml'"
+                        + (sourceHint != null ? " for POM " + sourceHint : "")
+                        + " and found " + actual
+                        + " instead of the declared parent " + declared
+                        + ". Maven will fall back to repository resolution."
+                        + " To suppress this warning, add <relativePath/> to your <parent> declaration.";
             } else {
                 // <relativePath> was set explicitly — this is a configuration error
-                buffer.append("'parent.relativePath'");
-                if (childModel != getRootModel()) {
-                    buffer.append(" of POM ").append(ModelProblemUtils.toSourceHint(childModel));
-                }
-                buffer.append(" points at '").append(parent.getRelativePath()).append("'");
-                buffer.append(" which resolves to ").append(groupId).append(':').append(artifactId);
-                buffer.append(" instead of the declared parent ")
-                        .append(parent.getGroupId())
-                        .append(':');
-                buffer.append(parent.getArtifactId()).append('.');
-                if (!maven3Mode) {
-                    buffer.append(
-                            " Correct the <relativePath> value or remove it to let Maven resolve the parent from the repository.");
-                } else {
-                    buffer.append(" Please verify your project structure.");
-                }
+                message = "'parent.relativePath'"
+                        + (sourceHint != null ? " of POM " + sourceHint : "")
+                        + " points at '" + parent.getRelativePath() + "'"
+                        + " which resolves to " + actual
+                        + " instead of the declared parent " + declared
+                        + (maven3Mode
+                                ? ". Please verify your project structure."
+                                : ". Correct the <relativePath> value or remove it to let Maven resolve the parent"
+                                        + " from the repository.");
             }
 
             setSource(childModel);
@@ -1469,7 +1461,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             //               OR maven3Personality is active (preserve historical lenient behaviour).
             // FATAL otherwise: explicit <relativePath> pointing at the wrong artifact is a config error.
             boolean warn = defaultPath || maven3Mode;
-            add(warn ? Severity.WARNING : Severity.FATAL, Version.BASE, buffer.toString(), parent.getLocation(""));
+            add(warn ? Severity.WARNING : Severity.FATAL, Version.BASE, message, parent.getLocation(""));
         }
 
         private void wrongParentRelativePath(Model childModel) {

@@ -974,38 +974,33 @@ public class DefaultModelBuilder implements ModelBuilder {
                 || !groupId.equals(parent.getGroupId())
                 || artifactId == null
                 || !artifactId.equals(parent.getArtifactId())) {
-            StringBuilder buffer = new StringBuilder(256);
+            String actual = groupId + ':' + artifactId;
+            String declared = parent.getGroupId() + ':' + parent.getArtifactId();
+            String sourceHint =
+                    (childModel != problems.getRootModel()) ? ModelProblemUtils.toSourceHint(childModel) : null;
+
+            String message;
             if (parent.getRelativePath() == null) {
                 // <relativePath> was omitted — Maven probed ../pom.xml on its own
-                buffer.append("Maven probed the default location '../pom.xml'");
-                if (childModel != problems.getRootModel()) {
-                    buffer.append(" for POM ").append(ModelProblemUtils.toSourceHint(childModel));
-                }
-                buffer.append(" and found ").append(groupId).append(':').append(artifactId);
-                buffer.append(" instead of the declared parent ")
-                        .append(parent.getGroupId())
-                        .append(':');
-                buffer.append(parent.getArtifactId());
-                buffer.append(
-                        ". Maven will fall back to repository resolution. To suppress this warning, add <relativePath/> to your <parent> declaration.");
+                message = "Maven probed the default location '../pom.xml'"
+                        + (sourceHint != null ? " for POM " + sourceHint : "")
+                        + " and found " + actual
+                        + " instead of the declared parent " + declared
+                        + ". Maven will fall back to repository resolution."
+                        + " To suppress this warning, add <relativePath/> to your <parent> declaration.";
             } else {
-                // <relativePath> was set explicitly — this is a configuration error
-                buffer.append("'parent.relativePath'");
-                if (childModel != problems.getRootModel()) {
-                    buffer.append(" of POM ").append(ModelProblemUtils.toSourceHint(childModel));
-                }
-                buffer.append(" points at '").append(parent.getRelativePath()).append("'");
-                buffer.append(" which resolves to ").append(groupId).append(':').append(artifactId);
-                buffer.append(" instead of the declared parent ")
-                        .append(parent.getGroupId())
-                        .append(':');
-                buffer.append(parent.getArtifactId())
-                        .append(". Please verify your project structure or correct the <relativePath> value.");
+                // <relativePath> was set explicitly
+                message = "'parent.relativePath'"
+                        + (sourceHint != null ? " of POM " + sourceHint : "")
+                        + " points at '" + parent.getRelativePath() + "'"
+                        + " which resolves to " + actual
+                        + " instead of the declared parent " + declared
+                        + ". Please verify your project structure or correct the <relativePath> value.";
             }
 
             problems.setSource(childModel);
             problems.add(new ModelProblemCollectorRequest(Severity.WARNING, Version.BASE)
-                    .setMessage(buffer.toString())
+                    .setMessage(message)
                     .setLocation(parent.getLocation("")));
             return null;
         }
