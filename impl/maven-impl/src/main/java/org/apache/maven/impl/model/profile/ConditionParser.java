@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.function.UnaryOperator;
 
 /**
@@ -196,6 +197,7 @@ public class ConditionParser {
 
     /**
      * Parses logical OR operations.
+     * The right operand is skipped without being evaluated when the left one is already {@code true}.
      *
      * @return the result of parsing logical OR operations
      */
@@ -203,14 +205,18 @@ public class ConditionParser {
         Object left = parseLogicalAnd();
         while (current < tokens.size() && tokens.get(current).equals("||")) {
             current++;
-            Object right = parseLogicalAnd();
-            left = (boolean) left || (boolean) right;
+            if ((boolean) left) {
+                skipOperand(Set.of("||", ",", ")"));
+            } else {
+                left = (boolean) parseLogicalAnd();
+            }
         }
         return left;
     }
 
     /**
      * Parses logical AND operations.
+     * The right operand is skipped without being evaluated when the left one is already {@code false}.
      *
      * @return the result of parsing logical AND operations
      */
@@ -218,10 +224,44 @@ public class ConditionParser {
         Object left = parseComparison();
         while (current < tokens.size() && tokens.get(current).equals("&&")) {
             current++;
-            Object right = parseComparison();
-            left = (boolean) left && (boolean) right;
+            if ((boolean) left) {
+                left = (boolean) parseComparison();
+            } else {
+                skipOperand(Set.of("&&", "||", ",", ")"));
+            }
         }
         return left;
+    }
+
+    /**
+     * Skips an operand without evaluating it, so that functions are not invoked on a branch whose
+     * value is not needed. Skipping stops before the first of the given terminators found outside
+     * of parentheses.
+     *
+     * @param terminators the tokens that end the operand
+     * @throws RuntimeException if the operand is missing or its parentheses are not balanced
+     */
+    private void skipOperand(Set<String> terminators) {
+        int start = current;
+        int depth = 0;
+        while (current < tokens.size()) {
+            String token = tokens.get(current);
+            if (depth == 0 && terminators.contains(token)) {
+                break;
+            }
+            if (token.equals("(")) {
+                depth++;
+            } else if (token.equals(")")) {
+                depth--;
+            }
+            current++;
+        }
+        if (depth > 0) {
+            throw new RuntimeException("Mismatched parentheses: missing closing parenthesis");
+        }
+        if (current == start) {
+            throw new RuntimeException("Unexpected end of expression");
+        }
     }
 
     /**
@@ -363,7 +403,7 @@ public class ConditionParser {
         // Check if it's followed by an opening parenthesis, indicating a function call
         if (current < tokens.size() && tokens.get(current).equals("(")) {
             // It's a function call, parse it as such
-            List<Object> args = parseArgumentList();
+            List<Object> args = parseArgumentList(name);
             if (functions.containsKey(name)) {
                 return functions.get(name).apply(args);
             } else {
@@ -379,15 +419,24 @@ public class ConditionParser {
 
     /**
      * Parses a list of arguments for a function call.
+     * For the {@code if} function, only the branch selected by the condition is evaluated,
+     * the other one is skipped and passed as {@code null}.
      *
+     * @param functionName the name of the called function
      * @return a list of parsed arguments
      * @throws RuntimeException if there's a mismatch in parentheses
      */
-    private List<Object> parseArgumentList() {
+    private List<Object> parseArgumentList(String functionName) {
         List<Object> args = new ArrayList<>();
         current++; // Skip the opening parenthesis
         while (current < tokens.size() && !tokens.get(current).equals(")")) {
-            args.add(parseLogicalOr());
+            int index = args.size();
+            if ("if".equals(functionName) && (index == 1 || index == 2) && toBoolean(args.get(0)) != (index == 1)) {
+                skipOperand(Set.of(",", ")"));
+                args.add(null);
+            } else {
+                args.add(parseLogicalOr());
+            }
             if (current < tokens.size() && tokens.get(current).equals(",")) {
                 current++;
             }
@@ -407,7 +456,7 @@ public class ConditionParser {
     private Object parseFunction() {
         String functionName = tokens.get(current);
         current++;
-        List<Object> args = parseArgumentList();
+        List<Object> args = parseArgumentList(functionName);
         return functions.get(functionName).apply(args);
     }
 
