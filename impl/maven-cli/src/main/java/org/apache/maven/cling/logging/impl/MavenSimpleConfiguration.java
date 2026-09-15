@@ -49,6 +49,23 @@ public class MavenSimpleConfiguration extends BaseSlf4jConfiguration {
                             + "' - ignoring system property and get log level from -X/-e/-q options, log level will be set to "
                             + value);
         }
+
+        // Eagerly apply the new level so that any loggers created or used by the
+        // FastTerminal background thread (started during createTerminal(), before
+        // activate() is called) see the correct effective level immediately.
+        // Without this, the background thread runs TerminalBuilder which logs JLine
+        // [DEBUG] messages via JUL → MavenJulHandler → SLF4J, and the SLF4J loggers
+        // still have currentLogLevel=INFO (CONFIG_PARAMS.defaultLogLevel not yet
+        // updated), so isDebugEnabled() returns false — but on Windows, if those
+        // loggers are newly created during the build() call, they read CONFIG_PARAMS
+        // at construction time and see the stale defaultLogLevel.
+        // Calling reconfigure() here updates CONFIG_PARAMS.defaultLogLevel from the
+        // system property we just set, and re-configures any already-created loggers.
+        // activate() will call reconfigure() again — that is harmless.
+        ILoggerFactory lf = LoggerFactory.getILoggerFactory();
+        if (lf instanceof MavenLoggerFactory mlf) {
+            mlf.reconfigure();
+        }
     }
 
     @Override
