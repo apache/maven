@@ -31,6 +31,7 @@ import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
@@ -38,6 +39,7 @@ import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -540,6 +542,37 @@ public abstract class AbstractModelInterpolatorTest {
         assertEquals(
                 new File(basedir, "artifact.jar").getAbsolutePath(),
                 new File(rDeps.get(0).getSystemPath()).getAbsolutePath());
+    }
+
+    @Test
+    public void testRecursiveExpressionCycleInPluginConfiguration() throws Exception {
+        // MNG-8174: a self-referencing property used in a plugin configuration attribute must not
+        // cause an NPE while interpolating the plugin configuration
+        Model model = new Model();
+        model.addProperty("prop", "${prop}");
+
+        Xpp3Dom configuration = new Xpp3Dom("configuration");
+        Xpp3Dom filter = new Xpp3Dom("filter");
+        filter.setAttribute("token", "key");
+        filter.setAttribute("value", "${prop}");
+        configuration.addChild(filter);
+
+        Plugin plugin = new Plugin();
+        plugin.setArtifactId("maven-antrun-plugin");
+        plugin.setConfiguration(configuration);
+
+        Build build = new Build();
+        build.addPlugin(plugin);
+        model.setBuild(build);
+
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        ModelInterpolator interpolator = createInterpolator();
+        Model out = interpolator.interpolateModel(model, null, createModelBuildingRequest(context), collector);
+
+        assertNotNull(out);
+        assertCollectorState(0, 2, 0, collector);
+        Xpp3Dom outConfig = (Xpp3Dom) out.getBuild().getPlugins().get(0).getConfiguration();
+        assertEquals("${prop}", outConfig.getChild("filter").getAttribute("value"));
     }
 
     protected abstract ModelInterpolator createInterpolator(PathTranslator translator) throws Exception;
