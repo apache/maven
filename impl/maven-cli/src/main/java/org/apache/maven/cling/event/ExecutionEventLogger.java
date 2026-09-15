@@ -25,6 +25,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
@@ -204,31 +205,51 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
         List<MavenProject> projects = session.getProjects();
 
-        StringBuilder buffer = new StringBuilder(128);
-
         String skippedMessage = builder().warning("SKIPPED").build();
         String successMessage = builder().success("SUCCESS").build();
         String failureMessage = builder().failure("FAILURE").build();
         String unknownMessage = builder().warning("UNKNOWN").build();
 
-        boolean lastWasSkipped = false;
+        List<ReactorSummaryEntry> entries = new ArrayList<>(projects.size());
         for (MavenProject project : projects) {
             BuildSummary buildSummary = result.getBuildSummary(project);
 
             String statusMessage;
-            boolean shouldSkip = result.hasExceptions();
-            if (buildSummary == null) {
-                statusMessage = skippedMessage;
-            } else if (buildSummary instanceof BuildSuccess) {
+            int group;
+            if (buildSummary instanceof BuildSuccess) {
                 statusMessage = successMessage;
+                group = 1;
             } else if (buildSummary instanceof BuildFailure) {
                 statusMessage = failureMessage;
-                shouldSkip = false;
+                group = 2;
+            } else if (buildSummary == null) {
+                statusMessage = skippedMessage;
+                group = 0;
             } else {
                 statusMessage = unknownMessage;
+                group = 0;
+            }
+            entries.add(new ReactorSummaryEntry(project, buildSummary, group, statusMessage));
+        }
+
+        ReactorSummaryRequest request =
+                new ReactorSummaryRequest(entries, new StringBuilder(128), isSingleVersion, result.hasExceptions());
+
+        logReactorSummaryGroup(request, 0);
+        logReactorSummaryGroup(request, 1);
+        logReactorSummaryGroup(request, 2);
+    }
+
+    private void logReactorSummaryGroup(ReactorSummaryRequest request, int group) {
+        StringBuilder buffer = request.buffer();
+
+        boolean lastWasSkipped = false;
+        for (ReactorSummaryEntry entry : request.entries()) {
+            if (entry.group() != group) {
+                continue;
             }
 
-            if (shouldSkip) {
+            if (group == 0 && entry.buildSummary() == null && request.hasExceptions()) {
                 lastWasSkipped = true;
                 continue;
             }
@@ -237,11 +258,11 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                 lastWasSkipped = false;
             }
 
-            buffer.append(project.getName());
+            buffer.append(entry.project().getName());
             buffer.append(' ');
 
-            if (!isSingleVersion) {
-                buffer.append(project.getVersion());
+            if (!request.isSingleVersion()) {
+                buffer.append(entry.project().getVersion());
                 buffer.append(' ');
             }
 
@@ -252,12 +273,16 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                 buffer.append(' ');
             }
 
-            buffer.append(statusMessage);
-            if (buildSummary != null) {
-                formatBuildTime(buffer, buildSummary);
+            buffer.append(entry.statusMessage());
+            if (entry.buildSummary() != null) {
+                formatBuildTime(buffer, entry.buildSummary());
             }
 
-            logger.info(buffer.toString());
+            if (entry.buildSummary() instanceof BuildFailure) {
+                logger.error(buffer.toString());
+            } else {
+                logger.info(buffer.toString());
+            }
             buffer.setLength(0);
         }
 
@@ -265,6 +290,12 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             logger.info("...");
         }
     }
+
+    private record ReactorSummaryRequest(
+            List<ReactorSummaryEntry> entries, StringBuilder buffer, boolean isSingleVersion, boolean hasExceptions) {}
+
+    private record ReactorSummaryEntry(
+            MavenProject project, BuildSummary buildSummary, int group, String statusMessage) {}
 
     private void formatBuildTime(StringBuilder buffer, BuildSummary buildSummary) {
         buffer.append(" [");
@@ -281,12 +312,17 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
         infoLine('-');
         MessageBuilder buffer = builder();
 
-        if (session.getResult().hasExceptions()) {
+        boolean failure = session.getResult().hasExceptions();
+        if (failure) {
             buffer.failure("BUILD FAILURE");
         } else {
             buffer.success("BUILD SUCCESS");
         }
-        logger.info(buffer.toString());
+        if (failure) {
+            logger.error(buffer.toString());
+        } else {
+            logger.info(buffer.toString());
+        }
     }
 
     private MessageBuilder builder() {
