@@ -46,6 +46,7 @@ import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.LookupException;
 import org.apache.maven.api.spi.ExtensibleEnumProvider;
 import org.apache.maven.api.spi.LifecycleProvider;
+import org.apache.maven.lifecycle.PluginVersions;
 import org.apache.maven.lifecycle.mapping.LifecyclePhase;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -416,7 +417,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     static class CleanLifecycle implements Lifecycle {
 
-        private static final String MAVEN_CLEAN_PLUGIN_VERSION = "3.4.0";
+        private static final String MAVEN_CLEAN_PLUGIN_VERSION = PluginVersions.CLEAN;
 
         @Override
         public String id() {
@@ -529,7 +530,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     static class SiteLifecycle implements Lifecycle {
 
-        private static final String MAVEN_SITE_PLUGIN_VERSION = "3.21.0";
+        private static final String MAVEN_SITE_PLUGIN_VERSION = PluginVersions.SITE;
         private static final String MAVEN_SITE_PLUGIN =
                 MAVEN_PLUGINS + "maven-site-plugin:" + MAVEN_SITE_PLUGIN_VERSION + ":";
         private static final String PHASE_SITE = "site";
