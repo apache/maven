@@ -420,6 +420,7 @@ public class MavenCli {
             if (configFile.isFile()) {
                 try (Stream<String> lines = Files.lines(configFile.toPath(), StandardCharsets.UTF_8)) {
                     String[] args = lines.filter(arg -> !arg.isEmpty() && !arg.startsWith("#"))
+                            .flatMap(line -> CleanArgument.splitLine(line).stream())
                             .toArray(String[]::new);
                     mavenConfig = cliManager.parse(args);
                     List<?> unrecognized = mavenConfig.getArgList();
