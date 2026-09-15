@@ -539,6 +539,19 @@ public class DefaultModelBuilder implements ModelBuilder {
      * @return a sandboxed context suitable for external model profile activation
      */
     private static ProfileActivationContext externalActivationContext(ProfileActivationContext delegate) {
+        // Pre-compute the merged system+project properties once per external model.
+        // getSystemProperties() may be called multiple times per profile (e.g. OperatingSystemProfileActivator
+        // calls it 3× for name/arch/version), so allocating a new HashMap on every call is O(deps × profiles ×
+        // |systemProperties|). Computing it eagerly here keeps the anonymous class allocation-free.
+        final Map<String, String> mergedSystemProps;
+        Map<String, String> projectProps = delegate.getProjectProperties();
+        if (projectProps == null || projectProps.isEmpty()) {
+            mergedSystemProps = delegate.getSystemProperties();
+        } else {
+            Map<String, String> merged = new HashMap<>(projectProps);
+            merged.putAll(delegate.getSystemProperties()); // system wins
+            mergedSystemProps = Collections.unmodifiableMap(merged);
+        }
         return new ProfileActivationContext() {
             @Override
             public List<String> getActiveProfileIds() {
@@ -551,19 +564,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             /**
-             * System properties merged with project properties (system wins on conflict).
+             * System properties merged with project properties (system wins on conflict),
+             * pre-computed once to avoid repeated allocations across multiple activator calls.
              * This makes POM-declared properties visible to the PropertyProfileActivator
              * without modifying the activator's lookup chain for non-external models.
              */
             @Override
             public Map<String, String> getSystemProperties() {
-                Map<String, String> projectProps = delegate.getProjectProperties();
-                if (projectProps == null || projectProps.isEmpty()) {
-                    return delegate.getSystemProperties();
-                }
-                Map<String, String> merged = new HashMap<>(projectProps);
-                merged.putAll(delegate.getSystemProperties()); // system wins
-                return merged;
+                return mergedSystemProps;
             }
 
             /** User properties are suppressed: consumer -D flags do not activate dependency profiles. */
