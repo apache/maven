@@ -975,19 +975,36 @@ public class DefaultModelBuilder implements ModelBuilder {
                 || artifactId == null
                 || !artifactId.equals(parent.getArtifactId())) {
             StringBuilder buffer = new StringBuilder(256);
-            buffer.append("'parent.relativePath'");
-            if (childModel != problems.getRootModel()) {
-                buffer.append(" of POM ").append(ModelProblemUtils.toSourceHint(childModel));
+            if (parent.getRelativePath() == null) {
+                // <relativePath> was omitted — Maven probed ../pom.xml on its own
+                buffer.append("Maven probed the default location '../pom.xml'");
+                if (childModel != problems.getRootModel()) {
+                    buffer.append(" for POM ").append(ModelProblemUtils.toSourceHint(childModel));
+                }
+                buffer.append(" and found ").append(groupId).append(':').append(artifactId);
+                buffer.append(" instead of the declared parent ")
+                        .append(parent.getGroupId())
+                        .append(':');
+                buffer.append(parent.getArtifactId());
+                buffer.append(
+                        ". Maven will fall back to repository resolution. To suppress this warning, add <relativePath/> to your <parent> declaration.");
+            } else {
+                // <relativePath> was set explicitly — this is a configuration error
+                buffer.append("'parent.relativePath'");
+                if (childModel != problems.getRootModel()) {
+                    buffer.append(" of POM ").append(ModelProblemUtils.toSourceHint(childModel));
+                }
+                buffer.append(" points at '").append(parent.getRelativePath()).append("'");
+                buffer.append(" which resolves to ").append(groupId).append(':').append(artifactId);
+                buffer.append(" instead of the declared parent ")
+                        .append(parent.getGroupId())
+                        .append(':');
+                buffer.append(parent.getArtifactId())
+                        .append(". Please verify your project structure or correct the <relativePath> value.");
             }
-            buffer.append(" points at ").append(groupId).append(':').append(artifactId);
-            buffer.append(" instead of ").append(parent.getGroupId()).append(':');
-            buffer.append(parent.getArtifactId()).append(", please verify your project structure");
 
             problems.setSource(childModel);
-            // When <relativePath> is omitted Maven defaults to ../pom.xml; downgrade to WARNING
-            // (not FATAL) in that case — same behaviour as the Maven 4 DefaultModelBuilder.
-            Severity severity = (parent.getRelativePath() == null) ? Severity.WARNING : Severity.FATAL;
-            problems.add(new ModelProblemCollectorRequest(severity, Version.BASE)
+            problems.add(new ModelProblemCollectorRequest(Severity.WARNING, Version.BASE)
                     .setMessage(buffer.toString())
                     .setLocation(parent.getLocation("")));
             return null;

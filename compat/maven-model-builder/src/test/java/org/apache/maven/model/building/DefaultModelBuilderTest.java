@@ -37,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  */
@@ -133,7 +132,7 @@ public class DefaultModelBuilderTest {
      * MNG-5146: when {@code <relativePath>} is omitted (null), the default {@code ../pom.xml} is
      * probed and, if its GA does not match the declared parent GA, Maven must emit a WARNING (not a
      * FATAL) and fall back to repository resolution.  The build must succeed and the warning must
-     * contain the standard mismatch message.
+     * mention that Maven probed the default location.
      */
     @Test
     public void testParentGaMismatchDefaultRelativePathProducesWarning(@TempDir Path tempDir)
@@ -169,31 +168,32 @@ public class DefaultModelBuilderTest {
         List<ModelProblem> problems = result.getProblems();
         long warningCount = problems.stream()
                 .filter(p -> p.getSeverity() == Severity.WARNING
-                        && p.getMessage().contains("please verify your project structure"))
+                        && p.getMessage().contains("Maven probed the default location"))
                 .count();
         assertEquals(1, warningCount, "Expected exactly one WARNING about GA mismatch; got: " + problems);
 
         // No FATAL problem for this mismatch.
         boolean hasFatalMismatch = problems.stream()
                 .anyMatch(p -> p.getSeverity() == Severity.FATAL
-                        && p.getMessage().contains("please verify your project structure"));
+                        && p.getMessage().contains("Maven probed the default location"));
         assertFalse(hasFatalMismatch, "Expected no FATAL for default-relativePath mismatch; got: " + problems);
     }
 
     /**
      * MNG-5146: when {@code <relativePath>} is set explicitly and points to a POM whose GA does
-     * not match the declared parent, Maven must emit a FATAL error and throw
-     * {@link ModelBuildingException}.
+     * not match the declared parent, the compat layer (Maven 3 behaviour) must emit a WARNING
+     * (not FATAL) and fall back to repository resolution.
      */
     @Test
-    public void testParentGaMismatchExplicitRelativePathProducesFatal(@TempDir Path tempDir) throws IOException {
+    public void testParentGaMismatchExplicitRelativePathProducesWarning(@TempDir Path tempDir)
+            throws IOException, ModelBuildingException {
         // Layout: tempDir/pom.xml (wrong GA) and tempDir/child/pom.xml (explicit relativePath)
         Path parentPom = tempDir.resolve("pom.xml");
         Files.writeString(parentPom, WRONG_PARENT);
 
         Path childDir = Files.createDirectory(tempDir.resolve("child"));
         Path childPom = childDir.resolve("pom.xml");
-        // <relativePath> explicitly points at ../pom.xml → same file, but wrong GA → must be FATAL
+        // <relativePath> explicitly points at ../pom.xml → same file, but wrong GA
         String childContent = "<project>\n"
                 + "  <modelVersion>4.0.0</modelVersion>\n"
                 + "  <parent>\n"
@@ -212,15 +212,20 @@ public class DefaultModelBuilderTest {
         request.setModelResolver(new ParentProvidingResolver("mygroup", "myparent", "1.0", REAL_PARENT));
         request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
 
-        ModelBuildingException ex = assertThrows(ModelBuildingException.class, () -> builder.build(request));
+        // Compat layer: explicit relativePath mismatch is a WARNING (not FATAL) — Maven 3 behaviour.
+        // The build falls back to repository resolution and succeeds.
+        ModelBuildingResult result = builder.build(request);
 
-        // The exception must contain a FATAL problem for this mismatch.
-        boolean hasFatalMismatch = ex.getProblems().stream()
-                .anyMatch(p -> p.getSeverity() == Severity.FATAL
-                        && p.getMessage().contains("please verify your project structure"));
-        assertTrue(
-                hasFatalMismatch,
-                "Expected a FATAL problem for explicit-relativePath mismatch; got: " + ex.getProblems());
+        List<ModelProblem> problems = result.getProblems();
+        long warningCount = problems.stream()
+                .filter(p -> p.getSeverity() == Severity.WARNING
+                        && p.getMessage().contains("'parent.relativePath'")
+                        && p.getMessage().contains("../pom.xml"))
+                .count();
+        assertEquals(
+                1,
+                warningCount,
+                "Expected exactly one WARNING for explicit-relativePath mismatch in compat layer; got: " + problems);
     }
 
     /**

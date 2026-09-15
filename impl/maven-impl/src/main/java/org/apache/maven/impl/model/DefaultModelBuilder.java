@@ -1426,18 +1426,49 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         private void mismatchRelativePathAndGA(Model childModel, Parent parent, String groupId, String artifactId) {
+            boolean defaultPath = childModel.getParent().getRelativePath() == null;
+            boolean maven3Mode = Features.mavenMaven3Personality(
+                    InternalSession.from(session).getSession().getConfigProperties());
+
             StringBuilder buffer = new StringBuilder(256);
-            buffer.append("'parent.relativePath'");
-            if (childModel != getRootModel()) {
-                buffer.append(" of POM ").append(ModelProblemUtils.toSourceHint(childModel));
+            if (defaultPath) {
+                // <relativePath> was omitted — Maven probed ../pom.xml on its own
+                buffer.append("Maven probed the default location '../pom.xml'");
+                if (childModel != getRootModel()) {
+                    buffer.append(" for POM ").append(ModelProblemUtils.toSourceHint(childModel));
+                }
+                buffer.append(" and found ").append(groupId).append(':').append(artifactId);
+                buffer.append(" instead of the declared parent ")
+                        .append(parent.getGroupId())
+                        .append(':');
+                buffer.append(parent.getArtifactId());
+                buffer.append(
+                        ". Maven will fall back to repository resolution. To suppress this warning, add <relativePath/> to your <parent> declaration.");
+            } else {
+                // <relativePath> was set explicitly — this is a configuration error
+                buffer.append("'parent.relativePath'");
+                if (childModel != getRootModel()) {
+                    buffer.append(" of POM ").append(ModelProblemUtils.toSourceHint(childModel));
+                }
+                buffer.append(" points at '").append(parent.getRelativePath()).append("'");
+                buffer.append(" which resolves to ").append(groupId).append(':').append(artifactId);
+                buffer.append(" instead of the declared parent ")
+                        .append(parent.getGroupId())
+                        .append(':');
+                buffer.append(parent.getArtifactId()).append('.');
+                if (!maven3Mode) {
+                    buffer.append(
+                            " Correct the <relativePath> value or remove it to let Maven resolve the parent from the repository.");
+                } else {
+                    buffer.append(" Please verify your project structure.");
+                }
             }
-            buffer.append(" points at ").append(groupId).append(':').append(artifactId);
-            buffer.append(" instead of ").append(parent.getGroupId()).append(':');
-            buffer.append(parent.getArtifactId()).append(", please verify your project structure");
 
             setSource(childModel);
-            boolean warn = MODEL_VERSION_4_0_0.equals(childModel.getModelVersion())
-                    || childModel.getParent().getRelativePath() == null;
+            // WARNING when: Maven probed the default path (user didn't set anything),
+            //               OR maven3Personality is active (preserve historical lenient behaviour).
+            // FATAL otherwise: explicit <relativePath> pointing at the wrong artifact is a config error.
+            boolean warn = defaultPath || maven3Mode;
             add(warn ? Severity.WARNING : Severity.FATAL, Version.BASE, buffer.toString(), parent.getLocation(""));
         }
 
