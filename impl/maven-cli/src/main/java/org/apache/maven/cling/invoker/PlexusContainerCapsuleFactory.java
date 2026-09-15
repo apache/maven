@@ -93,10 +93,14 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 coreRealm,
                 coreEntry.getExportedArtifacts(),
                 coreExtensionSelector.selectCoreExtensions(invoker, context));
-        List<CoreExtensionEntry> loadedExtensionsEntries =
-                loadedExtensions.stream().map(LoadedCoreExtension::entry).toList();
+        List<CoreExtensionEntry> loadedExtensionsEntries = new ArrayList<>(
+                loadedExtensions.stream().map(LoadedCoreExtension::entry).toList());
         ClassRealm containerRealm =
                 setupContainerRealm(context.logger, classWorld, coreRealm, extClassPath, loadedExtensionsEntries);
+        if (!extClassPath.isEmpty()) {
+            loadedExtensionsEntries.add(CoreExtensionEntry.discoverFrom(
+                    containerRealm, extClassPath.stream().map(Path::toFile).toList(), null, null));
+        }
         ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .setClassWorld(classWorld)
                 .setRealm(containerRealm)
