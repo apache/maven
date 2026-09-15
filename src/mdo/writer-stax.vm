@@ -365,18 +365,18 @@ public class ${className} {
 
     private void writeDom(XmlNode dom, XMLStreamWriter serializer) throws IOException, XMLStreamException {
         if (dom != null) {
-            serializer.writeStartElement(namespace, dom.name());
-            writeXmlNodeAttributes(serializer, dom.attributes(), dom.namespaces());
-            for (XmlNode child : dom.children()) {
+            serializer.writeStartElement(namespace, dom.getName());
+            writeXmlNodeAttributes(serializer, dom.getAttributes(), dom.getNamespaces());
+            for (XmlNode child : dom.getChildren()) {
                 writeDom(child, serializer);
             }
-            String value = dom.value();
+            String value = dom.getValue();
             if (value != null) {
                 serializer.writeCharacters(value);
             }
             serializer.writeEndElement();
 #if ( $locationTracking )
-            if (addLocationInformation && dom.inputLocation() instanceof InputLocation inputLocation && dom.children().isEmpty()) {
+            if (addLocationInformation && dom.getInputLocation() instanceof InputLocation inputLocation && dom.getChildren().isEmpty()) {
                 serializer.writeComment(toString(inputLocation));
             }
 #end

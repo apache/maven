@@ -252,7 +252,7 @@ public class ${className} {
     private void writeDom(XmlNode dom, XmlSerializer serializer) throws IOException {
         if (dom != null) {
             serializer.startTag(NAMESPACE, dom.getName());
-            writeXmlNodeAttributes(serializer, dom.getAttributes(), dom.namespaces());
+            writeXmlNodeAttributes(serializer, dom.getAttributes(), dom.getNamespaces());
             for (XmlNode child : dom.getChildren()) {
                 writeDom(child, serializer);
             }

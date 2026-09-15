@@ -43,13 +43,13 @@ public class XmlPlexusConfigurationOld extends DefaultPlexusConfiguration {
      * This is the performance bottleneck that was optimized in the new implementation.
      */
     public XmlPlexusConfigurationOld(XmlNode node) {
-        super(node.name(), node.value());
+        super(node.getName(), node.getValue());
 
         // Copy all attributes
-        node.attributes().forEach(this::setAttribute);
+        node.getAttributes().forEach(this::setAttribute);
 
         // Recursively create child configurations (expensive deep copying)
-        node.children().forEach(c -> this.addChild(new XmlPlexusConfigurationOld(c)));
+        node.getChildren().forEach(c -> this.addChild(new XmlPlexusConfigurationOld(c)));
     }
 
     @Override

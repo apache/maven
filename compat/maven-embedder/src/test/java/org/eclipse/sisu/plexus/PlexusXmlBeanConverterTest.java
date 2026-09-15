@@ -40,10 +40,10 @@ class PlexusXmlBeanConverterTest {
     void convertsXmlNode() {
         XmlNode node = assertInstanceOf(XmlNode.class, newConverter().convert(TypeLiteral.get(XmlNode.class), XML));
 
-        assertEquals("configuration", node.name());
-        assertEquals("strict", node.attribute("mode"));
-        assertEquals("text", node.child("value").value());
-        assertNull(node.child("empty").value());
+        assertEquals("configuration", node.getName());
+        assertEquals("strict", node.getAttribute("mode"));
+        assertEquals("text", node.getChild("value").getValue());
+        assertNull(node.getChild("empty").getValue());
     }
 
     @Test

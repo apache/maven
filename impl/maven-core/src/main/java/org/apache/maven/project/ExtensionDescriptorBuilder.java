@@ -93,13 +93,13 @@ public class ExtensionDescriptorBuilder {
             throw new IOException(e.getMessage(), e);
         }
 
-        if (!"extension".equals(dom.name())) {
-            throw new IOException("Unexpected root element \"" + dom.name() + "\", expected \"extension\"");
+        if (!"extension".equals(dom.getName())) {
+            throw new IOException("Unexpected root element \"" + dom.getName() + "\", expected \"extension\"");
         }
 
-        extensionDescriptor.setExportedPackages(parseStrings(dom.child("exportedPackages")));
+        extensionDescriptor.setExportedPackages(parseStrings(dom.getChild("exportedPackages")));
 
-        extensionDescriptor.setExportedArtifacts(parseStrings(dom.child("exportedArtifacts")));
+        extensionDescriptor.setExportedArtifacts(parseStrings(dom.getChild("exportedArtifacts")));
 
         return extensionDescriptor;
     }
@@ -110,8 +110,8 @@ public class ExtensionDescriptorBuilder {
         if (dom != null) {
             strings = new ArrayList<>();
 
-            for (XmlNode child : dom.children()) {
-                String string = child.value();
+            for (XmlNode child : dom.getChildren()) {
+                String string = child.getValue();
                 if (string != null) {
                     string = string.trim();
                     if (!string.isEmpty()) {

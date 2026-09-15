@@ -178,15 +178,15 @@ public class DefaultXmlService extends XmlService {
     }
 
     private void writeNode(XMLStreamWriter xmlWriter, XmlNode node) throws XMLStreamException {
-        xmlWriter.writeStartElement(node.prefix(), node.name(), node.namespaceUri());
+        xmlWriter.writeStartElement(node.getPrefix(), node.getName(), node.getNamespaceUri());
 
-        writeAttributes(xmlWriter, node.attributes(), node.namespaces());
+        writeAttributes(xmlWriter, node.getAttributes(), node.getNamespaces());
 
-        for (XmlNode child : node.children()) {
+        for (XmlNode child : node.getChildren()) {
             writeNode(xmlWriter, child);
         }
 
-        String value = node.value();
+        String value = node.getValue();
         if (value != null) {
             xmlWriter.writeCharacters(value);
         }
@@ -314,22 +314,22 @@ public class DefaultXmlService extends XmlService {
 
         if (mergeSelf) {
 
-            String value = dominant.value();
-            Object location = dominant.inputLocation();
-            Map<String, String> attrs = dominant.attributes();
+            String value = dominant.getValue();
+            Object location = dominant.getInputLocation();
+            Map<String, String> attrs = dominant.getAttributes();
             List<XmlNode> children = null;
 
-            for (Map.Entry<String, String> attr : recessive.attributes().entrySet()) {
+            for (Map.Entry<String, String> attr : recessive.getAttributes().entrySet()) {
                 String key = attr.getKey();
                 if (isEmpty(attrs.get(key))) {
-                    if (attrs == dominant.attributes()) {
+                    if (attrs == dominant.getAttributes()) {
                         attrs = new HashMap<>(attrs);
                     }
                     attrs.put(key, attr.getValue());
                 }
             }
 
-            if (!recessive.children().isEmpty()) {
+            if (!recessive.getChildren().isEmpty()) {
                 boolean mergeChildren = true;
                 if (childMergeOverride != null) {
                     mergeChildren = childMergeOverride;
@@ -342,26 +342,26 @@ public class DefaultXmlService extends XmlService {
 
                 Map<String, Iterator<XmlNode>> commonChildren = new HashMap<>();
                 Set<String> names =
-                        recessive.children().stream().map(XmlNode::name).collect(Collectors.toSet());
+                        recessive.getChildren().stream().map(XmlNode::getName).collect(Collectors.toSet());
                 for (String name : names) {
-                    List<XmlNode> dominantChildren = dominant.children().stream()
-                            .filter(n -> n.name().equals(name))
+                    List<XmlNode> dominantChildren = dominant.getChildren().stream()
+                            .filter(n -> n.getName().equals(name))
                             .toList();
                     if (!dominantChildren.isEmpty()) {
                         commonChildren.put(name, dominantChildren.iterator());
                     }
                 }
 
-                String keysValue = recessive.attribute(KEYS_COMBINATION_MODE_ATTRIBUTE);
+                String keysValue = recessive.getAttribute(KEYS_COMBINATION_MODE_ATTRIBUTE);
 
                 int recessiveChildIndex = 0;
-                for (XmlNode recessiveChild : recessive.children()) {
-                    String idValue = recessiveChild.attribute(ID_COMBINATION_MODE_ATTRIBUTE);
+                for (XmlNode recessiveChild : recessive.getChildren()) {
+                    String idValue = recessiveChild.getAttribute(ID_COMBINATION_MODE_ATTRIBUTE);
 
                     XmlNode childDom = null;
                     if (!isEmpty(idValue)) {
-                        for (XmlNode dominantChild : dominant.children()) {
-                            if (idValue.equals(dominantChild.attribute(ID_COMBINATION_MODE_ATTRIBUTE))) {
+                        for (XmlNode dominantChild : dominant.getChildren()) {
+                            if (idValue.equals(dominantChild.getAttribute(ID_COMBINATION_MODE_ATTRIBUTE))) {
                                 childDom = dominantChild;
                                 // we have a match, so don't append but merge
                                 mergeChildren = true;
@@ -371,12 +371,12 @@ public class DefaultXmlService extends XmlService {
                         String[] keys = keysValue.split(",");
                         Map<String, Optional<String>> recessiveKeyValues = Stream.of(keys)
                                 .collect(Collectors.toMap(
-                                        k -> k, k -> Optional.ofNullable(recessiveChild.attribute(k))));
+                                        k -> k, k -> Optional.ofNullable(recessiveChild.getAttribute(k))));
 
-                        for (XmlNode dominantChild : dominant.children()) {
+                        for (XmlNode dominantChild : dominant.getChildren()) {
                             Map<String, Optional<String>> dominantKeyValues = Stream.of(keys)
                                     .collect(Collectors.toMap(
-                                            k -> k, k -> Optional.ofNullable(dominantChild.attribute(k))));
+                                            k -> k, k -> Optional.ofNullable(dominantChild.getAttribute(k))));
 
                             if (recessiveKeyValues.equals(dominantKeyValues)) {
                                 childDom = dominantChild;
@@ -385,15 +385,15 @@ public class DefaultXmlService extends XmlService {
                             }
                         }
                     } else {
-                        childDom = dominant.child(recessiveChild.name());
+                        childDom = dominant.getChild(recessiveChild.getName());
                     }
 
                     if (mergeChildren && childDom != null) {
-                        String name = recessiveChild.name();
+                        String name = recessiveChild.getName();
                         Iterator<XmlNode> it = commonChildren.computeIfAbsent(
                                 name,
-                                n1 -> Stream.of(dominant.children().stream()
-                                                .filter(n2 -> n2.name().equals(n1))
+                                n1 -> Stream.of(dominant.getChildren().stream()
+                                                .filter(n2 -> n2.getName().equals(n1))
                                                 .collect(Collectors.toList()))
                                         .filter(l -> !l.isEmpty())
                                         .findFirst()
@@ -401,7 +401,7 @@ public class DefaultXmlService extends XmlService {
                                         .orElse(null));
                         if (it == null) {
                             if (children == null) {
-                                children = new ArrayList<>(dominant.children());
+                                children = new ArrayList<>(dominant.getChildren());
                             }
                             children.add(recessiveChild);
                         } else if (it.hasNext()) {
@@ -410,15 +410,15 @@ public class DefaultXmlService extends XmlService {
                             String dominantChildCombinationMode = getSelfCombinationMode(dominantChild);
                             if (SELF_COMBINATION_REMOVE.equals(dominantChildCombinationMode)) {
                                 if (children == null) {
-                                    children = new ArrayList<>(dominant.children());
+                                    children = new ArrayList<>(dominant.getChildren());
                                 }
                                 children.remove(dominantChild);
                             } else {
-                                int idx = dominant.children().indexOf(dominantChild);
+                                int idx = dominant.getChildren().indexOf(dominantChild);
                                 XmlNode merged = merge(dominantChild, recessiveChild, childMergeOverride);
                                 if (merged != dominantChild) {
                                     if (children == null) {
-                                        children = new ArrayList<>(dominant.children());
+                                        children = new ArrayList<>(dominant.getChildren());
                                     }
                                     children.set(idx, merged);
                                 }
@@ -426,7 +426,7 @@ public class DefaultXmlService extends XmlService {
                         }
                     } else {
                         if (children == null) {
-                            children = new ArrayList<>(dominant.children());
+                            children = new ArrayList<>(dominant.getChildren());
                         }
                         int idx = mergeChildren ? children.size() : recessiveChildIndex;
                         children.add(idx, recessiveChild);
@@ -435,21 +435,21 @@ public class DefaultXmlService extends XmlService {
                 }
             }
 
-            if (value != null || attrs != dominant.attributes() || children != null) {
+            if (value != null || attrs != dominant.getAttributes() || children != null) {
                 if (children == null) {
-                    children = dominant.children();
+                    children = dominant.getChildren();
                 }
-                if (!Objects.equals(value, dominant.value())
-                        || !Objects.equals(attrs, dominant.attributes())
-                        || !Objects.equals(children, dominant.children())
-                        || !Objects.equals(location, dominant.inputLocation())) {
+                if (!Objects.equals(value, dominant.getValue())
+                        || !Objects.equals(attrs, dominant.getAttributes())
+                        || !Objects.equals(children, dominant.getChildren())
+                        || !Objects.equals(location, dominant.getInputLocation())) {
                     return XmlNode.newBuilder()
-                            .prefix(dominant.prefix())
-                            .namespaceUri(dominant.namespaceUri())
-                            .name(dominant.name())
-                            .value(value != null ? value : dominant.value())
+                            .prefix(dominant.getPrefix())
+                            .namespaceUri(dominant.getNamespaceUri())
+                            .name(dominant.getName())
+                            .value(value != null ? value : dominant.getValue())
                             .attributes(attrs)
-                            .namespaces(dominant.namespaces())
+                            .namespaces(dominant.getNamespaces())
                             .children(children)
                             .inputLocation(location)
                             .build();
@@ -466,7 +466,7 @@ public class DefaultXmlService extends XmlService {
     }
 
     private static String getSelfCombinationMode(XmlNode node) {
-        String value = node.attribute(SELF_COMBINATION_MODE_ATTRIBUTE);
+        String value = node.getAttribute(SELF_COMBINATION_MODE_ATTRIBUTE);
         return !isEmpty(value) ? value : DEFAULT_SELF_COMBINATION_MODE;
     }
 
@@ -478,7 +478,7 @@ public class DefaultXmlService extends XmlService {
     @Nullable
     private static XmlNode findNodeById(@Nonnull List<XmlNode> nodes, @Nonnull String id) {
         return nodes.stream()
-                .filter(n -> id.equals(n.attribute(ID_COMBINATION_MODE_ATTRIBUTE)))
+                .filter(n -> id.equals(n.getAttribute(ID_COMBINATION_MODE_ATTRIBUTE)))
                 .findFirst()
                 .orElse(null);
     }
@@ -494,8 +494,8 @@ public class DefaultXmlService extends XmlService {
 
     private static boolean matchesKeys(@Nonnull XmlNode node1, @Nonnull XmlNode node2, @Nonnull String[] keys) {
         for (String key : keys) {
-            String value1 = node1.attribute(key);
-            String value2 = node2.attribute(key);
+            String value1 = node1.getAttribute(key);
+            String value2 = node2.getAttribute(key);
             if (!Objects.equals(value1, value2)) {
                 return false;
             }

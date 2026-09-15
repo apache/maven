@@ -36,7 +36,7 @@ class XmlServiceLoadingTest {
         try (URLClassLoader contextClassLoader = new URLClassLoader(new URL[0], null)) {
             Thread.currentThread().setContextClassLoader(contextClassLoader);
             XmlNode node = XmlService.read(new StringReader("<configuration/>"));
-            assertEquals("configuration", node.name());
+            assertEquals("configuration", node.getName());
         } finally {
             Thread.currentThread().setContextClassLoader(previous);
         }

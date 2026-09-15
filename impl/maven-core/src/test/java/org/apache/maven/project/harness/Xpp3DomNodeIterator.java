@@ -55,7 +55,7 @@ class Xpp3DomNodeIterator implements NodeIterator {
     Xpp3DomNodeIterator(NodePointer parent, NodeTest test, boolean reverse, NodePointer startWith) {
         this.parent = parent;
         this.node = (XmlNode) parent.getNode();
-        this.children = this.node.children();
+        this.children = this.node.getChildren();
         if (startWith != null) {
             Xpp3Dom startWithNode = (Xpp3Dom) startWith.getNode();
             for (; filteredIndex < children.size(); filteredIndex++) {
@@ -106,7 +106,7 @@ class Xpp3DomNodeIterator implements NodeIterator {
             return true;
         }
         if (test instanceof NodeNameTest nodeNameTest) {
-            String nodeName = node.name();
+            String nodeName = node.getName();
             if (nodeName == null || nodeName.isEmpty()) {
                 return false;
             }
@@ -126,7 +126,7 @@ class Xpp3DomNodeIterator implements NodeIterator {
         if (test instanceof NodeTypeTest nodeTypeTest) {
             return switch (nodeTypeTest.getNodeType()) {
                 case Compiler.NODE_TYPE_NODE -> true;
-                case Compiler.NODE_TYPE_TEXT -> node.value() != null;
+                case Compiler.NODE_TYPE_TEXT -> node.getValue() != null;
                 default -> false;
             };
         }
