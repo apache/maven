@@ -86,7 +86,10 @@ public interface Log {
      * Sends a lazily-computed message at the <b>trace</b> error level.
      * The supplier is only evaluated if trace is enabled.
      * <p>
-     * The default implementation is a no-op for backward compatibility.
+     * The default implementation is a no-op for backward compatibility
+     * with existing {@code Log} implementations.
+     *
+     * @param content the message supplier
      */
     default void trace(Supplier<String> content) {}
 
@@ -94,7 +97,11 @@ public interface Log {
      * Sends a lazily-computed message (and accompanying exception) at the <b>trace</b> error level.
      * The supplier is only evaluated if trace is enabled.
      * <p>
-     * The default implementation is a no-op for backward compatibility.
+     * The default implementation is a no-op for backward compatibility
+     * with existing {@code Log} implementations.
+     *
+     * @param content the message supplier
+     * @param error the error that caused this log
      */
     default void trace(Supplier<String> content, Throwable error) {}
 

@@ -332,16 +332,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             ProjectBuildLogAppender projectBuildLogAppender =
                     new ProjectBuildLogAppender(determineBuildEventListener(context));
             context.closeables.add(projectBuildLogAppender);
-
-            // Now that the logSink (and any -l log-file writer) is installed,
-            // replay early log messages that were accumulated before
-            // activateLogging() ran.  This ensures messages such as
-            // "Enabled to break the build on log level WARN." reach the log
-            // file rather than stdout (MavenITmng6065 regression fix).
-            if (context.pendingEarlyLogs != null) {
-                context.pendingEarlyLogs.forEach(e -> context.logger.log(e.level(), e.message(), e.error()));
-                context.pendingEarlyLogs = null;
-            }
         } else {
             doConfigureWithTerminal(context, context.terminal);
         }
@@ -508,15 +498,14 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         // at this point logging is set up, reply so far accumulated logs, if any and swap logger with real one
         Logger logger =
                 new Slf4jLogger(context.loggerFactory.getLogger(getClass().getName()));
-        // Defer draining the accumulated log queue to createTerminal() so that
-        // early messages (e.g. "Enabled to break the build on log level WARN.")
-        // are replayed AFTER ProjectBuildLogAppender has installed the
-        // MavenSimpleLogger logSink and wired up any -l log-file writer.
-        // Draining here (before createTerminal) would route those messages
-        // through super.write() → stdout, bypassing the log file
-        // (MavenITmng6065 regression).
-        context.pendingEarlyLogs = context.logger.drain();
+        // Drain early log messages accumulated before SLF4J was active.
+        // createTerminal() has already run and installed ProjectBuildLogAppender
+        // (and wired up any -l log-file writer), so draining here routes these
+        // messages through the logSink and into the log file, not just stdout.
+        // (MavenITmng6065 regression fix)
+        List<Logger.Entry> pending = context.logger.drain();
         context.logger = logger;
+        pending.forEach(e -> context.logger.log(e.level(), e.message(), e.error()));
     }
 
     protected void helpOrVersionAndMayExit(C context) throws Exception {
