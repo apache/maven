@@ -1426,7 +1426,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         private void mismatchRelativePathAndGA(Model childModel, Parent parent, String groupId, String artifactId) {
-            boolean defaultPath = childModel.getParent().getRelativePath() == null;
+            boolean defaultPath = parent.getRelativePath() == null;
             boolean maven3Mode = Features.mavenMaven3Personality(
                     InternalSession.from(session).getSession().getConfigProperties());
 
