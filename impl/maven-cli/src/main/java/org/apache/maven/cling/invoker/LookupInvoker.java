@@ -467,15 +467,16 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         // to match the effective log level.  This must happen AFTER install()
         // + activate() to avoid flooding JUL events during SLF4J bootstrap
         // (ConcurrentHashMap.computeIfAbsent reentrancy).
-        // In quiet mode keep the JUL root at WARNING so that INFO/DEBUG JUL
-        // events are suppressed at source — relying solely on the SLF4J-level
+        // In quiet mode keep the JUL root at SEVERE so that WARNING/INFO/DEBUG
+        // JUL events are suppressed at source — relying solely on the SLF4J-level
         // check in MavenJulHandler.isLevelEnabled() is racy: newly created
         // SLF4J loggers may briefly see the default INFO level before
         // quiet-mode propagation completes, leaking output that
         // MavenITmng4387QuietLoggingTest detects as a flaky failure.
+        // SEVERE (integer 1000) is the correct JUL equivalent of SLF4J ERROR.
         java.util.logging.Level julRootLevel;
         if (context.options().quiet().orElse(false)) {
-            julRootLevel = java.util.logging.Level.WARNING;
+            julRootLevel = java.util.logging.Level.SEVERE;
         } else if (context.invokerRequest.effectiveVerbose()) {
             julRootLevel = java.util.logging.Level.ALL;
         } else {
