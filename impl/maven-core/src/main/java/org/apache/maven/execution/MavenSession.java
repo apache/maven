@@ -93,12 +93,12 @@ public class MavenSession implements Cloneable {
 
     public void setProjects(List<MavenProject> projects) {
         if (!projects.isEmpty()) {
-            MavenProject first = projects.get(0);
-            this.currentProject = ThreadLocal.withInitial(() -> first);
-            this.topLevelProject = projects.stream()
+            MavenProject topLevelProject = projects.stream()
                     .filter(project -> project.isExecutionRoot())
                     .findFirst()
-                    .orElse(first);
+                    .orElse(projects.get(0));
+            this.currentProject = ThreadLocal.withInitial(() -> topLevelProject);
+            this.topLevelProject = topLevelProject;
         } else {
             this.currentProject = new ThreadLocal<>();
             this.topLevelProject = null;
