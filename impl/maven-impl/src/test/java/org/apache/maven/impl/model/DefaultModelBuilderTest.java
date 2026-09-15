@@ -145,12 +145,17 @@ class DefaultModelBuilderTest {
             systemProperties.put(name, System.getProperty(name));
         }
         systemProperties.put("some.dir", System.getProperty("java.io.tmpdir"));
-        systemProperties.put("some.gating.property", "true");
-        systemProperties.put("some.condition.property", "true");
+        // Use user properties for gating values: they simulate -D flags and must be suppressed
+        // when building external (repository-resolved) models. System properties are reserved for
+        // platform facts (java.version, os.name, …) that survive the external-model sandbox.
+        Map<String, String> userProperties = Map.of(
+                "some.gating.property", "true",
+                "some.condition.property", "true");
         return ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(requestType)
                 .systemProperties(systemProperties)
+                .userProperties(userProperties)
                 .source(Sources.buildSource(getPom("resolved-model-with-profiles")));
     }
 
@@ -208,8 +213,9 @@ class DefaultModelBuilderTest {
             systemProperties.put(name, System.getProperty(name));
         }
         systemProperties.put("some.dir", System.getProperty("java.io.tmpdir"));
-        systemProperties.put("some.gating.property", "true");
-        systemProperties.put("some.condition.property", "true");
+        // Note: some.gating.property and some.condition.property are simulated -D flags;
+        // they belong in userProperties, not systemProperties, so that the external-model
+        // sandbox correctly suppresses them when building repository-resolved models.
         return systemProperties;
     }
 
@@ -221,7 +227,9 @@ class DefaultModelBuilderTest {
                 List.of(),
                 List.of(),
                 systemProperties,
-                Map.of(),
+                // Gating props simulate -D flags: pass as user properties so the external-model
+                // sandbox suppresses them for dependency parents but allows them for project parents.
+                Map.of("some.gating.property", "true", "some.condition.property", "true"),
                 Model.newInstance());
     }
 
