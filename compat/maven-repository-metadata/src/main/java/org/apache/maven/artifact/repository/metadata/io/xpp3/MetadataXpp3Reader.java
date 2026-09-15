@@ -88,6 +88,11 @@ public class MetadataXpp3Reader {
             return new Metadata(delegate.read(reader, strict));
         } catch (XMLStreamException e) {
             throw new XmlPullParserException(e.getMessage(), null, e);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof XMLStreamException cause) {
+                throw new XmlPullParserException(cause.getMessage(), null, cause);
+            }
+            throw e;
         }
     }
 
@@ -105,6 +110,11 @@ public class MetadataXpp3Reader {
             return new Metadata(delegate.read(reader));
         } catch (XMLStreamException e) {
             throw new XmlPullParserException(e.getMessage(), null, e);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof XMLStreamException cause) {
+                throw new XmlPullParserException(cause.getMessage(), null, cause);
+            }
+            throw e;
         }
     }
 
@@ -123,6 +133,11 @@ public class MetadataXpp3Reader {
             return new Metadata(delegate.read(in, strict));
         } catch (XMLStreamException e) {
             throw new XmlPullParserException(e.getMessage(), null, e);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof XMLStreamException cause) {
+                throw new XmlPullParserException(cause.getMessage(), null, cause);
+            }
+            throw e;
         }
     }
 
@@ -140,6 +155,11 @@ public class MetadataXpp3Reader {
             return new Metadata(delegate.read(in));
         } catch (XMLStreamException e) {
             throw new XmlPullParserException(e.getMessage(), null, e);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof XMLStreamException cause) {
+                throw new XmlPullParserException(cause.getMessage(), null, cause);
+            }
+            throw e;
         }
     }
 

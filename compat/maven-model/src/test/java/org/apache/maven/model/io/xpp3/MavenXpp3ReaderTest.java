@@ -18,6 +18,8 @@
  */
 package org.apache.maven.model.io.xpp3;
 
+import javax.xml.stream.XMLStreamException;
+
 import java.io.ByteArrayInputStream;
 import java.io.StringReader;
 import java.nio.charset.StandardCharsets;
@@ -25,6 +27,7 @@ import java.nio.charset.StandardCharsets;
 import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class MavenXpp3ReaderTest {
@@ -34,9 +37,13 @@ class MavenXpp3ReaderTest {
     void malformedLazyXmlFailureIsReportedAsXmlPullParserException() {
         MavenXpp3Reader reader = new MavenXpp3Reader();
 
-        assertThrows(XmlPullParserException.class, () -> reader.read(new StringReader(MALFORMED_XML)));
-        assertThrows(
+        XmlPullParserException readerEx =
+                assertThrows(XmlPullParserException.class, () -> reader.read(new StringReader(MALFORMED_XML)));
+        assertInstanceOf(XMLStreamException.class, readerEx.getCause(), "cause should be the XMLStreamException");
+
+        XmlPullParserException streamEx = assertThrows(
                 XmlPullParserException.class,
                 () -> reader.read(new ByteArrayInputStream(MALFORMED_XML.getBytes(StandardCharsets.UTF_8))));
+        assertInstanceOf(XMLStreamException.class, streamEx.getCause(), "cause should be the XMLStreamException");
     }
 }
