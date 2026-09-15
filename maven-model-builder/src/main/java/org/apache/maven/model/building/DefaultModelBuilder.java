@@ -312,9 +312,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             List<Profile> interpolatedProfiles = getInterpolatedProfiles(rawModel, profileActivationContext, problems);
             tmpModel.setProfiles(interpolatedProfiles);
 
+            List<Profile> profilesToEvaluate =
+                    externalModel ? withoutFileActivation(tmpModel.getProfiles()) : tmpModel.getProfiles();
             List<Profile> activePomProfiles = profileSelector.getActiveProfiles(
-                    externalModel ? withoutFileAndPropertyActivation(interpolatedProfiles) : tmpModel.getProfiles(),
-                    profileActivationContext,
+                    profilesToEvaluate,
+                    externalModel ? externalActivationContext(profileActivationContext) : profileActivationContext,
                     problems);
 
             List<Profile> rawProfiles = new ArrayList<>();
@@ -516,16 +518,86 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     /**
-     * Returns the profiles from the given list whose activation does not depend on a file or a
-     * property. Profiles activated by JDK version, operating system, or marked
-     * {@code activeByDefault} are unaffected, since those conditions are a function of the build
-     * platform rather than of the model content.
+     * Returns a sandboxed {@link ProfileActivationContext} for evaluating profiles in
+     * repository-resolved (external) models — dependency POMs, parent POMs, and imported BOMs.
+     * <p>
+     * The sandboxed context preserves system properties (so JDK/OS activation works) and
+     * merges the POM's own {@code <properties>} into the system properties map so that
+     * property-activated profiles that depend on POM-declared values still work.
+     * User properties (consumer {@code -D} flags) are suppressed because they were not
+     * set for the dependency and must not accidentally activate its profiles.
+     * File-based profiles are pre-filtered via {@link #withoutFileActivation(List)} before
+     * reaching this context, so {@code getProjectDirectory()} is not relied on for file checks.
+     * <p>
+     * Model properties are merged into system properties (with system properties taking
+     * precedence) rather than changing the {@code PropertyProfileActivator} lookup chain,
+     * because changing the activator would affect ALL profile evaluations — including the
+     * build's own project — which can cause unintended profile activation when a POM declares
+     * a property that matches a profile's activation condition.
+     *
+     * @param delegate the original full context for this model build
+     * @return a sandboxed context suitable for external model profile activation
      */
-    private static List<Profile> withoutFileAndPropertyActivation(List<Profile> profiles) {
+    private static ProfileActivationContext externalActivationContext(ProfileActivationContext delegate) {
+        return new ProfileActivationContext() {
+            @Override
+            public List<String> getActiveProfileIds() {
+                return delegate.getActiveProfileIds();
+            }
+
+            @Override
+            public List<String> getInactiveProfileIds() {
+                return delegate.getInactiveProfileIds();
+            }
+
+            /**
+             * System properties merged with project properties (system wins on conflict).
+             * This makes POM-declared properties visible to the PropertyProfileActivator
+             * without modifying the activator's lookup chain for non-external models.
+             */
+            @Override
+            public Map<String, String> getSystemProperties() {
+                Map<String, String> projectProps = delegate.getProjectProperties();
+                if (projectProps == null || projectProps.isEmpty()) {
+                    return delegate.getSystemProperties();
+                }
+                Map<String, String> merged = new HashMap<>(projectProps);
+                merged.putAll(delegate.getSystemProperties()); // system wins
+                return merged;
+            }
+
+            /** User properties are suppressed: consumer -D flags do not activate dependency profiles. */
+            @Override
+            public Map<String, String> getUserProperties() {
+                return Collections.emptyMap();
+            }
+
+            @Override
+            public Map<String, String> getProjectProperties() {
+                return delegate.getProjectProperties();
+            }
+
+            @Override
+            public File getProjectDirectory() {
+                return delegate.getProjectDirectory();
+            }
+        };
+    }
+
+    /**
+     * Returns the profiles from the given list whose activation does not depend on a file.
+     * File-activated profiles are suppressed in external model builds because publisher-local
+     * paths do not exist in the consumer's environment and resolving them against the consumer's
+     * filesystem would produce non-deterministic or incorrect results.
+     *
+     * @param profiles the full profile list
+     * @return profiles with file-activated ones removed
+     */
+    private static List<Profile> withoutFileActivation(List<Profile> profiles) {
         List<Profile> eligible = new ArrayList<>(profiles.size());
         for (Profile profile : profiles) {
             Activation activation = profile.getActivation();
-            if (activation == null || (activation.getFile() == null && activation.getProperty() == null)) {
+            if (activation == null || activation.getFile() == null) {
                 eligible.add(profile);
             }
         }
