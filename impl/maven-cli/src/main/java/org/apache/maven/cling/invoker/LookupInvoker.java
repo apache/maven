@@ -292,13 +292,28 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         if (context.invokerRequest.effectiveVerbose()) {
             context.loggerLevel = Slf4jConfiguration.Level.DEBUG;
             context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
+            // JUL root for verbose (ALL) is set later in activateLogging(), after SLF4J is
+            // fully bootstrapped — setting Level.ALL here would flood JUL events through the
+            // default ConsoleHandler before MavenJulHandler is installed, and could trigger
+            // ConcurrentHashMap.computeIfAbsent reentrancy during SLF4J logger initialization.
         } else if (context.options().quiet().orElse(false)) {
             context.loggerLevel = Slf4jConfiguration.Level.ERROR;
             context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
+            // Set JUL root to SEVERE immediately so the FastTerminal background thread
+            // (started in createTerminal()) cannot emit JUL FINE/FINER events that would
+            // leak into log.txt via MavenJulHandler.  The SLF4J-level guard in
+            // MavenJulHandler.isLevelEnabled() alone is racy: loggers created on the
+            // background thread may briefly see the pre-reconfigure() defaultLogLevel.
+            // Blocking at JUL source is the only fully-closed gate.
+            java.util.logging.LogManager.getLogManager().getLogger("").setLevel(java.util.logging.Level.SEVERE);
         } else {
             // fall back to default log level specified in conf
             // see https://issues.apache.org/jira/browse/MNG-2570 and https://github.com/apache/maven/issues/11199
             context.loggerLevel = Slf4jConfiguration.Level.INFO; // default for display purposes
+            // Keep JUL root at INFO (the JVM default) so FINE/FINER events emitted by
+            // the FastTerminal background thread are already filtered before they can
+            // reach MavenJulHandler once it is installed in activateLogging().
+            java.util.logging.LogManager.getLogManager().getLogger("").setLevel(java.util.logging.Level.INFO);
         }
     }
 
@@ -453,22 +468,18 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
         context.slf4jConfiguration.activate();
 
-        // Now that SLF4J is fully initialized, set the JUL root logger level
-        // to match the effective log level.  This must happen AFTER install()
-        // + activate() to avoid flooding JUL events during SLF4J bootstrap
-        // (ConcurrentHashMap.computeIfAbsent reentrancy).
-        // In quiet mode keep the JUL root at SEVERE so that WARNING/INFO/DEBUG
-        // JUL events are suppressed at source — relying solely on the SLF4J-level
-        // check in MavenJulHandler.isLevelEnabled() is racy: newly created
-        // SLF4J loggers may briefly see the default INFO level before
-        // quiet-mode propagation completes, leaking output that
-        // MavenITmng4387QuietLoggingTest detects as a flaky failure.
-        // SEVERE (integer 1000) is the correct JUL equivalent of SLF4J ERROR.
+        // For verbose mode: set JUL root to ALL now that SLF4J is fully initialized.
+        // This must happen AFTER install() + activate() to avoid flooding JUL events
+        // through the default ConsoleHandler during SLF4J bootstrap, and to prevent
+        // ConcurrentHashMap.computeIfAbsent reentrancy in the SLF4J logger factory.
+        // For quiet and normal modes the JUL root was already set in configureLogging()
+        // (before createTerminal() started the FastTerminal background thread), so those
+        // cases are already covered and we just re-affirm the level here for clarity.
         java.util.logging.Level julRootLevel;
-        if (context.options().quiet().orElse(false)) {
-            julRootLevel = java.util.logging.Level.SEVERE;
-        } else if (context.invokerRequest.effectiveVerbose()) {
+        if (context.invokerRequest.effectiveVerbose()) {
             julRootLevel = java.util.logging.Level.ALL;
+        } else if (context.options().quiet().orElse(false)) {
+            julRootLevel = java.util.logging.Level.SEVERE;
         } else {
             julRootLevel = java.util.logging.Level.INFO;
         }
