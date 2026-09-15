@@ -421,6 +421,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             return derive(request, new DefaultModelBuilderResult(request, ProblemCollector.create(session)));
         }
 
+        ModelBuilderSessionState deriveWithProblemCollector(ModelBuilderRequest request) {
+            return derive(request, new DefaultModelBuilderResult(request, getProblemCollector()));
+        }
+
         ModelBuilderSessionState derive(ModelBuilderRequest request, DefaultModelBuilderResult result) {
             return derive(request, result, reportedImportWarnings, reactorProblemCollectors);
         }
@@ -1437,7 +1441,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .build();
 
             return new ExternalParent(
-                    derive(lenientRequest),
+                    deriveWithProblemCollector(lenientRequest),
                     parent,
                     new ResolvedParentKey(
                             groupId,
@@ -2225,7 +2229,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     ModelSource source = !externalOnly && isBuildRequest() ? findLocalParent(child, parent) : null;
                     if (source != null) {
                         localLocation = enter(source.getLocation());
-                        derived = derive(
+                        derived = deriveWithProblemCollector(
                                 request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER
                                         ? ModelBuilderRequest.builder(request)
                                                 .requestType(ModelBuilderRequest.RequestType.CONSUMER_PARENT)
@@ -2734,7 +2738,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .source(importSource)
                         .repositories(repositories)
                         .build();
-                ModelBuilderSessionState modelBuilderSession = derive(importRequest);
+                ModelBuilderSessionState modelBuilderSession = deriveWithProblemCollector(importRequest);
                 // build the effective model
                 modelBuilderSession.buildEffectiveModel(importIds);
                 importResult = modelBuilderSession.result;
