@@ -267,9 +267,7 @@ public final class SettingsUtilsV4 {
                     .collect(Collectors.toList()));
         }
 
-        org.apache.maven.api.model.Profile value = profile.build();
-        value.setSource("settings.xml");
-        return value;
+        return profile.build();
     }
 
     /**
