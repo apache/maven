@@ -112,12 +112,14 @@ class ResolvedDependencyProfileActivationTest {
     }
 
     @Test
-    void testDependencyPomActivatesOnlyEnvironmentIndependentProfiles() throws Exception {
+    void testDependencyPomHonorsJdkActivatedProfileRepositories() throws Exception {
         Model model = build(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
 
         assertNull(model.getProperties().get("profile.file"));
         assertNull(model.getProperties().get("profile.property"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
-        assertTrue(model.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+        // The JDK-activated profile fires legitimately under the sandbox and its
+        // repository must be honored (dep1 → dep2 pattern where dep2 is not on Central).
+        assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
 }
