@@ -84,6 +84,7 @@ import org.apache.maven.logging.LoggingOutputStream;
 import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.apache.maven.logging.SimpleBuildEventListener;
 import org.apache.maven.logging.api.LogLevelRecorder;
+import org.apache.maven.slf4j.MavenJulHandler;
 import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.codehaus.plexus.PlexusContainer;
 import org.jline.terminal.Terminal;
@@ -92,7 +93,6 @@ import org.jline.terminal.impl.AbstractPosixTerminal;
 import org.jline.terminal.spi.TerminalExt;
 import org.jline.utils.OSUtils;
 import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.slf4j.spi.LocationAwareLogger;
 
 import static java.util.Objects.requireNonNull;
@@ -292,13 +292,28 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         if (context.invokerRequest.effectiveVerbose()) {
             context.loggerLevel = Slf4jConfiguration.Level.DEBUG;
             context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
+            // JUL root for verbose (ALL) is set later in activateLogging(), after SLF4J is
+            // fully bootstrapped — setting Level.ALL here would flood JUL events through the
+            // default ConsoleHandler before MavenJulHandler is installed, and could trigger
+            // ConcurrentHashMap.computeIfAbsent reentrancy during SLF4J logger initialization.
         } else if (context.options().quiet().orElse(false)) {
             context.loggerLevel = Slf4jConfiguration.Level.ERROR;
             context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
+            // Set JUL root to SEVERE immediately so the FastTerminal background thread
+            // (started in createTerminal()) cannot emit JUL FINE/FINER events that would
+            // leak into log.txt via MavenJulHandler.  The SLF4J-level guard in
+            // MavenJulHandler.isLevelEnabled() alone is racy: loggers created on the
+            // background thread may briefly see the pre-reconfigure() defaultLogLevel.
+            // Blocking at JUL source is the only fully-closed gate.
+            java.util.logging.LogManager.getLogManager().getLogger("").setLevel(java.util.logging.Level.SEVERE);
         } else {
             // fall back to default log level specified in conf
             // see https://issues.apache.org/jira/browse/MNG-2570 and https://github.com/apache/maven/issues/11199
             context.loggerLevel = Slf4jConfiguration.Level.INFO; // default for display purposes
+            // Keep JUL root at INFO (the JVM default) so FINE/FINER events emitted by
+            // the FastTerminal background thread are already filtered before they can
+            // reach MavenJulHandler once it is installed in activateLogging().
+            java.util.logging.LogManager.getLogManager().getLogger("").setLevel(java.util.logging.Level.INFO);
         }
     }
 
@@ -447,12 +462,28 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void activateLogging(C context) throws Exception {
-        if (!SLF4JBridgeHandler.isInstalled()) {
-            SLF4JBridgeHandler.removeHandlersForRootLogger();
-            SLF4JBridgeHandler.install();
+        if (!MavenJulHandler.isInstalled()) {
+            MavenJulHandler.install();
         }
 
         context.slf4jConfiguration.activate();
+
+        // For verbose mode: set JUL root to ALL now that SLF4J is fully initialized.
+        // This must happen AFTER install() + activate() to avoid flooding JUL events
+        // through the default ConsoleHandler during SLF4J bootstrap, and to prevent
+        // ConcurrentHashMap.computeIfAbsent reentrancy in the SLF4J logger factory.
+        // For quiet and normal modes the JUL root was already set in configureLogging()
+        // (before createTerminal() started the FastTerminal background thread), so those
+        // cases are already covered and we just re-affirm the level here for clarity.
+        java.util.logging.Level julRootLevel;
+        if (context.invokerRequest.effectiveVerbose()) {
+            julRootLevel = java.util.logging.Level.ALL;
+        } else if (context.options().quiet().orElse(false)) {
+            julRootLevel = java.util.logging.Level.SEVERE;
+        } else {
+            julRootLevel = java.util.logging.Level.INFO;
+        }
+        java.util.logging.LogManager.getLogManager().getLogger("").setLevel(julRootLevel);
         if (context.options().failOnSeverity().isPresent()) {
             String logLevelThreshold = context.options().failOnSeverity().get();
             if (context.loggerFactory instanceof LogLevelRecorder recorder) {
@@ -478,8 +509,14 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         // at this point logging is set up, reply so far accumulated logs, if any and swap logger with real one
         Logger logger =
                 new Slf4jLogger(context.loggerFactory.getLogger(getClass().getName()));
-        context.logger.drain().forEach(e -> logger.log(e.level(), e.message(), e.error()));
+        // Drain early log messages accumulated before SLF4J was active.
+        // createTerminal() has already run and installed ProjectBuildLogAppender
+        // (and wired up any -l log-file writer), so draining here routes these
+        // messages through the logSink and into the log file, not just stdout.
+        // (MavenITmng6065 regression fix)
+        List<Logger.Entry> pending = context.logger.drain();
         context.logger = logger;
+        pending.forEach(e -> context.logger.log(e.level(), e.message(), e.error()));
     }
 
     protected void helpOrVersionAndMayExit(C context) throws Exception {

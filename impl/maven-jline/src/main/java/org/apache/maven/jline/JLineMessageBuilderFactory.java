@@ -136,7 +136,30 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory {
 
         @Override
         public AttributedStyle resolve(String spec) {
-            return styles.computeIfAbsent(spec, this::doResolve);
+            // Use get + compute + putIfAbsent instead of computeIfAbsent to avoid
+            // ConcurrentHashMap.IllegalStateException("Recursive update").
+            //
+            // ConcurrentHashMap.computeIfAbsent holds a bin lock for the duration of the
+            // mapping function.  If the mapping function triggers a re-entrant call to
+            // computeIfAbsent on the SAME map (even for a different key), ConcurrentHashMap
+            // detects the reentrancy and throws IllegalStateException("Recursive update") —
+            // and this exception also corrupts the outer computeIfAbsent bin state, so
+            // wrapping in try/catch is NOT sufficient.
+            //
+            // The reentrancy happens because doResolve() calls super.resolve() which logs
+            // via System.Logger (JUL), which MavenJulHandler routes to SLF4J, which calls
+            // MavenSimpleLogger.renderLevel(), which calls style() → resolve() here —
+            // re-entering computeIfAbsent on the same map from the same thread.
+            //
+            // The fix: compute outside the lock with get+compute+putIfAbsent.  If two threads
+            // race to populate the same key, one result is discarded — harmless for a style cache.
+            AttributedStyle cached = styles.get(spec);
+            if (cached != null) {
+                return cached;
+            }
+            AttributedStyle computed = doResolve(spec);
+            AttributedStyle existing = styles.putIfAbsent(spec, computed);
+            return existing != null ? existing : computed;
         }
 
         @Override
