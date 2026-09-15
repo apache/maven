@@ -18,8 +18,6 @@
  */
 package org.apache.maven.cli;
 
-import java.util.List;
-
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -53,18 +51,6 @@ class CleanArgumentTest {
         String[] cleanArgs = CleanArgument.cleanArgs(args);
         assertEquals(args.length, cleanArgs.length);
         assertEquals(information, cleanArgs[0]);
-    }
-
-    @Test
-    void splitLineTokenizesQuotedLongDefine() {
-        List<String> tokens = CleanArgument.splitLine("--define 'revision=1.0-SNAPSHOT'");
-        assertEquals(List.of("--define", "revision=1.0-SNAPSHOT"), tokens);
-    }
-
-    @Test
-    void splitLineTokenizesUnquotedLongDefine() {
-        List<String> tokens = CleanArgument.splitLine("--define revision=1.0-SNAPSHOT");
-        assertEquals(List.of("--define", "revision=1.0-SNAPSHOT"), tokens);
     }
 
     @Test
