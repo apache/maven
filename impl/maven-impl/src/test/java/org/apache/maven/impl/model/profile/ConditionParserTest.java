@@ -198,6 +198,7 @@ class ConditionParserTest {
                 "21",
                 parser.parse("if(contains('21-ea', '-'), substring('21-ea', 0, indexOf('21-ea', '-')), '21-ea')"));
         assertThrows(RuntimeException.class, () -> parser.parse("if(true, 'a')"));
+        assertThrows(RuntimeException.class, () -> parser.parse("if(false, 'a')"));
         assertThrows(RuntimeException.class, () -> parser.parse("if(false, substring('a', 0, 5), 'b'"));
     }
 

@@ -47,6 +47,11 @@ public class ConditionParser {
         Object apply(List<Object> args);
     }
 
+    /**
+     * Name of the {@code if} function, whose unselected branch is skipped instead of evaluated.
+     */
+    private static final String IF_FUNCTION = "if";
+
     private final Map<String, ExpressionFunction> functions; // Map to store functions by their names
     private final UnaryOperator<String> propertyResolver; // Property resolver
     private List<String> tokens; // List of tokens derived from the expression
@@ -431,7 +436,9 @@ public class ConditionParser {
         current++; // Skip the opening parenthesis
         while (current < tokens.size() && !tokens.get(current).equals(")")) {
             int index = args.size();
-            if ("if".equals(functionName) && (index == 1 || index == 2) && toBoolean(args.get(0)) != (index == 1)) {
+            if (IF_FUNCTION.equals(functionName)
+                    && (index == 1 || index == 2)
+                    && toBoolean(args.get(0)) != (index == 1)) {
                 skipOperand(Set.of(",", ")"));
                 args.add(null);
             } else {
