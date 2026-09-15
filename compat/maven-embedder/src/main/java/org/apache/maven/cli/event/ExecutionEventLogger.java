@@ -58,6 +58,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
     private final MessageBuilderFactory messageBuilderFactory;
     private final Logger logger;
+    private final Logger detailLogger;
     private int terminalWidth;
     private int lineLength;
     private int maxProjectNameLength;
@@ -73,7 +74,17 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     }
 
     public ExecutionEventLogger(MessageBuilderFactory messageBuilderFactory, Logger logger, int terminalWidth) {
+        this(messageBuilderFactory, logger, LoggerFactory.getLogger(logger.getName() + ".detail"), terminalWidth);
+    }
+
+    public ExecutionEventLogger(MessageBuilderFactory messageBuilderFactory, Logger logger, Logger detailLogger) {
+        this(messageBuilderFactory, logger, detailLogger, -1);
+    }
+
+    public ExecutionEventLogger(
+            MessageBuilderFactory messageBuilderFactory, Logger logger, Logger detailLogger, int terminalWidth) {
         this.logger = Objects.requireNonNull(logger, "logger cannot be null");
+        this.detailLogger = Objects.requireNonNull(detailLogger, "detailLogger cannot be null");
         this.messageBuilderFactory = messageBuilderFactory;
         this.terminalWidth = terminalWidth;
     }
@@ -274,9 +285,9 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             }
 
             if (entry.buildSummary() instanceof BuildFailure) {
-                logger.error(buffer.toString());
+                detailLogger.error(buffer.toString());
             } else {
-                logger.info(buffer.toString());
+                detailLogger.info(buffer.toString());
             }
             buffer.setLength(0);
         }

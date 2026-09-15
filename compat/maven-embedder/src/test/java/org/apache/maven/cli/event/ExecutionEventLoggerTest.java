@@ -60,6 +60,7 @@ class ExecutionEventLoggerTest {
     private MockitoSession mockitoSession;
 
     private Logger logger;
+    private Logger detailLogger;
     private ExecutionEventLogger executionEventLogger;
     private final JLineMessageBuilderFactory messageBuilderFactory = new JLineMessageBuilderFactory();
 
@@ -78,7 +79,9 @@ class ExecutionEventLoggerTest {
         mockitoSession = Mockito.mockitoSession().startMocking();
         logger = mock(Logger.class);
         when(logger.isInfoEnabled()).thenReturn(true);
-        executionEventLogger = new ExecutionEventLogger(messageBuilderFactory, logger);
+        detailLogger = mock(Logger.class);
+        lenient().when(detailLogger.isInfoEnabled()).thenReturn(true);
+        executionEventLogger = new ExecutionEventLogger(messageBuilderFactory, logger, detailLogger);
     }
 
     @AfterEach
@@ -332,15 +335,23 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 3.5.4-SNAPSHOT:");
         inOrder.verify(logger).info("");
-        inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
-        inOrder.verify(logger).info("Maven Project artifact2 ............................ SUCCESS [  2.000 s]");
-        inOrder.verify(logger).info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info("BUILD SUCCESS");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
         inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
         inOrder.verify(logger).info("------------------------------------------------------------------------");
+
+        InOrder detailInOrder = inOrder(detailLogger);
+        detailInOrder
+                .verify(detailLogger)
+                .info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
+        detailInOrder
+                .verify(detailLogger)
+                .info("Maven Project artifact2 ............................ SUCCESS [  2.000 s]");
+        detailInOrder
+                .verify(detailLogger)
+                .info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
     }
 
     @Test
@@ -377,15 +388,21 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 3.5.4-SNAPSHOT:");
         inOrder.verify(logger).info("");
-        inOrder.verify(logger).info("Maven Project artifact2 ............................ SKIPPED");
-        inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
-        inOrder.verify(logger).info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info("BUILD SUCCESS");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
         inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
         inOrder.verify(logger).info("------------------------------------------------------------------------");
+
+        InOrder detailInOrder = inOrder(detailLogger);
+        detailInOrder.verify(detailLogger).info("Maven Project artifact2 ............................ SKIPPED");
+        detailInOrder
+                .verify(detailLogger)
+                .info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
+        detailInOrder
+                .verify(detailLogger)
+                .info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
     }
 
     @Test
@@ -424,14 +441,20 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 3.5.4-SNAPSHOT:");
         inOrder.verify(logger).info("");
         inOrder.verify(logger).info("...");
-        inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
-        inOrder.verify(logger).info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).error("BUILD FAILURE");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
         inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
         inOrder.verify(logger).info("------------------------------------------------------------------------");
+
+        InOrder detailInOrder = inOrder(detailLogger);
+        detailInOrder
+                .verify(detailLogger)
+                .info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
+        detailInOrder
+                .verify(detailLogger)
+                .info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
     }
 
     @Test
@@ -471,14 +494,20 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 3.5.4-SNAPSHOT:");
         inOrder.verify(logger).info("");
         inOrder.verify(logger).info("...");
-        inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
-        inOrder.verify(logger).error("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).error("BUILD FAILURE");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
         inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
         inOrder.verify(logger).info("------------------------------------------------------------------------");
+
+        InOrder detailInOrder = inOrder(detailLogger);
+        detailInOrder
+                .verify(detailLogger)
+                .info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
+        detailInOrder
+                .verify(detailLogger)
+                .error("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
     }
 
     @Test
@@ -526,17 +555,29 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 3.5.4-SNAPSHOT:");
         inOrder.verify(logger).info("");
         inOrder.verify(logger).info("...");
-        inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
-        inOrder.verify(logger).info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
-        inOrder.verify(logger).info("Maven Project artifact4 ............................ SUCCESS [  4.000 s]");
-        inOrder.verify(logger).error("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
-        inOrder.verify(logger).error("Maven Project artifact5 ............................ FAILURE [  5.000 s]");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).error("BUILD FAILURE");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
         inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
         inOrder.verify(logger).info("------------------------------------------------------------------------");
+
+        InOrder detailInOrder = inOrder(detailLogger);
+        detailInOrder
+                .verify(detailLogger)
+                .info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
+        detailInOrder
+                .verify(detailLogger)
+                .info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
+        detailInOrder
+                .verify(detailLogger)
+                .info("Maven Project artifact4 ............................ SUCCESS [  4.000 s]");
+        detailInOrder
+                .verify(detailLogger)
+                .error("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
+        detailInOrder
+                .verify(detailLogger)
+                .error("Maven Project artifact5 ............................ FAILURE [  5.000 s]");
     }
 
     private static MavenProject generateMavenProject(String projectName) {
