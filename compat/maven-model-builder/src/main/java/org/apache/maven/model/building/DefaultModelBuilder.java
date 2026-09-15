@@ -970,11 +970,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             version = candidateModel.getParent().getVersion();
         }
 
-        if (parent.getRelativePath() != null
-                && (groupId == null
-                        || !groupId.equals(parent.getGroupId())
-                        || artifactId == null
-                        || !artifactId.equals(parent.getArtifactId()))) {
+        if (groupId == null
+                || !groupId.equals(parent.getGroupId())
+                || artifactId == null
+                || !artifactId.equals(parent.getArtifactId())) {
             StringBuilder buffer = new StringBuilder(256);
             buffer.append("'parent.relativePath'");
             if (childModel != problems.getRootModel()) {
@@ -985,7 +984,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             buffer.append(parent.getArtifactId()).append(", please verify your project structure");
 
             problems.setSource(childModel);
-            problems.add(new ModelProblemCollectorRequest(Severity.WARNING, Version.BASE)
+            // When <relativePath> is omitted Maven defaults to ../pom.xml; downgrade to WARNING
+            // (not FATAL) in that case — same behaviour as the Maven 4 DefaultModelBuilder.
+            Severity severity = (parent.getRelativePath() == null) ? Severity.WARNING : Severity.FATAL;
+            problems.add(new ModelProblemCollectorRequest(severity, Version.BASE)
                     .setMessage(buffer.toString())
                     .setLocation(parent.getLocation("")));
             return null;
