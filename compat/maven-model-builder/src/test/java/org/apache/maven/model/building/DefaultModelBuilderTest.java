@@ -34,6 +34,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -176,7 +177,7 @@ public class DefaultModelBuilderTest {
         boolean hasFatalMismatch = problems.stream()
                 .anyMatch(p -> p.getSeverity() == Severity.FATAL
                         && p.getMessage().contains("please verify your project structure"));
-        assertTrue(!hasFatalMismatch, "Expected no FATAL for default-relativePath mismatch; got: " + problems);
+        assertFalse(hasFatalMismatch, "Expected no FATAL for default-relativePath mismatch; got: " + problems);
     }
 
     /**
