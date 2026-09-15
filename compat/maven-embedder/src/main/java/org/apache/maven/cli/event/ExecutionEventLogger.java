@@ -58,7 +58,6 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
     private final MessageBuilderFactory messageBuilderFactory;
     private final Logger logger;
-    private final Logger detailLogger;
     private int terminalWidth;
     private int lineLength;
     private int maxProjectNameLength;
@@ -74,17 +73,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     }
 
     public ExecutionEventLogger(MessageBuilderFactory messageBuilderFactory, Logger logger, int terminalWidth) {
-        this(messageBuilderFactory, logger, LoggerFactory.getLogger(logger.getName() + ".detail"), terminalWidth);
-    }
-
-    public ExecutionEventLogger(MessageBuilderFactory messageBuilderFactory, Logger logger, Logger detailLogger) {
-        this(messageBuilderFactory, logger, detailLogger, -1);
-    }
-
-    public ExecutionEventLogger(
-            MessageBuilderFactory messageBuilderFactory, Logger logger, Logger detailLogger, int terminalWidth) {
         this.logger = Objects.requireNonNull(logger, "logger cannot be null");
-        this.detailLogger = Objects.requireNonNull(detailLogger, "detailLogger cannot be null");
         this.messageBuilderFactory = messageBuilderFactory;
         this.terminalWidth = terminalWidth;
     }
@@ -238,8 +227,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             entries.add(new ReactorSummaryEntry(project, buildSummary, group, statusMessage));
         }
 
-        ReactorSummaryRequest request =
-                new ReactorSummaryRequest(entries, new StringBuilder(128), isSingleVersion, result.hasExceptions());
+        ReactorSummaryRequest request = new ReactorSummaryRequest(entries, new StringBuilder(128), isSingleVersion);
 
         logReactorSummaryGroup(request, 0);
         logReactorSummaryGroup(request, 1);
@@ -249,19 +237,9 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     private void logReactorSummaryGroup(ReactorSummaryRequest request, int group) {
         StringBuilder buffer = request.buffer();
 
-        boolean lastWasSkipped = false;
         for (ReactorSummaryEntry entry : request.entries()) {
             if (entry.group() != group) {
                 continue;
-            }
-
-            if (group == 0 && entry.buildSummary() == null && request.hasExceptions()) {
-                lastWasSkipped = true;
-                continue;
-            }
-            if (lastWasSkipped) {
-                logger.info("...");
-                lastWasSkipped = false;
             }
 
             buffer.append(entry.project().getName());
@@ -285,20 +263,16 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             }
 
             if (entry.buildSummary() instanceof BuildFailure) {
-                detailLogger.error(buffer.toString());
+                logger.error(buffer.toString());
             } else {
-                detailLogger.info(buffer.toString());
+                logger.info(buffer.toString());
             }
             buffer.setLength(0);
-        }
-
-        if (lastWasSkipped) {
-            logger.info("...");
         }
     }
 
     private record ReactorSummaryRequest(
-            List<ReactorSummaryEntry> entries, StringBuilder buffer, boolean isSingleVersion, boolean hasExceptions) {}
+            List<ReactorSummaryEntry> entries, StringBuilder buffer, boolean isSingleVersion) {}
 
     private record ReactorSummaryEntry(
             MavenProject project, BuildSummary buildSummary, int group, String statusMessage) {}
