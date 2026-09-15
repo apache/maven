@@ -178,7 +178,9 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         Map<String, String> mergedProps = createMergedProperties(request);
 
         boolean mavenMaven3Personality = Features.mavenMaven3Personality(mergedProps);
-        MavenSessionBuilderSupplier supplier = new MavenSessionBuilderSupplier(repoSystem, mavenMaven3Personality);
+        boolean testJarTransitiveDeps = Features.testJarTransitiveDeps(mergedProps);
+        MavenSessionBuilderSupplier supplier =
+                new MavenSessionBuilderSupplier(repoSystem, mavenMaven3Personality, testJarTransitiveDeps);
         SessionBuilder sessionBuilder = supplier.get();
         sessionBuilder.setArtifactTypeRegistry(new TypeRegistryAdapter(typeRegistry)); // dynamic
         sessionBuilder.setCache(request.getRepositoryCache());
