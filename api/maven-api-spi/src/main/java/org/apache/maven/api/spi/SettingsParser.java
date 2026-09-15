@@ -54,6 +54,9 @@ public interface SettingsParser extends SpiService {
     /**
      * Determines whether this parser supports the source, without consuming its contents.
      * A source need not have a backing file; its location can also identify the syntax.
+     * Return {@code false} for unsupported sources. A runtime exception from this check is
+     * reported as a fatal selection error; Maven does not try another parser or the XML
+     * fallback for that source.
      *
      * @param source the settings source, never {@code null}
      * @return {@code true} if this parser supports the source

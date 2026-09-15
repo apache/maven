@@ -27,6 +27,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -63,6 +64,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class DefaultSettingsParserTest {
@@ -256,6 +258,70 @@ class DefaultSettingsParserTest {
         assertEquals(0, error.getProblemCollector().problemsReportedFor(BuilderProblem.Severity.WARNING));
         verify(first, never()).parse(any(), any());
         verify(second, never()).parse(any(), any());
+    }
+
+    @Test
+    void supportsFailurePreventsXmlFallback() throws Exception {
+        assertSupportsFailureStopsSelectionAndParsing("broken", false);
+    }
+
+    @Test
+    void unnamedSupportsFailurePreventsXmlFallback() throws Exception {
+        assertSupportsFailureStopsSelectionAndParsing(null, false);
+    }
+
+    @Test
+    void supportsFailurePreventsPreviouslyMatchedParser() throws Exception {
+        assertSupportsFailureStopsSelectionAndParsing("broken", true);
+    }
+
+    @Test
+    void unnamedSupportsFailurePreventsPreviouslyMatchedParser() throws Exception {
+        assertSupportsFailureStopsSelectionAndParsing(null, true);
+    }
+
+    private void assertSupportsFailureStopsSelectionAndParsing(String providerName, boolean matchingFirst)
+            throws Exception {
+        SettingsParser matching = mock(SettingsParser.class);
+        SettingsParser broken = mock(SettingsParser.class);
+        SettingsParser unvisited = mock(SettingsParser.class);
+        when(matching.supports(any())).thenReturn(true);
+        var failure = new IllegalStateException();
+        when(broken.supports(any())).thenThrow(failure);
+        var parsers = new LinkedHashMap<String, SettingsParser>();
+        if (matchingFirst) {
+            parsers.put("matching", matching);
+        }
+        parsers.put(providerName, broken);
+        parsers.put("unvisited", unvisited);
+        var xmlFactory = mock(SettingsXmlFactory.class);
+        var builder = new DefaultSettingsBuilder(xmlFactory, new DefaultInterpolator(), Map.of(), parsers);
+        var source = source("settings.xml", "<settings/>");
+        var error = assertThrows(
+                SettingsBuilderException.class,
+                () -> builder.build(SettingsBuilderRequest.builder()
+                        .session(mock(Session.class))
+                        .userSettingsSource(source)
+                        .build()));
+        var fatals = error.getProblemCollector()
+                .problems(BuilderProblem.Severity.FATAL)
+                .toList();
+        assertEquals(1, fatals.size());
+        var fatal = fatals.get(0);
+        assertEquals(
+                "Settings parser '" + (providerName != null ? providerName : "<unnamed>")
+                        + "' failed to determine support for this source",
+                fatal.getMessage());
+        assertEquals("settings.xml", fatal.getSource());
+        assertEquals(-1, fatal.getLineNumber());
+        assertEquals(-1, fatal.getColumnNumber());
+        assertSame(failure, fatal.getException());
+        assertEquals(0, error.getProblemCollector().problemsReportedFor(BuilderProblem.Severity.WARNING));
+        verify(broken).supports(source);
+        verify(matching, never()).parse(any(), any());
+        verify(broken, never()).parse(any(), any());
+        verifyNoInteractions(unvisited, xmlFactory);
+        verify(source, never()).openStream();
     }
 
     @Test

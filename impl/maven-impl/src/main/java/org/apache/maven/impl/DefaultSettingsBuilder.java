@@ -21,6 +21,7 @@ package org.apache.maven.impl;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -247,9 +248,26 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     @Nullable
     private SettingsParser selectParser(Source source, ProblemCollector<BuilderProblem> problems) {
-        List<Map.Entry<String, SettingsParser>> matches = settingsParsers.entrySet().stream()
-                .filter(entry -> entry.getValue().supports(source))
-                .toList();
+        List<Map.Entry<String, SettingsParser>> matches = new ArrayList<>();
+        for (Map.Entry<String, SettingsParser> entry : settingsParsers.entrySet()) {
+            boolean supported;
+            try {
+                supported = entry.getValue().supports(source);
+            } catch (RuntimeException e) {
+                problems.reportProblem(new DefaultBuilderProblem(
+                        source.getLocation(),
+                        -1,
+                        -1,
+                        e,
+                        "Settings parser '" + (entry.getKey() != null ? entry.getKey() : "<unnamed>")
+                                + "' failed to determine support for this source",
+                        BuilderProblem.Severity.FATAL));
+                return null;
+            }
+            if (supported) {
+                matches.add(entry);
+            }
+        }
         if (matches.size() > 1) {
             problems.reportProblem(new DefaultBuilderProblem(
                     source.getLocation(),
