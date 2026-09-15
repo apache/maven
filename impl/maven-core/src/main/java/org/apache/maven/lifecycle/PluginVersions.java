@@ -63,8 +63,7 @@ public final class PluginVersions {
         return version;
     }
 
-    // --- convenience constants used by lifecycle mapping providers ---
-
+    // START SNIPPET: versions
     public static final String CLEAN = version("maven-clean-plugin");
     public static final String COMPILER = version("maven-compiler-plugin");
     public static final String DEPLOY = version("maven-deploy-plugin");
@@ -78,4 +77,5 @@ public final class PluginVersions {
     public static final String SITE = version("maven-site-plugin");
     public static final String SUREFIRE = version("maven-surefire-plugin");
     public static final String WAR = version("maven-war-plugin");
+    // END SNIPPET: versions
 }
