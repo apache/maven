@@ -1733,7 +1733,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                             .filter(profile -> !hasFileOrPropertyOrConditionActivation(profile))
                             .toList();
                 }
-                // TODO(#428): repositories contributed by external-model profiles can shadow
+                // TODO(#13146): repositories contributed by external-model profiles can shadow
                 // central; a WARN/FAIL policy for URL mismatches should be added separately.
                 return profileSelector.getActiveProfiles(eligibleProfiles, profileActivationContext, this);
             } else {
