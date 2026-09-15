@@ -186,6 +186,29 @@ class DefaultModelBuilderTest {
     }
 
     /**
+     * An {@code activeByDefault=true} profile in an external dependency model must contribute
+     * its repositories — the same guarantee as for JDK/OS-activated profiles (see #13100).
+     * Uses a dedicated fixture with only an activeByDefault profile so the standard Maven rule
+     * ("activeByDefault is suppressed when any other profile activates") does not interfere.
+     */
+    @Test
+    public void testActiveByDefaultProfileRepositoryHonored() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.resolvedSource(
+                        getPom("active-by-default-profile"), "org.apache.maven.test:active-by-default-profile:1.0.0"))
+                .build();
+        Model model = builder.newSession().build(request).getEffectiveModel();
+
+        // The always-active profile activates by default: its repository must survive external
+        // model resolution unchanged. See #13100, #13141.
+        assertTrue(
+                model.getRepositories().stream().anyMatch(r -> "always-active-repo".equals(r.getId())),
+                "Repository from activeByDefault profile must be retained in external dependency model");
+    }
+
+    /**
      * A model built at {@link ModelBuilderRequest.RequestType#CONSUMER_DEPENDENCY} whose source
      * is one Maven was merely pointed at -- {@link Sources#buildSource} rather than a source
      * Maven resolved from a repository -- is not treated as coming from a repository. Every
