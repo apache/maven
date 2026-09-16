@@ -75,11 +75,11 @@ public class DefaultNode extends AbstractNode {
     @Override
     public Optional<RemoteRepository> getRepository() {
         org.eclipse.aether.artifact.Artifact artifact = node.getArtifact();
-        if (artifact == null || node.getRepositories().isEmpty()) {
+        List<org.eclipse.aether.repository.RemoteRepository> repos = node.getRepositories();
+        if (artifact == null || repos.isEmpty()) {
             return Optional.empty();
         }
-        LocalArtifactRequest request =
-                new LocalArtifactRequest(artifact, node.getRepositories(), node.getRequestContext());
+        LocalArtifactRequest request = new LocalArtifactRequest(artifact, repos, node.getRequestContext());
         LocalArtifactResult result =
                 session.getSession().getLocalRepositoryManager().find(session.getSession(), request);
         return Optional.ofNullable(result.getRepository()).map(session::getRemoteRepository);
