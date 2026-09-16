@@ -145,4 +145,16 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
         assertActivation(false, profile, newContext(null, newProperties("windows", "99", "amd64")));
         assertActivation(true, profile, newContext(null, newProperties("Mac OS X", "14.5", "aarch64")));
     }
+
+    @Test
+    void testCapitalFamily() {
+        Profile winnt = newProfile(ActivationOS.newBuilder().family("WinNT"));
+
+        assertActivation(true, winnt, newContext(null, newProperties("windows 11", "10.0", "amd64")));
+        assertActivation(false, winnt, newContext(null, newProperties("linux", "6.5.0-1014-aws", "amd64")));
+
+        Profile mac = newProfile(ActivationOS.newBuilder().family("Mac"));
+
+        assertActivation(true, mac, newContext(null, newProperties("darwin", "24.6.0", "aarch64")));
+    }
 }
