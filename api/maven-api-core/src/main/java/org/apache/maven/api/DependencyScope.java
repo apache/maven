@@ -67,6 +67,26 @@ public enum DependencyScope {
     COMPILE("compile", true),
 
     /**
+     * Compile, runtime and test, transitively exposed to consumers.
+     * Semantically equivalent to {@code compile}, but explicitly declares
+     * that this dependency forms part of the project's public API.
+     * Only valid for {@code modelVersion 4.2.0+}.
+     *
+     * @since 4.2.0
+     */
+    API("api", true),
+
+    /**
+     * Compile, runtime and test, but <em>not</em> transitively exposed to consumers.
+     * Use for dependencies that are internal implementation details.
+     * Mapped to {@code runtime} scope in consumer POMs for Maven 3 compatibility.
+     * Only valid for {@code modelVersion 4.2.0+}.
+     *
+     * @since 4.2.0
+     */
+    IMPLEMENTATION("implementation", false),
+
+    /**
      * Runtime and test.
      */
     RUNTIME("runtime", true),
