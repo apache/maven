@@ -44,7 +44,7 @@ class MavenITmng8294ParentChecksTest extends AbstractMavenIntegrationTestCase {
         verifier.addCliArgument("validate");
         assertThrows(VerificationException.class, verifier::execute);
         verifier.verifyTextInLog(
-                "at org.apache.maven.its.mng8294:parent instead of org.apache.maven.its.mng8294:bad-parent");
+                "which resolves to org.apache.maven.its.mng8294:parent instead of the declared parent org.apache.maven.its.mng8294:bad-parent");
     }
 
     /**
