@@ -33,7 +33,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * <h2>Activation rules for external models</h2>
  * <ul>
- *   <li><b>JDK / OS / activeByDefault</b> — always re-activated: they are platform facts.</li>
+ *   <li><b>JDK / OS / activeByDefault</b> — always re-activated: they are platform facts and may
+ *       contribute repositories (see #13100).</li>
  *   <li><b>File</b> — suppressed: publisher-local paths don't exist on the consumer's machine.</li>
  *   <li><b>Property (user / -D)</b> — suppressed: consumer flags were not set for that dependency
  *       and must not accidentally activate its profiles.</li>
@@ -44,7 +45,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *       A profile conditioned on a POM-declared property is publisher-intent, not consumer-injected.</li>
  *   <li><b>Negated property (-D absent)</b> — re-activated (default-on): the property is absent from
  *       the sandboxed context, so {@code !foo} evaluates to true, preserving the publisher's intent.</li>
- *   <li><b>Profile repositories</b> — always stripped from external models regardless of activation.</li>
+ *   <li><b>Profile repositories</b> — honored when the profile is legitimately active (JDK, OS,
+ *       activeByDefault, system property), since the dep1→dep2 resolution chain may require them.</li>
  * </ul>
  */
 class ResolvedDependencyProfileActivationTest {
@@ -132,7 +134,7 @@ class ResolvedDependencyProfileActivationTest {
             + "        <profile.negated.property>activated</profile.negated.property>\n"
             + "      </properties>\n"
             + "    </profile>\n"
-            // profile 6: JDK activation — always fires
+            // profile 6: JDK activation — always fires and its repositories are honored
             + "    <profile>\n"
             + "      <id>jdk-condition</id>\n"
             + "      <activation>\n"
@@ -300,14 +302,67 @@ class ResolvedDependencyProfileActivationTest {
     }
 
     @Test
-    void testExternalModelProfileRepositoriesAreAlwaysStripped() throws Exception {
-        // Profile repositories must never be contributed by external models, regardless of
-        // which profiles are active, to prevent dependency POMs injecting unwanted repositories.
+    void testExternalModelJdkActivatedProfileRepositoryIsHonored() throws Exception {
+        // A JDK-activated profile fires legitimately in external builds, and its repository
+        // must be honored to support dep1→dep2 resolution chains where dep2 is not on Central.
+        // See #13100.
         Model model = build(
                 ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, systemPropertiesWithTestValues(), new Properties());
 
         assertTrue(
-                model.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())),
-                "profile repository must NOT be present in external model build");
+                model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())),
+                "repository from JDK-activated profile must be retained in external model build");
+    }
+
+    /**
+     * An {@code activeByDefault=true} profile in an external dependency model must contribute
+     * its repositories — the same guarantee as for JDK/OS-activated profiles (see #13100).
+     * Uses an isolated POM with only an activeByDefault profile so the standard Maven rule
+     * ("activeByDefault is suppressed when any other profile activates") does not interfere.
+     */
+    @Test
+    void testActiveByDefaultProfileRepositoryHonored() throws Exception {
+        // Isolated POM: only one profile (activeByDefault=true), no other profiles that could
+        // suppress it.  Without isolation the JDK-activated sibling in POM would cause Maven
+        // to skip the activeByDefault profile entirely, making the test vacuous.
+        String activeByDefaultPom = "<project>\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>thegroup</groupId>\n"
+                + "  <artifactId>active-by-default-profile</artifactId>\n"
+                + "  <version>1</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "  <profiles>\n"
+                + "    <profile>\n"
+                + "      <id>always-active</id>\n"
+                + "      <activation>\n"
+                + "        <activeByDefault>true</activeByDefault>\n"
+                + "      </activation>\n"
+                + "      <repositories>\n"
+                + "        <repository>\n"
+                + "          <id>always-active-repo</id>\n"
+                + "          <url>https://repo.example.test/always-active</url>\n"
+                + "        </repository>\n"
+                + "      </repositories>\n"
+                + "    </profile>\n"
+                + "  </profiles>\n"
+                + "</project>\n";
+
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+
+        Properties systemProperties = new Properties();
+        systemProperties.putAll(System.getProperties());
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new StringModelSource(activeByDefaultPom));
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        request.setSystemProperties(systemProperties);
+
+        Model model = builder.build(request).getEffectiveModel();
+
+        // The always-active profile activates by default: its repository must survive external
+        // model resolution unchanged. See #13100, #13116.
+        assertTrue(
+                model.getRepositories().stream().anyMatch(r -> "always-active-repo".equals(r.getId())),
+                "Repository from activeByDefault profile must be retained in external dependency model");
     }
 }
