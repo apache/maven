@@ -1630,12 +1630,19 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // A model resolved to satisfy dependency resolution -- a dependency POM
                     // itself, or one of its parents, reached transitively -- evaluates only
                     // platform-derived activation (JDK version, operating system,
-                    // activeByDefault); its profiles contribute no repositories.
+                    // activeByDefault). Repository stripping is intentionally omitted here:
+                    // file and property activation is already excluded by the
+                    // hasFileOrPropertyOrConditionActivation filter below, so only
+                    // legitimately-active profiles reach injection. Stripping their
+                    // repositories would break the established project → dep1 → dep2 pattern
+                    // where dep1 declares dep2's repository inside an activeByDefault or
+                    // JDK-activated profile.
                     eligibleProfiles = interpolatedProfiles.stream()
                             .filter(profile -> !hasFileOrPropertyOrConditionActivation(profile))
-                            .map(profile -> profile.withRepositories(List.of()).withPluginRepositories(List.of()))
                             .toList();
                 }
+                // TODO(#13146): repositories contributed by external-model profiles can shadow
+                // central; a WARN/FAIL policy for URL mismatches should be added separately.
                 return profileSelector.getActiveProfiles(eligibleProfiles, profileActivationContext, this);
             } else {
                 // BUILD_CONSUMER: activate only deterministic profiles whose activation is a
