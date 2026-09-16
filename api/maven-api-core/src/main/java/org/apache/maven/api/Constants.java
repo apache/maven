@@ -576,6 +576,16 @@ public final class Constants {
     public static final String MAVEN_MAVEN3_PERSONALITY = "maven.maven3Personality";
 
     /**
+     * User property for enabling transitive dependencies of consumed test JARs.
+     * The effective default is {@code true} for Maven 4 semantics and {@code false}
+     * when Maven 3 personality is enabled.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_TEST_JAR_TRANSITIVE_DEPS = "maven.testJarTransitiveDeps";
+
+    /**
      * User property for disabling version resolver cache.
      *
      * @since 3.0.0
