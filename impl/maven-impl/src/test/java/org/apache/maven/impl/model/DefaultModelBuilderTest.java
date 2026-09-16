@@ -133,10 +133,12 @@ class DefaultModelBuilderTest {
     /**
      * Models built at {@link ModelBuilderRequest.RequestType#CONSUMER_DEPENDENCY} come from a
      * dependency POM resolved from a repository. Their file, property, and condition activators
-     * are not evaluated, and their profiles contribute no repositories. A project build, at
+     * are not evaluated. Platform-derived activation (JDK version, operating system,
+     * activeByDefault) is unaffected at either level. Repositories from legitimately-active
+     * profiles (JDK/OS/activeByDefault) are honored — stripping them would break the established
+     * {@code project → dep1 → dep2} pattern where dep1 declares dep2's non-Central repository
+     * inside a JDK- or activeByDefault-activated profile. A project build, at
      * {@link ModelBuilderRequest.RequestType#BUILD_PROJECT}, still evaluates every activator.
-     * Platform-derived activation (JDK version, operating system, activeByDefault) is unaffected
-     * at either level.
      */
     private ModelBuilderRequest.ModelBuilderRequestBuilder resolvedProfilesRequest(
             ModelBuilderRequest.RequestType requestType) {
@@ -197,7 +199,7 @@ class DefaultModelBuilderTest {
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
                 .source(Sources.resolvedSource(
-                        getPom("active-by-default-profile"), "org.apache.maven.test:active-by-default-profile:1.0.0"))
+                        getPom("active-by-default-profile"), "org.apache.maven.tests:active-by-default-profile:1.0.0"))
                 .build();
         Model model = builder.newSession().build(request).getEffectiveModel();
 
