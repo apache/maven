@@ -61,7 +61,7 @@ public class BuildStep {
     final Collection<BuildStep> successors = new HashSet<>();
     final AtomicInteger status = new AtomicInteger();
     final AtomicBoolean skip = new AtomicBoolean();
-    volatile Exception exception;
+    volatile Throwable exception;
 
     public BuildStep(String name, MavenProject project, Lifecycle.Phase phase) {
         this.name = Objects.requireNonNull(name, "name cannot be null");

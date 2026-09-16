@@ -62,6 +62,7 @@ import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.PackagingRegistry;
 import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.services.VersionParser;
@@ -77,6 +78,7 @@ import org.apache.maven.di.impl.DIException;
 import org.apache.maven.di.impl.InjectorImpl;
 import org.apache.maven.impl.AbstractSession;
 import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.MavenRepositoryListener;
 import org.apache.maven.impl.di.SessionScope;
 import org.apache.maven.impl.model.DefaultInterpolator;
 import org.apache.maven.impl.resolver.MavenSessionBuilderSupplier;
@@ -298,15 +300,27 @@ public class ApiRunner {
                 List<RemoteRepository> repositories,
                 List<org.eclipse.aether.repository.RemoteRepository> resolverRepositories,
                 Lookup lookup) {
-            super(session, repositorySystem, repositories, resolverRepositories, lookup);
+            this(session, repositorySystem, repositories, resolverRepositories, lookup, null);
+        }
+
+        protected DefaultSession(
+                RepositorySystemSession session,
+                RepositorySystem repositorySystem,
+                List<RemoteRepository> repositories,
+                List<org.eclipse.aether.repository.RemoteRepository> resolverRepositories,
+                Lookup lookup,
+                RequestTrace context) {
+            super(session, repositorySystem, repositories, resolverRepositories, lookup, context);
             systemProperties = System.getenv().entrySet().stream()
                     .collect(Collectors.toMap(e -> "env." + e.getKey(), Map.Entry::getValue));
             System.getProperties().forEach((k, v) -> systemProperties.put(k.toString(), v.toString()));
         }
 
         @Override
-        protected Session newSession(RepositorySystemSession session, List<RemoteRepository> repositories) {
-            DefaultSession newSession = new DefaultSession(session, repositorySystem, repositories, null, lookup);
+        protected Session newSession(
+                RepositorySystemSession session, List<RemoteRepository> repositories, RequestTrace context) {
+            DefaultSession newSession =
+                    new DefaultSession(session, repositorySystem, repositories, null, lookup, context);
             newSession.settings = this.settings;
             newSession.mavenVersion = this.mavenVersion;
             newSession.userProperties = this.userProperties;
@@ -542,6 +556,7 @@ public class ApiRunner {
         // Configure the resolver session with dependency resolution machinery
         MavenSessionBuilderSupplier sessionBuilderSupplier = new MavenSessionBuilderSupplier(system, false);
         DefaultRepositorySystemSession rsession = new DefaultRepositorySystemSession(h -> false);
+        rsession.setRepositoryListener(new MavenRepositoryListener());
         rsession.setScopeManager(new ScopeManagerImpl(Maven4ScopeManagerConfiguration.INSTANCE));
         rsession.setDependencyTraverser(sessionBuilderSupplier.getDependencyTraverser());
         rsession.setDependencyManager(sessionBuilderSupplier.getDependencyManager(true));

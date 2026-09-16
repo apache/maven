@@ -46,13 +46,17 @@ public class DefaultArtifactInstaller implements ArtifactInstaller {
     public void install(ArtifactInstallerRequest request) throws ArtifactInstallerException, IllegalArgumentException {
         requireNonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
-            InstallRequest installRequest =
-                    new InstallRequest().setArtifacts(session.toArtifacts(request.getArtifacts()));
+            InstallRequest installRequest = new InstallRequest()
+                    .setArtifacts(session.toArtifacts(request.getArtifacts()))
+                    .setTrace(trace.trace());
 
             repositorySystem.install(session.getSession(), installRequest);
         } catch (InstallationException e) {
             throw new ArtifactInstallerException(e.getMessage(), e);
+        } finally {
+            RequestTraceHelper.exit(trace);
         }
     }
 }

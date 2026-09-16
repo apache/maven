@@ -632,6 +632,26 @@ class DefaultModelInterpolatorTest {
         assertTrue(collector.getErrors().get(0).contains("recursive variable reference"));
     }
 
+    @Test
+    public void testRecursiveExpressionCycleInListField() throws Exception {
+        Map<String, String> props = new HashMap<>();
+        props.put("aa", "${bb}");
+        props.put("bb", "${aa}");
+
+        Model model = Model.newBuilder()
+                .properties(props)
+                .build(Build.newBuilder().filters(List.of("${aa}")).build())
+                .build();
+
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+
+        ModelBuilderRequest request = createModelBuildingRequest(Map.of()).build();
+        Model out = interpolator.interpolateModel(model, null, request, collector);
+
+        assertEquals(List.of("${aa}"), out.getBuild().getFilters());
+        assertTrue(collector.getErrors().get(0).contains("recursive variable reference"));
+    }
+
     @Disabled("per def cannot be recursive: ${basedir} is immediately going for project.basedir")
     @Test
     public void testRecursiveExpressionCycleBaseDir() throws Exception {

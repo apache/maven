@@ -20,9 +20,17 @@ package org.apache.maven.internal.impl;
 
 import java.nio.file.Paths;
 import java.util.Collections;
+import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
+import org.apache.maven.api.Session;
+import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.model.root.RootLocator;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -30,10 +38,88 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 
 public class DefaultSessionTest {
+
+    @Test
+    void testContextPropagationAndNesting() {
+        DefaultSession session = newSession();
+        RequestTrace context = new RequestTrace("context");
+        InternalSession contextualSession = InternalSession.from(session.withContext(context));
+
+        assertNull(session.getCurrentTrace());
+        assertSame(context, contextualSession.getCurrentTrace());
+
+        RequestTraceHelper.ResolverTrace nested = RequestTraceHelper.enter(contextualSession, "nested");
+        assertSame(context, nested.mvnTrace().parent());
+        assertEquals("context", nested.context());
+        assertSame(nested.mvnTrace(), contextualSession.getCurrentTrace());
+
+        RequestTraceHelper.exit(nested);
+        assertSame(context, contextualSession.getCurrentTrace());
+        assertNull(session.getCurrentTrace());
+    }
+
+    @Test
+    void testContextValidation() {
+        DefaultSession session = newSession();
+
+        assertThrows(NullPointerException.class, () -> session.withContext(null));
+        assertThrows(NullPointerException.class, () -> session.withContext(new RequestTrace(null, null, null)));
+    }
+
+    @Test
+    void testContextIsIsolatedAcrossThreads() throws Exception {
+        RequestTrace context = new RequestTrace("context");
+        InternalSession session = InternalSession.from(newSession().withContext(context));
+        CyclicBarrier barrier = new CyclicBarrier(2);
+        ExecutorService executor = Executors.newFixedThreadPool(2);
+
+        try {
+            Future<RequestTrace> first = executor.submit(() -> enterAndReadTrace(session, barrier, "first"));
+            Future<RequestTrace> second = executor.submit(() -> enterAndReadTrace(session, barrier, "second"));
+
+            RequestTrace firstTrace = first.get();
+            RequestTrace secondTrace = second.get();
+            assertEquals("first", firstTrace.data());
+            assertEquals("second", secondTrace.data());
+            assertSame(context, firstTrace.parent());
+            assertSame(context, secondTrace.parent());
+            assertSame(context, session.getCurrentTrace());
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    @Test
+    void testActiveTraceIsVisibleAcrossSessionsSharingResolverSession() {
+        DefaultSession parent = newSession();
+        InternalSession derived = InternalSession.from(parent.withContext(new RequestTrace("context")));
+        RequestTraceHelper.ResolverTrace nested = RequestTraceHelper.enter(derived, "nested");
+
+        try {
+            assertSame(nested.mvnTrace(), parent.getCurrentTrace());
+            assertSame(
+                    nested.mvnTrace(), InternalSession.from(parent.getSession()).getCurrentTrace());
+        } finally {
+            RequestTraceHelper.exit(nested);
+        }
+
+        assertNull(parent.getCurrentTrace());
+        assertEquals("context", derived.getCurrentTrace().context());
+    }
+
+    @Test
+    void testRepositoryDerivationPreservesContext() {
+        RequestTrace context = new RequestTrace("context");
+        Session derived = newSession().withContext(context).withRemoteRepositories(Collections.emptyList());
+
+        assertSame(context, InternalSession.from(derived).getCurrentTrace());
+    }
 
     @Test
     void testRootDirectoryWithNull() {
@@ -59,5 +145,25 @@ public class DefaultSessionTest {
                 new DefaultSession(ms, mock(RepositorySystem.class), Collections.emptyList(), null, null, null);
 
         assertEquals(Paths.get("myRootDirectory"), session.getRootDirectory());
+    }
+
+    private static RequestTrace enterAndReadTrace(InternalSession session, CyclicBarrier barrier, String data)
+            throws Exception {
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, data);
+        try {
+            barrier.await();
+            return session.getCurrentTrace();
+        } finally {
+            RequestTraceHelper.exit(trace);
+        }
+    }
+
+    private static DefaultSession newSession() {
+        RepositorySystemSession rss = new DefaultRepositorySystemSession(h -> false);
+        MavenSession mavenSession = new MavenSession(null, rss, new DefaultMavenExecutionRequest(), null);
+        DefaultSession session = new DefaultSession(
+                mavenSession, mock(RepositorySystem.class), Collections.emptyList(), null, null, null);
+        InternalSession.associate(rss, session);
+        return session;
     }
 }

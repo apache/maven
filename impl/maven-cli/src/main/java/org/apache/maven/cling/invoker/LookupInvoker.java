@@ -527,7 +527,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void preCommands(C context) throws Exception {
         boolean verbose = context.invokerRequest.effectiveVerbose();
-        boolean version = context.options().showVersion().orElse(false);
+        boolean version = context.options().showVersion().orElse(false) && !Boolean.getBoolean("maven.version.printed");
         if (verbose || version) {
             showVersion(context);
         }

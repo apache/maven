@@ -185,7 +185,32 @@ class DefaultModelBuilderTest {
         assertNull(model.getProperties().get("profile.property"));
         assertNull(model.getProperties().get("profile.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
-        assertTrue(model.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+        // Repositories from legitimately-active profiles (JDK-activated) must be honored:
+        // stripping them would break the project → dep1 → dep2 pattern. See #13100, #13116.
+        assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+    }
+
+    /**
+     * An {@code activeByDefault=true} profile in an external dependency model must contribute
+     * its repositories — the same guarantee as for JDK/OS-activated profiles (see #13100).
+     * Uses a dedicated fixture with only an activeByDefault profile so the standard Maven rule
+     * ("activeByDefault is suppressed when any other profile activates") does not interfere.
+     */
+    @Test
+    public void testActiveByDefaultProfileRepositoryHonored() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.resolvedSource(
+                        getPom("active-by-default-profile"), "org.apache.maven.test:active-by-default-profile:1.0.0"))
+                .build();
+        Model model = builder.newSession().build(request).getEffectiveModel();
+
+        // The always-active profile activates by default: its repository must survive external
+        // model resolution unchanged. See #13100, #13141.
+        assertTrue(
+                model.getRepositories().stream().anyMatch(r -> "always-active-repo".equals(r.getId())),
+                "Repository from activeByDefault profile must be retained in external dependency model");
     }
 
     /**
@@ -298,7 +323,8 @@ class DefaultModelBuilderTest {
         assertNull(dependencyParentModel.getProperties().get("profile.property"));
         assertNull(dependencyParentModel.getProperties().get("profile.condition"));
         assertEquals("activated", dependencyParentModel.getProperties().get("profile.jdk"));
-        assertTrue(dependencyParentModel.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+        // Repositories from legitimately-active profiles (JDK-activated) must be honored. See #13100, #13116.
+        assertTrue(dependencyParentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
 
         // The first (fully activated) result must not have been altered by the second read.
         assertEquals("activated", projectParentModel.getProperties().get("profile.file"));
@@ -317,7 +343,8 @@ class DefaultModelBuilderTest {
         Model dependencyParentModel2 =
                 dependencyState2.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
         assertNull(dependencyParentModel2.getProperties().get("profile.file"));
-        assertTrue(dependencyParentModel2.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+        // Repositories from legitimately-active profiles (JDK-activated) must be honored. See #13100, #13116.
+        assertTrue(dependencyParentModel2.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
 
         DefaultModelBuilder.ModelBuilderSessionState projectState2 = mainState.derive(sharedParentRequest2);
         Model projectParentModel2 =
@@ -378,7 +405,8 @@ class DefaultModelBuilderTest {
         assertNull(grandparentModel.getProperties().get("profile.property"));
         assertNull(grandparentModel.getProperties().get("profile.condition"));
         assertEquals("activated", grandparentModel.getProperties().get("profile.jdk"));
-        assertTrue(grandparentModel.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+        // Repositories from legitimately-active profiles (JDK-activated) must be honored. See #13100, #13116.
+        assertTrue(grandparentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
 
     /**

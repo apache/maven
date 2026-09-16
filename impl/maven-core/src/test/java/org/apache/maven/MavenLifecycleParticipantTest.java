@@ -36,6 +36,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
 
@@ -89,6 +90,16 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
         }
     }
 
+    public static class SelectCurrentProject extends AbstractMavenLifecycleParticipant {
+        @Override
+        public void afterProjectsRead(MavenSession session) {
+            assertEquals("dependency", session.getProjects().get(0).getArtifactId());
+            assertEquals("root", session.getTopLevelProject().getArtifactId());
+            assertSame(session.getTopLevelProject(), session.getCurrentProject());
+            session.setProjects(List.of(session.getCurrentProject()));
+        }
+    }
+
     @Override
     protected String getProjectsDirectory() {
         return "src/test/projects/lifecycle-listener";
@@ -126,6 +137,12 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
         List<String> reactorOrder =
                 getReactorOrder("lifecycle-participant-reactor-dependency-injection", InjectReactorDependency.class);
         assertEquals(Arrays.asList("parent", "module-b", "module-a"), reactorOrder);
+    }
+
+    @Test
+    void testCurrentProjectSelection() throws Exception {
+        List<String> reactorOrder = getReactorOrder("current-project-selection", SelectCurrentProject.class);
+        assertEquals(List.of("root"), reactorOrder);
     }
 
     private <T> List<String> getReactorOrder(String testProject, Class<T> participant) throws Exception {

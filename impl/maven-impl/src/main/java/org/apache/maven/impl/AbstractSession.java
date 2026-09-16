@@ -122,7 +122,7 @@ public abstract class AbstractSession implements InternalSession {
     protected final Lookup lookup;
     protected final Injector injector;
     private final Map<Class<? extends Service>, Service> services = new ConcurrentHashMap<>();
-    private final List<Listener> listeners = new CopyOnWriteArrayList<>();
+    private final List<Listener> listeners;
     private final Cache<org.eclipse.aether.graph.DependencyNode, Node> allNodes =
             Cache.newCache(Cache.ReferenceType.WEAK, "AbstractSession-Nodes");
     private final Map<Class<? extends Artifact>, Cache<org.eclipse.aether.artifact.Artifact, Artifact>> allArtifacts =
@@ -131,6 +131,7 @@ public abstract class AbstractSession implements InternalSession {
             Cache.newCache(Cache.ReferenceType.WEAK, "AbstractSession-Repositories");
     private final Cache<org.eclipse.aether.graph.Dependency, Dependency> allDependencies =
             Cache.newCache(Cache.ReferenceType.WEAK, "AbstractSession-Dependencies");
+    private final RequestTrace context;
     private volatile RequestCache requestCache;
 
     static {
@@ -143,11 +144,29 @@ public abstract class AbstractSession implements InternalSession {
             List<RemoteRepository> repositories,
             List<org.eclipse.aether.repository.RemoteRepository> resolverRepositories,
             Lookup lookup) {
+        this(session, repositorySystem, repositories, resolverRepositories, lookup, null);
+    }
+
+    protected AbstractSession(
+            RepositorySystemSession session,
+            RepositorySystem repositorySystem,
+            List<RemoteRepository> repositories,
+            List<org.eclipse.aether.repository.RemoteRepository> resolverRepositories,
+            Lookup lookup,
+            RequestTrace context) {
         this.session = requireNonNull(session, "session");
         this.repositorySystem = repositorySystem;
         this.repositories = getRepositories(repositories, resolverRepositories);
         this.lookup = lookup;
         this.injector = lookup != null ? lookup.lookupOptional(Injector.class).orElse(null) : null;
+        this.listeners = getListeners(session);
+        this.context = context;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static List<Listener> getListeners(RepositorySystemSession session) {
+        // Both event families share the registration scope of the underlying repository system session.
+        return (List<Listener>) session.getData().computeIfAbsent(Listener.class, CopyOnWriteArrayList::new);
     }
 
     @SuppressWarnings("unchecked")
@@ -383,16 +402,25 @@ public abstract class AbstractSession implements InternalSession {
 
         RepositorySystemSession repoSession =
                 new DefaultRepositorySystemSession(session).setLocalRepositoryManager(localRepositoryManager);
-        return newSession(repoSession, repositories);
+        return newSession(repoSession, repositories, getCurrentTrace());
     }
 
     @Nonnull
     @Override
     public Session withRemoteRepositories(@Nonnull List<RemoteRepository> repositories) {
-        return newSession(session, repositories);
+        return newSession(session, repositories, getCurrentTrace());
     }
 
-    protected abstract Session newSession(RepositorySystemSession session, List<RemoteRepository> repositories);
+    @Nonnull
+    @Override
+    public Session withContext(@Nonnull RequestTrace trace) {
+        requireNonNull(trace, "trace");
+        requireNonNull(trace.context(), "trace context");
+        return newSession(session, repositories, trace);
+    }
+
+    protected abstract Session newSession(
+            RepositorySystemSession session, List<RemoteRepository> repositories, RequestTrace context);
 
     @Nonnull
     @Override
@@ -1037,12 +1065,17 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public void setCurrentTrace(RequestTrace trace) {
-        getTraceHolder().set(trace);
+        if (trace == null || trace == context) {
+            getTraceHolder().remove();
+        } else {
+            getTraceHolder().set(trace);
+        }
     }
 
     @Override
     public RequestTrace getCurrentTrace() {
-        return getTraceHolder().get();
+        RequestTrace trace = getTraceHolder().get();
+        return trace != null ? trace : context;
     }
 
     @SuppressWarnings("unchecked")

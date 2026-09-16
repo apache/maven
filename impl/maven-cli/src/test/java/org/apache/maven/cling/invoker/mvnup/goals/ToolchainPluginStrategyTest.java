@@ -20,9 +20,15 @@ package org.apache.maven.cling.invoker.mvnup.goals;
 
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
 import java.util.Map;
 
 import eu.maveniverse.domtrip.Document;
+import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.PluginManagement;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -359,6 +365,8 @@ class ToolchainPluginStrategyTest {
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
             String output = doc.toXml();
             assertTrue(output.contains("<version>(,11]</version>"), "Expected version constraint in output: " + output);
+            assertTrue(
+                    output.contains("<version>3.2.0</version>"), "Expected plugin version 3.2.0 in output: " + output);
         }
 
         @Test
@@ -386,6 +394,85 @@ class ToolchainPluginStrategyTest {
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
             String output = doc.toXml();
             assertTrue(output.contains("<version>(,8]</version>"), "Expected version constraint in output: " + output);
+            assertTrue(
+                    output.contains("<version>3.2.0</version>"), "Expected plugin version 3.2.0 in output: " + output);
+        }
+
+        @Test
+        @DisplayName("should reuse existing toolchains-plugin and not create a duplicate")
+        void reuseExistingToolchainsPlugin() {
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>com.example</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-toolchains-plugin</artifactId>
+                                    <version>3.2.0</version>
+                                    <executions>
+                                        <execution>
+                                            <goals>
+                                                <goal>toolchain</goal>
+                                            </goals>
+                                        </execution>
+                                    </executions>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+            Document doc = Document.of(pomXml);
+            strategy.addToolchainsPlugin(doc, 11);
+
+            assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
+            String output = doc.toXml();
+            // Should NOT create a duplicate plugin entry
+            assertEquals(
+                    1,
+                    output.split("maven-toolchains-plugin").length - 1,
+                    "Should have exactly one toolchains-plugin entry: " + output);
+            // Old toolchain goal should still be present
+            assertTrue(
+                    output.contains("<goal>toolchain</goal>"), "Old toolchain goal should still be present: " + output);
+            // New select-jdk-toolchain goal should be added
+            assertTrue(
+                    output.contains("<goal>select-jdk-toolchain</goal>"),
+                    "New select-jdk-toolchain goal should be present: " + output);
+        }
+
+        @Test
+        @DisplayName("should not change existing version when reusing plugin")
+        void preserveExistingVersion() {
+            String pomXml = """
+                    <?xml version="1.0" encoding="UTF-8"?>
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                        <modelVersion>4.0.0</modelVersion>
+                        <groupId>com.example</groupId>
+                        <artifactId>test</artifactId>
+                        <version>1.0</version>
+                        <build>
+                            <plugins>
+                                <plugin>
+                                    <groupId>org.apache.maven.plugins</groupId>
+                                    <artifactId>maven-toolchains-plugin</artifactId>
+                                    <version>3.3.0</version>
+                                </plugin>
+                            </plugins>
+                        </build>
+                    </project>
+                    """;
+            Document doc = Document.of(pomXml);
+            strategy.addToolchainsPlugin(doc, 11);
+
+            String output = doc.toXml();
+            // Version should remain 3.3.0 — ToolchainPluginStrategy does not touch versions;
+            // version upgrades are handled by PluginUpgradeStrategy
+            assertTrue(output.contains("<version>3.3.0</version>"), "Version 3.3.0 should not be changed: " + output);
         }
     }
 
@@ -526,6 +613,113 @@ class ToolchainPluginStrategyTest {
             UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
 
             assertEquals(0, result.modifiedPoms().size());
+        }
+    }
+
+    @Nested
+    @DisplayName("Effective model source level detection")
+    class EffectiveModelSourceLevelTests {
+
+        private ToolchainPluginStrategy strategy;
+
+        @BeforeEach
+        void setUp() {
+            strategy = new ToolchainPluginStrategy();
+        }
+
+        @Test
+        @DisplayName("should detect source level from effective model maven.compiler.release property")
+        void detectFromEffectiveRelease() {
+            Model model = Model.newBuilder()
+                    .properties(Map.of("maven.compiler.release", "6"))
+                    .build();
+            assertEquals(6, strategy.detectSourceLevelFromModel(model));
+        }
+
+        @Test
+        @DisplayName("should detect source level from effective model maven.compiler.source property")
+        void detectFromEffectiveSource() {
+            Model model = Model.newBuilder()
+                    .properties(Map.of("maven.compiler.source", "1.6"))
+                    .build();
+            assertEquals(6, strategy.detectSourceLevelFromModel(model));
+        }
+
+        @Test
+        @DisplayName("effective model release takes precedence over source")
+        void effectiveReleaseTakesPrecedence() {
+            Model model = Model.newBuilder()
+                    .properties(Map.of("maven.compiler.release", "7", "maven.compiler.source", "6"))
+                    .build();
+            assertEquals(7, strategy.detectSourceLevelFromModel(model));
+        }
+
+        @Test
+        @DisplayName("should detect from effective model compiler plugin release config")
+        void detectFromEffectivePluginRelease() {
+            XmlNode config = XmlNode.newInstance("configuration", List.of(XmlNode.newInstance("release", "6")));
+            Plugin compilerPlugin = Plugin.newBuilder()
+                    .artifactId("maven-compiler-plugin")
+                    .configuration(config)
+                    .build();
+            Model model = Model.newBuilder()
+                    .build(Build.newBuilder().plugins(List.of(compilerPlugin)).build())
+                    .build();
+            assertEquals(6, strategy.detectSourceLevelFromModel(model));
+        }
+
+        @Test
+        @DisplayName("should detect from effective model compiler plugin source config")
+        void detectFromEffectivePluginSource() {
+            XmlNode config = XmlNode.newInstance("configuration", List.of(XmlNode.newInstance("source", "1.5")));
+            Plugin compilerPlugin = Plugin.newBuilder()
+                    .artifactId("maven-compiler-plugin")
+                    .configuration(config)
+                    .build();
+            Model model = Model.newBuilder()
+                    .build(Build.newBuilder().plugins(List.of(compilerPlugin)).build())
+                    .build();
+            assertEquals(5, strategy.detectSourceLevelFromModel(model));
+        }
+
+        @Test
+        @DisplayName("should detect from effective model pluginManagement")
+        void detectFromEffectivePluginManagement() {
+            XmlNode config = XmlNode.newInstance("configuration", List.of(XmlNode.newInstance("release", "8")));
+            Plugin compilerPlugin = Plugin.newBuilder()
+                    .artifactId("maven-compiler-plugin")
+                    .configuration(config)
+                    .build();
+            Model model = Model.newBuilder()
+                    .build(Build.newBuilder()
+                            .pluginManagement(PluginManagement.newBuilder()
+                                    .plugins(List.of(compilerPlugin))
+                                    .build())
+                            .build())
+                    .build();
+            assertEquals(8, strategy.detectSourceLevelFromModel(model));
+        }
+
+        @Test
+        @DisplayName("should return -1 from effective model with no source level")
+        void noSourceLevelInEffectiveModel() {
+            Model model = Model.newBuilder().build();
+            assertEquals(-1, strategy.detectSourceLevelFromModel(model));
+        }
+
+        @Test
+        @DisplayName("properties take precedence over plugin config in effective model")
+        void propertiesTakePrecedenceInEffectiveModel() {
+            XmlNode config = XmlNode.newInstance("configuration", List.of(XmlNode.newInstance("release", "6")));
+            Plugin compilerPlugin = Plugin.newBuilder()
+                    .artifactId("maven-compiler-plugin")
+                    .configuration(config)
+                    .build();
+            Model model = Model.newBuilder()
+                    .properties(Map.of("maven.compiler.release", "8"))
+                    .build(Build.newBuilder().plugins(List.of(compilerPlugin)).build())
+                    .build();
+            assertEquals(8, strategy.detectSourceLevelFromModel(model));
         }
     }
 }

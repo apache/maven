@@ -44,6 +44,7 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.ProjectManager;
+import org.apache.maven.impl.DefaultSourceRoot;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.MappedList;
 import org.apache.maven.impl.PropertiesAsMap;
@@ -201,11 +202,29 @@ public class DefaultProjectManager implements ProjectManager {
             @Nonnull ProjectScope scope,
             @Nonnull Language language,
             @Nonnull Path directory) {
+        addSourceRoot(project, scope, language, directory, false);
+    }
+
+    @Override
+    public void addSourceRoot(
+            @Nonnull Project project,
+            @Nonnull ProjectScope scope,
+            @Nonnull Language language,
+            @Nonnull Path directory,
+            boolean generated) {
         MavenProject prj = getMavenProject(requireNonNull(project, "project" + " cannot be null"));
-        prj.addSourceRoot(
-                requireNonNull(scope, "scope" + " cannot be null"),
-                requireNonNull(language, "language" + " cannot be null"),
-                requireNonNull(directory, "directory" + " cannot be null"));
+        Path resolved = prj.getBaseDirectory()
+                .resolve(requireNonNull(directory, "directory" + " cannot be null"))
+                .normalize();
+        ProjectScope actualScope = requireNonNull(scope, "scope" + " cannot be null");
+        Language actualLanguage = requireNonNull(language, "language" + " cannot be null");
+        boolean exists = prj.getSourceRoots().stream()
+                .anyMatch(source -> source.scope() == actualScope
+                        && source.language() == actualLanguage
+                        && source.directory().equals(resolved));
+        if (!exists) {
+            prj.addSourceRoot(new DefaultSourceRoot(actualScope, actualLanguage, resolved, generated));
+        }
     }
 
     @Override

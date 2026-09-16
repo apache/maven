@@ -329,11 +329,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // profile injection
             for (Profile activeProfile : activePomProfiles) {
-                profileInjector.injectProfile(
-                        tmpModel,
-                        externalModel ? withoutRepositories(activeProfile) : activeProfile,
-                        request,
-                        problems);
+                profileInjector.injectProfile(tmpModel, activeProfile, request, problems);
             }
 
             if (currentData == resultData) {
@@ -604,16 +600,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
         return eligible;
-    }
-
-    /**
-     * Returns a copy of the given profile with its repositories and plugin repositories cleared.
-     */
-    private static Profile withoutRepositories(Profile profile) {
-        Profile stripped = profile.clone();
-        stripped.setRepositories(Collections.emptyList());
-        stripped.setPluginRepositories(Collections.emptyList());
-        return stripped;
     }
 
     @Override

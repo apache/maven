@@ -74,6 +74,47 @@ class DefaultModelXmlFactoryTest {
     }
 
     @Test
+    void testGeneratedSourceRoundTrip() throws Exception {
+        String xml = """
+                <project xmlns="http://maven.apache.org/POM/4.2.0">
+                  <modelVersion>4.2.0</modelVersion>
+                  <groupId>g</groupId>
+                  <artifactId>a</artifactId>
+                  <version>1</version>
+                  <build>
+                    <sources>
+                      <source>
+                        <directory>target/generated-sources/java</directory>
+                        <generated>true</generated>
+                      </source>
+                      <source>
+                        <directory>src/main/java</directory>
+                      </source>
+                    </sources>
+                  </build>
+                </project>""";
+
+        Model model = factory.read(XmlReaderRequest.builder()
+                .reader(new StringReader(xml))
+                .strict(true)
+                .build());
+
+        assertTrue(model.getBuild().getSources().get(0).isGenerated());
+        assertFalse(model.getBuild().getSources().get(1).isGenerated());
+
+        StringWriter out = new StringWriter();
+        factory.write(
+                XmlWriterRequest.<Model>builder().writer(out).content(model).build());
+        Model roundTripped = factory.read(XmlReaderRequest.builder()
+                .reader(new StringReader(out.toString()))
+                .strict(true)
+                .build());
+
+        assertTrue(roundTripped.getBuild().getSources().get(0).isGenerated());
+        assertFalse(roundTripped.getBuild().getSources().get(1).isGenerated());
+    }
+
+    @Test
     void testInvalidNamespaceWithModelVersion410() {
         String xml = """
                 <project xmlns="http://invalid.namespace/4.1.0">
@@ -147,6 +188,34 @@ class DefaultModelXmlFactoryTest {
 
         String result = out.toString();
         assertFalse(result.contains("LOC_MARK"), "Unexpected marker found in output");
+    }
+
+    @Test
+    void testReadPomWithDoctypeDeclaration() throws Exception {
+        // Verify that a POM containing a DOCTYPE declaration with an external entity
+        // is handled gracefully: the pre-parse (extractModelId) should ignore DTDs
+        // and still extract the GAV coordinates correctly
+        String xml = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <!DOCTYPE project [
+                  <!ENTITY ext SYSTEM "file:///nonexistent/path">
+                ]>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>com.example</groupId>
+                  <artifactId>doctype-test</artifactId>
+                  <version>1.0.0</version>
+                </project>""";
+
+        // Use a Reader (not a Path) so the extractModelId pre-parse is triggered
+        // when no modelId is set on the request
+        XmlReaderRequest request =
+                XmlReaderRequest.builder().reader(new StringReader(xml)).build();
+
+        Model model = factory.read(request);
+        assertEquals("com.example", model.getGroupId());
+        assertEquals("doctype-test", model.getArtifactId());
+        assertEquals("1.0.0", model.getVersion());
     }
 
     @Test

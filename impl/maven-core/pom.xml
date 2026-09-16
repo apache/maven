@@ -31,6 +31,26 @@ under the License.
   <name>Maven 4 Core</name>
   <description>Maven Core classes.</description>
 
+  <properties>
+    <!-- Default lifecycle plugin versions.
+         Maintained here so that dependency-update bots (Dependabot, Renovate)
+         can propose version bumps automatically.  Values are filtered into
+         plugin-versions.properties at build time and loaded at runtime. -->
+    <version.maven-clean-plugin>3.4.0</version.maven-clean-plugin>
+    <version.maven-compiler-plugin>3.13.0</version.maven-compiler-plugin>
+    <version.maven-deploy-plugin>3.1.3</version.maven-deploy-plugin>
+    <version.maven-ear-plugin>3.3.0</version.maven-ear-plugin>
+    <version.maven-ejb-plugin>3.2.1</version.maven-ejb-plugin>
+    <version.maven-install-plugin>3.1.3</version.maven-install-plugin>
+    <version.maven-jar-plugin>3.4.2</version.maven-jar-plugin>
+    <version.maven-plugin-plugin>3.15.1</version.maven-plugin-plugin>
+    <version.maven-rar-plugin>3.0.0</version.maven-rar-plugin>
+    <version.maven-resources-plugin>3.3.1</version.maven-resources-plugin>
+    <version.maven-site-plugin>3.21.0</version.maven-site-plugin>
+    <version.maven-surefire-plugin>3.5.2</version.maven-surefire-plugin>
+    <version.maven-war-plugin>3.4.0</version.maven-war-plugin>
+  </properties>
+
   <dependencies>
     <!--  Maven4 API -->
     <dependency>
@@ -260,6 +280,74 @@ under the License.
     </resources>
     <pluginManagement>
       <plugins>
+        <!-- Default lifecycle plugins declared here so that dependency-update bots
+             (Dependabot, Renovate) see the version.maven-*-plugin properties as
+             actual plugin version references and can propose automated bumps. -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>${version.maven-clean-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${version.maven-compiler-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>${version.maven-deploy-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-ear-plugin</artifactId>
+          <version>${version.maven-ear-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-ejb-plugin</artifactId>
+          <version>${version.maven-ejb-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>${version.maven-install-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${version.maven-jar-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>${version.maven-plugin-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-rar-plugin</artifactId>
+          <version>${version.maven-rar-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>${version.maven-resources-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>${version.maven-site-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${version.maven-surefire-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>${version.maven-war-plugin}</version>
+        </plugin>
         <plugin>
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>

@@ -24,7 +24,21 @@ import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * A listener for session events.
- * TODO: open this to other events like similar to {@code org.apache.maven.eventspy.EventSpy}
+ * Existing implementations and lambdas receive execution events through {@link #onEvent(Event)}.
+ * Implement {@link ExecutionListener} or {@link RepositoryListener} for typed callbacks.
+ * <p>
+ * A listener implementing both interfaces must override {@link #onEvent(Event)} to resolve
+ * their conflicting default methods. Delegate to both defaults to receive typed callbacks
+ * for both event families; each default ignores events from the other family:
+ * <pre>{@code
+ * class CombinedListener implements ExecutionListener, RepositoryListener {
+ *     @Override
+ *     public void onEvent(Event event) {
+ *         ExecutionListener.super.onEvent(event);
+ *         RepositoryListener.super.onEvent(event);
+ *     }
+ * }
+ * }</pre>
  *
  * @since 4.0.0
  */
@@ -32,5 +46,10 @@ import org.apache.maven.api.annotations.Nonnull;
 @FunctionalInterface
 @Consumer
 public interface Listener {
+    /**
+     * Receives a build execution event.
+     *
+     * @param event the execution event
+     */
     void onEvent(@Nonnull Event event);
 }

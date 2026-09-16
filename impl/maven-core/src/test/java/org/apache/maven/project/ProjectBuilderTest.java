@@ -48,6 +48,8 @@ import org.junit.jupiter.api.io.TempDir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -188,6 +190,157 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         // re-build pom with modified parent
         ProjectBuildingResult result = projectBuilder.build(child, configuration);
         assertTrue(result.getProject().getProperties().containsKey("addedProperty"));
+    }
+
+    @Test
+    void testDeepParentHierarchy(@TempDir Path tempDir) throws Exception {
+        assertParentHierarchy(tempDir, 1000);
+    }
+
+    @Test
+    void testParentHierarchy(@TempDir Path tempDir) throws Exception {
+        assertParentHierarchy(tempDir, 10);
+    }
+
+    @Test
+    void testSuppliedProjectIsNotRebuilt(@TempDir Path tempDir) throws Exception {
+        MavenSession session = createMavenSession(null);
+        MavenProject supplied = new MavenProject();
+        supplied.setGroupId("test");
+        supplied.setArtifactId("supplied");
+        supplied.setVersion("1");
+        ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
+        request.setRepositorySession(session.getRepositorySession());
+        request.setProject(supplied);
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        ProjectBuildingResult result = getContainer()
+                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .build(tempDir.resolve("missing-pom.xml").toFile(), request);
+        assertSame(supplied, result.getProject());
+        assertSame(contextClassLoader, Thread.currentThread().getContextClassLoader());
+    }
+
+    @Test
+    void testFailedParentStillInitializesChild(@TempDir Path tempDir) throws Exception {
+        Path parentPom = tempDir.resolve("pom.xml");
+        Files.writeString(parentPom, """
+                <project>
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>test</groupId>
+                  <artifactId>parent</artifactId>
+                  <version>1</version>
+                  <packaging>pom</packaging>
+                  <dependencies>
+                    <dependency>
+                      <groupId>test</groupId>
+                      <artifactId>dependency</artifactId>
+                    </dependency>
+                  </dependencies>
+                </project>
+                """);
+        Path childPom = Files.createDirectory(tempDir.resolve("child")).resolve("pom.xml");
+        Files.writeString(childPom, """
+                <project>
+                  <modelVersion>4.0.0</modelVersion>
+                  <parent>
+                    <groupId>test</groupId>
+                    <artifactId>parent</artifactId>
+                    <version>1</version>
+                  </parent>
+                  <artifactId>child</artifactId>
+                  <dependencies>
+                    <dependency>
+                      <groupId>test</groupId>
+                      <artifactId>dependency</artifactId>
+                      <version>1</version>
+                    </dependency>
+                  </dependencies>
+                </project>
+                """);
+        MavenSession session = createMavenSession(null);
+        session.getRequest().setRootDirectory(tempDir);
+        ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
+        request.setRepositorySession(session.getRepositorySession());
+        org.apache.maven.project.ProjectBuilder builder =
+                getContainer().lookup(org.apache.maven.project.ProjectBuilder.class);
+        ClassLoader original = Thread.currentThread().getContextClassLoader();
+        ClassLoader caller = new ClassLoader(original) {};
+        Thread.currentThread().setContextClassLoader(caller);
+        try {
+            assertThrows(ProjectBuildingException.class, () -> builder.build(parentPom.toFile(), request));
+            assertSame(caller, Thread.currentThread().getContextClassLoader());
+            MavenProject child = builder.build(childPom.toFile(), request).getProject();
+            assertSame(caller, Thread.currentThread().getContextClassLoader());
+            assertNull(child.getParent());
+            assertEquals("parent", child.getParentArtifact().getArtifactId());
+            assertEquals(parentPom.toFile(), child.getParentFile());
+            assertEquals("child", child.getArtifact().getArtifactId());
+            assertEquals("1", child.getDependencies().get(0).getVersion());
+            assertNotNull(child.getOriginalModel());
+            assertFalse(child.getCompileSourceRoots().isEmpty());
+        } finally {
+            Thread.currentThread().setContextClassLoader(original);
+        }
+    }
+
+    private void assertParentHierarchy(Path tempDir, int depth) throws Exception {
+        for (int i = 0; i < depth; i++) {
+            Path directory = Files.createDirectory(tempDir.resolve("parent-" + i));
+            String parent = i == 0 ? "" : """
+                        <parent>
+                          <groupId>org.apache.maven.its.hierarchy</groupId>
+                          <artifactId>parent-%d</artifactId>
+                          <version>1</version>
+                          <relativePath>../parent-%d/pom.xml</relativePath>
+                        </parent>
+                        """.formatted(i - 1, i - 1);
+            Files.writeString(directory.resolve("pom.xml"), """
+                    <project>
+                      <modelVersion>4.0.0</modelVersion>
+                      %s
+                      <groupId>org.apache.maven.its.hierarchy</groupId>
+                      <artifactId>parent-%d</artifactId>
+                      <version>1</version>
+                      <packaging>pom</packaging>
+                      <properties>
+                        %s
+                        <nearest>%d</nearest>
+                      </properties>
+                    </project>
+                    """.formatted(
+                            parent, i, i == 0 ? "<inherited>root</inherited>" : "", i));
+        }
+
+        MavenSession session = createMavenSession(null);
+        session.getRequest().setRootDirectory(tempDir);
+        ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
+        request.setRepositorySession(session.getRepositorySession());
+        ClassLoader contextClassLoader = Thread.currentThread().getContextClassLoader();
+        MavenProject project = getContainer()
+                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .build(
+                        tempDir.resolve("parent-" + (depth - 1))
+                                .resolve("pom.xml")
+                                .toFile(),
+                        request)
+                .getProject();
+        assertSame(contextClassLoader, Thread.currentThread().getContextClassLoader());
+        for (int i = depth - 1; i >= 0; i--) {
+            assertNotNull(project, "Missing parent at depth " + i);
+            assertEquals("parent-" + i, project.getArtifactId());
+            assertEquals("root", project.getProperties().getProperty("inherited"));
+            assertEquals(Integer.toString(i), project.getProperties().getProperty("nearest"));
+            if (i > 0) {
+                assertEquals("parent-" + (i - 1), project.getParentArtifact().getArtifactId());
+                assertEquals(
+                        tempDir.resolve("parent-" + (i - 1)).resolve("pom.xml").toFile(), project.getParentFile());
+            } else {
+                assertNull(project.getParentArtifact());
+                assertNull(project.getParentFile());
+            }
+            project = project.getParent();
+        }
+        assertNull(project);
     }
 
     @Test

@@ -395,12 +395,15 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 case COMBINATION_ITEM:
                     int result = this.compareTo(((CombinationItem) item).getStringPart());
                     if (result == 0) {
+                        if (compareTo(null) == 0) {
+                            return -((CombinationItem) item).getDigitPart().compareTo(null);
+                        }
                         return -1;
                     }
                     return result;
 
                 case LIST_ITEM:
-                    return -1; // 1.any < 1-1
+                    return -item.compareTo(this);
 
                 default:
                     throw new IllegalStateException("invalid item: " + item.getClass());
@@ -479,13 +482,16 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 case STRING_ITEM:
                     result = stringPart.compareTo(item);
                     if (result == 0) {
+                        if (stringPart.compareTo(null) == 0) {
+                            return digitPart.compareTo(null);
+                        }
                         // X1 > X
                         return 1;
                     }
                     return result;
 
                 case LIST_ITEM:
-                    return -1;
+                    return -item.compareTo(this);
 
                 case COMBINATION_ITEM:
                     result = stringPart.compareTo(((CombinationItem) item).getStringPart());
@@ -569,6 +575,12 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     }
                 }
             }
+
+            if (size() == 1 && get(0) instanceof ListItem list) {
+                // Removing a zero prefix must not leave an extra qualifier nesting level.
+                clear();
+                addAll(list);
+            }
         }
 
         @Override
@@ -593,9 +605,12 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                     return -1; // 1-1 < 1.0.x
 
                 case STRING_ITEM:
-                    return 1;
                 case COMBINATION_ITEM:
-                    return 1; // 1-1 > 1-sp
+                    int scalarResult = isEmpty() ? -item.compareTo(null) : get(0).compareTo(item);
+                    for (int i = 1; scalarResult == 0 && i < size(); i++) {
+                        scalarResult = get(i).compareTo(null);
+                    }
+                    return scalarResult;
 
                 case LIST_ITEM:
                     Iterator<Item> left = iterator();
@@ -805,7 +820,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 return buf.substring(i);
             }
         }
-        return buf;
+        return "0";
     }
 
     @Override
@@ -861,6 +876,9 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 while (end > 0 && list.get(end - 1).compareTo(null) == 0) {
                     end--;
                 }
+                if (end == 1) {
+                    yield orderingHash(list.get(0));
+                }
                 int hash = 1;
                 for (int i = 0; i < end; i++) {
                     hash = 31 * hash + orderingHash(list.get(i));
@@ -872,6 +890,9 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 StringItem.comparableQualifier(((StringItem) item).value).hashCode();
             case Item.COMBINATION_ITEM -> {
                 CombinationItem combination = (CombinationItem) item;
+                if (combination.stringPart.compareTo(null) == 0 && combination.digitPart.isNull()) {
+                    yield orderingHash(combination.stringPart);
+                }
                 yield 31
                                 * StringItem.comparableQualifier(combination.stringPart.value)
                                         .hashCode()

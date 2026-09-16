@@ -21,11 +21,9 @@ package org.apache.maven.cling.invoker.mvnup.goals;
 import java.io.File;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -33,11 +31,10 @@ import eu.maveniverse.domtrip.Document;
 import eu.maveniverse.domtrip.Element;
 import eu.maveniverse.domtrip.maven.Coordinates;
 import eu.maveniverse.domtrip.maven.MavenPomElements;
-import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
+import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
-import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
@@ -45,12 +42,6 @@ import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.settings.Proxy;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
-import org.apache.maven.impl.standalone.ApiRunner;
-import org.eclipse.aether.spi.connector.transport.TransporterFactory;
-import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
-import org.eclipse.aether.spi.io.PathProcessor;
-import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
-import org.eclipse.aether.transport.file.FileTransporterFactory;
 
 import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
 
@@ -68,6 +59,19 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
  */
 public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
 
+    /**
+     * DI-injected standalone Maven 4 API Session, produced by {@link MvnupSessionHolder}.
+     * Sharing the session avoids recreating the heavyweight standalone DI container
+     * for each strategy. The Session's {@link org.apache.maven.api.cache.RequestCache}
+     * deduplicates effective model builds when the same POM path is resolved more
+     * than once within a strategy.
+     *
+     * <p>When running outside a DI container (e.g. unit tests), this field is {@code null}
+     * and {@link #getSession()} falls back to creating a session via
+     * {@link MvnupSessionHolder#createSession()}.
+     */
+    @Inject
+    @Named("mvnup")
     private Session session;
 
     /**
@@ -209,11 +213,28 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
         return new HashSet<>(coordinatesByGAV.values());
     }
 
-    protected Session getSession(UpgradeContext context) {
-        if (session == null) {
-            session = createMaven4Session(context);
+    /**
+     * Fallback session for unit tests that instantiate strategies directly (without DI).
+     */
+    private static volatile Session fallbackSession;
+
+    protected Session getSession() {
+        Session s = session;
+        if (s != null) {
+            return s;
         }
-        return session;
+        // Fallback for unit tests that instantiate strategies directly (without DI)
+        s = fallbackSession;
+        if (s == null) {
+            synchronized (AbstractUpgradeStrategy.class) {
+                s = fallbackSession;
+                if (s == null) {
+                    s = MvnupSessionHolder.createSession();
+                    fallbackSession = s;
+                }
+            }
+        }
+        return s;
     }
 
     /**
@@ -252,31 +273,6 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
             return "settings declare an active proxy that the mvnup standalone resolver cannot honor";
         }
         return null;
-    }
-
-    private Session createMaven4Session(UpgradeContext context) {
-        Session session = ApiRunner.createSession(injector -> {
-            injector.bindImplicit(TransporterFactoryConfig.class);
-        });
-
-        if (remoteResolutionUnsupportedReason(context) != null) {
-            // No remote repositories at all, rather than resolving from hardcoded public
-            // repositories while ignoring the operator's settings.
-            return session.withRemoteRepositories(List.of());
-        }
-
-        // Repositories declared in the effective settings are already part of the session
-        // (ApiRunner reads settings.xml from the real user home above); add central as the
-        // built-in fallback, exactly like a regular Maven build would. The apache-snapshots
-        // repository is intentionally not added: mvnup runs must not silently consume
-        // snapshot content that was never part of the operator's configuration.
-        List<RemoteRepository> repositories = new ArrayList<>(session.getRemoteRepositories());
-        boolean hasCentral = repositories.stream().anyMatch(r -> RemoteRepository.CENTRAL_ID.equals(r.getId()));
-        if (!hasCentral) {
-            repositories.add(session.createRemoteRepository(
-                    RemoteRepository.CENTRAL_ID, "https://repo.maven.apache.org/maven2"));
-        }
-        return session.withRemoteRepositories(repositories);
     }
 
     protected Path createTempProjectStructure(UpgradeContext context, Map<Path, Document> pomMap) throws Exception {
@@ -334,7 +330,7 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
     }
 
     protected org.apache.maven.api.model.Model buildEffectiveModel(UpgradeContext context, Path pomPath) {
-        Session session = getSession(context);
+        Session session = getSession();
         ModelBuilder modelBuilder = session.getService(ModelBuilder.class);
 
         ModelBuilderRequest request = ModelBuilderRequest.builder()
@@ -346,20 +342,5 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
 
         ModelBuilderResult result = modelBuilder.newSession().build(request);
         return result.getEffectiveModel();
-    }
-
-    static class TransporterFactoryConfig {
-        @Provides
-        @Named(ApacheTransporterFactory.NAME)
-        static TransporterFactory apacheTransporterFactory(
-                ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
-            return new ApacheTransporterFactory(checksumExtractor, pathProcessor);
-        }
-
-        @Provides
-        @Named(FileTransporterFactory.NAME)
-        static TransporterFactory fileTransporterFactory() {
-            return new FileTransporterFactory();
-        }
     }
 }

@@ -74,6 +74,12 @@ public interface PluginDependenciesResolver {
 
     /**
      * Resolves the runtime dependencies of the specified core extension (as {@link Plugin} as GAV carrier).
+     * <p>
+     * The default implementation delegates to
+     * {@link #resolvePlugin(Plugin, Artifact, DependencyFilter, List, RepositorySystemSession)} so that
+     * implementations written against Maven 4.0.0-rc-5 and earlier keep working. Implementations should override
+     * this method: unlike the default, a dedicated implementation is expected to read the extension's artifact
+     * descriptor first, applying relocations and dependency validation.
      *
      * @param plugin The plugin for which to resolve the dependencies, must not be {@code null}.
      * @param dependencyFilter A filter to exclude artifacts from resolution (but not collection), may be {@code null}.
@@ -83,15 +89,21 @@ public interface PluginDependenciesResolver {
      * @throws PluginResolutionException If any dependency could not be resolved.
      * @since 3.10.0
      */
-    DependencyResult resolveCoreExtensionAndFlatten(
+    default DependencyResult resolveCoreExtensionAndFlatten(
             Plugin plugin,
             DependencyFilter dependencyFilter,
             List<RemoteRepository> repositories,
             RepositorySystemSession session)
-            throws PluginResolutionException;
+            throws PluginResolutionException {
+        return resolvePlugin(plugin, null, dependencyFilter, repositories, session);
+    }
 
     /**
      * Resolves the runtime dependencies of the specified plugin.
+     * <p>
+     * Implementations must not delegate to
+     * {@link #resolvePluginAndFlatten(Plugin, Artifact, DependencyFilter, List, RepositorySystemSession)} without
+     * also overriding it: the default implementation of that method delegates back here.
      *
      * @param plugin The plugin for which to resolve the dependencies, must not be {@code null}.
      * @param artifact The plugin's main artifact, may be {@code null}.
@@ -114,6 +126,10 @@ public interface PluginDependenciesResolver {
 
     /**
      * Resolves the runtime dependencies of the specified plugin.
+     * <p>
+     * The default implementation delegates to
+     * {@link #resolvePlugin(Plugin, Artifact, DependencyFilter, List, RepositorySystemSession)}, which this method
+     * supersedes, so that implementations written against Maven 4.0.0-rc-5 and earlier keep working.
      *
      * @param plugin The plugin for which to resolve the dependencies, must not be {@code null}.
      * @param pluginArtifact The plugin's main artifact, may be {@code null}.
@@ -124,11 +140,13 @@ public interface PluginDependenciesResolver {
      * @throws PluginResolutionException If any dependency could not be resolved.
      * @since 3.10.0
      */
-    DependencyResult resolvePluginAndFlatten(
+    default DependencyResult resolvePluginAndFlatten(
             Plugin plugin,
             Artifact pluginArtifact,
             DependencyFilter dependencyFilter,
             List<RemoteRepository> repositories,
             RepositorySystemSession session)
-            throws PluginResolutionException;
+            throws PluginResolutionException {
+        return resolvePlugin(plugin, pluginArtifact, dependencyFilter, repositories, session);
+    }
 }
