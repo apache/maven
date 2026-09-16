@@ -46,6 +46,8 @@ class MavenITmng8655SettingsParserTest extends AbstractMavenIntegrationTestCase 
 
         Verifier verifier = newVerifier(project);
         verifier.setForkJvm(true);
+        // User-level core extensions would trigger settings parsing before the classpath parser is loaded.
+        verifier.setUserHomeDirectory(Files.createDirectories(directory.resolve("home")));
         verifier.addCliArguments("-Dmaven.ext.class.path=" + extension,
                 "-s", "settings.properties", "-Dparser.input=custom-settings", "validate");
         verifier.execute();
@@ -54,6 +56,7 @@ class MavenITmng8655SettingsParserTest extends AbstractMavenIntegrationTestCase 
 
         verifier = newVerifier(project);
         verifier.setForkJvm(true);
+        verifier.setUserHomeDirectory(directory.resolve("home"));
         verifier.setLogFileName("xml-fallback.txt");
         verifier.addCliArguments("-Dmaven.ext.class.path=" + extension, "-s", "settings.conf", "validate");
         verifier.execute();
@@ -68,6 +71,7 @@ class MavenITmng8655SettingsParserTest extends AbstractMavenIntegrationTestCase 
         Files.copy(testDir.resolve("extensions.xml"), project.resolve(".mvn/extensions.xml"));
         Verifier verifier = newVerifier(project);
         verifier.setForkJvm(true);
+        verifier.setUserHomeDirectory(Files.createDirectories(directory.resolve("home")));
         verifier.addCliArguments("-Dmaven.ext.class.path=" + testDir.resolve("extension/target/settings-parser-0.1.jar"),
                 "-s", "settings.properties", "validate");
         assertThrows(VerificationException.class, verifier::execute);

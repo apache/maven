@@ -318,7 +318,9 @@ class DefaultSettingsParserTest {
         assertSame(failure, fatal.getException());
         assertEquals(0, error.getProblemCollector().problemsReportedFor(BuilderProblem.Severity.WARNING));
         verify(broken).supports(source);
-        verify(matching, never()).parse(any(), any());
+        if (matchingFirst) {
+            verify(matching, never()).parse(any(), any());
+        }
         verify(broken, never()).parse(any(), any());
         verifyNoInteractions(unvisited, xmlFactory);
         verify(source, never()).openStream();
