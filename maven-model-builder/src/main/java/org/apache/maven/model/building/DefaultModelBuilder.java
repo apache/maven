@@ -324,6 +324,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             currentData.setActiveProfiles(rawProfiles);
 
             // profile injection
+            // TODO(#13146): repositories contributed by external-model profiles can shadow
+            // central; a WARN/FAIL policy for URL mismatches should be added separately.
             for (Profile activeProfile : activePomProfiles) {
                 profileInjector.injectProfile(tmpModel, activeProfile, request, problems);
             }
