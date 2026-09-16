@@ -278,6 +278,21 @@ class ExternalModelProfileActivationTest {
     }
 
     @Test
+    void testExternalModelSystemPropertySuppressesDefaultOnProfile() throws Exception {
+        // A system property named skip.defaults suppresses the default-on negated-property
+        // profile (!skip.defaults) even in external model builds. System properties are platform
+        // facts that pass through the sandbox unchanged, so the publisher's opt-out mechanism
+        // still works when the consumer sets it at the JVM level.
+        Properties sp = systemPropertiesWithTestValues();
+        sp.setProperty("skip.defaults", "true"); // system-level opt-out
+        Model model = build(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, sp, new Properties());
+
+        assertNull(
+                model.getProperties().get("profile.negated.property"),
+                "negated-property (default-on) profile must be suppressed when system property 'skip.defaults' is set");
+    }
+
+    @Test
     void testExternalModelJdkActivationIsPreserved() throws Exception {
         // JDK activation is a platform fact and must fire in external builds.
         Model model = build(
