@@ -538,6 +538,12 @@ public class DefaultModelBuilder implements ModelBuilder {
      */
     private static ProfileActivationContext externalActivationContext(ProfileActivationContext delegate) {
         return new ProfileActivationContext() {
+            /**
+             * Cached merged map of project + system properties (computed once on first access).
+             * System properties win on conflict. {@code null} means not yet computed.
+             */
+            private Map<String, String> mergedSystemProperties;
+
             @Override
             public List<String> getActiveProfileIds() {
                 return delegate.getActiveProfileIds();
@@ -552,16 +558,21 @@ public class DefaultModelBuilder implements ModelBuilder {
              * System properties merged with project properties (system wins on conflict).
              * This makes POM-declared properties visible to the PropertyProfileActivator
              * without modifying the activator's lookup chain for non-external models.
+             * The merged map is computed once and cached to avoid repeated allocations.
              */
             @Override
             public Map<String, String> getSystemProperties() {
+                if (mergedSystemProperties != null) {
+                    return mergedSystemProperties;
+                }
                 Map<String, String> projectProps = delegate.getProjectProperties();
                 if (projectProps == null || projectProps.isEmpty()) {
                     return delegate.getSystemProperties();
                 }
                 Map<String, String> merged = new HashMap<>(projectProps);
                 merged.putAll(delegate.getSystemProperties()); // system wins
-                return merged;
+                mergedSystemProperties = merged;
+                return mergedSystemProperties;
             }
 
             /** User properties are suppressed: consumer -D flags do not activate dependency profiles. */
