@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
@@ -250,41 +251,31 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     private SettingsParser selectParser(Source source, ProblemCollector<BuilderProblem> problems) {
         List<Map.Entry<String, SettingsParser>> matches = new ArrayList<>();
         for (Map.Entry<String, SettingsParser> entry : settingsParsers.entrySet()) {
-            boolean supported;
             try {
-                supported = entry.getValue().supports(source);
+                if (entry.getValue().supports(source)) {
+                    matches.add(entry);
+                }
             } catch (RuntimeException e) {
-                problems.reportProblem(new DefaultBuilderProblem(
-                        source.getLocation(),
-                        -1,
-                        -1,
-                        e,
-                        "Settings parser '" + (entry.getKey() != null ? entry.getKey() : "<unnamed>")
-                                + "' failed to determine support for this source",
-                        BuilderProblem.Severity.FATAL));
+                String msg = "Settings parser '" + parserName(entry.getKey())
+                        + "' failed to determine support for this source";
+                problems.reportProblem(
+                        new DefaultBuilderProblem(source.getLocation(), -1, -1, e, msg, BuilderProblem.Severity.FATAL));
                 return null;
-            }
-            if (supported) {
-                matches.add(entry);
             }
         }
         if (matches.size() > 1) {
-            problems.reportProblem(new DefaultBuilderProblem(
-                    source.getLocation(),
-                    -1,
-                    -1,
-                    null,
-                    "Multiple settings parsers support this source: "
-                            + String.join(
-                                    ", ",
-                                    matches.stream()
-                                            .map(entry -> entry.getKey() != null ? entry.getKey() : "<unnamed>")
-                                            .sorted()
-                                            .toList()),
-                    BuilderProblem.Severity.FATAL));
+            String parsers =
+                    matches.stream().map(e -> parserName(e.getKey())).sorted().collect(Collectors.joining(", "));
+            String msg = "Multiple settings parsers support this source: " + parsers;
+            problems.reportProblem(
+                    new DefaultBuilderProblem(source.getLocation(), -1, -1, null, msg, BuilderProblem.Severity.FATAL));
             return null;
         }
         return matches.isEmpty() ? xmlSettingsParser : matches.get(0).getValue();
+    }
+
+    private static String parserName(@Nullable String key) {
+        return key != null ? key : "<unnamed>";
     }
 
     private Settings interpolate(
