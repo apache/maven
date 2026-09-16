@@ -148,7 +148,64 @@ class BomRelocationTest {
         Map<String, String> poms = Map.of(
                 "test:old:1", pom("test", "old", "1", relocation("<artifactId>new</artifactId>")),
                 "test:new:1", pom("test", "new", "1", management(dependency("library", "2"))));
-        assertEquals(List.of("library:2"), managedDependencies(build(poms, management(bom("old")), true)));
+        assertEquals(List.of("library:2"), managedDependencies(build(null, management(bom("old")), poms)));
+    }
+
+    @Test
+    void reportsWorkspaceMissWithoutModelResolver() {
+        assertMissingWorkspaceModel(Map.of(), "missing", "test:missing:1");
+    }
+
+    @Test
+    void reportsWorkspaceRelocationTargetMissWithoutModelResolver() {
+        assertMissingWorkspaceModel(
+                Map.of("test:old:1", pom("test", "old", "1", relocation("<artifactId>missing</artifactId>"))),
+                "old",
+                "test:missing:1");
+    }
+
+    @Test
+    void fallsBackToModelResolverAfterWorkspaceMiss() throws Exception {
+        Map<String, String> poms =
+                Map.of("test:old:1", pom("test", "old", "1", management(dependency("library", "2"))));
+        assertEquals(List.of("library:2"), managedDependencies(build(poms, management(bom("old")), Map.of())));
+        assertEquals(1, resolutions.get("test:old:1"));
+    }
+
+    @Test
+    void fallsBackToModelResolverForWorkspaceRelocationTarget() throws Exception {
+        Map<String, String> workspace =
+                Map.of("test:old:1", pom("test", "old", "1", relocation("<artifactId>new</artifactId>")));
+        Map<String, String> poms =
+                Map.of("test:new:1", pom("test", "new", "1", management(dependency("library", "2"))));
+        assertEquals(List.of("library:2"), managedDependencies(build(poms, management(bom("old")), workspace)));
+        assertEquals(Map.of("test:new:1", 1), resolutions);
+    }
+
+    @Test
+    void preservesWorkspaceResolutionFailure() {
+        Map<String, String> poms =
+                Map.of("test:old:1", pom("test", "old", "1", management(dependency("library", "2"))));
+        ModelBuildingException exception = assertThrows(
+                ModelBuildingException.class,
+                () -> build(poms, management(bom("old")), Map.of("test:old:1", "<invalid")));
+        assertTrue(exception.getProblems().stream()
+                .anyMatch(problem -> problem.getSeverity() == ModelProblem.Severity.FATAL));
+        assertTrue(resolutions.isEmpty());
+    }
+
+    private void assertMissingWorkspaceModel(Map<String, String> workspace, String imported, String missing) {
+        ModelBuildingException exception =
+                assertThrows(ModelBuildingException.class, () -> build(null, management(bom(imported)), workspace));
+        ModelProblem problem = exception.getProblems().stream()
+                .filter(candidate -> candidate.getMessage().contains("no ModelResolver provided"))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError(exception.getMessage()));
+        assertEquals(ModelProblem.Severity.ERROR, problem.getSeverity());
+        assertTrue(problem.getMessage().contains(missing), problem.getMessage());
+        assertEquals("test:consumer:1", problem.getModelId());
+        assertTrue(problem.getLineNumber() > 0);
+        assertTrue(problem.getColumnNumber() > 0);
     }
 
     @Test
@@ -184,25 +241,28 @@ class BomRelocationTest {
     }
 
     private Model build(Map<String, String> poms, String content) throws Exception {
-        return build(poms, content, false);
+        return build(poms, content, null);
     }
 
-    private Model build(Map<String, String> poms, String content, boolean workspace) throws Exception {
+    private Model build(Map<String, String> poms, String content, Map<String, String> workspace) throws Exception {
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
         request.setModelSource(new StringModelSource(pom("test", "consumer", "1", content)));
-        request.setModelResolver(new DefaultModelBuilderTest.BaseModelResolver() {
-            @Override
-            public ModelSource resolveModel(String groupId, String artifactId, String version)
-                    throws UnresolvableModelException {
-                String id = groupId + ":" + artifactId + ":" + version;
-                resolutions.merge(id, 1, Integer::sum);
-                String source = poms.get(id);
-                if (source == null) {
-                    throw new UnresolvableModelException("Missing " + id, groupId, artifactId, version);
+        request.setLocationTracking(true);
+        if (poms != null) {
+            request.setModelResolver(new DefaultModelBuilderTest.BaseModelResolver() {
+                @Override
+                public ModelSource resolveModel(String groupId, String artifactId, String version)
+                        throws UnresolvableModelException {
+                    String id = groupId + ":" + artifactId + ":" + version;
+                    resolutions.merge(id, 1, Integer::sum);
+                    String source = poms.get(id);
+                    if (source == null) {
+                        throw new UnresolvableModelException("Missing " + id, groupId, artifactId, version);
+                    }
+                    return new StringModelSource(source, id);
                 }
-                return new StringModelSource(source, id);
-            }
-        });
+            });
+        }
         Map<String, Object> cache = new HashMap<>();
         request.setModelCache(new ModelCache() {
             @Override
@@ -215,8 +275,7 @@ class BomRelocationTest {
                 return cache.get(groupId + ":" + artifactId + ":" + version + ":" + tag);
             }
         });
-        if (workspace) {
-            request.setModelResolver(null);
+        if (workspace != null) {
             request.setWorkspaceModelResolver(new WorkspaceModelResolver() {
                 @Override
                 public Model resolveRawModel(String groupId, String artifactId, String version) {
@@ -226,9 +285,12 @@ class BomRelocationTest {
                 @Override
                 public Model resolveEffectiveModel(String groupId, String artifactId, String version)
                         throws UnresolvableModelException {
+                    String source = workspace.get(groupId + ":" + artifactId + ":" + version);
+                    if (source == null) {
+                        return null;
+                    }
                     try {
-                        return new MavenXpp3Reader()
-                                .read(new StringReader(poms.get(groupId + ":" + artifactId + ":" + version)));
+                        return new MavenXpp3Reader().read(new StringReader(source));
                     } catch (Exception e) {
                         throw new UnresolvableModelException(e.getMessage(), groupId, artifactId, version, e);
                     }
