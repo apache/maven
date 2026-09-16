@@ -169,6 +169,7 @@ class DefaultModelBuilderTest {
         assertEquals("activated", model.getProperties().get("profile.property"));
         assertEquals("activated", model.getProperties().get("profile.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
 
@@ -185,6 +186,11 @@ class DefaultModelBuilderTest {
         assertNull(model.getProperties().get("profile.property"));
         assertNull(model.getProperties().get("profile.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // Negated-property profile (!skip.defaults) fires because 'skip.defaults' is absent
+        // from the sandboxed context (user properties are suppressed; system properties do not
+        // contain it). This is the common opt-out flag pattern: the publisher's default-on
+        // profile must remain active for external builds unless a system-level override is set.
+        assertEquals("activated", model.getProperties().get("profile.negated.property"));
         // Repositories from legitimately-active profiles (JDK-activated) must be honored:
         // stripping them would break the project → dep1 → dep2 pattern. See #13100, #13116.
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
@@ -214,6 +220,36 @@ class DefaultModelBuilderTest {
     }
 
     /**
+     * A system property named {@code skip.defaults} suppresses the default-on negated-property
+     * profile ({@code !skip.defaults}) even in external (repository-resolved) model builds.
+     * System properties are platform facts that pass through the sandbox unchanged, so the
+     * publisher's opt-out mechanism still works when the consumer sets it at the JVM level.
+     */
+    @Test
+    public void testExternalModelSystemPropertySuppressesDefaultOnProfile() {
+        Map<String, String> systemProperties = new HashMap<>();
+        for (String name : System.getProperties().stringPropertyNames()) {
+            systemProperties.put(name, System.getProperty(name));
+        }
+        systemProperties.put("some.dir", System.getProperty("java.io.tmpdir"));
+        systemProperties.put("skip.defaults", "true"); // system-level opt-out
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .systemProperties(systemProperties)
+                .userProperties(Map.of("some.gating.property", "true", "some.condition.property", "true"))
+                .source(Sources.resolvedSource(
+                        getPom("resolved-model-with-profiles"),
+                        "org.apache.maven.test:resolved-model-with-profiles:1.0.0"))
+                .build();
+        Model model = builder.newSession().build(request).getEffectiveModel();
+
+        assertNull(
+                model.getProperties().get("profile.negated.property"),
+                "negated-property (default-on) profile must be suppressed when system property 'skip.defaults' is set");
+    }
+
+    /**
      * A model built at {@link ModelBuilderRequest.RequestType#CONSUMER_DEPENDENCY} whose source
      * is one Maven was merely pointed at -- {@link Sources#buildSource} rather than a source
      * Maven resolved from a repository -- is not treated as coming from a repository. Every
@@ -229,6 +265,7 @@ class DefaultModelBuilderTest {
         assertEquals("activated", model.getProperties().get("profile.property"));
         assertEquals("activated", model.getProperties().get("profile.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
 

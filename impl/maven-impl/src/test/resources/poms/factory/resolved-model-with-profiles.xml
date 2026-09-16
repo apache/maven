@@ -52,6 +52,18 @@
                 <profile.condition>activated</profile.condition>
             </properties>
         </profile>
+        <!-- default-on profile: fires when 'skip.defaults' is absent; suppressed when set as system property -->
+        <profile>
+            <id>negated-property-default-on</id>
+            <activation>
+                <property>
+                    <name>!skip.defaults</name>
+                </property>
+            </activation>
+            <properties>
+                <profile.negated.property>activated</profile.negated.property>
+            </properties>
+        </profile>
         <profile>
             <id>jdk-condition</id>
             <activation>
