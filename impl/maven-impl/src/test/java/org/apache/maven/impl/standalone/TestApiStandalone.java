@@ -75,7 +75,7 @@ class TestApiStandalone {
 
         Node node = session.collectDependencies(session.createDependencyCoordinates(coords), PathScope.MAIN_RUNTIME);
         assertNotNull(node);
-        assertEquals(6, node.getChildren().size());
+        assertEquals(6, node.children().size());
     }
 
     @Provides

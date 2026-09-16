@@ -47,7 +47,7 @@ public class DefaultTransportProvider implements TransportProvider {
     @Override
     public Transport transport(Session session, RemoteRepository repository) {
         try {
-            URI baseURI = new URI(repository.getUrl());
+            URI baseURI = new URI(repository.url());
             return new DefaultTransport(
                     baseURI,
                     transporterProvider.newTransporter(

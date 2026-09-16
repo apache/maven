@@ -338,10 +338,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             LinkedHashMap<String, RemoteRepository> byId = new LinkedHashMap<>();
             boolean hasDuplicates = false;
             for (RemoteRepository repo : repos) {
-                RemoteRepository existing = byId.putIfAbsent(repo.getId(), repo);
+                RemoteRepository existing = byId.putIfAbsent(repo.id(), repo);
                 if (existing != null) {
                     hasDuplicates = true;
-                    byId.put(repo.getId(), mergeRepositoryPolicies(existing, repo));
+                    byId.put(repo.id(), mergeRepositoryPolicies(existing, repo));
                 }
             }
             return hasDuplicates ? List.copyOf(byId.values()) : List.copyOf(repos);
@@ -680,17 +680,16 @@ public class DefaultModelBuilder implements ModelBuilder {
             // build request has a well-defined set of session/request repositories that
             // should take precedence; dependency and parent resolution do not.
             if (replace && isBuildRequest()) {
-                Set<String> ids = repos.stream().map(RemoteRepository::getId).collect(Collectors.toSet());
-                repositories = repositories.stream()
-                        .filter(r -> !ids.contains(r.getId()))
-                        .toList();
+                Set<String> ids = repos.stream().map(RemoteRepository::id).collect(Collectors.toSet());
+                repositories =
+                        repositories.stream().filter(r -> !ids.contains(r.id())).toList();
                 pomRepositories = pomRepositories.stream()
-                        .filter(r -> !ids.contains(r.getId()))
+                        .filter(r -> !ids.contains(r.id()))
                         .toList();
             } else {
                 Set<String> ids =
-                        pomRepositories.stream().map(RemoteRepository::getId).collect(Collectors.toSet());
-                repos = repos.stream().filter(r -> !ids.contains(r.getId())).toList();
+                        pomRepositories.stream().map(RemoteRepository::id).collect(Collectors.toSet());
+                repos = repos.stream().filter(r -> !ids.contains(r.id())).toList();
             }
 
             RepositoryFactory repositoryFactory = session.getService(RepositoryFactory.class);
