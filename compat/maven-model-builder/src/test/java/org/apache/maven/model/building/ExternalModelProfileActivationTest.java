@@ -31,10 +31,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * Models built at {@link ModelBuildingRequest#VALIDATION_LEVEL_MINIMAL} come from POMs resolved
  * from a repository during dependency resolution (a dependency POM, one of its parents, or an
  * imported BOM), see for instance {@code DefaultArtifactDescriptorReader#loadPom}. Their file and
- * property activators are not evaluated, and their profiles contribute no repositories. A project
- * build, at {@link ModelBuildingRequest#VALIDATION_LEVEL_STRICT}, still evaluates every activator.
- * Platform-derived activation (JDK version, operating system, activeByDefault) is unaffected at
- * either level.
+ * property activators are not evaluated. Platform-derived activation (JDK version, operating
+ * system, activeByDefault) is unaffected at either level. Repositories declared in
+ * legitimately-active profiles (JDK/OS/activeByDefault) are honored — stripping them would break
+ * the established {@code project → dep1 → dep2} pattern where dep1 declares dep2's non-Central
+ * repository inside a JDK- or activeByDefault-activated profile. A project build, at
+ * {@link ModelBuildingRequest#VALIDATION_LEVEL_STRICT}, still evaluates every activator.
  */
 class ExternalModelProfileActivationTest {
 
