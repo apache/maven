@@ -577,6 +577,8 @@ public final class Constants {
 
     /**
      * User property for enabling transitive dependencies of consumed test JARs.
+     * The effective default is {@code true} for Maven 4 semantics and {@code false}
+     * when Maven 3 personality is enabled.
      *
      * @since 4.1.0
      */

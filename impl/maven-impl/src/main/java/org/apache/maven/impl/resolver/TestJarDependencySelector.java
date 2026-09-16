@@ -32,7 +32,8 @@ import static java.util.Objects.requireNonNull;
 /**
  * Preserves Maven's normal non-transitive test-scope semantics while allowing the direct test-scoped dependencies of
  * a test JAR to participate in dependency collection. Those dependencies are part of the test artifact's classpath
- * contract, not the producer's main artifact contract.
+ * contract, not the producer's main artifact contract. Nested test JARs preserve the same rule: at each level,
+ * direct test-scoped dependencies are admitted when their immediate parent is itself a test JAR.
  */
 final class TestJarDependencySelector implements DependencySelector {
     private final DependencySelector delegate;
