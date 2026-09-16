@@ -146,7 +146,7 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
     }
 
     private boolean determineFamilyMatch(String family, String actualName) {
-        String test = family;
+        String test = family.toLowerCase(Locale.ENGLISH);
         boolean reverse = false;
 
         if (test.startsWith("!")) {
