@@ -109,6 +109,7 @@ import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.api.services.model.ModelVersionParser;
 import org.apache.maven.api.services.model.PluginConfigurationExpander;
 import org.apache.maven.api.services.model.PluginManagementInjector;
+import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileInjector;
 import org.apache.maven.api.services.model.ProfileSelector;
 import org.apache.maven.api.services.model.RootLocator;
@@ -1648,25 +1649,37 @@ public class DefaultModelBuilder implements ModelBuilder {
         private List<Profile> getActiveProfiles(
                 Collection<Profile> interpolatedProfiles, DefaultProfileActivationContext profileActivationContext) {
             if (isBuildRequestWithActivation()) {
-                Collection<Profile> eligibleProfiles = interpolatedProfiles;
                 if (externalOrigin) {
                     // A model resolved to satisfy dependency resolution -- a dependency POM
-                    // itself, or one of its parents, reached transitively -- evaluates only
-                    // platform-derived activation (JDK version, operating system,
-                    // activeByDefault). Repository stripping is intentionally omitted here:
-                    // file and property activation is already excluded by the
-                    // hasFileOrPropertyOrConditionActivation filter below, so only
-                    // legitimately-active profiles reach injection. Stripping their
-                    // repositories would break the established project → dep1 → dep2 pattern
-                    // where dep1 declares dep2's repository inside an activeByDefault or
-                    // JDK-activated profile.
-                    eligibleProfiles = interpolatedProfiles.stream()
-                            .filter(profile -> !hasFileOrPropertyOrConditionActivation(profile))
+                    // itself, or one of its parents, reached transitively -- evaluates profiles
+                    // against a sandboxed activation context.  The sandbox:
+                    //  - merges model properties into system property lookups (so POM-declared
+                    //    <properties> drive activation via the existing property lookup chain),
+                    //  - suppresses user properties (consumer -D flags must not activate
+                    //    dependency profiles — they were not set for that artifact),
+                    //  - disables file existence checks (publisher paths don't exist here).
+                    // Model properties are merged into system properties rather than adding
+                    // a separate lookup step in PropertyProfileActivator, because changing the
+                    // activator would affect ALL profile evaluations (including the build's own
+                    // project) and cause unintended profile activation when a POM declares a
+                    // property that matches a profile's activation condition.
+                    // File-activated profiles are pre-filtered (not just sandboxed) because
+                    // returning false from exists() would incorrectly activate <missing> profiles.
+                    // Repository stripping is intentionally omitted: only legitimately-active
+                    // profiles (JDK/OS/activeByDefault and POM-property-gated) reach injection,
+                    // and stripping their repositories would break the established
+                    // project → dep1 → dep2 pattern. See #13100.
+                    // TODO(#13146): repositories contributed by external-model profiles can shadow
+                    // central; a WARN/FAIL policy for URL mismatches should be added separately.
+                    Collection<Profile> nonFileProfiles = interpolatedProfiles.stream()
+                            .filter(p -> p.getActivation() == null
+                                    || p.getActivation().getFile() == null)
                             .toList();
+                    ProfileActivationContext externalContext =
+                            profileActivationContext.withoutUserPropertiesAndFilesystem();
+                    return profileSelector.getActiveProfiles(nonFileProfiles, externalContext, this);
                 }
-                // TODO(#13146): repositories contributed by external-model profiles can shadow
-                // central; a WARN/FAIL policy for URL mismatches should be added separately.
-                return profileSelector.getActiveProfiles(eligibleProfiles, profileActivationContext, this);
+                return profileSelector.getActiveProfiles(interpolatedProfiles, profileActivationContext, this);
             } else {
                 // BUILD_CONSUMER: activate only deterministic profiles whose activation is a
                 // function of the build platform (OS, JDK version, activeByDefault) rather than
@@ -1692,6 +1705,10 @@ public class DefaultModelBuilder implements ModelBuilder {
          * Determines whether the given profile's activation depends on file existence, a
          * property, or a condition expression, as opposed to being a function of the build
          * platform (JDK version, operating system) or {@code activeByDefault}.
+         * <p>
+         * Used for BUILD_CONSUMER model building to keep the consumer POM deterministic.
+         * For external (dependency/parent/BOM) models, the sandbox context approach is used
+         * instead — see {@link DefaultProfileActivationContext#withoutUserPropertiesAndFilesystem()}.
          */
         private static boolean hasFileOrPropertyOrConditionActivation(Profile profile) {
             Activation activation = profile.getActivation();
@@ -1703,7 +1720,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         /**
-         * Determines whether the given profile's activation includes a packaging condition.
          * Packaging-activated profiles are handled separately by the consumer POM builder's
          * {@code inlinePackagingActivatedProfiles()} and must not be activated during
          * BUILD_CONSUMER model building to avoid double-merging their contributions.

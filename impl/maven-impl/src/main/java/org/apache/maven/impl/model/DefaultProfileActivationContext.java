@@ -355,6 +355,104 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
         return this;
     }
 
+    /**
+     * Returns a sandboxed copy of this context suitable for evaluating profiles in
+     * repository-resolved (external) models — dependency POMs, parent POMs, and imported BOMs.
+     * <p>
+     * The sandboxed context:
+     * <ul>
+     *   <li><b>Merges model properties into system property lookups</b>: system properties
+     *       ({@code java.version}, {@code os.name}, …) are checked first (preserving JDK/OS
+     *       activation), then model properties (the POM's own {@code <properties>}) are used
+     *       as a fallback. This makes POM-declared properties visible to the
+     *       {@code PropertyProfileActivator} without modifying the activator's lookup chain
+     *       for non-external models.</li>
+     *   <li><b>Suppresses user properties</b> (consumer {@code -D} flags): they were not
+     *       set for the dependency and must not accidentally activate its profiles.</li>
+     *   <li><b>Disables file existence checks</b>: the publisher's file system paths do not
+     *       exist in the consumer's environment.  File-activated profiles should be
+     *       pre-filtered by the caller before reaching this context (the sandbox's
+     *       {@code exists()} returns {@code false} as a safety net, but that alone would
+     *       incorrectly activate {@code <missing>} profiles).</li>
+     * </ul>
+     *
+     * @return a sandboxed {@link ProfileActivationContext} for external model evaluation
+     */
+    public ProfileActivationContext withoutUserPropertiesAndFilesystem() {
+        return new ProfileActivationContext() {
+            @Override
+            public boolean isProfileActive(String profileId) {
+                return DefaultProfileActivationContext.this.isProfileActive(profileId);
+            }
+
+            @Override
+            public boolean isProfileInactive(String profileId) {
+                return DefaultProfileActivationContext.this.isProfileInactive(profileId);
+            }
+
+            /**
+             * System property lookup with model property fallback.
+             * System properties take precedence; model properties fill in as a fallback
+             * so POM-declared values drive property-activated profiles in external models.
+             */
+            @Override
+            public String getSystemProperty(String key) {
+                String value = DefaultProfileActivationContext.this.getSystemProperty(key);
+                if (value == null) {
+                    value = DefaultProfileActivationContext.this.getModelProperty(key);
+                }
+                return value;
+            }
+
+            /** User properties are suppressed: consumer {@code -D} flags do not activate dependency profiles. */
+            @Override
+            public String getUserProperty(String key) {
+                return null;
+            }
+
+            @Override
+            public String getModelProperty(String key) {
+                return DefaultProfileActivationContext.this.getModelProperty(key);
+            }
+
+            @Override
+            public String getModelArtifactId() {
+                return DefaultProfileActivationContext.this.getModelArtifactId();
+            }
+
+            @Override
+            public String getModelPackaging() {
+                return DefaultProfileActivationContext.this.getModelPackaging();
+            }
+
+            @Override
+            public String getModelRootDirectory() {
+                return DefaultProfileActivationContext.this.getModelRootDirectory();
+            }
+
+            @Override
+            public String getModelBaseDirectory() {
+                return DefaultProfileActivationContext.this.getModelBaseDirectory();
+            }
+
+            @Override
+            public String interpolatePath(String path) throws InterpolatorException {
+                return DefaultProfileActivationContext.this.interpolatePath(path);
+            }
+
+            /**
+             * File existence checks are disabled for external models: publisher paths do not
+             * exist in the consumer's environment.  File-activated profiles are pre-filtered
+             * before reaching this context (see {@code getActiveProfiles}), so this method
+             * should not normally be called; it returns {@code false} as a safety net.
+             */
+            @Override
+            public boolean exists(String path, boolean glob) {
+                return false;
+            }
+        };
+    }
+
     @Override
     public String interpolatePath(String path) throws InterpolatorException {
         if (path == null) {
