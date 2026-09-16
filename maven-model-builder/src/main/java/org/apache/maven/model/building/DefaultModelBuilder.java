@@ -324,12 +324,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             currentData.setActiveProfiles(rawProfiles);
 
             // profile injection
+            // TODO(#13146): repositories contributed by external-model profiles can shadow
+            // central; a WARN/FAIL policy for URL mismatches should be added separately.
             for (Profile activeProfile : activePomProfiles) {
-                profileInjector.injectProfile(
-                        tmpModel,
-                        externalModel ? withoutRepositories(activeProfile) : activeProfile,
-                        request,
-                        problems);
+                profileInjector.injectProfile(tmpModel, activeProfile, request, problems);
             }
 
             if (currentData == resultData) {
@@ -530,16 +528,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
         return eligible;
-    }
-
-    /**
-     * Returns a copy of the given profile with its repositories and plugin repositories cleared.
-     */
-    private static Profile withoutRepositories(Profile profile) {
-        Profile stripped = profile.clone();
-        stripped.setRepositories(Collections.emptyList());
-        stripped.setPluginRepositories(Collections.emptyList());
-        return stripped;
     }
 
     @Override
