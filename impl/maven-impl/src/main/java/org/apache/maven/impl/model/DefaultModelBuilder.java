@@ -1358,7 +1358,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         || !fileGroupId.equals(parent.getGroupId())
                         || fileArtifactId == null
                         || !fileArtifactId.equals(parent.getArtifactId())) {
-                    mismatchRelativePathAndGA(childModel, fileGroupId, fileArtifactId);
+                    mismatchRelativePathAndGA(childModel, parent, fileGroupId, fileArtifactId);
                     return null;
                 }
                 Model candidateModel = derived.readAsParentModel(profileActivationContext, parentChain);
@@ -1410,21 +1410,43 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
-        private void mismatchRelativePathAndGA(Model childModel, String groupId, String artifactId) {
-            Parent parent = childModel.getParent();
-            StringBuilder buffer = new StringBuilder(256);
-            buffer.append("'parent.relativePath'");
-            if (childModel != getRootModel()) {
-                buffer.append(" of POM ").append(ModelProblemUtils.toSourceHint(childModel));
+        private void mismatchRelativePathAndGA(Model childModel, Parent parent, String groupId, String artifactId) {
+            boolean defaultPath = parent.getRelativePath() == null;
+            boolean maven3Mode = Features.mavenMaven3Personality(
+                    InternalSession.from(session).getSession().getConfigProperties());
+
+            String actual = groupId + ':' + artifactId;
+            String declared = parent.getGroupId() + ':' + parent.getArtifactId();
+            String sourceHint = (childModel != getRootModel()) ? ModelProblemUtils.toSourceHint(childModel) : null;
+
+            String message;
+            if (defaultPath) {
+                // <relativePath> was omitted — Maven probed ../pom.xml on its own
+                message = "Maven probed the default location '../pom.xml'"
+                        + (sourceHint != null ? " for POM " + sourceHint : "")
+                        + " and found " + actual
+                        + " instead of the declared parent " + declared
+                        + ". Maven will fall back to repository resolution."
+                        + " To suppress this warning, add <relativePath/> to your <parent> declaration.";
+            } else {
+                // <relativePath> was set explicitly — this is a configuration error
+                message = "'parent.relativePath'"
+                        + (sourceHint != null ? " of POM " + sourceHint : "")
+                        + " points at '" + parent.getRelativePath() + "'"
+                        + " which resolves to " + actual
+                        + " instead of the declared parent " + declared
+                        + (maven3Mode
+                                ? ". Please verify your project structure."
+                                : ". Correct the <relativePath> value or remove it to let Maven resolve the parent"
+                                        + " from the repository.");
             }
-            buffer.append(" points at ").append(groupId).append(':').append(artifactId);
-            buffer.append(" instead of ").append(parent.getGroupId()).append(':');
-            buffer.append(parent.getArtifactId()).append(", please verify your project structure");
 
             setSource(childModel);
-            boolean warn = MODEL_VERSION_4_0_0.equals(childModel.getModelVersion())
-                    || childModel.getParent().getRelativePath() == null;
-            add(warn ? Severity.WARNING : Severity.FATAL, Version.BASE, buffer.toString(), parent.getLocation(""));
+            // WARNING when: Maven probed the default path (user didn't set anything),
+            //               OR maven3Personality is active (preserve historical lenient behaviour).
+            // FATAL otherwise: explicit <relativePath> pointing at the wrong artifact is a config error.
+            boolean warn = defaultPath || maven3Mode;
+            add(warn ? Severity.WARNING : Severity.FATAL, Version.BASE, message, parent.getLocation(""));
         }
 
         private void wrongParentRelativePath(Model childModel) {
@@ -1877,7 +1899,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                                             .version(parentVersion)
                                             .build());
                                 } else {
-                                    mismatchRelativePathAndGA(model, parentGroupId, parentArtifactId);
+                                    mismatchRelativePathAndGA(model, parent, parentGroupId, parentArtifactId);
                                 }
                             } else {
                                 if (!MODEL_VERSION_4_0_0.equals(model.getModelVersion()) && path != null) {
