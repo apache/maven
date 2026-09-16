@@ -29,6 +29,8 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.annotations.Nonnull;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.repository.LocalArtifactRequest;
+import org.eclipse.aether.repository.LocalArtifactResult;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 
@@ -72,8 +74,15 @@ public class DefaultNode extends AbstractNode {
 
     @Override
     public Optional<RemoteRepository> getRepository() {
-        // TODO: v4: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        org.eclipse.aether.artifact.Artifact artifact = node.getArtifact();
+        if (artifact == null || node.getRepositories().isEmpty()) {
+            return Optional.empty();
+        }
+        LocalArtifactRequest request =
+                new LocalArtifactRequest(artifact, node.getRepositories(), node.getRequestContext());
+        LocalArtifactResult result =
+                session.getSession().getLocalRepositoryManager().find(session.getSession(), request);
+        return Optional.ofNullable(result.getRepository()).map(session::getRemoteRepository);
     }
 
     /**

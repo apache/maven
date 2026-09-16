@@ -68,6 +68,8 @@ public interface Node {
 
     /**
      * The repository where this artifact has been downloaded from.
+     *
+     * @return an {@code Optional} containing the repository, or empty if not available (e.g. local artifact or root node)
      */
     @Nonnull
     Optional<RemoteRepository> getRepository();
