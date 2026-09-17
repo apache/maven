@@ -33,10 +33,12 @@ import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
@@ -97,7 +99,8 @@ class DefaultNodeTest {
         when(localResult.getRepository()).thenReturn(aetherRepo);
 
         LocalRepositoryManager lrm = mock(LocalRepositoryManager.class);
-        when(lrm.find(any(RepositorySystemSession.class), any(LocalArtifactRequest.class)))
+        ArgumentCaptor<LocalArtifactRequest> requestCaptor = ArgumentCaptor.forClass(LocalArtifactRequest.class);
+        when(lrm.find(any(RepositorySystemSession.class), requestCaptor.capture()))
                 .thenReturn(localResult);
 
         RepositorySystemSession repoSession = mock(RepositorySystemSession.class);
@@ -114,6 +117,10 @@ class DefaultNodeTest {
 
         assertTrue(result.isPresent());
         assertEquals(mavenRepo, result.get());
+        // Verify the request was built with the correct artifact and repositories
+        LocalArtifactRequest capturedRequest = requestCaptor.getValue();
+        assertSame(artifact, capturedRequest.getArtifact());
+        assertEquals(Collections.singletonList(aetherRepo), capturedRequest.getRepositories());
     }
 
     @Test
@@ -131,7 +138,8 @@ class DefaultNodeTest {
         when(localResult.getRepository()).thenReturn(null);
 
         LocalRepositoryManager lrm = mock(LocalRepositoryManager.class);
-        when(lrm.find(any(RepositorySystemSession.class), any(LocalArtifactRequest.class)))
+        ArgumentCaptor<LocalArtifactRequest> requestCaptor = ArgumentCaptor.forClass(LocalArtifactRequest.class);
+        when(lrm.find(any(RepositorySystemSession.class), requestCaptor.capture()))
                 .thenReturn(localResult);
 
         RepositorySystemSession repoSession = mock(RepositorySystemSession.class);
@@ -142,6 +150,10 @@ class DefaultNodeTest {
 
         DefaultNode defaultNode = new DefaultNode(session, node, false);
         assertFalse(defaultNode.getRepository().isPresent());
+        // Verify the request was built with the correct artifact and repositories
+        LocalArtifactRequest capturedRequest = requestCaptor.getValue();
+        assertSame(artifact, capturedRequest.getArtifact());
+        assertEquals(Collections.singletonList(aetherRepo), capturedRequest.getRepositories());
     }
 
     @Test
@@ -163,6 +175,31 @@ class DefaultNodeTest {
         node.setRepositories(Collections.emptyList());
 
         InternalSession session = mock(InternalSession.class);
+
+        DefaultNode defaultNode = new DefaultNode(session, node, false);
+        assertFalse(defaultNode.getRepository().isPresent());
+    }
+
+    @Test
+    void testGetRepositoryReturnsEmptyWhenLrmReturnsNull() {
+        // Guard against third-party LRM implementations that return null from find()
+        org.eclipse.aether.repository.RemoteRepository aetherRepo =
+                new org.eclipse.aether.repository.RemoteRepository.Builder(
+                                "central", "default", "https://repo1.maven.org/maven2")
+                        .build();
+        DefaultArtifact artifact = new DefaultArtifact("org.example:myapp:1.0");
+        DefaultDependencyNode node = new DefaultDependencyNode(artifact);
+        node.setRepositories(Collections.singletonList(aetherRepo));
+
+        LocalRepositoryManager lrm = mock(LocalRepositoryManager.class);
+        when(lrm.find(any(RepositorySystemSession.class), any(LocalArtifactRequest.class)))
+                .thenReturn(null);
+
+        RepositorySystemSession repoSession = mock(RepositorySystemSession.class);
+        when(repoSession.getLocalRepositoryManager()).thenReturn(lrm);
+
+        InternalSession session = mock(InternalSession.class);
+        when(session.getSession()).thenReturn(repoSession);
 
         DefaultNode defaultNode = new DefaultNode(session, node, false);
         assertFalse(defaultNode.getRepository().isPresent());
