@@ -34,6 +34,10 @@ import org.junit.jupiter.api.ClassOrdererContext;
  * Test suite ordering that orders tests by prefix (gh-xxx, mng-xxx, it-xxx) in descending order.
  * This ensures newer tests (higher numbers) are run first, which is useful for fail-fast behavior
  * since newer tests are more likely to fail.
+ * <p>
+ * {@code MavenITBootstrapTest} is always ordered first (before all other tests) to ensure the
+ * local repository is properly set up before any integration test runs.
+ * Unrecognized class name patterns fall back to alphabetical ordering with a log warning.
  */
 public class TestSuiteOrdering implements ClassOrderer {
 
@@ -114,7 +118,12 @@ public class TestSuiteOrdering implements ClassOrderer {
             return String.format("1-%08d", number); // Prefix with 1 for lowest priority
         }
 
-        // For any other tests, use the class name as-is (will be sorted alphabetically)
+        // Bootstrap test must always run first — give it the highest possible key
+        if (className.equals("MavenITBootstrapTest")) {
+            return "9-MavenITBootstrapTest";
+        }
+        // Unknown prefix — log once so contributors notice when adding non-standard class names
+        out.println("[TestSuiteOrdering] Unrecognized test class pattern, ordering as fallback: " + className);
         return "4-" + className;
     }
 }
