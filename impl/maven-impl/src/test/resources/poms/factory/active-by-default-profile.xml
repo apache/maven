@@ -16,7 +16,7 @@
  limitations under the License.
 -->
 <project xmlns="http://maven.apache.org/POM/4.1.0">
-    <groupId>org.apache.maven.tests</groupId>
+    <groupId>org.apache.maven.test</groupId>
     <artifactId>active-by-default-profile</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
