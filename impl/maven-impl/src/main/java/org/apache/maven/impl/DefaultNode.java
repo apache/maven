@@ -82,7 +82,9 @@ public class DefaultNode extends AbstractNode {
         LocalArtifactRequest request = new LocalArtifactRequest(artifact, repos, node.getRequestContext());
         LocalArtifactResult result =
                 session.getSession().getLocalRepositoryManager().find(session.getSession(), request);
-        return Optional.ofNullable(result.getRepository()).map(session::getRemoteRepository);
+        return Optional.ofNullable(result)
+                .map(LocalArtifactResult::getRepository)
+                .map(session::getRemoteRepository);
     }
 
     /**
