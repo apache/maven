@@ -567,11 +567,12 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
                 Map<String, String> projectProps = delegate.getProjectProperties();
                 if (projectProps == null || projectProps.isEmpty()) {
-                    return delegate.getSystemProperties();
+                    mergedSystemProperties = Collections.unmodifiableMap(delegate.getSystemProperties());
+                } else {
+                    Map<String, String> merged = new HashMap<>(projectProps);
+                    merged.putAll(delegate.getSystemProperties()); // system wins
+                    mergedSystemProperties = Collections.unmodifiableMap(merged);
                 }
-                Map<String, String> merged = new HashMap<>(projectProps);
-                merged.putAll(delegate.getSystemProperties()); // system wins
-                mergedSystemProperties = merged;
                 return mergedSystemProperties;
             }
 
