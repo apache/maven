@@ -139,12 +139,17 @@ class DefaultModelBuilderTest {
             systemProperties.put(name, System.getProperty(name));
         }
         systemProperties.put("some.dir", System.getProperty("java.io.tmpdir"));
-        systemProperties.put("some.gating.property", "true");
-        systemProperties.put("some.condition.property", "true");
+        // Use user properties for gating values: they simulate -D flags and must be suppressed
+        // when building external (repository-resolved) models. System properties are reserved for
+        // platform facts (java.version, os.name, …) that survive the external-model sandbox.
+        Map<String, String> userProperties = Map.of(
+                "some.gating.property", "true",
+                "some.condition.property", "true");
         return ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(requestType)
                 .systemProperties(systemProperties)
+                .userProperties(userProperties)
                 .source(Sources.buildSource(getPom("resolved-model-with-profiles")));
     }
 
@@ -157,7 +162,11 @@ class DefaultModelBuilderTest {
         assertEquals("activated", model.getProperties().get("profile.file"));
         assertEquals("activated", model.getProperties().get("profile.property"));
         assertEquals("activated", model.getProperties().get("profile.condition"));
+        // missing('/publisher/private/file') fires in a project build because that path
+        // genuinely doesn't exist on the developer's machine — normal project-build behaviour.
+        assertEquals("activated", model.getProperties().get("profile.missing.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
 
@@ -173,7 +182,16 @@ class DefaultModelBuilderTest {
         assertNull(model.getProperties().get("profile.file"));
         assertNull(model.getProperties().get("profile.property"));
         assertNull(model.getProperties().get("profile.condition"));
+        // missing()-condition profiles must be pre-filtered in CONSUMER_DEPENDENCY builds:
+        // inside the sandbox context.exists() always returns false, so missing(path) would
+        // evaluate to !false = true and fire unconditionally — same footgun as <file><missing>.
+        assertNull(model.getProperties().get("profile.missing.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // Negated-property profile (!skip.defaults) fires because 'skip.defaults' is absent
+        // from the sandboxed context (user properties are suppressed; system properties do not
+        // contain it). This is the common opt-out flag pattern: the publisher's default-on
+        // profile must remain active for external builds unless a system-level override is set.
+        assertEquals("activated", model.getProperties().get("profile.negated.property"));
         // Repositories from legitimately-active profiles (JDK-activated) must be honored.
         // See #13100, #13141.
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
@@ -203,6 +221,36 @@ class DefaultModelBuilderTest {
     }
 
     /**
+     * A system property named {@code skip.defaults} suppresses the default-on negated-property
+     * profile ({@code !skip.defaults}) even in external (repository-resolved) model builds.
+     * System properties are platform facts that pass through the sandbox unchanged, so the
+     * publisher's opt-out mechanism still works when the consumer sets it at the JVM level.
+     */
+    @Test
+    public void testExternalModelSystemPropertySuppressesDefaultOnProfile() {
+        Map<String, String> systemProperties = new HashMap<>();
+        for (String name : System.getProperties().stringPropertyNames()) {
+            systemProperties.put(name, System.getProperty(name));
+        }
+        systemProperties.put("some.dir", System.getProperty("java.io.tmpdir"));
+        systemProperties.put("skip.defaults", "true"); // system-level opt-out
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .systemProperties(systemProperties)
+                .userProperties(Map.of("some.gating.property", "true", "some.condition.property", "true"))
+                .source(Sources.resolvedSource(
+                        getPom("resolved-model-with-profiles"),
+                        "org.apache.maven.test:resolved-model-with-profiles:1.0.0"))
+                .build();
+        Model model = builder.newSession().build(request).getEffectiveModel();
+
+        assertNull(
+                model.getProperties().get("profile.negated.property"),
+                "negated-property (default-on) profile must be suppressed when system property 'skip.defaults' is set");
+    }
+
+    /**
      * A model built at {@link ModelBuilderRequest.RequestType#CONSUMER_DEPENDENCY} whose source
      * is one Maven was merely pointed at -- {@link Sources#buildSource} rather than a source
      * Maven resolved from a repository -- is not treated as coming from a repository. Every
@@ -218,6 +266,7 @@ class DefaultModelBuilderTest {
         assertEquals("activated", model.getProperties().get("profile.property"));
         assertEquals("activated", model.getProperties().get("profile.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
 
@@ -227,8 +276,6 @@ class DefaultModelBuilderTest {
             systemProperties.put(name, System.getProperty(name));
         }
         systemProperties.put("some.dir", System.getProperty("java.io.tmpdir"));
-        systemProperties.put("some.gating.property", "true");
-        systemProperties.put("some.condition.property", "true");
         return systemProperties;
     }
 
@@ -241,7 +288,9 @@ class DefaultModelBuilderTest {
                 List.of(),
                 List.of(),
                 systemProperties,
-                Map.of(),
+                // Gating props simulate -D flags: pass as user properties so the external-model
+                // sandbox suppresses them for dependency parents but allows them for project parents.
+                Map.of("some.gating.property", "true", "some.condition.property", "true"),
                 Model.newInstance());
     }
 
