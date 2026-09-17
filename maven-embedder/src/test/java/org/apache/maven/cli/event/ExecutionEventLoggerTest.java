@@ -279,11 +279,11 @@ public class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 1.0.0-SNAPSHOT:");
         inOrder.verify(logger).info("");
-        inOrder.verify(logger).info("...");
-        inOrder.verify(logger).info("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
-        inOrder.verify(logger).info("...");
+        inOrder.verify(logger).info("Maven Project artifact3 ............................ SKIPPED");
+        inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
+        inOrder.verify(logger).error("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
-        inOrder.verify(logger).info("BUILD FAILURE");
+        inOrder.verify(logger).error("BUILD FAILURE");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
         inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
@@ -335,13 +335,107 @@ public class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 1.0.0-SNAPSHOT:");
         inOrder.verify(logger).info("");
-        inOrder.verify(logger).info("...");
-        inOrder.verify(logger).info("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
-        inOrder.verify(logger).info("...");
-        inOrder.verify(logger).info("Maven Project artifact5 ............................ FAILURE [  5.000 s]");
-        inOrder.verify(logger).info("...");
+        inOrder.verify(logger).info("Maven Project artifact6 ............................ SKIPPED");
+        inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
+        inOrder.verify(logger).info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
+        inOrder.verify(logger).info("Maven Project artifact4 ............................ SUCCESS [  4.000 s]");
+        inOrder.verify(logger).error("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
+        inOrder.verify(logger).error("Maven Project artifact5 ............................ FAILURE [  5.000 s]");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
-        inOrder.verify(logger).info("BUILD FAILURE");
+        inOrder.verify(logger).error("BUILD FAILURE");
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+        inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
+        inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+    }
+
+    @Test
+    public void testSessionEndedSuccessWithSkippedModules() {
+        // prepare
+        MavenProject project1 = aProject("artifact1");
+        MavenProject project2 = aProject("artifact2");
+        MavenProject project3 = aProject("artifact3");
+
+        MavenExecutionResult executionResult = new DefaultMavenExecutionResult();
+        executionResult.addBuildSummary(new BuildSuccess(project1, 1000));
+        executionResult.addBuildSummary(new BuildSuccess(project3, 3000));
+
+        MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
+        executionRequest.setStartTime(new Date());
+
+        ProjectDependencyGraph projectDependencyGraph = mock(ProjectDependencyGraph.class);
+        when(projectDependencyGraph.getSortedProjects()).thenReturn(Arrays.asList(project1, project2, project3));
+
+        MavenSession mavenSession = mock(MavenSession.class);
+        when(mavenSession.getResult()).thenReturn(executionResult);
+        when(mavenSession.getRequest()).thenReturn(executionRequest);
+        when(mavenSession.getProjects()).thenReturn(Arrays.asList(project1, project2, project3));
+        when(mavenSession.getTopLevelProject()).thenReturn(project1);
+        when(mavenSession.getProjectDependencyGraph()).thenReturn(projectDependencyGraph);
+
+        ExecutionEvent event = mock(ExecutionEvent.class);
+        when(event.getSession()).thenReturn(mavenSession);
+
+        // execute
+        executionEventLogger.sessionEnded(event);
+
+        // verify
+        InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+        inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 1.0.0-SNAPSHOT:");
+        inOrder.verify(logger).info("");
+        inOrder.verify(logger).info("Maven Project artifact2 ............................ SKIPPED");
+        inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
+        inOrder.verify(logger).info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+        inOrder.verify(logger).info("BUILD SUCCESS");
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+        inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
+        inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+    }
+
+    @Test
+    public void testSessionEndedFailureMixedWithSkippedModules() {
+        // prepare
+        MavenProject project1 = aProject("artifact1");
+        MavenProject project2 = aProject("artifact2");
+        MavenProject project3 = aProject("artifact3");
+
+        MavenExecutionResult executionResult = new DefaultMavenExecutionResult();
+        executionResult.addBuildSummary(new BuildSuccess(project1, 1000));
+        executionResult.addBuildSummary(new BuildSuccess(project3, 3000));
+        executionResult.addException(new Exception("Failure"));
+
+        MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
+        executionRequest.setStartTime(new Date());
+
+        ProjectDependencyGraph projectDependencyGraph = mock(ProjectDependencyGraph.class);
+        when(projectDependencyGraph.getSortedProjects()).thenReturn(Arrays.asList(project1, project2, project3));
+
+        MavenSession mavenSession = mock(MavenSession.class);
+        when(mavenSession.getResult()).thenReturn(executionResult);
+        when(mavenSession.getRequest()).thenReturn(executionRequest);
+        when(mavenSession.getProjects()).thenReturn(Arrays.asList(project1, project2, project3));
+        when(mavenSession.getTopLevelProject()).thenReturn(project1);
+        when(mavenSession.getProjectDependencyGraph()).thenReturn(projectDependencyGraph);
+
+        ExecutionEvent event = mock(ExecutionEvent.class);
+        when(event.getSession()).thenReturn(mavenSession);
+
+        // execute
+        executionEventLogger.sessionEnded(event);
+
+        // verify
+        InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+        inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 1.0.0-SNAPSHOT:");
+        inOrder.verify(logger).info("");
+        inOrder.verify(logger).info("Maven Project artifact2 ............................ SKIPPED");
+        inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
+        inOrder.verify(logger).info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
+        inOrder.verify(logger).info("------------------------------------------------------------------------");
+        inOrder.verify(logger).error("BUILD FAILURE");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
         inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
