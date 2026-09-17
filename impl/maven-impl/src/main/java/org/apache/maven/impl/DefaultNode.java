@@ -29,6 +29,8 @@ import org.apache.maven.api.Node;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.annotations.Nonnull;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.repository.LocalArtifactRequest;
+import org.eclipse.aether.repository.LocalArtifactResult;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
 
@@ -37,6 +39,7 @@ public class DefaultNode extends AbstractNode {
     protected final @Nonnull InternalSession session;
     protected final @Nonnull org.eclipse.aether.graph.DependencyNode node;
     protected final boolean verbose;
+    private Optional<RemoteRepository> cachedRepository;
 
     public DefaultNode(
             @Nonnull InternalSession session, @Nonnull org.eclipse.aether.graph.DependencyNode node, boolean verbose) {
@@ -72,8 +75,21 @@ public class DefaultNode extends AbstractNode {
 
     @Override
     public Optional<RemoteRepository> getRepository() {
-        // TODO: v4: implement
-        throw new UnsupportedOperationException("Not implemented yet");
+        if (cachedRepository == null) {
+            org.eclipse.aether.artifact.Artifact artifact = node.getArtifact();
+            List<org.eclipse.aether.repository.RemoteRepository> repos = node.getRepositories();
+            if (artifact == null || repos.isEmpty()) {
+                cachedRepository = Optional.empty();
+            } else {
+                LocalArtifactRequest request = new LocalArtifactRequest(artifact, repos, node.getRequestContext());
+                LocalArtifactResult result =
+                        session.getSession().getLocalRepositoryManager().find(session.getSession(), request);
+                cachedRepository = Optional.ofNullable(result)
+                        .map(LocalArtifactResult::getRepository)
+                        .map(session::getRemoteRepository);
+            }
+        }
+        return cachedRepository;
     }
 
     /**

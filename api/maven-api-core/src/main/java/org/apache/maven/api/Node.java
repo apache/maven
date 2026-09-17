@@ -67,7 +67,11 @@ public interface Node {
     List<RemoteRepository> getRemoteRepositories();
 
     /**
-     * The repository where this artifact has been downloaded from.
+     * Returns the remote repository from which this artifact was downloaded, if known.
+     *
+     * @return an {@code Optional} containing the repository, or empty if not available
+     *         (e.g. local artifact, root node, or when the local repository manager
+     *         does not track artifact origins such as {@code SimpleLocalRepositoryManager})
      */
     @Nonnull
     Optional<RemoteRepository> getRepository();
