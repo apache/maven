@@ -35,9 +35,14 @@ import org.junit.jupiter.api.ClassOrdererContext;
  * This ensures newer tests (higher numbers) are run first, which is useful for fail-fast behavior
  * since newer tests are more likely to fail.
  * <p>
- * {@code MavenITBootstrapTest} is always ordered first (before all other tests) to ensure the
- * local repository is properly set up before any integration test runs.
- * Unrecognized class name patterns fall back to alphabetical ordering with a log warning.
+ * Execution order (first to last):
+ * <ol>
+ *   <li>{@code MavenITBootstrapTest} — always runs first to set up the local repository</li>
+ *   <li>gh-prefixed tests (descending number)</li>
+ *   <li>mng-prefixed tests (descending number)</li>
+ *   <li>it-prefixed tests (descending number)</li>
+ *   <li>Unrecognized class name patterns — fall back to alphabetical ordering (logged as warning)</li>
+ * </ol>
  */
 public class TestSuiteOrdering implements ClassOrderer {
 
@@ -97,33 +102,37 @@ public class TestSuiteOrdering implements ClassOrderer {
     private String getOrderKey(ClassDescriptor classDescriptor) {
         String className = classDescriptor.getTestClass().getSimpleName();
 
-        // Check for gh- pattern first (highest priority)
+        // Bootstrap test must always run first — give it the highest possible key.
+        // Checked before pattern matching to avoid a future rename like MavenITBootstrap42Test
+        // accidentally matching IT_PATTERN and sorting last.
+        if (className.equals("MavenITBootstrapTest")) {
+            return "9-MavenITBootstrapTest";
+        }
+
+        // Check for gh- pattern (highest priority among numbered tests)
         Matcher ghMatcher = GH_PATTERN.matcher(className);
         if (ghMatcher.matches()) {
             int number = Integer.parseInt(ghMatcher.group(1));
-            return String.format("3-%08d", number); // Prefix with 3 for highest priority
+            return String.format("3-%08d", number);
         }
 
         // Check for mng- pattern (medium priority)
         Matcher mngMatcher = MNG_PATTERN.matcher(className);
         if (mngMatcher.matches()) {
             int number = Integer.parseInt(mngMatcher.group(1));
-            return String.format("2-%08d", number); // Prefix with 2 for medium priority
+            return String.format("2-%08d", number);
         }
 
-        // Check for it- pattern (lowest priority)
+        // Check for it- pattern (lower priority)
         Matcher itMatcher = IT_PATTERN.matcher(className);
         if (itMatcher.matches()) {
             int number = Integer.parseInt(itMatcher.group(1));
-            return String.format("1-%08d", number); // Prefix with 1 for lowest priority
+            return String.format("1-%08d", number);
         }
 
-        // Bootstrap test must always run first — give it the highest possible key
-        if (className.equals("MavenITBootstrapTest")) {
-            return "9-MavenITBootstrapTest";
-        }
-        // Unknown prefix — log once so contributors notice when adding non-standard class names
+        // Unknown prefix — log so contributors notice when adding non-standard class names.
+        // Use "0-" so these sort last (after all known categories) in the descending order.
         out.println("[TestSuiteOrdering] Unrecognized test class pattern, ordering as fallback: " + className);
-        return "4-" + className;
+        return "0-" + className;
     }
 }
