@@ -1671,9 +1671,12 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // project → dep1 → dep2 pattern. See #13100.
                     // TODO(#13146): repositories contributed by external-model profiles can shadow
                     // central; a WARN/FAIL policy for URL mismatches should be added separately.
+                    // Condition profiles using exists()/missing() are also pre-filtered for the
+                    // same reason as file profiles: in the sandbox, context.exists() always returns
+                    // false, so missing(path) evaluates to !false = true and fires unconditionally.
                     Collection<Profile> nonFileProfiles = interpolatedProfiles.stream()
                             .filter(p -> p.getActivation() == null
-                                    || p.getActivation().getFile() == null)
+                                    || (p.getActivation().getFile() == null && !hasFileConditionExpression(p)))
                             .toList();
                     ProfileActivationContext externalContext =
                             profileActivationContext.withoutUserPropertiesAndFilesystem();
@@ -1717,6 +1720,22 @@ public class DefaultModelBuilder implements ModelBuilder {
                             || activation.getProperty() != null
                             || (activation.getCondition() != null
                                     && !activation.getCondition().isBlank()));
+        }
+
+        /**
+         * Returns {@code true} if the profile's condition expression calls {@code exists()} or
+         * {@code missing()}.  Such profiles must be pre-filtered out when building external
+         * (repository-resolved) models: inside the sandbox, {@code context.exists()} always
+         * returns {@code false}, so {@code missing(path)} evaluates to {@code !false = true}
+         * and fires unconditionally — the same footgun that file-activated profiles expose.
+         */
+        private static boolean hasFileConditionExpression(Profile profile) {
+            Activation a = profile.getActivation();
+            if (a == null || a.getCondition() == null) {
+                return false;
+            }
+            String c = a.getCondition();
+            return c.contains("exists(") || c.contains("missing(");
         }
 
         /**
