@@ -68,7 +68,8 @@ public final class ValidatingMetadataXpp3Reader {
             PathUtils.validatePathComponent(metadata.getVersion(), "version");
             for (Plugin plugin : metadata.getPlugins()) {
                 PathUtils.validatePathComponent(plugin.getArtifactId(), "plugin/artifactId");
-            }
+                PathUtils.validatePathComponent(plugin.getArtifactId(), "plugin/artifactId");
+                PathUtils.validatePathComponent(plugin.getPrefix(), "plugin/prefix");
             Versioning versioning = metadata.getVersioning();
             if (versioning != null) {
                 PathUtils.validatePathComponent(versioning.getLatest(), "versioning/latest");
