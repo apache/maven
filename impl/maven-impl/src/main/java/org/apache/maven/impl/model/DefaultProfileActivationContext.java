@@ -18,7 +18,6 @@
  */
 package org.apache.maven.impl.model;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.file.FileVisitResult;
 import java.nio.file.Files;
@@ -366,10 +365,14 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     @Override
     public String interpolatePath(String path) throws InterpolatorException {
+        return pathTranslator.alignToBaseDirectory(interpolate(path), model.getProjectDirectory());
+    }
+
+    private String interpolate(String path) throws InterpolatorException {
         if (path == null) {
             return null;
         }
-        String absolutePath = interpolator.interpolate(path, s -> {
+        return interpolator.interpolate(path, s -> {
             if ("basedir".equals(s) || "project.basedir".equals(s)) {
                 return getModelBaseDirectory();
             }
@@ -385,7 +388,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
             }
             return r;
         });
-        return pathTranslator.alignToBaseDirectory(absolutePath, model.getProjectDirectory());
     }
 
     @Override
@@ -399,9 +401,10 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     }
 
     private boolean doExists(String path, boolean enableGlob) throws ModelBuilderException {
-        String pattern = interpolatePath(path);
         String fixed, glob;
         if (enableGlob) {
+            // split before aligning to the base directory: '*' and '?' are not valid in a Windows path
+            String pattern = interpolate(path);
             int asteriskIndex = pattern.indexOf('*');
             int questionMarkIndex = pattern.indexOf('?');
             int firstWildcardIndex = questionMarkIndex < 0
@@ -411,17 +414,15 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
                 fixed = pattern;
                 glob = "";
             } else {
-                int lastSep = pattern.substring(0, firstWildcardIndex).lastIndexOf(File.separatorChar);
-                if (lastSep < 0) {
-                    fixed = "";
-                    glob = pattern;
-                } else {
-                    fixed = pattern.substring(0, lastSep);
-                    glob = pattern.substring(lastSep + 1);
-                }
+                String prefix = pattern.substring(0, firstWildcardIndex);
+                int lastSep = Math.max(prefix.lastIndexOf('/'), prefix.lastIndexOf('\\'));
+                fixed = pattern.substring(0, lastSep + 1);
+                // '\' is an escape character in the glob syntax, on Windows too, where '/' matches the separator
+                glob = pattern.substring(lastSep + 1).replace('\\', '/');
             }
+            fixed = pathTranslator.alignToBaseDirectory(fixed, model.getProjectDirectory());
         } else {
-            fixed = pattern;
+            fixed = interpolatePath(path);
             glob = "";
         }
         Path fixedPath = Paths.get(fixed);
