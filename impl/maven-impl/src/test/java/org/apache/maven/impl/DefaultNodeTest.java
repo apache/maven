@@ -204,4 +204,47 @@ class DefaultNodeTest {
         DefaultNode defaultNode = new DefaultNode(session, node, false);
         assertFalse(defaultNode.getRepository().isPresent());
     }
+
+    @Test
+    void testGetRepositoryIsCached() {
+        // Verify that the LRM is only consulted once even when getRepository() is called multiple times
+        org.eclipse.aether.repository.RemoteRepository aetherRepo =
+                new org.eclipse.aether.repository.RemoteRepository.Builder(
+                                "central", "default", "https://repo1.maven.org/maven2")
+                        .build();
+        DefaultArtifact artifact = new DefaultArtifact("org.example:myapp:1.0");
+        DefaultDependencyNode node = new DefaultDependencyNode(artifact);
+        node.setRepositories(Collections.singletonList(aetherRepo));
+
+        LocalArtifactResult localResult = mock(LocalArtifactResult.class);
+        when(localResult.getRepository()).thenReturn(aetherRepo);
+
+        LocalRepositoryManager lrm = mock(LocalRepositoryManager.class);
+        when(lrm.find(any(RepositorySystemSession.class), any(LocalArtifactRequest.class)))
+                .thenReturn(localResult);
+
+        RepositorySystemSession repoSession = mock(RepositorySystemSession.class);
+        when(repoSession.getLocalRepositoryManager()).thenReturn(lrm);
+
+        RemoteRepository mavenRepo = mock(RemoteRepository.class);
+
+        InternalSession session = mock(InternalSession.class);
+        when(session.getSession()).thenReturn(repoSession);
+        when(session.getRemoteRepository(eq(aetherRepo))).thenReturn(mavenRepo);
+
+        DefaultNode defaultNode = new DefaultNode(session, node, false);
+
+        // Call getRepository() three times
+        Optional<RemoteRepository> r1 = defaultNode.getRepository();
+        Optional<RemoteRepository> r2 = defaultNode.getRepository();
+        Optional<RemoteRepository> r3 = defaultNode.getRepository();
+
+        assertTrue(r1.isPresent());
+        assertEquals(mavenRepo, r1.get());
+        assertEquals(r1, r2);
+        assertEquals(r1, r3);
+
+        // LRM must have been invoked exactly once
+        Mockito.verify(lrm, Mockito.times(1)).find(any(RepositorySystemSession.class), any(LocalArtifactRequest.class));
+    }
 }

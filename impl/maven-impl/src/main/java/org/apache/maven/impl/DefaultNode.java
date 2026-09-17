@@ -39,6 +39,7 @@ public class DefaultNode extends AbstractNode {
     protected final @Nonnull InternalSession session;
     protected final @Nonnull org.eclipse.aether.graph.DependencyNode node;
     protected final boolean verbose;
+    private Optional<RemoteRepository> cachedRepository;
 
     public DefaultNode(
             @Nonnull InternalSession session, @Nonnull org.eclipse.aether.graph.DependencyNode node, boolean verbose) {
@@ -74,17 +75,21 @@ public class DefaultNode extends AbstractNode {
 
     @Override
     public Optional<RemoteRepository> getRepository() {
-        org.eclipse.aether.artifact.Artifact artifact = node.getArtifact();
-        List<org.eclipse.aether.repository.RemoteRepository> repos = node.getRepositories();
-        if (artifact == null || repos.isEmpty()) {
-            return Optional.empty();
+        if (cachedRepository == null) {
+            org.eclipse.aether.artifact.Artifact artifact = node.getArtifact();
+            List<org.eclipse.aether.repository.RemoteRepository> repos = node.getRepositories();
+            if (artifact == null || repos.isEmpty()) {
+                cachedRepository = Optional.empty();
+            } else {
+                LocalArtifactRequest request = new LocalArtifactRequest(artifact, repos, node.getRequestContext());
+                LocalArtifactResult result =
+                        session.getSession().getLocalRepositoryManager().find(session.getSession(), request);
+                cachedRepository = Optional.ofNullable(result)
+                        .map(LocalArtifactResult::getRepository)
+                        .map(session::getRemoteRepository);
+            }
         }
-        LocalArtifactRequest request = new LocalArtifactRequest(artifact, repos, node.getRequestContext());
-        LocalArtifactResult result =
-                session.getSession().getLocalRepositoryManager().find(session.getSession(), request);
-        return Optional.ofNullable(result)
-                .map(LocalArtifactResult::getRepository)
-                .map(session::getRemoteRepository);
+        return cachedRepository;
     }
 
     /**
