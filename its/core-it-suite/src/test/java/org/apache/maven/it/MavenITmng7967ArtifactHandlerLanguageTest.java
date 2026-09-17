@@ -60,7 +60,7 @@ class MavenITmng7967ArtifactHandlerLanguageTest extends AbstractMavenIntegration
         verifyTextNotInLog(logs, "[INFO] Not executing Javadoc as the project is not a Java classpath-capable package");
 
         // javadoc invocation should actually fail the build
-        verifyTextInLog(logs, "[INFO] BUILD FAILURE");
+        verifyTextInLog(logs, "[ERROR] BUILD FAILURE");
 
         // javadoc invocation should actually fail the build
         verifyTextInLog(logs, "[ERROR] Failed to execute goal org.apache.maven.plugins:maven-javadoc-plugin");
