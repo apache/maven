@@ -422,7 +422,6 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     void testFileWilcards() {
         assertActivation(true, newProfile("exists('${project.rootDirectory}/**/*.xsd')"), newFileContext());
         assertActivation(true, newProfile("exists('${project.basedir}/**/*.xsd')"), newFileContext());
-        assertActivation(true, newProfile("exists('${project.basedir}/**/*.xsd')"), newFileContext());
         assertActivation(true, newProfile("exists('**/*.xsd')"), newFileContext());
         assertActivation(true, newProfile("missing('**/*.xml')"), newFileContext());
         assertActivation(false, newProfile("missing('${project.basedir}/**/*.xsd')"), newFileContext());
