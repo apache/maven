@@ -21,7 +21,10 @@ package org.apache.maven.it;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,8 +52,11 @@ public class TestSuiteOrdering implements ClassOrderer {
     private static final Pattern GH_PATTERN = Pattern.compile(".*MavenITgh(\\d+).*");
     private static final Pattern MNG_PATTERN = Pattern.compile(".*MavenITmng(\\d+).*");
     private static final Pattern IT_PATTERN = Pattern.compile(".*MavenIT(\\d+).*");
+    private static final Pattern MDEP_PATTERN = Pattern.compile(".*MavenITmdep(\\d+).*");
 
     private static PrintStream out = System.out;
+    private static final Set<String> WARNED_CLASSES =
+            Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     private static void infoProperty(PrintStream info, String property) {
         info.println(property + ": " + System.getProperty(property));
@@ -130,9 +136,18 @@ public class TestSuiteOrdering implements ClassOrderer {
             return String.format("1-%08d", number);
         }
 
-        // Unknown prefix — log so contributors notice when adding non-standard class names.
+        // Check for mdep- pattern (lowest numbered priority)
+        Matcher mdepMatcher = MDEP_PATTERN.matcher(className);
+        if (mdepMatcher.matches()) {
+            int number = Integer.parseInt(mdepMatcher.group(1));
+            return String.format("1-%08d", number);
+        }
+
+        // Unknown prefix — log once per class so contributors notice non-standard names.
         // Use "0-" so these sort last (after all known categories) in the descending order.
-        out.println("[TestSuiteOrdering] Unrecognized test class pattern, ordering as fallback: " + className);
+        if (WARNED_CLASSES.add(className)) {
+            out.println("[TestSuiteOrdering] Unrecognized test class pattern, ordering as fallback: " + className);
+        }
         return "0-" + className;
     }
 }
