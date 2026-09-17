@@ -199,7 +199,7 @@ class DefaultModelBuilderTest {
                 .session(session)
                 .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
                 .source(Sources.resolvedSource(
-                        getPom("active-by-default-profile"), "org.apache.maven.tests:active-by-default-profile:1.0.0"))
+                        getPom("active-by-default-profile"), "org.apache.maven.test:active-by-default-profile:1.0.0"))
                 .build();
         Model model = builder.newSession().build(request).getEffectiveModel();
 
