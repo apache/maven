@@ -162,6 +162,9 @@ class DefaultModelBuilderTest {
         assertEquals("activated", model.getProperties().get("profile.file"));
         assertEquals("activated", model.getProperties().get("profile.property"));
         assertEquals("activated", model.getProperties().get("profile.condition"));
+        // missing('/publisher/private/file') fires in a project build because that path
+        // genuinely doesn't exist on the developer's machine — normal project-build behaviour.
+        assertEquals("activated", model.getProperties().get("profile.missing.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
         assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
@@ -179,6 +182,10 @@ class DefaultModelBuilderTest {
         assertNull(model.getProperties().get("profile.file"));
         assertNull(model.getProperties().get("profile.property"));
         assertNull(model.getProperties().get("profile.condition"));
+        // missing()-condition profiles must be pre-filtered in CONSUMER_DEPENDENCY builds:
+        // inside the sandbox context.exists() always returns false, so missing(path) would
+        // evaluate to !false = true and fire unconditionally — same footgun as <file><missing>.
+        assertNull(model.getProperties().get("profile.missing.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
         // Negated-property profile (!skip.defaults) fires because 'skip.defaults' is absent
         // from the sandboxed context (user properties are suppressed; system properties do not

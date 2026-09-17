@@ -545,7 +545,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         final Map<String, String> mergedSystemProps;
         Map<String, String> projectProps = delegate.getProjectProperties();
         if (projectProps == null || projectProps.isEmpty()) {
-            mergedSystemProps = delegate.getSystemProperties();
+            mergedSystemProps = Collections.unmodifiableMap(delegate.getSystemProperties());
         } else {
             Map<String, String> merged = new HashMap<>(projectProps);
             merged.putAll(delegate.getSystemProperties()); // system wins

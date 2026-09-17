@@ -1713,6 +1713,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // property that matches a profile's activation condition.
                     // File-activated profiles are pre-filtered (not just sandboxed) because
                     // returning false from exists() would incorrectly activate <missing> profiles.
+                    // Condition profiles using exists()/missing() are also pre-filtered for the
+                    // same reason: inside the sandbox, context.exists() always returns false, so
+                    // missing(path) evaluates to !false = true and fires unconditionally.
                     // Repository stripping is intentionally omitted here: only legitimately-active
                     // profiles reach injection, and stripping their repositories would break the
                     // established project → dep1 → dep2 pattern where dep1 declares dep2's
@@ -1720,7 +1723,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // See #13100, #13141.
                     Collection<Profile> nonFileProfiles = interpolatedProfiles.stream()
                             .filter(p -> p.getActivation() == null
-                                    || p.getActivation().getFile() == null)
+                                    || (p.getActivation().getFile() == null && !hasFileConditionExpression(p)))
                             .toList();
                     ProfileActivationContext externalContext =
                             profileActivationContext.withoutUserPropertiesAndFilesystem();
@@ -1766,6 +1769,22 @@ public class DefaultModelBuilder implements ModelBuilder {
                             || activation.getProperty() != null
                             || (activation.getCondition() != null
                                     && !activation.getCondition().isBlank()));
+        }
+
+        /**
+         * Returns {@code true} if the profile's condition expression calls {@code exists()} or
+         * {@code missing()}.  Such profiles must be pre-filtered out when building external
+         * (repository-resolved) models: inside the sandbox, {@code context.exists()} always
+         * returns {@code false}, so {@code missing(path)} evaluates to {@code !false = true}
+         * and fires unconditionally — the same footgun that file-activated profiles expose.
+         */
+        private static boolean hasFileConditionExpression(Profile profile) {
+            Activation a = profile.getActivation();
+            if (a == null || a.getCondition() == null) {
+                return false;
+            }
+            String c = a.getCondition();
+            return c.contains("exists(") || c.contains("missing(");
         }
 
         /**
