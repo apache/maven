@@ -38,65 +38,48 @@ import org.apache.maven.api.annotations.Provider;
 public interface Log {
     /**
      * {@return true if the <b>trace</b> error level is enabled}
-     * <p>
-     * The default implementation returns {@code false} for backward
-     * compatibility with existing {@code Log} implementations.
+     * @since 4.1.0
      */
-    default boolean isTraceEnabled() {
-        return false;
-    }
+    boolean isTraceEnabled();
 
     /**
-     * Sends a message to the user at the <b>trace</b> error level.
+     * Sends a message to the user in the <b>trace</b> error level.
      * <p>
-     * Trace is the most verbose level, intended for Maven core internals
-     * such as resolver negotiation, model interpolation, and lifecycle
-     * ordering details.  Use {@link #debug(CharSequence)} instead for
-     * messages that help <em>users</em> investigate their build
-     * (for instance, why a module was recompiled).
-     * <p>
-     * The default implementation is a no-op for backward compatibility
-     * with existing {@code Log} implementations.
+     * Trace is intended for Maven core internals and low-level framework
+     * diagnostics.  Plugin authors should normally use {@link #debug} for
+     * developer-facing diagnostic output.
      *
      * @param content the message to log
+     * @since 4.1.0
      */
-    default void trace(CharSequence content) {}
+    void trace(CharSequence content);
 
     /**
      * Sends a message (and accompanying exception) to the user at the <b>trace</b> error level.
-     * <p>
-     * The default implementation is a no-op for backward compatibility.
      *
      * @param content the message to log
      * @param error the error that caused this log
+     * @since 4.1.0
      */
-    default void trace(CharSequence content, Throwable error) {}
+    void trace(CharSequence content, Throwable error);
 
     /**
-     * Sends an exception to the user at the <b>trace</b> error level.
-     * The stack trace for this exception will be output when this error level is enabled.
-     * <p>
-     * The default implementation is a no-op for backward compatibility.
+     * Sends an exception to the user in the <b>trace</b> error level.
      *
      * @param error the error that caused this log
+     * @since 4.1.0
      */
-    default void trace(Throwable error) {}
+    void trace(Throwable error);
 
     /**
-     * Sends a lazily-computed message at the <b>trace</b> error level.
-     * The supplier is only evaluated if trace is enabled.
-     * <p>
-     * The default implementation is a no-op for backward compatibility.
+     * @since 4.1.0
      */
-    default void trace(Supplier<String> content) {}
+    void trace(Supplier<String> content);
 
     /**
-     * Sends a lazily-computed message (and accompanying exception) at the <b>trace</b> error level.
-     * The supplier is only evaluated if trace is enabled.
-     * <p>
-     * The default implementation is a no-op for backward compatibility.
+     * @since 4.1.0
      */
-    default void trace(Supplier<String> content, Throwable error) {}
+    void trace(Supplier<String> content, Throwable error);
 
     /**
      * {@return true if the <b>debug</b> error level is enabled}
@@ -245,6 +228,7 @@ public interface Log {
      *
      * @param name the child logger name segment (must not be {@code null})
      * @return a child {@code Log}, never {@code null}
+     * @since 4.1.0
      */
     default Log child(String name) {
         return this;

@@ -21,16 +21,17 @@ package org.apache.maven.slf4j;
 import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
 import java.util.logging.LogRecord;
 import java.util.logging.Logger;
 
+import org.apache.maven.api.services.MessageBuilder;
 import org.slf4j.LoggerFactory;
 import org.slf4j.spi.LocationAwareLogger;
+
+import static org.apache.maven.jline.MessageUtils.builder;
 
 /**
  * A JUL {@link Handler} that routes {@code java.util.logging} events into
@@ -38,12 +39,14 @@ import org.slf4j.spi.LocationAwareLogger;
  * metadata that the standard {@code SLF4JBridgeHandler} silently drops
  * (source class name, source method name, thread ID).
  * <p>
- * All JUL events are routed through SLF4J so that {@link MavenSimpleLogger}
- * produces a consistent {@code formattedMessage} (with timestamp, logger name,
- * and ANSI styling) regardless of the event's origin.  The JUL metadata is
- * stashed in a thread-local <em>before</em> the SLF4J call so that downstream
+ * When a {@link MavenSimpleLogger.LogSink LogSink} is installed (i.e. during
+ * a build), JUL events are sent directly to the sink — bypassing SLF4J
+ * entirely.  The JUL metadata is stashed in a thread-local so downstream
  * consumers (e.g. {@code ProjectBuildLogAppender}) can read it when
  * constructing a structured {@code LogEvent}.
+ * <p>
+ * When no LogSink is installed (e.g. during early bootstrap), the handler
+ * falls back to routing through SLF4J for console output.
  * <p>
  * Usage — replace the standard SLF4J bridge in {@code LookupInvoker}:
  * <pre>
@@ -67,32 +70,6 @@ public class MavenJulHandler extends Handler {
     public record JulMetadata(String sourceClassName, String sourceMethodName, long threadId) {}
 
     private static final ThreadLocal<JulMetadata> METADATA = new ThreadLocal<>();
-
-    /**
-     * Private SLF4J logger cache using {@link ConcurrentMap#putIfAbsent}
-     * instead of {@link ConcurrentMap#computeIfAbsent}.  This avoids the
-     * {@code ConcurrentHashMap.computeIfAbsent} reentrancy bug
-     * ({@code IllegalStateException("Recursive update")}) that occurs
-     * when a JUL event fires during SLF4J logger initialization: the
-     * handler's {@code publish()} calls {@code LoggerFactory.getLogger()},
-     * which internally uses {@code computeIfAbsent}, and if that triggers
-     * another JUL event whose logger name hashes to the same bucket,
-     * {@code ConcurrentHashMap} throws.  {@code putIfAbsent} is safe
-     * against reentrancy — worst case, two threads create the same
-     * logger and one is discarded.
-     */
-    private static final ConcurrentMap<String, org.slf4j.Logger> LOGGER_CACHE = new ConcurrentHashMap<>();
-
-    /**
-     * Re-entrancy guard: set to {@code true} while {@link #publish} is routing
-     * a JUL event through SLF4J on this thread.  Prevents recursive JUL events
-     * (e.g. JLine's {@code StyleResolver} calling {@code java.util.logging.Logger}
-     * while inside {@link MavenSimpleLogger#renderLevel} lazy-initialisation,
-     * which in turn is triggered by a JUL event during terminal construction)
-     * from re-entering {@code publish} and crashing with
-     * {@code ConcurrentHashMap.computeIfAbsent IllegalStateException("Recursive update")}.
-     */
-    private static final ThreadLocal<Boolean> IN_PUBLISH = new ThreadLocal<>();
 
     /**
      * Returns the JUL metadata for the current log event being processed,
@@ -120,13 +97,8 @@ public class MavenJulHandler extends Handler {
             rootLogger.removeHandler(handler);
         }
         rootLogger.addHandler(new MavenJulHandler());
-        // Note: we intentionally do NOT set rootLogger.setLevel(Level.ALL)
-        // here.  Setting it eagerly floods JUL events during SLF4J bootstrap,
-        // triggering ConcurrentHashMap.computeIfAbsent reentrancy in the
-        // SLF4J logger factory ("Recursive update").  The JUL root default
-        // (INFO) is fine — callers that need FINE/FINEST events (e.g. -X
-        // debug mode) should set the JUL root level after SLF4J is fully
-        // initialized.
+        // Accept all levels — filtering is done by SLF4J
+        rootLogger.setLevel(Level.ALL);
     }
 
     /**
@@ -149,44 +121,8 @@ public class MavenJulHandler extends Handler {
             return;
         }
 
-        // Re-entrancy guard: drop recursive JUL events that originate from
-        // within SLF4J/JLine processing triggered by this very publish() call.
-        // Example: MavenSimpleLogger.renderLevel() lazily initialises ANSI
-        // colour strings by calling JLine's StyleResolver, which logs DEBUG
-        // events via java.util.logging — re-entering publish() on the same
-        // thread and crashing ConcurrentHashMap.computeIfAbsent with
-        // IllegalStateException("Recursive update").
-        if (Boolean.TRUE.equals(IN_PUBLISH.get())) {
-            return;
-        }
-
-        // Guard against null logger name (allowed by JUL spec)
         String loggerName = record.getLoggerName();
-        if (loggerName == null) {
-            loggerName = "";
-        }
-
-        // Look up the SLF4J logger from our private cache, bypassing
-        // LoggerFactory.getLogger() on the hot path to avoid the
-        // ConcurrentHashMap.computeIfAbsent reentrancy problem.
-        org.slf4j.Logger slf4jLogger = LOGGER_CACHE.get(loggerName);
-        if (slf4jLogger == null) {
-            // Cold path: create the logger via SLF4J.  Guard against
-            // the ConcurrentHashMap.computeIfAbsent reentrancy bug:
-            // LoggerFactory.getLogger() uses computeIfAbsent internally,
-            // so if a JUL event fires during SLF4J initialization and
-            // the logger name hashes to the same bucket, CHM throws
-            // IllegalStateException("Recursive update").  We catch it
-            // and silently drop the event — it's a bootstrap race, and
-            // subsequent events will hit the cache.
-            try {
-                slf4jLogger = LoggerFactory.getLogger(loggerName);
-            } catch (IllegalStateException e) {
-                // ConcurrentHashMap reentrancy — drop this event
-                return;
-            }
-            LOGGER_CACHE.putIfAbsent(loggerName, slf4jLogger);
-        }
+        org.slf4j.Logger slf4jLogger = LoggerFactory.getLogger(loggerName);
         int slf4jLevel = julLevelToSlf4j(record.getLevel());
 
         // Quick exit if this level is not enabled
@@ -197,21 +133,21 @@ public class MavenJulHandler extends Handler {
         String message = formatMessage(record);
         Throwable throwable = record.getThrown();
 
-        // Set the JUL metadata before routing through SLF4J so that
-        // downstream consumers (e.g. ProjectBuildLogAppender) can read
-        // it when constructing a structured LogEvent.  By always going
-        // through SLF4J, the formattedMessage is produced by
-        // MavenSimpleLogger (with proper timestamp, logger name, and
-        // ANSI styling) regardless of whether the event originated from
-        // JUL or SLF4J — fixing the format inconsistency.
-        METADATA.set(
-                new JulMetadata(record.getSourceClassName(), record.getSourceMethodName(), record.getLongThreadID()));
-        IN_PUBLISH.set(Boolean.TRUE);
-        try {
+        // If a LogSink is installed, bypass SLF4J entirely: call the sink
+        // directly with the JUL metadata so no information is lost in transit.
+        MavenSimpleLogger.LogSink sink = MavenSimpleLogger.getLogSink();
+        if (sink != null) {
+            METADATA.set(new JulMetadata(
+                    record.getSourceClassName(), record.getSourceMethodName(), record.getLongThreadID()));
+            try {
+                String formatted = formatForConsole(slf4jLevel, message);
+                sink.accept(slf4jLevel, loggerName, message, formatted, throwable);
+            } finally {
+                METADATA.remove();
+            }
+        } else {
+            // No LogSink — fall through to SLF4J for console output
             logToSlf4j(slf4jLogger, slf4jLevel, message, throwable);
-        } finally {
-            IN_PUBLISH.remove();
-            METADATA.remove();
         }
     }
 
@@ -257,6 +193,23 @@ public class MavenJulHandler extends Handler {
         }
 
         return message;
+    }
+
+    /**
+     * Formats a JUL message for console output, matching the {@code [LEVEL] message}
+     * style used by MavenSimpleLogger with ANSI coloring when available.
+     */
+    private static String formatForConsole(int level, String message) {
+        MessageBuilder mb = builder();
+        String levelStr =
+                switch (level) {
+                    case LocationAwareLogger.TRACE_INT -> mb.trace("TRACE").build();
+                    case LocationAwareLogger.DEBUG_INT -> mb.debug("DEBUG").build();
+                    case LocationAwareLogger.INFO_INT -> mb.info("INFO").build();
+                    case LocationAwareLogger.WARN_INT -> mb.warning("WARNING").build();
+                    default -> mb.error("ERROR").build();
+                };
+        return "[" + levelStr + "] " + message;
     }
 
     private static int julLevelToSlf4j(Level julLevel) {

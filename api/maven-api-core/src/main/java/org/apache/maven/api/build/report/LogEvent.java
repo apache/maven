@@ -21,7 +21,6 @@ package org.apache.maven.api.build.report;
 import java.time.Instant;
 
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
@@ -43,7 +42,6 @@ import org.apache.maven.api.annotations.Nullable;
  * @since 4.1.0
  */
 @Experimental
-@Immutable
 public interface LogEvent {
 
     /**
@@ -117,6 +115,7 @@ public interface LogEvent {
      * For direct SLF4J logging it is {@code null}.
      *
      * @return the source class name, or {@code null}
+     * @since 4.1.0
      */
     @Nullable
     default String sourceClassName() {
@@ -131,6 +130,7 @@ public interface LogEvent {
      * For direct SLF4J logging it is {@code null}.
      *
      * @return the source method name, or {@code null}
+     * @since 4.1.0
      */
     @Nullable
     default String sourceMethodName() {
@@ -144,6 +144,7 @@ public interface LogEvent {
      * if the thread ID is not available (i.e. for direct SLF4J events).
      *
      * @return the thread ID, or {@code -1} if unavailable
+     * @since 4.1.0
      */
     default long threadId() {
         return -1;
@@ -157,7 +158,8 @@ public interface LogEvent {
      * providing a global ordering across all event sources (Log API,
      * JUL, and direct SLF4J).
      *
-     * @return the sequence number, or {@code -1} if unavailable
+     * @return the sequence number, always non-negative
+     * @since 4.1.0
      */
     default long sequenceNumber() {
         return -1;
