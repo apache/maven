@@ -38,6 +38,7 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends 
 
         Path pluginDir = testDir.resolve("plugin");
         Verifier verifier = newVerifier(pluginDir);
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -49,6 +50,7 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends 
 
         Verifier verifier = newVerifier(consumerDir);
         verifier.setLogFileName("log-direct-plugin-invocation.txt");
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument(PLUGIN_KEY + ":require-compile-phase");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -68,6 +70,7 @@ public class MavenITmng6566ExecuteAnnotationShouldNotReExecuteGoalsTest extends 
 
         Verifier verifier = newVerifier(consumerDir);
         verifier.setLogFileName("log-phase-execution.txt");
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();

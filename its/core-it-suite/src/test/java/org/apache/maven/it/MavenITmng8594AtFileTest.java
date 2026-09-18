@@ -44,6 +44,7 @@ class MavenITmng8594AtFileTest extends AbstractMavenIntegrationTestCase {
         verifier.addCliArgument("cmd.txt");
         verifier.addCliArgument("-Dcolor1=green");
         verifier.addCliArgument("-Dcolor2=blue");
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("clean");
         verifier.execute();
         verifier.verifyErrorFreeLog();

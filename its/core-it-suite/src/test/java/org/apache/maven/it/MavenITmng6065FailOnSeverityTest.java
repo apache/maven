@@ -45,6 +45,7 @@ public class MavenITmng6065FailOnSeverityTest extends AbstractMavenIntegrationTe
         boolean failed = false;
 
         try {
+            verifier.addCliArgument("--console=verbose");
             verifier.addCliArgument("compile");
             verifier.execute();
         } catch (VerificationException e) {
@@ -65,6 +66,7 @@ public class MavenITmng6065FailOnSeverityTest extends AbstractMavenIntegrationTe
         verifier.addCliArgument("--fail-on-severity");
         verifier.addCliArgument("ERROR");
 
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("compile");
         verifier.execute();
 

@@ -87,6 +87,7 @@ under the License.
       <includes>
         <include>mvn</include>
         <include>mvnenc</include>
+        <include>mvnlog</include>
         <include>mvnsh</include>
         <include>mvnup</include>
         <include>mvnDebug</include>
@@ -104,14 +105,6 @@ under the License.
     <fileSet>
       <directory>src/assembly/maven/lib</directory>
       <outputDirectory>lib</outputDirectory>
-    </fileSet>
-    <fileSet>
-      <directory>target/classes/org/apache/maven/messages</directory>
-      <outputDirectory>bin</outputDirectory>
-      <includes>
-        <include>maven.version.properties</include>
-      </includes>
-      <fileMode>0444</fileMode>
     </fileSet>
   </fileSets>
 </component>

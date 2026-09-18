@@ -43,6 +43,7 @@ public class MavenITmng5965ParallelBuildMultipliesWorkTest extends AbstractMaven
         verifier.setLogFileName("log-only.txt");
         verifier.addCliArgument("-T1");
         // include an aggregator task so that the two goals end up in different task segments
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArguments("clean", "install:help");
         verifier.execute();
         verifier.verifyErrorFreeLog();
