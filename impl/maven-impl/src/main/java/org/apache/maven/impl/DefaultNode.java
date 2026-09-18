@@ -53,27 +53,27 @@ public class DefaultNode extends AbstractNode {
     }
 
     @Override
-    public Artifact getArtifact() {
+    public Artifact artifact() {
         return node.getArtifact() != null ? session.getArtifact(node.getArtifact()) : null;
     }
 
     @Override
-    public Dependency getDependency() {
+    public Dependency dependency() {
         return node.getDependency() != null ? session.getDependency(node.getDependency()) : null;
     }
 
     @Override
-    public List<Node> getChildren() {
+    public List<Node> children() {
         return new MappedList<>(node.getChildren(), n -> session.getNode(n, verbose));
     }
 
     @Override
-    public List<RemoteRepository> getRemoteRepositories() {
+    public List<RemoteRepository> remoteRepositories() {
         return new MappedList<>(node.getRepositories(), session::getRemoteRepository);
     }
 
     @Override
-    public Optional<RemoteRepository> getRepository() {
+    public Optional<RemoteRepository> repository() {
         org.eclipse.aether.artifact.Artifact artifact = node.getArtifact();
         List<org.eclipse.aether.repository.RemoteRepository> repos = node.getRepositories();
         if (artifact == null || repos.isEmpty()) {

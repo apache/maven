@@ -34,7 +34,7 @@ public class DefaultDownloadedArtifact extends DefaultArtifact implements Downlo
     }
 
     @Override
-    public Path getPath() {
+    public Path path() {
         return artifact.getPath();
     }
 }

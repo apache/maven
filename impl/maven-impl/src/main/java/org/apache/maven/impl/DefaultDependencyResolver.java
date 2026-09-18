@@ -252,13 +252,13 @@ public class DefaultDependencyResolver implements DependencyResolver {
                     ArtifactResolverResult artifactResolverResult =
                             session.getService(ArtifactResolver.class).resolve(session, coordinates, repositories);
                     for (Node node : nodes) {
-                        Path path = (node.getArtifact() != null)
+                        Path path = (node.artifact() != null)
                                 ? artifactResolverResult
-                                        .getResult(node.getArtifact().toCoordinates())
+                                        .getResult(node.artifact().toCoordinates())
                                         .getPath()
                                 : null;
                         try {
-                            resolverResult.addDependency(node, node.getDependency(), filter, path);
+                            resolverResult.addDependency(node, node.dependency(), filter, path);
                         } catch (IOException e) {
                             throw cannotReadModuleInfo(path, e);
                         }

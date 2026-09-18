@@ -41,16 +41,20 @@ import org.apache.maven.api.annotations.Provider;
 public interface Node {
 
     /**
-     * @return artifact for this node
+     * Returns the artifact for this node.
+     *
+     * @return artifact for this node, or {@code null} if none
      */
     @Nullable
-    Artifact getArtifact();
+    Artifact artifact();
 
     /**
-     * @return dependency for this node
+     * Returns the dependency for this node.
+     *
+     * @return dependency for this node, or {@code null} if none
      */
     @Nullable
-    Dependency getDependency();
+    Dependency dependency();
 
     /**
      * Gets the child nodes of this node.
@@ -58,13 +62,15 @@ public interface Node {
      * @return the child nodes of this node, never {@code null}
      */
     @Nonnull
-    List<Node> getChildren();
+    List<Node> children();
 
     /**
-     * @return repositories of this node
+     * Returns the remote repositories of this node.
+     *
+     * @return repositories of this node, never {@code null}
      */
     @Nonnull
-    List<RemoteRepository> getRemoteRepositories();
+    List<RemoteRepository> remoteRepositories();
 
     /**
      * Returns the remote repository from which this artifact was downloaded, if known.
@@ -72,7 +78,60 @@ public interface Node {
      * @return an {@code Optional} containing the repository, or empty if not available (e.g. local artifact or root node)
      */
     @Nonnull
-    Optional<RemoteRepository> getRepository();
+    Optional<RemoteRepository> repository();
+
+    /**
+     * @return artifact for this node
+     * @deprecated Use {@link #artifact()} instead.
+     */
+    @Nullable
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    default Artifact getArtifact() {
+        return artifact();
+    }
+
+    /**
+     * @return dependency for this node
+     * @deprecated Use {@link #dependency()} instead.
+     */
+    @Nullable
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    default Dependency getDependency() {
+        return dependency();
+    }
+
+    /**
+     * Gets the child nodes of this node.
+     *
+     * @return the child nodes of this node, never {@code null}
+     * @deprecated Use {@link #children()} instead.
+     */
+    @Nonnull
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    default List<Node> getChildren() {
+        return children();
+    }
+
+    /**
+     * @return repositories of this node
+     * @deprecated Use {@link #remoteRepositories()} instead.
+     */
+    @Nonnull
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    default List<RemoteRepository> getRemoteRepositories() {
+        return remoteRepositories();
+    }
+
+    /**
+     * The repository where this artifact has been downloaded from.
+     *
+     * @deprecated Use {@link #repository()} instead.
+     */
+    @Nonnull
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    default Optional<RemoteRepository> getRepository() {
+        return repository();
+    }
 
     /**
      * Traverses this node and potentially its children using the specified visitor.
@@ -124,6 +183,6 @@ public interface Node {
      */
     @Nonnull
     default Stream<Node> stream() {
-        return Stream.concat(Stream.of(this), getChildren().stream().flatMap(Node::stream));
+        return Stream.concat(Stream.of(this), children().stream().flatMap(Node::stream));
     }
 }
