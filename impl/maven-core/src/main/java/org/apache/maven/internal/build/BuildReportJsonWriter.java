@@ -131,6 +131,9 @@ final class BuildReportJsonWriter {
         sb.append("{\n");
         writeField(sb, indent + 1, "severity", problem.getSeverity().name());
         writeField(sb, indent + 1, "message", problem.getMessage());
+        if (problem.getKey() != null) {
+            writeField(sb, indent + 1, "key", problem.getKey());
+        }
         String source = problem.getSource();
         if (source != null && !source.isEmpty()) {
             writeField(sb, indent + 1, "source", source);
@@ -140,6 +143,12 @@ final class BuildReportJsonWriter {
         }
         if (problem.getColumnNumber() > 0) {
             writeField(sb, indent + 1, "column", problem.getColumnNumber());
+        }
+        if (problem.getSuggestion() != null) {
+            writeField(sb, indent + 1, "suggestion", problem.getSuggestion());
+        }
+        if (problem.getDocumentationUrl() != null) {
+            writeField(sb, indent + 1, "documentationUrl", problem.getDocumentationUrl());
         }
         // Remove the trailing comma from the last written field
         int lastComma = sb.lastIndexOf(",\n");

@@ -263,6 +263,11 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             }
         }
 
+        // Propagate warning mode and diagnostic suppression to the session so
+        // BuildReportCollector (an EventSpy) can read them from user properties
+        String warningMode = context.options().warningMode().orElse("summary");
+        request.getUserProperties().put("maven.build.warningMode", warningMode);
+
         request.setTransferListener(determineTransferListener(
                 context, context.options().noTransferProgress().orElse(false)));
         request.setExecutionListener(determineExecutionListener(context));
