@@ -188,12 +188,12 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                 group = 0;
             } else {
                 statusMessage = unknownMessage;
-                group = 0;
+                group = 2;
             }
             entries.add(new ReactorSummaryEntry(project, buildSummary, group, statusMessage));
         }
 
-        ReactorSummaryRequest request = new ReactorSummaryRequest(entries, new StringBuilder(128), isSingleVersion);
+        ReactorSummaryRequest request = new ReactorSummaryRequest(entries, isSingleVersion);
 
         logReactorSummaryGroup(request, 0);
         logReactorSummaryGroup(request, 1);
@@ -201,7 +201,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     }
 
     private void logReactorSummaryGroup(ReactorSummaryRequest request, int group) {
-        StringBuilder buffer = request.getBuffer();
+        StringBuilder buffer = new StringBuilder(128);
 
         for (ReactorSummaryEntry entry : request.getEntries()) {
             if (entry.getGroup() != group) {
@@ -239,21 +239,15 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
     private static final class ReactorSummaryRequest {
         private final List<ReactorSummaryEntry> entries;
-        private final StringBuilder buffer;
         private final boolean singleVersion;
 
-        private ReactorSummaryRequest(List<ReactorSummaryEntry> entries, StringBuilder buffer, boolean singleVersion) {
+        private ReactorSummaryRequest(List<ReactorSummaryEntry> entries, boolean singleVersion) {
             this.entries = entries;
-            this.buffer = buffer;
             this.singleVersion = singleVersion;
         }
 
         private List<ReactorSummaryEntry> getEntries() {
             return entries;
-        }
-
-        private StringBuilder getBuffer() {
-            return buffer;
         }
 
         private boolean isSingleVersion() {
