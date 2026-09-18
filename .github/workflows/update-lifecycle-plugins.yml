@@ -57,7 +57,7 @@ jobs:
       - name: Open or update pull request
         if: ${{ !cancelled() }}
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GH_TOKEN: ${{ secrets.GH_TOKEN || github.token }}
         run: |
           BRANCH="update/lifecycle-plugins-${{ matrix.branch }}"
           if git diff --quiet impl/maven-core/pom.xml; then
