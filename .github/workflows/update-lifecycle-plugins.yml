@@ -48,7 +48,7 @@ jobs:
         run: |
           mvn -B versions:update-properties \
             -Pversions-update \
-            -DincludeProperties="version.maven-clean-plugin,version.maven-compiler-plugin,version.maven-deploy-plugin,version.maven-ear-plugin,version.maven-ejb-plugin,version.maven-install-plugin,version.maven-jar-plugin,version.maven-plugin-plugin,version.maven-rar-plugin,version.maven-resources-plugin,version.maven-site-plugin,version.maven-surefire-plugin,version.maven-war-plugin" \
+            -DincludeProperties="lifecycle.clean-plugin,lifecycle.compiler-plugin,lifecycle.deploy-plugin,lifecycle.ear-plugin,lifecycle.ejb-plugin,lifecycle.install-plugin,lifecycle.jar-plugin,lifecycle.plugin-plugin,lifecycle.rar-plugin,lifecycle.resources-plugin,lifecycle.site-plugin,lifecycle.surefire-plugin,lifecycle.war-plugin" \
             -pl impl/maven-core
 
       - name: Check for changes
