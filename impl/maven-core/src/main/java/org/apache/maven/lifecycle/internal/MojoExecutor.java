@@ -293,9 +293,7 @@ public class MojoExecutor {
     }
 
     private static void warn(String msg) {
-        for (String s : MultilineMessageHelper.format(msg)) {
-            LOGGER.warn(s);
-        }
+        LOGGER.warn(String.join("\n", MultilineMessageHelper.format(msg)));
     }
 
     private void doExecute(MavenSession session, MojoExecution mojoExecution, DependencyContext dependencyContext)
@@ -438,27 +436,9 @@ public class MojoExecutor {
                             .getData()
                             .computeIfAbsent(PROJECT_INDEX, () -> new ProjectIndex(session.getProjects()));
 
-                    Integer idx = projectIndex.getIndices().get(projectId);
-                    if (idx == null) {
-                        throw new LifecycleExecutionException(
-                                "Forked execution references project '" + projectId
-                                        + "' which is not in the reactor. This can happen with parallel builds"
-                                        + " (-T) or when extensions modify the session projects.",
-                                mojoExecution,
-                                project);
-                    }
-                    int index = idx;
+                    int index = projectIndex.getIndices().get(projectId);
 
                     MavenProject forkedProject = projectIndex.getProjects().get(projectId);
-                    if (forkedProject == null) {
-                        throw new LifecycleExecutionException(
-                                "Forked execution references project '" + projectId
-                                        + "' which is not in the reactor (no project instance). This can happen"
-                                        + " with parallel builds (-T) or when extensions modify the session"
-                                        + " projects.",
-                                mojoExecution,
-                                project);
-                    }
 
                     forkedProjects.add(forkedProject);
 

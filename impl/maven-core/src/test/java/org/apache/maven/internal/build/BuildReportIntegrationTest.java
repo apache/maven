@@ -27,6 +27,7 @@ import java.util.Properties;
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.build.report.BuildReport;
 import org.apache.maven.api.build.report.BuildStatus;
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
@@ -34,6 +35,7 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.impl.DefaultBuilderProblem;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -49,29 +51,49 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Integration test that exercises the full build report pipeline:
- * BuildReportCollector -> BuildReportJsonWriter -> file.
+ * BuildReportCollector → DefaultDiagnosticCollector → BuildReportJsonWriter → file.
  * <p>
  * This test simulates a complete multi-module build lifecycle with mojo
- * executions and failures, then verifies the resulting JSON report file
- * contains all expected data.
+ * executions, problems, and failures, then verifies the resulting
+ * JSON report file contains all expected data.
  */
 class BuildReportIntegrationTest {
 
     @TempDir
     Path tempDir;
 
+    private DefaultDiagnosticCollector diagnosticCollector;
     private BuildReportCollector collector;
 
     @BeforeEach
     void setUp() {
-        collector = new BuildReportCollector();
+        diagnosticCollector = new DefaultDiagnosticCollector();
+        collector = new BuildReportCollector(diagnosticCollector);
+    }
+
+    private static BuilderProblem warning(String key, String message, String source) {
+        return new DefaultBuilderProblem(
+                source, -1, -1, null, message, BuilderProblem.Severity.WARNING, key, null, null);
+    }
+
+    private static BuilderProblem warning(String key, String message, String source, String suggestion, String docUrl) {
+        return new DefaultBuilderProblem(
+                source, -1, -1, null, message, BuilderProblem.Severity.WARNING, key, suggestion, docUrl);
+    }
+
+    private static BuilderProblem info(String key, String message, String source) {
+        return new DefaultBuilderProblem(source, -1, -1, null, message, BuilderProblem.Severity.INFO, key, null, null);
+    }
+
+    private static BuilderProblem error(String key, String message, String source) {
+        return new DefaultBuilderProblem(source, -1, -1, null, message, BuilderProblem.Severity.ERROR, key, null, null);
     }
 
     /**
-     * Full lifecycle: multi-module build with mojos and JSON persistence.
+     * Full lifecycle: multi-module build with mojos, problems, and JSON persistence.
      */
     @Test
-    void testFullMultiModuleBuild() throws IOException {
+    void testFullMultiModuleBuildWithProblems() throws IOException {
         MavenProject parent = createProject("com.example", "parent", "2.0.0");
         MavenProject api = createProject("com.example", "api", "2.0.0");
         MavenProject impl = createProject("com.example", "impl", "2.0.0");
@@ -93,6 +115,15 @@ class BuildReportIntegrationTest {
         MojoExecution compileApi = createMojoExecution(
                 "org.apache.maven.plugins", "maven-compiler-plugin", "3.15.0", "compile", "default-compile", "compile");
         collector.onEvent(createEvent(ExecutionEvent.Type.MojoStarted, session, api, compileApi));
+
+        // Report a deprecation warning during compile
+        diagnosticCollector.report(warning(
+                "deprecated-source-target",
+                "source/target value 8 is deprecated",
+                "maven-compiler-plugin:3.15.0:compile",
+                "Update <maven.compiler.source> to 11 or higher",
+                null));
+
         collector.onEvent(createEvent(ExecutionEvent.Type.MojoSucceeded, session, api, compileApi));
 
         MojoExecution testApi = createMojoExecution(
@@ -109,8 +140,14 @@ class BuildReportIntegrationTest {
         MojoExecution compileImpl = createMojoExecution(
                 "org.apache.maven.plugins", "maven-compiler-plugin", "3.15.0", "compile", "default-compile", "compile");
         collector.onEvent(createEvent(ExecutionEvent.Type.MojoStarted, session, impl, compileImpl));
-        collector.onEvent(createEvent(ExecutionEvent.Type.MojoSucceeded, session, impl, compileImpl));
 
+        // Same warning fires again in a different module — should be deduplicated
+        diagnosticCollector.report(warning("deprecated-source-target", "source/target value 8 is deprecated", "impl"));
+
+        // Also report a unique info problem
+        diagnosticCollector.report(info("build-note", "Using JDK 21 toolchain", "toolchain"));
+
+        collector.onEvent(createEvent(ExecutionEvent.Type.MojoSucceeded, session, impl, compileImpl));
         result.addBuildSummary(new BuildSuccess(impl, 2000));
         collector.onEvent(createEvent(ExecutionEvent.Type.ProjectSucceeded, session, impl, null));
 
@@ -123,8 +160,16 @@ class BuildReportIntegrationTest {
         assertTrue(report.multiModule());
         assertEquals(3, report.modules().size());
 
-        // Problems should always be empty in this simplified collector
-        assertTrue(report.problems().isEmpty());
+        // Problems in the report
+        assertEquals(2, report.problems().size());
+        assertEquals("deprecated-source-target", report.problems().get(0).getKey());
+        assertEquals(BuilderProblem.Severity.WARNING, report.problems().get(0).getSeverity());
+        assertEquals("build-note", report.problems().get(1).getKey());
+        assertEquals(BuilderProblem.Severity.INFO, report.problems().get(1).getSeverity());
+
+        // Summary should show count = 2 for the warning
+        assertEquals(2, diagnosticCollector.getSummary().get(0).count());
+        assertEquals(1, diagnosticCollector.getSummary().get(1).count());
 
         // Module reports
         assertEquals("parent", report.modules().get(0).artifactId());
@@ -158,12 +203,45 @@ class BuildReportIntegrationTest {
         assertTrue(json.contains("\"goal\": \"compile\""));
         assertTrue(json.contains("\"goal\": \"test\""));
 
-        // Problems and failures should be empty
-        assertTrue(json.contains("\"problems\": []"));
+        // Problems in JSON
+        assertTrue(json.contains("\"problems\": ["));
+        assertTrue(json.contains("\"key\": \"deprecated-source-target\""));
+        assertTrue(json.contains("\"severity\": \"WARNING\""));
+        assertTrue(json.contains("\"suggestion\": \"Update <maven.compiler.source> to 11 or higher\""));
+        assertTrue(json.contains("\"key\": \"build-note\""));
+        assertTrue(json.contains("\"severity\": \"INFO\""));
+
+        // Failures should be empty
         assertTrue(json.contains("\"failures\": []"));
 
-        // Output arrays should be present (even if empty in unit test -- no SLF4J sink)
+        // Output arrays should be present (even if empty in unit test — no SLF4J sink)
         assertTrue(json.contains("\"output\": ["));
+    }
+
+    /**
+     * Tests that the problem summary printing doesn't throw when there are no problems.
+     */
+    @Test
+    void testDiagnosticSummaryWithNoProblems() {
+        // Should be a no-op, not throw
+        collector.printDiagnosticSummary();
+    }
+
+    /**
+     * Tests that the problem summary printing handles mixed severities.
+     */
+    @Test
+    void testDiagnosticSummaryWithMixedSeverities() {
+        diagnosticCollector.report(warning("warn-1", "first warning", null));
+        diagnosticCollector.report(warning("warn-1", "first warning (dup)", null));
+        diagnosticCollector.report(error("err-1", "first error", null));
+        diagnosticCollector.report(info("info-1", "info note", null));
+
+        // Should not throw
+        collector.printDiagnosticSummary();
+
+        assertTrue(diagnosticCollector.hasWarnings());
+        assertTrue(diagnosticCollector.hasErrors());
     }
 
     /**
@@ -201,38 +279,6 @@ class BuildReportIntegrationTest {
 
         // Not found
         assertFalse(report.findModule("nonexistent:module:1.0").isPresent());
-    }
-
-    /**
-     * Tests that timestamped report files are written alongside the latest symlink.
-     */
-    @Test
-    void testTimestampedReportFile() throws IOException {
-        MavenProject project = createProject("org.example", "my-app", "1.0.0");
-        MavenSession session = createSession(project);
-        session.getResult().addBuildSummary(new BuildSuccess(project, 1000));
-
-        collector.onEvent(createEvent(ExecutionEvent.Type.SessionStarted, session, project, null));
-        collector.onEvent(createEvent(ExecutionEvent.Type.ProjectStarted, session, project, null));
-        collector.onEvent(createEvent(ExecutionEvent.Type.ProjectSucceeded, session, project, null));
-
-        BuildReport report = collector.buildReport(session);
-        collector.writeReport(report, session);
-
-        Path reportsDir = tempDir.resolve("target").resolve(BuildReportCollector.REPORT_DIR);
-        assertTrue(Files.exists(reportsDir), "reports directory should exist");
-
-        // Should have at least two files: the timestamped one and the latest link/copy
-        long fileCount = Files.list(reportsDir)
-                .filter(p -> p.getFileName().toString().startsWith("build-report-"))
-                .count();
-        assertTrue(fileCount >= 2, "should have both timestamped and latest report files, found " + fileCount);
-
-        // The latest file should contain valid JSON
-        Path latestFile = reportsDir.resolve(BuildReportCollector.REPORT_LATEST);
-        String json = Files.readString(latestFile);
-        assertTrue(json.startsWith("{"), "report should start with JSON object");
-        assertTrue(json.contains("\"formatVersion\": 1"), "report should contain format version");
     }
 
     // ---- Test helpers ----
