@@ -60,8 +60,8 @@ public interface LocalRepository extends Repository {
      * @return the path, never {@code null}
      * @deprecated Use {@link #path()} instead.
      */
-    @Nonnull
     @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
     default Path getPath() {
         return path();
     }
