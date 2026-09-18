@@ -36,19 +36,19 @@ under the License.
          Maintained here so that dependency-update bots (Dependabot, Renovate)
          can propose version bumps automatically.  Values are filtered into
          plugin-versions.properties at build time and loaded at runtime. -->
-    <lifecycle.clean-plugin>3.4.0</lifecycle.clean-plugin>
-    <lifecycle.compiler-plugin>3.13.0</lifecycle.compiler-plugin>
-    <lifecycle.deploy-plugin>3.1.3</lifecycle.deploy-plugin>
-    <lifecycle.ear-plugin>3.3.0</lifecycle.ear-plugin>
-    <lifecycle.ejb-plugin>3.2.1</lifecycle.ejb-plugin>
-    <lifecycle.install-plugin>3.1.3</lifecycle.install-plugin>
-    <lifecycle.jar-plugin>3.4.2</lifecycle.jar-plugin>
-    <lifecycle.plugin-plugin>3.15.1</lifecycle.plugin-plugin>
-    <lifecycle.rar-plugin>3.0.0</lifecycle.rar-plugin>
-    <lifecycle.resources-plugin>3.3.1</lifecycle.resources-plugin>
-    <lifecycle.site-plugin>3.21.0</lifecycle.site-plugin>
-    <lifecycle.surefire-plugin>3.5.2</lifecycle.surefire-plugin>
-    <lifecycle.war-plugin>3.4.0</lifecycle.war-plugin>
+    <lifecycle.maven-clean-plugin>3.4.0</lifecycle.maven-clean-plugin>
+    <lifecycle.maven-compiler-plugin>3.13.0</lifecycle.maven-compiler-plugin>
+    <lifecycle.maven-deploy-plugin>3.1.3</lifecycle.maven-deploy-plugin>
+    <lifecycle.maven-ear-plugin>3.3.0</lifecycle.maven-ear-plugin>
+    <lifecycle.maven-ejb-plugin>3.2.1</lifecycle.maven-ejb-plugin>
+    <lifecycle.maven-install-plugin>3.1.3</lifecycle.maven-install-plugin>
+    <lifecycle.maven-jar-plugin>3.4.2</lifecycle.maven-jar-plugin>
+    <lifecycle.maven-plugin-plugin>3.15.1</lifecycle.maven-plugin-plugin>
+    <lifecycle.maven-rar-plugin>3.0.0</lifecycle.maven-rar-plugin>
+    <lifecycle.maven-resources-plugin>3.3.1</lifecycle.maven-resources-plugin>
+    <lifecycle.maven-site-plugin>3.21.0</lifecycle.maven-site-plugin>
+    <lifecycle.maven-surefire-plugin>3.5.2</lifecycle.maven-surefire-plugin>
+    <lifecycle.maven-war-plugin>3.4.0</lifecycle.maven-war-plugin>
   </properties>
 
   <dependencies>
@@ -286,67 +286,67 @@ under the License.
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-clean-plugin</artifactId>
-          <version>${lifecycle.clean-plugin}</version>
+          <version>${lifecycle.maven-clean-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-compiler-plugin</artifactId>
-          <version>${lifecycle.compiler-plugin}</version>
+          <version>${lifecycle.maven-compiler-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-deploy-plugin</artifactId>
-          <version>${lifecycle.deploy-plugin}</version>
+          <version>${lifecycle.maven-deploy-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-ear-plugin</artifactId>
-          <version>${lifecycle.ear-plugin}</version>
+          <version>${lifecycle.maven-ear-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-ejb-plugin</artifactId>
-          <version>${lifecycle.ejb-plugin}</version>
+          <version>${lifecycle.maven-ejb-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-install-plugin</artifactId>
-          <version>${lifecycle.install-plugin}</version>
+          <version>${lifecycle.maven-install-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-jar-plugin</artifactId>
-          <version>${lifecycle.jar-plugin}</version>
+          <version>${lifecycle.maven-jar-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-plugin-plugin</artifactId>
-          <version>${lifecycle.plugin-plugin}</version>
+          <version>${lifecycle.maven-plugin-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-rar-plugin</artifactId>
-          <version>${lifecycle.rar-plugin}</version>
+          <version>${lifecycle.maven-rar-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-resources-plugin</artifactId>
-          <version>${lifecycle.resources-plugin}</version>
+          <version>${lifecycle.maven-resources-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-site-plugin</artifactId>
-          <version>${lifecycle.site-plugin}</version>
+          <version>${lifecycle.maven-site-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
-          <version>${lifecycle.surefire-plugin}</version>
+          <version>${lifecycle.maven-surefire-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-war-plugin</artifactId>
-          <version>${lifecycle.war-plugin}</version>
+          <version>${lifecycle.maven-war-plugin}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.rat</groupId>

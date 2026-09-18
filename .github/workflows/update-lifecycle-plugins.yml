@@ -24,21 +24,24 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
-  pull-requests: write
+  contents: read
 
 jobs:
   update-lifecycle-plugins:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     strategy:
+      fail-fast: false
       matrix:
         branch: [master, maven-4.0.x]
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           ref: ${{ matrix.branch }}
 
-      - uses: actions/setup-java@v4
+      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           java-version: '21'
           distribution: 'temurin'
@@ -47,37 +50,37 @@ jobs:
       - name: Update lifecycle plugin versions
         run: |
           mvn -B versions:update-properties \
-            -Pversions-update \
-            -DincludeProperties="lifecycle.clean-plugin,lifecycle.compiler-plugin,lifecycle.deploy-plugin,lifecycle.ear-plugin,lifecycle.ejb-plugin,lifecycle.install-plugin,lifecycle.jar-plugin,lifecycle.plugin-plugin,lifecycle.rar-plugin,lifecycle.resources-plugin,lifecycle.site-plugin,lifecycle.surefire-plugin,lifecycle.war-plugin" \
+            -P?versions-update \
+            -DincludeProperties="lifecycle.maven-clean-plugin,lifecycle.maven-compiler-plugin,lifecycle.maven-deploy-plugin,lifecycle.maven-ear-plugin,lifecycle.maven-ejb-plugin,lifecycle.maven-install-plugin,lifecycle.maven-jar-plugin,lifecycle.maven-plugin-plugin,lifecycle.maven-rar-plugin,lifecycle.maven-resources-plugin,lifecycle.maven-site-plugin,lifecycle.maven-surefire-plugin,lifecycle.maven-war-plugin" \
             -pl impl/maven-core
 
-      - name: Check for changes
-        id: changes
+      - name: Open or update pull request
+        if: ${{ !cancelled() }}
+        env:
+          GH_TOKEN: ${{ secrets.GH_TOKEN }}
         run: |
+          BRANCH="update/lifecycle-plugins-${{ matrix.branch }}"
           if git diff --quiet impl/maven-core/pom.xml; then
-            echo "changed=false" >> $GITHUB_OUTPUT
-          else
-            echo "changed=true" >> $GITHUB_OUTPUT
-            echo "--- Updated properties ---"
-            git diff impl/maven-core/pom.xml | grep '^[+-].*version\.maven' | grep -v '^---\|^+++'
+            echo "No updates found for ${{ matrix.branch }}"
+            exit 0
           fi
 
-      - name: Create Pull Request
-        if: steps.changes.outputs.changed == 'true'
-        uses: peter-evans/create-pull-request@v7
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          branch: update/lifecycle-plugins-${{ matrix.branch }}
-          base: ${{ matrix.branch }}
-          commit-message: "chore: update Maven lifecycle plugin versions"
-          title: "chore: update Maven lifecycle plugin versions (${{ matrix.branch }})"
-          body: |
-            Automated update of Maven lifecycle plugin versions via `versions:update-properties`.
+          echo "--- Updated properties ---"
+          git diff impl/maven-core/pom.xml | grep '^[+-].*lifecycle\.' | grep -v '^---\|^+++'
 
-            These versions are declared in `impl/maven-core/pom.xml` and are used by the
-            Maven default lifecycle binding. They are filtered at build time into
-            `plugin-versions.properties` and loaded at runtime by `PluginVersions`.
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "${BRANCH}"
+          git add impl/maven-core/pom.xml
+          git commit -m "chore: update Maven lifecycle plugin versions"
+          git push --force --set-upstream origin "${BRANCH}"
 
-            This PR was created automatically by the `update-lifecycle-plugins` workflow.
-          labels: |
-            dependencies
+          gh pr create \
+            --base "${{ matrix.branch }}" \
+            --head "${BRANCH}" \
+            --title "chore: update Maven lifecycle plugin versions (${{ matrix.branch }})" \
+            --body "Automated update of Maven lifecycle plugin versions via \`versions:update-properties\`. These versions are declared in \`impl/maven-core/pom.xml\` and are used by the Maven default lifecycle binding. They are filtered at build time into \`plugin-versions.properties\` and loaded at runtime by \`PluginVersions\`. This PR was created automatically by the \`update-lifecycle-plugins\` workflow." \
+            --label "dependencies" \
+          || gh pr edit "${BRANCH}" \
+            --title "chore: update Maven lifecycle plugin versions (${{ matrix.branch }})" \
+            --body "Automated update of Maven lifecycle plugin versions via \`versions:update-properties\`. These versions are declared in \`impl/maven-core/pom.xml\` and are used by the Maven default lifecycle binding. They are filtered at build time into \`plugin-versions.properties\` and loaded at runtime by \`PluginVersions\`. This PR was created automatically by the \`update-lifecycle-plugins\` workflow."

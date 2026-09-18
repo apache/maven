@@ -1305,12 +1305,12 @@ under the License.
     <profile>
       <!--
         This profile is NEVER activated during a normal build.
-        It configures versions-maven-plugin to map the lifecycle.*-plugin
+        It configures versions-maven-plugin to map the lifecycle.maven-*-plugin
         properties (in impl/maven-core/pom.xml) to their corresponding Maven
         plugin artifacts, enabling:
 
           mvn versions:update-properties -Pversions-update \
-            DincludeProperties="lifecycle.clean-plugin,..." \
+            -DincludeProperties="lifecycle.maven-clean-plugin,..." \
             -pl impl/maven-core
 
         The GitHub Actions workflow .github/workflows/update-lifecycle-plugins.yml
@@ -1322,14 +1322,14 @@ under the License.
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>versions-maven-plugin</artifactId>
-            <version>2.18.0</version>
+            <version>2.22.0</version>
             <configuration>
               <generateBackupPoms>false</generateBackupPoms>
               <allowMajorUpdates>false</allowMajorUpdates>
               <allowSnapshots>false</allowSnapshots>
               <properties>
                 <property>
-                  <name>lifecycle.clean-plugin</name>
+                  <name>lifecycle.maven-clean-plugin</name>
                   <dependencies>
                     <dependency>
                       <groupId>org.apache.maven.plugins</groupId>
@@ -1338,7 +1338,7 @@ under the License.
                   </dependencies>
                 </property>
                 <property>
-                  <name>lifecycle.compiler-plugin</name>
+                  <name>lifecycle.maven-compiler-plugin</name>
                   <dependencies>
                     <dependency>
                       <groupId>org.apache.maven.plugins</groupId>
@@ -1347,7 +1347,7 @@ under the License.
                   </dependencies>
                 </property>
                 <property>
-                  <name>lifecycle.deploy-plugin</name>
+                  <name>lifecycle.maven-deploy-plugin</name>
                   <dependencies>
                     <dependency>
                       <groupId>org.apache.maven.plugins</groupId>
@@ -1356,7 +1356,7 @@ under the License.
                   </dependencies>
                 </property>
                 <property>
-                  <name>lifecycle.ear-plugin</name>
+                  <name>lifecycle.maven-ear-plugin</name>
                   <dependencies>
                     <dependency>
                       <groupId>org.apache.maven.plugins</groupId>
@@ -1365,7 +1365,7 @@ under the License.
                   </dependencies>
                 </property>
                 <property>
-                  <name>lifecycle.ejb-plugin</name>
+                  <name>lifecycle.maven-ejb-plugin</name>
                   <dependencies>
                     <dependency>
                       <groupId>org.apache.maven.plugins</groupId>
@@ -1374,7 +1374,7 @@ under the License.
                   </dependencies>
                 </property>
                 <property>
-                  <name>lifecycle.install-plugin</name>
+                  <name>lifecycle.maven-install-plugin</name>
                   <dependencies>
                     <dependency>
                       <groupId>org.apache.maven.plugins</groupId>
@@ -1383,7 +1383,7 @@ under the License.
                   </dependencies>
                 </property>
                 <property>
-                  <name>lifecycle.jar-plugin</name>
+                  <name>lifecycle.maven-jar-plugin</name>
                   <dependencies>
                     <dependency>
                       <groupId>org.apache.maven.plugins</groupId>
@@ -1392,7 +1392,7 @@ under the License.
                   </dependencies>
                 </property>
                 <property>
-                  <name>lifecycle.plugin-plugin</name>
+                  <name>lifecycle.maven-plugin-plugin</name>
                   <dependencies>
                     <dependency>
                       <groupId>org.apache.maven.plugins</groupId>
@@ -1401,7 +1401,7 @@ under the License.
                   </dependencies>
                 </property>
                 <property>
-                  <name>lifecycle.rar-plugin</name>
+                  <name>lifecycle.maven-rar-plugin</name>
                   <dependencies>
                     <dependency>
                       <groupId>org.apache.maven.plugins</groupId>
@@ -1410,7 +1410,7 @@ under the License.
                   </dependencies>
                 </property>
                 <property>
-                  <name>lifecycle.resources-plugin</name>
+                  <name>lifecycle.maven-resources-plugin</name>
                   <dependencies>
                     <dependency>
                       <groupId>org.apache.maven.plugins</groupId>
@@ -1419,7 +1419,7 @@ under the License.
                   </dependencies>
                 </property>
                 <property>
-                  <name>lifecycle.site-plugin</name>
+                  <name>lifecycle.maven-site-plugin</name>
                   <dependencies>
                     <dependency>
                       <groupId>org.apache.maven.plugins</groupId>
@@ -1428,7 +1428,7 @@ under the License.
                   </dependencies>
                 </property>
                 <property>
-                  <name>lifecycle.surefire-plugin</name>
+                  <name>lifecycle.maven-surefire-plugin</name>
                   <dependencies>
                     <dependency>
                       <groupId>org.apache.maven.plugins</groupId>
@@ -1437,7 +1437,7 @@ under the License.
                   </dependencies>
                 </property>
                 <property>
-                  <name>lifecycle.war-plugin</name>
+                  <name>lifecycle.maven-war-plugin</name>
                   <dependencies>
                     <dependency>
                       <groupId>org.apache.maven.plugins</groupId>
