@@ -51,6 +51,7 @@ jobs:
         run: |
           mvn -B versions:update-properties \
             -P?versions-update \
+            -DallowMajorUpdates=false \
             -DincludeProperties="lifecycle.maven-clean-plugin,lifecycle.maven-compiler-plugin,lifecycle.maven-deploy-plugin,lifecycle.maven-ear-plugin,lifecycle.maven-ejb-plugin,lifecycle.maven-install-plugin,lifecycle.maven-jar-plugin,lifecycle.maven-plugin-plugin,lifecycle.maven-rar-plugin,lifecycle.maven-resources-plugin,lifecycle.maven-site-plugin,lifecycle.maven-surefire-plugin,lifecycle.maven-war-plugin" \
             -pl impl/maven-core
 
