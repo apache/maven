@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.plugin.PluginValidationManager;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -55,7 +56,12 @@ class PlexusContainerDefaultDependenciesValidator extends AbstractMavenPluginDep
                     PluginValidationManager.IssueLocality.EXTERNAL,
                     session,
                     pluginArtifact,
-                    "Plugin depends on plexus-container-default, which is EOL");
+                    BuilderProblem.builder()
+                            .message("Plugin depends on plexus-container-default, which is EOL")
+                            .severity(BuilderProblem.Severity.WARNING)
+                            .key("plugin-validation:plexus-container-eol")
+                            .suggestion("Migrate from plexus-container-default to javax.inject / Eclipse Sisu")
+                            .build());
         }
     }
 }

@@ -101,7 +101,8 @@ class DefaultGraphBuilderTest {
     private final MavenSession session = mock(MavenSession.class);
     private final MavenExecutionRequest mavenExecutionRequest = mock(MavenExecutionRequest.class);
 
-    private final ProjectsSelector projectsSelector = new DefaultProjectsSelector(projectBuilder);
+    private final ProjectsSelector projectsSelector = new DefaultProjectsSelector(
+            projectBuilder, new org.apache.maven.internal.build.DefaultDiagnosticCollector());
 
     // Not using mocks for these strategies - a mock would just copy the actual implementation.
 

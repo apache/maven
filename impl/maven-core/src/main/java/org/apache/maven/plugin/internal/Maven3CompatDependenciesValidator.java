@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.plugin.PluginValidationManager;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -55,7 +56,13 @@ class Maven3CompatDependenciesValidator extends AbstractMavenPluginDependenciesV
                         PluginValidationManager.IssueLocality.EXTERNAL,
                         session,
                         pluginArtifact,
-                        "Plugin depends on the deprecated Maven 2.x compatibility layer, which will be not supported in Maven 4.x");
+                        BuilderProblem.builder()
+                                .message(
+                                        "Plugin depends on the deprecated Maven 2.x compatibility layer, which will be not supported in Maven 4.x")
+                                .severity(BuilderProblem.Severity.WARNING)
+                                .key("plugin-validation:maven-compat-dep")
+                                .suggestion("Remove the maven-compat dependency from the plugin")
+                                .build());
             }
         }
     }
