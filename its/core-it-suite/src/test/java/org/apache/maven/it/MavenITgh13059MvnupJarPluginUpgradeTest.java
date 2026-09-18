@@ -23,6 +23,7 @@ import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -90,5 +91,19 @@ class MavenITgh13059MvnupJarPluginUpgradeTest extends AbstractMavenIntegrationTe
         verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
+
+        // Step 3: re-run mvnup on the already-upgraded project — must be idempotent
+        String pomBefore = Files.readString(testDir.resolve("pom.xml"));
+        Verifier verifier3 = newVerifier(testDir);
+        verifier3.setForkJvm(true);
+        verifier3.setLogFileName("mvnup-rerun.txt");
+        verifier3.addCliArgument("--up");
+        verifier3.addCliArgument("apply");
+        verifier3.addCliArgument("-d");
+        verifier3.addCliArgument(testDir.toString());
+        verifier3.execute();
+        verifier3.verifyErrorFreeLog();
+        String pomAfter = Files.readString(testDir.resolve("pom.xml"));
+        assertEquals(pomBefore, pomAfter, "Second mvnup apply must be idempotent");
     }
 }
