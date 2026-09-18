@@ -78,7 +78,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.SettingsUtilsV4;
 import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
-import org.apache.maven.logging.AsyncDrainWriter;
 import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingOutputStream;
 import org.apache.maven.logging.ProjectBuildLogAppender;
@@ -156,6 +155,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         pushUserProperties(context);
         setupGuiceClassLoading(context);
         configureLogging(context);
+        preliminaryInteractiveDetection(context);
         createTerminal(context);
         activateLogging(context);
         helpOrVersionAndMayExit(context);
@@ -302,6 +302,30 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
     }
 
+    /**
+     * Sets {@code context.interactive} based on CLI flags and CI detection <em>before</em>
+     * {@link #createTerminal(LookupContext)} runs. This is necessary because
+     * {@code createTerminal} caches the {@link BuildEventListener} (via
+     * {@link #determineBuildEventListener}), and the console-mode auto-detection
+     * in subclasses reads {@code context.interactive} to decide between rich/plain/verbose.
+     *
+     * <p>The full settings-based interactive-mode resolution still runs later in
+     * {@link #settings}, so this is a best-effort early pass using only CLI flags and
+     * CI environment detection — which is sufficient for the console-mode decision.</p>
+     */
+    protected void preliminaryInteractiveDetection(C context) {
+        if (context.options().forceInteractive().orElse(false)) {
+            context.interactive = true;
+        } else if (context.options().nonInteractive().orElse(false)) {
+            context.interactive = false;
+        } else if (context.invokerRequest.ciInfo().isPresent()) {
+            context.interactive = false;
+        } else {
+            // Default: assume interactive (settings may refine later)
+            context.interactive = true;
+        }
+    }
+
     protected BuildEventListener determineBuildEventListener(C context) {
         if (context.buildEventListener == null) {
             context.buildEventListener = doDetermineBuildEventListener(context);
@@ -332,16 +356,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             ProjectBuildLogAppender projectBuildLogAppender =
                     new ProjectBuildLogAppender(determineBuildEventListener(context));
             context.closeables.add(projectBuildLogAppender);
-
-            // Now that the logSink (and any -l log-file writer) is installed,
-            // replay early log messages that were accumulated before
-            // activateLogging() ran.  This ensures messages such as
-            // "Enabled to break the build on log level WARN." reach the log
-            // file rather than stdout (MavenITmng6065 regression fix).
-            if (context.pendingEarlyLogs != null) {
-                context.pendingEarlyLogs.forEach(e -> context.logger.log(e.level(), e.message(), e.error()));
-                context.pendingEarlyLogs = null;
-            }
         } else {
             doConfigureWithTerminal(context, context.terminal);
         }
@@ -430,30 +444,24 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected Consumer<String> doDetermineWriter(C context) {
-        Consumer<String> raw;
         if (context.options().logFile().isPresent()) {
             Path logFile = context.cwd.resolve(context.options().logFile().get());
             try {
                 PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile), true);
                 context.closeables.add(printWriter);
-                raw = printWriter::println;
+                return printWriter::println;
             } catch (IOException e) {
                 throw new MavenException("Unable to redirect logging to " + logFile, e);
             }
         } else {
             // Given the terminal creation has been offloaded to a different thread,
             // do not pass directly the terminal writer
-            raw = msg -> {
+            return msg -> {
                 PrintWriter pw = context.terminal.writer();
                 pw.println(msg);
                 pw.flush();
             };
         }
-        // Wrap with lock-free async drain to eliminate PrintWriter synchronized contention
-        // when multiple PhasingExecutor threads log concurrently during parallel model building.
-        AsyncDrainWriter asyncWriter = new AsyncDrainWriter(raw);
-        context.closeables.add(asyncWriter);
-        return asyncWriter;
     }
 
     protected void activateLogging(C context) throws Exception {
@@ -462,26 +470,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         context.slf4jConfiguration.activate();
-
-        // Now that SLF4J is fully initialized, set the JUL root logger level
-        // to match the effective log level.  This must happen AFTER install()
-        // + activate() to avoid flooding JUL events during SLF4J bootstrap
-        // (ConcurrentHashMap.computeIfAbsent reentrancy).
-        // In quiet mode keep the JUL root at WARNING so that INFO/DEBUG JUL
-        // events are suppressed at source — relying solely on the SLF4J-level
-        // check in MavenJulHandler.isLevelEnabled() is racy: newly created
-        // SLF4J loggers may briefly see the default INFO level before
-        // quiet-mode propagation completes, leaking output that
-        // MavenITmng4387QuietLoggingTest detects as a flaky failure.
-        java.util.logging.Level julRootLevel;
-        if (context.options().quiet().orElse(false)) {
-            julRootLevel = java.util.logging.Level.WARNING;
-        } else if (context.invokerRequest.effectiveVerbose()) {
-            julRootLevel = java.util.logging.Level.ALL;
-        } else {
-            julRootLevel = java.util.logging.Level.INFO;
-        }
-        java.util.logging.LogManager.getLogManager().getLogger("").setLevel(julRootLevel);
         if (context.options().failOnSeverity().isPresent()) {
             String logLevelThreshold = context.options().failOnSeverity().get();
             if (context.loggerFactory instanceof LogLevelRecorder recorder) {
@@ -507,14 +495,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         // at this point logging is set up, reply so far accumulated logs, if any and swap logger with real one
         Logger logger =
                 new Slf4jLogger(context.loggerFactory.getLogger(getClass().getName()));
-        // Defer draining the accumulated log queue to createTerminal() so that
-        // early messages (e.g. "Enabled to break the build on log level WARN.")
-        // are replayed AFTER ProjectBuildLogAppender has installed the
-        // MavenSimpleLogger logSink and wired up any -l log-file writer.
-        // Draining here (before createTerminal) would route those messages
-        // through super.write() → stdout, bypassing the log file
-        // (MavenITmng6065 regression).
-        context.pendingEarlyLogs = context.logger.drain();
+        context.logger.drain().forEach(e -> logger.log(e.level(), e.message(), e.error()));
         context.logger = logger;
     }
 
@@ -563,7 +544,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void preCommands(C context) throws Exception {
         boolean verbose = context.invokerRequest.effectiveVerbose();
-        boolean version = context.options().showVersion().orElse(false) && !Boolean.getBoolean("maven.version.printed");
+        boolean version = context.options().showVersion().orElse(false);
         if (verbose || version) {
             showVersion(context);
         }
