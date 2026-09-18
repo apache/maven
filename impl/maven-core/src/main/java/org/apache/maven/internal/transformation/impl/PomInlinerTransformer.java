@@ -30,6 +30,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -76,6 +77,7 @@ class PomInlinerTransformer extends TransformerSupport {
         if (needsInlining.isEmpty()) {
             return artifacts;
         }
+        Map<String, String> pomProperties = pomProperties(session);
         ArrayList<Artifact> newArtifacts = new ArrayList<>(artifacts.size());
         for (Artifact artifact : artifacts) {
             if ("pom".equals(artifact.getExtension())
@@ -87,8 +89,13 @@ class PomInlinerTransformer extends TransformerSupport {
                             originalPom,
                             property -> {
                                 if (needsInlining.contains(property)) {
-                                    return (String)
-                                            session.getConfigProperties().get(property);
+                                    // Check configProperties first (CLI -D args take precedence),
+                                    // then fall back to POM-defined properties.
+                                    Object value = session.getConfigProperties().get(property);
+                                    if (value != null) {
+                                        return (String) value;
+                                    }
+                                    return pomProperties.get(property);
                                 }
                                 return null;
                             },
@@ -113,6 +120,13 @@ class PomInlinerTransformer extends TransformerSupport {
                         PomInlinerTransformer.class.getName() + ".needsInlining", ConcurrentHashMap::newKeySet);
     }
 
+    @SuppressWarnings("unchecked")
+    private Map<String, String> pomProperties(RepositorySystemSession session) {
+        return (Map<String, String>) session.getData()
+                .computeIfAbsent(
+                        PomInlinerTransformer.class.getName() + ".pomProperties", ConcurrentHashMap::new);
+    }
+
     @Override
     public void injectTransformedArtifacts(RepositorySystemSession session, MavenProject project) throws IOException {
         if (!Features.consumerPom(session.getConfigProperties())) {
@@ -125,12 +139,24 @@ class PomInlinerTransformer extends TransformerSupport {
                 String newVersion;
                 if (version != null) {
                     HashSet<String> usedProperties = new HashSet<>();
+                    Map<String, String> pomProperties = pomProperties(session);
                     newVersion = interpolator.interpolate(version.trim(), property -> {
-                        if (!session.getConfigProperties().containsKey(property)) {
-                            throw new IllegalArgumentException("Cannot inline property " + property);
+                        if (session.getConfigProperties().containsKey(property)) {
+                            usedProperties.add(property);
+                            return (String) session.getConfigProperties().get(property);
                         }
-                        usedProperties.add(property);
-                        return (String) session.getConfigProperties().get(property);
+                        // CI-friendly version properties (revision, sha1, changelist) may be
+                        // defined in the POM's <properties> section rather than passed via -D.
+                        // In that case, fall back to the project's effective properties so the
+                        // installed/deployed POM gets the literal version inlined for consumers.
+                        String projectValue = project.getProperties().getProperty(property);
+                        if (projectValue != null) {
+                            usedProperties.add(property);
+                            // Remember this value for replacePom(), which does not have a project ref.
+                            pomProperties.put(property, projectValue);
+                            return projectValue;
+                        }
+                        throw new IllegalArgumentException("Cannot inline property " + property);
                     });
                     if (!Objects.equals(version, newVersion)) {
                         needsInlining(session).addAll(usedProperties);
