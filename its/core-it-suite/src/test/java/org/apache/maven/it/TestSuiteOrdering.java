@@ -34,7 +34,7 @@ import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.ClassOrdererContext;
 
 /**
- * Test suite ordering that orders tests by prefix (gh-xxx, mng-xxx, it-xxx) in descending order.
+ * Test suite ordering that orders tests by prefix (gh-xxx, mng-xxx, it-xxx, mdep-xxx) in descending order.
  * This ensures newer tests (higher numbers) are run first, which is useful for fail-fast behavior
  * since newer tests are more likely to fail.
  * <p>
@@ -43,8 +43,8 @@ import org.junit.jupiter.api.ClassOrdererContext;
  *   <li>{@code MavenITBootstrapTest} — always runs first to set up the local repository</li>
  *   <li>gh-prefixed tests (descending number)</li>
  *   <li>mng-prefixed tests (descending number)</li>
- *   <li>it-prefixed tests (descending number)</li>
- *   <li>Unrecognized class name patterns — fall back to alphabetical ordering (logged as warning)</li>
+ *   <li>it-prefixed and mdep-prefixed tests (descending number)</li>
+ *   <li>Unrecognized class name patterns — fall back to alphabetical ordering (logged once as warning)</li>
  * </ol>
  */
 public class TestSuiteOrdering implements ClassOrderer {
@@ -54,7 +54,7 @@ public class TestSuiteOrdering implements ClassOrderer {
     private static final Pattern IT_PATTERN = Pattern.compile(".*MavenIT(\\d+).*");
     private static final Pattern MDEP_PATTERN = Pattern.compile(".*MavenITmdep(\\d+).*");
 
-    private static PrintStream out = System.out;
+    private static final PrintStream out = System.out;
     private static final Set<String> WARNED_CLASSES =
             Collections.newSetFromMap(new ConcurrentHashMap<>());
 
