@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @since 4.1.0
  */
-class MavenITMvnupToolchainPluginStrategyTest extends AbstractMavenIntegrationTestCase {
+class MavenITgh12922MvnupToolchainPluginStrategyTest extends AbstractMavenIntegrationTestCase {
 
     /**
      * Verify that mvnup adds the maven-toolchains-plugin with select-jdk-toolchain

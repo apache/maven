@@ -22,9 +22,9 @@ import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
-public class MavenITMissingNamespaceTest extends AbstractMavenIntegrationTestCase {
+public class MavenITgh10972MissingNamespaceTest extends AbstractMavenIntegrationTestCase {
 
-    public MavenITMissingNamespaceTest() {}
+    public MavenITgh10972MissingNamespaceTest() {}
 
     /**
      * Test when project element does not have an xmlns attribute.

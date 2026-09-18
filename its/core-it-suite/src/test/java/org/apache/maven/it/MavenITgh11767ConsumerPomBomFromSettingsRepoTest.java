@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @since 4.0.0
  */
-class MavenITConsumerPomBomFromSettingsRepoTest extends AbstractMavenIntegrationTestCase {
+class MavenITgh11767ConsumerPomBomFromSettingsRepoTest extends AbstractMavenIntegrationTestCase {
 
     /**
      * Verifies that consumer POM flattening works when the BOM is only available
