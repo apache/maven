@@ -20,15 +20,19 @@ package org.apache.maven.execution;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.RepositoryCache;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.monitor.event.EventDispatcher;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -72,6 +76,8 @@ public class MavenSession implements Cloneable {
     private ProjectDependencyGraph projectDependencyGraph;
 
     private boolean parallel;
+
+    private List<ModelProblem> modelProblems = Collections.emptyList();
 
     private final Map<String, Map<String, Map<String, Object>>> pluginContextsByProjectAndPluginKey =
             new ConcurrentHashMap<>();
@@ -251,6 +257,26 @@ public class MavenSession implements Cloneable {
 
     public void setParallel(boolean parallel) {
         this.parallel = parallel;
+    }
+
+    /**
+     * Returns the problems detected while building the Maven models.
+     *
+     * @return the model problems, never {@code null}
+     * @since 3.10.0
+     */
+    public List<ModelProblem> getModelProblems() {
+        return modelProblems;
+    }
+
+    /**
+     * Records the problems detected while building the Maven models.
+     *
+     * @param modelProblems the model problems, must not be {@code null}
+     * @since 3.10.0
+     */
+    public void setModelProblems(List<ModelProblem> modelProblems) {
+        this.modelProblems = Collections.unmodifiableList(new ArrayList<>(Objects.requireNonNull(modelProblems)));
     }
 
     public RepositorySystemSession getRepositorySession() {
