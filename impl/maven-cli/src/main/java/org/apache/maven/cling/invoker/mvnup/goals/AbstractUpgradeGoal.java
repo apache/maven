@@ -140,6 +140,11 @@ public abstract class AbstractUpgradeGoal implements Goal {
 
     private final StrategyOrchestrator orchestrator;
 
+    /**
+     * Creates a new upgrade goal.
+     *
+     * @param orchestrator the strategy orchestrator to use for upgrade execution
+     */
     @Inject
     public AbstractUpgradeGoal(StrategyOrchestrator orchestrator) {
         this.orchestrator = orchestrator;
@@ -205,6 +210,11 @@ public abstract class AbstractUpgradeGoal implements Goal {
     /**
      * Performs the upgrade logic using the strategy pattern.
      * Delegates to StrategyOrchestrator for coordinated strategy execution.
+     *
+     * @param context the upgrade context providing options and output methods
+     * @param targetModel the target Maven model version (e.g., {@code "4.0.0"} or {@code "4.1.0"})
+     * @param pomMap the map of POM file paths to their parsed documents
+     * @return the result of the upgrade operation
      */
     protected UpgradeResult doUpgrade(UpgradeContext context, String targetModel, Map<Path, Document> pomMap) {
         // Execute strategies using the orchestrator
@@ -229,12 +239,18 @@ public abstract class AbstractUpgradeGoal implements Goal {
     /**
      * Determines whether modifications should be saved to disk.
      * Apply goals return true, Check goals return false.
+     *
+     * @return {@code true} if modifications should be persisted to disk, {@code false} for dry-run mode
      */
     protected abstract boolean shouldSaveModifications();
 
     /**
      * Saves the modified documents to disk using domtrip's perfect formatting preservation.
      * Unmodified POMs are left untouched and are not reported as saved.
+     *
+     * @param context the upgrade context providing output methods
+     * @param pomMap the map of POM file paths to their parsed documents
+     * @param modifiedPoms the set of paths that were actually modified and need to be saved
      */
     protected void saveModifications(UpgradeContext context, Map<Path, Document> pomMap, Set<Path> modifiedPoms) {
         context.info("");
@@ -262,6 +278,8 @@ public abstract class AbstractUpgradeGoal implements Goal {
     /**
      * Creates .mvn directory in the root directory if it doesn't exist and the model isn't upgraded to 4.1.0.
      * This avoids the warning about not being able to find the root directory.
+     *
+     * @param context the upgrade context providing options and output methods
      */
     protected void createMvnDirectoryIfNeeded(UpgradeContext context) {
         context.info("");
@@ -298,6 +316,8 @@ public abstract class AbstractUpgradeGoal implements Goal {
      *   <li><strong>Develocity/Gradle Enterprise extension</strong>: Removed because it depends
      *       on {@code org.slf4j.impl.SimpleLogger} which is not available in Maven 4.</li>
      * </ul>
+     *
+     * @param context the upgrade context providing options and output methods
      */
     protected void fixIncompatibleExtensions(UpgradeContext context) {
         Path startingDirectory = context.options().directory().map(Paths::get).orElse(context.invokerRequest.cwd());

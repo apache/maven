@@ -232,6 +232,23 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
         }
     }
 
+    /**
+     * Context-aware write that includes the log level, logger name, and
+     * clean message alongside the formatted output. Subclasses can override
+     * to forward structured data to a log sink.
+     * <p>
+     * The default implementation delegates to {@link #write(StringBuilder, Throwable)}.
+     *
+     * @param level          the SLF4J log level constant
+     * @param loggerName     the name of the logger
+     * @param cleanMessage   the formatted message without level/timestamp prefix
+     * @param formattedBuf   the fully formatted log line
+     * @param t              the throwable, may be {@code null}
+     */
+    protected void write(int level, String loggerName, String cleanMessage, StringBuilder formattedBuf, Throwable t) {
+        write(formattedBuf, t);
+    }
+
     protected void writeThrowable(Throwable t, PrintStream targetStream) {
         if (t != null) {
             t.printStackTrace(targetStream);
@@ -375,7 +392,7 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
         // Append the message
         buf.append(formattedMessage);
 
-        write(buf, t);
+        write(level.toInt(), name, formattedMessage, buf, t);
     }
 
     protected String renderLevel(int levelInt) {
