@@ -1,0 +1,83 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+
+name: Update lifecycle plugin versions
+
+on:
+  schedule:
+    # Every Monday at 08:00 UTC
+    - cron: '0 8 * * 1'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-lifecycle-plugins:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        branch: [master, maven-4.0.x]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ matrix.branch }}
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+          cache: maven
+
+      - name: Update lifecycle plugin versions
+        run: |
+          mvn -B versions:update-properties \
+            -Pversions-update \
+            -DincludeProperties="version.maven-clean-plugin,version.maven-compiler-plugin,version.maven-deploy-plugin,version.maven-ear-plugin,version.maven-ejb-plugin,version.maven-install-plugin,version.maven-jar-plugin,version.maven-plugin-plugin,version.maven-rar-plugin,version.maven-resources-plugin,version.maven-site-plugin,version.maven-surefire-plugin,version.maven-war-plugin" \
+            -pl impl/maven-core
+
+      - name: Check for changes
+        id: changes
+        run: |
+          if git diff --quiet impl/maven-core/pom.xml; then
+            echo "changed=false" >> $GITHUB_OUTPUT
+          else
+            echo "changed=true" >> $GITHUB_OUTPUT
+            echo "--- Updated properties ---"
+            git diff impl/maven-core/pom.xml | grep '^[+-].*version\.maven' | grep -v '^---\|^+++'
+          fi
+
+      - name: Create Pull Request
+        if: steps.changes.outputs.changed == 'true'
+        uses: peter-evans/create-pull-request@v7
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          branch: update/lifecycle-plugins-${{ matrix.branch }}
+          base: ${{ matrix.branch }}
+          commit-message: "chore: update Maven lifecycle plugin versions"
+          title: "chore: update Maven lifecycle plugin versions (${{ matrix.branch }})"
+          body: |
+            Automated update of Maven lifecycle plugin versions via `versions:update-properties`.
+
+            These versions are declared in `impl/maven-core/pom.xml` and are used by the
+            Maven default lifecycle binding. They are filtered at build time into
+            `plugin-versions.properties` and loaded at runtime by `PluginVersions`.
+
+            This PR was created automatically by the `update-lifecycle-plugins` workflow.
+          labels: |
+            dependencies

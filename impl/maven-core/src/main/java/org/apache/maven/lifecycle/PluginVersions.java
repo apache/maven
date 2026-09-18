@@ -27,6 +27,7 @@ import java.util.Properties;
  * <p>
  * Versions are read from {@code plugin-versions.properties}, which is filtered
  * at build time from POM properties ({@code version.maven-<name>-plugin}).
+ * The properties file uses {@code lifecycle.<name>-plugin} keys.
  * Centralising them in the POM makes them visible to dependency-update bots
  * such as Dependabot and Renovate.
  *
@@ -50,7 +51,7 @@ public final class PluginVersions {
     private PluginVersions() {}
 
     private static String version(String pluginArtifactId) {
-        String key = "version." + pluginArtifactId;
+        String key = "lifecycle." + pluginArtifactId;
         String version = VERSIONS.getProperty(key);
         if (version == null) {
             throw new IllegalArgumentException("No default version defined for " + pluginArtifactId + "; add " + key
@@ -64,18 +65,18 @@ public final class PluginVersions {
     }
 
     // START SNIPPET: versions
-    public static final String CLEAN = version("maven-clean-plugin");
-    public static final String COMPILER = version("maven-compiler-plugin");
-    public static final String DEPLOY = version("maven-deploy-plugin");
-    public static final String EAR = version("maven-ear-plugin");
-    public static final String EJB = version("maven-ejb-plugin");
-    public static final String INSTALL = version("maven-install-plugin");
-    public static final String JAR = version("maven-jar-plugin");
-    public static final String PLUGIN = version("maven-plugin-plugin");
-    public static final String RAR = version("maven-rar-plugin");
-    public static final String RESOURCES = version("maven-resources-plugin");
-    public static final String SITE = version("maven-site-plugin");
-    public static final String SUREFIRE = version("maven-surefire-plugin");
-    public static final String WAR = version("maven-war-plugin");
+    public static final String CLEAN = version("clean-plugin");
+    public static final String COMPILER = version("compiler-plugin");
+    public static final String DEPLOY = version("deploy-plugin");
+    public static final String EAR = version("ear-plugin");
+    public static final String EJB = version("ejb-plugin");
+    public static final String INSTALL = version("install-plugin");
+    public static final String JAR = version("jar-plugin");
+    public static final String PLUGIN = version("plugin-plugin");
+    public static final String RAR = version("rar-plugin");
+    public static final String RESOURCES = version("resources-plugin");
+    public static final String SITE = version("site-plugin");
+    public static final String SUREFIRE = version("surefire-plugin");
+    public static final String WAR = version("war-plugin");
     // END SNIPPET: versions
 }
