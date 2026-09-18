@@ -48,7 +48,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITgh12625BomConsumerPomPropertyResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    MavenITBomConsumerPomPropertyResolutionTest() {
+    MavenITgh12625BomConsumerPomPropertyResolutionTest() {
         super("[4.0.0-rc-4,)");
     }
 
