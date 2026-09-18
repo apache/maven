@@ -16,23 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.internal.build;
+
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+
+import org.apache.maven.api.build.report.BuildStatus;
+import org.apache.maven.api.build.report.LogEvent;
+import org.apache.maven.api.build.report.MojoReport;
 
 /**
- * Structured build report data model.
- * <p>
- * The {@link org.apache.maven.api.build.report.BuildReport} is the root of a structured
- * representation of a Maven build execution. It is persisted to
- * {@code target/build-report.json} at the end of every build and can be consumed
- * by tools, CI systems, IDEs, and LLM agents without re-running the build or
- * parsing console output.
- * <p>
- * Build problems (warnings, errors) are represented as
- * {@link org.apache.maven.api.services.BuilderProblem} instances and included
- * in the report for downstream analysis.
- *
- * @since 4.1.0
+ * Internal immutable implementation of {@link MojoReport}.
  */
-@Experimental
-package org.apache.maven.api.build.report;
+record DefaultMojoReport(
+        String groupId,
+        String artifactId,
+        String version,
+        String goal,
+        String executionId,
+        String phase,
+        BuildStatus status,
+        Instant startTime,
+        Duration duration,
+        List<LogEvent> output)
+        implements MojoReport {
 
-import org.apache.maven.api.annotations.Experimental;
+    @Override
+    public List<LogEvent> output() {
+        return List.copyOf(output);
+    }
+}
