@@ -43,7 +43,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *
  * @since 4.0.0
  */
-class MavenITConsumerPomBomFromSettingsRepoTest extends AbstractMavenIntegrationTestCase {
+class MavenITgh11767ConsumerPomBomFromSettingsRepoTest extends AbstractMavenIntegrationTestCase {
 
     MavenITConsumerPomBomFromSettingsRepoTest() {
         super("[4.0.0-rc-1,)");
