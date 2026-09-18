@@ -18,8 +18,9 @@
  */
 package org.apache.maven.it;
 
+import java.io.File;
 import java.nio.file.Files;
-import java.nio.file.Path;
+import java.nio.file.Paths;
 
 import org.junit.jupiter.api.Test;
 
@@ -39,6 +40,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITgh13192PomInlinerCiFriendlyPropertyTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh13192PomInlinerCiFriendlyPropertyTest() {
+        super("[4.0.0,)");
+    }
+
     /**
      * Verify that {@code mvn install} in legacy mode succeeds when {@code ${revision}} is defined
      * only in POM {@code <properties>} (not via {@code -Drevision} on the command line), and that
@@ -46,9 +51,9 @@ class MavenITgh13192PomInlinerCiFriendlyPropertyTest extends AbstractMavenIntegr
      */
     @Test
     void testInstallSucceedsWithRevisionInPomProperties() throws Exception {
-        Path testDir = extractResources("gh-13192-ci-friendly-pom-property");
+        File testDir = extractResources("gh-13192-ci-friendly-pom-property");
 
-        Verifier verifier = newVerifier(testDir);
+        Verifier verifier = newVerifier(testDir.getPath());
         verifier.setAutoclean(false);
         // Legacy (Maven 3 personality) mode triggers PomInlinerTransformer
         verifier.addCliArgument("-Dmaven.maven3Personality=true");
@@ -59,9 +64,9 @@ class MavenITgh13192PomInlinerCiFriendlyPropertyTest extends AbstractMavenIntegr
 
         // The installed POM for base-project should contain the literal version "1.0.0",
         // not the placeholder "${revision}".
-        Path installedParentPom = verifier.getArtifactPath("gh-13192-ci-friendly", "base-project", "1.0.0", "pom");
-        assertTrue(Files.exists(installedParentPom), "Installed parent POM should exist: " + installedParentPom);
-        String parentPomContent = Files.readString(installedParentPom);
+        String installedParentPom = verifier.getArtifactPath("gh-13192-ci-friendly", "base-project", "1.0.0", "pom");
+        assertTrue(new File(installedParentPom).exists(), "Installed parent POM should exist: " + installedParentPom);
+        String parentPomContent = Files.readString(Paths.get(installedParentPom));
         assertFalse(
                 parentPomContent.contains("${revision}"),
                 "Installed parent POM should not contain '${revision}' placeholder");
@@ -70,9 +75,10 @@ class MavenITgh13192PomInlinerCiFriendlyPropertyTest extends AbstractMavenIntegr
                 "Installed parent POM should contain literal version '1.0.0'");
 
         // module-1 installed POM should also have the literal version
-        Path installedModule1Pom = verifier.getArtifactPath("gh-13192-ci-friendly", "module-1", "1.0.0", "pom");
-        assertTrue(Files.exists(installedModule1Pom), "Installed module-1 POM should exist: " + installedModule1Pom);
-        String module1PomContent = Files.readString(installedModule1Pom);
+        String installedModule1Pom = verifier.getArtifactPath("gh-13192-ci-friendly", "module-1", "1.0.0", "pom");
+        assertTrue(
+                new File(installedModule1Pom).exists(), "Installed module-1 POM should exist: " + installedModule1Pom);
+        String module1PomContent = Files.readString(Paths.get(installedModule1Pom));
         assertFalse(
                 module1PomContent.contains("${revision}"),
                 "Installed module-1 POM should not contain '${revision}' placeholder");
@@ -84,10 +90,10 @@ class MavenITgh13192PomInlinerCiFriendlyPropertyTest extends AbstractMavenIntegr
      */
     @Test
     void testPartialBuildAfterInstall() throws Exception {
-        Path testDir = extractResources("gh-13192-ci-friendly-pom-property");
+        File testDir = extractResources("gh-13192-ci-friendly-pom-property");
 
         // First: install all modules (revision from POM properties, no -D flag)
-        Verifier installVerifier = newVerifier(testDir);
+        Verifier installVerifier = newVerifier(testDir.getPath());
         installVerifier.setAutoclean(false);
         installVerifier.setLogFileName("install-log.txt");
         installVerifier.addCliArgument("-Dmaven.maven3Personality=true");
@@ -96,7 +102,7 @@ class MavenITgh13192PomInlinerCiFriendlyPropertyTest extends AbstractMavenIntegr
         installVerifier.verifyErrorFreeLog();
 
         // Then: build only module-2, which depends on module-1 (must come from local repo)
-        Verifier partialVerifier = newVerifier(testDir);
+        Verifier partialVerifier = newVerifier(testDir.getPath());
         partialVerifier.setAutoclean(false);
         partialVerifier.setLogFileName("partial-log.txt");
         partialVerifier.addCliArgument("-Dmaven.maven3Personality=true");
