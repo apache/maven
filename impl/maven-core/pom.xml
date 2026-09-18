@@ -36,19 +36,19 @@ under the License.
          Maintained here so that dependency-update bots (Dependabot, Renovate)
          can propose version bumps automatically.  Values are filtered into
          plugin-versions.properties at build time and loaded at runtime. -->
-    <lifecycle.maven-clean-plugin>3.4.0</lifecycle.maven-clean-plugin>
-    <lifecycle.maven-compiler-plugin>3.13.0</lifecycle.maven-compiler-plugin>
-    <lifecycle.maven-deploy-plugin>3.1.3</lifecycle.maven-deploy-plugin>
-    <lifecycle.maven-ear-plugin>3.3.0</lifecycle.maven-ear-plugin>
-    <lifecycle.maven-ejb-plugin>3.2.1</lifecycle.maven-ejb-plugin>
-    <lifecycle.maven-install-plugin>3.1.3</lifecycle.maven-install-plugin>
-    <lifecycle.maven-jar-plugin>3.4.2</lifecycle.maven-jar-plugin>
-    <lifecycle.maven-plugin-plugin>3.15.1</lifecycle.maven-plugin-plugin>
-    <lifecycle.maven-rar-plugin>3.0.0</lifecycle.maven-rar-plugin>
-    <lifecycle.maven-resources-plugin>3.3.1</lifecycle.maven-resources-plugin>
-    <lifecycle.maven-site-plugin>3.21.0</lifecycle.maven-site-plugin>
-    <lifecycle.maven-surefire-plugin>3.5.2</lifecycle.maven-surefire-plugin>
-    <lifecycle.maven-war-plugin>3.4.0</lifecycle.maven-war-plugin>
+    <lifecycle.maven-clean-plugin>3.5.0</lifecycle.maven-clean-plugin>
+    <lifecycle.maven-compiler-plugin>3.16.0</lifecycle.maven-compiler-plugin>
+    <lifecycle.maven-deploy-plugin>3.2.0</lifecycle.maven-deploy-plugin>
+    <lifecycle.maven-ear-plugin>3.4.0</lifecycle.maven-ear-plugin>
+    <lifecycle.maven-ejb-plugin>3.3.0</lifecycle.maven-ejb-plugin>
+    <lifecycle.maven-install-plugin>3.2.0</lifecycle.maven-install-plugin>
+    <lifecycle.maven-jar-plugin>3.5.1</lifecycle.maven-jar-plugin>
+    <lifecycle.maven-plugin-plugin>3.16.0</lifecycle.maven-plugin-plugin>
+    <lifecycle.maven-rar-plugin>3.1.0</lifecycle.maven-rar-plugin>
+    <lifecycle.maven-resources-plugin>3.5.0</lifecycle.maven-resources-plugin>
+    <lifecycle.maven-site-plugin>3.22.0</lifecycle.maven-site-plugin>
+    <lifecycle.maven-surefire-plugin>3.6.0</lifecycle.maven-surefire-plugin>
+    <lifecycle.maven-war-plugin>3.5.1</lifecycle.maven-war-plugin>
   </properties>
 
   <dependencies>
