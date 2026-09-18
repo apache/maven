@@ -257,6 +257,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             }
         }
 
+        request.setNoTransferProgress(context.options().noTransferProgress().orElse(false));
         request.setTransferListener(determineTransferListener(
                 context, context.options().noTransferProgress().orElse(false)));
         request.setExecutionListener(determineExecutionListener(context));

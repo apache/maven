@@ -16,23 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.build.report;
+package org.apache.maven.internal.build;
 
-import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Immutable;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+
+import org.apache.maven.api.build.report.BuildStatus;
+import org.apache.maven.api.build.report.LogEvent;
+import org.apache.maven.api.build.report.MojoReport;
 
 /**
- * Log severity levels, mirroring the standard SLF4J levels.
- *
- * @since 4.1.0
- * @see LogEvent#level()
+ * Internal immutable implementation of {@link MojoReport}.
  */
-@Experimental
-@Immutable
-public enum LogLevel {
-    TRACE,
-    DEBUG,
-    INFO,
-    WARN,
-    ERROR
+record DefaultMojoReport(
+        String groupId,
+        String artifactId,
+        String version,
+        String goal,
+        String executionId,
+        String phase,
+        BuildStatus status,
+        Instant startTime,
+        Duration duration,
+        List<LogEvent> output)
+        implements MojoReport {
+
+    @Override
+    public List<LogEvent> output() {
+        return List.copyOf(output);
+    }
 }

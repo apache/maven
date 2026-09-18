@@ -20,9 +20,11 @@ package org.apache.maven.slf4j;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.jline.MessageUtils;
 import org.junit.jupiter.api.AfterEach;
@@ -31,7 +33,11 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.TestInfo;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertLinesMatch;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MavenSimpleLoggerTest {
 
@@ -90,5 +96,64 @@ class MavenSimpleLoggerTest {
                 ">> stacktrace >>");
 
         assertLinesMatch(expectedLines, actualLines);
+    }
+
+    /**
+     * Verify that when a {@link MavenSimpleLogger.LogSink} is installed,
+     * {@code write()} routes the event to the sink instead of stdout.
+     */
+    @Test
+    void writeRoutesToSinkWhenInstalled() {
+        // Capture sink invocations
+        List<Object[]> captured = new ArrayList<>();
+        MavenSimpleLogger.LogSink sink = (level, loggerName, cleanMessage, formatted, t) ->
+                captured.add(new Object[] {level, loggerName, cleanMessage, formatted, t});
+
+        MavenSimpleLogger.setLogSink(sink);
+        try {
+            MavenSimpleLogger logger = new MavenSimpleLogger("test.logger");
+            logger.info("hello sink");
+
+            assertEquals(1, captured.size(), "sink should have been called exactly once");
+            Object[] call = captured.get(0);
+            // level corresponds to SLF4J INFO_INT = 20
+            assertEquals(org.slf4j.spi.LocationAwareLogger.INFO_INT, call[0]);
+            assertEquals("test.logger", call[1]);
+            assertEquals("hello sink", call[2]);
+            assertNotNull(call[3], "formatted message must not be null");
+            assertTrue(((String) call[3]).contains("hello sink"), "formatted must contain the message");
+            assertNull(call[4], "no throwable expected");
+        } finally {
+            MavenSimpleLogger.setLogSink(null);
+        }
+    }
+
+    /**
+     * Verify that when a throwable is present, the sink receives a formatted
+     * string that includes the exception class and message.
+     */
+    @Test
+    void writeRoutesThrowableToSink() {
+        AtomicReference<String> formattedRef = new AtomicReference<>();
+        AtomicReference<Throwable> throwableRef = new AtomicReference<>();
+        MavenSimpleLogger.LogSink sink = (level, loggerName, cleanMessage, formatted, t) -> {
+            formattedRef.set(formatted);
+            throwableRef.set(t);
+        };
+
+        MavenSimpleLogger.setLogSink(sink);
+        try {
+            MavenSimpleLogger logger = new MavenSimpleLogger("test.logger");
+            RuntimeException ex = new RuntimeException("boom");
+            logger.error("oops", ex);
+
+            String formatted = formattedRef.get();
+            assertNotNull(formatted, "formatted must not be null");
+            assertTrue(formatted.contains("oops"), "formatted must contain the log message");
+            assertTrue(formatted.contains("java.lang.RuntimeException"), "formatted must contain the exception class");
+            assertEquals(ex, throwableRef.get(), "sink must receive the original throwable");
+        } finally {
+            MavenSimpleLogger.setLogSink(null);
+        }
     }
 }

@@ -22,17 +22,25 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 
 /**
- * Log severity levels, mirroring the standard SLF4J levels.
+ * The outcome of a build, module, or mojo execution.
  *
  * @since 4.1.0
- * @see LogEvent#level()
  */
 @Experimental
 @Immutable
-public enum LogLevel {
-    TRACE,
-    DEBUG,
-    INFO,
-    WARN,
-    ERROR
+public enum BuildStatus {
+    /**
+     * Completed successfully.
+     */
+    SUCCESS,
+
+    /**
+     * Failed with an error.
+     */
+    FAILURE,
+
+    /**
+     * Skipped (e.g. because a dependency failed).
+     */
+    SKIPPED
 }
