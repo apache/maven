@@ -34,11 +34,21 @@ import org.eclipse.aether.transfer.TransferResource;
  * AbstractMavenTransferListener
  */
 public abstract class AbstractMavenTransferListener extends AbstractTransferListener {
+    /** The JLine style applied to transfer output (faint rendering). */
     public static final String STYLE = ".transfer:-faint";
 
+    /** Factory used to create styled message builders for terminal output. */
     protected final MessageBuilderFactory messageBuilderFactory;
+
+    /** Writer used to print transfer messages to the console. */
     protected final PrintWriter out;
 
+    /**
+     * Creates a new transfer listener.
+     *
+     * @param messageBuilderFactory the factory for creating styled messages
+     * @param out the writer for console output
+     */
     protected AbstractMavenTransferListener(MessageBuilderFactory messageBuilderFactory, PrintWriter out) {
         this.messageBuilderFactory = messageBuilderFactory;
         this.out = out;
