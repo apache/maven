@@ -26,7 +26,7 @@ import java.util.Properties;
  * Provides default plugin versions for the built-in lifecycle bindings.
  * <p>
  * Versions are read from {@code plugin-versions.properties}, which is filtered
- * at build time from POM properties ({@code version.maven-<name>-plugin}).
+ * at build time from POM properties ({@code lifecycle.maven-<name>-plugin}).
  * Centralising them in the POM makes them visible to dependency-update bots
  * such as Dependabot and Renovate.
  *
@@ -50,7 +50,7 @@ public final class PluginVersions {
     private PluginVersions() {}
 
     private static String version(String pluginArtifactId) {
-        String key = "version." + pluginArtifactId;
+        String key = "lifecycle." + pluginArtifactId;
         String version = VERSIONS.getProperty(key);
         if (version == null) {
             throw new IllegalArgumentException("No default version defined for " + pluginArtifactId + "; add " + key
