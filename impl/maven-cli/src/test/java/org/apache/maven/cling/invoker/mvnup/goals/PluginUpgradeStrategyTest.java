@@ -1850,12 +1850,13 @@ class PluginUpgradeStrategyTest {
         }
 
         @Test
-        @DisplayName("maven-jar-plugin upgrade target should be 3.3.1 not 3.5.0")
-        void jarPluginTargetShouldBe331() throws Exception {
-            // maven-jar-plugin 3.4.2 has timestamp range validation and stricter automatic module
-            // name checks that break many projects. 3.5.0 has a plexus-archiver regression
-            // (JarToolModularJarArchiver fails with "Could not create modular JAR file").
-            // Target 3.3.1 until a clean 3.5.x release is available.
+        @DisplayName("maven-jar-plugin upgrade target should be 3.4.1 not 3.5.0")
+        void jarPluginTargetShouldBe341() throws Exception {
+            // maven-jar-plugin 3.4.2 introduced two regressions (via maven-archiver 3.6.3):
+            //   - SOURCE_DATE_EPOCH=0 / 1970-01-01 timestamps rejected (apache/maven-jar-plugin#595)
+            //   - derived Automatic-Module-Name with hyphens causes build failure (apache/maven-jar-plugin#596)
+            // 3.4.1 uses maven-archiver 3.6.2 which has neither issue.
+            // Target 3.4.1 until #595/#596 are fixed and a clean 3.5.x ships.
             String pomXml = """
                     <?xml version="1.0" encoding="UTF-8"?>
                     <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -1890,9 +1891,9 @@ class PluginUpgradeStrategyTest {
                     .map(Element::textContentTrimmed)
                     .orElse(null);
             assertEquals(
-                    "3.3.1",
+                    "3.4.1",
                     version,
-                    "maven-jar-plugin should be upgraded to 3.3.1 (3.4.2 has timestamp/module-name regressions,"
+                    "maven-jar-plugin should be upgraded to 3.4.1 (3.4.2 has timestamp/module-name regressions,"
                             + " 3.5.0 has plexus-archiver modular JAR regression)");
         }
 
@@ -1925,7 +1926,7 @@ class PluginUpgradeStrategyTest {
             strategy.doApply(context, pomMap);
 
             String xml = document.toXml();
-            assertTrue(xml.contains("3.4.2"), "Version 3.4.2 should be preserved (already above min 3.3.1)");
+            assertTrue(xml.contains("3.4.2"), "Version 3.4.2 should be preserved (already above min 3.4.1)");
         }
 
         @Test

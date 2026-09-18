@@ -111,9 +111,11 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             new PluginUpgrade(
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-jar-plugin",
-                    "3.3.1",
+                    "3.4.1",
                     "4.0.0-beta-1",
-                    "Pre-release versions compiled against different Maven 4 API signatures"),
+                    "Pre-release versions compiled against different Maven 4 API signatures;"
+                            + " 3.4.2+ has SOURCE_DATE_EPOCH=0 timestamp rejection and invalid module name"
+                            + " validation regressions (apache/maven-jar-plugin#595, #596)"),
             new PluginUpgrade(
                     DEFAULT_MAVEN_PLUGIN_GROUP_ID,
                     "maven-install-plugin",
