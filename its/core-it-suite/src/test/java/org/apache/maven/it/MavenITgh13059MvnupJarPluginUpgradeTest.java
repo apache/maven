@@ -18,6 +18,7 @@
  */
 package org.apache.maven.it;
 
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -69,7 +70,7 @@ class MavenITgh13059MvnupJarPluginUpgradeTest extends AbstractMavenIntegrationTe
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        String pomContent = Files.readString(testDir.resolve("pom.xml"));
+        String pomContent = Files.readString(testDir.resolve("pom.xml"), StandardCharsets.UTF_8);
 
         // Must land on 3.4.1 — last clean version before the 3.4.2 regressions
         assertTrue(
@@ -93,7 +94,7 @@ class MavenITgh13059MvnupJarPluginUpgradeTest extends AbstractMavenIntegrationTe
         verifier.verifyErrorFreeLog();
 
         // Step 3: re-run mvnup on the already-upgraded project — must be idempotent
-        String pomBefore = Files.readString(testDir.resolve("pom.xml"));
+        String pomBefore = Files.readString(testDir.resolve("pom.xml"), StandardCharsets.UTF_8);
         Verifier verifier3 = newVerifier(testDir);
         verifier3.setForkJvm(true);
         verifier3.setLogFileName("mvnup-rerun.txt");
@@ -103,7 +104,7 @@ class MavenITgh13059MvnupJarPluginUpgradeTest extends AbstractMavenIntegrationTe
         verifier3.addCliArgument(testDir.toString());
         verifier3.execute();
         verifier3.verifyErrorFreeLog();
-        String pomAfter = Files.readString(testDir.resolve("pom.xml"));
+        String pomAfter = Files.readString(testDir.resolve("pom.xml"), StandardCharsets.UTF_8);
         assertEquals(pomBefore, pomAfter, "Second mvnup apply must be idempotent");
     }
 }
