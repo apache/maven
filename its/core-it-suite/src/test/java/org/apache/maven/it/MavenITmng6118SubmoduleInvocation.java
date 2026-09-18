@@ -56,6 +56,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     public void testInSubModule() throws Exception {
         // Compile the whole project first.
         Verifier verifier = newVerifier(testDir.toString(), false);
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("package");
         verifier.execute();
 
@@ -63,6 +64,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
         verifier = newVerifier(submoduleDirectory.toString(), false);
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-insubmodule.txt");
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("compile");
         verifier.execute();
     }
@@ -76,6 +78,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
     public void testWithFile() throws Exception {
         // Compile the whole project first.
         Verifier verifier = newVerifier(testDir.toString(), false);
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("package");
         verifier.execute();
 
@@ -84,6 +87,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
         verifier.setLogFileName("log-withfile.txt");
         verifier.addCliArgument("-f");
         verifier.addCliArgument("app/pom.xml");
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("compile");
         verifier.execute();
     }
@@ -100,6 +104,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
         verifier.addCliArgument("-f");
         verifier.addCliArgument("app/pom.xml");
         verifier.setLogFileName("log-withfilealsomake.txt");
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyTextInLog("Building Maven Integration Test :: MNG-6118 :: Library 1.0");
@@ -116,6 +121,7 @@ public class MavenITmng6118SubmoduleInvocation extends AbstractMavenIntegrationT
         Verifier verifier = newVerifier(submoduleDirectory, false);
         verifier.addCliArgument("-am");
         verifier.setLogFileName("log-insubmodulealsomake.txt");
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyTextInLog("Building Maven Integration Test :: MNG-6118 :: Library 1.0");

@@ -63,6 +63,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         verifier.addCliArgument("-Dmodule-b.fail=true");
 
         try {
+            verifier.addCliArgument("--console=verbose");
             verifier.addCliArgument("test");
             verifier.execute();
             fail("Expected this invocation to fail");
@@ -74,6 +75,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         // New build with -r should resume the build from module-b, skipping module-a since it has succeeded already.
         verifier = newVerifier(parentDependentTestDir);
         verifier.addCliArgument("-r");
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("test");
         verifier.execute();
         verifier.verifyTextNotInLog("Building module-a 1.0");
@@ -88,6 +90,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         verifier.addCliArgument("--fail-at-end");
 
         try {
+            verifier.addCliArgument("--console=verbose");
             verifier.addCliArgument("test");
             verifier.execute();
             fail("Expected this invocation to fail");
@@ -102,6 +105,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         // ... but adding -r should exclude those two from the build because the previous Maven invocation
         // marked them as successfully built.
         verifier.addCliArgument("-r");
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("test");
         verifier.execute();
     }
@@ -116,6 +120,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         verifier.addCliArgument("--fail-at-end");
 
         try {
+            verifier.addCliArgument("--console=verbose");
             verifier.addCliArgument("test");
             verifier.execute();
             fail("Expected this invocation to fail");
@@ -125,6 +130,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
 
         verifier = newVerifier(parentIndependentTestDir);
         verifier.addCliArgument("-r");
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("test");
         verifier.execute();
         verifier.verifyTextInLog("Building module-a 1.0");
@@ -139,6 +145,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         // https://issues.apache.org/jira/browse/MNG-5760?focusedCommentId=17143795&page=com.atlassian.jira.plugin.system.issuetabpanels:comment-tabpanel#comment-17143795)
         final Verifier verifier = newVerifier(noProjectTestDir);
         try {
+            verifier.addCliArgument("--console=verbose");
             verifier.addCliArgument("org.apache.maven.plugins:maven-resources-plugin:resources");
             verifier.execute();
         } catch (final VerificationException ve) {
@@ -164,6 +171,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         verifier.addCliArgument("-Dmodule-a.fail=true");
         verifier.addCliArgument("-Dmodule-c.fail=true");
         try {
+            verifier.addCliArgument("--console=verbose");
             verifier.addCliArgument("verify");
             verifier.execute();
             fail("Expected this invocation to fail");
@@ -183,6 +191,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         //   c : success
         //   d : success
 
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("verify");
         verifier.execute();
     }
@@ -204,6 +213,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         verifier.addCliArgument("-Dmodule-b.delay=2000");
         verifier.addCliArgument("-Dmodule-d.fail=true");
         try {
+            verifier.addCliArgument("--console=verbose");
             verifier.addCliArgument("verify");
             verifier.execute();
             fail("Expected this invocation to fail");
@@ -223,6 +233,7 @@ public class MavenITmng5760ResumeFeatureTest extends AbstractMavenIntegrationTes
         // The result should be:
         //   c : success
         //   d : success
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("verify");
         verifier.execute();
     }

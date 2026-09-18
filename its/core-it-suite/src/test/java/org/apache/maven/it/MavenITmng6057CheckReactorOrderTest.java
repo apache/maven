@@ -56,6 +56,7 @@ public class MavenITmng6057CheckReactorOrderTest extends AbstractMavenIntegratio
 
         verifier.setLogFileName("log-only.txt");
         verifier.addCliArgument("-Drevision=1.3.0-SNAPSHOT");
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("clean");
         verifier.execute();
         verifier.verifyErrorFreeLog();
