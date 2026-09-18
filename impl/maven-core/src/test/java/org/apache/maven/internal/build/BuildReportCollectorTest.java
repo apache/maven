@@ -35,7 +35,6 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.impl.DefaultBuilderProblem;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -334,8 +333,12 @@ class BuildReportCollectorTest {
     // ---- Test helpers ----
 
     private static BuilderProblem warning(String key, String message, String source) {
-        return new DefaultBuilderProblem(
-                source, -1, -1, null, message, BuilderProblem.Severity.WARNING, key, null, null);
+        return BuilderProblem.builder()
+                .source(source)
+                .message(message)
+                .severity(BuilderProblem.Severity.WARNING)
+                .key(key)
+                .build();
     }
 
     private MavenProject createProject(String groupId, String artifactId, String version) {

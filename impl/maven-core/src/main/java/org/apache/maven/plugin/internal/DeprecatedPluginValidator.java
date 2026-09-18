@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.PluginValidationManager;
@@ -53,6 +54,11 @@ class DeprecatedPluginValidator extends AbstractMavenPluginDescriptorSourcedPara
     }
 
     @Override
+    protected String getValidationKeyPrefix() {
+        return "deprecated-param";
+    }
+
+    @Override
     protected void doValidate(
             MavenSession mavenSession,
             MojoDescriptor mojoDescriptor,
@@ -65,7 +71,11 @@ class DeprecatedPluginValidator extends AbstractMavenPluginDescriptorSourcedPara
                     mavenSession,
                     mojoDescriptor,
                     mojoClass,
-                    logDeprecatedMojo(mojoDescriptor));
+                    BuilderProblem.builder()
+                            .message(logDeprecatedMojo(mojoDescriptor))
+                            .severity(BuilderProblem.Severity.WARNING)
+                            .key("plugin-validation:deprecated-goal:" + mojoDescriptor.getGoal())
+                            .build());
         }
 
         if (mojoDescriptor.getParameters() != null) {
@@ -92,7 +102,7 @@ class DeprecatedPluginValidator extends AbstractMavenPluginDescriptorSourcedPara
                     mavenSession,
                     mojoDescriptor,
                     mojoClass,
-                    formatParameter(parameter));
+                    buildParameterProblem(parameter));
         }
     }
 

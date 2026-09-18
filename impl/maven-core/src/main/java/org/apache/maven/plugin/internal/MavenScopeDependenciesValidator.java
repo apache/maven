@@ -26,6 +26,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.plugin.PluginValidationManager;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -65,8 +66,15 @@ class MavenScopeDependenciesValidator extends AbstractMavenPluginDependenciesVal
                     PluginValidationManager.IssueLocality.EXTERNAL,
                     session,
                     pluginArtifact,
-                    "Plugin should declare Maven artifacts in `provided` scope. If the plugin already declares them in `provided` scope, update the maven-plugin-plugin to latest version. Artifacts found with wrong scope: "
-                            + mavenArtifacts);
+                    BuilderProblem.builder()
+                            .message(
+                                    "Plugin should declare Maven artifacts in `provided` scope. If the plugin already declares them in `provided` scope, update the maven-plugin-plugin to latest version. Artifacts found with wrong scope: "
+                                            + mavenArtifacts)
+                            .severity(BuilderProblem.Severity.WARNING)
+                            .key("plugin-validation:wrong-scope")
+                            .suggestion(
+                                    "Change Maven artifact dependencies to 'provided' scope or update maven-plugin-plugin")
+                            .build());
         }
     }
 }

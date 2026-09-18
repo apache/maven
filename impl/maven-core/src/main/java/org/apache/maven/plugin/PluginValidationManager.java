@@ -18,6 +18,7 @@
  */
 package org.apache.maven.plugin;
 
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.eclipse.aether.RepositorySystemSession;
@@ -54,27 +55,94 @@ public interface PluginValidationManager {
      * This method should be used in "early" phase of plugin execution, possibly even when plugin or mojo descriptor
      * does not exist yet. In turn, this method will not record extra information like plugin occurrence or declaration
      * location as those are not yet available.
+     *
+     * @since 4.1.0
      */
     void reportPluginValidationIssue(
-            IssueLocality locality, RepositorySystemSession session, Artifact pluginArtifact, String issue);
+            IssueLocality locality, RepositorySystemSession session, Artifact pluginArtifact, BuilderProblem problem);
 
     /**
      * Reports plugin issues applicable to the plugin as a whole.
      * <p>
      * This method will record extra information as well, like plugin occurrence or declaration location.
+     *
+     * @since 4.1.0
      */
     void reportPluginValidationIssue(
-            IssueLocality locality, MavenSession mavenSession, MojoDescriptor mojoDescriptor, String issue);
+            IssueLocality locality, MavenSession mavenSession, MojoDescriptor mojoDescriptor, BuilderProblem problem);
 
     /**
      * Reports plugin Mojo issues applicable to the Mojo itself.
      * <p>
      * This method will record extra information as well, like plugin occurrence or declaration location.
+     *
+     * @since 4.1.0
      */
     void reportPluginMojoValidationIssue(
             IssueLocality locality,
             MavenSession mavenSession,
             MojoDescriptor mojoDescriptor,
             Class<?> mojoClass,
-            String issue);
+            BuilderProblem problem);
+
+    // ---- Deprecated String-based adapters for external callers ----
+
+    /**
+     * @deprecated Use {@link #reportPluginValidationIssue(IssueLocality, RepositorySystemSession, Artifact,
+     *     BuilderProblem)} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    default void reportPluginValidationIssue(
+            IssueLocality locality, RepositorySystemSession session, Artifact pluginArtifact, String issue) {
+        reportPluginValidationIssue(
+                locality,
+                session,
+                pluginArtifact,
+                BuilderProblem.builder()
+                        .message(issue)
+                        .severity(BuilderProblem.Severity.WARNING)
+                        .key("plugin-validation:" + issue.hashCode())
+                        .build());
+    }
+
+    /**
+     * @deprecated Use {@link #reportPluginValidationIssue(IssueLocality, MavenSession, MojoDescriptor,
+     *     BuilderProblem)} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    default void reportPluginValidationIssue(
+            IssueLocality locality, MavenSession mavenSession, MojoDescriptor mojoDescriptor, String issue) {
+        reportPluginValidationIssue(
+                locality,
+                mavenSession,
+                mojoDescriptor,
+                BuilderProblem.builder()
+                        .message(issue)
+                        .severity(BuilderProblem.Severity.WARNING)
+                        .key("plugin-validation:" + issue.hashCode())
+                        .build());
+    }
+
+    /**
+     * @deprecated Use {@link #reportPluginMojoValidationIssue(IssueLocality, MavenSession, MojoDescriptor, Class,
+     *     BuilderProblem)} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    default void reportPluginMojoValidationIssue(
+            IssueLocality locality,
+            MavenSession mavenSession,
+            MojoDescriptor mojoDescriptor,
+            Class<?> mojoClass,
+            String issue) {
+        reportPluginMojoValidationIssue(
+                locality,
+                mavenSession,
+                mojoDescriptor,
+                mojoClass,
+                BuilderProblem.builder()
+                        .message(issue)
+                        .severity(BuilderProblem.Severity.WARNING)
+                        .key("plugin-validation:" + issue.hashCode())
+                        .build());
+    }
 }

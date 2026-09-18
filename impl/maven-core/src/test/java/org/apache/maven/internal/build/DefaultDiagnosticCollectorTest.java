@@ -27,7 +27,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 import org.apache.maven.api.services.BuilderProblem;
-import org.apache.maven.impl.DefaultBuilderProblem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -45,16 +44,30 @@ class DefaultDiagnosticCollectorTest {
     }
 
     private static BuilderProblem warning(String key, String message, String source) {
-        return new DefaultBuilderProblem(
-                source, -1, -1, null, message, BuilderProblem.Severity.WARNING, key, null, null);
+        return BuilderProblem.builder()
+                .source(source)
+                .message(message)
+                .severity(BuilderProblem.Severity.WARNING)
+                .key(key)
+                .build();
     }
 
     private static BuilderProblem error(String key, String message, String source) {
-        return new DefaultBuilderProblem(source, -1, -1, null, message, BuilderProblem.Severity.ERROR, key, null, null);
+        return BuilderProblem.builder()
+                .source(source)
+                .message(message)
+                .severity(BuilderProblem.Severity.ERROR)
+                .key(key)
+                .build();
     }
 
     private static BuilderProblem info(String key, String message, String source) {
-        return new DefaultBuilderProblem(source, -1, -1, null, message, BuilderProblem.Severity.INFO, key, null, null);
+        return BuilderProblem.builder()
+                .source(source)
+                .message(message)
+                .severity(BuilderProblem.Severity.INFO)
+                .key(key)
+                .build();
     }
 
     @Test
@@ -175,16 +188,16 @@ class DefaultDiagnosticCollectorTest {
 
     @Test
     void testFullProblemFields() {
-        BuilderProblem p = new DefaultBuilderProblem(
-                "maven-compiler-plugin:3.15.0:compile",
-                42,
-                15,
-                null,
-                "unchecked cast from Object to List<String>",
-                BuilderProblem.Severity.WARNING,
-                "unchecked-cast",
-                "Add @SuppressWarnings(\"unchecked\") or use a type-safe alternative",
-                "https://docs.oracle.com/javase/tutorial/java/generics/rawTypes.html");
+        BuilderProblem p = BuilderProblem.builder()
+                .source("maven-compiler-plugin:3.15.0:compile")
+                .lineNumber(42)
+                .columnNumber(15)
+                .message("unchecked cast from Object to List<String>")
+                .severity(BuilderProblem.Severity.WARNING)
+                .key("unchecked-cast")
+                .suggestion("Add @SuppressWarnings(\"unchecked\") or use a type-safe alternative")
+                .documentationUrl("https://docs.oracle.com/javase/tutorial/java/generics/rawTypes.html")
+                .build();
 
         collector.report(p);
 
