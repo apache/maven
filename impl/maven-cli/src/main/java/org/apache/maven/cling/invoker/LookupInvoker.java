@@ -84,6 +84,7 @@ import org.apache.maven.logging.LoggingOutputStream;
 import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.apache.maven.logging.SimpleBuildEventListener;
 import org.apache.maven.logging.api.LogLevelRecorder;
+import org.apache.maven.slf4j.MavenJulHandler;
 import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.codehaus.plexus.PlexusContainer;
 import org.jline.terminal.Terminal;
@@ -92,7 +93,6 @@ import org.jline.terminal.impl.AbstractPosixTerminal;
 import org.jline.terminal.spi.TerminalExt;
 import org.jline.utils.OSUtils;
 import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.slf4j.spi.LocationAwareLogger;
 
 import static java.util.Objects.requireNonNull;
@@ -332,6 +332,16 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             ProjectBuildLogAppender projectBuildLogAppender =
                     new ProjectBuildLogAppender(determineBuildEventListener(context));
             context.closeables.add(projectBuildLogAppender);
+
+            // Now that the logSink (and any -l log-file writer) is installed,
+            // replay early log messages that were accumulated before
+            // activateLogging() ran.  This ensures messages such as
+            // "Enabled to break the build on log level WARN." reach the log
+            // file rather than stdout (MavenITmng6065 regression fix).
+            if (context.pendingEarlyLogs != null) {
+                context.pendingEarlyLogs.forEach(e -> context.logger.log(e.level(), e.message(), e.error()));
+                context.pendingEarlyLogs = null;
+            }
         } else {
             doConfigureWithTerminal(context, context.terminal);
         }
@@ -447,12 +457,31 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected void activateLogging(C context) throws Exception {
-        if (!SLF4JBridgeHandler.isInstalled()) {
-            SLF4JBridgeHandler.removeHandlersForRootLogger();
-            SLF4JBridgeHandler.install();
+        if (!MavenJulHandler.isInstalled()) {
+            MavenJulHandler.install();
         }
 
         context.slf4jConfiguration.activate();
+
+        // Now that SLF4J is fully initialized, set the JUL root logger level
+        // to match the effective log level.  This must happen AFTER install()
+        // + activate() to avoid flooding JUL events during SLF4J bootstrap
+        // (ConcurrentHashMap.computeIfAbsent reentrancy).
+        // In quiet mode keep the JUL root at WARNING so that INFO/DEBUG JUL
+        // events are suppressed at source — relying solely on the SLF4J-level
+        // check in MavenJulHandler.isLevelEnabled() is racy: newly created
+        // SLF4J loggers may briefly see the default INFO level before
+        // quiet-mode propagation completes, leaking output that
+        // MavenITmng4387QuietLoggingTest detects as a flaky failure.
+        java.util.logging.Level julRootLevel;
+        if (context.options().quiet().orElse(false)) {
+            julRootLevel = java.util.logging.Level.WARNING;
+        } else if (context.invokerRequest.effectiveVerbose()) {
+            julRootLevel = java.util.logging.Level.ALL;
+        } else {
+            julRootLevel = java.util.logging.Level.INFO;
+        }
+        java.util.logging.LogManager.getLogManager().getLogger("").setLevel(julRootLevel);
         if (context.options().failOnSeverity().isPresent()) {
             String logLevelThreshold = context.options().failOnSeverity().get();
             if (context.loggerFactory instanceof LogLevelRecorder recorder) {
@@ -478,7 +507,14 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         // at this point logging is set up, reply so far accumulated logs, if any and swap logger with real one
         Logger logger =
                 new Slf4jLogger(context.loggerFactory.getLogger(getClass().getName()));
-        context.logger.drain().forEach(e -> logger.log(e.level(), e.message(), e.error()));
+        // Defer draining the accumulated log queue to createTerminal() so that
+        // early messages (e.g. "Enabled to break the build on log level WARN.")
+        // are replayed AFTER ProjectBuildLogAppender has installed the
+        // MavenSimpleLogger logSink and wired up any -l log-file writer.
+        // Draining here (before createTerminal) would route those messages
+        // through super.write() → stdout, bypassing the log file
+        // (MavenITmng6065 regression).
+        context.pendingEarlyLogs = context.logger.drain();
         context.logger = logger;
     }
 
