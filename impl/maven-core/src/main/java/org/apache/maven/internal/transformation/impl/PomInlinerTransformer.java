@@ -123,8 +123,7 @@ class PomInlinerTransformer extends TransformerSupport {
     @SuppressWarnings("unchecked")
     private Map<String, String> pomProperties(RepositorySystemSession session) {
         return (Map<String, String>) session.getData()
-                .computeIfAbsent(
-                        PomInlinerTransformer.class.getName() + ".pomProperties", ConcurrentHashMap::new);
+                .computeIfAbsent(PomInlinerTransformer.class.getName() + ".pomProperties", ConcurrentHashMap::new);
     }
 
     @Override
