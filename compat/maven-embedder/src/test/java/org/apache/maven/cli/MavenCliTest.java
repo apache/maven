@@ -342,6 +342,42 @@ class MavenCliTest {
         assertEquals("-Dpom.xml", request.getCommandLine().getOptionValue(CLIManager.ALTERNATE_POM_FILE));
     }
 
+    /**
+     * Verifies the MNG-7131 contract: {@code .mvn/maven.config} uses a <em>one-argument-per-line</em> format,
+     * modelled after Java {@code @argfiles}. Each line is a single argv token — whitespace inside a line is
+     * preserved and is never re-split. This means a property value that contains spaces can be supplied as two
+     * consecutive lines:
+     * <pre>
+     *   --define
+     *   label=Apache Maven
+     * </pre>
+     * The two lines are passed as two separate tokens to Commons CLI, which consumes the second as the argument
+     * to {@code --define}. This is the contract introduced by commit {@code 331c5c3435} and broken by PR #13093
+     * (reverted in #13148); this test guards against that regression.
+     *
+     * @throws Exception in case of failure.
+     */
+    @Test
+    void testMavenConfigMultiLineDefineWithSpaces() throws Exception {
+        System.setProperty(
+                MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                new File("src/test/projects/mavenConfigSpacedValues").getCanonicalPath());
+        CliRequest request = new CliRequest(new String[0], null);
+
+        cli.initialize(request);
+        cli.cli(request);
+        cli.properties(request);
+
+        assertEquals(
+                "Apache Maven",
+                request.getUserProperties().getProperty("label"),
+                "MNG-7131: --define / value-with-spaces form must preserve the space");
+        assertEquals(
+                "1.0.0",
+                request.getUserProperties().getProperty("revision"),
+                "MNG-7131: --define / value-without-spaces form must work");
+    }
+
     @Test
     void testStyleColors() throws Exception {
         assumeTrue(MessageUtils.isColorEnabled(), "ANSI not supported");
