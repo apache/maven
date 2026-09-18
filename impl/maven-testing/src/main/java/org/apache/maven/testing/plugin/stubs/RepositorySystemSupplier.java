@@ -555,18 +555,16 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
 
     protected LocalRepositoryProvider createLocalRepositoryProvider() {
         LocalPathComposer localPathComposer = getLocalPathComposer();
-        RepositoryKeyFunctionFactory repositoryKeyFunctionFactory = getRepositoryKeyFunctionFactory();
         HashMap<String, LocalRepositoryManagerFactory> localRepositoryProviders = new HashMap<>(2);
         localRepositoryProviders.put(
-                SimpleLocalRepositoryManagerFactory.NAME,
-                new SimpleLocalRepositoryManagerFactory(localPathComposer, repositoryKeyFunctionFactory));
+                SimpleLocalRepositoryManagerFactory.NAME, new SimpleLocalRepositoryManagerFactory(localPathComposer));
         localRepositoryProviders.put(
                 EnhancedLocalRepositoryManagerFactory.NAME,
                 new EnhancedLocalRepositoryManagerFactory(
                         localPathComposer,
                         getTrackingFileManager(),
                         getLocalPathPrefixComposerFactory(),
-                        repositoryKeyFunctionFactory));
+                        getRepositoryKeyFunctionFactory()));
         return new DefaultLocalRepositoryProvider(localRepositoryProviders);
     }
 
