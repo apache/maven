@@ -95,9 +95,9 @@ class DefaultClassRealmManagerTest {
     }
 
     @Test
-    void testDebugEnabled() throws PlexusContainerException {
+    void testTraceEnabled() throws PlexusContainerException {
         Logger logger = mock(Logger.class);
-        when(logger.isDebugEnabled()).thenReturn(true);
+        when(logger.isTraceEnabled()).thenReturn(true);
 
         DefaultClassRealmManager classRealmManager;
         ClassRealm classRealm;
@@ -122,18 +122,18 @@ class DefaultClassRealmManagerTest {
                 classRealm.getURLs()[0].getPath().endsWith("local/repository/some/path"),
                 "ClassRealm URL should end with local repository path");
 
-        verifier.verify(logger, calls(1)).debug("Importing foreign packages into class realm {}", "maven.api");
-        verifier.verify(logger, calls(1)).debug("  Imported: {} < {}", "group1:artifact1", "test");
-        verifier.verify(logger, calls(1)).debug("  Excluded: {}", "group1:artifact2:ext:classifier1:null");
+        verifier.verify(logger, calls(1)).trace("Importing foreign packages into class realm {}", "maven.api");
+        verifier.verify(logger, calls(1)).trace("  Imported: {} < {}", "group1:artifact1", "test");
+        verifier.verify(logger, calls(1)).trace("  Excluded: {}", "group1:artifact2:ext:classifier1:null");
         verifier.verify(logger, calls(1))
-                .debug("Populating class realm {}", "project>modelGroup1:modelArtifact1:modelVersion1");
-        verifier.verify(logger, calls(1)).debug("  Included: {}", "group1:artifact1:ext:classifier1:null");
+                .trace("Populating class realm {}", "project>modelGroup1:modelArtifact1:modelVersion1");
+        verifier.verify(logger, calls(1)).trace("  Included: {}", "group1:artifact1:ext:classifier1:null");
     }
 
     @Test
-    void testDebugDisabled() throws PlexusContainerException {
+    void testTraceDisabled() throws PlexusContainerException {
         Logger logger = mock(Logger.class);
-        when(logger.isDebugEnabled()).thenReturn(false);
+        when(logger.isTraceEnabled()).thenReturn(false);
 
         DefaultClassRealmManager classRealmManager;
         ClassRealm classRealm;
@@ -158,11 +158,11 @@ class DefaultClassRealmManagerTest {
                 classRealm.getURLs()[0].getPath().endsWith("local/repository/some/path"),
                 "ClassRealm URL should end with local repository path");
 
-        verifier.verify(logger, calls(1)).debug("Importing foreign packages into class realm {}", "maven.api");
-        verifier.verify(logger, calls(1)).debug("  Imported: {} < {}", "group1:artifact1", "test");
+        verifier.verify(logger, calls(1)).trace("Importing foreign packages into class realm {}", "maven.api");
+        verifier.verify(logger, calls(1)).trace("  Imported: {} < {}", "group1:artifact1", "test");
         verifier.verify(logger, calls(1))
-                .debug("Populating class realm {}", "project>modelGroup1:modelArtifact1:modelVersion1");
-        verifier.verify(logger, never()).debug("  Included: {}", "group1:artifact1:ext:classifier1:null");
-        verifier.verify(logger, never()).debug("  Excluded: {}", "group1:artifact2:ext:classifier1:null");
+                .trace("Populating class realm {}", "project>modelGroup1:modelArtifact1:modelVersion1");
+        verifier.verify(logger, never()).trace("  Included: {}", "group1:artifact1:ext:classifier1:null");
+        verifier.verify(logger, never()).trace("  Excluded: {}", "group1:artifact2:ext:classifier1:null");
     }
 }
