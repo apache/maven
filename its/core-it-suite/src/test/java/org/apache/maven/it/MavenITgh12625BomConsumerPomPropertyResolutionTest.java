@@ -46,9 +46,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * @see <a href="https://lists.apache.org/thread/2s2myrg0zzk0q5z9kjhm8pwsntxmtnxh">Vote thread</a>
  * @since 4.0.0
  */
-class MavenITBomConsumerPomPropertyResolutionTest extends AbstractMavenIntegrationTestCase {
+class MavenITgh12625BomConsumerPomPropertyResolutionTest extends AbstractMavenIntegrationTestCase {
 
-    MavenITBomConsumerPomPropertyResolutionTest() {
+    MavenITgh12625BomConsumerPomPropertyResolutionTest() {
         super("[4.0.0-rc-4,)");
     }
 
