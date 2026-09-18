@@ -85,6 +85,8 @@ class PomInlinerTransformer extends TransformerSupport {
                 try {
                     Path tmpPom = Files.createTempFile("pom-inliner-", ".xml");
                     String originalPom = Files.readString(artifact.getPath());
+                    String groupId = artifact.getGroupId();
+                    String artifactId = artifact.getArtifactId();
                     String interpolatedPom = interpolator.interpolate(
                             originalPom,
                             property -> {
@@ -95,8 +97,7 @@ class PomInlinerTransformer extends TransformerSupport {
                                     if (value != null) {
                                         return (String) value;
                                     }
-                                    return pomProperties.get(
-                                            artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + property);
+                                    return pomProperties.get(groupId + ":" + artifactId + ":" + property);
                                 }
                                 return null;
                             },
