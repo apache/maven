@@ -39,6 +39,10 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITgh13192PomInlinerCiFriendlyPropertyTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh13192PomInlinerCiFriendlyPropertyTest() {
+        super("[4.0.0-rc-7,)");
+    }
+
     /**
      * Verify that {@code mvn install} in legacy mode succeeds when {@code ${revision}} is defined
      * only in POM {@code <properties>} (not via {@code -Drevision} on the command line), and that
@@ -65,9 +69,7 @@ class MavenITgh13192PomInlinerCiFriendlyPropertyTest extends AbstractMavenIntegr
         assertFalse(
                 parentPomContent.contains("${revision}"),
                 "Installed parent POM should not contain '${revision}' placeholder");
-        assertTrue(
-                parentPomContent.contains("1.0.0"),
-                "Installed parent POM should contain literal version '1.0.0'");
+        assertTrue(parentPomContent.contains("1.0.0"), "Installed parent POM should contain literal version '1.0.0'");
 
         // module-1 installed POM should also have the literal version
         Path installedModule1Pom = verifier.getArtifactPath("gh-13192-ci-friendly", "module-1", "1.0.0", "pom");

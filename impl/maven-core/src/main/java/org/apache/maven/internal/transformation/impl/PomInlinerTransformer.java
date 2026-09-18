@@ -95,7 +95,8 @@ class PomInlinerTransformer extends TransformerSupport {
                                     if (value != null) {
                                         return (String) value;
                                     }
-                                    return pomProperties.get(property);
+                                    return pomProperties.get(
+                                            artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + property);
                                 }
                                 return null;
                             },
@@ -152,7 +153,11 @@ class PomInlinerTransformer extends TransformerSupport {
                         if (projectValue != null) {
                             usedProperties.add(property);
                             // Remember this value for replacePom(), which does not have a project ref.
-                            pomProperties.put(property, projectValue);
+                            // Key by groupId:artifactId:property to avoid cross-project collision
+                            // in a reactor build where multiple modules may define the same property.
+                            pomProperties.put(
+                                    project.getGroupId() + ":" + project.getArtifactId() + ":" + property,
+                                    projectValue);
                             return projectValue;
                         }
                         throw new IllegalArgumentException("Cannot inline property " + property);
