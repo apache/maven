@@ -49,7 +49,7 @@ public class LifecycleDebugLogger {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     public void debug(String s) {
-        logger.debug(s);
+        logger.trace(s);
     }
 
     public void info(String s) {
@@ -57,45 +57,45 @@ public class LifecycleDebugLogger {
     }
 
     public void debugReactorPlan(ProjectBuildList projectBuilds) {
-        if (!logger.isDebugEnabled()) {
+        if (!logger.isTraceEnabled()) {
             return;
         }
 
-        logger.debug("=== REACTOR BUILD PLAN ================================================");
+        logger.trace("=== REACTOR BUILD PLAN ================================================");
 
         for (Iterator<ProjectSegment> it = projectBuilds.iterator(); it.hasNext(); ) {
             ProjectSegment projectBuild = it.next();
 
-            logger.debug("Project: " + projectBuild.getProject().getId());
-            logger.debug("Tasks:   " + projectBuild.getTaskSegment().getTasks());
-            logger.debug("Style:   " + (projectBuild.getTaskSegment().isAggregating() ? "Aggregating" : "Regular"));
+            logger.trace("Project: " + projectBuild.getProject().getId());
+            logger.trace("Tasks:   " + projectBuild.getTaskSegment().getTasks());
+            logger.trace("Style:   " + (projectBuild.getTaskSegment().isAggregating() ? "Aggregating" : "Regular"));
 
             if (it.hasNext()) {
-                logger.debug("-----------------------------------------------------------------------");
+                logger.trace("-----------------------------------------------------------------------");
             }
         }
 
-        logger.debug("=======================================================================");
+        logger.trace("=======================================================================");
     }
 
     public void debugProjectPlan(MavenProject currentProject, MavenExecutionPlan executionPlan) {
-        if (!logger.isDebugEnabled()) {
+        if (!logger.isTraceEnabled()) {
             return;
         }
 
-        logger.debug("=== PROJECT BUILD PLAN ================================================");
-        logger.debug("Project:       " + BuilderCommon.getKey(currentProject));
+        logger.trace("=== PROJECT BUILD PLAN ================================================");
+        logger.trace("Project:       " + BuilderCommon.getKey(currentProject));
 
         debugDependencyRequirements(executionPlan.getMojoExecutions());
 
-        logger.debug("Repositories (dependencies): " + currentProject.getRemoteProjectRepositories());
-        logger.debug("Repositories (plugins)     : " + currentProject.getRemotePluginRepositories());
+        logger.trace("Repositories (dependencies): " + currentProject.getRemoteProjectRepositories());
+        logger.trace("Repositories (plugins)     : " + currentProject.getRemotePluginRepositories());
 
         for (ExecutionPlanItem mojoExecution : executionPlan) {
             debugMojoExecution(mojoExecution.getMojoExecution());
         }
 
-        logger.debug("=======================================================================");
+        logger.trace("=======================================================================");
     }
 
     private void debugMojoExecution(MojoExecution mojoExecution) {
@@ -106,7 +106,7 @@ public class LifecycleDebugLogger {
         Map<String, List<MojoExecution>> forkedExecutions = mojoExecution.getForkedExecutions();
         if (!forkedExecutions.isEmpty()) {
             for (Map.Entry<String, List<MojoExecution>> fork : forkedExecutions.entrySet()) {
-                logger.debug("--- init fork of " + fork.getKey() + " for " + mojoExecId + " ---");
+                logger.trace("--- init fork of " + fork.getKey() + " for " + mojoExecId + " ---");
 
                 debugDependencyRequirements(fork.getValue());
 
@@ -114,15 +114,15 @@ public class LifecycleDebugLogger {
                     debugMojoExecution(forkedExecution);
                 }
 
-                logger.debug("--- exit fork of " + fork.getKey() + " for " + mojoExecId + " ---");
+                logger.trace("--- exit fork of " + fork.getKey() + " for " + mojoExecId + " ---");
             }
         }
 
-        logger.debug("-----------------------------------------------------------------------");
-        logger.debug("Goal:          " + mojoExecId);
-        logger.debug(
+        logger.trace("-----------------------------------------------------------------------");
+        logger.trace("Goal:          " + mojoExecId);
+        logger.trace(
                 "Style:         " + (mojoExecution.getMojoDescriptor().isAggregator() ? "Aggregating" : "Regular"));
-        logger.debug("Configuration: " + mojoExecution.getConfiguration());
+        logger.trace("Configuration: " + mojoExecution.getConfiguration());
     }
 
     private void debugDependencyRequirements(List<MojoExecution> mojoExecutions) {
@@ -143,7 +143,7 @@ public class LifecycleDebugLogger {
             }
         }
 
-        logger.debug("Dependencies (collect): " + scopesToCollect);
-        logger.debug("Dependencies (resolve): " + scopesToResolve);
+        logger.trace("Dependencies (collect): " + scopesToCollect);
+        logger.trace("Dependencies (resolve): " + scopesToResolve);
     }
 }
