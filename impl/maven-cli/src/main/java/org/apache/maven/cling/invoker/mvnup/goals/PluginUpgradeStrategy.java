@@ -463,7 +463,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                     return false;
                 }
             } else {
-                context.warning("Could not determine Quarkus platform version — if the project uses "
+                context.warning("Could not determine Quarkus platform version - if the project uses "
                         + "Quarkus 2.x, the plugin upgrade may cause build failures");
             }
         }
@@ -509,7 +509,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                                 + currentVersion + " is already >= " + upgrade.latestPreRelease);
                     }
                 } else {
-                    // No stable 4.x pre-release line — downgrade to the stable minVersion.
+                    // No stable 4.x pre-release line - downgrade to the stable minVersion.
                     // 4.0.0-beta-x versions compiled against a different API snapshot are
                     // incompatible at runtime; they must be pinned to the stable release.
                     Editor editor = new Editor(pomDocument);
@@ -556,14 +556,14 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         }
 
         // Check if property exists in the current POM but is already at/above minimum (no upgrade needed).
-        // In that case, skip the cross-POM search and the warning — the property IS defined.
+        // In that case, skip the cross-POM search and the warning - the property IS defined.
         Element currentRoot = pomDocument.root();
         Element currentProps = currentRoot.childElement(PROPERTIES).orElse(null);
         if (currentProps != null && currentProps.childElement(propertyName).isPresent()) {
             return false; // Found in current POM, no upgrade needed
         }
 
-        // Property not in current POM — search other POMs in the project (e.g., parent POM)
+        // Property not in current POM - search other POMs in the project (e.g., parent POM)
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Document otherDoc = entry.getValue();
             if (otherDoc == pomDocument) {
@@ -624,7 +624,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                             + upgrade.latestPreRelease);
                 }
             } else {
-                // No stable 4.x pre-release line — downgrade to the stable minVersion
+                // No stable 4.x pre-release line - downgrade to the stable minVersion
                 editor.setTextContent(propertyElement, upgrade.minVersion);
                 context.detail("Downgraded property " + propertyName + " (for " + upgrade.groupId + ":"
                         + upgrade.artifactId + ") from incompatible pre-release " + currentVersion
@@ -680,7 +680,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
         context.detail("Migrated " + migration.oldGroupId() + ":" + migration.oldArtifactId() + " to "
                 + migration.newGroupId() + ":" + migration.newArtifactId() + ":" + migration.minVersion() + " in "
-                + sectionName + " — " + migration.reason());
+                + sectionName + " - " + migration.reason());
         return true;
     }
 
@@ -1021,10 +1021,10 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                             needsDirectOverride.add(pluginKey);
                             context.debug("Plugin " + pluginKey + " version " + effectiveVersion
                                     + " has explicit version in inherited build/plugins"
-                                    + " — needs direct version override to " + upgrade.minVersion());
+                                    + " - needs direct version override to " + upgrade.minVersion());
                         } else {
                             context.debug("Plugin " + pluginKey + " version " + effectiveVersion
-                                    + " is managed via pluginManagement — needs version change to "
+                                    + " is managed via pluginManagement - needs version change to "
                                     + upgrade.minVersion());
                         }
                     }
@@ -1522,7 +1522,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * <p>Checks the following sources in order:
      * <ol>
      *   <li>{@code <dependencyManagement>} for {@code io.quarkus.platform:quarkus-bom}
-     *       or {@code io.quarkus:quarkus-bom} — extracts the version (resolving property references)</li>
+     *       or {@code io.quarkus:quarkus-bom} - extracts the version (resolving property references)</li>
      *   <li>Properties: {@code quarkus.platform.version}, {@code quarkus.version},
      *       {@code quarkus-plugin.version}</li>
      * </ol>
@@ -1678,11 +1678,11 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         }
 
         if (currentVersion == null) {
-            // Property is inherited from parent — we cannot resolve its actual value here,
+            // Property is inherited from parent - we cannot resolve its actual value here,
             // so skip decoupling to avoid introducing a potentially unnecessary property
             // that could downgrade an already-sufficient inherited version.
             context.debug("Shared property " + sharedPropertyName
-                    + " not found in current POM (may be inherited) — skipping version decoupling");
+                    + " not found in current POM (may be inherited) - skipping version decoupling");
             return false;
         }
 
@@ -1701,7 +1701,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         // Add the new property if it doesn't already exist
         Element existingProp = propertiesElement.childElement(newPropertyName).orElse(null);
         if (existingProp != null) {
-            // Property already exists — update its value
+            // Property already exists - update its value
             editor.setTextContent(existingProp, upgrade.minVersion);
         } else {
             DomUtils.insertContentElement(propertiesElement, newPropertyName, upgrade.minVersion);
@@ -1735,7 +1735,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         if (platformMinor != null && pluginMinor != null && !platformMinor.equals(pluginMinor)) {
             context.warning("quarkus-maven-plugin upgraded to " + pluginVersion
                     + " for Maven 4 compatibility. Your Quarkus platform is still at " + platformVersion
-                    + ". Consider upgrading the platform to match — mismatched plugin and platform"
+                    + ". Consider upgrading the platform to match - mismatched plugin and platform"
                     + " versions may cause unexpected behavior.");
         }
     }
