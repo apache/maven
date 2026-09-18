@@ -16,23 +16,29 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.api.build.report;
+
+import org.apache.maven.api.annotations.Experimental;
 
 /**
- * Structured build report data model.
- * <p>
- * The {@link org.apache.maven.api.build.report.BuildReport} is the root of a structured
- * representation of a Maven build execution. It is persisted to
- * {@code target/build-report.json} at the end of every build and can be consumed
- * by tools, CI systems, IDEs, and LLM agents without re-running the build or
- * parsing console output.
- * <p>
- * Build problems (warnings, errors) are represented as
- * {@link org.apache.maven.api.services.BuilderProblem} instances and included
- * in the report for downstream analysis.
+ * The outcome of a build, module, or mojo execution.
  *
  * @since 4.1.0
  */
 @Experimental
-package org.apache.maven.api.build.report;
+public enum BuildStatus {
+    /**
+     * Completed successfully.
+     */
+    SUCCESS,
 
-import org.apache.maven.api.annotations.Experimental;
+    /**
+     * Failed with an error.
+     */
+    FAILURE,
+
+    /**
+     * Skipped (e.g. because a dependency failed).
+     */
+    SKIPPED
+}
