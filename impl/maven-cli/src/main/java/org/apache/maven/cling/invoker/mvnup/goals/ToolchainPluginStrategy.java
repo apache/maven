@@ -49,8 +49,12 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROPERTIES;
 
 /**
  * Strategy for adding the {@code maven-toolchains-plugin} with the {@code select-jdk-toolchain}
- * goal when the project's required {@code --source}/{@code --release} level is no longer supported
- * by the running JDK.
+ * goal when the project's declared {@code --source}/{@code --release} level has been retired
+ * by a newer JDK (per JEP 182).
+ *
+ * <p>This strategy is independent of the JDK used to run {@code mvnup}: it acts purely on
+ * what the project <em>declares</em>. A project targeting {@code --source 6} needs the
+ * toolchain plugin regardless of whether {@code mvnup} is invoked under JDK 11 or JDK 25.
  *
  * <p>This strategy detects the project's source level from:
  * <ol>
@@ -59,8 +63,8 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PROPERTIES;
  *   <li>Compiler plugin {@code <configuration><release>} or {@code <source>}</li>
  * </ol>
  *
- * <p>If the running JDK does not support the detected source level (per JEP 182 retirement
- * schedule), and the {@code maven-toolchains-plugin} is not already configured with the
+ * <p>If the declared source level is retired (i.e. no longer accepted by the latest JDK)
+ * and the {@code maven-toolchains-plugin} is not already configured with the
  * {@code select-jdk-toolchain} goal, this strategy adds it so that the plugin's built-in
  * JDK discovery mechanism can find a compatible JDK at build time.
  *
@@ -132,8 +136,6 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
         Set<Path> modifiedPoms = new HashSet<>();
         Set<Path> errorPoms = new HashSet<>();
 
-        int runningJdkMajor = getRunningJdkMajor();
-
         for (Map.Entry<Path, Document> entry : pomMap.entrySet()) {
             Path pomPath = entry.getKey();
             Document pomDocument = entry.getValue();
@@ -154,8 +156,11 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
                     continue;
                 }
 
-                if (JdkSourceLevelSupport.supportsSourceLevel(runningJdkMajor, sourceLevel)) {
-                    context.success("Running JDK " + runningJdkMajor + " supports --source " + sourceLevel);
+                int latestJdk = JdkSourceLevelSupport.latestJdkForSourceLevel(sourceLevel);
+                if (latestJdk <= 0) {
+                    // Source level 8+ is not retired: all current JDKs still accept it.
+                    // Nothing to do — the project does not need a toolchain for this.
+                    context.success("--source " + sourceLevel + " is supported by all current JDKs");
                     continue;
                 }
 
@@ -165,7 +170,6 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
                     continue;
                 }
 
-                int latestJdk = JdkSourceLevelSupport.latestJdkForSourceLevel(sourceLevel);
                 addToolchainsPlugin(pomDocument, latestJdk);
                 modifiedPoms.add(pomPath);
                 context.success("Added maven-toolchains-plugin with " + SELECT_JDK_TOOLCHAIN_GOAL + " goal (--source "
@@ -501,13 +505,5 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
             }
         }
         return null;
-    }
-
-    /**
-     * Returns the major version of the running JDK.
-     * Extracted as a method so tests can override it.
-     */
-    int getRunningJdkMajor() {
-        return JdkSourceLevelSupport.getRunningJdkMajor();
     }
 }
