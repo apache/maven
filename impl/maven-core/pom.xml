@@ -281,7 +281,7 @@ under the License.
     <pluginManagement>
       <plugins>
         <!-- Default lifecycle plugins declared here so that dependency-update bots
-             (Dependabot, Renovate) see the version.maven-*-plugin properties as
+             (Dependabot, Renovate) see the lifecycle.maven-*-plugin properties as
              actual plugin version references and can propose automated bumps. -->
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>

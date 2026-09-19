@@ -222,12 +222,12 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                 group = 0;
             } else {
                 statusMessage = unknownMessage;
-                group = 2;
+                group = 0;
             }
             entries.add(new ReactorSummaryEntry(project, buildSummary, group, statusMessage));
         }
 
-        ReactorSummaryRequest request = new ReactorSummaryRequest(entries, isSingleVersion);
+        ReactorSummaryRequest request = new ReactorSummaryRequest(entries, new StringBuilder(128), isSingleVersion);
 
         logReactorSummaryGroup(request, 0);
         logReactorSummaryGroup(request, 1);
@@ -235,7 +235,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     }
 
     private void logReactorSummaryGroup(ReactorSummaryRequest request, int group) {
-        StringBuilder buffer = new StringBuilder(128);
+        StringBuilder buffer = request.buffer();
 
         for (ReactorSummaryEntry entry : request.entries()) {
             if (entry.group() != group) {
@@ -271,7 +271,8 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
         }
     }
 
-    private record ReactorSummaryRequest(List<ReactorSummaryEntry> entries, boolean isSingleVersion) {}
+    private record ReactorSummaryRequest(
+            List<ReactorSummaryEntry> entries, StringBuilder buffer, boolean isSingleVersion) {}
 
     private record ReactorSummaryEntry(
             MavenProject project, BuildSummary buildSummary, int group, String statusMessage) {}
