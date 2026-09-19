@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MavenITgh13192PomInlinerCiFriendlyPropertyTest extends AbstractMavenIntegrationTestCase {
 
     MavenITgh13192PomInlinerCiFriendlyPropertyTest() {
-        super("[4.0.0,)");
+        super("[4.0.0-rc-7,)");
     }
 
     /**

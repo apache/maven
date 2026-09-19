@@ -122,6 +122,10 @@ class PomInlinerTransformer extends TransformerSupport {
 
     @SuppressWarnings("unchecked")
     private Map<String, String> pomProperties(RepositorySystemSession session) {
+        // Key by property name — safe only because CI-friendly properties (revision,
+        // sha1, changelist) are defined once in the root POM and inherited by all
+        // modules; per-module overrides with different values are not supported by
+        // the CI-friendly pattern and would require keying by project GAV.
         return (Map<String, String>) session.getData()
                 .computeIfAbsent(PomInlinerTransformer.class.getName() + ".pomProperties", ConcurrentHashMap::new);
     }
