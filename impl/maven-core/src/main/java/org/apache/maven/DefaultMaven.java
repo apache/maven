@@ -507,11 +507,13 @@ public class DefaultMaven implements Maven {
     }
 
     /**
-     * Get all profiles that are detected in the projects, any parent of the projects, or the settings.
+     * Get all profiles that are detected in the projects, any parent of the projects, or the settings. Profile
+     * identifiers injected into an effective model are included because its parent {@link MavenProject} may be
+     * unavailable when parent project construction failed.
      * @param session The Maven session
      * @return A {@link Set} of profile identifiers, never {@code null}.
      */
-    private Set<String> getAllProfiles(MavenSession session) {
+    Set<String> getAllProfiles(MavenSession session) {
         final Map<String, Model> superPomModels = new HashMap<>();
         final Set<MavenProject> projectsIncludingParents = new HashSet<>();
         for (MavenProject project : session.getProjects()) {
@@ -529,13 +531,16 @@ public class DefaultMaven implements Maven {
         final Stream<String> projectProfiles = projectsIncludingParents.stream()
                 .flatMap(p -> p.getModel().getDelegate().getProfiles().stream())
                 .map(Profile::getId);
+        final Stream<String> injectedProfiles = session.getProjects().stream()
+                .flatMap(p -> p.getInjectedProfileIds().values().stream())
+                .flatMap(Collection::stream);
         final Stream<String> settingsProfiles =
                 session.getSettings().getProfiles().stream().map(org.apache.maven.settings.Profile::getId);
         final Stream<String> superPomProfiles = superPomModels.values().stream()
                 .flatMap(p -> p.getProfiles().stream())
                 .map(Profile::getId);
 
-        return Stream.of(projectProfiles, settingsProfiles, superPomProfiles)
+        return Stream.of(projectProfiles, injectedProfiles, settingsProfiles, superPomProfiles)
                 .flatMap(Function.identity())
                 .collect(toSet());
     }
