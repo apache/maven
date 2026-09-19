@@ -881,7 +881,6 @@ public class MavenProject implements Cloneable {
 
     public void setArtifacts(Set<Artifact> artifacts) {
         this.artifacts = artifacts;
-
         // flush the calculated artifactMap
         artifactMap = null;
     }
@@ -899,12 +898,13 @@ public class MavenProject implements Cloneable {
             if (artifactFilter == null || resolvedArtifacts == null) {
                 artifacts = new LinkedHashSet<>();
             } else {
-                artifacts = new LinkedHashSet<>(resolvedArtifacts.size() * 2);
+                Set<Artifact> result = new LinkedHashSet<>(resolvedArtifacts.size() * 2);
                 for (Artifact artifact : resolvedArtifacts) {
                     if (artifactFilter.include(artifact)) {
-                        artifacts.add(artifact);
+                        result.add(artifact);
                     }
                 }
+                artifacts = result;
             }
         }
         return artifacts;
