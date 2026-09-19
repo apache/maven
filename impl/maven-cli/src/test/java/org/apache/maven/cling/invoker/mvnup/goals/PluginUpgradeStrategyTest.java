@@ -66,6 +66,10 @@ class PluginUpgradeStrategyTest {
         return TestUtils.createMockContext();
     }
 
+    private UpgradeContext createMockContext(Path workingDirectory) {
+        return TestUtils.createMockContext(workingDirectory);
+    }
+
     private UpgradeContext createMockContext(UpgradeOptions options) {
         return TestUtils.createMockContext(options);
     }
@@ -223,8 +227,8 @@ class PluginUpgradeStrategyTest {
             assertTrue(result.modifiedCount() > 0, "Should have upgraded 3.0.0-M1 to 3.5.0");
 
             Editor editor = new Editor(document);
-            String version = editor.root()
-                    .path("build", "plugins", "plugin", "version")
+            Element root = editor.root();
+            String version = root.path("build", "plugins", "plugin", "version")
                     .map(Element::textContentTrimmed)
                     .orElse(null);
             assertEquals("3.5.0", version, "3.0.0-M1 should be upgraded to 3.5.0");
@@ -1164,51 +1168,63 @@ class PluginUpgradeStrategyTest {
                     </project>
                     """;
 
-            Document document = Document.of(pomXml);
-            Path pomPath = Paths.get("/project/pom.xml").toAbsolutePath();
-            Map<Path, Document> pomMap = Map.of(pomPath, document);
+            Path tempDir = Files.createTempDirectory("mvnup-test-");
+            try {
+                Files.createDirectories(tempDir.resolve(".mvn"));
+                Path pomPath = tempDir.resolve("pom.xml");
+                Files.writeString(pomPath, pomXml);
+                Document document = Document.of(pomXml);
+                Map<Path, Document> pomMap = Map.of(pomPath, document);
 
-            UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.doApply(context, pomMap);
+                UpgradeContext context = createMockContext(tempDir);
+                UpgradeResult result = strategy.doApply(context, pomMap);
 
-            assertTrue(result.success(), "Strategy should succeed");
+                assertTrue(result.success(), "Strategy should succeed");
 
-            Editor editor = new Editor(document);
-            Element root = editor.root();
+                Editor editor = new Editor(document);
+                Element root = editor.root();
 
-            // Verify pluginManagement entry exists for enforcer
-            Element pmPlugins =
-                    root.path("build", "pluginManagement", "plugins").orElse(null);
-            assertNotNull(pmPlugins, "Should have pluginManagement/plugins");
-            boolean hasEnforcerInPM = pmPlugins
-                    .childElements("plugin")
-                    .anyMatch(p -> "maven-enforcer-plugin"
-                            .equals(p.childElement("artifactId")
-                                    .map(Element::textContentTrimmed)
-                                    .orElse("")));
-            assertTrue(hasEnforcerInPM, "Should have enforcer in pluginManagement");
-
-            String xml = DomUtils.toXml(document);
-            assertTrue(
-                    xml.contains("Override version inherited from parent"),
-                    "Should add comment explaining the override");
-            // Verify the comment is on its own line, not appended to the previous closing tag
-            assertFalse(xml.contains("</plugin><!--"), "Comment should be on its own line, not appended to </plugin>");
-
-            // Verify NO direct build/plugins entry for enforcer (PM override is sufficient)
-            Element buildPlugins = root.childElement("build")
-                    .flatMap(b -> b.childElement("plugins"))
-                    .orElse(null);
-            if (buildPlugins != null) {
-                boolean hasEnforcerInPlugins = buildPlugins
+                // Verify pluginManagement entry exists for enforcer
+                Element pmPlugins =
+                        root.path("build", "pluginManagement", "plugins").orElse(null);
+                assertNotNull(pmPlugins, "Should have pluginManagement/plugins");
+                boolean hasEnforcerInPM = pmPlugins
                         .childElements("plugin")
                         .anyMatch(p -> "maven-enforcer-plugin"
                                 .equals(p.childElement("artifactId")
                                         .map(Element::textContentTrimmed)
                                         .orElse("")));
+                assertTrue(hasEnforcerInPM, "Should have enforcer in pluginManagement");
+
+                String xml = DomUtils.toXml(document);
+                assertTrue(
+                        xml.contains("Override version inherited from parent"),
+                        "Should add comment explaining the override");
+                // Verify the comment is on its own line, not appended to the previous closing tag
                 assertFalse(
-                        hasEnforcerInPlugins,
-                        "Should NOT add enforcer in build/plugins when pluginManagement override suffices");
+                        xml.contains("</plugin><!--"), "Comment should be on its own line, not appended to </plugin>");
+
+                // Verify NO direct build/plugins entry for enforcer (PM override is sufficient)
+                Element buildPlugins = root.childElement("build")
+                        .flatMap(b -> b.childElement("plugins"))
+                        .orElse(null);
+                if (buildPlugins != null) {
+                    boolean hasEnforcerInPlugins = buildPlugins
+                            .childElements("plugin")
+                            .anyMatch(p -> "maven-enforcer-plugin"
+                                    .equals(p.childElement("artifactId")
+                                            .map(Element::textContentTrimmed)
+                                            .orElse("")));
+                    assertFalse(
+                            hasEnforcerInPlugins,
+                            "Should NOT add enforcer in build/plugins when pluginManagement override suffices");
+                }
+            } finally {
+                try (var walk = Files.walk(tempDir)) {
+                    walk.sorted(java.util.Comparator.reverseOrder())
+                            .map(Path::toFile)
+                            .forEach(java.io.File::delete);
+                }
             }
         }
 
@@ -1240,41 +1256,53 @@ class PluginUpgradeStrategyTest {
                     """;
 
             Document document = Document.of(pomXml);
-            Path pomPath = Paths.get("/project/pom.xml").toAbsolutePath();
-            Map<Path, Document> pomMap = Map.of(pomPath, document);
+            Path tempDir2 = Files.createTempDirectory("mvnup-test-");
+            try {
+                Files.createDirectories(tempDir2.resolve(".mvn"));
+                Path pomPath = tempDir2.resolve("pom.xml");
+                Files.writeString(pomPath, pomXml);
+                document = Document.of(pomXml);
+                Map<Path, Document> pomMap = Map.of(pomPath, document);
 
-            UpgradeContext context = createMockContext();
-            UpgradeResult result = strategy.doApply(context, pomMap);
+                UpgradeContext context = createMockContext(tempDir2);
+                UpgradeResult result = strategy.doApply(context, pomMap);
 
-            assertTrue(result.success(), "Strategy should succeed");
+                assertTrue(result.success(), "Strategy should succeed");
 
-            Editor editor = new Editor(document);
-            Element root = editor.root();
-            Element buildPlugins = root.childElement("build")
-                    .flatMap(b -> b.childElement("plugins"))
-                    .orElse(null);
-            assertNotNull(buildPlugins, "Should have build/plugins section");
+                Editor editor = new Editor(document);
+                Element root = editor.root();
+                Element buildPlugins = root.childElement("build")
+                        .flatMap(b -> b.childElement("plugins"))
+                        .orElse(null);
+                assertNotNull(buildPlugins, "Should have build/plugins section");
 
-            long enforcerCount = buildPlugins
-                    .childElements("plugin")
-                    .filter(p -> "maven-enforcer-plugin"
-                            .equals(p.childElement("artifactId")
-                                    .map(Element::textContentTrimmed)
-                                    .orElse("")))
-                    .count();
-            assertEquals(1, enforcerCount, "Should have exactly one maven-enforcer-plugin in build/plugins");
+                long enforcerCount = buildPlugins
+                        .childElements("plugin")
+                        .filter(p -> "maven-enforcer-plugin"
+                                .equals(p.childElement("artifactId")
+                                        .map(Element::textContentTrimmed)
+                                        .orElse("")))
+                        .count();
+                assertEquals(1, enforcerCount, "Should have exactly one maven-enforcer-plugin in build/plugins");
 
-            String version = buildPlugins
-                    .childElements("plugin")
-                    .filter(p -> "maven-enforcer-plugin"
-                            .equals(p.childElement("artifactId")
-                                    .map(Element::textContentTrimmed)
-                                    .orElse("")))
-                    .findFirst()
-                    .flatMap(p -> p.childElement("version"))
-                    .map(Element::textContentTrimmed)
-                    .orElse(null);
-            assertEquals("3.5.0", version, "Existing enforcer-plugin version should be upgraded to 3.5.0");
+                String version = buildPlugins
+                        .childElements("plugin")
+                        .filter(p -> "maven-enforcer-plugin"
+                                .equals(p.childElement("artifactId")
+                                        .map(Element::textContentTrimmed)
+                                        .orElse("")))
+                        .findFirst()
+                        .flatMap(p -> p.childElement("version"))
+                        .map(Element::textContentTrimmed)
+                        .orElse(null);
+                assertEquals("3.5.0", version, "Existing enforcer-plugin version should be upgraded to 3.5.0");
+            } finally {
+                try (var walk = Files.walk(tempDir2)) {
+                    walk.sorted(java.util.Comparator.reverseOrder())
+                            .map(Path::toFile)
+                            .forEach(java.io.File::delete);
+                }
+            }
         }
 
         @Test
@@ -1349,8 +1377,6 @@ class PluginUpgradeStrategyTest {
         @Test
         @DisplayName("should warn when effective model analysis fails for POM with unresolvable remote parent")
         void shouldWarnWhenEffectiveModelAnalysisFailsForUnresolvableRemoteParent() throws Exception {
-            // POM inherits from a remote parent that does not exist.
-            // The effective model analysis should warn (not silently swallow) the failure.
             String pomXml = """
                     <?xml version="1.0" encoding="UTF-8"?>
                     <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -1370,12 +1396,10 @@ class PluginUpgradeStrategyTest {
             UpgradeContext context = createMockContext();
             UpgradeResult result = strategy.doApply(context, pomMap);
 
-            // Strategy should complete successfully even when effective model analysis fails
             assertNotNull(result, "Result should not be null");
             assertTrue(result.success(), "Strategy should succeed even when effective model analysis fails");
             assertTrue(result.processedPoms().contains(Paths.get("pom.xml")), "POM should be marked as processed");
 
-            // The warning should have been logged (not silently swallowed at debug level)
             verify(context.logger, atLeastOnce())
                     .warn(argThat(msg -> msg.contains("Failed to analyze effective model")));
         }
