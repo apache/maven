@@ -1,5 +1,5 @@
-<project>
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
     <groupId>tests.project</groupId>
     <artifactId>duplicate-plugin-defs-merged</artifactId>
     <version>1</version>
@@ -8,6 +8,7 @@
       <plugins>
         <plugin>
           <artifactId>maven-compiler-plugin</artifactId>
+          <version>3.11.0</version>
           <dependencies>
             <dependency>
               <groupId>group</groupId>
@@ -24,25 +25,36 @@
             </execution>
           </executions>
         </plugin>
-        <plugin>
-          <artifactId>maven-compiler-plugin</artifactId>
-          <dependencies>
-            <dependency>
-              <groupId>group</groupId>
-              <artifactId>second</artifactId>
-              <version>1</version>
-            </dependency>
-          </dependencies>
-          <executions>
-            <execution>
-              <id>second</id>
-              <goals>
-                <goal>compile</goal>
-              </goals>
-            </execution>
-          </executions>
-        </plugin>
-      </plugins>
+       </plugins>
     </build>
+
+  <profiles>
+    <profile>
+      <id>foo</id>
+      <activation><activeByDefault>true</activeByDefault></activation>
+      <build>
+        <plugins>
+          <plugin>
+            <artifactId>maven-compiler-plugin</artifactId>
+            <dependencies>
+              <dependency>
+                <groupId>group</groupId>
+                <artifactId>second</artifactId>
+                <version>1</version>
+              </dependency>
+            </dependencies>
+            <executions>
+              <execution>
+                <id>second</id>
+                <goals>
+                  <goal>compile</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
 </project>
