@@ -226,18 +226,13 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         Set<Path> errorPoms = new HashSet<>();
 
         try {
-            // Phase 1: Write all modifications to temp directory (keeping project structure)
-            Path tempDir = createTempProjectStructure(context, pomMap);
-
-            // Phase 2: For each POM, build effective model using the session and analyze plugins.
-            // Skip when the operator's settings declare a repository posture the standalone
-            // resolver cannot honor (mirrors, proxies, offline): resolving outside that
-            // posture would bypass the operator's configuration, so the remote-model-dependent
-            // analysis is skipped instead.
+            // Analyze plugins using effective models built from the original POMs.
+            // PluginUpgradeStrategy runs first (@Priority(10)), so pomMap is identical
+            // to the on-disk project; no temporary copy is needed.
             PluginAnalysisResults analysisResults;
             String unsupportedReason = remoteResolutionUnsupportedReason(context);
             if (unsupportedReason == null) {
-                analysisResults = analyzePluginsUsingEffectiveModels(context, pomMap, tempDir);
+                analysisResults = analyzePluginsUsingEffectiveModels(context, pomMap);
             } else {
                 context.warning("Skipping effective-model plugin analysis: " + unsupportedReason);
                 analysisResults = new PluginAnalysisResults(Map.of(), Map.of());
@@ -294,11 +289,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 }
             }
 
-            // Clean up temp directory
-            cleanupTempDirectory(tempDir);
-
         } catch (Exception e) {
-            context.failure("Failed to create temp project structure: " + e.getMessage());
+            context.failure("Failed to analyze plugins: " + e.getMessage());
             // Mark all POMs as errors
             errorPoms.addAll(pomMap.keySet());
         }
@@ -820,7 +812,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * plugins needing pluginManagement entries and plugins needing direct build/plugins overrides.
      */
     private PluginAnalysisResults analyzePluginsUsingEffectiveModels(
-            UpgradeContext context, Map<Path, Document> pomMap, Path tempDir) {
+            UpgradeContext context, Map<Path, Document> pomMap) {
         Map<Path, Set<String>> managementResult = new HashMap<>();
         Map<Path, Set<String>> directOverrideResult = new HashMap<>();
         Map<String, PluginUpgrade> basePluginUpgrades = getPluginUpgradesAsMap();
@@ -844,16 +836,11 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
             Path originalPomPath = entry.getKey();
 
             try {
-                // Find the corresponding temp POM path
-                Path commonRoot = findCommonRoot(pomMap.keySet());
-                Path relativePath = commonRoot.relativize(originalPomPath);
-                Path tempPomPath = tempDir.resolve(relativePath);
-
                 // Per-module check: if this POM or any of its local parent POMs
                 // has shade-plugin with custom transformers, exclude shade-plugin
                 // from upgrades for this module only
                 Map<String, PluginUpgrade> pluginUpgrades = basePluginUpgrades;
-                if (hasCustomTransformersInPomOrParents(context, originalPomPath, pomMap, tempDir, commonRoot)) {
+                if (hasCustomTransformersInPomOrParents(context, originalPomPath, pomMap)) {
                     pluginUpgrades = new HashMap<>(basePluginUpgrades);
                     pluginUpgrades.remove(shadePluginKey);
                     context.warning("Skipping maven-shade-plugin in effective-model analysis for " + originalPomPath
@@ -862,11 +849,10 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
                 // Build effective model using Maven 4 API
                 PluginAnalysis analysis =
-                        analyzeEffectiveModelForPlugins(context, tempPomPath, pluginUpgrades, projectJdk);
+                        analyzeEffectiveModelForPlugins(context, originalPomPath, pluginUpgrades, projectJdk);
 
                 // Determine where to add plugin management (last local parent)
-                Path targetPom =
-                        findLastLocalParentForPluginManagement(context, tempPomPath, pomMap, tempDir, commonRoot);
+                Path targetPom = findLastLocalParentForPluginManagement(context, originalPomPath, pomMap);
 
                 if (targetPom != null) {
                     managementResult
@@ -900,7 +886,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * This is a per-module check, unlike a global check across all POMs.
      */
     private boolean hasCustomTransformersInPomOrParents(
-            UpgradeContext context, Path pomPath, Map<Path, Document> pomMap, Path tempDir, Path commonRoot) {
+            UpgradeContext context, Path pomPath, Map<Path, Document> pomMap) {
         // Check the current POM
         Document doc = pomMap.get(pomPath);
         if (doc != null && hasCustomTransformersInDocument(doc)) {
@@ -910,8 +896,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
         // Walk up the parent hierarchy within the local pomMap
         if (doc != null) {
             try {
-                Path tempPomPath = tempDir.resolve(commonRoot.relativize(pomPath));
-                Model effectiveModel = buildEffectiveModel(context, tempPomPath);
+                Model effectiveModel = buildEffectiveModel(context, pomPath);
                 Model currentModel = effectiveModel;
 
                 while (currentModel.getParent() != null) {
@@ -922,8 +907,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                         if (parentDoc != null && hasCustomTransformersInDocument(parentDoc)) {
                             return true;
                         }
-                        Path parentTempPath = tempDir.resolve(commonRoot.relativize(parentPath));
-                        currentModel = buildEffectiveModel(context, parentTempPath);
+                        currentModel = buildEffectiveModel(context, parentPath);
                     } else {
                         break;
                     }
@@ -985,8 +969,8 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
     }
 
     private PluginAnalysis analyzeEffectiveModelForPlugins(
-            UpgradeContext context, Path tempPomPath, Map<String, PluginUpgrade> pluginUpgrades, int projectJdk) {
-        Model effectiveModel = buildEffectiveModel(context, tempPomPath);
+            UpgradeContext context, Path pomPath, Map<String, PluginUpgrade> pluginUpgrades, int projectJdk) {
+        Model effectiveModel = buildEffectiveModel(context, pomPath);
         return analyzePluginsFromEffectiveModel(context, effectiveModel, pluginUpgrades, projectJdk);
     }
 
@@ -1101,16 +1085,12 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
      * that's the target.
      */
     private Path findLastLocalParentForPluginManagement(
-            UpgradeContext context, Path tempPomPath, Map<Path, Document> pomMap, Path tempDir, Path commonRoot) {
+            UpgradeContext context, Path pomPath, Map<Path, Document> pomMap) {
 
-        Model effectiveModel = buildEffectiveModel(context, tempPomPath);
-
-        // Convert the temp path back to the original path
-        Path relativePath = tempDir.relativize(tempPomPath);
-        Path currentOriginalPath = commonRoot.resolve(relativePath);
+        Model effectiveModel = buildEffectiveModel(context, pomPath);
 
         // Start with current POM as the candidate
-        Path lastLocalParent = currentOriginalPath;
+        Path lastLocalParent = pomPath;
 
         // Walk up the parent hierarchy
         Model currentModel = effectiveModel;
@@ -1123,15 +1103,14 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
                 // Parent is local, so it becomes our new candidate
                 lastLocalParent = parentPath;
 
-                Path parentTempPath = tempDir.resolve(commonRoot.relativize(parentPath));
-                currentModel = buildEffectiveModel(context, parentTempPath);
+                currentModel = buildEffectiveModel(context, parentPath);
             } else {
                 // Parent is external, stop here
                 break;
             }
         }
 
-        context.debug("Last local parent for " + currentOriginalPath + " is " + lastLocalParent);
+        context.debug("Last local parent for " + pomPath + " is " + lastLocalParent);
         return lastLocalParent;
     }
 
