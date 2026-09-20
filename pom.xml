@@ -838,6 +838,7 @@ under the License.
               <exclude>.mvn/**</exclude>
               <exclude>.jbang/**</exclude>
               <exclude>.claude/**</exclude>
+              <exclude>.worktrees/**</exclude>
               <!--
                 ! Excluded the license files itself cause they do not have a license of themselves.
               -->
