@@ -439,6 +439,17 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
         }
 
+        private boolean isProjectPom(Path pomFile) {
+            List<org.apache.maven.api.Project> projects = session.getProjects();
+            if (pomFile == null || projects == null) { // no reactor yet while the session is being set up
+                return false;
+            }
+            Path path = pomFile.toAbsolutePath().normalize();
+            return projects.stream()
+                    .filter(Objects::nonNull)
+                    .anyMatch(p -> p.getPomPath().toAbsolutePath().normalize().equals(path));
+        }
+
         ProjectBuildingResult build(
                 boolean parent, Artifact artifact, boolean allowStubModel, List<ArtifactRepository> repositories)
                 throws ProjectBuildingException {
@@ -463,7 +474,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 ArtifactResolverResult.ResultItem resItem = res.getResult(coordinates);
 
                 pomArtifact = InternalMavenSession.from(session).toArtifact(resItem.getArtifact());
-                localProject = resItem.getRepository() instanceof org.apache.maven.api.WorkspaceRepository;
+                // the workspace also serves copies from the project-local repository; only a POM that belongs to
+                // a project of this session is a checkout with a basedir, the rest is treated like a repository
+                localProject = resItem.getRepository() instanceof org.apache.maven.api.WorkspaceRepository
+                        && isProjectPom(pomArtifact.getPath());
             } catch (ArtifactResolverException e) {
                 if (e.getResult().getResults().values().iterator().next().isMissing() && allowStubModel) {
                     return build(parent, null, createStubModelSource(artifact));
