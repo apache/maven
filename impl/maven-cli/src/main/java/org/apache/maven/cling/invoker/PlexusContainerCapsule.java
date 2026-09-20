@@ -22,6 +22,9 @@ import java.util.Optional;
 
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.internal.impl.DefaultLookup;
+import org.apache.maven.logging.OutputCapabilities;
+import org.apache.maven.logging.internal.DefaultOutputCapabilities;
+import org.apache.maven.slf4j.MavenLoggerFactory;
 import org.codehaus.plexus.DefaultPlexusContainer;
 
 import static java.util.Objects.requireNonNull;
@@ -46,6 +49,13 @@ public class PlexusContainerCapsule implements ContainerCapsule {
     @Override
     public void updateLogging(LookupContext context) {
         plexusContainer.getLoggerManager().setThresholds(toPlexusLoggingLevel(context.loggerLevel));
+        OutputCapabilities capabilities = lookup.lookup(OutputCapabilities.class);
+        if (capabilities instanceof DefaultOutputCapabilities defaultCapabilities) {
+            context.closeables.add(defaultCapabilities.install(
+                    context.loggerFactory instanceof MavenLoggerFactory
+                            ? context.outputCapabilities.get()
+                            : DefaultOutputCapabilities.UNKNOWN));
+        }
     }
 
     @Override
