@@ -64,6 +64,7 @@ import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
+import org.apache.maven.logging.internal.DefaultOutputCapabilities;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.Result;
 import org.apache.maven.model.superpom.SuperPomProvider;
@@ -109,6 +110,8 @@ public class DefaultMaven implements Maven {
 
     private final DefaultSessionFactory defaultSessionFactory;
 
+    private final DefaultOutputCapabilities outputCapabilities;
+
     private final WorkspaceReader ideWorkspaceReader;
 
     private final ProjectSelector projectSelector;
@@ -126,6 +129,7 @@ public class DefaultMaven implements Maven {
             BuildResumptionDataRepository buildResumptionDataRepository,
             SuperPomProvider superPomProvider,
             DefaultSessionFactory defaultSessionFactory,
+            DefaultOutputCapabilities outputCapabilities,
             @Nullable @Named("ide") WorkspaceReader ideWorkspaceReader) {
         this.lookup = lookup;
         this.eventCatapult = eventCatapult;
@@ -138,6 +142,7 @@ public class DefaultMaven implements Maven {
         this.superPomProvider = superPomProvider;
         this.ideWorkspaceReader = ideWorkspaceReader;
         this.defaultSessionFactory = defaultSessionFactory;
+        this.outputCapabilities = outputCapabilities;
         this.projectSelector = new ProjectSelector(); // if necessary switch to DI
     }
 
@@ -146,6 +151,7 @@ public class DefaultMaven implements Maven {
         MavenExecutionResult result;
 
         try {
+            request.getData().put(DefaultOutputCapabilities.REQUEST_DATA_KEY, outputCapabilities.asMap());
             result = doExecute(request);
         } catch (OutOfMemoryError e) {
             result = addExceptionToResult(new DefaultMavenExecutionResult(), e);
