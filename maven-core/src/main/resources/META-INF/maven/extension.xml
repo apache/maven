@@ -32,6 +32,7 @@ under the License.
     <exportedPackage>org.apache.maven.execution.scope</exportedPackage>
     <exportedPackage>org.apache.maven.graph</exportedPackage>
     <exportedPackage>org.apache.maven.lifecycle</exportedPackage>
+    <exportedPackage>org.apache.maven.logging.*</exportedPackage>
     <exportedPackage>org.apache.maven.model</exportedPackage>
     <exportedPackage>org.apache.maven.monitor</exportedPackage>
     <exportedPackage>org.apache.maven.plugin</exportedPackage>

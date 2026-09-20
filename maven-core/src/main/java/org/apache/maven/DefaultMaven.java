@@ -47,6 +47,7 @@ import org.apache.maven.internal.RepositorySystemSessionFactory;
 import org.apache.maven.internal.aether.MavenChainedWorkspaceReader;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
+import org.apache.maven.logging.internal.DefaultOutputCapabilities;
 import org.apache.maven.model.Prerequisites;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.Result;
@@ -94,6 +95,9 @@ public class DefaultMaven implements Maven {
     private RepositorySystemSessionFactory repositorySessionFactory;
 
     @Inject
+    private DefaultOutputCapabilities outputCapabilities;
+
+    @Inject
     @Named(GraphBuilder.HINT)
     private GraphBuilder graphBuilder;
 
@@ -102,6 +106,7 @@ public class DefaultMaven implements Maven {
         MavenExecutionResult result;
 
         try {
+            request.getData().put(DefaultOutputCapabilities.REQUEST_DATA_KEY, outputCapabilities.asMap());
             result = doExecute(request);
         } catch (OutOfMemoryError e) {
             result = addExceptionToResult(new DefaultMavenExecutionResult(), e);

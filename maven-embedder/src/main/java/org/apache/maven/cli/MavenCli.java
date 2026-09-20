@@ -68,6 +68,7 @@ import org.apache.maven.cli.logging.Slf4jConfiguration;
 import org.apache.maven.cli.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
 import org.apache.maven.cli.logging.Slf4jStdoutLogger;
+import org.apache.maven.cli.logging.impl.Slf4jSimpleConfiguration;
 import org.apache.maven.cli.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.SimplexTransferListener;
@@ -87,6 +88,8 @@ import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.logging.OutputCapabilities;
+import org.apache.maven.logging.internal.DefaultOutputCapabilities;
 import org.apache.maven.message.MessageBuilder;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.interpolation.ModelInterpolator;
@@ -119,6 +122,7 @@ import org.eclipse.aether.transfer.TransferListener;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.simple.MavenSlf4jSimpleFriend;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
@@ -311,8 +315,18 @@ public class MavenCli {
 
             return 1;
         } finally {
-            if (localContainer != null) {
-                localContainer.dispose();
+            try {
+                if (localContainer != null) {
+                    localContainer.dispose();
+                }
+            } finally {
+                if (cliRequest.outputCapabilitiesCleanup != null) {
+                    try {
+                        cliRequest.outputCapabilitiesCleanup.close();
+                    } catch (Exception e) {
+                        throw new IllegalStateException("Unable to restore logging capabilities", e);
+                    }
+                }
             }
         }
     }
@@ -548,6 +562,7 @@ public class MavenCli {
         }
 
         // LOG STREAMS
+        PrintStream logFileStream = null;
         if (cliRequest.commandLine.hasOption(CLIManager.LOG_FILE)) {
             File logFile = new File(cliRequest.commandLine.getOptionValue(CLIManager.LOG_FILE));
             logFile = resolveFile(logFile, cliRequest.workingDirectory);
@@ -562,6 +577,7 @@ public class MavenCli {
                 PrintStream ps = new PrintStream(new FileOutputStream(logFile));
                 System.setOut(ps);
                 System.setErr(ps);
+                logFileStream = ps;
             } catch (FileNotFoundException e) {
                 //
                 // Ignore
@@ -570,6 +586,9 @@ public class MavenCli {
         }
 
         slf4jConfiguration.activate();
+        cliRequest.outputCapabilities = slf4jConfiguration instanceof Slf4jSimpleConfiguration
+                ? MavenSlf4jSimpleFriend.outputCapabilities(logFileStream)
+                : () -> DefaultOutputCapabilities.UNKNOWN;
 
         plexusLoggerManager = new Slf4jLoggerManager();
         slf4jLogger = slf4jLoggerFactory.getLogger(this.getClass().getName());
@@ -701,6 +720,11 @@ public class MavenCli {
         Thread.currentThread().setContextClassLoader(container.getContainerRealm());
 
         container.setLoggerManager(plexusLoggerManager);
+        OutputCapabilities capabilities = container.lookup(OutputCapabilities.class);
+        if (capabilities instanceof DefaultOutputCapabilities) {
+            cliRequest.outputCapabilitiesCleanup =
+                    ((DefaultOutputCapabilities) capabilities).install(cliRequest.outputCapabilities.get());
+        }
 
         for (CoreExtensionEntry extension : extensions) {
             container.discoverComponents(

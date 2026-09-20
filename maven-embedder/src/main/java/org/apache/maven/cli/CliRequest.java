@@ -20,10 +20,13 @@ package org.apache.maven.cli;
 
 import java.io.File;
 import java.util.Properties;
+import java.util.function.Supplier;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.logging.OutputCapabilities;
+import org.apache.maven.logging.internal.DefaultOutputCapabilities;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
@@ -51,6 +54,10 @@ public class CliRequest {
     Properties systemProperties = new Properties();
 
     MavenExecutionRequest request;
+
+    Supplier<OutputCapabilities> outputCapabilities = () -> DefaultOutputCapabilities.UNKNOWN;
+
+    AutoCloseable outputCapabilitiesCleanup;
 
     CliRequest(String[] args, ClassWorld classWorld) {
         this.args = args;
