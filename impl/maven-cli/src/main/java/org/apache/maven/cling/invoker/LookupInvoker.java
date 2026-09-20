@@ -24,6 +24,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -82,9 +83,12 @@ import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingOutputStream;
+import org.apache.maven.logging.OutputCapabilities.Destination;
 import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.apache.maven.logging.SimpleBuildEventListener;
 import org.apache.maven.logging.api.LogLevelRecorder;
+import org.apache.maven.logging.internal.DefaultOutputCapabilities;
+import org.apache.maven.logging.internal.TerminalOutputCapabilities;
 import org.apache.maven.slf4j.MavenJulHandler;
 import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.codehaus.plexus.PlexusContainer;
@@ -465,11 +469,19 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             try {
                 PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile), true);
                 context.closeables.add(printWriter);
+                context.outputCapabilities =
+                        () -> DefaultOutputCapabilities.snapshot(Destination.FILE, StandardCharsets.UTF_8);
                 return printWriter::println;
             } catch (IOException e) {
                 throw new MavenException("Unable to redirect logging to " + logFile, e);
             }
         } else {
+            // Resolve this after terminal initialization, when the container is ready.
+            context.outputCapabilities = () -> DefaultOutputCapabilities.snapshot(
+                    context.invokerRequest.embedded()
+                            ? Destination.UNKNOWN
+                            : TerminalOutputCapabilities.destination(context.terminal),
+                    context.terminal.outputEncoding());
             // Given the terminal creation has been offloaded to a different thread,
             // do not pass directly the terminal writer
             return msg -> {
