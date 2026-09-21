@@ -377,8 +377,8 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 3.5.4-SNAPSHOT:");
         inOrder.verify(logger).info("");
-        inOrder.verify(logger).info("Maven Project artifact2 ............................ SKIPPED");
         inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
+        inOrder.verify(logger).info("Maven Project artifact2 ............................ SKIPPED");
         inOrder.verify(logger).info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info("BUILD SUCCESS");
@@ -423,9 +423,7 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 3.5.4-SNAPSHOT:");
         inOrder.verify(logger).info("");
-        inOrder.verify(logger).info("Maven Project artifact2 ............................ SKIPPED");
-        inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
-        inOrder.verify(logger).info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
+        inOrder.verify(logger).info("...");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).error("BUILD FAILURE");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
@@ -470,9 +468,9 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 3.5.4-SNAPSHOT:");
         inOrder.verify(logger).info("");
-        inOrder.verify(logger).info("Maven Project artifact3 ............................ SKIPPED");
-        inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
+        inOrder.verify(logger).info("...");
         inOrder.verify(logger).error("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
+        inOrder.verify(logger).info("...");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).error("BUILD FAILURE");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
@@ -525,12 +523,11 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).info("Reactor Summary for Maven Project artifact1 3.5.4-SNAPSHOT:");
         inOrder.verify(logger).info("");
-        inOrder.verify(logger).info("Maven Project artifact6 ............................ SKIPPED");
-        inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
-        inOrder.verify(logger).info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
-        inOrder.verify(logger).info("Maven Project artifact4 ............................ SUCCESS [  4.000 s]");
+        inOrder.verify(logger).info("...");
         inOrder.verify(logger).error("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
+        inOrder.verify(logger).info("...");
         inOrder.verify(logger).error("Maven Project artifact5 ............................ FAILURE [  5.000 s]");
+        inOrder.verify(logger).info("...");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
         inOrder.verify(logger).error("BUILD FAILURE");
         inOrder.verify(logger).info("------------------------------------------------------------------------");

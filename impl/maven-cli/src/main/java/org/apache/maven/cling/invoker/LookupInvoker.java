@@ -80,7 +80,6 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.SettingsUtilsV4;
 import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
-import org.apache.maven.logging.AsyncDrainWriter;
 import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingOutputStream;
 import org.apache.maven.logging.ProjectBuildLogAppender;
@@ -158,6 +157,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         pushUserProperties(context);
         setupGuiceClassLoading(context);
         configureLogging(context);
+        preliminaryInteractiveDetection(context);
         createTerminal(context);
         activateLogging(context);
         helpOrVersionAndMayExit(context);
@@ -318,6 +318,30 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
     }
 
+    /**
+     * Sets {@code context.interactive} based on CLI flags and CI detection <em>before</em>
+     * {@link #createTerminal(LookupContext)} runs. This is necessary because
+     * {@code createTerminal} caches the {@link BuildEventListener} (via
+     * {@link #determineBuildEventListener}), and the console-mode auto-detection
+     * in subclasses reads {@code context.interactive} to decide between rich/plain/verbose.
+     *
+     * <p>The full settings-based interactive-mode resolution still runs later in
+     * {@link #settings}, so this is a best-effort early pass using only CLI flags and
+     * CI environment detection — which is sufficient for the console-mode decision.</p>
+     */
+    protected void preliminaryInteractiveDetection(C context) {
+        if (context.options().forceInteractive().orElse(false)) {
+            context.interactive = true;
+        } else if (context.options().nonInteractive().orElse(false)) {
+            context.interactive = false;
+        } else if (context.invokerRequest.ciInfo().isPresent()) {
+            context.interactive = false;
+        } else {
+            // Default: assume interactive (settings may refine later)
+            context.interactive = true;
+        }
+    }
+
     protected BuildEventListener determineBuildEventListener(C context) {
         if (context.buildEventListener == null) {
             context.buildEventListener = doDetermineBuildEventListener(context);
@@ -436,30 +460,24 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected Consumer<String> doDetermineWriter(C context) {
-        Consumer<String> raw;
         if (context.options().logFile().isPresent()) {
             Path logFile = context.cwd.resolve(context.options().logFile().get());
             try {
                 PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile), true);
                 context.closeables.add(printWriter);
-                raw = printWriter::println;
+                return printWriter::println;
             } catch (IOException e) {
                 throw new MavenException("Unable to redirect logging to " + logFile, e);
             }
         } else {
             // Given the terminal creation has been offloaded to a different thread,
             // do not pass directly the terminal writer
-            raw = msg -> {
+            return msg -> {
                 PrintWriter pw = context.terminal.writer();
                 pw.println(msg);
                 pw.flush();
             };
         }
-        // Wrap with lock-free async drain to eliminate PrintWriter synchronized contention
-        // when multiple PhasingExecutor threads log concurrently during parallel model building.
-        AsyncDrainWriter asyncWriter = new AsyncDrainWriter(raw);
-        context.closeables.add(asyncWriter);
-        return asyncWriter;
     }
 
     protected void activateLogging(C context) throws Exception {
@@ -569,7 +587,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void preCommands(C context) throws Exception {
         boolean verbose = context.invokerRequest.effectiveVerbose();
-        boolean version = context.options().showVersion().orElse(false) && !Boolean.getBoolean("maven.version.printed");
+        boolean version = context.options().showVersion().orElse(false);
         if (verbose || version) {
             showVersion(context);
         }
