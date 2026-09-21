@@ -125,6 +125,8 @@ public class MavenSimpleLogger extends MavenBaseLogger {
         writeThrowable(t, stream::println);
     }
 
+    private static final int MAX_THROWABLE_DEPTH = 20;
+
     protected void writeThrowable(Throwable t, Consumer<String> stream) {
         if (t == null) {
             return;
@@ -135,10 +137,14 @@ public class MavenSimpleLogger extends MavenBaseLogger {
         }
         stream.accept(builder.toString());
 
-        printStackTrace(t, stream, "");
+        printStackTrace(t, stream, "", 0);
     }
 
     protected void printStackTrace(Throwable t, Consumer<String> stream, String prefix) {
+        printStackTrace(t, stream, prefix, 0);
+    }
+
+    private void printStackTrace(Throwable t, Consumer<String> stream, String prefix, int depth) {
         MessageBuilder builder = builder();
         for (StackTraceElement e : t.getStackTrace()) {
             builder.a(prefix);
@@ -154,16 +160,24 @@ public class MavenSimpleLogger extends MavenBaseLogger {
             stream.accept(builder.toString());
             builder.setLength(0);
         }
-        for (Throwable se : t.getSuppressed()) {
-            writeThrowable(se, stream, "Suppressed", prefix + "    ");
-        }
-        Throwable cause = t.getCause();
-        if (cause != null && t != cause) {
-            writeThrowable(cause, stream, "Caused by", prefix);
+        if (depth < MAX_THROWABLE_DEPTH) {
+            for (Throwable se : t.getSuppressed()) {
+                writeThrowable(se, stream, "Suppressed", prefix + "    ", depth + 1);
+            }
+            Throwable cause = t.getCause();
+            if (cause != null && t != cause) {
+                writeThrowable(cause, stream, "Caused by", prefix, depth + 1);
+            }
+        } else {
+            stream.accept(prefix + "    [...cause/suppressed chain truncated at depth " + MAX_THROWABLE_DEPTH + "]");
         }
     }
 
     protected void writeThrowable(Throwable t, Consumer<String> stream, String caption, String prefix) {
+        writeThrowable(t, stream, caption, prefix, 0);
+    }
+
+    private void writeThrowable(Throwable t, Consumer<String> stream, String caption, String prefix, int depth) {
         MessageBuilder builder =
                 builder().a(prefix).strong(caption).a(": ").a(t.getClass().getName());
         if (t.getMessage() != null) {
@@ -171,7 +185,7 @@ public class MavenSimpleLogger extends MavenBaseLogger {
         }
         stream.accept(builder.toString());
 
-        printStackTrace(t, stream, prefix);
+        printStackTrace(t, stream, prefix, depth);
     }
 
     protected String getLocation(final StackTraceElement e) {

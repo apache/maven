@@ -20,6 +20,8 @@ package org.apache.maven.slf4j;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.LogRecord;
 
@@ -111,6 +113,31 @@ class MavenJulHandlerTest {
         } finally {
             MavenJulHandler.setInPublishForTest(false);
         }
+    }
+
+    /**
+     * Verify that a {@link java.util.logging.Filter} installed on the handler is respected:
+     * records rejected by the filter must be silently dropped without being forwarded.
+     * This exercises the {@code isLoggable(record)} guard added to {@link MavenJulHandler#publish}.
+     */
+    @Test
+    void publishRespectsHandlerFilter() {
+        MavenJulHandler handler = new MavenJulHandler();
+
+        // Install a filter that rejects every record, tracking whether it was consulted.
+        List<LogRecord> filtered = new ArrayList<>();
+        handler.setFilter(record -> {
+            filtered.add(record);
+            return false; // reject all
+        });
+
+        LogRecord record = new LogRecord(Level.INFO, "should be filtered");
+        // publish() must return without throwing — record is rejected by the filter.
+        handler.publish(record);
+
+        // The filter must have been consulted exactly once.
+        assertEquals(1, filtered.size(), "Filter should have been consulted for the published record");
+        assertEquals(record, filtered.get(0), "Filter should have been given the exact record");
     }
 
     /**

@@ -39,6 +39,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.BuildEnvironment;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.MonotonicClock;
@@ -284,6 +285,75 @@ public class ApiRunner {
      */
     static class DefaultSession extends AbstractSession {
 
+        // NOTE: If BuildEnvironment gains new abstract methods, update this constant.
+        // DefaultBuildEnvironment (maven-core) cannot be used here — module boundary.
+        private static final BuildEnvironment EMPTY_BUILD_ENVIRONMENT = new BuildEnvironment() {
+            @Override
+            public List<String> goals() {
+                return List.of();
+            }
+
+            @Override
+            public Map<String, String> userProperties() {
+                return Map.of();
+            }
+
+            @Override
+            public Map<String, String> systemInfo() {
+                return Map.of();
+            }
+
+            @Override
+            public String localRepository() {
+                return "";
+            }
+
+            @Override
+            public List<String> activeProfiles() {
+                return List.of();
+            }
+
+            @Override
+            public List<String> selectedProjects() {
+                return List.of();
+            }
+
+            @Override
+            public String resumeFrom() {
+                return null;
+            }
+
+            @Override
+            public String reactorFailureBehavior() {
+                return "FAIL_FAST";
+            }
+
+            @Override
+            public boolean offline() {
+                return false;
+            }
+
+            @Override
+            public boolean updateSnapshots() {
+                return false;
+            }
+
+            @Override
+            public boolean noTransferProgress() {
+                return false;
+            }
+
+            @Override
+            public boolean batchMode() {
+                return false;
+            }
+
+            @Override
+            public int threads() {
+                return 1;
+            }
+        };
+
         private final Map<String, String> systemProperties;
         private final Instant startTime = MonotonicClock.now();
         private Settings settings;
@@ -379,6 +449,13 @@ public class ApiRunner {
         @Override
         public int getDegreeOfConcurrency() {
             return 0;
+        }
+
+        @Override
+        public BuildEnvironment buildEnvironment() {
+            // ApiRunner is a standalone/embedded session with no MavenExecutionRequest;
+            // return a minimal environment reflecting defaults.
+            return EMPTY_BUILD_ENVIRONMENT;
         }
 
         @Override
