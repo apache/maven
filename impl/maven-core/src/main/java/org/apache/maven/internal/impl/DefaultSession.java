@@ -31,12 +31,15 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.SessionData;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 import org.apache.maven.api.services.MavenException;
+import org.apache.maven.api.services.ModelProblem;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.toolchain.ToolchainModel;
@@ -58,6 +61,8 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.maven.internal.impl.CoreUtils.map;
 
 public class DefaultSession extends AbstractSession implements InternalMavenSession {
+
+    private static final SessionData.Key<ModelProblems> MODEL_PROBLEMS = SessionData.key(ModelProblems.class);
 
     private final MavenSession mavenSession;
     private final MavenRepositorySystem mavenRepositorySystem;
@@ -96,6 +101,14 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
         this.mavenSession = session;
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.runtimeInformation = runtimeInformation;
+    }
+
+    @Nonnull
+    @Override
+    public ProblemCollector<ModelProblem> getModelProblemCollector() {
+        return getData()
+                .computeIfAbsent(MODEL_PROBLEMS, () -> new ModelProblems(ProblemCollector.create(this)))
+                .collector();
     }
 
     @Override
@@ -256,4 +269,6 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
             throw new UnsupportedOperationException("Not yet implemented");
         }
     }
+
+    private record ModelProblems(ProblemCollector<ModelProblem> collector) {}
 }

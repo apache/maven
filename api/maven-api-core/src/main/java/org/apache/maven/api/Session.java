@@ -102,9 +102,7 @@ public interface Session extends ProtoSession {
      * @return the session model problem collector, never {@code null}
      */
     @Nonnull
-    default ProblemCollector<ModelProblem> getModelProblemCollector() {
-        return SessionModelProblems.getProblemCollector(this);
-    }
+    ProblemCollector<ModelProblem> getModelProblemCollector();
 
     /**
      * Default implementation at {@link ProtoSession} level, as the notion of project

@@ -42,6 +42,8 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -179,6 +181,27 @@ public class DefaultSessionTest {
         assertSame(
                 problem,
                 session.getModelProblemCollector().problems().findFirst().orElseThrow());
+    }
+
+    @Test
+    void modelProblemsAreIsolatedBetweenIndependentSessions() {
+        DefaultSession session = newSession();
+        DefaultSession otherSession = newSession();
+        ModelProblem problem = new DefaultModelProblem(
+                "model warning",
+                BuilderProblem.Severity.WARNING,
+                ModelProblem.Version.BASE,
+                "pom.xml",
+                -1,
+                -1,
+                "org.example:project:1",
+                null);
+
+        session.getModelProblemCollector().reportProblem(problem);
+
+        assertNotSame(session.getModelProblemCollector(), otherSession.getModelProblemCollector());
+        assertFalse(otherSession.getModelProblemCollector().hasWarningProblems());
+        assertEquals(0, otherSession.getModelProblemCollector().totalProblemsReported());
     }
 
     @Test
