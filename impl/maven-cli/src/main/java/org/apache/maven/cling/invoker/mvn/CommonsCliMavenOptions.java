@@ -216,6 +216,24 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     }
 
     @Override
+    public Optional<List<String>> skippedPhases() {
+        if (commandLine.hasOption(CLIManager.SKIP_PHASES)) {
+            return Optional.of(Arrays.stream(commandLine.getOptionValues(CLIManager.SKIP_PHASES))
+                    .map(String::strip)
+                    .toList());
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<Boolean> skipTests() {
+        if (commandLine.hasOption(CLIManager.SKIP_TESTS)) {
+            return Optional.of(true);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public Optional<List<String>> goals() {
         if (!commandLine.getArgList().isEmpty()) {
             return Optional.of(commandLine.getArgList());
@@ -252,6 +270,8 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
         public static final String STRICT_ARTIFACT_DESCRIPTOR_POLICY = "sadp";
         public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
         public static final String AT_FILE = "af";
+        public static final String SKIP_PHASES = "sp";
+        public static final String SKIP_TESTS = "st";
 
         @Override
         protected void prepareOptions(org.apache.commons.cli.Options options) {
@@ -359,6 +379,19 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
                     .hasArg()
                     .desc(
                             "If set, Maven will load command line options from the specified file and merge with CLI specified ones.")
+                    .get());
+            options.addOption(Option.builder(SKIP_PHASES)
+                    .longOpt("skip-phases")
+                    .hasArgs()
+                    .valueSeparator(',')
+                    .desc("Comma-separated list of lifecycle phases whose mojo executions should be skipped."
+                            + " The phases remain in the DAG; only their bound mojos are suppressed."
+                            + " Example: --skip-phases=test,integration-test")
+                    .get());
+            options.addOption(Option.builder(SKIP_TESTS)
+                    .longOpt("skip-tests")
+                    .desc("Skip test and integration-test phases."
+                            + " Shorthand for --skip-phases=test,integration-test.")
                     .get());
         }
     }

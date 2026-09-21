@@ -28,6 +28,7 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -619,6 +620,9 @@ public class BuildPlanExecutor {
         private void plan() {
             lock.writeLock().lock();
             try {
+                Set<String> skippedPhases = session.getRequest() != null
+                        ? new HashSet<>(session.getRequest().getSkippedPhases())
+                        : Set.of();
                 Set<BuildStep> planSteps = plan.allSteps()
                         .filter(step -> PLAN.equals(step.name))
                         .filter(step -> step.predecessors.stream().allMatch(s -> s.status.get() == EXECUTED))
@@ -629,9 +633,23 @@ public class BuildPlanExecutor {
                     for (Plugin plugin : project.getBuild().getPlugins()) {
                         for (PluginExecution execution : plugin.getExecutions()) {
                             for (String goal : execution.getGoals()) {
+                                // If the phase is declared on the execution, check skip-phases before
+                                // loading the descriptor (avoids unnecessary plugin resolution).
+                                String declaredPhase = execution.getPhase();
+                                if (declaredPhase != null && !skippedPhases.isEmpty()) {
+                                    String tmp = plan.aliases().getOrDefault(declaredPhase, declaredPhase);
+                                    String resolved = tmp.startsWith(AT) ? tmp.substring(AT.length()) : tmp;
+                                    if (skippedPhases.contains(resolved)) {
+                                        logger.debug(
+                                                "Skipping mojo execution {}:{} bound to phase '{}' (--skip-phases)",
+                                                plugin.getArtifactId(),
+                                                goal,
+                                                resolved);
+                                        continue;
+                                    }
+                                }
                                 MojoDescriptor mojoDescriptor = getMojoDescriptor(project, plugin, goal);
-                                String phase =
-                                        execution.getPhase() != null ? execution.getPhase() : mojoDescriptor.getPhase();
+                                String phase = declaredPhase != null ? declaredPhase : mojoDescriptor.getPhase();
                                 if (phase == null) {
                                     continue;
                                 }
@@ -639,6 +657,14 @@ public class BuildPlanExecutor {
                                 String resolvedPhase = tmpResolvedPhase.startsWith(AT)
                                         ? tmpResolvedPhase.substring(AT.length())
                                         : tmpResolvedPhase;
+                                if (skippedPhases.contains(resolvedPhase)) {
+                                    logger.debug(
+                                            "Skipping mojo execution {}:{} bound to phase '{}' (--skip-phases)",
+                                            plugin.getArtifactId(),
+                                            goal,
+                                            resolvedPhase);
+                                    continue;
+                                }
                                 plan.step(project, resolvedPhase).ifPresent(n -> {
                                     MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());
                                     mojoExecution.setLifecyclePhase(phase);

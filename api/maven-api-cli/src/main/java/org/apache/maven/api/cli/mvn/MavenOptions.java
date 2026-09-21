@@ -214,6 +214,39 @@ public interface MavenOptions extends Options {
     Optional<String> atFile();
 
     /**
+     * Returns the list of lifecycle phases to skip (mojos bound to these phases will not be executed).
+     *
+     * <p>This provides a plugin-agnostic alternative to per-plugin skip properties such as
+     * {@code -DskipTests}. All mojos bound to the listed phases are suppressed, regardless of
+     * which plugin they belong to. The phases themselves remain in the lifecycle DAG — only their
+     * mojo executions are inhibited.</p>
+     *
+     * <p>Example: {@code --skip-phases=test,integration-test} suppresses all test execution
+     * while still running compile, package, and verify.</p>
+     *
+     * @return an {@link Optional} containing the list of phase names to skip, or empty if not specified
+     * @since 4.1.0
+     */
+    @Nonnull
+    Optional<List<String>> skippedPhases();
+
+    /**
+     * Returns whether to skip all test-related phases ({@code test} and {@code integration-test}).
+     *
+     * <p>This is a convenient shorthand for {@code --skip-phases=test,integration-test}. It suppresses
+     * all mojos bound to the {@code test} and {@code integration-test} lifecycle phases, regardless of
+     * which plugin they belong to, while still running {@code verify} checks (e.g. checkstyle, spotbugs).</p>
+     *
+     * <p>Unlike {@code -DskipTests} which is maven-surefire-plugin-specific, this option works with
+     * any test plugin.</p>
+     *
+     * @return an {@link Optional} containing {@code true} if tests should be skipped, or empty if not specified
+     * @since 4.1.0
+     */
+    @Nonnull
+    Optional<Boolean> skipTests();
+
+    /**
      * Returns the list of goals and phases to execute.
      *
      * @return an {@link Optional} containing the list of goals and phases to execute, or empty if not specified

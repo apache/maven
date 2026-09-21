@@ -119,6 +119,8 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     private List<String> goals;
 
+    private List<String> skippedPhases;
+
     private boolean useReactor = false;
 
     private boolean recursive = true;
@@ -197,6 +199,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setInstallationToolchainsFile(original.getInstallationToolchainsFile());
         copy.setBaseDirectory((original.getBaseDirectory() != null) ? new File(original.getBaseDirectory()) : null);
         copy.setGoals(original.getGoals());
+        copy.setSkippedPhases(original.getSkippedPhases());
         copy.setRecursive(original.isRecursive());
         copy.setPom(original.getPom());
         copy.setSystemProperties(original.getSystemProperties());
@@ -245,6 +248,24 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
             goals = new ArrayList<>();
         }
         return goals;
+    }
+
+    @Override
+    public MavenExecutionRequest setSkippedPhases(List<String> skippedPhases) {
+        if (skippedPhases != null) {
+            this.skippedPhases = new ArrayList<>(skippedPhases);
+        } else {
+            this.skippedPhases = null;
+        }
+        return this;
+    }
+
+    @Override
+    public List<String> getSkippedPhases() {
+        if (skippedPhases == null) {
+            skippedPhases = new ArrayList<>();
+        }
+        return skippedPhases;
     }
 
     @Override

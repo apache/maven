@@ -39,6 +39,12 @@ import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
 import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.lifecycle.internal.stub.ExecutionEventCatapultStub;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.plugin.MavenPluginManager;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
@@ -49,6 +55,12 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class BuildPlanExecutorTest {
 
@@ -154,6 +166,117 @@ class BuildPlanExecutorTest {
                 "an Error must halt the reactor even when a second failure is recorded for the same project, but"
                         + " the build was not halted; recorded exceptions: "
                         + session.getResult().getExceptions());
+    }
+
+    /**
+     * When a phase is listed in {@code --skip-phases}, no mojo bound to that phase must appear in the
+     * concurrent build plan after the PLAN step executes. The existing mojos list on the BuildStep for
+     * that phase must remain empty.
+     */
+    @Test
+    void skippedPhasesMojoIsNotAddedToPlan() throws Exception {
+        MavenProject project = newProject();
+        MavenSession session = newSession(project);
+        session.getRequest().setSkippedPhases(List.of("validate"));
+
+        // Attach a plugin execution bound explicitly to "validate"
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        pluginDescriptor.setGroupId("org.apache.maven.plugins");
+        pluginDescriptor.setArtifactId("maven-skip-test-plugin");
+        pluginDescriptor.setVersion("1.0");
+
+        MojoDescriptor mojoDescriptor = new MojoDescriptor();
+        mojoDescriptor.setGoal("run");
+        mojoDescriptor.setPluginDescriptor(pluginDescriptor);
+
+        Plugin plugin = new Plugin();
+        plugin.setGroupId("org.apache.maven.plugins");
+        plugin.setArtifactId("maven-skip-test-plugin");
+        plugin.setVersion("1.0");
+        PluginExecution execution = new PluginExecution();
+        execution.setId("default-run");
+        execution.setPhase("validate");
+        execution.addGoal("run");
+        plugin.addExecution(execution);
+
+        Build build = new Build();
+        build.addPlugin(plugin);
+        project.setBuild(build);
+
+        MavenPluginManager pluginManager = mock(MavenPluginManager.class);
+        when(pluginManager.getMojoDescriptor(eq(plugin), eq("run"), any(), any()))
+                .thenReturn(mojoDescriptor);
+
+        ReactorContext reactorContext = newReactorContext(session);
+        newExecutorWithPluginManager(pluginManager, (BeforeProjectExecution) event -> {})
+                .execute(session, reactorContext, List.of(newTaskSegment()));
+        assertTrue(
+                session.getResult().getExceptions().isEmpty(),
+                "No exceptions expected when a phase is skipped: "
+                        + session.getResult().getExceptions());
+        // getMojoDescriptor must NOT have been called — the mojo bound to the skipped phase was filtered out
+        verify(pluginManager, never()).getMojoDescriptor(any(), any(), any(), any());
+    }
+
+    /**
+     * When the skipped-phases list is empty, all mojos bound to lifecycle phases must be processed normally.
+     * This is the complement of {@link #skippedPhasesMojoIsNotAddedToPlan()} and pins the non-skip path
+     * in the concurrent {@code plan()} method so both branches are exercised.
+     */
+    @Test
+    void emptySkippedPhasesDoesNotFilterMojos() throws Exception {
+        MavenProject project = newProject();
+        MavenSession session = newSession(project);
+        // Explicitly empty — no skipping expected
+        session.getRequest().setSkippedPhases(List.of());
+
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        pluginDescriptor.setGroupId("org.apache.maven.plugins");
+        pluginDescriptor.setArtifactId("maven-no-skip-test-plugin");
+        pluginDescriptor.setVersion("1.0");
+
+        MojoDescriptor mojoDescriptor = new MojoDescriptor();
+        mojoDescriptor.setGoal("run");
+        mojoDescriptor.setPluginDescriptor(pluginDescriptor);
+
+        Plugin plugin = new Plugin();
+        plugin.setGroupId("org.apache.maven.plugins");
+        plugin.setArtifactId("maven-no-skip-test-plugin");
+        plugin.setVersion("1.0");
+        PluginExecution execution = new PluginExecution();
+        execution.setId("default-run");
+        execution.setPhase("validate");
+        execution.addGoal("run");
+        plugin.addExecution(execution);
+
+        Build build = new Build();
+        build.addPlugin(plugin);
+        project.setBuild(build);
+
+        MavenPluginManager pluginManager = mock(MavenPluginManager.class);
+        when(pluginManager.getMojoDescriptor(eq(plugin), eq("run"), any(), any()))
+                .thenReturn(mojoDescriptor);
+
+        ReactorContext reactorContext = newReactorContext(session);
+        newExecutorWithPluginManager(pluginManager, (BeforeProjectExecution) event -> {})
+                .execute(session, reactorContext, List.of(newTaskSegment()));
+
+        // getMojoDescriptor must have been called — the mojo was not filtered out
+        verify(pluginManager).getMojoDescriptor(eq(plugin), eq("run"), any(), any());
+    }
+
+    private BuildPlanExecutor newExecutorWithPluginManager(
+            MavenPluginManager pluginManager, ProjectExecutionListener listener) {
+        return new BuildPlanExecutor(
+                null,
+                new ExecutionEventCatapultStub(),
+                List.of(listener),
+                new NoopTransformerManager(),
+                new BuildPlanLogger(),
+                Map.of(),
+                pluginManager,
+                null,
+                new DefaultLifecycleRegistry(Collections.emptyList()));
     }
 
     private ReactorContext execute(MavenSession session, MavenProject project, BeforeProjectExecution listener)

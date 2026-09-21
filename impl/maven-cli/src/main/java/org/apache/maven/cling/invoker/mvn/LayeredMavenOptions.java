@@ -165,6 +165,16 @@ public class LayeredMavenOptions<O extends MavenOptions> extends LayeredOptions<
     }
 
     @Override
+    public Optional<List<String>> skippedPhases() {
+        return collectListIfPresentOrEmpty(MavenOptions::skippedPhases);
+    }
+
+    @Override
+    public Optional<Boolean> skipTests() {
+        return returnFirstPresentOrEmpty(MavenOptions::skipTests);
+    }
+
+    @Override
     public MavenOptions interpolate(UnaryOperator<String> callback) {
         ArrayList<MavenOptions> interpolatedOptions = new ArrayList<>(options.size());
         for (MavenOptions o : options) {

@@ -121,6 +121,24 @@ public interface MavenExecutionRequest {
 
     List<String> getGoals();
 
+    /**
+     * Sets the lifecycle phases whose mojo executions should be suppressed.
+     *
+     * @param skippedPhases list of phase names (e.g. {@code "test"}, {@code "integration-test"}),
+     *                      or {@code null} to clear
+     * @return this request
+     * @since 4.1.0
+     */
+    MavenExecutionRequest setSkippedPhases(List<String> skippedPhases);
+
+    /**
+     * Returns the lifecycle phases whose mojo executions are suppressed.
+     *
+     * @return mutable list of phase names; never {@code null}
+     * @since 4.1.0
+     */
+    List<String> getSkippedPhases();
+
     // Properties
 
     /**

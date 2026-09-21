@@ -211,6 +211,9 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                     MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
                     PluginVersionResolutionException, LifecyclePhaseNotFoundException {
         final List<MojoExecution> mojoExecutions = new ArrayList<>();
+        final Set<String> skippedPhases = session.getRequest() != null
+                ? new HashSet<>(session.getRequest().getSkippedPhases())
+                : Set.of();
 
         for (Task task : tasks) {
             if (task instanceof GoalTask) {
@@ -233,8 +236,11 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                 Map<String, List<MojoExecution>> phaseToMojoMapping =
                         calculateLifecycleMappings(session, project, lifecyclePhase);
 
-                for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values()) {
-                    mojoExecutions.addAll(mojoExecutionsFromLifecycle);
+                for (Map.Entry<String, List<MojoExecution>> entry : phaseToMojoMapping.entrySet()) {
+                    if (skippedPhases.contains(entry.getKey())) {
+                        continue;
+                    }
+                    mojoExecutions.addAll(entry.getValue());
                 }
             } else {
                 throw new IllegalStateException("unexpected task " + task);

@@ -236,6 +236,17 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
         request.setNoSnapshotUpdates(context.options().suppressSnapshotUpdates().orElse(false));
         request.setGoals(context.options().goals().orElse(List.of()));
+        request.setSkippedPhases(context.options().skippedPhases().orElse(List.of()));
+        if (context.options().skipTests().orElse(false)) {
+            List<String> phases = new ArrayList<>(request.getSkippedPhases());
+            if (!phases.contains("test")) {
+                phases.add("test");
+            }
+            if (!phases.contains("integration-test")) {
+                phases.add("integration-test");
+            }
+            request.setSkippedPhases(phases);
+        }
         request.setReactorFailureBehavior(determineReactorFailureBehaviour(context));
         request.setRecursive(!context.options().nonRecursive().orElse(!request.isRecursive()));
         request.setOffline(context.options().offline().orElse(request.isOffline()));
