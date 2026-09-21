@@ -19,6 +19,7 @@
 package org.apache.maven.project;
 
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -79,7 +80,9 @@ public class DefaultMavenProjectBuilderTest extends AbstractMavenProjectTestCase
     public void testDuplicatePluginDefinitionsMerged() throws Exception {
         File f1 = getTestFile("src/test/resources/projects/duplicate-plugins-merged-pom.xml");
 
-        MavenProject project = getProject(f1);
+        ProjectBuildingRequest configuration = newBuildingRequest();
+        configuration.setActiveProfileIds(Arrays.asList("foo"));
+        MavenProject project = projectBuilder.build(f1, configuration).getProject();
         assertEquals(2, project.getBuildPlugins().get(0).getDependencies().size());
         assertEquals(2, project.getBuildPlugins().get(0).getExecutions().size());
         assertEquals(
