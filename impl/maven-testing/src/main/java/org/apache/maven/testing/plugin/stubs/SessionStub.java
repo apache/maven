@@ -76,6 +76,8 @@ public class SessionStub implements Session {
 
     private final Settings settings;
 
+    private final ProblemCollector<ModelProblem> modelProblemCollector = ProblemCollector.create(100);
+
     public SessionStub(Settings settings) {
         this(null, null, settings);
     }
@@ -158,7 +160,7 @@ public class SessionStub implements Session {
     @Nonnull
     @Override
     public ProblemCollector<ModelProblem> getModelProblemCollector() {
-        return ProblemCollector.empty();
+        return modelProblemCollector;
     }
 
     @Override
