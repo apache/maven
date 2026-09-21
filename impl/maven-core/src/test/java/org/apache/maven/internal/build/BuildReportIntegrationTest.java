@@ -1,0 +1,313 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.maven.internal.build;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Properties;
+
+import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.build.report.BuildReport;
+import org.apache.maven.api.build.report.BuildStatus;
+import org.apache.maven.execution.BuildSuccess;
+import org.apache.maven.execution.DefaultMavenExecutionRequest;
+import org.apache.maven.execution.DefaultMavenExecutionResult;
+import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.execution.MavenSession;
+import org.apache.maven.plugin.MojoExecution;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.project.MavenProject;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+/**
+ * Integration test that exercises the full build report pipeline:
+ * BuildReportCollector -> BuildReportJsonWriter -> file.
+ * <p>
+ * This test simulates a complete multi-module build lifecycle with mojo
+ * executions and failures, then verifies the resulting JSON report file
+ * contains all expected data.
+ */
+class BuildReportIntegrationTest {
+
+    @TempDir
+    Path tempDir;
+
+    private BuildReportCollector collector;
+
+    @BeforeEach
+    void setUp() {
+        collector = new BuildReportCollector();
+    }
+
+    /**
+     * Full lifecycle: multi-module build with mojos and JSON persistence.
+     */
+    @Test
+    void testFullMultiModuleBuild() throws IOException {
+        MavenProject parent = createProject("com.example", "parent", "2.0.0");
+        MavenProject api = createProject("com.example", "api", "2.0.0");
+        MavenProject impl = createProject("com.example", "impl", "2.0.0");
+
+        MavenSession session = createSession(parent, api, impl);
+        MavenExecutionResult result = session.getResult();
+
+        // Session starts
+        collector.onEvent(createEvent(ExecutionEvent.Type.SessionStarted, session, parent, null));
+
+        // --- Module: parent ---
+        collector.onEvent(createEvent(ExecutionEvent.Type.ProjectStarted, session, parent, null));
+        result.addBuildSummary(new BuildSuccess(parent, 500));
+        collector.onEvent(createEvent(ExecutionEvent.Type.ProjectSucceeded, session, parent, null));
+
+        // --- Module: api ---
+        collector.onEvent(createEvent(ExecutionEvent.Type.ProjectStarted, session, api, null));
+
+        MojoExecution compileApi = createMojoExecution(
+                "org.apache.maven.plugins", "maven-compiler-plugin", "3.15.0", "compile", "default-compile", "compile");
+        collector.onEvent(createEvent(ExecutionEvent.Type.MojoStarted, session, api, compileApi));
+        collector.onEvent(createEvent(ExecutionEvent.Type.MojoSucceeded, session, api, compileApi));
+
+        MojoExecution testApi = createMojoExecution(
+                "org.apache.maven.plugins", "maven-surefire-plugin", "3.5.0", "test", "default-test", "test");
+        collector.onEvent(createEvent(ExecutionEvent.Type.MojoStarted, session, api, testApi));
+        collector.onEvent(createEvent(ExecutionEvent.Type.MojoSucceeded, session, api, testApi));
+
+        result.addBuildSummary(new BuildSuccess(api, 3000));
+        collector.onEvent(createEvent(ExecutionEvent.Type.ProjectSucceeded, session, api, null));
+
+        // --- Module: impl ---
+        collector.onEvent(createEvent(ExecutionEvent.Type.ProjectStarted, session, impl, null));
+
+        MojoExecution compileImpl = createMojoExecution(
+                "org.apache.maven.plugins", "maven-compiler-plugin", "3.15.0", "compile", "default-compile", "compile");
+        collector.onEvent(createEvent(ExecutionEvent.Type.MojoStarted, session, impl, compileImpl));
+        collector.onEvent(createEvent(ExecutionEvent.Type.MojoSucceeded, session, impl, compileImpl));
+
+        result.addBuildSummary(new BuildSuccess(impl, 2000));
+        collector.onEvent(createEvent(ExecutionEvent.Type.ProjectSucceeded, session, impl, null));
+
+        // --- Build report ---
+        BuildReport report = collector.buildReport(session);
+
+        // Basic assertions
+        assertNotNull(report);
+        assertEquals(BuildStatus.SUCCESS, report.status());
+        assertTrue(report.multiModule());
+        assertEquals(3, report.modules().size());
+
+        // Problems should always be empty in this simplified collector
+        assertTrue(report.problems().isEmpty());
+
+        // Module reports
+        assertEquals("parent", report.modules().get(0).artifactId());
+        assertEquals("api", report.modules().get(1).artifactId());
+        assertEquals(2, report.modules().get(1).mojos().size());
+        assertEquals("compile", report.modules().get(1).mojos().get(0).goal());
+        assertEquals("test", report.modules().get(1).mojos().get(1).goal());
+        assertEquals("impl", report.modules().get(2).artifactId());
+
+        // Write to JSON and verify
+        collector.writeReport(report, session);
+
+        Path reportsDir = tempDir.resolve("target").resolve(BuildReportCollector.REPORT_DIR);
+        Path latestFile = reportsDir.resolve(BuildReportCollector.REPORT_LATEST);
+        assertTrue(Files.exists(latestFile), "build-report-latest.json should exist");
+
+        String json = Files.readString(latestFile);
+
+        // Verify JSON structure
+        assertTrue(json.contains("\"formatVersion\": 1"));
+        assertTrue(json.contains("\"status\": \"SUCCESS\""));
+        assertTrue(json.contains("\"multiModule\": true"));
+        assertTrue(json.contains("\"threads\": 1"));
+
+        // Modules in JSON
+        assertTrue(json.contains("\"artifactId\": \"parent\""));
+        assertTrue(json.contains("\"artifactId\": \"api\""));
+        assertTrue(json.contains("\"artifactId\": \"impl\""));
+
+        // Mojos in JSON
+        assertTrue(json.contains("\"goal\": \"compile\""));
+        assertTrue(json.contains("\"goal\": \"test\""));
+
+        // Problems and failures should be empty
+        assertTrue(json.contains("\"problems\": []"));
+        assertTrue(json.contains("\"failures\": []"));
+
+        // Output arrays should be present (even if empty in unit test -- no SLF4J sink)
+        assertTrue(json.contains("\"output\": ["));
+    }
+
+    /**
+     * Tests navigation methods on the built report.
+     */
+    @Test
+    void testReportNavigationMethods() {
+        MavenProject project = createProject("org.example", "my-app", "1.0.0");
+        MavenSession session = createSession(project);
+        MavenExecutionResult result = session.getResult();
+
+        collector.onEvent(createEvent(ExecutionEvent.Type.SessionStarted, session, project, null));
+        collector.onEvent(createEvent(ExecutionEvent.Type.ProjectStarted, session, project, null));
+
+        MojoExecution mojo = createMojoExecution(
+                "org.apache.maven.plugins", "maven-compiler-plugin", "3.15.0", "compile", "default-compile", "compile");
+        collector.onEvent(createEvent(ExecutionEvent.Type.MojoStarted, session, project, mojo));
+        collector.onEvent(createEvent(ExecutionEvent.Type.MojoSucceeded, session, project, mojo));
+
+        result.addBuildSummary(new BuildSuccess(project, 5000));
+        collector.onEvent(createEvent(ExecutionEvent.Type.ProjectSucceeded, session, project, null));
+
+        BuildReport report = collector.buildReport(session);
+
+        // findModule by GAV
+        var moduleOpt = report.findModule("org.example:my-app:1.0.0");
+        assertTrue(moduleOpt.isPresent());
+        assertEquals("my-app", moduleOpt.get().artifactId());
+        assertEquals("org.example:my-app:1.0.0", moduleOpt.get().id());
+
+        // findMojo by id
+        var mojoOpt = moduleOpt.get().findMojo("maven-compiler-plugin:3.15.0:compile");
+        assertTrue(mojoOpt.isPresent());
+        assertEquals("compile", mojoOpt.get().goal());
+
+        // Not found
+        assertFalse(report.findModule("nonexistent:module:1.0").isPresent());
+    }
+
+    /**
+     * Tests that timestamped report files are written alongside the latest symlink.
+     */
+    @Test
+    void testTimestampedReportFile() throws IOException {
+        MavenProject project = createProject("org.example", "my-app", "1.0.0");
+        MavenSession session = createSession(project);
+        session.getResult().addBuildSummary(new BuildSuccess(project, 1000));
+
+        collector.onEvent(createEvent(ExecutionEvent.Type.SessionStarted, session, project, null));
+        collector.onEvent(createEvent(ExecutionEvent.Type.ProjectStarted, session, project, null));
+        collector.onEvent(createEvent(ExecutionEvent.Type.ProjectSucceeded, session, project, null));
+
+        BuildReport report = collector.buildReport(session);
+        collector.writeReport(report, session);
+
+        Path reportsDir = tempDir.resolve("target").resolve(BuildReportCollector.REPORT_DIR);
+        assertTrue(Files.exists(reportsDir), "reports directory should exist");
+
+        // Should have at least two files: the timestamped one and the latest link/copy
+        long fileCount = Files.list(reportsDir)
+                .filter(p -> p.getFileName().toString().startsWith("build-report-"))
+                .count();
+        assertTrue(fileCount >= 2, "should have both timestamped and latest report files, found " + fileCount);
+
+        // The latest file should contain valid JSON
+        Path latestFile = reportsDir.resolve(BuildReportCollector.REPORT_LATEST);
+        String json = Files.readString(latestFile);
+        assertTrue(json.startsWith("{"), "report should start with JSON object");
+        assertTrue(json.contains("\"formatVersion\": 1"), "report should contain format version");
+    }
+
+    // ---- Test helpers ----
+
+    private MavenProject createProject(String groupId, String artifactId, String version) {
+        MavenProject project = new MavenProject();
+        project.setGroupId(groupId);
+        project.setArtifactId(artifactId);
+        project.setVersion(version);
+        return project;
+    }
+
+    private MavenSession createSession(MavenProject... projects) {
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setStartInstant(MonotonicClock.now());
+        request.setGoals(List.of("clean", "install"));
+        request.setTopDirectory(tempDir);
+
+        Properties systemProperties = new Properties();
+        systemProperties.setProperty("maven.version", "4.1.0-SNAPSHOT");
+        request.setSystemProperties(systemProperties);
+
+        MavenExecutionResult result = new DefaultMavenExecutionResult();
+
+        @SuppressWarnings("deprecation")
+        MavenSession session = new MavenSession(null, null, request, result);
+        session.setProjects(List.of(projects));
+        return session;
+    }
+
+    private MojoExecution createMojoExecution(
+            String groupId, String artifactId, String version, String goal, String executionId, String phase) {
+        @SuppressWarnings("deprecation")
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        pluginDescriptor.setGroupId(groupId);
+        pluginDescriptor.setArtifactId(artifactId);
+        pluginDescriptor.setVersion(version);
+
+        MojoDescriptor mojoDescriptor = new MojoDescriptor();
+        mojoDescriptor.setGoal(goal);
+        mojoDescriptor.setPluginDescriptor(pluginDescriptor);
+
+        MojoExecution execution = new MojoExecution(mojoDescriptor, executionId);
+        execution.setLifecyclePhase(phase);
+
+        return execution;
+    }
+
+    private ExecutionEvent createEvent(
+            ExecutionEvent.Type type, MavenSession session, MavenProject project, MojoExecution mojo) {
+        return new ExecutionEvent() {
+            @Override
+            public Type getType() {
+                return type;
+            }
+
+            @Override
+            public MavenSession getSession() {
+                return session;
+            }
+
+            @Override
+            public MavenProject getProject() {
+                return project;
+            }
+
+            @Override
+            public MojoExecution getMojoExecution() {
+                return mojo;
+            }
+
+            @Override
+            public Exception getException() {
+                return null;
+            }
+        };
+    }
+}
