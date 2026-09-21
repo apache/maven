@@ -936,6 +936,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected int calculateDegreeOfConcurrency(String threadConfiguration) {
+        if ("max".equalsIgnoreCase(threadConfiguration)) {
+            return Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
+        }
         try {
             if (threadConfiguration.endsWith("C")) {
                 String str = threadConfiguration.substring(0, threadConfiguration.length() - 1);
@@ -959,7 +962,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid threads value: '" + threadConfiguration
-                    + "'. Supported are int and float values ending with C.");
+                    + "'. Supported are 'max', int and float values ending with C.");
         }
     }
 
