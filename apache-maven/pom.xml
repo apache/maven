@@ -124,11 +124,11 @@ under the License.
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
-            <excludes>
+            <inputExcludes>
               <exclude>src/bin/m2.conf</exclude>
               <!-- Excluded the license files itself cause they do not have a license of themselves. -->
               <exclude>src/main/appended-resources/licenses/**</exclude>
-            </excludes>
+            </inputExcludes>
           </configuration>
         </plugin>
       </plugins>
