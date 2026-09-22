@@ -24,7 +24,9 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Integration tests for the {@code --skip-phases} and {@code --skip-tests} CLI options
- * introduced by <a href="https://github.com/apache/maven/issues/13230">GH-13230</a>.
+ * introduced by <a href="https://github.com/apache/maven/issues/13230">GH-13230</a>,
+ * and the lifecycle DAG change that makes {@code install} and {@code deploy} depend on
+ * {@code verify} (so that {@code mvn install} always runs {@code verify}).
  *
  * @since 4.1.0
  */
@@ -102,6 +104,45 @@ class MavenITmng13230SkipPhasesTest extends AbstractMavenIntegrationTestCase {
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
+        verifier.verifyTextNotInLog("maven-surefire-plugin");
+    }
+
+    /**
+     * Verify the lifecycle DAG change: {@code install} now depends on {@code verify},
+     * so {@code mvn install} must run the {@code verify} phase (and thus surefire).
+     * Prior to this change, {@code install} only required {@code package}, so tests
+     * were never run by {@code mvn install}.
+     */
+    @Test
+    void installPhaseRunsVerifyWithNewDag() throws Exception {
+        Path basedir = extractResources("mng-13230");
+
+        Verifier verifier = newVerifier(basedir);
+        verifier.setLogFileName("log-install-runs-verify.txt");
+        verifier.addCliArgument("install");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        // install → after(verify) → verify includes test, so surefire must execute
+        verifier.verifyTextInLog("maven-surefire-plugin");
+    }
+
+    /**
+     * Verify that {@code mvn install --skip-phases=verify} skips the verify mojos
+     * (surefire does not run) while {@code install} itself still succeeds.
+     * This confirms the DAG change does not lock users out of skipping verify.
+     */
+    @Test
+    void installWithSkipVerifySkipsVerifyMojos() throws Exception {
+        Path basedir = extractResources("mng-13230");
+
+        Verifier verifier = newVerifier(basedir);
+        verifier.setLogFileName("log-install-skip-verify.txt");
+        verifier.addCliArguments("install", "--skip-phases", "verify");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        // verify mojos are skipped — surefire (bound to test, inside verify) must not run
         verifier.verifyTextNotInLog("maven-surefire-plugin");
     }
 }
