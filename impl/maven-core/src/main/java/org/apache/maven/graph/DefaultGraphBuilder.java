@@ -98,7 +98,6 @@ public class DefaultGraphBuilder implements GraphBuilder {
 
             if (result == null) {
                 final List<MavenProject> projects = getProjectsForMavenReactor(session);
-                validateProjects(projects, session.getRequest());
                 processPackagingAttribute(projects, session.getRequest());
                 enrichRequestFromResumptionData(projects, session.getRequest());
                 result = reactorDependencyGraph(session, projects);
@@ -141,6 +140,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
                 trimSelectedProjects(activeProjects, allSortedProjects, projectDependencyGraph, session.getRequest());
         activeProjects = trimResumedProjects(activeProjects, projectDependencyGraph, session.getRequest());
         activeProjects = trimExcludedProjects(activeProjects, projectDependencyGraph, session.getRequest());
+        validateExtensionIsNotPartOfReactor(activeProjects, projects, session.getRequest());
 
         if (activeProjects.size() != projectDependencyGraph.getSortedProjects().size()) {
             projectDependencyGraph = new FilteredProjectDependencyGraph(projectDependencyGraph, activeProjects);
@@ -376,15 +376,17 @@ public class DefaultGraphBuilder implements GraphBuilder {
         return requestPomCollectionStrategy.collectProjects(request);
     }
 
-    private void validateProjects(List<MavenProject> projects, MavenExecutionRequest request)
+    private void validateExtensionIsNotPartOfReactor(
+            List<MavenProject> projects, List<MavenProject> allProjects, MavenExecutionRequest request)
             throws MavenExecutionException {
         Map<String, MavenProject> projectsMap = new HashMap<>();
 
-        List<MavenProject> projectsInRequestScope = getProjectsInRequestScope(request, projects);
+        List<MavenProject> projectsInRequestScope = getProjectsInRequestScope(request, allProjects);
         for (MavenProject p : projectsInRequestScope) {
-            String projectKey = ArtifactUtils.key(p.getGroupId(), p.getArtifactId(), p.getVersion());
-
-            projectsMap.put(projectKey, p);
+            if (projects.contains(p)) {
+                String projectKey = ArtifactUtils.key(p.getGroupId(), p.getArtifactId(), p.getVersion());
+                projectsMap.put(projectKey, p);
+            }
         }
 
         for (MavenProject project : projects) {
