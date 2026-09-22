@@ -621,7 +621,7 @@ public class BuildPlanExecutor {
             lock.writeLock().lock();
             try {
                 Set<String> skippedPhases = session.getRequest() != null
-                        ? new HashSet<>(session.getRequest().getSkippedPhases())
+                        ? expandSkippedPhases(new HashSet<>(session.getRequest().getSkippedPhases()))
                         : Set.of();
                 Set<BuildStep> planSteps = plan.allSteps()
                         .filter(step -> PLAN.equals(step.name))
@@ -705,6 +705,32 @@ public class BuildPlanExecutor {
             } finally {
                 lock.writeLock().unlock();
             }
+        }
+
+        /**
+         * Expands the set of explicitly skipped phase names to include all their descendant
+         * (child/sub) phases in the lifecycle DAG.
+         *
+         * <p>When a user specifies {@code --skip-phases=verify}, all mojos bound to sub-phases
+         * of {@code verify} (e.g. {@code test}, {@code unit-test}, {@code integration-test}) must
+         * also be skipped, since those sub-phases are part of the skipped phase.</p>
+         *
+         * @param explicit the set of phase names explicitly listed in {@code --skip-phases}
+         * @return a new set containing the original phase names plus all their descendants
+         */
+        private Set<String> expandSkippedPhases(Set<String> explicit) {
+            if (explicit.isEmpty()) {
+                return explicit;
+            }
+            Set<String> expanded = new HashSet<>(explicit);
+            lifecycles.stream()
+                    .forEach(lifecycle -> lifecycle.allPhases().forEach(phase -> {
+                        if (explicit.contains(phase.name())) {
+                            // Add all descendant phase names for this skipped phase
+                            phase.allPhases().map(Lifecycle.Phase::name).forEach(expanded::add);
+                        }
+                    }));
+            return expanded;
         }
 
         /**

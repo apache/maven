@@ -169,6 +169,57 @@ class BuildPlanExecutorTest {
     }
 
     /**
+     * When a parent phase is listed in {@code --skip-phases}, mojos bound to its sub-phases must also
+     * be skipped. For example, {@code --skip-phases=verify} must suppress mojos bound to {@code test},
+     * {@code integration-test}, etc., since those are sub-phases of {@code verify} in the lifecycle DAG.
+     */
+    @Test
+    void skippingParentPhaseAlsoSkipsSubPhases() throws Exception {
+        MavenProject project = newProject();
+        MavenSession session = newSessionForGoal(project, "install");
+        // Skip the parent phase "verify" — test is a sub-phase of verify
+        session.getRequest().setSkippedPhases(List.of("verify"));
+
+        // Attach a plugin execution bound explicitly to "test" (a sub-phase of "verify")
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        pluginDescriptor.setGroupId("org.apache.maven.plugins");
+        pluginDescriptor.setArtifactId("maven-surefire-plugin");
+        pluginDescriptor.setVersion("3.0");
+
+        MojoDescriptor mojoDescriptor = new MojoDescriptor();
+        mojoDescriptor.setGoal("test");
+        mojoDescriptor.setPluginDescriptor(pluginDescriptor);
+
+        Plugin plugin = new Plugin();
+        plugin.setGroupId("org.apache.maven.plugins");
+        plugin.setArtifactId("maven-surefire-plugin");
+        plugin.setVersion("3.0");
+        PluginExecution execution = new PluginExecution();
+        execution.setId("default-test");
+        execution.setPhase("test");
+        execution.addGoal("test");
+        plugin.addExecution(execution);
+
+        Build build = new Build();
+        build.addPlugin(plugin);
+        project.setBuild(build);
+
+        MavenPluginManager pluginManager = mock(MavenPluginManager.class);
+        when(pluginManager.getMojoDescriptor(eq(plugin), eq("test"), any(), any()))
+                .thenReturn(mojoDescriptor);
+
+        ReactorContext reactorContext = newReactorContext(session);
+        newExecutorWithPluginManager(pluginManager, (BeforeProjectExecution) event -> {})
+                .execute(session, reactorContext, List.of(newTaskSegmentForGoal("install")));
+        assertTrue(
+                session.getResult().getExceptions().isEmpty(),
+                "No exceptions expected when parent phase is skipped: "
+                        + session.getResult().getExceptions());
+        // getMojoDescriptor must NOT have been called — the mojo bound to the sub-phase is filtered out
+        verify(pluginManager, never()).getMojoDescriptor(any(), any(), any(), any());
+    }
+
+    /**
      * When a phase is listed in {@code --skip-phases}, no mojo bound to that phase must appear in the
      * concurrent build plan after the PLAN step executes. The existing mojos list on the BuildStep for
      * that phase must remain empty.
@@ -313,12 +364,6 @@ class BuildPlanExecutorTest {
                 new ReactorBuildStatus(session.getProjectDependencyGraph()));
     }
 
-    private TaskSegment newTaskSegment() {
-        TaskSegment taskSegment = new TaskSegment(false);
-        taskSegment.getTasks().add(new LifecycleTask("validate"));
-        return taskSegment;
-    }
-
     private BuildPlanExecutor newExecutor(ProjectExecutionListener listener) {
         return new BuildPlanExecutor(
                 null,
@@ -340,13 +385,27 @@ class BuildPlanExecutorTest {
     }
 
     private MavenSession newSession(MavenProject project) {
+        return newSessionForGoal(project, "validate");
+    }
+
+    private MavenSession newSessionForGoal(MavenProject project, String goal) {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-        request.setGoals(List.of("validate"));
+        request.setGoals(List.of(goal));
         MavenSession result = new MavenSession(
                 null, new DefaultRepositorySystemSession(h -> false), request, new DefaultMavenExecutionResult());
         result.setProjectDependencyGraph(new SingleProjectDependencyGraph(project));
         result.setProjects(List.of(project));
         return result;
+    }
+
+    private TaskSegment newTaskSegment() {
+        return newTaskSegmentForGoal("validate");
+    }
+
+    private TaskSegment newTaskSegmentForGoal(String goal) {
+        TaskSegment taskSegment = new TaskSegment(false);
+        taskSegment.getTasks().add(new LifecycleTask(goal));
+        return taskSegment;
     }
 
     private static final class SingleProjectDependencyGraph implements ProjectDependencyGraph {
