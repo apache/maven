@@ -128,9 +128,10 @@ class MavenITmng13230SkipPhasesTest extends AbstractMavenIntegrationTestCase {
     }
 
     /**
-     * Verify that {@code mvn install --skip-phases=verify} skips the verify mojos
-     * (surefire does not run) while {@code install} itself still succeeds.
-     * This confirms the DAG change does not lock users out of skipping verify.
+     * Verify that {@code mvn install --skip-phases=test,verify} skips mojos bound to
+     * both the {@code test} and {@code verify} phases (surefire does not run) while
+     * {@code install} itself still succeeds.
+     * This confirms the DAG change does not lock users out of skipping test and verify.
      */
     @Test
     void installWithSkipVerifySkipsVerifyMojos() throws Exception {
@@ -138,11 +139,13 @@ class MavenITmng13230SkipPhasesTest extends AbstractMavenIntegrationTestCase {
 
         Verifier verifier = newVerifier(basedir);
         verifier.setLogFileName("log-install-skip-verify.txt");
-        verifier.addCliArguments("install", "--skip-phases", "verify");
+        // Skip both test and verify phases: surefire (bound to test) must not run,
+        // nor any mojos bound to verify.
+        verifier.addCliArguments("install", "--skip-phases", "test,verify");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        // verify mojos are skipped — surefire (bound to test, inside verify) must not run
+        // test and verify mojos are skipped — surefire must not appear in the log
         verifier.verifyTextNotInLog("maven-surefire-plugin");
     }
 }
