@@ -34,6 +34,7 @@ import java.util.Set;
 
 import org.apache.maven.api.plugin.descriptor.lifecycle.Execution;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Phase;
+import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.execution.MavenSession;
@@ -82,7 +83,10 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
 
     private final Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators;
 
+    private final LifecycleRegistry lifecycleRegistry;
+
     @Inject
+    @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultLifecycleExecutionPlanCalculator(
             BuildPluginManager pluginManager,
             DefaultLifecycles defaultLifecycles,
@@ -90,7 +94,8 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
             LifecyclePluginResolver lifecyclePluginResolver,
             @Named(DefaultLifecycleMappingDelegate.HINT) LifecycleMappingDelegate standardDelegate,
             Map<String, LifecycleMappingDelegate> delegates,
-            Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators) {
+            Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators,
+            LifecycleRegistry lifecycleRegistry) {
         this.pluginManager = pluginManager;
         this.defaultLifecycles = defaultLifecycles;
         this.mojoDescriptorCreator = mojoDescriptorCreator;
@@ -98,6 +103,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
         this.standardDelegate = standardDelegate;
         this.delegates = delegates;
         this.mojoExecutionConfigurators = mojoExecutionConfigurators;
+        this.lifecycleRegistry = lifecycleRegistry;
     }
 
     // Only used for testing
@@ -113,6 +119,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
         this.standardDelegate = null;
         this.delegates = null;
         this.mojoExecutionConfigurators = Collections.singletonMap("default", new DefaultMojoExecutionConfigurator());
+        this.lifecycleRegistry = null;
     }
 
     @Override
@@ -212,7 +219,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                     PluginVersionResolutionException, LifecyclePhaseNotFoundException {
         final List<MojoExecution> mojoExecutions = new ArrayList<>();
         final Set<String> skippedPhases = session.getRequest() != null
-                ? new HashSet<>(session.getRequest().getSkippedPhases())
+                ? expandSkippedPhases(new HashSet<>(session.getRequest().getSkippedPhases()))
                 : Set.of();
 
         for (Task task : tasks) {
@@ -247,6 +254,37 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
             }
         }
         return mojoExecutions;
+    }
+
+    /**
+     * Expands the set of explicitly skipped phases to include all descendant sub-phases.
+     * <p>
+     * When a user specifies {@code --skip-phases=verify}, all phases nested inside {@code verify}
+     * (e.g. {@code test}, {@code integration-test}) should also be skipped, matching the semantics
+     * of the concurrent builder ({@code BuildPlanExecutor}). Without this expansion the sequential
+     * builder (used by default) would only skip mojos whose execution phase is literally
+     * {@code "verify"}, leaving sub-phase mojos running — an asymmetry with the concurrent path.
+     * <p>
+     * When {@code lifecycleRegistry} is not available (test-only constructor path) the method
+     * returns the input set unchanged so existing behaviour is preserved.
+     *
+     * @param explicit the set of phase names explicitly listed in {@code --skip-phases}
+     * @return a new set containing the original phase names plus all their descendants
+     */
+    private Set<String> expandSkippedPhases(Set<String> explicit) {
+        if (explicit.isEmpty() || lifecycleRegistry == null) {
+            return explicit;
+        }
+        Set<String> expanded = new HashSet<>(explicit);
+        lifecycleRegistry.stream()
+                .forEach(lifecycle -> lifecycle.allPhases().forEach(phase -> {
+                    if (explicit.contains(phase.name())) {
+                        phase.allPhases()
+                                .map(org.apache.maven.api.Lifecycle.Phase::name)
+                                .forEach(expanded::add);
+                    }
+                }));
+        return expanded;
     }
 
     private Map<String, List<MojoExecution>> calculateLifecycleMappings(

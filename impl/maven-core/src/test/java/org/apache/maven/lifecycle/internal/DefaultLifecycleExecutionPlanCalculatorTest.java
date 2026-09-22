@@ -18,12 +18,14 @@
  */
 package org.apache.maven.lifecycle.internal;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
@@ -36,6 +38,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -90,7 +93,8 @@ class DefaultLifecycleExecutionPlanCalculatorTest {
                 lifecyclePluginResolver,
                 lifecycleMappingDelegate,
                 Map.of(),
-                Map.of());
+                Map.of(),
+                null);
 
         calculator.calculateExecutionPlan(session, project, List.of(new LifecycleTask("validate")), false);
 
@@ -129,7 +133,8 @@ class DefaultLifecycleExecutionPlanCalculatorTest {
                 lifecyclePluginResolver,
                 lifecycleMappingDelegate,
                 Map.of(),
-                Map.of());
+                Map.of(),
+                null);
 
         List<MojoExecution> executions =
                 calculator.calculateMojoExecutions(session, project, List.of(new LifecycleTask("test")));
@@ -163,7 +168,8 @@ class DefaultLifecycleExecutionPlanCalculatorTest {
                 lifecyclePluginResolver,
                 lifecycleMappingDelegate,
                 Map.of(),
-                Map.of());
+                Map.of(),
+                null);
 
         List<MojoExecution> executions =
                 calculator.calculateMojoExecutions(session, project, List.of(new LifecycleTask("validate")));
@@ -171,5 +177,60 @@ class DefaultLifecycleExecutionPlanCalculatorTest {
         // No NPE, all mojos returned (nothing skipped when request is null)
         assertNotNull(executions);
         assertEquals(1, executions.size());
+    }
+
+    /**
+     * Verifies that skipping a parent phase in the sequential builder also suppresses mojos bound
+     * to sub-phases — symmetric with the concurrent {@code BuildPlanExecutor} path.
+     * <p>
+     * Uses a real {@link DefaultLifecycleRegistry} (empty extensions) so {@code expandSkippedPhases}
+     * can walk the actual Maven default lifecycle DAG. The mapping is mocked so the test stays fast.
+     */
+    @Test
+    void skipParentPhaseAlsoFiltersSubPhases() throws Exception {
+        LifecyclePluginResolver lifecyclePluginResolver = mock(LifecyclePluginResolver.class);
+        MavenSession session = mock(MavenSession.class);
+        MavenProject project = new MavenProject();
+        DefaultLifecycles defaultLifecycles = mock(DefaultLifecycles.class);
+        // The legacy Lifecycle object returned by DefaultLifecycles.get() for the delegate call.
+        // We simulate a lifecycle that contains "test" and "verify" as sibling phases.
+        Lifecycle lifecycle = new Lifecycle("default", List.of("test", "verify"), Map.of());
+        LifecycleMappingDelegate lifecycleMappingDelegate = mock(LifecycleMappingDelegate.class);
+
+        MojoDescriptor testMojo = new MojoDescriptor();
+        MojoDescriptor verifyMojo = new MojoDescriptor();
+        MojoExecution testExecution = new MojoExecution(testMojo);
+        MojoExecution verifyExecution = new MojoExecution(verifyMojo);
+
+        when(defaultLifecycles.get("verify")).thenReturn(lifecycle);
+        when(lifecycleMappingDelegate.calculateLifecycleMappings(session, project, lifecycle, "verify"))
+                .thenReturn(Map.of(
+                        "test", List.of(testExecution),
+                        "verify", List.of(verifyExecution)));
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        // Skip only "verify" explicitly — "test" is a sub-phase in the default DAG so it
+        // must also be filtered out via expandSkippedPhases.
+        request.setSkippedPhases(List.of("verify"));
+        when(session.getRequest()).thenReturn(request);
+
+        DefaultLifecycleExecutionPlanCalculator calculator = new DefaultLifecycleExecutionPlanCalculator(
+                mock(BuildPluginManager.class),
+                defaultLifecycles,
+                mock(MojoDescriptorCreator.class),
+                lifecyclePluginResolver,
+                lifecycleMappingDelegate,
+                Map.of(),
+                Map.of(),
+                new DefaultLifecycleRegistry(Collections.emptyList()));
+
+        List<MojoExecution> executions =
+                calculator.calculateMojoExecutions(session, project, List.of(new LifecycleTask("verify")));
+
+        // Both "test" and "verify" mojos must be suppressed.
+        // "verify" is explicitly skipped; "test" is a sub-phase of "verify" in the default DAG.
+        assertTrue(
+                executions.isEmpty(),
+                "All mojos should be suppressed when their phase or a parent phase is skipped, but got: " + executions);
     }
 }

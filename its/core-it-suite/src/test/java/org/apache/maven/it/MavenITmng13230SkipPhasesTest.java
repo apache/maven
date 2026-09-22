@@ -38,7 +38,7 @@ class MavenITmng13230SkipPhasesTest extends AbstractMavenIntegrationTestCase {
      * the phases leading up to and after it.
      */
     @Test
-    void skipPhasesSupressesMojosForSkippedPhase() throws Exception {
+    void skipPhasesSuppressesMojosForSkippedPhase() throws Exception {
         Path basedir = extractResources("mng-13230");
 
         Verifier verifier = newVerifier(basedir);
