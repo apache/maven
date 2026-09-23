@@ -174,7 +174,7 @@
       <name>Alias</name>
       <description>A named build alias. Every argument on the command line is checked against alias names;
       when a match is found it is replaced in-place by the alias expansion tokens. Supports both inline
-      text (shorthand, whitespace-separated) and structured &lt;arg&gt; elements for values that contain spaces.</description>
+      text (shorthand, whitespace-separated) and structured arg elements for values that contain spaces.</description>
       <version>1.0.0+</version>
       <fields>
         <field xml.attribute="true">

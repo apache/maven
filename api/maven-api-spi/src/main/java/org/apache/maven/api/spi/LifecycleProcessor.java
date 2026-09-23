@@ -37,18 +37,8 @@ import org.apache.maven.api.di.Named;
  * input must always produce the same output. They receive the output of the previous processor
  * in the chain.
  *
- * <p>Example — injecting a {@code docker-push} phase after {@code deploy}:
- * <pre>{@code
- * @Named
- * public class DockerLifecycleProcessor implements LifecycleProcessor {
- *     public Lifecycle process(Lifecycle lifecycle) {
- *         if (!Lifecycle.DEFAULT.equals(lifecycle.id())) return lifecycle;
- *         // Use PhaseEnrichedLifecycle (from impl/maven-core) to inject custom phases
- *         return new PhaseEnrichedLifecycle(lifecycle,
- *                 List.of(new PhaseEnrichedLifecycle.InjectedPhase("docker-push", null, "deploy", null)));
- *     }
- * }
- * }</pre>
+ * <p>See {@code ReactorXmlLifecycleProcessor} in {@code impl/maven-core} for a concrete
+ * reference implementation that injects phases from {@code .mvn/reactor.xml}.
  *
  * @since 4.1.0
  */
