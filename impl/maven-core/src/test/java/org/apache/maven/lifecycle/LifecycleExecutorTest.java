@@ -192,6 +192,46 @@ class LifecycleExecutorTest extends AbstractCoreMavenComponentTestCase {
 
     // We need to take in multiple lifecycles
     @Test
+    public void testCalculationOfBuildPlanTasksOfTheVerifyLifecycleAndTheInstallLifecycle() throws Exception {
+        File pom = getProject("project-with-additional-lifecycle-elements");
+        MavenSession session = createMavenSession(pom);
+        assertEquals(
+                "project-with-additional-lifecycle-elements",
+                session.getCurrentProject().getArtifactId());
+        assertEquals("1.0", session.getCurrentProject().getVersion());
+        List<MojoExecution> executionPlan =
+                getExecutions(calculateExecutionPlan(session, "clean", "verify", "install"));
+
+        // [01] clean:clean
+        // [02] resources:resources
+        // [03] compiler:compile
+        // [04] it:generate-metadata
+        // [05] resources:testResources
+        // [06] compiler:testCompile
+        // [07] it:generate-test-metadata
+        // [08] surefire:test
+        // [09] jar:jar
+        // [10] install:install
+        //
+        assertListEquals(
+                List.of(
+                        "clean:clean",
+                        "resources:resources",
+                        "compiler:compile",
+                        "it:generate-metadata",
+                        "resources:testResources",
+                        "compiler:testCompile",
+                        "it:generate-test-metadata",
+                        "surefire:test",
+                        "jar:jar",
+                        "install:install"),
+                executionPlan.stream()
+                        .map(plan -> plan.getMojoDescriptor().getFullGoalName())
+                        .toList());
+    }
+
+    // We need to take in multiple lifecycles
+    @Test
     public void testCalculationOfBuildPlanWithMultipleExecutionsOfModello() throws Exception {
         File pom = getProject("project-with-multiple-executions");
         MavenSession session = createMavenSession(pom);
