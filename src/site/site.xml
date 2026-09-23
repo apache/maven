@@ -60,6 +60,7 @@ under the License.
       <item name="Artifact Handlers" href="./impl/maven-core/artifact-handlers.html"/>
       <item name="CLI options" href="./compat/maven-embedder/cli.html"/>
       <item name="Super POM" href="./compat/maven-model-builder/super-pom.html"/>
+      <item name="Maven Configuration" href="./configuration.html"/>
     </menu>
 
     <menu inherit="bottom" name="Development">
