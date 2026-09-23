@@ -24,7 +24,13 @@ module org.apache.maven.internal.xml {
     requires org.codehaus.stax2;
     requires static org.eclipse.sisu.plexus;
 
-    exports org.apache.maven.internal.xml;
+    exports org.apache.maven.internal.xml to
+            org.apache.maven.cling,
+            org.apache.maven.core,
+            org.apache.maven.embedder,
+            org.apache.maven.impl,
+            org.apache.maven.plugin,
+            org.apache.maven.testing;
 
     provides org.apache.maven.api.xml.XmlService with
             org.apache.maven.internal.xml.DefaultXmlService;
