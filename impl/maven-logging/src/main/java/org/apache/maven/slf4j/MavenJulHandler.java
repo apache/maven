@@ -80,6 +80,13 @@ public class MavenJulHandler extends Handler {
      * {@code ConcurrentHashMap} throws.  {@code putIfAbsent} is safe
      * against reentrancy — worst case, two threads create the same
      * logger and one is discarded.
+     * <p>
+     * The cache is intentionally unbounded: its size is naturally bounded
+     * by the number of distinct JUL logger names observed across all builds
+     * in a JVM lifetime, which is small in practice (a few dozen at most).
+     * In long-running daemon processes this set grows monotonically but
+     * never exceeds the set of all distinct logger names used by the JUL
+     * frameworks active in the build environment.
      */
     private static final ConcurrentMap<String, org.slf4j.Logger> LOGGER_CACHE = new ConcurrentHashMap<>();
 
