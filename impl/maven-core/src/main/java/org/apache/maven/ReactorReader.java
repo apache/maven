@@ -425,13 +425,13 @@ class ReactorReader implements MavenWorkspaceReader {
             if (Files.isDirectory(artifactPath)) {
                 try (Stream<Path> paths = Files.list(artifactPath)) {
                     for (Path path : (Iterable<Path>) paths::iterator) {
-                        Files.delete(path);
+                        Files.deleteIfExists(path);
                     }
                 }
                 try {
-                    Files.delete(artifactPath);
-                    Files.delete(artifactPath.getParent());
-                    Files.delete(artifactPath.getParent().getParent());
+                    Files.deleteIfExists(artifactPath);
+                    Files.deleteIfExists(artifactPath.getParent());
+                    Files.deleteIfExists(artifactPath.getParent().getParent());
                 } catch (DirectoryNotEmptyException e) {
                     // ignore
                 }
