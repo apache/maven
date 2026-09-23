@@ -42,6 +42,7 @@ public class Apply extends AbstractUpgradeGoal {
 
     @Override
     public int execute(UpgradeContext context) throws Exception {
+        context.setDryRun(false);
         context.info("Maven Upgrade Tool - Apply");
         context.println();
 

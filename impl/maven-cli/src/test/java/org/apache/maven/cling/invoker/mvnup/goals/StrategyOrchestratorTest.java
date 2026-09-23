@@ -219,6 +219,27 @@ class StrategyOrchestratorTest {
     class ResultAggregationTests {
 
         @Test
+        @DisplayName("should describe modifications as planned in dry-run mode")
+        void shouldDescribeModificationsAsPlannedInDryRunMode() throws Exception {
+            UpgradeContext context = Mockito.spy(createMockContext());
+            context.setDryRun(true);
+            Map<Path, Document> pomMap = Map.of(Paths.get("pom.xml"), mock(Document.class));
+
+            when(mockStrategies.get(0).isApplicable(context)).thenReturn(true);
+            when(mockStrategies.get(0).apply(Mockito.eq(context), Mockito.any()))
+                    .thenReturn(
+                            new UpgradeResult(Set.of(Paths.get("pom.xml")), Set.of(Paths.get("pom.xml")), Set.of()));
+            when(mockStrategies.get(1).isApplicable(context)).thenReturn(false);
+            when(mockStrategies.get(2).isApplicable(context)).thenReturn(false);
+
+            orchestrator.executeStrategies(context, pomMap);
+
+            verify(context).action("1 POM(s) would be modified");
+            verify(context).action("Total POMs would be modified: 1");
+            verify(context, Mockito.never()).success("Modified: 1 POMs");
+        }
+
+        @Test
         @DisplayName("should return empty result when no strategies are applicable")
         void shouldReturnEmptyResultWhenNoStrategiesApplicable() throws Exception {
             UpgradeContext context = createMockContext();

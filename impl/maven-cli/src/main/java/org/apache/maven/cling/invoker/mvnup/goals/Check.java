@@ -42,6 +42,7 @@ public class Check extends AbstractUpgradeGoal {
 
     @Override
     public int execute(UpgradeContext context) throws Exception {
+        context.setDryRun(true);
         context.info("Maven Upgrade Tool - Check");
         context.println();
 
