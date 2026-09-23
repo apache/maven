@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>49</version>
+    <version>50</version>
     <relativePath />
   </parent>
 
@@ -856,7 +856,7 @@ under the License.
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
-            <excludes>
+            <inputExcludes>
               <exclude>Jenkinsfile</exclude>
               <exclude>**/.gitattributes</exclude>
               <exclude>src/main/resources/META-INF/services/**</exclude>
@@ -875,7 +875,7 @@ under the License.
                 ! Excluded the license files itself cause they do not have a license of themselves.
               -->
               <exclude>src/main/appended-resources/licenses/**</exclude>
-            </excludes>
+            </inputExcludes>
           </configuration>
         </plugin>
       </plugins>
