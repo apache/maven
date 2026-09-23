@@ -39,10 +39,18 @@ class ReactorXmlLifecycleProcessorTest {
 
     private static PhaseInjection phase(String name, String parent, String after, String before) {
         PhaseInjection.Builder b = PhaseInjection.newBuilder();
-        if (name != null) b.name(name);
-        if (parent != null) b.parent(parent);
-        if (after != null) b.after(after);
-        if (before != null) b.before(before);
+        if (name != null) {
+            b.name(name);
+        }
+        if (parent != null) {
+            b.parent(parent);
+        }
+        if (after != null) {
+            b.after(after);
+        }
+        if (before != null) {
+            b.before(before);
+        }
         return b.build();
     }
 
