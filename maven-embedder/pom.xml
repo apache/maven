@@ -173,12 +173,12 @@ under the License.
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
-            <excludes combine.children="append">
+            <inputExcludes>
               <exclude>src/main/resources/META-INF/MANIFEST.MF</exclude>
               <exclude>src/test/*-projects/**</exclude>
               <exclude>src/test/*-project/**</exclude>
               <exclude>src/test/plugin-version-references/**</exclude>
-            </excludes>
+            </inputExcludes>
           </configuration>
         </plugin>
       </plugins>

@@ -203,12 +203,12 @@ under the License.
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
-            <excludes combine.children="append">
+            <inputExcludes>
               <exclude>lifecycle-executor.txt</exclude>
               <exclude>plugin-manager.txt</exclude>
               <exclude>project-builder.txt</exclude>
               <exclude>src/site/resources/design/**</exclude>
-            </excludes>
+            </inputExcludes>
           </configuration>
         </plugin>
       </plugins>
