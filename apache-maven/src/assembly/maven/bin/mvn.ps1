@@ -20,6 +20,14 @@ under the License.
 <#-----------------------------------------------------------------------------
 Apache Maven Startup Script
 
+On Linux and macOS, a dedicated pwsh file invocation replaces PowerShell with
+Java when PowerShell 7.3+ provides Switch-Process. Calls from existing sessions,
+other scripts, or a host started with -NoExit retain child-process execution.
+Windows and older PowerShell versions always use child-process execution.
+
+The launcher exports MAVEN_POWERSHELL_EXECUTABLE as the absolute host path for
+nested Maven builds. It preserves the caller's execution policy.
+
 Environment Variable Prerequisites
 
   JAVA_HOME       (Optional) Points to a Java installation.
@@ -43,6 +51,65 @@ function Write-MavenDebug {
 
   if ($env:MAVEN_DEBUG_SCRIPT) {
     [Console]::Error.WriteLine("[DEBUG] $Message")
+  }
+}
+
+function Test-MavenProcessReplacement {
+  # Replacing an interactive host (or another script's host) would discard the
+  # caller. Only a dedicated pwsh file invocation of a packaged launcher is safe.
+  if ($script:IsWindowsPlatform -or $PSVersionTable.PSVersion -lt [version] "7.3") {
+    return $false
+  }
+  if (-not (Get-Command "Microsoft.PowerShell.Core\Switch-Process" -CommandType Cmdlet -ErrorAction SilentlyContinue)) {
+    return $false
+  }
+
+  $hostArguments = [Environment]::GetCommandLineArgs()
+  $entry = $null
+  for ($index = 1; $index -lt $hostArguments.Length; $index++) {
+    $argument = $hostArguments[$index]
+    if ($argument -match '^-(f|fi|fil|file)$') {
+      if (++$index -lt $hostArguments.Length) {
+        $entry = $hostArguments[$index]
+      }
+      break
+    }
+    if ($argument -match '^-(noprofile|nop|nologo|nol|noninteractive|noni|login|l)$') {
+      continue
+    }
+    if ($argument -match '^-(workingdirectory|wd|w|executionpolicy|ep|ex)$') {
+      $index++
+      continue
+    }
+    if ($argument.StartsWith("-")) {
+      # Includes -NoExit, command/encoded-command, stdin and unknown host modes.
+      return $false
+    }
+    $entry = $argument # implicit -File
+    break
+  }
+  if (-not $entry -or $entry -eq "-") {
+    return $false
+  }
+
+  try {
+    $entryPath = (Get-Item -LiteralPath $entry -ErrorAction Stop).FullName
+    $launchers = @("mvn.ps1", "mvnDebug.ps1", "mvnenc.ps1", "mvnsh.ps1", "mvnup.ps1", "mvnyjp.ps1") |
+      ForEach-Object { Join-Path $PSScriptRoot $_ }
+    $stack = @(Get-PSCallStack)
+    if ($entryPath -cne $stack[-1].ScriptName -or $launchers -cnotcontains $entryPath) {
+      return $false
+    }
+    foreach ($frame in $stack) {
+      if (-not $frame.ScriptName -or $launchers -cnotcontains $frame.ScriptName) {
+        return $false
+      }
+    }
+    return $true
+  }
+  catch {
+    # Unrecognized hosting arrangements keep ordinary child-process execution.
+    return $false
   }
 }
 
@@ -420,6 +487,23 @@ function Invoke-MavenLauncher {
     Write-MavenDebug "MAVEN_POWERSHELL_EXECUTABLE is unavailable"
   }
 
+  if ($script:ReplaceMavenProcess) {
+    $previousDirectory = [Environment]::CurrentDirectory
+    try {
+      # Switch-Process inherits the native cwd, which Set-Location does not update.
+      [Environment]::CurrentDirectory = $ExecutionContext.SessionState.Path.CurrentFileSystemLocation.ProviderPath
+      Write-MavenDebug "Replacing PowerShell process $PID with Java"
+      [Console]::Out.Flush()
+      [Console]::Error.Flush()
+      Microsoft.PowerShell.Core\Switch-Process -WithCommand (@($javaCommand) + $javaArguments) -ErrorAction Stop
+      throw "Switch-Process returned without replacing the process"
+    }
+    finally {
+      # Successful replacement never returns; restore the cwd only on failure.
+      [Environment]::CurrentDirectory = $previousDirectory
+    }
+  }
+
   $ErrorActionPreference = "Continue"
   $nativeArguments = ConvertTo-MavenNativeArguments -Arguments $javaArguments
   & $javaCommand @nativeArguments
@@ -427,6 +511,8 @@ function Invoke-MavenLauncher {
 }
 
 try {
+  # Capture the startup context before a Maven RC script can change location.
+  $script:ReplaceMavenProcess = Test-MavenProcessReplacement
   Invoke-MavenLauncher -Arguments $args
   exit $script:MavenProcessExitCode
 }

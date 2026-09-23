@@ -52,6 +52,71 @@ function Assert-Line {
   }
 }
 
+function Assert-Arguments {
+  param([string[]] $Lines, [AllowEmptyString()][string[]] $Values)
+  $actual = @($Lines | Where-Object { $_.StartsWith("arg=") })
+  $expected = @($Values | ForEach-Object { "arg=" + (Encode-Value $_) })
+  if (($actual -join "`n") -cne ($expected -join "`n")) {
+    throw "Java received different arguments: $($actual -join '; '), expected: $($expected -join '; ')"
+  }
+}
+
+function Invoke-Host {
+  param([string[]] $Arguments, [string] $InputText = "", [int] $ExpectedExit = 7)
+
+  $hostName = if ($PSVersionTable.PSEdition -eq "Desktop") { "powershell.exe" } elseif ($env:OS -eq "Windows_NT") { "pwsh.exe" } else { "pwsh" }
+  $start = New-Object Diagnostics.ProcessStartInfo
+  $start.FileName = Join-Path $PSHOME $hostName
+  $start.UseShellExecute = $false
+  $start.RedirectStandardInput = $true
+  $start.RedirectStandardOutput = $true
+  $start.RedirectStandardError = $true
+  $start.WorkingDirectory = $temporaryRoot
+  # ProcessStartInfo.ArgumentList is unavailable on Windows PowerShell 5.1.
+  $quoted = @($Arguments | ForEach-Object {
+      '"' + [regex]::Replace([regex]::Replace($_, '(\\*)"', '$1$1\"'), '(\\+)$', '$1$1') + '"'
+    })
+  $start.Arguments = $quoted -join " "
+  $process = New-Object Diagnostics.Process
+  $process.StartInfo = $start
+  try {
+    if (Test-Path -LiteralPath $outputFile) { Remove-Item -LiteralPath $outputFile }
+    [void] $process.Start()
+    $processId = $process.Id
+    $stdout = $process.StandardOutput.ReadToEndAsync()
+    $stderr = $process.StandardError.ReadToEndAsync()
+    $process.StandardInput.Write($InputText)
+    $process.StandardInput.Close()
+    if (-not $process.WaitForExit(20000)) {
+      $process.Kill()
+      throw "PowerShell child did not finish"
+    }
+    $result = [pscustomobject]@{
+      ProcessId = $processId
+      ExitCode = $process.ExitCode
+      Output = $stdout.GetAwaiter().GetResult()
+      Error = $stderr.GetAwaiter().GetResult()
+    }
+    if ($result.ExitCode -ne $ExpectedExit) { throw "Expected child exit ${ExpectedExit}: $($result | Out-String)" }
+    return $result
+  }
+  finally {
+    $process.Dispose()
+  }
+}
+
+function Assert-Process {
+  param($Result, [bool] $Replaced)
+  $lines = [IO.File]::ReadAllLines($outputFile)
+  $javaPid = ($lines | Where-Object { $_.StartsWith("pid=") }) -replace '^pid=', ''
+  if (($javaPid -eq "$($Result.ProcessId)") -ne $Replaced) {
+    throw "Unexpected process replacement: PowerShell=$($Result.ProcessId), Java=$javaPid, expected=$Replaced"
+  }
+  if (-not $Result.Output.Contains("fixture-stdout") -or -not $Result.Error.Contains("fixture-stderr")) {
+    throw "Child streams were not preserved: $($Result | Out-String)"
+  }
+}
+
 try {
   New-Item -ItemType Directory -Path $bin -Force > $null
   New-Item -ItemType Directory -Path (Join-Path $fixture "boot") > $null
@@ -74,6 +139,10 @@ public class Launcher {
         lines.add("cwd=" + encode(Paths.get("").toAbsolutePath().toString()));
         lines.add("pid=" + ProcessHandle.current().pid());
         lines.add("host=" + encode(System.getenv("MAVEN_POWERSHELL_EXECUTABLE")));
+        if (Arrays.asList(args).contains("--read-stdin")) {
+            lines.add("stdin=" + encode(new java.io.BufferedReader(new java.io.InputStreamReader(
+                    System.in, StandardCharsets.UTF_8)).readLine()));
+        }
         Files.write(Paths.get(System.getProperty("probe.output")), lines, StandardCharsets.UTF_8);
         System.out.println("fixture-stdout");
         System.err.println("fixture-stderr");
@@ -98,10 +167,7 @@ public class Launcher {
     & (Join-Path $bin "mvn.ps1") @values
     if ($LASTEXITCODE -ne 0) { throw "Launcher failed in $mode argument mode" }
     $lines = [IO.File]::ReadAllLines($outputFile)
-    if (@($lines | Where-Object { $_.StartsWith("arg=") }).Count -ne $values.Count) {
-      throw "Java received the wrong argument count in $mode mode"
-    }
-    foreach ($value in $values) { Assert-Line $lines ("arg=" + (Encode-Value $value)) }
+    Assert-Arguments $lines $values
     Assert-Line $lines ("property=" + (Encode-Value $property))
     Write-Output "[PASS] Java receives exact arguments and JVM properties in $mode mode"
   }
@@ -113,6 +179,74 @@ public class Launcher {
   Assert-Line ([IO.File]::ReadAllLines($outputFile)) "arg="
   $env:MAVEN_ARGS = $null
   Write-Output "[PASS] option parsing preserves an empty quoted argument"
+
+  $canReplace = $env:OS -ne "Windows_NT" -and $PSVersionTable.PSEdition -ne "Desktop" -and
+    $PSVersionTable.PSVersion -ge [version] "7.3" -and
+    [bool](Get-Command "Microsoft.PowerShell.Core\Switch-Process" -CommandType Cmdlet -ErrorAction SilentlyContinue)
+  $env:MAVEN_DEBUG_OPTS = "-Dprobe.debug=true"
+  foreach ($name in @("mvn.ps1", "mvnDebug.ps1", "mvnenc.ps1", "mvnsh.ps1", "mvnup.ps1")) {
+    $result = Invoke-Host -Arguments (@("-NoProfile", "-File", (Join-Path $bin $name)) + $values + @("--fail", "-NoExit"))
+    Assert-Process $result $canReplace
+    $lines = [IO.File]::ReadAllLines($outputFile)
+    $mode = @{ "mvnDebug.ps1" = "--debug"; "mvnenc.ps1" = "--enc"; "mvnsh.ps1" = "--shell"; "mvnup.ps1" = "--up" }
+    $expectedArguments = @()
+    if ($mode.ContainsKey($name)) { $expectedArguments += $mode[$name] }
+    Assert-Arguments $lines ($expectedArguments + $values + @("--fail", "-NoExit"))
+    Assert-Line $lines ("property=" + (Encode-Value $property))
+    Assert-Line $lines ("cwd=" + (Encode-Value $temporaryRoot))
+  }
+  Write-Output "[PASS] dedicated launcher and wrapper processes preserve PID policy, arguments, streams and exit status"
+
+  $result = Invoke-Host -Arguments @("-NoProfile", "-File", (Join-Path $bin "mvn.ps1"), "--read-stdin", "--fail") -InputText "input-marker`n"
+  Assert-Process $result $canReplace
+  Assert-Line ([IO.File]::ReadAllLines($outputFile)) ("stdin=" + (Encode-Value "input-marker"))
+  Write-Output "[PASS] Java receives redirected stdin"
+
+  foreach ($prefix in @(@("-NoProfile", "-f"), @("-NoProfile"))) {
+    $result = Invoke-Host -Arguments (@($prefix) + @((Join-Path $bin "mvn.ps1"), "--fail"))
+    Assert-Process $result $canReplace
+  }
+  $result = Invoke-Host -ExpectedExit 0 -Arguments @("-NoProfile", "-NoExit", "-File", (Join-Path $bin "mvn.ps1"), "--fail")
+  Assert-Process $result $false
+
+  $command = "& '" + (Join-Path $bin "mvn.ps1") + "' --fail; " + '$code = $LASTEXITCODE; Write-Output caller-resumed; exit $code'
+  $caller = Join-Path $temporaryRoot "caller.ps1"
+  [IO.File]::WriteAllText($caller, $command)
+  $calls = @(
+    @("-NoProfile", "-Command", $command),
+    @("-NoProfile", "-EncodedCommand", [Convert]::ToBase64String([Text.Encoding]::Unicode.GetBytes($command))),
+    @("-NoProfile", "-File", $caller)
+  )
+  foreach ($call in $calls) {
+    $result = Invoke-Host -Arguments $call
+    Assert-Process $result $false
+    if (-not $result.Output.Contains("caller-resumed")) { throw "Caller did not resume" }
+  }
+  $result = Invoke-Host -Arguments @("-NoProfile", "-File", "-") -InputText ($command + [Environment]::NewLine)
+  Assert-Process $result $false
+  if (-not $result.Output.Contains("caller-resumed")) { throw "Stdin caller did not resume" }
+  Write-Output "[PASS] existing sessions, caller scripts, stdin scripts and -NoExit keep child-process execution"
+
+  if ($canReplace) {
+    $savedHome = $env:HOME
+    try {
+      $rcHome = Join-Path $temporaryRoot "rc home"
+      $changedDirectory = Join-Path $temporaryRoot "changed directory"
+      New-Item -ItemType Directory -Path $rcHome, $changedDirectory > $null
+      [IO.File]::WriteAllText((Join-Path $rcHome ".mavenrc.ps1"), "Set-Location -LiteralPath '$changedDirectory'")
+      $env:HOME = $rcHome
+      $env:MAVEN_SKIP_RC = $null
+      $result = Invoke-Host -Arguments @("-NoProfile", "-File", (Join-Path $bin "mvn.ps1"), "--fail")
+      Assert-Process $result $true
+      Assert-Line ([IO.File]::ReadAllLines($outputFile)) ("cwd=" + (Encode-Value $changedDirectory))
+      Write-Output "[PASS] process replacement uses the PowerShell filesystem location after RC loading"
+    }
+    finally {
+      $env:HOME = $savedHome
+      $env:MAVEN_SKIP_RC = "true"
+    }
+  }
+
 }
 finally {
   if ($null -ne $savedPassing) { $PSNativeCommandArgumentPassing = $savedPassing }
