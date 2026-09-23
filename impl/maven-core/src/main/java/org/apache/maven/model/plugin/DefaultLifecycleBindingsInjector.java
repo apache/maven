@@ -30,6 +30,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.LifeCyclePluginAnalyzer;
 import org.apache.maven.model.Build;
@@ -77,8 +78,20 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
             lifecycleModel.setBuild(new Build());
             lifecycleModel.getBuild().getPlugins().addAll(defaultPlugins);
 
-            new LifecycleBindingsMerger(getPhaseToLifecycleMap()).merge(model, lifecycleModel);
+            boolean warn = isWarnEnabled(request);
+            new LifecycleBindingsMerger(getPhaseToLifecycleMap(), warn ? problems : null).merge(model, lifecycleModel);
         }
+    }
+
+    private static boolean isWarnEnabled(ModelBuildingRequest request) {
+        if (request == null) {
+            return false;
+        }
+        String value = request.getUserProperties().getProperty(Constants.MAVEN_WARN_CROSS_LIFECYCLE_MANAGED_EXECUTION);
+        if (value == null) {
+            value = request.getSystemProperties().getProperty(Constants.MAVEN_WARN_CROSS_LIFECYCLE_MANAGED_EXECUTION);
+        }
+        return value == null || Boolean.parseBoolean(value);
     }
 
     private Map<String, String> getPhaseToLifecycleMap() {
@@ -99,9 +112,11 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
         private static final String PLUGIN_MANAGEMENT = "plugin-management";
 
         private final Map<String, String> phaseToLifecycle;
+        private final ModelProblemCollector problems;
 
-        LifecycleBindingsMerger(Map<String, String> phaseToLifecycle) {
+        LifecycleBindingsMerger(Map<String, String> phaseToLifecycle, ModelProblemCollector problems) {
             this.phaseToLifecycle = phaseToLifecycle;
+            this.problems = problems;
         }
 
         public void merge(Model target, Model source) {
@@ -164,7 +179,26 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
 
         private Plugin mergePluginManagement(Plugin lifecyclePlugin, Plugin managedPlugin, boolean sourceDominant) {
             Plugin plugin = managedPlugin.clone();
-            plugin.getExecutions().removeIf(execution -> !isFromSameLifecycle(lifecyclePlugin, execution));
+            plugin.getExecutions().removeIf(execution -> {
+                if (isFromSameLifecycle(lifecyclePlugin, execution)) {
+                    return false;
+                }
+                if (problems != null) {
+                    problems.add(new ModelProblemCollectorRequest(Severity.WARNING, Version.BASE)
+                            .setMessage("Managed execution '" + execution.getId() + "' of plugin '"
+                                    + managedPlugin.getGroupId() + ":" + managedPlugin.getArtifactId()
+                                    + "' is bound to phase '" + execution.getPhase()
+                                    + "' which belongs to a different lifecycle than the one currently"
+                                    + " executing. The execution will not run because the plugin is"
+                                    + " introduced only by lifecycle bindings."
+                                    + " Declare the plugin in <build><plugins> to apply all its"
+                                    + " managed executions unconditionally, or set"
+                                    + " -Dmaven.warn.crossLifecycleManagedExecution=false to suppress"
+                                    + " this warning.")
+                            .setLocation(execution.getLocation("")));
+                }
+                return true;
+            });
             mergePlugin(plugin, lifecyclePlugin, sourceDominant, Collections.emptyMap());
             return plugin;
         }

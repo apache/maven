@@ -88,7 +88,7 @@ class DefaultLifecycleBindingsInjectorTest {
                 .build();
 
         Model resultModel = new DefaultLifecycleBindingsInjector.LifecycleBindingsMerger(
-                        Map.of("clean", "clean", "initialize", "default"))
+                        Map.of("clean", "clean", "initialize", "default"), null)
                 .merge(target, source);
 
         Plugin result = resultModel.getBuild().getPlugins().get(0);
@@ -156,8 +156,8 @@ class DefaultLifecycleBindingsInjectorTest {
                         .plugins(List.of(plugin("1", execution("lifecycle", boundPhase, source), source)))
                         .build())
                 .build();
-        Model result =
-                new DefaultLifecycleBindingsInjector.LifecycleBindingsMerger(phases).merge(target, lifecycleModel);
+        Model result = new DefaultLifecycleBindingsInjector.LifecycleBindingsMerger(phases, null)
+                .merge(target, lifecycleModel);
         assertEquals(
                 retained,
                 result.getBuild().getPlugins().get(0).getExecutions().stream()

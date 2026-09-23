@@ -29,7 +29,9 @@ import org.apache.maven.api.Packaging;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Build;
+import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginContainer;
@@ -84,7 +86,10 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
             Model lifecycleModel = Model.newBuilder()
                     .build(Build.newBuilder().plugins(allPlugins.values()).build())
                     .build();
-            return new LifecycleBindingsMerger(getPhaseToLifecycleMap()).merge(model, lifecycleModel);
+            boolean warn =
+                    request != null && Features.warnOnCrossLifecycleManagedExecution(request.getUserProperties());
+            return new LifecycleBindingsMerger(getPhaseToLifecycleMap(), warn ? problems : null)
+                    .merge(model, lifecycleModel);
         }
     }
 
@@ -124,9 +129,11 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
         private static final String PLUGIN_MANAGEMENT = "plugin-management";
 
         private final Map<String, String> phaseToLifecycle;
+        private final ModelProblemCollector problems;
 
-        LifecycleBindingsMerger(Map<String, String> phaseToLifecycle) {
+        LifecycleBindingsMerger(Map<String, String> phaseToLifecycle, ModelProblemCollector problems) {
             this.phaseToLifecycle = phaseToLifecycle;
+            this.problems = problems;
         }
 
         public Model merge(Model target, Model source) {
@@ -196,9 +203,31 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
         }
 
         private Plugin mergePluginManagement(Plugin lifecyclePlugin, Plugin managedPlugin, boolean sourceDominant) {
-            Plugin filteredManagedPlugin = managedPlugin.withExecutions(managedPlugin.getExecutions().stream()
-                    .filter(execution -> isFromSameLifecycle(lifecyclePlugin, execution))
-                    .toList());
+            List<PluginExecution> filtered = managedPlugin.getExecutions().stream()
+                    .filter(execution -> {
+                        if (isFromSameLifecycle(lifecyclePlugin, execution)) {
+                            return true;
+                        }
+                        if (problems != null) {
+                            problems.add(
+                                    Severity.WARNING,
+                                    Version.BASE,
+                                    "Managed execution '" + execution.getId() + "' of plugin '"
+                                            + managedPlugin.getGroupId() + ":" + managedPlugin.getArtifactId()
+                                            + "' is bound to phase '" + execution.getPhase()
+                                            + "' which belongs to a different lifecycle than the one currently"
+                                            + " executing. The execution will not run because the plugin is"
+                                            + " introduced only by lifecycle bindings."
+                                            + " Declare the plugin in <build><plugins> to apply all its"
+                                            + " managed executions unconditionally, or set"
+                                            + " -Dmaven.warn.crossLifecycleManagedExecution=false to suppress"
+                                            + " this warning.",
+                                    (InputLocation) null);
+                        }
+                        return false;
+                    })
+                    .toList();
+            Plugin filteredManagedPlugin = managedPlugin.withExecutions(filtered);
             return mergePlugin(filteredManagedPlugin, lifecyclePlugin, sourceDominant, Collections.emptyMap());
         }
 
