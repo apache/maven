@@ -21,18 +21,23 @@ package org.apache.maven.impl.standalone;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Map;
 
 import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
+import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.Sources;
+import org.apache.maven.impl.model.DefaultModelProblem;
 import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
 import org.eclipse.aether.spi.io.PathProcessor;
 import org.eclipse.aether.transport.apache.ApacheTransporterFactory;
@@ -40,7 +45,10 @@ import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class TestApiStandalone {
@@ -76,6 +84,50 @@ class TestApiStandalone {
         Node node = session.collectDependencies(session.createDependencyCoordinates(coords), PathScope.MAIN_RUNTIME);
         assertNotNull(node);
         assertEquals(6, node.getChildren().size());
+    }
+
+    @Test
+    void testModelProblemsAreSharedOnlyWithDerivedSessions() {
+        Session session = ApiRunner.createSession();
+        Session derivedSession = session.withRemoteRepositories(session.getRemoteRepositories());
+        Session otherSession = ApiRunner.createSession();
+        ModelProblem problem = modelProblem();
+
+        derivedSession.getModelProblemCollector().reportProblem(problem);
+
+        assertSame(session.getModelProblemCollector(), derivedSession.getModelProblemCollector());
+        assertTrue(session.getModelProblemCollector().hasWarningProblems());
+        assertEquals(1, session.getModelProblemCollector().totalProblemsReported());
+        assertSame(
+                problem,
+                session.getModelProblemCollector().problems().findFirst().orElseThrow());
+        assertNotSame(session.getModelProblemCollector(), otherSession.getModelProblemCollector());
+        assertFalse(otherSession.getModelProblemCollector().hasWarningProblems());
+        assertEquals(0, otherSession.getModelProblemCollector().totalProblemsReported());
+    }
+
+    @Test
+    void testModelProblemCollectorReportsOverflow() {
+        ApiRunner.DefaultSession session = (ApiRunner.DefaultSession) ApiRunner.createSession();
+        session.setUserProperties(Map.of(Constants.MAVEN_BUILDER_MAX_PROBLEMS, "0"));
+
+        session.getModelProblemCollector().reportProblem(modelProblem());
+
+        assertTrue(session.getModelProblemCollector().problemsOverflow());
+        assertEquals(1, session.getModelProblemCollector().totalProblemsReported());
+        assertEquals(0, session.getModelProblemCollector().problems().count());
+    }
+
+    private static ModelProblem modelProblem() {
+        return new DefaultModelProblem(
+                "model warning",
+                BuilderProblem.Severity.WARNING,
+                ModelProblem.Version.BASE,
+                "pom.xml",
+                -1,
+                -1,
+                "org.example:project:1",
+                null);
     }
 
     @Provides
