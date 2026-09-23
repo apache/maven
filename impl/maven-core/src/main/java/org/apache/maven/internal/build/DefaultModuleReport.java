@@ -41,13 +41,8 @@ record DefaultModuleReport(
         List<LogEvent> output)
         implements ModuleReport {
 
-    @Override
-    public List<MojoReport> mojos() {
-        return List.copyOf(mojos);
-    }
-
-    @Override
-    public List<LogEvent> output() {
-        return List.copyOf(output);
+    DefaultModuleReport {
+        mojos = List.copyOf(mojos);
+        output = List.copyOf(output);
     }
 }

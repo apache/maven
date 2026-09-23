@@ -20,8 +20,10 @@ package org.apache.maven.internal.build;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.maven.api.BuildEnvironment;
+import org.apache.maven.api.reactor.ReactorConfig;
 
 /**
  * Internal immutable implementation of {@link BuildEnvironment}.
@@ -39,7 +41,8 @@ record DefaultBuildEnvironment(
         boolean updateSnapshots,
         boolean noTransferProgress,
         boolean batchMode,
-        int threads)
+        int threads,
+        ReactorConfig reactorConfigValue)
         implements BuildEnvironment {
 
     @Override
@@ -65,5 +68,10 @@ record DefaultBuildEnvironment(
     @Override
     public List<String> selectedProjects() {
         return List.copyOf(selectedProjects);
+    }
+
+    @Override
+    public Optional<ReactorConfig> reactorConfig() {
+        return Optional.ofNullable(reactorConfigValue);
     }
 }

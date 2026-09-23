@@ -42,8 +42,7 @@ record DefaultMojoReport(
         List<LogEvent> output)
         implements MojoReport {
 
-    @Override
-    public List<LogEvent> output() {
-        return List.copyOf(output);
+    DefaultMojoReport {
+        output = List.copyOf(output);
     }
 }

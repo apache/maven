@@ -50,35 +50,18 @@ record DefaultBuildReport(
         List<LogEvent> output)
         implements BuildReport {
 
+    DefaultBuildReport {
+        goals = List.copyOf(goals);
+        modules = List.copyOf(modules);
+        failures = List.copyOf(failures);
+        problems = List.copyOf(problems);
+        output = List.copyOf(output);
+    }
+
     private static final int FORMAT_VERSION = 1;
 
     @Override
     public int formatVersion() {
         return FORMAT_VERSION;
-    }
-
-    @Override
-    public List<ModuleReport> modules() {
-        return List.copyOf(modules);
-    }
-
-    @Override
-    public List<FailureReport> failures() {
-        return List.copyOf(failures);
-    }
-
-    @Override
-    public List<BuilderProblem> problems() {
-        return List.copyOf(problems);
-    }
-
-    @Override
-    public List<String> goals() {
-        return List.copyOf(goals);
-    }
-
-    @Override
-    public List<LogEvent> output() {
-        return List.copyOf(output);
     }
 }

@@ -178,14 +178,12 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     @Nonnull
     @Override
     public BuildEnvironment buildEnvironment() {
-        if (buildEnvironment == null) {
-            synchronized (this) {
-                if (buildEnvironment == null) {
-                    buildEnvironment = BuildReportCollector.buildEnvironment(getMavenSession());
-                }
-            }
+        BuildEnvironment env = this.buildEnvironment;
+        if (env == null) {
+            env = BuildReportCollector.buildEnvironment(getMavenSession());
+            this.buildEnvironment = env;
         }
-        return buildEnvironment;
+        return env;
     }
 
     @Nonnull

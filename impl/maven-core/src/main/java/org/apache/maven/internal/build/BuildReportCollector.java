@@ -49,6 +49,7 @@ import org.apache.maven.api.build.report.FailureReport;
 import org.apache.maven.api.build.report.LogEvent;
 import org.apache.maven.api.build.report.ModuleReport;
 import org.apache.maven.api.build.report.MojoReport;
+import org.apache.maven.api.reactor.ReactorConfig;
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
@@ -472,7 +473,8 @@ public final class BuildReportCollector extends AbstractEventSpy {
                 request.isUpdateSnapshots(),
                 request.isNoTransferProgress(),
                 !request.isInteractiveMode(),
-                request.getDegreeOfConcurrency());
+                request.getDegreeOfConcurrency(),
+                (ReactorConfig) request.getData().get(ReactorConfig.class.getName()));
     }
 
     private static final Set<String> SENSITIVE_KEY_FRAGMENTS =
@@ -526,29 +528,37 @@ public final class BuildReportCollector extends AbstractEventSpy {
         }
 
         // Mojo reports
-        List<MojoTiming> timings = mojoTimings.getOrDefault(key, Collections.emptyList());
+        List<MojoTiming> timings = mojoTimings.get(key);
         List<MojoReport> mojoReports;
-        synchronized (timings) {
-            mojoReports = timings.stream()
-                    .map(t -> (MojoReport) new DefaultMojoReport(
-                            t.groupId,
-                            t.artifactId,
-                            t.version,
-                            t.goal,
-                            t.executionId,
-                            t.phase,
-                            t.status,
-                            t.startTime,
-                            t.duration,
-                            t.output))
-                    .toList();
+        if (timings == null) {
+            mojoReports = List.of();
+        } else {
+            synchronized (timings) {
+                mojoReports = timings.stream()
+                        .map(t -> (MojoReport) new DefaultMojoReport(
+                                t.groupId,
+                                t.artifactId,
+                                t.version,
+                                t.goal,
+                                t.executionId,
+                                t.phase,
+                                t.status,
+                                t.startTime,
+                                t.duration,
+                                t.output))
+                        .toList();
+            }
         }
 
         // Module-level log events (between mojos)
-        List<LogEvent> moduleLogBuffer = moduleLogBuffers.getOrDefault(key, Collections.emptyList());
+        List<LogEvent> moduleLogBuffer = moduleLogBuffers.get(key);
         List<LogEvent> moduleOutput;
-        synchronized (moduleLogBuffer) {
-            moduleOutput = List.copyOf(moduleLogBuffer);
+        if (moduleLogBuffer == null) {
+            moduleOutput = List.of();
+        } else {
+            synchronized (moduleLogBuffer) {
+                moduleOutput = List.copyOf(moduleLogBuffer);
+            }
         }
 
         return new DefaultModuleReport(
@@ -567,12 +577,14 @@ public final class BuildReportCollector extends AbstractEventSpy {
 
         // Try to find which mojo failed
         String mojoId = null;
-        List<MojoTiming> timings = mojoTimings.getOrDefault(projectKey(project), Collections.emptyList());
-        synchronized (timings) {
-            for (MojoTiming t : timings) {
-                if (t.status == BuildStatus.FAILURE) {
-                    mojoId = t.artifactId + ":" + t.version + ":" + t.goal;
-                    break;
+        List<MojoTiming> timings = mojoTimings.get(projectKey(project));
+        if (timings != null) {
+            synchronized (timings) {
+                for (MojoTiming t : timings) {
+                    if (t.status == BuildStatus.FAILURE) {
+                        mojoId = t.artifactId + ":" + t.version + ":" + t.goal;
+                        break;
+                    }
                 }
             }
         }

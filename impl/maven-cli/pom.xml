@@ -286,6 +286,26 @@ under the License.
               <goal>velocity</goal>
             </goals>
           </execution>
+          <execution>
+            <id>modello-reactor</id>
+            <goals>
+              <goal>velocity</goal>
+            </goals>
+            <configuration>
+              <version>1.0.0</version>
+              <models>
+                <model>../../api/maven-api-core/src/main/mdo/reactor.mdo</model>
+              </models>
+              <templates>
+                <template>reader-stax.vm</template>
+              </templates>
+              <params>
+                <param>packageModelV4=org.apache.maven.api.reactor</param>
+                <param>packageToolV4=org.apache.maven.cling.internal.reactor.io</param>
+                <param>locationTracking=false</param>
+              </params>
+            </configuration>
+          </execution>
         </executions>
       </plugin>
       <plugin>

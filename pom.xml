@@ -146,14 +146,14 @@ under the License.
     <byteBuddyVersion>1.18.14</byteBuddyVersion>
     <classWorldsVersion>2.12.1</classWorldsVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
-    <domtripVersion>1.6.0</domtripVersion>
+    <domtripVersion>1.7.0</domtripVersion>
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>33.7.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
 
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
-    <jlineVersion>4.4.3</jlineVersion>
+    <jlineVersion>4.4.5</jlineVersion>
     <jmhVersion>1.37</jmhVersion>
     <junitVersion>6.1.3</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
@@ -826,6 +826,7 @@ under the License.
               <exclude>.mvn/**</exclude>
               <exclude>.jbang/**</exclude>
               <exclude>.claude/**</exclude>
+              <exclude>.worktrees/**</exclude>
               <!--
                 ! Excluded the license files itself cause they do not have a license of themselves.
               -->

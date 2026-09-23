@@ -20,10 +20,12 @@ package org.apache.maven.api;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.reactor.ReactorConfig;
 
 /**
  * Describes the invocation context of a Maven build: the flags, properties, and
@@ -200,4 +202,18 @@ public interface BuildEnvironment {
      * @return the thread count
      */
     int threads();
+
+    /**
+     * The parsed {@code .mvn/reactor.xml} configuration for this build, if present.
+     *
+     * <p>This provides access to the reactor-scoped options, extensions, aliases and
+     * phase injections declared in the project's {@code .mvn/reactor.xml} file.
+     * Returns {@link Optional#empty()} when no {@code reactor.xml} was found or parsed.
+     *
+     * @return the reactor configuration, never {@code null}
+     */
+    @Nonnull
+    default Optional<ReactorConfig> reactorConfig() {
+        return Optional.empty();
+    }
 }

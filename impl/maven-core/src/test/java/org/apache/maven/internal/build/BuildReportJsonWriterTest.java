@@ -40,7 +40,20 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class BuildReportJsonWriterTest {
 
     private static final BuildEnvironment EMPTY_ENV = new DefaultBuildEnvironment(
-            List.of(), Map.of(), Map.of(), "", List.of(), List.of(), null, "FAIL_FAST", false, false, false, false, 1);
+            List.of(),
+            Map.of(),
+            Map.of(),
+            "",
+            List.of(),
+            List.of(),
+            null,
+            "FAIL_FAST",
+            false,
+            false,
+            false,
+            false,
+            1,
+            null);
     private static final Instant BASE_TIME = Instant.parse("2025-01-15T10:30:00Z");
 
     @Test

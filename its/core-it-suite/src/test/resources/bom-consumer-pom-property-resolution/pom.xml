@@ -17,9 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.bom-property</groupId>
@@ -29,13 +27,13 @@ under the License.
 
   <name>BOM Consumer POM Property Resolution Test</name>
 
-  <!-- Property defined in parent, used by BOM child -->
-  <properties>
-    <junit.version>4.13.2</junit.version>
-  </properties>
-
   <modules>
     <module>mod-1</module>
     <module>bom</module>
   </modules>
+
+  <!-- Property defined in parent, used by BOM child -->
+  <properties>
+    <junit.version>4.13.2</junit.version>
+  </properties>
 </project>

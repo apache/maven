@@ -36,8 +36,7 @@ class MavenITmng8709ProfileDependencyVersionTest extends AbstractMavenIntegratio
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Path consumerPom = verifier.getArtifactPath(
-                "org.apache.maven.its.mng8709", "profile-version", "1.0", "pom");
+        Path consumerPom = verifier.getArtifactPath("org.apache.maven.its.mng8709", "profile-version", "1.0", "pom");
         String content = Files.readString(consumerPom);
         assertTrue(content.contains("<activeByDefault>true</activeByDefault>"));
         assertTrue(content.contains("<version>${junit.version}</version>"));
