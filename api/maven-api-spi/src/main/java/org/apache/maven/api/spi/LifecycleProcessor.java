@@ -32,8 +32,10 @@ import org.apache.maven.api.di.Named;
  * lifecycle DAG.  Multiple processors are applied in order; each one receives the output of the
  * previous one.
  *
- * <p>Processors are called once per lifecycle per session, after the base lifecycles have been
- * assembled by the {@link LifecycleProvider}s, so they have access to full session context.
+ * <p>Processors are called each time the lifecycle phase map is rebuilt (potentially multiple
+ * times per build). Implementations must be stateless and idempotent — the same lifecycle
+ * input must always produce the same output. They receive the output of the previous processor
+ * in the chain.
  *
  * <p>Example — injecting a {@code docker-push} phase after {@code deploy}:
  * <pre>{@code
@@ -41,8 +43,9 @@ import org.apache.maven.api.di.Named;
  * public class DockerLifecycleProcessor implements LifecycleProcessor {
  *     public Lifecycle process(Lifecycle lifecycle) {
  *         if (!Lifecycle.DEFAULT.equals(lifecycle.id())) return lifecycle;
- *         return LifecycleProcessor.withInjectedPhase(lifecycle,
- *                 "docker-push", "deploy", null);
+ *         // Use PhaseEnrichedLifecycle (from impl/maven-core) to inject custom phases
+ *         return new PhaseEnrichedLifecycle(lifecycle,
+ *                 List.of(new PhaseEnrichedLifecycle.InjectedPhase("docker-push", null, "deploy", null)));
  *     }
  * }
  * }</pre>

@@ -185,7 +185,7 @@ public class MavenParser extends BaseParser {
             return options;
         } catch (ParseException e) {
             throw new IllegalArgumentException(
-                    "Failed to parse arguments from reactor.xml <options>: " + e.getMessage(), e.getCause());
+                    "Failed to parse arguments from reactor.xml <options>: " + e.getMessage(), e);
         }
     }
 
