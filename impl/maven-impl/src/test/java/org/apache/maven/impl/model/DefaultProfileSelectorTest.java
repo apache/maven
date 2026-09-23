@@ -68,8 +68,8 @@ class DefaultProfileSelectorTest {
     }
 
     /**
-     * MNG-6787: when -P is used, external activeByDefault profiles (settings.xml)
-     * must NOT be active.
+     * MNG-6787: when -P is used with an external profile, an external activeByDefault
+     * profile (settings.xml) must NOT be active.
      */
     @Test
     void externalActiveByDefaultSuppressedWhenProfileExplicitlyActivated() {
@@ -86,6 +86,27 @@ class DefaultProfileSelectorTest {
         assertEquals("explicit", active.get(0).getId());
         assertFalse(active.stream().anyMatch(p -> "defaults".equals(p.getId())),
                 "activeByDefault external profile must be suppressed when -P is used");
+    }
+
+    /**
+     * MNG-6787: explicitly activating a POM profile via -P must also suppress
+     * external (settings.xml) activeByDefault profiles, because
+     * anyProfileExplicitlyActivated fires regardless of the activated profile's source.
+     */
+    @Test
+    void externalActiveByDefaultSuppressedWhenPomProfileExplicitlyActivated() {
+        DefaultProfileSelector selector = new DefaultProfileSelector();
+        Profile explicitPomProfile = profile("pom-explicit", Profile.SOURCE_POM);
+        Profile externalDefault = activeByDefaultProfile("ext-default", Profile.SOURCE_SETTINGS);
+
+        List<Profile> active = selector.getActiveProfiles(
+                Arrays.asList(explicitPomProfile, externalDefault),
+                contextWithActiveIds("pom-explicit"),
+                noopCollector());
+
+        assertTrue(active.stream().anyMatch(p -> "pom-explicit".equals(p.getId())));
+        assertFalse(active.stream().anyMatch(p -> "ext-default".equals(p.getId())),
+                "External activeByDefault must be suppressed when any profile is explicitly activated via -P");
     }
 
     /**
