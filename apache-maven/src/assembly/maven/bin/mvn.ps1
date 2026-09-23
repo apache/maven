@@ -87,30 +87,58 @@ function ConvertFrom-MavenOptionString {
   $current = New-Object System.Text.StringBuilder
   $inDoubleQuotes = $false
   $inSingleQuotes = $false
+  $tokenStarted = $false
 
   foreach ($character in $Value.ToCharArray()) {
     if ($character -eq '"' -and -not $inSingleQuotes) {
+      $tokenStarted = $true
       $inDoubleQuotes = -not $inDoubleQuotes
     }
     elseif ($character -eq "'" -and -not $inDoubleQuotes) {
+      $tokenStarted = $true
       $inSingleQuotes = -not $inSingleQuotes
     }
     elseif ([char]::IsWhiteSpace($character) -and -not $inDoubleQuotes -and -not $inSingleQuotes) {
-      if ($current.Length -gt 0) {
+      if ($tokenStarted) {
         $result.Add($current.ToString())
         [void] $current.Clear()
+        $tokenStarted = $false
       }
     }
     else {
+      $tokenStarted = $true
       [void] $current.Append($character)
     }
   }
 
-  if ($current.Length -gt 0) {
+  if ($tokenStarted) {
     $result.Add($current.ToString())
   }
 
   return $result.ToArray()
+}
+
+function ConvertTo-MavenNativeArguments {
+  param([AllowEmptyString()][string[]] $Arguments)
+
+  # Switch-Process and modern native argument passing consume the original array.
+  # Older PowerShell rebuilds a command string, losing empty arguments and literal
+  # quotes unless we escape them for that extra parsing step. Do not change the
+  # caller's native argument-passing preference.
+  $passing = Get-Variable PSNativeCommandArgumentPassing -ValueOnly -ErrorAction SilentlyContinue
+  if ($passing -and "$passing" -ne "Legacy") {
+    return ,$Arguments
+  }
+
+  [string[]] $nativeArguments = @($Arguments | ForEach-Object {
+      if ($_ -eq "") {
+        '""'
+      }
+      else {
+        [regex]::Replace($_, '(\\*)"', '$1$1\"')
+      }
+    })
+  return ,$nativeArguments
 }
 
 function Get-MavenJavaCommand {
@@ -270,7 +298,8 @@ function Get-MavenJvmConfigArguments {
 
   # Keep compiler and JVM diagnostics out of the option text while relying on the native exit code.
   $ErrorActionPreference = "Continue"
-  $parserOutput = @(& $JavaCommand $parser $jvmConfig $ProjectBaseDirectory)
+  $parserArguments = ConvertTo-MavenNativeArguments -Arguments @($parser, $jvmConfig, $ProjectBaseDirectory)
+  $parserOutput = @(& $JavaCommand @parserArguments)
   $parserExitCode = $LASTEXITCODE
   Write-MavenDebug "JvmConfigParser exit code: $parserExitCode"
   if ($parserExitCode -ne 0) {
@@ -392,7 +421,8 @@ function Invoke-MavenLauncher {
   }
 
   $ErrorActionPreference = "Continue"
-  & $javaCommand @javaArguments
+  $nativeArguments = ConvertTo-MavenNativeArguments -Arguments $javaArguments
+  & $javaCommand @nativeArguments
   $script:MavenProcessExitCode = $LASTEXITCODE
 }
 

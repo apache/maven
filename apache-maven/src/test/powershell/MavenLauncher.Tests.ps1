@@ -306,3 +306,5 @@ finally {
     Remove-Item -LiteralPath $temporaryRoot -Recurse -Force
   }
 }
+
+& (Join-Path $PSScriptRoot "MavenLauncher.Native.Tests.ps1") -MavenHome $MavenHome
