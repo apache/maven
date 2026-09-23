@@ -65,12 +65,29 @@ public class DefaultProfileSelector implements ProfileSelector {
             Collection<Profile> profiles, ProfileActivationContext context, ModelProblemCollector problems) {
         List<Profile> activeProfiles = new ArrayList<>(profiles.size());
         List<Profile> activePomProfilesByDefault = new ArrayList<>();
+        List<Profile> activeExternalProfilesByDefault = new ArrayList<>();
+
+        // Tracks whether any POM profile became active for a reason *other* than
+        // activeByDefault (i.e. via -P or a condition activator such as file/property/OS).
+        // When true, POM activeByDefault profiles are suppressed.
         boolean activatedPomProfileNotByDefault = false;
+
+        // MNG-6787: tracks whether any profile was *explicitly* requested on the
+        // command line via -P / --activate-profiles.  This is intentionally stricter
+        // than activatedPomProfileNotByDefault: condition-triggered POM profiles
+        // suppress POM activeByDefault profiles (existing behaviour), but they do NOT
+        // suppress external (settings.xml) activeByDefault profiles because the spec
+        // says only an explicit -P activation should deactivate external defaults.
+        boolean anyProfileExplicitlyActivated = false;
 
         for (Profile profile : profiles) {
             if (!context.isProfileInactive(profile.getId())) {
                 if (context.isProfileActive(profile.getId()) || isActive(profile, context, problems)) {
                     activeProfiles.add(profile);
+                    if (context.isProfileActive(profile.getId())) {
+                        // Profile was explicitly requested via -P / --activate-profiles
+                        anyProfileExplicitlyActivated = true;
+                    }
                     if (Profile.SOURCE_POM.equals(profile.getSource())) {
                         activatedPomProfileNotByDefault = true;
                     }
@@ -78,7 +95,10 @@ public class DefaultProfileSelector implements ProfileSelector {
                     if (Profile.SOURCE_POM.equals(profile.getSource())) {
                         activePomProfilesByDefault.add(profile);
                     } else {
-                        activeProfiles.add(profile);
+                        // MNG-6787: defer external (e.g. settings.xml) activeByDefault
+                        // profiles so they can be suppressed when the user explicitly
+                        // activates a profile via -P.
+                        activeExternalProfilesByDefault.add(profile);
                     }
                 }
             }
@@ -86,6 +106,12 @@ public class DefaultProfileSelector implements ProfileSelector {
 
         if (!activatedPomProfileNotByDefault) {
             activeProfiles.addAll(activePomProfilesByDefault);
+        }
+
+        // MNG-6787: suppress external activeByDefault profiles whenever any profile
+        // was explicitly activated on the command line via -P / --activate-profiles.
+        if (!anyProfileExplicitlyActivated) {
+            activeProfiles.addAll(activeExternalProfilesByDefault);
         }
 
         return activeProfiles;
