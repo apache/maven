@@ -64,10 +64,6 @@ under the License.
           <artifactId>maven-artifact</artifactId>
         </exclusion>
         <exclusion>
-          <groupId>org.apache.maven.shared</groupId>
-          <artifactId>maven-verifier</artifactId>
-        </exclusion>
-        <exclusion>
           <groupId>junit</groupId>
           <artifactId>junit</artifactId>
         </exclusion>
