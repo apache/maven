@@ -141,9 +141,9 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
                     modifiedPoms.add(pomPath);
                     if (MODEL_VERSION_4_1_0.equals(currentVersion)
                             || ModelVersionUtils.isNewerThan410(currentVersion)) {
-                        context.success("Full inference optimizations applied");
+                        logInferenceResult(context, "Full inference optimizations");
                     } else {
-                        context.success("Limited inference optimizations applied (parent-related only)");
+                        logInferenceResult(context, "Limited inference optimizations (parent-related only)");
                     }
                 } else {
                     context.success("No inference optimizations needed");
@@ -157,6 +157,14 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
         }
 
         return new UpgradeResult(processedPoms, modifiedPoms, errorPoms);
+    }
+
+    private static void logInferenceResult(UpgradeContext context, String description) {
+        if (context.isDryRun()) {
+            context.action(description + " would be applied");
+        } else {
+            context.success(description + " applied");
+        }
     }
 
     /**
