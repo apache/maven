@@ -65,6 +65,16 @@ public class DefaultArtifactManager implements ArtifactManager {
     @Override
     public Optional<Path> getPath(@Nonnull Artifact artifact) {
         String id = id(requireNonNull(artifact, "artifact cannot be null"));
+        // Check explicitly-set paths first: a call to setPath() registers a path in this map
+        // and must take precedence over the project artifact's file. For example,
+        // maven-install-plugin calls setPath(pomArtifact, pomPath) before installing;
+        // without this check, a prior jar:jar invocation on a pom-packaged project would
+        // have set project.getArtifact().getFile() to the JAR, causing getPath(pomArtifact)
+        // to return the JAR path instead of the POM path. (MINSTALL-315)
+        Path path = paths.get(id);
+        if (path != null) {
+            return Optional.of(path);
+        }
         if (session.getMavenSession().getAllProjects() != null) {
             for (MavenProject project : session.getMavenSession().getAllProjects()) {
                 if (id.equals(id(project.getArtifact()))
@@ -73,8 +83,7 @@ public class DefaultArtifactManager implements ArtifactManager {
                 }
             }
         }
-        Path path = paths.get(id);
-        if (path == null && artifact instanceof DefaultArtifact defaultArtifact) {
+        if (artifact instanceof DefaultArtifact defaultArtifact) {
             path = defaultArtifact.getArtifact().getPath();
         }
         return Optional.ofNullable(path);
