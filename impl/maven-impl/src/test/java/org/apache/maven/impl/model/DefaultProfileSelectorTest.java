@@ -49,17 +49,49 @@ class DefaultProfileSelectorTest {
     private ProfileActivationContext contextWithActiveIds(String... activeIds) {
         List<String> active = Arrays.asList(activeIds);
         return new ProfileActivationContext() {
-            public boolean isProfileActive(String profileId) { return active.contains(profileId); }
-            public boolean isProfileInactive(String profileId) { return false; }
-            public String getSystemProperty(String key) { return null; }
-            public String getUserProperty(String key) { return null; }
-            public String getModelProperty(String key) { return null; }
-            public String getModelArtifactId() { return null; }
-            public String getModelPackaging() { return null; }
-            public String getModelRootDirectory() { return null; }
-            public String getModelBaseDirectory() { return null; }
-            public String interpolatePath(String path) { return path; }
-            public boolean exists(String path, boolean glob) { return false; }
+            public boolean isProfileActive(String profileId) {
+                return active.contains(profileId);
+            }
+
+            public boolean isProfileInactive(String profileId) {
+                return false;
+            }
+
+            public String getSystemProperty(String key) {
+                return null;
+            }
+
+            public String getUserProperty(String key) {
+                return null;
+            }
+
+            public String getModelProperty(String key) {
+                return null;
+            }
+
+            public String getModelArtifactId() {
+                return null;
+            }
+
+            public String getModelPackaging() {
+                return null;
+            }
+
+            public String getModelRootDirectory() {
+                return null;
+            }
+
+            public String getModelBaseDirectory() {
+                return null;
+            }
+
+            public String interpolatePath(String path) {
+                return path;
+            }
+
+            public boolean exists(String path, boolean glob) {
+                return false;
+            }
         };
     }
 
