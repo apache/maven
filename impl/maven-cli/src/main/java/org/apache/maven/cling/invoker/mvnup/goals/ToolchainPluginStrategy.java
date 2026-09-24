@@ -172,8 +172,10 @@ public class ToolchainPluginStrategy extends AbstractUpgradeStrategy {
 
                 addToolchainsPlugin(pomDocument, latestJdk);
                 modifiedPoms.add(pomPath);
-                logChange(context, "Added maven-toolchains-plugin with " + SELECT_JDK_TOOLCHAIN_GOAL
-                        + " goal (--source " + sourceLevel + " requires JDK <= " + latestJdk + ")");
+                logChange(
+                        context,
+                        "Added maven-toolchains-plugin with " + SELECT_JDK_TOOLCHAIN_GOAL + " goal (--source "
+                                + sourceLevel + " requires JDK <= " + latestJdk + ")");
                 context.warning("A JDK <= " + latestJdk
                         + " must be installed and discoverable by the toolchains plugin"
                         + " for the build to succeed. If no matching JDK is found,"
