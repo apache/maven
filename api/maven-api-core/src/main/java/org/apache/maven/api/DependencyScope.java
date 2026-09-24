@@ -73,6 +73,21 @@ public enum DependencyScope {
 
     /**
      * Provided.
+     * <p>
+     * A dependency required for compilation and testing that is expected to be provided at runtime
+     * by the JDK or the runtime environment/container.
+     * <p>
+     * <b>Transitivity and classpath behavior:</b>
+     * <ul>
+     *   <li><b>Downstream transitivity:</b> Dependencies in this scope are not transitive to projects
+     *       that depend on this project.</li>
+     *   <li><b>Upstream transitivity:</b> Transitive {@code compile} and {@code runtime} dependencies
+     *       of a provided dependency are included and assigned effective {@code provided} scope.</li>
+     *   <li><b>Omitted dependencies:</b> Transitive {@code provided} and {@code test} dependencies of
+     *       a provided dependency are omitted.</li>
+     *   <li><b>Classpaths:</b> Available on compile and test classpaths, but not on the main runtime
+     *       classpath.</li>
+     * </ul>
      */
     PROVIDED("provided", false),
 
