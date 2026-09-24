@@ -37,7 +37,7 @@ import org.apache.maven.api.di.Named;
  * input must always produce the same output. They receive the output of the previous processor
  * in the chain.
  *
- * <p>See {@code ReactorXmlLifecycleProcessor} in {@code impl/maven-core} for a concrete
+ * <p>See {@code ReactorXmlLifecycleProcessor} in {@code impl/maven-cli} for a concrete
  * reference implementation that injects phases from {@code .mvn/reactor.xml}.
  *
  * @since 4.1.0

@@ -59,7 +59,7 @@
         </field>
         <field>
           <name>optionArgs</name>
-          <description>Structured CLI options — each &lt;arg&gt; element is one option token.
+          <description>Structured CLI options — each {@literal &lt;arg&gt;} element is one option token.
           Use instead of {@link #getOptions()} when option values contain spaces.
           Mutually exclusive with options.</description>
           <version>1.0.0+</version>
@@ -194,7 +194,7 @@
         </field>
         <field>
           <name>args</name>
-          <description>Structured form: each &lt;arg&gt; element is one argument token.
+          <description>Structured form: each {@literal &lt;arg&gt;} element is one argument token.
           Use when argument values contain spaces. Mutually exclusive with content.</description>
           <version>1.0.0+</version>
           <required>false</required>
