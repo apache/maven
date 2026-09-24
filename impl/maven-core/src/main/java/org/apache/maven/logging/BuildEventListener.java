@@ -18,6 +18,7 @@
  */
 package org.apache.maven.logging;
 
+import org.apache.maven.api.build.report.LogEvent;
 import org.apache.maven.execution.ExecutionEvent;
 import org.eclipse.aether.transfer.TransferEvent;
 
@@ -30,7 +31,7 @@ public interface BuildEventListener {
 
     void projectStarted(String projectId);
 
-    void projectLogMessage(String projectId, String event);
+    void projectLogMessage(String projectId, LogEvent event);
 
     void projectFinished(String projectId);
 

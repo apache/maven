@@ -16,31 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.logging.impl;
+package org.apache.maven.lifecycle.internal.filter;
 
-import org.apache.maven.cling.logging.BaseSlf4jConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.apache.maven.api.MojoExecution;
 
 /**
- * Configuration for slf4j-logback.
+ * A {@link FilterPredicate} that matches all {@link MojoExecution}s bound to a specific lifecycle phase.
  *
- * @since 3.1.0
+ * <p>Syntax in {@code -Dmaven.lifecycle.filter}: {@code phase(<phaseName>)}
+ *
+ * <p>Example: {@code -Dmaven.lifecycle.filter=phase(test)} removes all mojos bound to the {@code test} phase.
+ *
+ * @since 4.1.0
  */
-public class LogbackConfiguration extends BaseSlf4jConfiguration {
-    @Override
-    public void setRootLoggerLevel(Level level) {
-        ch.qos.logback.classic.Level value =
-                switch (level) {
-                    case DEBUG -> ch.qos.logback.classic.Level.DEBUG;
-                    case INFO -> ch.qos.logback.classic.Level.INFO;
-                    default -> ch.qos.logback.classic.Level.ERROR;
-                };
-        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(value);
+public class PhasePredicate implements FilterPredicate {
+
+    private final String phaseName;
+
+    public PhasePredicate(String phaseName) {
+        this.phaseName = phaseName;
     }
 
     @Override
-    public void activate() {
-        // no op
+    public boolean matches(MojoExecution execution) {
+        return phaseName.equals(execution.getLifecyclePhase());
+    }
+
+    @Override
+    public String toString() {
+        return "phase(" + phaseName + ")";
     }
 }

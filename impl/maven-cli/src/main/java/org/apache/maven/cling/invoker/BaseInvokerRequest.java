@@ -30,6 +30,7 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.cisupport.CIInfo;
+import org.apache.maven.api.reactor.ReactorConfig;
 
 import static java.util.Objects.requireNonNull;
 
@@ -46,6 +47,7 @@ public class BaseInvokerRequest implements InvokerRequest {
     private final List<CoreExtensions> coreExtensions;
     private final CIInfo ciInfo;
     private final Options options;
+    private final ReactorConfig reactorConfig;
 
     @SuppressWarnings("ParameterNumber")
     public BaseInvokerRequest(
@@ -60,7 +62,8 @@ public class BaseInvokerRequest implements InvokerRequest {
             @Nullable Path rootDirectory,
             @Nullable List<CoreExtensions> coreExtensions,
             @Nullable CIInfo ciInfo,
-            @Nullable Options options) {
+            @Nullable Options options,
+            @Nullable ReactorConfig reactorConfig) {
         this.parserRequest = requireNonNull(parserRequest);
         this.parsingFailed = parsingFailed;
         this.cwd = requireNonNull(cwd);
@@ -74,6 +77,7 @@ public class BaseInvokerRequest implements InvokerRequest {
         this.coreExtensions = coreExtensions;
         this.ciInfo = ciInfo;
         this.options = options;
+        this.reactorConfig = reactorConfig;
     }
 
     @Override
@@ -133,5 +137,10 @@ public class BaseInvokerRequest implements InvokerRequest {
 
     public Optional<Options> options() {
         return Optional.ofNullable(options);
+    }
+
+    @Override
+    public Optional<ReactorConfig> reactorConfig() {
+        return Optional.ofNullable(reactorConfig);
     }
 }

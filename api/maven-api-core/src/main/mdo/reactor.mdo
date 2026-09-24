@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  Licensed to the Apache Software Foundation (ASF) under one
+  or more contributor license agreements.  See the NOTICE file
+  distributed with this work for additional information
+  regarding copyright ownership.  The ASF licenses this file
+  to you under the Apache License, Version 2.0 (the
+  "License"); you may not use this file except in compliance
+  with the License.  You may obtain a copy of the License at
+
+   http://www.apache.org/licenses/LICENSE-2.0
+
+  Unless required by applicable law or agreed to in writing,
+  software distributed under the License is distributed on an
+  "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+  KIND, either express or implied.  See the License for the
+  specific language governing permissions and limitations
+  under the License.
+
+-->
+
+<model xmlns="http://codehaus-plexus.github.io/MODELLO/2.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/2.0.0 https://codehaus-plexus.github.io/modello/xsd/modello-2.0.0.xsd"
+  xml.namespace="http://maven.apache.org/REACTOR/${version}"
+  xml.schemaLocation="https://maven.apache.org/xsd/reactor-${version}.xsd">
+
+  <id>reactor</id>
+  <name>ReactorConfig</name>
+  <description><![CDATA[
+  <p>This is a reference for the Reactor Configuration descriptor.</p>
+  <p>The default location for the Reactor Configuration descriptor file is <code>${maven.projectBasedir}/.mvn/reactor.xml</code></p>
+  <p>It consolidates reactor-scoped build configuration previously split across <code>.mvn/maven.config</code>
+     (CLI flag defaults) and <code>.mvn/extensions.xml</code> (core extensions), and adds support for
+     named build aliases and reactor-level lifecycle phase injection.</p>
+  ]]></description>
+
+  <defaults>
+    <default>
+      <key>package</key>
+      <value>org.apache.maven.api.reactor</value>
+    </default>
+  </defaults>
+
+  <classes>
+    <class rootElement="true" xml.tagName="reactor" xsd.compositor="sequence">
+      <name>ReactorConfig</name>
+      <description>Reactor-scoped build configuration for a Maven project.</description>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>options</name>
+          <description>CLI options to prepend to every invocation. Replaces .mvn/maven.config when present.
+          Expressed as whitespace-separated, quote-aware inline text (e.g. {@code -T4 --no-transfer-progress}).
+          For options with spaces in their values, use the structured form via {@link #getOptionArgs()}.</description>
+          <version>1.0.0+</version>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>optionArgs</name>
+          <description>Structured CLI options — each {@literal &lt;arg&gt;} element is one option token.
+          Use instead of {@link #getOptions()} when option values contain spaces.
+          Mutually exclusive with options.</description>
+          <version>1.0.0+</version>
+          <required>false</required>
+          <association xml.itemsStyle="flat" xml.tagName="arg">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>extensions</name>
+          <description>Core extensions to load. Replaces .mvn/extensions.xml when present.</description>
+          <version>1.0.0+</version>
+          <required>false</required>
+          <association xml.itemsStyle="flat" xml.tagName="extension">
+            <type>ReactorExtension</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>aliases</name>
+          <description>Named build aliases. Every argument on the command line is checked against alias
+          names in order; each match is replaced in-place by the alias expansion tokens.
+          Expansion is not recursive.</description>
+          <version>1.0.0+</version>
+          <required>false</required>
+          <association xml.itemsStyle="flat" xml.tagName="alias">
+            <type>Alias</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>phases</name>
+          <description>Custom lifecycle phase injections. Phases are registered in the lifecycle DAG
+          with the declared after/before edges.</description>
+          <version>1.0.0+</version>
+          <required>false</required>
+          <association xml.itemsStyle="flat" xml.tagName="phase">
+            <type>PhaseInjection</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+
+    <class xml.tagName="extension">
+      <name>ReactorExtension</name>
+      <description>Describes a core extension to load.</description>
+      <version>1.0.0+</version>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <description>The group ID of the extension's artifact.</description>
+          <version>1.0.0+</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <description>The artifact ID of the extension.</description>
+          <version>1.0.0+</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>version</name>
+          <description>The version of the extension.</description>
+          <version>1.0.0+</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>classLoadingStrategy</name>
+          <description>The class loading strategy: 'self-first' (the default), 'parent-first' (loads classes from the
+          parent, then from the extension) or 'plugin' (follows the rules from extensions defined as plugins).</description>
+          <version>1.0.0+</version>
+          <defaultValue>self-first</defaultValue>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>configuration</name>
+          <description>Extension-specific configuration passed to the extension during initialization.
+          The structure is extension-defined.</description>
+          <version>1.0.0+</version>
+          <required>false</required>
+          <type>DOM</type>
+        </field>
+      </fields>
+      <codeSegments>
+        <codeSegment>
+          <version>1.0.0+</version>
+          <code>
+            <![CDATA[
+    /**
+     * Gets the identifier of the extension.
+     *
+     * @return The extension id in the form {@code <groupId>:<artifactId>:<version>}, never {@code null}.
+     */
+    public String getId() {
+        return (getGroupId() == null ? "[unknown-group-id]" : getGroupId())
+            + ":" + (getArtifactId() == null ? "[unknown-artifact-id]" : getArtifactId())
+            + ":" + (getVersion() == null ? "[unknown-version]" : getVersion());
+    }
+            ]]>
+          </code>
+        </codeSegment>
+      </codeSegments>
+    </class>
+
+    <class xml.tagName="alias">
+      <name>Alias</name>
+      <description>A named build alias. Every argument on the command line is checked against alias names;
+      when a match is found it is replaced in-place by the alias expansion tokens. Supports both inline
+      text (shorthand, whitespace-separated) and structured arg elements for values that contain spaces.</description>
+      <version>1.0.0+</version>
+      <fields>
+        <field xml.attribute="true">
+          <name>name</name>
+          <description>The alias name. Must not start with '-'.</description>
+          <version>1.0.0+</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>content</name>
+          <description>Inline text form: whitespace-separated arguments, quote-aware.
+          Mutually exclusive with args.</description>
+          <version>1.0.0+</version>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>args</name>
+          <description>Structured form: each {@literal &lt;arg&gt;} element is one argument token.
+          Use when argument values contain spaces. Mutually exclusive with content.</description>
+          <version>1.0.0+</version>
+          <required>false</required>
+          <association xml.itemsStyle="flat" xml.tagName="arg">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+
+    <class xml.tagName="phase">
+      <name>PhaseInjection</name>
+      <description>A custom phase to inject into the lifecycle DAG.</description>
+      <version>1.0.0+</version>
+      <fields>
+        <field xml.attribute="true">
+          <name>name</name>
+          <description>The name of the new phase to inject.</description>
+          <version>1.0.0+</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>parent</name>
+          <description>The name of the existing phase whose children list receives this injection.
+          Must be specified to correctly place the new phase in the Maven 4 lifecycle tree.
+          For example, use {@code parent="verify"} to insert a phase alongside
+          {@code unit-test} and {@code integration-test}.</description>
+          <version>1.0.0+</version>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>after</name>
+          <description>The name of a sibling phase (child of the same parent) that this phase must come after.
+          Takes precedence over {@code before} for positioning.</description>
+          <version>1.0.0+</version>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>before</name>
+          <description>The name of a sibling phase (child of the same parent) that this phase must come before.
+          Used only for positioning when {@code after} is absent.</description>
+          <version>1.0.0+</version>
+          <required>false</required>
+          <type>String</type>
+        </field>
+      </fields>
+    </class>
+  </classes>
+</model>

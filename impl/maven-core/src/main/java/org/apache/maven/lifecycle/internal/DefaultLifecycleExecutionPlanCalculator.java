@@ -240,6 +240,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                 throw new IllegalStateException("unexpected task " + task);
             }
         }
+
         return mojoExecutions;
     }
 

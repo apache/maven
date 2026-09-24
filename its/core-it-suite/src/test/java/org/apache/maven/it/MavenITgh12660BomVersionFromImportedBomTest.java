@@ -61,8 +61,7 @@ class MavenITgh12660BomVersionFromImportedBomTest extends AbstractMavenIntegrati
         verifier.verifyErrorFreeLog();
 
         // Read the consumer POM that was installed to the local repo
-        Path consumerPomPath =
-                verifier.getArtifactPath("org.apache.maven.its.gh12660", "bom", "1.0.0-SNAPSHOT", "pom");
+        Path consumerPomPath = verifier.getArtifactPath("org.apache.maven.its.gh12660", "bom", "1.0.0-SNAPSHOT", "pom");
 
         assertTrue(Files.exists(consumerPomPath), "Consumer POM not found at " + consumerPomPath);
 

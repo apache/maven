@@ -86,6 +86,10 @@ public class DefaultMojoExecution implements MojoExecution {
 
             @Override
             public Artifact getArtifact() {
+                if (session == null) {
+                    throw new IllegalStateException("MojoExecution.getPlugin().getArtifact() requires a session, "
+                            + "but this instance was created without one");
+                }
                 org.apache.maven.artifact.Artifact artifact =
                         delegate.getMojoDescriptor().getPluginDescriptor().getPluginArtifact();
                 org.eclipse.aether.artifact.Artifact resolverArtifact = RepositoryUtils.toArtifact(artifact);
@@ -94,6 +98,11 @@ public class DefaultMojoExecution implements MojoExecution {
 
             @Override
             public Map<String, Dependency> getDependenciesMap() {
+                if (session == null) {
+                    throw new IllegalStateException(
+                            "MojoExecution.getPlugin().getDependenciesMap() requires a session, "
+                                    + "but this instance was created without one");
+                }
                 DependencyNode resolverNode =
                         delegate.getMojoDescriptor().getPluginDescriptor().getDependencyNode();
                 DefaultNode node = new DefaultNode(session, resolverNode, false);

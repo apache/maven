@@ -37,6 +37,8 @@ package org.apache.maven.its.it0124;
  * under the License.
  */
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -48,8 +50,6 @@ import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugin.MojoFailureException;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
-
-import javax.inject.Inject;
 
 /**
  * Simple mojo to write the injected artifact factory implementation to a file.
