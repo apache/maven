@@ -736,12 +736,6 @@ public class MavenCli {
 
         Set<String> exportedArtifacts = new HashSet<>(coreEntry.getExportedArtifacts());
         Set<String> exportedPackages = new HashSet<>(coreEntry.getExportedPackages());
-        if (!extClassPath.isEmpty()) {
-            CoreExtensionEntry classPathEntry =
-                    CoreExtensionEntry.discoverFrom(containerRealm, extClassPath, null, null);
-            exportedArtifacts.addAll(classPathEntry.getExportedArtifacts());
-            exportedPackages.addAll(classPathEntry.getExportedPackages());
-        }
         for (CoreExtensionEntry extension : extensions) {
             exportedArtifacts.addAll(extension.getExportedArtifacts());
             exportedPackages.addAll(extension.getExportedPackages());

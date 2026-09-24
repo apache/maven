@@ -57,6 +57,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 
 class PlexusContainerCapsuleFactoryTest {
     @TempDir
@@ -167,7 +168,44 @@ class PlexusContainerCapsuleFactoryTest {
                 pluginRealm.loadClass("extension.internal.Private").getClassLoader());
     }
 
-    private void createContainer(List<String> args) throws Exception {
+    @Test
+    void ignoresMalformedDescriptorWithoutSkippingLaterEntries() throws Exception {
+        Path malformed = extension(false, true);
+        Files.writeString(malformed.resolve("META-INF/maven/extension.xml"), "<invalid/>");
+        Path valid = extension(true, true);
+        createContainer(List.of("-Dmaven.ext.class.path=" + malformed + File.pathSeparator + valid));
+
+        assertTrue(container.lookup(CoreExports.class).getExportedArtifacts().contains("extension:api"));
+    }
+
+    @Test
+    void processesEquivalentClassPathEntriesOnce() throws Exception {
+        Path extension = extension(true, true);
+        Path alias = directory.relativize(extension);
+        MavenContext context =
+                createContainer(List.of("-Dmaven.ext.class.path=" + extension + File.pathSeparator + alias));
+
+        assertEquals(List.of(extension), new PlexusContainerCapsuleFactory<MavenContext>().parseExtClasspath(context));
+        assertEquals(1, container.getContainerRealm().getURLs().length);
+        assertTrue(container.lookup(CoreExports.class).getExportedArtifacts().contains("extension:api"));
+    }
+
+    @Test
+    void processesSymlinkedClassPathEntryOnce() throws Exception {
+        Path extension = extension(true, true);
+        Path alias = directory.resolve("extension-alias.jar");
+        try {
+            Files.createSymbolicLink(alias, extension);
+        } catch (UnsupportedOperationException | java.io.IOException | SecurityException e) {
+            assumeTrue(false, "Symbolic links are unavailable: " + e.getMessage());
+        }
+        MavenContext context =
+                createContainer(List.of("-Dmaven.ext.class.path=" + extension + File.pathSeparator + alias));
+
+        assertEquals(List.of(extension), new PlexusContainerCapsuleFactory<MavenContext>().parseExtClasspath(context));
+    }
+
+    private MavenContext createContainer(List<String> args) throws Exception {
         var request = new MavenParser()
                 .parseInvocation(ParserRequest.mvn(args, new JLineMessageBuilderFactory())
                         .cwd(directory)
@@ -181,6 +219,7 @@ class PlexusContainerCapsuleFactoryTest {
         var invoker = new MavenInvoker(
                 ProtoLookup.builder().addMapping(ClassWorld.class, world).build(), null);
         container = new PlexusContainerCapsuleFactory<MavenContext>().container(invoker, context, (i, c) -> List.of());
+        return context;
     }
 
     private ClassRealm pluginRealm(List<Artifact> artifacts) throws Exception {
