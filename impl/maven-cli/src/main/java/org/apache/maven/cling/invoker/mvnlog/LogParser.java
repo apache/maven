@@ -16,36 +16,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.logging;
+package org.apache.maven.cling.invoker.mvnlog;
 
-import org.apache.maven.execution.ExecutionEvent;
-import org.eclipse.aether.transfer.TransferEvent;
+import org.apache.commons.cli.ParseException;
+import org.apache.maven.api.cli.Options;
+import org.apache.maven.cling.invoker.BaseParser;
 
-/**
- * An abstract build event sink.
- */
-public interface BuildEventListener {
-
-    void sessionStarted(ExecutionEvent event);
-
-    void projectStarted(String projectId);
-
-    void projectLogMessage(String projectId, String event);
-
-    void projectFinished(String projectId, String status);
-
-    void executionFailure(String projectId, boolean halted, String exception);
-
-    void mojoStarted(ExecutionEvent event);
-
-    void mojoFinished(ExecutionEvent event, String status);
-
-
-    void finish(int exitCode) throws Exception;
-
-    void fail(Throwable t) throws Exception;
-
-    void log(String msg);
-
-    void transfer(String projectId, TransferEvent e);
+public class LogParser extends BaseParser {
+    @Override
+    protected Options parseCliOptions(LocalContext context) {
+        try {
+            return CommonsCliLogOptions.parse(context.parserRequest.args().toArray(new String[0]));
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Failed to parse command line options: " + e.getMessage(), e);
+        }
+    }
 }
