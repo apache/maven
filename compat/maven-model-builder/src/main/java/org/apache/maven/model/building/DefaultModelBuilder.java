@@ -1340,6 +1340,14 @@ public class DefaultModelBuilder implements ModelBuilder {
 
                 // no workspace resolver or workspace resolver returned null (i.e. model not in workspace)
                 if (importModel == null) {
+                    if (modelResolver == null) {
+                        problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.BASE)
+                                .setMessage("Non-resolvable import POM "
+                                        + ModelProblemUtils.toId(groupId, artifactId, version)
+                                        + ": not found in workspace and no ModelResolver provided")
+                                .setLocation(dependency.getLocation("")));
+                        continue;
+                    }
                     final ModelSource importSource;
                     try {
                         importSource = modelResolver.resolveModel(groupId, artifactId, version);
