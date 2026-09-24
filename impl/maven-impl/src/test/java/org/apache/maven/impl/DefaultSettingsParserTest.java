@@ -411,6 +411,34 @@ class DefaultSettingsParserTest {
     }
 
     @Test
+    void projectSettingsCannotWidenServerCredentialOrigins() throws Exception {
+        var result = builder(Map.of())
+                .build(SettingsBuilderRequest.builder()
+                        .session(mock(Session.class))
+                        .userSettingsSource(source(
+                                "user.xml",
+                                "<settings><servers><server><id>repository</id>"
+                                        + "<username>user</username><repositoryOrigins>"
+                                        + "<repositoryOrigin>https://good.example.org</repositoryOrigin>"
+                                        + "</repositoryOrigins></server></servers></settings>"))
+                        .projectSettingsSource(source(
+                                "project.xml",
+                                "<settings><servers><server><id>repository</id><repositoryOrigins>"
+                                        + "<repositoryOrigin>https://evil.example.org</repositoryOrigin>"
+                                        + "</repositoryOrigins></server></servers></settings>"))
+                        .build());
+
+        // a server of the project settings is kept as a separate entry of the same id, so the origins of
+        // every entry matter: none of them may come from the project
+        List<String> repositoryOrigins = result.getEffectiveSettings().getServers().stream()
+                .filter(server -> "repository".equals(server.getId()))
+                .flatMap(server -> server.getRepositoryOrigins().stream())
+                .toList();
+        assertEquals(List.of("https://good.example.org"), repositoryOrigins);
+        assertTrue(result.getProblems().hasWarningProblems());
+    }
+
+    @Test
     void customSettingsDecryptionFailureDoesNotExposeCredentials() throws Exception {
         String encrypted = "{L6L/HbmrY+cH+sNkphn-corrupted-q3fguYepTpM04WlIXb8nB1pk=}";
         SettingsParser parser = mock(SettingsParser.class);
