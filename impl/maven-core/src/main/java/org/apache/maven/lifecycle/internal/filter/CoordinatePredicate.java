@@ -38,7 +38,10 @@ import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
  * <ul>
  *   <li>{@code *} — matches every mojo execution</li>
  *   <li>{@code :A} — any groupId, specific artifactId (e.g. {@code :maven-enforcer-plugin})</li>
- *   <li>{@code G:A} — exact groupId:artifactId (e.g. {@code org.apache.maven.plugins:maven-enforcer-plugin})</li>
+ *   <li>{@code G:A} — exact groupId:artifactId (e.g. {@code org.apache.maven.plugins:maven-enforcer-plugin}).
+ *       The groupId <strong>must contain at least one {@code '.'}</strong> for this form to be recognised;
+ *       groupIds without a dot (e.g. {@code commons-io}) are routed to prefix-based matching instead.
+ *       Use the {@code :A} form to match by artifactId only when the groupId has no dot.</li>
  *   <li>{@code P} — plugin prefix (e.g. {@code enforcer}), resolved against
  *       {@link MojoExecution#getMojoDescriptor()} goal prefix</li>
  *   <li>{@code P:v:g} — prefix + version + goal</li>
@@ -93,7 +96,8 @@ public class CoordinatePredicate implements FilterPredicate {
      * <ul>
      *   <li>{@code *} — match all</li>
      *   <li>{@code :A} — by artifactId only</li>
-     *   <li>{@code G:A} — by groupId:artifactId (token contains {@code :} after first char)</li>
+     *   <li>{@code G:A} — by groupId:artifactId. The groupId must contain at least one {@code '.'} to be
+     *       recognised as a G:A form; groupIds without a dot are treated as a plugin prefix instead.</li>
      *   <li>{@code P} — by prefix</li>
      *   <li>{@code P:v:g} — by prefix + version + goal</li>
      *   <li>{@code P:v:g@e} — by prefix + version + goal + executionId</li>
@@ -122,6 +126,9 @@ public class CoordinatePredicate implements FilterPredicate {
         // Try to detect G:A form: the token contains ':' AND the part before the first ':' looks like a
         // groupId (contains a '.' suggesting it's a Java package name like org.apache.maven).
         // This distinguishes "org.apache.maven.plugins:maven-enforcer-plugin" from "enforcer:3.1.0:enforce".
+        // Limitation: groupIds that do not contain a '.' (e.g. "commons-io:commons-io") are misrouted
+        // to prefix-based matching. For such groupIds use the explicit ":A" form for artifactId-only
+        // matching, or the full "G:A" form only when the groupId contains at least one '.'.
         int firstColon = token.indexOf(':');
         if (firstColon > 0 && token.substring(0, firstColon).contains(".")) {
             // G:A[:v[:g[@e]]] form

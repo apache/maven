@@ -78,6 +78,9 @@ public class MojoExecutionFilter {
     private static FilterPredicate parseToken(String token) {
         if (token.startsWith("phase(") && token.endsWith(")")) {
             String phaseName = token.substring("phase(".length(), token.length() - 1);
+            if (phaseName.isBlank()) {
+                throw new IllegalArgumentException("phase() predicate requires a non-blank phase name");
+            }
             return new PhasePredicate(phaseName);
         }
         return CoordinatePredicate.parse(token);
