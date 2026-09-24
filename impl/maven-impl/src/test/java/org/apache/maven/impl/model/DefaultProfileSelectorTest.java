@@ -110,13 +110,12 @@ class DefaultProfileSelectorTest {
         Profile defaultProfile = activeByDefaultProfile("defaults", Profile.SOURCE_SETTINGS);
 
         List<Profile> active = selector.getActiveProfiles(
-                Arrays.asList(explicitProfile, defaultProfile),
-                contextWithActiveIds("explicit"),
-                noopCollector());
+                Arrays.asList(explicitProfile, defaultProfile), contextWithActiveIds("explicit"), noopCollector());
 
         assertEquals(1, active.size(), "Only the explicitly activated profile should be active");
         assertEquals("explicit", active.get(0).getId());
-        assertFalse(active.stream().anyMatch(p -> "defaults".equals(p.getId())),
+        assertFalse(
+                active.stream().anyMatch(p -> "defaults".equals(p.getId())),
                 "activeByDefault external profile must be suppressed when -P is used");
     }
 
@@ -137,7 +136,8 @@ class DefaultProfileSelectorTest {
                 noopCollector());
 
         assertTrue(active.stream().anyMatch(p -> "pom-explicit".equals(p.getId())));
-        assertFalse(active.stream().anyMatch(p -> "ext-default".equals(p.getId())),
+        assertFalse(
+                active.stream().anyMatch(p -> "ext-default".equals(p.getId())),
                 "External activeByDefault must be suppressed when any profile is explicitly activated via -P");
     }
 
@@ -150,9 +150,7 @@ class DefaultProfileSelectorTest {
         Profile defaultProfile = activeByDefaultProfile("defaults", Profile.SOURCE_SETTINGS);
 
         List<Profile> active = selector.getActiveProfiles(
-                Collections.singletonList(defaultProfile),
-                contextWithActiveIds(),
-                noopCollector());
+                Collections.singletonList(defaultProfile), contextWithActiveIds(), noopCollector());
 
         assertEquals(1, active.size(), "activeByDefault external profile must be active when no -P given");
         assertEquals("defaults", active.get(0).getId());
@@ -174,7 +172,8 @@ class DefaultProfileSelectorTest {
                 noopCollector());
 
         assertTrue(active.stream().anyMatch(p -> "explicit".equals(p.getId())));
-        assertFalse(active.stream().anyMatch(p -> "pom-default".equals(p.getId())),
+        assertFalse(
+                active.stream().anyMatch(p -> "pom-default".equals(p.getId())),
                 "POM activeByDefault must be suppressed when another POM profile is activated");
     }
 }
