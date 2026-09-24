@@ -138,7 +138,9 @@ under the License.
           <name>activeByDefault</name>
           <version>1.0.0</version>
           <type>boolean</type>
-          <description>Flag specifying whether this profile is active as a default.</description>
+          <description>Flag specifying whether this profile is active as a default.
+            Note: unlike the Maven 4 implementation, this compat selector does not
+            suppress external activeByDefault profiles when -P is used.</description>
         </field>
         <field>
           <name>jdk</name>
