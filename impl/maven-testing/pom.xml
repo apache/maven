@@ -30,6 +30,10 @@ under the License.
   <name>Maven Plugin Testing Mechanism</name>
   <description>The Maven Plugin Testing Harness provides mechanisms to manage tests on Mojo.</description>
 
+  <properties>
+    <javaModuleName>org.apache.maven.testing</javaModuleName>
+  </properties>
+
   <dependencies>
     <!-- maven -->
     <dependency>

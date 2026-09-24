@@ -31,6 +31,10 @@ under the License.
   <name>Maven 4 API :: Repository Metadata</name>
   <description>Maven 4 API - Immutable Repository Metadata model.</description>
 
+  <properties>
+    <javaModuleName>org.apache.maven.api.metadata</javaModuleName>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
