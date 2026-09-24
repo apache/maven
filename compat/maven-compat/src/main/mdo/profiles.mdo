@@ -138,7 +138,8 @@ under the License.
           <name>activeByDefault</name>
           <version>1.0.0</version>
           <type>boolean</type>
-          <description>Flag specifying whether this profile is active as a default.</description>
+          <description>If set to true, this profile will be active by default unless another profile is
+            explicitly activated via the command line {@code -P} / {@code --activate-profiles} option.</description>
         </field>
         <field>
           <name>jdk</name>

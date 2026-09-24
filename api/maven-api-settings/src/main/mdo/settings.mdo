@@ -715,7 +715,11 @@
           <version>1.0.0+</version>
           <type>boolean</type>
           <description>
-            Flag specifying whether this profile is active as a default.
+            If set to true, this profile will be active by default unless another profile is
+            explicitly activated via the command line {@code -P} / {@code --activate-profiles}
+            option. Unlike POM {@code activeByDefault} profiles (which are also suppressed by
+            condition-based activators in the same POM), external profiles defined in
+            {@code settings.xml} are only suppressed by an explicit {@code -P} request.
           </description>
         </field>
         <field>
