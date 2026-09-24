@@ -48,12 +48,12 @@ class DefaultArtifactCoordinatesTest {
         }
 
         @Override
-        public VersionRange getVersionRange() {
+        public VersionRange versionRange() {
             return null;
         }
 
         @Override
-        public Version getRecommendedVersion() {
+        public Version recommendedVersion() {
             return null;
         }
 
