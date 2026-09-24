@@ -54,8 +54,6 @@ import org.eclipse.aether.resolution.MetadataResult;
 import org.eclipse.aether.resolution.VersionRangeRequest;
 import org.eclipse.aether.resolution.VersionRangeResolutionException;
 import org.eclipse.aether.resolution.VersionRangeResult;
-import org.eclipse.aether.spi.locator.Service;
-import org.eclipse.aether.spi.locator.ServiceLocator;
 import org.eclipse.aether.spi.synccontext.SyncContextFactory;
 import org.eclipse.aether.util.ConfigUtils;
 import org.eclipse.aether.util.version.GenericVersionScheme;
@@ -70,7 +68,7 @@ import org.eclipse.aether.version.VersionScheme;
  */
 @Named
 @Singleton
-public class DefaultVersionRangeResolver implements VersionRangeResolver, Service {
+public class DefaultVersionRangeResolver implements VersionRangeResolver {
     /**
      * Configuration property for version range resolution used metadata {@link Metadata.Nature}.
      * It may contain string names of {@link Metadata.Nature} enum values, or string value {@code "auto"}
@@ -103,13 +101,6 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver, Servic
         setMetadataResolver(metadataResolver);
         setSyncContextFactory(syncContextFactory);
         setRepositoryEventDispatcher(repositoryEventDispatcher);
-    }
-
-    @Deprecated
-    public void initService(ServiceLocator locator) {
-        setMetadataResolver(locator.getService(MetadataResolver.class));
-        setSyncContextFactory(locator.getService(SyncContextFactory.class));
-        setRepositoryEventDispatcher(locator.getService(RepositoryEventDispatcher.class));
     }
 
     public DefaultVersionRangeResolver setMetadataResolver(MetadataResolver metadataResolver) {
