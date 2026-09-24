@@ -1167,7 +1167,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         void buildEffectiveModel(Collection<String> importIds) throws ModelBuilderException {
-            buildEffectiveModel(new ImportContext(importIds, Set.of(), false, this, null));
+            buildEffectiveModel(new ImportContext(importIds, Set.of(), false, this, null, null));
         }
 
         private void buildEffectiveModel(ImportContext context) throws ModelBuilderException {
@@ -2519,16 +2519,24 @@ public class DefaultModelBuilder implements ModelBuilder {
             ImportedModel importedModel = cached.model;
             if (importedModel == null) {
                 boolean locked = cached.lock.tryLock();
-                if (!locked && context.relocationSources.isEmpty()) {
+                // Nested waits must follow a strict order, or two parallel imports can each hold
+                // one BOM lock while waiting for the other. A contended lower key is loaded locally.
+                if (!locked
+                        && context.relocationSources.isEmpty()
+                        && (context.highestLockedImport == null
+                                || context.highestLockedImport.compareTo(imported) < 0)) {
                     cached.lock.lock();
                     locked = true;
                 }
                 try {
                     importedModel = cached.model;
                     if (importedModel == null) {
-                        // A relocation may lead back to an import being built by another thread.
-                        // Only these paths avoid waiting; ordinary imports still share one in-flight build.
-                        importedModel = doLoadDependencyManagement(dependency, groupId, artifactId, version, context);
+                        importedModel = doLoadDependencyManagement(
+                                dependency,
+                                groupId,
+                                artifactId,
+                                version,
+                                locked ? context.withImportLock(imported) : context);
                         if (locked && importedModel != null) {
                             cached.model = importedModel;
                         }
@@ -2571,7 +2579,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                 if (relocation.getMessage() != null) {
                     message += ": " + relocation.getMessage();
                 }
-                add(Severity.WARNING, Version.BASE, message, dependency.getLocation(""));
+                if (context.parent == null && context.relocationSources.isEmpty()) {
+                    add(Severity.WARNING, Version.BASE, message, dependency.getLocation(""));
+                } else {
+                    logger.debug(message);
+                }
                 if (!groupId.equals(relocatedDependency.getGroupId())
                         || !artifactId.equals(relocatedDependency.getArtifactId())
                         || !importedModel.version().equals(relocatedDependency.getVersion())) {
@@ -2671,13 +2683,22 @@ public class DefaultModelBuilder implements ModelBuilder {
                 Set<String> relocationSources,
                 boolean relocationTarget,
                 ModelProblemCollector problems,
-                ImportContext parent) {
+                ImportContext parent,
+                String highestLockedImport) {
             ImportContext withRelocation(String source) {
-                return new ImportContext(importIds, concat(relocationSources, source), true, problems, parent);
+                return new ImportContext(
+                        importIds, concat(relocationSources, source), true, problems, parent, highestLockedImport);
             }
 
             ImportContext withProblems(ModelProblemCollector collector) {
-                return new ImportContext(importIds, relocationSources, false, collector, this);
+                return new ImportContext(importIds, relocationSources, false, collector, this, highestLockedImport);
+            }
+
+            ImportContext withImportLock(String imported) {
+                String highest = highestLockedImport == null || highestLockedImport.compareTo(imported) < 0
+                        ? imported
+                        : highestLockedImport;
+                return new ImportContext(importIds, relocationSources, relocationTarget, problems, parent, highest);
             }
 
             boolean cycleIncludesRelocation(String repeated) {

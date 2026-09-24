@@ -77,6 +77,11 @@ class BomRelocationConcurrencyTest {
     }
 
     @Test
+    void completesConcurrentOrdinaryImportCycle() throws Exception {
+        buildConcurrently(Map.of("a", management(bom("b")), "b", management(bom("a"))), false, false, true);
+    }
+
+    @Test
     void detectsConcurrentMixedImportRelocationCycle() throws Exception {
         // Without relocation, these are two acyclic import graphs, not an existing import-only cycle.
         buildConcurrently(
@@ -119,13 +124,20 @@ class BomRelocationConcurrencyTest {
 
     private void buildConcurrently(Map<String, String> contents, boolean expectCycle, boolean coldOrdinary)
             throws Exception {
+        buildConcurrently(contents, expectCycle, coldOrdinary, false);
+    }
+
+    private void buildConcurrently(
+            Map<String, String> contents, boolean expectCycle, boolean coldOrdinary, boolean ordinaryCycle)
+            throws Exception {
         Map<String, ModelSource> sources = new HashMap<>();
         for (var entry : contents.entrySet()) {
             Path path = tempDir.resolve(entry.getKey() + ".pom");
             Files.writeString(path, pom(entry.getKey(), entry.getValue()));
             sources.put("test:" + entry.getKey() + ":1", Sources.resolvedSource(path, "test:" + entry.getKey() + ":1"));
         }
-        BarrierModelResolver barrierResolver = new BarrierModelResolver(sources, !expectCycle && !coldOrdinary);
+        BarrierModelResolver barrierResolver =
+                new BarrierModelResolver(sources, !expectCycle && !coldOrdinary && !ordinaryCycle);
         resolver = barrierResolver;
         transformer = new CountingModelTransformer(coldOrdinary);
         Session session = ApiRunner.createSession(
@@ -184,7 +196,7 @@ class BomRelocationConcurrencyTest {
                             task.get(Math.max(1, deadline - System.nanoTime()), TimeUnit.NANOSECONDS);
                     assertFalse(expectCycle, "Build completed without detecting the relocation cycle");
                     assertEquals(
-                            List.of("library:2"),
+                            ordinaryCycle ? List.of() : List.of("library:2"),
                             result.getEffectiveModel().getDependencyManagement().getDependencies().stream()
                                     .map(d -> d.getArtifactId() + ":" + d.getVersion())
                                     .toList());
@@ -204,7 +216,7 @@ class BomRelocationConcurrencyTest {
                 }
             }
             assertEquals(0, barrierResolver.firstLoads.getCount(), "Both source loads must overlap");
-            if (!expectCycle) {
+            if (!expectCycle && !ordinaryCycle) {
                 assertEquals(
                         Map.of("test:a:1", 1, "test:b:1", 1, "test:target:1", 1),
                         barrierResolver.resolveCounts,

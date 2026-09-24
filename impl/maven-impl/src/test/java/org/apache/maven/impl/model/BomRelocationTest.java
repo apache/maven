@@ -30,10 +30,12 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
+import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.eclipse.aether.transport.file.FileTransporterFactory;
@@ -64,9 +66,21 @@ class BomRelocationTest {
                 "relocated:old:1", pom("relocated", "old", "1", relocation("<artifactId>new</artifactId>")),
                 "relocated:new:1", pom("relocated", "new", "1", relocation("<version>2</version>")),
                 "relocated:new:2", pom("relocated", "new", "2", management(dependency("library", "2"))));
+        ModelBuilderResult result = build(poms, management(bom("old")));
+        assertEquals(List.of("library:2"), managedDependencies(result.getEffectiveModel()));
         assertEquals(
-                List.of("library:2"),
-                managedDependencies(build(poms, management(bom("old"))).getEffectiveModel()));
+                List.of("The import POM test:old:1 has been relocated to relocated:old:1"), relocationWarnings(result));
+    }
+
+    @Test
+    void warnsForDirectImportAfterTransitiveImportWasCached() throws Exception {
+        Map<String, String> poms = Map.of(
+                "test:outer:1", pom("test", "outer", "1", management(bom("old"))),
+                "test:old:1", pom("test", "old", "1", relocation("<artifactId>new</artifactId>")),
+                "test:new:1", pom("test", "new", "1", management(dependency("library", "2"))));
+        ModelBuilderResult result = build(poms, management(bom("outer") + bom("old")));
+        assertEquals(List.of("library:2"), managedDependencies(result.getEffectiveModel()));
+        assertEquals(List.of("The import POM test:old:1 has been relocated to test:new:1"), relocationWarnings(result));
     }
 
     @Test
@@ -357,6 +371,17 @@ class BomRelocationTest {
                                 p -> p.getMessage()
                                         .equals(
                                                 "The import POM test:old:1 has been relocated to test:new:1: Please update the import")));
+        assertEquals(
+                List.of("The import POM test:old:1 has been relocated to test:new:1: Please update the import"),
+                relocationWarnings(result));
+        ModelProblem warning = result.getProblemCollector()
+                .problems()
+                .filter(problem -> problem.getSeverity() == BuilderProblem.Severity.WARNING)
+                .filter(problem -> problem.getMessage().contains("has been relocated"))
+                .findFirst()
+                .orElseThrow();
+        assertEquals("test:consumer:1", warning.getModelId());
+        assertTrue(warning.getLineNumber() > 0);
     }
 
     @Test
@@ -431,6 +456,15 @@ class BomRelocationTest {
     private List<String> managedDependencies(Model model) {
         return model.getDependencyManagement().getDependencies().stream()
                 .map(d -> d.getArtifactId() + ":" + d.getVersion())
+                .toList();
+    }
+
+    private List<String> relocationWarnings(ModelBuilderResult result) {
+        return result.getProblemCollector()
+                .problems()
+                .filter(problem -> problem.getSeverity() == BuilderProblem.Severity.WARNING)
+                .map(BuilderProblem::getMessage)
+                .filter(message -> message.contains("has been relocated"))
                 .toList();
     }
 
