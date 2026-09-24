@@ -98,7 +98,6 @@ public class DefaultGraphBuilder implements GraphBuilder {
 
             if (result == null) {
                 final List<MavenProject> projects = getProjectsForMavenReactor(session);
-                validateProjects(projects, session.getRequest());
                 processPackagingAttribute(projects, session.getRequest());
                 enrichRequestFromResumptionData(projects, session.getRequest());
                 result = reactorDependencyGraph(session, projects);
@@ -141,6 +140,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
                 trimSelectedProjects(activeProjects, allSortedProjects, projectDependencyGraph, session.getRequest());
         activeProjects = trimResumedProjects(activeProjects, projectDependencyGraph, session.getRequest());
         activeProjects = trimExcludedProjects(activeProjects, projectDependencyGraph, session.getRequest());
+        validateReactorExtensionNotUsedInActiveReactor(activeProjects, session.getRequest());
 
         if (activeProjects.size() != projectDependencyGraph.getSortedProjects().size()) {
             projectDependencyGraph = new FilteredProjectDependencyGraph(projectDependencyGraph, activeProjects);
@@ -376,18 +376,16 @@ public class DefaultGraphBuilder implements GraphBuilder {
         return requestPomCollectionStrategy.collectProjects(request);
     }
 
-    private void validateProjects(List<MavenProject> projects, MavenExecutionRequest request)
-            throws MavenExecutionException {
+    private void validateReactorExtensionNotUsedInActiveReactor(
+            List<MavenProject> activeProjects, MavenExecutionRequest request) throws MavenExecutionException {
         Map<String, MavenProject> projectsMap = new HashMap<>();
 
-        List<MavenProject> projectsInRequestScope = getProjectsInRequestScope(request, projects);
-        for (MavenProject p : projectsInRequestScope) {
+        for (MavenProject p : activeProjects) {
             String projectKey = ArtifactUtils.key(p.getGroupId(), p.getArtifactId(), p.getVersion());
-
             projectsMap.put(projectKey, p);
         }
 
-        for (MavenProject project : projects) {
+        for (MavenProject project : activeProjects) {
             // MNG-1911 / MNG-5572: Building plugins with extensions cannot be part of reactor
             for (Plugin plugin : project.getBuildPlugins()) {
                 if (plugin.isExtensions()) {
