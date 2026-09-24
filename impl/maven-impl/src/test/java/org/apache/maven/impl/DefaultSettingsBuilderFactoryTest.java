@@ -18,6 +18,7 @@
  */
 package org.apache.maven.impl;
 
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -37,6 +38,7 @@ import org.apache.maven.impl.model.DefaultInterpolator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -158,6 +160,55 @@ class DefaultSettingsBuilderFactoryTest {
         assertEquals(
                 "'servers.server[0].aliases[0]' for server-1 must be unique across all server ids and aliases but found duplicate alias server-2",
                 problems.problems().findFirst().orElseThrow().getMessage());
+    }
+
+    @Test
+    void testSettingsWithServerRepositoryOrigins() {
+        Settings settings = execute("settings-servers-4").getEffectiveSettings();
+
+        List<Server> servers = settings.getServers();
+        assertEquals(2, servers.size());
+
+        List<String> repositoryOrigins = List.of("https://repo.example.org", "https://mirror.example.org:8443");
+
+        Server server1 = getServerById(servers, "server-1");
+        assertEquals(repositoryOrigins, server1.getRepositoryOrigins());
+
+        // an alias is the same credentials under another id, so it is bound to the same origins
+        Server server11 = getServerById(servers, "server-11");
+        assertEquals(repositoryOrigins, server11.getRepositoryOrigins());
+    }
+
+    @Test
+    void projectSettingsCannotWidenServerCredentialOrigins(@TempDir Path tempDir) throws Exception {
+        Path userSettings = Files.writeString(
+                tempDir.resolve("user.xml"),
+                "<settings><servers><server><id>repository</id>"
+                        + "<username>user</username><repositoryOrigins>"
+                        + "<repositoryOrigin>https://good.example.org</repositoryOrigin>"
+                        + "</repositoryOrigins></server></servers></settings>");
+        Path projectSettings = Files.writeString(
+                tempDir.resolve("project.xml"),
+                "<settings><servers><server><id>repository</id><repositoryOrigins>"
+                        + "<repositoryOrigin>https://evil.example.org</repositoryOrigin>"
+                        + "</repositoryOrigins></server></servers></settings>");
+
+        SettingsBuilder builder =
+                new DefaultSettingsBuilder(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), Map.of());
+        SettingsBuilderResult result = builder.build(SettingsBuilderRequest.builder()
+                .session(session)
+                .userSettingsSource(Sources.buildSource(userSettings))
+                .projectSettingsSource(Sources.buildSource(projectSettings))
+                .build());
+
+        // a server of the project settings is kept as a separate entry of the same id, so the origins of
+        // every entry matter: none of them may come from the project
+        List<String> repositoryOrigins = result.getEffectiveSettings().getServers().stream()
+                .filter(server -> "repository".equals(server.getId()))
+                .flatMap(server -> server.getRepositoryOrigins().stream())
+                .toList();
+        assertEquals(List.of("https://good.example.org"), repositoryOrigins);
+        assertTrue(result.getProblems().hasWarningProblems());
     }
 
     private Path getSettings(String name) {
