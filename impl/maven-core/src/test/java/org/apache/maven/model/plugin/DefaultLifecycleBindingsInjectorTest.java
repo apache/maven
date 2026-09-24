@@ -37,12 +37,18 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.model.PluginManagement;
+import org.apache.maven.model.building.ModelProblem;
+import org.apache.maven.model.building.ModelProblemCollector;
+import org.apache.maven.model.building.ModelProblemCollectorRequest;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class DefaultLifecycleBindingsInjectorTest {
@@ -72,10 +78,20 @@ class DefaultLifecycleBindingsInjectorTest {
 
         Model target = modelWithPluginManagement(managedPlugin);
         Model source = modelWithPlugin(lifecyclePlugin);
+        ModelProblemCollector problems = mock(ModelProblemCollector.class);
 
         new DefaultLifecycleBindingsInjector.LifecycleBindingsMerger(
-                        Map.of("clean", "clean", "initialize", "default"), null)
+                        Map.of("clean", "clean", "initialize", "default"), problems)
                 .merge(target, source);
+
+        ArgumentCaptor<ModelProblemCollectorRequest> warning =
+                ArgumentCaptor.forClass(ModelProblemCollectorRequest.class);
+        verify(problems).add(warning.capture());
+        assertEquals(ModelProblem.Severity.WARNING, warning.getValue().getSeverity());
+        assertTrue(warning.getValue().getMessage().contains("managed-initialize"));
+        assertTrue(warning.getValue().getMessage().contains("org.apache.maven.plugins:maven-clean-plugin"));
+        assertTrue(warning.getValue().getMessage().contains("initialize"));
+        assertEquals(crossLifecycleExecution.getLocation(""), warning.getValue().getLocation());
 
         Plugin result = target.getBuild().getPlugins().get(0);
         Xpp3Dom resultConfiguration = (Xpp3Dom) result.getConfiguration();

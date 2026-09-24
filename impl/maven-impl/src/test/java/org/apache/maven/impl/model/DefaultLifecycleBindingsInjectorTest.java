@@ -36,14 +36,21 @@ import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.model.PluginExecution;
 import org.apache.maven.api.model.PluginManagement;
+import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.LifecycleRegistry;
+import org.apache.maven.api.services.ModelProblem.Version;
+import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.PackagingRegistry;
 import org.apache.maven.api.xml.XmlNode;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class DefaultLifecycleBindingsInjectorTest {
@@ -86,10 +93,19 @@ class DefaultLifecycleBindingsInjectorTest {
         Model source = Model.newBuilder()
                 .build(Build.newBuilder().plugins(List.of(lifecyclePlugin)).build())
                 .build();
+        ModelProblemCollector problems = mock(ModelProblemCollector.class);
 
         Model resultModel = new DefaultLifecycleBindingsInjector.LifecycleBindingsMerger(
-                        Map.of("clean", "clean", "initialize", "default"), null)
+                        Map.of("clean", "clean", "initialize", "default"), problems)
                 .merge(target, source);
+
+        ArgumentCaptor<String> warning = ArgumentCaptor.forClass(String.class);
+        ArgumentCaptor<InputLocation> location = ArgumentCaptor.forClass(InputLocation.class);
+        verify(problems).add(eq(Severity.WARNING), eq(Version.BASE), warning.capture(), location.capture());
+        assertTrue(warning.getValue().contains("managed-initialize"));
+        assertTrue(warning.getValue().contains("org.apache.maven.plugins:maven-clean-plugin"));
+        assertTrue(warning.getValue().contains("initialize"));
+        assertEquals(crossLifecycleExecution.getLocation(""), location.getValue());
 
         Plugin result = resultModel.getBuild().getPlugins().get(0);
         XmlNode resultConfiguration = result.getConfiguration();

@@ -31,7 +31,6 @@ import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.feature.Features;
 import org.apache.maven.api.model.Build;
-import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.PluginContainer;
@@ -222,7 +221,7 @@ public class DefaultLifecycleBindingsInjector implements LifecycleBindingsInject
                                             + " managed executions unconditionally, or set"
                                             + " -Dmaven.warn.crossLifecycleManagedExecution=false to suppress"
                                             + " this warning.",
-                                    (InputLocation) null);
+                                    execution.getLocation(""));
                         }
                         return false;
                     })

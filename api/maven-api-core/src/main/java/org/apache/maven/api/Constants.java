@@ -579,9 +579,8 @@ public final class Constants {
      * User property to suppress warnings about pluginManagement executions that are filtered out because they are
      * bound to a lifecycle phase that belongs to a different lifecycle than the one being executed. Such executions
      * are silently dropped when the plugin is introduced only by lifecycle bindings (not explicitly declared in
-     * {@code <build><plugins>}). Set to {@code false} to suppress the warning once you have reviewed and
-     * accepted the behavior, or declare the plugin in {@code <build><plugins>} to retain all its managed
-     * executions unconditionally.
+     * {@code <build><plugins>}). Set to {@code false} to suppress the warning, or declare the plugin in
+     * {@code <build><plugins>} to retain all its managed executions unconditionally.
      *
      * @since 4.1.0
      */
