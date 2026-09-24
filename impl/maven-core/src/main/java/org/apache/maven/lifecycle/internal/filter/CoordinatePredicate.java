@@ -43,7 +43,9 @@ import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
  *       groupIds without a dot (e.g. {@code commons-io}) are routed to prefix-based matching instead.
  *       Use the {@code :A} form to match by artifactId only when the groupId has no dot.</li>
  *   <li>{@code P} — plugin prefix (e.g. {@code enforcer}), resolved against
- *       {@link MojoExecution#getMojoDescriptor()} goal prefix</li>
+ *       {@link MojoExecution#getMojoDescriptor()} goal prefix.
+ *       The prefix <strong>must not contain a {@code '.'}</strong>; prefixes with a dot
+ *       (e.g. {@code io.smallrye}) are routed to groupId:artifactId matching instead.</li>
  *   <li>{@code P:v:g} — prefix + version + goal</li>
  *   <li>{@code P:v:g@e} — prefix + version + goal + executionId</li>
  * </ul>
