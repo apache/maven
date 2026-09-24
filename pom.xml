@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-parent</artifactId>
-    <version>49</version>
+    <version>50</version>
     <relativePath />
   </parent>
 
@@ -146,7 +146,7 @@ under the License.
     <byteBuddyVersion>1.18.14</byteBuddyVersion>
     <classWorldsVersion>2.12.1</classWorldsVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
-    <domtripVersion>1.7.0</domtripVersion>
+    <domtripVersion>1.8.0</domtripVersion>
     <guiceVersion>5.1.0</guiceVersion>
     <guavaVersion>33.7.1-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
@@ -169,7 +169,7 @@ under the License.
     <stax2ApiVersion>4.3.0</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
     <woodstoxVersion>7.2.2</woodstoxVersion>
-    <xmlunitVersion>2.13.0</xmlunitVersion>
+    <xmlunitVersion>2.14.0</xmlunitVersion>
     <jacocoArgLine />
     <argLine.xmx>-Xmx256m</argLine.xmx>
     <argLine.mockito />
@@ -812,7 +812,7 @@ under the License.
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
-            <excludes>
+            <inputExcludes>
               <exclude>Jenkinsfile</exclude>
               <exclude>**/.gitattributes</exclude>
               <exclude>src/main/resources/META-INF/services/**</exclude>
@@ -831,7 +831,7 @@ under the License.
                 ! Excluded the license files itself cause they do not have a license of themselves.
               -->
               <exclude>src/main/appended-resources/licenses/**</exclude>
-            </excludes>
+            </inputExcludes>
           </configuration>
         </plugin>
       </plugins>
@@ -1053,7 +1053,7 @@ under the License.
             </dependencies>
             <executions>
               <execution>
-                <id>render-maven-configuration-md</id>
+                <id>render-maven-configuration-xdoc</id>
                 <goals>
                   <goal>java</goal>
                 </goals>

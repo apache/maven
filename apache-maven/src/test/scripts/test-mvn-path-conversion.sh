@@ -107,7 +107,17 @@ replace() {
 }
 
 case " $* " in
-  *" --windows "*) printf 'C:%s\n' "`replace "$path" '/' '\'`" ;;
+  *" --windows "*)
+    case "$path" in
+      /cygdrive/c/*)
+        path="`replace "$path" '/cygdrive/c/' ''`"
+        printf 'C:\%s\n' "`replace "$path" '/' '\'`"
+        ;;
+      *)
+        printf 'C:%s\n' "`replace "$path" '/' '\'`"
+        ;;
+    esac
+    ;;
   *" --unix "*) printf '%s\n' "`replace "${path#C:}" '\' '/'`" ;;
   *) printf '%s\n' "$path" ;;
 esac
@@ -176,9 +186,18 @@ failures=0
 
 # run_mvn <uname-output> <stub-dir>
 run_mvn() {
+  run_mvn_with_args "$1" "$2" verify
+}
+
+# run_mvn_with_args <uname-output> <stub-dir> [args...]
+run_mvn_with_args() {
+  uname_out="$1"
+  shift
+  stub_dir="$1"
+  shift
   ( cd "$project_dir/module" &&
-    FAKE_UNAME="$1" PATH="$2" JAVA_HOME= MAVEN_SKIP_RC=1 \
-      "$sh_bin" "$maven_home/bin/mvn" verify 2>/dev/null )
+    FAKE_UNAME="$uname_out" PATH="$stub_dir" JAVA_HOME= MAVEN_SKIP_RC=1 \
+      "$sh_bin" "$maven_home/bin/mvn" "$@" 2>/dev/null )
 }
 
 # run_mvn_debug <uname-output> <stub-dir>
@@ -261,6 +280,26 @@ for os in CYGWIN_NT-10.0 MINGW32_NT-6.2 MINGW64_NT-10.0 MSYS_NT-10.0; do
     "[-Dlibrary.jline.path=`to_windows "$maven_home/lib/jline-native"`]"
   assert_not_contains "$os: no path mixes both separators" "$output" "\\/"
 done
+
+# Cygwin: -f with absolute POSIX path is converted
+output=`run_mvn_with_args CYGWIN_NT-10.0 "$stub_dir" -f /cygdrive/c/temp/pom.xml validate`
+assert_contains "cygwin: -f /cygdrive path converted" "$output" "[-f][C:\\temp\\pom.xml]"
+
+# Cygwin: -s with absolute POSIX path is converted
+output=`run_mvn_with_args CYGWIN_NT-10.0 "$stub_dir" -s /cygdrive/c/settings.xml validate`
+assert_contains "cygwin: -s /cygdrive path converted" "$output" "[-s][C:\\settings.xml]"
+
+# Cygwin: --file= with absolute POSIX path is converted
+output=`run_mvn_with_args CYGWIN_NT-10.0 "$stub_dir" --file=/cygdrive/c/temp/pom.xml validate`
+assert_contains "cygwin: --file= /cygdrive path converted" "$output" "[--file=C:\\temp\\pom.xml]"
+
+# Cygwin: relative path is left unchanged
+output=`run_mvn_with_args CYGWIN_NT-10.0 "$stub_dir" -f ./relative/pom.xml validate`
+assert_contains "cygwin: relative -f path unchanged" "$output" "[-f][./relative/pom.xml]"
+
+# MinGW/MSYS2: conversion does NOT run (cygwin=false)
+output=`run_mvn_with_args MINGW64_NT-10.0 "$stub_dir" -f /cygdrive/c/temp/pom.xml validate`
+assert_contains "mingw: -f path not converted" "$output" "[-f][/cygdrive/c/temp/pom.xml]"
 
 # Without cygpath the launcher must still work, using unconverted paths, rather
 # than passing empty paths to the JVM.
