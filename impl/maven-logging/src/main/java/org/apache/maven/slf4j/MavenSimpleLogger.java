@@ -39,12 +39,43 @@ public class MavenSimpleLogger extends MavenBaseLogger {
     private String warnRenderedLevel;
     private String errorRenderedLevel;
 
-    static Consumer<String> logSink;
+    /**
+     * Structured log sink that receives level, logger name, clean message,
+     * formatted console output, and throwable for each log event.
+     * <p>
+     * This replaces the previous {@code Consumer<String>} sink to enable
+     * console renderers (e.g. rich mode) to filter by log level and access
+     * the clean message independently of ANSI formatting.
+     *
+     * @since 4.1.0
+     */
+    @FunctionalInterface
+    public interface LogSink {
+        void accept(int level, String loggerName, String cleanMessage, String formattedMessage, Throwable throwable);
+    }
+
+    static volatile LogSink logSink;
 
     public static final String DEFAULT_LOG_LEVEL_KEY = "org.slf4j.simpleLogger.defaultLogLevel";
 
-    public static void setLogSink(Consumer<String> logSink) {
+    /**
+     * Sets the structured log sink.
+     *
+     * @param logSink the sink, or {@code null} to remove
+     * @since 4.1.0
+     */
+    public static void setLogSink(LogSink logSink) {
         MavenSimpleLogger.logSink = logSink;
+    }
+
+    /**
+     * Returns the current log sink, or {@code null} if none is set.
+     *
+     * @return the current log sink, or {@code null}
+     * @since 4.1.0
+     */
+    public static LogSink getLogSink() {
+        return logSink;
     }
 
     MavenSimpleLogger(String name) {
@@ -70,15 +101,22 @@ public class MavenSimpleLogger extends MavenBaseLogger {
     }
 
     @Override
-    protected void write(StringBuilder buf, Throwable t) {
-        Consumer<String> sink = logSink;
+    protected void write(int level, String loggerName, String cleanMessage, StringBuilder formattedBuf, Throwable t) {
+        LogSink sink = logSink;
         if (sink != null) {
-            sink.accept(buf.toString());
+            // Build the full formatted output including throwable rendering,
+            // reusing the existing writeThrowable/printStackTrace methods
+            // to keep a single rendering path for throwables.
+            String formatted = formattedBuf.toString();
             if (t != null) {
-                writeThrowable(t, sink);
+                StringBuilder full = new StringBuilder(formatted);
+                full.append(System.lineSeparator());
+                writeThrowable(t, line -> full.append(line).append(System.lineSeparator()));
+                formatted = full.toString();
             }
+            sink.accept(level, loggerName, cleanMessage, formatted, t);
         } else {
-            super.write(buf, t);
+            super.write(formattedBuf, t);
         }
     }
 
@@ -86,6 +124,8 @@ public class MavenSimpleLogger extends MavenBaseLogger {
     protected void writeThrowable(Throwable t, PrintStream stream) {
         writeThrowable(t, stream::println);
     }
+
+    private static final int MAX_THROWABLE_DEPTH = 20;
 
     protected void writeThrowable(Throwable t, Consumer<String> stream) {
         if (t == null) {
@@ -97,10 +137,14 @@ public class MavenSimpleLogger extends MavenBaseLogger {
         }
         stream.accept(builder.toString());
 
-        printStackTrace(t, stream, "");
+        printStackTrace(t, stream, "", 0);
     }
 
     protected void printStackTrace(Throwable t, Consumer<String> stream, String prefix) {
+        printStackTrace(t, stream, prefix, 0);
+    }
+
+    private void printStackTrace(Throwable t, Consumer<String> stream, String prefix, int depth) {
         MessageBuilder builder = builder();
         for (StackTraceElement e : t.getStackTrace()) {
             builder.a(prefix);
@@ -116,16 +160,24 @@ public class MavenSimpleLogger extends MavenBaseLogger {
             stream.accept(builder.toString());
             builder.setLength(0);
         }
-        for (Throwable se : t.getSuppressed()) {
-            writeThrowable(se, stream, "Suppressed", prefix + "    ");
-        }
-        Throwable cause = t.getCause();
-        if (cause != null && t != cause) {
-            writeThrowable(cause, stream, "Caused by", prefix);
+        if (depth < MAX_THROWABLE_DEPTH) {
+            for (Throwable se : t.getSuppressed()) {
+                writeThrowable(se, stream, "Suppressed", prefix + "    ", depth + 1);
+            }
+            Throwable cause = t.getCause();
+            if (cause != null && t != cause) {
+                writeThrowable(cause, stream, "Caused by", prefix, depth + 1);
+            }
+        } else {
+            stream.accept(prefix + "    [...cause/suppressed chain truncated at depth " + MAX_THROWABLE_DEPTH + "]");
         }
     }
 
     protected void writeThrowable(Throwable t, Consumer<String> stream, String caption, String prefix) {
+        writeThrowable(t, stream, caption, prefix, 0);
+    }
+
+    private void writeThrowable(Throwable t, Consumer<String> stream, String caption, String prefix, int depth) {
         MessageBuilder builder =
                 builder().a(prefix).strong(caption).a(": ").a(t.getClass().getName());
         if (t.getMessage() != null) {
@@ -133,7 +185,7 @@ public class MavenSimpleLogger extends MavenBaseLogger {
         }
         stream.accept(builder.toString());
 
-        printStackTrace(t, stream, prefix);
+        printStackTrace(t, stream, prefix, depth);
     }
 
     protected String getLocation(final StackTraceElement e) {
