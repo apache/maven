@@ -19,9 +19,15 @@ name: PR Automation
 on:
   pull_request_target:
     types:
+      # zizmor: ignore[dangerous-triggers]
       - closed
+
+permissions: {}
 
 jobs:
   pr-automation:
     name: PR Automation
-    uses: apache/maven-gh-actions-shared/.github/workflows/pr-automation.yml@v5
+    permissions:
+      issues: write
+      pull-requests: write
+    uses: apache/maven-gh-actions-shared/.github/workflows/pr-automation.yml@8599b638c78a2bec146a98d75d4c8b4e8458324f # v5
