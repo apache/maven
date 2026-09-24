@@ -481,9 +481,9 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                                                     after(TEST_COMPILE),
                                                     after(TEST_RESOURCES),
                                                     dependencies(SCOPE_TEST, READY))),
-                                    phase(INTEGRATION_TEST)),
-                            phase(INSTALL, after(PACKAGE)),
-                            phase(DEPLOY, after(PACKAGE)))));
+                                    phase(INTEGRATION_TEST, after(BUILD))),
+                            phase(INSTALL, after(VERIFY)),
+                            phase(DEPLOY, after(VERIFY)))));
             // END SNIPPET: default
         }
 
