@@ -54,6 +54,21 @@ Artifact handlers are required by the dependency resolution mechanism.
     </component>
 
     <!--
+     | core override JAR
+     |-->
+    <component>
+      <role>org.apache.maven.artifact.handler.ArtifactHandler</role>
+      <role-hint>core-override-jar</role-hint>
+      <implementation>org.apache.maven.artifact.handler.DefaultArtifactHandler</implementation>
+      <configuration>
+        <type>core-override-jar</type>
+        <extension>jar</extension>
+        <language>java</language>
+        <addedToClasspath>true</addedToClasspath>
+      </configuration>
+    </component>
+
+    <!--
      | EJB
      |-->
     <component>
