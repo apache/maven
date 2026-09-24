@@ -17,7 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0">
+<project xmlns="http://maven.apache.org/POM/4.1.0">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng1088</groupId>
@@ -26,9 +26,10 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-1088</name>
-  <description>Test that the plugin manager falls back to resolution from the repository if a plugin is part of the reactor
-    (i.e. an active project artifact) but the lifecycle has not been executed far enough to produce a file for
-    the plugin (i.e. a phase before "compile").</description>
+  <description>
+    Test that the concurrent builder can build a plugin that is part of the reactor,
+    then use it in a sibling module — without any pre-installed version in the local repo.
+  </description>
 
   <modules>
     <module>plugin</module>
