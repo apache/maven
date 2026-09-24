@@ -1097,7 +1097,7 @@ under the License.
             </dependencies>
             <executions>
               <execution>
-                <id>render-maven-configuration-md</id>
+                <id>render-maven-configuration-xdoc</id>
                 <goals>
                   <goal>java</goal>
                 </goals>

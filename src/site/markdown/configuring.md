@@ -88,6 +88,8 @@ The main user properties source `${maven.home}/conf/maven-user.properties` defin
 load the _user wide_ user properties from `~/.m2/maven-user.properties` and the _project_ specific user properties 
 from `${session.rootDirectory}/.mvn/maven-user.properties`.
 
+For the complete list of available Maven configuration properties and options, see [Maven Configuration Options](configuration.html).
+
 ## Settings
 
 ## Extensions
