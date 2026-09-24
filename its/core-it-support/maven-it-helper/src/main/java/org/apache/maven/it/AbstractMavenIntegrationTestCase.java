@@ -139,6 +139,12 @@ public abstract class AbstractMavenIntegrationTestCase {
 
         verifier.setAutoclean(false);
 
+        // Isolate ITs from the host CI environment so that console mode auto-detection
+        // (CI → plain) does not suppress output that ITs rely on (e.g. mojo-start banners,
+        // Reactor Summary lines). ITs that specifically test CI-mode behaviour must opt back
+        // in by calling verifier.setEnvironmentVariable("CI", "true") explicitly.
+        verifier.removeCIEnvironmentVariables();
+
         if (settings != null) {
             Path settingsPath;
             if (!settings.isEmpty()) {

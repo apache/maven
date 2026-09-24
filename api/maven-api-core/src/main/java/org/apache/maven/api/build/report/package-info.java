@@ -16,34 +16,23 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.logging;
-
-import org.apache.maven.api.build.report.LogEvent;
-import org.apache.maven.execution.ExecutionEvent;
-import org.eclipse.aether.transfer.TransferEvent;
 
 /**
- * An abstract build event sink.
+ * Structured build report data model.
+ * <p>
+ * The {@link org.apache.maven.api.build.report.BuildReport} is the root of a structured
+ * representation of a Maven build execution. It is persisted to
+ * {@code target/build-report.json} at the end of every build and can be consumed
+ * by tools, CI systems, IDEs, and LLM agents without re-running the build or
+ * parsing console output.
+ * <p>
+ * Build problems (warnings, errors) are represented as
+ * {@link org.apache.maven.api.services.BuilderProblem} instances and included
+ * in the report for downstream analysis.
+ *
+ * @since 4.1.0
  */
-public interface BuildEventListener {
+@Experimental
+package org.apache.maven.api.build.report;
 
-    void sessionStarted(ExecutionEvent event);
-
-    void projectStarted(String projectId);
-
-    void projectLogMessage(String projectId, LogEvent event);
-
-    void projectFinished(String projectId);
-
-    void executionFailure(String projectId, boolean halted, String exception);
-
-    void mojoStarted(ExecutionEvent event);
-
-    void finish(int exitCode) throws Exception;
-
-    void fail(Throwable t) throws Exception;
-
-    void log(String msg);
-
-    void transfer(String projectId, TransferEvent e);
-}
+import org.apache.maven.api.annotations.Experimental;

@@ -16,34 +16,38 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.logging;
+package org.apache.maven.internal.build;
 
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+
+import org.apache.maven.api.build.report.BuildStatus;
 import org.apache.maven.api.build.report.LogEvent;
-import org.apache.maven.execution.ExecutionEvent;
-import org.eclipse.aether.transfer.TransferEvent;
+import org.apache.maven.api.build.report.ModuleReport;
+import org.apache.maven.api.build.report.MojoReport;
 
 /**
- * An abstract build event sink.
+ * Internal immutable implementation of {@link ModuleReport}.
  */
-public interface BuildEventListener {
+record DefaultModuleReport(
+        String groupId,
+        String artifactId,
+        String version,
+        BuildStatus status,
+        Instant startTime,
+        Duration duration,
+        List<MojoReport> mojos,
+        List<LogEvent> output)
+        implements ModuleReport {
 
-    void sessionStarted(ExecutionEvent event);
+    @Override
+    public List<MojoReport> mojos() {
+        return List.copyOf(mojos);
+    }
 
-    void projectStarted(String projectId);
-
-    void projectLogMessage(String projectId, LogEvent event);
-
-    void projectFinished(String projectId);
-
-    void executionFailure(String projectId, boolean halted, String exception);
-
-    void mojoStarted(ExecutionEvent event);
-
-    void finish(int exitCode) throws Exception;
-
-    void fail(Throwable t) throws Exception;
-
-    void log(String msg);
-
-    void transfer(String projectId, TransferEvent e);
+    @Override
+    public List<LogEvent> output() {
+        return List.copyOf(output);
+    }
 }

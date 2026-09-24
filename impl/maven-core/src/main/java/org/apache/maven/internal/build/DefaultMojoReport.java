@@ -16,31 +16,34 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.logging.impl;
+package org.apache.maven.internal.build;
 
-import org.apache.maven.cling.logging.BaseSlf4jConfiguration;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+
+import org.apache.maven.api.build.report.BuildStatus;
+import org.apache.maven.api.build.report.LogEvent;
+import org.apache.maven.api.build.report.MojoReport;
 
 /**
- * Configuration for slf4j-logback.
- *
- * @since 3.1.0
+ * Internal immutable implementation of {@link MojoReport}.
  */
-public class LogbackConfiguration extends BaseSlf4jConfiguration {
-    @Override
-    public void setRootLoggerLevel(Level level) {
-        ch.qos.logback.classic.Level value =
-                switch (level) {
-                    case DEBUG -> ch.qos.logback.classic.Level.DEBUG;
-                    case INFO -> ch.qos.logback.classic.Level.INFO;
-                    default -> ch.qos.logback.classic.Level.ERROR;
-                };
-        ((ch.qos.logback.classic.Logger) LoggerFactory.getLogger(Logger.ROOT_LOGGER_NAME)).setLevel(value);
-    }
+record DefaultMojoReport(
+        String groupId,
+        String artifactId,
+        String version,
+        String goal,
+        String executionId,
+        String phase,
+        BuildStatus status,
+        Instant startTime,
+        Duration duration,
+        List<LogEvent> output)
+        implements MojoReport {
 
     @Override
-    public void activate() {
-        // no op
+    public List<LogEvent> output() {
+        return List.copyOf(output);
     }
 }
