@@ -151,14 +151,19 @@ public class StrategyOrchestrator {
             context.failure("Strategy completed with errors");
             context.indent();
             context.info("Processed: " + result.processedPoms().size() + " POMs");
-            context.info("Modified: " + result.modifiedPoms().size() + " POMs");
+            context.info((context.isDryRun() ? "Would modify: " : "Modified: ")
+                    + result.modifiedPoms().size() + " POMs");
             context.failure("Errors: " + result.errorPoms().size() + " POMs");
             context.unindent();
         } else if (!result.modifiedPoms().isEmpty()) {
             context.success("Strategy completed successfully");
             context.indent();
             context.info("Processed: " + result.processedPoms().size() + " POMs");
-            context.success("Modified: " + result.modifiedPoms().size() + " POMs");
+            if (context.isDryRun()) {
+                context.action(result.modifiedPoms().size() + " POM(s) would be modified");
+            } else {
+                context.success("Modified: " + result.modifiedPoms().size() + " POMs");
+            }
             context.unindent();
         } else {
             context.info("Strategy completed (no changes needed)");
@@ -178,8 +183,13 @@ public class StrategyOrchestrator {
         context.info("Total POMs processed: " + overallResult.processedPoms().size());
 
         if (!overallResult.modifiedPoms().isEmpty()) {
-            context.success(
-                    "Total POMs modified: " + overallResult.modifiedPoms().size());
+            if (context.isDryRun()) {
+                context.action("Total POMs would be modified: "
+                        + overallResult.modifiedPoms().size());
+            } else {
+                context.success(
+                        "Total POMs modified: " + overallResult.modifiedPoms().size());
+            }
         } else {
             context.info("No POMs required modifications");
         }

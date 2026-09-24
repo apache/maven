@@ -138,7 +138,7 @@ public class NashornCompatibilityStrategy extends AbstractUpgradeStrategy {
                 boolean modified = injectNashornForAntrunJavaScript(pomDocument, context);
 
                 if (modified) {
-                    context.success("Injected standalone Nashorn dependency for antrun JavaScript");
+                    logChange(context, "Injected standalone Nashorn dependency for antrun JavaScript");
                     modifiedPoms.add(pomPath);
                 } else {
                     context.success("No antrun JavaScript usage found");
