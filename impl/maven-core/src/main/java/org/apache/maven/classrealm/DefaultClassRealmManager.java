@@ -22,10 +22,21 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.lang.module.Configuration;
+import java.lang.module.FindException;
+import java.lang.module.ModuleFinder;
+import java.lang.module.ResolutionException;
 import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,15 +46,15 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.classworlds.ClassRealm;
+import org.apache.maven.api.classworlds.ClassWorld;
+import org.apache.maven.api.classworlds.DuplicateRealmException;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.internal.CoreRealm;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Plugin;
-import org.codehaus.plexus.classworlds.ClassWorld;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
 import org.eclipse.aether.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -110,8 +121,8 @@ public class DefaultClassRealmManager implements ClassRealmManager {
                 null /* artifacts */);
 
         Map<String, ClassLoader> apiV4Imports = new HashMap<>();
-        apiV4Imports.put("org.apache.maven.api", containerRealm);
-        apiV4Imports.put("org.slf4j", containerRealm);
+        apiV4Imports.put("org.apache.maven.api", containerRealm.getClassLoader());
+        apiV4Imports.put("org.slf4j", containerRealm.getClassLoader());
         this.maven4ApiRealm = createRealm(API_V4_REALMID, RealmType.Core, null, null, apiV4Imports, null);
 
         this.providedArtifacts = exports.getExportedArtifacts();
@@ -207,6 +218,8 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
         populateRealm(classRealm, constituents);
 
+        applyModuleAccessDescriptors(classRealm);
+
         return classRealm;
     }
 
@@ -219,7 +232,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
     public ClassRealm createProjectRealm(Model model, List<Artifact> artifacts) {
         Objects.requireNonNull(model, "model cannot be null");
 
-        ClassLoader parent = getMavenApiRealm();
+        ClassLoader parent = getMavenApiRealm().getClassLoader();
 
         return createRealm(getKey(model), RealmType.Project, parent, null, null, artifacts);
     }
@@ -232,7 +245,8 @@ public class DefaultClassRealmManager implements ClassRealmManager {
     public ClassRealm createExtensionRealm(Plugin plugin, List<Artifact> artifacts) {
         Objects.requireNonNull(plugin, "plugin cannot be null");
 
-        Map<String, ClassLoader> foreignImports = Collections.singletonMap("", getMavenApiRealm());
+        Map<String, ClassLoader> foreignImports =
+                Collections.singletonMap("", getMavenApiRealm().getClassLoader());
 
         return createRealm(
                 getKey(plugin, true), RealmType.Extension, PARENT_CLASSLOADER, null, foreignImports, artifacts);
@@ -257,6 +271,101 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         }
 
         return createRealm(getKey(plugin, false), RealmType.Plugin, parent, parentImports, foreignImports, artifacts);
+    }
+
+    @Override
+    public ClassRealm createModularPluginRealm(Plugin plugin, ClassLoader parent, List<Artifact> artifacts)
+            throws ModuleLayerCreationException {
+        Objects.requireNonNull(plugin, "plugin cannot be null");
+
+        if (parent == null) {
+            parent = PARENT_CLASSLOADER;
+        }
+
+        String realmId = getKey(plugin, false);
+        ClassRealm classRealm = newRealm(realmId);
+        classRealm.setParentClassLoader(parent);
+
+        // Collect all artifact paths for the module finder
+        List<Path> modulePaths = new ArrayList<>();
+        if (artifacts != null) {
+            for (Artifact artifact : artifacts) {
+                if (artifact.getFile() != null && !isProvidedArtifact(artifact, true)) {
+                    modulePaths.add(artifact.getFile().toPath());
+                } else if (logger.isDebugEnabled() && artifact.getFile() != null) {
+                    logger.debug("  Excluded from module path: {}", getId(artifact));
+                }
+            }
+        }
+
+        if (modulePaths.isEmpty()) {
+            throw new ModuleLayerCreationException("Plugin " + plugin.getId()
+                    + " declares <modular>true</modular> but has no artifacts" + " to place on the module path");
+        }
+
+        try {
+            ModuleFinder finder = ModuleFinder.of(modulePaths.toArray(new Path[0]));
+            Set<String> moduleNames = finder.findAll().stream()
+                    .map(ref -> ref.descriptor().name())
+                    .collect(Collectors.toSet());
+
+            if (moduleNames.isEmpty()) {
+                throw new ModuleLayerCreationException(
+                        "Plugin " + plugin.getId() + " declares <modular>true</modular> but none of its"
+                                + " artifacts contain module descriptors (module-info.class)."
+                                + " Ensure the plugin JAR is compiled with a module-info.java.");
+            }
+
+            // Parent layer: use the runtime layer from ClassWorld if available (has Maven API
+            // modules + JLine), otherwise fall back to the boot layer.
+            // Flat hierarchy — all plugin layers are siblings under this parent.
+            org.codehaus.plexus.classworlds.ClassWorld implWorld = (org.codehaus.plexus.classworlds.ClassWorld) world;
+            ModuleLayer parentLayer =
+                    implWorld.getModuleLayer() != null ? implWorld.getModuleLayer() : ModuleLayer.boot();
+
+            // resolveAndBind: resolves modules and binds service providers,
+            // enabling ServiceLoader discovery within the plugin layer
+            Configuration cfg = parentLayer.configuration().resolveAndBind(ModuleFinder.of(), finder, moduleNames);
+
+            // One loader per plugin — isolation between plugins
+            ModuleLayer.Controller controller =
+                    ModuleLayer.defineModulesWithOneLoader(cfg, List.of(parentLayer), parent);
+
+            ModuleLayer pluginLayer = controller.layer();
+
+            // Store per-realm, not per-world
+            var implRealm = (org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm;
+            implRealm.setModuleLayer(pluginLayer, controller);
+
+            // Also populate the realm's classpath with the same artifacts
+            // so that ClassRealm.getURLs() returns meaningful results
+            // and resource loading works through the realm
+            populateRealm(
+                    classRealm,
+                    artifacts == null
+                            ? List.of()
+                            : artifacts.stream()
+                                    .filter(a -> a.getFile() != null && !isProvidedArtifact(a, true))
+                                    .map(ArtifactClassRealmConstituent::new)
+                                    .collect(Collectors.toList()));
+
+            // Apply META-INF/maven/module-access descriptors for access to
+            // boot-layer modules (e.g. java.base internals)
+            applyModuleAccessDescriptors(classRealm);
+
+            logger.debug(
+                    "Created modular plugin realm {} with ModuleLayer containing modules: {}", realmId, moduleNames);
+
+            return classRealm;
+
+        } catch (FindException | ResolutionException e) {
+            throw new ModuleLayerCreationException(
+                    "Failed to create module layer for plugin " + plugin.getId()
+                            + " which declares <modular>true</modular>."
+                            + " Ensure all dependencies are module-path compatible"
+                            + " (no split packages, valid module descriptors): " + e.getMessage(),
+                    e);
+        }
     }
 
     private static String getKey(Plugin plugin, boolean extension) {
@@ -302,7 +411,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
             for (ClassRealmManagerDelegate delegate : delegates) {
                 try {
-                    delegate.setupRealm(classRealm, request);
+                    delegate.setupRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm, request);
                 } catch (Exception e) {
                     logger.error(
                             delegate.getClass().getName() + " failed to setup class realm " + classRealm + ": "
@@ -353,7 +462,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             for (String imp : parentImports) {
                 logger.debug("  Imported: {} < {}", imp, getId(classRealm.getParentClassLoader()));
 
-                classRealm.importFromParent(imp);
+                ((org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm).importFromParent(imp);
             }
         }
     }
@@ -363,5 +472,117 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             return classRealm.getId();
         }
         return classLoader;
+    }
+
+    private static final String MODULE_ACCESS_DESCRIPTOR = "META-INF/maven/module-access";
+
+    /**
+     * Reads {@code META-INF/maven/module-access} descriptors from the plugin realm's classpath and
+     * applies the access directives they contain.
+     *
+     * <h4>Purpose</h4>
+     * <p>
+     * When a plugin (or extension) runs on the <em>classpath</em> (unnamed module) it may need to
+     * call into packages of a <em>named</em> module that lives in Maven's boot/runtime layer —
+     * for example JLine modules in {@code lib/modules/}, or any future Maven API module that ships
+     * as a named module.  Named modules do not export their internals to the unnamed module by
+     * default; the JVM enforces this at runtime via strong encapsulation.
+     * </p>
+     * <p>
+     * The {@code META-INF/maven/module-access} file is a plugin-side escape hatch: it lets the
+     * plugin declare which packages of which boot-layer modules it needs opened or exported
+     * <strong>to itself</strong> (always {@code ALL-UNNAMED} as the target).  Maven applies these
+     * directives programmatically via {@link Module#addExports}/{@link Module#addOpens} on startup
+     * of the plugin realm, before any plugin class is loaded.
+     * </p>
+     *
+     * <h4>Direction of access</h4>
+     * <p>
+     * Directives go from an <em>existing</em> named module in the boot/runtime layer
+     * <strong>to</strong> the unnamed-module classloader of the plugin.  In other words:
+     * a plugin cannot use this mechanism to export its <em>own</em> packages; it can only
+     * widen access from modules that Maven already owns (and that are loaded before the plugin).
+     * </p>
+     *
+     * <h4>File format</h4>
+     * <p>Each non-blank, non-comment line is one of:</p>
+     * <pre>
+     *   add-exports &lt;module&gt;/&lt;package&gt;=ALL-UNNAMED
+     *   add-opens   &lt;module&gt;/&lt;package&gt;=ALL-UNNAMED
+     *   add-reads   &lt;module&gt;
+     * </pre>
+     * <p>
+     * These mirror the JVM flags {@code --add-exports}, {@code --add-opens}, and
+     * {@code --add-reads} respectively.  Lines starting with {@code #} are comments.
+     * </p>
+     *
+     * <h4>Why not {@code module-info.java}?</h4>
+     * <p>
+     * The boot-layer modules (e.g. JLine) are compiled independently and cannot reference
+     * the plugin's module name at compile time.  Adding {@code exports … to plugin.module} in
+     * their {@code module-info} would create an unacceptable coupling.  Programmatic
+     * {@code addExports}/{@code addOpens} is the standard JDK-endorsed workaround for
+     * this exact scenario (see {@link java.lang.Module#addExports}).
+     * </p>
+     *
+     * @param classRealm the plugin class realm whose JAR(s) are scanned for descriptors
+     */
+    private void applyModuleAccessDescriptors(ClassRealm classRealm) {
+        var implRealm = (org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm;
+        try {
+            Enumeration<URL> resources = implRealm.getResources(MODULE_ACCESS_DESCRIPTOR);
+            while (resources.hasMoreElements()) {
+                URL resource = resources.nextElement();
+                try (BufferedReader reader =
+                        new BufferedReader(new InputStreamReader(resource.openStream(), StandardCharsets.UTF_8))) {
+                    String line;
+                    while ((line = reader.readLine()) != null) {
+                        line = line.trim();
+                        if (line.isEmpty() || line.startsWith("#")) {
+                            continue;
+                        }
+                        applyModuleAccessDirective(implRealm, line);
+                    }
+                }
+            }
+        } catch (IOException e) {
+            logger.debug("Failed to read module-access descriptors for realm {}", classRealm.getId(), e);
+        }
+    }
+
+    private void applyModuleAccessDirective(org.codehaus.plexus.classworlds.realm.ClassRealm realm, String line) {
+        if (line.startsWith("add-exports ")) {
+            applyExportOrOpen(realm, line.substring("add-exports ".length()).trim(), false);
+        } else if (line.startsWith("add-opens ")) {
+            applyExportOrOpen(realm, line.substring("add-opens ".length()).trim(), true);
+        } else if (line.startsWith("add-reads ")) {
+            String module = line.substring("add-reads ".length()).trim();
+            realm.addReads(module);
+        } else {
+            logger.debug("Unknown module-access directive: {}", line);
+        }
+    }
+
+    private void applyExportOrOpen(org.codehaus.plexus.classworlds.realm.ClassRealm realm, String spec, boolean open) {
+        int slash = spec.indexOf('/');
+        if (slash <= 0) {
+            logger.debug("Invalid module-access directive (missing '/'): {}", spec);
+            return;
+        }
+        String module = spec.substring(0, slash);
+        String pkg = spec.substring(slash + 1);
+        int eq = pkg.indexOf('=');
+        if (eq > 0) {
+            String target = pkg.substring(eq + 1).trim();
+            pkg = pkg.substring(0, eq).trim();
+            if (!"ALL-UNNAMED".equals(target)) {
+                logger.warn("module-access directive target '{}' ignored, only ALL-UNNAMED is supported", target);
+            }
+        }
+        if (open) {
+            realm.addOpens(module, pkg);
+        } else {
+            realm.addExports(module, pkg);
+        }
     }
 }

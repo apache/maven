@@ -388,17 +388,22 @@ goto processArgs
 :endHandleArgs
 call :processArgs %*
 
-for %%i in ("%MAVEN_HOME%"\boot\plexus-classworlds-*) do set LAUNCHER_JAR="%%i"
+set LAUNCHER_JAR="%MAVEN_HOME%\boot\*"
 set LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
+set MODULES_DIR="%MAVEN_HOME%\lib\modules"
 if "%MAVEN_MAIN_CLASS%"=="" @set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenCling
 
-@REM Only pass MAVEN_ARGS for the default Maven build command (MavenCling),
-@REM not for sub-commands like --up, --enc, or --shell which have their own options.
-if not "%MAVEN_MAIN_CLASS%"=="org.apache.maven.cling.MavenCling" set "MAVEN_ARGS="
+@rem Module-path and native access flags require a JDK that can read the module jars.
+@rem The probe includes --module-path so it fails on JDKs that cannot read the module descriptors.
+set MAVEN_MODULE_OPTS=
+"%JAVACMD%" --module-path %MODULES_DIR% --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm -version >NUL 2>&1
+if not ERRORLEVEL 1 (
+  set MAVEN_MODULE_OPTS=--module-path %MODULES_DIR% --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm,org.jline.nativ
+)
 
 if defined MAVEN_DEBUG_SCRIPT (
   echo [DEBUG] Launching JVM with command:
-  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS% %MAVEN_DEBUG_OPTS% --enable-native-access=ALL-UNNAMED -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %MAVEN_VERSION_PRINTED% %LAUNCHER_CLASS% %MAVEN_ARGS% %*
+  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS% %MAVEN_DEBUG_OPTS% %MAVEN_MODULE_OPTS% -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %LAUNCHER_CLASS% %MAVEN_ARGS% %*
 )
 
 "%JAVACMD%" ^
@@ -406,7 +411,7 @@ if defined MAVEN_DEBUG_SCRIPT (
   %MAVEN_OPTS% ^
   %JVM_CONFIG_MAVEN_OPTS% ^
   %MAVEN_DEBUG_OPTS% ^
-  --enable-native-access=ALL-UNNAMED ^
+  %MAVEN_MODULE_OPTS% ^
   -classpath %LAUNCHER_JAR% ^
   "-Dclassworlds.conf=%CLASSWORLDS_CONF%" ^
   "-Dmaven.home=%MAVEN_HOME%" ^

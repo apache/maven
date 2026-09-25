@@ -29,11 +29,11 @@ import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.classworlds.ClassRealm;
+import org.apache.maven.api.classworlds.NoSuchRealmException;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
-import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -66,6 +66,8 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
 
         private final DependencyFilter filter;
 
+        private final boolean modular;
+
         private final int hashCode;
 
         public CacheKey(
@@ -75,6 +77,17 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
                 DependencyFilter dependencyFilter,
                 List<RemoteRepository> repositories,
                 RepositorySystemSession session) {
+            this(plugin, parentRealm, foreignImports, dependencyFilter, repositories, session, false);
+        }
+
+        public CacheKey(
+                Plugin plugin,
+                ClassLoader parentRealm,
+                Map<String, ClassLoader> foreignImports,
+                DependencyFilter dependencyFilter,
+                List<RemoteRepository> repositories,
+                RepositorySystemSession session,
+                boolean modular) {
             this.plugin = plugin.clone();
             this.workspace = RepositoryUtils.getWorkspace(session);
             this.localRepo = session.getLocalRepository();
@@ -89,6 +102,7 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
             this.parentRealm = parentRealm;
             this.foreignImports = (foreignImports != null) ? foreignImports : Collections.emptyMap();
             this.filter = dependencyFilter;
+            this.modular = modular;
 
             int hash = 17;
             hash = hash * 31 + CacheUtils.pluginHashCode(plugin);
@@ -98,6 +112,7 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
             hash = hash * 31 + Objects.hashCode(parentRealm);
             hash = hash * 31 + this.foreignImports.hashCode();
             hash = hash * 31 + Objects.hashCode(dependencyFilter);
+            hash = hash * 31 + Boolean.hashCode(modular);
             this.hashCode = hash;
         }
 
@@ -119,6 +134,7 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
 
             if (o instanceof CacheKey that) {
                 return parentRealm == that.parentRealm
+                        && modular == that.modular
                         && CacheUtils.pluginEquals(plugin, that.plugin)
                         && Objects.equals(workspace, that.workspace)
                         && Objects.equals(localRepo, that.localRepo)
@@ -141,7 +157,19 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
             DependencyFilter dependencyFilter,
             List<RemoteRepository> repositories,
             RepositorySystemSession session) {
-        return new CacheKey(plugin, parentRealm, foreignImports, dependencyFilter, repositories, session);
+        return createKey(plugin, parentRealm, foreignImports, dependencyFilter, repositories, session, false);
+    }
+
+    @Override
+    public Key createKey(
+            Plugin plugin,
+            ClassLoader parentRealm,
+            Map<String, ClassLoader> foreignImports,
+            DependencyFilter dependencyFilter,
+            List<RemoteRepository> repositories,
+            RepositorySystemSession session,
+            boolean modular) {
+        return new CacheKey(plugin, parentRealm, foreignImports, dependencyFilter, repositories, session, modular);
     }
 
     @Override
