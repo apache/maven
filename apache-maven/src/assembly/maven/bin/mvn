@@ -355,14 +355,11 @@ find_file_argument_basedir() {
       elif [ -f "${arg}" ]; then
         basedir=`dirname "${arg}"`
         basedir=`cd "$basedir" && pwd -P`
-        if [ ! -d "$basedir" ]; then
-          echo "Directory $basedir extracted from the -f/--file command-line argument ${arg} does not exist" >&2
-          exit 1
-        fi
-      else
-        echo "POM file ${arg} specified with the -f/--file command line argument does not exist" >&2
-        exit 1
       fi
+      # If the argument does not exist (e.g. a Cygwin/MSYS path that will be
+      # converted later, or a genuinely missing file), fall back to the current
+      # directory.  The Java layer validates the path and produces the proper
+      # error message when the file is truly absent.
       break
     fi
     if [ "$arg" = "-f" -o "$arg" = "--file" ]; then
