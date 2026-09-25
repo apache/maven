@@ -234,7 +234,12 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                         calculateLifecycleMappings(session, project, lifecyclePhase);
 
                 for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values()) {
-                    mojoExecutions.addAll(mojoExecutionsFromLifecycle);
+                    List<String> containedLifeCycles = mojoExecutions.stream()
+                            .map(MojoExecution::getLifecyclePhase)
+                            .toList();
+                    mojoExecutions.addAll(mojoExecutionsFromLifecycle.stream()
+                            .filter(e -> !containedLifeCycles.contains(e.getLifecyclePhase()))
+                            .toList());
                 }
             } else {
                 throw new IllegalStateException("unexpected task " + task);
