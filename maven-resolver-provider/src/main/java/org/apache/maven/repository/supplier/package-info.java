@@ -16,27 +16,10 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.repository.internal;
 
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.supplier.RepositorySystemSupplier;
-import org.junit.jupiter.api.Test;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-
-public class MavenRepositorySystemUtilsTest {
-
-    @Test
-    public void testGetRepositorySystem() {
-        RepositorySystem repoSys = new RepositorySystemSupplier().get();
-        assertNotNull(repoSys);
-    }
-
-    @Test
-    public void testGetMetadataGeneratorFactories() {
-        assertEquals(
-                3,
-                new RepositorySystemSupplier().getMetadataGeneratorFactories().size());
-    }
-}
+/**
+ * This package contains the supplier to bring up Resolver (not Maven!) instance, when no DI is wanted.
+ *
+ * @since 3.10.0
+ */
+package org.apache.maven.repository.supplier;
