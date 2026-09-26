@@ -166,6 +166,7 @@ Maven's inputs split cleanly into **operator-supplied (trusted)** and **reposito
 | **Consumer-POM transform input** (`mvn deploy`) | **4.x only** | operator project → published | source **no**; the *published* result is a new surface for downstream | verify what you publish matches intent *(inferred, Q7)* |
 | **`mvnup` rewrite input** | **4.x only** | operator `pom.xml` | **no** — trusted, but written back in place | review the diff `mvnup` produces *(inferred, Q8)* |
 | **`mvnenc` secrets / vault** | **4.x only** | operator | **no** — trusted | manage the master key/vault (§10) *(inferred, Q9)* |
+| **`mvnval` validation input** | **4.x only** | operator `pom.xml` | **no** — trusted, read-only | reads POMs and reports on them; resolves no parent, reaches no network, writes nothing back |
 
 **Size/shape.** Maven imposes no general bound on POM size, dependency-graph depth, or artifact size; resolution of a hostile dependency graph (deep transitive fan-out, decompression of hostile archives) is a resource surface. *(inferred, Q17)*
 
