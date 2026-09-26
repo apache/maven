@@ -148,15 +148,20 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
      * User property selecting how server credentials configured in settings are scoped to repositories:
      * <ul>
      *     <li>{@code origin} (default): credentials for a server id are only used with a repository whose
-     *     origin (protocol, host and port) matches a repository or mirror declared with the same id in
-     *     settings or on the command line. For server ids without any such declared repository (for
-     *     example pure deployment servers whose URL comes from the project's
+     *     origin (protocol, host and port) matches an origin declared for the same id, either by a
+     *     repository or mirror declared with that id in settings or on the command line, or by the
+     *     {@code <repositoryOrigins>} of that server in settings. For server ids without any such declared
+     *     origin (for example pure deployment servers whose URL comes from the project's
      *     {@code distributionManagement}), credentials are used as before, but a warning identifying the
      *     target origin is emitted.</li>
      *     <li>{@code strict}: like {@code origin}, but credentials are refused for server ids that have no
-     *     repository or mirror declared in settings or on the command line.</li>
+     *     declared origin at all.</li>
      *     <li>{@code id}: legacy behavior, credentials are matched by server id only.</li>
      * </ul>
+     * <p>
+     * Repositories declared inside a settings {@code <profile>} only contribute an origin when the profile
+     * id is listed in {@code <activeProfiles>}; profiles activated through {@code <activation>} or
+     * {@code -P} contribute none, which is what {@code <server><repositoryOrigins>} is for.
      *
      * @since 3.10.0
      */
@@ -298,8 +303,9 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
             mainSessionBuilder.setDependencyManager(new TransitiveDependencyManager());
         }
 
-        // origins of the repositories and mirrors the operator declared for a given server id, used below
-        // to scope that id's credentials to the origin(s) it was actually configured for
+        // origins of the repositories and mirrors the operator declared for a given server id, completed
+        // below with the origins declared on the servers themselves, used to scope that id's credentials
+        // to the origin(s) it was actually configured for
         Map<String, Set<String>> declaredRepositoryOrigins = new HashMap<>();
 
         DefaultMirrorSelector mirrorSelector = new DefaultMirrorSelector();
@@ -341,6 +347,13 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
             authBuilder.addUsername(server.getUsername()).addPassword(server.getPassword());
             authBuilder.addPrivateKey(server.getPrivateKey(), server.getPassphrase());
             authSelector.add(server.getId(), authBuilder.build());
+
+            // origins the operator bound to this id explicitly, added to the ones collected above from the
+            // mirrors and the repositories of the request
+            for (String repositoryOrigin : server.getRepositoryOrigins()) {
+                OriginBoundAuthenticationSelector.addOrigin(
+                        declaredRepositoryOrigins, server.getId(), repositoryOrigin);
+            }
 
             if (server.getConfiguration() != null) {
                 Xpp3Dom dom = (Xpp3Dom) server.getConfiguration();
