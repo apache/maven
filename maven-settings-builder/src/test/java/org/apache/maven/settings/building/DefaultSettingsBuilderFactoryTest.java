@@ -131,6 +131,29 @@ public class DefaultSettingsBuilderFactoryTest {
         assertTrue(server3.getAliases().isEmpty());
     }
 
+    @Test
+    void testSettingsWithServerRepositoryOrigins() throws Exception {
+        SettingsBuilder builder = new DefaultSettingsBuilderFactory().newInstance();
+
+        DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
+        request.setSystemProperties(System.getProperties());
+        request.setUserSettingsFile(getSettings("settings-servers-4"));
+
+        Settings settings = builder.build(request).getEffectiveSettings();
+
+        List<Server> servers = settings.getServers();
+        assertEquals(2, servers.size());
+
+        List<String> repositoryOrigins = Arrays.asList("https://repo.example.org", "https://mirror.example.org:8443");
+
+        Server server1 = getServerById(servers, "server-1");
+        assertEquals(repositoryOrigins, server1.getRepositoryOrigins());
+
+        // an alias is the same credentials under another id, so it is bound to the same origins
+        Server server11 = getServerById(servers, "server-11");
+        assertEquals(repositoryOrigins, server11.getRepositoryOrigins());
+    }
+
     private Server getServerById(List<Server> servers, String id) {
         return servers.stream()
                 .filter(s -> s.getId().equals(id))

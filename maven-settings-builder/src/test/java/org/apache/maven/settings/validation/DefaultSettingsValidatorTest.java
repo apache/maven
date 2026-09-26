@@ -266,6 +266,75 @@ public class DefaultSettingsValidatorTest {
         assertContains(problems.messages.get(0), "'servers.server[0].aliases[0]' for server-1 is missing");
     }
 
+    @Test
+    void testValidateServerRepositoryOrigins() {
+        SimpleProblemCollector problems = validateRepositoryOrigins(
+                "https://repo.example.org", "https://mirror.example.org:8443", "HTTP://Repo.Example.Org:80");
+        assertEquals(0, problems.messages.size());
+    }
+
+    @Test
+    void testValidateServerRepositoryOriginWithoutScheme() {
+        SimpleProblemCollector problems = validateRepositoryOrigins("repo.example.org");
+        assertEquals(1, problems.messages.size());
+        assertContains(
+                problems.messages.get(0),
+                "'servers.server[0].repositoryOrigins[0]' for server-1 must start with a scheme,"
+                        + " for example https://repo.example.org, but found 'repo.example.org'");
+    }
+
+    @Test
+    void testValidateServerRepositoryOriginWithoutHost() {
+        SimpleProblemCollector problems = validateRepositoryOrigins("file:/tmp/repo");
+        assertEquals(1, problems.messages.size());
+        assertContains(problems.messages.get(0), "must name a host");
+    }
+
+    @Test
+    void testValidateServerRepositoryOriginWithUserInfo() {
+        SimpleProblemCollector problems = validateRepositoryOrigins("https://user:pwd@repo.example.org");
+        assertEquals(1, problems.messages.size());
+        assertContains(problems.messages.get(0), "must not carry user information");
+    }
+
+    @Test
+    void testValidateServerRepositoryOriginEmpty() {
+        SimpleProblemCollector problems = validateRepositoryOrigins("");
+        assertEquals(1, problems.messages.size());
+        assertContains(problems.messages.get(0), "'servers.server[0].repositoryOrigins[0]' for server-1 is missing");
+    }
+
+    @Test
+    void testValidateServerRepositoryOriginWithPath() {
+        SimpleProblemCollector problems = validateRepositoryOrigins("https://repo.example.org/releases/");
+        assertEquals(1, problems.messages.size());
+        assertContains(
+                problems.messages.get(0),
+                "is a repository origin, not a repository URL; only 'https://repo.example.org'"
+                        + " of 'https://repo.example.org/releases/' is used");
+    }
+
+    @Test
+    void testValidateServerRepositoryOriginWithPlaceholderIsNotValidated() {
+        // this validator runs before the settings are interpolated
+        SimpleProblemCollector problems = validateRepositoryOrigins("${env.REPO_URL}");
+        assertEquals(0, problems.messages.size());
+    }
+
+    private SimpleProblemCollector validateRepositoryOrigins(String... repositoryOrigins) {
+        Settings settings = new Settings();
+        Server server = new Server();
+        server.setId("server-1");
+        for (String repositoryOrigin : repositoryOrigins) {
+            server.addRepositoryOrigin(repositoryOrigin);
+        }
+        settings.addServer(server);
+
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validate(settings, problems);
+        return problems;
+    }
+
     private static class SimpleProblemCollector implements SettingsProblemCollector {
 
         private final List<String> messages = new ArrayList<>();
