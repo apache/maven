@@ -228,6 +228,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                                     .filePermissions(null)
                                     .directoryPermissions(null)
                                     .aliases(List.of())
+                                    .repositoryOrigins(List.of())
                                     .build())
                             .toList())
                     .build();
