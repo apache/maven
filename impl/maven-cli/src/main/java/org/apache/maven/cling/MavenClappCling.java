@@ -173,16 +173,23 @@ public class MavenClappCling extends ClingSupport {
                     "System property 'maven.home' is not set; cannot locate CLAPP lib directory for: " + clappName);
         }
 
-        Path clappLibDir = Paths.get(mavenHome).resolve(CLAPP_LIB_RELATIVE_PATH).resolve(clappName);
+        // Validate tool name to prevent path traversal
+        if (!clappName.matches("^[a-zA-Z0-9_-]+$")) {
+            throw new IOException("Invalid CLAPP tool name: '" + clappName + "'");
+        }
+
+        Path baseDir = Paths.get(mavenHome).resolve(CLAPP_LIB_RELATIVE_PATH).normalize();
+        Path clappLibDir = baseDir.resolve(clappName).normalize();
+        if (!clappLibDir.startsWith(baseDir)) {
+            throw new IOException("Invalid CLAPP lib directory path traversal attempt for: " + clappName);
+        }
 
         // Build the list of jar URLs from the CLAPP-specific lib directory
         List<URL> jarUrls = collectJarUrls(clappLibDir, clappName);
 
         // Create a child class-loader that sees the core classes + the CLAPP's own jars
         ClassLoader parentLoader = Thread.currentThread().getContextClassLoader();
-        URLClassLoader clappLoader = new URLClassLoader(jarUrls.toArray(new URL[0]), parentLoader);
-
-        try {
+        try (URLClassLoader clappLoader = new URLClassLoader(jarUrls.toArray(new URL[0]), parentLoader)) {
             Class<?> clazz = clappLoader.loadClass(clappMainClass);
             Method mainMethod = clazz.getMethod("main", String[].class, ClassWorld.class);
             // Publish the CLAPP class-loader as the context class-loader so that

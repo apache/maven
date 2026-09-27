@@ -113,4 +113,18 @@ class MavenClappClingTest {
             System.clearProperty("maven.home");
         }
     }
+
+    @Test
+    void launchClapp_throwsIOException_whenToolNameInvalid() {
+        System.setProperty("maven.home", tempDir.toString());
+        try {
+            assertThrows(
+                    IOException.class,
+                    () -> MavenClappCling.launchClapp(
+                            "../badtool", "com.example.Main", new String[0], null),
+                    "Expected IOException when CLAPP tool name contains invalid path characters");
+        } finally {
+            System.clearProperty("maven.home");
+        }
+    }
 }
