@@ -403,12 +403,12 @@ if "%_PROC_ARG%"=="--clapp" (
     goto processArgs
 )
 if "%_PROC_ARG:~0,8%"=="--clapp=" (
-    set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenClappCling"
-    set "MAVEN_CLAPP_NAME=%_PROC_ARG:~8%"
-    if "%MAVEN_CLAPP_NAME%"=="" (
+    if "%_PROC_ARG:~8%"=="" (
         echo Error: --clapp= requires a non-empty tool name >&2
         goto error
     )
+    set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenClappCling"
+    set "MAVEN_CLAPP_NAME=%_PROC_ARG:~8%"
     shift
     goto processArgs
 )
