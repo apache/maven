@@ -126,7 +126,7 @@ class ReporterTest {
         @DisplayName("should report a clean file on one line")
         void shouldReportCleanFileOnOneLine() {
             List<String> lines = TestUtils.render(new TextReporter(), List.of(Report.of(POM, List.of())));
-            assertEquals(List.of("bad/pom.xml: no problems"), lines);
+            assertEquals(List.of(POM + ": no problems"), lines);
         }
 
         @Test
@@ -138,7 +138,7 @@ class ReporterTest {
                             POM,
                             List.of(TestUtils.problem(BuilderProblem.Severity.ERROR, "boom", "bad/pom.xml", 13, 17)))));
 
-            assertEquals("bad/pom.xml:", lines.get(0));
+            assertEquals(POM + ":", lines.get(0));
             assertEquals("  ERROR boom @ line 13, column 17", lines.get(FIRST_PROBLEM_LINE));
         }
 
@@ -160,7 +160,7 @@ class ReporterTest {
         void shouldReportUnreadableFile() {
             List<String> lines =
                     TestUtils.render(new TextReporter(), List.of(Report.failed(POM, "not a readable file")));
-            assertEquals(List.of("bad/pom.xml: not a readable file"), lines);
+            assertEquals(List.of(POM + ": not a readable file"), lines);
         }
     }
 
