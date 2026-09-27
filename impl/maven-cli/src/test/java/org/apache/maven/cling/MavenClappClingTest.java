@@ -44,14 +44,14 @@ class MavenClappClingTest {
     // -------------------------------------------------------------------------
 
     @Test
-    void collectJarUrls_returnsEmptyList_whenDirectoryDoesNotExist() throws IOException {
+    void collectJarUrlsReturnsEmptyListWhenDirectoryDoesNotExist() throws IOException {
         Path nonExistent = tempDir.resolve("does-not-exist");
         List<URL> urls = MavenClappCling.collectJarUrls(nonExistent, "mytool");
         assertTrue(urls.isEmpty(), "Expected empty list for non-existent CLAPP lib directory");
     }
 
     @Test
-    void collectJarUrls_returnsJars_whenDirectoryContainsJars() throws IOException {
+    void collectJarUrlsReturnsJarsWhenDirectoryContainsJars() throws IOException {
         Path clappDir = Files.createDirectory(tempDir.resolve("mytool"));
         Files.createFile(clappDir.resolve("a.jar"));
         Files.createFile(clappDir.resolve("b.jar"));
@@ -64,14 +64,14 @@ class MavenClappClingTest {
     }
 
     @Test
-    void collectJarUrls_returnsEmptyList_whenDirectoryIsEmpty() throws IOException {
+    void collectJarUrlsReturnsEmptyListWhenDirectoryIsEmpty() throws IOException {
         Path clappDir = Files.createDirectory(tempDir.resolve("empty-tool"));
         List<URL> urls = MavenClappCling.collectJarUrls(clappDir, "empty-tool");
         assertTrue(urls.isEmpty(), "Expected empty list for empty CLAPP lib directory");
     }
 
     @Test
-    void collectJarUrls_throwsIOException_whenPathIsNotDirectory() throws IOException {
+    void collectJarUrlsThrowsIOExceptionWhenPathIsNotDirectory() throws IOException {
         Path file = Files.createFile(tempDir.resolve("not-a-dir"));
         assertThrows(
                 IOException.class,
@@ -84,7 +84,7 @@ class MavenClappClingTest {
     // -------------------------------------------------------------------------
 
     @Test
-    void launchClapp_throwsClappException_whenMavenHomeNotSet() {
+    void launchClappThrowsClappExceptionWhenMavenHomeNotSet() {
         String saved = System.getProperty("maven.home");
         try {
             System.clearProperty("maven.home");
@@ -100,7 +100,7 @@ class MavenClappClingTest {
     }
 
     @Test
-    void launchClapp_throwsClappException_whenMainClassNotFound() {
+    void launchClappThrowsClappExceptionWhenMainClassNotFound() {
         System.setProperty("maven.home", tempDir.toString());
         try {
             // No jars in lib/clapp/mytool/, main class definitely not on classpath
@@ -115,7 +115,7 @@ class MavenClappClingTest {
     }
 
     @Test
-    void launchClapp_throwsIllegalArgumentException_whenToolNameInvalid() {
+    void launchClappThrowsIllegalArgumentExceptionWhenToolNameInvalid() {
         System.setProperty("maven.home", tempDir.toString());
         try {
             assertThrows(
