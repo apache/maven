@@ -46,7 +46,7 @@ import org.eclipse.aether.util.repository.SimpleArtifactDescriptorPolicy;
  * always use regular dependency injection to acquire the repository system.
  *
  * @author Benjamin Bentmann
- * @deprecated Use {@link org.eclipse.aether.supplier.SessionBuilderSupplier} instead.
+ * @deprecated Use {@link org.apache.maven.repository.supplier.RepositorySystemSupplier} instead.
  */
 @Deprecated
 public final class MavenRepositorySystemUtils {
@@ -62,7 +62,7 @@ public final class MavenRepositorySystemUtils {
      * the session with authentication, mirror, proxy and other information required for your environment.
      *
      * @return The new repository system session, never {@code null}.
-     * @deprecated Use {@link org.eclipse.aether.supplier.SessionBuilderSupplier} instead.
+     * @deprecated Use {@link org.apache.maven.repository.supplier.RepositorySystemSupplier} instead.
      */
     @Deprecated
     public static DefaultRepositorySystemSession newSession() {
