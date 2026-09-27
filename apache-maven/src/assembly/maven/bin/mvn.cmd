@@ -105,6 +105,8 @@ if "%_FLAG_ARG%"=="--debug" set "IS_VERBOSE=1"
 if "%_FLAG_ARG%"=="--enc" set "IS_MAIN_OVERRIDE=1"
 if "%_FLAG_ARG%"=="--shell" set "IS_MAIN_OVERRIDE=1"
 if "%_FLAG_ARG%"=="--up" set "IS_MAIN_OVERRIDE=1"
+if "%_FLAG_ARG%"=="--clapp" set "IS_MAIN_OVERRIDE=1"
+if "%_FLAG_ARG:~0,8%"=="--clapp=" set "IS_MAIN_OVERRIDE=1"
 @REM Compact single-dash tokens (e.g. -qv, -vX) mirror the Unix script's
 @REM -[qvVXe]* handling, but only when the part after '-' is made exclusively
 @REM of the safe chars v V q X e; otherwise (e.g. -f, -D...) the token is
@@ -379,8 +381,37 @@ if "%~1"=="--debug" (
 )
 exit /b 0
 
+:readClappMainClass
+if not exist "%~1" exit /b 0
+for /f "usebackq tokens=1,* delims==" %%a in ("%~1") do (
+    if "%%a"=="mainClass" set "MAVEN_CLAPP_MAIN_CLASS=%%b"
+)
+exit /b 0
+
 :processArgs
 if "%~1"=="" exit /b 0
+set "_PROC_ARG=%~1"
+if "%_PROC_ARG%"=="--clapp" (
+    if "%~2"=="" (
+        echo Error: --clapp requires a tool name argument ^(e.g. --clapp mvnfoo^) >&2
+        goto error
+    )
+    set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenClappCling"
+    set "MAVEN_CLAPP_NAME=%~2"
+    shift
+    shift
+    goto processArgs
+)
+if "%_PROC_ARG:~0,8%"=="--clapp=" (
+    set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenClappCling"
+    set "MAVEN_CLAPP_NAME=%_PROC_ARG:~8%"
+    if "%MAVEN_CLAPP_NAME%"=="" (
+        echo Error: --clapp= requires a non-empty tool name >&2
+        goto error
+    )
+    shift
+    goto processArgs
+)
 call :handleArgs %1
 shift
 goto processArgs
@@ -388,17 +419,27 @@ goto processArgs
 :endHandleArgs
 call :processArgs %*
 
+if defined MAVEN_CLAPP_NAME (
+    call :readClappMainClass "%MAVEN_HOME%\lib\clapp\%MAVEN_CLAPP_NAME%\clapp.properties"
+)
+
+set "MAVEN_CLAPP_OPTS="
+if defined MAVEN_CLAPP_NAME set MAVEN_CLAPP_OPTS="-Dmaven.clapp.name=%MAVEN_CLAPP_NAME%"
+if defined MAVEN_CLAPP_MAIN_CLASS if not "%MAVEN_CLAPP_MAIN_CLASS%"=="org.apache.maven.cling.MavenClappCling" (
+    set MAVEN_CLAPP_OPTS=%MAVEN_CLAPP_OPTS% "-Dmaven.clapp.mainClass=%MAVEN_CLAPP_MAIN_CLASS%"
+)
+
 for %%i in ("%MAVEN_HOME%"\boot\plexus-classworlds-*) do set LAUNCHER_JAR="%%i"
 set LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 if "%MAVEN_MAIN_CLASS%"=="" @set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenCling
 
 @REM Only pass MAVEN_ARGS for the default Maven build command (MavenCling),
-@REM not for sub-commands like --up, --enc, or --shell which have their own options.
+@REM not for sub-commands like --up, --enc, --shell, or --clapp which have their own options.
 if not "%MAVEN_MAIN_CLASS%"=="org.apache.maven.cling.MavenCling" set "MAVEN_ARGS="
 
 if defined MAVEN_DEBUG_SCRIPT (
   echo [DEBUG] Launching JVM with command:
-  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS% %MAVEN_DEBUG_OPTS% --enable-native-access=ALL-UNNAMED -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %MAVEN_VERSION_PRINTED% %LAUNCHER_CLASS% %MAVEN_ARGS% %*
+  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS% %MAVEN_DEBUG_OPTS% --enable-native-access=ALL-UNNAMED -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" %MAVEN_CLAPP_OPTS% "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %MAVEN_VERSION_PRINTED% %LAUNCHER_CLASS% %MAVEN_ARGS% %*
 )
 
 "%JAVACMD%" ^
@@ -411,6 +452,7 @@ if defined MAVEN_DEBUG_SCRIPT (
   "-Dclassworlds.conf=%CLASSWORLDS_CONF%" ^
   "-Dmaven.home=%MAVEN_HOME%" ^
   "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" ^
+  %MAVEN_CLAPP_OPTS% ^
   "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" ^
   "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" ^
   %MAVEN_VERSION_PRINTED% ^
