@@ -29,7 +29,6 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -71,13 +70,13 @@ class CommonsCliValidateOptionsTest {
     }
 
     @Test
-    @DisplayName("should reject a bad --format while parsing, not while executing")
-    void shouldRejectBadFormatWhileParsing() {
-        ParseException e = assertThrows(
-                ParseException.class,
-                () -> CommonsCliValidateOptions.parse(new String[] {"--format", "xml"}),
-                "an unknown format must fail during parsing, so the user sees a usage error");
-        assertTrue(e.getMessage().contains("xml"), e.getMessage());
+    @DisplayName("should carry a bad --format through to the invoker rather than failing to parse")
+    void shouldNotRejectBadFormatWhileParsing() throws ParseException {
+        // Failing here would mark the invocation unparseable and exit 1, while the tool documents
+        // 2 for bad usage. ValidateInvoker rejects the value and returns that code.
+        CommonsCliValidateOptions options = CommonsCliValidateOptions.parse(new String[] {"--format", "xml"});
+
+        assertEquals("xml", options.format().orElseThrow());
     }
 
     @Test

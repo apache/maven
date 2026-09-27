@@ -36,18 +36,15 @@ import org.apache.maven.cling.invoker.CommonsCliOptions;
  */
 public class CommonsCliValidateOptions extends CommonsCliOptions implements ValidateOptions {
 
+    /**
+     * Deliberately does not check {@code --format}. Throwing here marks the whole invocation as
+     * unparseable, and the CLI exits 1 before the tool runs, which contradicts the exit code the
+     * tool documents for bad usage. {@link ValidateInvoker} checks it instead, which also covers
+     * the value only becoming wrong once options are interpolated.
+     */
     public static CommonsCliValidateOptions parse(String[] args) throws ParseException {
         CLIManager cliManager = new CLIManager();
-        CommonsCliValidateOptions options =
-                new CommonsCliValidateOptions(Options.SOURCE_CLI, cliManager, cliManager.parse(args));
-        // Reject a bad --format here, so the user gets a usage error rather than a failure
-        // after the container has been built.
-        try {
-            options.format().ifPresent(OutputFormat::parse);
-        } catch (IllegalArgumentException e) {
-            throw new ParseException(e.getMessage());
-        }
-        return options;
+        return new CommonsCliValidateOptions(Options.SOURCE_CLI, cliManager, cliManager.parse(args));
     }
 
     protected CommonsCliValidateOptions(String source, CLIManager cliManager, CommandLine commandLine) {

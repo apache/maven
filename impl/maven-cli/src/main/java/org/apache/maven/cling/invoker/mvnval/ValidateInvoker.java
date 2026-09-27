@@ -35,6 +35,7 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.Sources;
+import org.apache.maven.cling.invoker.CoreExtensionSelector;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.impl.standalone.ApiRunner;
@@ -89,6 +90,18 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
         // created it yet.
         format.report(reports, determineWriter(context));
         return exitCode(reports);
+    }
+
+    /**
+     * Loads no core extension, whatever {@code .mvn/extensions.xml} asks for.
+     * <p>
+     * The default selector resolves every declared extension before {@code execute} runs, which
+     * reaches the network and then runs that extension's code. Validating a POM someone handed you
+     * must not do either, and no extension can change what the raw model says anyway.
+     */
+    @Override
+    protected CoreExtensionSelector<ValidateContext> createCoreExtensionSelector() {
+        return (invoker, context) -> List.of();
     }
 
     /**

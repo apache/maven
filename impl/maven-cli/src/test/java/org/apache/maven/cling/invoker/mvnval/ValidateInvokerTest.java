@@ -266,6 +266,22 @@ class ValidateInvokerTest {
     }
 
     @Nested
+    @DisplayName("Extensions")
+    class ExtensionTests {
+
+        @Test
+        @DisplayName("should load no core extension, so validating a POM cannot reach the network")
+        void shouldLoadNoCoreExtension() {
+            // The default selector resolves everything .mvn/extensions.xml declares before the
+            // tool runs, which downloads and then executes that code.
+            assertEquals(
+                    List.of(),
+                    invoker.createCoreExtensionSelector().selectCoreExtensions(invoker, null),
+                    "a POM handed to the validator must not be able to pull in extensions");
+        }
+    }
+
+    @Nested
     @DisplayName("Format")
     class FormatTests {
 
@@ -280,6 +296,16 @@ class ValidateInvokerTest {
             assertEquals(1, output.size(), "the whole report is one document, not a line per problem: " + output);
             assertTrue(output.get(0).startsWith("[{"), "expected a JSON array: " + output);
             assertTrue(output.get(0).contains("\"severity\":\"ERROR\""), output.get(0));
+        }
+
+        @Test
+        @DisplayName("should reject an unknown format with the bad-usage code, not the parse-failure one")
+        void shouldRejectUnknownFormatWithBadOperation() throws Exception {
+            // Rejecting this while parsing would mark the invocation unparseable and exit 1,
+            // which is not the code the tool documents for bad usage.
+            int exitCode = run(List.of(writePom("xml-format", "").toString()), Optional.of("xml"));
+
+            assertEquals(ValidateInvoker.BAD_OPERATION, exitCode);
         }
 
         @Test
