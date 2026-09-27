@@ -7,7 +7,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-  http://www.apache.org/licenses/LICENSE-2.0
+  https://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
@@ -17,11 +17,11 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-# Maven CLAPP (Command Line App) Guide
+# Maven CLAPP (Command Line Application) Guide
 
-Starting with Maven 4.1.0, Apache Maven provides native support for **CLAPP** (Command Line App) tools.
+Starting with Maven 4.1.0, Apache Maven provides native support for **CLAPP** (Command Line Application / CLI tool) extensions.
 
-CLAPP enables third-party developers and plugin authors to build and distribute standalone CLI utilities that run directly via the standard Maven launcher (`mvn --clapp <toolname>`) while maintaining **per-tool isolated classpaths**.
+CLAPP enables developers to build and distribute standalone CLI utilities that run directly via the standard Maven launcher (`mvn --clapp <toolname>`) while maintaining **per-tool isolated classpaths**.
 
 ---
 
@@ -33,6 +33,11 @@ Traditionally, adding a new CLI command to Maven required placing all of its thi
 - **Lack of isolation**: Classes could accidentally leak or collide across tools.
 
 CLAPP solves this by isolating each tool into its own sub-directory inside `${maven.home}/lib/clapp/<toolname>/`.
+
+### Distribution Directory vs. Local Repository (`.m2/repository`)
+
+- **`${maven.home}/lib/clapp/<toolname>/`**: Designed for tools bundled with or installed directly into the Maven distribution (such as system administration utilities or pre-packaged corporate CLI tools), ensuring their private JARs do not leak into the core `plexus.core` realm.
+- **`~/.m2/repository/`**: Remains Maven's standard dependency cache. Tools running under CLAPP have full access to Maven core repository services (such as Resolver and RepositorySystem) to dynamically resolve and load dependencies from the local `.m2` repository or remote repositories as needed.
 
 ---
 
@@ -48,7 +53,7 @@ mvn --clapp <toolname> [args...]
 2. It sets the system property `maven.clapp.name=<toolname>` and reads `${maven.home}/lib/clapp/<toolname>/clapp.properties` to obtain the entry-point class.
 3. The launcher delegates to `org.apache.maven.cling.MavenClappCling`.
 4. `MavenClappCling` constructs a child `URLClassLoader` containing all `*.jar` files located in `${maven.home}/lib/clapp/<toolname>/`. This child classloader delegates to the parent core Maven classloader (the Plexus `plexus.core` realm).
-5. The entry-point class's `main(String[] args, ClassWorld world)` method is invoked via reflection.
+5. The entry-point class's `run(String[] args, ClassWorld world)` method (or `main(...)`) is invoked via reflection.
 6. The child `URLClassLoader` is automatically closed upon completion via try-with-resources.
 
 This model provides two key guarantees:
@@ -57,7 +62,7 @@ This model provides two key guarantees:
 
 ---
 
-## Packaging a Third-Party CLAPP
+## Packaging a Tool
 
 ### 1. Directory Structure
 
@@ -87,7 +92,7 @@ mainClass=org.example.mytool.MyToolCling
 
 ### 3. Entry-Point Implementation
 
-Your entry-point class must expose a `public static int main(String[] args, ClassWorld world)` method:
+The recommended entry-point method is `public static int run(String[] args, ClassWorld world)`:
 
 ```java
 package org.example.mytool;
@@ -96,7 +101,12 @@ import org.codehaus.plexus.classworlds.ClassWorld;
 
 public class MyToolCling {
 
-    public static int main(String[] args, ClassWorld world) {
+    /**
+     * Recommended entry-point method for CLI tools.
+     * Note: public static int main(String[] args, ClassWorld world) and standard
+     * public static void main(String[] args) are also supported for compatibility.
+     */
+    public static int run(String[] args, ClassWorld world) {
         System.out.println("Executing MyTool with arguments: " + String.join(" ", args));
 
         // Use core Maven services or your private dependencies here

@@ -127,4 +127,74 @@ class MavenClappClingTest {
             System.clearProperty("maven.home");
         }
     }
+
+    @Test
+    void launchClappInvokesRunMethodSuccessfully() throws Exception {
+        System.setProperty("maven.home", tempDir.toString());
+        try {
+            int exitCode = MavenClappCling.launchClapp(
+                    "mytool", SampleRunTool.class.getName(), new String[] {"test"}, null);
+            assertEquals(42, exitCode);
+        } finally {
+            System.clearProperty("maven.home");
+        }
+    }
+
+    @Test
+    void launchClappInvokesMainMethodSuccessfully() throws Exception {
+        System.setProperty("maven.home", tempDir.toString());
+        try {
+            int exitCode = MavenClappCling.launchClapp(
+                    "mytool", SampleMainTool.class.getName(), new String[] {"test"}, null);
+            assertEquals(99, exitCode);
+        } finally {
+            System.clearProperty("maven.home");
+        }
+    }
+
+    @Test
+    void launchClappInvokesStandardMainMethodSuccessfully() throws Exception {
+        System.setProperty("maven.home", tempDir.toString());
+        try {
+            int exitCode = MavenClappCling.launchClapp(
+                    "mytool", SampleStandardMainTool.class.getName(), new String[] {"test"}, null);
+            assertEquals(0, exitCode);
+        } finally {
+            System.clearProperty("maven.home");
+        }
+    }
+
+    @Test
+    void launchClappThrowsClappExceptionWhenNoEntryPointFound() {
+        System.setProperty("maven.home", tempDir.toString());
+        try {
+            assertThrows(
+                    MavenClappCling.ClappException.class,
+                    () -> MavenClappCling.launchClapp(
+                            "mytool", SampleNoEntryPointTool.class.getName(), new String[0], null),
+                    "Expected ClappException when class does not expose run or main");
+        } finally {
+            System.clearProperty("maven.home");
+        }
+    }
+
+    public static class SampleRunTool {
+        public static int run(String[] args, org.codehaus.plexus.classworlds.ClassWorld world) {
+            return 42;
+        }
+    }
+
+    public static class SampleMainTool {
+        public static int main(String[] args, org.codehaus.plexus.classworlds.ClassWorld world) {
+            return 99;
+        }
+    }
+
+    public static class SampleStandardMainTool {
+        public static void main(String[] args) {
+        }
+    }
+
+    public static class SampleNoEntryPointTool {
+    }
 }

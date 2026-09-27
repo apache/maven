@@ -23,8 +23,9 @@ clapp.properties format
 -----------------------
 
   # Fully-qualified class name of the CLAPP entry point.
-  # The class must expose:
-  #   public static int main(String[] args, ClassWorld world)
+  # The class should expose:
+  #   public static int run(String[] args, ClassWorld world)
+  # (or public static int main(String[] args, ClassWorld world))
   mainClass=com.example.mytool.MyCling
 
 Launching a CLAPP

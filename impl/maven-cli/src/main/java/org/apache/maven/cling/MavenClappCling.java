@@ -208,17 +208,17 @@ public class MavenClappCling extends ClingSupport {
         ClassLoader parentLoader = Thread.currentThread().getContextClassLoader();
         try (URLClassLoader clappLoader = new URLClassLoader(jarUrls.toArray(new URL[0]), parentLoader)) {
             Class<?> clazz = clappLoader.loadClass(clappMainClass);
-            Method mainMethod = clazz.getMethod("main", String[].class, ClassWorld.class);
+            Method entryPoint = findEntryPointMethod(clazz);
             // Publish the CLAPP class-loader as the context class-loader so that
             // SPI / ServiceLoader mechanisms work correctly inside the CLAPP.
             Thread.currentThread().setContextClassLoader(clappLoader);
-            return (int) mainMethod.invoke(null, args, world);
+            return invokeEntryPoint(entryPoint, args, world);
         } catch (ClassNotFoundException e) {
             throw new ClappException("CLAPP '" + clappName + "': cannot find main class '" + clappMainClass + "'", e);
         } catch (NoSuchMethodException e) {
             throw new ClappException(
                     "CLAPP '" + clappName + "': main class '" + clappMainClass
-                            + "' does not expose public static int main(String[], ClassWorld)",
+                            + "' does not expose a supported entry point: public static int run(String[], ClassWorld) or main(...)",
                     e);
         } catch (InvocationTargetException e) {
             Throwable cause = e.getCause();
@@ -234,10 +234,36 @@ public class MavenClappCling extends ClingSupport {
             throw new ClappException("CLAPP '" + clappName + "': invocation failed", cause != null ? cause : e);
         } catch (IllegalAccessException e) {
             throw new ClappException(
-                    "CLAPP '" + clappName + "': cannot access main method of '" + clappMainClass + "'", e);
+                    "CLAPP '" + clappName + "': cannot access entry point method of '" + clappMainClass + "'", e);
         } finally {
             // Restore class-loader so that the core Maven runtime is unaffected
             Thread.currentThread().setContextClassLoader(parentLoader);
+        }
+    }
+
+    static Method findEntryPointMethod(Class<?> clazz) throws NoSuchMethodException {
+        // 1. Preferred CLI tool entry point: run(String[], ClassWorld)
+        try {
+            return clazz.getMethod("run", String[].class, ClassWorld.class);
+        } catch (NoSuchMethodException ignored) {
+        }
+        // 2. ClassWorld Cling convention: main(String[], ClassWorld)
+        try {
+            return clazz.getMethod("main", String[].class, ClassWorld.class);
+        } catch (NoSuchMethodException ignored) {
+        }
+        // 3. Standard Java entry point: main(String[])
+        return clazz.getMethod("main", String[].class);
+    }
+
+    static int invokeEntryPoint(Method method, String[] args, ClassWorld world)
+            throws IllegalAccessException, InvocationTargetException {
+        if (method.getParameterCount() == 2) {
+            Object result = method.invoke(null, args, world);
+            return result instanceof Integer ? (Integer) result : 0;
+        } else {
+            Object result = method.invoke(null, (Object) args);
+            return result instanceof Integer ? (Integer) result : 0;
         }
     }
 
