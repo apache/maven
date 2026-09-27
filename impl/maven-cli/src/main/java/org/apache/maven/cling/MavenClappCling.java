@@ -40,6 +40,7 @@ import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
+import org.apache.maven.api.services.MavenException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
@@ -74,6 +75,21 @@ public class MavenClappCling extends ClingSupport {
      * That class must expose a {@code public static int main(String[], ClassWorld)} method.
      */
     public static final String MAVEN_CLAPP_MAIN_CLASS_PROPERTY = "maven.clapp.mainClass";
+
+    /**
+     * Exception thrown when a CLAPP tool cannot be loaded, configured, or launched.
+     *
+     * @since 4.1.0
+     */
+    public static class ClappException extends MavenException {
+        public ClappException(String message) {
+            super(message);
+        }
+
+        public ClappException(String message, Throwable cause) {
+            super(message, cause);
+        }
+    }
 
     /**
      * Relative path under {@code ${maven.home}} where per-CLAPP jar directories live.
@@ -162,26 +178,27 @@ public class MavenClappCling extends ClingSupport {
      * @param args           command-line arguments
      * @param world          the ClassWorld shared with the Maven core
      * @return the exit code returned by the CLAPP
-     * @throws IOException if the CLAPP lib directory cannot be read or the entry-point class
-     *                     cannot be loaded/invoked
+     * @throws IOException              if the CLAPP lib directory exists but cannot be read
+     * @throws ClappException          if the CLAPP cannot be loaded or invocation fails
+     * @throws IllegalArgumentException if the CLAPP tool name is invalid or attempts path traversal
      */
     static int launchClapp(String clappName, String clappMainClass, String[] args, ClassWorld world)
-            throws IOException {
+            throws IOException, ClappException {
         String mavenHome = System.getProperty("maven.home");
         if (mavenHome == null || mavenHome.isBlank()) {
-            throw new IOException(
+            throw new ClappException(
                     "System property 'maven.home' is not set; cannot locate CLAPP lib directory for: " + clappName);
         }
 
         // Validate tool name to prevent path traversal
         if (!clappName.matches("^[a-zA-Z0-9_-]+$")) {
-            throw new IOException("Invalid CLAPP tool name: '" + clappName + "'");
+            throw new IllegalArgumentException("Invalid CLAPP tool name: '" + clappName + "'");
         }
 
         Path baseDir = Paths.get(mavenHome).resolve(CLAPP_LIB_RELATIVE_PATH).normalize();
         Path clappLibDir = baseDir.resolve(clappName).normalize();
         if (!clappLibDir.startsWith(baseDir)) {
-            throw new IOException("Invalid CLAPP lib directory path traversal attempt for: " + clappName);
+            throw new IllegalArgumentException("Invalid CLAPP lib directory path traversal attempt for: " + clappName);
         }
 
         // Build the list of jar URLs from the CLAPP-specific lib directory
@@ -197,9 +214,9 @@ public class MavenClappCling extends ClingSupport {
             Thread.currentThread().setContextClassLoader(clappLoader);
             return (int) mainMethod.invoke(null, args, world);
         } catch (ClassNotFoundException e) {
-            throw new IOException("CLAPP '" + clappName + "': cannot find main class '" + clappMainClass + "'", e);
+            throw new ClappException("CLAPP '" + clappName + "': cannot find main class '" + clappMainClass + "'", e);
         } catch (NoSuchMethodException e) {
-            throw new IOException(
+            throw new ClappException(
                     "CLAPP '" + clappName + "': main class '" + clappMainClass
                             + "' does not expose public static int main(String[], ClassWorld)",
                     e);
@@ -214,9 +231,9 @@ public class MavenClappCling extends ClingSupport {
             if (cause instanceof Error) {
                 throw (Error) cause;
             }
-            throw new IOException("CLAPP '" + clappName + "': invocation failed", cause != null ? cause : e);
+            throw new ClappException("CLAPP '" + clappName + "': invocation failed", cause != null ? cause : e);
         } catch (IllegalAccessException e) {
-            throw new IOException(
+            throw new ClappException(
                     "CLAPP '" + clappName + "': cannot access main method of '" + clappMainClass + "'", e);
         } finally {
             // Restore class-loader so that the core Maven runtime is unaffected

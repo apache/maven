@@ -32,6 +32,7 @@ This is the [API](./apidocs/org/apache/maven/api/cli/package-summary.html) for M
 - [`mvnenc`](./apidocs/org/apache/maven/api/cli/mvnenc/package-summary.html), the Maven Password Encryption tool,
 - [`mvnsh`](./apidocs/org/apache/maven/api/cli/mvnsh/package-summary.html), the Maven Shell tool,
 - [`mvnup`](./apidocs/org/apache/maven/api/cli/mvnup/package-summary.html), the Maven Upgrade tool.
+- [CLAPP (Command Line App)](./clapp.html), support for third-party CLI tools with isolated classpaths.
 
 This API also defines [Core Extensions model](./core-extensions.html) for `.mvn/extensions.xml`.
 

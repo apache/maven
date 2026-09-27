@@ -84,14 +84,14 @@ class MavenClappClingTest {
     // -------------------------------------------------------------------------
 
     @Test
-    void launchClapp_throwsIOException_whenMavenHomeNotSet() {
+    void launchClapp_throwsClappException_whenMavenHomeNotSet() {
         String saved = System.getProperty("maven.home");
         try {
             System.clearProperty("maven.home");
             assertThrows(
-                    IOException.class,
+                    MavenClappCling.ClappException.class,
                     () -> MavenClappCling.launchClapp("mytool", "com.example.Main", new String[0], null),
-                    "Expected IOException when maven.home is not set");
+                    "Expected ClappException when maven.home is not set");
         } finally {
             if (saved != null) {
                 System.setProperty("maven.home", saved);
@@ -100,29 +100,29 @@ class MavenClappClingTest {
     }
 
     @Test
-    void launchClapp_throwsIOException_whenMainClassNotFound() {
+    void launchClapp_throwsClappException_whenMainClassNotFound() {
         System.setProperty("maven.home", tempDir.toString());
         try {
             // No jars in lib/clapp/mytool/, main class definitely not on classpath
             assertThrows(
-                    IOException.class,
+                    MavenClappCling.ClappException.class,
                     () -> MavenClappCling.launchClapp(
                             "mytool", "com.example.NonExistentMain", new String[0], null),
-                    "Expected IOException when CLAPP main class cannot be found");
+                    "Expected ClappException when CLAPP main class cannot be found");
         } finally {
             System.clearProperty("maven.home");
         }
     }
 
     @Test
-    void launchClapp_throwsIOException_whenToolNameInvalid() {
+    void launchClapp_throwsIllegalArgumentException_whenToolNameInvalid() {
         System.setProperty("maven.home", tempDir.toString());
         try {
             assertThrows(
-                    IOException.class,
+                    IllegalArgumentException.class,
                     () -> MavenClappCling.launchClapp(
                             "../badtool", "com.example.Main", new String[0], null),
-                    "Expected IOException when CLAPP tool name contains invalid path characters");
+                    "Expected IllegalArgumentException when CLAPP tool name contains invalid path characters");
         } finally {
             System.clearProperty("maven.home");
         }

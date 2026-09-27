@@ -501,13 +501,7 @@ if $cygwin ; then
 fi
 
 handle_args() {
-  _skip_next=false
   while [ $# -gt 0 ]; do
-    if $_skip_next ; then
-      _skip_next=false
-      shift
-      continue
-    fi
     case $1 in
       --debug)
         if [ -z "$MAVEN_DEBUG_OPTS" ] ; then
@@ -598,7 +592,7 @@ cmd="\"$JAVACMD\" \
   \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\""
 
 # When a CLAPP is active, inject the tool name and main class as system properties
-# so that MavenClappCling (and m2.conf) can pick them up.
+# so that MavenClappCling can pick them up.
 if [ -n "$MAVEN_CLAPP_NAME" ]; then
   cmd="$cmd \"-Dmaven.clapp.name=$MAVEN_CLAPP_NAME\""
 fi

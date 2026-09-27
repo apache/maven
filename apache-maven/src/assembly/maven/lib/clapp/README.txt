@@ -24,13 +24,14 @@ clapp.properties format
 
   # Fully-qualified class name of the CLAPP entry point.
   # The class must expose:
-  #   public static int main(String[] args, ClassWorld world) throws IOException
+  #   public static int main(String[] args, ClassWorld world)
   mainClass=com.example.mytool.MyCling
 
 Launching a CLAPP
 -----------------
 
   mvn --clapp <toolname> [tool-specific arguments...]
+  mvn --clapp=<toolname> [tool-specific arguments...]
 
 The `mvn` script reads lib/clapp/<toolname>/clapp.properties, sets the
 maven.clapp.name and maven.clapp.mainClass JVM system properties, and then
@@ -40,3 +41,6 @@ main class inside the tool-specific ClassLoader.
 Built-in tools (mvnenc, mvnsh, mvnup) continue to use their dedicated Cling
 classes and do NOT require a clapp.properties file because they ship their
 dependencies in the shared lib/ directory.
+
+For comprehensive documentation on authoring third-party CLAPP tools, see the
+Maven 4 API - CLI site documentation (clapp.html).
