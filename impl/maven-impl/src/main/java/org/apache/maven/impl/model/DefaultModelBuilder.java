@@ -487,7 +487,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
             boolean derivedExternalOrigin = externalOrigin || isExternalOrigin(request);
-            return new ModelBuilderSessionState(
+            ModelBuilderSessionState derived = new ModelBuilderSessionState(
                     session,
                     request,
                     result,
@@ -500,6 +500,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     derivedRepos,
                     new LinkedHashSet<>(),
                     derivedExternalOrigin);
+            // Carried over so the reactor walk keeps its reporting mode whichever state runs it.
+            derived.reportReactorLoadFailures = reportReactorLoadFailures;
+            return derived;
         }
 
         @Override

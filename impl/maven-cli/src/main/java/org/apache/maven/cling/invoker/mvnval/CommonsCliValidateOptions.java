@@ -71,11 +71,15 @@ public class CommonsCliValidateOptions extends CommonsCliOptions implements Vali
         super.displayHelp(request, printStream);
         printStream.accept("");
         printStream.accept("Validates the given POM files, or ./pom.xml when none are given.");
-        printStream.accept("Parents are not resolved and no build is run, so the verdict depends");
-        printStream.accept("on the files alone. Subprojects are not validated unless named.");
+        printStream.accept("No parent is resolved and no build is run, so the verdict comes from");
+        printStream.accept("the POM files themselves. A subproject is read when its parent needs");
+        printStream.accept("it, but only the POMs named on the command line are reported on.");
         printStream.accept("");
         printStream.accept("Exits with 0 when nothing was reported, 1 when anything was rejected,");
-        printStream.accept("2 on bad usage, and 3 when only warnings were reported.");
+        printStream.accept("2 on bad usage, and 4 when only warnings were reported.");
+        printStream.accept("");
+        printStream.accept("--format json writes one document to standard output. Options that log");
+        printStream.accept("there too, such as -e, -V and -X, will put lines in front of it.");
         printStream.accept("");
     }
 

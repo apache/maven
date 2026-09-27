@@ -25,6 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.maven.api.Session;
+import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.mvnval.ValidateOptions;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.impl.standalone.ApiRunner;
@@ -35,6 +36,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -270,14 +273,22 @@ class ValidateInvokerTest {
     class ExtensionTests {
 
         @Test
-        @DisplayName("should load no core extension, so validating a POM cannot reach the network")
-        void shouldLoadNoCoreExtension() {
-            // The default selector resolves everything .mvn/extensions.xml declares before the
-            // tool runs, which downloads and then executes that code.
-            assertEquals(
-                    List.of(),
-                    invoker.createCoreExtensionSelector().selectCoreExtensions(invoker, null),
-                    "a POM handed to the validator must not be able to pull in extensions");
+        @DisplayName("should stand up no container, so the POM's directory cannot make it load code")
+        void shouldStandUpNoContainer() throws Exception {
+            // Booting it would resolve and run whatever .mvn/extensions.xml declares, and whatever
+            // maven.ext.class.path names in .mvn/maven-user.properties.
+            ValidateContext context = TestUtils.createMockContext(tempDir, mock(ValidateOptions.class));
+
+            invoker.container(context);
+            invoker.postContainer(context);
+            invoker.lookup(context);
+            invoker.init(context);
+            invoker.settings(context);
+
+            assertNull(context.containerCapsule, "no container");
+            assertNull(context.lookup, "nothing to look up from");
+            assertNull(context.eventSpyDispatcher, "no event spies");
+            assertNull(context.effectiveSettings, "no settings, so no mirrors, proxies or credentials");
         }
     }
 
@@ -296,6 +307,21 @@ class ValidateInvokerTest {
             assertEquals(1, output.size(), "the whole report is one document, not a line per problem: " + output);
             assertTrue(output.get(0).startsWith("[{"), "expected a JSON array: " + output);
             assertTrue(output.get(0).contains("\"severity\":\"ERROR\""), output.get(0));
+        }
+
+        @Test
+        @DisplayName("should turn an unparseable command line into the bad-usage code")
+        void shouldTurnParseFailureIntoBadOperation() {
+            ValidateContext context = TestUtils.createMockContext(tempDir, mock(ValidateOptions.class));
+            when(context.invokerRequest.parsingFailed()).thenReturn(true);
+
+            InvokerException.ExitException e =
+                    assertThrows(InvokerException.ExitException.class, () -> invoker.validate(context));
+
+            assertEquals(
+                    ValidateInvoker.BAD_OPERATION,
+                    e.getExitCode(),
+                    "the base exits 1, which this tool uses for a rejected POM");
         }
 
         @Test

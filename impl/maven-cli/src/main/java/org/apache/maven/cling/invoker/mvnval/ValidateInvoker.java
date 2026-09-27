@@ -26,6 +26,7 @@ import java.util.function.Consumer;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvnval.ValidateOptions;
 import org.apache.maven.api.services.Lookup;
@@ -35,33 +36,45 @@ import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.Sources;
-import org.apache.maven.cling.invoker.CoreExtensionSelector;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.impl.standalone.ApiRunner;
+import org.jline.reader.UserInterruptException;
+import org.jline.terminal.Terminal;
 
 /**
  * Validates POM files without building them.
  * <p>
  * Validation stops after {@link ModelBuilder.ModelBuilderSession#buildRaw}, so no parent is
- * resolved and the verdict depends on the files alone, never on the network. The problems it can
- * reach are therefore a subset: a dependency whose version comes from the parent's
+ * resolved and the verdict comes from the POM files themselves. The problems it can reach are
+ * therefore a subset: a dependency whose version comes from the parent's
  * {@code dependencyManagement} is only checked later, in {@code validateEffectiveModel}.
+ * <p>
+ * It stands up no container and reads no settings, so a directory holding a POM cannot make this
+ * process fetch or run anything. What it cannot refuse is the JVM: {@code bin/mvn} hands
+ * {@code .mvn/jvm.config} to the launcher before any of this runs.
  */
 public class ValidateInvoker extends LookupInvoker<ValidateContext> {
 
     public static final int OK = 0;
     public static final int ERROR = 1;
 
-    /** Bad user input, as in {@code mvnenc} and {@code mvnup}. */
+    /** Bad user input. Same meaning as in {@code mvnenc} and {@code mvnup}. */
     public static final int BAD_OPERATION = 2;
 
     /**
-     * Nothing was rejected, but something was reported. Deliberately not 2: the CLI itself exits
-     * with 2 when a tool fails in a way it does not handle, and a gate must be able to tell "this
-     * POM has warnings" from "mvnval broke".
+     * Interrupted. Same meaning as in {@code mvnenc} and {@code mvnup}, and reachable only with a
+     * terminal attached: without one the signal reaches the JVM instead and the exit code is its.
+     * Left out of {@code --help} for that reason.
      */
-    public static final int WARNINGS = 3;
+    public static final int CANCELED = 3;
+
+    /**
+     * Nothing was rejected, but something was reported. Numbered 4 rather than reusing a lower
+     * code: 0 to 3 mean the same thing across the Maven 4 tools, and a gate must be able to tell
+     * "this POM has warnings" from "mvnval broke" or "somebody hit Ctrl+C".
+     */
+    public static final int WARNINGS = 4;
 
     public ValidateInvoker(Lookup protoLookup, @Nullable Consumer<LookupContext> contextConsumer) {
         super(protoLookup, contextConsumer);
@@ -75,34 +88,89 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
 
     @Override
     protected int execute(ValidateContext context) throws Exception {
-        OutputFormat format;
         try {
-            // The parser checks --format too, but options are interpolated after parsing, so
-            // ${...} can still turn into anything by the time it gets here.
-            format = context.options().format().map(OutputFormat::parse).orElse(OutputFormat.TEXT);
-        } catch (IllegalArgumentException e) {
-            context.logger.error(e.getMessage());
-            return BAD_OPERATION;
-        }
+            context.terminal.handle(
+                    Terminal.Signal.INT, signal -> Thread.currentThread().interrupt());
 
-        List<Report> reports = validate(resolvePoms(context), createSession());
-        // determineWriter, not context.writer: that field is lazy and nothing on this path has
-        // created it yet.
-        format.report(reports, determineWriter(context));
-        return exitCode(reports);
+            OutputFormat format;
+            try {
+                // The parser checks --format too, but options are interpolated afterwards, so
+                // ${...} can still become anything by the time it reaches here.
+                format = context.options().format().map(OutputFormat::parse).orElse(OutputFormat.TEXT);
+            } catch (IllegalArgumentException e) {
+                context.logger.error(e.getMessage());
+                return BAD_OPERATION;
+            }
+
+            List<Report> reports = validate(resolvePoms(context), createSession());
+            // interrupted(), not isInterrupted(): clear the flag where it is acted on. Reporting
+            // here would give a verdict on only the files reached so far.
+            if (Thread.interrupted()) {
+                return canceled(context);
+            }
+            // determineWriter, not context.writer: on a real run that field is still empty and
+            // this is what fills it.
+            format.report(reports, determineWriter(context));
+            return exitCode(reports);
+        } catch (UserInterruptException e) {
+            return canceled(context);
+        } catch (Exception e) {
+            // Without this an unexpected failure escapes to the CLI and becomes 2, which this tool
+            // documents as bad usage. Both siblings catch here too.
+            if (context.options().showErrors().orElse(false)) {
+                context.logger.error(e.getMessage(), e);
+            } else {
+                context.logger.error(e.getMessage());
+            }
+            return ERROR;
+        }
+    }
+
+    private static int canceled(ValidateContext context) {
+        context.logger.error("Validation canceled by user.");
+        return CANCELED;
     }
 
     /**
-     * Loads no core extension, whatever {@code .mvn/extensions.xml} asks for.
+     * Turns an unparseable command line into {@link #BAD_OPERATION}.
      * <p>
-     * The default selector resolves every declared extension before {@code execute} runs, which
-     * reaches the network and then runs that extension's code. Validating a POM someone handed you
-     * must not do either, and no extension can change what the raw model says anyway.
+     * The base exits 1 for a bad argument, which is the code this tool uses for a POM it rejected.
+     * A gate has to be able to tell a typo in its own script from a POM that failed validation.
      */
     @Override
-    protected CoreExtensionSelector<ValidateContext> createCoreExtensionSelector() {
-        return (invoker, context) -> List.of();
+    protected void validate(ValidateContext context) throws Exception {
+        try {
+            super.validate(context);
+        } catch (InvokerException.ExitException e) {
+            throw e.getExitCode() == ERROR ? new InvokerException.ExitException(BAD_OPERATION) : e;
+        }
     }
+
+    // The next five steps stand up dependency injection and read configuration. Nothing here uses
+    // either: the model builder comes from createSession(). Running them would let the directory
+    // holding the POM decide what this process loads, via .mvn/extensions.xml, .mvn/settings.xml,
+    // or maven.ext.class.path in .mvn/maven-user.properties. Refused one at a time rather than by
+    // replacing doInvoke, so a step added to the base class later still runs.
+
+    /** No container: nothing is looked up, and no extension or contributed property is loaded. */
+    @Override
+    protected void container(ValidateContext context) {}
+
+    /** No container, so no {@code PropertyContributor} to run. */
+    @Override
+    protected void postContainer(ValidateContext context) {}
+
+    /** No container to look up from. */
+    @Override
+    protected void lookup(ValidateContext context) {}
+
+    /** No {@code EventSpy} dispatch: this tool emits no build events. */
+    @Override
+    protected void init(ValidateContext context) {}
+
+    /** No settings: nothing here resolves, mirrors, proxies or authenticates. */
+    @Override
+    protected void settings(ValidateContext context) {}
 
     /**
      * Creates the session the model builder runs on. Made here because {@code LookupInvoker} only
@@ -126,6 +194,10 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
         ModelBuilder modelBuilder = session.getService(ModelBuilder.class);
         List<Report> reports = new ArrayList<>(poms.size());
         for (Path pom : poms) {
+            // Ctrl+C lands between files, not part way through one.
+            if (Thread.currentThread().isInterrupted()) {
+                break;
+            }
             reports.add(validate(pom, session, modelBuilder));
         }
         return reports;
@@ -144,8 +216,7 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
         try {
             return Report.of(pom, problemsOf(modelBuilder.newSession().buildRaw(request)));
         } catch (ModelBuilderException e) {
-            // A result that explains nothing would report the file as clean, so the exception
-            // speaks in its place.
+            // A result that explains nothing would report the file as clean, so use the exception.
             ModelBuilderResult result = e.getResult();
             return result != null && result.getProblemCollector().hasErrorProblems()
                     ? Report.of(pom, problemsOf(result))
@@ -154,7 +225,7 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
             // buildRaw is unimplemented: the tool is unusable, rather than this file being bad.
             throw e;
         } catch (Exception e) {
-            // One pathological file must not lose the verdict on the others.
+            // One bad file must not lose the verdict on the others.
             return Report.failed(pom, describe(e));
         }
     }
