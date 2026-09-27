@@ -142,6 +142,7 @@ QUIET=false
 VERBOSE=false
 MAIN_CLASS_OVERRIDE=false
 FAST_VERSION_PRINTED=false
+MAVEN_CLAPP_NAME=
 for arg in "$@"; do
   if [ "$arg" = "--" ] ; then
     break
@@ -151,7 +152,8 @@ for arg in "$@"; do
     -V|--show-version) SHOW_VERSION=true ;;
     -q|--quiet) QUIET=true ;;
     -X|--debug) VERBOSE=true ;;
-    --enc|--shell|--up) MAIN_CLASS_OVERRIDE=true ;;
+    --enc|--shell|--up|--clapp) MAIN_CLASS_OVERRIDE=true ;;
+    --clapp=*) MAIN_CLASS_OVERRIDE=true ;;
     -[qvVXe]*)
       case $arg in
         *v*) VERSION_AND_EXIT=true ;;
@@ -499,7 +501,13 @@ if $cygwin ; then
 fi
 
 handle_args() {
+  _skip_next=false
   while [ $# -gt 0 ]; do
+    if $_skip_next ; then
+      _skip_next=false
+      shift
+      continue
+    fi
     case $1 in
       --debug)
         if [ -z "$MAVEN_DEBUG_OPTS" ] ; then
@@ -524,11 +532,54 @@ handle_args() {
       --up)
         MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenUpCling"
         ;;
+      # ---------------------------------------------------------------------------
+      # CLAPP support: --clapp <toolname> or --clapp=<toolname>
+      # Launches a Maven Command Line App from lib/clapp/<toolname>/.
+      # The tool must advertise its entry-point class in the file
+      #   lib/clapp/<toolname>/clapp.properties  (key: mainClass)
+      # If that file is absent the class defaults to MavenClappCling which will
+      # emit a helpful error message.
+      # ---------------------------------------------------------------------------
+      --clapp)
+        shift
+        if [ $# -eq 0 ]; then
+          echo "Error: --clapp requires a tool name argument (e.g. --clapp mvnfoo)" >&2
+          exit 1
+        fi
+        MAVEN_CLAPP_NAME="$1"
+        MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenClappCling"
+        _load_clapp_main_class "$MAVEN_CLAPP_NAME"
+        ;;
+      --clapp=*)
+        MAVEN_CLAPP_NAME="${1#--clapp=}"
+        if [ -z "$MAVEN_CLAPP_NAME" ]; then
+          echo "Error: --clapp= requires a non-empty tool name" >&2
+          exit 1
+        fi
+        MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenClappCling"
+        _load_clapp_main_class "$MAVEN_CLAPP_NAME"
+        ;;
       *)
         ;;
     esac
     shift
   done
+}
+
+# Read the CLAPP main class from lib/clapp/<name>/clapp.properties (key: mainClass).
+# Sets MAVEN_CLAPP_MAIN_CLASS; falls back to the generic MavenClappCling dispatcher
+# if the properties file is absent (it will emit a clear error at JVM startup).
+_load_clapp_main_class() {
+  _cname="$1"
+  _props="$MAVEN_HOME/lib/clapp/$_cname/clapp.properties"
+  MAVEN_CLAPP_MAIN_CLASS=
+  if [ -f "$_props" ]; then
+    MAVEN_CLAPP_MAIN_CLASS=$(sed -n 's/^mainClass=//p' "$_props" | head -n 1)
+  fi
+  if [ -z "$MAVEN_CLAPP_MAIN_CLASS" ]; then
+    # No properties file or no mainClass entry – MavenClappCling will handle the error
+    MAVEN_CLAPP_MAIN_CLASS="org.apache.maven.cling.MavenClappCling"
+  fi
 }
 
 handle_args "$@"
@@ -545,6 +596,15 @@ cmd="\"$JAVACMD\" \
   \"-Dmaven.mainClass=$MAVEN_MAIN_CLASS\" \
   \"-Dlibrary.jline.path=$JLINE_NATIVE_PATH\" \
   \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\""
+
+# When a CLAPP is active, inject the tool name and main class as system properties
+# so that MavenClappCling (and m2.conf) can pick them up.
+if [ -n "$MAVEN_CLAPP_NAME" ]; then
+  cmd="$cmd \"-Dmaven.clapp.name=$MAVEN_CLAPP_NAME\""
+fi
+if [ -n "$MAVEN_CLAPP_MAIN_CLASS" ] && [ "$MAVEN_CLAPP_MAIN_CLASS" != "org.apache.maven.cling.MavenClappCling" ]; then
+  cmd="$cmd \"-Dmaven.clapp.mainClass=$MAVEN_CLAPP_MAIN_CLASS\""
+fi
 
 # The JVM option must precede the main class on the command line, otherwise it
 # would be treated as a plain Maven argument rather than a system property.
@@ -567,7 +627,7 @@ fi
 # to preserve literal values (backslashes, ${...} placeholders) without
 # shell re-parsing. Only the base command uses eval for MAVEN_OPTS word splitting.
 # MAVEN_ARGS is only passed for the default Maven build command (MavenCling),
-# not for sub-commands like --up, --enc, or --shell which have their own options.
+# not for sub-commands like --up, --enc, --shell, or --clapp which have their own options.
 if [ "$MAVEN_MAIN_CLASS" = "org.apache.maven.cling.MavenCling" ]; then
   eval exec "$cmd" '$MAVEN_ARGS' '"$@"'
 else

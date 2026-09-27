@@ -106,6 +106,14 @@ under the License.
       <outputDirectory>lib</outputDirectory>
     </fileSet>
     <fileSet>
+      <!-- CLAPP (Command Line App) skeleton directory -->
+      <directory>src/assembly/maven/lib/clapp</directory>
+      <outputDirectory>lib/clapp</outputDirectory>
+      <includes>
+        <include>README.txt</include>
+      </includes>
+    </fileSet>
+    <fileSet>
       <directory>target/classes/org/apache/maven/messages</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>
