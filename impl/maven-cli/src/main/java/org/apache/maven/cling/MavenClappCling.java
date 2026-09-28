@@ -37,10 +37,10 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
+import org.apache.maven.api.services.MavenException;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
-import org.apache.maven.api.services.MavenException;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
@@ -116,12 +116,15 @@ public class MavenClappCling extends ClingSupport {
         String clappName = System.getProperty(MAVEN_CLAPP_NAME_PROPERTY);
         String clappMainClass = System.getProperty(MAVEN_CLAPP_MAIN_CLASS_PROPERTY);
 
-        if (clappName != null && !clappName.isBlank() && clappMainClass != null && !clappMainClass.isBlank()) {
+        if (clappName != null && !clappName.isBlank()) {
+            if (clappMainClass == null || clappMainClass.isBlank()) {
+                throw new ClappException("CLAPP '" + clappName + "': mainClass is not configured in clapp.properties");
+            }
             return launchClapp(clappName.trim(), clappMainClass.trim(), args, world);
         }
 
         // Fallback: behave as MavenCling when no CLAPP is configured
-        return MavenCling.main(args, world);
+        return new MavenCling(world).run(args, null, null, null, false);
     }
 
     /**
@@ -206,7 +209,7 @@ public class MavenClappCling extends ClingSupport {
 
         // Create a child class-loader that sees the core classes + the CLAPP's own jars
         ClassLoader parentLoader = Thread.currentThread().getContextClassLoader();
-        try (URLClassLoader clappLoader = new URLClassLoader(jarUrls.toArray(new URL[0]), parentLoader)) {
+        try (ClappClassLoader clappLoader = new ClappClassLoader(jarUrls.toArray(new URL[0]), parentLoader)) {
             Class<?> clazz = clappLoader.loadClass(clappMainClass);
             Method entryPoint = findEntryPointMethod(clazz);
             // Publish the CLAPP class-loader as the context class-loader so that
@@ -298,5 +301,48 @@ public class MavenClappCling extends ClingSupport {
             }
         }
         return urls;
+    }
+
+    /**
+     * Child-first (parent-last) {@link URLClassLoader} ensuring tool-bundled private dependencies
+     * take precedence over libraries present in Maven's core realm, while delegating core Java and Maven
+     * API classes to the parent first.
+     */
+    static class ClappClassLoader extends URLClassLoader {
+        ClappClassLoader(URL[] urls, ClassLoader parent) {
+            super(urls, parent);
+        }
+
+        @Override
+        protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
+            synchronized (getClassLoadingLock(name)) {
+                Class<?> c = findLoadedClass(name);
+                if (c == null) {
+                    if (isParentFirst(name)) {
+                        c = super.loadClass(name, resolve);
+                    } else {
+                        try {
+                            c = findClass(name);
+                        } catch (ClassNotFoundException e) {
+                            c = super.loadClass(name, resolve);
+                        }
+                    }
+                }
+                if (resolve) {
+                    resolveClass(c);
+                }
+                return c;
+            }
+        }
+
+        private static boolean isParentFirst(String name) {
+            return name.startsWith("java.")
+                    || name.startsWith("javax.")
+                    || name.startsWith("jdk.")
+                    || name.startsWith("sun.")
+                    || name.startsWith("org.apache.maven.api.")
+                    || name.startsWith("org.apache.maven.cling.")
+                    || name.startsWith("org.codehaus.plexus.classworlds.");
+        }
     }
 }

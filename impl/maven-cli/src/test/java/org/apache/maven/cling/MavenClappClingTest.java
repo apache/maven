@@ -18,11 +18,16 @@
  */
 package org.apache.maven.cling;
 
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
+
 import java.io.IOException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
+import java.util.jar.JarOutputStream;
+import java.util.zip.ZipEntry;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -106,8 +111,7 @@ class MavenClappClingTest {
             // No jars in lib/clapp/mytool/, main class definitely not on classpath
             assertThrows(
                     MavenClappCling.ClappException.class,
-                    () -> MavenClappCling.launchClapp(
-                            "mytool", "com.example.NonExistentMain", new String[0], null),
+                    () -> MavenClappCling.launchClapp("mytool", "com.example.NonExistentMain", new String[0], null),
                     "Expected ClappException when CLAPP main class cannot be found");
         } finally {
             System.clearProperty("maven.home");
@@ -120,8 +124,7 @@ class MavenClappClingTest {
         try {
             assertThrows(
                     IllegalArgumentException.class,
-                    () -> MavenClappCling.launchClapp(
-                            "../badtool", "com.example.Main", new String[0], null),
+                    () -> MavenClappCling.launchClapp("../badtool", "com.example.Main", new String[0], null),
                     "Expected IllegalArgumentException when CLAPP tool name contains invalid path characters");
         } finally {
             System.clearProperty("maven.home");
@@ -132,8 +135,8 @@ class MavenClappClingTest {
     void launchClappInvokesRunMethodSuccessfully() throws Exception {
         System.setProperty("maven.home", tempDir.toString());
         try {
-            int exitCode = MavenClappCling.launchClapp(
-                    "mytool", SampleRunTool.class.getName(), new String[] {"test"}, null);
+            int exitCode =
+                    MavenClappCling.launchClapp("mytool", SampleRunTool.class.getName(), new String[] {"test"}, null);
             assertEquals(42, exitCode);
         } finally {
             System.clearProperty("maven.home");
@@ -144,8 +147,8 @@ class MavenClappClingTest {
     void launchClappInvokesMainMethodSuccessfully() throws Exception {
         System.setProperty("maven.home", tempDir.toString());
         try {
-            int exitCode = MavenClappCling.launchClapp(
-                    "mytool", SampleMainTool.class.getName(), new String[] {"test"}, null);
+            int exitCode =
+                    MavenClappCling.launchClapp("mytool", SampleMainTool.class.getName(), new String[] {"test"}, null);
             assertEquals(99, exitCode);
         } finally {
             System.clearProperty("maven.home");
@@ -178,6 +181,55 @@ class MavenClappClingTest {
         }
     }
 
+    @Test
+    void mainThrowsClappExceptionWhenClappConfiguredWithoutMainClass() {
+        System.setProperty(MavenClappCling.MAVEN_CLAPP_NAME_PROPERTY, "mytool");
+        System.clearProperty(MavenClappCling.MAVEN_CLAPP_MAIN_CLASS_PROPERTY);
+        try {
+            assertThrows(
+                    MavenClappCling.ClappException.class,
+                    () -> MavenClappCling.main(new String[0], null),
+                    "Expected ClappException when CLAPP name is set but mainClass is missing");
+        } finally {
+            System.clearProperty(MavenClappCling.MAVEN_CLAPP_NAME_PROPERTY);
+        }
+    }
+
+    @Test
+    void launchClappLoadsFromJarInClappDirectory() throws Exception {
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        if (compiler == null) {
+            return;
+        }
+        System.setProperty("maven.home", tempDir.toString());
+        try {
+            Path srcDir = Files.createDirectory(tempDir.resolve("src"));
+            Path javaFile = srcDir.resolve("StandaloneJarTool.java");
+            Files.writeString(
+                    javaFile,
+                    "public class StandaloneJarTool {\n"
+                            + "    public static int run(String[] args, org.codehaus.plexus.classworlds.ClassWorld world) {\n"
+                            + "        return 123;\n"
+                            + "    }\n"
+                            + "}\n");
+            Path binDir = Files.createDirectory(tempDir.resolve("bin"));
+            compiler.run(null, null, null, "-d", binDir.toString(), javaFile.toString());
+
+            Path clappLibDir = Files.createDirectories(tempDir.resolve("lib/clapp/standalone"));
+            Path jarFile = clappLibDir.resolve("standalone-tool.jar");
+            try (JarOutputStream jos = new JarOutputStream(Files.newOutputStream(jarFile))) {
+                jos.putNextEntry(new ZipEntry("StandaloneJarTool.class"));
+                Files.copy(binDir.resolve("StandaloneJarTool.class"), jos);
+                jos.closeEntry();
+            }
+
+            int exitCode = MavenClappCling.launchClapp("standalone", "StandaloneJarTool", new String[0], null);
+            assertEquals(123, exitCode);
+        } finally {
+            System.clearProperty("maven.home");
+        }
+    }
+
     public static class SampleRunTool {
         public static int run(String[] args, org.codehaus.plexus.classworlds.ClassWorld world) {
             return 42;
@@ -191,10 +243,8 @@ class MavenClappClingTest {
     }
 
     public static class SampleStandardMainTool {
-        public static void main(String[] args) {
-        }
+        public static void main(String[] args) {}
     }
 
-    public static class SampleNoEntryPointTool {
-    }
+    public static class SampleNoEntryPointTool {}
 }
