@@ -31,6 +31,7 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvnval.ValidateOptions;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ModelBuilder;
+import org.apache.maven.api.services.ModelBuilder.ModelBuilderSession;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
@@ -45,10 +46,11 @@ import org.jline.terminal.Terminal;
 /**
  * Validates POM files without building them.
  * <p>
- * Validation stops after {@link ModelBuilder.ModelBuilderSession#buildRaw}, so no parent is
- * resolved and the verdict comes from the POM files themselves. The problems it can reach are
- * therefore a subset: a dependency whose version comes from the parent's
- * {@code dependencyManagement} is only checked later, in {@code validateEffectiveModel}.
+ * Validation stops after {@link ModelBuilder.ModelBuilderSession#validate}, which reads no
+ * further than the raw model, so no parent is resolved and the verdict comes from the POM files
+ * themselves. The problems it can reach are therefore a subset: a dependency whose version comes
+ * from the parent's {@code dependencyManagement} is only checked later, in
+ * {@code validateEffectiveModel}.
  * <p>
  * It stands up no container and reads no settings, so a directory holding a POM cannot make this
  * process fetch or run anything. What it cannot refuse is the JVM: {@code bin/mvn} hands
@@ -102,7 +104,7 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                 return BAD_OPERATION;
             }
 
-            List<Report> reports = validate(resolvePoms(context), createSession());
+            List<Report> reports = validateAll(resolvePoms(context), createSession());
             // interrupted(), not isInterrupted(): clear the flag where it is acted on. Reporting
             // here would give a verdict on only the files reached so far.
             if (Thread.interrupted()) {
@@ -190,20 +192,23 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                 : args.stream().map(context.cwd::resolve).distinct().toList();
     }
 
-    private static List<Report> validate(List<Path> poms, Session session) {
-        ModelBuilder modelBuilder = session.getService(ModelBuilder.class);
+    private static List<Report> validateAll(List<Path> poms, Session session) {
+        // One session for the run, not per file. It saves no reading: every validate() walks
+        // the reactor from the root again.
+        ModelBuilderSession builderSession =
+                session.getService(ModelBuilder.class).newSession();
         List<Report> reports = new ArrayList<>(poms.size());
         for (Path pom : poms) {
             // Ctrl+C lands between files, not part way through one.
             if (Thread.currentThread().isInterrupted()) {
                 break;
             }
-            reports.add(validate(pom, session, modelBuilder));
+            reports.add(validateOne(pom, session, builderSession));
         }
         return reports;
     }
 
-    private static Report validate(Path pom, Session session, ModelBuilder modelBuilder) {
+    private static Report validateOne(Path pom, Session session, ModelBuilderSession builderSession) {
         String unusable = unusable(pom);
         if (unusable != null) {
             return Report.failed(pom, unusable);
@@ -214,7 +219,7 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                 .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
                 .build();
         try {
-            return Report.of(pom, problemsOf(modelBuilder.newSession().buildRaw(request)));
+            return Report.of(pom, problemsOf(builderSession.validate(request)));
         } catch (ModelBuilderException e) {
             // A result that explains nothing would report the file as clean, so use the exception.
             ModelBuilderResult result = e.getResult();
@@ -222,7 +227,7 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                     ? Report.of(pom, problemsOf(result))
                     : Report.failed(pom, describe(e));
         } catch (UnsupportedOperationException e) {
-            // buildRaw is unimplemented: the tool is unusable, rather than this file being bad.
+            // validate is unimplemented: the tool is unusable, rather than this file being bad.
             throw e;
         } catch (Exception e) {
             // One bad file must not lose the verdict on the others.

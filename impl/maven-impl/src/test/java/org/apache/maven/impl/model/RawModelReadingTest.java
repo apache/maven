@@ -42,7 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests {@link ModelBuilder.ModelBuilderSession#buildRaw}, which reads and validates a POM without
+ * Tests {@link ModelBuilder.ModelBuilderSession#validate}, which reads and validates a POM without
  * building it: it returns the problems instead of throwing on them, and it reads only files.
  */
 class RawModelReadingTest {
@@ -133,17 +133,33 @@ class RawModelReadingTest {
     }
 
     @Test
-    void shouldRejectBuildRawWhenAnImplementationDoesNotSupportIt() {
+    void shouldRejectValidateWhenAnImplementationDoesNotSupportIt() {
         ModelBuilder.ModelBuilderSession unsupporting = request -> {
             throw new UnsupportedOperationException("build is not under test");
         };
 
-        assertThrows(UnsupportedOperationException.class, () -> unsupporting.buildRaw(null));
+        assertThrows(UnsupportedOperationException.class, () -> unsupporting.validate(null));
+    }
+
+    @Test
+    void shouldValidateSeveralProjectsOnOneSession(@TempDir Path directory) throws IOException {
+        // Two reactors meeting in one session under the same coordinates is the case that would
+        // break if the session kept a single source per groupId:artifactId.
+        Path first = writeSubproject(writeReactor(directory.resolve("first"), "good"), "good");
+        Path second = writeSubproject(writeReactor(directory.resolve("second"), "good"), "good");
+        ModelBuilder.ModelBuilderSession shared = builder.newSession();
+
+        assertEquals(List.of(), messages(readRaw(shared, first)), "the first project is clean on its own");
+        assertEquals(List.of(), messages(readRaw(shared, second)), "the second project sees the same session");
     }
 
     private List<ModelProblem> readRaw(Path pom) {
-        return builder.newSession()
-                .buildRaw(ModelBuilderRequest.builder()
+        return readRaw(builder.newSession(), pom);
+    }
+
+    private List<ModelProblem> readRaw(ModelBuilder.ModelBuilderSession builderSession, Path pom) {
+        return builderSession
+                .validate(ModelBuilderRequest.builder()
                         .session(session)
                         .source(Sources.buildSource(pom))
                         .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
