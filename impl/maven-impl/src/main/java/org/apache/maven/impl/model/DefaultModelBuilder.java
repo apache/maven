@@ -254,7 +254,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         @Override
-        public ModelBuilderResult buildRaw(ModelBuilderRequest request) throws ModelBuilderException {
+        public ModelBuilderResult validate(ModelBuilderRequest request) throws ModelBuilderException {
             RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
             try {
                 ModelBuilderSessionState session = sessionFor(request);
@@ -266,13 +266,6 @@ public class DefaultModelBuilder implements ModelBuilder {
                 session.readRawModel();
                 return session.result;
             } finally {
-                // Always clear, unlike build(), which is also entered for nested requests:
-                // buildRaw is only ever called as a top-level one.
-                try {
-                    clearRequestScopedCache(request);
-                } catch (Exception e) {
-                    logger.debug("Failed to clear REQUEST_SCOPED cache for raw model request: {}", request, e);
-                }
                 RequestTraceHelper.exit(trace);
             }
         }

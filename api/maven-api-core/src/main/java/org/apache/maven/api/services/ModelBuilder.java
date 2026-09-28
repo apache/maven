@@ -40,30 +40,35 @@ public interface ModelBuilder extends Service {
         ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException;
 
         /**
-         * Reads and validates the raw model, without inheritance, interpolation or profile injection.
+         * Validates the model described by the request, collecting every problem instead of
+         * throwing on the first one.
          * <p>
          * Unlike {@link #build(ModelBuilderRequest)} this does not throw when validation reports
          * errors: the result carries errors and warnings alike, so a caller that only wants to
          * report on a POM can see warnings that come with no error. A problem severe enough that
          * the model cannot be read at all is still thrown.
          * <p>
-         * Reading one raw model can need others: a subproject may leave out its parent version,
-         * which is then taken from the parent's own file model. An implementation may therefore
-         * read files besides the one the request names, up to the project root. Nothing is
-         * resolved from a repository and nothing is downloaded.
+         * This implementation stops after the raw model, so no inheritance, interpolation or
+         * profile injection happens and only the source, the file model, the raw model and the
+         * problems are populated on the result. {@link ModelBuilderResult#getEffectiveModel()}
+         * and the other accessors describing a fully built model are not.
          * <p>
-         * Only the source, the file model, the raw model and the problems are populated on the
-         * result. The accessors that describe a fully built model, such as
-         * {@link ModelBuilderResult#getEffectiveModel()}, are not.
+         * Reading one model can need others: a subproject may leave out its parent version, which
+         * is then taken from the parent's own file model. An implementation may therefore read
+         * files besides the one the request names, up to the project root. Nothing is resolved
+         * from a repository and nothing is downloaded.
+         * <p>
+         * The session holds what it builds for its own lifetime, so give a validation run a
+         * session of its own rather than sharing one with {@link #build(ModelBuilderRequest)}.
          *
          * @param request the request containing the parameters for reading the model
-         * @return the result, carrying the raw model and the problems collected
+         * @return the result, carrying the model that was read and the problems collected
          * @throws ModelBuilderException if the model cannot be read at all
          * @throws UnsupportedOperationException if this implementation does not support it
          * @since 4.1.0
          */
-        default ModelBuilderResult buildRaw(ModelBuilderRequest request) throws ModelBuilderException {
-            throw new UnsupportedOperationException(getClass().getName() + " does not support reading a raw model");
+        default ModelBuilderResult validate(ModelBuilderRequest request) throws ModelBuilderException {
+            throw new UnsupportedOperationException(getClass().getName() + " does not support validating a model");
         }
     }
 
