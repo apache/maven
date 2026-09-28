@@ -16,29 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.logging.impl;
-
-import org.apache.maven.cling.logging.BaseSlf4jConfiguration;
 
 /**
- * Configuration for slf4j-log4j2.
+ * Structured build report data model.
+ * <p>
+ * This package provides structured representations of build execution
+ * data, including log events and (in future) full build reports.
+ * {@link org.apache.maven.api.build.report.LogEvent} is the foundational
+ * type representing a single structured log entry captured during the build.
  *
- * @since 3.1.0
+ * @since 4.1.0
  */
-public class Log4j2Configuration extends BaseSlf4jConfiguration {
-    @Override
-    public void setRootLoggerLevel(Level level) {
-        String value =
-                switch (level) {
-                    case DEBUG -> "debug";
-                    case INFO -> "info";
-                    default -> "error";
-                };
-        System.setProperty("maven.logging.root.level", value);
-    }
+@Experimental
+package org.apache.maven.api.build.report;
 
-    @Override
-    public void activate() {
-        // no op
-    }
-}
+import org.apache.maven.api.annotations.Experimental;

@@ -39,12 +39,43 @@ public class MavenSimpleLogger extends MavenBaseLogger {
     private String warnRenderedLevel;
     private String errorRenderedLevel;
 
-    static Consumer<String> logSink;
+    /**
+     * Structured log sink that receives level, logger name, clean message,
+     * formatted console output, and throwable for each log event.
+     * <p>
+     * This replaces the previous {@code Consumer<String>} sink to enable
+     * console renderers (e.g. rich mode) to filter by log level and access
+     * the clean message independently of ANSI formatting.
+     *
+     * @since 4.1.0
+     */
+    @FunctionalInterface
+    public interface LogSink {
+        void accept(int level, String loggerName, String cleanMessage, String formattedMessage, Throwable throwable);
+    }
+
+    static volatile LogSink logSink;
 
     public static final String DEFAULT_LOG_LEVEL_KEY = "org.slf4j.simpleLogger.defaultLogLevel";
 
-    public static void setLogSink(Consumer<String> logSink) {
+    /**
+     * Sets the structured log sink.
+     *
+     * @param logSink the sink, or {@code null} to remove
+     * @since 4.1.0
+     */
+    public static void setLogSink(LogSink logSink) {
         MavenSimpleLogger.logSink = logSink;
+    }
+
+    /**
+     * Returns the current log sink, or {@code null} if none is set.
+     *
+     * @return the current log sink, or {@code null}
+     * @since 4.1.0
+     */
+    public static LogSink getLogSink() {
+        return logSink;
     }
 
     MavenSimpleLogger(String name) {
@@ -70,15 +101,22 @@ public class MavenSimpleLogger extends MavenBaseLogger {
     }
 
     @Override
-    protected void write(StringBuilder buf, Throwable t) {
-        Consumer<String> sink = logSink;
+    protected void write(int level, String loggerName, String cleanMessage, StringBuilder formattedBuf, Throwable t) {
+        LogSink sink = logSink;
         if (sink != null) {
-            sink.accept(buf.toString());
+            // Build the full formatted output including throwable rendering,
+            // reusing the existing writeThrowable/printStackTrace methods
+            // to keep a single rendering path for throwables.
+            String formatted = formattedBuf.toString();
             if (t != null) {
-                writeThrowable(t, sink);
+                StringBuilder full = new StringBuilder(formatted);
+                full.append(System.lineSeparator());
+                writeThrowable(t, line -> full.append(line).append(System.lineSeparator()));
+                formatted = full.toString();
             }
+            sink.accept(level, loggerName, cleanMessage, formatted, t);
         } else {
-            super.write(buf, t);
+            super.write(formattedBuf, t);
         }
     }
 
