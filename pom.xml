@@ -342,7 +342,7 @@ under the License.
       <dependency>
         <groupId>org.apache.maven.shared</groupId>
         <artifactId>maven-shared-utils</artifactId>
-        <version>3.4.2</version>
+        <version>3.5.0</version>
         <exclusions>
           <!-- We use org.apache.maven.shared.utils.logging only in Maven Core -->
           <exclusion>
