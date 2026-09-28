@@ -36,6 +36,9 @@ class JsonReporter implements Reporter {
     private static final char FIRST_PRINTABLE_ASCII = 0x20;
     private static final char LAST_PRINTABLE_ASCII = 0x7e;
 
+    /** The two quotes, plus room for a few escapes. */
+    private static final int ESCAPE_HEADROOM = 16;
+
     @Override
     public void report(List<Report> reports, Consumer<String> out) {
         out.accept(reports.stream().map(JsonReporter::toJson).collect(Collectors.joining(",", "[", "]")));
@@ -78,32 +81,47 @@ class JsonReporter implements Reporter {
         if (value == null) {
             return "null";
         }
-        StringBuilder sb = new StringBuilder(value.length() + 2).append('"');
+        StringBuilder sb = null;
         for (int i = 0; i < value.length(); i++) {
             char c = value.charAt(i);
-            switch (c) {
-                case '"' -> sb.append("\\\"");
-                case '\\' -> sb.append("\\\\");
-                case '\n' -> sb.append("\\n");
-                case '\r' -> sb.append("\\r");
-                case '\t' -> sb.append("\\t");
-                default -> {
-                    // Everything outside printable ASCII is escaped, not just the control
-                    // characters JSON forbids: the writer's charset is the console's, which on
-                    // Windows is routinely not UTF-8, and a path can carry an unpaired surrogate
-                    // that no charset can encode.
-                    if (c < FIRST_PRINTABLE_ASCII || c > LAST_PRINTABLE_ASCII) {
-                        sb.append("\\u")
-                                .append(HEX[c >> 12 & 0xf])
-                                .append(HEX[c >> 8 & 0xf])
-                                .append(HEX[c >> 4 & 0xf])
-                                .append(HEX[c & 0xf]);
-                    } else {
-                        sb.append(c);
-                    }
+            String escaped = escaped(c);
+            if (escaped == null) {
+                if (sb != null) {
+                    sb.append(c);
                 }
+            } else {
+                if (sb == null) {
+                    sb = new StringBuilder(value.length() + ESCAPE_HEADROOM)
+                            .append('"')
+                            .append(value, 0, i);
+                }
+                sb.append(escaped);
             }
         }
-        return sb.append('"').toString();
+        return sb == null ? '"' + value + '"' : sb.append('"').toString();
+    }
+
+    /**
+     * The replacement for a character that cannot stand for itself, or {@code null} when it can.
+     * <p>
+     * Everything outside printable ASCII is escaped, not just the control characters JSON forbids:
+     * the writer's charset is the console's, which on Windows is routinely not UTF-8, and a path
+     * can carry an unpaired surrogate that no charset can encode.
+     */
+    @Nullable
+    private static String escaped(char c) {
+        return switch (c) {
+            case '"' -> "\\\"";
+            case '\\' -> "\\\\";
+            case '\n' -> "\\n";
+            case '\r' -> "\\r";
+            case '\t' -> "\\t";
+            default ->
+                c < FIRST_PRINTABLE_ASCII || c > LAST_PRINTABLE_ASCII
+                        ? new String(new char[] {
+                            '\\', 'u', HEX[c >> 12 & 0xf], HEX[c >> 8 & 0xf], HEX[c >> 4 & 0xf], HEX[c & 0xf]
+                        })
+                        : null;
+        };
     }
 }
