@@ -18,6 +18,7 @@
  */
 package org.apache.maven.cling.invoker.mvnval;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -256,14 +257,23 @@ class ValidateInvokerTest {
         @DisplayName("should read a POM named twice only once")
         void shouldReadAPomNamedTwiceOnce() throws Exception {
             Path pom = writePom("twice", "");
+            List<String> named = new ArrayList<>(List.of(pom.toString(), "./twice/pom.xml"));
+            try {
+                // Windows refuses this without developer mode, and the two spellings above
+                // already make the point there.
+                named.add(Files.createSymbolicLink(tempDir.resolve("linked.xml"), pom)
+                        .toString());
+            } catch (IOException | UnsupportedOperationException e) {
+                // no link on this machine
+            }
 
-            int exitCode = run(List.of(pom.toString(), "./twice/pom.xml"));
+            int exitCode = run(named);
 
             assertEquals(ValidateInvoker.ERROR, exitCode, output.toString());
             assertEquals(
                     1,
-                    output.stream().filter(line -> line.endsWith("pom.xml:")).count(),
-                    "one file named two ways is one report: " + output);
+                    output.stream().filter(line -> line.endsWith(":")).count(),
+                    "one file named several ways is one report: " + output);
         }
     }
 

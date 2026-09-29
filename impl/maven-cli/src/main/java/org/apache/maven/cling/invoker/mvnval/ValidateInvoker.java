@@ -478,11 +478,9 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
         List<String> args = context.options().poms().orElse(List.of());
         return args.isEmpty()
                 ? List.of(context.cwd.resolve("pom.xml"))
-                // Normalised before distinct(), or "pom.xml ./pom.xml" is two paths and the same
-                // file is read, reported and counted twice.
                 : args.stream()
                         .map(context.cwd::resolve)
-                        .map(Path::normalize)
+                        .map(ValidateInvoker::sameFileSamePath)
                         .distinct()
                         .toList();
     }
@@ -543,6 +541,21 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                 .filter(path -> !Files.isDirectory(path))
                 .map(path -> "--local-repository " + path + " is not a directory.")
                 .orElse(null);
+    }
+
+    /**
+     * The one spelling of a path, so that naming a file twice reports it once. {@code "pom.xml"}
+     * and {@code "./pom.xml"} differ before normalising, and on Windows or macOS {@code POM.XML}
+     * is the same file again. {@link Path#toRealPath} settles all of those, including a symbolic
+     * link, and needs the file to be there; when it is not, the normalised path goes through and
+     * {@code unusable} reports it missing.
+     */
+    private static Path sameFileSamePath(Path pom) {
+        try {
+            return pom.toRealPath();
+        } catch (IOException e) {
+            return pom.normalize();
+        }
     }
 
     /**
