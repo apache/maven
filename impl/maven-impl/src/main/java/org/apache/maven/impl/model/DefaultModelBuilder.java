@@ -264,10 +264,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
             try {
                 ModelBuilderSessionState session = sessionFor(request);
-                // Map the reactor first: a subproject of a 4.1.0 build may leave out its parent
-                // version, which is then inferred from the parent's own file model. Without this
-                // a valid subproject fails with "'parent.version' is missing". The root is not
-                // mandatory, so a POM outside any project is still read on its own.
+                // Map the reactor first: a 4.1.0 subproject may leave out its parent version,
+                // taken from the parent's own file model, so without this a valid subproject
+                // fails with "'parent.version' is missing". A POM outside any project still reads.
                 session.loadReactor(false, false);
                 session.readRawModel();
                 return session.result;

@@ -46,7 +46,7 @@ public interface ValidateOptions extends Options {
     /**
      * Returns the POM files to validate, as given on the command line and resolved against the
      * working directory. The list is never empty; when no POM is named the {@link Optional} is
-     * empty instead, and {@code ./pom.xml} is validated.
+     * empty instead.
      *
      * @return an {@link Optional} holding the paths, or empty when none were given
      */

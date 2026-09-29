@@ -95,7 +95,7 @@ class ValidateInvokerTest {
     @BeforeEach
     void setUp() {
         output = new ArrayList<>();
-        // Built once through the seam: it is the expensive part of every test here.
+        // One session for the whole test: building one is the expensive part of every test here.
         Session shared = ApiRunner.createSession();
         aimed = new ArrayList<>();
         invoker = new ValidateInvoker(ProtoLookup.builder().build(), null) {
@@ -145,11 +145,9 @@ class ValidateInvokerTest {
         @Test
         @DisplayName("should register the transports resolution needs")
         void shouldRegisterTransports() throws Exception {
-            // The block whose absence produces "No transporter factories registered". Proved by
-            // fetching over file://, which needs FileTransporterFactory and no network: the same
-            // POM through a session built without the block cannot be resolved at all. Every
-            // other test here replaces createSession, so without this the block could be deleted
-            // and the suite would stay green.
+            // The block whose absence produces "No transporter factories registered". Proved over
+            // file://, which needs FileTransporterFactory and no network. Every other test here
+            // replaces createSession, so without this the block could be deleted and stay green.
             Path repository = Files.createDirectories(tempDir.resolve("served/org/test/far/1.0"));
             String parent = """
                     <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -621,8 +619,7 @@ class ValidateInvokerTest {
         void shouldUseTheAimedLocalRepository() throws Exception {
             // Proved positively, because a failed resolution writes nothing and so says nothing
             // about where it looked: the parent is laid out by hand in the aimed repository and
-            // nowhere else, so a clean verdict is only reachable by reading it from there. This
-            // is the assertion that failed while the path was still being dropped.
+            // nowhere else, so a clean verdict is only reachable by reading it from there.
             Path repo = tempDir.resolve("aimed");
             Path laid = Files.createDirectories(repo.resolve("org/test/absent/1.0"));
             Files.writeString(laid.resolve("absent-1.0.pom"), """
@@ -668,8 +665,7 @@ class ValidateInvokerTest {
             invoker.execute(context);
 
             // The directory this run made, not everything in the temp directory: another mvnval
-            // on the same machine would fail that, and a leftover from a killed run is exactly
-            // what the production javadoc says to expect.
+            // on the same machine would fail that.
             Path made = aimed.stream().filter(Objects::nonNull).findFirst().orElse(null);
             assertNotNull(made, "effective mode with --temp-local-repository must aim somewhere");
             assertFalse(Files.exists(made), "a throwaway repository that outlives the run is not throwaway");

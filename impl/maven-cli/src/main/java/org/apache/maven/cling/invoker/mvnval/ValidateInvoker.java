@@ -70,8 +70,8 @@ import org.jline.terminal.Terminal;
  * {@code dependencyManagement}. {@code effective}, the default, runs that pass and then builds
  * the effective model as well, so parents and imported boms are resolved and the checks needing
  * them run too. Both passes, because the effective build says nothing about the reactor around a
- * POM: on its own it calls a project with a subproject that is not on disk clean, while
- * {@code mvn} refuses to read it.
+ * POM: on its own it passes a project whose declared subproject is not on disk, which
+ * {@code mvn} refuses to read.
  * <p>
  * Nothing is ever written back to a POM. In {@code effective} mode what is resolved lands in the
  * local repository, as it does for every Maven tool. {@code --local-repository} aims that
@@ -81,8 +81,8 @@ import org.jline.terminal.Terminal;
  * It stands up no container, so the directory holding a POM cannot make this process load
  * anything through {@code .mvn/extensions.xml}, {@code maven.ext.class.path} or
  * {@code .mvn/settings.xml}. The user's own settings are another matter: resolution reads them
- * for mirrors, proxies and credentials, as it has to. What it cannot refuse is the JVM:
- * {@code bin/mvn} hands {@code .mvn/jvm.config} to the launcher before any of this runs.
+ * for mirrors, proxies and credentials, as it has to. The JVM is outside this:
+ * {@code bin/mvn} passes {@code .mvn/jvm.config} to the launcher before this process starts.
  */
 public class ValidateInvoker extends LookupInvoker<ValidateContext> {
 
@@ -137,10 +137,9 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                 context.logger.error(e.getMessage());
                 return BAD_OPERATION;
             }
-            // The base parser accepts these and nothing here can honour them: resolution runs on
-            // the session ApiRunner builds, which reads the user's settings.xml and takes offline
-            // from it. Refused rather than ignored: a gate that passed --offline would go to the
-            // network anyway. In raw mode nothing resolves, so there they are inert and accepted.
+            // Nothing here can honour these: resolution runs on the session ApiRunner builds,
+            // which reads the user's settings.xml and takes offline from it. Ignoring them would
+            // send a gate that passed --offline to the network. Raw mode resolves nothing.
             if (mode != ValidationMode.RAW) {
                 String refused = refusedOption(context.options());
                 if (refused != null) {
@@ -152,17 +151,17 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
             if (context.options().localRepository().isPresent()
                     && context.options().tempLocalRepository().orElse(false)) {
                 context.logger.error(
-                        "--local-repository and --temp-local-repository name different" + " directories; give one.");
+                        "--local-repository and --temp-local-repository name different directories; give one.");
                 return BAD_OPERATION;
             }
-            // Only in effective mode: raw resolves nothing, so making a directory there could
-            // lose a run that would never have written to it.
             String unusableRepository = unusableRepository(context);
             if (unusableRepository != null) {
                 context.logger.error(unusableRepository);
                 return BAD_OPERATION;
             }
             Path localRepository = null;
+            // Only in effective mode: raw resolves nothing, so making a directory there could
+            // lose a run that would never have written to it.
             if (mode != ValidationMode.RAW) {
                 try {
                     localRepository = localRepository(context);
@@ -188,7 +187,7 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                 if (cleanup != null) {
                     // Delete first, deregister second. The other order leaves a window where a
                     // signal arriving after the hook is gone kills the process before the
-                    // deletion runs, which cost one directory in four in a timing test.
+                    // deletion runs.
                     deleteRecursively(localRepository, context);
                     removeHook(cleanup);
                 }
@@ -262,8 +261,7 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
      * The log and the document share standard output, and the resolver writes an {@code [INFO]}
      * line of its own the first time it reads a repository's prefix file, so on the ordinary path
      * {@code mvnval --format json} was not JSON. Same mechanism as {@code -q}, applied for the
-     * caller. Asking for {@code -X} or {@code -e} means the log is what is wanted, so there it
-     * stays and the document is the caller's problem.
+     * caller. Asking for {@code -X} or {@code -e} means the log is what is wanted, so there it stays.
      */
     @Override
     protected void configureLogging(ValidateContext context) throws Exception {
@@ -274,8 +272,8 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
             context.loggerLevel = Slf4jConfiguration.Level.ERROR;
             // Announce the level before asking for it. setRootLoggerLevel logs, at INFO, that it
             // is overriding maven.logger.defaultLogLevel when that property already says
-            // something else, and a CI runner in debug mode sets it to debug -- so the one line
-            // the logger emits would be the line that breaks the document.
+            // something else, and a CI runner in debug mode sets it to debug. That one
+            // line would be the line that breaks the document.
             System.setProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL, "error");
             context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
         }
@@ -385,11 +383,6 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
         }
     }
 
-    /**
-     * The local repository to resolve into, or {@code null} to leave the configured one alone.
-     * The temporary directory is made here rather than in {@link #createSession(Path)} so that
-     * the caller owns it and can delete it on every path out.
-     */
     /** Whether {@code localRepository} is the throwaway directory this run made. */
     private static boolean temporary(ValidateContext context, @Nullable Path localRepository) {
         return localRepository != null
@@ -400,9 +393,8 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
      * Deletes the throwaway directory when the process is signalled.
      * <p>
      * The {@code finally} covers every way out of {@code execute}, but not a signal, and a CI job
-     * killed on timeout is the case this option exists for. Measured without the hook: a
-     * {@code SIGTERM} part way through a run left the populated directory behind four times out
-     * of four. {@code SIGKILL} still escapes, as it escapes every hook.
+     * killed on timeout is the case this option exists for. Without the hook a {@code SIGTERM} part way
+     * through a run left the populated directory behind. {@code SIGKILL} still escapes, as it escapes every hook.
      */
     private static Thread cleanupHook(Path directory, ValidateContext context) {
         Thread hook = new Thread(() -> deleteRecursively(directory, context), "mvnval-repo-cleanup");
@@ -419,6 +411,11 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
         }
     }
 
+    /**
+     * The local repository to resolve into, or {@code null} to leave the configured one alone.
+     * The throwaway directory is made here rather than in {@link #createSession(Path)} so the
+     * caller owns it and can delete it on every path out.
+     */
     @Nullable
     private static Path localRepository(ValidateContext context) throws IOException {
         if (context.options().tempLocalRepository().orElse(false)) {

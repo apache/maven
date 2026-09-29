@@ -95,8 +95,8 @@ public class CommonsCliValidateOptions extends CommonsCliOptions implements Vali
         printStream.accept("and works offline, but it cannot see a dependency whose version is");
         printStream.accept("inherited. --mode effective, the default, runs that and then resolves");
         printStream.accept("parents and imported boms so the checks needing them run as well. That");
-        printStream.accept("goes to the network, to Central and to any repository the POM itself");
-        printStream.accept("declares, and caches what it fetches in the local repository.");
+        printStream.accept("goes to the network, to the repositories the settings declare and to");
+        printStream.accept("any the POM itself declares, caching what it fetches locally.");
         printStream.accept("");
         printStream.accept("A subproject is read when its parent needs it, and only the POMs named");
         printStream.accept("on the command line are reported on, though a problem inherited from a");

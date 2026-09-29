@@ -39,62 +39,27 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-/**
- * Utility class for creating test fixtures and reducing code duplication in tests.
- */
 final class TestUtils {
 
-    private TestUtils() {
-        // Utility class
-    }
+    private TestUtils() {}
 
     /**
      * Creates a problem the way the model builder does, through {@link DefaultModelProblem}.
      * Fakes must not be used here: {@code DefaultModelProblem.getLocation()} returns an empty
      * string, and a fake that returns a location hides the bug that fact caused.
-     *
-     * @param severity the severity to report
-     * @param message the message to report
-     * @param source the source path, may be {@code null}
-     * @param line the line number, non-positive when unknown
-     * @param column the column number, non-positive when unknown
-     * @return a problem as the model builder would produce it
      */
     static ModelProblem problem(BuilderProblem.Severity severity, String message, String source, int line, int column) {
         return new DefaultModelProblem(
                 message, severity, ModelProblem.Version.V40, source, line, column, "org.test:test:1.0", null);
     }
 
-    /**
-     * Collects the lines a reporter writes.
-     *
-     * @param format the reporter to drive
-     * @param reports the reports to render
-     * @return the lines written, in order
-     */
+    /** Collects the lines a reporter writes, in order. */
     static List<String> render(OutputFormat format, List<Report> reports) {
         List<String> lines = new ArrayList<>();
         format.report(reports, lines::add);
         return lines;
     }
 
-    /**
-     * Creates a mock ValidateContext with the given options.
-     *
-     * @param options the validation options to use
-     * @return a mock ValidateContext
-     */
-    static ValidateContext createMockContext(ValidateOptions options) {
-        return createMockContext(Paths.get("/project"), options);
-    }
-
-    /**
-     * Creates a mock ValidateContext with the specified working directory and options.
-     *
-     * @param workingDirectory the working directory to use
-     * @param options the validation options to use
-     * @return a mock ValidateContext
-     */
     static ValidateContext createMockContext(Path workingDirectory, ValidateOptions options) {
         InvokerRequest request = mock(InvokerRequest.class);
 

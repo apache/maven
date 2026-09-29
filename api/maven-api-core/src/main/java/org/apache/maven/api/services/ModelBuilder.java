@@ -57,7 +57,6 @@ public interface ModelBuilder extends Service {
          * is then taken from the parent's own file model. An implementation may therefore read
          * files besides the one the request names, up to the project root.
          *
-         * @param request the request containing the parameters for reading the model
          * @return the result, carrying the model that was read and the problems collected
          * @throws ModelBuilderException if the model cannot be read at all
          * @throws UnsupportedOperationException if this implementation does not support it
