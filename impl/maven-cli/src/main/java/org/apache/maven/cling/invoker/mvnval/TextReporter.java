@@ -29,12 +29,11 @@ import org.apache.maven.api.services.ModelProblem;
 /**
  * Renders validation results as plain text, one problem per line.
  */
-class TextReporter implements Reporter {
+class TextReporter {
 
     private static final String INDENT = "  ";
 
-    @Override
-    public void report(List<Report> reports, Consumer<String> out) {
+    static void report(List<Report> reports, Consumer<String> out) {
         for (Report report : reports) {
             if (report.failure() != null) {
                 out.accept(report.pom() + ": " + report.failure());

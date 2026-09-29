@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Unit tests for {@link Reporter} and its two implementations.
+ * Unit tests for the two output formats.
  * Tests that both formats derive a problem's location from its parts rather than from
  * {@link ModelProblem#getLocation()}, and that the JSON document escapes what it must.
  */
@@ -46,7 +46,7 @@ class ReporterTest {
 
     /** The problem line of a rendered text report, without the "  SEVERITY message" prefix. */
     private static String locationOf(ModelProblem problem) {
-        String line = TestUtils.render(new TextReporter(), List.of(Report.of(POM, List.of(problem))))
+        String line = TestUtils.render(OutputFormat.TEXT, List.of(Report.of(POM, List.of(problem))))
                 .get(FIRST_PROBLEM_LINE);
         int at = line.indexOf(" @ ");
         return at < 0 ? "" : line.substring(at + 3);
@@ -102,7 +102,7 @@ class ReporterTest {
         ModelProblem problem = TestUtils.problem(
                 BuilderProblem.Severity.FATAL, "Non-parseable POM" + System.lineSeparator() + "at [1,19]", null, 0, 0);
 
-        List<String> lines = TestUtils.render(new TextReporter(), List.of(Report.of(POM, List.of(problem))));
+        List<String> lines = TestUtils.render(OutputFormat.TEXT, List.of(Report.of(POM, List.of(problem))));
 
         assertEquals(
                 "  FATAL Non-parseable POM" + System.lineSeparator() + "    at [1,19]", lines.get(FIRST_PROBLEM_LINE));
@@ -125,7 +125,7 @@ class ReporterTest {
         @Test
         @DisplayName("should report a clean file on one line")
         void shouldReportCleanFileOnOneLine() {
-            List<String> lines = TestUtils.render(new TextReporter(), List.of(Report.of(POM, List.of())));
+            List<String> lines = TestUtils.render(OutputFormat.TEXT, List.of(Report.of(POM, List.of())));
             assertEquals(List.of(POM + ": no problems"), lines);
         }
 
@@ -133,7 +133,7 @@ class ReporterTest {
         @DisplayName("should append the location after the message")
         void shouldAppendLocationAfterMessage() {
             List<String> lines = TestUtils.render(
-                    new TextReporter(),
+                    OutputFormat.TEXT,
                     List.of(Report.of(
                             POM,
                             List.of(TestUtils.problem(BuilderProblem.Severity.ERROR, "boom", "bad/pom.xml", 13, 17)))));
@@ -146,7 +146,7 @@ class ReporterTest {
         @DisplayName("should omit the location separator when there is no location")
         void shouldOmitLocationSeparatorWhenNoLocation() {
             List<String> lines = TestUtils.render(
-                    new TextReporter(),
+                    OutputFormat.TEXT,
                     List.of(Report.of(
                             POM,
                             List.of(TestUtils.problem(BuilderProblem.Severity.WARNING, "no place", null, -1, -1)))));
@@ -159,7 +159,7 @@ class ReporterTest {
         @DisplayName("should report a file that could not be read")
         void shouldReportUnreadableFile() {
             List<String> lines =
-                    TestUtils.render(new TextReporter(), List.of(Report.failed(POM, "not a readable file")));
+                    TestUtils.render(OutputFormat.TEXT, List.of(Report.failed(POM, "not a readable file")));
             assertEquals(List.of(POM + ": not a readable file"), lines);
         }
     }
@@ -172,7 +172,7 @@ class ReporterTest {
         @DisplayName("should emit one object per file in a single array")
         void shouldEmitOneObjectPerFile() {
             List<String> lines = TestUtils.render(
-                    new JsonReporter(),
+                    OutputFormat.JSON,
                     List.of(Report.of(Path.of("a.xml"), List.of()), Report.of(Path.of("b.xml"), List.of())));
 
             assertEquals(1, lines.size(), "the whole document should be written as one line");
@@ -183,7 +183,7 @@ class ReporterTest {
         @DisplayName("should leave out absent fields rather than emitting the -1 sentinel")
         void shouldLeaveOutAbsentFields() {
             String json = TestUtils.render(
-                            new JsonReporter(),
+                            OutputFormat.JSON,
                             List.of(Report.of(
                                     POM,
                                     List.of(TestUtils.problem(
@@ -201,7 +201,7 @@ class ReporterTest {
         @DisplayName("should escape quotes, backslashes and control characters")
         void shouldEscapeQuotesBackslashesAndControlCharacters() {
             String json = TestUtils.render(
-                            new JsonReporter(),
+                            OutputFormat.JSON,
                             List.of(Report.of(
                                     POM,
                                     List.of(TestUtils.problem(
@@ -225,7 +225,7 @@ class ReporterTest {
             // console that is not UTF-8 would mangle the accented letter. Both are escaped so the
             // document survives whatever the writer's charset turns out to be.
             String json = TestUtils.render(
-                            new JsonReporter(),
+                            OutputFormat.JSON,
                             List.of(Report.of(
                                     POM,
                                     List.of(TestUtils.problem(
@@ -241,7 +241,7 @@ class ReporterTest {
         @Test
         @DisplayName("should record a file that could not be read as a failure")
         void shouldRecordUnreadableFileAsFailure() {
-            String json = TestUtils.render(new JsonReporter(), List.of(Report.failed(POM, "not a readable file")))
+            String json = TestUtils.render(OutputFormat.JSON, List.of(Report.failed(POM, "not a readable file")))
                     .get(0);
             assertTrue(json.contains("\"failure\":\"not a readable file\""), json);
         }

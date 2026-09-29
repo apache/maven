@@ -68,13 +68,13 @@ final class TestUtils {
     /**
      * Collects the lines a reporter writes.
      *
-     * @param reporter the reporter to drive
+     * @param format the reporter to drive
      * @param reports the reports to render
      * @return the lines written, in order
      */
-    static List<String> render(Reporter reporter, List<Report> reports) {
+    static List<String> render(OutputFormat format, List<Report> reports) {
         List<String> lines = new ArrayList<>();
-        reporter.report(reports, lines::add);
+        format.report(reports, lines::add);
         return lines;
     }
 

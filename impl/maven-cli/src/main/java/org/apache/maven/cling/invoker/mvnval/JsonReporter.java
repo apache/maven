@@ -29,7 +29,7 @@ import org.apache.maven.api.services.ModelProblem;
  * Renders validation results as a JSON array, one object per validated file. Assembled by hand
  * so the tool needs no dependency the distribution does not already carry.
  */
-class JsonReporter implements Reporter {
+class JsonReporter {
 
     private static final char[] HEX = "0123456789abcdef".toCharArray();
 
@@ -39,8 +39,7 @@ class JsonReporter implements Reporter {
     /** The two quotes, plus room for a few escapes. */
     private static final int ESCAPE_HEADROOM = 16;
 
-    @Override
-    public void report(List<Report> reports, Consumer<String> out) {
+    static void report(List<Report> reports, Consumer<String> out) {
         out.accept(reports.stream().map(JsonReporter::toJson).collect(Collectors.joining(",", "[", "]")));
     }
 

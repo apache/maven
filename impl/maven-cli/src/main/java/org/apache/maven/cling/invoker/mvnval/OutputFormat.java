@@ -28,18 +28,24 @@ import java.util.stream.Collectors;
  * Output formats the validation tool understands.
  */
 enum OutputFormat {
-    TEXT(new TextReporter()),
-    JSON(new JsonReporter());
+    TEXT {
+        @Override
+        void report(List<Report> reports, Consumer<String> out) {
+            TextReporter.report(reports, out);
+        }
+    },
+    JSON {
+        @Override
+        void report(List<Report> reports, Consumer<String> out) {
+            JsonReporter.report(reports, out);
+        }
+    };
 
-    private final Reporter reporter;
-
-    OutputFormat(Reporter reporter) {
-        this.reporter = reporter;
-    }
-
-    void report(List<Report> reports, Consumer<String> out) {
-        reporter.report(reports, out);
-    }
+    /**
+     * Renders the reports, handing each line to {@code out} without a line separator. A format may
+     * emit any number of lines per report, including one line for all of them.
+     */
+    abstract void report(List<Report> reports, Consumer<String> out);
 
     static OutputFormat parse(String name) {
         return Arrays.stream(values())
