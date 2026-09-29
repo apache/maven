@@ -18,21 +18,18 @@
  */
 package org.apache.maven.cling.invoker.mvnval;
 
-import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
 
-import org.apache.maven.api.Session;
 import org.apache.maven.api.services.ModelBuilder.ModelBuilderSession;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderRequest.RequestType;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
-import org.apache.maven.api.services.Sources;
 
 /**
  * How far the model builder runs before the verdict is taken.
@@ -45,9 +42,9 @@ enum ValidationMode {
      */
     RAW {
         @Override
-        List<ModelProblem> problemsFor(ModelBuilderSession builderSession, Session session, Path pom)
+        List<ModelProblem> problemsFor(ModelBuilderSession builderSession, ModelBuilderRequest request)
                 throws ModelBuilderException {
-            return rawProblems(builderSession, session, pom);
+            return rawProblems(builderSession, request);
         }
     },
 
@@ -57,12 +54,12 @@ enum ValidationMode {
      */
     EFFECTIVE {
         @Override
-        List<ModelProblem> problemsFor(ModelBuilderSession builderSession, Session session, Path pom)
+        List<ModelProblem> problemsFor(ModelBuilderSession builderSession, ModelBuilderRequest request)
                 throws ModelBuilderException {
             // Raw first, and on its own request. The effective build reports nothing about the
             // reactor, so a subproject this POM names but does not have passes unnoticed through
             // build() alone, while mvn refuses to read the project.
-            List<ModelProblem> problems = rawProblems(builderSession, session, pom);
+            List<ModelProblem> problems = rawProblems(builderSession, request);
             if (problems.stream().anyMatch(problem -> problem.getSeverity() == ModelProblem.Severity.ERROR)) {
                 // Nothing is gained by resolving parents for a POM that is already rejected, and
                 // it would go to the network to say so.
@@ -75,7 +72,10 @@ enum ValidationMode {
             try {
                 // Completes the model: inheritance, interpolation, then validateEffectiveModel. It
                 // throws once it has collected an error, so throwing is the ordinary path here.
-                all.addAll(problemsOf(builderSession.build(request(RequestType.BUILD_EFFECTIVE, session, pom))));
+                ModelBuilderRequest effectiveRequest = ModelBuilderRequest.builder(request)
+                        .requestType(RequestType.BUILD_EFFECTIVE)
+                        .build();
+                all.addAll(problemsOf(builderSession.build(effectiveRequest)));
                 return all;
             } catch (ModelBuilderException e) {
                 // Carry the raw warnings out with the exception's own problems. Letting it fly
@@ -91,7 +91,7 @@ enum ValidationMode {
     };
 
     /** Collects the problems this mode can see, in the order the model builder reports them. */
-    abstract List<ModelProblem> problemsFor(ModelBuilderSession builderSession, Session session, Path pom)
+    abstract List<ModelProblem> problemsFor(ModelBuilderSession builderSession, ModelBuilderRequest request)
             throws ModelBuilderException;
 
     /**
@@ -99,21 +99,13 @@ enum ValidationMode {
      * POM and check its {@code relativePath}; it does not make this a build, since {@code validate}
      * stops before inheritance.
      */
-    private static List<ModelProblem> rawProblems(ModelBuilderSession builderSession, Session session, Path pom)
+    private static List<ModelProblem> rawProblems(ModelBuilderSession builderSession, ModelBuilderRequest request)
             throws ModelBuilderException {
-        return problemsOf(builderSession.validate(request(RequestType.BUILD_PROJECT, session, pom)));
+        return problemsOf(builderSession.validate(request));
     }
 
     static List<ModelProblem> problemsOf(ModelBuilderResult result) {
         return result.getProblemCollector().problems().toList();
-    }
-
-    private static ModelBuilderRequest request(RequestType type, Session session, Path pom) {
-        return ModelBuilderRequest.builder()
-                .session(session)
-                .source(Sources.buildSource(pom))
-                .requestType(type)
-                .build();
     }
 
     static ValidationMode parse(String name) {

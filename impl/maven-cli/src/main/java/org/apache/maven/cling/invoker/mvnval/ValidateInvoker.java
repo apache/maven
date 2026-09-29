@@ -25,6 +25,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
 import java.util.stream.Stream;
 
@@ -45,9 +46,11 @@ import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilder.ModelBuilderSession;
 import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
+import org.apache.maven.api.services.ModelBuilderRequest.RequestType;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.SettingsBuilder;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
@@ -121,10 +124,13 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
 
     @Override
     protected int execute(ValidateContext context) throws Exception {
+        Thread validationThread = Thread.currentThread();
+        AtomicBoolean cancellationRequested = new AtomicBoolean();
+        Terminal.SignalHandler previousHandler = context.terminal.handle(Terminal.Signal.INT, signal -> {
+            cancellationRequested.set(true);
+            validationThread.interrupt();
+        });
         try {
-            context.terminal.handle(
-                    Terminal.Signal.INT, signal -> Thread.currentThread().interrupt());
-
             OutputFormat format;
             ValidationMode mode;
             try {
@@ -173,10 +179,9 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
             }
             Thread cleanup = temporary(context, localRepository) ? cleanupHook(localRepository, context) : null;
             try {
-                List<Report> reports = validateAll(resolvePoms(context), createSession(localRepository), mode);
-                // interrupted(), not isInterrupted(): clear the flag where it is acted on.
-                // Reporting here would give a verdict on only the files reached so far.
-                if (Thread.interrupted()) {
+                List<Report> reports =
+                        validateAll(context, createSession(localRepository), mode, cancellationRequested);
+                if (cancellationRequested.get() || Thread.currentThread().isInterrupted()) {
                     return canceled(context);
                 }
                 // determineWriter, not context.writer: on a real run that field is still empty
@@ -200,6 +205,9 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
         } catch (UserInterruptException e) {
             return canceled(context);
         } catch (Exception e) {
+            if (cancellationRequested.get() || Thread.currentThread().isInterrupted()) {
+                return canceled(context);
+            }
             // Without this an unexpected failure escapes to the CLI and becomes 2, which this tool
             // documents as bad usage. Both siblings catch here too.
             if (context.options().showErrors().orElse(false)) {
@@ -208,10 +216,16 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                 context.logger.error(e.getMessage());
             }
             return ERROR;
+        } finally {
+            context.terminal.handle(Terminal.Signal.INT, previousHandler);
+            if (cancellationRequested.get()) {
+                Thread.interrupted();
+            }
         }
     }
 
     private static int canceled(ValidateContext context) {
+        Thread.interrupted();
         context.logger.error("Validation canceled by user.");
         return CANCELED;
     }
@@ -485,32 +499,40 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                         .toList();
     }
 
-    private static List<Report> validateAll(List<Path> poms, Session session, ValidationMode mode) {
+    private static List<Report> validateAll(
+            ValidateContext context, Session session, ValidationMode mode, AtomicBoolean cancellationRequested) {
+        List<Path> poms = resolvePoms(context);
         ModelBuilder builder = session.getService(ModelBuilder.class);
         List<Report> reports = new ArrayList<>(poms.size());
         for (Path pom : poms) {
-            // Ctrl+C lands between files, not part way through one.
-            if (Thread.currentThread().isInterrupted()) {
+            if (cancellationRequested.get() || Thread.currentThread().isInterrupted()) {
                 break;
             }
+            ModelBuilderRequest request = ModelBuilderRequest.builder()
+                    .session(session)
+                    .source(Sources.buildSource(pom))
+                    .requestType(RequestType.BUILD_PROJECT)
+                    .userProperties(context.protoSession.getUserProperties())
+                    .build();
             // A session per POM. Sharing one made the verdict depend on argument order: derived
             // sessions share mappedSources, so a groupId:artifactId registered while reading an
             // earlier POM answered a later POM's parent lookup, and two files given in the other
             // order came back with different problems. Sharing bought no reading either, since
             // every pass walks the reactor from the root again.
-            reports.add(validateOne(pom, session, builder.newSession(), mode));
+            reports.add(validateOne(request, builder.newSession(), mode));
         }
         return reports;
     }
 
     private static Report validateOne(
-            Path pom, Session session, ModelBuilderSession builderSession, ValidationMode mode) {
+            ModelBuilderRequest request, ModelBuilderSession builderSession, ValidationMode mode) {
+        Path pom = request.getSource().getPath();
         String unusable = unusable(pom);
         if (unusable != null) {
             return Report.failed(pom, unusable);
         }
         try {
-            return Report.of(pom, mode.problemsFor(builderSession, session, pom));
+            return Report.of(pom, mode.problemsFor(builderSession, request));
         } catch (ModelBuilderException e) {
             // A result that explains nothing would report the file as clean, so use the exception.
             ModelBuilderResult result = e.getResult();

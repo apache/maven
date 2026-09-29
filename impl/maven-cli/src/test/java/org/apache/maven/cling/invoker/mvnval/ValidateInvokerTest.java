@@ -23,21 +23,29 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.mvnval.ValidateOptions;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.impl.standalone.ApiRunner;
+import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -47,7 +55,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 /**
@@ -227,6 +239,98 @@ class ValidateInvokerTest {
             hex.append(String.format("%02x", b));
         }
         return hex.toString();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"raw", "effective"})
+    void shouldLetUserPropertiesOverridePomProperties(String mode) throws Exception {
+        Path root = Files.createDirectories(tempDir.resolve("properties"));
+        Files.writeString(root.resolve("pom.xml"), """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>org.test</groupId><artifactId>parent</artifactId>
+                  <version>1.0</version><packaging>pom</packaging>
+                  <properties>
+                    <child>missing</child>
+                    <dependencyVersion/>
+                  </properties>
+                  <modules><module>${child}</module></modules>
+                  <dependencies>
+                    <dependency>
+                      <groupId>org.test</groupId><artifactId>dependency</artifactId>
+                      <version>${dependencyVersion}</version>
+                    </dependency>
+                  </dependencies>
+                </project>
+                """);
+        Path module = Files.createDirectories(root.resolve("mod"));
+        Files.writeString(module.resolve("pom.xml"), """
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>org.test</groupId><artifactId>mod</artifactId><version>1.0</version>
+                </project>
+                """);
+        ValidateOptions options = mock(ValidateOptions.class);
+        when(options.mode()).thenReturn(Optional.of(mode));
+        ValidateContext context = TestUtils.createMockContext(root, options);
+        context.protoSession = ProtoSession.newBuilder()
+                .withUserProperties(Map.of("child", "mod", "dependencyVersion", "1.0"))
+                .withTopDirectory(root)
+                .build();
+        context.writer = output::add;
+
+        assertEquals(ValidateInvoker.OK, invoker.execute(context), output.toString());
+        assertEquals(1, output.size());
+        assertTrue(output.get(0).endsWith(": no problems"), output.toString());
+    }
+
+    @Test
+    void shouldCancelFromAnotherThreadAfterTheModelBuilderClearsTheInterrupt() throws Exception {
+        ValidateOptions options = mock(ValidateOptions.class);
+        when(options.mode()).thenReturn(Optional.of("raw"));
+        when(options.poms())
+                .thenReturn(Optional.of(List.of(
+                        writePom("first", "").toString(), writePom("second", "").toString())));
+        ValidateContext context = TestUtils.createMockContext(tempDir, options);
+        context.writer = output::add;
+        Terminal.SignalHandler previousHandler = mock(Terminal.SignalHandler.class);
+        AtomicReference<Terminal.SignalHandler> handler = new AtomicReference<>();
+        doAnswer(call -> {
+                    handler.set(call.getArgument(1));
+                    return previousHandler;
+                })
+                .when(context.terminal)
+                .handle(eq(Terminal.Signal.INT), any());
+
+        Session session = mock(Session.class);
+        ModelBuilder builder = mock(ModelBuilder.class);
+        ModelBuilder.ModelBuilderSession builderSession = mock(ModelBuilder.ModelBuilderSession.class);
+        when(session.getService(ModelBuilder.class)).thenReturn(builder);
+        when(builder.newSession()).thenReturn(builderSession);
+        AtomicBoolean validationThreadInterrupted = new AtomicBoolean();
+        when(builderSession.validate(any())).thenAnswer(call -> {
+            CompletableFuture.runAsync(() -> handler.get().handle(Terminal.Signal.INT))
+                    .join();
+            validationThreadInterrupted.set(Thread.interrupted());
+            throw new IllegalStateException("Interrupted model read");
+        });
+        ValidateInvoker canceling = new ValidateInvoker(ProtoLookup.builder().build(), null) {
+            @Override
+            protected Session createSession(Path localRepository) {
+                return session;
+            }
+        };
+
+        try {
+            assertEquals(ValidateInvoker.CANCELED, canceling.execute(context));
+            assertTrue(validationThreadInterrupted.get());
+            assertFalse(Thread.currentThread().isInterrupted());
+            assertTrue(output.isEmpty(), output.toString());
+            verify(builderSession, times(1)).validate(any());
+            verify(context.terminal).handle(Terminal.Signal.INT, previousHandler);
+        } finally {
+            Thread.interrupted();
+        }
     }
 
     @Nested
