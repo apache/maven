@@ -63,7 +63,7 @@ class OutputFormatTest {
 
         for (OutputFormat format : OutputFormat.values()) {
             List<String> lines = new ArrayList<>();
-            format.report(List.of(report), lines::add);
+            format.report(List.of(report), Path.of("").toAbsolutePath(), lines::add);
 
             assertFalse(lines.isEmpty(), "every format must produce output: " + format);
         }

@@ -53,10 +53,10 @@ final class TestUtils {
                 message, severity, ModelProblem.Version.V40, source, line, column, "org.test:test:1.0", null);
     }
 
-    /** Collects the lines a reporter writes, in order. */
+    /** Collects the lines a reporter writes, in order, as if run from an unrelated directory. */
     static List<String> render(OutputFormat format, List<Report> reports) {
         List<String> lines = new ArrayList<>();
-        format.report(reports, lines::add);
+        format.report(reports, Paths.get("/elsewhere"), lines::add);
         return lines;
     }
 

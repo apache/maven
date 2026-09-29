@@ -18,6 +18,7 @@
  */
 package org.apache.maven.cling.invoker.mvnval;
 
+import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -30,13 +31,14 @@ import java.util.stream.Collectors;
 enum OutputFormat {
     TEXT {
         @Override
-        void report(List<Report> reports, Consumer<String> out) {
-            TextReporter.report(reports, out);
+        void report(List<Report> reports, Path cwd, Consumer<String> out) {
+            TextReporter.report(reports, cwd, out);
         }
     },
     JSON {
         @Override
-        void report(List<Report> reports, Consumer<String> out) {
+        void report(List<Report> reports, Path cwd, Consumer<String> out) {
+            // Absolute paths only: the document may be read somewhere else entirely.
             JsonReporter.report(reports, out);
         }
     };
@@ -45,7 +47,7 @@ enum OutputFormat {
      * Renders the reports, handing each line to {@code out} without a line separator. A format may
      * emit any number of lines per report, including one line for all of them.
      */
-    abstract void report(List<Report> reports, Consumer<String> out);
+    abstract void report(List<Report> reports, Path cwd, Consumer<String> out);
 
     static OutputFormat parse(String name) {
         return Arrays.stream(values())

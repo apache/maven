@@ -254,6 +254,26 @@ class ValidateInvokerTest {
         }
 
         @Test
+        @DisplayName("should print a path under the working directory as the caller typed it")
+        void shouldPrintPathsRelativeToTheWorkingDirectory() throws Exception {
+            Path pom = writePom("near", "");
+            Path outside = Files.createDirectories(
+                            Files.createTempDirectory("mvnval-outside-").resolve("far"))
+                    .resolve("pom.xml");
+            Files.writeString(outside, String.format(DUPLICATE_DEPENDENCY, ""));
+
+            String far = outside.toRealPath().toString();
+            run(List.of(pom.toString(), outside.toString()));
+
+            assertTrue(
+                    output.stream().anyMatch(line -> line.startsWith("near/pom.xml:")),
+                    "a file under the working directory is named relative to it: " + output);
+            assertTrue(
+                    output.stream().anyMatch(line -> line.startsWith(far)),
+                    "a file outside it keeps its absolute path, or it would be ambiguous: " + output);
+        }
+
+        @Test
         @DisplayName("should read a POM named twice only once")
         void shouldReadAPomNamedTwiceOnce() throws Exception {
             Path pom = writePom("twice", "");

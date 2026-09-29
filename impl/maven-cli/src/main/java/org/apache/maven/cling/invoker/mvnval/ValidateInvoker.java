@@ -181,7 +181,7 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                 }
                 // determineWriter, not context.writer: on a real run that field is still empty
                 // and this is what fills it.
-                format.report(reports, determineWriter(context));
+                format.report(reports, context.cwd.get(), determineWriter(context));
                 return exitCode(reports);
             } finally {
                 if (cleanup != null) {
