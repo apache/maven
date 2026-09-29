@@ -33,8 +33,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the {@link CommonsCliValidateOptions} class.
- * Tests that POM paths arrive as positional arguments and that a bad {@code --format} value is
- * rejected while the options are parsed, rather than later during execution.
+ * Tests that POM paths arrive as positional arguments, that the options carrying a value take
+ * one, and that a bad {@code --format} value reaches the invoker rather than being rejected
+ * while the options are parsed.
  */
 @DisplayName("CommonsCliValidateOptions")
 class CommonsCliValidateOptionsTest {
@@ -116,5 +117,22 @@ class CommonsCliValidateOptionsTest {
                 help.stream().filter(l -> l.contains("usage:")).findFirst().orElseThrow();
         assertTrue(usage.contains("<pom>"), "mvnval takes POM files: " + usage);
         assertFalse(usage.contains("goal"), "mvnval runs no goals or phases: " + usage);
+    }
+
+    @Test
+    @DisplayName("should take a value for --mode without swallowing the pom")
+    void shouldTakeModeValue() throws ParseException {
+        CommonsCliValidateOptions options = CommonsCliValidateOptions.parse(new String[] {"--mode", "raw", "pom.xml"});
+
+        assertEquals("raw", options.mode().orElseThrow());
+        assertEquals(List.of("pom.xml"), options.poms().orElseThrow(), "the value must not swallow the pom");
+    }
+
+    @Test
+    @DisplayName("should leave the mode empty when it is not given")
+    void shouldLeaveModeEmptyWhenNotGiven() throws ParseException {
+        CommonsCliValidateOptions options = CommonsCliValidateOptions.parse(new String[] {"pom.xml"});
+
+        assertTrue(options.mode().isEmpty(), "empty, not a default, so the invoker decides what the default is");
     }
 }

@@ -23,6 +23,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.cli.InvokerException;
@@ -79,17 +80,20 @@ class ValidateInvokerTest {
     Path tempDir;
 
     private List<String> output;
+
     private ValidateInvoker invoker;
 
     @BeforeEach
     void setUp() {
         output = new ArrayList<>();
-        // The session is created through the seam so the test pays for it once.
-        Session session = ApiRunner.createSession();
+        // Built once through the seam: it is the expensive part of every test here.
+        Session shared = ApiRunner.createSession();
         invoker = new ValidateInvoker(ProtoLookup.builder().build(), null) {
             @Override
             protected Session createSession() {
-                return session;
+                // The transports and the settings-derived repository list production adds are
+                // not here: this session has neither.
+                return shared;
             }
         };
     }
@@ -105,8 +109,14 @@ class ValidateInvokerTest {
     }
 
     private int run(List<String> poms, Optional<String> format) throws Exception {
+        return run(poms, format, Optional.of("raw"));
+    }
+
+    /** Defaults to raw: the tests using this helper read files only. */
+    private int run(List<String> poms, Optional<String> format, Optional<String> mode) throws Exception {
         ValidateOptions options = mock(ValidateOptions.class);
         when(options.format()).thenReturn(format);
+        when(options.mode()).thenReturn(mode);
         when(options.poms()).thenReturn(poms.isEmpty() ? Optional.empty() : Optional.of(poms));
 
         ValidateContext context = TestUtils.createMockContext(tempDir, options);
@@ -342,6 +352,202 @@ class ValidateInvokerTest {
             int exitCode = run(List.of(writePom("bad-format", "").toString()), Optional.of("yaml"));
 
             assertEquals(ValidateInvoker.BAD_OPERATION, exitCode, "a bad format is a usage error, not a verdict");
+        }
+
+        @Test
+        @DisplayName("should reject an unknown mode with the bad-usage code")
+        void shouldRejectUnknownModeWithBadOperation() throws Exception {
+            int exitCode = run(List.of(writePom("bad-mode", "").toString()), Optional.empty(), Optional.of("deep"));
+
+            assertEquals(ValidateInvoker.BAD_OPERATION, exitCode);
+        }
+    }
+
+    @Nested
+    @DisplayName("Effective mode")
+    class EffectiveTests {
+
+        private Path project(String parent, String relativePath) throws Exception {
+            Path root = Files.createDirectories(tempDir.resolve("proj"));
+            Files.writeString(root.resolve("pom.xml"), """
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                      <modelVersion>4.0.0</modelVersion>
+                      <groupId>org.test</groupId><artifactId>par</artifactId>
+                      <version>1.0</version><packaging>pom</packaging>
+                    </project>""");
+            Path child = Files.createDirectories(root.resolve("child")).resolve("pom.xml");
+            Files.writeString(child, """
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                      <modelVersion>4.0.0</modelVersion>
+                      <parent>
+                        <groupId>org.test</groupId><artifactId>%s</artifactId>
+                        <version>1.0</version>%s
+                      </parent>
+                      <artifactId>child</artifactId>
+                      <dependencies>
+                        <dependency><groupId>junit</groupId><artifactId>junit</artifactId></dependency>
+                      </dependencies>
+                    </project>""".formatted(parent, relativePath));
+            return child;
+        }
+
+        private int runEffective(Path pom) throws Exception {
+            ValidateOptions options = mock(ValidateOptions.class);
+            when(options.mode()).thenReturn(Optional.of("effective"));
+            when(options.poms()).thenReturn(Optional.of(List.of(pom.toString())));
+            ValidateContext context = TestUtils.createMockContext(tempDir, options);
+            context.writer = output::add;
+            return invoker.execute(context);
+        }
+
+        @Test
+        @DisplayName("should report a problem that only the effective model shows")
+        void shouldReportInheritedProblem() throws Exception {
+            // A dependency with no version of its own is checked in validateEffectiveModel, which
+            // raw mode never reaches. The parent is next door, so nothing has to be resolved.
+            int exitCode = runEffective(project("par", ""));
+
+            assertEquals(ValidateInvoker.ERROR, exitCode, output.toString());
+            assertTrue(
+                    output.stream().anyMatch(line -> line.contains("'dependencies.dependency.version'")),
+                    "the inherited missing version is what effective mode is for: " + output);
+        }
+
+        @Test
+        @DisplayName("should go looking for a parent that is not on disk")
+        void shouldResolveParentThatIsNotOnDisk() throws Exception {
+            // Names a parent no file provides, so raw mode is clean and effective mode has to
+            // reach for it. The shared session registers no transport, so the reach fails wherever
+            // it is run, and the failure is the evidence.
+            int exitCode = runEffective(project("absent", "<relativePath/>"));
+
+            assertEquals(ValidateInvoker.ERROR, exitCode, output.toString());
+            assertTrue(
+                    output.stream().anyMatch(line -> line.contains("Non-resolvable parent POM")),
+                    "effective mode has to reach for a parent it cannot read from disk: " + output);
+        }
+
+        @Test
+        @DisplayName("should refuse --offline rather than reach the network behind it")
+        void shouldRefuseOfflineInEffectiveMode() throws Exception {
+            ValidateOptions options = mock(ValidateOptions.class);
+            when(options.mode()).thenReturn(Optional.of("effective"));
+            when(options.offline()).thenReturn(Optional.of(true));
+            when(options.poms())
+                    .thenReturn(Optional.of(
+                            List.of(project("absent", "<relativePath/>").toString())));
+            ValidateContext context = TestUtils.createMockContext(tempDir, options);
+            context.writer = output::add;
+
+            assertEquals(ValidateInvoker.BAD_OPERATION, invoker.execute(context));
+        }
+
+        @Test
+        @DisplayName("should see a subproject that is not on disk, as the build does")
+        void shouldReportMissingSubproject() throws Exception {
+            // The regression this mode was changed for. build() reports nothing about the reactor
+            // around a POM, so on its own it called this project clean while mvn refuses to read
+            // it. Effective mode therefore runs the raw pass first and keeps its problems.
+            Path root = Files.createDirectories(tempDir.resolve("ghosted"));
+            Files.writeString(root.resolve("pom.xml"), """
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                      <modelVersion>4.0.0</modelVersion>
+                      <groupId>org.test</groupId><artifactId>ghosted</artifactId>
+                      <version>1.0</version><packaging>pom</packaging>
+                      <modules><module>ghost</module></modules>
+                    </project>""");
+
+            int exitCode = runEffective(root.resolve("pom.xml"));
+
+            assertEquals(ValidateInvoker.ERROR, exitCode, output.toString());
+            assertTrue(
+                    output.stream().anyMatch(line -> line.contains("Child subproject ghost")),
+                    "the default mode must not pass a project the build cannot read: " + output);
+        }
+
+        @Test
+        @DisplayName("should refuse an alternate settings file it cannot honour")
+        void shouldRefuseAlternateSettings() throws Exception {
+            // Resolution runs on the session ApiRunner builds, which reads ~/.m2/settings.xml and
+            // nothing else. Accepting the option would resolve through the default file's mirrors
+            // and credentials while the caller believed they had redirected it.
+            ValidateOptions options = mock(ValidateOptions.class);
+            when(options.mode()).thenReturn(Optional.of("effective"));
+            when(options.altUserSettings()).thenReturn(Optional.of("ci-settings.xml"));
+            when(options.poms())
+                    .thenReturn(Optional.of(List.of(project("par", "").toString())));
+            ValidateContext context = TestUtils.createMockContext(tempDir, options);
+            context.writer = output::add;
+
+            assertEquals(ValidateInvoker.BAD_OPERATION, invoker.execute(context));
+        }
+
+        @Test
+        @DisplayName("should accept an alternate settings file in raw mode, where it changes nothing")
+        void shouldAcceptAlternateSettingsInRawMode() throws Exception {
+            ValidateOptions options = mock(ValidateOptions.class);
+            when(options.mode()).thenReturn(Optional.of("raw"));
+            when(options.altUserSettings()).thenReturn(Optional.of("ci-settings.xml"));
+            when(options.poms())
+                    .thenReturn(Optional.of(List.of(project("par", "").toString())));
+            ValidateContext context = TestUtils.createMockContext(tempDir, options);
+            context.writer = output::add;
+
+            assertEquals(ValidateInvoker.OK, invoker.execute(context), output.toString());
+        }
+
+        @Test
+        @DisplayName("should give the same verdict whichever order the POMs are named in")
+        void shouldNotDependOnArgumentOrder() throws Exception {
+            // The regression a shared ModelBuilderSession caused: derived sessions share
+            // mappedSources, so a decoy declaring the same groupId:artifactId as a real parent
+            // answered the child's parent lookup and changed its verdict. Two roots with the same
+            // coordinates and different packaging is the shape that broke.
+            Path child = project("par", "");
+            Path decoy = Files.createDirectories(tempDir.resolve("decoy")).resolve("pom.xml");
+            Files.writeString(decoy, """
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                      <modelVersion>4.0.0</modelVersion>
+                      <groupId>org.test</groupId><artifactId>par</artifactId>
+                      <version>1.0</version><packaging>jar</packaging>
+                    </project>""");
+
+            List<String> childFirst = runEffectiveOn(List.of(child.toString(), decoy.toString()));
+            List<String> decoyFirst = runEffectiveOn(List.of(decoy.toString(), child.toString()));
+
+            assertEquals(
+                    Set.copyOf(childFirst),
+                    Set.copyOf(decoyFirst),
+                    "the same files must get the same problems whichever order they are given in");
+        }
+
+        private List<String> runEffectiveOn(List<String> poms) throws Exception {
+            ValidateOptions options = mock(ValidateOptions.class);
+            when(options.mode()).thenReturn(Optional.of("effective"));
+            when(options.poms()).thenReturn(Optional.of(poms));
+            ValidateContext context = TestUtils.createMockContext(tempDir, options);
+            List<String> lines = new ArrayList<>();
+            context.writer = lines::add;
+            invoker.execute(context);
+            return lines;
+        }
+
+        @Test
+        @DisplayName("should leave the same project alone in raw mode")
+        void shouldNotResolveInRawMode() throws Exception {
+            Path pom = project("absent", "<relativePath/>");
+            ValidateOptions options = mock(ValidateOptions.class);
+            when(options.mode()).thenReturn(Optional.of("raw"));
+            when(options.poms()).thenReturn(Optional.of(List.of(pom.toString())));
+            ValidateContext context = TestUtils.createMockContext(tempDir, options);
+            context.writer = output::add;
+
+            int exitCode = invoker.execute(context);
+
+            assertEquals(ValidateInvoker.OK, exitCode, output.toString());
+            assertTrue(
+                    output.stream().noneMatch(line -> line.contains("Non-resolvable")),
+                    "raw mode must not go looking for the parent: " + output);
         }
     }
 }

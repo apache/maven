@@ -52,4 +52,15 @@ public interface ValidateOptions extends Options {
      */
     @Nonnull
     Optional<List<String>> poms();
+
+    /**
+     * Returns how far the model builder should run, matched case-insensitively against {@code raw},
+     * which stops at the raw model and reaches no repository, and {@code effective}, which resolves
+     * parents and imports as well. An unrecognised value is rejected as a usage error.
+     *
+     * @return an {@link Optional} holding the requested mode, or empty when not given, in which
+     *         case {@code effective} is used
+     */
+    @Nonnull
+    Optional<String> mode();
 }
