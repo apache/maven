@@ -150,6 +150,17 @@ class CommonsCliValidateOptionsTest {
     }
 
     @Test
+    @DisplayName("should fold the deprecated -gs into the installation settings")
+    void shouldFoldDeprecatedGlobalSettings() throws ParseException {
+        // The parser accepts both spellings for one option, which is why the refusal message
+        // names both: someone who typed -gs would not recognise --install-settings.
+        CommonsCliValidateOptions options =
+                CommonsCliValidateOptions.parse(new String[] {"-gs", "settings.xml", "pom.xml"});
+
+        assertEquals("settings.xml", options.altInstallationSettings().orElseThrow());
+    }
+
+    @Test
     @DisplayName("should leave the mode empty when it is not given")
     void shouldLeaveModeEmptyWhenNotGiven() throws ParseException {
         CommonsCliValidateOptions options = CommonsCliValidateOptions.parse(new String[] {"pom.xml"});

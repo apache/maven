@@ -461,16 +461,18 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
     @Nullable
     private static String refusedOption(ValidateOptions options) {
         if (options.offline().orElse(false)) {
-            return "--offline";
+            return "--offline (-o)";
         }
         if (options.altUserSettings().isPresent()) {
-            return "--settings";
+            return "--settings (-s)";
         }
         if (options.altProjectSettings().isPresent()) {
-            return "--project-settings";
+            return "--project-settings (-ps)";
         }
         if (options.altInstallationSettings().isPresent()) {
-            return "--install-settings";
+            // Both spellings, because the parser folds -gs into this one and naming only the
+            // long form tells someone who typed -gs about an option they did not use.
+            return "--install-settings (-is, -gs)";
         }
         return null;
     }
