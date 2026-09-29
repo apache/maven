@@ -29,6 +29,7 @@ import java.util.Set;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.mvnval.ValidateOptions;
+import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
@@ -37,12 +38,14 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
+import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -133,6 +136,98 @@ class ValidateInvokerTest {
         ValidateContext context = TestUtils.createMockContext(tempDir, options);
         context.writer = output::add;
         return invoker.execute(context);
+    }
+
+    @Nested
+    @DisplayName("Wiring")
+    class WiringTests {
+
+        @Test
+        @DisplayName("should register the transports resolution needs")
+        void shouldRegisterTransports() throws Exception {
+            // The block whose absence produces "No transporter factories registered". Proved by
+            // fetching over file://, which needs FileTransporterFactory and no network: the same
+            // POM through a session built without the block cannot be resolved at all. Every
+            // other test here replaces createSession, so without this the block could be deleted
+            // and the suite would stay green.
+            Path repository = Files.createDirectories(tempDir.resolve("served/org/test/far/1.0"));
+            String parent = """
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                      <modelVersion>4.0.0</modelVersion>
+                      <groupId>org.test</groupId><artifactId>far</artifactId>
+                      <version>1.0</version><packaging>pom</packaging>
+                    </project>""";
+            Files.writeString(repository.resolve("far-1.0.pom"), parent);
+            // A repository without checksums is refused before the content is looked at, so the
+            // transport would never be exercised.
+            Files.writeString(repository.resolve("far-1.0.pom.sha1"), sha1(parent));
+            Path pom = Files.createDirectories(tempDir.resolve("fetcher")).resolve("pom.xml");
+            Files.writeString(pom, """
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                      <modelVersion>4.0.0</modelVersion>
+                      <parent>
+                        <groupId>org.test</groupId><artifactId>far</artifactId>
+                        <version>1.0</version><relativePath/>
+                      </parent>
+                      <artifactId>fetcher</artifactId>
+                      <repositories>
+                        <repository><id>served</id><url>%s</url></repository>
+                      </repositories>
+                    </project>""".formatted(tempDir.resolve("served").toUri()));
+
+            ValidateOptions options = mock(ValidateOptions.class);
+            when(options.mode()).thenReturn(Optional.of("effective"));
+            when(options.localRepository())
+                    .thenReturn(Optional.of(tempDir.resolve("into").toString()));
+            when(options.poms()).thenReturn(Optional.of(List.of(pom.toString())));
+            ValidateContext context = TestUtils.createMockContext(tempDir, options);
+            context.writer = output::add;
+
+            int exitCode = new ValidateInvoker(ProtoLookup.builder().build(), null).execute(context);
+
+            assertEquals(ValidateInvoker.OK, exitCode, output.toString());
+            assertTrue(
+                    Files.exists(tempDir.resolve("into/org/test/far/1.0/far-1.0.pom")),
+                    "the parent has to arrive through a transport: " + output);
+        }
+
+        @Test
+        @DisplayName("should exit on bad usage when the model builder cannot validate")
+        void shouldRefuseAModelBuilderThatCannotValidate() throws Exception {
+            // validate() is a default that throws, so an out-of-tree ModelBuilder may not have it.
+            // Unreachable from the shipped CLI, which is why it is worth pinning here: nothing was
+            // wrong with the POM, so this must not be the code that means a POM was rejected.
+            ValidateInvoker refusing = new ValidateInvoker(ProtoLookup.builder().build(), null) {
+                @Override
+                protected Session createSession(Path localRepository) {
+                    Session session = mock(Session.class);
+                    ModelBuilder builder = mock(ModelBuilder.class);
+                    ModelBuilder.ModelBuilderSession builderSession = mock(ModelBuilder.ModelBuilderSession.class);
+                    when(session.getService(ModelBuilder.class)).thenReturn(builder);
+                    when(builder.newSession()).thenReturn(builderSession);
+                    when(builderSession.validate(any()))
+                            .thenThrow(new UnsupportedOperationException("does not support validating a model"));
+                    return session;
+                }
+            };
+            ValidateOptions options = mock(ValidateOptions.class);
+            when(options.mode()).thenReturn(Optional.of("raw"));
+            when(options.poms())
+                    .thenReturn(Optional.of(List.of(writePom("unsupported", "").toString())));
+            ValidateContext context = TestUtils.createMockContext(tempDir, options);
+            context.writer = output::add;
+
+            assertEquals(ValidateInvoker.BAD_OPERATION, refusing.execute(context));
+        }
+    }
+
+    private static String sha1(String content) throws Exception {
+        byte[] digest = java.security.MessageDigest.getInstance("SHA-1").digest(content.getBytes(UTF_8));
+        StringBuilder hex = new StringBuilder(digest.length * 2);
+        for (byte b : digest) {
+            hex.append(String.format("%02x", b));
+        }
+        return hex.toString();
     }
 
     @Nested
