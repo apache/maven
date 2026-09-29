@@ -63,4 +63,23 @@ public interface ValidateOptions extends Options {
      */
     @Nonnull
     Optional<String> mode();
+
+    /**
+     * Returns the local repository to resolve into, in place of the configured one, resolved
+     * against the working directory. Without effect in {@code raw} mode, which resolves nothing.
+     *
+     * @return an {@link Optional} holding the path, or empty when not given
+     */
+    @Nonnull
+    Optional<String> localRepository();
+
+    /**
+     * Returns whether to resolve into a directory created for this run and deleted when it ends, so
+     * that validating a POM leaves the configured local repository untouched. Without effect in
+     * {@code raw} mode, which resolves nothing.
+     *
+     * @return an {@link Optional} holding the choice, or empty when not given
+     */
+    @Nonnull
+    Optional<Boolean> tempLocalRepository();
 }

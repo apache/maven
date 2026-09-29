@@ -18,11 +18,15 @@
  */
 package org.apache.maven.cling.invoker.mvnval;
 
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
@@ -144,19 +148,54 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                     return BAD_OPERATION;
                 }
             }
-            List<Report> reports = validateAll(resolvePoms(context), createSession(), mode);
-            // interrupted(), not isInterrupted(): clear the flag where it is acted on. Reporting
-            // here would give a verdict on only the files reached so far.
-            if (Thread.interrupted()) {
-                return canceled(context);
+
+            if (context.options().localRepository().isPresent()
+                    && context.options().tempLocalRepository().orElse(false)) {
+                context.logger.error(
+                        "--local-repository and --temp-local-repository name different" + " directories; give one.");
+                return BAD_OPERATION;
             }
-            // determineWriter, not context.writer: on a real run that field is still empty and
-            // this is what fills it.
-            format.report(reports, determineWriter(context));
-            return exitCode(reports);
+            // Only in effective mode: raw resolves nothing, so making a directory there could
+            // lose a run that would never have written to it.
+            String unusableRepository = unusableRepository(context);
+            if (unusableRepository != null) {
+                context.logger.error(unusableRepository);
+                return BAD_OPERATION;
+            }
+            Path localRepository = null;
+            if (mode != ValidationMode.RAW) {
+                try {
+                    localRepository = localRepository(context);
+                } catch (IOException e) {
+                    // Not ERROR: no POM was rejected, the run could not be set up.
+                    context.logger.error("Could not create a temporary local repository: " + e);
+                    return BAD_OPERATION;
+                }
+            }
+            Thread cleanup = temporary(context, localRepository) ? cleanupHook(localRepository, context) : null;
+            try {
+                List<Report> reports = validateAll(resolvePoms(context), createSession(localRepository), mode);
+                // interrupted(), not isInterrupted(): clear the flag where it is acted on.
+                // Reporting here would give a verdict on only the files reached so far.
+                if (Thread.interrupted()) {
+                    return canceled(context);
+                }
+                // determineWriter, not context.writer: on a real run that field is still empty
+                // and this is what fills it.
+                format.report(reports, determineWriter(context));
+                return exitCode(reports);
+            } finally {
+                if (cleanup != null) {
+                    // Delete first, deregister second. The other order leaves a window where a
+                    // signal arriving after the hook is gone kills the process before the
+                    // deletion runs, which cost one directory in four in a timing test.
+                    deleteRecursively(localRepository, context);
+                    removeHook(cleanup);
+                }
+            }
         } catch (UnsupportedOperationException e) {
-            // The ModelBuilder on this session has not implemented validate. Nothing was wrong
-            // with any POM, so this must not be ERROR, the code a gate reads as "a POM rejected".
+            // The ModelBuilder in this container has not written validate. Nothing was wrong with
+            // any POM, so this must not be ERROR, the code a gate reads as "a POM was rejected".
             context.logger.error("This Maven installation cannot validate POMs: " + e.getMessage());
             return BAD_OPERATION;
         } catch (UserInterruptException e) {
@@ -265,7 +304,7 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
     protected void init(ValidateContext context) {}
 
     /**
-     * No settings step: the model builder runs on the session from {@link #createSession()},
+     * No settings step: the model builder runs on the session from {@link #createSession(Path)},
      * which reads the user's settings itself when it has to resolve.
      */
     @Override
@@ -279,8 +318,14 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
      *
      * @return the session, never {@code null}
      */
-    protected Session createSession() {
+    protected Session createSession(@Nullable Path localRepository) {
         Session session = ApiRunner.createSession(injector -> injector.bindImplicit(TransporterFactoryConfig.class));
+        if (localRepository != null) {
+            // Set on the session that came back, not passed to createSession, which prefers
+            // settings.getLocalRepository() over its argument and may in any case hand back a
+            // session another tool built. See derivedRepositories for why that happens.
+            session = session.withLocalRepository(session.createLocalRepository(localRepository));
+        }
         return session.withRemoteRepositories(derivedRepositories(session));
     }
 
@@ -337,6 +382,75 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
         @Named(FileTransporterFactory.NAME)
         static TransporterFactory fileTransporterFactory() {
             return new FileTransporterFactory();
+        }
+    }
+
+    /**
+     * The local repository to resolve into, or {@code null} to leave the configured one alone.
+     * The temporary directory is made here rather than in {@link #createSession(Path)} so that
+     * the caller owns it and can delete it on every path out.
+     */
+    /** Whether {@code localRepository} is the throwaway directory this run made. */
+    private static boolean temporary(ValidateContext context, @Nullable Path localRepository) {
+        return localRepository != null
+                && context.options().tempLocalRepository().orElse(false);
+    }
+
+    /**
+     * Deletes the throwaway directory when the process is signalled.
+     * <p>
+     * The {@code finally} covers every way out of {@code execute}, but not a signal, and a CI job
+     * killed on timeout is the case this option exists for. Measured without the hook: a
+     * {@code SIGTERM} part way through a run left the populated directory behind four times out
+     * of four. {@code SIGKILL} still escapes, as it escapes every hook.
+     */
+    private static Thread cleanupHook(Path directory, ValidateContext context) {
+        Thread hook = new Thread(() -> deleteRecursively(directory, context), "mvnval-repo-cleanup");
+        Runtime.getRuntime().addShutdownHook(hook);
+        return hook;
+    }
+
+    /** Takes the hook off, unless the shutdown it guards against has already begun. */
+    private static void removeHook(Thread hook) {
+        try {
+            Runtime.getRuntime().removeShutdownHook(hook);
+        } catch (IllegalStateException e) {
+            // Shutdown is under way and the hook is running or about to; it does the same work.
+        }
+    }
+
+    @Nullable
+    private static Path localRepository(ValidateContext context) throws IOException {
+        if (context.options().tempLocalRepository().orElse(false)) {
+            return Files.createTempDirectory("mvnval-repo-");
+        }
+        // maven.repo.local is how every other Maven command aims the local repository, so
+        // swallowing it while offering --local-repository would be the trap this tool refuses
+        // -o and -s to avoid. The option wins, being the more specific request.
+        return context.options()
+                .localRepository()
+                .or(() -> Optional.ofNullable(
+                        context.protoSession.getEffectiveProperties().get(Constants.MAVEN_REPO_LOCAL)))
+                .map(context.cwd::resolve)
+                .orElse(null);
+    }
+
+    /**
+     * Deletes the temporary local repository, deepest entry first. A failure here is reported and
+     * not thrown: the verdict on the POMs is already given, and losing it over a leftover
+     * directory would be the wrong trade. A process killed before this runs leaves the directory
+     * behind, where the operating system's temporary cleanup finds it.
+     */
+    private static void deleteRecursively(Path directory, ValidateContext context) {
+        if (!Files.exists(directory)) {
+            return;
+        }
+        try (Stream<Path> entries = Files.walk(directory)) {
+            for (Path entry : entries.sorted(Comparator.reverseOrder()).toList()) {
+                Files.deleteIfExists(entry);
+            }
+        } catch (IOException e) {
+            context.logger.warn("Could not delete the temporary local repository " + directory + ": " + e);
         }
     }
 
@@ -408,12 +522,28 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                     : Report.failed(pom, describe(e));
         } catch (UnsupportedOperationException e) {
             // Past the catch-all below, or it would be reported as this file being bad. execute()
-            // turns it into BAD_OPERATION: the tool cannot run here.
+            // turns it into BAD_OPERATION: the tool cannot run at all here.
             throw e;
         } catch (Exception e) {
             // One bad file must not lose the verdict on the others.
             return Report.failed(pom, describe(e));
         }
+    }
+
+    /**
+     * Says why {@code --local-repository} cannot be used, or {@code null} when it can. A path that
+     * exists and is not a directory reaches the resolver and comes back as a ClassCastException
+     * between two exception types, reported against the POM as though the POM were at fault.
+     */
+    @Nullable
+    private static String unusableRepository(ValidateContext context) {
+        return context.options()
+                .localRepository()
+                .map(context.cwd::resolve)
+                .filter(Files::exists)
+                .filter(path -> !Files.isDirectory(path))
+                .map(path -> "--local-repository " + path + " is not a directory.")
+                .orElse(null);
     }
 
     /**

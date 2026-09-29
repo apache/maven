@@ -22,6 +22,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -37,6 +38,8 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -81,6 +84,9 @@ class ValidateInvokerTest {
 
     private List<String> output;
 
+    /** Every path handed to the seam, so a test can assert on the one the run actually made. */
+    private List<Path> aimed;
+
     private ValidateInvoker invoker;
 
     @BeforeEach
@@ -88,12 +94,17 @@ class ValidateInvokerTest {
         output = new ArrayList<>();
         // Built once through the seam: it is the expensive part of every test here.
         Session shared = ApiRunner.createSession();
+        aimed = new ArrayList<>();
         invoker = new ValidateInvoker(ProtoLookup.builder().build(), null) {
             @Override
-            protected Session createSession() {
-                // The transports and the settings-derived repository list production adds are
-                // not here: this session has neither.
-                return shared;
+            protected Session createSession(Path localRepository) {
+                // withLocalRepository is the line production uses, so an aimed repository is
+                // exercised rather than stubbed. The transports and the settings-derived
+                // repository list production adds are not: this session has neither.
+                aimed.add(localRepository);
+                return localRepository == null
+                        ? shared
+                        : shared.withLocalRepository(shared.createLocalRepository(localRepository));
             }
         };
     }
@@ -511,6 +522,65 @@ class ValidateInvokerTest {
         }
 
         @Test
+        @DisplayName("should read the parent from an aimed local repository")
+        void shouldUseTheAimedLocalRepository() throws Exception {
+            // Proved positively, because a failed resolution writes nothing and so says nothing
+            // about where it looked: the parent is laid out by hand in the aimed repository and
+            // nowhere else, so a clean verdict is only reachable by reading it from there. This
+            // is the assertion that failed while the path was still being dropped.
+            Path repo = tempDir.resolve("aimed");
+            Path laid = Files.createDirectories(repo.resolve("org/test/absent/1.0"));
+            Files.writeString(laid.resolve("absent-1.0.pom"), """
+                    <project xmlns="http://maven.apache.org/POM/4.0.0">
+                      <modelVersion>4.0.0</modelVersion>
+                      <groupId>org.test</groupId><artifactId>absent</artifactId>
+                      <version>1.0</version><packaging>pom</packaging>
+                      <dependencyManagement><dependencies>
+                        <dependency>
+                          <groupId>junit</groupId><artifactId>junit</artifactId><version>4.13.2</version>
+                        </dependency>
+                      </dependencies></dependencyManagement>
+                    </project>""");
+            ValidateOptions options = mock(ValidateOptions.class);
+            when(options.mode()).thenReturn(Optional.of("effective"));
+            when(options.localRepository()).thenReturn(Optional.of(repo.toString()));
+            when(options.poms())
+                    .thenReturn(Optional.of(
+                            List.of(project("absent", "<relativePath/>").toString())));
+            ValidateContext context = TestUtils.createMockContext(tempDir, options);
+            context.writer = output::add;
+
+            int exitCode = invoker.execute(context);
+
+            assertEquals(ValidateInvoker.OK, exitCode, output.toString());
+            assertTrue(
+                    output.stream().noneMatch(line -> line.contains("Non-resolvable")),
+                    "the aimed repository has the parent, so nothing should go looking: " + output);
+        }
+
+        @Test
+        @DisplayName("should delete the temporary local repository when the run ends")
+        void shouldDeleteTheTemporaryLocalRepository() throws Exception {
+            ValidateOptions options = mock(ValidateOptions.class);
+            when(options.mode()).thenReturn(Optional.of("effective"));
+            when(options.tempLocalRepository()).thenReturn(Optional.of(true));
+            when(options.poms())
+                    .thenReturn(Optional.of(
+                            List.of(project("absent", "<relativePath/>").toString())));
+            ValidateContext context = TestUtils.createMockContext(tempDir, options);
+            context.writer = output::add;
+
+            invoker.execute(context);
+
+            // The directory this run made, not everything in the temp directory: another mvnval
+            // on the same machine would fail that, and a leftover from a killed run is exactly
+            // what the production javadoc says to expect.
+            Path made = aimed.stream().filter(Objects::nonNull).findFirst().orElse(null);
+            assertNotNull(made, "effective mode with --temp-local-repository must aim somewhere");
+            assertFalse(Files.exists(made), "a throwaway repository that outlives the run is not throwaway");
+        }
+
+        @Test
         @DisplayName("should give the same verdict whichever order the POMs are named in")
         void shouldNotDependOnArgumentOrder() throws Exception {
             // The regression a shared ModelBuilderSession caused: derived sessions share
@@ -544,6 +614,37 @@ class ValidateInvokerTest {
             context.writer = lines::add;
             invoker.execute(context);
             return lines;
+        }
+
+        @Test
+        @DisplayName("should refuse a local repository that is not a directory")
+        void shouldRefuseALocalRepositoryThatIsNotADirectory() throws Exception {
+            // Without this the path reaches the resolver and comes back as a cast between two
+            // exception types, reported against the POM as though the POM were at fault.
+            Path file = Files.writeString(tempDir.resolve("not-a-dir"), "");
+            ValidateOptions options = mock(ValidateOptions.class);
+            when(options.mode()).thenReturn(Optional.of("effective"));
+            when(options.localRepository()).thenReturn(Optional.of(file.toString()));
+            when(options.poms())
+                    .thenReturn(Optional.of(List.of(project("par", "").toString())));
+            ValidateContext context = TestUtils.createMockContext(tempDir, options);
+            context.writer = output::add;
+
+            assertEquals(ValidateInvoker.BAD_OPERATION, invoker.execute(context));
+        }
+
+        @Test
+        @DisplayName("should refuse two different local repositories")
+        void shouldRefuseBothLocalRepositoryOptions() throws Exception {
+            ValidateOptions options = mock(ValidateOptions.class);
+            when(options.localRepository()).thenReturn(Optional.of("somewhere"));
+            when(options.tempLocalRepository()).thenReturn(Optional.of(true));
+            when(options.poms())
+                    .thenReturn(Optional.of(List.of(project("par", "").toString())));
+            ValidateContext context = TestUtils.createMockContext(tempDir, options);
+            context.writer = output::add;
+
+            assertEquals(ValidateInvoker.BAD_OPERATION, invoker.execute(context));
         }
 
         @Test

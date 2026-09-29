@@ -129,6 +129,27 @@ class CommonsCliValidateOptionsTest {
     }
 
     @Test
+    @DisplayName("should take the local repository path")
+    void shouldTakeLocalRepositoryPath() throws ParseException {
+        CommonsCliValidateOptions options =
+                CommonsCliValidateOptions.parse(new String[] {"--local-repository", "/tmp/repo", "pom.xml"});
+
+        assertEquals("/tmp/repo", options.localRepository().orElseThrow());
+        assertEquals(List.of("pom.xml"), options.poms().orElseThrow(), "the value must not swallow the pom");
+        assertTrue(options.tempLocalRepository().isEmpty(), "the two options are separate");
+    }
+
+    @Test
+    @DisplayName("should take the throwaway local repository as a flag with no value")
+    void shouldTakeTempLocalRepository() throws ParseException {
+        CommonsCliValidateOptions options =
+                CommonsCliValidateOptions.parse(new String[] {"--temp-local-repository", "pom.xml"});
+
+        assertEquals(true, options.tempLocalRepository().orElseThrow());
+        assertEquals(List.of("pom.xml"), options.poms().orElseThrow(), "the flag takes no argument");
+    }
+
+    @Test
     @DisplayName("should leave the mode empty when it is not given")
     void shouldLeaveModeEmptyWhenNotGiven() throws ParseException {
         CommonsCliValidateOptions options = CommonsCliValidateOptions.parse(new String[] {"pom.xml"});

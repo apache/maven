@@ -65,6 +65,18 @@ public class CommonsCliValidateOptions extends CommonsCliOptions implements Vali
 
     @Override
     @Nonnull
+    public Optional<String> localRepository() {
+        return Optional.ofNullable(commandLine.getOptionValue(CLIManager.LOCAL_REPOSITORY));
+    }
+
+    @Override
+    @Nonnull
+    public Optional<Boolean> tempLocalRepository() {
+        return commandLine.hasOption(CLIManager.TEMP_LOCAL_REPOSITORY) ? Optional.of(true) : Optional.empty();
+    }
+
+    @Override
+    @Nonnull
     public Optional<List<String>> poms() {
         if (commandLine.getArgList().isEmpty()) {
             return Optional.empty();
@@ -89,6 +101,12 @@ public class CommonsCliValidateOptions extends CommonsCliOptions implements Vali
         printStream.accept("A subproject is read when its parent needs it, and only the POMs named");
         printStream.accept("on the command line are reported on, though a problem inherited from a");
         printStream.accept("parent is reported against the POM that inherited it.");
+        printStream.accept("");
+        printStream.accept("--local-repository aims resolution at another local repository, and");
+        printStream.accept("--temp-local-repository at one created for the run and deleted when it");
+        printStream.accept("ends, so that validating a POM leaves the configured one untouched.");
+        printStream.accept("Without --local-repository, maven.repo.local is used as elsewhere.");
+        printStream.accept("Neither option changes what --mode raw does, since it resolves nothing.");
         printStream.accept("");
         printStream.accept("-o, -s, -ps and -is are refused outside --mode raw: resolution reads the");
         printStream.accept("default settings files and cannot be redirected.");
@@ -115,6 +133,10 @@ public class CommonsCliValidateOptions extends CommonsCliOptions implements Vali
 
         public static final String MODE = "mode";
 
+        public static final String LOCAL_REPOSITORY = "local-repository";
+
+        public static final String TEMP_LOCAL_REPOSITORY = "temp-local-repository";
+
         @Override
         protected void prepareOptions(org.apache.commons.cli.Options options) {
             super.prepareOptions(options);
@@ -127,6 +149,15 @@ public class CommonsCliValidateOptions extends CommonsCliOptions implements Vali
                     .longOpt(MODE)
                     .hasArg()
                     .desc("How far to validate: effective (default) or raw.")
+                    .get());
+            options.addOption(Option.builder()
+                    .longOpt(LOCAL_REPOSITORY)
+                    .hasArg()
+                    .desc("Resolve into this local repository instead of the configured one.")
+                    .get());
+            options.addOption(Option.builder()
+                    .longOpt(TEMP_LOCAL_REPOSITORY)
+                    .desc("Resolve into a directory created for this run and deleted when it ends.")
                     .get());
         }
 
