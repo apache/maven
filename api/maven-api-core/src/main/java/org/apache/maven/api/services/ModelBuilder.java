@@ -48,18 +48,14 @@ public interface ModelBuilder extends Service {
          * report on a POM can see warnings that come with no error. A problem severe enough that
          * the model cannot be read at all is still thrown.
          * <p>
-         * This implementation stops after the raw model, so no inheritance, interpolation or
-         * profile injection happens and only the source, the file model, the raw model and the
-         * problems are populated on the result. {@link ModelBuilderResult#getEffectiveModel()}
-         * and the other accessors describing a fully built model are not.
+         * An implementation must not resolve from a remote repository and must not download. How
+         * much of the pipeline it runs beyond that is its own, so a caller takes the verdict from
+         * the problems on the result rather than from the model accessors, whose {@code @Nonnull}
+         * contracts describe a fully built model and do not hold here.
          * <p>
          * Reading one model can need others: a subproject may leave out its parent version, which
          * is then taken from the parent's own file model. An implementation may therefore read
-         * files besides the one the request names, up to the project root. Nothing is resolved
-         * from a repository and nothing is downloaded.
-         * <p>
-         * The session holds what it builds for its own lifetime, so give a validation run a
-         * session of its own rather than sharing one with {@link #build(ModelBuilderRequest)}.
+         * files besides the one the request names, up to the project root.
          *
          * @param request the request containing the parameters for reading the model
          * @return the result, carrying the model that was read and the problems collected

@@ -253,6 +253,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
+        /**
+         * Stops after the raw model, so no inheritance, interpolation or profile injection
+         * happens: only the source, the file model, the raw model and the problems are populated
+         * on the result. Reaches no repository. The checks run at strict level for any build
+         * request type; {@code BUILD_PROJECT} additionally looks for a parent beside the POM.
+         */
         @Override
         public ModelBuilderResult validate(ModelBuilderRequest request) throws ModelBuilderException {
             RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
