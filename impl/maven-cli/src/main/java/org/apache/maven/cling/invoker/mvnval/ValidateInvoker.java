@@ -365,7 +365,13 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
         List<String> args = context.options().poms().orElse(List.of());
         return args.isEmpty()
                 ? List.of(context.cwd.resolve("pom.xml"))
-                : args.stream().map(context.cwd::resolve).distinct().toList();
+                // Normalised before distinct(), or "pom.xml ./pom.xml" is two paths and the same
+                // file is read, reported and counted twice.
+                : args.stream()
+                        .map(context.cwd::resolve)
+                        .map(Path::normalize)
+                        .distinct()
+                        .toList();
     }
 
     private static List<Report> validateAll(List<Path> poms, Session session, ValidationMode mode) {

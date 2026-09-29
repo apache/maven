@@ -147,6 +147,20 @@ class ValidateInvokerTest {
                     output.stream().anyMatch(l -> l.contains("must be unique")),
                     "and also without a parent: " + output);
         }
+
+        @Test
+        @DisplayName("should read a POM named twice only once")
+        void shouldReadAPomNamedTwiceOnce() throws Exception {
+            Path pom = writePom("twice", "");
+
+            int exitCode = run(List.of(pom.toString(), "./twice/pom.xml"));
+
+            assertEquals(ValidateInvoker.ERROR, exitCode, output.toString());
+            assertEquals(
+                    1,
+                    output.stream().filter(line -> line.endsWith("pom.xml:")).count(),
+                    "one file named two ways is one report: " + output);
+        }
     }
 
     @Nested
