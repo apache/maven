@@ -21,7 +21,7 @@ under the License.
        xsi:schemaLocation="http://codehaus-plexus.github.io/MODELLO/2.0.0 https://codehaus-plexus.github.io/modello/xsd/modello-2.0.0.xsd"
   xml.namespace="http://maven.apache.org/LIFECYCLE/${version}"
   xml.schemaLocation="https://maven.apache.org/xsd/lifecycle-${version}.xsd">
-  <id>lifecycle-mappings</id>
+  <id>lifecycle</id>
   <name>LifecycleMappings</name>
   <description><![CDATA[
     Configuration of custom lifecycle mappings for the plugin, as generally stored in
