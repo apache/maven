@@ -50,6 +50,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -687,18 +688,25 @@ class ValidateInvokerTest {
         }
 
         @Test
-        @DisplayName("should refuse --offline rather than reach the network behind it")
-        void shouldRefuseOfflineInEffectiveMode() throws Exception {
+        @DisplayName("should honour --offline and fail when a parent is not in the local repository")
+        void shouldHonourOfflineInEffectiveMode() throws Exception {
             ValidateOptions options = mock(ValidateOptions.class);
             when(options.mode()).thenReturn(Optional.of("effective"));
             when(options.offline()).thenReturn(Optional.of(true));
+            when(options.tempLocalRepository()).thenReturn(Optional.of(true));
             when(options.poms())
                     .thenReturn(Optional.of(
                             List.of(project("absent", "<relativePath/>").toString())));
             ValidateContext context = TestUtils.createMockContext(tempDir, options);
             context.writer = output::add;
 
-            assertEquals(ValidateInvoker.BAD_OPERATION, invoker.execute(context));
+            // -o is now honoured: the run fails because the parent cannot be fetched offline,
+            // but the failure is a validation result (exit 1), not a bad-usage error (exit 2).
+            int exitCode = invoker.execute(context);
+            assertNotEquals(
+                    ValidateInvoker.BAD_OPERATION,
+                    exitCode,
+                    "--offline must be honoured, not refused as bad usage: " + output);
         }
 
         @Test

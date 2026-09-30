@@ -18,12 +18,15 @@
  */
 package org.apache.maven.cling.invoker.mvnval;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.Consumer;
@@ -38,6 +41,7 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvnval.ValidateOptions;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.model.RepositoryPolicy;
@@ -54,7 +58,9 @@ import org.apache.maven.api.services.Sources;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
+import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.standalone.ApiRunner;
+import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
 import org.eclipse.aether.spi.io.PathProcessor;
@@ -86,6 +92,15 @@ import org.jline.terminal.Terminal;
  * {@code .mvn/settings.xml}. The user's own settings are another matter: resolution reads them
  * for mirrors, proxies and credentials, as it has to. The JVM is outside this:
  * {@code bin/mvn} passes {@code .mvn/jvm.config} to the launcher before this process starts.
+ * <p>
+ * {@code -o} works in {@code effective} mode: resolution hits the local repository only and
+ * fails fast when a parent or BOM is absent. Combined with {@code --temp-local-repository} it
+ * proves that the POMs being validated are fully self-contained.
+ * <p>
+ * When more than one POM is given, {@code effective} mode pre-scans them all to build a bundle
+ * workspace: a parent that is named in the bundle is resolved from disk rather than from a
+ * repository, so the verdict does not depend on publication order and the run does not download
+ * what is already on disk.
  */
 public class ValidateInvoker extends LookupInvoker<ValidateContext> {
 
@@ -143,13 +158,18 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                 context.logger.error(e.getMessage());
                 return BAD_OPERATION;
             }
-            // Nothing here can honour these: resolution runs on the session ApiRunner builds,
-            // which reads the user's settings.xml and takes offline from it. Ignoring them would
-            // send a gate that passed --offline to the network. Raw mode resolves nothing.
+            // -s/-ps/-is redirect the settings files that ApiRunner reads at session-creation time.
+            // Honouring them would require threading the alternate path into ApiRunner before it
+            // starts; that is a larger change than belongs here, so they are still refused.
+            // -o is different: it applies to the resolver session, which createSession() returns,
+            // and can be applied there after the session is built.  Raw mode resolves nothing, so
+            // none of these apply there.
             if (mode != ValidationMode.RAW) {
-                String refused = refusedOption(context.options());
+                String refused = refusedSettingsOption(context.options());
                 if (refused != null) {
-                    context.logger.error(refused + " needs --mode raw, which reaches no repository.");
+                    context.logger.error(refused
+                            + " cannot redirect the settings file mvnval reads."
+                            + " Use the default settings, or copy the relevant settings to the default location.");
                     return BAD_OPERATION;
                 }
             }
@@ -342,6 +362,40 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
     }
 
     /**
+     * Applies {@code --offline} to a session built by {@link #createSession}.
+     * <p>
+     * {@code ApiRunner.createSession} applies offline from the settings file.  This supplements
+     * that: when the caller passes {@code -o} on the command line, the session is made offline
+     * regardless of what the settings say, by cloning the underlying resolver session with offline
+     * set to true.
+     */
+    private static Session withOffline(Session session) {
+        // withLocalRepository(same repo) forces AbstractSession to clone the underlying resolver
+        // session (DefaultRepositorySystemSession) into a fresh one held only by the new session
+        // object.  That fresh clone is safe to mutate without affecting the caller's session.
+        Session copy = session.withLocalRepository(session.getLocalRepository());
+        DefaultRepositorySystemSession rsession =
+                (DefaultRepositorySystemSession) InternalSession.from(copy).getSession();
+        rsession.setOffline(true);
+        return copy;
+    }
+
+    /**
+     * Installs a {@link BundleWorkspaceReader} on the resolver session so that parent and BOM
+     * lookups for POMs in the bundle are answered from disk rather than from a repository.
+     * <p>
+     * The workspace reader is set on a clone of the resolver session: it does not mutate the
+     * original session, which the tests may reuse across runs.
+     */
+    private static Session withWorkspaceReader(Session session, BundleWorkspaceReader reader) {
+        Session copy = session.withLocalRepository(session.getLocalRepository());
+        DefaultRepositorySystemSession rsession =
+                (DefaultRepositorySystemSession) InternalSession.from(copy).getSession();
+        rsession.setWorkspaceReader(reader);
+        return copy;
+    }
+
+    /**
      * The repositories to resolve from, derived here rather than taken as they came.
      * <p>
      * {@code ApiRunner.createSession} asks its injector for an unqualified {@code Session}, and
@@ -466,14 +520,13 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
     }
 
     /**
-     * Names the first resolution option given that this tool cannot act on, or {@code null} when
-     * none was.
+     * Names the first settings-redirect option given that this tool cannot act on, or
+     * {@code null} when none was given.
+     * <p>
+     * {@code -o} is intentionally absent: it is honoured in {@link #validateAll}.
      */
     @Nullable
-    private static String refusedOption(ValidateOptions options) {
-        if (options.offline().orElse(false)) {
-            return "--offline (-o)";
-        }
+    private static String refusedSettingsOption(ValidateOptions options) {
         if (options.altUserSettings().isPresent()) {
             return "--settings (-s)";
         }
@@ -501,15 +554,34 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
 
     private static List<Report> validateAll(
             ValidateContext context, Session session, ValidationMode mode, AtomicBoolean cancellationRequested) {
+        // Apply --offline after session creation: the session already has mirrors, proxies and
+        // credentials from the settings; making it offline only prevents the resolver from
+        // opening connections, which is exactly what -o requests.
+        if (context.options().offline().orElse(false)) {
+            session = withOffline(session);
+        }
+
         List<Path> poms = resolvePoms(context);
         ModelBuilder builder = session.getService(ModelBuilder.class);
+
+        // In effective mode with more than one POM, build a bundle workspace so that parent and
+        // BOM lookups for members of the bundle are answered from disk.  This is safe to share
+        // across sessions because the index is immutable: it is built once here and never written
+        // to.  The ordering bug that forced per-POM sessions arose from mappedSources, which is
+        // mutable session state; the workspace reader has no such shared mutable state.
+        if (mode == ValidationMode.EFFECTIVE && poms.size() > 1) {
+            BundleWorkspaceReader bundleReader = buildBundleWorkspace(poms, session, builder);
+            session = withWorkspaceReader(session, bundleReader);
+        }
+
+        final Session resolvedSession = session;
         List<Report> reports = new ArrayList<>(poms.size());
         for (Path pom : poms) {
             if (cancellationRequested.get() || Thread.currentThread().isInterrupted()) {
                 break;
             }
             ModelBuilderRequest request = ModelBuilderRequest.builder()
-                    .session(session)
+                    .session(resolvedSession)
                     .source(Sources.buildSource(pom))
                     .requestType(RequestType.BUILD_PROJECT)
                     .userProperties(context.protoSession.getUserProperties())
@@ -522,6 +594,49 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
             reports.add(validateOne(request, builder.newSession(), mode));
         }
         return reports;
+    }
+
+    /**
+     * Pre-scans all input POMs to build the bundle workspace index.
+     * <p>
+     * The index maps {@code groupId:artifactId} to the POM file on disk.  Scanning uses
+     * {@link ModelBuilder#buildRawModel} so that only the file is read and no parent resolution
+     * runs.  A POM that cannot be parsed is skipped: the validation pass that follows will report
+     * it as broken, which is the right place for that verdict.
+     * <p>
+     * The index is keyed by GA rather than GAV because a bundle is expected to carry at most one
+     * version of any given module, and a version mismatch between a child's declaration and the
+     * parent found in the bundle is something the validator should report rather than a reason to
+     * fall through to the repository.
+     */
+    private static BundleWorkspaceReader buildBundleWorkspace(List<Path> poms, Session session, ModelBuilder builder) {
+        Map<String, File> index = new HashMap<>();
+        Map<String, Model> models = new HashMap<>();
+        for (Path pom : poms) {
+            if (!Files.isRegularFile(pom) || !Files.isReadable(pom)) {
+                continue;
+            }
+            try {
+                ModelBuilderRequest req = ModelBuilderRequest.builder()
+                        .session(session)
+                        .source(Sources.buildSource(pom))
+                        .requestType(RequestType.BUILD_PROJECT)
+                        .build();
+                Model model = builder.buildRawModel(req);
+                String groupId = model.getGroupId() != null
+                        ? model.getGroupId()
+                        : (model.getParent() != null ? model.getParent().getGroupId() : null);
+                String artifactId = model.getArtifactId();
+                if (groupId != null && artifactId != null) {
+                    String ga = groupId + ":" + artifactId;
+                    index.put(ga, pom.toFile());
+                    models.put(ga, model);
+                }
+            } catch (Exception e) {
+                // Validation will report this POM as broken; skip it for the workspace index.
+            }
+        }
+        return new BundleWorkspaceReader(index, models);
     }
 
     private static Report validateOne(
