@@ -428,16 +428,29 @@ class ReactorReader implements MavenWorkspaceReader {
                         Files.deleteIfExists(path);
                     }
                 }
-                try {
-                    Files.deleteIfExists(artifactPath);
-                    Files.deleteIfExists(artifactPath.getParent());
-                    Files.deleteIfExists(artifactPath.getParent().getParent());
-                } catch (DirectoryNotEmptyException e) {
-                    // ignore
-                }
+                deleteIfEmpty(artifactPath);
+                deleteIfEmpty(artifactPath.getParent());
+                deleteIfEmpty(artifactPath.getParent().getParent());
+                deleteIfEmpty(getProjectLocalRepo());
+                deleteIfEmpty(getProjectLocalRepo().getParent());
             }
         } catch (IOException e) {
             LOGGER.error("Error while cleaning project local repository", e);
+        }
+    }
+
+    /**
+     * Deletes {@code dir} if it exists and is empty, silently ignoring non-empty directories.
+     * Used to prune the per-GAV, groupId, {@code project-local-repo}, and {@code .mvn/target}
+     * directory hierarchy after a project's clean phase so that no empty remnants are left.
+     */
+    private void deleteIfEmpty(Path dir) {
+        try {
+            Files.deleteIfExists(dir);
+        } catch (DirectoryNotEmptyException e) {
+            // Directory still has content (other modules' artifacts) — leave it alone.
+        } catch (IOException e) {
+            LOGGER.warn("Failed to delete directory {}", dir, e);
         }
     }
 
