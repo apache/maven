@@ -19,6 +19,7 @@
 package org.apache.maven.cling.invoker;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -93,10 +94,14 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 coreRealm,
                 coreEntry.getExportedArtifacts(),
                 coreExtensionSelector.selectCoreExtensions(invoker, context));
-        List<CoreExtensionEntry> loadedExtensionsEntries =
-                loadedExtensions.stream().map(LoadedCoreExtension::entry).toList();
+        List<CoreExtensionEntry> loadedExtensionsEntries = new ArrayList<>(
+                loadedExtensions.stream().map(LoadedCoreExtension::entry).toList());
         ClassRealm containerRealm =
                 setupContainerRealm(context.logger, classWorld, coreRealm, extClassPath, loadedExtensionsEntries);
+        for (Path entry : extClassPath) {
+            loadedExtensionsEntries.add(
+                    CoreExtensionEntry.discoverFrom(containerRealm, List.of(entry.toFile()), null, null));
+        }
         ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .setClassWorld(classWorld)
                 .setRealm(containerRealm)
@@ -211,11 +216,21 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             }
         }
         ArrayList<Path> jars = new ArrayList<>();
+        Set<Path> seen = new HashSet<>();
         if (extClassPath != null && !extClassPath.isEmpty()) {
             for (String jar : extClassPath.split(File.pathSeparator)) {
                 Path file = context.cwd.resolve(jar);
-                context.logger.debug("  included '" + file + "'");
-                jars.add(file);
+                Path realPath;
+                try {
+                    realPath = file.toRealPath();
+                } catch (IOException e) {
+                    // Preserve the existing handling of optional entries that do not exist.
+                    realPath = file.toAbsolutePath().normalize();
+                }
+                if (seen.add(realPath)) {
+                    context.logger.debug("  included '" + file + "'");
+                    jars.add(file);
+                }
             }
         }
         return jars;
