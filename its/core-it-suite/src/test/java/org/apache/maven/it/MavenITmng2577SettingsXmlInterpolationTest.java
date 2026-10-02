@@ -86,4 +86,20 @@ public class MavenITmng2577SettingsXmlInterpolationTest extends AbstractMavenInt
         assertEquals("usr-prop-test", props.getProperty("settings.servers.0.username"));
         assertEquals(File.separator, props.getProperty("settings.servers.0.password"));
     }
+
+    /**
+     * Verify that the built-in settings.xml remains parseable when the user home contains a double-hyphen.
+     *
+     * @throws Exception in case of failure
+     */
+    @Test
+    public void testitUserHomeWithDoubleHyphen() throws Exception {
+        File testDir = extractResources("/mng-2577");
+
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
+        verifier.setUserHomeDirectory(testDir.toPath().resolve("foo--bar"));
+        verifier.addCliArgument("validate");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+    }
 }
