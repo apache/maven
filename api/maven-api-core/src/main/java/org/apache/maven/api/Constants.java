@@ -890,7 +890,7 @@ public final class Constants {
      * @see org.apache.maven.api.services.ModelBuilder#MODEL_VERSION_4_0_0
      * @see org.apache.maven.api.services.ModelBuilder#MODEL_VERSION_4_1_0
      */
-    @Config(readOnly = true)
+    @Config(source = Config.Source.USER_PROPERTIES)
     public static final String MAVEN_SESSION_MODEL_VERSION = "session.modelVersion";
 
     private Constants() {}

@@ -87,18 +87,19 @@ public final class Features {
 
     /**
      * Check if the session's declared model version ({@code session.modelVersion}) implies
-     * Maven 3-compatible defaults.
+     * Maven 3-compatible defaults for resolution.
      * <p>
      * Returns {@code true} when <em>either</em>:
      * <ul>
      *   <li>{@link #mavenMaven3Personality(Map)} is {@code true}, or</li>
      *   <li>{@code session.modelVersion} is explicitly set to {@code "4.0.0"}.</li>
      * </ul>
-     * This is the single place to check whether resolver and model-builder defaults should
-     * revert to the Maven 3 / POM 4.0.0 behaviour (MNG-7984).
+     * This is the single place to check whether resolver defaults (such as scope manager
+     * configuration and dependency manager transitivity) should revert to the Maven 3 /
+     * POM 4.0.0 behaviour (MNG-7984).
      *
      * @param userProperties the merged user/system/profile properties map
-     * @return {@code true} if Maven 3-compatible model defaults should be used
+     * @return {@code true} if Maven 3-compatible resolver defaults should be used
      * @since 4.2.0
      */
     public static boolean maven3CompatModelVersion(@Nullable Map<String, ?> userProperties) {
