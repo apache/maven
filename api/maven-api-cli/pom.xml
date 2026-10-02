@@ -30,6 +30,10 @@
   <name>Maven 4 API :: CLI</name>
   <description>Maven 4 API - CLI.</description>
 
+  <properties>
+    <javaModuleName>org.apache.maven.api.cli</javaModuleName>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
