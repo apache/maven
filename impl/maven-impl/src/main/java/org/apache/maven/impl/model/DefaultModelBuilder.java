@@ -42,6 +42,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicReference;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
@@ -73,6 +74,7 @@ import org.apache.maven.api.model.Mixin;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.model.Relocation;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.BuilderProblem.Severity;
@@ -121,6 +123,7 @@ import org.apache.maven.impl.DefaultRemoteRepository;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.impl.cache.Cache;
+import org.apache.maven.impl.resolver.MetadataInputValidator;
 import org.apache.maven.impl.util.PhasingExecutor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1166,6 +1169,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
 
         void buildEffectiveModel(Collection<String> importIds) throws ModelBuilderException {
+            buildEffectiveModel(new ImportContext(importIds, Set.of(), false, this, null, null));
+        }
+
+        private void buildEffectiveModel(ImportContext context) throws ModelBuilderException {
             Model resultModel = readEffectiveModel();
             setSource(resultModel);
             setRootModel(resultModel);
@@ -1187,7 +1194,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             // dependency management import
-            resultModel = importDependencyManagement(resultModel, importIds);
+            resultModel = importDependencyManagement(resultModel, context);
 
             // dependency management injection
             resultModel = dependencyManagementInjector.injectManagement(resultModel, request, this);
@@ -2522,7 +2529,8 @@ public class DefaultModelBuilder implements ModelBuilder {
             });
         }
 
-        private Model importDependencyManagement(Model model, Collection<String> importIds) {
+        private Model importDependencyManagement(Model model, ImportContext context) {
+            Collection<String> importIds = context.importIds;
             DependencyManagement depMgmt = model.getDependencyManagement();
 
             if (depMgmt == null) {
@@ -2546,7 +2554,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
                 it.remove();
 
-                DependencyManagement importMgmt = loadDependencyManagement(dependency, importIds);
+                DependencyManagement importMgmt = loadDependencyManagement(dependency, context);
 
                 if (importMgmt != null) {
                     if (importMgmts == null) {
@@ -2670,7 +2678,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
-        private DependencyManagement loadDependencyManagement(Dependency dependency, Collection<String> importIds) {
+        private DependencyManagement loadDependencyManagement(Dependency dependency, ImportContext context) {
             String groupId = dependency.getGroupId();
             String artifactId = dependency.getArtifactId();
             String version = dependency.getVersion();
@@ -2703,27 +2711,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 return null;
             }
 
-            String imported = groupId + ':' + artifactId + ':' + version;
-
-            if (importIds.contains(imported)) {
-                StringBuilder message =
-                        new StringBuilder("The dependencies of type=pom and with scope=import form a cycle: ");
-                for (String modelId : importIds) {
-                    message.append(modelId).append(" -> ");
-                }
-                message.append(imported);
-                add(Severity.ERROR, Version.BASE, message.toString());
-                return null;
-            }
-
-            Model importModel = cache(
-                    repositories,
-                    groupId,
-                    artifactId,
-                    version,
-                    null,
-                    IMPORT,
-                    () -> doLoadDependencyManagement(dependency, groupId, artifactId, version, importIds));
+            Model importModel = loadImportModel(dependency, context);
             DependencyManagement importMgmt = importModel != null ? importModel.getDependencyManagement() : null;
             if (importMgmt == null) {
                 importMgmt = DependencyManagement.newInstance();
@@ -2745,21 +2733,127 @@ public class DefaultModelBuilder implements ModelBuilder {
                     .build();
         }
 
+        private Model loadImportModel(Dependency dependency, ImportContext context) {
+            Collection<String> importIds = context.importIds;
+            String groupId = dependency.getGroupId();
+            String artifactId = dependency.getArtifactId();
+            String version = dependency.getVersion();
+            String imported = groupId + ':' + artifactId + ':' + version;
+
+            if (importIds.contains(imported)) {
+                StringBuilder message = new StringBuilder("The import POMs form a cycle: ");
+                for (String modelId : importIds) {
+                    message.append(modelId).append(" -> ");
+                }
+                message.append(imported);
+                if (context.cycleIncludesRelocation(imported)) {
+                    context.reportRelocationProblem(message.toString(), dependency.getLocation(""), null);
+                } else {
+                    add(Severity.ERROR, Version.BASE, message.toString());
+                }
+                return null;
+            }
+
+            ImportModelCacheEntry cached =
+                    cache(repositories, groupId, artifactId, version, null, IMPORT, ImportModelCacheEntry::new);
+            ImportedModel importedModel = cached.model;
+            if (importedModel == null) {
+                boolean locked = cached.lock.tryLock();
+                // Nested waits must follow a strict order, or two parallel imports can each hold
+                // one BOM lock while waiting for the other. A contended lower key is loaded locally.
+                if (!locked
+                        && context.relocationSources.isEmpty()
+                        && (context.highestLockedImport == null
+                                || context.highestLockedImport.compareTo(imported) < 0)) {
+                    cached.lock.lock();
+                    locked = true;
+                }
+                try {
+                    importedModel = cached.model;
+                    if (importedModel == null) {
+                        importedModel = doLoadDependencyManagement(
+                                dependency,
+                                groupId,
+                                artifactId,
+                                version,
+                                locked ? context.withImportLock(imported) : context);
+                        if (locked && importedModel != null) {
+                            cached.model = importedModel;
+                        }
+                    }
+                } finally {
+                    if (locked) {
+                        cached.lock.unlock();
+                    }
+                }
+            }
+            if (importedModel == null) {
+                return null;
+            }
+
+            Model importModel = importedModel.model();
+            Relocation relocation = importModel.getDistributionManagement() != null
+                    ? importModel.getDistributionManagement().getRelocation()
+                    : null;
+            if (relocation != null) {
+                if (!validateRelocationCoordinate(relocation.getGroupId(), "groupId", dependency, context)
+                        || !validateRelocationCoordinate(relocation.getArtifactId(), "artifactId", dependency, context)
+                        || !validateRelocationCoordinate(relocation.getVersion(), "version", dependency, context)) {
+                    return null;
+                }
+                Dependency.Builder relocated = Dependency.newBuilder(dependency).version(importedModel.version());
+                if (relocation.getGroupId() != null && !relocation.getGroupId().isEmpty()) {
+                    relocated.groupId(relocation.getGroupId());
+                }
+                if (relocation.getArtifactId() != null
+                        && !relocation.getArtifactId().isEmpty()) {
+                    relocated.artifactId(relocation.getArtifactId());
+                }
+                if (relocation.getVersion() != null && !relocation.getVersion().isEmpty()) {
+                    relocated.version(relocation.getVersion());
+                }
+                Dependency relocatedDependency = relocated.build();
+                String message = "The import POM " + imported + " has been relocated to "
+                        + relocatedDependency.getGroupId() + ':' + relocatedDependency.getArtifactId() + ':'
+                        + relocatedDependency.getVersion();
+                if (relocation.getMessage() != null) {
+                    message += ": " + relocation.getMessage();
+                }
+                if (context.parent == null && context.relocationSources.isEmpty()) {
+                    add(Severity.WARNING, Version.BASE, message, dependency.getLocation(""));
+                } else {
+                    logger.debug(message);
+                }
+                if (!groupId.equals(relocatedDependency.getGroupId())
+                        || !artifactId.equals(relocatedDependency.getArtifactId())
+                        || !importedModel.version().equals(relocatedDependency.getVersion())) {
+                    // Keep relocation sources on the same path as imports to detect mixed cycles.
+                    importIds.add(imported);
+                    try {
+                        return loadImportModel(relocatedDependency, context.withRelocation(imported));
+                    } finally {
+                        importIds.remove(imported);
+                    }
+                }
+            }
+            return importModel;
+        }
+
         @SuppressWarnings("checkstyle:parameternumber")
-        private Model doLoadDependencyManagement(
-                Dependency dependency,
-                String groupId,
-                String artifactId,
-                String version,
-                Collection<String> importIds) {
+        private ImportedModel doLoadDependencyManagement(
+                Dependency dependency, String groupId, String artifactId, String version, ImportContext context) {
             Model importModel;
             ModelSource importSource;
+            String resolvedVersion = version;
             boolean repositoryResolved = false;
             try {
                 importSource = resolveReactorModel(groupId, artifactId, version);
                 if (importSource == null) {
-                    importSource = modelResolver.resolveModel(
-                            request.getSession(), repositories, dependency, new AtomicReference<>());
+                    AtomicReference<Dependency> modified = new AtomicReference<>();
+                    importSource = modelResolver.resolveModel(request.getSession(), repositories, dependency, modified);
+                    if (modified.get() != null) {
+                        resolvedVersion = modified.get().getVersion();
+                    }
                     repositoryResolved = true;
                 }
             } catch (ModelBuilderException | ModelResolverException e) {
@@ -2770,7 +2864,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
                 buffer.append(": ").append(e.getMessage());
 
-                add(Severity.ERROR, Version.BASE, buffer.toString(), dependency.getLocation(""), e);
+                if (context.relocationTarget) {
+                    context.reportRelocationProblem(buffer.toString(), dependency.getLocation(""), e);
+                } else {
+                    add(Severity.ERROR, Version.BASE, buffer.toString(), dependency.getLocation(""), e);
+                }
                 return null;
             }
 
@@ -2803,7 +2901,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                         .build();
                 ModelBuilderSessionState modelBuilderSession = derive(importRequest);
                 // build the effective model
-                modelBuilderSession.buildEffectiveModel(importIds);
+                modelBuilderSession.buildEffectiveModel(context.withProblems(modelBuilderSession));
                 importResult = modelBuilderSession.result;
             } catch (ModelBuilderException e) {
                 return null;
@@ -2815,7 +2913,69 @@ public class DefaultModelBuilder implements ModelBuilder {
                 importModel = rejectSystemScopeFromRepositoryImport(importModel, dependency);
             }
 
-            return importModel;
+            return new ImportedModel(importModel, resolvedVersion);
+        }
+
+        private record ImportedModel(Model model, String version) {}
+
+        private record ImportContext(
+                Collection<String> importIds,
+                Set<String> relocationSources,
+                boolean relocationTarget,
+                ModelProblemCollector problems,
+                ImportContext parent,
+                String highestLockedImport) {
+            ImportContext withRelocation(String source) {
+                return new ImportContext(
+                        importIds, concat(relocationSources, source), true, problems, parent, highestLockedImport);
+            }
+
+            ImportContext withProblems(ModelProblemCollector collector) {
+                return new ImportContext(importIds, relocationSources, false, collector, this, highestLockedImport);
+            }
+
+            ImportContext withImportLock(String imported) {
+                String highest = highestLockedImport == null || highestLockedImport.compareTo(imported) < 0
+                        ? imported
+                        : highestLockedImport;
+                return new ImportContext(importIds, relocationSources, relocationTarget, problems, parent, highest);
+            }
+
+            boolean cycleIncludesRelocation(String repeated) {
+                boolean inCycle = false;
+                for (String id : importIds) {
+                    inCycle |= id.equals(repeated);
+                    if (inCycle && relocationSources.contains(id)) {
+                        return true;
+                    }
+                }
+                return false;
+            }
+
+            void reportRelocationProblem(String message, InputLocation location, Exception exception) {
+                // Fail every enclosing import without promoting unrelated model validation errors.
+                for (ImportContext context = this; context != null; context = context.parent) {
+                    context.problems.add(Severity.ERROR, Version.BASE, message, location, exception);
+                }
+            }
+        }
+
+        private static final class ImportModelCacheEntry {
+            private final ReentrantLock lock = new ReentrantLock();
+            private volatile ImportedModel model;
+        }
+
+        private boolean validateRelocationCoordinate(
+                String value, String component, Dependency dependency, ImportContext context) {
+            if (MetadataInputValidator.isInvalidCoordinateComponent(value)) {
+                context.reportRelocationProblem(
+                        "Invalid relocation " + component + " '" + value
+                                + "': not a valid artifact coordinate component",
+                        dependency.getLocation(""),
+                        null);
+                return false;
+            }
+            return true;
         }
 
         /**
