@@ -105,6 +105,7 @@ if "%_FLAG_ARG%"=="--debug" set "IS_VERBOSE=1"
 if "%_FLAG_ARG%"=="--enc" set "IS_MAIN_OVERRIDE=1"
 if "%_FLAG_ARG%"=="--shell" set "IS_MAIN_OVERRIDE=1"
 if "%_FLAG_ARG%"=="--up" set "IS_MAIN_OVERRIDE=1"
+if "%_FLAG_ARG%"=="--val" set "IS_MAIN_OVERRIDE=1"
 @REM Compact single-dash tokens (e.g. -qv, -vX) mirror the Unix script's
 @REM -[qvVXe]* handling, but only when the part after '-' is made exclusively
 @REM of the safe chars v V q X e; otherwise (e.g. -f, -D...) the token is
@@ -376,6 +377,8 @@ if "%~1"=="--debug" (
       set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenShellCling"
 ) else if "%~1"=="--up" (
       set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenUpCling"
+) else if "%~1"=="--val" (
+      set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenValCling"
 )
 exit /b 0
 
@@ -393,7 +396,7 @@ set LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 if "%MAVEN_MAIN_CLASS%"=="" @set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenCling
 
 @REM Only pass MAVEN_ARGS for the default Maven build command (MavenCling),
-@REM not for sub-commands like --up, --enc, or --shell which have their own options.
+@REM not for sub-commands like --up, --enc, --shell or --val which have their own options.
 if not "%MAVEN_MAIN_CLASS%"=="org.apache.maven.cling.MavenCling" set "MAVEN_ARGS="
 
 if defined MAVEN_DEBUG_SCRIPT (

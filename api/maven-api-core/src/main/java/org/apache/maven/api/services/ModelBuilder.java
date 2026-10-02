@@ -38,6 +38,33 @@ public interface ModelBuilder extends Service {
     interface ModelBuilderSession {
 
         ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException;
+
+        /**
+         * Validates the model described by the request, collecting every problem instead of
+         * throwing on the first one.
+         * <p>
+         * Unlike {@link #build(ModelBuilderRequest)} this does not throw when validation reports
+         * errors: the result carries errors and warnings alike, so a caller that only wants to
+         * report on a POM can see warnings that come with no error. A problem severe enough that
+         * the model cannot be read at all is still thrown.
+         * <p>
+         * An implementation must not resolve from a remote repository and must not download. How
+         * much of the pipeline it runs beyond that is its own, so a caller takes the verdict from
+         * the problems on the result rather than from the model accessors, whose {@code @Nonnull}
+         * contracts describe a fully built model and do not hold here.
+         * <p>
+         * Reading one model can need others: a subproject may leave out its parent version, which
+         * is then taken from the parent's own file model. An implementation may therefore read
+         * files besides the one the request names, up to the project root.
+         *
+         * @return the result, carrying the model that was read and the problems collected
+         * @throws ModelBuilderException if the model cannot be read at all
+         * @throws UnsupportedOperationException if this implementation does not support it
+         * @since 4.1.0
+         */
+        default ModelBuilderResult validate(ModelBuilderRequest request) throws ModelBuilderException {
+            throw new UnsupportedOperationException(getClass().getName() + " does not support validating a model");
+        }
     }
 
     Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException;
