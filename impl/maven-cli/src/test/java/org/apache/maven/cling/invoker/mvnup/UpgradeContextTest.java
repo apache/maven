@@ -24,7 +24,9 @@ import org.apache.maven.cling.invoker.mvnup.goals.TestUtils;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Unit tests for the {@link UpgradeContext} class.
@@ -42,6 +44,7 @@ class UpgradeContextTest {
         // Verify context is created and basic methods work
         assertNotNull(context, "Context should be created");
         assertNotNull(context.options(), "Options should be available");
+        assertFalse(context.isDryRun(), "Contexts should default to applying changes");
 
         // Test that icon methods don't throw exceptions
         // (The actual icon choice depends on terminal charset capabilities)
@@ -50,6 +53,16 @@ class UpgradeContextTest {
         context.warning("Test warning message");
         context.detail("Test detail message");
         context.action("Test action message");
+    }
+
+    @Test
+    @DisplayName("should track dry-run state")
+    void shouldTrackDryRunState() {
+        UpgradeContext context = TestUtils.createMockContext(Paths.get("/test"));
+
+        context.setDryRun(true);
+
+        assertTrue(context.isDryRun(), "Dry-run contexts should report that changes are not persisted");
     }
 
     @Test

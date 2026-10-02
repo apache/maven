@@ -125,7 +125,7 @@ public class DuplicateElementStrategy extends AbstractUpgradeStrategy {
                 boolean hasIssues = removeDuplicateElements(pomDocument.root(), context);
 
                 if (hasIssues) {
-                    context.success("Duplicate XML elements removed");
+                    logChange(context, "Duplicate XML elements removed");
                     modifiedPoms.add(pomPath);
                 } else {
                     context.success("No duplicate XML elements found");

@@ -151,6 +151,9 @@ public abstract class AbstractUpgradeGoal implements Goal {
      */
     @Override
     public int execute(UpgradeContext context) throws Exception {
+        // Keep the reporting mode derived from the goal's persistence behaviour so
+        // strategies cannot accidentally report apply-mode output during a check.
+        context.setDryRun(!shouldSaveModifications());
         UpgradeOptions options = context.options();
 
         // Determine target model version
