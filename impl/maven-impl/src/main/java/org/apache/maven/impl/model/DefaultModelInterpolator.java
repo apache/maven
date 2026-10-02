@@ -236,6 +236,14 @@ public class DefaultModelInterpolator implements ModelInterpolator {
         if (value == null && !restricted) {
             value = request.getSystemProperties().get("env." + expression);
         }
+        // session.modelVersion – if the caller did not supply this property explicitly via
+        // user/system properties, derive it from the model's own <modelVersion> element.
+        // This makes ${session.modelVersion} usable in POM interpolation (MNG-7984).
+        // Note: this intentionally resolves even when restricted == true because modelVersion
+        // is read directly from the model's own XML metadata (not an external property or secret).
+        if (value == null && Constants.MAVEN_SESSION_MODEL_VERSION.equals(expression)) {
+            value = model.getModelVersion();
+        }
         // un-prefixed model reflection
         if (value == null) {
             value = projectProperty(model, projectDir, expression, false);

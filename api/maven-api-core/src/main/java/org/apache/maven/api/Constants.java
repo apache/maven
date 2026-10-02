@@ -868,5 +868,30 @@ public final class Constants {
     @Config(type = "java.lang.Boolean", defaultValue = "false")
     public static final String MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL = "maven.model.dependencyInterpolation.full";
 
+    /**
+     * User property key to declare or override the effective POM model version for the session.
+     * When explicitly set (e.g. via {@code -Dsession.modelVersion=4.0.0}), this value controls
+     * which set of defaults Maven applies (resolver behaviour, dependency-manager transitivity,
+     * etc.) and is also exposed as an interpolation expression ({@code ${session.modelVersion}})
+     * inside POM files.
+     * <p>
+     * If the property is <em>not</em> set explicitly, Maven derives the value automatically:
+     * during POM interpolation the model's own {@code <modelVersion>} element is used, while
+     * at session-setup time the property is absent and Maven falls back to its built-in
+     * defaults (Maven 4 behaviour).
+     * </p>
+     * <ul>
+     *   <li>{@code 4.0.0} – apply Maven 3-compatible defaults (e.g. disable resolver
+     *       dependency-manager transitivity)</li>
+     *   <li>{@code 4.1.0} or higher – apply Maven 4 defaults</li>
+     * </ul>
+     *
+     * @since 4.2.0
+     * @see org.apache.maven.api.services.ModelBuilder#MODEL_VERSION_4_0_0
+     * @see org.apache.maven.api.services.ModelBuilder#MODEL_VERSION_4_1_0
+     */
+    @Config(source = Config.Source.USER_PROPERTIES)
+    public static final String MAVEN_SESSION_MODEL_VERSION = "session.modelVersion";
+
     private Constants() {}
 }

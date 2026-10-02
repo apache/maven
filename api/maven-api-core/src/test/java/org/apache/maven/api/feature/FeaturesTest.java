@@ -191,4 +191,49 @@ class FeaturesTest {
         assertTrue(Features.deployBuildPom(properties));
         assertTrue(Features.consumerPom(properties));
     }
+
+    // --- Tests for maven3CompatModelVersion (MNG-7984) ---
+
+    @Test
+    void testMaven3CompatModelVersion_nullProperties() {
+        // null map: no personality set, no session.modelVersion → NOT compat mode
+        assertFalse(Features.maven3CompatModelVersion(null));
+    }
+
+    @Test
+    void testMaven3CompatModelVersion_emptyProperties() {
+        assertFalse(Features.maven3CompatModelVersion(Map.of()));
+    }
+
+    @Test
+    void testMaven3CompatModelVersion_modelVersion4_0_0() {
+        // Explicitly setting session.modelVersion=4.0.0 → Maven 3-compat mode
+        Map<String, Object> props = Map.of(Constants.MAVEN_SESSION_MODEL_VERSION, "4.0.0");
+        assertTrue(Features.maven3CompatModelVersion(props));
+    }
+
+    @Test
+    void testMaven3CompatModelVersion_modelVersion4_1_0() {
+        // Maven 4 model version → NOT Maven 3-compat mode
+        Map<String, Object> props = Map.of(Constants.MAVEN_SESSION_MODEL_VERSION, "4.1.0");
+        assertFalse(Features.maven3CompatModelVersion(props));
+    }
+
+    @Test
+    void testMaven3CompatModelVersion_maven3PersonalityOverrides() {
+        // maven3Personality=true should force compat mode regardless of modelVersion
+        Map<String, Object> props = Map.of(
+                Constants.MAVEN_MAVEN3_PERSONALITY, "true",
+                Constants.MAVEN_SESSION_MODEL_VERSION, "4.1.0");
+        assertTrue(Features.maven3CompatModelVersion(props));
+    }
+
+    @Test
+    void testMaven3CompatModelVersion_maven3PersonalityFalseModelVersion4_0_0() {
+        // maven3Personality=false but session.modelVersion=4.0.0 → still compat mode
+        Map<String, Object> props = Map.of(
+                Constants.MAVEN_MAVEN3_PERSONALITY, "false",
+                Constants.MAVEN_SESSION_MODEL_VERSION, "4.0.0");
+        assertTrue(Features.maven3CompatModelVersion(props));
+    }
 }
