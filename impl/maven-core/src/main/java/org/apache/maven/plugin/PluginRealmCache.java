@@ -100,10 +100,15 @@ public interface PluginRealmCache {
             throws PluginResolutionException, PluginContainerException {
         CacheRecord cr = get(key);
         if (cr == null) {
-            CacheRecord tcr = supplier.load();
-            cr = put(key, tcr.getRealm(), tcr.getArtifacts());
+            cr = supplier.load();
+            put(key, cr.getRealm(), cr.getArtifacts(), cr.getDependencyNode());
         }
         return cr;
+    }
+
+    default CacheRecord put(
+            Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts, DependencyNode dependencyNode) {
+        return put(key, pluginRealm, pluginArtifacts);
     }
 
     CacheRecord put(Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts);
