@@ -22,6 +22,7 @@ import java.util.Map;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.services.ModelBuilder;
 
 /**
  * Centralized class for Maven Core feature information.
@@ -82,6 +83,30 @@ public final class Features {
      */
     public static boolean deployBuildPom(@Nullable Map<String, ?> userProperties) {
         return doGet(userProperties, Constants.MAVEN_DEPLOY_BUILD_POM, true);
+    }
+
+    /**
+     * Check if the session's declared model version ({@code session.modelVersion}) implies
+     * Maven 3-compatible defaults.
+     * <p>
+     * Returns {@code true} when <em>either</em>:
+     * <ul>
+     *   <li>{@link #mavenMaven3Personality(Map)} is {@code true}, or</li>
+     *   <li>{@code session.modelVersion} is explicitly set to {@code "4.0.0"}.</li>
+     * </ul>
+     * This is the single place to check whether resolver and model-builder defaults should
+     * revert to the Maven 3 / POM 4.0.0 behaviour (MNG-7984).
+     *
+     * @param userProperties the merged user/system/profile properties map
+     * @return {@code true} if Maven 3-compatible model defaults should be used
+     * @since 4.2.0
+     */
+    public static boolean maven3CompatModelVersion(@Nullable Map<String, ?> userProperties) {
+        if (mavenMaven3Personality(userProperties)) {
+            return true;
+        }
+        Object mv = userProperties != null ? userProperties.get(Constants.MAVEN_SESSION_MODEL_VERSION) : null;
+        return mv != null && ModelBuilder.MODEL_VERSION_4_0_0.equals(mv.toString());
     }
 
     private static boolean doGet(Map<String, ?> userProperties, String key, boolean def) {

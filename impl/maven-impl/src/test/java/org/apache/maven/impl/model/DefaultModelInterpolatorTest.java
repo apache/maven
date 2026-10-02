@@ -712,6 +712,39 @@ class DefaultModelInterpolatorTest {
         assertEquals("https://github.com/slackapi/java-slack-sdk", out.getUrl());
     }
 
+    @Test
+    void testSessionModelVersionInterpolation() throws Exception {
+        Model model = Model.newBuilder()
+                .modelVersion("4.0.0")
+                .description("Model version is ${session.modelVersion}")
+                .build();
+
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out = interpolator.interpolateModel(
+                model, null, createModelBuildingRequest(context).build(), collector);
+
+        assertProblemFree(collector);
+        assertEquals("Model version is 4.0.0", out.getDescription());
+    }
+
+    @Test
+    void testSessionModelVersionInterpolationUserPropertyOverride() throws Exception {
+        Model model = Model.newBuilder()
+                .modelVersion("4.0.0")
+                .description("Model version is ${session.modelVersion}")
+                .build();
+
+        Map<String, String> userProps = new HashMap<>(context);
+        userProps.put("session.modelVersion", "4.1.0");
+
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out = interpolator.interpolateModel(
+                model, null, createModelBuildingRequest(userProps).build(), collector);
+
+        assertProblemFree(collector);
+        assertEquals("Model version is 4.1.0", out.getDescription());
+    }
+
     @Provides
     @Priority(10)
     @SuppressWarnings("unused")

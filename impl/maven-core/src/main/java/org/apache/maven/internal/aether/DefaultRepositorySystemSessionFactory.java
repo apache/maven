@@ -405,8 +405,12 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         sessionBuilder.setRepositoryListener(repositoryListener);
 
         // may be overridden
+        // Use Maven 3-compatible defaults if either maven3Personality is set OR if session.modelVersion
+        // is explicitly declared as 4.0.0 (MNG-7984: switch defaults based on model version).
+        boolean usingMaven3CompatModel = Features.maven3CompatModelVersion(mergedProps);
         String resolverDependencyManagerTransitivity = mergedProps.getOrDefault(
-                Constants.MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY, Boolean.toString(!mavenMaven3Personality));
+                Constants.MAVEN_RESOLVER_DEPENDENCY_MANAGER_TRANSITIVITY,
+                Boolean.toString(!usingMaven3CompatModel));
         sessionBuilder.setDependencyManager(
                 supplier.getDependencyManager(Boolean.parseBoolean(resolverDependencyManagerTransitivity)));
 
