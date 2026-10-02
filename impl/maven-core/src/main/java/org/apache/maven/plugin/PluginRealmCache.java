@@ -27,6 +27,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 
 /**
@@ -48,13 +49,28 @@ public interface PluginRealmCache {
             return artifacts;
         }
 
+        /**
+         * Resolver node captured when the realm was created. {@code null} when the realm was cached
+         * before the node was recorded.
+         */
+        public DependencyNode getDependencyNode() {
+            return dependencyNode;
+        }
+
         private final ClassRealm realm;
 
         private final List<Artifact> artifacts;
 
+        private final DependencyNode dependencyNode;
+
         public CacheRecord(ClassRealm realm, List<Artifact> artifacts) {
+            this(realm, artifacts, null);
+        }
+
+        public CacheRecord(ClassRealm realm, List<Artifact> artifacts, DependencyNode dependencyNode) {
             this.realm = realm;
             this.artifacts = artifacts;
+            this.dependencyNode = dependencyNode;
         }
     }
 
@@ -84,10 +100,15 @@ public interface PluginRealmCache {
             throws PluginResolutionException, PluginContainerException {
         CacheRecord cr = get(key);
         if (cr == null) {
-            CacheRecord tcr = supplier.load();
-            cr = put(key, tcr.getRealm(), tcr.getArtifacts());
+            cr = supplier.load();
+            put(key, cr.getRealm(), cr.getArtifacts(), cr.getDependencyNode());
         }
         return cr;
+    }
+
+    default CacheRecord put(
+            Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts, DependencyNode dependencyNode) {
+        return put(key, pluginRealm, pluginArtifacts);
     }
 
     CacheRecord put(Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts);
