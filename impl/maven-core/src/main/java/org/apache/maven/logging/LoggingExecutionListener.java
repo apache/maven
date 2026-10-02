@@ -100,14 +100,14 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
     public void projectSucceeded(ExecutionEvent event) {
         setMdc(event);
         delegate.projectSucceeded(event);
-        buildEventListener.projectFinished(event.getProject().getArtifactId());
+        buildEventListener.projectFinished(event.getProject().getArtifactId(), "SUCCESS");
     }
 
     @Override
     public void projectFailed(ExecutionEvent event) {
         setMdc(event);
         delegate.projectFailed(event);
-        buildEventListener.projectFinished(event.getProject().getArtifactId());
+        buildEventListener.projectFinished(event.getProject().getArtifactId(), "FAILED");
     }
 
     @Override
@@ -115,7 +115,7 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
         setMdc(event);
         buildEventListener.projectStarted(event.getProject().getArtifactId());
         delegate.projectSkipped(event);
-        buildEventListener.projectFinished(event.getProject().getArtifactId());
+        buildEventListener.projectFinished(event.getProject().getArtifactId(), "SKIPPED");
     }
 
     @Override
@@ -129,6 +129,7 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
     @Override
     public void mojoSucceeded(ExecutionEvent event) {
         setMdc(event);
+        buildEventListener.mojoFinished(event, "SUCCESS");
         delegate.mojoSucceeded(event);
         ProjectBuildLogAppender.setMojoId(null);
     }
@@ -136,6 +137,7 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
     @Override
     public void mojoFailed(ExecutionEvent event) {
         setMdc(event);
+        buildEventListener.mojoFinished(event, "FAILED");
         delegate.mojoFailed(event);
         ProjectBuildLogAppender.setMojoId(null);
     }
@@ -143,9 +145,11 @@ public class LoggingExecutionListener implements ExecutionListener, ProjectExecu
     @Override
     public void mojoSkipped(ExecutionEvent event) {
         setMdc(event);
+        buildEventListener.mojoFinished(event, "SKIPPED");
         delegate.mojoSkipped(event);
         ProjectBuildLogAppender.setMojoId(null);
     }
+
 
     @Override
     public void forkStarted(ExecutionEvent event) {
