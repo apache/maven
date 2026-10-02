@@ -2786,7 +2786,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                     add(
                             Severity.WARNING,
                             Version.BASE,
-                            "BOM imports from within reactor should be avoided",
+                            "BOM import '"
+                                    + ModelProblemUtils.toId(groupId, artifactId, version)
+                                    + "' references a module within the same reactor."
+                                    + " The BOM will be evaluated without conditional profile activation"
+                                    + " (file/property/condition), which may produce an incomplete"
+                                    + " dependencyManagement compared to the BOM's own build."
+                                    + " Prefer parent POM inheritance for intra-reactor version management.",
                             dependency.getLocation(""));
                 }
             }
