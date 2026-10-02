@@ -23,7 +23,7 @@ under the License.
  | This is the configuration file for Maven. It can be specified at two levels:
  |
  |  1. User Level. This settings.xml file provides configuration for a single user,
- |                 and is normally provided in ${user.home}/.m2/settings.xml.
+ |                 and is normally provided in ~/.m2/settings.xml.
  |
  |                 NOTE: This location can be overridden with the CLI option:
  |
@@ -33,7 +33,7 @@ under the License.
  |                 This settings.xml file provides configuration for all Maven
  |                 users on a machine (assuming they're all using the same Maven
  |                 installation). It's normally provided in
- |                 ${maven.installation.conf}/settings.xml.
+ |                 /path/to/maven/conf/settings.xml.
  |
  |                 NOTE: This location can be overridden with the CLI option:
  |
@@ -50,7 +50,7 @@ under the License.
   <!-- localRepository
    | The path to the local repository maven will use to store artifacts.
    |
-   | Default: ${user.home}/.m2/repository
+   | Default: ~/.m2/repository
   <localRepository>/path/to/local/repo</localRepository>
   -->
 
@@ -259,7 +259,7 @@ under the License.
      |   <artifactId>myplugin</artifactId>
      |
      |   <configuration>
-     |     <tomcatLocation>${tomcatPath}</tomcatLocation>
+     |     <tomcatLocation>/path/to/tomcat</tomcatLocation>
      |   </configuration>
      | </plugin>
      | ...
