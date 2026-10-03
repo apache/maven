@@ -20,6 +20,7 @@ package org.apache.maven.plugin.internal;
 
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.inject.Provider;
 import javax.inject.Singleton;
 
 import java.io.ByteArrayOutputStream;
@@ -130,6 +131,7 @@ import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.eclipse.aether.util.filter.AndDependencyFilter;
+import org.eclipse.sisu.inject.BeanLocator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -169,6 +171,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     private final List<MavenPluginConfigurationValidator> configurationValidators;
     private final PluginValidationManager pluginValidationManager;
     private final List<MavenPluginPrerequisitesChecker> prerequisitesCheckers;
+    private final Provider<BeanLocator> beanLocator;
     private final ExtensionDescriptorBuilder extensionDescriptorBuilder = new ExtensionDescriptorBuilder();
     private final PluginDescriptorBuilder builder = new PluginDescriptorBuilder();
 
@@ -186,7 +189,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             MavenPluginValidator pluginValidator,
             List<MavenPluginConfigurationValidator> configurationValidators,
             PluginValidationManager pluginValidationManager,
-            List<MavenPluginPrerequisitesChecker> prerequisitesCheckers) {
+            List<MavenPluginPrerequisitesChecker> prerequisitesCheckers,
+            Provider<BeanLocator> beanLocator) {
         this.container = container;
         this.classRealmManager = classRealmManager;
         this.pluginDescriptorCache = pluginDescriptorCache;
@@ -199,6 +203,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         this.configurationValidators = configurationValidators;
         this.pluginValidationManager = pluginValidationManager;
         this.prerequisitesCheckers = prerequisitesCheckers;
+        this.beanLocator = beanLocator;
     }
 
     @Override
@@ -563,7 +568,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         org.apache.maven.api.plugin.Log log = new DefaultLog(
                 LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getImplementation()));
         try {
-            Injector injector = Injector.create();
+            // falls back to the Sisu beans visible from the plugin realm, as the rest of core does
+            Injector injector = SisuDiBridgeModule.newBridgeInjector(beanLocator);
             injector.discover(pluginRealm);
             // Add known classes
             // TODO: get those from the existing plexus scopes ?
