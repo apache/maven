@@ -88,6 +88,16 @@ public class SisuDiBridgeModule extends AbstractModule {
         }
     }
 
+    /**
+     * Creates an injector for a Maven 4 API mojo, one per execution, so the Sisu beans of its plugin realm can be
+     * injected into it. A single bean comes from {@code locator} only when the injector has no binding of its own for
+     * the key, so the project, session, mojo execution and log it binds are never shadowed by Sisu's scoped proxies.
+     * Its bindings are not mirrored into Guice.
+     */
+    public static Injector newBridgeInjector(Provider<BeanLocator> locator) {
+        return new BridgeInjectorImpl(locator, null, true);
+    }
+
     private void bindScope(
             InjectorImpl injector,
             Provider<PlexusContainer> containerProvider,
@@ -105,16 +115,26 @@ public class SisuDiBridgeModule extends AbstractModule {
     static class BridgeInjectorImpl extends InjectorImpl {
         final Provider<BeanLocator> locator;
         final Binder binder;
+        final boolean sisuFallbackOnly;
 
         BridgeInjectorImpl(Provider<BeanLocator> locator, Binder binder) {
+            this(locator, binder, false);
+        }
+
+        /**
+         * @param sisuFallbackOnly whether a single bean comes from Sisu only when this injector has no binding for
+         *     its key, so Sisu beans cannot shadow what the injector binds itself
+         */
+        BridgeInjectorImpl(Provider<BeanLocator> locator, Binder binder, boolean sisuFallbackOnly) {
             this.locator = locator;
             this.binder = binder;
+            this.sisuFallbackOnly = sisuFallbackOnly;
         }
 
         @Override
         protected <U> Injector bind(Key<U> key, Binding<U> binding) {
             super.bind(key, binding);
-            if (key.getQualifier() != null) {
+            if (binder != null && key.getQualifier() != null) {
                 com.google.inject.Key<U> k = toGuiceKey(key);
                 this.binder.bind(k).toProvider(new BridgeProvider<>(binding));
             }
@@ -181,9 +201,11 @@ public class SisuDiBridgeModule extends AbstractModule {
             // Add DI bindings
             list.addAll(getBindings().getOrDefault(key, Set.of()));
             // Add Plexus bindings
-            for (var bean : locator.get().locate(toGuiceKey(key))) {
-                if (isPlexusBean(bean)) {
-                    list.add(new BindingToBeanEntry<>(key).toBeanEntry(bean).prioritize(bean.getRank()));
+            if (!sisuFallbackOnly || list.isEmpty()) {
+                for (var bean : locator.get().locate(toGuiceKey(key))) {
+                    if (isPlexusBean(bean)) {
+                        list.add(new BindingToBeanEntry<>(key).toBeanEntry(bean).prioritize(bean.getRank()));
+                    }
                 }
             }
             if (!list.isEmpty()) {
