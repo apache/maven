@@ -19,17 +19,21 @@
 package org.apache.maven.plugin.internal;
 
 import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
+import javax.tools.JavaCompiler;
+import javax.tools.ToolProvider;
 
+import java.io.File;
+import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
-import org.apache.maven.api.Project;
-import org.apache.maven.api.Session;
 import org.apache.maven.api.model.Plugin;
-import org.apache.maven.api.plugin.Log;
 import org.apache.maven.api.plugin.Mojo;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
@@ -47,15 +51,19 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
- * A mojo written against the Maven 4 API is built by its own {@link org.apache.maven.di.Injector}. A component in the
- * same plugin realm that is indexed for Sisu ({@code META-INF/sisu/javax.inject.Named}), as every library still on
- * JSR-330 and Sisu ships its components, must be injectable into such a mojo, without shadowing what that injector
- * binds itself: the project, session, mojo execution and log.
+ * A mojo written against the Maven 4 API is built by its own {@link org.apache.maven.di.Injector}. A component that
+ * its plugin realm ships for Sisu ({@code META-INF/sisu/javax.inject.Named}), as every library still on JSR-330 and Sisu
+ * does, must be injectable into such a mojo, without shadowing what that injector binds itself: the project, session,
+ * mojo execution and log.
+ * <p>
+ * The plugin classes are compiled at test time into the plugin realm's own directory, without annotation processing:
+ * classes nested in this test would be indexed into the test class path, and the container would then find the
+ * components in the core realm rather than in the plugin realm.
  */
 class V4MojoSisuComponentTest extends AbstractCoreMavenComponentTestCase {
 
@@ -63,12 +71,50 @@ class V4MojoSisuComponentTest extends AbstractCoreMavenComponentTestCase {
     private static final String ARTIFACT_ID = "v4-sisu-plugin";
     private static final String VERSION = "1.0";
     private static final String GOAL = "inject";
+    private static final String PACKAGE = "org.apache.maven.its.v4sisu";
+
+    private static final Map<String, String> PLUGIN_SOURCES = Map.of(
+            "SisuComponent",
+            "public interface SisuComponent {}",
+            "SisuComponentImpl",
+            """
+            @javax.inject.Named("sisu")
+            @javax.inject.Singleton
+            public class SisuComponentImpl implements SisuComponent {}
+            """,
+            "OtherComponent",
+            "public interface OtherComponent {}",
+            // a bare @Named on a Default* class is Sisu's "default" component, maven-scm's DefaultScmManager for one
+            "DefaultComponent",
+            """
+            @javax.inject.Named
+            @javax.inject.Singleton
+            public class DefaultComponent implements OtherComponent {}
+            """,
+            "InjectingMojo",
+            """
+            import org.apache.maven.api.di.Inject;
+            import org.apache.maven.api.di.Named;
+
+            @Named("%s")
+            public class InjectingMojo implements org.apache.maven.api.plugin.Mojo {
+                @Inject @Named("sisu") SisuComponent component;
+                @Inject OtherComponent defaultComponent;
+                @Inject @Named("default") OtherComponent namedDefaultComponent;
+                @Inject org.apache.maven.api.Session session;
+                @Inject org.apache.maven.api.Project project;
+                @Inject org.apache.maven.api.MojoExecution execution;
+                @Inject org.apache.maven.api.plugin.Log log;
+
+                public void execute() {}
+            }
+            """.formatted(GROUP_ID + ":" + ARTIFACT_ID + ":" + VERSION + ":" + GOAL));
 
     @Inject
     private MavenPluginManager pluginManager;
 
     @TempDir
-    Path indexes;
+    Path pluginDir;
 
     @Override
     protected String getProjectsDirectory() {
@@ -78,6 +124,7 @@ class V4MojoSisuComponentTest extends AbstractCoreMavenComponentTestCase {
     @Test
     void v4MojoCanInjectSisuComponentFromItsPluginRealm() throws Exception {
         ClassRealm pluginRealm = pluginRealm();
+        Class<?> sisuComponent = pluginRealm.loadClass(PACKAGE + ".SisuComponent");
 
         // as DefaultMavenPluginManager.discoverPluginComponents does when it sets up the plugin realm
         ((DefaultPlexusContainer) container)
@@ -91,47 +138,103 @@ class V4MojoSisuComponentTest extends AbstractCoreMavenComponentTestCase {
                                 .version(VERSION)
                                 .build()),
                         new SisuDiBridgeModule(true));
-        // the container sees the component, as it does for a Maven 3 mojo
+        // the plugin classes live in the plugin realm only
+        assertSame(pluginRealm, sisuComponent.getClassLoader());
+        assertThrows(
+                ClassNotFoundException.class,
+                () -> container.getContainerRealm().loadClass(PACKAGE + ".SisuComponentImpl"));
+        // the container finds the component from the plugin realm, as for a Maven 3 mojo
         ClassRealm oldLookupRealm = container.setLookupRealm(pluginRealm);
         try {
-            assertInstanceOf(SisuComponentImpl.class, container.lookup(SisuComponent.class, "sisu"));
+            assertEquals(
+                    PACKAGE + ".SisuComponentImpl",
+                    container.lookup(sisuComponent, "sisu").getClass().getName());
         } finally {
             container.setLookupRealm(oldLookupRealm);
         }
 
         MavenSession session = createMavenSession(null);
         // the session maps only a project with a basedir to an API Project
-        session.getProjects().get(0).setFile(indexes.resolve("pom.xml").toFile());
+        session.getProjects().get(0).setFile(pluginDir.resolve("pom.xml").toFile());
         session.setCurrentProject(session.getProjects().get(0));
 
-        InjectingMojo mojo =
-                (InjectingMojo) pluginManager.getConfiguredMojo(Mojo.class, session, mojoExecution(pluginRealm));
+        Mojo mojo = pluginManager.getConfiguredMojo(Mojo.class, session, mojoExecution(pluginRealm));
 
-        assertInstanceOf(SisuComponentImpl.class, mojo.component);
+        assertEquals(PACKAGE + ".SisuComponentImpl", className(field(mojo, "component")));
+        assertEquals(PACKAGE + ".DefaultComponent", className(field(mojo, "defaultComponent")));
+        assertEquals(PACKAGE + ".DefaultComponent", className(field(mojo, "namedDefaultComponent")));
         // what the mojo injector binds itself still wins over the Sisu scopes, even outside a mojo execution scope
-        assertSame(session.getSession(), mojo.session);
-        assertEquals(session.getCurrentProject().getArtifactId(), mojo.project.getArtifactId());
-        assertEquals(GOAL, mojo.execution.getGoal());
-        assertNotNull(mojo.log);
+        assertSame(session.getSession(), field(mojo, "session"));
+        assertEquals(
+                session.getCurrentProject().getArtifactId(),
+                ((org.apache.maven.api.Project) field(mojo, "project")).getArtifactId());
+        assertEquals(GOAL, ((org.apache.maven.api.MojoExecution) field(mojo, "execution")).getGoal());
+        assertNotNull(field(mojo, "log"));
     }
 
+    /**
+     * A realm like a real plugin realm: its own classes and index files, and the API packages imported from core.
+     */
     private ClassRealm pluginRealm() throws Exception {
-        write("META-INF/sisu/javax.inject.Named", SisuComponentImpl.class.getName());
-        write("META-INF/maven/org.apache.maven.api.di.Inject", InjectingMojo.class.getName());
-        // like a real plugin realm: classes come in through imports from the core realm, so core's components stay
-        // visible, while the realm's resources are its own index files only, not every index on the test class path
+        Path classes = pluginDir.resolve("classes");
+        compile(classes);
+        write(
+                classes.resolve("META-INF/sisu/javax.inject.Named"),
+                PACKAGE + ".SisuComponentImpl",
+                PACKAGE + ".DefaultComponent");
+        write(classes.resolve("META-INF/maven/org.apache.maven.api.di.Inject"), PACKAGE + ".InjectingMojo");
+
         ClassRealm realm = ((DefaultPlexusContainer) container)
                 .getClassWorld()
                 .newRealm(GROUP_ID + ":" + ARTIFACT_ID + ":" + VERSION, ClassLoader.getPlatformClassLoader());
-        realm.importFrom(container.getContainerRealm(), getClass().getPackageName());
-        realm.addURL(indexes.toUri().toURL());
+        realm.importFrom(container.getContainerRealm(), "org.apache.maven.api");
+        realm.importFrom(container.getContainerRealm(), "javax.inject");
+        realm.addURL(classes.toUri().toURL());
         return realm;
     }
 
-    private void write(String index, String className) throws Exception {
-        Path file = indexes.resolve(index);
+    private void compile(Path classes) throws Exception {
+        Path sources = pluginDir.resolve("sources");
+        List<String> arguments = new ArrayList<>(List.of(
+                "-proc:none", "-d", classes.toString(), "-classpath", classPath(), "-sourcepath", sources.toString()));
+        for (Map.Entry<String, String> source : PLUGIN_SOURCES.entrySet()) {
+            Path file = sources.resolve(PACKAGE.replace('.', '/') + "/" + source.getKey() + ".java");
+            write(file, "package " + PACKAGE + ";\n\n" + source.getValue());
+            arguments.add(file.toString());
+        }
+        JavaCompiler compiler = ToolProvider.getSystemJavaCompiler();
+        assertEquals(0, compiler.run(null, null, null, arguments.toArray(new String[0])), "plugin sources compile");
+    }
+
+    private static String classPath() throws Exception {
+        Set<String> entries = new LinkedHashSet<>();
+        for (Class<?> type : List.of(
+                javax.inject.Named.class,
+                org.apache.maven.api.di.Inject.class,
+                org.apache.maven.api.Project.class,
+                Mojo.class)) {
+            entries.add(Path.of(type.getProtectionDomain()
+                            .getCodeSource()
+                            .getLocation()
+                            .toURI())
+                    .toString());
+        }
+        return String.join(File.pathSeparator, entries);
+    }
+
+    private static void write(Path file, String... lines) throws Exception {
         Files.createDirectories(file.getParent());
-        Files.writeString(file, className + "\n");
+        Files.writeString(file, String.join("\n", lines) + "\n");
+    }
+
+    private static Object field(Object object, String name) throws Exception {
+        Field field = object.getClass().getDeclaredField(name);
+        field.setAccessible(true);
+        return field.get(object);
+    }
+
+    private static String className(Object object) {
+        return object == null ? null : object.getClass().getName();
     }
 
     private static MojoExecution mojoExecution(ClassRealm pluginRealm) throws Exception {
@@ -144,42 +247,11 @@ class V4MojoSisuComponentTest extends AbstractCoreMavenComponentTestCase {
                 pluginDescriptor,
                 org.apache.maven.api.plugin.descriptor.MojoDescriptor.newBuilder()
                         .goal(GOAL)
-                        .implementation(InjectingMojo.class.getName())
+                        .implementation(PACKAGE + ".InjectingMojo")
                         .build());
         // as setupPluginRealm does, so the descriptor loads the mojo class from the realm
         mojoDescriptor.setRealm(pluginRealm);
         pluginDescriptor.addMojo(mojoDescriptor);
         return new MojoExecution(mojoDescriptor);
-    }
-
-    public interface SisuComponent {}
-
-    /**
-     * A component as libraries on JSR-330 and Sisu ship it, maven-scm's providers for one.
-     */
-    @Named("sisu")
-    @Singleton
-    public static class SisuComponentImpl implements SisuComponent {}
-
-    @org.apache.maven.api.di.Named(GROUP_ID + ":" + ARTIFACT_ID + ":" + VERSION + ":" + GOAL)
-    public static class InjectingMojo implements Mojo {
-        @org.apache.maven.api.di.Inject
-        @org.apache.maven.api.di.Named("sisu")
-        SisuComponent component;
-
-        @org.apache.maven.api.di.Inject
-        Session session;
-
-        @org.apache.maven.api.di.Inject
-        Project project;
-
-        @org.apache.maven.api.di.Inject
-        org.apache.maven.api.MojoExecution execution;
-
-        @org.apache.maven.api.di.Inject
-        Log log;
-
-        @Override
-        public void execute() {}
     }
 }
