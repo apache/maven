@@ -52,7 +52,7 @@ class ConditionParserTest {
 
         ConditionProfileActivator activator = new ConditionProfileActivator(versionParser, new DefaultInterpolator());
         functions = activator.registerFunctions(context, versionParser);
-        propertyResolver = s -> activator.property(context, s);
+        propertyResolver = s -> activator.property(null, context, s);
         parser = new ConditionParser(functions, propertyResolver);
     }
 
