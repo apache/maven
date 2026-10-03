@@ -20,6 +20,7 @@ package org.apache.maven.cli.event;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Objects;
 
@@ -28,8 +29,10 @@ import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.BuildSummary;
 import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
@@ -243,10 +246,44 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
         if (logger.isInfoEnabled()) {
             logger.info("");
             infoLine('-');
+            MavenSession session = event.getSession();
+            MavenExecutionResult result = session.getResult();
+            ProjectDependencyGraph projectDependencyGraph = session.getProjectDependencyGraph();
+            List<MavenProject> upstreamProjects;
+            if (MavenExecutionRequest.REACTOR_FAIL_AT_END.equals(session.getReactorFailureBehavior())
+                    && projectDependencyGraph != null) {
+
+                // the project is blacklisted only so one of its upstreams must have failed here...
+                upstreamProjects = projectDependencyGraph.getUpstreamProjects(event.getProject(), true);
+            } else {
+                // any other failure must have lead to this so any projects is eligible
+                upstreamProjects = session.getProjects();
+            }
+            // now collect all failing projects order by their ID
 
             infoMain("Skipping " + event.getProject().getName());
             logger.info("This project has been banned from the build due to previous failures.");
-
+            upstreamProjects.stream()
+                    .map(result::getBuildSummary)
+                    .filter(BuildFailure.class::isInstance)
+                    .map(BuildFailure.class::cast)
+                    .sorted(Comparator.comparing(
+                            BuildFailure::getProject,
+                            Comparator.comparing(MavenProject::getId, String.CASE_INSENSITIVE_ORDER)))
+                    .forEach(buildfailure -> {
+                        String reason;
+                        Throwable cause = buildfailure.getCause();
+                        if (cause == null) {
+                            reason = "failed!";
+                        } else {
+                            reason = cause.getClass().getSimpleName();
+                            String message = cause.getMessage();
+                            if (message != null) {
+                                message += ": " + message;
+                            }
+                        }
+                        logger.info(" - " + buildfailure.getProject().getId() + ": " + reason);
+                    });
             infoLine('-');
         }
     }
