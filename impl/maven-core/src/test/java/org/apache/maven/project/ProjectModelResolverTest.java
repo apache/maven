@@ -55,7 +55,7 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
+    void testResolveParentThrowsUnresolvableModelExceptionWhenNotFound() {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
         parent.setArtifactId("apache");
@@ -70,7 +70,7 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
+    void testResolveParentThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
         parent.setArtifactId("apache");
@@ -84,7 +84,7 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
+    void testResolveParentThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
         parent.setArtifactId("apache");
@@ -95,6 +95,22 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
                 () -> newModelResolver().resolveModel(parent),
                 "Expected 'UnresolvableModelException' not thrown.");
         assertEquals("The requested parent version range '[1,)' does not specify an upper bound", e.getMessage());
+    }
+
+    @Test
+    void testResolveParentThrowsUnresolvableModelExceptionWhenUsingWrongRangeFormat() {
+        final Parent parent = new Parent();
+        parent.setGroupId("org.apache");
+        parent.setArtifactId("apache");
+        parent.setVersion("[1:2)");
+
+        UnresolvableModelException e = assertThrows(
+                UnresolvableModelException.class,
+                () -> newModelResolver().resolveModel(parent),
+                "Expected 'UnresolvableModelException' not thrown.");
+        assertEquals(
+                "Failed to resolve version range for org.apache:apache:pom:[1:2): Invalid version range [1:2), single version must be surrounded by []",
+                e.getMessage());
     }
 
     @Test
@@ -120,7 +136,7 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() throws Exception {
+    void testResolveDependencyThrowsUnresolvableModelExceptionWhenNotFound() {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
         dependency.setArtifactId("apache");
@@ -135,7 +151,7 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() throws Exception {
+    void testResolveDependencyThrowsUnresolvableModelExceptionWhenNoMatchingVersionFound() {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
         dependency.setArtifactId("apache");
@@ -149,7 +165,7 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
     }
 
     @Test
-    void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() throws Exception {
+    void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingRangesWithoutUpperBound() {
         final Dependency dependency = new Dependency();
         dependency.setGroupId("org.apache");
         dependency.setArtifactId("apache");
@@ -160,6 +176,22 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
                 () -> newModelResolver().resolveModel(dependency),
                 "Expected 'UnresolvableModelException' not thrown.");
         assertEquals("The requested dependency version range '[1,)' does not specify an upper bound", e.getMessage());
+    }
+
+    @Test
+    void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingWrongRangeFormat() {
+        final Dependency dependency = new Dependency();
+        dependency.setGroupId("org.apache");
+        dependency.setArtifactId("apache");
+        dependency.setVersion("[2:3)");
+
+        UnresolvableModelException e = assertThrows(
+                UnresolvableModelException.class,
+                () -> newModelResolver().resolveModel(dependency),
+                "Expected 'UnresolvableModelException' not thrown.");
+        assertEquals(
+                "Failed to resolve version range for org.apache:apache:pom:[2:3): Invalid version range [2:3), single version must be surrounded by []",
+                e.getMessage());
     }
 
     @Test
