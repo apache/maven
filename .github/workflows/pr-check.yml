@@ -23,11 +23,4 @@ on:
 
 jobs:
   pr-check:
-    # Skip for bots and for committers/members of the apache org.
-    # Note: github.event.pull_request context is available here (caller level) but
-    # not reliably inside the reusable workflow itself when called via workflow_call.
-    # MEMBER       = org member with public membership
-    # OWNER        = org owner
-    # COLLABORATOR = committer/member whose org membership is private
-    if: ${{ github.event.pull_request.user.type != 'Bot' && !contains(fromJSON('["OWNER", "MEMBER", "COLLABORATOR"]'), github.event.pull_request.author_association) }}
     uses: apache/maven-gh-actions-shared/.github/workflows/pr-check.yml@v5
