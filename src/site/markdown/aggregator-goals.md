@@ -20,9 +20,9 @@ under the License.
 
 ## Overview
 
-Aggregation was introduced early in Maven 2 ([MNG-250](https://issues.apache.org/jira/browse/MNG-250)) to enable plugins to operate across an entire multi-module build reactor rather than on a single isolated module. It is exposed to plugin developers via the `@Mojo(aggregator = true)` annotation (or `@aggregator` in JavaDoc tag format).
+Aggregation was introduced early in Maven 2 ([MNG-250](https://github.com/apache/maven/issues/2896)) to enable plugins to operate across an entire multi-module build reactor rather than on a single isolated module. It is exposed to plugin developers via the `@Mojo(aggregator = true)` annotation (or `@aggregator` in JavaDoc tag format).
 
-This document analyzes the current behavior, outlines historical shortcomings, and establishes a target design specification for refactoring aggregator goals in Maven ([MNG-7991](https://issues.apache.org/jira/browse/MNG-7991)).
+This document analyzes the current behavior, outlines historical shortcomings, and establishes a target design specification for refactoring aggregator goals in Maven ([MNG-7991](https://github.com/apache/maven/issues/8718)).
 
 ---
 
@@ -67,7 +67,7 @@ When an aggregator Mojo declares `@Execute(phase = ...)` or `@Execute(goal = ...
 
 Over successive Maven releases, multiple discrepancies and pain points have been identified:
 
-1. **CLI vs. Lifecycle Discrepancy ([MNG-6336](https://issues.apache.org/jira/browse/MNG-6336))**:
+1. **CLI vs. Lifecycle Discrepancy ([MNG-6336](https://github.com/apache/maven/issues/7529))**:
    - Plugin authors annotate a goal with `@Mojo(aggregator = true)` with the expectation that Maven will execute it once per reactor.
    - While CLI invocation honors this expectation (running only on root), lifecycle binding runs it on every module.
    - Forcing users to configure `<inherited>false</inherited>` is error-prone, unintuitive, and breaks down in nested multi-module structures.
@@ -78,7 +78,7 @@ Over successive Maven releases, multiple discrepancies and pain points have been
    - When the purpose of the aggregator is to combine artifacts or reports produced by child modules (e.g. aggregated Javadoc, Jacoco code coverage, distribution zip), executing on the root project at the start fails because child outputs do not yet exist.
    - Projects often resort to artificial "distribution" child modules placed last in reactor order to work around this limitation.
 
-3. **Submodule Forking Issues ([MNG-7672](https://issues.apache.org/jira/browse/MNG-7672), [MNG-7163](https://issues.apache.org/jira/browse/MNG-7163), [MNG-2184](https://issues.apache.org/jira/browse/MNG-2184))**:
+3. **Submodule Forking Issues ([MNG-7672](https://github.com/apache/maven/issues/8780), [MNG-7163](https://github.com/apache/maven/issues/8291), [MNG-2184](https://github.com/apache/maven/issues/4453))**:
    - When an aggregator goal is executed within a submodule, forking triggers a build of the entire reactor from within that submodule, repeating already-completed goals.
 
 4. **Reporting and Site Generation Edge Cases**:
@@ -88,7 +88,7 @@ Over successive Maven releases, multiple discrepancies and pain points have been
 
 ## 3. Target Architecture & Design Specification (Maven 4+)
 
-To address [MNG-7991](https://issues.apache.org/jira/browse/MNG-7991) and related issues, the reactor aggregation mechanism should be decoupled and modernized:
+To address [MNG-7991](https://github.com/apache/maven/issues/8718) and related issues, the reactor aggregation mechanism should be decoupled and modernized:
 
 ### 3.1 Explicit Execution Semantics
 
@@ -101,8 +101,8 @@ Rather than overloading a single boolean flag `aggregator = true`, execution sco
 | **`REACTOR_AT_END`** | Executes once across collected projects *after* all reactor modules complete the phase. | End of reactor build (similar to deploy-at-end). |
 
 ### 3.2 Lifecycle Engine Unification
-- **Automatic Root-Only Lifecycle Binding ([MNG-6336](https://issues.apache.org/jira/browse/MNG-6336))**: When a goal marked as an aggregator is bound to a lifecycle phase, Maven's lifecycle planner should default to executing it once on the root project unless explicitly declared otherwise.
-- **Phase Post-Aggregator Hooks ([MNG-5665](https://issues.apache.org/jira/browse/MNG-5665))**: Support lifecycle phases that trigger aggregation tasks after reactor submodules have completed upstream tasks (e.g. `post-verify-reactor`).
+- **Automatic Root-Only Lifecycle Binding ([MNG-6336](https://github.com/apache/maven/issues/7529))**: When a goal marked as an aggregator is bound to a lifecycle phase, Maven's lifecycle planner should default to executing it once on the root project unless explicitly declared otherwise.
+- **Phase Post-Aggregator Hooks ([MNG-5665](https://github.com/apache/maven/issues/6657))**: Support lifecycle phases that trigger aggregation tasks after reactor submodules have completed upstream tasks (e.g. `post-verify-reactor`).
 
 ### 3.3 Forking Deduplication
 - Forked lifecycles initiated by an aggregator must verify previously satisfied phases in the reactor session cache to avoid repeating work already accomplished in the current build.
@@ -111,14 +111,14 @@ Rather than overloading a single boolean flag `aggregator = true`, execution sco
 
 ## 4. Related Issues
 
-| Key | Summary | Relationship |
-| :--- | :--- | :--- |
-| [MNG-7991](https://issues.apache.org/jira/browse/MNG-7991) | Refactor "aggregator" goal feature | Umbrella / Architecture |
-| [MNG-6336](https://issues.apache.org/jira/browse/MNG-6336) | Aggregator Mojo should be executed only once even when part of the lifecycle | Core defect |
-| [MNG-250](https://issues.apache.org/jira/browse/MNG-250) | Make aggregation feasible | Original origin |
-| [MNG-2184](https://issues.apache.org/jira/browse/MNG-2184) | Possible problem with `@aggregator` and forked lifecycles | Forking defect |
-| [MNG-5665](https://issues.apache.org/jira/browse/MNG-5665) | Advanced Lifecycle Handling | Lifecycle enhancement |
-| [MNG-7163](https://issues.apache.org/jira/browse/MNG-7163) | Aggregating Mojo re-executes goals for child modules that are already executed | Forking duplication |
-| [MNG-7672](https://issues.apache.org/jira/browse/MNG-7672) | Aggregate goals executed in a submodule forks the whole reactor | Submodule isolation |
-| [MNG-4504](https://issues.apache.org/jira/browse/MNG-4504) | Disallowing all aggregator bindings to any lifecycle is too broad | Lifecycle policy |
-| [MNG-7900](https://issues.apache.org/jira/browse/MNG-7900) | Wrapper lifecycle in multi module project should be executed only in root module | Wrapper lifecycle |
+| Key | GitHub Issue | Summary | Relationship |
+| :--- | :--- | :--- | :--- |
+| MNG-7991 | [#8718](https://github.com/apache/maven/issues/8718) | Refactor "aggregator" goal feature | Umbrella / Architecture |
+| MNG-6336 | [#7529](https://github.com/apache/maven/issues/7529) | Aggregator Mojo should be executed only once even when part of the lifecycle | Core defect |
+| MNG-250 | [#2896](https://github.com/apache/maven/issues/2896) | Make aggregation feasible | Original origin |
+| MNG-2184 | [#4453](https://github.com/apache/maven/issues/4453) | Possible problem with `@aggregator` and forked lifecycles | Forking defect |
+| MNG-5665 | [#6657](https://github.com/apache/maven/issues/6657) | Advanced Lifecycle Handling | Lifecycle enhancement |
+| MNG-7163 | [#8291](https://github.com/apache/maven/issues/8291) | Aggregating Mojo re-executes goals for child modules that are already executed | Forking duplication |
+| MNG-7672 | [#8780](https://github.com/apache/maven/issues/8780) | Aggregate goals executed in a submodule forks the whole reactor | Submodule isolation |
+| MNG-4504 | [#5543](https://github.com/apache/maven/issues/5543) | Disallowing all aggregator bindings to any lifecycle is too broad | Lifecycle policy |
+| MNG-7900 | [#9015](https://github.com/apache/maven/issues/9015) | Wrapper lifecycle in multi module project should be executed only in root module | Wrapper lifecycle |
