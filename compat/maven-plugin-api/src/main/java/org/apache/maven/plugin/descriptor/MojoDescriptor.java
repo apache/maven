@@ -547,9 +547,9 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
     }
 
     /**
-     * Indicates whether the Mojo operates as an aggregator across the Maven reactor and its child modules.
+     * Indicates whether the Mojo operates as an aggregator across the Maven reactor and its subprojects.
      *
-     * @return <code>true</code> if the Mojo operates across the Maven reactor and its child modules,
+     * @return <code>true</code> if the Mojo operates across the Maven reactor and its subprojects,
      *         <code>false</code> otherwise.
      */
     public boolean isAggregator() {

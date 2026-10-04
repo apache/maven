@@ -37,7 +37,7 @@ When an aggregating goal is invoked from the command line:
    boolean aggregating = mojoDescriptor.isAggregator() || !mojoDescriptor.isProjectRequired();
    ```
 2. **Aggregating Task Segment**: A distinct aggregating `TaskSegment` is created.
-3. **Execution on Root Project Only**: The lifecycle execution engine (`LifecycleStarter` / `ConcurrentLifecycleStarter`) executes this task segment exclusively on the top-level project (`session.getTopLevelProject()`). Submodules in the reactor are skipped for this goal.
+3. **Execution on Root Project Only**: `BuildListCalculator` (and `BuildPlanExecutor` in the concurrent path) restricts aggregating task segments to the top-level project (`session.getTopLevelProject()`). Submodules in the reactor are skipped for this goal.
 4. **Ordering**: If the CLI invocation specifies both a lifecycle phase and an aggregator goal (e.g. `mvn clean install site:stage`), the normal lifecycle runs across all modules first, and the aggregator goal executes once at the end on the root module.
 
 ### 1.2 Lifecycle-Bound Execution (`<phase>...</phase>`)
