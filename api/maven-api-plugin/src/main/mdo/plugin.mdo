@@ -310,7 +310,7 @@ under the License.
           <description>
             Flags this Mojo to run in a multi-module aggregating manner across the reactor.
             When invoked directly via CLI, it executes only once on the top-level project.
-            When bound to a lifecycle phase, it executes on each module unless inheritance is explicitly disabled.
+            When bound to a lifecycle phase, it executes on each subproject unless inheritance is explicitly disabled.
           </description>
           <defaultValue>false</defaultValue>
         </field>
