@@ -92,7 +92,9 @@ public class SisuDiBridgeModule extends AbstractModule {
      * Creates an injector for a Maven 4 API mojo, one per execution, so the Sisu beans of its plugin realm can be
      * injected into it. A single bean comes from {@code locator} only when the injector has no binding of its own for
      * the key, so the project, session, mojo execution and log it binds are never shadowed by Sisu's scoped proxies.
-     * Its bindings are not mirrored into Guice.
+     * {@code List} and {@code Map} injection points and {@link InjectorImpl#getAllBindings} mean every implementation,
+     * so they merge the injector's bindings with the Sisu beans, as the core bridge does. Its bindings are not mirrored
+     * into Guice.
      */
     public static Injector newBridgeInjector(Provider<BeanLocator> locator) {
         return new BridgeInjectorImpl(locator, null, true);
@@ -123,7 +125,8 @@ public class SisuDiBridgeModule extends AbstractModule {
 
         /**
          * @param sisuFallbackOnly whether a single bean comes from Sisu only when this injector has no binding for
-         *     its key, so Sisu beans cannot shadow what the injector binds itself
+         *     its key, so Sisu beans cannot shadow what the injector binds itself; it governs single-bean resolution
+         *     only, collections ({@code List}, {@code Map}, {@link #getAllBindings}) always merge both sources
          */
         BridgeInjectorImpl(Provider<BeanLocator> locator, Binder binder, boolean sisuFallbackOnly) {
             this.locator = locator;
@@ -248,7 +251,7 @@ public class SisuDiBridgeModule extends AbstractModule {
                 List<Binding<?>> list = new ArrayList<>();
                 // Add DI bindings
                 list.addAll(getBindings().getOrDefault(elementType, Set.of()));
-                // Add Plexus bindings
+                // Add Plexus bindings, also in fallback-only mode: a collection means every implementation
                 for (var bean : locator.get().locate(toGuiceKey(elementType))) {
                     if (isPlexusBean(bean)) {
                         list.add(new BindingToBeanEntry<>(elementType).toBeanEntry(bean));
@@ -275,6 +278,7 @@ public class SisuDiBridgeModule extends AbstractModule {
                                     : "";
                     map.compute(name, (n, ob) -> ob == null || comparator.compare(ob, b) < 0 ? b : ob);
                 }
+                // Add Plexus bindings, also in fallback-only mode: a collection means every implementation
                 for (var bean : locator.get().locate(toGuiceKey(valueType))) {
                     if (isPlexusBean(bean)) {
                         Binding<?> b = new BindingToBeanEntry<>(valueType)
