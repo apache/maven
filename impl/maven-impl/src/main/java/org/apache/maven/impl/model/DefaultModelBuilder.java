@@ -2465,7 +2465,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                             phase = ParentModelPhase.MERGE_MIXIN;
                             return new ParentResolutionFrame(model, mixins.next(), recording, chain, false, false);
                         }
-                        List<Profile> profiles = getActiveProfiles(model.getProfiles(), recording);
+                        // Evaluate with the parent's properties but the child's basedir (as Maven 3 does);
+                        // parent properties are kept out of the cache key since they derive from the source.
+                        DefaultProfileActivationContext activation = recording.start(model.getProperties());
+                        List<Profile> profiles = getActiveProfiles(model.getProfiles(), activation);
+                        replayRecordIntoContext(activation.stop(), recording, false);
                         model = profileInjector
                                 .injectProfiles(model, profiles, request, ModelBuilderSessionState.this)
                                 .withProfiles(List.of())
@@ -2937,6 +2941,13 @@ public class DefaultModelBuilder implements ModelBuilder {
          */
         private void replayRecordIntoContext(
                 DefaultProfileActivationContext.Record cachedRecord, DefaultProfileActivationContext targetContext) {
+            replayRecordIntoContext(cachedRecord, targetContext, true);
+        }
+
+        private void replayRecordIntoContext(
+                DefaultProfileActivationContext.Record cachedRecord,
+                DefaultProfileActivationContext targetContext,
+                boolean includeModelProperties) {
             if (targetContext.record == null) {
                 return; // Target context is not recording
             }
@@ -2958,7 +2969,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             cachedRecord.usedUserProperties.forEach(targetRecord.usedUserProperties::putIfAbsent);
 
             // Replay model properties
-            cachedRecord.usedModelProperties.forEach(targetRecord.usedModelProperties::putIfAbsent);
+            if (includeModelProperties) {
+                cachedRecord.usedModelProperties.forEach(targetRecord.usedModelProperties::putIfAbsent);
+            }
 
             // Replay model infos
             cachedRecord.usedModelInfos.forEach(targetRecord.usedModelInfos::putIfAbsent);
