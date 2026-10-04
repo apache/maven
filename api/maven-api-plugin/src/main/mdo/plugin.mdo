@@ -308,8 +308,9 @@ under the License.
           <version>1.0.0+</version>
           <type>boolean</type>
           <description>
-            Flags this Mojo to run it in a multi-module way, i.e. aggregate the build with the set of projects
-            listed as modules.
+            Flags this Mojo to run in a multi-module aggregating manner across the reactor.
+            When invoked directly via CLI, it executes only once on the top-level project.
+            When bound to a lifecycle phase, it executes on each module unless inheritance is explicitly disabled.
           </description>
           <defaultValue>false</defaultValue>
         </field>

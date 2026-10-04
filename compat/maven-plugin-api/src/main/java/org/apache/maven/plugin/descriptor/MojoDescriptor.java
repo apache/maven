@@ -539,16 +539,18 @@ public class MojoDescriptor extends ComponentDescriptor<Mojo> implements Cloneab
     }
 
     /**
-     * @param aggregator <code>true</code> if the Mojo uses the Maven project and its child modules,
-     * <code>false</code> otherwise.
+     * @param aggregator <code>true</code> if the Mojo operates across the reactor project and its subprojects,
+     *                   <code>false</code> otherwise.
      */
     public void setAggregator(boolean aggregator) {
         this.aggregator = aggregator;
     }
 
     /**
-     * @return <code>true</code> if the Mojo uses the Maven project and its child modules,
-     * <code>false</code> otherwise.
+     * Indicates whether the Mojo operates as an aggregator across the Maven reactor and its child modules.
+     *
+     * @return <code>true</code> if the Mojo operates across the Maven reactor and its child modules,
+     *         <code>false</code> otherwise.
      */
     public boolean isAggregator() {
         return aggregator;
