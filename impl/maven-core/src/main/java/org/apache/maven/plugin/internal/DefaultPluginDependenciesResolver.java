@@ -22,14 +22,20 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.impl.resolver.RelocatedArtifact;
@@ -75,17 +81,30 @@ import org.slf4j.LoggerFactory;
 public class DefaultPluginDependenciesResolver implements PluginDependenciesResolver {
     private static final String REPOSITORY_CONTEXT = org.apache.maven.api.services.RequestTrace.CONTEXT_PLUGIN;
 
+    private static final String MANAGED_DEPENDENCIES_KEY =
+            DefaultPluginDependenciesResolver.class.getName() + ".managedDependencies";
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final RepositorySystem repoSystem;
 
     private final List<MavenPluginDependenciesValidator> dependenciesValidators;
 
-    @Inject
+    private final CoreExports coreExports;
+
     public DefaultPluginDependenciesResolver(
             RepositorySystem repoSystem, List<MavenPluginDependenciesValidator> dependenciesValidators) {
+        this(repoSystem, dependenciesValidators, null);
+    }
+
+    @Inject
+    public DefaultPluginDependenciesResolver(
+            RepositorySystem repoSystem,
+            List<MavenPluginDependenciesValidator> dependenciesValidators,
+            CoreExports coreExports) {
         this.repoSystem = repoSystem;
         this.dependenciesValidators = dependenciesValidators;
+        this.coreExports = coreExports;
     }
 
     private Artifact toArtifact(Plugin plugin, RepositorySystemSession session) {
@@ -271,6 +290,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             request.setRequestContext(REPOSITORY_CONTEXT);
             request.setRepositories(repositories);
             request.setRoot(new org.eclipse.aether.graph.Dependency(pluginArtifact, null));
+            request.setManagedDependencies(getManagedDependencies(session));
             for (Dependency dependency : plugin.getDependencies()) {
                 org.eclipse.aether.graph.Dependency pluginDep =
                         RepositoryUtils.toDependency(dependency, session.getArtifactTypeRegistry());
@@ -306,5 +326,57 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         } finally {
             RequestTraceHelper.exit(trace);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private List<org.eclipse.aether.graph.Dependency> getManagedDependencies(RepositorySystemSession session) {
+        if (coreExports == null) {
+            return Collections.emptyList();
+        }
+        return (List<org.eclipse.aether.graph.Dependency>)
+                session.getData().computeIfAbsent(MANAGED_DEPENDENCIES_KEY, this::computeManagedDependencies);
+    }
+
+    private List<org.eclipse.aether.graph.Dependency> computeManagedDependencies() {
+        if (coreExports == null || coreExports.getExportedArtifacts() == null) {
+            return Collections.emptyList();
+        }
+        List<org.eclipse.aether.graph.Dependency> managed = new ArrayList<>();
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        if (cl == null) {
+            cl = getClass().getClassLoader();
+        }
+        for (String ga : coreExports.getExportedArtifacts()) {
+            int idx = ga.indexOf(':');
+            if (idx <= 0 || idx >= ga.length() - 1) {
+                continue;
+            }
+            String groupId = ga.substring(0, idx);
+            String artifactId = ga.substring(idx + 1);
+            String resource = "META-INF/maven/" + groupId + "/" + artifactId + "/pom.properties";
+            Properties props = new Properties();
+            try (InputStream is = cl.getResourceAsStream(resource)) {
+                if (is != null) {
+                    props.load(is);
+                } else if (cl != getClass().getClassLoader()) {
+                    try (InputStream fallbackIs = getClass().getClassLoader().getResourceAsStream(resource)) {
+                        if (fallbackIs != null) {
+                            props.load(fallbackIs);
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                logger.debug("Could not read " + resource, e);
+            }
+            String version = props.getProperty("version");
+            if (version != null) {
+                version = version.trim();
+                if (!version.isEmpty() && !version.startsWith("${")) {
+                    Artifact artifact = new DefaultArtifact(groupId, artifactId, "jar", version);
+                    managed.add(new org.eclipse.aether.graph.Dependency(artifact, DependencyScope.PROVIDED.id()));
+                }
+            }
+        }
+        return Collections.unmodifiableList(managed);
     }
 }
