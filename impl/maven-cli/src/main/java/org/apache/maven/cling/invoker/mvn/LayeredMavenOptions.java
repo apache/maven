@@ -90,6 +90,11 @@ public class LayeredMavenOptions<O extends MavenOptions> extends LayeredOptions<
     }
 
     @Override
+    public Optional<Boolean> printBuildOrder() {
+        return returnFirstPresentOrEmpty(MavenOptions::printBuildOrder);
+    }
+
+    @Override
     public Optional<Boolean> failAtEnd() {
         return returnFirstPresentOrEmpty(MavenOptions::failAtEnd);
     }
