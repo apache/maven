@@ -344,6 +344,71 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
     }
 
     @Test
+    void testParentOutsideReactorIsBuiltOnce(@TempDir Path tempDir) throws Exception {
+        Files.writeString(tempDir.resolve("pom.xml"), """
+                <project>
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>test</groupId>
+                  <artifactId>root</artifactId>
+                  <version>1</version>
+                  <packaging>pom</packaging>
+                  <properties>
+                    <inherited>root</inherited>
+                  </properties>
+                </project>
+                """);
+        Path parentPom = Files.createDirectory(tempDir.resolve("parent")).resolve("pom.xml");
+        Files.writeString(parentPom, """
+                <project>
+                  <modelVersion>4.0.0</modelVersion>
+                  <parent>
+                    <groupId>test</groupId>
+                    <artifactId>root</artifactId>
+                    <version>1</version>
+                  </parent>
+                  <artifactId>parent</artifactId>
+                  <packaging>pom</packaging>
+                </project>
+                """);
+        List<File> children = new ArrayList<>();
+        for (String name : List.of("a", "b")) {
+            Path childPom = Files.createDirectories(tempDir.resolve("parent").resolve(name))
+                    .resolve("pom.xml");
+            Files.writeString(childPom, """
+                    <project>
+                      <modelVersion>4.0.0</modelVersion>
+                      <parent>
+                        <groupId>test</groupId>
+                        <artifactId>parent</artifactId>
+                        <version>1</version>
+                      </parent>
+                      <artifactId>%s</artifactId>
+                    </project>
+                    """.formatted(name));
+            children.add(childPom.toFile());
+        }
+
+        MavenSession session = createMavenSession(null);
+        session.getRequest().setRootDirectory(tempDir);
+        ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
+        request.setRepositorySession(session.getRepositorySession());
+        List<ProjectBuildingResult> results = getContainer()
+                .lookup(org.apache.maven.project.ProjectBuilder.class)
+                .build(children, false, request);
+
+        assertEquals(2, results.size());
+        MavenProject a = results.get(0).getProject();
+        MavenProject b = results.get(1).getProject();
+        assertEquals("root", a.getProperties().getProperty("inherited"));
+        assertNotNull(a.getParent());
+        assertEquals("parent", a.getParent().getArtifactId());
+        assertEquals("root", a.getParent().getParent().getArtifactId());
+        // both children share one parent chain instead of rebuilding it from disk (GH-13294)
+        assertSame(a.getParent(), b.getParent());
+        assertSame(a.getParent().getParent(), b.getParent().getParent());
+    }
+
+    @Test
     void testReadErroneousMavenProjectContainsReference() throws Exception {
         File pomFile = new File("src/test/resources/projects/artifactMissingVersion/pom.xml").getAbsoluteFile();
         MavenSession mavenSession = createMavenSession(null);
