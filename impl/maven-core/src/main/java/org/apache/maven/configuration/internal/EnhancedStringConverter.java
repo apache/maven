@@ -29,7 +29,9 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 /**
  * Converter for String, CharSequence, StringBuilder, and StringBuffer that properly handles
- * empty configuration elements (e.g. {@code <setting></setting>} or {@code <setting/>}).
+ * explicit empty configuration elements (e.g. {@code <setting></setting>}) by converting them
+ * to empty strings, while preserving existing behavior for self-closing tags without default-values
+ * (e.g. {@code <setting/>}) by returning {@code null} to keep the bean field's Java default.
  */
 class EnhancedStringConverter extends AbstractConfigurationConverter {
 
@@ -100,13 +102,17 @@ class EnhancedStringConverter extends AbstractConfigurationConverter {
                                     defaultValue, configuration.getName()),
                             e);
                 }
-            } else {
-                result = "";
             }
+            // For self-closing <tag/> without default-value, leave result null
+            // to preserve existing behavior (keep bean field's Java default)
         }
 
         if (result == null) {
-            result = "";
+            return null;
+        }
+
+        if (!type.isInstance(result) && !(result instanceof CharSequence)) {
+            failIfNotTypeCompatible(result, type, configuration);
         }
 
         String str = result.toString();

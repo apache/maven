@@ -250,14 +250,14 @@ class EnhancedCompositeBeanHelperTest {
     }
 
     @Test
-    void testSetSelfClosingEmptyStringOverridesPreInitializedDefault() throws Exception {
+    void testSetSelfClosingEmptyStringPreservesPreInitializedDefault() throws Exception {
         TestBean bean = new TestBean();
         assertEquals("defaultDirect", bean.getInitializedField());
 
         // self-closing: getValue() is null
         PlexusConfiguration config = new XmlPlexusConfiguration("initializedField");
         helper.setProperty(bean, "initializedField", String.class, config);
-        assertEquals("", bean.getInitializedField());
+        assertEquals("defaultDirect", bean.getInitializedField());
     }
 
     @Test
