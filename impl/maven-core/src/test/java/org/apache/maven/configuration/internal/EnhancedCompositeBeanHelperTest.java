@@ -208,12 +208,77 @@ class EnhancedCompositeBeanHelperTest {
         assertEquals("value2", bean2.getDirectField());
     }
 
+    @Test
+    void testSetEmptyStringWithField() throws Exception {
+        TestBean bean = new TestBean();
+        PlexusConfiguration config = new XmlPlexusConfiguration("directField");
+        config.setValue("");
+
+        helper.setProperty(bean, "directField", String.class, config);
+
+        assertEquals("", bean.getDirectField());
+        verify(listener).notifyFieldChangeUsingReflection("directField", "", bean);
+    }
+
+    @Test
+    void testSetEmptyStringWithSetter() throws Exception {
+        TestBean bean = new TestBean();
+        PlexusConfiguration config = new XmlPlexusConfiguration("name");
+        config.setValue("");
+
+        helper.setProperty(bean, "name", String.class, config);
+
+        assertEquals("", bean.getName());
+        verify(listener).notifyFieldChangeUsingSetter("name", "", bean);
+    }
+
+    @Test
+    void testSetEmptyStringOverridesPreInitializedDefault() throws Exception {
+        TestBean bean = new TestBean();
+        assertEquals("defaultDirect", bean.getInitializedField());
+        assertEquals("defaultSetter", bean.getInitializedSetter());
+
+        PlexusConfiguration config1 = new XmlPlexusConfiguration("initializedField");
+        config1.setValue("");
+        helper.setProperty(bean, "initializedField", String.class, config1);
+        assertEquals("", bean.getInitializedField());
+
+        PlexusConfiguration config2 = new XmlPlexusConfiguration("initializedSetter");
+        config2.setValue("");
+        helper.setProperty(bean, "initializedSetter", String.class, config2);
+        assertEquals("", bean.getInitializedSetter());
+    }
+
+    @Test
+    void testSetSelfClosingEmptyStringOverridesPreInitializedDefault() throws Exception {
+        TestBean bean = new TestBean();
+        assertEquals("defaultDirect", bean.getInitializedField());
+
+        // self-closing: getValue() is null
+        PlexusConfiguration config = new XmlPlexusConfiguration("initializedField");
+        helper.setProperty(bean, "initializedField", String.class, config);
+        assertEquals("", bean.getInitializedField());
+    }
+
+    @Test
+    void testSetEmptyStringOverridesDefaultValueAttribute() throws Exception {
+        TestBean bean = new TestBean();
+        PlexusConfiguration config = new XmlPlexusConfiguration("initializedField");
+        config.setAttribute("default-value", "fallback");
+        config.setValue("");
+
+        helper.setProperty(bean, "initializedField", String.class, config);
+        assertEquals("", bean.getInitializedField());
+    }
+
     /**
      * Test bean class for testing property setting.
      */
     public static class TestBean {
         private String name;
         private String directField;
+        private String initializedField = "defaultDirect";
+        private String initializedSetter = "defaultSetter";
         private List<String> items = new ArrayList<>();
 
         public String getName() {
@@ -226,6 +291,18 @@ class EnhancedCompositeBeanHelperTest {
 
         public String getDirectField() {
             return directField;
+        }
+
+        public String getInitializedField() {
+            return initializedField;
+        }
+
+        public String getInitializedSetter() {
+            return initializedSetter;
+        }
+
+        public void setInitializedSetter(String initializedSetter) {
+            this.initializedSetter = initializedSetter;
         }
 
         public List<String> getItems() {

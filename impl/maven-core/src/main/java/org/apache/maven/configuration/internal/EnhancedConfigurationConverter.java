@@ -54,8 +54,10 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
                 } else {
                     result = evaluator.evaluate(value);
                 }
+            } else if (null != value && (type == String.class || type == CharSequence.class || type == Object.class || type == null)) {
+                result = "";
             }
-            if (null == result && configuration.getChildCount() == 0) {
+            if (null == result && configuration.getChildCount() == 0 && configuration.getValue() == null) {
                 value = configuration.getAttribute("default-value");
                 if (null != value && !value.isEmpty()) {
                     if (evaluator instanceof TypeAwareExpressionEvaluator typeAwareExpressionEvaluator) {
