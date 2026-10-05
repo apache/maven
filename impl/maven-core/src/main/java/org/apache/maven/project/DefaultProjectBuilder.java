@@ -316,6 +316,11 @@ public class DefaultProjectBuilder implements ProjectBuilder {
         private final ModelBuilder.ModelBuilderSession modelBuilderSession;
         private final Map<String, MavenProject> projectIndex = new ConcurrentHashMap<>(256);
 
+        // Parents outside the reactor, built once per POM file and shared by all their children. Reactor POM
+        // sources are request-scoped in the model cache, so rebuilding a parent per child re-reads its whole
+        // parent chain from disk each time
+        private final Map<Path, MavenProject> parentProjects = new ConcurrentHashMap<>();
+
         // Store computed repositories per project to avoid leakage between projects
         private final Map<String, List<ArtifactRepository>> projectRepositories = new ConcurrentHashMap<>();
 
@@ -1079,9 +1084,17 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                     Path parentPomFile = parentModel.getPomFile();
                     if (parentPomFile != null) {
                         project.setParentFile(parentPomFile.toFile());
+                        Path parentKey = parentPomFile.toAbsolutePath().normalize();
                         try {
-                            parent = build(true, parentPomFile, Sources.buildSource(parentPomFile))
-                                    .getProject();
+                            parent = parentProjects.get(parentKey);
+                            if (parent == null) {
+                                parent = build(true, parentPomFile, Sources.buildSource(parentPomFile))
+                                        .getProject();
+                                MavenProject existing = parentProjects.putIfAbsent(parentKey, parent);
+                                if (existing != null) {
+                                    parent = existing;
+                                }
+                            }
                         } catch (ProjectBuildingException e) {
                             // MNG-4488 where let invalid parents slide on by
                             if (logger.isDebugEnabled()) {
