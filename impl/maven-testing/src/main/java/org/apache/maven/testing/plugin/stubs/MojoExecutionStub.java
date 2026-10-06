@@ -62,37 +62,37 @@ public class MojoExecutionStub implements MojoExecution {
     }
 
     @Override
-    public Plugin getPlugin() {
+    public Plugin plugin() {
         return plugin;
     }
 
     @Override
-    public PluginExecution getModel() {
-        return model;
+    public Optional<PluginExecution> model() {
+        return Optional.ofNullable(model);
     }
 
     @Override
-    public MojoDescriptor getDescriptor() {
+    public MojoDescriptor descriptor() {
         return descriptor;
     }
 
     @Override
-    public String getLifecyclePhase() {
+    public String lifecyclePhase() {
         return lifecyclePhase;
     }
 
     @Override
-    public String getExecutionId() {
+    public String executionId() {
         return executionId;
     }
 
     @Override
-    public String getGoal() {
+    public String goal() {
         return goal;
     }
 
     @Override
-    public Optional<XmlNode> getConfiguration() {
+    public Optional<XmlNode> configuration() {
         return Optional.ofNullable(dom);
     }
 

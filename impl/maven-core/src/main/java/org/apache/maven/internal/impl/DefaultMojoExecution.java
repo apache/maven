@@ -38,42 +38,83 @@ import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.impl.DefaultNode;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.graph.DependencyNode;
 
+import static java.util.Objects.requireNonNull;
+
+/**
+ * Immutable snapshot of a mojo execution, captured at the point when execution begins
+ * (after configuration merging, descriptor resolution, and lifecycle phase assignment are complete).
+ * All state is copied at construction time; no reference to the mutable legacy
+ * {@link org.apache.maven.plugin.MojoExecution} is retained after construction.
+ */
 public class DefaultMojoExecution implements MojoExecution {
-    private final InternalMavenSession session;
-    private final org.apache.maven.plugin.MojoExecution delegate;
+
+    private final Plugin plugin;
+    private final Optional<PluginExecution> model;
+    private final MojoDescriptor descriptor;
+    private final String executionId;
+    private final String goal;
+    private final String lifecyclePhase;
+    private final XmlNode configuration;
 
     public DefaultMojoExecution(InternalMavenSession session, org.apache.maven.plugin.MojoExecution delegate) {
-        this.session = session;
-        this.delegate = delegate;
+        requireNonNull(session, "session");
+        requireNonNull(delegate, "delegate");
+        this.descriptor = requireNonNull(delegate.getMojoDescriptor(), "delegate.mojoDescriptor")
+                .getMojoDescriptorV4();
+        this.executionId = delegate.getExecutionId();
+        this.goal = delegate.getGoal();
+        this.lifecyclePhase = delegate.getLifecyclePhase();
+        this.configuration = delegate.getConfiguration() != null
+                ? delegate.getConfiguration().getDom()
+                : null;
+        this.plugin = buildPlugin(session, delegate);
+        this.model = buildModel(delegate);
     }
 
-    public org.apache.maven.plugin.MojoExecution getDelegate() {
-        return delegate;
-    }
+    private static Plugin buildPlugin(InternalMavenSession session, org.apache.maven.plugin.MojoExecution delegate) {
+        org.apache.maven.plugin.descriptor.MojoDescriptor legacyDescriptor = delegate.getMojoDescriptor();
+        org.apache.maven.plugin.descriptor.PluginDescriptor legacyPluginDescriptor =
+                legacyDescriptor.getPluginDescriptor();
+        PluginDescriptor pluginDescriptorV4 = legacyPluginDescriptor.getPluginDescriptorV4();
 
-    @Override
-    public Plugin getPlugin() {
+        ClassLoader classLoader = legacyDescriptor.getRealm();
+
+        org.apache.maven.artifact.Artifact legacyArtifact = legacyPluginDescriptor.getPluginArtifact();
+        org.eclipse.aether.artifact.Artifact resolverArtifact = RepositoryUtils.toArtifact(legacyArtifact);
+        Artifact artifact = resolverArtifact != null ? session.getArtifact(resolverArtifact) : null;
+
+        DependencyNode resolverNode = legacyPluginDescriptor.getDependencyNode();
+        Map<String, Dependency> dependenciesMap = resolverNode != null
+                ? Collections.unmodifiableMap(new DefaultNode(session, resolverNode, false)
+                        .stream()
+                                .filter(Objects::nonNull)
+                                .map(Node::getDependency)
+                                .filter(Objects::nonNull)
+                                .collect(Collectors.toMap(
+                                        d -> d.getGroupId() + ":" + d.getArtifactId(), d -> d, (a, b) -> a)))
+                : Collections.emptyMap();
+
+        org.apache.maven.api.model.Plugin modelPlugin =
+                delegate.getPlugin() != null ? delegate.getPlugin().getDelegate() : null;
+
         return new Plugin() {
             @Override
             public org.apache.maven.api.model.Plugin getModel() {
-                return delegate.getPlugin().getDelegate();
+                return modelPlugin;
             }
 
             @Override
             public PluginDescriptor getDescriptor() {
-                return delegate.getMojoDescriptor().getPluginDescriptor().getPluginDescriptorV4();
+                return pluginDescriptorV4;
             }
 
             @Override
             public List<Lifecycle> getLifecycles() {
                 try {
-                    return Collections.unmodifiableList(new ArrayList<>(delegate.getMojoDescriptor()
-                            .getPluginDescriptor()
-                            .getLifecycleMappings()
-                            .values()));
+                    return Collections.unmodifiableList(new ArrayList<>(
+                            legacyPluginDescriptor.getLifecycleMappings().values()));
                 } catch (Exception e) {
                     throw new RuntimeException("Unable to load plugin lifecycles", e);
                 }
@@ -81,67 +122,69 @@ public class DefaultMojoExecution implements MojoExecution {
 
             @Override
             public ClassLoader getClassLoader() {
-                return delegate.getMojoDescriptor().getRealm();
+                return classLoader;
             }
 
             @Override
             public Artifact getArtifact() {
-                org.apache.maven.artifact.Artifact artifact =
-                        delegate.getMojoDescriptor().getPluginDescriptor().getPluginArtifact();
-                org.eclipse.aether.artifact.Artifact resolverArtifact = RepositoryUtils.toArtifact(artifact);
-                return resolverArtifact != null ? session.getArtifact(resolverArtifact) : null;
+                return artifact;
             }
 
             @Override
             public Map<String, Dependency> getDependenciesMap() {
-                DependencyNode resolverNode =
-                        delegate.getMojoDescriptor().getPluginDescriptor().getDependencyNode();
-                DefaultNode node = new DefaultNode(session, resolverNode, false);
-                return Collections.unmodifiableMap(node.stream()
-                        .filter(Objects::nonNull)
-                        .map(Node::getDependency)
-                        .filter(Objects::nonNull)
-                        .collect(Collectors.toMap(d -> d.getGroupId() + ":" + d.getArtifactId(), d -> d)));
+                return dependenciesMap;
             }
         };
     }
 
-    @Override
-    public PluginExecution getModel() {
+    private static Optional<PluginExecution> buildModel(org.apache.maven.plugin.MojoExecution delegate) {
+        if (delegate.getPlugin() == null) {
+            return Optional.empty();
+        }
+        String id = delegate.getExecutionId();
         return delegate.getPlugin().getExecutions().stream()
-                .filter(pe -> Objects.equals(pe.getId(), getExecutionId()))
+                .filter(pe -> Objects.equals(pe.getId(), id))
                 .findFirst()
-                .map(org.apache.maven.model.PluginExecution::getDelegate)
-                .orElse(null);
+                .map(org.apache.maven.model.PluginExecution::getDelegate);
     }
 
     @Override
-    public MojoDescriptor getDescriptor() {
-        return delegate.getMojoDescriptor().getMojoDescriptorV4();
+    public Plugin plugin() {
+        return plugin;
     }
 
     @Override
-    public String getLifecyclePhase() {
-        return delegate.getLifecyclePhase();
+    public Optional<PluginExecution> model() {
+        return model;
     }
 
     @Override
-    public String getExecutionId() {
-        return delegate.getExecutionId();
+    public MojoDescriptor descriptor() {
+        return descriptor;
     }
 
     @Override
-    public String getGoal() {
-        return delegate.getGoal();
+    public String executionId() {
+        return executionId;
     }
 
     @Override
-    public Optional<XmlNode> getConfiguration() {
-        return Optional.of(delegate.getConfiguration()).map(Xpp3Dom::getDom);
+    public String goal() {
+        return goal;
+    }
+
+    @Override
+    public String lifecyclePhase() {
+        return lifecyclePhase;
+    }
+
+    @Override
+    public Optional<XmlNode> configuration() {
+        return Optional.ofNullable(configuration);
     }
 
     @Override
     public String toString() {
-        return delegate.toString();
+        return descriptor.getId() + " {execution: " + executionId + '}';
     }
 }
