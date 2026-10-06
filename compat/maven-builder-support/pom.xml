@@ -31,7 +31,6 @@ under the License.
   <name>Maven Builder Support (deprecated)</name>
   <description>Support for descriptor builders (model, setting, toolchains)</description>
 
-  <properties />
 
   <dependencies>
     <dependency>

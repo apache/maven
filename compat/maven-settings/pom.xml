@@ -31,7 +31,6 @@ under the License.
   <name>Maven Settings</name>
   <description>Maven Settings model.</description>
 
-  <properties />
 
   <dependencies>
     <dependency>

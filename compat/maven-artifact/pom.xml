@@ -30,7 +30,6 @@ under the License.
 
   <name>Maven Artifact</name>
 
-  <properties />
 
   <dependencies>
     <dependency>
