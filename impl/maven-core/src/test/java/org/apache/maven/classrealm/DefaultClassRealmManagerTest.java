@@ -18,10 +18,13 @@
  */
 package org.apache.maven.classrealm;
 
+import javax.naming.spi.InitialContextFactory;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.ServiceLoader;
 
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.internal.impl.internal.DefaultCoreRealm;
@@ -41,6 +44,7 @@ import org.slf4j.LoggerFactory;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.endsWith;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.calls;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -93,6 +97,18 @@ class DefaultClassRealmManagerTest {
         model.setVersion("modelVersion1");
 
         return model;
+    }
+
+    @Test
+    void realmSeesPlatformServiceProviders() throws PlexusContainerException {
+        ClassRealm classRealm = newDefaultClassRealmManager(new DefaultPlexusContainer())
+                .createProjectRealm(newTestModel(), newTestArtifactList());
+
+        // JNDI resolves java.naming.factory.initial through ServiceLoader with the context class loader
+        assertTrue(
+                ServiceLoader.load(InitialContextFactory.class, classRealm).stream()
+                        .anyMatch(provider -> provider.type().getName().equals("com.sun.jndi.dns.DnsContextFactory")),
+                "jdk.naming.dns provider should be visible from a realm");
     }
 
     @Test
