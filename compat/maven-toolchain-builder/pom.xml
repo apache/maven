@@ -31,7 +31,6 @@ under the License.
   <name>Maven Toolchain Builder (deprecated)</name>
   <description>The effective toolchain builder.</description>
 
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

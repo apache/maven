@@ -31,7 +31,6 @@ under the License.
   <name>Maven Artifact Resolver Provider (deprecated)</name>
   <description>Components completing Maven Resolver for utilizing Maven POM and repository metadata.</description>
 
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

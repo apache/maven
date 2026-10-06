@@ -37,7 +37,6 @@ under the License.
     </contributor>
   </contributors>
 
-
   <dependencies>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>

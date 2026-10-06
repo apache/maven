@@ -31,7 +31,6 @@ under the License.
   <name>Maven Toolchain Model</name>
   <description>Maven Toolchain model.</description>
 
-
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
