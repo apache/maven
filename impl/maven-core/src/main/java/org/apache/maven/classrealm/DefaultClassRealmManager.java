@@ -129,7 +129,9 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
             while (true) {
                 try {
-                    ClassRealm classRealm = world.newRealm(realmId, null);
+                    // the platform loader as base keeps JDK service providers such as jdk.naming.dns visible to
+                    // ServiceLoader; a null base only reaches the bootstrap loader
+                    ClassRealm classRealm = world.newRealm(realmId, ClassLoader.getPlatformClassLoader());
 
                     logger.debug("Created new class realm {}", realmId);
 
