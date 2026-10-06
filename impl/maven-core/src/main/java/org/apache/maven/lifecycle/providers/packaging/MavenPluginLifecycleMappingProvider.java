@@ -40,7 +40,7 @@ public final class MavenPluginLifecycleMappingProvider extends AbstractLifecycle
                 "org.apache.maven.plugins:maven-resources-plugin:" + PluginVersions.RESOURCES + ":testResources",
         "test-compile", "org.apache.maven.plugins:maven-compiler-plugin:" + PluginVersions.COMPILER + ":testCompile",
         "test", "org.apache.maven.plugins:maven-surefire-plugin:" + PluginVersions.SUREFIRE + ":test",
-        "package", "org.apache.maven.plugins:maven-jar-plugin:" + PluginVersions.JAR + ":jar,",
+        "package", "org.apache.maven.plugins:maven-jar-plugin:" + PluginVersions.JAR + ":jar",
         "install", "org.apache.maven.plugins:maven-install-plugin:" + PluginVersions.INSTALL + ":install",
         "deploy", "org.apache.maven.plugins:maven-deploy-plugin:" + PluginVersions.DEPLOY + ":deploy"
     };
