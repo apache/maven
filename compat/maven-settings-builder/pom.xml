@@ -37,9 +37,7 @@ under the License.
     </contributor>
   </contributors>
 
-  <properties>
-    <javaModuleName>org.apache.maven.settings.builder</javaModuleName>
-  </properties>
+  <properties />
 
   <dependencies>
     <dependency>

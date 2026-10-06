@@ -32,7 +32,6 @@ under the License.
   <description>The effective model builder, with inheritance, profile activation, interpolation, ...</description>
 
   <properties>
-    <javaModuleName>org.apache.maven.model.builder</javaModuleName>
     <!-- in: DefaultModelValidator, DefaultModelBuilder -->
     <checkstyle.violation.ignore>FileLength</checkstyle.violation.ignore>
   </properties>

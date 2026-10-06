@@ -31,9 +31,7 @@ under the License.
   <name>Maven Toolchain Model</name>
   <description>Maven Toolchain model.</description>
 
-  <properties>
-    <javaModuleName>org.apache.maven.toolchain.model</javaModuleName>
-  </properties>
+  <properties />
 
   <dependencies>
     <dependency>

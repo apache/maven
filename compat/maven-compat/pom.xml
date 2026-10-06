@@ -31,9 +31,7 @@ under the License.
   <name>Maven 2 Compat (deprecated)</name>
   <description>Deprecated Maven 2 classes, maintained as compatibility layer.</description>
 
-  <properties>
-    <javaModuleName>org.apache.maven.compat</javaModuleName>
-  </properties>
+  <properties />
 
   <dependencies>
     <dependency>

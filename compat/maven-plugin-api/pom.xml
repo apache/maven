@@ -31,9 +31,7 @@ under the License.
   <name>Maven 3 Plugin API</name>
   <description>The API for Maven 3 plugins - Mojos - development.</description>
 
-  <properties>
-    <javaModuleName>org.apache.maven.plugin</javaModuleName>
-  </properties>
+  <properties />
 
   <dependencies>
     <dependency>

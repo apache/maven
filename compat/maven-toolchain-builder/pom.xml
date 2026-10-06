@@ -31,9 +31,7 @@ under the License.
   <name>Maven Toolchain Builder (deprecated)</name>
   <description>The effective toolchain builder.</description>
 
-  <properties>
-    <javaModuleName>org.apache.maven.toolchain.builder</javaModuleName>
-  </properties>
+  <properties />
 
   <dependencies>
     <dependency>

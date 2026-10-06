@@ -31,9 +31,7 @@ under the License.
   <name>Maven Embedder (deprecated)</name>
   <description>Maven embeddable component, with CLI and logging support.</description>
 
-  <properties>
-    <javaModuleName>org.apache.maven.embedder</javaModuleName>
-  </properties>
+  <properties />
 
   <dependencies>
     <!--  Maven4 API -->

@@ -31,9 +31,7 @@ under the License.
   <name>Maven Artifact Resolver Provider (deprecated)</name>
   <description>Components completing Maven Resolver for utilizing Maven POM and repository metadata.</description>
 
-  <properties>
-    <javaModuleName>org.apache.maven.resolver.provider</javaModuleName>
-  </properties>
+  <properties />
 
   <dependencies>
     <dependency>
