@@ -163,7 +163,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         try {
             collect.setTrace(RequestTrace.newChild(trace, depRequest));
             node = repoSystem.collectDependencies(session, collect).getRoot();
-		warnAboutObsoleteExclusions(session, collect);
+            warnAboutObsoleteExclusions(session, collect);
             result.setDependencyGraph(node);
         } catch (DependencyCollectionException e) {
             result.setDependencyGraph(e.getResult().getRoot());
@@ -217,56 +217,55 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
             }
         }
     }
-private void warnAboutObsoleteExclusions(RepositorySystemSession session, CollectRequest collect)
-        throws DependencyCollectionException {
 
-    if (!logger.isWarnEnabled()) {
-        return;
-    }
+    private void warnAboutObsoleteExclusions(RepositorySystemSession session, CollectRequest collect)
+            throws DependencyCollectionException {
 
-    for (org.eclipse.aether.graph.Dependency dependency : collect.getDependencies()) {
-        if (dependency.getExclusions() == null || dependency.getExclusions().isEmpty()) {
-            continue;
+        if (!logger.isWarnEnabled()) {
+            return;
         }
 
-        CollectRequest diagnosticCollect = new CollectRequest();
-        diagnosticCollect.setRequestContext(collect.getRequestContext());
-        diagnosticCollect.setRepositories(collect.getRepositories());
-        diagnosticCollect.setManagedDependencies(collect.getManagedDependencies());
-        diagnosticCollect.addDependency(dependency.setExclusions(null));
+        for (org.eclipse.aether.graph.Dependency dependency : collect.getDependencies()) {
+            if (dependency.getExclusions() == null || dependency.getExclusions().isEmpty()) {
+                continue;
+            }
 
-        DependencyNode diagnosticRoot =
-                repoSystem.collectDependencies(session, diagnosticCollect).getRoot();
+            CollectRequest diagnosticCollect = new CollectRequest();
+            diagnosticCollect.setRequestContext(collect.getRequestContext());
+            diagnosticCollect.setRepositories(collect.getRepositories());
+            diagnosticCollect.setManagedDependencies(collect.getManagedDependencies());
+            diagnosticCollect.addDependency(dependency.setExclusions(null));
 
-        checkObsoleteExclusions(dependency, diagnosticRoot);
+            DependencyNode diagnosticRoot =
+                    repoSystem.collectDependencies(session, diagnosticCollect).getRoot();
+
+            checkObsoleteExclusions(dependency, diagnosticRoot);
+        }
     }
-}
-private boolean containsExcludedDependency(
-        DependencyNode node, org.eclipse.aether.graph.Exclusion exclusion) {
 
-    for (DependencyNode child : node.getChildren()) {
-        if (child.getDependency() != null) {
-            org.eclipse.aether.artifact.Artifact artifact =
-                    child.getDependency().getArtifact();
+    private boolean containsExcludedDependency(DependencyNode node, org.eclipse.aether.graph.Exclusion exclusion) {
 
-            boolean groupMatches =
-                    "*".equals(exclusion.getGroupId())
-                            || exclusion.getGroupId().equals(artifact.getGroupId());
+        for (DependencyNode child : node.getChildren()) {
+            if (child.getDependency() != null) {
+                org.eclipse.aether.artifact.Artifact artifact =
+                        child.getDependency().getArtifact();
 
-            boolean artifactMatches =
-                    "*".equals(exclusion.getArtifactId())
-                            || exclusion.getArtifactId().equals(artifact.getArtifactId());
+                boolean groupMatches = "*".equals(exclusion.getGroupId())
+                        || exclusion.getGroupId().equals(artifact.getGroupId());
 
-            if (groupMatches && artifactMatches) {
+                boolean artifactMatches = "*".equals(exclusion.getArtifactId())
+                        || exclusion.getArtifactId().equals(artifact.getArtifactId());
+
+                if (groupMatches && artifactMatches) {
+                    return true;
+                }
+            }
+
+            if (containsExcludedDependency(child, exclusion)) {
                 return true;
             }
         }
 
-        if (containsExcludedDependency(child, exclusion)) {
-            return true;
-        }
+        return false;
     }
-
-    return false;
-}
 }
