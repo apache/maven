@@ -224,45 +224,23 @@ private void warnAboutObsoleteExclusions(RepositorySystemSession session, Collec
         return;
     }
 
-    CollectRequest diagnosticCollect = new CollectRequest();
-    diagnosticCollect.setRootArtifact(collect.getRootArtifact());
-    diagnosticCollect.setRequestContext(collect.getRequestContext());
-    diagnosticCollect.setRepositories(collect.getRepositories());
-    diagnosticCollect.setManagedDependencies(collect.getManagedDependencies());
-
-    collect.getDependencies().forEach(dependency ->
-            diagnosticCollect.addDependency(dependency.setExclusions(null)));
-
-    DependencyNode diagnosticRoot =
-            repoSystem.collectDependencies(session, diagnosticCollect).getRoot();
-
     for (org.eclipse.aether.graph.Dependency dependency : collect.getDependencies()) {
         if (dependency.getExclusions() == null || dependency.getExclusions().isEmpty()) {
             continue;
         }
 
+        CollectRequest diagnosticCollect = new CollectRequest();
+        diagnosticCollect.setRequestContext(collect.getRequestContext());
+        diagnosticCollect.setRepositories(collect.getRepositories());
+        diagnosticCollect.setManagedDependencies(collect.getManagedDependencies());
+        diagnosticCollect.addDependency(dependency.setExclusions(null));
+
+        DependencyNode diagnosticRoot =
+                repoSystem.collectDependencies(session, diagnosticCollect).getRoot();
+
         checkObsoleteExclusions(dependency, diagnosticRoot);
     }
 }
-
-private void checkObsoleteExclusions(
-        org.eclipse.aether.graph.Dependency dependency, DependencyNode diagnosticRoot) {
-
-    for (org.eclipse.aether.graph.Exclusion exclusion : dependency.getExclusions()) {
-        if (!containsExcludedDependency(diagnosticRoot, exclusion)) {
-            logger.warn("exclusion of "
-                    + exclusion.getGroupId()
-                    + ":"
-                    + exclusion.getArtifactId()
-                    + " for "
-                    + dependency.getArtifact().getGroupId()
-                    + ":"
-                    + dependency.getArtifact().getArtifactId()
-                    + " is obsolete - there is no dependency on this exclusion");
-        }
-    }
-}
-
 private boolean containsExcludedDependency(
         DependencyNode node, org.eclipse.aether.graph.Exclusion exclusion) {
 

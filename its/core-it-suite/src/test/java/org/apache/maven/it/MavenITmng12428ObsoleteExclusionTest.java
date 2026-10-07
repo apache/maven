@@ -53,5 +53,9 @@ public class MavenITmng12428ObsoleteExclusionTest extends AbstractMavenIntegrati
         verifier.verifyTextInLog(
                 "exclusion of org.apache.maven.its.mng12428:unused "
                         + "for org.apache.maven.its.mng12428:c");
+
+	  verifier.verifyTextNotInLog(
+        "exclusion of org.apache.maven.its.mng12428:b "
+                + "for org.apache.maven.its.mng12428:d");
     }
 }
