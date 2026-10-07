@@ -20,6 +20,7 @@ package org.apache.maven.cli;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
@@ -57,8 +58,11 @@ import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.transfer.TransferListener;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.impl.DumbTerminal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -71,8 +75,10 @@ import static org.apache.maven.cli.MavenCli.performProjectActivation;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -183,6 +189,9 @@ class MavenCliTest {
         int cpus = Runtime.getRuntime().availableProcessors();
         assertEquals((int) (cpus * 2.2), cli.calculateDegreeOfConcurrency("2.2C"));
         assertEquals(1, cli.calculateDegreeOfConcurrency("0.0001C"));
+        assertEquals(Math.max(1, cpus - 1), cli.calculateDegreeOfConcurrency("max"));
+        assertEquals(Math.max(1, cpus - 1), cli.calculateDegreeOfConcurrency("MAX"));
+        assertEquals(Math.max(1, cpus - 1), cli.calculateDegreeOfConcurrency("Max"));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("-2.2C"));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0C"));
     }
@@ -492,6 +501,74 @@ class MavenCliTest {
         assertEquals(
                 "." + File.separatorChar + "custom2",
                 executionRequest.getLocalRepositoryPath().toString());
+    }
+
+    /**
+     * The embedded entry point never goes through {@code main}, so no terminal is installed (#13357).
+     */
+    @Nested
+    class EmbeddedColor {
+
+        @BeforeEach
+        void setUp() {
+            // restored by the outer @AfterEach
+            System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, ".");
+            MessageUtils.setColorEnabled(true);
+        }
+
+        @AfterEach
+        void tearDown() {
+            MessageUtils.systemInstall((Terminal) null);
+            MessageUtils.setColorEnabled(true);
+        }
+
+        private String embeddedVersionOutput(String... extraArgs) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ByteArrayOutputStream err = new ByteArrayOutputStream();
+            String[] args = new String[extraArgs.length + 1];
+            args[0] = "--version";
+            System.arraycopy(extraArgs, 0, args, 1, extraArgs.length);
+            assertEquals(0, new MavenCli().doMain(args, ".", new PrintStream(out, true), new PrintStream(err, true)));
+            return new String(out.toByteArray(), StandardCharsets.UTF_8);
+        }
+
+        @Test
+        void colorYesEmitsAnsiAndLeavesNoTerminalBehind() {
+            assertNull(MessageUtils.getTerminal());
+
+            String output = embeddedVersionOutput("--color=yes");
+
+            assertTrue(output.contains("Apache Maven"));
+            assertNotEquals(stripAnsiCodes(output), output, "ANSI escapes expected: " + output);
+            assertNull(MessageUtils.getTerminal());
+        }
+
+        @Test
+        void colorNoAndAutoEmitNoAnsi() {
+            String no = embeddedVersionOutput("--color=no");
+            assertTrue(no.contains("Apache Maven"));
+            assertEquals(stripAnsiCodes(no), no);
+
+            MessageUtils.setColorEnabled(true);
+            String auto = embeddedVersionOutput();
+            assertTrue(auto.contains("Apache Maven"));
+            assertEquals(stripAnsiCodes(auto), auto);
+            assertNull(MessageUtils.getTerminal());
+        }
+
+        @Test
+        void installedTerminalIsLeftAlone() throws Exception {
+            Terminal mine = new DumbTerminal(
+                    "test", Terminal.TYPE_DUMB, InputStream.nullInputStream(), new ByteArrayOutputStream(), null);
+            MessageUtils.systemInstall(mine);
+            try {
+                embeddedVersionOutput("--color=yes");
+                assertSame(mine, MessageUtils.getTerminal());
+            } finally {
+                MessageUtils.systemInstall((Terminal) null);
+                mine.close();
+            }
+        }
     }
 
     /**

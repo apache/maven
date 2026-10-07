@@ -462,6 +462,42 @@ if $cygwin || $mingw ; then
 fi
 MAVEN_PROJECTBASEDIR="$MAVEN_PROJECTBASEDIR_NATIVE"
 
+# MNG-8056: Under Cygwin, the JVM is a native Windows process and cannot resolve
+# Cygwin-style POSIX paths (e.g. /cygdrive/c/...) directly.  The internal paths
+# (MAVEN_HOME, CLASSWORLDS_CONF, JAVA_HOME, …) are already converted above, but
+# user-supplied paths passed via -f/--file, -s/--settings, -gs/--global-settings, -t/--toolchains, -gt/--global-toolchains,
+# -ps/--project-settings, -is/--install-settings, -it/--install-toolchains,
+# -l/--log-file, and -af/--at-file reach the JVM unconverted.
+# The loop below rewrites only those argument values that begin with '/' (absolute
+# POSIX paths); relative paths and already-Windows paths are left unchanged.
+# MinGW/MSYS2 perform automatic path mangling, so the fix is Cygwin-only.
+if $cygwin ; then
+  _np=false
+  _count=$#
+  while [ $_count -gt 0 ]; do
+    _a="$1"
+    shift
+    if $_np; then
+      case "$_a" in
+        /*) _a=$(cygpath --windows "$_a") ;;
+      esac
+      _np=false
+    else
+      case "$_a" in
+        -f|--file|-s|--settings|-gs|--global-settings|-t|--toolchains|-gt|--global-toolchains|-ps|--project-settings|-is|--install-settings|-it|--install-toolchains|-l|--log-file|-af|--at-file)
+          _np=true ;;
+        --file=/*|--settings=/*|--global-settings=/*|--toolchains=/*|--global-toolchains=/*|--project-settings=/*|--install-settings=/*|--install-toolchains=/*|--log-file=/*|--at-file=/*)
+          _flag="${_a%%=*}"
+          _path="${_a#*=}"
+          _a="${_flag}=$(cygpath --windows "${_path}")"
+          ;;
+      esac
+    fi
+    set -- "$@" "$_a"
+    _count=$(( _count - 1 ))
+  done
+fi
+
 handle_args() {
   while [ $# -gt 0 ]; do
     case $1 in

@@ -31,10 +31,11 @@ The API for Maven 3 plugins - composed of goals implemented by Mojos - developme
 - goal code extends [`AbstractMojo` base class](./apidocs/org/apache/maven/plugin/AbstractMojo.html) that implements [`Mojo` interface](./apidocs/org/apache/maven/plugin/Mojo.html),
 - [`Log` interface](./apidocs/org/apache/maven/plugin/logging/Log.html) provides easy logging for the goal.
 
-A plugin is described in a [`META-INF/maven/plugin.xml` plugin descriptor](../../api/maven-api-plugin/plugin.html), generally generated from plugin sources using [maven-plugin-plugin](/plugin-tools/maven-plugin-plugin/).
+A Maven 3 plugin is described in a [`META-INF/maven/plugin.xml` plugin descriptor](./plugin.html), generally generated from plugin sources using [maven-plugin-plugin](/plugin-tools/maven-plugin-plugin/).
 
 ## See Also
 
 - [Mojo API Specification](/developers/mojo-api-specification.html)
 - [Plugin Tools](/plugin-tools/) that provide [maven-plugin-plugin](/plugin-tools/maven-plugin-plugin/) to generate the [`META-INF/maven/plugin.xml` plugin descriptor](./plugin.html)
 - [Plugin Testing](/plugin-testing/) frameworks
+- Maven 4 evolution of [plugin descriptor](../../api/maven-api-plugin/)

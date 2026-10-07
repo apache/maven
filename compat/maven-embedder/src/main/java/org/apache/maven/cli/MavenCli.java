@@ -26,6 +26,7 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
@@ -125,6 +126,8 @@ import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.transfer.TransferListener;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.impl.DumbTerminal;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -242,6 +245,29 @@ public class MavenCli {
     }
 
     /**
+     * Installs a threadless, colour-capable "dumb" terminal that is not attached to the process console, so that
+     * an explicit {@code --color=yes} works; automatic detection still yields plain output for it. Colour is
+     * optional, so failure to create the terminal is not an error.
+     *
+     * @return the installed terminal, or {@code null} if it could not be created
+     */
+    private static Terminal installEmbeddedTerminal() {
+        try {
+            Terminal dumb = new DumbTerminal(
+                    "Maven",
+                    Terminal.TYPE_DUMB_COLOR,
+                    InputStream.nullInputStream(),
+                    OutputStream.nullOutputStream(),
+                    null);
+            MessageUtils.systemInstall(dumb);
+            return dumb;
+        } catch (IOException e) {
+            LoggerFactory.getLogger(MavenCli.class).debug("Could not create terminal, continuing without colour", e);
+            return null;
+        }
+    }
+
+    /**
      * This supports painless invocation by the Verifier during embedded execution of the core ITs.
      * See <a href="http://maven.apache.org/shared/maven-verifier/xref/org/apache/maven/it/Embedded3xLauncher.html">
      * <code>Embedded3xLauncher</code> in <code>maven-verifier</code></a>
@@ -266,6 +292,10 @@ public class MavenCli {
             realms = Collections.emptySet();
         }
 
+        // Embedders call this method instead of main(), so nobody installed a terminal; without one
+        // MessageUtils.isColorEnabled() is always false, even for an explicit --color=yes (#13357).
+        // The dumb terminal keeps "auto" plain, and an already installed terminal is left alone.
+        Terminal embeddedTerminal = null;
         try {
             if (stdout != null) {
                 System.setOut(stdout);
@@ -274,11 +304,25 @@ public class MavenCli {
                 System.setErr(stderr);
             }
 
+            if (MessageUtils.getTerminal() == null) {
+                embeddedTerminal = installEmbeddedTerminal();
+            }
+
             CliRequest cliRequest = new CliRequest(args, classWorld);
             cliRequest.workingDirectory = workingDirectory;
 
             return doMain(cliRequest);
         } finally {
+            if (embeddedTerminal != null) {
+                if (MessageUtils.getTerminal() == embeddedTerminal) {
+                    MessageUtils.systemInstall((Terminal) null);
+                }
+                try {
+                    embeddedTerminal.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
             if (classWorld != null) {
                 for (ClassRealm realm : new ArrayList<>(classWorld.getRealms())) {
                     String realmId = realm.getId();
@@ -531,6 +575,10 @@ public class MavenCli {
                     && (commandLine.hasOption(CLIManager.BATCH_MODE)
                             || commandLine.hasOption(CLIManager.NON_INTERACTIVE));
             if (isBatchMode || commandLine.hasOption(CLIManager.LOG_FILE)) {
+                MessageUtils.setColorEnabled(false);
+            } else if (MessageUtils.getTerminal() != null
+                    && MessageUtils.getTerminal().getType().startsWith("dumb")) {
+                // if the terminal is detected as dumb terminal, disable colors
                 MessageUtils.setColorEnabled(false);
             }
         }
@@ -1624,6 +1672,9 @@ public class MavenCli {
     }
 
     int calculateDegreeOfConcurrency(String threadConfiguration) {
+        if ("max".equalsIgnoreCase(threadConfiguration)) {
+            return Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
+        }
         try {
             if (threadConfiguration.endsWith("C")) {
                 String str = threadConfiguration.substring(0, threadConfiguration.length() - 1);
@@ -1647,7 +1698,7 @@ public class MavenCli {
             }
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid threads value: '" + threadConfiguration
-                    + "'. Supported are int and float values ending with C.");
+                    + "'. Supported are 'max', int and float values ending with C.");
         }
     }
 

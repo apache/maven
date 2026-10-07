@@ -44,6 +44,9 @@ updates:
         versions: [ "[1.3.0,)" ]
       - dependency-name: "org.codehaus.plexus:plexus-cipher"
         versions: [ ">=2.1.0" ]
+      # Mockito 5 requires Java 11; the build still runs on JDK 8
+      - dependency-name: "org.mockito:*"
+        versions: [">= 5.0.0"]
 
   - package-ecosystem: "maven"
     directory: "/"
@@ -60,6 +63,9 @@ updates:
         versions: [ "[1.3.0,)" ]
       - dependency-name: "org.codehaus.plexus:plexus-cipher"
         versions: [ ">=2.1.0" ]
+      # Mockito 5 requires Java 11; the build still runs on JDK 8
+      - dependency-name: "org.mockito:*"
+        versions: [">= 5.0.0"]
 
   - package-ecosystem: "github-actions"
     directory: "/"

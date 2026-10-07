@@ -6,6 +6,14 @@
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
   <description>Verifies that maven.lifecycle.filter=phase(test) skips the test phase.</description>
+  <dependencies>
+    <dependency>
+      <groupId>org.junit.jupiter</groupId>
+      <artifactId>junit-jupiter-api</artifactId>
+      <version>5.11.0</version>
+      <scope>test</scope>
+    </dependency>
+  </dependencies>
   <build>
     <plugins>
       <plugin>

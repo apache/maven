@@ -29,7 +29,7 @@ import org.apache.maven.api.annotations.Nonnull;
  *
  * <p>Each {@code Artifact} instance is basically an exact pointer to a file in a Maven repository.
  * {@code Artifact} instances are created when <dfn>resolving</dfn> {@link ArtifactCoordinates} instances.
- * Resolving is the process that selects a {@linkplain #getVersion() particular version}
+ * Resolving is the process that selects a {@linkplain #version() particular version}
  * and downloads the artifact in the local repository.  This operation returns a {@link DownloadedArtifact}.
  * </p>
  *
@@ -46,32 +46,61 @@ public interface Artifact {
      */
     @Nonnull
     default String key() {
-        String c = getClassifier();
-        return getGroupId()
-                + ':'
-                + getArtifactId()
-                + ':'
-                + getExtension()
-                + (c.isEmpty() ? "" : ":" + c)
-                + ':'
-                + getVersion();
+        String c = classifier();
+        return groupId() + ':' + artifactId() + ':' + extension() + (c.isEmpty() ? "" : ":" + c) + ':' + version();
     }
 
     /**
      * {@return the group identifier of the artifact}.
      *
-     * @see ArtifactCoordinates#getGroupId()
+     * @see ArtifactCoordinates#groupId()
      */
     @Nonnull
-    String getGroupId();
+    String groupId();
+
+    /**
+     * {@return the group identifier of the artifact}.
+     *
+     * @see ArtifactCoordinates#getGroupId()
+     * @deprecated Use {@link #groupId()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default String getGroupId() {
+        return groupId();
+    }
+
+    /**
+     * {@return the identifier of the artifact}.
+     *
+     * @see ArtifactCoordinates#artifactId()
+     */
+    @Nonnull
+    String artifactId();
 
     /**
      * {@return the identifier of the artifact}.
      *
      * @see ArtifactCoordinates#getArtifactId()
+     * @deprecated Use {@link #artifactId()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default String getArtifactId() {
+        return artifactId();
+    }
+
+    /**
+     * {@return the version of the artifact}.
+     * Contrarily to {@link ArtifactCoordinates},
+     * each {@code Artifact} is associated to a specific version instead of a range of versions.
+     * If the {@linkplain #baseVersion() base version} contains a meta-version such as {@code SNAPSHOT},
+     * those keywords are replaced by, for example, the actual timestamp.
+     *
+     * @see ArtifactCoordinates#versionConstraint()
      */
     @Nonnull
-    String getArtifactId();
+    Version version();
 
     /**
      * {@return the version of the artifact}.
@@ -81,27 +110,68 @@ public interface Artifact {
      * those keywords are replaced by, for example, the actual timestamp.
      *
      * @see ArtifactCoordinates#getVersionConstraint()
+     * @deprecated Use {@link #version()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default Version getVersion() {
+        return version();
+    }
+
+    /**
+     * {@return the version or meta-version of the artifact}.
+     * A meta-version is a version suffixed with the {@code SNAPSHOT} keyword.
+     * Meta-versions are represented in a base version by their symbols (e.g., {@code SNAPSHOT}),
+     * while they are replaced by, for example, the actual timestamp in the {@linkplain #version() version}.
      */
     @Nonnull
-    Version getVersion();
+    Version baseVersion();
 
     /**
      * {@return the version or meta-version of the artifact}.
      * A meta-version is a version suffixed with the {@code SNAPSHOT} keyword.
      * Meta-versions are represented in a base version by their symbols (e.g., {@code SNAPSHOT}),
      * while they are replaced by, for example, the actual timestamp in the {@linkplain #getVersion() version}.
+     *
+     * @deprecated Use {@link #baseVersion()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default Version getBaseVersion() {
+        return baseVersion();
+    }
+
+    /**
+     * Returns the classifier of the artifact.
+     *
+     * @return the classifier or an empty string if none, never {@code null}
+     * @see ArtifactCoordinates#classifier()
      */
     @Nonnull
-    Version getBaseVersion();
+    String classifier();
 
     /**
      * Returns the classifier of the artifact.
      *
      * @return the classifier or an empty string if none, never {@code null}
      * @see ArtifactCoordinates#getClassifier()
+     * @deprecated Use {@link #classifier()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default String getClassifier() {
+        return classifier();
+    }
+
+    /**
+     * Returns the file extension of the artifact.
+     * The dot separator is <em>not</em> included in the returned string.
+     *
+     * @return the file extension or an empty string if none, never {@code null}
+     * @see ArtifactCoordinates#extension()
      */
     @Nonnull
-    String getClassifier();
+    String extension();
 
     /**
      * Returns the file extension of the artifact.
@@ -109,9 +179,13 @@ public interface Artifact {
      *
      * @return the file extension or an empty string if none, never {@code null}
      * @see ArtifactCoordinates#getExtension()
+     * @deprecated Use {@link #extension()} instead.
      */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     @Nonnull
-    String getExtension();
+    default String getExtension() {
+        return extension();
+    }
 
     /**
      * Determines whether this artifact uses a snapshot version.
