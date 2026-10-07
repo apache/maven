@@ -163,6 +163,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         try {
             collect.setTrace(RequestTrace.newChild(trace, depRequest));
             node = repoSystem.collectDependencies(session, collect).getRoot();
+		warnAboutObsoleteExclusions(session, collect);
             result.setDependencyGraph(node);
         } catch (DependencyCollectionException e) {
             result.setDependencyGraph(e.getResult().getRoot());
@@ -216,4 +217,78 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
             }
         }
     }
+private void warnAboutObsoleteExclusions(RepositorySystemSession session, CollectRequest collect)
+        throws DependencyCollectionException {
+
+    if (!logger.isWarnEnabled()) {
+        return;
+    }
+
+    CollectRequest diagnosticCollect = new CollectRequest();
+    diagnosticCollect.setRootArtifact(collect.getRootArtifact());
+    diagnosticCollect.setRequestContext(collect.getRequestContext());
+    diagnosticCollect.setRepositories(collect.getRepositories());
+    diagnosticCollect.setManagedDependencies(collect.getManagedDependencies());
+
+    collect.getDependencies().forEach(dependency ->
+            diagnosticCollect.addDependency(dependency.setExclusions(null)));
+
+    DependencyNode diagnosticRoot =
+            repoSystem.collectDependencies(session, diagnosticCollect).getRoot();
+
+    for (org.eclipse.aether.graph.Dependency dependency : collect.getDependencies()) {
+        if (dependency.getExclusions() == null || dependency.getExclusions().isEmpty()) {
+            continue;
+        }
+
+        checkObsoleteExclusions(dependency, diagnosticRoot);
+    }
+}
+
+private void checkObsoleteExclusions(
+        org.eclipse.aether.graph.Dependency dependency, DependencyNode diagnosticRoot) {
+
+    for (org.eclipse.aether.graph.Exclusion exclusion : dependency.getExclusions()) {
+        if (!containsExcludedDependency(diagnosticRoot, exclusion)) {
+            logger.warn("exclusion of "
+                    + exclusion.getGroupId()
+                    + ":"
+                    + exclusion.getArtifactId()
+                    + " for "
+                    + dependency.getArtifact().getGroupId()
+                    + ":"
+                    + dependency.getArtifact().getArtifactId()
+                    + " is obsolete - there is no dependency on this exclusion");
+        }
+    }
+}
+
+private boolean containsExcludedDependency(
+        DependencyNode node, org.eclipse.aether.graph.Exclusion exclusion) {
+
+    for (DependencyNode child : node.getChildren()) {
+        if (child.getDependency() != null) {
+            org.eclipse.aether.artifact.Artifact artifact =
+                    child.getDependency().getArtifact();
+
+            boolean groupMatches =
+                    "*".equals(exclusion.getGroupId())
+                            || exclusion.getGroupId().equals(artifact.getGroupId());
+
+            boolean artifactMatches =
+                    "*".equals(exclusion.getArtifactId())
+                            || exclusion.getArtifactId().equals(artifact.getArtifactId());
+
+            if (groupMatches && artifactMatches) {
+                return true;
+            }
+        }
+
+        if (containsExcludedDependency(child, exclusion)) {
+            return true;
+        }
+    }
+
+    return false;
+}
 }
