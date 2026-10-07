@@ -1532,9 +1532,13 @@
             {@code partner}
             (directly synced from a partner Maven 2 repository), {@code deployed} (was deployed from a Maven 2
             instance), {@code verified} (has been hand verified as correct and final).
+            @deprecated This field is obsolete, not used by Maven, and must not be set in project POMs.
           </description>
           <required>false</required>
           <type>String</type>
+          <annotations>
+            <annotation>@Deprecated(since = "4.0.0")</annotation>
+          </annotations>
         </field>
       </fields>
     </class>
