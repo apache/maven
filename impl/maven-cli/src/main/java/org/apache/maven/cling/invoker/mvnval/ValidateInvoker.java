@@ -60,6 +60,7 @@ import org.apache.maven.cling.invoker.LookupInvoker;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.standalone.ApiRunner;
+import org.apache.maven.jline.MessageUtils;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.spi.connector.transport.TransporterFactory;
 import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
@@ -212,7 +213,7 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                         context.cwd.get(),
                         determineWriter(context),
                         contextLines,
-                        Boolean.TRUE.equals(context.coloredOutput));
+                        MessageUtils.isColorEnabled());
                 return exitCode(reports);
             } finally {
                 if (cleanup != null) {
