@@ -31,6 +31,7 @@
   <description>Maven 4 API - Dependency Injection</description>
 
   <properties>
+    <javaModuleName>org.apache.maven.api.di</javaModuleName>
     <maven.compiler.proc>none</maven.compiler.proc>
   </properties>
 </project>
