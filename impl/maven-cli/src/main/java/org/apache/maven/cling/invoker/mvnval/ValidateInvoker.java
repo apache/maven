@@ -377,29 +377,29 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
      * set to true.
      */
     private static Session withOffline(Session session) {
-        // withLocalRepository(same repo) forces AbstractSession to clone the underlying resolver
-        // session (DefaultRepositorySystemSession) into a fresh one held only by the new session
-        // object.  That fresh clone is safe to mutate without affecting the caller's session.
-        Session copy = session.withLocalRepository(session.getLocalRepository());
+        // AbstractSession.withLocalRepository short-circuits when the path is unchanged
+        // (returns this). Mutate the underlying DefaultRepositorySystemSession in-place.
+        // Safe only because validateAll reassigns session immediately and does not retain
+        // the pre-mutation reference.
         DefaultRepositorySystemSession rsession =
-                (DefaultRepositorySystemSession) InternalSession.from(copy).getSession();
+                (DefaultRepositorySystemSession) InternalSession.from(session).getSession();
         rsession.setOffline(true);
-        return copy;
+        return session;
     }
 
     /**
      * Installs a {@link BundleWorkspaceReader} on the resolver session so that parent and BOM
      * lookups for POMs in the bundle are answered from disk rather than from a repository.
-     * <p>
-     * The workspace reader is set on a clone of the resolver session: it does not mutate the
-     * original session, which the tests may reuse across runs.
      */
     private static Session withWorkspaceReader(Session session, BundleWorkspaceReader reader) {
-        Session copy = session.withLocalRepository(session.getLocalRepository());
+        // AbstractSession.withLocalRepository short-circuits when the path is unchanged
+        // (returns this). Mutate the underlying DefaultRepositorySystemSession in-place.
+        // Safe only because validateAll reassigns session immediately and does not retain
+        // the pre-mutation reference.
         DefaultRepositorySystemSession rsession =
-                (DefaultRepositorySystemSession) InternalSession.from(copy).getSession();
+                (DefaultRepositorySystemSession) InternalSession.from(session).getSession();
         rsession.setWorkspaceReader(reader);
-        return copy;
+        return session;
     }
 
     /**

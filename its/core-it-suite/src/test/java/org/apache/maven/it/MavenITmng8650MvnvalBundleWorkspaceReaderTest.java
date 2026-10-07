@@ -62,7 +62,7 @@ class MavenITmng8650MvnvalBundleWorkspaceReaderTest extends AbstractMavenIntegra
     void testBundleParentResolvedFromDiskParentFirst() throws Exception {
         Path testDir = extractResources("mvnval-validate-pom");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.setForkJvm(true);
         verifier.setLogFileName("bundle-parent-first.txt");
         verifier.addCliArgument("--val");
@@ -84,7 +84,7 @@ class MavenITmng8650MvnvalBundleWorkspaceReaderTest extends AbstractMavenIntegra
     void testBundleParentResolvedFromDiskChildFirst() throws Exception {
         Path testDir = extractResources("mvnval-validate-pom");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.setForkJvm(true);
         verifier.setLogFileName("bundle-child-first.txt");
         verifier.addCliArgument("--val");
@@ -108,7 +108,7 @@ class MavenITmng8650MvnvalBundleWorkspaceReaderTest extends AbstractMavenIntegra
     void testOfflineBundleResolvesFromDisk() throws Exception {
         Path testDir = extractResources("mvnval-validate-pom");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.setForkJvm(true);
         verifier.setLogFileName("bundle-offline.txt");
         verifier.addCliArgument("--val");
@@ -131,7 +131,7 @@ class MavenITmng8650MvnvalBundleWorkspaceReaderTest extends AbstractMavenIntegra
     void testOfflineSinglePomFailsWhenParentAbsent() throws Exception {
         Path testDir = extractResources("mvnval-validate-pom");
 
-        Verifier verifier = newVerifier(testDir.toString());
+        Verifier verifier = newVerifier(testDir, null);
         verifier.setForkJvm(true);
         verifier.setLogFileName("bundle-offline-missing-parent.txt");
         verifier.addCliArgument("--val");
