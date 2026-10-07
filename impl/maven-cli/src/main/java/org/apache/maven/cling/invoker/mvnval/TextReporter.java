@@ -19,6 +19,9 @@
 package org.apache.maven.cling.invoker.mvnval;
 
 import java.io.IOException;
+import java.net.URI;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
@@ -26,30 +29,43 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.services.BuilderProblem;
+import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.ModelProblem;
+import org.apache.maven.jline.MessageUtils;
 
 /**
- * Renders validation results as plain text, one problem per line.
+ * Renders validation results as plain text, one problem per line, with optional
+ * source-context lines and ANSI color when the terminal supports it.
  */
 class TextReporter {
 
     private static final String INDENT = "  ";
+    private static final int MAX_LINE_WIDTH = 120;
 
-    static void report(List<Report> reports, Path cwd, Consumer<String> out) {
+    static void report(List<Report> reports, Path cwd, Consumer<String> out, int context, boolean color) {
         Path base = realPath(cwd);
         for (Report report : reports) {
             String pom = display(report.pom(), base);
             if (report.failure() != null) {
-                out.accept(pom + ": " + report.failure());
+                out.accept(newBuilder(color).strong(pom + ":").build() + " " + report.failure());
             } else if (report.clean()) {
-                out.accept(pom + ": no problems");
+                out.accept(newBuilder(color).success(pom + ": no problems").build());
             } else {
-                out.accept(pom + ":");
+                out.accept(newBuilder(color).strong(pom + ":").build());
                 for (ModelProblem problem : report.problems()) {
-                    out.accept(line(problem, report));
+                    out.accept(problemLine(problem, report, color));
+                    if (context > 0 && problem.getLineNumber() > 0) {
+                        contextLines(problem, report, context, color, out);
+                    }
                 }
             }
         }
+    }
+
+    /** Returns a color-aware or plain {@link MessageBuilder}. */
+    private static MessageBuilder newBuilder(boolean color) {
+        return color ? MessageUtils.builder() : new PlainMessageBuilder();
     }
 
     /**
@@ -74,15 +90,27 @@ class TextReporter {
         }
     }
 
-    private static String line(ModelProblem problem, Report report) {
+    private static String problemLine(ModelProblem problem, Report report, boolean color) {
         // A parser failure arrives as a message of several lines; the continuations are indented
         // one step deeper than the entry so it still reads as one.
         String message = String.valueOf(problem.getMessage())
                 .lines()
                 .collect(Collectors.joining(System.lineSeparator() + INDENT + INDENT));
-        String text = INDENT + problem.getSeverity() + " " + message;
+
+        MessageBuilder b = newBuilder(color).a(INDENT);
+        BuilderProblem.Severity severity = problem.getSeverity();
+        if (severity == BuilderProblem.Severity.FATAL || severity == BuilderProblem.Severity.ERROR) {
+            b.failure(severity.toString());
+        } else {
+            b.warning(severity.toString());
+        }
+        b.a(" ").a(message);
+
         String where = location(problem, report);
-        return where.isEmpty() ? text : text + " @ " + where;
+        if (!where.isEmpty()) {
+            b.a(" @ ").a(where);
+        }
+        return b.build();
     }
 
     /**
@@ -99,5 +127,119 @@ class TextReporter {
                         problem.getColumnNumber() > 0 ? "column " + problem.getColumnNumber() : null)
                 .filter(Objects::nonNull)
                 .collect(Collectors.joining(", "));
+    }
+
+    /**
+     * Reads the source file for the problem and emits the surrounding {@code context} lines,
+     * with a {@code >} marker on the problem line and line numbers as a gutter.
+     * <p>
+     * Lines longer than {@value #MAX_LINE_WIDTH} characters are truncated with an ellipsis so
+     * the output does not wrap on a standard terminal.
+     */
+    private static void contextLines(
+            ModelProblem problem, Report report, int context, boolean color, Consumer<String> out) {
+        Path source = resolveSourcePath(problem, report);
+        if (source == null || !Files.isRegularFile(source)) {
+            return;
+        }
+        List<String> lines;
+        try {
+            lines = Files.readAllLines(source, StandardCharsets.UTF_8);
+        } catch (IOException e) {
+            return;
+        }
+        int total = lines.size();
+        int problemLine = problem.getLineNumber(); // 1-based
+        if (problemLine < 1 || problemLine > total) {
+            return;
+        }
+        int first = Math.max(1, problemLine - context);
+        int last = Math.min(total, problemLine + context);
+
+        // Width of the line-number gutter: enough digits for the largest line number shown.
+        int gutterWidth = Integer.toString(last).length();
+
+        for (int i = first; i <= last; i++) {
+            String text = lines.get(i - 1);
+            if (text.length() > MAX_LINE_WIDTH) {
+                text = text.substring(0, MAX_LINE_WIDTH - 1) + "\u2026";
+            }
+            boolean isProb = (i == problemLine);
+            String marker = isProb ? ">" : " ";
+            String num = String.format("%" + gutterWidth + "d", i);
+            MessageBuilder b = newBuilder(color).a(INDENT).a(marker).a(" ");
+            if (isProb) {
+                b.strong(num + " | " + text);
+            } else {
+                b.a(num).a(" | ").a(text);
+            }
+            out.accept(b.build());
+        }
+    }
+
+    /**
+     * Resolves the path of the file containing the problem. Falls back to the report's own POM
+     * when the problem has no source or the source cannot be converted to a path.
+     */
+    private static Path resolveSourcePath(ModelProblem problem, Report report) {
+        String source = problem.getSource();
+        if (source == null || source.isEmpty()) {
+            return report.pom();
+        }
+        try {
+            Path path = source.startsWith("file:") ? Path.of(URI.create(source)) : Path.of(source);
+            path = path.normalize();
+            return path.isAbsolute() ? path : report.pom().resolveSibling(path);
+        } catch (IllegalArgumentException e) {
+            return report.pom();
+        }
+    }
+
+    /**
+     * A plain {@link MessageBuilder} that produces text with no ANSI escapes.
+     * Used when color is disabled.
+     */
+    private static final class PlainMessageBuilder implements MessageBuilder {
+
+        private final StringBuilder buf = new StringBuilder();
+
+        @Override
+        public MessageBuilder style(String style) {
+            return this;
+        }
+
+        @Override
+        public MessageBuilder resetStyle() {
+            return this;
+        }
+
+        @Override
+        public MessageBuilder append(CharSequence cs) {
+            buf.append(cs);
+            return this;
+        }
+
+        @Override
+        public MessageBuilder append(CharSequence cs, int start, int end) {
+            buf.append(cs, start, end);
+            return this;
+        }
+
+        @Override
+        public MessageBuilder append(char c) {
+            buf.append(c);
+            return this;
+        }
+
+        @Override
+        public MessageBuilder setLength(int length) {
+            buf.setLength(length);
+            return this;
+        }
+
+        @Override
+        public String build() {
+            return buf.toString();
+        }
     }
 }

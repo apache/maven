@@ -55,8 +55,13 @@ final class TestUtils {
 
     /** Collects the lines a reporter writes, in order, as if run from an unrelated directory. */
     static List<String> render(OutputFormat format, List<Report> reports) {
+        return render(format, reports, 0);
+    }
+
+    /** Collects the lines a reporter writes with the given source-context window. */
+    static List<String> render(OutputFormat format, List<Report> reports, int context) {
         List<String> lines = new ArrayList<>();
-        format.report(reports, Paths.get("/elsewhere"), lines::add);
+        format.report(reports, Paths.get("/elsewhere"), lines::add, context, false);
         return lines;
     }
 

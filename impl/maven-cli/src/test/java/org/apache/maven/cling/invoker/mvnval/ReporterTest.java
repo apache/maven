@@ -162,6 +162,57 @@ class ReporterTest {
                     TestUtils.render(OutputFormat.TEXT, List.of(Report.failed(POM, "not a readable file")));
             assertEquals(List.of(POM + ": not a readable file"), lines);
         }
+
+        @Test
+        @DisplayName("should emit context lines around a problem when the source file exists")
+        void shouldEmitContextLines() throws Exception {
+            // Write a temporary POM with some content so the context reader can find the file.
+            java.nio.file.Path tmp = java.nio.file.Files.createTempFile("mvnval-test-", ".xml");
+            try {
+                java.nio.file.Files.writeString(tmp, "<project>\n  <bad/>\n  <also/>\n</project>\n");
+                // Problem on line 2, context=1 → lines 1–3 should appear.
+                List<String> lines = TestUtils.render(
+                        OutputFormat.TEXT,
+                        List.of(Report.of(
+                                tmp,
+                                List.of(TestUtils.problem(
+                                        BuilderProblem.Severity.ERROR, "bad element", tmp.toString(), 2, 3)))),
+                        1);
+                // Verify the marker line is present.
+                assertTrue(
+                        lines.stream().anyMatch(l -> l.contains("> ") && l.contains("<bad/>")),
+                        "problem line must carry the > marker: " + lines);
+                // Verify the surrounding context line is present.
+                assertTrue(
+                        lines.stream().anyMatch(l -> !l.contains("> ") && l.contains("<project>")),
+                        "context line before the problem must appear: " + lines);
+                assertTrue(
+                        lines.stream().anyMatch(l -> !l.contains("> ") && l.contains("<also/>")),
+                        "context line after the problem must appear: " + lines);
+            } finally {
+                java.nio.file.Files.deleteIfExists(tmp);
+            }
+        }
+
+        @Test
+        @DisplayName("should suppress context when --context 0 is used")
+        void shouldSuppressContextWhenZero() throws Exception {
+            java.nio.file.Path tmp = java.nio.file.Files.createTempFile("mvnval-test-", ".xml");
+            try {
+                java.nio.file.Files.writeString(tmp, "<project>\n  <bad/>\n</project>\n");
+                List<String> lines = TestUtils.render(
+                        OutputFormat.TEXT,
+                        List.of(Report.of(
+                                tmp,
+                                List.of(TestUtils.problem(
+                                        BuilderProblem.Severity.ERROR, "bad element", tmp.toString(), 2, 1)))),
+                        0);
+                // No gutter lines — only the header and the problem line itself.
+                assertTrue(lines.stream().noneMatch(l -> l.contains("|")), "no gutter lines when context=0: " + lines);
+            } finally {
+                java.nio.file.Files.deleteIfExists(tmp);
+            }
+        }
     }
 
     @Nested

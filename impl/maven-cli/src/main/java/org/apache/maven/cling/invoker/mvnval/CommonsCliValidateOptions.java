@@ -77,6 +77,24 @@ public class CommonsCliValidateOptions extends CommonsCliOptions implements Vali
 
     @Override
     @Nonnull
+    public Optional<Integer> context() {
+        String val = commandLine.getOptionValue(CLIManager.CONTEXT);
+        if (val == null) {
+            return Optional.empty();
+        }
+        try {
+            int n = Integer.parseInt(val);
+            if (n < 0) {
+                throw new IllegalArgumentException("--context value must be non-negative: " + val);
+            }
+            return Optional.of(n);
+        } catch (NumberFormatException e) {
+            throw new IllegalArgumentException("--context value must be an integer: " + val);
+        }
+    }
+
+    @Override
+    @Nonnull
     public Optional<List<String>> poms() {
         if (commandLine.getArgList().isEmpty()) {
             return Optional.empty();
@@ -130,6 +148,10 @@ public class CommonsCliValidateOptions extends CommonsCliOptions implements Vali
         printStream.accept("on, and its lines land in front of the document; -V prints the version");
         printStream.accept("banner there whatever the log level.");
         printStream.accept("");
+        printStream.accept("-C N (--context N) shows N lines of source before and after each problem");
+        printStream.accept("location, like grep -C. The default is 2. Pass 0 to suppress. Has no");
+        printStream.accept("effect under --format json, which always reports the raw line number.");
+        printStream.accept("");
     }
 
     @Override
@@ -147,6 +169,8 @@ public class CommonsCliValidateOptions extends CommonsCliOptions implements Vali
         public static final String LOCAL_REPOSITORY = "local-repository";
 
         public static final String TEMP_LOCAL_REPOSITORY = "temp-local-repository";
+
+        public static final String CONTEXT = "context";
 
         @Override
         protected void prepareOptions(org.apache.commons.cli.Options options) {
@@ -169,6 +193,12 @@ public class CommonsCliValidateOptions extends CommonsCliOptions implements Vali
             options.addOption(Option.builder()
                     .longOpt(TEMP_LOCAL_REPOSITORY)
                     .desc("Resolve into a directory created for this run and deleted when it ends.")
+                    .get());
+            options.addOption(Option.builder("C")
+                    .longOpt(CONTEXT)
+                    .hasArg()
+                    .argName("N")
+                    .desc("Show N lines of XML context around each problem location (default 2, 0 to disable).")
                     .get());
         }
 

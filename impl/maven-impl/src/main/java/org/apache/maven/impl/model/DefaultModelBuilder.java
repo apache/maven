@@ -664,9 +664,14 @@ public class DefaultModelBuilder implements ModelBuilder {
                 source = getSource();
             }
 
-            if (line <= 0 && column <= 0 && exception instanceof ModelParserException e) {
-                line = e.getLineNumber();
-                column = e.getColumnNumber();
+            if (line <= 0 && column <= 0) {
+                if (exception instanceof ModelParserException e) {
+                    line = e.getLineNumber();
+                    column = e.getColumnNumber();
+                } else if (exception instanceof XmlReaderException e && e.getLocation() != null) {
+                    line = e.getLocation().getLineNumber();
+                    column = e.getLocation().getColumnNumber();
+                }
             }
 
             ModelProblem problem =

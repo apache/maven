@@ -82,4 +82,17 @@ public interface ValidateOptions extends Options {
      */
     @Nonnull
     Optional<Boolean> tempLocalRepository();
+
+    /**
+     * Returns the number of source lines to display before and after a problem location, giving
+     * the reader the surrounding XML context. Applies to {@code text} format only; JSON output
+     * carries the raw line and column numbers instead.
+     * <p>
+     * The value {@code 0} disables context display. The default when the option is absent is
+     * {@code 2}, matching the behaviour of {@code grep -C 2}.
+     *
+     * @return an {@link Optional} holding the requested context size, or empty when not given
+     */
+    @Nonnull
+    Optional<Integer> context();
 }

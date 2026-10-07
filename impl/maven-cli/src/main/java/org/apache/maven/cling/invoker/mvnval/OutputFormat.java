@@ -31,13 +31,13 @@ import java.util.stream.Collectors;
 enum OutputFormat {
     TEXT {
         @Override
-        void report(List<Report> reports, Path cwd, Consumer<String> out) {
-            TextReporter.report(reports, cwd, out);
+        void report(List<Report> reports, Path cwd, Consumer<String> out, int context, boolean color) {
+            TextReporter.report(reports, cwd, out, context, color);
         }
     },
     JSON {
         @Override
-        void report(List<Report> reports, Path cwd, Consumer<String> out) {
+        void report(List<Report> reports, Path cwd, Consumer<String> out, int context, boolean color) {
             // Absolute paths only: the document may be read somewhere else entirely.
             JsonReporter.report(reports, out);
         }
@@ -46,8 +46,11 @@ enum OutputFormat {
     /**
      * Renders the reports, handing each line to {@code out} without a line separator. A format may
      * emit any number of lines per report, including one line for all of them.
+     *
+     * @param context number of source lines before/after each problem location (text format only)
+     * @param color   whether ANSI color codes are enabled
      */
-    abstract void report(List<Report> reports, Path cwd, Consumer<String> out);
+    abstract void report(List<Report> reports, Path cwd, Consumer<String> out, int context, boolean color);
 
     static OutputFormat parse(String name) {
         return Arrays.stream(values())

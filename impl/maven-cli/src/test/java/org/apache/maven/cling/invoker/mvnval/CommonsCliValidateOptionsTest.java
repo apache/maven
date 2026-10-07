@@ -167,4 +167,29 @@ class CommonsCliValidateOptionsTest {
 
         assertTrue(options.mode().isEmpty(), "empty, not a default, so the invoker decides what the default is");
     }
+
+    @Test
+    @DisplayName("should take a context size from -C")
+    void shouldTakeContextShortOption() throws ParseException {
+        CommonsCliValidateOptions options = CommonsCliValidateOptions.parse(new String[] {"-C", "5", "pom.xml"});
+
+        assertEquals(5, options.context().orElseThrow());
+        assertEquals(List.of("pom.xml"), options.poms().orElseThrow(), "the value must not swallow the pom");
+    }
+
+    @Test
+    @DisplayName("should take a context size from --context")
+    void shouldTakeContextLongOption() throws ParseException {
+        CommonsCliValidateOptions options = CommonsCliValidateOptions.parse(new String[] {"--context", "0", "pom.xml"});
+
+        assertEquals(0, options.context().orElseThrow());
+    }
+
+    @Test
+    @DisplayName("should leave context empty when not given")
+    void shouldLeaveContextEmptyWhenNotGiven() throws ParseException {
+        CommonsCliValidateOptions options = CommonsCliValidateOptions.parse(new String[] {"pom.xml"});
+
+        assertTrue(options.context().isEmpty(), "empty, not a default, so the invoker decides what the default is");
+    }
 }

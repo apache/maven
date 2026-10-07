@@ -206,7 +206,13 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                 }
                 // determineWriter, not context.writer: on a real run that field is still empty
                 // and this is what fills it.
-                format.report(reports, context.cwd.get(), determineWriter(context));
+                int contextLines = context.options().context().orElse(2);
+                format.report(
+                        reports,
+                        context.cwd.get(),
+                        determineWriter(context),
+                        contextLines,
+                        Boolean.TRUE.equals(context.coloredOutput));
                 return exitCode(reports);
             } finally {
                 if (cleanup != null) {
@@ -290,24 +296,24 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
     }
 
     /**
-     * Keeps the log out of the document under {@code --format json}.
+     * Suppresses resolver noise from the output unless the caller asked for it.
      * <p>
-     * The log and the document share standard output, and the resolver writes an {@code [INFO]}
-     * line of its own the first time it reads a repository's prefix file, so on the ordinary path
-     * {@code mvnval --format json} was not JSON. Same mechanism as {@code -q}, applied for the
-     * caller. Asking for {@code -X} or {@code -e} means the log is what is wanted, so there it stays.
+     * The resolver writes an {@code [INFO]} line the first time it reads a repository's prefix
+     * file. Under {@code --format json} that line breaks the document; in text mode it clutters
+     * output that is meant to list only POM problems. Neither case benefits from seeing it.
+     * The level is forced to {@code ERROR} — the same effect as {@code -q} — unless {@code -X}
+     * or {@code -e} is given, in which case the full log is what the caller wants.
+     * <p>
+     * The property must be set <em>before</em> calling {@link Slf4jConfiguration#setRootLoggerLevel}
+     * because that method itself logs at {@code INFO} when it overrides a value already set (e.g.
+     * a CI runner running with {@code DEBUG}), which would be the very noise we are suppressing.
      */
     @Override
     protected void configureLogging(ValidateContext context) throws Exception {
         super.configureLogging(context);
-        if (json(context)
-                && !context.options().verbose().orElse(false)
+        if (!context.options().verbose().orElse(false)
                 && !context.options().showErrors().orElse(false)) {
             context.loggerLevel = Slf4jConfiguration.Level.ERROR;
-            // Announce the level before asking for it. setRootLoggerLevel logs, at INFO, that it
-            // is overriding maven.logger.defaultLogLevel when that property already says
-            // something else, and a CI runner in debug mode sets it to debug. That one
-            // line would be the line that breaks the document.
             System.setProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL, "error");
             context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
         }
