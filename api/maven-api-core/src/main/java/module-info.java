@@ -32,6 +32,7 @@ module org.apache.maven.api {
     exports org.apache.maven.api.feature;
     exports org.apache.maven.api.plugin;
     exports org.apache.maven.api.plugin.annotations;
+    exports org.apache.maven.api.build.report;
     exports org.apache.maven.api.reactor;
     exports org.apache.maven.api.services;
     exports org.apache.maven.api.services.xml;
