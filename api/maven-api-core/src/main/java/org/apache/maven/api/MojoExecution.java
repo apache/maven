@@ -22,6 +22,7 @@ import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.PluginExecution;
 import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.api.xml.XmlNode;
@@ -80,9 +81,9 @@ public interface MojoExecution {
     /**
      * Returns the build lifecycle phase to which this execution is bound.
      *
-     * @return the lifecycle phase name, or an empty string if not bound to a phase, never {@code null}
+     * @return the lifecycle phase name, or {@code null} if not bound to a phase
      */
-    @Nonnull
+    @Nullable
     String getLifecyclePhase();
 
     /**
