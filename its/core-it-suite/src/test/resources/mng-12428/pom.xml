@@ -45,5 +45,16 @@ under the License.
       </exclusion>
     </exclusions>
   </dependency>
+<dependency>
+    <groupId>org.apache.maven.its.mng12428</groupId>
+    <artifactId>d</artifactId>
+    <version>0.1</version>
+    <exclusions>
+        <exclusion>
+            <groupId>org.apache.maven.its.mng12428</groupId>
+            <artifactId>b</artifactId>
+        </exclusion>
+    </exclusions>
+</dependency>
 </dependencies>
 </project>

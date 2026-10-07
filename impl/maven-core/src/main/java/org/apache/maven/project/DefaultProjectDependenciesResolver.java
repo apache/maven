@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,7 +164,6 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         try {
             collect.setTrace(RequestTrace.newChild(trace, depRequest));
             node = repoSystem.collectDependencies(session, collect).getRoot();
-            warnAboutObsoleteExclusions(session, collect);
             result.setDependencyGraph(node);
         } catch (DependencyCollectionException e) {
             result.setDependencyGraph(e.getResult().getRoot());
@@ -172,6 +172,8 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
             throw new DependencyResolutionException(
                     result, "Could not collect dependencies for project " + project.getId(), e);
         }
+
+        warnAboutObsoleteExclusions(session, collect);
 
         depRequest.setRoot(node);
 
@@ -218,8 +220,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         }
     }
 
-    private void warnAboutObsoleteExclusions(RepositorySystemSession session, CollectRequest collect)
-            throws DependencyCollectionException {
+    private void warnAboutObsoleteExclusions(RepositorySystemSession session, CollectRequest collect) {
 
         if (!logger.isWarnEnabled()) {
             return;
@@ -234,12 +235,37 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
             diagnosticCollect.setRequestContext(collect.getRequestContext());
             diagnosticCollect.setRepositories(collect.getRepositories());
             diagnosticCollect.setManagedDependencies(collect.getManagedDependencies());
-            diagnosticCollect.addDependency(dependency.setExclusions(null));
+            diagnosticCollect.addDependency(dependency.setExclusions(Collections.emptyList()));
 
-            DependencyNode diagnosticRoot =
-                    repoSystem.collectDependencies(session, diagnosticCollect).getRoot();
+            try {
+                DependencyNode diagnosticRoot = repoSystem
+                        .collectDependencies(session, diagnosticCollect)
+                        .getRoot();
 
-            checkObsoleteExclusions(dependency, diagnosticRoot);
+                checkObsoleteExclusions(dependency, diagnosticRoot);
+            } catch (DependencyCollectionException e) {
+                logger.debug("Could not perform diagnostic resolution for obsolete-exclusion check", e);
+            }
+        }
+    }
+
+    private void checkObsoleteExclusions(
+            org.eclipse.aether.graph.Dependency dependency, DependencyNode diagnosticRoot) {
+
+        for (org.eclipse.aether.graph.Exclusion exclusion : dependency.getExclusions()) {
+            boolean found = containsExcludedDependency(diagnosticRoot, exclusion);
+
+            if (!found) {
+                logger.warn("exclusion of "
+                        + exclusion.getGroupId()
+                        + ":"
+                        + exclusion.getArtifactId()
+                        + " for "
+                        + dependency.getArtifact().getGroupId()
+                        + ":"
+                        + dependency.getArtifact().getArtifactId()
+                        + " is obsolete - there is no dependency on this exclusion");
+            }
         }
     }
 
