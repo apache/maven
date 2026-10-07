@@ -215,7 +215,7 @@ public interface SourceRoot {
      *   <li>If the configured target path is absolute (e.g., {@code /tmp/custom}):
      *       <ul><li>Return it unchanged (no resolution needed)</li></ul></li>
      *   <li>Otherwise, get the output directory for this source root's {@link #scope()} by calling
-     *       {@code project.getOutputDirectory(scope())}:
+     *       {@code project.outputDirectory(scope())}:
      *       <ul>
      *         <li>For {@link ProjectScope#MAIN}: typically {@code /path/to/project/target/classes}</li>
      *         <li>For {@link ProjectScope#TEST}: typically {@code /path/to/project/target/test-classes}</li>
@@ -289,7 +289,7 @@ public interface SourceRoot {
      * if (configured.isPresent() && configured.get().isAbsolute()) {
      *     return configured.get();
      * }
-     * Path outputDir = project.getOutputDirectory(scope());
+     * Path outputDir = project.outputDirectory(scope());
      * return configured.map(outputDir::resolve).orElse(outputDir);
      * }</pre>
      *
@@ -304,7 +304,7 @@ public interface SourceRoot {
         Optional<Path> targetPath = targetPath();
         // The test for `isAbsolute()` is a small optimization for avoiding the call to `getOutputDirectory(…)`.
         return targetPath.filter(Path::isAbsolute).orElseGet(() -> {
-            Path base = project.getOutputDirectory(scope());
+            Path base = project.outputDirectory(scope());
             return targetPath.map(base::resolve).orElse(base);
         });
     }
