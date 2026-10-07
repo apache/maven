@@ -373,8 +373,7 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
      * <p>
      * {@code ApiRunner.createSession} applies offline from the settings file.  This supplements
      * that: when the caller passes {@code -o} on the command line, the session is made offline
-     * regardless of what the settings say, by cloning the underlying resolver session with offline
-     * set to true.
+     * regardless of what the settings say, by setting offline to true on the underlying resolver session.
      */
     private static Session withOffline(Session session) {
         // AbstractSession.withLocalRepository short-circuits when the path is unchanged
