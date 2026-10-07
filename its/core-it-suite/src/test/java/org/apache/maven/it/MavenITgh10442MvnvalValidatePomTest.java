@@ -52,6 +52,8 @@ class MavenITgh10442MvnvalValidatePomTest extends AbstractMavenIntegrationTestCa
         verifier.setForkJvm(true);
         verifier.setLogFileName("clean.txt");
         verifier.addCliArgument("--val");
+        verifier.addCliArgument("--mode");
+        verifier.addCliArgument("raw");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
@@ -70,6 +72,8 @@ class MavenITgh10442MvnvalValidatePomTest extends AbstractMavenIntegrationTestCa
         verifier.setForkJvm(true);
         verifier.setLogFileName("duplicate.txt");
         verifier.addCliArgument("--val");
+        verifier.addCliArgument("--mode");
+        verifier.addCliArgument("raw");
 
         assertThrows(
                 VerificationException.class, verifier::execute, "Validation should have exited with a non-zero code");
@@ -93,6 +97,8 @@ class MavenITgh10442MvnvalValidatePomTest extends AbstractMavenIntegrationTestCa
         verifier.setForkJvm(true);
         verifier.setLogFileName("json.txt");
         verifier.addCliArgument("--val");
+        verifier.addCliArgument("--mode");
+        verifier.addCliArgument("raw");
         verifier.addCliArgument("--format");
         verifier.addCliArgument("json");
         verifier.execute();

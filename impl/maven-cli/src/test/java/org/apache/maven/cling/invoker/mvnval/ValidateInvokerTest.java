@@ -373,7 +373,7 @@ class ValidateInvokerTest {
                 run(List.of(pom.toString(), outside.toString()));
 
                 assertTrue(
-                        output.stream().anyMatch(line -> line.startsWith("near/pom.xml:")),
+                        output.stream().anyMatch(line -> line.startsWith(Path.of("near", "pom.xml") + ":")),
                         "a file under the working directory is named relative to it: " + output);
                 assertTrue(
                         output.stream().anyMatch(line -> line.startsWith(far)),
