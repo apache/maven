@@ -100,6 +100,18 @@ class MojoExecutionFilterTest {
                 UnsupportedOperationException.class, () -> predicates.add(CoordinatePredicate.MATCH_ALL));
     }
 
+    @Test
+    void emptyPhaseParensThrows() {
+        org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalArgumentException.class, () -> MojoExecutionFilter.parse("phase()"));
+    }
+
+    @Test
+    void blankPhaseParensThrows() {
+        org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalArgumentException.class, () -> MojoExecutionFilter.parse("phase(  )"));
+    }
+
     // ── propertyName ─────────────────────────────────────────────────────────
 
     @Test

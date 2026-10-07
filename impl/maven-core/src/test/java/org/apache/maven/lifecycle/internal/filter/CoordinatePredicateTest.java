@@ -162,4 +162,21 @@ class CoordinatePredicateTest {
         when(exec.getPlugin()).thenReturn(null);
         assertTrue(CoordinatePredicate.MATCH_ALL.matches(exec));
     }
+
+    @Test
+    void dotlessGroupIdIsMisroutedToPrefixMode() {
+        // GroupIds without a '.' (e.g. "commons-io") cannot be used in G:A form — they are routed
+        // to prefix-based matching. Document this: the token "commons-io:commons-io" is treated as
+        // prefix="commons-io", version="commons-io" — it will NOT match an execution with groupId
+        // "commons-io". Users should use ":commons-io" (artifactId-only form) instead.
+        MojoExecution exec = execution("commons-io", "commons-io", "2.15.1", "commons-io", "copy", "default");
+        // "commons-io:commons-io" is parsed as P:v form (prefix="commons-io", version="commons-io").
+        // The prefix check succeeds (goalPrefix="commons-io" matches), but the version check fails
+        // ("commons-io" != "2.15.1"), so the predicate returns false. This demonstrates that the
+        // misrouting produces a non-matching predicate, not a silent match.
+        CoordinatePredicate p = CoordinatePredicate.parse("commons-io:commons-io");
+        assertFalse(p.matches(exec), "dotless groupId in G:A form is misrouted to prefix mode and should not match");
+        // The correct workaround: use :A form to match by artifactId
+        assertTrue(CoordinatePredicate.parse(":commons-io").matches(exec));
+    }
 }
