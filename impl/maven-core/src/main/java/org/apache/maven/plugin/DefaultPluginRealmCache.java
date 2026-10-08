@@ -200,6 +200,25 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
         cache.clear();
     }
 
+    @Override
+    public void invalidate(org.apache.maven.api.Artifact artifact) {
+        cache.entrySet().removeIf(entry -> {
+            boolean matches = entry.getValue().getArtifacts().stream()
+                    .anyMatch(a -> a.getGroupId().equals(artifact.getGroupId())
+                            && a.getArtifactId().equals(artifact.getArtifactId())
+                            && a.getVersion().equals(artifact.getVersion().toString()));
+            if (matches) {
+                ClassRealm realm = entry.getValue().getRealm();
+                try {
+                    realm.getWorld().disposeRealm(realm.getId());
+                } catch (NoSuchRealmException e) {
+                    // ignore
+                }
+            }
+            return matches;
+        });
+    }
+
     protected static int pluginHashCode(Plugin plugin) {
         return CacheUtils.pluginHashCode(plugin);
     }
