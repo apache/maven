@@ -26,8 +26,20 @@ under the License.
 
 # Maven 4 API - Plugin Descriptor Model
 
-This is the immutable model for Maven Plugin Descriptor in `org.apache.maven.api.plugin.descriptor` package.
+This is the immutable model for Maven 4 Plugin Descriptor classes in `org.apache.maven.api.plugin.descriptor` package
+and associated lifecycle bindings in `org.apache.maven.api.plugin.descriptor.lifecycle`.
+
+Data about a plugin is stored in [`META-INF/maven/plugin.xml` plugin descriptor](./plugin.html),
+generally generated from plugin sources using [maven-plugin-plugin](/plugin-tools/maven-plugin-plugin/)
+and [Maven 4 API Core plugin annotations](../maven-api-core/) or [Maven 3 Plugin Tools' annotations](/plugin-tools/maven-plugin-annotations/index.html).
 
 The following are generated from this model:
 
 - [Java sources](./apidocs/index.html) with `Builder` inner classes for immutable instances creation.
+- [`META-INF/maven/plugin.xml` plugin descriptor](./plugin.html)
+- [`META-INF/maven/lifecycle.xml` plugin descriptor](./lifecycle.html)
+
+## See Also
+
+- [Maven 4 API Core](../maven-api-core/)
+- [Maven 3 plugin API and descriptor](../../compat/maven-plugin-api/)

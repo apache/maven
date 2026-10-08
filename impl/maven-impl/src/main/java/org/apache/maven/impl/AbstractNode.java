@@ -33,7 +33,7 @@ public abstract class AbstractNode implements Node {
     @Override
     public boolean accept(NodeVisitor visitor) {
         if (visitor.enter(this)) {
-            for (Node child : getChildren()) {
+            for (Node child : children()) {
                 if (!child.accept(visitor)) {
                     break;
                 }
@@ -45,7 +45,7 @@ public abstract class AbstractNode implements Node {
     @Override
     public Node filter(Predicate<Node> filter) {
         List<Node> children =
-                getChildren().stream().filter(filter).map(n -> n.filter(filter)).collect(Collectors.toList());
+                children().stream().filter(filter).map(n -> n.filter(filter)).collect(Collectors.toList());
         return new WrapperNode(this, Collections.unmodifiableList(children));
     }
 

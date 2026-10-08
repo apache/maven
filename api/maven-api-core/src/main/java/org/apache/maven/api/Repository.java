@@ -64,7 +64,7 @@ public interface Repository {
      * @return the (case-sensitive) identifier, never {@code null}
      */
     @Nonnull
-    String getId();
+    String id();
 
     /**
      * Gets the type of the repository, for example "default".
@@ -72,5 +72,29 @@ public interface Repository {
      * @return the (case-sensitive) type of the repository, never {@code null}
      */
     @Nonnull
-    String getType();
+    String type();
+
+    /**
+     * Gets the identifier of this repository.
+     *
+     * @return the (case-sensitive) identifier, never {@code null}
+     * @deprecated Use {@link #id()} instead.
+     */
+    @Nonnull
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    default String getId() {
+        return id();
+    }
+
+    /**
+     * Gets the type of the repository, for example "default".
+     *
+     * @return the (case-sensitive) type of the repository, never {@code null}
+     * @deprecated Use {@link #type()} instead.
+     */
+    @Nonnull
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    default String getType() {
+        return type();
+    }
 }

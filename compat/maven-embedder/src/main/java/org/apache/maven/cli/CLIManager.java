@@ -307,7 +307,8 @@ public class CLIManager {
         options.addOption(Option.builder(THREADS)
                 .longOpt("threads")
                 .hasArg()
-                .desc("Thread count, for instance 4 (int) or 2C/2.5C (int/float) where C is core multiplied")
+                .desc(
+                        "Thread count, for instance 4 (int) or 2C/2.5C (int/float) where C is core multiplied, or 'max' (available processors minus 1, minimum 1)")
                 .build());
         options.addOption(Option.builder(BUILDER)
                 .longOpt("builder")

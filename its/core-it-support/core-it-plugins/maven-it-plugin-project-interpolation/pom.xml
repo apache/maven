@@ -45,7 +45,7 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-compat</artifactId>
+      <artifactId>maven-core</artifactId>
       <scope>provided</scope>
     </dependency>
     <!-- Test the resolution of the version -->
@@ -57,10 +57,6 @@ under the License.
         <exclusion>
           <groupId>org.apache.maven</groupId>
           <artifactId>maven-artifact</artifactId>
-        </exclusion>
-        <exclusion>
-          <groupId>org.apache.maven.shared</groupId>
-          <artifactId>maven-verifier</artifactId>
         </exclusion>
         <exclusion>
           <groupId>junit</groupId>
