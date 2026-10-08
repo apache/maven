@@ -76,8 +76,17 @@ public @interface Mojo {
     boolean projectRequired() default true;
 
     /**
-     * if the Mojo uses the Maven project and its subprojects.
-     * @return uses the Maven project and its subprojects
+     * Indicates whether the Mojo operates as an aggregator across the Maven reactor and its subprojects.
+     * <p>
+     * <b>Execution semantics:</b>
+     * <ul>
+     *   <li>When invoked directly via CLI (e.g. {@code mvn plugin:goal}), an aggregator Mojo executes
+     *       only once on the top-level project of the reactor, after preceding lifecycle phases complete.</li>
+     *   <li>When bound to a lifecycle phase, the goal executes during that phase for each subproject in the
+     *       reactor unless explicitly configured with {@code <inherited>false</inherited>}.</li>
+     * </ul>
+     *
+     * @return {@code true} if the Mojo operates across the reactor project and its subprojects
      */
     boolean aggregator() default false;
 
