@@ -141,9 +141,9 @@ public class InferenceStrategy extends AbstractUpgradeStrategy {
                     modifiedPoms.add(pomPath);
                     if (MODEL_VERSION_4_1_0.equals(currentVersion)
                             || ModelVersionUtils.isNewerThan410(currentVersion)) {
-                        context.success("Full inference optimizations applied");
+                        logChange(context, "Full inference optimizations");
                     } else {
-                        context.success("Limited inference optimizations applied (parent-related only)");
+                        logChange(context, "Limited inference optimizations (parent-related only)");
                     }
                 } else {
                     context.success("No inference optimizations needed");

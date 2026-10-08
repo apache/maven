@@ -114,7 +114,7 @@ public class RepositoryHttpsUpgradeStrategy extends AbstractUpgradeStrategy {
 
                 if (hasUpgrades) {
                     modifiedPoms.add(pomPath);
-                    context.success("HTTP repository URLs upgraded to HTTPS");
+                    logChange(context, "HTTP repository URLs upgraded to HTTPS");
                 } else {
                     context.success("No HTTP repository URLs found");
                 }
