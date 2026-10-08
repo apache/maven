@@ -576,6 +576,19 @@ public final class Constants {
     public static final String MAVEN_MAVEN3_PERSONALITY = "maven.maven3Personality";
 
     /**
+     * User property to suppress warnings about pluginManagement executions that are filtered out because they are
+     * bound to a lifecycle phase that belongs to a different lifecycle than the one being executed. Such executions
+     * are silently dropped when the plugin is introduced only by lifecycle bindings (not explicitly declared in
+     * {@code <build><plugins>}). Set to {@code false} to suppress the warning, or declare the plugin in
+     * {@code <build><plugins>} to retain all its managed executions unconditionally.
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_WARN_CROSS_LIFECYCLE_MANAGED_EXECUTION =
+            "maven.warn.crossLifecycleManagedExecution";
+
+    /**
      * User property for disabling version resolver cache.
      *
      * @since 3.0.0
