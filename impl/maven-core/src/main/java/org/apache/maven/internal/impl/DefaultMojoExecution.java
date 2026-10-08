@@ -53,7 +53,7 @@ public class DefaultMojoExecution implements MojoExecution {
     private final Plugin plugin;
     private final Optional<PluginExecution> model;
     private final MojoDescriptor descriptor;
-    private final String executionId;
+    private final Optional<String> executionId;
     private final String goal;
     private final Optional<String> lifecyclePhase;
     private final XmlNode configuration;
@@ -63,7 +63,7 @@ public class DefaultMojoExecution implements MojoExecution {
         requireNonNull(delegate, "delegate");
         this.descriptor = requireNonNull(delegate.getMojoDescriptor(), "delegate.mojoDescriptor")
                 .getMojoDescriptorV4();
-        this.executionId = delegate.getExecutionId();
+        this.executionId = Optional.ofNullable(delegate.getExecutionId());
         this.goal = delegate.getGoal();
         this.lifecyclePhase = Optional.ofNullable(delegate.getLifecyclePhase());
         this.configuration = delegate.getConfiguration() != null
@@ -167,7 +167,7 @@ public class DefaultMojoExecution implements MojoExecution {
     }
 
     @Override
-    public String executionId() {
+    public Optional<String> executionId() {
         return executionId;
     }
 
@@ -188,6 +188,6 @@ public class DefaultMojoExecution implements MojoExecution {
 
     @Override
     public String toString() {
-        return descriptor.getId() + " {execution: " + executionId + '}';
+        return descriptor.getId() + " {execution: " + executionId.orElse("<cli>") + '}';
     }
 }

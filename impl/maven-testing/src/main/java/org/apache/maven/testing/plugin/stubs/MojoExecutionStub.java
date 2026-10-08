@@ -82,8 +82,8 @@ public class MojoExecutionStub implements MojoExecution {
     }
 
     @Override
-    public String executionId() {
-        return executionId;
+    public Optional<String> executionId() {
+        return Optional.ofNullable(executionId);
     }
 
     @Override

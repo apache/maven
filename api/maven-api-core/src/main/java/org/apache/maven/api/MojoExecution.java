@@ -65,9 +65,12 @@ public interface MojoExecution {
     @Nonnull
     MojoDescriptor descriptor();
 
-    /** {@return the execution identifier as declared in the POM} */
+    /**
+     * {@return the execution identifier as declared in the POM, or empty for a direct CLI invocation
+     * (e.g. {@code mvn groupId:artifactId:goal}) where no {@code <execution>} element is present}
+     */
     @Nonnull
-    String executionId();
+    Optional<String> executionId();
 
     /** {@return the goal being executed} */
     @Nonnull
@@ -116,9 +119,9 @@ public interface MojoExecution {
      * @deprecated Use {@link #executionId()} instead.
      */
     @Deprecated(since = "4.1.0", forRemoval = true)
-    @Nonnull
+    @Nullable
     default String getExecutionId() {
-        return executionId();
+        return executionId().orElse(null);
     }
 
     /**
