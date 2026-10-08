@@ -74,7 +74,7 @@ class DefaultMojoExecutionTest {
     }
 
     @Test
-    void cliInvocationPath_executionIdAndLifecyclePhaseAreEmpty() {
+    void cliInvocationPathExecutionIdAndLifecyclePhaseAreEmpty() {
         InternalMavenSession session = mock(InternalMavenSession.class);
         MojoExecution delegate = cliExecution("help");
 
@@ -88,7 +88,7 @@ class DefaultMojoExecutionTest {
     }
 
     @Test
-    void lifecycleBoundExecution_executionIdAndLifecyclePhasePresentAndImmutable() {
+    void lifecycleBoundExecutionExecutionIdAndLifecyclePhasePresentAndImmutable() {
         InternalMavenSession session = mock(InternalMavenSession.class);
         MojoExecution delegate = lifecycleExecution("compile", "default-compile", "compile");
 
