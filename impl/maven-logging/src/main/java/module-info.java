@@ -21,6 +21,7 @@ module org.apache.maven.logging {
     requires org.apache.maven.api;
     requires org.apache.maven.jline;
     requires org.slf4j;
+    requires java.logging;
 
     exports org.apache.maven.logging.api;
     exports org.apache.maven.slf4j to
