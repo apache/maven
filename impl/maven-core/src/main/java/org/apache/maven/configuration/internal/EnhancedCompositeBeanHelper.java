@@ -99,6 +99,9 @@ public final class EnhancedCompositeBeanHelper {
                         "Basic element '" + configuration.getName() + "' must not contain child elements");
             }
             value = convertProperty(beanType, paramType.getRawType(), paramType.getType(), configuration);
+            if (value == null) {
+                value = getEmptyValueForType(paramType.getRawType(), configuration);
+            }
         }
 
         if (value != null) {
@@ -126,6 +129,9 @@ public final class EnhancedCompositeBeanHelper {
         if (methodInfo != null) {
             try {
                 Object value = convertPropertyForMethod(beanType, methodInfo, valueType, configuration);
+                if (value == null) {
+                    value = getEmptyValueForType(TypeLiteral.get(methodInfo.parameterType).getRawType(), configuration);
+                }
                 if (value != null) {
                     if (listener != null) {
                         listener.notifyFieldChangeUsingSetter(propertyName, value, bean);
@@ -143,6 +149,9 @@ public final class EnhancedCompositeBeanHelper {
         if (field != null) {
             try {
                 Object value = convertPropertyForField(beanType, field, valueType, configuration);
+                if (value == null) {
+                    value = getEmptyValueForType(field.getType(), configuration);
+                }
                 if (value != null) {
                     if (listener != null) {
                         listener.notifyFieldChangeUsingReflection(propertyName, value, bean);
@@ -305,6 +314,34 @@ public final class EnhancedCompositeBeanHelper {
             field.setAccessible(true);
         }
         field.set(bean, value);
+    }
+
+    /**
+     * Fallback to provide an empty instance (e.g. empty String) for explicit empty tags
+     * ({@code <tag></tag>}) if a converter returned null (for instance when standard Plexus
+     * converters are used without EnhancedStringConverter) or in the setDefault path.
+     * Note: for self-closing tags ({@code <tag/>}), this returns null to preserve the bean's
+     * Java-initialized default values.
+     */
+    private Object getEmptyValueForType(Class<?> type, PlexusConfiguration configuration) {
+        if (configuration.getChildCount() == 0) {
+            String value = configuration.getValue();
+            if (value != null && value.isEmpty()) {
+                return createEmptyValue(type);
+            }
+        }
+        return null;
+    }
+
+    private Object createEmptyValue(Class<?> type) {
+        if (String.class.equals(type) || CharSequence.class.equals(type)) {
+            return "";
+        } else if (StringBuilder.class.equals(type)) {
+            return new StringBuilder("");
+        } else if (StringBuffer.class.equals(type)) {
+            return new StringBuffer("");
+        }
+        return null;
     }
 
     /**

@@ -838,7 +838,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
             Collection<Parameter> missingParameters = validator.getMissingParameters();
             if (!missingParameters.isEmpty()) {
-                if ("basic".equals(configuratorId)) {
+                if ("basic".equals(configuratorId) || "enhanced".equals(configuratorId)) {
                     throw new PluginParameterException(mojoDescriptor, new ArrayList<>(missingParameters));
                 } else {
                     /*
