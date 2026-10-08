@@ -58,41 +58,75 @@ public enum DependencyScope {
 
     /**
      * Compile only.
+     * <p>
+     * A dependency required for compiling the main project code, but not included in the main runtime classpath.
      */
     COMPILE_ONLY("compile-only", false),
 
     /**
-     * Compile, runtime and test.
+     * Compile.
+     * <p>
+     * The default scope used when no scope is explicitly given for a direct dependency.
+     * Dependencies in this scope are required for compiling, testing, and running the project,
+     * and are transitive.
      */
     COMPILE("compile", true),
 
     /**
-     * Runtime and test.
+     * Runtime.
+     * <p>
+     * A dependency not required for compiling the project source code, but required for executing
+     * and testing the project. Dependencies in this scope are transitive.
      */
     RUNTIME("runtime", true),
 
     /**
      * Provided.
+     * <p>
+     * A dependency required for compilation and testing that is expected to be provided at runtime
+     * by the JDK or the runtime environment/container.
+     * <p>
+     * <b>Transitivity and classpath behavior:</b>
+     * <ul>
+     *   <li><b>Downstream transitivity:</b> Dependencies in this scope are not transitive to projects
+     *       that depend on this project.</li>
+     *   <li><b>Upstream transitivity:</b> Transitive {@code compile} and {@code runtime} dependencies
+     *       of a provided dependency are included and assigned effective {@code provided} scope.</li>
+     *   <li><b>Omitted dependencies:</b> Transitive {@code provided} and {@code test} dependencies of
+     *       a provided dependency are omitted.</li>
+     *   <li><b>Classpaths:</b> Available on compile and test classpaths, but not on the main runtime
+     *       classpath.</li>
+     * </ul>
      */
     PROVIDED("provided", false),
 
     /**
      * Test compile only.
+     * <p>
+     * A dependency required only for compiling the test sources, but not needed for running tests.
      */
     TEST_ONLY("test-only", false),
 
     /**
-     * Test compile and test runtime.
+     * Test.
+     * <p>
+     * A dependency required for compiling and running tests, but not required for compiling or
+     * running the main project code. Dependencies in this scope are not transitive.
      */
     TEST("test", false),
 
     /**
      * Test runtime.
+     * <p>
+     * A dependency not required for compiling test sources, but required for executing tests.
      */
     TEST_RUNTIME("test-runtime", false),
 
     /**
-     * System scope.
+     * System.
+     * <p>
+     * Similar to {@link #PROVIDED}, but the artifact is bound to an explicit path on the local file system
+     * rather than resolved from a repository.
      */
     SYSTEM("system", false);
 
