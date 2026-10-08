@@ -24,7 +24,7 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-# Maven Compat
+# Maven 2 Compat (deprecated)
 
 Maven2 classes maintained as compatibility layer for plugins that need to keep Maven2 compatibility.
 

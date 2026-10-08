@@ -227,13 +227,13 @@ public abstract class AbstractSession implements InternalSession {
         return new WorkspaceRepository() {
             @Nonnull
             @Override
-            public String getId() {
+            public String id() {
                 return repository.getId();
             }
 
             @Nonnull
             @Override
-            public String getType() {
+            public String type() {
                 return repository.getContentType();
             }
         };
@@ -393,7 +393,7 @@ public abstract class AbstractSession implements InternalSession {
     public Session withLocalRepository(@Nonnull LocalRepository localRepository) {
         requireNonNull(localRepository, "localRepository");
         if (session.getLocalRepository() != null
-                && Objects.equals(session.getLocalRepository().getBasePath(), localRepository.getPath())) {
+                && Objects.equals(session.getLocalRepository().getBasePath(), localRepository.path())) {
             return this;
         }
         org.eclipse.aether.repository.LocalRepository repository = toRepository(localRepository);
@@ -921,7 +921,7 @@ public abstract class AbstractSession implements InternalSession {
         Node root = getService(DependencyResolver.class)
                 .collect(this, dependency, scope)
                 .getRoot();
-        return root.getChildren().iterator().next();
+        return root.children().iterator().next();
     }
 
     @Nonnull
