@@ -77,8 +77,8 @@ public class MojoExecutionStub implements MojoExecution {
     }
 
     @Override
-    public String lifecyclePhase() {
-        return lifecyclePhase;
+    public Optional<String> lifecyclePhase() {
+        return Optional.ofNullable(lifecyclePhase);
     }
 
     @Override

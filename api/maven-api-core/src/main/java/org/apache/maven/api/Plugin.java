@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 
@@ -35,7 +36,7 @@ import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 @Experimental
 public interface Plugin {
 
-    @Nonnull
+    @Nullable
     org.apache.maven.api.model.Plugin getModel();
 
     @Nonnull
@@ -47,7 +48,7 @@ public interface Plugin {
     @Nonnull
     ClassLoader getClassLoader();
 
-    @Nonnull
+    @Nullable
     Artifact getArtifact();
 
     @Nonnull

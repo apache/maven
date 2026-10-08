@@ -73,9 +73,9 @@ public interface MojoExecution {
     @Nonnull
     String goal();
 
-    /** {@return the lifecycle phase this execution is bound to} */
+    /** {@return the lifecycle phase this execution is bound to, or empty for a direct CLI invocation} */
     @Nonnull
-    String lifecyclePhase();
+    Optional<String> lifecyclePhase();
 
     /** {@return the merged configuration for this execution, if any} */
     @Nonnull
@@ -134,9 +134,9 @@ public interface MojoExecution {
      * @deprecated Use {@link #lifecyclePhase()} instead.
      */
     @Deprecated(since = "4.1.0", forRemoval = true)
-    @Nonnull
+    @Nullable
     default String getLifecyclePhase() {
-        return lifecyclePhase();
+        return lifecyclePhase().orElse(null);
     }
 
     /**

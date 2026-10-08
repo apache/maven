@@ -55,7 +55,7 @@ public class DefaultMojoExecution implements MojoExecution {
     private final MojoDescriptor descriptor;
     private final String executionId;
     private final String goal;
-    private final String lifecyclePhase;
+    private final Optional<String> lifecyclePhase;
     private final XmlNode configuration;
 
     public DefaultMojoExecution(InternalMavenSession session, org.apache.maven.plugin.MojoExecution delegate) {
@@ -65,7 +65,7 @@ public class DefaultMojoExecution implements MojoExecution {
                 .getMojoDescriptorV4();
         this.executionId = delegate.getExecutionId();
         this.goal = delegate.getGoal();
-        this.lifecyclePhase = delegate.getLifecyclePhase();
+        this.lifecyclePhase = Optional.ofNullable(delegate.getLifecyclePhase());
         this.configuration = delegate.getConfiguration() != null
                 ? delegate.getConfiguration().getDom()
                 : null;
@@ -93,7 +93,10 @@ public class DefaultMojoExecution implements MojoExecution {
                                 .map(Node::getDependency)
                                 .filter(Objects::nonNull)
                                 .collect(Collectors.toMap(
-                                        d -> d.getGroupId() + ":" + d.getArtifactId(), d -> d, (a, b) -> a)))
+                                        d -> d.getGroupId() + ":" + d.getArtifactId(),
+                                        d -> d,
+                                        (a, b) -> a))) // first-wins on duplicate groupId:artifactId
+                // (transitive duplicates are normal)
                 : Collections.emptyMap();
 
         org.apache.maven.api.model.Plugin modelPlugin =
@@ -174,7 +177,7 @@ public class DefaultMojoExecution implements MojoExecution {
     }
 
     @Override
-    public String lifecyclePhase() {
+    public Optional<String> lifecyclePhase() {
         return lifecyclePhase;
     }
 
