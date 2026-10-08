@@ -72,7 +72,7 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
                         .equals(DefaultRepositorySystemSessionFactory.resolve(repository.getBasedir()))) {
             return session;
         }
-        if (repository.getLayout() instanceof DefaultRepositoryLayout) {
+        if (repository.getLayout() instanceof DefaultRepositoryLayout && "local".equals(repository.getId())) {
             return new DefaultRepositorySystemSession(session)
                     .setLocalRepositoryManager(DefaultRepositorySystemSessionFactory.setUpLocalRepositoryManager(
                             repository.getBasedir(), system, session));
