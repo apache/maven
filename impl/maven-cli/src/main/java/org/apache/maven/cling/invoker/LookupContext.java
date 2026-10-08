@@ -24,6 +24,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -34,13 +35,13 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.OutputCapabilities;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.logging.BuildEventListener;
-import org.apache.maven.logging.OutputCapabilities;
-import org.apache.maven.logging.internal.DefaultOutputCapabilities;
+import org.apache.maven.logging.internal.CliOutputCapabilities;
 import org.jline.terminal.Terminal;
 import org.slf4j.ILoggerFactory;
 
@@ -93,8 +94,11 @@ public class LookupContext implements AutoCloseable {
     public Terminal terminal;
     public Consumer<String> writer;
 
-    // Set only by a known writer route; custom listeners and writers remain unknown.
-    public Supplier<OutputCapabilities> outputCapabilities = () -> DefaultOutputCapabilities.UNKNOWN;
+    // Set by the selected listener, independently of the writer's destination and encoding.
+    public Optional<OutputCapabilities.Format> outputFormat = Optional.empty();
+
+    public Supplier<OutputCapabilities> outputCapabilities =
+            () -> CliOutputCapabilities.snapshot(null, null, outputFormat.orElse(null));
 
     public ContainerCapsule containerCapsule;
     public Lookup lookup;

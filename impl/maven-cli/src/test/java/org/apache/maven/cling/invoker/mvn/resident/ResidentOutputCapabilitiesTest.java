@@ -29,15 +29,15 @@ import java.util.Optional;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.ParserRequest;
+import org.apache.maven.api.services.OutputCapabilities;
+import org.apache.maven.api.services.OutputCapabilities.Destination;
+import org.apache.maven.api.services.OutputCapabilities.Format;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.MavenContext;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
-import org.apache.maven.logging.OutputCapabilities;
-import org.apache.maven.logging.OutputCapabilities.Destination;
 import org.apache.maven.logging.SimpleBuildEventListener;
-import org.apache.maven.logging.internal.DefaultOutputCapabilities;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -63,15 +63,20 @@ class ResidentOutputCapabilitiesTest {
         Path file = directory.resolve("build.log");
         try (ClassWorld world = new ClassWorld("plexus.core", getClass().getClassLoader());
                 InspectingInvoker invoker = new InspectingInvoker(world)) {
-            assertEquals(0, invoker.invoke(request(List.of("-l", file.toString(), "--color=always", "validate"))));
+            assertEquals(
+                    0,
+                    invoker.invoke(request(
+                            List.of("-l", file.toString(), "--console=machine", "--color=always", "validate"))));
             OutputCapabilities component = invoker.component;
             Map<?, ?> fileMap = invoker.captured;
             assertEquals("FILE", invoker.captured.get("destination"));
             assertEquals("UTF-8", invoker.captured.get("encoding"));
-            assertEquals(Destination.FILE, invoker.destination);
+            assertEquals("MACHINE_READABLE", invoker.captured.get("format"));
+            assertEquals(Optional.of(Destination.FILE), invoker.destination);
             assertEquals(Optional.of(StandardCharsets.UTF_8), invoker.encoding);
-            assertEquals(Destination.UNKNOWN, component.getDestination());
+            assertEquals(Optional.empty(), component.getDestination());
             assertEquals(Optional.empty(), component.getEncoding());
+            assertEquals(Optional.empty(), component.getFormat());
             assertEquals("FILE", fileMap.get("destination"));
             assertEquals("UTF-8", fileMap.get("encoding"));
             assertTrue(Files.readString(file).contains("output-capabilities-marker"));
@@ -79,28 +84,32 @@ class ResidentOutputCapabilitiesTest {
             assertEquals(0, invoker.invoke(request(List.of("validate"))));
             assertSame(component, invoker.component);
             assertNotSame(fileMap, invoker.captured);
-            assertEquals(Destination.UNKNOWN, invoker.destination); // embedded byte stream
+            assertEquals(Optional.empty(), invoker.destination); // embedded byte stream
             assertTrue(invoker.encoding.isPresent());
             Map<?, ?> embeddedMap = invoker.captured;
-            assertEquals("UNKNOWN", embeddedMap.get("destination"));
+            assertEquals("HUMAN_READABLE", embeddedMap.get("format"));
+            assertEquals("MACHINE_READABLE", fileMap.get("format"));
+            assertEquals(null, embeddedMap.get("destination"));
             assertEquals(invoker.encoding.get().name(), embeddedMap.get("encoding"));
             assertEquals(Optional.empty(), component.getEncoding());
+            assertEquals(Optional.empty(), component.getFormat());
             assertEquals("FILE", fileMap.get("destination"));
             assertEquals("UTF-8", fileMap.get("encoding"));
 
             invoker.fail = true;
             InvokerException.ExitException failure = assertThrows(
                     InvokerException.ExitException.class,
-                    () -> invoker.invoke(request(List.of("-l", file.toString(), "validate"))));
+                    () -> invoker.invoke(request(List.of("-l", file.toString(), "--console=machine", "validate"))));
             assertEquals(2, failure.getExitCode());
             assertSame(component, invoker.component);
             assertNotSame(fileMap, invoker.captured);
-            assertEquals(Destination.FILE, invoker.destination);
+            assertEquals(Optional.of(Destination.FILE), invoker.destination);
             assertEquals(fileMap, invoker.captured);
-            assertEquals("UNKNOWN", embeddedMap.get("destination"));
+            assertEquals(null, embeddedMap.get("destination"));
             assertTrue(embeddedMap.containsKey("encoding"));
-            assertEquals(Destination.UNKNOWN, component.getDestination());
+            assertEquals(Optional.empty(), component.getDestination());
             assertEquals(Optional.empty(), component.getEncoding());
+            assertEquals(Optional.empty(), component.getFormat());
             assertEquals("FILE", fileMap.get("destination"));
             assertEquals("UTF-8", fileMap.get("encoding"));
         }
@@ -118,8 +127,10 @@ class ResidentOutputCapabilitiesTest {
                 InspectingInvoker invoker = new InspectingInvoker(world)) {
             invoker.customListener = true;
             assertEquals(0, invoker.invoke(request(List.of("validate"))));
-            assertEquals(Destination.UNKNOWN, invoker.destination);
+            assertEquals(Optional.empty(), invoker.destination);
             assertEquals(Optional.empty(), invoker.encoding);
+            assertEquals(Optional.empty(), invoker.format);
+            assertEquals(Map.of(), invoker.captured);
         }
     }
 
@@ -136,7 +147,8 @@ class ResidentOutputCapabilitiesTest {
 
     private static class InspectingInvoker extends ResidentMavenInvoker {
         private OutputCapabilities component;
-        private Destination destination;
+        private Optional<Destination> destination;
+        private Optional<Format> format;
         private Optional<java.nio.charset.Charset> encoding;
         private Map<?, ?> captured;
         private boolean fail;
@@ -160,13 +172,14 @@ class ResidentOutputCapabilitiesTest {
             component = context.lookup.lookup(OutputCapabilities.class);
             destination = component.getDestination();
             encoding = component.getEncoding();
+            format = component.getFormat();
             request.setLocalRepositoryPath(context.cwd.resolve("repository").toFile());
             int result = super.doExecute(context, request);
             assertEquals(0, result);
             captured = (Map<?, ?>) request.getData().get("maven.logging.outputCapabilities");
-            assertSame(((DefaultOutputCapabilities) component).asMap(), captured);
-            assertEquals(destination.name(), captured.get("destination"));
+            assertEquals(destination.map(Enum::name).orElse(null), captured.get("destination"));
             assertEquals(encoding.map(java.nio.charset.Charset::name).orElse(null), captured.get("encoding"));
+            assertEquals(format.map(Enum::name).orElse(null), captured.get("format"));
             context.logger.info("output-capabilities-marker");
             if (fail) {
                 throw new IllegalStateException("test invocation failure");

@@ -55,14 +55,16 @@ public class LegacyOutputMojo extends AbstractMojo {
         }
         Properties properties = new Properties();
         properties.setProperty("available", Boolean.toString(available));
-        properties.setProperty("destination", "UNKNOWN");
-        properties.setProperty("encoding", "unknown");
         properties.setProperty("defaultEncoding", Charset.defaultCharset().name());
         if (available) {
             Map<?, ?> snapshot = new HashMap<>((Map<?, ?>) value);
             Object destination = snapshot.get("destination");
-            if (Arrays.asList("CONSOLE", "FILE", "REDIRECTED", "UNKNOWN").contains(destination)) {
+            if (Arrays.asList("CONSOLE", "FILE", "REDIRECTED").contains(destination)) {
                 properties.setProperty("destination", (String) destination);
+            }
+            Object format = snapshot.get("format");
+            if (Arrays.asList("HUMAN_READABLE", "MACHINE_READABLE").contains(format)) {
+                properties.setProperty("format", (String) format);
             }
             Object encoding = snapshot.get("encoding");
             if (encoding instanceof String) {

@@ -33,13 +33,16 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.maven.api.services.OutputCapabilities;
+import org.apache.maven.api.services.OutputCapabilities.Destination;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.logging.OutputCapabilities.Destination;
-import org.apache.maven.logging.internal.DefaultOutputCapabilities;
+import org.apache.maven.logging.internal.TestOutputCapabilities;
+import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
+import org.codehaus.plexus.testing.PlexusTestConfiguration;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -50,14 +53,18 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @PlexusTest
-class OutputCapabilitiesRequestTest extends AbstractCoreMavenComponentTestCase {
+class OutputCapabilitiesRequestTest extends AbstractCoreMavenComponentTestCase implements PlexusTestConfiguration {
     private static final String KEY = "maven.logging.outputCapabilities";
 
     @Inject
     private Maven maven;
 
-    @Inject
-    private DefaultOutputCapabilities capabilities;
+    private final TestOutputCapabilities capabilities = new TestOutputCapabilities();
+
+    @Override
+    public void customizeContainer(PlexusContainer container) {
+        container.addComponent(capabilities, OutputCapabilities.class.getName());
+    }
 
     @Override
     protected String getProjectsDirectory() {
@@ -74,10 +81,10 @@ class OutputCapabilitiesRequestTest extends AbstractCoreMavenComponentTestCase {
         for (Destination destination : Destination.values()) {
             for (Charset encoding : Arrays.asList(null, StandardCharsets.UTF_8, Charset.forName("latin1"))) {
                 Map<String, String> captured;
-                try (AutoCloseable cleanup =
-                        capabilities.install(DefaultOutputCapabilities.snapshot(destination, encoding))) {
-                    captured = capabilities.asMap();
+                try (AutoCloseable cleanup = capabilities.install(TestOutputCapabilities.snapshot(
+                        destination, encoding, OutputCapabilities.Format.HUMAN_READABLE))) {
                     MavenExecutionResult result = maven.execute(request);
+                    captured = captured(request);
                     assertFalse(result.getExceptions().isEmpty());
                     assertSame(captured, request.getData().get(KEY));
                     assertEquals(destination.name(), captured.get("destination"));
@@ -87,7 +94,7 @@ class OutputCapabilitiesRequestTest extends AbstractCoreMavenComponentTestCase {
                 assertSame(captured, request.getData().get(KEY));
                 assertEquals(destination.name(), captured.get("destination"));
                 assertEquals(encoding == null ? null : encoding.name(), captured.get("encoding"));
-                assertEquals(Destination.UNKNOWN, capabilities.getDestination());
+                assertEquals(Optional.empty(), capabilities.getDestination());
             }
         }
     }
@@ -97,10 +104,10 @@ class OutputCapabilitiesRequestTest extends AbstractCoreMavenComponentTestCase {
         MavenExecutionRequest request = request("simple");
         assertNull(request.getData().get(KEY));
         RequestObserver observer = observer();
-        try (AutoCloseable cleanup =
-                capabilities.install(DefaultOutputCapabilities.snapshot(Destination.FILE, StandardCharsets.UTF_8))) {
+        try (AutoCloseable cleanup = capabilities.install(TestOutputCapabilities.snapshot(
+                Destination.FILE, StandardCharsets.UTF_8, OutputCapabilities.Format.HUMAN_READABLE))) {
             executeSuccessfully(request);
-            Map<String, String> captured = capabilities.asMap();
+            Map<String, String> captured = captured(request);
             assertSame(request, observer.session.getRequest());
             assertSame(captured, observer.captured);
             assertNull(observer.resolverMetadata);
@@ -115,7 +122,7 @@ class OutputCapabilitiesRequestTest extends AbstractCoreMavenComponentTestCase {
             assertEquals("UTF-8", captured.get("encoding"));
         }
         assertEquals("FILE", observer.captured.get("destination"));
-        assertEquals(Destination.UNKNOWN, capabilities.getDestination());
+        assertEquals(Optional.empty(), capabilities.getDestination());
         assertEquals(Optional.empty(), capabilities.getEncoding());
     }
 
@@ -125,41 +132,41 @@ class OutputCapabilitiesRequestTest extends AbstractCoreMavenComponentTestCase {
         original.getData().put("unrelated", "original");
         Map<String, String> fileMap;
         Map<String, String> consoleMap;
-        try (AutoCloseable file =
-                capabilities.install(DefaultOutputCapabilities.snapshot(Destination.FILE, StandardCharsets.UTF_8))) {
+        try (AutoCloseable file = capabilities.install(TestOutputCapabilities.snapshot(
+                Destination.FILE, StandardCharsets.UTF_8, OutputCapabilities.Format.HUMAN_READABLE))) {
             executeSuccessfully(original);
-            fileMap = capabilities.asMap();
+            fileMap = captured(original);
             MavenExecutionRequest copy = DefaultMavenExecutionRequest.copy(original);
             assertTrue(copy.getData().isEmpty());
             copy.getData().put("unrelated", "copy");
             MavenExecutionRequest independent = request("simple");
             assertNull(independent.getData().get(KEY));
-            try (AutoCloseable console = capabilities.install(
-                    DefaultOutputCapabilities.snapshot(Destination.CONSOLE, StandardCharsets.ISO_8859_1))) {
-                consoleMap = capabilities.asMap();
+            try (AutoCloseable console = capabilities.install(TestOutputCapabilities.snapshot(
+                    Destination.CONSOLE, StandardCharsets.ISO_8859_1, OutputCapabilities.Format.HUMAN_READABLE))) {
                 executeSuccessfully(copy);
+                consoleMap = captured(copy);
                 executeSuccessfully(independent);
                 assertSame(consoleMap, copy.getData().get(KEY));
-                assertSame(consoleMap, independent.getData().get(KEY));
+                assertEquals(consoleMap, independent.getData().get(KEY));
                 assertSame(fileMap, original.getData().get(KEY));
                 assertEquals("original", original.getData().get("unrelated"));
                 assertEquals("copy", copy.getData().get("unrelated"));
                 assertNull(independent.getData().get("unrelated"));
                 executeSuccessfully(original);
-                assertSame(consoleMap, original.getData().get(KEY));
+                assertEquals(consoleMap, original.getData().get(KEY));
                 assertEquals("original", original.getData().get("unrelated"));
                 assertEquals("FILE", fileMap.get("destination"));
             }
-            assertSame(consoleMap, original.getData().get(KEY));
+            assertEquals(consoleMap, original.getData().get(KEY));
             executeSuccessfully(original);
-            assertSame(fileMap, original.getData().get(KEY));
+            assertEquals(fileMap, original.getData().get(KEY));
             assertEquals("CONSOLE", consoleMap.get("destination"));
             assertEquals("ISO-8859-1", consoleMap.get("encoding"));
         }
-        assertSame(fileMap, original.getData().get(KEY));
+        assertEquals(fileMap, original.getData().get(KEY));
         executeSuccessfully(original);
-        assertSame(capabilities.asMap(), original.getData().get(KEY));
-        assertEquals("UNKNOWN", capabilities.asMap().get("destination"));
+        assertEquals(capabilities.asMap(), original.getData().get(KEY));
+        assertNull(capabilities.asMap().get("destination"));
         assertFalse(capabilities.asMap().containsKey("encoding"));
         assertEquals("original", original.getData().get("unrelated"));
         assertEquals("FILE", fileMap.get("destination"));
@@ -172,19 +179,24 @@ class OutputCapabilitiesRequestTest extends AbstractCoreMavenComponentTestCase {
         MavenExecutionRequest request = request("cyclic-reference");
         RequestObserver observer = observer();
         Map<String, String> captured;
-        try (AutoCloseable cleanup = capabilities.install(
-                DefaultOutputCapabilities.snapshot(Destination.UNKNOWN, StandardCharsets.ISO_8859_1))) {
-            captured = capabilities.asMap();
+        try (AutoCloseable cleanup = capabilities.install(TestOutputCapabilities.snapshot(
+                null, StandardCharsets.ISO_8859_1, OutputCapabilities.Format.HUMAN_READABLE))) {
             MavenExecutionResult result = maven.execute(request);
+            captured = captured(request);
             assertEquals(
                     ProjectCycleException.class, result.getExceptions().get(0).getClass());
             assertSame(captured, observer.captured);
             assertNull(observer.resolverMetadata);
         }
         assertSame(captured, request.getData().get(KEY));
-        assertEquals("UNKNOWN", captured.get("destination"));
+        assertNull(captured.get("destination"));
         assertEquals("ISO-8859-1", captured.get("encoding"));
         assertEquals(Optional.empty(), capabilities.getEncoding());
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Map<String, String> captured(MavenExecutionRequest request) {
+        return (Map<String, String>) request.getData().get(KEY);
     }
 
     private MavenExecutionRequest request(String project) throws Exception {

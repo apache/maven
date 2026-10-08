@@ -27,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MavenITOutputCapabilitiesTest extends AbstractMavenIntegrationTestCase {
     @Test
-    void injectsCapabilitiesIntoLegacyPluginsInParallelReactor() throws Exception {
+    void injectsApiServiceAndPublishesLegacyMapInParallelReactor() throws Exception {
         Path directory = extractResources("output-capabilities");
         Verifier plugin = newVerifier(directory.resolve("plugin"));
         plugin.addCliArgument("install");
@@ -38,23 +38,30 @@ class MavenITOutputCapabilitiesTest extends AbstractMavenIntegrationTestCase {
         legacyPlugin.execute();
         legacyPlugin.verifyErrorFreeLog();
 
-        for (String color : new String[] {"never", "always"}) {
-            Verifier consumer = newVerifier(directory.resolve("consumer"));
-            consumer.addCliArgument("-T2");
-            consumer.addCliArgument("-B");
-            consumer.addCliArgument("--color=" + color);
-            consumer.addCliArgument("validate");
-            consumer.execute();
-            consumer.verifyErrorFreeLog();
-            for (String prefix : new String[] {"", "child/"}) {
-                Properties properties = consumer.loadProperties(prefix + "target/output-capabilities.properties");
-                Properties legacy = consumer.loadProperties(prefix + "target/legacy-output-capabilities.properties");
-                assertEquals("true", legacy.getProperty("available"));
-                assertEquals(properties.getProperty("destination"), legacy.getProperty("destination"));
-                assertEquals(properties.getProperty("encoding"), legacy.getProperty("encoding"));
-                // Maven 4's verifier directs logging through -l.
-                assertEquals("FILE", properties.getProperty("destination"));
-                assertEquals("UTF-8", properties.getProperty("encoding"));
+        for (String mode : new String[] {"plain", "rich", "verbose", "machine"}) {
+            for (String color : new String[] {"never", "always"}) {
+                Verifier consumer = newVerifier(directory.resolve("consumer"));
+                consumer.addCliArgument("-T2");
+                consumer.addCliArgument("--console=" + mode);
+                consumer.addCliArgument("-B");
+                consumer.addCliArgument("--color=" + color);
+                consumer.addCliArgument("validate");
+                consumer.execute();
+                consumer.verifyErrorFreeLog();
+                for (String prefix : new String[] {"", "child/"}) {
+                    Properties properties = consumer.loadProperties(prefix + "target/output-capabilities.properties");
+                    Properties legacy = consumer.loadProperties(prefix + "target/legacy-output-capabilities.properties");
+                    assertEquals("true", legacy.getProperty("available"));
+                    assertEquals(properties.getProperty("destination"), legacy.getProperty("destination"));
+                    assertEquals(properties.getProperty("encoding"), legacy.getProperty("encoding"));
+                    // Maven 4's verifier directs logging through -l.
+                    assertEquals("FILE", properties.getProperty("destination"));
+                    assertEquals(properties.getProperty("format"), legacy.getProperty("format"));
+                    assertEquals(
+                            "machine".equals(mode) ? "MACHINE_READABLE" : "HUMAN_READABLE",
+                            properties.getProperty("format"));
+                    assertEquals("UTF-8", properties.getProperty("encoding"));
+                }
             }
         }
     }

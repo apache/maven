@@ -41,6 +41,7 @@ import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.OutputCapabilities;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.ToolchainsBuilderRequest;
@@ -389,10 +390,17 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     protected BuildEventListener doDetermineBuildEventListener(MavenContext context) {
         String consoleMode = determineConsoleMode(context);
         if ("machine".equals(consoleMode)) {
-            return new MachineBuildEventListener(determineWriter(context));
+            context.outputFormat = Optional.of(OutputCapabilities.Format.MACHINE_READABLE);
+            Consumer<String> writer = determineWriter(context);
+            return new MachineBuildEventListener(writer);
         }
-        if ("rich".equals(consoleMode) && context.terminal != null) {
-            return new RichBuildEventListener(context.terminal, determineWriter(context));
+        // Rich output writes directly to the terminal. Keep -l on the selected file writer.
+        if ("rich".equals(consoleMode)
+                && context.terminal != null
+                && context.options().logFile().isEmpty()) {
+            context.outputFormat = Optional.of(OutputCapabilities.Format.HUMAN_READABLE);
+            Consumer<String> writer = determineWriter(context);
+            return new RichBuildEventListener(context.terminal, writer);
         }
         return super.doDetermineBuildEventListener(context);
     }

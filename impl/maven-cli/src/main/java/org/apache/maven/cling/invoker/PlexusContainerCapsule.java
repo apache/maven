@@ -21,9 +21,9 @@ package org.apache.maven.cling.invoker;
 import java.util.Optional;
 
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.OutputCapabilities;
 import org.apache.maven.internal.impl.DefaultLookup;
-import org.apache.maven.logging.OutputCapabilities;
-import org.apache.maven.logging.internal.DefaultOutputCapabilities;
+import org.apache.maven.logging.internal.CliOutputCapabilities;
 import org.apache.maven.slf4j.MavenLoggerFactory;
 import org.codehaus.plexus.DefaultPlexusContainer;
 
@@ -50,11 +50,11 @@ public class PlexusContainerCapsule implements ContainerCapsule {
     public void updateLogging(LookupContext context) {
         plexusContainer.getLoggerManager().setThresholds(toPlexusLoggingLevel(context.loggerLevel));
         OutputCapabilities capabilities = lookup.lookup(OutputCapabilities.class);
-        if (capabilities instanceof DefaultOutputCapabilities defaultCapabilities) {
-            context.closeables.add(defaultCapabilities.install(
+        if (capabilities instanceof CliOutputCapabilities cliCapabilities) {
+            context.closeables.add(cliCapabilities.install(
                     context.loggerFactory instanceof MavenLoggerFactory
                             ? context.outputCapabilities.get()
-                            : DefaultOutputCapabilities.UNKNOWN));
+                            : CliOutputCapabilities.EMPTY));
         }
     }
 

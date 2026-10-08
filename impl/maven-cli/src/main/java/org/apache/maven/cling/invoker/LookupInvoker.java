@@ -35,6 +35,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
@@ -54,6 +55,8 @@ import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.api.services.OutputCapabilities;
+import org.apache.maven.api.services.OutputCapabilities.Destination;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.SettingsBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilderResult;
@@ -83,11 +86,10 @@ import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingOutputStream;
-import org.apache.maven.logging.OutputCapabilities.Destination;
 import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.apache.maven.logging.SimpleBuildEventListener;
 import org.apache.maven.logging.api.LogLevelRecorder;
-import org.apache.maven.logging.internal.DefaultOutputCapabilities;
+import org.apache.maven.logging.internal.CliOutputCapabilities;
 import org.apache.maven.logging.internal.TerminalOutputCapabilities;
 import org.apache.maven.slf4j.MavenJulHandler;
 import org.apache.maven.slf4j.MavenSimpleLogger;
@@ -355,6 +357,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected BuildEventListener doDetermineBuildEventListener(C context) {
         Consumer<String> writer = determineWriter(context);
+        context.outputFormat = Optional.of(OutputCapabilities.Format.HUMAN_READABLE);
         return new SimpleBuildEventListener(writer);
     }
 
@@ -469,19 +472,21 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             try {
                 PrintWriter printWriter = new PrintWriter(Files.newBufferedWriter(logFile), true);
                 context.closeables.add(printWriter);
-                context.outputCapabilities =
-                        () -> DefaultOutputCapabilities.snapshot(Destination.FILE, StandardCharsets.UTF_8);
+                context.outputCapabilities = () -> CliOutputCapabilities.snapshot(
+                        Destination.FILE, StandardCharsets.UTF_8, context.outputFormat.orElse(null));
                 return printWriter::println;
             } catch (IOException e) {
                 throw new MavenException("Unable to redirect logging to " + logFile, e);
             }
         } else {
             // Resolve this after terminal initialization, when the container is ready.
-            context.outputCapabilities = () -> DefaultOutputCapabilities.snapshot(
+            context.outputCapabilities = () -> CliOutputCapabilities.snapshot(
                     context.invokerRequest.embedded()
-                            ? Destination.UNKNOWN
-                            : TerminalOutputCapabilities.destination(context.terminal),
-                    context.terminal.outputEncoding());
+                            ? null
+                            : TerminalOutputCapabilities.destination(context.terminal)
+                                    .orElse(null),
+                    context.terminal.outputEncoding(),
+                    context.outputFormat.orElse(null));
             // Given the terminal creation has been offloaded to a different thread,
             // do not pass directly the terminal writer
             return msg -> {

@@ -18,8 +18,6 @@
  */
 package org.apache.maven.its.output;
 
-import javax.inject.Inject;
-
 import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -27,25 +25,40 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.util.Properties;
 
-import org.apache.maven.logging.OutputCapabilities;
-import org.apache.maven.plugin.AbstractMojo;
-import org.apache.maven.plugin.MojoExecutionException;
-import org.apache.maven.plugins.annotations.Mojo;
-import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.plugin.Log;
+import org.apache.maven.api.plugin.MojoException;
+import org.apache.maven.api.plugin.annotations.Mojo;
+import org.apache.maven.api.plugin.annotations.Parameter;
+import org.apache.maven.api.services.OutputCapabilities;
 
-@Mojo(name = "report", threadSafe = true)
-public class OutputMojo extends AbstractMojo {
+@Mojo(name = "report")
+public class OutputMojo implements org.apache.maven.api.plugin.Mojo {
     @Inject
     private OutputCapabilities capabilities;
+
+    @Inject
+    private Session session;
+
+    @Inject
+    private Log log;
 
     @Parameter(defaultValue = "${project.build.directory}/output-capabilities.properties", readonly = true)
     private File output;
 
     @Override
-    public void execute() throws MojoExecutionException {
+    public void execute() throws MojoException {
+        if (session.getService(OutputCapabilities.class) != capabilities) {
+            OutputCapabilities service = session.getService(OutputCapabilities.class);
+            throw new MojoException("Service " + service.getClass().getName() + " " + service.getDestination()
+                    + "/" + service.getFormat() + " differs from injected " + capabilities.getClass().getName()
+                    + " " + capabilities.getDestination() + "/" + capabilities.getFormat());
+        }
         Properties properties = new Properties();
-        properties.setProperty("destination", capabilities.getDestination().name());
-        properties.setProperty("encoding", capabilities.getEncoding().map(Charset::name).orElse("unknown"));
+        capabilities.getDestination().ifPresent(value -> properties.setProperty("destination", value.name()));
+        capabilities.getFormat().ifPresent(value -> properties.setProperty("format", value.name()));
+        capabilities.getEncoding().ifPresent(value -> properties.setProperty("encoding", value.name()));
         properties.setProperty("defaultEncoding", Charset.defaultCharset().name());
         try {
             Files.createDirectories(output.toPath().getParent());
@@ -53,8 +66,8 @@ public class OutputMojo extends AbstractMojo {
                 properties.store(stream, "Maven logging capabilities");
             }
         } catch (IOException e) {
-            throw new MojoExecutionException("Unable to write capabilities", e);
+            throw new MojoException("Unable to write capabilities", e);
         }
-        getLog().info("output-capabilities-marker caf\u00e9 \u251c\u2500");
+        log.info("output-capabilities-marker caf\u00e9 \u251c\u2500");
     }
 }

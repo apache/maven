@@ -21,8 +21,9 @@ package org.apache.maven.logging.internal;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 
-import org.apache.maven.logging.OutputCapabilities.Destination;
+import org.apache.maven.api.services.OutputCapabilities.Destination;
 import org.jline.terminal.impl.exec.ExecTerminalProvider;
 import org.jline.terminal.spi.SystemStream;
 import org.jline.utils.OSUtils;
@@ -45,9 +46,10 @@ public final class ExecTerminalProbe {
             if (provider.isSystemStream(stream)) {
                 throw new AssertionError("Expected an inconclusive negative exec probe for " + stream);
             }
-            Destination destination = TerminalOutputCapabilities.probe(Collections.singletonList(provider), stream);
-            if (destination != Destination.UNKNOWN) {
-                throw new AssertionError(stream + ": expected UNKNOWN, got " + destination);
+            Optional<Destination> destination =
+                    TerminalOutputCapabilities.probe(Collections.singletonList(provider), stream);
+            if (destination.isPresent()) {
+                throw new AssertionError(stream + ": expected absent destination, got " + destination);
             }
         }
     }

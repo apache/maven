@@ -24,9 +24,10 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.maven.logging.OutputCapabilities.Destination;
+import org.apache.maven.api.services.OutputCapabilities.Destination;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.impl.DumbTerminalProvider;
 import org.jline.terminal.impl.exec.ExecTerminalProvider;
@@ -55,13 +56,14 @@ class TerminalOutputCapabilitiesTest {
             when(terminal.getProvider()).thenReturn(provider);
             when(terminal.getSystemStream()).thenReturn(stream);
             when(provider.isSystemStream(stream)).thenReturn(true);
-            assertEquals(Destination.CONSOLE, TerminalOutputCapabilities.destination(terminal));
+            assertEquals(Optional.of(Destination.CONSOLE), TerminalOutputCapabilities.destination(terminal));
             assertEquals(
-                    Destination.CONSOLE, TerminalOutputCapabilities.probe(Collections.singletonList(provider), stream));
+                    Optional.of(Destination.CONSOLE),
+                    TerminalOutputCapabilities.probe(Collections.singletonList(provider), stream));
             when(provider.isSystemStream(stream)).thenReturn(false);
-            assertEquals(Destination.UNKNOWN, TerminalOutputCapabilities.destination(terminal));
+            assertEquals(Optional.empty(), TerminalOutputCapabilities.destination(terminal));
             assertEquals(
-                    Destination.UNKNOWN, TerminalOutputCapabilities.probe(Collections.singletonList(provider), stream));
+                    Optional.empty(), TerminalOutputCapabilities.probe(Collections.singletonList(provider), stream));
         }
     }
 
@@ -73,12 +75,14 @@ class TerminalOutputCapabilitiesTest {
             for (boolean console : Arrays.asList(false, true)) {
                 when(other.isSystemStream(stream)).thenReturn(console);
                 Destination expected = console ? Destination.CONSOLE : Destination.REDIRECTED;
-                assertEquals(expected, TerminalOutputCapabilities.probe(Arrays.asList(exec, other), stream));
-                assertEquals(expected, TerminalOutputCapabilities.probe(Arrays.asList(other, exec), stream));
+                assertEquals(
+                        Optional.of(expected), TerminalOutputCapabilities.probe(Arrays.asList(exec, other), stream));
+                assertEquals(
+                        Optional.of(expected), TerminalOutputCapabilities.probe(Arrays.asList(other, exec), stream));
             }
             when(other.isSystemStream(stream)).thenThrow(new UnsatisfiedLinkError());
-            assertEquals(Destination.UNKNOWN, TerminalOutputCapabilities.probe(Arrays.asList(exec, other), stream));
-            assertEquals(Destination.UNKNOWN, TerminalOutputCapabilities.probe(Arrays.asList(other, exec), stream));
+            assertEquals(Optional.empty(), TerminalOutputCapabilities.probe(Arrays.asList(exec, other), stream));
+            assertEquals(Optional.empty(), TerminalOutputCapabilities.probe(Arrays.asList(other, exec), stream));
         }
     }
 
@@ -109,16 +113,15 @@ class TerminalOutputCapabilitiesTest {
 
     @Test
     void unavailableProvidersDoNotMeanRedirection() {
+        assertEquals(Optional.empty(), TerminalOutputCapabilities.probe(Collections.emptyList(), SystemStream.Output));
         assertEquals(
-                Destination.UNKNOWN, TerminalOutputCapabilities.probe(Collections.emptyList(), SystemStream.Output));
-        assertEquals(
-                Destination.UNKNOWN,
+                Optional.empty(),
                 TerminalOutputCapabilities.probe(
                         Collections.singletonList(new DumbTerminalProvider()), SystemStream.Output));
         TerminalProvider failing = mock(TerminalProvider.class);
         when(failing.isSystemStream(SystemStream.Output)).thenThrow(new UnsatisfiedLinkError());
         assertEquals(
-                Destination.UNKNOWN,
+                Optional.empty(),
                 TerminalOutputCapabilities.probe(Collections.singletonList(failing), SystemStream.Output));
     }
 
@@ -130,17 +133,17 @@ class TerminalOutputCapabilitiesTest {
         when(terminal.getSystemStream()).thenReturn(SystemStream.Error);
         when(terminal.getType()).thenReturn(Terminal.TYPE_DUMB);
         when(provider.isSystemStream(SystemStream.Error)).thenReturn(true);
-        assertEquals(Destination.CONSOLE, TerminalOutputCapabilities.destination(terminal));
+        assertEquals(Optional.of(Destination.CONSOLE), TerminalOutputCapabilities.destination(terminal));
         when(provider.isSystemStream(SystemStream.Error)).thenReturn(false);
-        assertEquals(Destination.REDIRECTED, TerminalOutputCapabilities.destination(terminal));
+        assertEquals(Optional.of(Destination.REDIRECTED), TerminalOutputCapabilities.destination(terminal));
     }
 
     @Test
     void customTerminalDoesNotImplyConsole() {
         TerminalExt terminal = mock(TerminalExt.class);
         when(terminal.getProvider()).thenReturn(mock(TerminalProvider.class));
-        assertEquals(Destination.UNKNOWN, TerminalOutputCapabilities.destination(terminal));
-        assertEquals(Destination.UNKNOWN, TerminalOutputCapabilities.destination(mock(Terminal.class)));
+        assertEquals(Optional.empty(), TerminalOutputCapabilities.destination(terminal));
+        assertEquals(Optional.empty(), TerminalOutputCapabilities.destination(mock(Terminal.class)));
     }
 
     @Test
@@ -149,10 +152,10 @@ class TerminalOutputCapabilitiesTest {
         TerminalProvider console = mock(TerminalProvider.class);
         when(console.isSystemStream(SystemStream.Output)).thenReturn(true);
         assertEquals(
-                Destination.CONSOLE,
+                Optional.of(Destination.CONSOLE),
                 TerminalOutputCapabilities.probe(Arrays.asList(redirected, console), SystemStream.Output));
         assertEquals(
-                Destination.REDIRECTED,
+                Optional.of(Destination.REDIRECTED),
                 TerminalOutputCapabilities.probe(Collections.singletonList(redirected), SystemStream.Output));
     }
 }

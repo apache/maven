@@ -19,9 +19,10 @@
 package org.apache.maven.logging.internal;
 
 import java.util.List;
+import java.util.Optional;
 
+import org.apache.maven.api.services.OutputCapabilities.Destination;
 import org.apache.maven.jline.FastTerminal;
-import org.apache.maven.logging.OutputCapabilities.Destination;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.DumbTerminalProvider;
@@ -38,7 +39,7 @@ public final class TerminalOutputCapabilities {
 
     private TerminalOutputCapabilities() {}
 
-    public static Destination destination(Terminal terminal) {
+    public static Optional<Destination> destination(Terminal terminal) {
         try {
             if (terminal instanceof FastTerminal fastTerminal) {
                 LOGGER.debug("Resolving asynchronous terminal for logging output detection");
@@ -46,9 +47,9 @@ public final class TerminalOutputCapabilities {
             }
             if (!(terminal instanceof TerminalExt extended)) {
                 LOGGER.debug(
-                        "Logging destination is UNKNOWN: terminal {} does not expose its provider and system stream",
+                        "Logging destination is unavailable: terminal {} does not expose its provider and system stream",
                         terminal == null ? null : terminal.getClass().getName());
-                return Destination.UNKNOWN;
+                return Optional.empty();
             }
             SystemStream stream = extended.getSystemStream();
             TerminalProvider provider = extended.getProvider();
@@ -60,14 +61,14 @@ public final class TerminalOutputCapabilities {
             if (provider != null && !(provider instanceof DumbTerminalProvider)) {
                 // A non-system terminal may be backed by arbitrary embedder streams.
                 if (stream == null) {
-                    LOGGER.debug("Logging destination is UNKNOWN: terminal provider has no system stream");
-                    return Destination.UNKNOWN;
+                    LOGGER.debug("Logging destination is unavailable: terminal provider has no system stream");
+                    return Optional.empty();
                 }
                 return probe(provider, stream);
             }
             if (!(provider instanceof DumbTerminalProvider)) {
-                LOGGER.debug("Logging destination is UNKNOWN: terminal has no provider");
-                return Destination.UNKNOWN;
+                LOGGER.debug("Logging destination is unavailable: terminal has no provider");
+                return Optional.empty();
             }
             // A dumb terminal can also result from redirected stdin or failed terminal
             // creation. Ask the configured providers about output, not terminal type.
@@ -84,55 +85,55 @@ public final class TerminalOutputCapabilities {
             }
             return probe(providers, outputStream);
         } catch (RuntimeException | LinkageError e) {
-            LOGGER.debug("Logging destination is UNKNOWN: terminal output detection failed", e);
-            return Destination.UNKNOWN;
+            LOGGER.debug("Logging destination is unavailable: terminal output detection failed", e);
+            return Optional.empty();
         }
     }
 
-    static Destination probe(List<TerminalProvider> providers, SystemStream stream) {
+    static Optional<Destination> probe(List<TerminalProvider> providers, SystemStream stream) {
         boolean redirected = false;
         for (TerminalProvider provider : providers) {
             if (provider instanceof DumbTerminalProvider) {
                 LOGGER.debug("Skipping dumb terminal provider when probing logging stream {}", stream);
                 continue;
             }
-            Destination result = probe(provider, stream);
-            if (result == Destination.CONSOLE) {
+            Optional<Destination> result = probe(provider, stream);
+            if (result.orElse(null) == Destination.CONSOLE) {
                 return result;
             }
-            redirected |= result == Destination.REDIRECTED;
+            redirected |= result.orElse(null) == Destination.REDIRECTED;
         }
-        Destination result = redirected ? Destination.REDIRECTED : Destination.UNKNOWN;
+        Optional<Destination> result = redirected ? Optional.of(Destination.REDIRECTED) : Optional.empty();
         LOGGER.debug("Logging destination for stream {} after probing configured providers: {}", stream, result);
         return result;
     }
 
-    private static Destination probe(TerminalProvider provider, SystemStream stream) {
+    private static Optional<Destination> probe(TerminalProvider provider, SystemStream stream) {
         String providerClass = provider == null ? null : provider.getClass().getName();
         try {
-            Destination result;
+            Optional<Destination> result;
             if (provider.isSystemStream(stream)) {
-                result = Destination.CONSOLE;
+                result = Optional.of(Destination.CONSOLE);
             } else if (provider instanceof ExecTerminalProvider) {
                 // The exec provider also returns false when its external probe fails.
                 // A negative result cannot distinguish redirection from failed detection.
                 LOGGER.debug(
-                        "Logging destination is UNKNOWN: exec terminal provider {} returned an inconclusive negative result for stream {}",
+                        "Logging destination is unavailable: exec terminal provider {} returned an inconclusive negative result for stream {}",
                         providerClass,
                         stream);
-                return Destination.UNKNOWN;
+                return Optional.empty();
             } else {
-                result = Destination.REDIRECTED;
+                result = Optional.of(Destination.REDIRECTED);
             }
             LOGGER.debug("Terminal provider {} reports logging stream {} as {}", providerClass, stream, result);
             return result;
         } catch (RuntimeException | LinkageError e) {
             LOGGER.debug(
-                    "Logging destination is UNKNOWN: terminal provider {} failed to inspect stream {}",
+                    "Logging destination is unavailable: terminal provider {} failed to inspect stream {}",
                     providerClass,
                     stream,
                     e);
-            return Destination.UNKNOWN;
+            return Optional.empty();
         }
     }
 }

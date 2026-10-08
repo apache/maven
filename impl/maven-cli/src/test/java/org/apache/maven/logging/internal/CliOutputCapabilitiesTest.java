@@ -25,8 +25,8 @@ import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-import org.apache.maven.logging.OutputCapabilities;
-import org.apache.maven.logging.OutputCapabilities.Destination;
+import org.apache.maven.api.services.OutputCapabilities;
+import org.apache.maven.api.services.OutputCapabilities.Destination;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.junit.jupiter.api.Test;
@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 
 @PlexusTest
-class DefaultOutputCapabilitiesTest {
+class CliOutputCapabilitiesTest {
     @Inject
     private OutputCapabilities capabilities;
 
@@ -45,7 +45,7 @@ class DefaultOutputCapabilitiesTest {
     @Test
     void injectableSingletonWithoutSession() throws Exception {
         assertSame(capabilities, container.lookup(OutputCapabilities.class));
-        assertEquals(Destination.UNKNOWN, capabilities.getDestination());
+        assertEquals(Optional.empty(), capabilities.getDestination());
         assertEquals(Optional.empty(), capabilities.getEncoding());
     }
 
@@ -53,7 +53,7 @@ class DefaultOutputCapabilitiesTest {
     void availableThroughMaven4LookupWithoutSession() throws Exception {
         assertSame(
                 capabilities,
-                container.lookup(org.apache.maven.di.Injector.class).getInstance(DefaultOutputCapabilities.class));
+                container.lookup(org.apache.maven.di.Injector.class).getInstance(CliOutputCapabilities.class));
         assertSame(
                 capabilities,
                 container.lookup(org.apache.maven.api.services.Lookup.class).lookup(OutputCapabilities.class));
@@ -64,48 +64,72 @@ class DefaultOutputCapabilitiesTest {
 
     @Test
     void updatesAreVisibleToParallelClientsAndRestoredOnClose() throws Exception {
-        DefaultOutputCapabilities component = (DefaultOutputCapabilities) capabilities;
+        CliOutputCapabilities component = (CliOutputCapabilities) capabilities;
         try (AutoCloseable cleanup =
-                component.install(DefaultOutputCapabilities.snapshot(Destination.FILE, StandardCharsets.UTF_8))) {
+                component.install(CliOutputCapabilities.snapshot(Destination.FILE, StandardCharsets.UTF_8, null))) {
             assertEquals(
-                    Destination.FILE,
+                    Optional.of(Destination.FILE),
                     CompletableFuture.supplyAsync(capabilities::getDestination).get(10, TimeUnit.SECONDS));
             assertEquals(
                     Optional.of(StandardCharsets.UTF_8),
                     CompletableFuture.supplyAsync(capabilities::getEncoding).get(10, TimeUnit.SECONDS));
             try (AutoCloseable nested = component.install(
-                    DefaultOutputCapabilities.snapshot(Destination.CONSOLE, StandardCharsets.ISO_8859_1))) {
-                assertEquals(Destination.CONSOLE, capabilities.getDestination());
+                    CliOutputCapabilities.snapshot(Destination.CONSOLE, StandardCharsets.ISO_8859_1, null))) {
+                assertEquals(Optional.of(Destination.CONSOLE), capabilities.getDestination());
                 assertEquals(Optional.of(StandardCharsets.ISO_8859_1), capabilities.getEncoding());
             }
-            assertEquals(Destination.FILE, capabilities.getDestination());
+            assertEquals(Optional.of(Destination.FILE), capabilities.getDestination());
             assertEquals(Optional.of(StandardCharsets.UTF_8), capabilities.getEncoding());
         }
-        assertEquals(Destination.UNKNOWN, capabilities.getDestination());
+        assertEquals(Optional.empty(), capabilities.getDestination());
         assertEquals(Optional.empty(), capabilities.getEncoding());
     }
 
     @Test
     void unknownDestinationCanHaveKnownEncoding() throws Exception {
-        try (AutoCloseable cleanup = ((DefaultOutputCapabilities) capabilities)
-                .install(DefaultOutputCapabilities.snapshot(Destination.UNKNOWN, StandardCharsets.UTF_8))) {
-            assertEquals(Destination.UNKNOWN, capabilities.getDestination());
+        try (AutoCloseable cleanup = ((CliOutputCapabilities) capabilities)
+                .install(CliOutputCapabilities.snapshot(null, StandardCharsets.UTF_8, null))) {
+            assertEquals(Optional.empty(), capabilities.getDestination());
             assertEquals(Optional.of(StandardCharsets.UTF_8), capabilities.getEncoding());
         }
     }
 
     @Test
+    void outOfOrderCleanupSkipsClosedInstallations() throws Exception {
+        CliOutputCapabilities component = (CliOutputCapabilities) capabilities;
+        AutoCloseable first = component.install(CliOutputCapabilities.snapshot(
+                Destination.FILE, StandardCharsets.UTF_8, OutputCapabilities.Format.HUMAN_READABLE));
+        AutoCloseable second = component.install(CliOutputCapabilities.snapshot(
+                Destination.CONSOLE, StandardCharsets.US_ASCII, OutputCapabilities.Format.MACHINE_READABLE));
+        try {
+            first.close();
+            assertEquals(Optional.of(Destination.CONSOLE), component.getDestination());
+            assertEquals(Optional.of(OutputCapabilities.Format.MACHINE_READABLE), component.getFormat());
+            second.close();
+            assertEquals(Optional.empty(), component.getDestination());
+            assertEquals(Optional.empty(), component.getEncoding());
+            assertEquals(Optional.empty(), component.getFormat());
+            first.close();
+            second.close();
+            assertEquals(Optional.empty(), component.getFormat());
+        } finally {
+            second.close();
+            first.close();
+        }
+    }
+
+    @Test
     void repeatedCleanupDoesNotResetNextInvocation() throws Exception {
-        DefaultOutputCapabilities component = (DefaultOutputCapabilities) capabilities;
+        CliOutputCapabilities component = (CliOutputCapabilities) capabilities;
         AutoCloseable first =
-                component.install(DefaultOutputCapabilities.snapshot(Destination.FILE, StandardCharsets.UTF_8));
+                component.install(CliOutputCapabilities.snapshot(Destination.FILE, StandardCharsets.UTF_8, null));
         first.close();
         try (AutoCloseable second = component.install(
-                DefaultOutputCapabilities.snapshot(Destination.REDIRECTED, StandardCharsets.US_ASCII))) {
+                CliOutputCapabilities.snapshot(Destination.REDIRECTED, StandardCharsets.US_ASCII, null))) {
             first.close();
-            assertEquals(Destination.REDIRECTED, capabilities.getDestination());
+            assertEquals(Optional.of(Destination.REDIRECTED), capabilities.getDestination());
             assertEquals(Optional.of(StandardCharsets.US_ASCII), capabilities.getEncoding());
         }
-        assertEquals(Destination.UNKNOWN, capabilities.getDestination());
+        assertEquals(Optional.empty(), capabilities.getDestination());
     }
 }
