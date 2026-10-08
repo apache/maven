@@ -26,6 +26,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.cli.InvokerException;
@@ -38,6 +39,8 @@ import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.logging.BuildEventListener;
+import org.apache.maven.logging.OutputCapabilities;
+import org.apache.maven.logging.internal.DefaultOutputCapabilities;
 import org.jline.terminal.Terminal;
 import org.slf4j.ILoggerFactory;
 
@@ -89,6 +92,9 @@ public class LookupContext implements AutoCloseable {
     public Boolean coloredOutput;
     public Terminal terminal;
     public Consumer<String> writer;
+
+    // Set only by a known writer route; custom listeners and writers remain unknown.
+    public Supplier<OutputCapabilities> outputCapabilities = () -> DefaultOutputCapabilities.UNKNOWN;
 
     public ContainerCapsule containerCapsule;
     public Lookup lookup;
