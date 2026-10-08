@@ -451,17 +451,24 @@ public class Verifier {
             if (!Files.isRegularFile(settingsFile)) {
                 throw new IllegalArgumentException("settings xml does not exist: " + settingsXml);
             }
-            return executorTool.localRepository(executorRequest()
+            ExecutorRequest.Builder builder = executorRequest()
                     .cwd(tempBasedir)
                     .argument("-s")
-                    .argument(settingsFile.toString()));
+                    .argument(settingsFile.toString());
+            if (!environmentVariables.isEmpty()) {
+                builder.environmentVariables(environmentVariables);
+            }
+            return executorTool.localRepository(builder);
         } else {
             String outerHead = System.getProperty("maven.test.repo.local", "").trim();
             if (!outerHead.isEmpty()) {
                 return outerHead;
             } else {
-                return executorTool.localRepository(
-                        executorRequest().cwd(tempBasedir));
+                ExecutorRequest.Builder builder = executorRequest().cwd(tempBasedir);
+                if (!environmentVariables.isEmpty()) {
+                    builder.environmentVariables(environmentVariables);
+                }
+                return executorTool.localRepository(builder);
             }
         }
     }
