@@ -47,6 +47,7 @@ import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.SessionData;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
@@ -60,7 +61,9 @@ import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
+import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.PackagingRegistry;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.RepositoryFactory;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.SettingsBuilder;
@@ -284,6 +287,8 @@ public class ApiRunner {
      */
     static class DefaultSession extends AbstractSession {
 
+        private static final SessionData.Key<ModelProblems> MODEL_PROBLEMS = SessionData.key(ModelProblems.class);
+
         private final Map<String, String> systemProperties;
         private final Instant startTime = MonotonicClock.now();
         private Settings settings;
@@ -325,6 +330,14 @@ public class ApiRunner {
             newSession.mavenVersion = this.mavenVersion;
             newSession.userProperties = this.userProperties;
             return newSession;
+        }
+
+        @Nonnull
+        @Override
+        public ProblemCollector<ModelProblem> getModelProblemCollector() {
+            return getData()
+                    .computeIfAbsent(MODEL_PROBLEMS, () -> new ModelProblems(ProblemCollector.create(this)))
+                    .collector();
         }
 
         void setSettings(Settings settings) {
@@ -405,6 +418,8 @@ public class ApiRunner {
         public Map<String, Object> getPluginContext(Project project) {
             throw new UnsupportedInStandaloneModeException();
         }
+
+        private record ModelProblems(ProblemCollector<ModelProblem> collector) {}
     }
 
     @Provides
