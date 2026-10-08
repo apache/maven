@@ -2589,7 +2589,7 @@
             <li>{@code combine.self}: available values are {@code merge} (default) and {@code override}.</li>
             </ul>
 
-            <p>Since Maven 4.1.0, empty string plugin parameters have distinct semantics based on XML form:
+            <p>Since Maven 4.1.0, empty string plugin parameters have distinct semantics based on XML form:</p>
             <ul>
             <li><b>Explicit empty tag</b> ({@code <param></param>}): overrides the mojo's pre-initialized
                 Java default with an empty value (empty string for {@code String}, {@code CharSequence},
