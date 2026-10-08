@@ -121,7 +121,7 @@ class DefaultRepositorySystemSessionFactoryTest {
     }
 
     @Test
-    void dropsAnAutoDiscoveredPrefixesFileWhenItDeniesAnExistingPathByDefault() throws Exception {
+    void configuresVerifyDeniedDropsTreeTrueByDefault() throws Exception {
         MavenExecutionRequest request = requestWithServer(serverWithRepositoryOrigins("internal"));
 
         Object value = systemSessionFactory
