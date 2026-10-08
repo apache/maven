@@ -238,6 +238,10 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         // Resolver's ConfigUtils solely rely on config properties, that is why we need to add both here as well.
         configProps.putAll(request.getSystemProperties());
         configProps.putAll(request.getUserProperties());
+        // Auto-discovered prefix files from virtual repositories may describe only one member repository.
+        // If verification proves such a file incomplete, favour resolving available artifacts by dropping it.
+        // Explicit user-provided prefix files remain authoritative in Resolver, and users can override this default.
+        configProps.putIfAbsent("aether.remoteRepositoryFilter.prefixes.verifyDeniedDropsTree", Boolean.TRUE);
 
         RepositorySystemSession.SessionBuilder mainSessionBuilder = new SessionBuilderSupplier(repoSystem).get();
         mainSessionBuilder.setCache(request.getRepositoryCache());

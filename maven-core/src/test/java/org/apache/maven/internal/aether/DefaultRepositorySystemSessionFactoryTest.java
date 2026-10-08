@@ -39,6 +39,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
@@ -48,6 +49,9 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 @PlexusTest
 class DefaultRepositorySystemSessionFactoryTest {
+
+    private static final String PREFIXES_VERIFY_DENIED_DROPS_TREE =
+            "aether.remoteRepositoryFilter.prefixes.verifyDeniedDropsTree";
 
     @Inject
     private RepositorySystemSessionFactory systemSessionFactory;
@@ -114,6 +118,35 @@ class DefaultRepositorySystemSessionFactoryTest {
         AuthenticationSelector selector = authenticationSelector(request);
 
         assertNull(selector.getAuthentication(repository("internal", "https://repo.example.org/releases/")));
+    }
+
+    @Test
+    void dropsAnAutoDiscoveredPrefixesFileWhenItDeniesAnExistingPathByDefault() throws Exception {
+        MavenExecutionRequest request = requestWithServer(serverWithRepositoryOrigins("internal"));
+
+        Object value = systemSessionFactory
+                .newRepositorySessionBuilder(request)
+                .build()
+                .getConfigProperties()
+                .get(PREFIXES_VERIFY_DENIED_DROPS_TREE);
+
+        assertEquals(Boolean.TRUE, value);
+    }
+
+    @Test
+    void preservesAnExplicitPrefixesFilterSetting() throws Exception {
+        MavenExecutionRequest request = requestWithServer(serverWithRepositoryOrigins("internal"));
+        Properties userProperties = new Properties();
+        userProperties.setProperty(PREFIXES_VERIFY_DENIED_DROPS_TREE, "false");
+        request.setUserProperties(userProperties);
+
+        Object value = systemSessionFactory
+                .newRepositorySessionBuilder(request)
+                .build()
+                .getConfigProperties()
+                .get(PREFIXES_VERIFY_DENIED_DROPS_TREE);
+
+        assertEquals("false", value);
     }
 
     private static Properties strictCredentialScope() {
