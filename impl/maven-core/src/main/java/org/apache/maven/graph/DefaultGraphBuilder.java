@@ -98,7 +98,6 @@ public class DefaultGraphBuilder implements GraphBuilder {
 
             if (result == null) {
                 final List<MavenProject> projects = getProjectsForMavenReactor(session);
-                validateProjects(projects, session.getRequest());
                 processPackagingAttribute(projects, session.getRequest());
                 enrichRequestFromResumptionData(projects, session.getRequest());
                 result = reactorDependencyGraph(session, projects);
@@ -141,6 +140,8 @@ public class DefaultGraphBuilder implements GraphBuilder {
                 trimSelectedProjects(activeProjects, allSortedProjects, projectDependencyGraph, session.getRequest());
         activeProjects = trimResumedProjects(activeProjects, projectDependencyGraph, session.getRequest());
         activeProjects = trimExcludedProjects(activeProjects, projectDependencyGraph, session.getRequest());
+
+        validateExtensionIsNotPartOfReactor(activeProjects);
 
         if (activeProjects.size() != projectDependencyGraph.getSortedProjects().size()) {
             projectDependencyGraph = new FilteredProjectDependencyGraph(projectDependencyGraph, activeProjects);
@@ -376,15 +377,10 @@ public class DefaultGraphBuilder implements GraphBuilder {
         return requestPomCollectionStrategy.collectProjects(request);
     }
 
-    private void validateProjects(List<MavenProject> projects, MavenExecutionRequest request)
-            throws MavenExecutionException {
-        Map<String, MavenProject> projectsMap = new HashMap<>();
-
-        List<MavenProject> projectsInRequestScope = getProjectsInRequestScope(request, projects);
-        for (MavenProject p : projectsInRequestScope) {
-            String projectKey = ArtifactUtils.key(p.getGroupId(), p.getArtifactId(), p.getVersion());
-
-            projectsMap.put(projectKey, p);
+    private void validateExtensionIsNotPartOfReactor(List<MavenProject> projects) {
+        Set<String> projectKeys = new HashSet<>();
+        for (MavenProject p : projects) {
+            projectKeys.add(ArtifactUtils.key(p.getGroupId(), p.getArtifactId(), p.getVersion()));
         }
 
         for (MavenProject project : projects) {
@@ -394,7 +390,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
                     String pluginKey =
                             ArtifactUtils.key(plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion());
 
-                    if (projectsMap.containsKey(pluginKey)) {
+                    if (projectKeys.contains(pluginKey)) {
                         LOGGER.warn(
                                 "'{}' uses '{}' as extension which is not possible within the same reactor build. "
                                         + "This plugin was pulled from the local repository!",
