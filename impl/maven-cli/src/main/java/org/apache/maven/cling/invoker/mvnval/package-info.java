@@ -17,18 +17,12 @@
  * under the License.
  */
 
-module org.apache.maven.api.cli {
-    requires transitive org.apache.maven.api;
-    requires transitive org.apache.maven.api.annotations;
-    requires transitive org.apache.maven.api.xml;
-
-    exports org.apache.maven.api.cli;
-    exports org.apache.maven.api.cli.cisupport;
-    exports org.apache.maven.api.cli.extensions;
-    exports org.apache.maven.api.cli.logging;
-    exports org.apache.maven.api.cli.mvn;
-    exports org.apache.maven.api.cli.mvnenc;
-    exports org.apache.maven.api.cli.mvnsh;
-    exports org.apache.maven.api.cli.mvnup;
-    exports org.apache.maven.api.cli.mvnval;
-}
+/**
+ * Implementation of the Maven POM Validation tool ({@code mvnval}).
+ *
+ * <p>This package contains the implementation classes for the POM validation tool,
+ * which reads and validates POM files without building them.</p>
+ *
+ * @since 4.1.0
+ */
+package org.apache.maven.cling.invoker.mvnval;

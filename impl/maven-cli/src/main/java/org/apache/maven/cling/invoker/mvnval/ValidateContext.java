@@ -16,19 +16,24 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cling.invoker.mvnval;
 
-module org.apache.maven.api.cli {
-    requires transitive org.apache.maven.api;
-    requires transitive org.apache.maven.api.annotations;
-    requires transitive org.apache.maven.api.xml;
+import org.apache.maven.api.cli.InvokerRequest;
+import org.apache.maven.api.cli.mvnval.ValidateOptions;
+import org.apache.maven.cling.invoker.LookupContext;
 
-    exports org.apache.maven.api.cli;
-    exports org.apache.maven.api.cli.cisupport;
-    exports org.apache.maven.api.cli.extensions;
-    exports org.apache.maven.api.cli.logging;
-    exports org.apache.maven.api.cli.mvn;
-    exports org.apache.maven.api.cli.mvnenc;
-    exports org.apache.maven.api.cli.mvnsh;
-    exports org.apache.maven.api.cli.mvnup;
-    exports org.apache.maven.api.cli.mvnval;
+/**
+ * Context for the POM validation tool. It adds no state of its own and exists only to narrow
+ * {@link #options()} to {@link ValidateOptions}.
+ */
+public class ValidateContext extends LookupContext {
+
+    public ValidateContext(InvokerRequest request, ValidateOptions options) {
+        super(request, true, options);
+    }
+
+    @Override
+    public ValidateOptions options() {
+        return (ValidateOptions) super.options();
+    }
 }

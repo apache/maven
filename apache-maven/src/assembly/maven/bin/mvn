@@ -151,7 +151,7 @@ for arg in "$@"; do
     -V|--show-version) SHOW_VERSION=true ;;
     -q|--quiet) QUIET=true ;;
     -X|--debug) VERBOSE=true ;;
-    --enc|--shell|--up) MAIN_CLASS_OVERRIDE=true ;;
+    --enc|--shell|--up|--val) MAIN_CLASS_OVERRIDE=true ;;
     -[qvVXe]*)
       case $arg in
         *v*) VERSION_AND_EXIT=true ;;
@@ -524,6 +524,9 @@ handle_args() {
       --up)
         MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenUpCling"
         ;;
+      --val)
+        MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenValCling"
+        ;;
       *)
         ;;
     esac
@@ -567,7 +570,7 @@ fi
 # to preserve literal values (backslashes, ${...} placeholders) without
 # shell re-parsing. Only the base command uses eval for MAVEN_OPTS word splitting.
 # MAVEN_ARGS is only passed for the default Maven build command (MavenCling),
-# not for sub-commands like --up, --enc, or --shell which have their own options.
+# not for sub-commands like --up, --enc, --shell or --val which have their own options.
 if [ "$MAVEN_MAIN_CLASS" = "org.apache.maven.cling.MavenCling" ]; then
   eval exec "$cmd" '$MAVEN_ARGS' '"$@"'
 else

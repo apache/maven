@@ -16,19 +16,20 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+package org.apache.maven.cling.invoker.mvnval;
 
-module org.apache.maven.api.cli {
-    requires transitive org.apache.maven.api;
-    requires transitive org.apache.maven.api.annotations;
-    requires transitive org.apache.maven.api.xml;
+import org.apache.commons.cli.ParseException;
+import org.apache.maven.api.cli.Options;
+import org.apache.maven.cling.invoker.BaseParser;
 
-    exports org.apache.maven.api.cli;
-    exports org.apache.maven.api.cli.cisupport;
-    exports org.apache.maven.api.cli.extensions;
-    exports org.apache.maven.api.cli.logging;
-    exports org.apache.maven.api.cli.mvn;
-    exports org.apache.maven.api.cli.mvnenc;
-    exports org.apache.maven.api.cli.mvnsh;
-    exports org.apache.maven.api.cli.mvnup;
-    exports org.apache.maven.api.cli.mvnval;
+public class ValidateParser extends BaseParser {
+
+    @Override
+    protected Options parseCliOptions(LocalContext context) {
+        try {
+            return CommonsCliValidateOptions.parse(context.parserRequest.args().toArray(new String[0]));
+        } catch (ParseException e) {
+            throw new IllegalArgumentException("Failed to parse command line options: " + e.getMessage(), e);
+        }
+    }
 }
