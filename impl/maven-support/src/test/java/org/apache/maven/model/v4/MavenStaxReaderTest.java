@@ -281,6 +281,74 @@ class MavenStaxReaderTest {
         assertEquals(5, module3Location.getColumnNumber(), "Module 3 should start at column 5");
     }
 
+    @Test
+    void testDependencyIdAttribute() throws Exception {
+        String xml = "<project>\n"
+                + "  <modelVersion>4.2.0</modelVersion>\n"
+                + "  <dependencies>\n"
+                + "    <dependency id=\"org.slf4j:slf4j-api:2.0.17\"/>\n"
+                + "  </dependencies>\n"
+                + "</project>";
+
+        Model model = fromXml(xml);
+        assertEquals(1, model.getDependencies().size());
+        Dependency dep = model.getDependencies().get(0);
+        assertEquals("org.slf4j:slf4j-api:2.0.17", dep.getId());
+    }
+
+    @Test
+    void testDependencyIdAttributeWithScope() throws Exception {
+        String xml = "<project>\n"
+                + "  <modelVersion>4.2.0</modelVersion>\n"
+                + "  <dependencies>\n"
+                + "    <dependency id=\"org.junit.jupiter:junit-jupiter-api:5.14.1\">\n"
+                + "      <scope>test</scope>\n"
+                + "    </dependency>\n"
+                + "  </dependencies>\n"
+                + "</project>";
+
+        Model model = fromXml(xml);
+        assertEquals(1, model.getDependencies().size());
+        Dependency dep = model.getDependencies().get(0);
+        assertEquals("org.junit.jupiter:junit-jupiter-api:5.14.1", dep.getId());
+        assertEquals("test", dep.getScope());
+    }
+
+    @Test
+    void testExclusionIdAttribute() throws Exception {
+        String xml = "<project>\n"
+                + "  <modelVersion>4.2.0</modelVersion>\n"
+                + "  <dependencies>\n"
+                + "    <dependency id=\"org.postgresql:postgresql:42.7.3\">\n"
+                + "      <exclusions>\n"
+                + "        <exclusion id=\"*:*\"/>\n"
+                + "      </exclusions>\n"
+                + "    </dependency>\n"
+                + "  </dependencies>\n"
+                + "</project>";
+
+        Model model = fromXml(xml);
+        assertEquals(1, model.getDependencies().size());
+        Dependency dep = model.getDependencies().get(0);
+        assertEquals("org.postgresql:postgresql:42.7.3", dep.getId());
+        assertEquals(1, dep.getExclusions().size());
+        assertEquals("*:*", dep.getExclusions().get(0).getId());
+    }
+
+    @Test
+    void testMixinIdAttribute() throws Exception {
+        String xml = "<project>\n"
+                + "  <modelVersion>4.2.0</modelVersion>\n"
+                + "  <mixins>\n"
+                + "    <mixin id=\"com.example:java-mixin:1.0.0\"/>\n"
+                + "  </mixins>\n"
+                + "</project>";
+
+        Model model = fromXml(xml);
+        assertEquals(1, model.getMixins().size());
+        assertEquals("com.example:java-mixin:1.0.0", model.getMixins().get(0).getGav());
+    }
+
     private Model fromXml(String xml) throws XMLStreamException {
         MavenStaxReader reader = new MavenStaxReader();
         return reader.read(new StringReader(xml), true, null);

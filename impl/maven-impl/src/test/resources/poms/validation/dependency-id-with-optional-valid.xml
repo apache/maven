@@ -1,0 +1,11 @@
+<project>
+  <modelVersion>4.2.0</modelVersion>
+  <artifactId>aid</artifactId>
+  <groupId>gid</groupId>
+  <version>0.1</version>
+
+  <dependencies>
+    <!-- EXPECT: valid — trailing ? marks optional; <optional> child forbidden when ? is in id -->
+    <dependency id="commons-io:commons-io:2.11.0?"/>
+  </dependencies>
+</project>
