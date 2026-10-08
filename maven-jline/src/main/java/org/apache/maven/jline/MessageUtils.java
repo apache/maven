@@ -18,6 +18,7 @@
  */
 package org.apache.maven.jline;
 
+import java.io.PrintStream;
 import java.util.function.Consumer;
 
 import org.apache.maven.message.MessageBuilder;
@@ -32,6 +33,7 @@ public class MessageUtils {
     static MessageBuilderFactory messageBuilderFactory = new JLineMessageBuilderFactory();
     static boolean colorEnabled = true;
     static Thread shutdownHook;
+    static PrintStream systemErr;
     static final Object STARTUP_SHUTDOWN_MONITOR = new Object();
 
     public static void systemInstall(Terminal terminal) {
@@ -43,6 +45,8 @@ public class MessageUtils {
     }
 
     public static void systemInstall(Consumer<TerminalBuilder> builderConsumer, Consumer<Terminal> terminalConsumer) {
+        PrintStream originalSystemErr = System.err;
+        systemErr = originalSystemErr;
         MessageUtils.terminal = new FastTerminal(
                 () -> {
                     TerminalBuilder builder = TerminalBuilder.builder()
@@ -57,7 +61,13 @@ public class MessageUtils {
                 },
                 terminal -> {
                     AnsiConsole.setTerminal(terminal);
-                    AnsiConsole.systemInstall();
+                    try {
+                        AnsiConsole.systemInstall();
+                    } finally {
+                        // JLine's AnsiConsole sends both wrapped streams to the terminal output,
+                        // which is stdout for Maven. Keep stderr on its original stream.
+                        System.setErr(originalSystemErr);
+                    }
                     if (terminalConsumer != null) {
                         terminalConsumer.accept(terminal);
                     }
@@ -109,6 +119,10 @@ public class MessageUtils {
             AnsiConsole.systemUninstall();
         } finally {
             terminal = null;
+            if (systemErr != null) {
+                System.setErr(systemErr);
+                systemErr = null;
+            }
         }
     }
 

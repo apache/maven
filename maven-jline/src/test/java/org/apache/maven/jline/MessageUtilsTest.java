@@ -18,12 +18,15 @@
  */
 package org.apache.maven.jline;
 
+import java.io.PrintStream;
+
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 class MessageUtilsTest {
 
@@ -45,5 +48,20 @@ class MessageUtilsTest {
             MessageUtils.terminal = terminal;
             assertDoesNotThrow(MessageUtils::awaitTerminalInitialization);
         }
+    }
+
+    @Test
+    void systemInstallKeepsStandardErrorUnchanged() throws Exception {
+        PrintStream originalErr = System.err;
+        try {
+            MessageUtils.systemInstall();
+            MessageUtils.awaitTerminalInitialization();
+
+            assertSame(originalErr, System.err);
+        } finally {
+            MessageUtils.systemUninstall();
+        }
+
+        assertSame(originalErr, System.err);
     }
 }
