@@ -64,7 +64,7 @@ public class DefaultMojoExecution implements MojoExecution {
         this.descriptor = requireNonNull(delegate.getMojoDescriptor(), "delegate.mojoDescriptor")
                 .getMojoDescriptorV4();
         this.executionId = Optional.ofNullable(delegate.getExecutionId());
-        this.goal = delegate.getGoal();
+        this.goal = requireNonNull(delegate.getGoal(), "delegate.goal");
         this.lifecyclePhase = Optional.ofNullable(delegate.getLifecyclePhase());
         this.configuration = delegate.getConfiguration() != null
                 ? delegate.getConfiguration().getDom()
