@@ -42,4 +42,8 @@ public final class Tools {
 
     public static final String MVNUP_CMD = "mvnup";
     public static final String MVNUP_NAME = "Maven Upgrade Tool";
+
+    public static final String MVNLOG_CMD = "mvnlog";
+    public static final String MVNLOG_NAME = "Maven Log Viewer Tool";
 }
+
