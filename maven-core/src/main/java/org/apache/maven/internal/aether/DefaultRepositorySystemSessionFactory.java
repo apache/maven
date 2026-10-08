@@ -238,8 +238,8 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         // Resolver's ConfigUtils solely rely on config properties, that is why we need to add both here as well.
         configProps.putAll(request.getSystemProperties());
         configProps.putAll(request.getUserProperties());
-        // Default true drops verified-denied tree entries so artifacts remain resolvable when a virtual repository
-        // publishes an incomplete prefix file. Set false to restore Resolver's fall-through behaviour.
+        // Default true drops the auto-discovered prefix tree after a verified denial. Set false to allow only the
+        // verified path while the filter continues enforcing denials for all other paths.
         configProps.putIfAbsent("aether.remoteRepositoryFilter.prefixes.verifyDeniedDropsTree", Boolean.TRUE);
 
         RepositorySystemSession.SessionBuilder mainSessionBuilder = new SessionBuilderSupplier(repoSystem).get();
