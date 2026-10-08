@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Set;
 
 import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.classworlds.ClassRealm;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.ExecutionEvent;
@@ -55,7 +56,6 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -201,7 +201,7 @@ public class BuilderCommon {
     public static void attachToThread(MavenProject currentProject) {
         ClassRealm projectRealm = currentProject.getClassRealm();
         if (projectRealm != null) {
-            Thread.currentThread().setContextClassLoader(projectRealm);
+            Thread.currentThread().setContextClassLoader(projectRealm.getClassLoader());
         }
     }
 
