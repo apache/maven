@@ -37,7 +37,8 @@ import org.apache.maven.api.annotations.Nullable;
  * such as {@code project.build.sourceDirectory}.
  * <p>
  * In addition to usual getters using {@code getXxx} or {@code isXxx} suffixes, accessors
- * using {@code asXxx} or {@code toXxx} prefixes are also supported.
+ * using {@code asXxx} or {@code toXxx} prefixes are also supported, as well as noun-based
+ * accessors matching the property name exactly (e.g. {@code plugin()}, {@code descriptor()}).
  */
 public class ReflectionValueExtractor {
     private static final Object[] OBJECT_ARGS = new Object[0];
@@ -279,6 +280,12 @@ public class ReflectionValueExtractor {
                 if (method != null) {
                     return method.invoke(value, OBJECT_ARGS);
                 }
+            }
+            // Also support noun-based accessor style (e.g. plugin(), descriptor(), goal())
+            // where the method name matches the property name exactly.
+            Method method = classMap.findMethod(property);
+            if (method != null) {
+                return method.invoke(value, OBJECT_ARGS);
             }
             return null;
         } catch (InvocationTargetException e) {
