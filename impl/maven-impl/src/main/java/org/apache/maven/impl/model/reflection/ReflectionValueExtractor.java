@@ -267,6 +267,19 @@ public class ReflectionValueExtractor {
         throw new IntrospectionException(message);
     }
 
+    /**
+     * Resolves a single property segment against {@code value} by trying, in order:
+     * <ol>
+     *   <li>Prefixed accessors: {@code getX()}, {@code isX()}, {@code toX()}, {@code asX()}</li>
+     *   <li>Noun-based accessors: a zero-arg method whose name matches the property name exactly
+     *       (e.g. {@code plugin()}, {@code descriptor()}, {@code goal()}).</li>
+     * </ol>
+     * The noun-based fallback is intentional and applies globally to <em>any</em> object in the
+     * expression tree, not just {@code MojoExecution}. Classes that expose zero-arg methods whose
+     * names collide with common property names (e.g. {@code type()}, {@code name()}) will be
+     * resolved via this path. This is by design — it allows modern noun-style APIs to be used
+     * transparently in expressions like {@code ${mojo.plugin}} or {@code ${mojo.goal}}.
+     */
     private static Object getPropertyValue(Object value, String property) throws IntrospectionException {
         if (value == null || property == null || property.isEmpty()) {
             return null;

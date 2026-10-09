@@ -560,6 +560,57 @@ public class ReflectionValueExtractorTest {
     }
 
     /**
+     * Verifies that noun-based accessor methods (zero-arg methods whose name matches the property
+     * name exactly, without a {@code get}/is/to/as prefix) are resolved by {@link ReflectionValueExtractor}.
+     * This is the mechanism that allows {@code ${mojo.plugin}}, {@code ${mojo.goal}},
+     * {@code ${mojo.descriptor}}, etc. to work with the modern Maven 4 noun-style API.
+     */
+    @Test
+    void testNounStyleAccessorResolution() throws Exception {
+        NounStyleBean bean = new NounStyleBean("my-goal", "org.apache.maven", "maven-core", "1.0");
+
+        // trimRootToken=true (default): "bean" is stripped as the root token, then "goal" etc. are resolved
+        assertEquals("my-goal", ReflectionValueExtractor.evaluate("bean.goal", bean));
+        assertEquals("org.apache.maven", ReflectionValueExtractor.evaluate("bean.groupId", bean));
+        assertEquals("maven-core", ReflectionValueExtractor.evaluate("bean.artifactId", bean));
+        assertEquals("1.0", ReflectionValueExtractor.evaluate("bean.version", bean));
+    }
+
+    public static class NounStyleBean {
+        private final String goal;
+        private final String groupId;
+        private final String artifactId;
+        private final String version;
+
+        public NounStyleBean(String goal, String groupId, String artifactId, String version) {
+            this.goal = goal;
+            this.groupId = groupId;
+            this.artifactId = artifactId;
+            this.version = version;
+        }
+
+        /** Noun-style accessor — no {@code get} prefix. */
+        public String goal() {
+            return goal;
+        }
+
+        /** Noun-style accessor — no {@code get} prefix. */
+        public String groupId() {
+            return groupId;
+        }
+
+        /** Noun-style accessor — no {@code get} prefix. */
+        public String artifactId() {
+            return artifactId;
+        }
+
+        /** Noun-style accessor — no {@code get} prefix. */
+        public String version() {
+            return version;
+        }
+    }
+
+    /**
      * <p>testRootPropertyRegression.</p>
      *
      * @throws Exception if any.
