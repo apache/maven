@@ -517,7 +517,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                             mes.setDescriptor(md);
                         }
                     }
-                    requireNonNull(mes.getDescriptor());
+                    requireNonNull(mes.descriptor());
                 }
                 PluginStub plugin = new PluginStub();
                 plugin.setDescriptor(pluginDescriptor);

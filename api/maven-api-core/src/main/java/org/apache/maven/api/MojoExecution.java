@@ -23,7 +23,6 @@ import java.util.Optional;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.PluginExecution;
 import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.api.xml.XmlNode;
@@ -83,71 +82,4 @@ public interface MojoExecution {
     /** {@return the merged configuration for this execution, if any} */
     @Nonnull
     Optional<XmlNode> configuration();
-
-    // -------------------------------------------------------------------------
-    // Deprecated get-prefixed accessors — use noun-based methods instead
-    // -------------------------------------------------------------------------
-
-    /**
-     * @deprecated Use {@link #plugin()} instead.
-     */
-    @Deprecated(since = "4.1.0", forRemoval = true)
-    @Nonnull
-    default Plugin getPlugin() {
-        return plugin();
-    }
-
-    /**
-     * @deprecated Use {@link #model()} instead.
-     */
-    @Deprecated(since = "4.1.0", forRemoval = true)
-    @Nullable
-    default PluginExecution getModel() {
-        return model().orElse(null);
-    }
-
-    /**
-     * @deprecated Use {@link #descriptor()} instead.
-     */
-    @Deprecated(since = "4.1.0", forRemoval = true)
-    @Nonnull
-    default MojoDescriptor getDescriptor() {
-        return descriptor();
-    }
-
-    /**
-     * @deprecated Use {@link #executionId()} instead.
-     */
-    @Deprecated(since = "4.1.0", forRemoval = true)
-    @Nullable
-    default String getExecutionId() {
-        return executionId().orElse(null);
-    }
-
-    /**
-     * @deprecated Use {@link #goal()} instead.
-     */
-    @Deprecated(since = "4.1.0", forRemoval = true)
-    @Nonnull
-    default String getGoal() {
-        return goal();
-    }
-
-    /**
-     * @deprecated Use {@link #lifecyclePhase()} instead.
-     */
-    @Deprecated(since = "4.1.0", forRemoval = true)
-    @Nullable
-    default String getLifecyclePhase() {
-        return lifecyclePhase().orElse(null);
-    }
-
-    /**
-     * @deprecated Use {@link #configuration()} instead.
-     */
-    @Deprecated(since = "4.1.0", forRemoval = true)
-    @Nonnull
-    default Optional<XmlNode> getConfiguration() {
-        return configuration();
-    }
 }
