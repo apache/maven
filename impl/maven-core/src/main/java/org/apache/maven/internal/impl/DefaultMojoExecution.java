@@ -39,6 +39,8 @@ import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.impl.DefaultNode;
 import org.eclipse.aether.graph.DependencyNode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 
@@ -49,6 +51,8 @@ import static java.util.Objects.requireNonNull;
  * {@link org.apache.maven.plugin.MojoExecution} is retained after construction.
  */
 public class DefaultMojoExecution implements MojoExecution {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMojoExecution.class);
 
     private final Plugin plugin;
     private final Optional<PluginExecution> model;
@@ -103,13 +107,15 @@ public class DefaultMojoExecution implements MojoExecution {
                 delegate.getPlugin() != null ? delegate.getPlugin().getDelegate() : null;
 
         // Eagerly capture lifecycle mappings so the Plugin snapshot is truly immutable.
-        // getLifecycleMappings() reads from the plugin JAR; it may fail if the artifact
-        // is not yet resolved (e.g. CLI-invoked goals) — fall back to an empty list.
+        // getLifecycleMappings() reads from the plugin JAR; plugins that do not bundle
+        // custom lifecycle metadata will throw here — fall back to an empty list.
         List<Lifecycle> lifecycles;
         try {
             lifecycles = Collections.unmodifiableList(new ArrayList<>(
                     legacyPluginDescriptor.getLifecycleMappings().values()));
         } catch (Exception e) {
+            LOGGER.debug(
+                    "Unable to load lifecycle mappings for {}: {}", legacyPluginDescriptor.getId(), e.getMessage());
             lifecycles = Collections.emptyList();
         }
         final List<Lifecycle> snapshotLifecycles = lifecycles;
