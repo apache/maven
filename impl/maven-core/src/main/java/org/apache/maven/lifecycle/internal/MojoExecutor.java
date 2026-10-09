@@ -199,7 +199,7 @@ public class MojoExecutor {
             List<FilterPredicate> filterPredicates)
             throws LifecycleExecutionException {
         if (MojoExecutionFilter.matches(mojoExecution, filterPredicates)) {
-            LOGGER.info("Skipping {} (filtered by {})", mojoExecution.getGoal(), MojoExecutionFilter.PROPERTY_NAME);
+            LOGGER.info("Skipping {} (filtered by {})", mojoExecution, MojoExecutionFilter.PROPERTY_NAME);
             return;
         }
         execute(session, mojoExecution, dependencyContext);
