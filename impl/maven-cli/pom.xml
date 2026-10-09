@@ -308,6 +308,11 @@ under the License.
                 <param>packageToolV4=org.apache.maven.cling.internal.reactor.io</param>
                 <param>locationTracking=false</param>
               </params>
+              <!-- Modello singularizes field names by stripping trailing 's'; "aliases" -> "aliase".
+                   This exception table maps the plural field name to the correct singular XML tag. -->
+              <pluralExceptions>
+                <aliases>alias</aliases>
+              </pluralExceptions>
             </configuration>
           </execution>
         </executions>
