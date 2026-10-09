@@ -76,7 +76,10 @@ public class MojoExecutionFilter {
     }
 
     private static FilterPredicate parseToken(String token) {
-        if (token.startsWith("phase(") && token.endsWith(")")) {
+        if (token.startsWith("phase(")) {
+            if (!token.endsWith(")")) {
+                throw new IllegalArgumentException("Invalid phase() predicate '" + token + "': missing closing ')'");
+            }
             String phaseName = token.substring("phase(".length(), token.length() - 1);
             if (phaseName.isBlank()) {
                 throw new IllegalArgumentException("phase() predicate requires a non-blank phase name");

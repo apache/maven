@@ -118,6 +118,13 @@ class MojoExecutionFilterTest {
                 IllegalArgumentException.class, () -> MojoExecutionFilter.parse("phase(test))"));
     }
 
+    @Test
+    void missingClosingParenThrows() {
+        // phase(test with no closing ')' must not silently fall through to CoordinatePredicate
+        org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalArgumentException.class, () -> MojoExecutionFilter.parse("phase(test"));
+    }
+
     // ── propertyName ─────────────────────────────────────────────────────────
 
     @Test
