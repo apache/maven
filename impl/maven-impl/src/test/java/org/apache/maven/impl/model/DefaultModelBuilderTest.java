@@ -194,6 +194,9 @@ class DefaultModelBuilderTest {
         // in the sandbox context.exists() always returns false, so missing(path) evaluates
         // to !false = true and fires unconditionally — same footgun as <file><missing>.
         assertNull(model.getProperties().get("profile.missing.condition"));
+        assertNull(
+                model.getProperties().get("profile.pom.property"),
+                "POM-declared properties must not activate dependency profiles");
         assertEquals("activated", model.getProperties().get("profile.jdk"));
         // Negated-property profile (!skip.defaults) fires because 'skip.defaults' is absent
         // from the sandboxed context (user properties are suppressed; system properties do not

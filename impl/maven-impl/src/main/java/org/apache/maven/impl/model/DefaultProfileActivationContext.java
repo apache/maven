@@ -360,12 +360,10 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
      * <p>
      * The sandboxed context:
      * <ul>
-     *   <li><b>Merges model properties into system property lookups</b>: system properties
-     *       ({@code java.version}, {@code os.name}, …) are checked first (preserving JDK/OS
-     *       activation), then model properties (the POM's own {@code <properties>}) are used
-     *       as a fallback. This makes POM-declared properties visible to the
-     *       {@code PropertyProfileActivator} without modifying the activator's lookup chain
-     *       for non-external models.</li>
+     *   <li><b>Preserves system properties</b> ({@code java.version}, {@code os.name}, …)
+     *       so platform-based activation continues to work. POM-defined properties are not
+     *       exposed through this lookup, so a dependency POM cannot activate its own
+     *       property-based profiles.</li>
      *   <li><b>Suppresses user properties</b> (consumer {@code -D} flags): they were not
      *       set for the dependency and must not accidentally activate its profiles.</li>
      *   <li><b>Disables file existence checks</b>: the publisher's file system paths do not
@@ -389,18 +387,9 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
                 return DefaultProfileActivationContext.this.isProfileInactive(profileId);
             }
 
-            /**
-             * System property lookup with model property fallback.
-             * System properties take precedence; model properties fill in as a fallback
-             * so POM-declared values drive property-activated profiles in external models.
-             */
             @Override
             public String getSystemProperty(String key) {
-                String value = DefaultProfileActivationContext.this.getSystemProperty(key);
-                if (value == null) {
-                    value = DefaultProfileActivationContext.this.getModelProperty(key);
-                }
-                return value;
+                return DefaultProfileActivationContext.this.getSystemProperty(key);
             }
 
             /** User properties are suppressed: consumer {@code -D} flags do not activate dependency profiles. */

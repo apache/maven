@@ -20,6 +20,9 @@
     <artifactId>resolved-model-with-profiles</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <properties>
+        <pom.declared.prop>hello</pom.declared.prop>
+    </properties>
     <profiles>
         <profile>
             <id>file-condition</id>
@@ -41,6 +44,17 @@
             </activation>
             <properties>
                 <profile.property>activated</profile.property>
+            </properties>
+        </profile>
+        <profile>
+            <id>pom-declared-property-condition</id>
+            <activation>
+                <property>
+                    <name>pom.declared.prop</name>
+                </property>
+            </activation>
+            <properties>
+                <profile.pom.property>activated</profile.pom.property>
             </properties>
         </profile>
         <profile>

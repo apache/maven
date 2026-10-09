@@ -73,9 +73,9 @@ public class PropertyProfileActivator implements ProfileActivator {
 
         // Lookup order: user (-D) → system (java.version, os.name, …).
         // In external model builds the caller provides a sandboxed context
-        // (see DefaultModelBuilder.externalActivationContext()) that suppresses user properties
-        // and merges model properties into system properties, so consumer -D flags cannot
-        // activate dependency profiles while POM-declared properties still drive activation.
+        // (see DefaultModelBuilder.externalActivationContext()) that suppresses user and
+        // POM-defined properties, so consumer -D flags and dependency-local properties cannot
+        // activate dependency profiles.
         String sysValue = context.getUserProperties().get(name);
         if (sysValue == null) {
             sysValue = context.getSystemProperties().get(name);

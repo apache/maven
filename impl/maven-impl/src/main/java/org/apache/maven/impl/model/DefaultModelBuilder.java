@@ -1654,20 +1654,16 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // A model resolved to satisfy dependency resolution -- a dependency POM
                     // itself, or one of its parents, reached transitively -- evaluates profiles
                     // against a sandboxed activation context.  The sandbox:
-                    //  - merges model properties into system property lookups (so POM-declared
-                    //    <properties> drive activation via the existing property lookup chain),
+                    //  - does not expose model properties through system-property lookups, so
+                    //    dependency POMs cannot activate their own property-based profiles,
                     //  - suppresses user properties (consumer -D flags must not activate
                     //    dependency profiles — they were not set for that artifact),
                     //  - disables file existence checks (publisher paths don't exist here).
-                    // Model properties are merged into system properties rather than adding
-                    // a separate lookup step in PropertyProfileActivator, because changing the
-                    // activator would affect ALL profile evaluations (including the build's own
-                    // project) and cause unintended profile activation when a POM declares a
-                    // property that matches a profile's activation condition.
                     // File-activated profiles are pre-filtered (not just sandboxed) because
                     // returning false from exists() would incorrectly activate <missing> profiles.
                     // Repository stripping is intentionally omitted: only legitimately-active
-                    // profiles (JDK/OS/activeByDefault and POM-property-gated) reach injection,
+                    // profiles (JDK/OS/activeByDefault and negated-property default-on profiles)
+                    // reach injection,
                     // and stripping their repositories would break the established
                     // project → dep1 → dep2 pattern. See #13100.
                     // TODO(#13146): repositories contributed by external-model profiles can shadow

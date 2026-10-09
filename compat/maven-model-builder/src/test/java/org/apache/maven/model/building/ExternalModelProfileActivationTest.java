@@ -39,13 +39,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *       and must not accidentally activate its profiles.</li>
  *   <li><b>Property (system)</b> — re-activated: system properties are platform facts
  *       ({@code java.version}, {@code os.name}, …).</li>
- *   <li><b>Property (POM-declared, from &lt;properties&gt;)</b> — re-activated: the POM's own
- *       properties are part of the artifact's published identity, not the consumer's environment.
- *       A profile conditioned on a POM-declared property is publisher-intent, not consumer-injected.</li>
+ *   <li><b>Property (POM-declared, from &lt;properties&gt;)</b> — suppressed: a dependency POM's
+ *       own properties must not activate its profiles.</li>
  *   <li><b>Negated property (-D absent)</b> — re-activated (default-on): the property is absent from
  *       the sandboxed context, so {@code !foo} evaluates to true, preserving the publisher's intent.</li>
  *   <li><b>Profile repositories</b> — honored from legitimately-active profiles (JDK/OS/activeByDefault
- *       and POM-property-gated); stripping them would break the established
+ *       and negated-property default-on profiles); stripping them would break the established
  *       {@code project → dep1 → dep2} pattern. See #13100.</li>
  * </ul>
  */
@@ -110,7 +109,7 @@ class ExternalModelProfileActivationTest {
             + "        <profile.sys.property>activated</profile.sys.property>\n"
             + "      </properties>\n"
             + "    </profile>\n"
-            // profile 4: POM-declared property activation (positive) — must fire in external builds
+            // profile 4: POM-declared property activation (positive) — suppressed in external builds
             + "    <profile>\n"
             + "      <id>pom-declared-property-condition</id>\n"
             + "      <activation>\n"
@@ -196,13 +195,9 @@ class ExternalModelProfileActivationTest {
                 "activated",
                 model.getProperties().get("profile.sys.property"),
                 "system-property profile must fire in project build");
-        // POM-declared property activation is only supported in external (sandbox) builds.
-        // In project builds, the PropertyProfileActivator does not check model properties
-        // because doing so would cause unintended profile activation when a POM declares
-        // a property that also matches a profile's activation condition (see IT proxy profile).
         assertNull(
                 model.getProperties().get("profile.pom.property"),
-                "POM-declared-property profile must NOT fire in project build (only in external)");
+                "POM-declared-property profile must NOT fire in project build");
         assertEquals(
                 "activated",
                 model.getProperties().get("profile.negated.property"),
@@ -251,16 +246,14 @@ class ExternalModelProfileActivationTest {
     }
 
     @Test
-    void testExternalModelPomDeclaredPropertyActivationIsPreserved() throws Exception {
-        // A profile conditioned on the POM's own <properties> must fire in external builds:
-        // those properties are part of the artifact's published identity, not the consumer's env.
+    void testExternalModelPomDeclaredPropertyActivationIsSuppressed() throws Exception {
+        // A dependency POM's own <properties> must not activate a property-based profile.
         Model model = build(
                 ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, systemPropertiesWithTestValues(), new Properties());
 
-        assertEquals(
-                "activated",
+        assertNull(
                 model.getProperties().get("profile.pom.property"),
-                "POM-declared-property profile must fire in external model build");
+                "POM-declared-property profile must NOT fire in external model build");
     }
 
     @Test
