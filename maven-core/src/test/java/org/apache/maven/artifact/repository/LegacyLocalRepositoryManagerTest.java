@@ -19,6 +19,7 @@
 package org.apache.maven.artifact.repository;
 
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
+import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -91,21 +92,51 @@ class LegacyLocalRepositoryManagerTest {
     }
 
     @Test
-    void overlayUsesResolverManagerForLocalDefaultLayoutRepository() {
+    void overlayDoesNotTrustRepositoryIdForLocalRepositoryDetection() {
         ArtifactRepository repository = mock(ArtifactRepository.class);
         when(repository.getBasedir()).thenReturn("target/local-repository");
         when(repository.getId()).thenReturn("local");
         when(repository.getLayout()).thenReturn(new DefaultRepositoryLayout());
 
         RepositorySystem system = mock(RepositorySystem.class);
-        LocalRepositoryManager resolverManager = mock(LocalRepositoryManager.class);
-        when(system.newLocalRepositoryManager(any(RepositorySystemSession.class), any(LocalRepository.class)))
-                .thenReturn(resolverManager);
         RepositorySystemSession session = new DefaultRepositorySystemSession();
 
         RepositorySystemSession overlaid = LegacyLocalRepositoryManager.overlay(repository, session, system);
 
-        assertSame(resolverManager, overlaid.getLocalRepositoryManager());
-        verify(system).newLocalRepositoryManager(any(RepositorySystemSession.class), any(LocalRepository.class));
+        assertInstanceOf(LegacyLocalRepositoryManager.class, overlaid.getLocalRepositoryManager());
+        verify(system, never())
+                .newLocalRepositoryManager(any(RepositorySystemSession.class), any(LocalRepository.class));
+    }
+
+    @Test
+    void overlayCreatesSessionWhenInputIsNull() {
+        ArtifactRepository repository = mock(ArtifactRepository.class);
+        when(repository.getBasedir()).thenReturn("target/staging");
+        when(repository.getId()).thenReturn("local");
+
+        RepositorySystemSession overlaid =
+                LegacyLocalRepositoryManager.overlay(repository, null, mock(RepositorySystem.class));
+
+        assertInstanceOf(DefaultRepositorySystemSession.class, overlaid);
+        assertInstanceOf(LegacyLocalRepositoryManager.class, overlaid.getLocalRepositoryManager());
+    }
+
+    @Test
+    void overlayKeepsExistingManagerForActualLocalRepository() {
+        String basedir = DefaultRepositorySystemSessionFactory.resolve("target/local-repository")
+                .toString();
+        ArtifactRepository repository = mock(ArtifactRepository.class);
+        when(repository.getBasedir()).thenReturn("target/local-repository");
+
+        LocalRepositoryManager existingManager = mock(LocalRepositoryManager.class);
+        when(existingManager.getRepository()).thenReturn(new LocalRepository(basedir));
+        RepositorySystemSession session =
+                new DefaultRepositorySystemSession().setLocalRepositoryManager(existingManager);
+
+        RepositorySystemSession overlaid =
+                LegacyLocalRepositoryManager.overlay(repository, session, mock(RepositorySystem.class));
+
+        assertSame(session, overlaid);
+        assertSame(existingManager, overlaid.getLocalRepositoryManager());
     }
 }
