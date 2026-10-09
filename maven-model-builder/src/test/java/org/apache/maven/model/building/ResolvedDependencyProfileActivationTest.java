@@ -18,10 +18,15 @@
  */
 package org.apache.maven.model.building;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.maven.model.Model;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -166,6 +171,44 @@ class ResolvedDependencyProfileActivationTest {
         return builder.build(request).getEffectiveModel();
     }
 
+    private Model buildProjectAtMinimal(File pomFile, Properties systemProperties, Properties userProperties)
+            throws Exception {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setPomFile(pomFile);
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        request.setSystemProperties(systemProperties);
+        request.setUserProperties(userProperties);
+        request.setModelResolver(new DefaultModelBuilderTest.BaseModelResolver());
+
+        return builder.build(request).getEffectiveModel();
+    }
+
+    private Model buildFromRepositoryAtMinimal(File pomFile, Properties systemProperties, Properties userProperties)
+            throws Exception {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new FileModelSource(pomFile));
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        request.setSystemProperties(systemProperties);
+        request.setUserProperties(userProperties);
+        request.setModelResolver(new DefaultModelBuilderTest.BaseModelResolver());
+
+        return builder.build(request).getEffectiveModel();
+    }
+
+    private File writePom(Path dir) throws Exception {
+        String pom = POM.replace(
+                "<pom.declared.prop>hello</pom.declared.prop>",
+                "<pom.declared.prop>hello</pom.declared.prop>\n"
+                        + "    <interpolated.user.property>${user.gating.prop}</interpolated.user.property>");
+        Path file = dir.resolve("pom.xml");
+        Files.write(file, pom.getBytes(StandardCharsets.UTF_8));
+        return file.toFile();
+    }
+
     private Properties systemPropertiesWithTestValues() {
         Properties sp = new Properties();
         sp.putAll(System.getProperties());
@@ -211,6 +254,42 @@ class ResolvedDependencyProfileActivationTest {
         assertTrue(
                 model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())),
                 "profile repository must be present in project build");
+    }
+
+    @Test
+    void testProjectModeAtMinimalValidationEvaluatesUserPropertyAndFileActivators(@TempDir Path dir) throws Exception {
+        // An embedder (an IDE) builds the operator's own project from its POM file at
+        // VALIDATION_LEVEL_MINIMAL for leniency. A POM file means project mode, so the
+        // repository-model sandbox must not apply.
+        Model model =
+                buildProjectAtMinimal(writePom(dir), systemPropertiesWithTestValues(), userPropertiesWithTestValues());
+
+        assertEquals(
+                "activated",
+                model.getProperties().get("profile.user.property"),
+                "user-property profile must fire for a project built from its POM file");
+        assertEquals(
+                "activated",
+                model.getProperties().get("profile.file"),
+                "file profile must fire for a project built from its POM file");
+        assertEquals(
+                "true",
+                model.getProperties().get("interpolated.user.property"),
+                "user properties must be interpolated for a project built from its POM file");
+    }
+
+    @Test
+    void testSamePomFromRepositoryAtMinimalValidationStaysSandboxed(@TempDir Path dir) throws Exception {
+        // The same POM loaded as a repository model (model source, no POM file) keeps the sandbox.
+        Model model = buildFromRepositoryAtMinimal(
+                writePom(dir), systemPropertiesWithTestValues(), userPropertiesWithTestValues());
+
+        assertNull(model.getProperties().get("profile.user.property"), "user-property profile must NOT fire");
+        assertNull(model.getProperties().get("profile.file"), "file profile must NOT fire");
+        assertEquals(
+                "${user.gating.prop}",
+                model.getProperties().get("interpolated.user.property"),
+                "user properties must stay literal in a repository model");
     }
 
     @Test
