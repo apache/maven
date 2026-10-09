@@ -58,19 +58,23 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
 
     public static RepositorySystemSession overlay(
             ArtifactRepository repository, RepositorySystemSession session, RepositorySystem system) {
-        RepositorySystemSession baseSession = session == null ? new DefaultRepositorySystemSession() : session;
         if (repository == null || repository.getBasedir() == null) {
-            return baseSession;
+            return session;
         }
 
-        LocalRepositoryManager lrm = baseSession.getLocalRepositoryManager();
-        if (lrm != null
-                && lrm.getRepository()
-                        .getBasePath()
-                        .equals(DefaultRepositorySystemSessionFactory.resolve(repository.getBasedir()))) {
-            return baseSession;
+        if (session != null) {
+            LocalRepositoryManager lrm = session.getLocalRepositoryManager();
+            if (lrm != null
+                    && lrm.getRepository()
+                            .getBasePath()
+                            .equals(DefaultRepositorySystemSessionFactory.resolve(repository.getBasedir()))) {
+                return session;
+            }
+        } else {
+            session = new DefaultRepositorySystemSession();
         }
-        return new DefaultRepositorySystemSession(baseSession)
+
+        return new DefaultRepositorySystemSession(session)
                 .setLocalRepositoryManager(new LegacyLocalRepositoryManager(repository));
     }
 

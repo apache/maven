@@ -31,6 +31,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
@@ -119,6 +120,11 @@ class LegacyLocalRepositoryManagerTest {
 
         assertInstanceOf(DefaultRepositorySystemSession.class, overlaid);
         assertInstanceOf(LegacyLocalRepositoryManager.class, overlaid.getLocalRepositoryManager());
+    }
+
+    @Test
+    void overlayReturnsNullWhenNoRepositoryOrSessionIsProvided() {
+        assertNull(LegacyLocalRepositoryManager.overlay(null, null, mock(RepositorySystem.class)));
     }
 
     @Test
