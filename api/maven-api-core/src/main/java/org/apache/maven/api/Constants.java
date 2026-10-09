@@ -868,5 +868,15 @@ public final class Constants {
     @Config(type = "java.lang.Boolean", defaultValue = "false")
     public static final String MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL = "maven.model.dependencyInterpolation.full";
 
+    /**
+     * Comma-separated list of mojo execution filter predicates. Matching executions are skipped at runtime.
+     * Supported forms: {@code *}, {@code :A}, {@code G:A}, {@code G:A:v:g[@e]}, {@code P}, {@code P:v:g},
+     * {@code P:v:g@e}, {@code phase(name)}.
+     *
+     * @since 4.1.0
+     */
+    @Config
+    public static final String MAVEN_LIFECYCLE_FILTER = "maven.lifecycle.filter";
+
     private Constants() {}
 }
