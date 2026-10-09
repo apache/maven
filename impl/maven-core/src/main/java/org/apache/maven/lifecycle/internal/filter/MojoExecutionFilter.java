@@ -81,6 +81,10 @@ public class MojoExecutionFilter {
             if (phaseName.isBlank()) {
                 throw new IllegalArgumentException("phase() predicate requires a non-blank phase name");
             }
+            if (phaseName.contains(")")) {
+                throw new IllegalArgumentException(
+                        "Invalid phase() predicate '" + token + "': phase name must not contain ')'");
+            }
             return new PhasePredicate(phaseName);
         }
         return CoordinatePredicate.parse(token);

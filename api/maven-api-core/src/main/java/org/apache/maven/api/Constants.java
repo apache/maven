@@ -870,8 +870,8 @@ public final class Constants {
 
     /**
      * Comma-separated list of mojo execution filter predicates. Matching executions are skipped at runtime.
-     * Supported forms: {@code *}, {@code :A}, {@code G:A}, {@code P}, {@code P:v:g}, {@code P:v:g@e},
-     * {@code phase(name)}.
+     * Supported forms: {@code *}, {@code :A}, {@code G:A}, {@code G:A:v:g[@e]}, {@code P}, {@code P:v:g},
+     * {@code P:v:g@e}, {@code phase(name)}.
      */
     @Config
     public static final String MAVEN_LIFECYCLE_FILTER = "maven.lifecycle.filter";

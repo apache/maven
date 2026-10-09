@@ -112,6 +112,12 @@ class MojoExecutionFilterTest {
                 IllegalArgumentException.class, () -> MojoExecutionFilter.parse("phase(  )"));
     }
 
+    @Test
+    void extraClosingParenThrows() {
+        org.junit.jupiter.api.Assertions.assertThrows(
+                IllegalArgumentException.class, () -> MojoExecutionFilter.parse("phase(test))"));
+    }
+
     // ── propertyName ─────────────────────────────────────────────────────────
 
     @Test

@@ -150,16 +150,20 @@ class CoordinatePredicateTest {
     @Test
     void noDescriptorDoesNotMatchSpecificPlugin() {
         MojoExecution exec = mock(MojoExecution.class);
-        when(exec.getPlugin()).thenReturn(null);
+        Plugin plugin = mock(Plugin.class);
+        when(plugin.getDescriptor()).thenReturn(null);
+        when(exec.getPlugin()).thenReturn(plugin);
         when(exec.getGoal()).thenReturn("test");
         when(exec.getExecutionId()).thenReturn("default-test");
         assertFalse(CoordinatePredicate.parse(":maven-surefire-plugin").matches(exec));
     }
 
     @Test
-    void wildcardMatchesEvenWithNullPlugin() {
+    void wildcardMatchesEvenWithNullDescriptor() {
         MojoExecution exec = mock(MojoExecution.class);
-        when(exec.getPlugin()).thenReturn(null);
+        Plugin plugin = mock(Plugin.class);
+        when(plugin.getDescriptor()).thenReturn(null);
+        when(exec.getPlugin()).thenReturn(plugin);
         assertTrue(CoordinatePredicate.MATCH_ALL.matches(exec));
     }
 

@@ -180,10 +180,15 @@ public class MojoExecutor {
      * Resolves the mojo execution filter predicates for this build.
      * Uses {@code -Dmaven.lifecycle.filter} user property; returns an empty list if absent.
      */
-    private List<FilterPredicate> resolveFilterPredicates(MavenSession session) {
+    private List<FilterPredicate> resolveFilterPredicates(MavenSession session) throws LifecycleExecutionException {
         Properties userProps = session.getUserProperties();
         String filterExpression = userProps != null ? userProps.getProperty(MojoExecutionFilter.PROPERTY_NAME) : null;
-        return MojoExecutionFilter.parse(filterExpression);
+        try {
+            return MojoExecutionFilter.parse(filterExpression);
+        } catch (IllegalArgumentException e) {
+            throw new LifecycleExecutionException(
+                    "Invalid value for '" + MojoExecutionFilter.PROPERTY_NAME + "': " + e.getMessage(), e);
+        }
     }
 
     private void execute(
@@ -194,7 +199,7 @@ public class MojoExecutor {
             List<FilterPredicate> filterPredicates)
             throws LifecycleExecutionException {
         if (MojoExecutionFilter.matches(mojoExecution, filterPredicates)) {
-            eventCatapult.fire(ExecutionEvent.Type.MojoSkipped, session, mojoExecution);
+            LOGGER.debug("Skipping {} (filtered by {})", mojoExecution.getGoal(), MojoExecutionFilter.PROPERTY_NAME);
             return;
         }
         execute(session, mojoExecution, dependencyContext);

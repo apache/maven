@@ -178,8 +178,7 @@ public class CoordinatePredicate implements FilterPredicate {
             return true;
         }
 
-        PluginDescriptor descriptor =
-                execution.getPlugin() != null ? execution.getPlugin().getDescriptor() : null;
+        PluginDescriptor descriptor = execution.getPlugin().getDescriptor();
 
         // prefix-based matching
         if (prefix != null) {
