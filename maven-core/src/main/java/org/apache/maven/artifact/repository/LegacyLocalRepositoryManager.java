@@ -30,7 +30,6 @@ import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreExce
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.repository.Proxy;
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.metadata.Metadata;
@@ -56,8 +55,7 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
 
     private final LocalRepository repo;
 
-    public static RepositorySystemSession overlay(
-            ArtifactRepository repository, RepositorySystemSession session, RepositorySystem system) {
+    public static RepositorySystemSession overlay(ArtifactRepository repository, RepositorySystemSession session) {
         if (repository == null || repository.getBasedir() == null) {
             return session;
         }

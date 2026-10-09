@@ -21,7 +21,6 @@ package org.apache.maven.artifact.repository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.metadata.DefaultMetadata;
 import org.eclipse.aether.metadata.Metadata;
@@ -34,10 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class LegacyLocalRepositoryManagerTest {
@@ -79,17 +75,11 @@ class LegacyLocalRepositoryManagerTest {
         when(repository.getId()).thenReturn("central-staging");
         when(repository.getLayout()).thenReturn(new DefaultRepositoryLayout());
 
-        RepositorySystem system = mock(RepositorySystem.class);
-        LocalRepositoryManager resolverManager = mock(LocalRepositoryManager.class);
-        when(system.newLocalRepositoryManager(any(RepositorySystemSession.class), any(LocalRepository.class)))
-                .thenReturn(resolverManager);
         RepositorySystemSession session = new DefaultRepositorySystemSession();
 
-        RepositorySystemSession overlaid = LegacyLocalRepositoryManager.overlay(repository, session, system);
+        RepositorySystemSession overlaid = LegacyLocalRepositoryManager.overlay(repository, session);
 
         assertInstanceOf(LegacyLocalRepositoryManager.class, overlaid.getLocalRepositoryManager());
-        verify(system, never())
-                .newLocalRepositoryManager(any(RepositorySystemSession.class), any(LocalRepository.class));
     }
 
     @Test
@@ -99,14 +89,11 @@ class LegacyLocalRepositoryManagerTest {
         when(repository.getId()).thenReturn("local");
         when(repository.getLayout()).thenReturn(new DefaultRepositoryLayout());
 
-        RepositorySystem system = mock(RepositorySystem.class);
         RepositorySystemSession session = new DefaultRepositorySystemSession();
 
-        RepositorySystemSession overlaid = LegacyLocalRepositoryManager.overlay(repository, session, system);
+        RepositorySystemSession overlaid = LegacyLocalRepositoryManager.overlay(repository, session);
 
         assertInstanceOf(LegacyLocalRepositoryManager.class, overlaid.getLocalRepositoryManager());
-        verify(system, never())
-                .newLocalRepositoryManager(any(RepositorySystemSession.class), any(LocalRepository.class));
     }
 
     @Test
@@ -115,8 +102,7 @@ class LegacyLocalRepositoryManagerTest {
         when(repository.getBasedir()).thenReturn("target/staging");
         when(repository.getId()).thenReturn("local");
 
-        RepositorySystemSession overlaid =
-                LegacyLocalRepositoryManager.overlay(repository, null, mock(RepositorySystem.class));
+        RepositorySystemSession overlaid = LegacyLocalRepositoryManager.overlay(repository, null);
 
         assertInstanceOf(DefaultRepositorySystemSession.class, overlaid);
         assertInstanceOf(LegacyLocalRepositoryManager.class, overlaid.getLocalRepositoryManager());
@@ -124,7 +110,7 @@ class LegacyLocalRepositoryManagerTest {
 
     @Test
     void overlayReturnsNullWhenNoRepositoryOrSessionIsProvided() {
-        assertNull(LegacyLocalRepositoryManager.overlay(null, null, mock(RepositorySystem.class)));
+        assertNull(LegacyLocalRepositoryManager.overlay(null, null));
     }
 
     @Test
@@ -139,8 +125,7 @@ class LegacyLocalRepositoryManagerTest {
         RepositorySystemSession session =
                 new DefaultRepositorySystemSession().setLocalRepositoryManager(existingManager);
 
-        RepositorySystemSession overlaid =
-                LegacyLocalRepositoryManager.overlay(repository, session, mock(RepositorySystem.class));
+        RepositorySystemSession overlaid = LegacyLocalRepositoryManager.overlay(repository, session);
 
         assertSame(session, overlaid);
         assertSame(existingManager, overlaid.getLocalRepositoryManager());

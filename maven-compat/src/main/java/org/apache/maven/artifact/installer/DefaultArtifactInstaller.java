@@ -67,7 +67,7 @@ public class DefaultArtifactInstaller extends AbstractLogEnabled implements Arti
     public void install(File source, Artifact artifact, ArtifactRepository localRepository)
             throws ArtifactInstallationException {
         RepositorySystemSession session =
-                LegacyLocalRepositoryManager.overlay(localRepository, legacySupport.getRepositorySession(), repoSystem);
+                LegacyLocalRepositoryManager.overlay(localRepository, legacySupport.getRepositorySession());
 
         InstallRequest request = new InstallRequest();
 
