@@ -102,6 +102,18 @@ public class DefaultMojoExecution implements MojoExecution {
         org.apache.maven.api.model.Plugin modelPlugin =
                 delegate.getPlugin() != null ? delegate.getPlugin().getDelegate() : null;
 
+        // Eagerly capture lifecycle mappings so the Plugin snapshot is truly immutable.
+        // getLifecycleMappings() reads from the plugin JAR; it may fail if the artifact
+        // is not yet resolved (e.g. CLI-invoked goals) — fall back to an empty list.
+        List<Lifecycle> lifecycles;
+        try {
+            lifecycles = Collections.unmodifiableList(new ArrayList<>(
+                    legacyPluginDescriptor.getLifecycleMappings().values()));
+        } catch (Exception e) {
+            lifecycles = Collections.emptyList();
+        }
+        final List<Lifecycle> snapshotLifecycles = lifecycles;
+
         return new Plugin() {
             @Override
             public org.apache.maven.api.model.Plugin getModel() {
@@ -115,12 +127,7 @@ public class DefaultMojoExecution implements MojoExecution {
 
             @Override
             public List<Lifecycle> getLifecycles() {
-                try {
-                    return Collections.unmodifiableList(new ArrayList<>(
-                            legacyPluginDescriptor.getLifecycleMappings().values()));
-                } catch (Exception e) {
-                    throw new RuntimeException("Unable to load plugin lifecycles", e);
-                }
+                return snapshotLifecycles;
             }
 
             @Override
