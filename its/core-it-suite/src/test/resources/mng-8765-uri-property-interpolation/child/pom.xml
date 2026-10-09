@@ -29,8 +29,6 @@ under the License.
   <artifactId>child</artifactId>
 
   <name>Maven Integration Test :: MNG-8765 :: Child</name>
-  <description>
-    Child module that inherits the test.version property from the parent
-    and uses it in a URI-typed plugin parameter.
-  </description>
+  <description>Child module that inherits the test.version property from the parent
+    and uses it in a URI-typed plugin parameter.</description>
 </project>

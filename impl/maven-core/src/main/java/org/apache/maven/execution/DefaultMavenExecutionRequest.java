@@ -64,6 +64,8 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     private boolean interactiveMode = true;
 
+    private boolean noTransferProgress = false;
+
     private boolean cacheTransferError = false;
 
     private boolean cacheNotFound = false;
@@ -180,6 +182,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setLocalRepositoryPath(original.getLocalRepositoryPath());
         copy.setOffline(original.isOffline());
         copy.setInteractiveMode(original.isInteractiveMode());
+        copy.setNoTransferProgress(original.isNoTransferProgress());
         copy.setCacheNotFound(original.isCacheNotFound());
         copy.setCacheTransferError(original.isCacheTransferError());
         copy.setIgnoreMissingArtifactDescriptor(original.isIgnoreMissingArtifactDescriptor());
@@ -624,6 +627,17 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     public MavenExecutionRequest setInteractiveMode(boolean interactive) {
         interactiveMode = interactive;
 
+        return this;
+    }
+
+    @Override
+    public boolean isNoTransferProgress() {
+        return noTransferProgress;
+    }
+
+    @Override
+    public MavenExecutionRequest setNoTransferProgress(boolean noTransferProgress) {
+        this.noTransferProgress = noTransferProgress;
         return this;
     }
 

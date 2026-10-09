@@ -16,29 +16,33 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.logging.impl;
+package org.apache.maven.internal.build;
 
-import org.apache.maven.cling.logging.BaseSlf4jConfiguration;
+import java.time.Duration;
+import java.time.Instant;
+import java.util.List;
+
+import org.apache.maven.api.build.report.BuildStatus;
+import org.apache.maven.api.build.report.LogEvent;
+import org.apache.maven.api.build.report.MojoReport;
 
 /**
- * Configuration for slf4j-log4j2.
- *
- * @since 3.1.0
+ * Internal immutable implementation of {@link MojoReport}.
  */
-public class Log4j2Configuration extends BaseSlf4jConfiguration {
-    @Override
-    public void setRootLoggerLevel(Level level) {
-        String value =
-                switch (level) {
-                    case DEBUG -> "debug";
-                    case INFO -> "info";
-                    default -> "error";
-                };
-        System.setProperty("maven.logging.root.level", value);
-    }
+record DefaultMojoReport(
+        String groupId,
+        String artifactId,
+        String version,
+        String goal,
+        String executionId,
+        String phase,
+        BuildStatus status,
+        Instant startTime,
+        Duration duration,
+        List<LogEvent> output)
+        implements MojoReport {
 
-    @Override
-    public void activate() {
-        // no op
+    DefaultMojoReport {
+        output = List.copyOf(output);
     }
 }

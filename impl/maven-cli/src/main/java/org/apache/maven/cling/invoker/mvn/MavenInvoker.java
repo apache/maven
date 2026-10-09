@@ -39,6 +39,7 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenOptions;
+import org.apache.maven.api.reactor.ReactorConfig;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.Sources;
@@ -257,6 +258,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             }
         }
 
+        request.setNoTransferProgress(context.options().noTransferProgress().orElse(false));
         request.setTransferListener(determineTransferListener(
                 context, context.options().noTransferProgress().orElse(false)));
         request.setExecutionListener(determineExecutionListener(context));
@@ -304,6 +306,12 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         if (context.options().builder().isPresent()) {
             request.setBuilderId(context.options().builder().get());
         }
+
+        // Store ReactorConfig on the request data map so it is accessible to other components
+        // (e.g. future ReactorXmlPhaseInjector) without adding a dependency on maven-cli.
+        context.invokerRequest
+                .reactorConfig()
+                .ifPresent(rc -> request.getData().put(ReactorConfig.class.getName(), rc));
     }
 
     protected Path determinePom(MavenContext context, Lookup lookup) {

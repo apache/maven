@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -18,7 +17,6 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-
 <project xmlns="http://maven.apache.org/POM/4.0.0">
   <modelVersion>4.0.0</modelVersion>
 
@@ -28,12 +26,10 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: unversioned plugin must not resolve to a pre-release</name>
-  <description>
-    Declares a plugin without a version. The plugin repository offers a stable 1.0 and a
+  <description>Declares a plugin without a version. The plugin repository offers a stable 1.0 and a
     pre-release 2.0-beta-1, and its metadata names the pre-release as the RELEASE version --
     exactly the situation Maven Central produces while a plugin's next major line is still in
-    beta. Maven must select the stable version.
-  </description>
+    beta. Maven must select the stable version.</description>
 
   <build>
     <plugins>
@@ -44,10 +40,10 @@ under the License.
         <executions>
           <execution>
             <id>touch</id>
-            <phase>validate</phase>
             <goals>
               <goal>touch</goal>
             </goals>
+            <phase>validate</phase>
           </execution>
         </executions>
       </plugin>

@@ -26,12 +26,10 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: legacy-plugin-dependencies-resolver</name>
-  <description>
-    A core extension that overrides PluginDependenciesResolver implementing only the method set that
+  <description>A core extension that overrides PluginDependenciesResolver implementing only the method set that
     existed up to Maven 4.0.0-rc-5. It is deliberately compiled against maven-core 4.0.0-rc-5, the last
     release before resolveCoreExtensionAndFlatten and resolvePluginAndFlatten were added, so that it
-    reproduces the situation every out-of-tree implementation is in: built against one Maven, run on another.
-  </description>
+    reproduces the situation every out-of-tree implementation is in: built against one Maven, run on another.</description>
 
   <properties>
     <maven.compiler.release>17</maven.compiler.release>
