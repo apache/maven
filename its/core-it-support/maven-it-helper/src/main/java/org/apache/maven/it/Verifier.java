@@ -452,7 +452,7 @@ public class Verifier {
                 throw new IllegalArgumentException("settings xml does not exist: " + settingsXml);
             }
             ExecutorRequest.Builder builder = executorRequest()
-                    .cwd(tempBasedir)
+                    .cwd(basedir)
                     .argument("-s")
                     .argument(settingsFile.toString());
             if (!environmentVariables.isEmpty()) {
@@ -772,6 +772,9 @@ public class Verifier {
     }
 
     public List<String> loadLogLines() throws IOException {
+        if (!Files.exists(logFile)) {
+            return List.of();
+        }
         return loadLines(getLogFileName());
     }
 
