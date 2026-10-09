@@ -30,7 +30,7 @@ import org.apache.maven.internal.impl.DefaultMojoExecution;
  * and applies them at mojo execution time in {@code MojoExecutor}.
  *
  * <p>The property value is a comma-separated list of predicates, OR-ed together:
- * a mojo execution matching <em>any</em> predicate is skipped (a {@code MojoSkipped} event is fired).
+ * a mojo execution matching <em>any</em> predicate is skipped.
  *
  * <p>Supported predicate forms:
  * <ul>
