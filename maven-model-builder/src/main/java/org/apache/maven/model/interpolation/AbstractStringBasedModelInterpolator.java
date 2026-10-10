@@ -196,12 +196,13 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
 
         valueSources.add(modelValueSource1);
 
-        // Models built at VALIDATION_LEVEL_MINIMAL are the models Maven builds while resolving
-        // dependency, parent and BOM-import POMs from a repository, not the operator's own
-        // project. Such models interpolate only against their own properties and a small set
-        // of environment-independent expressions; everything else in the user/system property
-        // space stays uninterpolated. Operator project builds use a higher validation level and
-        // keep the full set of value sources, unchanged from previous behavior.
+        // Models built without a POM file at VALIDATION_LEVEL_MINIMAL are the models Maven builds
+        // while resolving dependency, parent and BOM-import POMs from a repository, not the
+        // operator's own project. Such models interpolate only against their own properties and a
+        // small set of environment-independent expressions; everything else in the user/system
+        // property space stays uninterpolated. Operator project builds have a POM file or use a
+        // higher validation level and keep the full set of value sources, unchanged from previous
+        // behavior.
         boolean restricted = restrictExternalModelInterpolation(config);
 
         ValueSource userPropertiesValueSource = new MapBasedValueSource(config.getUserProperties());
@@ -234,7 +235,8 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
     }
 
     private static boolean restrictExternalModelInterpolation(ModelBuildingRequest config) {
-        return config.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
+        return config.getPomFile() == null
+                && config.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
                 && !Boolean.parseBoolean(config.getSystemProperties().getProperty(FULL_EXTERNAL_INTERPOLATION_PROPERTY))
                 && !Boolean.parseBoolean(config.getUserProperties().getProperty(FULL_EXTERNAL_INTERPOLATION_PROPERTY));
     }
