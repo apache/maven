@@ -23,10 +23,16 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.Properties;
 
+import org.apache.maven.settings.building.DefaultSettingsBuilderFactory;
+import org.apache.maven.settings.building.DefaultSettingsBuildingRequest;
 import org.apache.maven.settings.io.xpp3.SettingsXpp3Reader;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -47,5 +53,22 @@ class GlobalSettingsTest {
                 new InputStreamReader(Files.newInputStream(globalSettingsFile.toPath()), StandardCharsets.UTF_8)) {
             new SettingsXpp3Reader().read(reader);
         }
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"/home/user", "/foo--bar/"})
+    void testGlobalSettingsInterpolation(String userHome) {
+        String basedir = System.getProperty("basedir", System.getProperty("user.dir"));
+
+        Properties systemProperties = new Properties();
+        systemProperties.setProperty("user.home", userHome);
+        systemProperties.setProperty("maven.conf", new File(basedir, "src/conf").getAbsolutePath());
+
+        DefaultSettingsBuildingRequest request = new DefaultSettingsBuildingRequest();
+        request.setGlobalSettingsFile(new File(basedir, "src/conf/settings.xml"));
+        request.setSystemProperties(systemProperties);
+
+        assertDoesNotThrow(
+                () -> new DefaultSettingsBuilderFactory().newInstance().build(request));
     }
 }
