@@ -23,8 +23,11 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.Source;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
@@ -146,6 +149,52 @@ class DefaultModelProcessorTest {
 
         Model result = processor.read(request);
         assertNotNull(result);
+        verify(xmlFactory, never()).read(any(XmlReaderRequest.class));
+    }
+
+    @Test
+    void testParserLocatingProjectDirectoryIsInvokedForDirectorySource() throws Exception {
+        // a non-XML syntax whose "pom" is the project directory itself (e.g. a MANIFEST.MF based project)
+        Path projectDir = Files.createDirectories(tempDir.resolve("project"));
+        Files.createDirectories(projectDir.resolve("META-INF"));
+        Files.writeString(projectDir.resolve("META-INF/MANIFEST.MF"), "Bundle-SymbolicName: test");
+
+        Model parsed = Model.newBuilder()
+                .modelVersion("4.0.0")
+                .groupId("g")
+                .artifactId("a")
+                .version("1")
+                .build();
+        AtomicInteger parseCalls = new AtomicInteger();
+        ModelParser parser = new ModelParser() {
+            @Override
+            public Optional<Source> locate(Path dir) {
+                return Files.isRegularFile(dir.resolve("META-INF/MANIFEST.MF"))
+                        ? Optional.of(Sources.fromPath(dir))
+                        : Optional.empty();
+            }
+
+            @Override
+            public Model parse(Source source, Map<String, ?> options) {
+                parseCalls.incrementAndGet();
+                return parsed;
+            }
+        };
+
+        ModelXmlFactory xmlFactory = mock(ModelXmlFactory.class);
+        when(xmlFactory.read(any(XmlReaderRequest.class)))
+                .thenThrow(new XmlReaderException("Is a directory", null, null));
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, Map.of("manifest", parser));
+
+        Path located = processor.locateExistingPom(projectDir);
+        assertEquals(projectDir, located);
+
+        Model result = processor.read(
+                XmlReaderRequest.builder().path(located).strict(true).build());
+
+        assertEquals(1, parseCalls.get(), "ModelParser#parse should be called for the located source");
+        assertEquals("a", result.getArtifactId());
+        assertEquals(located, result.getPomFile());
         verify(xmlFactory, never()).read(any(XmlReaderRequest.class));
     }
 }
