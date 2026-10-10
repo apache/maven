@@ -130,6 +130,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
             scope.seed(Project.class, sessionV4.getProject(project));
             scope.seed(org.apache.maven.api.MojoExecution.class, new DefaultMojoExecution(sessionV4, mojoExecution));
 
+            Object mojoLock;
             if (mojoDescriptor.isV4Api()) {
                 // For Maven 4 plugins, register a service so that they can be directly injected into plugins
                 Map<Class<? extends Service>, Supplier<? extends Service>> services = sessionV4.getAllServices();
@@ -138,8 +139,10 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
                 org.apache.maven.api.plugin.Mojo mojoV4 = mavenPluginManager.getConfiguredMojo(
                         org.apache.maven.api.plugin.Mojo.class, session, mojoExecution);
                 mojo = new MojoWrapper(mojoV4);
+                mojoLock = mojoV4.getClass();
             } else {
                 mojo = mavenPluginManager.getConfiguredMojo(Mojo.class, session, mojoExecution);
+                mojoLock = mojo.getClass();
             }
 
             legacySupport.setSession(session);
@@ -149,9 +152,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
             // MavenProjectHelper.attachArtifact(..).
             try {
                 MojoExecutionEvent mojoExecutionEvent = new MojoExecutionEvent(session, project, mojoExecution, mojo);
-                mojoExecutionListener.beforeMojoExecution(mojoExecutionEvent);
-                mojo.execute();
-                mojoExecutionListener.afterMojoExecutionSuccess(mojoExecutionEvent);
+                executeMojo(mojoDescriptor, mojo, mojoLock, mojoExecutionEvent);
             } catch (ClassCastException | MavenException e) {
                 // to be processed in the outer catch block
                 throw e;
@@ -203,6 +204,20 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
             legacySupport.setSession(oldSession);
         }
+    }
+
+    private void executeMojo(
+            MojoDescriptor mojoDescriptor, Mojo mojo, Object mojoLock, MojoExecutionEvent mojoExecutionEvent)
+            throws MojoExecutionException, MojoFailureException {
+        mojoExecutionListener.beforeMojoExecution(mojoExecutionEvent);
+        if (mojoDescriptor.isThreadSafe()) {
+            mojo.execute();
+        } else {
+            synchronized (mojoLock) {
+                mojo.execute();
+            }
+        }
+        mojoExecutionListener.afterMojoExecutionSuccess(mojoExecutionEvent);
     }
 
     /**
