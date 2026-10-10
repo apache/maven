@@ -81,7 +81,7 @@ public class DefaultArtifactDeployer extends AbstractLogEnabled implements Artif
             File source, Artifact artifact, ArtifactRepository deploymentRepository, ArtifactRepository localRepository)
             throws ArtifactDeploymentException {
         RepositorySystemSession session =
-                LegacyLocalRepositoryManager.overlay(localRepository, legacySupport.getRepositorySession(), repoSystem);
+                LegacyLocalRepositoryManager.overlay(localRepository, legacySupport.getRepositorySession());
 
         DeployRequest request = new DeployRequest();
 

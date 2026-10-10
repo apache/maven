@@ -26,12 +26,10 @@ import java.util.Objects;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.metadata.ArtifactMetadata;
 import org.apache.maven.artifact.repository.layout.ArtifactRepositoryLayout;
-import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.artifact.repository.metadata.RepositoryMetadataStoreException;
 import org.apache.maven.internal.aether.DefaultRepositorySystemSessionFactory;
 import org.apache.maven.repository.Proxy;
 import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.metadata.Metadata;
@@ -57,29 +55,25 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
 
     private final LocalRepository repo;
 
-    private final boolean realLocalRepo;
-
-    public static RepositorySystemSession overlay(
-            ArtifactRepository repository, RepositorySystemSession session, RepositorySystem system) {
+    public static RepositorySystemSession overlay(ArtifactRepository repository, RepositorySystemSession session) {
         if (repository == null || repository.getBasedir() == null) {
             return session;
         }
 
-        LocalRepositoryManager lrm = session.getLocalRepositoryManager();
-        if (lrm != null
-                && lrm.getRepository()
-                        .getBasePath()
-                        .equals(DefaultRepositorySystemSessionFactory.resolve(repository.getBasedir()))) {
-            return session;
-        }
-        if (repository.getLayout() instanceof DefaultRepositoryLayout) {
-            return new DefaultRepositorySystemSession(session)
-                    .setLocalRepositoryManager(DefaultRepositorySystemSessionFactory.setUpLocalRepositoryManager(
-                            repository.getBasedir(), system, session));
+        if (session != null) {
+            LocalRepositoryManager lrm = session.getLocalRepositoryManager();
+            if (lrm != null
+                    && lrm.getRepository()
+                            .getBasePath()
+                            .equals(DefaultRepositorySystemSessionFactory.resolve(repository.getBasedir()))) {
+                return session;
+            }
         } else {
-            return new DefaultRepositorySystemSession(session)
-                    .setLocalRepositoryManager(new LegacyLocalRepositoryManager(repository));
+            session = new DefaultRepositorySystemSession();
         }
+
+        return new DefaultRepositorySystemSession(session)
+                .setLocalRepositoryManager(new LegacyLocalRepositoryManager(repository));
     }
 
     private LegacyLocalRepositoryManager(ArtifactRepository delegate) {
@@ -89,20 +83,6 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
         repo = new LocalRepository(
                 new File(delegate.getBasedir()),
                 (layout != null) ? layout.getClass().getSimpleName() : "legacy");
-
-        /*
-         * NOTE: "invoker:install" vs "appassembler:assemble": Both mojos use the artifact installer to put an artifact
-         * into a repository. In the first case, the result needs to be a proper local repository that one can use for
-         * local artifact resolution. In the second case, the result needs to precisely obey the path information of the
-         * repository's layout to allow pointing at artifacts within the repository. Unfortunately,
-         * DefaultRepositoryLayout does not correctly describe the layout of a local repository which unlike a remote
-         * repository never uses timestamps in the filename of a snapshot artifact. The discrepancy gets notable when a
-         * remotely resolved snapshot artifact gets passed into pathOf(). So producing a proper local artifact path
-         * using DefaultRepositoryLayout requires us to enforce usage of the artifact's base version. This
-         * transformation however contradicts the other use case of precisely obeying the repository's layout. The below
-         * flag tries to detect which use case applies to make both plugins happy.
-         */
-        realLocalRepo = (layout instanceof DefaultRepositoryLayout) && "local".equals(delegate.getId());
     }
 
     public LocalRepository getRepository() {
@@ -110,9 +90,6 @@ public class LegacyLocalRepositoryManager implements LocalRepositoryManager {
     }
 
     public String getPathForLocalArtifact(Artifact artifact) {
-        if (realLocalRepo) {
-            return delegate.pathOf(RepositoryUtils.toArtifact(artifact.setVersion(artifact.getBaseVersion())));
-        }
         return delegate.pathOf(RepositoryUtils.toArtifact(artifact));
     }
 

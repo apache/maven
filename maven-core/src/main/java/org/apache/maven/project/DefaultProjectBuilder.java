@@ -1009,8 +1009,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             this.request = request;
             this.modelPool = modelPool;
             this.modelCache = modelCache;
-            session = LegacyLocalRepositoryManager.overlay(
-                    request.getLocalRepository(), request.getRepositorySession(), repoSystem);
+            session =
+                    LegacyLocalRepositoryManager.overlay(request.getLocalRepository(), request.getRepositorySession());
             repositories = RepositoryUtils.toRepos(request.getRemoteRepositories());
         }
     }

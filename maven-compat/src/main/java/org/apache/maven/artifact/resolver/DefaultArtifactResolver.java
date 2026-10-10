@@ -117,7 +117,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
     }
 
     private RepositorySystemSession getSession(ArtifactRepository localRepository) {
-        return LegacyLocalRepositoryManager.overlay(localRepository, legacySupport.getRepositorySession(), repoSystem);
+        return LegacyLocalRepositoryManager.overlay(localRepository, legacySupport.getRepositorySession());
     }
 
     private void injectSession1(RepositoryRequest request, MavenSession session) {
