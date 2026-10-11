@@ -52,6 +52,7 @@ import org.apache.maven.api.services.DependencyResolverException;
 import org.apache.maven.api.services.DependencyResolverRequest;
 import org.apache.maven.api.services.DependencyResolverResult;
 import org.apache.maven.api.services.ProjectManager;
+import org.apache.maven.impl.resolver.TrackingExclusionDependencySelector;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.collection.CollectRequest;
@@ -62,6 +63,8 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.scope.ResolutionScope;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.impl.ImplUtils.cast;
@@ -70,6 +73,8 @@ import static org.apache.maven.impl.ImplUtils.map;
 @Named
 @Singleton
 public class DefaultDependencyResolver implements DependencyResolver {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDependencyResolver.class);
 
     /**
      * Cache of information about the modules contained in a path element.
@@ -167,6 +172,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
             try {
                 final CollectResult result =
                         session.getRepositorySystem().collectDependencies(systemSession, collectRequest);
+                warnObsoleteExclusions(systemSession, request);
                 return new DefaultDependencyResolverResult(
                         null,
                         moduleCache(request),
@@ -192,6 +198,36 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 .flattenDependencyNodes(session.getSession(), root, getScopeDependencyFilter(scope));
         dependencies.remove(root);
         return map(dependencies, session::getNode);
+    }
+
+    private void warnObsoleteExclusions(RepositorySystemSession session, DependencyResolverRequest request) {
+        if (!LOGGER.isWarnEnabled()) {
+            return;
+        }
+        String projectKey = request.getProject()
+                .map(p -> p.getGroupId() + ":" + p.getArtifactId())
+                .orElse(null);
+        String projectId = request.getProject().map(Project::getId).orElse(projectKey);
+        List<TrackingExclusionDependencySelector.ExclusionTrackingRecord> records =
+                TrackingExclusionDependencySelector.getTrackingRecords(session, projectKey);
+        for (TrackingExclusionDependencySelector.ExclusionTrackingRecord record : records) {
+            org.eclipse.aether.graph.Dependency directDep = record.getDirectDependency();
+            String depCoord = directDep.getArtifact().getGroupId() + ":"
+                    + directDep.getArtifact().getArtifactId();
+            for (org.eclipse.aether.graph.Exclusion exclusion : record.getDeclaredExclusions()) {
+                if ("*".equals(exclusion.getGroupId()) && "*".equals(exclusion.getArtifactId())) {
+                    continue;
+                }
+                if (!record.getMatchedExclusions().contains(exclusion)) {
+                    LOGGER.warn(
+                            "The exclusion of {}:{} for {} in {} is obsolete - there is no dependency on this exclusion",
+                            exclusion.getGroupId(),
+                            exclusion.getArtifactId(),
+                            depCoord,
+                            projectId != null ? projectId : "project");
+                }
+            }
+        }
     }
 
     private static DependencyFilter getScopeDependencyFilter(PathScope scope) {
