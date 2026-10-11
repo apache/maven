@@ -90,6 +90,17 @@ from `${session.rootDirectory}/.mvn/maven-user.properties`.
 
 For the complete list of available Maven configuration properties and options, see [Maven Configuration Options](configuration.html).
 
+### Profile-Scoped Properties
+
+Starting in Maven 4, when active profiles define properties, Maven automatically surfaces profile-scoped properties under the `profile.<id>.<key>` namespace for model interpolation (e.g., `${profile.my-profile.my-property}`).
+
+This allows referencing properties from specific active profiles even when multiple active profiles define properties with the same name:
+
+* **Active Profiles Only**: Only properties defined in active profiles are injected into the model properties. Inactive profile properties are excluded.
+* **Reserved Namespace**: The `profile.<id>.*` namespace is reserved for profile-scoped property resolution. If a POM explicitly defines a property that clashes with a profile-scoped key, the active profile's value takes precedence and a warning is logged.
+* **Prefix Exclusion Rule**: Properties within a profile that already start with `profile.` (e.g., `profile.custom`) are not re-prefixed to avoid redundant double-scoping.
+* **Profile ID Naming Recommendation**: Use hyphens or underscores instead of dots in profile IDs (e.g., `scala-2.12` rather than `scala.2.12`). Because dots serve as key delimiters in property interpolation, profile IDs containing dots may cause key collisions if another profile defines overlapping property names (e.g., profile `foo.bar` with property `baz` collides with profile `foo` with property `bar.baz`).
+
 ## Settings
 
 Settings are configured in the `~/.m2/settings.xml` file (user level),
