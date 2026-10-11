@@ -1662,9 +1662,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // File-activated profiles are pre-filtered (not just sandboxed) because
                     // returning false from exists() would incorrectly activate <missing> profiles.
                     // Repository stripping is intentionally omitted: only legitimately-active
-                    // profiles (JDK/OS/activeByDefault and negated-property default-on profiles)
-                    // reach injection, and stripping their repositories would break the established
-                    // project → dep1 → dep2 pattern. See #13100.
+                    // profiles (JDK/OS/activeByDefault and negated-property default-on profiles) reach injection,
+                    // and stripping their repositories would break the established project → dep1 → dep2 pattern.
+                    // See #13100.
                     // TODO(#13146): repositories contributed by external-model profiles can shadow
                     // central; a WARN/FAIL policy for URL mismatches should be added separately.
                     // Condition profiles using exists()/missing() are also pre-filtered for the
