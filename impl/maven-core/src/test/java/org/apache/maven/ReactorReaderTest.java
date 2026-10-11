@@ -141,7 +141,47 @@ class ReactorReaderTest {
     }
 
     @Test
+    void producesMainArtifactDelegatesToProjectWhenAvailable() {
+        MavenProject mavenProject = new MavenProject();
+        mavenProject.setGroupId("org.test");
+        mavenProject.setArtifactId("custom-project");
+        mavenProject.setVersion("1.0.0");
+        mavenProject.setPackaging("jar");
+        mavenProject.setBuild(new Build());
+
+        org.apache.maven.api.Project apiProject = Mockito.mock(org.apache.maven.api.Project.class);
+        when(apiProject.producesMainArtifact()).thenReturn(false);
+        when(internalSession.getProject(mavenProject)).thenReturn(apiProject);
+
+        when(session.getProjects()).thenReturn(List.of(mavenProject));
+        ReactorReader reader = new ReactorReader(session);
+
+        assertFalse(reader.producesMainArtifact(mavenProject));
+    }
+
+    @Test
+    void producesMainArtifactHandlesUnknownPackagingGracefully() {
+        when(internalSession.requirePackaging("unknown")).thenThrow(new IllegalArgumentException("Unknown packaging"));
+
+        MavenProject project = new MavenProject();
+        project.setGroupId("org.test");
+        project.setArtifactId("unknown-pkg");
+        project.setVersion("1.0.0");
+        project.setPackaging("unknown");
+        project.setBuild(new Build());
+
+        when(session.getProjects()).thenReturn(List.of(project));
+        ReactorReader reader = new ReactorReader(session);
+
+        assertTrue(reader.producesMainArtifact(project));
+    }
+
+    @Test
     void reactorFindsPomAndAttachedArtifactsForModularProject() throws Exception {
+        Packaging jarPackaging = Mockito.mock(Packaging.class);
+        when(jarPackaging.producesMainArtifact()).thenReturn(true);
+        when(internalSession.requirePackaging("jar")).thenReturn(jarPackaging);
+
         MavenProject project = new MavenProject();
         project.setGroupId("org.test");
         project.setArtifactId("modular-project");
@@ -150,6 +190,18 @@ class ReactorReaderTest {
         Build build = new Build();
         build.setOutputDirectory("target/classes");
         project.setBuild(build);
+
+        project.addSourceRoot(new DefaultSourceRoot(
+                ProjectScope.MAIN,
+                Language.JAVA_FAMILY,
+                "org.test.module.a",
+                null,
+                Path.of("src/module-a"),
+                null,
+                null,
+                false,
+                null,
+                true));
 
         File pomFile = File.createTempFile("pom", ".xml");
         pomFile.deleteOnExit();

@@ -42,6 +42,7 @@ import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
@@ -160,12 +161,15 @@ class DefaultProjectManagerTest {
                 "org.foo", "bar", "1.0.0", "compile", "jar", "", new TestArtifactHandler("jar")));
 
         Project project = new DefaultProject(session, mavenProject);
-        assertTrue(project.getPackaging().producesMainArtifact());
+        assertTrue(project.packaging().producesMainArtifact());
+        assertTrue(project.producesMainArtifact());
+        assertSame(project.packaging(), project.packaging());
 
         List<ProducedArtifact> artifacts = project.getArtifacts();
         assertEquals(2, artifacts.size());
         assertTrue(artifacts.contains(pomProduced));
         assertTrue(artifacts.contains(jarProduced));
+        assertTrue(project.mainArtifact().isPresent());
 
         DefaultProjectManager projectManager = new DefaultProjectManager(session, Mockito.mock(ArtifactManager.class));
         Collection<ProducedArtifact> all = projectManager.getAllArtifacts(project);
@@ -185,27 +189,27 @@ class DefaultProjectManagerTest {
 
         MavenProject mavenProject = new MavenProject();
         mavenProject.setGroupId("org.foo");
-        mavenProject.setArtifactId("bar");
+        mavenProject.setArtifactId("bar-parent");
         mavenProject.setVersion("1.0.0");
         mavenProject.setPackaging("pom");
         mavenProject.setFile(
                 Path.of("target", "project", "pom.xml").toAbsolutePath().toFile());
         mavenProject.setArtifact(new org.apache.maven.artifact.DefaultArtifact(
-                "org.foo", "bar", "1.0.0", "compile", "pom", "", new TestArtifactHandler("pom")));
+                "org.foo", "bar-parent", "1.0.0", "compile", "pom", "", new TestArtifactHandler("pom")));
 
         Project project = new DefaultProject(session, mavenProject);
-        assertFalse(project.getPackaging().producesMainArtifact());
+        assertFalse(project.packaging().producesMainArtifact());
+        assertFalse(project.producesMainArtifact());
+        assertSame(project.packaging(), project.packaging());
 
         List<ProducedArtifact> artifacts = project.getArtifacts();
         assertEquals(1, artifacts.size());
         assertTrue(artifacts.contains(pomProduced));
-
-        DefaultProjectManager projectManager = new DefaultProjectManager(session, Mockito.mock(ArtifactManager.class));
-        assertEquals(1, projectManager.getAllArtifacts(project).size());
+        assertFalse(project.mainArtifact().isPresent());
     }
 
     @Test
-    void bomPackagingBehavesCorrectly() {
+    void bomPackagingDoesNotProduceMainArtifact() {
         InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
         Packaging packaging = Mockito.mock(Packaging.class);
         when(packaging.producesMainArtifact()).thenReturn(false);
@@ -226,11 +230,14 @@ class DefaultProjectManagerTest {
                 "org.foo", "bar-bom", "1.0.0", "compile", "pom", "", new TestArtifactHandler("pom")));
 
         Project project = new DefaultProject(session, mavenProject);
-        assertFalse(project.getPackaging().producesMainArtifact());
+        assertFalse(project.packaging().producesMainArtifact());
+        assertFalse(project.producesMainArtifact());
+        assertSame(project.packaging(), project.packaging());
 
         List<ProducedArtifact> artifacts = project.getArtifacts();
         assertEquals(1, artifacts.size());
         assertTrue(artifacts.contains(pomProduced));
+        assertFalse(project.mainArtifact().isPresent());
     }
 
     @Test
@@ -271,12 +278,15 @@ class DefaultProjectManagerTest {
 
         Project project = new DefaultProject(session, mavenProject);
 
-        assertFalse(project.getPackaging().producesMainArtifact());
+        assertTrue(project.packaging().producesMainArtifact());
+        assertFalse(project.producesMainArtifact());
+        assertSame(project.packaging(), project.packaging());
 
         List<ProducedArtifact> artifacts = project.getArtifacts();
         assertEquals(1, artifacts.size());
         assertTrue(artifacts.contains(pomProduced));
         assertFalse(artifacts.contains(jarProduced));
+        assertFalse(project.mainArtifact().isPresent());
 
         DefaultProjectManager projectManager = new DefaultProjectManager(session, Mockito.mock(ArtifactManager.class));
         Collection<ProducedArtifact> all = projectManager.getAllArtifacts(project);
@@ -330,7 +340,9 @@ class DefaultProjectManagerTest {
         DefaultProjectManager projectManager = new DefaultProjectManager(session, artifactManager);
 
         // Before adding module source root: standard JAR produces main artifact
-        assertTrue(project.getPackaging().producesMainArtifact());
+        assertTrue(project.packaging().producesMainArtifact());
+        assertTrue(project.producesMainArtifact());
+        assertSame(project.packaging(), project.packaging());
         assertEquals(2, project.getArtifacts().size());
 
         // Add module source root
@@ -348,14 +360,18 @@ class DefaultProjectManagerTest {
                         null,
                         true));
 
-        // After adding module source hierarchy: producesMainArtifact is false
-        assertFalse(project.getPackaging().producesMainArtifact());
+        // After adding module source hierarchy: project does not produce main artifact, but packaging descriptor still
+        // does
+        assertTrue(project.packaging().producesMainArtifact());
+        assertFalse(project.producesMainArtifact());
+        assertSame(project.packaging(), project.packaging());
 
         // project.getArtifacts() contains ONLY POM artifact (directory is NOT exposed as main artifact)
         List<ProducedArtifact> artifacts = project.getArtifacts();
         assertEquals(1, artifacts.size());
         assertTrue(artifacts.contains(pomProduced));
         assertFalse(artifacts.contains(jarProduced));
+        assertFalse(project.mainArtifact().isPresent());
 
         // Legacy MavenProject.getArtifact() remains intact for backward compatibility
         assertEquals(legacyArtifact, mavenProject.getArtifact());

@@ -52,11 +52,9 @@ public final class SourceQueries {
                 return true;
             }
         }
-        Collection<SourceRoot> roots = project.getSourceRoots();
-        return roots != null
-                && roots.stream()
-                        .filter(SourceRoot::enabled)
-                        .anyMatch(sr -> sr.module().isPresent());
+        return project.getSourceRoots().stream()
+                .filter(SourceRoot::enabled)
+                .anyMatch(sr -> sr.module().isPresent());
     }
 
     /**

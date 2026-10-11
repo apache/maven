@@ -44,12 +44,16 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.Packaging;
+import org.apache.maven.api.Project;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.LookupException;
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.resolver.MavenWorkspaceReader;
+import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.SourceQueries;
 import org.apache.maven.project.artifact.ProjectArtifact;
@@ -470,19 +474,33 @@ class ReactorReader implements MavenWorkspaceReader {
         return artifacts.map(RepositoryUtils::toArtifact);
     }
 
+    /**
+     * Determines whether the project produces a main artifact.
+     * Package-private for testing.
+     */
     boolean producesMainArtifact(MavenProject project) {
         if ("pom".equals(project.getPackaging())) {
             return false;
         }
         try {
             if (session != null && session.getSession() != null) {
-                org.apache.maven.api.Packaging pkg = session.getSession().requirePackaging(project.getPackaging());
-                if (!pkg.producesMainArtifact()) {
+                if (session.getSession() instanceof InternalMavenSession ims) {
+                    Project p = ims.getProject(project);
+                    if (p != null) {
+                        return p.producesMainArtifact();
+                    }
+                }
+                Packaging pkg = session.getSession().requirePackaging(project.getPackaging());
+                if (pkg != null && !pkg.producesMainArtifact()) {
                     return false;
                 }
             }
-        } catch (Exception e) {
-            // fallback
+        } catch (IllegalArgumentException | LookupException e) {
+            LOGGER.debug(
+                    "Cannot determine packaging '{}' for project '{}', assuming default",
+                    project.getPackaging(),
+                    project.getId(),
+                    e);
         }
         return !SourceQueries.usesModuleSourceHierarchy(project);
     }

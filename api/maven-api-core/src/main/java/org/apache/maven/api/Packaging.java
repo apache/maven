@@ -92,8 +92,7 @@ public interface Packaging extends ExtensibleEnum {
 
     /**
      * {@return whether this packaging produces a main artifact}.
-     * Packaging types such as {@code pom} or {@code bom}, or projects with a module source hierarchy,
-     * do not produce a main artifact.
+     * Packaging types such as {@code pom} or {@code bom} do not produce a main artifact.
      *
      * @since 4.1.0
      */
