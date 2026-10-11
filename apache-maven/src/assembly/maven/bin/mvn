@@ -397,27 +397,41 @@ concat_lines() {
       return 1
     }
 
-    # Run the parser using source-launch mode
-    # Capture both stdout and stderr for comprehensive error reporting
-    parser_output=$("$JAVACMD" "$MAVEN_HOME/bin/JvmConfigParser.java" "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" 2>&1)
+    # Run the parser using source-launch mode. Keep stderr separate because the JVM
+    # writes JAVA_TOOL_OPTIONS / JDK_JAVA_OPTIONS notices to stderr on successful
+    # startup; those notices must not become JVM arguments.
+    parser_stderr_file=$(mktemp "${TMPDIR:-/tmp}/maven-jvm-config.XXXXXX") || {
+      echo "ERROR: Unable to create temporary file for JvmConfigParser stderr" >&2
+      return 1
+    }
+    parser_output=$("$JAVACMD" "$MAVEN_HOME/bin/JvmConfigParser.java" "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" 2>"$parser_stderr_file")
     parser_exit=$?
 
     if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
       echo "[DEBUG] JvmConfigParser exit code: $parser_exit" >&2
-      printf '[DEBUG] JvmConfigParser output: %s\n' "$parser_output" >&2
+      printf '[DEBUG] JvmConfigParser stdout: %s\n' "$parser_output" >&2
+      if [ -s "$parser_stderr_file" ]; then
+        echo "[DEBUG] JvmConfigParser stderr:" >&2
+        sed 's/^/[DEBUG] /' "$parser_stderr_file" >&2
+      fi
     fi
 
     if [ $parser_exit -ne 0 ]; then
-      # Parser failed - print comprehensive error information
+      # Parser failed - print comprehensive error information, including stderr.
       echo "ERROR: JvmConfigParser failed with exit code $parser_exit" >&2
       printf '  jvm.config path: %s\n' "$1" >&2
       printf '  Maven basedir: %s\n' "$MAVEN_PROJECTBASEDIR" >&2
       printf '  Java command: %s\n' "$JAVACMD" >&2
       echo "  Parser output:" >&2
       printf '%s\n' "$parser_output" | sed 's/^/    /' >&2
+      if [ -s "$parser_stderr_file" ]; then
+        sed 's/^/    /' "$parser_stderr_file" >&2
+      fi
+      rm -f "$parser_stderr_file"
       exit 1
     fi
 
+    rm -f "$parser_stderr_file"
     printf '%s\n' "$parser_output"
   fi
 }
