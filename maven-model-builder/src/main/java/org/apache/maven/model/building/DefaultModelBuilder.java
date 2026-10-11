@@ -519,37 +519,18 @@ public class DefaultModelBuilder implements ModelBuilder {
      * Returns a sandboxed {@link ProfileActivationContext} for evaluating profiles in
      * repository-resolved (external) models — dependency POMs, parent POMs, and imported BOMs.
      * <p>
-     * The sandboxed context preserves system properties (so JDK/OS activation works) and
-     * merges the POM's own {@code <properties>} into the system properties map so that
-     * property-activated profiles that depend on POM-declared values still work.
+     * The sandboxed context preserves system properties (so JDK/OS activation works).
      * User properties (consumer {@code -D} flags) are suppressed because they were not
-     * set for the dependency and must not accidentally activate its profiles.
+     * set for the dependency and must not accidentally activate its profiles. POM-defined
+     * properties are not exposed through the system-property lookup, so a dependency POM
+     * cannot activate its own property-based profiles.
      * File-based profiles are pre-filtered via {@link #withoutFileActivation(List)} before
      * reaching this context, so {@code getProjectDirectory()} is not relied on for file checks.
-     * <p>
-     * Model properties are merged into system properties (with system properties taking
-     * precedence) rather than changing the {@code PropertyProfileActivator} lookup chain,
-     * because changing the activator would affect ALL profile evaluations — including the
-     * build's own project — which can cause unintended profile activation when a POM declares
-     * a property that matches a profile's activation condition.
      *
      * @param delegate the original full context for this model build
      * @return a sandboxed context suitable for external model profile activation
      */
     private static ProfileActivationContext externalActivationContext(ProfileActivationContext delegate) {
-        // Pre-compute the merged system+project properties once per external model.
-        // getSystemProperties() may be called multiple times per profile (e.g. OperatingSystemProfileActivator
-        // calls it 3× for name/arch/version), so allocating a new HashMap on every call is O(deps × profiles ×
-        // |systemProperties|). Computing it eagerly here keeps the anonymous class allocation-free.
-        final Map<String, String> mergedSystemProps;
-        Map<String, String> projectProps = delegate.getProjectProperties();
-        if (projectProps == null || projectProps.isEmpty()) {
-            mergedSystemProps = delegate.getSystemProperties();
-        } else {
-            Map<String, String> merged = new HashMap<>(projectProps);
-            merged.putAll(delegate.getSystemProperties()); // system wins
-            mergedSystemProps = Collections.unmodifiableMap(merged);
-        }
         return new ProfileActivationContext() {
             @Override
             public List<String> getActiveProfileIds() {
@@ -561,15 +542,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                 return delegate.getInactiveProfileIds();
             }
 
-            /**
-             * System properties merged with project properties (system wins on conflict),
-             * pre-computed once to avoid repeated allocations across multiple activator calls.
-             * This makes POM-declared properties visible to the PropertyProfileActivator
-             * without modifying the activator's lookup chain for non-external models.
-             */
             @Override
             public Map<String, String> getSystemProperties() {
-                return mergedSystemProps;
+                return delegate.getSystemProperties();
             }
 
             /** User properties are suppressed: consumer -D flags do not activate dependency profiles. */
