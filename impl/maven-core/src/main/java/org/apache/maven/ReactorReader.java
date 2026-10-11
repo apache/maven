@@ -491,7 +491,7 @@ class ReactorReader implements MavenWorkspaceReader {
                     }
                 }
                 Packaging pkg = session.getSession().requirePackaging(project.getPackaging());
-                if (pkg != null && !pkg.producesMainArtifact()) {
+                if (!pkg.producesMainArtifact()) {
                     return false;
                 }
             }
