@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle.internal;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Set;
 import java.util.TreeSet;
 
 import org.apache.maven.project.MavenProject;
@@ -48,6 +49,10 @@ public class DependencyContext {
     private volatile Collection<?> lastDependencyArtifacts = Collections.emptyList();
 
     private volatile int lastDependencyArtifactCount = -1;
+
+    private volatile Set<String> lastScopesToCollect;
+
+    private volatile Set<String> lastScopesToResolve;
 
     public DependencyContext(
             MavenProject project, Collection<String> scopesToCollect, Collection<String> scopesToResolve) {
@@ -83,6 +88,17 @@ public class DependencyContext {
                 || (lastDependencyArtifacts != null && lastDependencyArtifactCount != lastDependencyArtifacts.size());
     }
 
+    /**
+     * Tells whether the dependencies of the current project have to be resolved again for a mojo requiring the given
+     * scopes, that is when the project was last resolved for other scopes or its dependency artifacts changed.
+     */
+    public boolean isResolutionRequiredForCurrentProject(
+            Collection<String> scopesToCollect, Collection<String> scopesToResolve) {
+        return !Set.copyOf(scopesToCollect).equals(lastScopesToCollect)
+                || !Set.copyOf(scopesToResolve).equals(lastScopesToResolve)
+                || isResolutionRequiredForCurrentProject();
+    }
+
     public boolean isResolutionRequiredForAggregatedProjects(
             Collection<String> scopesToCollect, Collection<String> scopesToResolve) {
         return scopesToCollectForAggregatedProjects.addAll(scopesToCollect)
@@ -92,5 +108,16 @@ public class DependencyContext {
     public void synchronizeWithProjectState() {
         lastDependencyArtifacts = project.getDependencyArtifacts();
         lastDependencyArtifactCount = (lastDependencyArtifacts != null) ? lastDependencyArtifacts.size() : 0;
+        lastScopesToCollect = null;
+        lastScopesToResolve = null;
+    }
+
+    /**
+     * Records the project state after its dependencies were resolved for the given scopes.
+     */
+    public void synchronizeWithProjectState(Collection<String> scopesToCollect, Collection<String> scopesToResolve) {
+        synchronizeWithProjectState();
+        lastScopesToCollect = Set.copyOf(scopesToCollect);
+        lastScopesToResolve = Set.copyOf(scopesToResolve);
     }
 }

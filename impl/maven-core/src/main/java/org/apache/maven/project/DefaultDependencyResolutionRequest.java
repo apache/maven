@@ -18,6 +18,9 @@
  */
 package org.apache.maven.project;
 
+import java.util.Collection;
+import java.util.Set;
+
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
 
@@ -32,6 +35,8 @@ public class DefaultDependencyResolutionRequest implements DependencyResolutionR
     private DependencyFilter filter;
 
     private RepositorySystemSession session;
+
+    private Set<String> excludedScopes = Set.of();
 
     public DefaultDependencyResolutionRequest() {
         // enables default constructor
@@ -72,6 +77,29 @@ public class DefaultDependencyResolutionRequest implements DependencyResolutionR
     @Override
     public DependencyResolutionRequest setRepositorySession(RepositorySystemSession repositorySession) {
         this.session = repositorySession;
+        return this;
+    }
+
+    /**
+     * Returns the scopes of the direct dependencies that are left out of the collected dependency graph.
+     *
+     * @return the excluded scopes, never {@code null}
+     * @since 4.1.0
+     */
+    public Set<String> getExcludedScopes() {
+        return excludedScopes;
+    }
+
+    /**
+     * Sets the scopes of the direct dependencies that are left out of the collected dependency graph, so that they
+     * do not take part in the conflict resolution of the dependencies of the other scopes.
+     *
+     * @param excludedScopes the excluded scopes, may be {@code null}
+     * @return this request, never {@code null}
+     * @since 4.1.0
+     */
+    public DefaultDependencyResolutionRequest setExcludedScopes(Collection<String> excludedScopes) {
+        this.excludedScopes = excludedScopes != null ? Set.copyOf(excludedScopes) : Set.of();
         return this;
     }
 }

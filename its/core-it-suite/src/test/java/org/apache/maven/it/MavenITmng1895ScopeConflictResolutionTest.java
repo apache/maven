@@ -36,7 +36,8 @@ public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenInte
 
     /**
      * Verify that for a dependency being referenced in two different scopes, the scope given directly in the POM
-     * always wins, even if weaker than the scope of the transitive dependency.
+     * always wins, even if weaker than the scope of the transitive dependency. The exception is the test scope, which
+     * only applies to the test class path (<a href="https://issues.apache.org/jira/browse/MNG-6058">MNG-6058</a>).
      *
      * @throws Exception in case of failure
      */
@@ -58,13 +59,13 @@ public class MavenITmng1895ScopeConflictResolutionTest extends AbstractMavenInte
         List<String> compile = verifier.loadLines("target/compile.txt");
         assertTrue(compile.contains("a-0.1.jar"), compile.toString());
         assertFalse(compile.contains("b-0.1.jar"), compile.toString());
-        assertFalse(compile.contains("c-0.1.jar"), compile.toString());
+        assertTrue(compile.contains("c-0.1.jar"), compile.toString());
         assertTrue(compile.contains("d-0.1.jar"), compile.toString());
 
         List<String> runtime = verifier.loadLines("target/runtime.txt");
         assertFalse(runtime.contains("a-0.1.jar"), runtime.toString());
         assertTrue(runtime.contains("b-0.1.jar"), runtime.toString());
-        assertFalse(runtime.contains("c-0.1.jar"), runtime.toString());
+        assertTrue(runtime.contains("c-0.1.jar"), runtime.toString());
         assertTrue(runtime.contains("d-0.1.jar"), runtime.toString());
 
         List<String> test = verifier.loadLines("target/test.txt");
