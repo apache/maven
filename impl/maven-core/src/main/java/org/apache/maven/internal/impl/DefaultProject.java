@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Stream;
@@ -31,6 +32,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Exclusion;
+import org.apache.maven.api.Language;
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
@@ -40,10 +42,12 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.impl.MappedCollection;
 import org.apache.maven.impl.MappedList;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.SourceQueries;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
@@ -99,7 +103,7 @@ public class DefaultProject implements Project {
 
         ArrayList<ProducedArtifact> result = new ArrayList<>(2);
         result.add(session.getArtifact(ProducedArtifact.class, pomArtifact));
-        if (!ArtifactIdUtils.equalsVersionlessId(pomArtifact, projectArtifact)) {
+        if (packaging().producesMainArtifact() && !ArtifactIdUtils.equalsVersionlessId(pomArtifact, projectArtifact)) {
             result.add(session.getArtifact(ProducedArtifact.class, projectArtifact));
         }
         return Collections.unmodifiableList(result);
@@ -108,7 +112,32 @@ public class DefaultProject implements Project {
     @Nonnull
     @Override
     public Packaging packaging() {
+        if (packaging != null && packaging.producesMainArtifact() && SourceQueries.usesModuleSourceHierarchy(project)) {
+            return new DelegatingPackaging(packaging, false);
+        }
         return packaging;
+    }
+
+    private record DelegatingPackaging(Packaging delegate, boolean producesMainArtifact) implements Packaging {
+        @Override
+        public String id() {
+            return delegate.id();
+        }
+
+        @Override
+        public Type type() {
+            return delegate.type();
+        }
+
+        @Override
+        public Language language() {
+            return delegate.language();
+        }
+
+        @Override
+        public Map<String, PluginContainer> plugins() {
+            return delegate.plugins();
+        }
     }
 
     @Nonnull

@@ -23,6 +23,7 @@ import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
+import org.apache.maven.api.SourceRoot;
 import org.apache.maven.api.model.Source;
 
 /**
@@ -35,6 +36,28 @@ import org.apache.maven.api.model.Source;
  */
 public final class SourceQueries {
     private SourceQueries() {}
+
+    /**
+     * Returns whether the given project uses a modular source hierarchy, either
+     * by declaring modular source elements in its build model or via enabled
+     * modular source roots.
+     *
+     * @param project the project to check
+     * @return {@code true} if the project uses a modular source hierarchy
+     * @since 4.1.0
+     */
+    public static boolean usesModuleSourceHierarchy(MavenProject project) {
+        if (project.getBuild() != null && project.getBuild().getDelegate() != null) {
+            if (usesModuleSourceHierarchy(project.getBuild().getDelegate().getSources())) {
+                return true;
+            }
+        }
+        Collection<SourceRoot> roots = project.getSourceRoots();
+        return roots != null
+                && roots.stream()
+                        .filter(SourceRoot::enabled)
+                        .anyMatch(sr -> sr.module().isPresent());
+    }
 
     /**
      * Returns whether at least one source in the collection has a non-blank module name,

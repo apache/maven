@@ -51,6 +51,7 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.resolver.MavenWorkspaceReader;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.SourceQueries;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceRepository;
@@ -402,7 +403,7 @@ class ReactorReader implements MavenWorkspaceReader {
      * @param project the project to copy artifacts from
      */
     private void installIntoProjectLocalRepository(MavenProject project) {
-        if ("pom".equals(project.getPackaging())
+        if (!producesMainArtifact(project)
                         && !"clean".equals(getLifecycles(project).peekLast())
                 || hasBeenPackagedDuringThisSession(project)) {
             getProjectArtifacts(project).filter(this::isRegularFile).forEach(this::installIntoProjectLocalRepository);
@@ -463,10 +464,27 @@ class ReactorReader implements MavenWorkspaceReader {
                         // pom artifact
                         Stream.of(new ProjectArtifact(project)),
                         // main project artifact if not a pom
-                        "pom".equals(project.getPackaging()) ? Stream.empty() : Stream.of(project.getArtifact())),
+                        !producesMainArtifact(project) ? Stream.empty() : Stream.of(project.getArtifact())),
                 // attached artifacts
                 project.getAttachedArtifacts().stream());
         return artifacts.map(RepositoryUtils::toArtifact);
+    }
+
+    boolean producesMainArtifact(MavenProject project) {
+        if ("pom".equals(project.getPackaging())) {
+            return false;
+        }
+        try {
+            if (session != null && session.getSession() != null) {
+                org.apache.maven.api.Packaging pkg = session.getSession().requirePackaging(project.getPackaging());
+                if (!pkg.producesMainArtifact()) {
+                    return false;
+                }
+            }
+        } catch (Exception e) {
+            // fallback
+        }
+        return !SourceQueries.usesModuleSourceHierarchy(project);
     }
 
     private boolean isRegularFile(Artifact artifact) {
