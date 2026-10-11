@@ -57,11 +57,17 @@ public class CleanArgument {
             }
 
             // this has to be a separate "if" statement, to capture the case of: "-Dfoo=bar"
-            if (addedToBuffer && arg.endsWith("\"")) {
+            if (currentArg != null && arg.endsWith("\"")) {
                 // if we're building an argument, keep doing so.
-                // if this is the case of "-Dfoo=bar", then we need to adjust the buffer.
-                if (!currentArg.isEmpty()) {
-                    currentArg.setLength(currentArg.length() - 1);
+                if (addedToBuffer) {
+                    // if this is the case of "-Dfoo=bar", then we need to adjust the buffer.
+                    if (!currentArg.isEmpty()) {
+                        currentArg.setLength(currentArg.length() - 1);
+                    }
+                }
+                // otherwise, we trim the trailing " and append to the buffer.
+                else {
+                    currentArg.append(' ').append(arg, 0, arg.length() - 1);
                 }
 
                 cleaned.add(currentArg.toString());

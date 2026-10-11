@@ -20,6 +20,7 @@ package org.apache.maven.cli;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -42,6 +43,13 @@ class CleanArgumentTest {
         assertEquals(args.length, cleanArgs.length);
         assertEquals("-Dfoo=bar", cleanArgs[0]);
         assertEquals("-Dfoo2=bar two", cleanArgs[1]);
+    }
+
+    @Test
+    void cleanArgsShouldJoinQuotedArgumentSplitOnWhitespace() {
+        String[] args = {"\"-Dfoo=a", "b\"", "validate"};
+        String[] cleanArgs = CleanArgument.cleanArgs(args);
+        assertArrayEquals(new String[] {"-Dfoo=a b", "validate"}, cleanArgs);
     }
 
     @Test
