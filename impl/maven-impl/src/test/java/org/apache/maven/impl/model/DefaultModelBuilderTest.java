@@ -197,6 +197,9 @@ class DefaultModelBuilderTest {
         assertNull(
                 model.getProperties().get("profile.pom.property"),
                 "POM-declared properties must not activate dependency profiles");
+        assertNull(
+                model.getProperties().get("profile.pom.condition"),
+                "POM-declared properties must not activate dependency condition profiles");
         assertEquals("activated", model.getProperties().get("profile.jdk"));
         // Negated-property profile (!skip.defaults) fires because 'skip.defaults' is absent
         // from the sandboxed context (user properties are suppressed; system properties do not

@@ -400,7 +400,9 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
             @Override
             public String getModelProperty(String key) {
-                return DefaultProfileActivationContext.this.getModelProperty(key);
+                // Dependency POM properties must not influence external profile activation,
+                // including condition expressions.
+                return null;
             }
 
             @Override

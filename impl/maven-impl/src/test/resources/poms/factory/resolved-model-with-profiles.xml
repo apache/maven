@@ -66,6 +66,15 @@
                 <profile.condition>activated</profile.condition>
             </properties>
         </profile>
+        <profile>
+            <id>pom-declared-condition</id>
+            <activation>
+                <condition>${pom.declared.prop} == 'hello'</condition>
+            </activation>
+            <properties>
+                <profile.pom.condition>activated</profile.pom.condition>
+            </properties>
+        </profile>
         <!-- missing()-condition profile: must NOT fire in CONSUMER_DEPENDENCY builds -->
         <!-- missing() = !exists() and in the sandbox exists() always returns false,  -->
         <!-- so missing() would always return true — this profile must be pre-filtered. -->
