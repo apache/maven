@@ -73,7 +73,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        java: [8, 25, 26]
+        java: [8, 25, 27]
 
       fail-fast: false
     runs-on: ${{ matrix.os }}
@@ -150,7 +150,8 @@ jobs:
 
       - name: Running integration tests
         shell: bash
-        run: ./mvnw install -e -B -V -Prun-its,embedded -Dmaven.repo.local="$HOME/.m2/repository" -DmavenDistro="$GITHUB_WORKSPACE/built-maven/apache-maven-bin.zip" -f maven-integration-testing/pom.xml
+        # palantir-java-format crashes on JDK 27 (palantir/palantir-java-format#1786); drop the skip once a fixed release is in maven-parent
+        run: ./mvnw install -e -B -V -Prun-its,embedded -Dmaven.repo.local="$HOME/.m2/repository" -DmavenDistro="$GITHUB_WORKSPACE/built-maven/apache-maven-bin.zip" -f maven-integration-testing/pom.xml ${{ matrix.java == 27 && '-Dspotless.skip=true' || '' }}
 
       - name: Save ~/.m2/repository
         # pull requests restore the cache without saving their own copy
