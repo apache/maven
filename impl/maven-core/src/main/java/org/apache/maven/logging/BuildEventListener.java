@@ -32,11 +32,14 @@ public interface BuildEventListener {
 
     void projectLogMessage(String projectId, String event);
 
-    void projectFinished(String projectId);
+    void projectFinished(String projectId, String status);
 
     void executionFailure(String projectId, boolean halted, String exception);
 
     void mojoStarted(ExecutionEvent event);
+
+    void mojoFinished(ExecutionEvent event, String status);
+
 
     void finish(int exitCode) throws Exception;
 
