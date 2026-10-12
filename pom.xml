@@ -979,6 +979,17 @@ under the License.
 
   <profiles>
     <profile>
+      <!-- palantir-java-format crashes on JDK 27 (palantir/palantir-java-format#1786);
+           drop this profile once maven-parent ships a fixed release -->
+      <id>jdk27-skip-spotless</id>
+      <activation>
+        <jdk>[27,)</jdk>
+      </activation>
+      <properties>
+        <spotless.skip>true</spotless.skip>
+      </properties>
+    </profile>
+    <profile>
       <id>mockito</id>
       <activation>
         <property>
