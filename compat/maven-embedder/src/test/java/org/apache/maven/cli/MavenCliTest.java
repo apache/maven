@@ -30,6 +30,7 @@ import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Properties;
 import java.util.stream.Stream;
 
 import com.google.common.jimfs.Configuration;
@@ -64,6 +65,9 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.EnabledOnOs;
+import org.junit.jupiter.api.condition.OS;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -789,6 +793,60 @@ class MavenCliTest {
         }
 
         assertEquals(expectedSubClass, transferListener.getClass());
+    }
+
+    /**
+     * “/d/…” and “/c/…” should convert to proper Windows drive paths.
+     */
+    @Test
+    void msysPathsAreConverted() {
+        assertEquals(
+                "D:/projects/foo", MavenCli.msysToWindowsPath("/d/projects/foo").replace('\\', '/'));
+        assertEquals("C:/x", MavenCli.msysToWindowsPath("/c/x").replace('\\', '/'));
+    }
+
+    /**
+     * Only a path starting with a drive letter is converted.
+     */
+    @Test
+    void otherPathsAreKept() {
+        assertNull(MavenCli.msysToWindowsPath(null));
+        assertEquals("", MavenCli.msysToWindowsPath(""));
+        assertEquals("/tmp/repo", MavenCli.msysToWindowsPath("/tmp/repo"));
+        assertEquals("/c", MavenCli.msysToWindowsPath("/c"));
+        assertEquals("C:\\Users\\alice", MavenCli.msysToWindowsPath("C:\\Users\\alice"));
+        assertEquals("relative/path", MavenCli.msysToWindowsPath("relative/path"));
+    }
+
+    /**
+     * Full `initialize` run: ensures the JVM properties are rewritten when running on Windows.
+     */
+    @Test
+    @EnabledOnOs(OS.WINDOWS)
+    void initializeNormalisesUserHome(@TempDir Path tmpDir) throws Exception {
+        // Backup current system properties to restore afterwards
+        final Properties backup = (Properties) System.getProperties().clone();
+        try {
+            // Required by MavenCli.initialize
+            System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, tmpDir.toString());
+
+            // Inject MSYS‑style paths
+            System.setProperty("user.home", "/d/test/home");
+            System.setProperty(Constants.MAVEN_REPO_LOCAL, "/d/test/repo");
+
+            final MavenCli cli = new MavenCli();
+            final CliRequest req = new CliRequest(new String[0], null);
+            cli.initialize(req);
+
+            // Assertions: both properties should now be real Windows paths
+            assertEquals("D:/test/home", System.getProperty("user.home").replace('\\', '/'));
+            assertEquals(
+                    "D:/test/repo",
+                    System.getProperty(Constants.MAVEN_REPO_LOCAL).replace('\\', '/'));
+        } finally {
+            // Restore original system properties
+            System.setProperties(backup);
+        }
     }
 
     public static Stream<Arguments> calculateTransferListenerArguments() {

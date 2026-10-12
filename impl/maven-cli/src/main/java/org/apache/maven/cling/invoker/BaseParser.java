@@ -303,7 +303,8 @@ public abstract class BaseParser implements Parser {
             context.systemPropertiesOverrides.put("user.home", result.toString());
             return result;
         } else {
-            Path result = getCanonicalPath(Paths.get(System.getProperty("user.home")));
+            // MSYS2 and Git Bash hand over Windows paths in their POSIX style, e.g. /c/Users/alice
+            Path result = getCanonicalPath(Paths.get(MsysPaths.toNativePath(System.getProperty("user.home"))));
             mayOverrideDirectorySystemProperty(context, "user.home", result);
             return result;
         }

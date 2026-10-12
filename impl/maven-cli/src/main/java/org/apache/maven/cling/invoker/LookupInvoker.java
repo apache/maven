@@ -627,8 +627,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             throws Exception {
         Path userSettingsFile = null;
         if (context.options().altUserSettings().isPresent()) {
-            userSettingsFile =
-                    context.cwd.resolve(context.options().altUserSettings().get());
+            userSettingsFile = context.cwd.resolve(
+                    MsysPaths.toNativePath(context.options().altUserSettings().get()));
 
             if (!Files.isRegularFile(userSettingsFile)) {
                 throw new FileNotFoundException("The specified user settings file does not exist: " + userSettingsFile);
@@ -637,8 +637,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             String userSettingsFileStr =
                     context.protoSession.getEffectiveProperties().get(Constants.MAVEN_USER_SETTINGS);
             if (userSettingsFileStr != null) {
-                userSettingsFile =
-                        context.userDirectory.resolve(userSettingsFileStr).normalize();
+                userSettingsFile = context.userDirectory
+                        .resolve(MsysPaths.toNativePath(userSettingsFileStr))
+                        .normalize();
             }
         }
 
@@ -780,7 +781,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         }
         if (userDefinedLocalRepo != null) {
-            return context.cwd.resolve(userDefinedLocalRepo);
+            return context.cwd.resolve(MsysPaths.toNativePath(userDefinedLocalRepo));
         }
         // settings
         userDefinedLocalRepo = context.effectiveSettings.getLocalRepository();
