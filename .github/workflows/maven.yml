@@ -218,7 +218,8 @@ jobs:
 
       - name: Build site with downloaded Maven
         shell: bash
-        run: mvn site -e -B -V -Preporting
+        # the javadoc report forks a build that runs Spotless; same JDK 27 skip as above
+        run: mvn site -e -B -V -Preporting ${{ matrix.java == '27' && '-Dspotless.skip=true' || '' }}
 
       - name: Upload Mimir caches
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
