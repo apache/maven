@@ -992,10 +992,15 @@ under the License.
   <profiles>
     <profile>
       <!-- palantir-java-format crashes on JDK 27 (palantir/palantir-java-format#1786);
-           drop this profile once maven-parent ships a fixed release -->
+           drop this profile once maven-parent ships a fixed release.
+           Activated by property, not <jdk>: the model builder tests build this POM in sessions
+           without java.version, where a <jdk> activation is an error. -->
       <id>jdk27-skip-spotless</id>
       <activation>
-        <jdk>[27,)</jdk>
+        <property>
+          <name>java.specification.version</name>
+          <value>27</value>
+        </property>
       </activation>
       <properties>
         <spotless.skip>true</spotless.skip>
