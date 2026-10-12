@@ -150,8 +150,7 @@ jobs:
 
       - name: Running integration tests
         shell: bash
-        # palantir-java-format crashes on JDK 27 (palantir/palantir-java-format#1786); drop the skip once a fixed release is in maven-parent
-        run: ./mvnw install -e -B -V -Prun-its,embedded -Dmaven.repo.local="$HOME/.m2/repository" -DmavenDistro="$GITHUB_WORKSPACE/built-maven/apache-maven-bin.zip" -f maven-integration-testing/pom.xml ${{ matrix.java == 27 && '-Dspotless.skip=true' || '' }}
+        run: ./mvnw install -e -B -V -Prun-its,embedded -Dmaven.repo.local="$HOME/.m2/repository" -DmavenDistro="$GITHUB_WORKSPACE/built-maven/apache-maven-bin.zip" -f maven-integration-testing/pom.xml
 
       - name: Save ~/.m2/repository
         # pull requests restore the cache without saving their own copy
