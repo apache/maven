@@ -49,7 +49,7 @@ jobs:
       - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           java-version: 21
-          distribution: 'zulu'
+          distribution: 'temurin'
           cache: 'maven'
           # pull requests restore the caches of the branch they target without saving their own copies
           cache-read-only: ${{ github.event_name == 'pull_request' }}
@@ -138,7 +138,8 @@ jobs:
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'zulu'
+          # Temurin comes from the runners' tool cache; it has no JDK 8 for macOS on Apple Silicon
+          distribution: ${{ (runner.os == 'macOS' && matrix.java == 8) && 'zulu' || 'temurin' }}
           cache: 'maven'
           # pull requests restore the caches of the branch they target without saving their own copies
           cache-read-only: ${{ github.event_name == 'pull_request' }}
