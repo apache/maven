@@ -154,6 +154,9 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
+          # JDKs missing from the runners' tool cache (non-LTS) are restored from the Actions cache
+          cache-jdk: true
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
 
       - name: Install Graphviz (MacOS)
         if: runner.os == 'macOS'
@@ -267,6 +270,9 @@ jobs:
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
+          # JDKs missing from the runners' tool cache (non-LTS) are restored from the Actions cache
+          cache-jdk: true
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
 
       - name: Checkout maven
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
