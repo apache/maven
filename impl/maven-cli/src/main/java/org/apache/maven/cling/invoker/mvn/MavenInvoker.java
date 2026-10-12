@@ -52,6 +52,7 @@ import org.apache.maven.cling.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.CliUtils;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
+import org.apache.maven.cling.invoker.MsysPaths;
 import org.apache.maven.cling.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cling.transfer.QuietMavenTransferListener;
 import org.apache.maven.cling.transfer.SimplexTransferListener;
@@ -147,8 +148,8 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     protected void toolchains(MavenContext context, MavenExecutionRequest request) throws Exception {
         Path userToolchainsFile = null;
         if (context.options().altUserToolchains().isPresent()) {
-            userToolchainsFile =
-                    context.cwd.resolve(context.options().altUserToolchains().get());
+            userToolchainsFile = context.cwd.resolve(
+                    MsysPaths.toNativePath(context.options().altUserToolchains().get()));
 
             if (!Files.isRegularFile(userToolchainsFile)) {
                 throw new FileNotFoundException(
@@ -158,7 +159,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             String userToolchainsFileStr =
                     context.protoSession.getEffectiveProperties().get(Constants.MAVEN_USER_TOOLCHAINS);
             if (userToolchainsFileStr != null) {
-                userToolchainsFile = context.cwd.resolve(userToolchainsFileStr);
+                userToolchainsFile = context.cwd.resolve(MsysPaths.toNativePath(userToolchainsFileStr));
             }
         }
 
