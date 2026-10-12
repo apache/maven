@@ -83,7 +83,7 @@ under the License.
     <maven.compiler.release>17</maven.compiler.release>
 
     <wagonVersion>3.5.3</wagonVersion>
-    <asmVersion>9.10.1</asmVersion>
+    <asmVersion>9.11</asmVersion>
     <plexusUtilsVersion>3.6.2</plexusUtilsVersion>
     <plexusXmlVersion>4.2.0</plexusXmlVersion>
 
