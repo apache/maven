@@ -68,9 +68,15 @@ under the License.
       <includes>
         <include>*.cmd</include>
         <include>*.conf</include>
-        <include>*.java</include>
       </includes>
       <lineEnding>dos</lineEnding>
+    </fileSet>
+    <fileSet>
+      <directory>target/classes</directory>
+      <outputDirectory>bin</outputDirectory>
+      <includes>
+        <include>JvmConfigParser.class</include>
+      </includes>
     </fileSet>
     <fileSet>
       <directory>target/dependency/org/jline/nativ</directory>
