@@ -68,7 +68,6 @@ public interface RepositoryFactory extends Service {
      *
      * @param repository the model repository to convert, must not be {@code null}
      * @return a new remote repository instance, never {@code null}
-     * @throws IllegalArgumentException if the model repository is invalid
      */
     @Nonnull
     RemoteRepository createRemote(@Nonnull Repository repository);
@@ -83,16 +82,14 @@ public interface RepositoryFactory extends Service {
      * repositories.
      * <p>
      * When {@code processRecessive} is {@code true}, recessive repositories are treated
-     * as raw definitions and are subjected to mirror selection, proxy selection, and
-     * authentication configuration from the {@link Session}. When {@code false},
-     * recessive repositories are assumed to be already processed and are merged without
-     * reapplying session settings.
+     * as raw or unconfigured definitions and session-level configuration is applied.
+     * When {@code false}, they are assumed to be already configured and are merged as-is.
      *
      * @param session the current build session, must not be {@code null}
      * @param dominant the list of dominant remote repositories taking precedence, must not be {@code null}
      * @param recessive the list of recessive remote repositories to merge into the dominant list, must not be {@code null}
-     * @param processRecessive {@code true} if recessive repositories should be configured using mirrors,
-     *                         proxies, and authentication from the session; {@code false} if they are already configured
+     * @param processRecessive {@code true} if session-level configuration should be applied to recessive
+     *                         repositories; {@code false} if they are assumed to be already configured
      * @return the aggregated list of remote repositories, never {@code null}
      */
     @Nonnull
