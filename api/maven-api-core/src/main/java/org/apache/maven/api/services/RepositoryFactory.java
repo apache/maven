@@ -37,15 +37,64 @@ import org.apache.maven.api.model.Repository;
 @Experimental
 public interface RepositoryFactory extends Service {
 
+    /**
+     * Creates a {@link LocalRepository} backed by the given filesystem path.
+     * The path will be converted to an absolute path.
+     *
+     * @param path the filesystem path to the local repository, must not be {@code null}
+     * @return a new local repository instance, never {@code null}
+     */
     @Nonnull
     LocalRepository createLocal(@Nonnull Path path);
 
+    /**
+     * Creates a {@link RemoteRepository} with the given identifier and URL.
+     * The repository will use the standard default layout and default release
+     * and snapshot policies.
+     *
+     * @param id the identifier of the remote repository, must not be {@code null}
+     * @param url the URL of the remote repository, must not be {@code null}
+     * @return a new remote repository instance, never {@code null}
+     */
     @Nonnull
     RemoteRepository createRemote(@Nonnull String id, @Nonnull String url);
 
+    /**
+     * Creates a {@link RemoteRepository} from the given POM model repository definition.
+     * <p>
+     * The returned repository preserves the identifier, layout, and URL from the model,
+     * and translates its release and snapshot policies (including enabled state, update
+     * policy, and checksum policy).
+     *
+     * @param repository the model repository to convert, must not be {@code null}
+     * @return a new remote repository instance, never {@code null}
+     * @throws IllegalArgumentException if the model repository is invalid
+     */
     @Nonnull
     RemoteRepository createRemote(@Nonnull Repository repository);
 
+    /**
+     * Aggregates two lists of remote repositories into a single list by merging
+     * definitions and resolving duplicates.
+     * <p>
+     * Repositories in the {@code dominant} list take precedence over repositories
+     * in the {@code recessive} list with matching identifiers. The aggregated list
+     * retains the order of dominant repositories, followed by non-duplicate recessive
+     * repositories.
+     * <p>
+     * When {@code processRecessive} is {@code true}, recessive repositories are treated
+     * as raw definitions and are subjected to mirror selection, proxy selection, and
+     * authentication configuration from the {@link Session}. When {@code false},
+     * recessive repositories are assumed to be already processed and are merged without
+     * reapplying session settings.
+     *
+     * @param session the current build session, must not be {@code null}
+     * @param dominant the list of dominant remote repositories taking precedence, must not be {@code null}
+     * @param recessive the list of recessive remote repositories to merge into the dominant list, must not be {@code null}
+     * @param processRecessive {@code true} if recessive repositories should be configured using mirrors,
+     *                         proxies, and authentication from the session; {@code false} if they are already configured
+     * @return the aggregated list of remote repositories, never {@code null}
+     */
     @Nonnull
     List<RemoteRepository> aggregate(
             @Nonnull Session session,
