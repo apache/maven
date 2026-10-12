@@ -17,7 +17,11 @@
 
 name: Java CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ maven-3.9.x ]
+  pull_request:
+    branches: [ maven-3.9.x ]
 
 # allow single build per branch or PR
 concurrency:
@@ -29,9 +33,6 @@ permissions: {}
 
 jobs:
   build:
-
-    # execute on any push or pull request from forked repo
-    if: github.event_name == 'push' || ( github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork )
 
     strategy:
       matrix:
@@ -50,8 +51,8 @@ jobs:
           java-version: 21
           distribution: 'zulu'
           cache: 'maven'
-          # pull requests and dependabot/ branches restore caches without saving their own copies
-          cache-read-only: ${{ github.event_name == 'pull_request' || startsWith(github.ref_name, 'dependabot/') }}
+          # pull requests restore the caches of the branch they target without saving their own copies
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
 
       - name: Set up Maven
         run:
@@ -139,8 +140,8 @@ jobs:
           java-version: ${{ matrix.java }}
           distribution: 'zulu'
           cache: 'maven'
-          # pull requests and dependabot/ branches restore caches without saving their own copies
-          cache-read-only: ${{ github.event_name == 'pull_request' || startsWith(github.ref_name, 'dependabot/') }}
+          # pull requests restore the caches of the branch they target without saving their own copies
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
           show-download-progress: true # ITs verify transfer progress output
 
       - name: Set up Maven
@@ -152,8 +153,8 @@ jobs:
         run: ./mvnw install -e -B -V -Prun-its,embedded -Dmaven.repo.local="$HOME/.m2/repository" -DmavenDistro="$GITHUB_WORKSPACE/built-maven/apache-maven-bin.zip" -f maven-integration-testing/pom.xml
 
       - name: Save ~/.m2/repository
-        # pull requests and dependabot/ branches restore the cache without saving their own copy
-        if: ${{ github.event_name == 'push' && !startsWith(github.ref_name, 'dependabot/') && steps.it-m2-repo.outputs.cache-hit != 'true' && !cancelled() && !failure() }}
+        # pull requests restore the cache without saving their own copy
+        if: ${{ github.event_name == 'push' && steps.it-m2-repo.outputs.cache-hit != 'true' && !cancelled() && !failure() }}
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.m2/repository
