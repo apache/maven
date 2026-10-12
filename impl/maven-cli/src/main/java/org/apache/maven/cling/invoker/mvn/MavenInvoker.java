@@ -51,6 +51,7 @@ import org.apache.maven.cling.event.ExecutionEventLogger;
 import org.apache.maven.cling.invoker.CliUtils;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
+import org.apache.maven.cling.invoker.ProcessRuns;
 import org.apache.maven.cling.transfer.ConsoleMavenTransferListener;
 import org.apache.maven.cling.transfer.QuietMavenTransferListener;
 import org.apache.maven.cling.transfer.SimplexTransferListener;
@@ -614,6 +615,22 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
         for (ExceptionSummary child : summary.getChildren()) {
             logSummary(context, child, references, indent);
+        }
+    }
+
+    @Override
+    protected void preCommands(final MavenContext context) throws Exception {
+        super.preCommands(context);
+
+        try {
+            final long pid = ProcessHandle.current().pid();
+            final String version = String.valueOf(getClass().getPackage().getImplementationVersion());
+            final Path workDir = context.cwd.get();
+            final Path execRoot = context.invokerRequest.rootDirectory().orElse(context.invokerRequest.topDirectory());
+            ProcessRuns.install(version, workDir, execRoot);
+            context.closeables.add(() -> ProcessRuns.uninstall(pid));
+        } catch (final Exception ignored) {
+            // best-effort
         }
     }
 }

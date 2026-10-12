@@ -492,6 +492,10 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             showVersion(context);
             throw new InvokerException.ExitException(0);
         }
+        if (context.options().processes().orElse(false)) {
+            determineWriter(context).accept(ProcessRuns.listAlive());
+            throw new InvokerException.ExitException(0);
+        }
     }
 
     protected void showVersion(C context) {
