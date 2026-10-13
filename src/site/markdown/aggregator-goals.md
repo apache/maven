@@ -45,7 +45,7 @@ When an aggregating goal is invoked from the command line:
          ? Collections.singletonMap(rootProject, allProjects.get(rootProject))
          : allProjects;
      ```
-4. **Ordering**: If the CLI invocation specifies both a lifecycle phase and an aggregator goal (e.g. `mvn clean install site:stage`), the normal lifecycle runs across all modules first, and the aggregator goal executes once at the end on the root module.
+4. **Ordering**: Task segments are produced in CLI argument order — there is no automatic re-sorting. In `mvn clean install site:stage`, the non-aggregating `clean install` segment runs first (across all modules), then the aggregating `site:stage` segment runs once on the root. If the user writes `mvn site:stage install`, the aggregating segment runs first.
 
 ### 1.2 Lifecycle-Bound Execution (`<phase>...</phase>`)
 When an aggregator Mojo is bound to a phase in a `pom.xml`:
@@ -66,9 +66,9 @@ When executing an aggregator Mojo:
 - If `true`, Maven resolves dependencies not only for the current project, but also across all projects in `session.getProjects()` matching the scopes requested by the Mojo.
 
 ### 1.4 Forked Lifecycles
-When an aggregator Mojo declares `@Execute(phase = ...)` or `@Execute(goal = ...)`:
-- `BuildPlanExecutor` creates a forked plan encompassing the current project and all collected sub-projects (`step.project.getCollectedProjects()`).
-- This forks execution across the entire reactor tree, leading to duplicated builds, redundant tests, and nested reactor re-executions.
+When an aggregator Mojo declares `@Execute(phase = ...)` or `@Execute(goal = ...)`, the concurrent builder (`BuildPlanExecutor`) handles each case differently:
+- **`@Execute(phase = ...)`**: A forked plan is computed for the **current project only** (`Collections.singletonMap(step.project, ...)`), up to the specified phase. The main plan is appended after the forked plan as a DAG dependency.
+- **`@Execute(goal = ...)`**: A forked plan is computed for the current project, plus `step.project.getCollectedProjects()` if the mojo is also an aggregator. This means forking a non-aggregator goal targets only the current project; forking an aggregator goal spans the reactor tree rooted at the current project, which can lead to duplicated builds, redundant tests, and nested reactor re-executions.
 
 ---
 
@@ -131,7 +131,7 @@ reactor subprojects have finished their full build** — enforced by the DAG, no
 
 | Problem (section 2) | Concurrent builder solution |
 | :--- | :--- |
-| **CLI vs. lifecycle discrepancy** ([MNG-6336](https://github.com/apache/maven/issues/7529)) | Bind to `after:all` on the root project — runs once after the full reactor, whether invoked via CLI or lifecycle. No `<inherited>false</inherited>` needed. |
+| **CLI vs. lifecycle discrepancy** ([MNG-6336](https://github.com/apache/maven/issues/7529)) | Bind to `after:all` on the root project — runs once after the full reactor. The timing guarantee is enforced by the DAG regardless of whether the goal was invoked via CLI or lifecycle. Note: `<inherited>false</inherited>` is still required if the execution is declared in a parent POM, since the `before:`/`after:` system controls ordering, not inheritance. |
 | **Execution timing** (aggregator runs before children are built) | `after:all` fires after all children complete `all`, which includes `build`/`verify`. Artifact outputs are available. |
 | **`before:each` / `after:each`** | Goals bound to these phases run once per subproject, bracketing each module's full build. Useful for per-module setup/teardown. |
 
