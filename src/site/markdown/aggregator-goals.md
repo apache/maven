@@ -101,8 +101,9 @@ The Maven 4 concurrent builder introduces a first-class solution to several of t
 the `before:` and `after:` phase prefixes and two special reactor-scoped phases: `all` and `each`.
 
 > **Note**: The `before:`/`after:` phase system and the `all`/`each` phases require **model version 4.1.0**
-> (`<modelVersion>4.1.0</modelVersion>`) and the **concurrent builder** (activated via `-b concurrent`,
-> which is the default when using `-T` in Maven 4). They are not supported by the legacy sequential builder.
+> (`<modelVersion>4.1.0</modelVersion>`) and the **concurrent builder** (`ConcurrentLifecycleStarter`,
+> activated via `-b concurrent`). They are not supported by the legacy sequential builder
+> (`DefaultLifecycleStarter`, the default when no `-b` flag is passed).
 
 ### 3.1 The `all` and `each` Phases
 
