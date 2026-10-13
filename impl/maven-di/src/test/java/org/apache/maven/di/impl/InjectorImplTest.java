@@ -158,10 +158,18 @@ public class InjectorImplTest {
 
     @Test
     public void bindInterfacesTest() {
-        Injector injector = Injector.create().bindImplicit(BindInterfaces.class);
+        Injector injector = Injector.create().bindImplicit(BindInterfaces.ClassImpl.class);
         BindInterfaces.TestInterface<String> inst =
                 injector.getInstance(new Key<BindInterfaces.TestInterface<String>>() {});
-        assertNotNull(inst);
+        assertInstanceOf(BindInterfaces.ClassImpl.class, inst);
+    }
+
+    @Test
+    void bindTypedInterfacesTest() {
+        Injector injector = Injector.create().bindImplicit(BindInterfaces.TypedClassImpl.class);
+        BindInterfaces.TestInterface<String> inst =
+                injector.getInstance(new Key<BindInterfaces.TestInterface<String>>() {});
+        assertInstanceOf(BindInterfaces.TypedClassImpl.class, inst);
     }
 
     static class BindInterfaces {

@@ -21,10 +21,18 @@ package org.apache.maven.impl.standalone;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Set;
 
 import org.apache.maven.api.Session;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.di.Key;
+import org.apache.maven.di.impl.Binding;
+import org.apache.maven.di.impl.InjectorImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -37,8 +45,55 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class ApiRunnerSettingsTest {
 
+    private static final String OTHER_SESSION_NAME = "other";
+
     @TempDir
     Path tempDir;
+
+    @Test
+    void testNamedSessionProviderDoesNotReplaceStandaloneSession() throws IOException {
+        Path installation = Files.createDirectories(tempDir.resolve("installation"));
+        Path localRepository = tempDir.resolve("requested-repository");
+        String oldHome = System.getProperty("user.home");
+        String oldMavenHome = System.getProperty("maven.home");
+        try {
+            System.setProperty("user.home", tempDir.toString());
+            System.setProperty("maven.home", installation.toString());
+            Session session = ApiRunner.createSession(
+                    injector -> {
+                        injector.bindImplicit(OtherSessionProvider.class);
+                        InjectorImpl impl = (InjectorImpl) injector;
+                        Set<Binding<?>> ordered =
+                                new LinkedHashSet<>(impl.getBindings().get(Key.of(Session.class, OTHER_SESSION_NAME)));
+                        ordered.addAll(impl.getBindings().get(Key.of(Session.class)));
+                        impl.getBindings().put(Key.of(Session.class), ordered);
+                    },
+                    localRepository,
+                    ApiRunner.SecurityMode.NONE);
+
+            assertEquals(localRepository, session.getLocalRepository().path());
+            assertEquals(
+                    List.of("central"),
+                    session.getRemoteRepositories().stream().map(r -> r.id()).toList());
+        } finally {
+            System.setProperty("user.home", oldHome);
+            if (oldMavenHome != null) {
+                System.setProperty("maven.home", oldMavenHome);
+            } else {
+                System.clearProperty("maven.home");
+            }
+        }
+    }
+
+    static class OtherSessionProvider {
+        @Provides
+        @Named(OTHER_SESSION_NAME)
+        static Session createSession() {
+            Session session = ApiRunner.createSession(null, null, ApiRunner.SecurityMode.NONE);
+            return session.withRemoteRepositories(
+                    List.of(session.createRemoteRepository(OTHER_SESSION_NAME, "https://repository.example.invalid")));
+        }
+    }
 
     @Test
     void testSecurityModeNone() {
