@@ -202,7 +202,6 @@ public class InjectorImpl implements Injector {
             return false;
         }
         Object firstIdentity = first.getRegistrationIdentity();
-        Object firstIdentity = first.getRegistrationIdentity();
         Object secondIdentity = second.getRegistrationIdentity();
         // Both sides have explicit identities: use equals-based comparison (e.g. two initialized
         // bindings wrapping the same source class). If only one side has an explicit identity,
