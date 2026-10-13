@@ -20,6 +20,9 @@
     <artifactId>resolved-model-with-profiles</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
+    <properties>
+        <pom.declared.prop>hello</pom.declared.prop>
+    </properties>
     <profiles>
         <profile>
             <id>file-condition</id>
@@ -62,6 +65,18 @@
             </activation>
             <properties>
                 <profile.missing.condition>activated</profile.missing.condition>
+            </properties>
+        </profile>
+        <!-- POM-declared property activation: suppressed in external builds (see #13390) -->
+        <profile>
+            <id>pom-declared-property-condition</id>
+            <activation>
+                <property>
+                    <name>pom.declared.prop</name>
+                </property>
+            </activation>
+            <properties>
+                <profile.pom.property>activated</profile.pom.property>
             </properties>
         </profile>
         <!-- default-on profile: fires when 'skip.defaults' is absent; suppressed when set as system property -->

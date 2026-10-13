@@ -174,6 +174,9 @@ class DefaultModelBuilderTest {
         // genuinely doesn't exist on the developer's machine — normal project-build behaviour.
         assertEquals("activated", model.getProperties().get("profile.missing.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // POM-declared properties do not drive profile activation in any context:
+        // the PropertyProfileActivator only checks user → system properties.
+        assertNull(model.getProperties().get("profile.pom.property"));
         assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
@@ -195,6 +198,8 @@ class DefaultModelBuilderTest {
         // to !false = true and fires unconditionally — same footgun as <file><missing>.
         assertNull(model.getProperties().get("profile.missing.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // POM-declared property must not self-activate a profile in external builds (#13390).
+        assertNull(model.getProperties().get("profile.pom.property"));
         // Negated-property profile (!skip.defaults) fires because 'skip.defaults' is absent
         // from the sandboxed context (user properties are suppressed; system properties do not
         // contain it). This is the common opt-out flag pattern: the publisher's default-on
@@ -274,6 +279,8 @@ class DefaultModelBuilderTest {
         assertEquals("activated", model.getProperties().get("profile.property"));
         assertEquals("activated", model.getProperties().get("profile.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // POM-declared properties do not drive profile activation even in caller-supplied builds.
+        assertNull(model.getProperties().get("profile.pom.property"));
         assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
