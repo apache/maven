@@ -53,10 +53,6 @@
               <phase>post-site</phase>
               <phase>site-deploy</phase>
             </phases>
-            <default-phases>
-              <site>org.apache.maven.plugins:maven-site-plugin:site</site>
-              <site-deploy>org.apache.maven.plugins:maven-site-plugin:deploy</site-deploy>
-            </default-phases>
           </lifecycle>
         </lifecycles>
       </configuration>
@@ -72,13 +68,9 @@
             <!-- START SNIPPET: pom-lifecycle -->
 
             <phases>
-              <package>org.apache.maven.plugins:maven-site-plugin:attach-descriptor</package>
               <install>org.apache.maven.plugins:maven-install-plugin:install</install>
               <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
             </phases>
-            <optional-mojos>
-              <optional-mojo>org.apache.maven.plugins:maven-site-plugin:attach-descriptor</optional-mojo>
-            </optional-mojos>
             <!-- END SNIPPET: pom-lifecycle -->
           </lifecycle>
         </lifecycles>
@@ -95,15 +87,11 @@
             <!-- START SNIPPET: pom-lifecycle -->
             <phases>
               <package>
-                org.apache.maven.plugins:maven-site-plugin:attach-descriptor,
                 org.apache.maven.plugins:maven-clean-plugin:clean
               </package>
               <install>org.apache.maven.plugins:maven-install-plugin:install</install>
               <deploy>org.apache.maven.plugins:maven-deploy-plugin:deploy</deploy>
             </phases>
-            <optional-mojos>
-              <optional-mojo>org.apache.maven.plugins:maven-site-plugin:attach-descriptor</optional-mojo>
-            </optional-mojos>
             <!-- END SNIPPET: pom-lifecycle -->
           </lifecycle>
         </lifecycles>
