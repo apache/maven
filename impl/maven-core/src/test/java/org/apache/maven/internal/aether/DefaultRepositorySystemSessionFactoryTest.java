@@ -164,6 +164,37 @@ public class DefaultRepositorySystemSessionFactoryTest {
     }
 
     @Test
+    void versionedDependencyCollectorSkipperIsDefaultAndCanBeOverridden() throws InvalidRepositoryException {
+        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Collections.emptyMap(),
+                versionFilterBuilder);
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        assertEquals(
+                "versioned",
+                systemSessionFactory
+                        .newRepositorySession(request)
+                        .getConfigProperties()
+                        .get("aether.dependencyCollector.bf.skipper"));
+
+        Properties properties = new Properties();
+        properties.setProperty("aether.dependencyCollector.bf.skipper", "versionless");
+        request.setSystemProperties(properties);
+        assertEquals(
+                "versionless",
+                systemSessionFactory
+                        .newRepositorySession(request)
+                        .getConfigProperties()
+                        .get("aether.dependencyCollector.bf.skipper"));
+    }
+
+    @Test
     void wagonProviderConfigurationTest() throws InvalidRepositoryException {
         Server server = new Server();
         server.setId("repository");

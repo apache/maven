@@ -85,6 +85,8 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
 
     public static final String MAVEN_RESOLVER_TRANSPORT_DEFAULT = "default";
 
+    private static final String MAVEN_RESOLVER_BF_COLLECTOR_SKIPPER = "aether.dependencyCollector.bf.skipper";
+
     public static final String MAVEN_RESOLVER_TRANSPORT_WAGON = "wagon";
 
     public static final String MAVEN_RESOLVER_TRANSPORT_APACHE = "apache";
@@ -194,6 +196,10 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         configProps.put(ConfigurationProperties.INTERACTIVE, request.isInteractiveMode());
         configProps.put("maven.startTime", request.getStartTime());
         configProps.put(Constants.MAVEN_START_INSTANT, request.getStartInstant());
+        if (!mergedProps.containsKey(MAVEN_RESOLVER_BF_COLLECTOR_SKIPPER)) {
+            // Keep dependencies of the eventual version-range winner when another version was visited first.
+            configProps.put(MAVEN_RESOLVER_BF_COLLECTOR_SKIPPER, "versioned");
+        }
 
         sessionBuilder.setOffline(request.isOffline());
         sessionBuilder.setChecksumPolicy(request.getGlobalChecksumPolicy());
