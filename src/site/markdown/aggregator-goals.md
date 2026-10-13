@@ -100,10 +100,10 @@ Over successive Maven releases, multiple discrepancies and pain points have been
 The Maven 4 concurrent builder introduces a first-class solution to several of the shortcomings above through
 the `before:` and `after:` phase prefixes and two special reactor-scoped phases: `all` and `each`.
 
-> **Note**: The `before:`/`after:` phase system and the `all`/`each` phases require **model version 4.1.0**
-> (`<modelVersion>4.1.0</modelVersion>`) and the **concurrent builder** (`ConcurrentLifecycleStarter`,
-> activated via `-b concurrent`). They are not supported by the legacy sequential builder
-> (`DefaultLifecycleStarter`, the default when no `-b` flag is passed).
+> **Note**: The `before:`/`after:` phase system and the `all`/`each` phases require the **concurrent builder**
+> (`ConcurrentLifecycleStarter`, activated via `-b concurrent`). They work with any POM model version
+> (4.0.0 or 4.1.0) — no model version upgrade is required. They are not supported by the legacy
+> singlethreaded or multithreaded builders (`DefaultLifecycleStarter`, the default when no `-b` flag is passed).
 
 ### 3.1 The `all` and `each` Phases
 
@@ -138,7 +138,7 @@ reactor subprojects have finished their full build** — enforced by the DAG, no
 ### 3.3 Example: Aggregated Javadoc after the Full Reactor
 
 ```xml
-<!-- model version 4.1.0 only, on the root project -->
+<!-- requires -b concurrent; works with any model version -->
 <execution>
   <id>aggregate-javadoc</id>
   <goals><goal>aggregate</goal></goals>
