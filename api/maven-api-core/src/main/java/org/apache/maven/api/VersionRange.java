@@ -48,13 +48,35 @@ public interface VersionRange {
      * Returns the upper boundary of this range, or {@code null} if none.
      */
     @Nullable
-    Boundary getUpperBoundary();
+    Boundary upperBoundary();
+
+    /**
+     * Returns the upper boundary of this range, or {@code null} if none.
+     *
+     * @deprecated Use {@link #upperBoundary()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nullable
+    default Boundary getUpperBoundary() {
+        return upperBoundary();
+    }
 
     /**
      * Returns the lower boundary of this range, or {@code null} if none.
      */
     @Nullable
-    Boundary getLowerBoundary();
+    Boundary lowerBoundary();
+
+    /**
+     * Returns the lower boundary of this range, or {@code null} if none.
+     *
+     * @deprecated Use {@link #lowerBoundary()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nullable
+    default Boundary getLowerBoundary() {
+        return lowerBoundary();
+    }
 
     /**
      * {@return the string representation of this version}
@@ -70,7 +92,17 @@ public interface VersionRange {
         /**
          * The bounding version.
          */
-        Version getVersion();
+        Version version();
+
+        /**
+         * The bounding version.
+         *
+         * @deprecated Use {@link #version()} instead.
+         */
+        @Deprecated(since = "4.1.0", forRemoval = true)
+        default Version getVersion() {
+            return version();
+        }
 
         /**
          * Returns {@code true} if version is included of the range.

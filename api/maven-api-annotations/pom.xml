@@ -30,4 +30,8 @@
   <name>Maven 4 API :: Meta annotations</name>
   <description>Maven 4 API - Java meta annotations.</description>
 
+  <properties>
+    <javaModuleName>org.apache.maven.api.annotations</javaModuleName>
+  </properties>
+
 </project>

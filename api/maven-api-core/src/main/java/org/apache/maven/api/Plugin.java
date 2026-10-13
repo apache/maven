@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 
@@ -36,17 +37,13 @@ import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
  * </p>
  *
  * @since 4.0.0
- * @see MojoExecution#getPlugin()
+ * @see MojoExecution#plugin()
  */
 @Experimental
 public interface Plugin {
 
-    /**
-     * Returns the POM model representation of this plugin.
-     *
-     * @return the plugin model from the POM, never {@code null}
-     */
-    @Nonnull
+    /** {@return the POM model representation of this plugin, or {@code null} if not available} */
+    @Nullable
     org.apache.maven.api.model.Plugin getModel();
 
     /**
@@ -73,12 +70,8 @@ public interface Plugin {
     @Nonnull
     ClassLoader getClassLoader();
 
-    /**
-     * Returns the primary {@link Artifact} of this plugin.
-     *
-     * @return the plugin artifact, never {@code null}
-     */
-    @Nonnull
+    /** {@return the primary artifact of this plugin, or {@code null} if not available} */
+    @Nullable
     Artifact getArtifact();
 
     /**

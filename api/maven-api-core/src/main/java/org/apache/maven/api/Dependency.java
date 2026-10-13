@@ -41,19 +41,47 @@ public interface Dependency extends Artifact {
      * a modular-<abbr>JAR</abbr> if it is intended to be placed on the module path,
      * a <abbr>JAR</abbr> containing test classes, <i>etc.</i>
      *
-     * @see DependencyCoordinates#getType()
+     * @see DependencyCoordinates#type()
      */
     @Nonnull
-    Type getType();
+    Type type();
+
+    /**
+     * {@return the type of the dependency}.
+     * A dependency can be a <abbr>JAR</abbr> file,
+     * a modular-<abbr>JAR</abbr> if it is intended to be placed on the module path,
+     * a <abbr>JAR</abbr> containing test classes, <i>etc.</i>
+     *
+     * @see DependencyCoordinates#getType()
+     * @deprecated Use {@link #type()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nonnull
+    default Type getType() {
+        return type();
+    }
+
+    /**
+     * {@return the time at which the dependency will be used}.
+     * It may be, for example, at compile time only, at run time or at test time.
+     *
+     * @see DependencyCoordinates#scope()
+     */
+    @Nonnull
+    DependencyScope scope();
 
     /**
      * {@return the time at which the dependency will be used}.
      * It may be, for example, at compile time only, at run time or at test time.
      *
      * @see DependencyCoordinates#getScope()
+     * @deprecated Use {@link #scope()} instead.
      */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     @Nonnull
-    DependencyScope getScope();
+    default DependencyScope getScope() {
+        return scope();
+    }
 
     /**
      * Returns whether the dependency is optional or mandatory.
@@ -61,7 +89,7 @@ public interface Dependency extends Artifact {
      * The value is computed during the dependencies collection phase.
      *
      * @return {@code true} if the dependency is optional, or {@code false} if mandatory
-     * @see DependencyCoordinates#getOptional()
+     * @see DependencyCoordinates#optional()
      */
     boolean isOptional();
 

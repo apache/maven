@@ -30,6 +30,10 @@ under the License.
   <name>Maven 4 Logging</name>
   <description>Provides the Maven Logging infrastructure</description>
 
+  <properties>
+    <javaModuleName>org.apache.maven.logging</javaModuleName>
+  </properties>
+
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>

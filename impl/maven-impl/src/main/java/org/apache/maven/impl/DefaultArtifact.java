@@ -38,14 +38,14 @@ public class DefaultArtifact implements Artifact {
     public DefaultArtifact(@Nonnull InternalSession session, @Nonnull org.eclipse.aether.artifact.Artifact artifact) {
         this.session = requireNonNull(session, "session");
         this.artifact = requireNonNull(artifact, "artifact");
-        this.key = getGroupId()
+        this.key = groupId()
                 + ':'
-                + getArtifactId()
+                + artifactId()
                 + ':'
-                + getExtension()
-                + (getClassifier().isEmpty() ? "" : ":" + getClassifier())
+                + extension()
+                + (classifier().isEmpty() ? "" : ":" + classifier())
                 + ':'
-                + getVersion();
+                + version();
     }
 
     public org.eclipse.aether.artifact.Artifact getArtifact() {
@@ -59,36 +59,36 @@ public class DefaultArtifact implements Artifact {
 
     @Nonnull
     @Override
-    public String getGroupId() {
+    public String groupId() {
         return artifact.getGroupId();
     }
 
     @Nonnull
     @Override
-    public String getArtifactId() {
+    public String artifactId() {
         return artifact.getArtifactId();
     }
 
     @Nonnull
     @Override
-    public Version getVersion() {
+    public Version version() {
         return session.parseVersion(artifact.getVersion());
     }
 
     @Override
-    public Version getBaseVersion() {
+    public Version baseVersion() {
         return session.parseVersion(artifact.getBaseVersion());
     }
 
     @Nonnull
     @Override
-    public String getExtension() {
+    public String extension() {
         return artifact.getExtension();
     }
 
     @Nonnull
     @Override
-    public String getClassifier() {
+    public String classifier() {
         return artifact.getClassifier();
     }
 

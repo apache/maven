@@ -40,30 +40,30 @@ class ArtifactCoordinatesTest {
             String groupId, String artifactId, String extension, String classifier, String version) {
         return new ArtifactCoordinates() {
             @Override
-            public String getGroupId() {
+            public String groupId() {
                 return groupId;
             }
 
             @Override
-            public String getArtifactId() {
+            public String artifactId() {
                 return artifactId;
             }
 
             @Override
-            public String getClassifier() {
+            public String classifier() {
                 return classifier;
             }
 
             @Override
-            public VersionConstraint getVersionConstraint() {
+            public VersionConstraint versionConstraint() {
                 return new VersionConstraint() {
                     @Override
-                    public VersionRange getVersionRange() {
+                    public VersionRange versionRange() {
                         return null;
                     }
 
                     @Override
-                    public Version getRecommendedVersion() {
+                    public Version recommendedVersion() {
                         return null;
                     }
 
@@ -80,7 +80,7 @@ class ArtifactCoordinatesTest {
             }
 
             @Override
-            public String getExtension() {
+            public String extension() {
                 return extension;
             }
         };

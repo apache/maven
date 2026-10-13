@@ -153,7 +153,7 @@ under the License.
 
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
     <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
-    <jlineVersion>4.4.6</jlineVersion>
+    <jlineVersion>4.4.7</jlineVersion>
     <jmhVersion>1.37</jmhVersion>
     <junitVersion>6.1.3</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
@@ -689,7 +689,7 @@ under the License.
       <dependency>
         <groupId>eu.maveniverse.maven.mimir</groupId>
         <artifactId>testing</artifactId>
-        <version>0.12.3</version>
+        <version>0.12.4</version>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
@@ -731,7 +731,7 @@ under the License.
         <plugin>
           <groupId>com.github.siom79.japicmp</groupId>
           <artifactId>japicmp-maven-plugin</artifactId>
-          <version>0.26.2</version>
+          <version>0.26.3</version>
           <executions>
             <execution>
               <goals>
@@ -819,6 +819,26 @@ under the License.
               <version>${asmVersion}</version>
             </dependency>
           </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <configuration>
+            <archive>
+              <manifestEntries>
+                <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
+              </manifestEntries>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <sourceFileExcludes>
+              <sourceFileExclude>module-info.java</sourceFileExclude>
+            </sourceFileExcludes>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.rat</groupId>
@@ -958,6 +978,22 @@ under the License.
   </build>
 
   <profiles>
+    <profile>
+      <!-- palantir-java-format crashes on JDK 27 (palantir/palantir-java-format#1786);
+           drop this profile once maven-parent ships a fixed release.
+           Activated by property, not <jdk>: the model builder tests build this POM in sessions
+           without java.version, where a <jdk> activation is an error. -->
+      <id>jdk27-skip-spotless</id>
+      <activation>
+        <property>
+          <name>java.specification.version</name>
+          <value>27</value>
+        </property>
+      </activation>
+      <properties>
+        <spotless.skip>true</spotless.skip>
+      </properties>
+    </profile>
     <profile>
       <id>mockito</id>
       <activation>
@@ -1157,6 +1193,10 @@ under the License.
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
+              <legacyMode>true</legacyMode>
+              <sourceFileExcludes>
+                <sourceFileExclude>module-info.java</sourceFileExclude>
+              </sourceFileExcludes>
               <tags>
                 <tag>
                   <name>provisional</name>

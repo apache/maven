@@ -21,8 +21,8 @@ package org.apache.maven.api;
 import java.util.Optional;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.PluginExecution;
 import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.api.xml.XmlNode;
@@ -32,65 +32,54 @@ import org.apache.maven.api.xml.XmlNode;
  * An instance of this object is bound to the {@link org.apache.maven.api.di.MojoExecutionScoped}
  * and available as {@code mojoExecution} within {@link org.apache.maven.api.plugin.annotations.Parameter}
  * expressions.
+ * <p>
+ * Instances are immutable snapshots taken at the point when execution begins (after configuration
+ * merging, descriptor resolution, and lifecycle phase assignment are all complete).
  *
  * @since 4.0.0
  */
 @Experimental
+@Immutable
 public interface MojoExecution {
 
-    /**
-     * Returns the runtime {@link Plugin} associated with this execution.
-     *
-     * @return the plugin runtime, never {@code null}
-     */
+    /** {@return the plugin that owns this execution} */
     @Nonnull
-    Plugin getPlugin();
+    Plugin plugin();
 
     /**
-     * Returns the POM model {@link PluginExecution} corresponding to this execution.
-     *
-     * @return the plugin execution model, never {@code null}
+     * {@return the {@code <execution>} element from the POM (or from the default lifecycle bindings)
+     * that corresponds to this execution, or empty for a direct CLI invocation
+     * (e.g. {@code mvn groupId:artifactId:goal})}
+     * <p>
+     * Default lifecycle bindings (such as {@code maven-compiler-plugin:compile} bound to the
+     * {@code compile} phase for {@code jar} packaging) are synthesised from lifecycle mapping
+     * metadata and injected as {@code <execution>} elements before model resolution, so they
+     * are also present here.  Only a CLI-invoked goal — which has no backing {@code <plugin>}
+     * entry in the model — results in an empty {@code Optional}.
      */
     @Nonnull
-    PluginExecution getModel();
+    Optional<PluginExecution> model();
+
+    /** {@return the descriptor of the mojo being executed} */
+    @Nonnull
+    MojoDescriptor descriptor();
 
     /**
-     * Returns the {@link MojoDescriptor} describing the mojo to be executed.
-     *
-     * @return the mojo descriptor, never {@code null}
+     * {@return the execution identifier as declared in the POM, or empty for a direct CLI invocation
+     * (e.g. {@code mvn groupId:artifactId:goal}) where no {@code <execution>} element is present}
      */
     @Nonnull
-    MojoDescriptor getDescriptor();
+    Optional<String> executionId();
 
-    /**
-     * Returns the unique execution identifier within the plugin configuration.
-     *
-     * @return the execution ID, never {@code null}
-     */
+    /** {@return the goal being executed} */
     @Nonnull
-    String getExecutionId();
+    String goal();
 
-    /**
-     * Returns the goal name executed by this mojo.
-     *
-     * @return the mojo goal, never {@code null}
-     */
+    /** {@return the lifecycle phase this execution is bound to, or empty for a direct CLI invocation} */
     @Nonnull
-    String getGoal();
+    Optional<String> lifecyclePhase();
 
-    /**
-     * Returns the build lifecycle phase to which this execution is bound.
-     *
-     * @return the lifecycle phase name, or {@code null} if not bound to a phase
-     */
-    @Nullable
-    String getLifecyclePhase();
-
-    /**
-     * Returns the effective XML configuration for this mojo execution, if present.
-     *
-     * @return an {@link Optional} containing the XML configuration node, or empty if none configured
-     */
+    /** {@return the merged configuration for this execution, if any} */
     @Nonnull
-    Optional<XmlNode> getConfiguration();
+    Optional<XmlNode> configuration();
 }
