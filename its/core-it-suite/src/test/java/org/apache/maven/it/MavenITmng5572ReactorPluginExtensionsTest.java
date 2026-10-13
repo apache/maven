@@ -59,12 +59,18 @@ public class MavenITmng5572ReactorPluginExtensionsTest extends AbstractMavenInte
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        if (getMavenVersion().getMajorVersion() <= 3) {
-            verifier.verifyTextInLog(
-                    "[WARNING] project uses org.apache.maven.its.mng5572:plugin as extensions, which is not possible within the same reactor build. This plugin was pulled from the local repository!");
-        } else {
-            verifier.verifyTextInLog(
-                    "[WARNING] 'project' uses 'org.apache.maven.its.mng5572:plugin' as extension which is not possible within the same reactor build. This plugin was pulled from the local repository!");
-        }
+        verifier.verifyTextInLog(
+                "[WARNING] 'project' uses 'org.apache.maven.its.mng5572:plugin' as extension which is not possible within the same reactor build. This plugin was pulled from the local repository!");
+
+        // MNG-8092: no warning when the plugin project is excluded from the reactor
+        Verifier excluded = newVerifier(testDir.getAbsolutePath());
+        excluded.setLogFileName("log3.txt");
+        excluded.setAutoclean(false);
+        excluded.addCliArgument("-pl");
+        excluded.addCliArgument("!plugin");
+        excluded.addCliArgument("validate");
+        excluded.execute();
+        excluded.verifyErrorFreeLog();
+        excluded.verifyTextNotInLog("as extension which is not possible within the same reactor build");
     }
 }
