@@ -84,7 +84,7 @@ under the License.
     <maven.compiler.release>17</maven.compiler.release>
 
     <wagonVersion>3.5.3</wagonVersion>
-    <asmVersion>9.10.1</asmVersion>
+    <asmVersion>9.11</asmVersion>
     <plexusUtilsVersion>4.1.0</plexusUtilsVersion>
     <plexusXmlVersion>4.2.0</plexusXmlVersion>
 
@@ -273,7 +273,7 @@ under the License.
       <dependency>
         <groupId>org.slf4j</groupId>
         <artifactId>slf4j-api</artifactId>
-        <version>2.0.19</version>
+        <version>2.0.20</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>

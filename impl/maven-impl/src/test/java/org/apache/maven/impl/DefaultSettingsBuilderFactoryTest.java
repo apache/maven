@@ -162,6 +162,23 @@ class DefaultSettingsBuilderFactoryTest {
     }
 
     @Test
+    void testSettingsWithServerRepositoryOrigins() {
+        Settings settings = execute("settings-servers-4").getEffectiveSettings();
+
+        List<Server> servers = settings.getServers();
+        assertEquals(2, servers.size());
+
+        List<String> repositoryOrigins = List.of("https://repo.example.org", "https://mirror.example.org:8443");
+
+        Server server1 = getServerById(servers, "server-1");
+        assertEquals(repositoryOrigins, server1.getRepositoryOrigins());
+
+        // an alias is the same credentials under another id, so it is bound to the same origins
+        Server server11 = getServerById(servers, "server-11");
+        assertEquals(repositoryOrigins, server11.getRepositoryOrigins());
+    }
+
+    @Test
     void testRelativeLocalRepositoryIsResolvedToAbsolute() {
         Settings settings = execute("settings-relative-local-repo").getEffectiveSettings();
 

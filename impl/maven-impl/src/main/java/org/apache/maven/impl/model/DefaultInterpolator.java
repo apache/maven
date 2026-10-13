@@ -39,6 +39,8 @@ public class DefaultInterpolator implements Interpolator {
     private static final String DELIM_START = "${";
     private static final String DELIM_STOP = "}";
     private static final String MARKER = "$__";
+    private static final String OP_DEFAULT = ":-";
+    private static final String OP_ALTERNATE = ":+";
 
     @Override
     public void interpolate(
@@ -295,8 +297,8 @@ public class DefaultInterpolator implements Interpolator {
         String substValue = null;
 
         while (startIdx < variable.length()) {
-            int idx1 = variable.indexOf(":-", startIdx);
-            int idx2 = variable.indexOf(":+", startIdx);
+            int idx1 = variable.indexOf(OP_DEFAULT, startIdx);
+            int idx2 = variable.indexOf(OP_ALTERNATE, startIdx);
             int idx = idx1 >= 0 ? idx2 >= 0 ? Math.min(idx1, idx2) : idx1 : idx2;
 
             if (idx < 0) {
@@ -317,8 +319,8 @@ public class DefaultInterpolator implements Interpolator {
             }
 
             // Find the end of the current operator's value
-            int nextIdx1 = variable.indexOf(":-", idx + 2);
-            int nextIdx2 = variable.indexOf(":+", idx + 2);
+            int nextIdx1 = variable.indexOf(OP_DEFAULT, idx + 2);
+            int nextIdx2 = variable.indexOf(OP_ALTERNATE, idx + 2);
             int nextIdx = nextIdx1 >= 0 ? nextIdx2 >= 0 ? Math.min(nextIdx1, nextIdx2) : nextIdx1 : nextIdx2;
 
             String op = variable.substring(idx, idx + 2);
@@ -329,20 +331,19 @@ public class DefaultInterpolator implements Interpolator {
                     opValue, variable, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
 
             // Apply the operator
-            if (":+".equals(op)) {
+            if (OP_ALTERNATE.equals(op)) {
                 if (substValue != null && !substValue.isEmpty()) {
                     substValue = processedOpValue;
                     // Skip any remaining operators since we've made a decision
                     break;
                 }
-            } else if (":-".equals(op)) {
+            } else {
+                // OP_DEFAULT: op can only be OP_DEFAULT here since idx was found by indexOf
                 if (substValue == null || substValue.isEmpty()) {
                     substValue = processedOpValue;
                     // Skip any remaining operators since we've made a decision
                     break;
                 }
-            } else {
-                throw new InterpolatorException("Bad substitution operator in: ${" + variable + "}");
             }
 
             startIdx = nextIdx >= 0 ? nextIdx : variable.length();

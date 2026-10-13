@@ -120,8 +120,8 @@ public interface ProjectManager extends Service {
         String name = path.getFileName().toString();
         int dot = name.lastIndexOf('.');
         String ext = dot >= 1 ? name.substring(dot + 1) : "";
-        ProducedArtifact artifact = session.createProducedArtifact(
-                project.getGroupId(), project.getArtifactId(), project.getVersion(), ext);
+        ProducedArtifact artifact =
+                session.createProducedArtifact(project.groupId(), project.artifactId(), project.version(), ext);
         attachArtifact(project, artifact, path);
     }
 
@@ -137,7 +137,7 @@ public interface ProjectManager extends Service {
     default void attachArtifact(
             @Nonnull Session session, @Nonnull Project project, @Nonnull String type, @Nonnull Path path) {
         ProducedArtifact artifact = session.createProducedArtifact(
-                project.getGroupId(), project.getArtifactId(), project.getVersion(), null, null, type);
+                project.groupId(), project.artifactId(), project.version(), null, null, type);
         attachArtifact(project, artifact, path);
     }
 

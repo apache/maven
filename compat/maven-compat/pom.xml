@@ -255,6 +255,15 @@ under the License.
           </execution>
         </executions>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <additionalJOptions>
+            <additionalJOption>--add-exports=org.codehaus.plexus.interpolation/org.codehaus.plexus.interpolation.util=org.apache.maven.compat</additionalJOption>
+          </additionalJOptions>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 

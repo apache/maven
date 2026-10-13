@@ -33,7 +33,7 @@ permissions: {}
 
 env:
   # Keep in sync with mimir testing version in pom.xml
-  MIMIR_VERSION: 0.12.3
+  MIMIR_VERSION: 0.12.4
   MIMIR_BASEDIR: ~/.mimir
   MIMIR_LOCAL: ~/.mimir/local
   MAVEN_OPTS: -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath=./target/java_heapdump.hprof
@@ -47,6 +47,8 @@ env:
 jobs:
   initial-build:
     runs-on: ubuntu-latest
+    outputs:
+      pom-hash: ${{ steps.pom-hash.outputs.hash }}
     steps:
       - name: Set up JDK
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
@@ -58,6 +60,11 @@ jobs:
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
+
+      - name: Hash the POMs for the Mimir cache key
+        id: pom-hash
+        shell: bash
+        run: echo "hash=${{ hashFiles('**/pom.xml') }}" >> "$GITHUB_OUTPUT"
 
       - name: Verify Mimir version alignment
         shell: bash
@@ -77,17 +84,18 @@ jobs:
           cp .github/ci-extensions.xml .mvn/extensions.xml
 
       - name: Restore Mimir caches
+        id: mimir-restore
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: master-${{ runner.os }}-${{ github.run_id }}
+          key: master-${{ runner.os }}-${{ steps.pom-hash.outputs.hash }}
           restore-keys: |
             master-${{ runner.os }}-
             master-
 
       - name: Set up Maven
         shell: bash
-        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=4.0.0-rc-6"
+        run: mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=4.0.0-rc-7"
 
       - name: Prepare Mimir for Maven 4.x
         shell: bash
@@ -105,15 +113,16 @@ jobs:
         run: ls -la apache-maven/target
 
       - name: Upload Mimir caches
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: ${{ !cancelled() && !failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        # only consolidate-caches reads these, and it saves only on push when the key is not stored yet
+        if: ${{ github.event_name != 'pull_request' && steps.mimir-restore.outputs.cache-hit != 'true' && !cancelled() && !failure() }}
         with:
           name: cache-${{ runner.os }}-initial
           retention-days: 1
           path: ${{ env.MIMIR_LOCAL }}
 
       - name: Upload Maven distributions
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         with:
           name: maven-distributions
           path: |
@@ -121,7 +130,7 @@ jobs:
             apache-maven/target/apache-maven*.tar.gz
 
       - name: Upload test artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ failure() || cancelled() }}
         with:
           name: initial-logs
@@ -131,7 +140,7 @@ jobs:
             **/target/java_heapdump.hprof
 
       - name: Upload Mimir logs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: initial-mimir-logs
@@ -147,13 +156,16 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        java: ['17', '21', '25']
+        java: ['17', '25', '27']
     steps:
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
+          # JDKs missing from the runners' tool cache (non-LTS) are restored from the Actions cache
+          cache-jdk: true
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
 
       - name: Install Graphviz (MacOS)
         if: runner.os == 'macOS'
@@ -182,16 +194,17 @@ jobs:
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Restore Mimir caches
+        id: mimir-restore
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: master-${{ runner.os }}-${{ github.run_id }}
+          key: master-${{ runner.os }}-${{ needs.initial-build.outputs.pom-hash }}
           restore-keys: |
             master-${{ runner.os }}-
             master-
 
       - name: Download Maven distribution
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: maven-distributions
           path: maven-dist
@@ -226,15 +239,16 @@ jobs:
         run: mvn site -e -B -V -Preporting
 
       - name: Upload Mimir caches
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: ${{ !cancelled() && !failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        # only consolidate-caches reads these, and it saves only on push when the key is not stored yet
+        if: ${{ github.event_name != 'pull_request' && steps.mimir-restore.outputs.cache-hit != 'true' && !cancelled() && !failure() }}
         with:
           name: cache-${{ runner.os }}-full-build-${{ matrix.java }}
           retention-days: 1
           path: ${{ env.MIMIR_LOCAL }}
 
       - name: Upload test artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: failure() || cancelled()
         with:
           name: full-build-logs-${{ runner.os }}-${{ matrix.java }}
@@ -244,7 +258,7 @@ jobs:
             **/target/java_heapdump.hprof
 
       - name: Upload Mimir logs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: full-build-mimir-logs-${{ runner.os }}-${{ matrix.java }}
@@ -260,13 +274,16 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
-        java: ['17', '21', '25']
+        java: ['17', '25', '27']
     steps:
       - name: Set up JDK ${{ matrix.java }}
         uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
         with:
           java-version: ${{ matrix.java }}
           distribution: 'temurin'
+          # JDKs missing from the runners' tool cache (non-LTS) are restored from the Actions cache
+          cache-jdk: true
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
 
       - name: Checkout maven
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -283,16 +300,17 @@ jobs:
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Restore Mimir caches
+        id: mimir-restore
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: master-${{ runner.os }}-${{ github.run_id }}
+          key: master-${{ runner.os }}-${{ needs.initial-build.outputs.pom-hash }}
           restore-keys: |
             master-${{ runner.os }}-
             master-
 
       - name: Download Maven distribution
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: maven-distributions
           path: maven-dist
@@ -323,15 +341,16 @@ jobs:
         run: mvn install -e -B -V -Prun-its,mimir
 
       - name: Upload Mimir caches
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
-        if: ${{ !cancelled() && !failure() }}
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        # only consolidate-caches reads these, and it saves only on push when the key is not stored yet
+        if: ${{ github.event_name != 'pull_request' && steps.mimir-restore.outputs.cache-hit != 'true' && !cancelled() && !failure() }}
         with:
           name: cache-${{ runner.os }}-integration-tests-${{ matrix.java }}
           retention-days: 1
           path: ${{ env.MIMIR_LOCAL }}
 
       - name: Upload test artifacts
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ failure() || cancelled() }}
         with:
           name: integration-test-logs-${{ runner.os }}-${{ matrix.java }}
@@ -343,7 +362,7 @@ jobs:
             **/target/java_heapdump.hprof
 
       - name: Upload Mimir logs
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: always()
         with:
           name: integration-test-mimir-logs-${{ runner.os }}-${{ matrix.java }}
@@ -367,18 +386,29 @@ jobs:
       matrix:
         os: [ubuntu-latest, macos-latest, windows-latest]
     needs:
+      - initial-build
       - full-build
       - integration-tests
     steps:
+      # The key changes only with the POMs; an entry saved under it is never replaced,
+      # so a run whose POMs match a stored entry has nothing to publish.
+      - name: Look up the cache
+        id: lookup
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ${{ env.MIMIR_LOCAL }}
+          key: master-${{ runner.os }}-${{ needs.initial-build.outputs.pom-hash }}
+          lookup-only: true
       - name: Download Caches
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        if: steps.lookup.outputs.cache-hit != 'true'
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           merge-multiple: true
           pattern: 'cache-${{ runner.os }}*'
           path: ${{ env.MIMIR_LOCAL }}
       - name: Publish cache
         uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
-        if: ${{ github.event_name != 'pull_request' && !cancelled() && !failure() }}
+        if: ${{ github.event_name != 'pull_request' && steps.lookup.outputs.cache-hit != 'true' && !cancelled() && !failure() }}
         with:
           path: ${{ env.MIMIR_LOCAL }}
-          key: master-${{ runner.os }}-${{ github.run_id }}
+          key: master-${{ runner.os }}-${{ needs.initial-build.outputs.pom-hash }}
