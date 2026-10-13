@@ -384,11 +384,14 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 createPluginRealm(pluginDescriptor, session, parent, foreignImports, filter);
 
                 return new PluginRealmCache.CacheRecord(
-                        pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts());
+                        pluginDescriptor.getClassRealm(),
+                        pluginDescriptor.getArtifacts(),
+                        pluginDescriptor.getDependencyNode());
             });
 
             pluginDescriptor.setClassRealm(cacheRecord.getRealm());
             pluginDescriptor.setArtifacts(new ArrayList<>(cacheRecord.getArtifacts()));
+            pluginDescriptor.setDependencyNode(cacheRecord.getDependencyNode());
             for (ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents()) {
                 componentDescriptor.setRealm(cacheRecord.getRealm());
             }
