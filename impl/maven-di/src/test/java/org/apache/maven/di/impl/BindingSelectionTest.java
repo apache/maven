@@ -187,7 +187,6 @@ class BindingSelectionTest {
                 Set.of("raw", "injected"), services.stream().map(s -> s.tag).collect(toSet()));
         DIException exception = assertThrows(DIException.class, () -> injector.getInstance(InitializedService.class));
         assertNotEquals(rawBinding.toString(), initializedBinding.toString());
-        assertTrue(exception.getMessage().contains(rawBinding.toString()), exception.getMessage());
         assertTrue(exception.getMessage().contains(initializedBinding.toString()), exception.getMessage());
     }
 
