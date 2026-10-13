@@ -113,12 +113,26 @@ public class MavenCliTest {
         List<String> inactive = new ArrayList<>();
 
         MavenCli.performProfileActivation(
-                new CLIManager().parse(new String[] {"-P", "?run-its,+?docs,-?slow,!?legacy,plain", "-P", "?more"}),
+                new CLIManager().parse(new String[] {
+                    "-P", "?run-its,+?docs,-?slow,!?legacy,plain,-off,!gone", "-P", " ?spaced , +?more "
+                }),
                 active,
                 inactive);
 
-        assertEquals(Arrays.asList("run-its", "docs", "plain", "more"), active);
-        assertEquals(Arrays.asList("slow", "legacy"), inactive);
+        assertEquals(Arrays.asList("run-its", "docs", "plain", "spaced", "more"), active);
+        assertEquals(Arrays.asList("slow", "legacy", "off", "gone"), inactive);
+    }
+
+    @Test
+    public void testDegenerateProfileTokens() throws Exception {
+        List<String> active = new ArrayList<>();
+        List<String> inactive = new ArrayList<>();
+
+        MavenCli.performProfileActivation(
+                new CLIManager().parse(new String[] {"-P", "?,!,+,-,+?,-?,!?,,"}), active, inactive);
+
+        assertTrue(active.isEmpty());
+        assertTrue(inactive.isEmpty());
     }
 
     @Test

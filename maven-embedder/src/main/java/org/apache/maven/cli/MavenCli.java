@@ -1665,6 +1665,10 @@ public class MavenCli {
                             profileId = profileId.substring(1);
                         }
 
+                        if (profileId.isEmpty()) {
+                            continue;
+                        }
+
                         if (active) {
                             activeProfiles.add(profileId);
                         } else {
