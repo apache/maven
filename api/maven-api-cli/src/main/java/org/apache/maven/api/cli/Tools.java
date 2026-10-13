@@ -42,4 +42,14 @@ public final class Tools {
 
     public static final String MVNUP_CMD = "mvnup";
     public static final String MVNUP_NAME = "Maven Upgrade Tool";
+
+    /**
+     * @since 4.1.0
+     */
+    public static final String MVNVAL_CMD = "mvnval";
+
+    /**
+     * @since 4.1.0
+     */
+    public static final String MVNVAL_NAME = "Maven POM Validation Tool";
 }
