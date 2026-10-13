@@ -63,6 +63,7 @@ class ApiRunnerSettingsTest {
                     injector -> {
                         injector.bindImplicit(OtherSessionProvider.class);
                         InjectorImpl impl = (InjectorImpl) injector;
+                        // Put the named provider first so the old selection logic fails this test.
                         Set<Binding<?>> ordered =
                                 new LinkedHashSet<>(impl.getBindings().get(Key.of(Session.class, OTHER_SESSION_NAME)));
                         ordered.addAll(impl.getBindings().get(Key.of(Session.class)));
