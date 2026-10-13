@@ -21,6 +21,9 @@ package org.apache.maven.internal.aether;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.Locale;
+import java.util.StringJoiner;
+
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.spi.validator.Validator;
 import org.eclipse.aether.spi.validator.ValidatorFactory;
@@ -51,8 +54,7 @@ public class MavenValidatorFactory implements ValidatorFactory {
 
     @Override
     public Validator newInstance(RepositorySystemSession session) {
-        switch (ConfigUtils.getEnum(
-                session, ValidationLevel.class, ValidationLevel.DEFAULT, MAVEN_RESOLVER_VALIDATION)) {
+        switch (getValidationLevel(session)) {
             case DEFAULT:
                 return defaultValidator;
             case MILD:
@@ -61,6 +63,22 @@ public class MavenValidatorFactory implements ValidatorFactory {
                 return NOOP;
             default:
                 throw new IllegalArgumentException("Unknown validation level");
+        }
+    }
+
+    private static ValidationLevel getValidationLevel(RepositorySystemSession session) {
+        String value = ConfigUtils.getString(session, ValidationLevel.DEFAULT.name(), MAVEN_RESOLVER_VALIDATION);
+        try {
+            return ValidationLevel.valueOf(value.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            StringJoiner supported = new StringJoiner(", ");
+            for (ValidationLevel level : ValidationLevel.values()) {
+                supported.add(level.name().toLowerCase(Locale.ROOT));
+            }
+            throw new IllegalArgumentException(
+                    "Invalid value '" + value + "' for " + MAVEN_RESOLVER_VALIDATION + ", supported values are: "
+                            + supported,
+                    e);
         }
     }
 }
