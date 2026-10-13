@@ -38,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import static java.util.stream.Collectors.toSet;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -175,14 +176,19 @@ class BindingSelectionTest {
         InjectorImpl injector = new InjectorImpl();
         injector.bindInstance(String.class, "injected");
         Key<InitializedService> key = Key.of(InitializedService.class);
-        injector.bind(
-                key, ReflectionUtils.bindingFromConstructor(key, InitializedService.class.getDeclaredConstructor()));
-        injector.bind(key, ReflectionUtils.generateImplicitBinding(key));
+        Binding<InitializedService> rawBinding =
+                ReflectionUtils.bindingFromConstructor(key, InitializedService.class.getDeclaredConstructor());
+        Binding<InitializedService> initializedBinding = ReflectionUtils.generateImplicitBinding(key);
+        injector.bind(key, rawBinding);
+        injector.bind(key, initializedBinding);
 
         List<InitializedService> services = injector.getInstance(new Key<List<InitializedService>>() {});
         assertEquals(
                 Set.of("raw", "injected"), services.stream().map(s -> s.tag).collect(toSet()));
-        assertThrows(DIException.class, () -> injector.getInstance(InitializedService.class));
+        DIException exception = assertThrows(DIException.class, () -> injector.getInstance(InitializedService.class));
+        assertNotEquals(rawBinding.toString(), initializedBinding.toString());
+        assertTrue(exception.getMessage().contains(rawBinding.toString()), exception.getMessage());
+        assertTrue(exception.getMessage().contains(initializedBinding.toString()), exception.getMessage());
     }
 
     private static BindingInitializer<InitializedService> tagInitializer(String tag) {

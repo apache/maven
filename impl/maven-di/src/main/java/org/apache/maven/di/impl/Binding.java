@@ -105,6 +105,14 @@ public abstract class Binding<T> {
         return initializeWith(bindingInitializer, null);
     }
 
+    /**
+     * Initializes this binding with an optional identity for deduplicating generated registrations.
+     * Without one, each wrapper has its own identity and identifies its initializer in diagnostics.
+     *
+     * @param bindingInitializer initializer applied to the created instance
+     * @param registrationIdentity identity shared by equivalent registrations, or {@code null}
+     * @return the initialized binding
+     */
     Binding<T> initializeWith(BindingInitializer<T> bindingInitializer, Object registrationIdentity) {
         return new Binding<T>(
                 this.originalKey,
@@ -131,7 +139,9 @@ public abstract class Binding<T> {
             @Override
             public String toString() {
                 return Binding.this
-                        + (registrationIdentity == null ? " initialized by " + identityString(bindingInitializer) : "");
+                        + (registrationIdentity == null
+                                ? " initialized by " + identityString(bindingInitializer)
+                                : " (initialized)");
             }
 
             @Override
