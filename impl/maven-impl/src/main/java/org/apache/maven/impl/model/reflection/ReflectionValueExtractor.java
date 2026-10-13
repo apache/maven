@@ -37,7 +37,8 @@ import org.apache.maven.api.annotations.Nullable;
  * such as {@code project.build.sourceDirectory}.
  * <p>
  * In addition to usual getters using {@code getXxx} or {@code isXxx} suffixes, accessors
- * using {@code asXxx} or {@code toXxx} prefixes are also supported.
+ * using {@code asXxx} or {@code toXxx} prefixes are also supported, as well as noun-based
+ * accessors matching the property name exactly (e.g. {@code plugin()}, {@code descriptor()}).
  */
 public class ReflectionValueExtractor {
     private static final Object[] OBJECT_ARGS = new Object[0];
@@ -266,6 +267,19 @@ public class ReflectionValueExtractor {
         throw new IntrospectionException(message);
     }
 
+    /**
+     * Resolves a single property segment against {@code value} by trying, in order:
+     * <ol>
+     *   <li>Prefixed accessors: {@code getX()}, {@code isX()}, {@code toX()}, {@code asX()}</li>
+     *   <li>Noun-based accessors: a zero-arg method whose name matches the property name exactly
+     *       (e.g. {@code plugin()}, {@code descriptor()}, {@code goal()}).</li>
+     * </ol>
+     * The noun-based fallback is intentional and applies globally to <em>any</em> object in the
+     * expression tree, not just {@code MojoExecution}. Classes that expose zero-arg methods whose
+     * names collide with common property names (e.g. {@code type()}, {@code name()}) will be
+     * resolved via this path. This is by design — it allows modern noun-style APIs to be used
+     * transparently in expressions like {@code ${mojo.plugin}} or {@code ${mojo.goal}}.
+     */
     private static Object getPropertyValue(Object value, String property) throws IntrospectionException {
         if (value == null || property == null || property.isEmpty()) {
             return null;
@@ -279,6 +293,12 @@ public class ReflectionValueExtractor {
                 if (method != null) {
                     return method.invoke(value, OBJECT_ARGS);
                 }
+            }
+            // Also support noun-based accessor style (e.g. plugin(), descriptor(), goal())
+            // where the method name matches the property name exactly.
+            Method method = classMap.findMethod(property);
+            if (method != null) {
+                return method.invoke(value, OBJECT_ARGS);
             }
             return null;
         } catch (InvocationTargetException e) {
