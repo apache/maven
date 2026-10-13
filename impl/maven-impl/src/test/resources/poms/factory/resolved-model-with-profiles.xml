@@ -79,6 +79,18 @@
                 <profile.pom.property>activated</profile.pom.property>
             </properties>
         </profile>
+        <!-- POM-declared property via <condition>: must also be suppressed in external builds (#13390).
+             ConditionProfileActivator.doGetProperty() calls context.getModelProperty() directly,
+             so the sandbox must override getModelProperty() to return null. -->
+        <profile>
+            <id>pom-declared-property-via-condition</id>
+            <activation>
+                <condition>${pom.declared.prop} == 'hello'</condition>
+            </activation>
+            <properties>
+                <profile.pom.condition>activated</profile.pom.condition>
+            </properties>
+        </profile>
         <!-- default-on profile: fires when 'skip.defaults' is absent; suppressed when set as system property -->
         <profile>
             <id>negated-property-default-on</id>

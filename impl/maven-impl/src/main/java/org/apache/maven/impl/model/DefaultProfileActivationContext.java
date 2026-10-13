@@ -364,9 +364,12 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
      *       so JDK/OS activation works.</li>
      *   <li><b>Suppresses user properties</b> (consumer {@code -D} flags): they were not
      *       set for the dependency and must not accidentally activate its profiles.</li>
-     *   <li><b>Does not expose model properties through system property lookups</b>: a
-     *       dependency POM's own {@code <properties>} must not activate its own
-     *       property-based profiles (see #13390).</li>
+     *   <li><b>Suppresses model properties</b>: a dependency POM's own
+     *       {@code <properties>} must not activate its own property-based or
+     *       condition-based profiles (see #13390). Both {@link PropertyProfileActivator}
+     *       and {@link org.apache.maven.impl.model.profile.ConditionProfileActivator}
+     *       read model properties directly via {@code getModelProperty()}, so the
+     *       sandbox overrides that method to return {@code null}.</li>
      *   <li><b>Disables file existence checks</b>: the publisher's file system paths do not
      *       exist in the consumer's environment.  File-activated profiles should be
      *       pre-filtered by the caller before reaching this context (the sandbox's
@@ -399,9 +402,15 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
                 return null;
             }
 
+            /**
+             * Model properties are suppressed: a dependency POM's own {@code <properties>} must not
+             * activate its own profiles. Both {@link PropertyProfileActivator} and
+             * {@link org.apache.maven.impl.model.profile.ConditionProfileActivator} call
+             * {@code getModelProperty()} directly, so returning {@code null} here closes the gap.
+             */
             @Override
             public String getModelProperty(String key) {
-                return DefaultProfileActivationContext.this.getModelProperty(key);
+                return null;
             }
 
             @Override
