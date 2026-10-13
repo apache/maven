@@ -121,7 +121,7 @@ all                    ← reactor-scoped wrapper (children link)
 ```
 
 The `all` phase carries a `children(all)` link, which the concurrent builder translates into DAG edges:
-- Every child project's `before:all` must complete before the root project's `before:all` fires.
+- The root project's `before:all` fires first; every child project's `before:all` waits for it to complete.
 - The root project's `after:all` fires only after every child's `after:all` has completed.
 
 This means a plugin goal bound to `after:all` on the root project is **guaranteed to run once, after all
