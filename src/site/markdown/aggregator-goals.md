@@ -95,27 +95,68 @@ Over successive Maven releases, multiple discrepancies and pain points have been
 
 ---
 
-## 3. Target Architecture & Design Specification (Maven 4+)
+## 3. Maven 4 Concurrent Builder: `before:`/`after:` Phase System
 
-> **Note**: This section describes proposed future improvements, not currently implemented behaviour.
+The Maven 4 concurrent builder introduces a first-class solution to several of the shortcomings above through
+the `before:` and `after:` phase prefixes and two special reactor-scoped phases: `all` and `each`.
 
-To address [MNG-7991](https://github.com/apache/maven/issues/8718) and related issues, the reactor aggregation mechanism should be decoupled and modernized:
+> **Note**: The `before:`/`after:` phase system and the `all`/`each` phases require **model version 4.1.0**
+> (`<modelVersion>4.1.0</modelVersion>`) and the **concurrent builder** (activated via `-b concurrent`,
+> which is the default when using `-T` in Maven 4). They are not supported by the legacy sequential builder.
 
-### 3.1 Explicit Execution Semantics
+### 3.1 The `all` and `each` Phases
 
-Rather than overloading a single boolean flag `aggregator = true`, execution scope should distinguish between:
+The default Maven 4 lifecycle defines a top-level `all` phase that wraps the entire reactor, with `each`
+representing a single subproject's full build:
 
-| Scope | Description | Execution Timing |
-| :--- | :--- | :--- |
-| **`PROJECT`** (Default) | Standard Mojo execution per project module. | Normal reactor topological order. |
-| **`REACTOR_ROOT`** | Executes once on the root project of the reactor. | Top of reactor build. |
-| **`REACTOR_AT_END`** | Executes once across collected projects *after* all reactor modules complete the phase. | End of reactor build (similar to deploy-at-end). |
+```
+all                    ← reactor-scoped wrapper (children link)
+└── each               ← per-subproject scope
+    ├── validate / initialize
+    ├── build (sources → compile → ready → package)
+    ├── verify (unit-test, integration-test)
+    ├── install
+    └── deploy
+```
 
-### 3.2 Lifecycle Engine Unification
-- **Automatic Root-Only Lifecycle Binding ([MNG-6336](https://github.com/apache/maven/issues/7529))**: When a goal marked as an aggregator is bound to a lifecycle phase, Maven's lifecycle planner should default to executing it once on the root project unless explicitly declared otherwise.
-- **Phase Post-Aggregator Hooks ([MNG-5665](https://github.com/apache/maven/issues/6657))**: Support lifecycle phases that trigger aggregation tasks after reactor submodules have completed upstream tasks (e.g. `post-verify-reactor`).
+The `all` phase carries a `children(all)` link, which the concurrent builder translates into DAG edges:
+- Every child project's `before:all` must complete before the root project's `before:all` fires.
+- The root project's `after:all` fires only after every child's `after:all` has completed.
 
-### 3.3 Forking Deduplication
+This means a plugin goal bound to `after:all` on the root project is **guaranteed to run once, after all
+reactor subprojects have finished their full build** — enforced by the DAG, not by a global lock.
+
+### 3.2 Solving the Aggregation Problems
+
+| Problem (section 2) | Concurrent builder solution |
+| :--- | :--- |
+| **CLI vs. lifecycle discrepancy** ([MNG-6336](https://github.com/apache/maven/issues/7529)) | Bind to `after:all` on the root project — runs once after the full reactor, whether invoked via CLI or lifecycle. No `<inherited>false</inherited>` needed. |
+| **Execution timing** (aggregator runs before children are built) | `after:all` fires after all children complete `all`, which includes `build`/`verify`. Artifact outputs are available. |
+| **`before:each` / `after:each`** | Goals bound to these phases run once per subproject, bracketing each module's full build. Useful for per-module setup/teardown. |
+
+### 3.3 Example: Aggregated Javadoc after the Full Reactor
+
+```xml
+<!-- model version 4.1.0 only, on the root project -->
+<execution>
+  <id>aggregate-javadoc</id>
+  <goals><goal>aggregate</goal></goals>
+  <phase>after:all</phase>
+</execution>
+```
+
+This executes `maven-javadoc-plugin:aggregate` exactly once on the root project, after every subproject has
+completed its `all` phase (which includes compilation and packaging). No distribution submodule workaround
+required.
+
+### 3.4 Remaining Work for `aggregator = true`
+
+The `before:`/`after:` system does not yet replace the `aggregator = true` flag for plugins targeting
+**Maven 3 model POMs** (model version 4.0.0). For those, the legacy shortcomings described in section 2
+still apply. The open design question tracked in [MNG-7991](https://github.com/apache/maven/issues/8718)
+covers how to bridge this gap cleanly.
+
+### 3.5 Forking Deduplication (open)
 - Forked lifecycles initiated by an aggregator must verify previously satisfied phases in the reactor session cache to avoid repeating work already accomplished in the current build.
 
 ---
