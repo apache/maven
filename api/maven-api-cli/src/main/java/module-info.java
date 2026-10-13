@@ -30,4 +30,5 @@ module org.apache.maven.api.cli {
     exports org.apache.maven.api.cli.mvnenc;
     exports org.apache.maven.api.cli.mvnsh;
     exports org.apache.maven.api.cli.mvnup;
+    exports org.apache.maven.api.cli.mvnval;
 }
