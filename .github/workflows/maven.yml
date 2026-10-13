@@ -84,6 +84,7 @@ jobs:
           cp .github/ci-extensions.xml .mvn/extensions.xml
 
       - name: Restore Mimir caches
+        id: mimir-restore
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.MIMIR_LOCAL }}
@@ -113,7 +114,8 @@ jobs:
 
       - name: Upload Mimir caches
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: ${{ !cancelled() && !failure() }}
+        # only consolidate-caches reads these, and it saves only on push when the key is not stored yet
+        if: ${{ github.event_name != 'pull_request' && steps.mimir-restore.outputs.cache-hit != 'true' && !cancelled() && !failure() }}
         with:
           name: cache-${{ runner.os }}-initial
           retention-days: 1
@@ -192,6 +194,7 @@ jobs:
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Restore Mimir caches
+        id: mimir-restore
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.MIMIR_LOCAL }}
@@ -237,7 +240,8 @@ jobs:
 
       - name: Upload Mimir caches
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: ${{ !cancelled() && !failure() }}
+        # only consolidate-caches reads these, and it saves only on push when the key is not stored yet
+        if: ${{ github.event_name != 'pull_request' && steps.mimir-restore.outputs.cache-hit != 'true' && !cancelled() && !failure() }}
         with:
           name: cache-${{ runner.os }}-full-build-${{ matrix.java }}
           retention-days: 1
@@ -296,6 +300,7 @@ jobs:
           cp .github/ci-extensions.xml ~/.m2/extensions.xml
 
       - name: Restore Mimir caches
+        id: mimir-restore
         uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ${{ env.MIMIR_LOCAL }}
@@ -337,7 +342,8 @@ jobs:
 
       - name: Upload Mimir caches
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: ${{ !cancelled() && !failure() }}
+        # only consolidate-caches reads these, and it saves only on push when the key is not stored yet
+        if: ${{ github.event_name != 'pull_request' && steps.mimir-restore.outputs.cache-hit != 'true' && !cancelled() && !failure() }}
         with:
           name: cache-${{ runner.os }}-integration-tests-${{ matrix.java }}
           retention-days: 1
