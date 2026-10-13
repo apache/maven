@@ -145,6 +145,12 @@ class DefaultInterpolatorTest {
     }
 
     @Test
+    void testUnknownOperatorTreatedAsVariableName() {
+        // `:?` is not a recognised operator; the entire `foo:?bar` is treated as a plain variable name
+        assertEquals("", substVars("${foo:?bar}", "z"));
+    }
+
+    @Test
     void testExpansion() {
         Map<String, String> props = new LinkedHashMap<>();
         props.put("a", "foo");
