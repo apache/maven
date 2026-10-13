@@ -228,15 +228,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
             try {
                 // Create or derive a session based on the request
-                ModelBuilderSessionState session;
-                if (mainSession == null) {
-                    mainSession = new ModelBuilderSessionState(request);
-                    session = mainSession;
-                } else {
-                    session = mainSession.deriveTopLevel(
-                            request,
-                            new DefaultModelBuilderResult(request, ProblemCollector.create(mainSession.session)));
-                }
+                ModelBuilderSessionState session = sessionFor(request);
                 // Build the request
                 if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
                     // build the build poms
@@ -260,6 +252,38 @@ public class DefaultModelBuilder implements ModelBuilder {
                 RequestTraceHelper.exit(trace);
             }
         }
+
+        /**
+         * Stops after the raw model, so no inheritance, interpolation or profile injection
+         * happens: only the source, the file model, the raw model and the problems are populated
+         * on the result. Reaches no repository. The checks run at strict level for any build
+         * request type; {@code BUILD_PROJECT} additionally looks for a parent beside the POM.
+         */
+        @Override
+        public ModelBuilderResult validate(ModelBuilderRequest request) throws ModelBuilderException {
+            RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
+            try {
+                ModelBuilderSessionState session = sessionFor(request);
+                // Map the reactor first: a 4.1.0 subproject may leave out its parent version,
+                // taken from the parent's own file model, so without this a valid subproject
+                // fails with "'parent.version' is missing". A POM outside any project still reads.
+                session.loadReactor(false, false);
+                session.readRawModel();
+                return session.result;
+            } finally {
+                RequestTraceHelper.exit(trace);
+            }
+        }
+
+        /** Creates the session on the first request, then derives one with its own result. */
+        private ModelBuilderSessionState sessionFor(ModelBuilderRequest request) {
+            if (mainSession == null) {
+                mainSession = new ModelBuilderSessionState(request);
+                return mainSession;
+            }
+            return mainSession.deriveTopLevel(
+                    request, new DefaultModelBuilderResult(request, ProblemCollector.create(mainSession.session)));
+        }
     }
 
     protected class ModelBuilderSessionState implements ModelProblemCollector {
@@ -270,6 +294,9 @@ public class DefaultModelBuilder implements ModelBuilder {
         final Map<GAKey, Set<ModelSource>> mappedSources;
         final Set<ImportWarningKey> reportedImportWarnings;
         final Map<String, ProblemCollector<ModelProblem>> reactorProblemCollectors;
+
+        /** See {@link #loadReactor(boolean, boolean)}. */
+        private boolean reportReactorLoadFailures = true;
 
         String source;
         Model sourceModel;
@@ -458,7 +485,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
             boolean derivedExternalOrigin = externalOrigin || isExternalOrigin(request);
-            return new ModelBuilderSessionState(
+            ModelBuilderSessionState derived = new ModelBuilderSessionState(
                     session,
                     request,
                     result,
@@ -471,6 +498,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     derivedRepos,
                     new LinkedHashSet<>(),
                     derivedExternalOrigin);
+            // Carried over so the reactor walk keeps its reporting mode whichever state runs it.
+            derived.reportReactorLoadFailures = reportReactorLoadFailures;
+            return derived;
         }
 
         @Override
@@ -634,9 +664,14 @@ public class DefaultModelBuilder implements ModelBuilder {
                 source = getSource();
             }
 
-            if (line <= 0 && column <= 0 && exception instanceof ModelParserException e) {
-                line = e.getLineNumber();
-                column = e.getColumnNumber();
+            if (line <= 0 && column <= 0) {
+                if (exception instanceof ModelParserException e) {
+                    line = e.getLineNumber();
+                    column = e.getColumnNumber();
+                } else if (exception instanceof XmlReaderException e && e.getLocation() != null) {
+                    line = e.getLocation().getLineNumber();
+                    column = e.getLocation().getColumnNumber();
+                }
             }
 
             ModelProblem problem =
@@ -957,7 +992,17 @@ public class DefaultModelBuilder implements ModelBuilder {
             return getPropertiesWithProfiles(model, new HashMap<>());
         }
 
-        private void buildBuildPom() throws ModelBuilderException {
+        /**
+         * Loads the file models of the whole reactor from the project root, so that every model
+         * that may be needed to read another one is mapped. With {@code mandatoryRoot} false, a
+         * source outside any project is read on its own instead of failing.
+         * <p>
+         * With {@code reportLoadFailures} false, a module that cannot be loaded is logged instead
+         * of reported, so that a caller reading a single POM is not told its file is broken when
+         * a sibling is. Reading the POM it did ask about reports that one's own failure anyway.
+         */
+        private void loadReactor(boolean mandatoryRoot, boolean reportLoadFailures) {
+            this.reportReactorLoadFailures = reportLoadFailures;
             // Retrieve and normalize the source path, ensuring it's non-null and in absolute form
             Path top = request.getSource().getPath();
             if (top == null) {
@@ -970,11 +1015,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             try {
                 rootDirectory = session.getRootDirectory();
             } catch (IllegalStateException e) {
-                rootDirectory = session.getService(RootLocator.class).findMandatoryRoot(top);
+                RootLocator rootLocator = session.getService(RootLocator.class);
+                rootDirectory = mandatoryRoot ? rootLocator.findMandatoryRoot(top) : rootLocator.findRoot(top);
             }
 
             // Locate and normalize the root POM if it exists, fallback to top otherwise
-            Path root = modelProcessor.locateExistingPom(rootDirectory);
+            Path root = rootDirectory != null ? modelProcessor.locateExistingPom(rootDirectory) : null;
             if (root != null) {
                 root = root.toAbsolutePath().normalize();
             } else {
@@ -983,6 +1029,10 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // Load all models starting from the root
             loadFromRoot(root, top);
+        }
+
+        private void buildBuildPom() throws ModelBuilderException {
+            loadReactor(true, true);
 
             // Check for errors after loading models
             if (hasErrors()) {
@@ -1052,14 +1102,17 @@ public class DefaultModelBuilder implements ModelBuilder {
                 loadFilePom(executor, top, root, Set.of(), r);
             }
             if (result.getFileModel() == null && !Objects.equals(top, root)) {
-                logger.warn(
-                        "The top project ({}) cannot be found in the reactor from root project ({}). "
-                                + "Make sure the root directory is correct (a missing '.mvn' directory in the root "
-                                + "project is the most common cause) and the project is correctly included "
-                                + "in the reactor (missing activated profiles, command line options, etc.). For this "
-                                + "build, the top project will be used as the root project.",
-                        top,
-                        root);
+                // Only a warning when a build is what was asked for. A caller reading one POM has
+                // no reactor to get wrong, and the retry below is routine there, not a misconfiguration.
+                (reportReactorLoadFailures ? logger.atWarn() : logger.atDebug())
+                        .log(
+                                "The top project ({}) cannot be found in the reactor from root project ({}). "
+                                        + "Make sure the root directory is correct (a missing '.mvn' directory in the root "
+                                        + "project is the most common cause) and the project is correctly included "
+                                        + "in the reactor (missing activated profiles, command line options, etc.). For this "
+                                        + "build, the top project will be used as the root project.",
+                                top,
+                                root);
                 mappedSources.clear();
                 reportedImportWarnings.clear();
                 reactorProblemCollectors.clear();
@@ -1154,7 +1207,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             } catch (ModelBuilderException e) {
                 // gathered with problem collector
-                add(Severity.ERROR, Version.V40, "Failed to load project " + pom, e);
+                if (reportReactorLoadFailures) {
+                    add(Severity.ERROR, Version.V40, "Failed to load project " + pom, e);
+                } else {
+                    // The caller asked about one POM. If that POM is the one that failed, reading
+                    // it reports the failure again in a moment, with the real reason attached.
+                    logger.debug("Failed to load project {} while mapping the reactor", pom, e);
+                }
             }
         }
 

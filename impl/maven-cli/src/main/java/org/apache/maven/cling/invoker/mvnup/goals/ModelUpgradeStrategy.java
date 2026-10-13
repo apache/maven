@@ -118,7 +118,7 @@ public class ModelUpgradeStrategy extends AbstractUpgradeStrategy {
                     } finally {
                         context.unindent();
                     }
-                    context.success("Model upgrade completed");
+                    logChange(context, "Model upgrade");
                     modifiedPoms.add(pomPath);
                 } else {
                     // Treat invalid upgrades (including downgrades) as errors, not warnings

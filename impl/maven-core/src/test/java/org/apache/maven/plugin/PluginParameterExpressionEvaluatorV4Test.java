@@ -101,7 +101,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         System.out.println("Result: " + result);
 
         assertSame(
-                exec.getPlugin().getDescriptor(),
+                exec.plugin().getDescriptor(),
                 result,
                 "${mojo.plugin.descriptor} expression does not return plugin descriptor.");
     }
@@ -120,9 +120,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         assertNotNull(depResults);
         assertEquals(1, depResults.size());
         assertEquals(
-                exec.getPlugin().getArtifact().key(),
-                depResults.iterator().next().key(),
-                "dependency artifact is wrong.");
+                exec.plugin().getArtifact().key(), depResults.iterator().next().key(), "dependency artifact is wrong.");
     }
 
     @Test
@@ -142,7 +140,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         assertEquals(1, depResults.size());
         assertTrue(depResults.containsKey("org.myco.plugins:my-plugin"));
         assertEquals(
-                exec.getPlugin().getArtifact().key(),
+                exec.plugin().getArtifact().key(),
                 depResults.get("org.myco.plugins:my-plugin").key(),
                 "dependency artifact is wrong.");
     }
@@ -159,7 +157,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         System.out.println("Result: " + result);
 
         assertSame(
-                exec.getPlugin().getArtifact().getArtifactId(),
+                exec.plugin().getArtifact().getArtifactId(),
                 result,
                 "${plugin.artifactId} expression does not return plugin descriptor's artifactId.");
     }
