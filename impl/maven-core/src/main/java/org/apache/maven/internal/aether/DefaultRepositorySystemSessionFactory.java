@@ -83,9 +83,9 @@ import static java.util.Objects.requireNonNull;
 @Singleton
 public class DefaultRepositorySystemSessionFactory implements RepositorySystemSessionFactory {
 
-    public static final String MAVEN_RESOLVER_TRANSPORT_DEFAULT = "default";
-
     private static final String MAVEN_RESOLVER_BF_COLLECTOR_SKIPPER = "aether.dependencyCollector.bf.skipper";
+
+    public static final String MAVEN_RESOLVER_TRANSPORT_DEFAULT = "default";
 
     public static final String MAVEN_RESOLVER_TRANSPORT_WAGON = "wagon";
 
