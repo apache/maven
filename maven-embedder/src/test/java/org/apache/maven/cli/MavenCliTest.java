@@ -24,6 +24,9 @@ import java.io.File;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
@@ -102,6 +105,20 @@ public class MavenCliTest {
         assertEquals(1, cli.calculateDegreeOfConcurrency(" 1 "));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("-2.2C"));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0C"));
+    }
+
+    @Test
+    public void testOptionalProfiles() throws Exception {
+        List<String> active = new ArrayList<>();
+        List<String> inactive = new ArrayList<>();
+
+        MavenCli.performProfileActivation(
+                new CLIManager().parse(new String[] {"-P", "?run-its,+?docs,-?slow,!?legacy,plain", "-P", "?more"}),
+                active,
+                inactive);
+
+        assertEquals(Arrays.asList("run-its", "docs", "plain", "more"), active);
+        assertEquals(Arrays.asList("slow", "legacy"), inactive);
     }
 
     @Test
