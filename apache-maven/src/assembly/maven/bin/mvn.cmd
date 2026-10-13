@@ -105,6 +105,7 @@ if "%_FLAG_ARG%"=="--debug" set "IS_VERBOSE=1"
 if "%_FLAG_ARG%"=="--enc" set "IS_MAIN_OVERRIDE=1"
 if "%_FLAG_ARG%"=="--shell" set "IS_MAIN_OVERRIDE=1"
 if "%_FLAG_ARG%"=="--up" set "IS_MAIN_OVERRIDE=1"
+if "%_FLAG_ARG%"=="--val" set "IS_MAIN_OVERRIDE=1"
 @REM Compact single-dash tokens (e.g. -qv, -vX) mirror the Unix script's
 @REM -[qvVXe]* handling, but only when the part after '-' is made exclusively
 @REM of the safe chars v V q X e; otherwise (e.g. -f, -D...) the token is
@@ -283,7 +284,7 @@ set JVM_CONFIG_MAVEN_OPTS=
 
 if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadJvmConfig
 
-rem Use Java source-launch mode (JDK 11+) to parse jvm.config
+rem Use the precompiled JvmConfigParser to parse jvm.config
 rem This avoids batch script parsing issues with special characters (pipes, quotes, @, etc.)
 rem Java writes parsed output to a temp file; we read it with 'set /p' + input redirect.
 rem
@@ -307,11 +308,11 @@ if defined MAVEN_DEBUG_SCRIPT (
   echo [DEBUG] Found .mvn\jvm.config file at: %MAVEN_PROJECTBASEDIR%\.mvn\jvm.config
   echo [DEBUG] Using temp file: %JVM_CONFIG_TEMP%
   echo [DEBUG] Running JvmConfigParser with Java: %JAVACMD%
-  echo [DEBUG] Parser arguments: "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" "%JVM_CONFIG_TEMP%"
+  echo [DEBUG] Parser arguments: -cp "%MAVEN_HOME%\bin" JvmConfigParser "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" "%JVM_CONFIG_TEMP%"
 )
 
 rem Run parser with output file as third argument - Java writes directly to file
-"%JAVACMD%" "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" "%JVM_CONFIG_TEMP%"
+"%JAVACMD%" -cp "%MAVEN_HOME%\bin" JvmConfigParser "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" "%JVM_CONFIG_TEMP%"
 set JVM_CONFIG_EXIT=%ERRORLEVEL%
 
 if defined MAVEN_DEBUG_SCRIPT (
@@ -376,6 +377,8 @@ if "%~1"=="--debug" (
       set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenShellCling"
 ) else if "%~1"=="--up" (
       set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenUpCling"
+) else if "%~1"=="--val" (
+      set "MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenValCling"
 )
 exit /b 0
 
@@ -393,7 +396,7 @@ set LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 if "%MAVEN_MAIN_CLASS%"=="" @set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenCling
 
 @REM Only pass MAVEN_ARGS for the default Maven build command (MavenCling),
-@REM not for sub-commands like --up, --enc, or --shell which have their own options.
+@REM not for sub-commands like --up, --enc, --shell or --val which have their own options.
 if not "%MAVEN_MAIN_CLASS%"=="org.apache.maven.cling.MavenCling" set "MAVEN_ARGS="
 
 if defined MAVEN_DEBUG_SCRIPT (

@@ -31,7 +31,8 @@ This is the [API](./apidocs/org/apache/maven/api/cli/package-summary.html) for M
 - [`mvn`](./apidocs/org/apache/maven/api/cli/mvn/package-summary.html), the Maven build tool,
 - [`mvnenc`](./apidocs/org/apache/maven/api/cli/mvnenc/package-summary.html), the Maven Password Encryption tool,
 - [`mvnsh`](./apidocs/org/apache/maven/api/cli/mvnsh/package-summary.html), the Maven Shell tool,
-- [`mvnup`](./apidocs/org/apache/maven/api/cli/mvnup/package-summary.html), the Maven Upgrade tool.
+- [`mvnup`](./apidocs/org/apache/maven/api/cli/mvnup/package-summary.html), the Maven Upgrade tool,
+- [`mvnval`](./apidocs/org/apache/maven/api/cli/mvnval/package-summary.html), the Maven POM Validation tool.
 
 This API also defines [Core Extensions model](./core-extensions.html) for `.mvn/extensions.xml`.
 
