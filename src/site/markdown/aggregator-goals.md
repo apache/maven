@@ -152,10 +152,11 @@ required.
 
 ### 3.4 Remaining Work for `aggregator = true`
 
-The `before:`/`after:` system does not yet replace the `aggregator = true` flag for plugins targeting
-**Maven 3 model POMs** (model version 4.0.0). For those, the legacy shortcomings described in section 2
-still apply. The open design question tracked in [MNG-7991](https://github.com/apache/maven/issues/8718)
-covers how to bridge this gap cleanly.
+The `before:`/`after:` phase system is an alternative approach to aggregation. Existing plugins that rely
+on `@Mojo(aggregator = true)` still exhibit the legacy shortcomings described in section 2, regardless of
+the POM model version in use. The `before:`/`after:` system does not automatically fix those plugins; it
+provides a better foundation for new plugin designs. The open design question tracked in
+[MNG-7991](https://github.com/apache/maven/issues/8718) covers how to bridge this gap cleanly.
 
 ### 3.5 Forking Deduplication (open)
 - Forked lifecycles initiated by an aggregator must verify previously satisfied phases in the reactor session cache to avoid repeating work already accomplished in the current build.
