@@ -38,8 +38,8 @@ When an aggregating goal is invoked from the command line:
    ```
 2. **Aggregating Task Segment**: A distinct aggregating `TaskSegment` is created.
 3. **Execution on Root Project Only**: Aggregating task segments are restricted to the top-level project (`session.getTopLevelProject()`). Submodules in the reactor are skipped for this goal.
-   - In the **sequential builder**, this filtering is performed by `BuildListCalculator`.
-   - In the **concurrent builder** (`-T`), it is performed by `BuildPlanExecutor` inside `buildInitialPlan()`:
+   - In the **singlethreaded** and **multithreaded** builders, this filtering is performed by `BuildListCalculator`.
+   - In the **concurrent builder** (`-b concurrent`), it is performed by `BuildPlanExecutor` inside `buildInitialPlan()`:
      ```java
      Map<MavenProject, List<MavenProject>> projects = taskSegment.isAggregating()
          ? Collections.singletonMap(rootProject, allProjects.get(rootProject))
@@ -52,13 +52,13 @@ When an aggregator Mojo is bound to a phase in a `pom.xml`:
 1. **Lifecycle Segment Classification**: Lifecycle phases (e.g. `package`, `verify`) produce standard non-aggregating `TaskSegment`s.
 2. **Per-Module Execution**: The goal is injected into the execution plan of **every module** in the reactor that inherits the plugin configuration.
 3. **Redundant Executions**: Unless the project author explicitly configures `<inherited>false</inherited>` on the plugin execution in the parent POM, the aggregator Mojo executes once for each module in the reactor.
-4. **Thread Locking (sequential builder only)**: In sequential parallel builds (`-T`) using the classic builder, `MojoExecutor` acquires an exclusive reactor-wide write lock (`aggregatorLock.writeLock()`) whenever an aggregator executes:
+4. **Thread Locking (multithreaded builder only)**: When using the multithreaded builder (`-T`), `MojoExecutor` acquires an exclusive reactor-wide write lock (`aggregatorLock.writeLock()`) whenever an aggregator executes:
    ```java
    acquiredAggregatorLock = aggregator ? aggregatorLock.writeLock() : aggregatorLock.readLock();
    ```
    This means that executing an aggregator Mojo across multiple submodules repeatedly halts parallel build concurrency across all threads.
 
-   In the **concurrent builder** (Maven 4's default `-T` implementation), project-level locking is disabled entirely — the concurrent `MojoExecutor` overrides `useProjectLock()` to return `false`. The concurrent builder instead relies on the build plan DAG to enforce ordering between steps.
+   In the **concurrent builder** (`-b concurrent`), project-level locking is disabled entirely — the concurrent `MojoExecutor` overrides `useProjectLock()` to return `false`. The concurrent builder instead relies on the build plan DAG to enforce ordering between steps.
 
 ### 1.3 Dependency Resolution
 When executing an aggregator Mojo:
