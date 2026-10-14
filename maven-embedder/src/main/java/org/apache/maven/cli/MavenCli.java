@@ -646,8 +646,13 @@ public class MavenCli {
         // print usage (like `mvn -h`) and exit successfully instead of failing with
         // "No goals have been specified for this build."
         // When a POM is present the default goal (if any) may apply, so let Maven proceed normally.
+        // Skip this check for encryption commands (--encrypt-password, --encrypt-master-password)
+        // which also have no goals and no POM, but are handled later by encryption().
         List<String> goals = cliRequest.commandLine.getArgList();
-        if (goals.isEmpty() && modelProcessor != null) {
+        if (goals.isEmpty()
+                && modelProcessor != null
+                && !cliRequest.commandLine.hasOption(CLIManager.ENCRYPT_PASSWORD)
+                && !cliRequest.commandLine.hasOption(CLIManager.ENCRYPT_MASTER_PASSWORD)) {
             File pom = modelProcessor.locatePom(new File(cliRequest.workingDirectory));
             if (!pom.isFile()) {
                 cliManager.displayHelp(System.out);
