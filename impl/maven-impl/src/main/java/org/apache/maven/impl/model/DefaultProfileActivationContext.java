@@ -366,7 +366,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
      *       set for the dependency and must not accidentally activate its profiles.</li>
      *   <li><b>Suppresses model properties</b>: a dependency POM's own
      *       {@code <properties>} must not activate its own property-based or
-     *       condition-based profiles (see #13390). Both {@link PropertyProfileActivator}
+     *       condition-based profiles (see #13390). Both {@link org.apache.maven.impl.model.profile.PropertyProfileActivator}
      *       and {@link org.apache.maven.impl.model.profile.ConditionProfileActivator}
      *       read model properties directly via {@code getModelProperty()}, so the
      *       sandbox overrides that method to return {@code null}.</li>
