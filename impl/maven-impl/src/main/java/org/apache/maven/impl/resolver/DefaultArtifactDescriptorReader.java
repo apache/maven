@@ -166,6 +166,17 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 throw new ArtifactDescriptorException(result);
             }
 
+            Model model;
+
+            final WorkspaceReader workspace = session.getWorkspaceReader();
+            if (workspace instanceof MavenWorkspaceReader mavenWorkspaceReader) {
+                model = mavenWorkspaceReader.findModel(pomArtifact);
+                if (model != null) {
+                    result.setRepository(workspace.getRepository());
+                    return model;
+                }
+            }
+
             ArtifactResult resolveResult;
             try {
                 ArtifactRequest resolveRequest =
@@ -183,17 +194,6 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                 }
                 result.addException(e);
                 throw new ArtifactDescriptorException(result);
-            }
-
-            Model model;
-
-            // TODO hack: don't rebuild model if it was already loaded during reactor resolution
-            final WorkspaceReader workspace = session.getWorkspaceReader();
-            if (workspace instanceof MavenWorkspaceReader mavenWorkspaceReader) {
-                model = mavenWorkspaceReader.findModel(pomArtifact);
-                if (model != null) {
-                    return model;
-                }
             }
 
             try {

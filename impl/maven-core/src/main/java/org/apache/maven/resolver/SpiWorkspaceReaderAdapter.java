@@ -26,6 +26,8 @@ import java.util.Optional;
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.impl.resolver.MavenWorkspaceReader;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.repository.WorkspaceRepository;
@@ -41,7 +43,7 @@ import org.eclipse.aether.repository.WorkspaceRepository;
  *
  * @since 4.1.0
  */
-public class SpiWorkspaceReaderAdapter implements WorkspaceReader {
+public class SpiWorkspaceReaderAdapter implements WorkspaceReader, MavenWorkspaceReader {
 
     private final org.apache.maven.api.spi.WorkspaceReader delegate;
     private final WorkspaceRepository repository;
@@ -65,6 +67,11 @@ public class SpiWorkspaceReaderAdapter implements WorkspaceReader {
     @Override
     public List<String> findVersions(Artifact artifact) {
         return delegate.findVersions(toApiArtifact(artifact));
+    }
+
+    @Override
+    public Model findModel(Artifact artifact) {
+        return delegate.findModel(toApiArtifact(artifact)).orElse(null);
     }
 
     /**
