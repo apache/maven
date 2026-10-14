@@ -31,8 +31,15 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <p>Verifies that SPI workspace readers are:
  * <ol>
  *   <li>Discovered via DI and active during the build session</li>
- *   <li>Consulted for regular artifact resolution (dependency resolution, model building, etc.)</li>
+ *   <li>Consulted for regular artifact resolution (findArtifact, findVersions)</li>
+ *   <li>Consulted for model resolution via findModel() — the path wired through
+ *       {@code SpiWorkspaceReaderAdapter} implementing {@code MavenWorkspaceReader}</li>
  * </ol>
+ *
+ * <p>The test extension ({@code TestSpiWorkspaceReader}) serves a completely synthetic artifact
+ * ({@code org.apache.maven.its.mng8766:virtual-dep:1.0}) that does not exist in any repository.
+ * The project POM declares a dependency on this artifact, so Maven must consult the workspace reader
+ * for both the artifact file ({@code findArtifact}) and the model ({@code findModel}).
  *
  * @since 4.1.0
  */
@@ -48,22 +55,37 @@ class MavenITmng8766SpiWorkspaceReaderTest extends AbstractMavenIntegrationTestC
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        // Run the project that uses the extension — process-resources triggers artifact resolution
+        // Run the project that uses the extension — compile triggers artifact + model resolution
         verifier = newVerifier(testDir.resolve("project"));
-        verifier.addCliArgument("process-resources");
+        verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();
+
+        List<String> logLines = verifier.loadLogLines();
 
         // Verify the SPI workspace reader was created (proves DI discovery works)
         verifier.verifyTextInLog("[SPI-WR] created");
 
         // Verify the SPI workspace reader was consulted during artifact resolution
-        // (findArtifact is called for dependencies, model resolution, etc.)
-        List<String> logLines = verifier.loadLogLines();
-        boolean hasFindArtifactCalls =
-                logLines.stream().anyMatch(line -> line.contains("[SPI-WR] findArtifact("));
+        boolean hasFindArtifactCalls = logLines.stream().anyMatch(line -> line.contains("[SPI-WR] findArtifact("));
+        assertTrue(hasFindArtifactCalls, "SPI workspace reader should be consulted during artifact resolution");
+
+        // Verify findModel() was called for the synthetic dependency —
+        // this proves SpiWorkspaceReaderAdapter implements MavenWorkspaceReader and is
+        // correctly wired into the MavenChainedWorkspaceReader dispatch chain.
+        boolean hasFindModelCall = logLines.stream()
+                .anyMatch(line -> line.contains("[SPI-WR] findModel(")
+                        && line.contains("org.apache.maven.its.mng8766:virtual-dep"));
         assertTrue(
-                hasFindArtifactCalls,
-                "SPI workspace reader should be consulted during artifact resolution");
+                hasFindModelCall,
+                "SPI workspace reader findModel() should be called for the synthetic dependency "
+                        + "(org.apache.maven.its.mng8766:virtual-dep:1.0)");
+
+        // Verify the synthetic POM was returned and accepted (reader logs this on success)
+        boolean hasModelReturned =
+                logLines.stream().anyMatch(line -> line.contains("[SPI-WR] findModel: returning synthetic POM for"));
+        assertTrue(
+                hasModelReturned,
+                "SPI workspace reader findModel() should have returned a synthetic POM for virtual-dep");
     }
 }

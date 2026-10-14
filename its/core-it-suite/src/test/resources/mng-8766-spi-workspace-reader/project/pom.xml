@@ -34,6 +34,16 @@ under the License.
       <version>4.13.2</version>
       <scope>test</scope>
     </dependency>
+    <!--
+      Synthetic dependency served entirely by the SPI workspace reader (TestSpiWorkspaceReader).
+      It does not exist in any remote or local repository; the workspace reader provides both the
+      artifact file (findArtifact) and the model (findModel), proving end-to-end wiring works.
+    -->
+    <dependency>
+      <groupId>org.apache.maven.its.mng8766</groupId>
+      <artifactId>virtual-dep</artifactId>
+      <version>1.0</version>
+    </dependency>
   </dependencies>
 
 </project>
