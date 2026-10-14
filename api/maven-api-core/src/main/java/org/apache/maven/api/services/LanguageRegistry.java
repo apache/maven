@@ -20,4 +20,9 @@ package org.apache.maven.api.services;
 
 import org.apache.maven.api.Language;
 
+/**
+ * Registry for {@link Language} extensible enum values.
+ *
+ * @since 4.0.0
+ */
 public interface LanguageRegistry extends ExtensibleEnumRegistry<Language> {}

@@ -20,6 +20,11 @@ package org.apache.maven.api.services;
 
 import org.apache.maven.api.annotations.Experimental;
 
+/**
+ * Exception thrown when dependency resolution fails.
+ *
+ * @since 4.0.0
+ */
 @Experimental
 public class DependencyResolverException extends MavenException {
 

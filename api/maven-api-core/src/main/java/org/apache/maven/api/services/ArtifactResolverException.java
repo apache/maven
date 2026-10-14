@@ -40,6 +40,7 @@ public class ArtifactResolverException extends MavenException {
         this.result = result;
     }
 
+    /** @return the resolution result containing detailed information about the failure */
     public ArtifactResolverResult getResult() {
         return result;
     }

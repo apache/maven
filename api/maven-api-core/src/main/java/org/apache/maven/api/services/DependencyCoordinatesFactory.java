@@ -47,17 +47,38 @@ public interface DependencyCoordinatesFactory extends Service {
     @Nonnull
     DependencyCoordinates create(@Nonnull DependencyCoordinatesFactoryRequest request);
 
+    /**
+     * Creates dependency coordinates from artifact coordinates.
+     *
+     * @param session the session
+     * @param coordinates the artifact coordinates
+     * @return a new {@link DependencyCoordinates}, never {@code null}
+     */
     @Nonnull
     default DependencyCoordinates create(@Nonnull Session session, @Nonnull ArtifactCoordinates coordinates) {
         return create(DependencyCoordinatesFactoryRequest.build(session, coordinates));
     }
 
+    /**
+     * Creates dependency coordinates from an existing dependency.
+     *
+     * @param session the session
+     * @param dependency the dependency
+     * @return a new {@link DependencyCoordinates}, never {@code null}
+     */
     @Nonnull
     default DependencyCoordinates create(
             @Nonnull Session session, @Nonnull org.apache.maven.api.Dependency dependency) {
         return create(DependencyCoordinatesFactoryRequest.build(session, dependency));
     }
 
+    /**
+     * Creates dependency coordinates from a model dependency.
+     *
+     * @param session the session
+     * @param dependency the model dependency
+     * @return a new {@link DependencyCoordinates}, never {@code null}
+     */
     @Nonnull
     default DependencyCoordinates create(@Nonnull Session session, Dependency dependency) {
         return create(DependencyCoordinatesFactoryRequest.build(
@@ -70,6 +91,13 @@ public interface DependencyCoordinatesFactory extends Service {
                 dependency.getType()));
     }
 
+    /**
+     * Creates dependency coordinates from a plugin model.
+     *
+     * @param session the session
+     * @param plugin the plugin
+     * @return a new {@link DependencyCoordinates}, never {@code null}
+     */
     @Nonnull
     default DependencyCoordinates create(@Nonnull Session session, Plugin plugin) {
         // TODO: hard coded string
@@ -77,6 +105,13 @@ public interface DependencyCoordinatesFactory extends Service {
                 session, plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), null, null, "maven-plugin"));
     }
 
+    /**
+     * Creates dependency coordinates from a report plugin model.
+     *
+     * @param session the session
+     * @param reportPlugin the report plugin
+     * @return a new {@link DependencyCoordinates}, never {@code null}
+     */
     @Nonnull
     default DependencyCoordinates create(@Nonnull Session session, ReportPlugin reportPlugin) {
         // TODO: hard coded string

@@ -29,10 +29,15 @@ import org.apache.maven.api.annotations.Nullable;
  */
 @Experimental
 public interface Exclusion {
+    /**
+     * {@return the group identifier of the excluded dependency, or {@code null} for a wildcard}.
+     */
     @Nullable
     String groupId();
 
     /**
+     * {@return the group identifier of the excluded dependency, or {@code null} for a wildcard}.
+     *
      * @deprecated Use {@link #groupId()} instead.
      */
     @Deprecated(since = "4.1.0", forRemoval = true)
@@ -41,10 +46,15 @@ public interface Exclusion {
         return groupId();
     }
 
+    /**
+     * {@return the artifact identifier of the excluded dependency, or {@code null} for a wildcard}.
+     */
     @Nullable
     String artifactId();
 
     /**
+     * {@return the artifact identifier of the excluded dependency, or {@code null} for a wildcard}.
+     *
      * @deprecated Use {@link #artifactId()} instead.
      */
     @Deprecated(since = "4.1.0", forRemoval = true)
