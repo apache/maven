@@ -194,4 +194,22 @@ public interface ClassRealm extends Closeable {
      */
     @Nullable
     URL loadResourceFromParent(@Nonnull String name);
+
+    /**
+     * Returns the JPMS {@link ModuleLayer} associated with this realm, or {@code null}
+     * if this realm uses classic classpath loading.
+     *
+     * @return the module layer, or {@code null}
+     * @since 4.1.0
+     */
+    @Nullable
+    ModuleLayer getModuleLayer();
+
+    /**
+     * Returns whether this realm is backed by a JPMS {@link ModuleLayer}.
+     *
+     * @return {@code true} if this realm has an associated module layer
+     * @since 4.1.0
+     */
+    boolean isModular();
 }
