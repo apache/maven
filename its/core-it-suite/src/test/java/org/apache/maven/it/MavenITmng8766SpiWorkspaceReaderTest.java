@@ -34,10 +34,6 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *   <li>Consulted for regular artifact resolution (dependency resolution, model building, etc.)</li>
  * </ol>
  *
- * <p>The {@code PluginRealmCache.invalidate(Artifact)} SPI allows IDE integrators to purge
- * stale plugin realms when workspace artifacts are rebuilt, rather than opting out of plugin
- * resolution entirely.
- *
  * @since 4.1.0
  */
 class MavenITmng8766SpiWorkspaceReaderTest extends AbstractMavenIntegrationTestCase {

@@ -62,4 +62,22 @@ public interface WorkspaceReader extends SpiService {
      * @return list of available versions, may be empty
      */
     List<String> findVersions(Artifact artifact);
+
+    /**
+     * Finds the path to the POM (model) for the given artifact in the workspace, if present.
+     *
+     * <p>This method allows workspace readers to expose project models directly, enabling
+     * IDE integrators to provide accurate model data without requiring the artifact to be
+     * installed to a local repository first.
+     *
+     * <p>The default implementation returns empty, preserving backward compatibility for
+     * implementations that only support artifact resolution.
+     *
+     * @param artifact the artifact whose model (POM) to look up, never {@code null}
+     * @return the path to the POM file, or empty if not available in the workspace
+     * @since 4.1.0
+     */
+    default Optional<Path> findModel(Artifact artifact) {
+        return Optional.empty();
+    }
 }
