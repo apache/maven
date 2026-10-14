@@ -164,11 +164,6 @@ under the License.
     </dependency>
 
     <dependency>
-      <groupId>ch.qos.logback</groupId>
-      <artifactId>logback-classic</artifactId>
-      <optional>true</optional>
-    </dependency>
-    <dependency>
       <groupId>org.jline</groupId>
       <artifactId>jansi-core</artifactId>
     </dependency>
