@@ -18,22 +18,29 @@
  */
 package org.apache.maven.plugin;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.spi.CacheFactory;
+import org.apache.maven.api.spi.MavenCache;
+import org.apache.maven.internal.cache.MavenCacheHolder;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
+import org.eclipse.sisu.Typed;
 
 /**
  * Caches raw plugin descriptors. A raw plugin descriptor is a descriptor that has just been extracted from the plugin
@@ -46,14 +53,48 @@ import org.eclipse.aether.repository.WorkspaceRepository;
  */
 @Named
 @Singleton
-public class DefaultPluginDescriptorCache implements PluginDescriptorCache {
+@Typed({PluginDescriptorCache.class, MavenCacheHolder.class})
+public class DefaultPluginDescriptorCache implements PluginDescriptorCache, MavenCacheHolder {
 
-    private Map<Key, PluginDescriptor> descriptors = new ConcurrentHashMap<>(128);
-    private Map<Key, Key> keys = new ConcurrentHashMap<>();
+    /**
+     * Internal {@link CacheRecord} wrapper for a plugin descriptor entry.
+     * Descriptor caches have no direct file dependencies tracked (the descriptor is raw metadata),
+     * so invalidation flushes all entries conservatively.
+     */
+    private static final class DescriptorRecord implements org.apache.maven.api.spi.CacheRecord {
+
+        private final PluginDescriptor descriptor;
+
+        DescriptorRecord(PluginDescriptor descriptor) {
+            this.descriptor = descriptor;
+        }
+
+        @Override
+        public Stream<Path> getDependencyPaths() {
+            // Plugin descriptors are read from JARs, but we do not track the JAR paths
+            // at this level. Invalidation is handled conservatively by flushing all
+            // descriptor entries when any plugin artifact changes.
+            return Stream.empty();
+        }
+
+        @Override
+        public void invalidate() {
+            // No resources to release for descriptor entries
+        }
+    }
+
+    private final MavenCache<Key, DescriptorRecord> cache;
+    private final Map<Key, Key> keys = new ConcurrentHashMap<>();
+
+    @Inject
+    public DefaultPluginDescriptorCache(CacheFactory cacheFactory) {
+        this.cache = cacheFactory.createCache();
+    }
 
     @Override
     public void flush() {
-        descriptors.clear();
+        cache.clear();
+        keys.clear();
     }
 
     @Override
@@ -63,33 +104,49 @@ public class DefaultPluginDescriptorCache implements PluginDescriptorCache {
 
     @Override
     public PluginDescriptor get(Key cacheKey) {
-        return clone(descriptors.get(cacheKey));
+        DescriptorRecord record = cache.get(cacheKey);
+        return record != null ? clone(record.descriptor) : null;
     }
 
     @Override
     public PluginDescriptor get(Key key, PluginDescriptorSupplier supplier)
             throws PluginDescriptorParsingException, PluginResolutionException, InvalidPluginDescriptorException {
 
-        PluginDescriptor desc = descriptors.get(key);
-        if (desc == null) {
+        DescriptorRecord record = cache.get(key);
+        if (record == null) {
             synchronized (key) {
-                desc = descriptors.get(key);
-                if (desc == null) {
-                    desc = supplier.load();
-                    descriptors.putIfAbsent(key, clone(desc));
+                record = cache.get(key);
+                if (record == null) {
+                    PluginDescriptor desc = supplier.load();
+                    DescriptorRecord newRecord = new DescriptorRecord(clone(desc));
+                    cache.computeIfAbsent(key, k -> newRecord);
+                    return clone(desc);
                 }
             }
         }
-        return clone(desc);
+        return clone(record.descriptor);
     }
 
     @Override
     public void put(Key cacheKey, PluginDescriptor pluginDescriptor) {
-        descriptors.put(cacheKey, clone(pluginDescriptor));
+        cache.put(cacheKey, new DescriptorRecord(clone(pluginDescriptor)));
     }
 
     protected static PluginDescriptor clone(PluginDescriptor original) {
         return new PluginDescriptor(original);
+    }
+
+    // MavenCacheHolder
+
+    @Override
+    public void invalidatePath(Path path) {
+        // Descriptor entries have no tracked file paths; flush all conservatively.
+        flush();
+    }
+
+    @Override
+    public void flushCache() {
+        flush();
     }
 
     private static final class CacheKey implements Key {

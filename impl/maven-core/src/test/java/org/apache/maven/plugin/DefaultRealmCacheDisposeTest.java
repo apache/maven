@@ -21,6 +21,7 @@ package org.apache.maven.plugin;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.internal.cache.DefaultCacheFactory;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.junit.jupiter.api.Test;
@@ -46,8 +47,9 @@ class DefaultRealmCacheDisposeTest {
         ClassWorld world = new ClassWorld();
         ClassRealm realm = world.newRealm("test-plugin-realm");
 
-        DefaultPluginRealmCache cache = new DefaultPluginRealmCache();
-        PluginRealmCache.CacheRecord record = new PluginRealmCache.CacheRecord(realm, List.<Artifact>of());
+        DefaultPluginRealmCache cache = new DefaultPluginRealmCache(new DefaultCacheFactory());
+        DefaultPluginRealmCache.PluginRealmRecord record =
+                new DefaultPluginRealmCache.PluginRealmRecord(realm, List.<Artifact>of(), null);
         cache.cache.put(new TestKey(), record);
 
         cache.dispose();
@@ -61,8 +63,9 @@ class DefaultRealmCacheDisposeTest {
         ClassWorld world = new ClassWorld();
         ClassRealm realm = world.newRealm("test-plugin-realm-flush");
 
-        DefaultPluginRealmCache cache = new DefaultPluginRealmCache();
-        PluginRealmCache.CacheRecord record = new PluginRealmCache.CacheRecord(realm, List.<Artifact>of());
+        DefaultPluginRealmCache cache = new DefaultPluginRealmCache(new DefaultCacheFactory());
+        DefaultPluginRealmCache.PluginRealmRecord record =
+                new DefaultPluginRealmCache.PluginRealmRecord(realm, List.<Artifact>of(), null);
         cache.cache.put(new TestKey(), record);
 
         cache.flush();

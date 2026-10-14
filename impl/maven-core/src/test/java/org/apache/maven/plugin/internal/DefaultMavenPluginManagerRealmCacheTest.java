@@ -25,6 +25,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.cache.DefaultCacheFactory;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.DefaultPluginRealmCache;
 import org.apache.maven.plugin.PluginArtifactsCache;
@@ -76,7 +77,7 @@ class DefaultMavenPluginManagerRealmCacheTest {
                 mock(DefaultPlexusContainer.class),
                 classRealmManager,
                 mock(PluginDescriptorCache.class),
-                new DefaultPluginRealmCache(),
+                new DefaultPluginRealmCache(new DefaultCacheFactory()),
                 resolver,
                 mock(org.apache.maven.plugin.ExtensionRealmCache.class),
                 mock(PluginVersionResolver.class),
