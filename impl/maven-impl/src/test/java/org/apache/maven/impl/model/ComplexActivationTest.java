@@ -28,6 +28,7 @@ import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.Sources;
+import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,6 +51,13 @@ class ComplexActivationTest {
         session = ApiRunner.createSession();
         builder = session.getService(ModelBuilder.class);
         assertNotNull(builder);
+    }
+
+    @Test
+    void testFactoryPomsUseTheirOwnRootDirectory() {
+        Path pom = getPom("complex");
+
+        assertEquals(pom.getParent(), session.getService(RootLocator.class).findMandatoryRoot(pom));
     }
 
     @Test
