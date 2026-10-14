@@ -66,29 +66,30 @@ public class DefaultPackagingRegistry
 
     @Inject
     public DefaultPackagingRegistry(Lookup lookup, TypeRegistry typeRegistry, List<PackagingProvider> providers) {
-        super(providers);
+        super(lookup, PackagingProvider.class, providers);
         this.lookup = lookup;
         this.typeRegistry = typeRegistry;
     }
 
     @Override
     public Optional<Packaging> lookup(String id) {
-        id = id.toLowerCase(Locale.ROOT);
-        // TODO: we should be able to inject a Map<String, LifecycleMapping> directly,
-        // however, SISU visibility filtering can only happen when an explicit
-        // lookup is performed. The whole problem here is caused by "project extensions"
-        // which are bound to a project's classloader, without any clear definition
-        // of a "project scope"
+        Optional<Packaging> result = super.lookup(id);
+        if (result.isPresent()) {
+            return result;
+        }
+        // Legacy LifecycleMapping fallback: SISU visibility filtering requires
+        // an explicit lookup (project extensions are bound to a project classloader)
+        String packagingId = id.toLowerCase(Locale.ROOT);
         LifecycleMapping lifecycleMapping =
-                lookup.lookupOptional(LifecycleMapping.class, id).orElse(null);
+                lookup.lookupOptional(LifecycleMapping.class, packagingId).orElse(null);
         if (lifecycleMapping == null) {
             return Optional.empty();
         }
-        Type type = typeRegistry.lookup(id).orElse(null);
+        Type type = typeRegistry.lookup(packagingId).orElse(null);
         if (type == null) {
             return Optional.empty();
         }
-        return Optional.of(new DefaultPackaging(id, type, getPlugins(lifecycleMapping)));
+        return Optional.of(new DefaultPackaging(packagingId, type, getPlugins(lifecycleMapping)));
     }
 
     private Map<String, PluginContainer> getPlugins(LifecycleMapping lifecycleMapping) {

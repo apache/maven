@@ -35,6 +35,7 @@ import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.ExtensibleEnumRegistry;
 import org.apache.maven.api.services.LanguageRegistry;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.PathScopeRegistry;
 import org.apache.maven.api.services.ProjectScopeRegistry;
 import org.apache.maven.api.spi.ExtensibleEnumProvider;
@@ -89,15 +90,36 @@ public class ExtensibleEnumRegistries {
             implements ExtensibleEnumRegistry<T> {
 
         protected final Map<String, T> values;
+        private final Lookup lookup;
+        private final Class<P> providerType;
 
+        @SafeVarargs
         public DefaultExtensibleEnumRegistry(List<P> providers, T... builtinValues) {
+            this(null, null, providers, builtinValues);
+        }
+
+        @SafeVarargs
+        public DefaultExtensibleEnumRegistry(
+                Lookup lookup, Class<P> providerType, List<P> providers, T... builtinValues) {
+            this.lookup = lookup;
+            this.providerType = providerType;
             values = Stream.concat(Stream.of(builtinValues), providers.stream().flatMap(p -> p.provides().stream()))
                     .collect(Collectors.toUnmodifiableMap(t -> t.id().toLowerCase(Locale.ROOT), t -> t));
         }
 
         @Override
         public Optional<T> lookup(String id) {
-            return Optional.ofNullable(values.get(requireNonNull(id, "id").toLowerCase(Locale.ROOT)));
+            String key = requireNonNull(id, "id").toLowerCase(Locale.ROOT);
+            if (lookup != null && providerType != null) {
+                Optional<T> result = lookup.lookupList(providerType).stream()
+                        .flatMap(p -> p.provides().stream())
+                        .filter(t -> key.equals(t.id().toLowerCase(Locale.ROOT)))
+                        .findFirst();
+                if (result.isPresent()) {
+                    return result;
+                }
+            }
+            return Optional.ofNullable(values.get(key));
         }
     }
 }

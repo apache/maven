@@ -78,26 +78,29 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
     @Nonnull
     public Type require(String id) {
         requireNonNull(id, "id cannot be null");
-        return usedTypes.computeIfAbsent(id, i -> {
-            Type type = lookup.lookupList(TypeProvider.class).stream()
-                    .flatMap(p -> p.provides().stream())
-                    .filter(t -> Objects.equals(id, t.id()))
-                    .findFirst()
-                    .orElse(null);
-            if (type == null) {
-                // Copy data as the ArtifactHandler is not immutable, but Type should be.
-                ArtifactHandler handler = manager.getArtifactHandler(id);
-                type = new DefaultType(
-                        id,
-                        languageRegistry.lookup(handler.getLanguage()).orElseGet(() -> handler::getLanguage),
-                        handler.getExtension(),
-                        handler.getClassifier(),
-                        handler.isIncludesDependencies(),
-                        handler.isAddedToClasspath()
-                                ? new JavaPathType[] {JavaPathType.CLASSES, JavaPathType.MODULES}
-                                : new JavaPathType[] {});
-            }
+        // Dynamic providers are queried first (uncached) so that SISU visibility
+        // filtering works correctly for project-extension-contributed types.
+        // Only the legacy ArtifactHandler fallback is cached.
+        Type type = lookup.lookupList(TypeProvider.class).stream()
+                .flatMap(p -> p.provides().stream())
+                .filter(t -> Objects.equals(id, t.id()))
+                .findFirst()
+                .orElse(null);
+        if (type != null) {
             return type;
+        }
+        return usedTypes.computeIfAbsent(id, i -> {
+            // Copy data as the ArtifactHandler is not immutable, but Type should be.
+            ArtifactHandler handler = manager.getArtifactHandler(id);
+            return new DefaultType(
+                    id,
+                    languageRegistry.lookup(handler.getLanguage()).orElseGet(() -> handler::getLanguage),
+                    handler.getExtension(),
+                    handler.getClassifier(),
+                    handler.isIncludesDependencies(),
+                    handler.isAddedToClasspath()
+                            ? new JavaPathType[] {JavaPathType.CLASSES, JavaPathType.MODULES}
+                            : new JavaPathType[] {});
         });
     }
 }
