@@ -74,7 +74,7 @@ public class TestSpiWorkspaceReader implements WorkspaceReader {
     @Override
     public List<String> findVersions(Artifact artifact) {
         log.info("[SPI-WR] findVersions({})", artifact.key());
-        if (SYNTHETIC_GROUP.equals(artifact.getGroupId()) && SYNTHETIC_ARTIFACT.equals(artifact.getArtifactId())) {
+        if (SYNTHETIC_GROUP.equals(artifact.groupId()) && SYNTHETIC_ARTIFACT.equals(artifact.artifactId())) {
             return Collections.singletonList(SYNTHETIC_VERSION);
         }
         return Collections.emptyList();
@@ -106,8 +106,8 @@ public class TestSpiWorkspaceReader implements WorkspaceReader {
     }
 
     private static boolean isSyntheticArtifact(Artifact artifact) {
-        return SYNTHETIC_GROUP.equals(artifact.getGroupId())
-                && SYNTHETIC_ARTIFACT.equals(artifact.getArtifactId())
-                && SYNTHETIC_VERSION.equals(artifact.getVersion().toString());
+        return SYNTHETIC_GROUP.equals(artifact.groupId())
+                && SYNTHETIC_ARTIFACT.equals(artifact.artifactId())
+                && SYNTHETIC_VERSION.equals(artifact.version().toString());
     }
 }
