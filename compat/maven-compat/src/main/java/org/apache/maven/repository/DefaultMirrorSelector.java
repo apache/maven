@@ -21,6 +21,8 @@ package org.apache.maven.repository;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -129,7 +131,10 @@ public class DefaultMirrorSelector implements MirrorSelector {
      * external:*} and {@code external:http:*} mirror matching below.
      */
     private static final Pattern URL_PROTOCOL_AND_HOST =
-            Pattern.compile("([^:/]+(:[^:/]{2,}+(?=://))?):(//([^@/]*@)?([^/:]+))?.*");
+            Pattern.compile("([^:/]+(:[^:/]{2,}+(?=://))?):(//([^@/]*@)?(\\[[^\\]]*\\]|[^/:]+))?.*");
+
+    /** An IPv4 address of the loopback range 127.0.0.0/8. */
+    private static final Pattern IPV4_LOOPBACK = Pattern.compile("127(\\.(25[0-5]|2[0-4]\\d|1?\\d?\\d)){3}");
 
     /**
      * Checks the URL to see if this repository refers to an external repository. A URL that
@@ -149,8 +154,30 @@ public class DefaultMirrorSelector implements MirrorSelector {
         return !(isLocal(m.group(5)) || "file".equalsIgnoreCase(m.group(1)));
     }
 
+    /**
+     * Checks whether a host names the local machine: {@code localhost}, an IPv4 address of the loopback
+     * range {@code 127.0.0.0/8} or an IPv6 loopback address in brackets. An IPv4-mapped IPv6 address is judged by its
+     * IPv4 address. The names are not resolved.
+     *
+     * @param host the host of a repository URL, may be {@code null}
+     * @return true if the host is local
+     */
     private static boolean isLocal(String host) {
-        return "localhost".equals(host) || "127.0.0.1".equals(host);
+        if (host == null) {
+            return false;
+        }
+        if ("localhost".equals(host) || IPV4_LOOPBACK.matcher(host).matches()) {
+            return true;
+        }
+        if (host.startsWith("[") && host.endsWith("]")) {
+            try {
+                // an IP literal is parsed without any name lookup
+                return InetAddress.getByName(host).isLoopbackAddress();
+            } catch (UnknownHostException e) {
+                return false;
+            }
+        }
+        return false;
     }
 
     /**
