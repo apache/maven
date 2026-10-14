@@ -30,7 +30,7 @@ import org.apache.maven.api.annotations.Nullable;
 import static java.util.Objects.requireNonNull;
 
 /**
- *
+ * Request for creating an {@link org.apache.maven.api.Artifact} from individual coordinate components.
  *
  * @since 4.0.0
  */

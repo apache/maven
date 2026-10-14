@@ -29,6 +29,8 @@ import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.ReportPlugin;
 
 /**
+ * Service for creating {@link org.apache.maven.api.DependencyCoordinates} instances
+ * from requests, model dependencies, plugins, or artifact coordinates.
  *
  * @since 4.0.0
  */

@@ -36,6 +36,8 @@ import org.apache.maven.api.annotations.Nullable;
 import static java.util.Objects.requireNonNull;
 
 /**
+ * Request for creating {@link org.apache.maven.api.DependencyCoordinates}, extending
+ * {@link ArtifactCoordinatesFactoryRequest} with scope, optionality, and exclusion information.
  *
  * @since 4.0.0
  */

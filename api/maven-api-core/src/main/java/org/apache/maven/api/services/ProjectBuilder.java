@@ -26,6 +26,8 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
+ * Service for building {@link org.apache.maven.api.Project} instances from POM files or other sources.
+ *
  * @since 4.0.0
  */
 @Experimental

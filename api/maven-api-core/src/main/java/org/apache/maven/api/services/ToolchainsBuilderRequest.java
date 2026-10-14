@@ -32,6 +32,7 @@ import org.apache.maven.api.annotations.Nullable;
 import static java.util.Objects.requireNonNull;
 
 /**
+ * Request for building the effective toolchains from installation and user-level toolchain sources.
  *
  * @since 4.0.0
  */

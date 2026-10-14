@@ -32,6 +32,7 @@ import org.apache.maven.api.annotations.Nullable;
 import static java.util.Objects.requireNonNull;
 
 /**
+ * Request for resolving a meta-version of an artifact to a concrete version.
  *
  * @since 4.0.0
  */

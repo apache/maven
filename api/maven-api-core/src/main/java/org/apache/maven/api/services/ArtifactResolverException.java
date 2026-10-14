@@ -21,7 +21,8 @@ package org.apache.maven.api.services;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
- *
+ * Exception thrown when artifact resolution fails, carrying the partial
+ * {@link ArtifactResolverResult} with details about the failure.
  *
  * @since 4.0.0
  */

@@ -27,6 +27,8 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
+ * Result of resolving a meta-version, providing the concrete resolved version
+ * and the repository it was resolved from.
  *
  * @since 4.0.0
  */
