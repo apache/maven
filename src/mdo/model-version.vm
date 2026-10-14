@@ -188,7 +188,6 @@ public class ${className} {
                                                 "api".equals(dependency.getScope())
                                                         || "implementation".equals(dependency.getScope()))));
     }
-    }
 
     private boolean has(String str) {
         return str != null;
