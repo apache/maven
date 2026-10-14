@@ -158,7 +158,7 @@ public class MojoExecutionFilter {
 
             @Override
             public ClassLoader getClassLoader() {
-                return null;
+                throw new UnsupportedOperationException("getClassLoader() is not available in the filter adapter");
             }
 
             @Override

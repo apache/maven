@@ -21,7 +21,7 @@ package org.apache.maven.lifecycle.internal.filter;
 import org.apache.maven.api.MojoExecution;
 
 /**
- * Predicate for filtering {@link MojoExecution} entries from the lifecycle build plan.
+ * Predicate for filtering {@link MojoExecution} entries at execution time.
  *
  * <p>Used by {@code -Dmaven.lifecycle.filter} to skip matching executions at runtime.
  * New predicate types can be added without breaking existing filter expressions.
@@ -32,10 +32,10 @@ import org.apache.maven.api.MojoExecution;
 public interface FilterPredicate {
 
     /**
-     * Returns {@code true} if the given mojo execution should be <em>excluded</em> from the build plan.
+     * Returns {@code true} if the given mojo execution should be <em>skipped</em> at execution time.
      *
      * @param execution the mojo execution to test
-     * @return {@code true} to remove this execution from the plan, {@code false} to keep it
+     * @return {@code true} to skip this execution, {@code false} to execute it normally
      */
     boolean matches(MojoExecution execution);
 }
