@@ -380,15 +380,15 @@ find_file_argument_basedir() {
 # Set MAVEN_DEBUG_SCRIPT=1 to enable debug logging
 concat_lines() {
   if [ -f "$1" ]; then
-    # Use Java source-launch mode (JDK 11+) to run JvmConfigParser directly
-    # This avoids the need for compilation and temporary directories
+    # JvmConfigParser is shipped precompiled: source-launch mode would compile it
+    # on every invocation, which costs several times the actual parsing
 
     # Debug logging
     if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
       printf '[DEBUG] Found jvm.config file at: %s\n' "$1" >&2
       printf '[DEBUG] Running JvmConfigParser with Java: %s\n' "$JAVACMD" >&2
       printf '[DEBUG] Parser arguments: %s %s %s\n' \
-        "$MAVEN_HOME/bin/JvmConfigParser.java" "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" >&2
+        "-cp $MAVEN_HOME/bin JvmConfigParser" "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" >&2
     fi
 
     # Verify Java is available
@@ -397,12 +397,12 @@ concat_lines() {
       return 1
     }
 
-    # Run the parser using source-launch mode
+    # Run the parser
     # Capture stdout for JVM options; capture stderr separately so JVM notices
     # (e.g. JAVA_TOOL_OPTIONS) do not pollute MAVEN_OPTS.
     parser_stderr_file=$(mktemp "${TMPDIR:-/tmp}/mvn-jvm-config-stderr.XXXXXX" 2>/dev/null || echo "${TMPDIR:-/tmp}/mvn-jvm-config-stderr.$$")
     trap 'rm -f "$parser_stderr_file"' EXIT INT TERM
-    parser_output=$("$JAVACMD" "$MAVEN_HOME/bin/JvmConfigParser.java" "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" 2>"$parser_stderr_file")
+    parser_output=$("$JAVACMD" -cp "$MAVEN_HOME/bin" JvmConfigParser "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" 2>"$parser_stderr_file")
     parser_exit=$?
 
     if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then

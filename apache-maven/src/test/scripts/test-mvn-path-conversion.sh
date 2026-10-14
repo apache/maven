@@ -131,8 +131,8 @@ case " $* " in
   *" -version "*) exit 0 ;;
 esac
 
-case "$1" in
-  *JvmConfigParser.java)
+case "$3" in
+  JvmConfigParser)
     # Mimics bin/JvmConfigParser: strip comments, expand the base directory
     # placeholders and print the arguments quoted.
     expand() {
@@ -149,7 +149,7 @@ case "$1" in
       printf '%s' "$out$text"
     }
 
-    basedir="$3"
+    basedir="$5"
     set -f
     while IFS= read -r line || [ -n "$line" ]; do
       line="${line%%#*}"
@@ -158,7 +158,7 @@ case "$1" in
       for token in $line; do
         printf '"%s" ' "$token"
       done
-    done < "$2"
+    done < "$4"
     printf '\n'
     exit 0 ;;
 esac

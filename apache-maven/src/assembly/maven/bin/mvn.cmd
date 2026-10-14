@@ -284,7 +284,7 @@ set JVM_CONFIG_MAVEN_OPTS=
 
 if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadJvmConfig
 
-rem Use Java source-launch mode (JDK 11+) to parse jvm.config
+rem Use the precompiled JvmConfigParser to parse jvm.config
 rem This avoids batch script parsing issues with special characters (pipes, quotes, @, etc.)
 rem Java writes parsed output to a temp file; we read it with 'set /p' + input redirect.
 rem
@@ -308,11 +308,11 @@ if defined MAVEN_DEBUG_SCRIPT (
   echo [DEBUG] Found .mvn\jvm.config file at: %MAVEN_PROJECTBASEDIR%\.mvn\jvm.config
   echo [DEBUG] Using temp file: %JVM_CONFIG_TEMP%
   echo [DEBUG] Running JvmConfigParser with Java: %JAVACMD%
-  echo [DEBUG] Parser arguments: "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" "%JVM_CONFIG_TEMP%"
+  echo [DEBUG] Parser arguments: -cp "%MAVEN_HOME%\bin" JvmConfigParser "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" "%JVM_CONFIG_TEMP%"
 )
 
 rem Run parser with output file as third argument - Java writes directly to file
-"%JAVACMD%" "%MAVEN_HOME%\bin\JvmConfigParser.java" "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" "%JVM_CONFIG_TEMP%"
+"%JAVACMD%" -cp "%MAVEN_HOME%\bin" JvmConfigParser "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" "%MAVEN_PROJECTBASEDIR%" "%JVM_CONFIG_TEMP%"
 set JVM_CONFIG_EXIT=%ERRORLEVEL%
 
 if defined MAVEN_DEBUG_SCRIPT (

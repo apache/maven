@@ -37,6 +37,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
+import java.util.logging.Handler;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
@@ -124,6 +125,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         Properties oldProps = new Properties();
         oldProps.putAll(System.getProperties());
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+        // activateLogging() replaces them with SLF4JBridgeHandler, whose classes live in Maven's realm
+        Handler[] oldRootLoggerHandlers = java.util.logging.Logger.getLogger("").getHandlers();
         try (C context = createContext(invokerRequest)) {
             if (contextConsumer != null) {
                 contextConsumer.accept(context);
@@ -147,6 +150,22 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         } finally {
             Thread.currentThread().setContextClassLoader(oldCL);
             System.setProperties(oldProps);
+            restoreRootLoggerHandlers(oldRootLoggerHandlers);
+        }
+    }
+
+    /**
+     * Puts back the handlers the {@code java.util.logging} root logger had before the invocation. When Maven runs inside
+     * another JVM, the root logger belongs to that JVM, and a {@code SLF4JBridgeHandler} left on it would route the
+     * host's logging to Maven and fail once Maven's class realm is closed.
+     */
+    private static void restoreRootLoggerHandlers(Handler[] handlers) {
+        java.util.logging.Logger root = java.util.logging.Logger.getLogger("");
+        for (Handler handler : root.getHandlers()) {
+            root.removeHandler(handler);
+        }
+        for (Handler handler : handlers) {
+            root.addHandler(handler);
         }
     }
 

@@ -115,7 +115,7 @@ public class SourceStrategy extends AbstractUpgradeStrategy {
 
                 if (hasChanges) {
                     modifiedPoms.add(pomPath);
-                    context.success("Source configuration migrated to <source> elements");
+                    logChange(context, "Source configuration migrated to <source> elements");
                 } else {
                     context.success("No source configuration to migrate");
                 }
