@@ -30,7 +30,7 @@ import java.util.List;
  * Parses .mvn/jvm.config file for Windows batch/Unix shell scripts.
  * This avoids the complexity of parsing special characters (pipes, quotes, etc.) in scripts.
  *
- * Usage: java JvmConfigParser.java <jvm.config-path> <maven-project-basedir> [output-file]
+ * Usage: java -cp <bin-dir> JvmConfigParser <jvm.config-path> <maven-project-basedir> [output-file]
  *
  * If output-file is provided, writes result to that file (avoids Windows file locking issues).
  * Otherwise, outputs to stdout.
@@ -40,7 +40,7 @@ import java.util.List;
 public class JvmConfigParser {
     public static void main(String[] args) {
         if (args.length < 2 || args.length > 3) {
-            System.err.println("Usage: java JvmConfigParser.java <jvm.config-path> <maven-project-basedir> [output-file]");
+            System.err.println("Usage: java -cp <bin-dir> JvmConfigParser <jvm.config-path> <maven-project-basedir> [output-file]");
             System.exit(1);
         }
 

@@ -21,6 +21,8 @@ package org.apache.maven.settings.validation;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -109,6 +111,8 @@ public class DefaultSettingsValidator implements SettingsValidator {
                                 "must be unique across all server ids and aliases but found duplicate alias " + alias);
                     }
                 }
+
+                validateRepositoryOrigins(problems, server, i);
             }
         }
 
@@ -225,6 +229,81 @@ public class DefaultSettingsValidator implements SettingsValidator {
                         "uses the unsupported value 'legacy', artifact resolution might fail.");
             }
         }
+    }
+
+    private static void validateRepositoryOrigins(SettingsProblemCollector problems, Server server, int index) {
+        for (int o = 0; o < server.getRepositoryOrigins().size(); o++) {
+            String repositoryOrigin = server.getRepositoryOrigins().get(o);
+            String fieldName = "servers.server[" + index + "].repositoryOrigins[" + o + "]";
+
+            if (!validateStringNotEmpty(problems, fieldName, repositoryOrigin, server.getId())) {
+                continue;
+            }
+
+            // settings are validated before they are interpolated here, so a placeholder is not something
+            // this validator can judge
+            if (repositoryOrigin.contains("${")) {
+                continue;
+            }
+
+            String invalid = invalidRepositoryOriginReason(repositoryOrigin);
+            if (invalid != null) {
+                addViolation(problems, Severity.ERROR, fieldName, server.getId(), invalid);
+                continue;
+            }
+
+            String ignored = ignoredRepositoryOriginPartsReason(repositoryOrigin);
+            if (ignored != null) {
+                addViolation(problems, Severity.WARNING, fieldName, server.getId(), ignored);
+            }
+        }
+    }
+
+    /**
+     * Parses a {@code <server><repositoryOrigins>} value the way the credential scoping does; see
+     * {@code OriginBoundAuthenticationSelector#originOf(String)} in maven-core, which is the authority
+     * on what an origin is. Returns {@code null} when the value is not a URI at all.
+     */
+    private static URI parseRepositoryOrigin(String value) {
+        try {
+            return new URI(value).parseServerAuthority();
+        } catch (URISyntaxException e) {
+            return null;
+        }
+    }
+
+    /**
+     * @return the reason why no origin can be derived from the given value, or {@code null} if one can
+     */
+    private static String invalidRepositoryOriginReason(String value) {
+        URI uri = parseRepositoryOrigin(value);
+        if (uri == null) {
+            return "must be a repository origin of the form scheme://host[:port] but found '" + value + "'";
+        }
+        if (uri.getScheme() == null) {
+            return "must start with a scheme, for example https://repo.example.org, but found '" + value + "'";
+        }
+        if (uri.getHost() == null) {
+            return "must name a host, for example https://repo.example.org, but found '" + value + "'";
+        }
+        if (uri.getUserInfo() != null) {
+            return "must not carry user information but found '" + value + "'";
+        }
+        return null;
+    }
+
+    /**
+     * @return the reason why parts of the given value are ignored, or {@code null} if it is a bare origin
+     */
+    private static String ignoredRepositoryOriginPartsReason(String value) {
+        URI uri = parseRepositoryOrigin(value);
+        String path = uri.getRawPath();
+        boolean extraPath = path != null && !path.isEmpty() && !"/".equals(path);
+        if (!extraPath && uri.getRawQuery() == null && uri.getRawFragment() == null) {
+            return null;
+        }
+        return "is a repository origin, not a repository URL; only '" + uri.getScheme() + "://" + uri.getAuthority()
+                + "' of '" + value + "' is used";
     }
 
     // ----------------------------------------------------------------------

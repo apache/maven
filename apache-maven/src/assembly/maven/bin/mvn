@@ -151,7 +151,7 @@ for arg in "$@"; do
     -V|--show-version) SHOW_VERSION=true ;;
     -q|--quiet) QUIET=true ;;
     -X|--debug) VERBOSE=true ;;
-    --enc|--shell|--up) MAIN_CLASS_OVERRIDE=true ;;
+    --enc|--shell|--up|--val) MAIN_CLASS_OVERRIDE=true ;;
     -[qvVXe]*)
       case $arg in
         *v*) VERSION_AND_EXIT=true ;;
@@ -382,15 +382,15 @@ find_file_argument_basedir() {
 # Set MAVEN_DEBUG_SCRIPT=1 to enable debug logging
 concat_lines() {
   if [ -f "$1" ]; then
-    # Use Java source-launch mode (JDK 11+) to run JvmConfigParser directly
-    # This avoids the need for compilation and temporary directories
+    # JvmConfigParser is shipped precompiled: source-launch mode would compile it
+    # on every invocation, which costs several times the actual parsing
 
     # Debug logging
     if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
       printf '[DEBUG] Found jvm.config file at: %s\n' "$1" >&2
       printf '[DEBUG] Running JvmConfigParser with Java: %s\n' "$JAVACMD" >&2
       printf '[DEBUG] Parser arguments: %s %s %s\n' \
-        "$MAVEN_HOME/bin/JvmConfigParser.java" "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" >&2
+        "-cp $MAVEN_HOME/bin JvmConfigParser" "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" >&2
     fi
 
     # Verify Java is available
@@ -399,9 +399,9 @@ concat_lines() {
       return 1
     }
 
-    # Run the parser using source-launch mode
+    # Run the parser
     # Capture both stdout and stderr for comprehensive error reporting
-    parser_output=$("$JAVACMD" "$MAVEN_HOME/bin/JvmConfigParser.java" "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" 2>&1)
+    parser_output=$("$JAVACMD" -cp "$MAVEN_HOME/bin" JvmConfigParser "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" 2>&1)
     parser_exit=$?
 
     if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
@@ -529,6 +529,9 @@ handle_args() {
       --up)
         MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenUpCling"
         ;;
+      --val)
+        MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenValCling"
+        ;;
       *)
         ;;
     esac
@@ -572,7 +575,7 @@ fi
 # to preserve literal values (backslashes, ${...} placeholders) without
 # shell re-parsing. Only the base command uses eval for MAVEN_OPTS word splitting.
 # MAVEN_ARGS is only passed for the default Maven build command (MavenCling),
-# not for sub-commands like --up, --enc, or --shell which have their own options.
+# not for sub-commands like --up, --enc, --shell or --val which have their own options.
 if [ "$MAVEN_MAIN_CLASS" = "org.apache.maven.cling.MavenCling" ]; then
   eval exec "$cmd" '$MAVEN_ARGS' '"$@"'
 else

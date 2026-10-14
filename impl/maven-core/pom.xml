@@ -32,6 +32,7 @@ under the License.
   <description>Maven Core classes.</description>
 
   <properties>
+    <javaModuleName>org.apache.maven.core</javaModuleName>
     <!-- Default lifecycle plugin versions.
          Maintained here so that dependency-update bots (Dependabot, Renovate)
          can propose version bumps automatically.  Values are filtered into

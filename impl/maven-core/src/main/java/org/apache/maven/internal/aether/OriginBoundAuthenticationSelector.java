@@ -38,10 +38,11 @@ import static java.util.Objects.requireNonNull;
  * port) of the repository or mirror the operator declared for the same server id.
  * <p>
  * A repository's id and its origin are independent: this selector serves a server id's credentials
- * only to a repository whose origin matches one the operator declared for that id, in settings or on
- * the command line. Ids with no operator-declared origin keep the previous behaviour unless
- * {@code strict} scope is requested, and a warning naming the target origin is emitted once per
- * id/origin pair.
+ * only to a repository whose origin matches one the operator declared for that id, either by declaring
+ * a repository or mirror with that id in settings or on the command line, or by listing the origin in
+ * that server's {@code <repositoryOrigins>} in settings. Ids with no operator-declared origin keep the
+ * previous behaviour unless {@code strict} scope is requested, and a warning naming the target origin
+ * is emitted once per id/origin pair.
  *
  * @see DefaultRepositorySystemSessionFactory#MAVEN_REPOSITORY_CREDENTIAL_SCOPE
  */
@@ -135,8 +136,10 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
                     id,
                     origin,
                     "Not using credentials of server '" + id + "' for repository " + repository.getUrl()
-                            + ": the repository or mirror declared for this id resides at " + origins
-                            + ". Set "
+                            + ": the origins declared for this id are " + origins
+                            + ". Add " + originHint(origin)
+                            + " to <repositoryOrigins> of that server in settings if these credentials belong"
+                            + " there, or set "
                             + DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE + "="
                             + SCOPE_ID + " to restore legacy id-only credential matching.");
             return null;
@@ -147,8 +150,10 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
                     origin,
                     "Not using credentials of server '" + id + "' for repository " + repository.getUrl()
                             + ": no repository or mirror with this id is declared in settings or on the command"
-                            + " line, and " + DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE
-                            + "=" + SCOPE_STRICT + " is in effect.");
+                            + " line and the server declares no <repositoryOrigins>, and "
+                            + DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE
+                            + "=" + SCOPE_STRICT + " is in effect. Declare " + originHint(origin)
+                            + " in <repositoryOrigins> of that server in settings to allow it.");
             return null;
         }
         warnOnce(
@@ -156,10 +161,17 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
                 origin,
                 "Using credentials of server '" + id + "' for repository " + repository.getUrl()
                         + ", although no repository or mirror with this id is declared in settings or on the"
-                        + " command line. Set "
+                        + " command line and the server declares no <repositoryOrigins>. Declare "
+                        + originHint(origin)
+                        + " in <repositoryOrigins> of that server in settings to bind these credentials"
+                        + " explicitly, or set "
                         + DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE
                         + "=" + SCOPE_STRICT + " to refuse such credential use.");
         return auth;
+    }
+
+    private static String originHint(String origin) {
+        return origin != null ? "'" + origin + "'" : "its origin";
     }
 
     private void warnOnce(String id, String origin, String message) {
