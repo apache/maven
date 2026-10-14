@@ -62,6 +62,7 @@ import org.apache.maven.api.services.PathScopeRegistry;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
+import org.apache.maven.classrealm.ModuleLayerCreationException;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.execution.MavenSession;
@@ -378,20 +379,18 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                     foreignImports,
                     filter,
                     project.getRemotePluginRepositories(),
-                    session.getRepositorySession());
+                    session.getRepositorySession(),
+                    pluginDescriptor.isModular());
 
             PluginRealmCache.CacheRecord cacheRecord = pluginRealmCache.get(cacheKey, () -> {
                 createPluginRealm(pluginDescriptor, session, parent, foreignImports, filter);
 
                 return new PluginRealmCache.CacheRecord(
-                        pluginDescriptor.getClassRealm(),
-                        pluginDescriptor.getArtifacts(),
-                        pluginDescriptor.getDependencyNode());
+                        pluginDescriptor.getClassRealm(), pluginDescriptor.getArtifacts());
             });
 
             pluginDescriptor.setClassRealm(cacheRecord.getRealm());
             pluginDescriptor.setArtifacts(new ArrayList<>(cacheRecord.getArtifacts()));
-            pluginDescriptor.setDependencyNode(cacheRecord.getDependencyNode());
             for (ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents()) {
                 componentDescriptor.setRealm(cacheRecord.getRealm());
             }
@@ -430,11 +429,27 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
         pluginArtifacts = toMavenArtifacts(result);
 
-        // Classic classpath-based plugin
-        pluginRealm = classRealmManager.createPluginRealm(
-                plugin, parent, null, foreignImports, toAetherArtifacts(pluginArtifacts));
+        if (pluginDescriptor.isModular()) {
+            // Modular plugin: load in its own JPMS ModuleLayer.
+            // No Sisu/Plexus discovery — DI only via maven-di Injector.
+            try {
+                pluginRealm =
+                        classRealmManager.createModularPluginRealm(plugin, parent, toAetherArtifacts(pluginArtifacts));
+            } catch (ModuleLayerCreationException e) {
+                throw new PluginContainerException(
+                        plugin,
+                        null,
+                        "Failed to create modular plugin realm for " + plugin.getId() + ": " + e.getMessage(),
+                        e);
+            }
+            // No discoverPluginComponents() — modular plugins use maven-di only
+        } else {
+            // Classic classpath-based plugin
+            pluginRealm = classRealmManager.createPluginRealm(
+                    plugin, parent, null, foreignImports, toAetherArtifacts(pluginArtifacts));
 
-        discoverPluginComponents(pluginRealm, plugin, pluginDescriptor);
+            discoverPluginComponents(pluginRealm, plugin, pluginDescriptor);
+        }
 
         pluginDescriptor.setDependencyNode(result.getRoot());
         pluginDescriptor.setClassRealm(pluginRealm);
@@ -535,11 +550,16 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         // lookups that occur in contextualize calls in line with the right realm.
         ClassRealm oldLookupRealm = container.setLookupRealm(pluginRealm);
 
+        // For modular plugins, set TCCL to the ModuleLayer's classloader
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(pluginRealm);
+        ClassLoader effectiveLoader = getEffectiveClassLoader(pluginRealm);
+        Thread.currentThread().setContextClassLoader(effectiveLoader);
 
         try {
-            if (mojoDescriptor.isV4Api()) {
+            if (pluginDescriptor.isModular()) {
+                // Modular plugins always use the v4 Mojo loading path with maven-di
+                return loadV4Mojo(mojoInterface, session, mojoExecution, mojoDescriptor, pluginDescriptor, pluginRealm);
+            } else if (mojoDescriptor.isV4Api()) {
                 return loadV4Mojo(mojoInterface, session, mojoExecution, mojoDescriptor, pluginDescriptor, pluginRealm);
             } else {
                 return loadV3Mojo(mojoInterface, session, mojoExecution, mojoDescriptor, pluginDescriptor, pluginRealm);
@@ -548,6 +568,24 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
             container.setLookupRealm(oldLookupRealm);
         }
+    }
+
+    /**
+     * Returns the effective classloader for a plugin realm.
+     * For modular plugins, returns the ModuleLayer's classloader;
+     * for classic plugins, returns the realm's own classloader.
+     */
+    private static ClassLoader getEffectiveClassLoader(ClassRealm pluginRealm) {
+        var implRealm = (org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm;
+        if (implRealm.isModular()) {
+            ModuleLayer layer = implRealm.getModuleLayer();
+            // defineModulesWithOneLoader guarantees a single shared ClassLoader for all
+            // modules in the layer; any module's getClassLoader() returns the same instance.
+            String anyModuleName =
+                    layer.modules().stream().findFirst().orElseThrow().getName();
+            return layer.findLoader(anyModuleName);
+        }
+        return pluginRealm.getClassLoader();
     }
 
     private <T> T loadV4Mojo(
@@ -567,9 +605,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         org.apache.maven.api.plugin.Log log = new DefaultLog(
                 LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getImplementation()));
         try {
-            // Discover components from the effective ClassLoader (module layer loader for modular plugins)
+            // For modular plugins, discover from the ModuleLayer's classloader
+            ClassLoader discoveryLoader = getEffectiveClassLoader(pluginRealm);
             Injector injector = Injector.create();
-            injector.discover(pluginRealm);
+            injector.discover(discoveryLoader);
             // Add known classes
             // TODO: get those from the existing plexus scopes ?
             injector.bindInstance(Session.class, sessionV4);
