@@ -146,7 +146,7 @@ public class MojoExecutionFilter {
             }
 
             @Override
-            @Nullable
+            @Nullable // adapter may lack a descriptor; all predicates null-guard this
             public PluginDescriptor getDescriptor() {
                 return descriptorV4;
             }
