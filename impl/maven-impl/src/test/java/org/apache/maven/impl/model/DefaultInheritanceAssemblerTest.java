@@ -18,11 +18,15 @@
  */
 package org.apache.maven.impl.model;
 
+import java.io.StringReader;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
+import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Plugin;
+import org.apache.maven.api.model.ReportPlugin;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.services.xml.XmlWriterRequest;
 import org.apache.maven.impl.DefaultModelXmlFactory;
@@ -31,7 +35,9 @@ import org.junit.jupiter.api.Test;
 import org.xmlunit.builder.DiffBuilder;
 import org.xmlunit.diff.Diff;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 class DefaultInheritanceAssemblerTest {
 
@@ -51,6 +57,74 @@ class DefaultInheritanceAssemblerTest {
 
     private Model getModel(String name) throws Exception {
         return xmlFactory.read(XmlReaderRequest.builder().path(getPom(name)).build());
+    }
+
+    /**
+     * An inherited plugin must still report the POM that declares it, as the location of the plugin element
+     * itself is what tools use to resolve paths in the plugin configuration against the declaring POM.
+     */
+    @Test
+    void testInheritedPluginKeepsItsLocation() throws Exception {
+        Model parent = readWithLocations(
+                "<project><modelVersion>4.0.0</modelVersion><groupId>g</groupId><artifactId>parent</artifactId>"
+                        + "<version>1</version><packaging>pom</packaging><build><plugins><plugin>"
+                        + "<artifactId>some-plugin</artifactId></plugin></plugins></build>"
+                        + "<reporting><plugins><plugin><artifactId>some-report</artifactId></plugin></plugins>"
+                        + "</reporting></project>",
+                "parent.xml");
+        Model child = readWithLocations(
+                "<project><modelVersion>4.0.0</modelVersion><parent><groupId>g</groupId>"
+                        + "<artifactId>parent</artifactId><version>1</version></parent>"
+                        + "<artifactId>child</artifactId></project>",
+                "child.xml");
+
+        Model assembled = assembler.assembleModelInheritance(child, parent, null, null);
+
+        Plugin plugin = assembled.getBuild().getPlugins().get(0);
+        InputLocation location = plugin.getLocation("");
+        assertNotNull(location);
+        assertEquals(parent.getBuild().getPlugins().get(0).getLocation(""), location);
+        assertEquals("g:parent:1", location.getSource().getModelId());
+
+        ReportPlugin reportPlugin = assembled.getReporting().getPlugins().get(0);
+        location = reportPlugin.getLocation("");
+        assertNotNull(location);
+        assertEquals(parent.getReporting().getPlugins().get(0).getLocation(""), location);
+        assertEquals("g:parent:1", location.getSource().getModelId());
+    }
+
+    /**
+     * A plugin that the child declares itself keeps the location of the child declaration, the location of the
+     * inherited one must not replace it.
+     */
+    @Test
+    void testChildPluginKeepsItsOwnLocation() throws Exception {
+        Model parent = readWithLocations(
+                "<project><modelVersion>4.0.0</modelVersion><groupId>g</groupId><artifactId>parent</artifactId>"
+                        + "<version>1</version><packaging>pom</packaging><build><plugins><plugin>"
+                        + "<artifactId>some-plugin</artifactId></plugin></plugins></build></project>",
+                "parent.xml");
+        Model child = readWithLocations(
+                "<project><modelVersion>4.0.0</modelVersion><parent><groupId>g</groupId>"
+                        + "<artifactId>parent</artifactId><version>1</version></parent>"
+                        + "<artifactId>child</artifactId><build><plugins><plugin>"
+                        + "<artifactId>some-plugin</artifactId></plugin></plugins></build></project>",
+                "child.xml");
+
+        Model assembled = assembler.assembleModelInheritance(child, parent, null, null);
+
+        InputLocation location = assembled.getBuild().getPlugins().get(0).getLocation("");
+        assertNotNull(location);
+        assertEquals(child.getBuild().getPlugins().get(0).getLocation(""), location);
+        assertEquals("g:child:1", location.getSource().getModelId());
+    }
+
+    private Model readWithLocations(String xml, String location) throws Exception {
+        return xmlFactory.read(XmlReaderRequest.builder()
+                .reader(new StringReader(xml))
+                .location(location)
+                .addLocationInformation(true)
+                .build());
     }
 
     @Test
