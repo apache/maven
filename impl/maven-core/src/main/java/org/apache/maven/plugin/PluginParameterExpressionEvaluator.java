@@ -81,6 +81,13 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
 
     private Properties properties;
 
+    /**
+     * Creates an evaluator that is not bound to a mojo execution: the expressions referring to the mojo or to its
+     * plugin ({@code ${mojo}}, {@code ${plugin}} and their sub-expressions) evaluate to {@code null}, as unknown
+     * expressions do, while all the other expressions are evaluated normally.
+     *
+     * @param session the session to evaluate the expressions against
+     */
     public PluginParameterExpressionEvaluator(MavenSession session) {
         this(session, null);
     }
@@ -163,7 +170,7 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
             return expression.replace("$$", "$");
         }
 
-        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+        MojoDescriptor mojoDescriptor = mojoExecution != null ? mojoExecution.getMojoDescriptor() : null;
 
         if ("localRepository".equals(expression)) {
             value = session.getLocalRepository();
@@ -234,12 +241,13 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                         "Error evaluating plugin parameter expression: " + expression, e);
             }
         } else if (expression.equals("plugin")) {
-            value = mojoDescriptor.getPluginDescriptor();
+            value = mojoDescriptor != null ? mojoDescriptor.getPluginDescriptor() : null;
         } else if (expression.startsWith("plugin")) {
             try {
                 int pathSeparator = expression.indexOf('/');
 
-                PluginDescriptor pluginDescriptor = mojoDescriptor.getPluginDescriptor();
+                PluginDescriptor pluginDescriptor =
+                        mojoDescriptor != null ? mojoDescriptor.getPluginDescriptor() : null;
 
                 if (pathSeparator > 0) {
                     String pathExpression = expression.substring(0, pathSeparator);
