@@ -26,21 +26,19 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-8765</name>
-  <description>
-    Verify that property interpolation runs before type conversion for URI-typed
+  <description>Verify that property interpolation runs before type conversion for URI-typed
     plugin parameters. When a URI parameter contains a property reference like
     https://example.com/${my.version}/path, the ${my.version} must be resolved
     before the string is converted to java.net.URI. Otherwise, the curly braces
-    cause a URISyntaxException.
-  </description>
-
-  <properties>
-    <test.version>1.2.3</test.version>
-  </properties>
+    cause a URISyntaxException.</description>
 
   <modules>
     <module>child</module>
   </modules>
+
+  <properties>
+    <test.version>1.2.3</test.version>
+  </properties>
 
   <build>
     <plugins>
