@@ -26,6 +26,7 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.di.Named;
+import org.apache.maven.api.model.Model;
 
 /**
  * SPI for IDE and tool integrators to provide workspace artifact resolution.
@@ -64,20 +65,21 @@ public interface WorkspaceReader extends SpiService {
     List<String> findVersions(Artifact artifact);
 
     /**
-     * Finds the path to the POM (model) for the given artifact in the workspace, if present.
+     * Returns the model (POM) for the given artifact from the workspace, if available.
      *
-     * <p>This method allows workspace readers to expose project models directly, enabling
-     * IDE integrators to provide accurate model data without requiring the artifact to be
-     * installed to a local repository first.
+     * <p>This method allows IDE integrators to provide project models built directly from
+     * their own sources (e.g. Eclipse manifests, Gradle metadata) without writing an
+     * intermediate XML file for Maven to parse. The returned model bypasses
+     * {@code ModelProcessor} entirely and is used as-is by the resolver.
      *
      * <p>The default implementation returns empty, preserving backward compatibility for
-     * implementations that only support artifact resolution.
+     * implementations that only provide artifact resolution.
      *
-     * @param artifact the artifact whose model (POM) to look up, never {@code null}
-     * @return the path to the POM file, or empty if not available in the workspace
+     * @param artifact the artifact whose model to look up, never {@code null}
+     * @return the model, or empty if not available in the workspace
      * @since 4.1.0
      */
-    default Optional<Path> findModel(Artifact artifact) {
+    default Optional<Model> findModel(Artifact artifact) {
         return Optional.empty();
     }
 }

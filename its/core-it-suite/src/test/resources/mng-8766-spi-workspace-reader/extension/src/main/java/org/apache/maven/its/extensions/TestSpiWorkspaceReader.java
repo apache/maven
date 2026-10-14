@@ -18,16 +18,13 @@
  */
 package org.apache.maven.its.extensions;
 
-import java.io.IOException;
-import java.io.OutputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.di.Named;
+import org.apache.maven.api.model.Model;
 import org.apache.maven.api.spi.WorkspaceReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,26 +78,18 @@ public class TestSpiWorkspaceReader implements WorkspaceReader {
     }
 
     @Override
-    public Optional<Path> findModel(Artifact artifact) {
+    public Optional<Model> findModel(Artifact artifact) {
         log.info("[SPI-WR] findModel({})", artifact.key());
         if (isSyntheticArtifact(artifact)) {
-            try {
-                Path pom = Files.createTempFile("mng8766-virtual-dep", ".pom");
-                pom.toFile().deleteOnExit();
-                String pomContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-                        + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
-                        + "  <modelVersion>4.0.0</modelVersion>\n"
-                        + "  <groupId>" + SYNTHETIC_GROUP + "</groupId>\n"
-                        + "  <artifactId>" + SYNTHETIC_ARTIFACT + "</artifactId>\n"
-                        + "  <version>" + SYNTHETIC_VERSION + "</version>\n"
-                        + "  <packaging>jar</packaging>\n"
-                        + "</project>\n";
-                Files.writeString(pom, pomContent);
-                log.info("[SPI-WR] findModel: returning synthetic POM for {}", artifact.key());
-                return Optional.of(pom);
-            } catch (IOException e) {
-                log.warn("[SPI-WR] could not create synthetic POM: {}", e.getMessage());
-            }
+            Model model = Model.newBuilder()
+                    .modelVersion("4.0.0")
+                    .groupId(SYNTHETIC_GROUP)
+                    .artifactId(SYNTHETIC_ARTIFACT)
+                    .version(SYNTHETIC_VERSION)
+                    .packaging("jar")
+                    .build();
+            log.info("[SPI-WR] findModel: returning synthetic POM for {}", artifact.key());
+            return Optional.of(model);
         }
         return Optional.empty();
     }

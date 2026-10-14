@@ -18,12 +18,7 @@
  */
 package org.apache.maven.resolver;
 
-import javax.xml.stream.XMLStreamException;
-
 import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
@@ -33,11 +28,8 @@ import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.impl.resolver.MavenWorkspaceReader;
-import org.apache.maven.model.v4.MavenStaxReader;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceRepository;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Bridge adapter that wraps an {@link org.apache.maven.api.spi.WorkspaceReader SPI WorkspaceReader}
@@ -47,15 +39,13 @@ import org.slf4j.LoggerFactory;
  * {@link org.apache.maven.api.Artifact} types, allowing SPI implementations to work
  * with Maven 4 API types exclusively while being integrated into the resolver's
  * workspace reader chain. By implementing {@link MavenWorkspaceReader}, the adapter
- * also participates in model resolution: {@link #findModel(Artifact)} delegates to
- * {@link org.apache.maven.api.spi.WorkspaceReader#findModel(org.apache.maven.api.Artifact)}
- * and parses the returned POM path into a v4 {@link Model}.
+ * also participates in model resolution: {@link #findModel(Artifact)} delegates directly
+ * to {@link org.apache.maven.api.spi.WorkspaceReader#findModel(org.apache.maven.api.Artifact)},
+ * which returns a pre-built {@link Model} (bypassing {@code ModelProcessor} entirely).
  *
  * @since 4.1.0
  */
 public class SpiWorkspaceReaderAdapter implements MavenWorkspaceReader {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(SpiWorkspaceReaderAdapter.class);
 
     private final org.apache.maven.api.spi.WorkspaceReader delegate;
     private final WorkspaceRepository repository;
@@ -83,23 +73,7 @@ public class SpiWorkspaceReaderAdapter implements MavenWorkspaceReader {
 
     @Override
     public Model findModel(Artifact artifact) {
-        Optional<Path> modelPath = delegate.findModel(toApiArtifact(artifact));
-        if (modelPath.isEmpty()) {
-            return null;
-        }
-        try (InputStream is = Files.newInputStream(modelPath.get())) {
-            return new MavenStaxReader().read(is, false, null);
-        } catch (IOException | XMLStreamException e) {
-            LOGGER.debug(
-                    "SPI WorkspaceReader {} returned a model path for {} but parsing failed: {}",
-                    delegate.getClass().getName(),
-                    artifact,
-                    e.getMessage(),
-                    e);
-            // Return null — consistent with other MavenWorkspaceReader implementations.
-            // The caller (DefaultArtifactDescriptorReader) will fall back to normal resolution.
-            return null;
-        }
+        return delegate.findModel(toApiArtifact(artifact)).orElse(null);
     }
 
     /**
