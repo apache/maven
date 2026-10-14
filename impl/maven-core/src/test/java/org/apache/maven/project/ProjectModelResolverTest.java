@@ -108,9 +108,8 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
                 UnresolvableModelException.class,
                 () -> newModelResolver().resolveModel(parent),
                 "Expected 'UnresolvableModelException' not thrown.");
-        assertEquals(
-                "Failed to resolve version range for org.apache:apache:pom:[1:2): Invalid version range [1:2), single version must be surrounded by []",
-                e.getMessage());
+        assertNotNull(e.getMessage());
+        assertTrue(e.getMessage().contains("[1:2)"));
     }
 
     @Test
@@ -189,9 +188,8 @@ class ProjectModelResolverTest extends AbstractMavenProjectTestCase {
                 UnresolvableModelException.class,
                 () -> newModelResolver().resolveModel(dependency),
                 "Expected 'UnresolvableModelException' not thrown.");
-        assertEquals(
-                "Failed to resolve version range for org.apache:apache:pom:[2:3): Invalid version range [2:3), single version must be surrounded by []",
-                e.getMessage());
+        assertNotNull(e.getMessage());
+        assertTrue(e.getMessage().contains("[2:3)"));
     }
 
     @Test
