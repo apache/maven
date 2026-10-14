@@ -53,7 +53,7 @@ class ApiRunnerSettingsTest {
     @Test
     void testNamedSessionProviderDoesNotReplaceStandaloneSession() throws IOException {
         Path installation = Files.createDirectories(tempDir.resolve("installation"));
-        Path localRepository = tempDir.resolve("requested-repository");
+        Path localRepository = Files.createDirectories(tempDir.resolve("requested-repository"));
         String oldHome = System.getProperty("user.home");
         String oldMavenHome = System.getProperty("maven.home");
         try {
@@ -72,7 +72,10 @@ class ApiRunnerSettingsTest {
                     localRepository,
                     ApiRunner.SecurityMode.NONE);
 
-            assertEquals(localRepository, session.getLocalRepository().path());
+            Path selectedRepository = session.getLocalRepository().path();
+            assertTrue(
+                    Files.isSameFile(localRepository, selectedRepository),
+                    () -> "Expected local repository " + localRepository + " but was " + selectedRepository);
             assertEquals(
                     List.of("central"),
                     session.getRemoteRepositories().stream().map(r -> r.id()).toList());
