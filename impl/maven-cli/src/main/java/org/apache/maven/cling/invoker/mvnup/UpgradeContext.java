@@ -47,6 +47,15 @@ public class UpgradeContext extends LookupContext {
     // Indentation control for nested logging
     private int indentLevel = 0;
     private String indentString = Indentation.DEFAULT;
+    private boolean dryRun;
+
+    public boolean isDryRun() {
+        return dryRun;
+    }
+
+    public void setDryRun(boolean dryRun) {
+        this.dryRun = dryRun;
+    }
 
     public void addInHeader(String text) {
         addInHeader(AttributedStyle.DEFAULT, text);
