@@ -27,6 +27,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.RemoteRepository;
 
 /**
@@ -48,13 +49,28 @@ public interface PluginRealmCache {
             return artifacts;
         }
 
+        /**
+         * Resolver node captured when the realm was created. {@code null} when the realm was cached
+         * before the node was recorded.
+         */
+        public DependencyNode getDependencyNode() {
+            return dependencyNode;
+        }
+
         private final ClassRealm realm;
 
         private final List<Artifact> artifacts;
 
+        private final DependencyNode dependencyNode;
+
         public CacheRecord(ClassRealm realm, List<Artifact> artifacts) {
+            this(realm, artifacts, null);
+        }
+
+        public CacheRecord(ClassRealm realm, List<Artifact> artifacts, DependencyNode dependencyNode) {
             this.realm = realm;
             this.artifacts = artifacts;
+            this.dependencyNode = dependencyNode;
         }
     }
 
@@ -84,35 +100,20 @@ public interface PluginRealmCache {
             throws PluginResolutionException, PluginContainerException {
         CacheRecord cr = get(key);
         if (cr == null) {
-            CacheRecord tcr = supplier.load();
-            cr = put(key, tcr.getRealm(), tcr.getArtifacts());
+            cr = supplier.load();
+            put(key, cr.getRealm(), cr.getArtifacts(), cr.getDependencyNode());
         }
         return cr;
+    }
+
+    default CacheRecord put(
+            Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts, DependencyNode dependencyNode) {
+        return put(key, pluginRealm, pluginArtifacts);
     }
 
     CacheRecord put(Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts);
 
     void flush();
-
-    /**
-     * Invalidates all cache entries whose resolved artifacts include the given artifact.
-     *
-     * <p>IDE integrators and other workspace-aware tools can call this method when a workspace
-     * artifact changes on disk, so that subsequent builds will re-resolve the affected plugin
-     * realms from the updated sources rather than using a stale cached classloader.
-     *
-     * <p>Implementations may choose to match on {@code groupId:artifactId:version} only, ignoring
-     * classifier and extension, to maximize the chance of invalidating related entries.
-     *
-     * <p>The default implementation is a no-op (safe for existing implementations that do not
-     * track artifact-to-entry mappings).
-     *
-     * @param artifact the workspace artifact that has changed, never {@code null}
-     * @since 4.1.0
-     */
-    default void invalidate(org.apache.maven.api.Artifact artifact) {
-        // no-op by default
-    }
 
     /**
      * Registers the specified cache record for usage with the given project. Integrators can use the information
