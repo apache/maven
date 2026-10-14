@@ -32,8 +32,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * <ol>
  *   <li>Discovered via DI and active during the build session</li>
  *   <li>Consulted for regular artifact resolution (findArtifact, findVersions)</li>
- *   <li>Consulted for model resolution via findModel() — the path wired through
- *       {@code SpiWorkspaceReaderAdapter} implementing {@code MavenWorkspaceReader}</li>
+ *   <li>Consulted for model resolution via findModel() — the pre-built {@link org.apache.maven.api.model.Model}
+ *       returned by the SPI is passed directly through {@code SpiWorkspaceReaderAdapter}
+ *       to the resolver, bypassing {@code ModelProcessor} entirely</li>
  * </ol>
  *
  * <p>The test extension ({@code TestSpiWorkspaceReader}) serves a completely synthetic artifact
