@@ -28,6 +28,7 @@ import org.apache.maven.api.Constants;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Plugin;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.PluginExecution;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
@@ -35,7 +36,7 @@ import org.apache.maven.api.xml.XmlNode;
 
 /**
  * Parses the {@code maven.lifecycle.filter} user property value into a list of {@link FilterPredicate}s,
- * and applies them at mojo execution time in {@code MojoExecutor}.</p>
+ * and applies them at mojo execution time in {@code MojoExecutor}.
  *
  * <p>The property value is a comma-separated list of predicates, OR-ed together:
  * a mojo execution matching <em>any</em> predicate is skipped.
@@ -145,6 +146,7 @@ public class MojoExecutionFilter {
             }
 
             @Override
+            @Nullable
             public PluginDescriptor getDescriptor() {
                 return descriptorV4;
             }
@@ -186,6 +188,7 @@ public class MojoExecutionFilter {
             }
 
             @Override
+            @Nullable
             public org.apache.maven.api.plugin.descriptor.MojoDescriptor descriptor() {
                 return legacyMojo != null ? legacyMojo.getMojoDescriptorV4() : null;
             }

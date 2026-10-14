@@ -23,7 +23,7 @@ import org.apache.maven.api.MojoExecution;
 /**
  * Predicate for filtering {@link MojoExecution} entries from the lifecycle build plan.
  *
- * <p>Used by {@code -Dmaven.lifecycle.filter} to remove matching executions before the build starts.
+ * <p>Used by {@code -Dmaven.lifecycle.filter} to skip matching executions at runtime.
  * New predicate types can be added without breaking existing filter expressions.
  *
  * @see MojoExecutionFilter

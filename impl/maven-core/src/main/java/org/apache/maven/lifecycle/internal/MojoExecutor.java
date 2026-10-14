@@ -200,6 +200,7 @@ public class MojoExecutor {
             throws LifecycleExecutionException {
         if (MojoExecutionFilter.matches(mojoExecution, filterPredicates)) {
             LOGGER.info("Skipping {} (filtered by {})", mojoExecution, MojoExecutionFilter.PROPERTY_NAME);
+            eventCatapult.fire(ExecutionEvent.Type.MojoSkipped, session, mojoExecution);
             return;
         }
         execute(session, mojoExecution, dependencyContext);
