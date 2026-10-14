@@ -77,6 +77,26 @@ if $cygwin || $mingw ; then
   fi
 fi
 
+# A cygpath(1) from an unrelated POSIX emulation layer (e.g. the one shipped in
+# an Anaconda installation) can be found on the PATH first. It re-roots every
+# POSIX path under its own installation prefix, so all converted values point to
+# non-existing directories and the JVM dies with a bare ClassNotFoundException.
+# cygpath can convert relative paths too, but the current directory is the only
+# path that is known to exist at this point: verify that its Windows form can be
+# found on disk before trusting any of the later conversions.
+if $cygwin || $mingw ; then
+  _cygpath_bin=`( \unset -f command; \command -v cygpath )` || _cygpath_bin=
+  _probe_win=`cygpath --windows "$PWD"` || _probe_win=
+  if [ -z "$_probe_win" ] || [ ! -d "$_probe_win" ] ; then
+    printf '%s\n' "Warning: the cygpath found on the PATH (\"$_cygpath_bin\") does not convert paths to" >&2
+    printf '%s\n' "usable Windows paths (\"$PWD\" converts to \"$_probe_win\", which does not exist)," >&2
+    printf '%s\n' "so Apache Maven cannot convert paths to the Windows format." >&2
+    printf '%s\n' "Some plugins may misbehave when they receive POSIX paths." >&2
+    cygwin=false
+    mingw=false
+  fi
+fi
+
 ## resolve links - $0 may be a link to Maven's home
 PRG="$0"
 
