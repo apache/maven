@@ -119,6 +119,22 @@ public class ProjectModelResolverTest {
     }
 
     @Test
+    public void testResolveParentThrowsUnresolvableModelExceptionWhenUsingWrongRangeFormat() throws Exception {
+        final Parent parent = new Parent();
+        parent.setGroupId("org.apache");
+        parent.setArtifactId("apache");
+        parent.setVersion("[1:2)");
+
+        try {
+            this.newModelResolver().resolveModel(parent);
+            fail("Expected 'UnresolvableModelException' not thrown.");
+        } catch (final UnresolvableModelException e) {
+            assertNotNull(e.getMessage());
+            assertThat(e.getMessage(), containsString("[1:2)"));
+        }
+    }
+
+    @Test
     public void testResolveParentSuccessfullyResolvesExistingParentWithoutRange() throws Exception {
         final Parent parent = new Parent();
         parent.setGroupId("org.apache");
@@ -185,6 +201,22 @@ public class ProjectModelResolverTest {
         } catch (final UnresolvableModelException e) {
             assertEquals(
                     "The requested dependency version range '[1,)' does not specify an upper bound", e.getMessage());
+        }
+    }
+
+    @Test
+    public void testResolveDependencyThrowsUnresolvableModelExceptionWhenUsingWrongRangeFormat() throws Exception {
+        final Dependency dependency = new Dependency();
+        dependency.setGroupId("org.apache");
+        dependency.setArtifactId("apache");
+        dependency.setVersion("[2:3)");
+
+        try {
+            this.newModelResolver().resolveModel(dependency);
+            fail("Expected 'UnresolvableModelException' not thrown.");
+        } catch (final UnresolvableModelException e) {
+            assertNotNull(e.getMessage());
+            assertThat(e.getMessage(), containsString("[2:3)"));
         }
     }
 
