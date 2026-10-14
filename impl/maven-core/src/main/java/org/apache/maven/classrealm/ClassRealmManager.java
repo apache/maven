@@ -92,4 +92,22 @@ public interface ClassRealmManager {
             List<String> parentImports,
             Map<String, ClassLoader> foreignImports,
             List<Artifact> artifacts);
+
+    /**
+     * Creates a new class realm for a modular plugin, loaded in its own JPMS {@link ModuleLayer}.
+     * <p>
+     * All plugin artifacts are placed on the module path and resolved via
+     * {@link java.lang.module.Configuration#resolveAndBind}. There is no fallback to classpath loading —
+     * if the module graph cannot be resolved (e.g. split packages), this method throws.
+     * </p>
+     *
+     * @param plugin The plugin for which to create a modular realm, must not be {@code null}.
+     * @param parent The parent class loader, may be {@code null}.
+     * @param artifacts The artifacts to place on the module path, may be {@code null}.
+     * @return The new modular plugin realm with an associated {@link ModuleLayer}.
+     * @throws ModuleLayerCreationException if the module layer cannot be created.
+     * @since 4.1.0
+     */
+    ClassRealm createModularPluginRealm(Plugin plugin, ClassLoader parent, List<Artifact> artifacts)
+            throws ModuleLayerCreationException;
 }
