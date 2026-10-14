@@ -1534,7 +1534,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 .dependencies(List.of(compileDep, apiDep, runtimeDep, unscopedDep))
                 .build();
 
-        Model transformed = DefaultConsumerPomBuilder.transformNonPom(model, null);
+        Model transformed = DefaultConsumerPomBuilder.transformNonPom(model, new MavenProject(model));
         assertNotNull(transformed.getDependencies());
         // All four should be retained
         assertTrue(
@@ -1543,6 +1543,11 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         assertTrue(
                 transformed.getDependencies().stream().anyMatch(d -> "api-dep".equals(d.getArtifactId())),
                 "api-scoped dep should be retained");
+        assertTrue(
+                transformed.getDependencies().stream()
+                        .filter(d -> "api-dep".equals(d.getArtifactId()))
+                        .allMatch(d -> "compile".equals(d.getScope())),
+                "api-scoped dep should be remapped to compile scope in consumer POM");
         assertTrue(
                 transformed.getDependencies().stream().anyMatch(d -> "runtime-dep".equals(d.getArtifactId())),
                 "runtime-scoped dep should be retained");

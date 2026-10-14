@@ -643,6 +643,33 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         return dependency;
     }
 
+    private static Model mapScopesForConsumerPom(Model model) {
+        model = model.withDependencies(model.getDependencies().stream()
+                .map(DefaultConsumerPomBuilder::mapScopeForConsumerPom)
+                .toList());
+
+        if (model.getDependencyManagement() != null) {
+            model = model.withDependencyManagement(model.getDependencyManagement()
+                    .withDependencies(model.getDependencyManagement().getDependencies().stream()
+                            .map(DefaultConsumerPomBuilder::mapScopeForConsumerPom)
+                            .toList()));
+        }
+
+        return model.withProfiles(model.getProfiles().stream()
+                .map(profile -> profile.withDependencies(profile.getDependencies().stream()
+                                .map(DefaultConsumerPomBuilder::mapScopeForConsumerPom)
+                                .toList())
+                        .withDependencyManagement(
+                                profile.getDependencyManagement() == null
+                                        ? null
+                                        : profile.getDependencyManagement()
+                                                .withDependencies(
+                                                        profile.getDependencyManagement().getDependencies().stream()
+                                                                .map(DefaultConsumerPomBuilder::mapScopeForConsumerPom)
+                                                                .toList())))
+                .toList());
+    }
+
     private Dependency merge(Dependency dep1, Dependency dep2) {
         throw new IllegalArgumentException("Duplicate dependency: " + getDependencyKey(dep1));
     }
@@ -748,7 +775,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                                 : null);
         builder.profiles(prune(model.getProfiles()));
 
-        model = builder.build();
+        model = mapScopesForConsumerPom(builder.build());
         String modelVersion = new MavenModelVersion().getModelVersion(model);
         if (!ModelBuilder.MODEL_VERSION_4_0_0.equals(modelVersion) && !preserveModelVersion) {
             warnNotDowngraded(project);
@@ -773,7 +800,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         builder.packaging(POM_PACKAGING);
         builder.profiles(prune(model.getProfiles()));
 
-        model = builder.build();
+        model = mapScopesForConsumerPom(builder.build());
         String modelVersion = new MavenModelVersion().getModelVersion(model);
         if (!ModelBuilder.MODEL_VERSION_4_0_0.equals(modelVersion) && !preserveModelVersion) {
             warnNotDowngraded(project);
@@ -794,6 +821,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         if (parent != null) {
             model = model.withParent(parent.withRelativePath(null));
         }
+        model = mapScopesForConsumerPom(model);
         var projectSources = project.getBuild().getDelegate().getSources();
         if (SourceQueries.usesModuleSourceHierarchy(projectSources)) {
             // Dependencies are dispatched by maven-jar-plugin in the POM generated for each module.
