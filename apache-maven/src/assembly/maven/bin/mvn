@@ -224,26 +224,48 @@ concat_lines() {
     }
 
     # Run the parser
-    # Capture both stdout and stderr for comprehensive error reporting
-    parser_output=$("$JAVACMD" -cp "$MAVEN_HOME/bin" JvmConfigParser "$1" "$_basedir_native" 2>&1)
+    # Capture stdout for JVM options; capture stderr separately so JVM notices
+    # (e.g. JAVA_TOOL_OPTIONS) do not pollute MAVEN_OPTS.
+    parser_stderr_file=$(mktemp "${TMPDIR:-/tmp}/mvn-jvm-config-stderr.XXXXXX" 2>/dev/null || echo "${TMPDIR:-/tmp}/mvn-jvm-config-stderr.$$")
+    trap 'rm -f "$parser_stderr_file"' EXIT INT TERM
+    parser_output=$("$JAVACMD" -cp "$MAVEN_HOME/bin" JvmConfigParser "$1" "$_basedir_native" 2>"$parser_stderr_file")
     parser_exit=$?
 
     if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
       echo "[DEBUG] JvmConfigParser exit code: $parser_exit" >&2
       printf '[DEBUG] JvmConfigParser output: %s\n' "$parser_output" >&2
+      if [ -s "$parser_stderr_file" ]; then
+        while IFS= read -r parser_err_line || [ -n "$parser_err_line" ]; do
+          printf '[DEBUG] JvmConfigParser stderr: %s\n' "$parser_err_line" >&2
+        done < "$parser_stderr_file"
+      fi
     fi
 
     if [ $parser_exit -ne 0 ]; then
       # Parser failed - print comprehensive error information
       echo "ERROR: JvmConfigParser failed with exit code $parser_exit" >&2
-      echo "  jvm.config path: $1" >&2
-      echo "  Maven basedir: $MAVEN_PROJECTBASEDIR" >&2
-      echo "  Java command: $JAVACMD" >&2
-      printf '  Parser output:\n' >&2
-      printf '%s\n' "$parser_output" | sed 's/^/    /' >&2
+      printf '  jvm.config path: %s\n' "$1" >&2
+      printf '  Maven basedir: %s\n' "$MAVEN_PROJECTBASEDIR" >&2
+      printf '  Java command: %s\n' "$JAVACMD" >&2
+      echo "  Parser output:" >&2
+      # Print captured stderr (parser exceptions/diagnostics) and stdout so no diagnostic info is dropped
+      if [ -s "$parser_stderr_file" ]; then
+        while IFS= read -r parser_err_line || [ -n "$parser_err_line" ]; do
+          printf '    %s\n' "$parser_err_line" >&2
+        done < "$parser_stderr_file"
+      fi
+      if [ -n "$parser_output" ]; then
+        printf '%s\n' "$parser_output" | while IFS= read -r parser_out_line || [ -n "$parser_out_line" ]; do
+          printf '    %s\n' "$parser_out_line" >&2
+        done
+      fi
+      rm -f "$parser_stderr_file" 2>/dev/null || :
+      trap - EXIT INT TERM
       exit 1
     fi
 
+    rm -f "$parser_stderr_file" 2>/dev/null || :
+    trap - EXIT INT TERM
     printf '%s\n' "$parser_output"
   fi
 }
