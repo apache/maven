@@ -369,13 +369,14 @@ public class DefaultMaven implements Maven {
         //      Collect already-registered SPI delegates (by identity) to avoid wrapping the same
         //      reader twice (core extensions are registered both in the global container before
         //      buildGraph() and via getProjectScopedExtensionComponents() here).
-        IdentityHashMap<org.apache.maven.api.spi.WorkspaceReader, Boolean> wrappedDelegates = new IdentityHashMap<>();
+        Set<org.apache.maven.api.spi.WorkspaceReader> wrappedDelegates =
+                Collections.newSetFromMap(new IdentityHashMap<>());
         workspaceReaders.stream()
                 .filter(r -> r instanceof SpiWorkspaceReaderAdapter)
-                .forEach(r -> wrappedDelegates.put(((SpiWorkspaceReaderAdapter) r).getDelegate(), Boolean.TRUE));
+                .forEach(r -> wrappedDelegates.add(((SpiWorkspaceReaderAdapter) r).getDelegate()));
         for (org.apache.maven.api.spi.WorkspaceReader spiReader : getProjectScopedExtensionComponents(
                 session.getProjects(), org.apache.maven.api.spi.WorkspaceReader.class)) {
-            if (!wrappedDelegates.containsKey(spiReader)) {
+            if (!wrappedDelegates.contains(spiReader)) {
                 workspaceReaders.add(new SpiWorkspaceReaderAdapter(spiReader));
             }
         }
