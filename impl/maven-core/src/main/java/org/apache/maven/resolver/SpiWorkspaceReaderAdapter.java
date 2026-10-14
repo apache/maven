@@ -19,29 +19,39 @@
 package org.apache.maven.resolver;
 
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import javax.xml.stream.XMLStreamException;
+
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.impl.resolver.MavenWorkspaceReader;
+import org.apache.maven.model.v4.MavenStaxReader;
 import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.aether.repository.WorkspaceRepository;
 
 /**
  * Bridge adapter that wraps an {@link org.apache.maven.api.spi.WorkspaceReader SPI WorkspaceReader}
- * into a resolver {@link WorkspaceReader}.
+ * into a {@link MavenWorkspaceReader}.
  *
  * <p>This adapter translates between resolver {@link Artifact} and Maven API
  * {@link org.apache.maven.api.Artifact} types, allowing SPI implementations to work
  * with Maven 4 API types exclusively while being integrated into the resolver's
- * workspace reader chain.
+ * workspace reader chain. By implementing {@link MavenWorkspaceReader}, the adapter
+ * also participates in model resolution: {@link #findModel(Artifact)} delegates to
+ * {@link org.apache.maven.api.spi.WorkspaceReader#findModel(org.apache.maven.api.Artifact)}
+ * and parses the returned POM path into a v4 {@link Model}.
  *
  * @since 4.1.0
  */
-public class SpiWorkspaceReaderAdapter implements WorkspaceReader {
+public class SpiWorkspaceReaderAdapter implements MavenWorkspaceReader {
 
     private final org.apache.maven.api.spi.WorkspaceReader delegate;
     private final WorkspaceRepository repository;
@@ -65,6 +75,21 @@ public class SpiWorkspaceReaderAdapter implements WorkspaceReader {
     @Override
     public List<String> findVersions(Artifact artifact) {
         return delegate.findVersions(toApiArtifact(artifact));
+    }
+
+    @Override
+    public Model findModel(Artifact artifact) {
+        Optional<Path> modelPath = delegate.findModel(toApiArtifact(artifact));
+        if (modelPath.isEmpty()) {
+            return null;
+        }
+        try (InputStream is = Files.newInputStream(modelPath.get())) {
+            return new MavenStaxReader().read(is, false, null);
+        } catch (IOException | XMLStreamException e) {
+            // Return null — consistent with other MavenWorkspaceReader implementations.
+            // The caller (DefaultArtifactDescriptorReader) will fall back to normal resolution.
+            return null;
+        }
     }
 
     /**
