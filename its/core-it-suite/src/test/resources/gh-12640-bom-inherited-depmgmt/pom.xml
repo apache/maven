@@ -17,9 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.gh12640</groupId>
@@ -28,6 +26,12 @@ under the License.
   <packaging>pom</packaging>
 
   <name>GH-12640: BOM inherited dependency management test</name>
+
+  <modules>
+    <module>mod-1</module>
+    <module>mod-2</module>
+    <module>bom</module>
+  </modules>
 
   <properties>
     <ext.lib.version>2.0.0</ext.lib.version>
@@ -51,10 +55,4 @@ under the License.
       </dependency>
     </dependencies>
   </dependencyManagement>
-
-  <modules>
-    <module>mod-1</module>
-    <module>mod-2</module>
-    <module>bom</module>
-  </modules>
 </project>

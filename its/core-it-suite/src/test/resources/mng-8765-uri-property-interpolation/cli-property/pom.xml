@@ -25,12 +25,10 @@ under the License.
   <version>1.0-SNAPSHOT</version>
 
   <name>Maven Integration Test :: MNG-8765 :: CLI Property</name>
-  <description>
-    Verify that a property passed via -D on the CLI is resolved in a URI-typed
+  <description>Verify that a property passed via -D on the CLI is resolved in a URI-typed
     plugin parameter. The property is NOT defined in POM properties, only via
     -Dcli.version=2.0.0 on the command line, simulating how some plugins
-    (like Groovy scripts) dynamically set properties at runtime.
-  </description>
+    (like Groovy scripts) dynamically set properties at runtime.</description>
 
   <build>
     <plugins>

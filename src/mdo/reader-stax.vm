@@ -403,7 +403,7 @@ public class ${className} {
                     ${classLcapName}.${field.name}(buildXmlNode(parser));
         #end
                     break;
-      #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
+      #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" && !$Helper.isFlatItems( $field ) )
                     List<String> ${field.name} = new ArrayList<>();
         #if ( $locationTracking )
                     locations = new HashMap<>();
@@ -452,7 +452,7 @@ public class ${className} {
                     ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, namespace));
         #end
                     break;
-      #elseif ( $field.to && $field.multiplicity == "*" && $Helper.isFlatItems( $field ) )
+      #elseif ( $field.to && $field.multiplicity == "*" && $Helper.isFlatItems( $field ) && $field.to != "String" )
         #if ( $locationTracking )
                     ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace, inputSrc));
         #elseif ( $needXmlContext )
@@ -460,6 +460,9 @@ public class ${className} {
         #else
                     ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace));
         #end
+                    break;
+      #elseif ( $field.to == "String" && $field.multiplicity == "*" && $Helper.isFlatItems( $field ) )
+                    ${field.name}.add(interpolatedTrimmed(nextText(parser, strict), "${fieldTagName}"));
                     break;
       #elseif ( $field.to && $field.multiplicity == "*" )
                     List<$field.to> ${field.name} = new ArrayList<>();

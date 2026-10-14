@@ -23,6 +23,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -33,6 +34,7 @@ import java.util.stream.Collectors;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
+import org.apache.maven.api.spi.LifecycleProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,6 +56,8 @@ public class DefaultLifecycles {
 
     private final LifecycleRegistry registry;
 
+    private final List<LifecycleProcessor> lifecycleProcessors;
+
     private Map<String, Lifecycle> customLifecycles;
 
     private boolean lifecyclesPrinted;
@@ -61,22 +65,32 @@ public class DefaultLifecycles {
     public DefaultLifecycles() {
         this.lookup = null;
         this.registry = null;
+        this.lifecycleProcessors = Collections.emptyList();
     }
 
     /**
-     * @deprecated Use {@link #DefaultLifecycles(LifecycleRegistry,Lookup)} instead
+     * @deprecated Use {@link #DefaultLifecycles(LifecycleRegistry, Lookup, List)} instead
      */
     @Deprecated
     public DefaultLifecycles(Map<String, Lifecycle> lifecycles, org.codehaus.plexus.logging.Logger logger) {
         this.customLifecycles = lifecycles;
         this.lookup = null;
         this.registry = null;
+        this.lifecycleProcessors = Collections.emptyList();
     }
 
     @Inject
-    public DefaultLifecycles(LifecycleRegistry registry, Lookup lookup) {
+    public DefaultLifecycles(LifecycleRegistry registry, Lookup lookup, List<LifecycleProcessor> lifecycleProcessors) {
         this.lookup = lookup;
         this.registry = registry;
+        this.lifecycleProcessors = lifecycleProcessors != null ? lifecycleProcessors : Collections.emptyList();
+    }
+
+    /**
+     * Constructor for use in tests and legacy code that does not need lifecycle processors.
+     */
+    public DefaultLifecycles(LifecycleRegistry registry, Lookup lookup) {
+        this(registry, lookup, Collections.emptyList());
     }
 
     /**
@@ -93,7 +107,12 @@ public class DefaultLifecycles {
      * We use this to map all phases to the lifecycle that contains it. This is used so that a user can specify the
      * phase they want to execute, and we can easily determine what lifecycle we need to run.
      *
-     * @return A map of lifecycles, indexed on id
+     * <p>When {@link LifecycleProcessor} SPI implementations are registered (e.g. to inject
+     * custom phases declared in {@code .mvn/reactor.xml}), each lifecycle is passed through
+     * the processor chain before its phases are registered in the map.  This allows custom
+     * phases to be invoked on the command line just like built-in phases.
+     *
+     * @return A map of phase name to lifecycle
      */
     public Map<String, Lifecycle> getPhaseToLifecycleMap() {
         if (logger.isDebugEnabled() && !lifecyclesPrinted) {
@@ -109,33 +128,55 @@ public class DefaultLifecycles {
         Map<String, Lifecycle> phaseToLifecycleMap = new HashMap<>();
 
         for (Lifecycle lifecycle : getLifeCycles()) {
-            for (String phase : lifecycle.getPhases()) {
+            // Apply LifecycleProcessor chain (e.g. reactor.xml phase injections)
+            Lifecycle processed = applyProcessors(lifecycle);
+
+            for (String phase : processed.getPhases()) {
                 // The first definition wins.
-                Lifecycle original = phaseToLifecycleMap.put(phase, lifecycle);
+                Lifecycle original = phaseToLifecycleMap.put(phase, processed);
                 if (original != null && logger.isWarnEnabled()) {
                     logger.warn(
                             "Duplicated lifecycle phase {}. Defined in {} but also in {}",
                             phase,
                             original.getId(),
-                            lifecycle.getId());
+                            processed.getId());
                 }
             }
-            if (lifecycle.getDelegate() != null) {
+            if (processed.getDelegate() != null) {
                 for (org.apache.maven.api.Lifecycle.Alias alias :
-                        lifecycle.getDelegate().aliases()) {
-                    Lifecycle original = phaseToLifecycleMap.put(alias.v3Phase(), lifecycle);
+                        processed.getDelegate().aliases()) {
+                    Lifecycle original = phaseToLifecycleMap.put(alias.v3Phase(), processed);
                     if (original != null && logger.isWarnEnabled()) {
                         logger.warn(
                                 "Duplicated lifecycle phase {}. Defined in {} but also in {}",
                                 alias.v3Phase(),
                                 original.getId(),
-                                lifecycle.getId());
+                                processed.getId());
                     }
                 }
             }
         }
 
         return phaseToLifecycleMap;
+    }
+
+    /**
+     * Applies all registered {@link LifecycleProcessor}s to the given lifecycle in order.
+     */
+    private Lifecycle applyProcessors(Lifecycle lifecycle) {
+        org.apache.maven.api.Lifecycle apiLifecycle = lifecycle.getDelegate() != null ? lifecycle.getDelegate() : null;
+        if (apiLifecycle == null || lifecycleProcessors.isEmpty()) {
+            return lifecycle;
+        }
+        org.apache.maven.api.Lifecycle processed = apiLifecycle;
+        for (LifecycleProcessor processor : lifecycleProcessors) {
+            processed = processor.process(processed);
+        }
+        if (processed == apiLifecycle) {
+            return lifecycle; // unchanged — avoid wrapper allocation
+        }
+        // Re-wrap the processed API lifecycle in the legacy Lifecycle shell
+        return new Lifecycle(registry, processed);
     }
 
     /**
