@@ -19,15 +19,23 @@
 package org.apache.maven.lifecycle.internal.filter;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
+import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.Dependency;
 import org.apache.maven.api.MojoExecution;
-import org.apache.maven.internal.impl.DefaultMojoExecution;
+import org.apache.maven.api.Plugin;
+import org.apache.maven.api.model.PluginExecution;
+import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
+import org.apache.maven.api.xml.XmlNode;
 
 /**
  * Parses the {@code maven.lifecycle.filter} user property value into a list of {@link FilterPredicate}s,
- * and applies them at mojo execution time in {@code MojoExecutor}.
+ * and applies them at mojo execution time in {@code MojoExecutor}.</p>
  *
  * <p>The property value is a comma-separated list of predicates, OR-ed together:
  * a mojo execution matching <em>any</em> predicate is skipped.
@@ -97,9 +105,10 @@ public class MojoExecutionFilter {
      * Returns {@code true} if the given legacy mojo execution matches any predicate in the list
      * and should be skipped.
      *
-     * <p>Uses {@link DefaultMojoExecution} with a {@code null} session: only string fields
-     * ({@link MojoExecution#getDescriptor()}, {@link MojoExecution#getGoal()}, etc.) are accessed
-     * by the predicates.
+     * <p>Adapts the legacy {@link org.apache.maven.plugin.MojoExecution} into a lightweight
+     * {@link MojoExecution} view — only the fields accessed by the predicates
+     * ({@code plugin()}, {@code goal()}, {@code executionId()}, {@code lifecyclePhase()})
+     * are populated. No session is required.
      *
      * @param execution  the legacy mojo execution to test
      * @param predicates the predicates to apply (OR-ed)
@@ -109,12 +118,97 @@ public class MojoExecutionFilter {
         if (predicates.isEmpty()) {
             return false;
         }
-        MojoExecution apiExecution = new DefaultMojoExecution(null, execution);
+        MojoExecution apiExecution = adapt(execution);
         for (FilterPredicate predicate : predicates) {
             if (predicate.matches(apiExecution)) {
                 return true;
             }
         }
         return false;
+    }
+
+    /**
+     * Adapts a legacy {@link org.apache.maven.plugin.MojoExecution} to the API
+     * {@link MojoExecution} interface using only the fields needed by the predicates.
+     * No session is required.
+     */
+    private static MojoExecution adapt(org.apache.maven.plugin.MojoExecution legacy) {
+        org.apache.maven.plugin.descriptor.MojoDescriptor legacyMojo = legacy.getMojoDescriptor();
+        org.apache.maven.plugin.descriptor.PluginDescriptor legacyPlugin =
+                legacyMojo != null ? legacyMojo.getPluginDescriptor() : null;
+        PluginDescriptor descriptorV4 = legacyPlugin != null ? legacyPlugin.getPluginDescriptorV4() : null;
+
+        Plugin plugin = new Plugin() {
+            @Override
+            public org.apache.maven.api.model.Plugin getModel() {
+                return null;
+            }
+
+            @Override
+            public PluginDescriptor getDescriptor() {
+                return descriptorV4;
+            }
+
+            @Override
+            public List<Lifecycle> getLifecycles() {
+                return Collections.emptyList();
+            }
+
+            @Override
+            public ClassLoader getClassLoader() {
+                return null;
+            }
+
+            @Override
+            public Artifact getArtifact() {
+                return null;
+            }
+
+            @Override
+            public java.util.Map<String, Dependency> getDependenciesMap() {
+                return Collections.emptyMap();
+            }
+        };
+
+        String goal = legacy.getGoal();
+        Optional<String> executionId = Optional.ofNullable(legacy.getExecutionId());
+        Optional<String> lifecyclePhase = Optional.ofNullable(legacy.getLifecyclePhase());
+
+        return new MojoExecution() {
+            @Override
+            public Plugin plugin() {
+                return plugin;
+            }
+
+            @Override
+            public Optional<PluginExecution> model() {
+                return Optional.empty();
+            }
+
+            @Override
+            public org.apache.maven.api.plugin.descriptor.MojoDescriptor descriptor() {
+                return legacyMojo != null ? legacyMojo.getMojoDescriptorV4() : null;
+            }
+
+            @Override
+            public Optional<String> executionId() {
+                return executionId;
+            }
+
+            @Override
+            public String goal() {
+                return goal;
+            }
+
+            @Override
+            public Optional<String> lifecyclePhase() {
+                return lifecyclePhase;
+            }
+
+            @Override
+            public Optional<XmlNode> configuration() {
+                return Optional.empty();
+            }
+        };
     }
 }

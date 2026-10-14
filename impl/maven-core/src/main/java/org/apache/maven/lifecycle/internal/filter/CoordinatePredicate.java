@@ -30,8 +30,8 @@ import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
  * {@code plugin:version:goal@executionId} notation used in
  * {@code DefaultLifecycleExecutionPlanCalculator} for goal tasks.
  *
- * <p>Matching uses {@link MojoExecution#getDescriptor()} for goal-level fields and
- * {@link MojoExecution#getPlugin()} for plugin-level coordinates (groupId, artifactId, version,
+ * <p>Matching uses {@link MojoExecution#descriptor()} for goal-level fields and
+ * {@link MojoExecution#plugin()} for plugin-level coordinates (groupId, artifactId, version,
  * goal prefix).
  *
  * <p>Forms:
@@ -178,7 +178,7 @@ public class CoordinatePredicate implements FilterPredicate {
             return true;
         }
 
-        PluginDescriptor descriptor = execution.getPlugin().getDescriptor();
+        PluginDescriptor descriptor = execution.plugin().getDescriptor();
 
         // prefix-based matching
         if (prefix != null) {
@@ -208,10 +208,10 @@ public class CoordinatePredicate implements FilterPredicate {
                 return false;
             }
         }
-        if (goal != null && !goal.equals(execution.getGoal())) {
+        if (goal != null && !goal.equals(execution.goal())) {
             return false;
         }
-        if (executionId != null && !executionId.equals(execution.getExecutionId())) {
+        if (executionId != null && !executionId.equals(execution.executionId().orElse(null))) {
             return false;
         }
 

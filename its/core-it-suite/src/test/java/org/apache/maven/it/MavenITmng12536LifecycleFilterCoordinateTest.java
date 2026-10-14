@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  *
  * @see <a href="https://github.com/apache/maven/issues/12536">MNG-12536</a>
  */
-class MavenITmng12536LifecycleFilterCoordinateTest extends AbstractMavenIntegrationTestCase {
+public class MavenITmng12536LifecycleFilterCoordinateTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     void filterByArtifactIdSkipsSurefire() throws Exception {

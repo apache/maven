@@ -18,6 +18,8 @@
  */
 package org.apache.maven.lifecycle.internal.filter;
 
+import java.util.Optional;
+
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Plugin;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
@@ -45,9 +47,9 @@ class CoordinatePredicateTest {
         when(plugin.getDescriptor()).thenReturn(descriptor);
 
         MojoExecution exec = mock(MojoExecution.class);
-        when(exec.getPlugin()).thenReturn(plugin);
-        when(exec.getGoal()).thenReturn(goal);
-        when(exec.getExecutionId()).thenReturn(executionId);
+        when(exec.plugin()).thenReturn(plugin);
+        when(exec.goal()).thenReturn(goal);
+        when(exec.executionId()).thenReturn(Optional.ofNullable(executionId));
         return exec;
     }
 
@@ -152,9 +154,9 @@ class CoordinatePredicateTest {
         MojoExecution exec = mock(MojoExecution.class);
         Plugin plugin = mock(Plugin.class);
         when(plugin.getDescriptor()).thenReturn(null);
-        when(exec.getPlugin()).thenReturn(plugin);
-        when(exec.getGoal()).thenReturn("test");
-        when(exec.getExecutionId()).thenReturn("default-test");
+        when(exec.plugin()).thenReturn(plugin);
+        when(exec.goal()).thenReturn("test");
+        when(exec.executionId()).thenReturn(Optional.of("default-test"));
         assertFalse(CoordinatePredicate.parse(":maven-surefire-plugin").matches(exec));
     }
 
@@ -163,7 +165,7 @@ class CoordinatePredicateTest {
         MojoExecution exec = mock(MojoExecution.class);
         Plugin plugin = mock(Plugin.class);
         when(plugin.getDescriptor()).thenReturn(null);
-        when(exec.getPlugin()).thenReturn(plugin);
+        when(exec.plugin()).thenReturn(plugin);
         assertTrue(CoordinatePredicate.MATCH_ALL.matches(exec));
     }
 

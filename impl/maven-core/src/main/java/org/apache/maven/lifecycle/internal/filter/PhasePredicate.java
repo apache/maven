@@ -39,7 +39,7 @@ public class PhasePredicate implements FilterPredicate {
 
     @Override
     public boolean matches(MojoExecution execution) {
-        return phaseName.equals(execution.getLifecyclePhase());
+        return execution.lifecyclePhase().map(phaseName::equals).orElse(false);
     }
 
     @Override

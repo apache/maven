@@ -18,6 +18,8 @@
  */
 package org.apache.maven.lifecycle.internal.filter;
 
+import java.util.Optional;
+
 import org.apache.maven.api.MojoExecution;
 import org.junit.jupiter.api.Test;
 
@@ -34,28 +36,28 @@ class PhasePredicateTest {
     @Test
     void matchesExecutionBoundToThatPhase() {
         MojoExecution exec = mock(MojoExecution.class);
-        when(exec.getLifecyclePhase()).thenReturn("test");
+        when(exec.lifecyclePhase()).thenReturn(Optional.of("test"));
         assertTrue(new PhasePredicate("test").matches(exec));
     }
 
     @Test
     void doesNotMatchDifferentPhase() {
         MojoExecution exec = mock(MojoExecution.class);
-        when(exec.getLifecyclePhase()).thenReturn("compile");
+        when(exec.lifecyclePhase()).thenReturn(Optional.of("compile"));
         assertFalse(new PhasePredicate("test").matches(exec));
     }
 
     @Test
     void doesNotMatchNullPhase() {
         MojoExecution exec = mock(MojoExecution.class);
-        when(exec.getLifecyclePhase()).thenReturn(null);
+        when(exec.lifecyclePhase()).thenReturn(Optional.empty());
         assertFalse(new PhasePredicate("test").matches(exec));
     }
 
     @Test
     void matchesIntegrationTestPhase() {
         MojoExecution exec = mock(MojoExecution.class);
-        when(exec.getLifecyclePhase()).thenReturn("integration-test");
+        when(exec.lifecyclePhase()).thenReturn(Optional.of("integration-test"));
         assertTrue(new PhasePredicate("integration-test").matches(exec));
     }
 

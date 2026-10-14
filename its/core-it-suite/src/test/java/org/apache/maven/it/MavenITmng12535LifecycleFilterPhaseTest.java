@@ -28,7 +28,7 @@ import org.junit.jupiter.api.Test;
  *
  * @see <a href="https://github.com/apache/maven/issues/12535">MNG-12535</a>
  */
-class MavenITmng12535LifecycleFilterPhaseTest extends AbstractMavenIntegrationTestCase {
+public class MavenITmng12535LifecycleFilterPhaseTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     void lifecycleFilterSkipsTestPhase() throws Exception {
