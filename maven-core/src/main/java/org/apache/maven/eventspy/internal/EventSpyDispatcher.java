@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
 @Named
 public class EventSpyDispatcher {
 
-    private final Logger logger = LoggerFactory.getLogger(getClass());
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventSpyDispatcher.class);
 
     private final List<EventSpy> eventSpies;
 
@@ -107,10 +107,10 @@ public class EventSpyDispatcher {
     private void logError(String action, Throwable e, EventSpy spy) {
         String msg = "Failed to " + action + " spy " + spy.getClass().getName() + ": " + e.getMessage();
 
-        if (logger.isDebugEnabled()) {
-            logger.warn(msg, e);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.warn(msg, e);
         } else {
-            logger.warn(msg);
+            LOGGER.warn(msg);
         }
     }
 }
