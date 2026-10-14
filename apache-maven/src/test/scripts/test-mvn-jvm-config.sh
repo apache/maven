@@ -89,19 +89,19 @@ case " $* " in
   *" -version "*) exit 0 ;;
 esac
 
-case "$1" in
-  *JvmConfigParser.java)
+case "$3" in
+  JvmConfigParser)
     if [ "$FAIL_PARSER" = "1" ]; then
       echo "Error: simulated parser failure" >&2
       exit 1
     fi
-    # Emulate JvmConfigParser output
+    # Emulate JvmConfigParser output; args are: -cp <bin-dir> JvmConfigParser <config> <basedir>
     while IFS= read -r line || [ -n "$line" ]; do
       line="${line%%#*}"
       for token in $line; do
         printf '"%s" ' "$token"
       done
-    done < "$2"
+    done < "$4"
     printf '\n'
     exit 0 ;;
 esac
