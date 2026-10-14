@@ -648,9 +648,12 @@ public class MavenCli {
         // When a POM is present the default goal (if any) may apply, so let Maven proceed normally.
         // Skip this check for encryption commands (--encrypt-password, --encrypt-master-password)
         // which also have no goals and no POM, but are handled later by encryption().
+        // Also skip when -f/--file is specified: the alternate POM existence is validated later,
+        // and the working directory may legitimately have no pom.xml.
         List<String> goals = cliRequest.commandLine.getArgList();
         if (goals.isEmpty()
                 && modelProcessor != null
+                && !cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_POM_FILE)
                 && !cliRequest.commandLine.hasOption(CLIManager.ENCRYPT_PASSWORD)
                 && !cliRequest.commandLine.hasOption(CLIManager.ENCRYPT_MASTER_PASSWORD)) {
             File pom = modelProcessor.locatePom(new File(cliRequest.workingDirectory));
