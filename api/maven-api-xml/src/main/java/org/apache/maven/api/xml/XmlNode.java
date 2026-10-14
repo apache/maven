@@ -343,6 +343,17 @@ public interface XmlNode {
         return XmlService.merge(dominant, recessive, null);
     }
 
+    /**
+     * Merge recessive into dominant, with an explicit child merge override.
+     *
+     * @param dominant the dominant node, may be {@code null}
+     * @param recessive the recessive node, may be {@code null}
+     * @param childMergeOverride if non-null, overrides the child combination mode
+     * @return the merged node, or {@code null} if both inputs are {@code null}
+     *
+     * @deprecated Use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     static XmlNode merge(
             @Nullable XmlNode dominant, @Nullable XmlNode recessive, @Nullable Boolean childMergeOverride) {

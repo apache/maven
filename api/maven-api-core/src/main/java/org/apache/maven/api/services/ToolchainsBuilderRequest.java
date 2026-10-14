@@ -54,6 +54,14 @@ public interface ToolchainsBuilderRequest extends Request<ProtoSession> {
     @Nonnull
     Optional<Source> getUserToolchainsSource();
 
+    /**
+     * Creates a request from installation and user toolchains sources.
+     *
+     * @param session the session
+     * @param installationToolchainsFile the installation toolchains source, or {@code null}
+     * @param userToolchainsSource the user toolchains source, or {@code null}
+     * @return the new request
+     */
     @Nonnull
     static ToolchainsBuilderRequest build(
             @Nonnull ProtoSession session,
@@ -66,6 +74,15 @@ public interface ToolchainsBuilderRequest extends Request<ProtoSession> {
                 .build();
     }
 
+    /**
+     * Creates a request from installation and user toolchains paths.
+     * Paths that do not exist are treated as absent.
+     *
+     * @param session the session
+     * @param installationToolchainsFile the installation toolchains path, or {@code null}
+     * @param userToolchainsPath the user toolchains path, or {@code null}
+     * @return the new request
+     */
     @Nonnull
     static ToolchainsBuilderRequest build(
             @Nonnull ProtoSession session,
@@ -84,6 +101,11 @@ public interface ToolchainsBuilderRequest extends Request<ProtoSession> {
                 .build();
     }
 
+    /**
+     * Creates a new builder for constructing a {@code ToolchainsBuilderRequest}.
+     *
+     * @return a new builder
+     */
     @Nonnull
     static ToolchainsBuilderRequestBuilder builder() {
         return new ToolchainsBuilderRequestBuilder();

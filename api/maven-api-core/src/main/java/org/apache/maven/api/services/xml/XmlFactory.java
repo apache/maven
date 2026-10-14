@@ -39,43 +39,109 @@ import org.apache.maven.api.annotations.Nonnull;
 @Experimental
 public interface XmlFactory<T> extends Service {
 
+    /**
+     * Reads an object from the specified path using strict parsing.
+     *
+     * @param path the path to read from
+     * @return the parsed object
+     * @throws XmlReaderException if an error occurs during parsing
+     */
     @Nonnull
     default T read(@Nonnull Path path) throws XmlReaderException {
         return read(path, true);
     }
 
+    /**
+     * Reads an object from the specified path.
+     *
+     * @param path the path to read from
+     * @param strict whether to enforce strict parsing
+     * @return the parsed object
+     * @throws XmlReaderException if an error occurs during parsing
+     */
     @Nonnull
     default T read(@Nonnull Path path, boolean strict) throws XmlReaderException {
         return read(XmlReaderRequest.builder().path(path).strict(strict).build());
     }
 
+    /**
+     * Reads an object from the specified input stream using strict parsing.
+     *
+     * @param input the input stream to read from
+     * @return the parsed object
+     * @throws XmlReaderException if an error occurs during parsing
+     */
     @Nonnull
     default T read(@Nonnull InputStream input) throws XmlReaderException {
         return read(input, true);
     }
 
+    /**
+     * Reads an object from the specified input stream.
+     *
+     * @param input the input stream to read from
+     * @param strict whether to enforce strict parsing
+     * @return the parsed object
+     * @throws XmlReaderException if an error occurs during parsing
+     */
     @Nonnull
     default T read(@Nonnull InputStream input, boolean strict) throws XmlReaderException {
         return read(XmlReaderRequest.builder().inputStream(input).strict(strict).build());
     }
 
+    /**
+     * Reads an object from the specified reader using strict parsing.
+     *
+     * @param reader the reader to read from
+     * @return the parsed object
+     * @throws XmlReaderException if an error occurs during parsing
+     */
     @Nonnull
     default T read(@Nonnull Reader reader) throws XmlReaderException {
         return read(reader, true);
     }
 
+    /**
+     * Reads an object from the specified reader.
+     *
+     * @param reader the reader to read from
+     * @param strict whether to enforce strict parsing
+     * @return the parsed object
+     * @throws XmlReaderException if an error occurs during parsing
+     */
     @Nonnull
     default T read(@Nonnull Reader reader, boolean strict) throws XmlReaderException {
         return read(XmlReaderRequest.builder().reader(reader).strict(strict).build());
     }
 
+    /**
+     * Reads an object using the specified request.
+     *
+     * @param request the reader request containing the input source and options
+     * @return the parsed object
+     * @throws XmlReaderException if an error occurs during parsing
+     */
     @Nonnull
     T read(@Nonnull XmlReaderRequest request) throws XmlReaderException;
 
+    /**
+     * Writes the given content to the specified path.
+     *
+     * @param content the object to write
+     * @param path the path to write to
+     * @throws XmlWriterException if an error occurs during writing
+     */
     default void write(@Nonnull T content, @Nonnull Path path) throws XmlWriterException {
         write(XmlWriterRequest.<T>builder().content(content).path(path).build());
     }
 
+    /**
+     * Writes the given content to the specified output stream.
+     *
+     * @param content the object to write
+     * @param outputStream the output stream to write to
+     * @throws XmlWriterException if an error occurs during writing
+     */
     default void write(@Nonnull T content, @Nonnull OutputStream outputStream) throws XmlWriterException {
         write(XmlWriterRequest.<T>builder()
                 .content(content)
@@ -83,10 +149,23 @@ public interface XmlFactory<T> extends Service {
                 .build());
     }
 
+    /**
+     * Writes the given content to the specified writer.
+     *
+     * @param content the object to write
+     * @param writer the writer to write to
+     * @throws XmlWriterException if an error occurs during writing
+     */
     default void write(@Nonnull T content, @Nonnull Writer writer) throws XmlWriterException {
         write(XmlWriterRequest.<T>builder().content(content).writer(writer).build());
     }
 
+    /**
+     * Writes an object using the specified request.
+     *
+     * @param request the writer request containing the output target and content
+     * @throws XmlWriterException if an error occurs during writing
+     */
     void write(@Nonnull XmlWriterRequest<T> request) throws XmlWriterException;
 
     /**

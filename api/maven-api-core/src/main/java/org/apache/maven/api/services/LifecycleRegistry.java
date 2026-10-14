@@ -24,11 +24,31 @@ import java.util.stream.StreamSupport;
 
 import org.apache.maven.api.Lifecycle;
 
+/**
+ * Registry for {@link Lifecycle} extensible enum values.
+ * <p>
+ * In addition to the standard registry lookup operations, this interface provides
+ * iteration over all registered lifecycles and computation of the ordered phase list
+ * for a given lifecycle.
+ *
+ * @since 4.0.0
+ */
 public interface LifecycleRegistry extends ExtensibleEnumRegistry<Lifecycle>, Iterable<Lifecycle> {
 
+    /**
+     * Returns a sequential stream of all registered lifecycles.
+     *
+     * @return a stream of lifecycles
+     */
     default Stream<Lifecycle> stream() {
         return StreamSupport.stream(spliterator(), false);
     }
 
+    /**
+     * Computes the ordered list of phase names for the given lifecycle.
+     *
+     * @param lifecycle the lifecycle whose phases should be computed
+     * @return the ordered list of phase names
+     */
     List<String> computePhases(Lifecycle lifecycle);
 }
