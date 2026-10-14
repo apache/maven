@@ -18,6 +18,8 @@
  */
 package org.apache.maven.resolver;
 
+import javax.xml.stream.XMLStreamException;
+
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
@@ -25,8 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
-
-import javax.xml.stream.XMLStreamException;
 
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Version;
@@ -36,6 +36,8 @@ import org.apache.maven.impl.resolver.MavenWorkspaceReader;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Bridge adapter that wraps an {@link org.apache.maven.api.spi.WorkspaceReader SPI WorkspaceReader}
@@ -52,6 +54,8 @@ import org.eclipse.aether.repository.WorkspaceRepository;
  * @since 4.1.0
  */
 public class SpiWorkspaceReaderAdapter implements MavenWorkspaceReader {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(SpiWorkspaceReaderAdapter.class);
 
     private final org.apache.maven.api.spi.WorkspaceReader delegate;
     private final WorkspaceRepository repository;
@@ -86,6 +90,12 @@ public class SpiWorkspaceReaderAdapter implements MavenWorkspaceReader {
         try (InputStream is = Files.newInputStream(modelPath.get())) {
             return new MavenStaxReader().read(is, false, null);
         } catch (IOException | XMLStreamException e) {
+            LOGGER.debug(
+                    "SPI WorkspaceReader {} returned a model path for {} but parsing failed: {}",
+                    delegate.getClass().getName(),
+                    artifact,
+                    e.getMessage(),
+                    e);
             // Return null — consistent with other MavenWorkspaceReader implementations.
             // The caller (DefaultArtifactDescriptorReader) will fall back to normal resolution.
             return null;
@@ -117,12 +127,12 @@ public class SpiWorkspaceReaderAdapter implements MavenWorkspaceReader {
 
         LightweightApiArtifact(Artifact artifact) {
             this.artifact = artifact;
-            this.key = getGroupId()
+            this.key = artifact.getGroupId()
                     + ':'
-                    + getArtifactId()
+                    + artifact.getArtifactId()
                     + ':'
-                    + getExtension()
-                    + (getClassifier().isEmpty() ? "" : ":" + getClassifier())
+                    + artifact.getExtension()
+                    + (artifact.getClassifier().isEmpty() ? "" : ":" + artifact.getClassifier())
                     + ':'
                     + artifact.getVersion();
         }
@@ -134,37 +144,37 @@ public class SpiWorkspaceReaderAdapter implements MavenWorkspaceReader {
 
         @Nonnull
         @Override
-        public String getGroupId() {
+        public String groupId() {
             return artifact.getGroupId();
         }
 
         @Nonnull
         @Override
-        public String getArtifactId() {
+        public String artifactId() {
             return artifact.getArtifactId();
         }
 
         @Nonnull
         @Override
-        public Version getVersion() {
+        public Version version() {
             return new StringVersion(artifact.getVersion());
         }
 
         @Nonnull
         @Override
-        public Version getBaseVersion() {
+        public Version baseVersion() {
             return new StringVersion(artifact.getBaseVersion());
         }
 
         @Nonnull
         @Override
-        public String getExtension() {
+        public String extension() {
             return artifact.getExtension();
         }
 
         @Nonnull
         @Override
-        public String getClassifier() {
+        public String classifier() {
             return artifact.getClassifier();
         }
 
@@ -198,6 +208,13 @@ public class SpiWorkspaceReaderAdapter implements MavenWorkspaceReader {
 
     /**
      * Simple {@link Version} implementation that wraps a version string.
+     *
+     * <p><b>Note on ordering:</b> {@link #compareTo(Version)} uses lexicographic string
+     * comparison, which does <em>not</em> give correct semantic version ordering for
+     * multi-digit components (e.g. {@code "10"} sorts before {@code "9"}).  This wrapper
+     * is used solely to pass artifact coordinates to SPI workspace readers; callers should
+     * not rely on {@code compareTo} for correct Maven version ordering.  Use a proper
+     * {@link org.apache.maven.api.services.VersionParser} when version ordering matters.</p>
      */
     private record StringVersion(String version) implements Version {
         @Override
