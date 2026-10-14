@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -249,6 +250,17 @@ public class DefaultMaven implements Maven {
             return addExceptionToResult(result, e);
         }
 
+        // Register SPI workspace readers from the global container before project graph building.
+        // Core extensions declared in .mvn/extensions.xml are loaded into the global container
+        // before project scanning begins. Without this early registration, workspace readers from
+        // core extensions would miss the POM resolution phase (buildGraph), which resolves
+        // dependency POMs before setupWorkspaceReader() is called. Project-scoped readers (from
+        // per-project extensions) are added again in setupWorkspaceReader() after buildGraph().
+        for (org.apache.maven.api.spi.WorkspaceReader spiReader :
+                lookup.lookupList(org.apache.maven.api.spi.WorkspaceReader.class)) {
+            chainedWorkspaceReader.addReader(new SpiWorkspaceReaderAdapter(spiReader));
+        }
+
         eventCatapult.fire(ExecutionEvent.Type.ProjectDiscoveryStarted, session, null);
 
         Result<? extends ProjectDependencyGraph> graphResult = buildGraph(session);
@@ -343,7 +355,8 @@ public class DefaultMaven implements Maven {
         // 1) Reactor workspace reader
         WorkspaceReader reactorReader = lookup.lookup(WorkspaceReader.class, ReactorReader.HINT);
         workspaceReaders.add(reactorReader);
-        // 2) Repository system session-scoped workspace reader (contains ide and exec request reader)
+        // 2) Repository system session-scoped workspace reader (contains ide, exec request reader,
+        //    and SPI readers already registered from the global container before buildGraph()).
         for (WorkspaceReader repoWorkspaceReader : chainedWorkspaceReader.getReaders()) {
             if (repoWorkspaceReader != null && repoWorkspaceReader != reactorReader) {
                 workspaceReaders.add(repoWorkspaceReader);
@@ -351,12 +364,20 @@ public class DefaultMaven implements Maven {
         }
         // 3) .. n) Project-scoped legacy workspace readers (org.eclipse.aether)
         workspaceReaders.addAll(getProjectScopedExtensionComponents(session.getProjects(), WorkspaceReader.class));
-        // n+1) SPI workspace readers (org.apache.maven.api.spi) — discovered here, after buildGraph()
-        //      has loaded core extensions into the container so they are visible via
-        //      getProjectScopedExtensionComponents.
+        // n+1) Project-scoped SPI workspace readers not yet registered (those loaded by project-level
+        //      extensions that are not core extensions and thus not visible in the global container).
+        //      Collect already-registered SPI delegates (by identity) to avoid wrapping the same
+        //      reader twice (core extensions are registered both in the global container before
+        //      buildGraph() and via getProjectScopedExtensionComponents() here).
+        IdentityHashMap<org.apache.maven.api.spi.WorkspaceReader, Boolean> wrappedDelegates = new IdentityHashMap<>();
+        workspaceReaders.stream()
+                .filter(r -> r instanceof SpiWorkspaceReaderAdapter)
+                .forEach(r -> wrappedDelegates.put(((SpiWorkspaceReaderAdapter) r).getDelegate(), Boolean.TRUE));
         for (org.apache.maven.api.spi.WorkspaceReader spiReader : getProjectScopedExtensionComponents(
                 session.getProjects(), org.apache.maven.api.spi.WorkspaceReader.class)) {
-            workspaceReaders.add(new SpiWorkspaceReaderAdapter(spiReader));
+            if (!wrappedDelegates.containsKey(spiReader)) {
+                workspaceReaders.add(new SpiWorkspaceReaderAdapter(spiReader));
+            }
         }
         chainedWorkspaceReader.setReaders(workspaceReaders);
     }
