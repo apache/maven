@@ -170,6 +170,7 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
             return expression.replace("$$", "$");
         }
 
+        // the evaluator may be created without a mojo execution, see the single argument constructor
         MojoDescriptor mojoDescriptor = mojoExecution != null ? mojoExecution.getMojoDescriptor() : null;
 
         if ("localRepository".equals(expression)) {
@@ -224,7 +225,7 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
             value = session.getRepositorySession();
         } else if (expression.equals("mojo") || expression.equals("mojoExecution")) {
             value = mojoExecution;
-        } else if (expression.startsWith("mojo")) {
+        } else if (expression.startsWith("mojo") && mojoExecution != null) {
             try {
                 int pathSeparator = expression.indexOf('/');
 
@@ -242,7 +243,7 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
             }
         } else if (expression.equals("plugin")) {
             value = mojoDescriptor != null ? mojoDescriptor.getPluginDescriptor() : null;
-        } else if (expression.startsWith("plugin")) {
+        } else if (expression.startsWith("plugin") && mojoDescriptor != null) {
             try {
                 int pathSeparator = expression.indexOf('/');
 

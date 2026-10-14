@@ -87,6 +87,30 @@ public class DefaultNode extends AbstractNode {
                 .map(session::getRemoteRepository);
     }
 
+    @Override
+    public Optional<Node> winner() {
+        Object winner = node.getData().get(ConflictResolver.NODE_DATA_WINNER);
+        return winner instanceof DependencyNode
+                ? Optional.of(session.getNode((DependencyNode) winner, verbose))
+                : Optional.empty();
+    }
+
+    @Override
+    public Optional<String> premanagedVersion() {
+        return Optional.ofNullable(DependencyManagerUtils.getPremanagedVersion(node));
+    }
+
+    @Override
+    public Optional<String> premanagedScope() {
+        return Optional.ofNullable(DependencyManagerUtils.getPremanagedScope(node));
+    }
+
+    @Override
+    public Optional<String> originalScope() {
+        Object scope = node.getData().get(ConflictResolver.NODE_DATA_ORIGINAL_SCOPE);
+        return scope instanceof String ? Optional.of((String) scope) : Optional.empty();
+    }
+
     /**
      * Returns a detailed string representation of this dependency node.
      * <p>
