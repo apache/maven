@@ -23,13 +23,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.classworlds.ClassWorld;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvnenc.EncryptInvoker;
 import org.apache.maven.cling.invoker.mvnenc.EncryptParser;
-import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * Maven encrypt CLI "new-gen".
@@ -47,7 +47,7 @@ public class MavenEncCling extends ClingSupport {
     /**
      * ClassWorld Launcher "enhanced" entry point: returning exitCode and accepts Class World.
      */
-    public static int main(String[] args, ClassWorld world) throws IOException {
+    public static int main(String[] args, org.codehaus.plexus.classworlds.ClassWorld world) throws IOException {
         return new MavenEncCling(world).run(args, null, null, null, false);
     }
 
@@ -56,7 +56,7 @@ public class MavenEncCling extends ClingSupport {
      */
     public static int main(
             String[] args,
-            ClassWorld world,
+            org.codehaus.plexus.classworlds.ClassWorld world,
             @Nullable InputStream stdIn,
             @Nullable OutputStream stdOut,
             @Nullable OutputStream stdErr)
