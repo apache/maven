@@ -26,6 +26,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.Project;
@@ -46,6 +48,7 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 // TODO the antrun plugin has its own configurator, the only plugin that does. might need to think about how that works
@@ -58,10 +61,15 @@ import org.slf4j.LoggerFactory;
 @Singleton
 public class DefaultBuildPluginManager implements BuildPluginManager {
 
+    private static final String NON_THREAD_SAFE_SERIALIZER_PROPERTY = "maven.plugin.nonThreadSafeSerializer";
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultBuildPluginManager.class);
+
     private final MavenPluginManager mavenPluginManager;
     private final LegacySupport legacySupport;
     private final MojoExecutionScope scope;
     private final MojoExecutionListener mojoExecutionListener;
+    private final ConcurrentHashMap<Class<?>, ReentrantLock> mojoLocks = new ConcurrentHashMap<>();
 
     @Inject
     public DefaultBuildPluginManager(
@@ -130,7 +138,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
             scope.seed(Project.class, sessionV4.getProject(project));
             scope.seed(org.apache.maven.api.MojoExecution.class, new DefaultMojoExecution(sessionV4, mojoExecution));
 
-            Object mojoLock;
+            Class<?> mojoLock;
             if (mojoDescriptor.isV4Api()) {
                 // For Maven 4 plugins, register a service so that they can be directly injected into plugins
                 Map<Class<? extends Service>, Supplier<? extends Service>> services = sessionV4.getAllServices();
@@ -207,17 +215,33 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
     }
 
     private void executeMojo(
-            MojoDescriptor mojoDescriptor, Mojo mojo, Object mojoLock, MojoExecutionEvent mojoExecutionEvent)
+            MojoDescriptor mojoDescriptor, Mojo mojo, Class<?> mojoLock, MojoExecutionEvent mojoExecutionEvent)
             throws MojoExecutionException, MojoFailureException {
         mojoExecutionListener.beforeMojoExecution(mojoExecutionEvent);
-        if (mojoDescriptor.isThreadSafe()) {
+        if (mojoDescriptor.isThreadSafe() || !isNonThreadSafeMojoSerializationEnabled()) {
             mojo.execute();
         } else {
-            synchronized (mojoLock) {
+            ReentrantLock lock = mojoLocks.computeIfAbsent(mojoLock, key -> new ReentrantLock());
+            if (!lock.tryLock()) {
+                LOGGER.warn(
+                        "Serializing concurrent execution of non-thread-safe mojo {}. This may reduce build parallelism. "
+                                + "Mark the mojo @threadSafe if it is safe for concurrent use, or disable serialization with "
+                                + "-D{}=false.",
+                        mojoDescriptor.getId(),
+                        NON_THREAD_SAFE_SERIALIZER_PROPERTY);
+                lock.lock();
+            }
+            try {
                 mojo.execute();
+            } finally {
+                lock.unlock();
             }
         }
         mojoExecutionListener.afterMojoExecutionSuccess(mojoExecutionEvent);
+    }
+
+    private boolean isNonThreadSafeMojoSerializationEnabled() {
+        return Boolean.parseBoolean(System.getProperty(NON_THREAD_SAFE_SERIALIZER_PROPERTY, "true"));
     }
 
     /**

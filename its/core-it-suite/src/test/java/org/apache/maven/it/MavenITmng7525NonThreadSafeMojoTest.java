@@ -22,6 +22,8 @@ import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
+
 /**
  * Verifies that parallel reactor builds serialize executions of a mojo that is not marked as thread-safe.
  */
@@ -38,5 +40,21 @@ class MavenITmng7525NonThreadSafeMojoTest extends AbstractMavenIntegrationTestCa
         verifier = newVerifier(projectDir);
         verifier.execute("-T2", "validate");
         verifier.verifyErrorFreeLog();
+        verifier.verifyTextInLog("Serializing concurrent execution of non-thread-safe mojo");
+    }
+
+    @Test
+    void canDisableNonThreadSafeMojoSerialization() throws Exception {
+        Path projectDir = extractResources("mng-7525-non-thread-safe-mojo");
+
+        Verifier verifier = newVerifier(projectDir);
+        verifier.execute("install", "-pl", "plugin");
+        verifier.verifyErrorFreeLog();
+
+        Verifier disabledVerifier = newVerifier(projectDir);
+        assertThrows(
+                VerificationException.class,
+                () -> disabledVerifier.execute("-Dmaven.plugin.nonThreadSafeSerializer=false", "-T2", "validate"));
+        disabledVerifier.verifyTextInLog("non-thread-safe mojo was executed concurrently");
     }
 }
