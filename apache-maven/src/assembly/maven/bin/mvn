@@ -327,8 +327,6 @@ fi
 find_maven_basedir() {
 (
   basedir=`find_file_argument_basedir "$@"`
-  rc=$?
-  [ $rc -ne 0 ] && exit $rc
   wdir="$basedir"
   while :
   do
@@ -357,14 +355,11 @@ find_file_argument_basedir() {
       elif [ -f "${arg}" ]; then
         basedir=`dirname "${arg}"`
         basedir=`cd "$basedir" && pwd -P`
-        if [ ! -d "$basedir" ]; then
-          printf '[ERROR] Directory %s extracted from the -f/--file command-line argument %s does not exist\n' "$basedir" "${arg}" >&2
-          exit 1
-        fi
-      else
-        printf '[ERROR] POM file %s specified with the -f/--file command line argument does not exist\n' "${arg}" >&2
-        exit 1
       fi
+      # If the argument does not exist (e.g. a Cygwin/MSYS path that will be
+      # converted later, or a genuinely missing file), fall back to the current
+      # directory.  The Java layer validates the path and produces the proper
+      # error message when the file is truly absent.
       break
     fi
     if [ "$arg" = "-f" -o "$arg" = "--file" ]; then
@@ -425,9 +420,6 @@ concat_lines() {
 }
 
 MAVEN_PROJECTBASEDIR="`find_maven_basedir "$@"`"
-if [ $? -ne 0 ] ; then
-  exit 1
-fi
 
 # Under Cygwin/MinGW the POSIX form of the project base directory is required by
 # the shell (to locate .mvn/jvm.config), while the JVM and everything it hands

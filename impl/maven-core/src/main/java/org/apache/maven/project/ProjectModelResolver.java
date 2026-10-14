@@ -220,6 +220,9 @@ public class ProjectModelResolver implements ModelResolver {
         } catch (final VersionRangeResolutionException e) {
             throw new UnresolvableModelException(
                     e.getMessage(), parent.getGroupId(), parent.getArtifactId(), parent.getVersion(), e);
+        } catch (final IllegalArgumentException e) {
+            throw new UnresolvableModelException(
+                    e.getMessage(), parent.getGroupId(), parent.getArtifactId(), parent.getVersion(), e);
         }
     }
 
@@ -261,6 +264,9 @@ public class ProjectModelResolver implements ModelResolver {
 
             return resolveModel(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
         } catch (VersionRangeResolutionException e) {
+            throw new UnresolvableModelException(
+                    e.getMessage(), dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), e);
+        } catch (IllegalArgumentException e) {
             throw new UnresolvableModelException(
                     e.getMessage(), dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion(), e);
         }
