@@ -93,7 +93,8 @@ class MavenITmng8655SettingsParserTest extends AbstractMavenIntegrationTestCase 
         var result = new ForkedMavenExecutor(installation).execute(ExecutorRequest.mavenBuilder()
                 .cwd(project)
                 .userHomeDirectory(Files.createDirectories(directory.resolve("home")))
-                .arguments(List.of("-B", "-ntp", "-s", "settings.properties", "-Dparser.input=bootstrap-settings",
+                .arguments(List.of("-B", "-ntp", "--console=verbose", "-s", "settings.properties",
+                        "-Dparser.input=bootstrap-settings",
                         "-Dmaven.repo.local=" + localRepository, "validate"))
                 .skipMavenRc(true)
                 .grabOutputAsString(true)

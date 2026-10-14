@@ -22,6 +22,8 @@ import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-4411">MNG-4411</a>.
  *
@@ -44,6 +46,11 @@ public class MavenITmng4411VersionInfoTest extends AbstractMavenIntegrationTestC
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier.verifyTextInLog("Maven");
+        // When using --version, Maven may use the shell fast-path (no JVM) which outputs to stdout
+        // rather than the -l log file. Check both sources so the test passes in both embedded
+        // (in-process, output goes to log) and forked (shell fast-path, output goes to stdout) modes.
+        boolean inLog = verifier.textOccurrencesInLog("Maven") > 0;
+        boolean inStdout = verifier.getStdout().contains("Maven");
+        assertTrue(inLog || inStdout, "Expected 'Maven' in log or stdout");
     }
 }
