@@ -75,13 +75,13 @@ class ApiRunnerSettingsTest {
                     localRepository,
                     ApiRunner.SecurityMode.NONE);
 
-            Path selectedRepository = session.getLocalRepository().path();
+            Path selectedRepository = session.getLocalRepository().getPath();
             assertTrue(
                     Files.isSameFile(localRepository, selectedRepository),
                     () -> "Expected local repository " + localRepository + " but was " + selectedRepository);
             assertEquals(
                     List.of("central"),
-                    session.getRemoteRepositories().stream().map(r -> r.id()).toList());
+                    session.getRemoteRepositories().stream().map(r -> r.getId()).toList());
         } finally {
             System.setProperty("user.home", oldHome);
             if (oldMavenHome != null) {
