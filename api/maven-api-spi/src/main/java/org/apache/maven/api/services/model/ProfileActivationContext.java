@@ -76,13 +76,12 @@ public interface ProfileActivationContext {
     String getUserProperty(@Nonnull String key);
 
     /**
-     * Gets the model property to use for interpolation and profile activation.
+     * Gets the model property to use for interpolation.
      * <p>
      * These are the properties declared in the model's own {@code <properties>} section.
-     * They are part of the artifact's published identity and are always consulted for profile
-     * activation, including in repository-resolved (external) model builds. Unlike
-     * {@link #getUserProperty(String)}, these are never suppressed when evaluating dependency
-     * profiles.
+     * They are available for interpolation but are <b>not</b> used for profile activation
+     * in repository-resolved (external) model builds — a dependency POM's own properties
+     * must not activate its own property-based profiles (see #13390).
      *
      * @param key the name of the model property
      * @return The model property for the specified key, or {@code null};
