@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import static org.apache.maven.api.Lifecycle.AFTER;
 import static org.apache.maven.api.Lifecycle.BEFORE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -85,6 +86,102 @@ class BuildPlanCreatorTest {
             phase.predecessors.forEach(
                     pred -> assertTrue(plan.step(pred.project, pred.name).isPresent(), "Phase not present: " + pred));
         });
+    }
+
+    /**
+     * Regression test for <a href="https://github.com/apache/maven/issues/13529">#13529</a>:
+     * merging overlapping lifecycle plans (e.g., {@code package} then {@code install})
+     * must un-skip the non-overlapping phases so that mojos can be bound during planning.
+     */
+    @Test
+    void testMergeUnskipsNonOverlappingPhases() {
+        MavenProject project = new MavenProject();
+        project.setCollectedProjects(List.of());
+        project.setArtifactId("test");
+        Map<MavenProject, List<MavenProject>> projects = Collections.singletonMap(project, Collections.emptyList());
+
+        BuildPlan plan = calculateLifecycleMappings(projects, "package");
+
+        // Verify install is skipped in the package plan
+        assertTrue(plan.requiredStep(project, "install").skip.get());
+
+        plan.then(calculateLifecycleMappings(projects, "install"));
+
+        // Verify install-related steps are NOT skipped after merge
+        for (String stepName : List.of("before:install", "install", "after:install")) {
+            assertFalse(
+                    plan.requiredStep(project, stepName).skip.get(),
+                    "Step " + stepName + " should not be skipped after merging package+install plans");
+        }
+
+        // Verify install is reachable from package
+        assertTrue(
+                plan.requiredStep(project, "install").isSuccessorOf(plan.requiredStep(project, "after:package")),
+                "install must be a successor of package");
+
+        // Verify all predecessor references point to steps actually in the plan
+        plan.allSteps()
+                .forEach(step -> step.predecessors.forEach(pred -> assertTrue(
+                        plan.step(pred.project, pred.name).isPresent(), "Predecessor not in plan: " + pred)));
+    }
+
+    /**
+     * Simulates {@code package javadoc:aggregate-jar install} with three task segments.
+     * The aggregator goal must run after package but before install, without creating
+     * cycles in the build plan.
+     */
+    @Test
+    void testMergeThreeSegmentsWithAggregatorGoal() {
+        MavenProject root = new MavenProject();
+        root.setCollectedProjects(List.of());
+        root.setArtifactId("root");
+        MavenProject child = new MavenProject();
+        child.setCollectedProjects(List.of());
+        child.setArtifactId("child");
+        Map<MavenProject, List<MavenProject>> allProjects = new HashMap<>();
+        allProjects.put(root, Collections.emptyList());
+        allProjects.put(child, Collections.singletonList(root));
+
+        // Segment 1: package (all projects)
+        BuildPlan plan = new BuildPlan(allProjects);
+        plan.then(calculateLifecycleMappings(allProjects, "package"));
+
+        // Segment 2: aggregator goal (root only)
+        BuildPlan goalPlan = new BuildPlan();
+        BuildStep goalStep = new BuildStep("javadoc:aggregate-jar", root, null);
+        Map<String, BuildStep> goalSteps = new HashMap<>();
+        goalSteps.put("javadoc:aggregate-jar", goalStep);
+        goalPlan.addProject(root, goalSteps);
+        plan.then(goalPlan);
+
+        // Segment 3: install (all projects)
+        plan.then(calculateLifecycleMappings(allProjects, "install"));
+
+        // Verify: all predecessor references point to plan objects (no dangling)
+        plan.allSteps()
+                .forEach(step -> step.predecessors.forEach(pred -> assertTrue(
+                        plan.step(pred.project, pred.name).isPresent(), "Predecessor not in plan: " + pred)));
+
+        // Verify: install is not skipped for both projects
+        for (MavenProject p : List.of(root, child)) {
+            assertFalse(
+                    plan.requiredStep(p, "install").skip.get(),
+                    "install should not be skipped for " + p.getArtifactId());
+        }
+
+        // Verify: no cycle — javadoc must NOT be a successor of install
+        BuildStep jdocStep = plan.requiredStep(root, "javadoc:aggregate-jar");
+        BuildStep installStep = plan.requiredStep(root, "install");
+        assertFalse(
+                jdocStep.isSuccessorOf(installStep), "javadoc must not be a successor of install (would create cycle)");
+
+        // Verify: javadoc runs after package
+        assertTrue(
+                jdocStep.isSuccessorOf(plan.requiredStep(root, "after:package")),
+                "javadoc must be a successor of package");
+
+        // Verify: install runs after javadoc
+        assertTrue(installStep.isSuccessorOf(jdocStep), "install must be a successor of javadoc:aggregate-jar");
     }
 
     @Test

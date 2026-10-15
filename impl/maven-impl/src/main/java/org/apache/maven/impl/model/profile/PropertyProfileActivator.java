@@ -39,10 +39,9 @@ import org.apache.maven.api.services.model.ProfileActivator;
  * The property lookup order is: user properties ({@code -D} flags) → system properties
  * ({@code java.version}, {@code os.name}, …).  In external model builds (dependency POMs,
  * parent POMs, imported BOMs), the caller provides a sandboxed {@link ProfileActivationContext}
- * that suppresses user properties and merges model properties into the system properties map,
- * so only platform and POM-declared properties drive activation.  This makes profile
- * activation in published artifacts deterministic: it depends on the consumer's platform
- * and the artifact's declared properties, not on the consumer's {@code -D} flags.
+ * that suppresses user properties, so consumer {@code -D} flags cannot activate dependency
+ * profiles.  Model properties are not exposed through the system-property lookup, so a
+ * dependency POM's own {@code <properties>} cannot self-activate profiles (see #13390).
  *
  * @see ActivationProperty
  */
@@ -90,9 +89,9 @@ public class PropertyProfileActivator implements ProfileActivator {
 
         // Lookup order: user (-D) → system (java.version, os.name, …).
         // In external model builds the caller provides a sandboxed context that suppresses
-        // user properties and merges model properties into system properties, so consumer
-        // -D flags cannot activate dependency profiles while POM-declared properties still
-        // drive activation.
+        // user properties, so consumer -D flags cannot activate dependency profiles.
+        // Model properties are not exposed through the system-property lookup,
+        // so a dependency POM's own <properties> cannot self-activate profiles.
         String sysValue = context.getUserProperty(name);
         if (sysValue == null && "packaging".equals(name)) {
             sysValue = context.getModelPackaging();

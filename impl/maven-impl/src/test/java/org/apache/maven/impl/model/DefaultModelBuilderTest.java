@@ -174,6 +174,12 @@ class DefaultModelBuilderTest {
         // genuinely doesn't exist on the developer's machine — normal project-build behaviour.
         assertEquals("activated", model.getProperties().get("profile.missing.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // POM-declared properties do not drive profile activation in any context:
+        // the PropertyProfileActivator only checks user → system properties.
+        assertNull(model.getProperties().get("profile.pom.property"));
+        // POM-declared property via <condition>: in a project build the non-sandboxed context
+        // allows getModelProperty() to return the real POM property, so this condition fires.
+        assertEquals("activated", model.getProperties().get("profile.pom.condition"));
         assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
@@ -195,6 +201,12 @@ class DefaultModelBuilderTest {
         // to !false = true and fires unconditionally — same footgun as <file><missing>.
         assertNull(model.getProperties().get("profile.missing.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // POM-declared property must not self-activate a profile in external builds (#13390).
+        assertNull(model.getProperties().get("profile.pom.property"));
+        // POM-declared property via <condition> must also be suppressed (#13390):
+        // ConditionProfileActivator.doGetProperty() calls getModelProperty() directly,
+        // so the sandbox must return null from getModelProperty() to close the gap.
+        assertNull(model.getProperties().get("profile.pom.condition"));
         // Negated-property profile (!skip.defaults) fires because 'skip.defaults' is absent
         // from the sandboxed context (user properties are suppressed; system properties do not
         // contain it). This is the common opt-out flag pattern: the publisher's default-on
@@ -274,6 +286,11 @@ class DefaultModelBuilderTest {
         assertEquals("activated", model.getProperties().get("profile.property"));
         assertEquals("activated", model.getProperties().get("profile.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // POM-declared properties do not drive profile activation even in caller-supplied builds.
+        assertNull(model.getProperties().get("profile.pom.property"));
+        // POM-declared property via <condition>: caller-supplied model uses non-sandboxed context,
+        // so getModelProperty() returns real POM properties and the condition fires.
+        assertEquals("activated", model.getProperties().get("profile.pom.condition"));
         assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
@@ -1737,6 +1754,31 @@ class DefaultModelBuilderTest {
                     "org.apache.maven.test:standalone-parent:1.0.0",
                     warnings.get(0).getModelId());
         }
+    }
+
+    @Test
+    void testMng8710ParentFileProfileWithPropertyActivationAppliesToChild() {
+        Path pom = Paths.get("src/test/resources/poms/factory/mng-8710/pom.xml").toAbsolutePath();
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .recursive(true)
+                        .source(Sources.buildSource(pom))
+                        .build());
+
+        Model parentModel = result.getEffectiveModel();
+        assertEquals("activated", parentModel.getProperties().get("profile.from.parent"));
+
+        ModelBuilderResult childResult = result.getChildren().stream()
+                .filter(r -> "mng-8710-child".equals(r.getEffectiveModel().getArtifactId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("child result missing: " + result.getChildren()));
+        Model childModel = childResult.getEffectiveModel();
+        assertEquals(
+                "activated",
+                childModel.getProperties().get("profile.from.parent"),
+                "Parent file profile interpolating ${message.file} must inject into child (MNG-8710)");
     }
 
     @Test

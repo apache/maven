@@ -19,6 +19,7 @@
 package org.apache.maven.di.impl;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Member;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
@@ -71,7 +72,16 @@ public abstract class Binding<T> {
 
     public static <R> Binding<R> to(
             Key<R> originalKey, TupleConstructorN<R> constructor, Dependency<?>[] dependencies, int priority) {
-        return new BindingToConstructor<>(originalKey, constructor, dependencies, priority);
+        return to(originalKey, constructor, dependencies, priority, null);
+    }
+
+    static <R> Binding<R> to(
+            Key<R> originalKey,
+            TupleConstructorN<R> constructor,
+            Dependency<?>[] dependencies,
+            int priority,
+            Member source) {
+        return new BindingToConstructor<>(originalKey, constructor, dependencies, priority, source);
     }
 
     // endregion
@@ -92,6 +102,18 @@ public abstract class Binding<T> {
     }
 
     public Binding<T> initializeWith(BindingInitializer<T> bindingInitializer) {
+        return initializeWith(bindingInitializer, null);
+    }
+
+    /**
+     * Initializes this binding with an optional identity for deduplicating generated registrations.
+     * Without one, each wrapper has its own identity. The initializer is identified in diagnostics.
+     *
+     * @param bindingInitializer initializer applied to the created instance
+     * @param registrationIdentity identity shared by equivalent registrations, or {@code null}
+     * @return the initialized binding
+     */
+    Binding<T> initializeWith(BindingInitializer<T> bindingInitializer, Object registrationIdentity) {
         return new Binding<T>(
                 this.originalKey,
                 Stream.of(this.dependencies, bindingInitializer.getDependencies())
@@ -116,7 +138,12 @@ public abstract class Binding<T> {
 
             @Override
             public String toString() {
-                return Binding.this.toString();
+                return Binding.this + " initialized by " + identityString(bindingInitializer);
+            }
+
+            @Override
+            Object getRegistrationIdentity() {
+                return registrationIdentity != null ? registrationIdentity : this;
             }
         };
     }
@@ -137,6 +164,16 @@ public abstract class Binding<T> {
 
     public int getPriority() {
         return priority;
+    }
+
+    Object getRegistrationIdentity() {
+        return this;
+    }
+
+    private static String identityString(Object object) {
+        return object == null
+                ? "null"
+                : object.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(object));
     }
 
     @Override
@@ -168,7 +205,7 @@ public abstract class Binding<T> {
 
         @Override
         public String toString() {
-            return "BindingToInstance[" + instance + "]" + getDependencies();
+            return "BindingToInstance[" + getOriginalKey() + ", " + identityString(instance) + "]" + getDependencies();
         }
     }
 
@@ -187,19 +224,25 @@ public abstract class Binding<T> {
 
         @Override
         public String toString() {
-            return "BindingToSupplier[" + supplier + "]" + getDependencies();
+            return "BindingToSupplier[" + getOriginalKey() + ", " + identityString(supplier) + "]" + getDependencies();
         }
     }
 
     public static class BindingToConstructor<T> extends Binding<T> {
         final TupleConstructorN<T> constructor;
         final Dependency<?>[] args;
+        final Member source;
 
         BindingToConstructor(
-                Key<? extends T> key, TupleConstructorN<T> constructor, Dependency<?>[] dependencies, int priority) {
+                Key<? extends T> key,
+                TupleConstructorN<T> constructor,
+                Dependency<?>[] dependencies,
+                int priority,
+                Member source) {
             super(key, new HashSet<>(Arrays.asList(dependencies)), null, priority);
             this.constructor = constructor;
             this.args = dependencies;
+            this.source = source;
         }
 
         @Override
@@ -213,7 +256,14 @@ public abstract class Binding<T> {
 
         @Override
         public String toString() {
-            return "BindingToConstructor[" + getOriginalKey() + "]" + getDependencies();
+            return "BindingToConstructor[" + getOriginalKey() + ", "
+                    + (source != null ? source : identityString(constructor)) + "]"
+                    + getDependencies();
+        }
+
+        @Override
+        Object getRegistrationIdentity() {
+            return source != null ? source : this;
         }
     }
 }

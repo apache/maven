@@ -81,6 +81,51 @@ public interface Node {
     Optional<RemoteRepository> repository();
 
     /**
+     * Returns the node that won the conflict resolution against this node, if this node was omitted for a conflict
+     * or a duplicate. The resolution metadata is only available when the dependency graph was collected in verbose
+     * mode, see {@link org.apache.maven.api.services.DependencyResolverRequest#getVerbose()}.
+     *
+     * @return an {@code Optional} containing the winning node, or empty if this node was not omitted or the
+     *         information was not collected
+     * @since 4.1.0
+     */
+    @Nonnull
+    Optional<Node> winner();
+
+    /**
+     * Returns the version declared for this dependency before dependency management replaced it. The value is only
+     * available when the graph was collected in verbose mode.
+     *
+     * @return an {@code Optional} containing the declared version, or empty if the version was not managed or the
+     *         information was not collected
+     * @since 4.1.0
+     */
+    @Nonnull
+    Optional<String> premanagedVersion();
+
+    /**
+     * Returns the scope declared for this dependency before dependency management replaced it. The value is only
+     * available when the graph was collected in verbose mode.
+     *
+     * @return an {@code Optional} containing the declared scope, or empty if the scope was not managed or the
+     *         information was not collected
+     * @since 4.1.0
+     */
+    @Nonnull
+    Optional<String> premanagedScope();
+
+    /**
+     * Returns the scope this dependency had before conflict resolution changed it. The value is only available when
+     * the graph was collected in verbose mode.
+     *
+     * @return an {@code Optional} containing the original scope, or empty if the scope was not changed or the
+     *         information was not collected
+     * @since 4.1.0
+     */
+    @Nonnull
+    Optional<String> originalScope();
+
+    /**
      * @return artifact for this node
      * @deprecated Use {@link #artifact()} instead.
      */

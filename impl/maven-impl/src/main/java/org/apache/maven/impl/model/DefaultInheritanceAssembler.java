@@ -252,6 +252,7 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
                         // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions
                         Plugin plugin = Plugin.newInstance(false);
                         plugin = mergePlugin(plugin, element, sourceDominant, context);
+                        plugin = withElementLocation(plugin, element);
 
                         Object key = getPluginKey().apply(plugin);
 
@@ -292,6 +293,38 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
             }
         }
 
+        /**
+         * Keeps the location of the {@code <plugin>} element itself, which is stored under the empty key and
+         * which merging into a new instance does not copy, so that the inherited plugin still tells which POM
+         * declares it.
+         *
+         * @param merged the plugin resulting from the merge
+         * @param declared the plugin as declared in the parent POM
+         * @return the merged plugin, with the location of the declared plugin element if it is known
+         */
+        private static Plugin withElementLocation(Plugin merged, Plugin declared) {
+            InputLocation location = declared.getLocation("");
+            return location != null
+                    ? Plugin.newBuilder(merged, true).location("", location).build()
+                    : merged;
+        }
+
+        /**
+         * Same as {@link #withElementLocation(Plugin, Plugin)} for a report plugin.
+         *
+         * @param merged the report plugin resulting from the merge
+         * @param declared the report plugin as declared in the parent POM
+         * @return the merged report plugin, with the location of the declared element if it is known
+         */
+        private static ReportPlugin withElementLocation(ReportPlugin merged, ReportPlugin declared) {
+            InputLocation location = declared.getLocation("");
+            return location != null
+                    ? ReportPlugin.newBuilder(merged, true)
+                            .location("", location)
+                            .build()
+                    : merged;
+        }
+
         @Override
         protected Plugin mergePlugin(
                 Plugin target, Plugin source, boolean sourceDominant, Map<Object, Object> context) {
@@ -325,6 +358,7 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
                         // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions as well
                         ReportPlugin plugin = ReportPlugin.newInstance(false);
                         plugin = mergeReportPlugin(plugin, element, sourceDominant, context);
+                        plugin = withElementLocation(plugin, element);
 
                         merged.put(getReportPluginKey().apply(element), plugin);
                     }

@@ -480,6 +480,45 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         return new MavenProject(new Model());
     }
 
+    /**
+     * An evaluator created without a mojo execution still evaluates the expressions which do not depend on one.
+     */
+    @Test
+    void testEvaluationWithoutMojoExecution() throws Exception {
+        String sysprop = "PPEET_without_mojo_execution";
+        Properties executionProperties = new Properties();
+        executionProperties.setProperty(sysprop, "value");
+        MavenSession session =
+                createSession((MutablePlexusContainer) getContainer(), getLocalRepository(), executionProperties);
+        session.getRequest().setRootDirectory(rootDirectory);
+
+        ExpressionEvaluator ee = new PluginParameterExpressionEvaluator(session);
+
+        assertEquals("value", ee.evaluate("${" + sysprop + "}"));
+        assertEquals("prefix-value-suffix", ee.evaluate("prefix-${" + sysprop + "}-suffix"));
+        assertSame(session, ee.evaluate("${session}"));
+        assertNull(ee.evaluate("${PPEET_nonexisting_property}"));
+    }
+
+    /**
+     * Without a mojo execution there is no mojo and no plugin to evaluate an expression against, which
+     * yields no value rather than a failure.
+     */
+    @Test
+    void testMojoAndPluginExpressionsWithoutMojoExecution() throws Exception {
+        MavenSession session =
+                createSession((MutablePlexusContainer) getContainer(), getLocalRepository(), new Properties());
+        session.getRequest().setRootDirectory(rootDirectory);
+
+        ExpressionEvaluator ee = new PluginParameterExpressionEvaluator(session);
+
+        assertNull(ee.evaluate("${mojo}"));
+        assertNull(ee.evaluate("${mojoExecution}"));
+        assertNull(ee.evaluate("${mojo.goal}"));
+        assertNull(ee.evaluate("${plugin}"));
+        assertNull(ee.evaluate("${plugin.artifactId}"));
+    }
+
     private ExpressionEvaluator createExpressionEvaluator(
             MavenProject project, PluginDescriptor pluginDescriptor, Properties executionProperties) throws Exception {
         ArtifactRepository repo = getLocalRepository();

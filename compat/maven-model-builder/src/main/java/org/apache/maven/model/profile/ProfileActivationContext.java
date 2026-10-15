@@ -80,12 +80,12 @@ public interface ProfileActivationContext {
     File getProjectDirectory();
 
     /**
-     * Gets current calculated project properties
+     * Gets current calculated project properties.
      * <p>
      * These are the properties declared in the model's own {@code <properties>} section.
-     * They are part of the artifact's published identity and are consulted for profile activation
-     * in all contexts, including repository-resolved (external) model builds. Unlike
-     * {@link #getUserProperties()}, these are never suppressed when evaluating dependency profiles.
+     * They are available for interpolation but are <b>not</b> used for profile activation
+     * in repository-resolved (external) model builds — a dependency POM's own properties
+     * must not activate its own property-based profiles (see #13390).
      *
      * @return The project properties, never {@code null}.
      */
