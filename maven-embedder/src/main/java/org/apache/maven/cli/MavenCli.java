@@ -631,7 +631,7 @@ public class MavenCli {
         }
     }
 
-    private void commands(CliRequest cliRequest) {
+    private void commands(CliRequest cliRequest) throws ExitException {
         if (cliRequest.showErrors) {
             slf4jLogger.info("Error stacktraces are turned on.");
         }
@@ -640,6 +640,27 @@ public class MavenCli {
             slf4jLogger.info("Disabling strict checksum verification on all artifact downloads.");
         } else if (MavenExecutionRequest.CHECKSUM_POLICY_FAIL.equals(cliRequest.request.getGlobalChecksumPolicy())) {
             slf4jLogger.info("Enabling strict checksum verification on all artifact downloads.");
+        }
+
+        // If no goals/phases were specified and there is no POM in the current directory,
+        // print usage (like `mvn -h`) and exit successfully instead of failing with
+        // "No goals have been specified for this build."
+        // When a POM is present the default goal (if any) may apply, so let Maven proceed normally.
+        // Skip this check for encryption commands (--encrypt-password, --encrypt-master-password)
+        // which also have no goals and no POM, but are handled later by encryption().
+        // Also skip when -f/--file is specified: the alternate POM existence is validated later,
+        // and the working directory may legitimately have no pom.xml.
+        List<String> goals = cliRequest.commandLine.getArgList();
+        if (goals.isEmpty()
+                && modelProcessor != null
+                && !cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_POM_FILE)
+                && !cliRequest.commandLine.hasOption(CLIManager.ENCRYPT_PASSWORD)
+                && !cliRequest.commandLine.hasOption(CLIManager.ENCRYPT_MASTER_PASSWORD)) {
+            File pom = modelProcessor.locatePom(new File(cliRequest.workingDirectory));
+            if (!pom.isFile()) {
+                cliManager.displayHelp(System.out);
+                throw new ExitException(0);
+            }
         }
 
         if (slf4jLogger.isDebugEnabled()) {
