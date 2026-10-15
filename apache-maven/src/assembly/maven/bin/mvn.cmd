@@ -398,7 +398,9 @@ if "%MAVEN_MAIN_CLASS%"=="" @set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenCl
 
 @rem Module-path and native access flags require a JDK that can read the module jars.
 @rem The probe includes --module-path so it fails on JDKs that cannot read the module descriptors.
-set MAVEN_MODULE_OPTS=
+@rem Fall back to ALL-UNNAMED so that --enable-native-access is always granted on JDK 22+,
+@rem even when the module-path probe fails (older JDK, missing lib\modules\, locked-down env).
+set MAVEN_MODULE_OPTS=--enable-native-access=ALL-UNNAMED
 "%JAVACMD%" --module-path %MODULES_DIR% --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm -version >NUL 2>&1
 if not ERRORLEVEL 1 (
   set MAVEN_MODULE_OPTS=--module-path %MODULES_DIR% --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm,org.jline.nativ

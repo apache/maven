@@ -492,13 +492,6 @@ LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 JLINE_NATIVE_PATH="$MAVEN_HOME/lib/jline-native"
 MODULES_DIR="$MAVEN_HOME/lib/modules"
 
-# Module-path and native access flags require a JDK that can read the module jars.
-# The probe includes --module-path so it fails on JDKs that cannot read the module descriptors.
-USE_MODULE_PATH=false
-if "$JAVACMD" --module-path "$MODULES_DIR" --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm -version >/dev/null 2>&1; then
-  USE_MODULE_PATH=true
-fi
-
 # For Cygwin and MinGW, switch paths to Windows format before running java(1) command
 if $cygwin || $mingw ; then
   [ -n "$JAVA_HOME" ] &&
@@ -509,12 +502,15 @@ if $cygwin || $mingw ; then
   # converted separately, appending to the already converted MAVEN_HOME would
   # produce a path mixing both separators, e.g. C:\maven/lib/jline-native
   JLINE_NATIVE_PATH=`cygpath --windows "$JLINE_NATIVE_PATH"`
-  MAVEN_PROJECTBASEDIR=`cygpath --windows "$MAVEN_PROJECTBASEDIR"`
   MODULES_DIR=`cygpath --windows "$MODULES_DIR"`
 fi
 
-MAVEN_MODULE_OPTS=""
-if $USE_MODULE_PATH; then
+# Module-path and native access flags require a JDK that can read the module jars.
+# The probe includes --module-path so it fails on JDKs that cannot read the module descriptors.
+# Fall back to ALL-UNNAMED so that --enable-native-access is always granted on JDK 22+,
+# even when the module-path probe fails (older JDK, missing lib/modules/, locked-down env).
+MAVEN_MODULE_OPTS="--enable-native-access=ALL-UNNAMED"
+if "$JAVACMD" --module-path "$MODULES_DIR" --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm -version >/dev/null 2>&1; then
   MAVEN_MODULE_OPTS="--module-path \"$MODULES_DIR\" --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm,org.jline.nativ"
 fi
 MAVEN_PROJECTBASEDIR="$MAVEN_PROJECTBASEDIR_NATIVE"
