@@ -575,14 +575,15 @@ public class ApiRunner {
         // Set the Maven version
         session.setMavenVersion(detectMavenVersion(lookup));
 
-        // local repository
-        String localRepository = settings.getLocalRepository() != null
+        // Preserve Path values; the String constructor parses repository URLs.
+        LocalRepository localRepository = settings.getLocalRepository() != null
                         && !settings.getLocalRepository().isEmpty()
-                ? settings.getLocalRepository()
+                ? new LocalRepository(settings.getLocalRepository())
                 : localRepoProvider != null && localRepoProvider.getLocalRepo() != null
-                        ? localRepoProvider.getLocalRepo().toString()
-                        : mavenUserHome.resolve("repository").toString();
-        LocalRepositoryManager llm = system.newLocalRepositoryManager(rsession, new LocalRepository(localRepository));
+                        ? new LocalRepository(localRepoProvider.getLocalRepo().toAbsolutePath())
+                        : new LocalRepository(
+                                mavenUserHome.resolve("repository").toAbsolutePath());
+        LocalRepositoryManager llm = system.newLocalRepositoryManager(rsession, localRepository);
         rsession.setLocalRepositoryManager(llm);
 
         // Apply offline mode from settings
