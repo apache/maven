@@ -166,6 +166,12 @@ class DefaultModelBuilderTest {
         // genuinely doesn't exist on the developer's machine — normal project-build behaviour.
         assertEquals("activated", model.getProperties().get("profile.missing.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // POM-declared properties do not drive profile activation in any context:
+        // the PropertyProfileActivator only checks user → system properties.
+        assertNull(model.getProperties().get("profile.pom.property"));
+        // POM-declared property via <condition>: in a project build the non-sandboxed context
+        // allows getModelProperty() to return the real POM property, so this condition fires.
+        assertEquals("activated", model.getProperties().get("profile.pom.condition"));
         assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
@@ -187,6 +193,12 @@ class DefaultModelBuilderTest {
         // evaluate to !false = true and fire unconditionally — same footgun as <file><missing>.
         assertNull(model.getProperties().get("profile.missing.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // POM-declared property must not self-activate a profile in external builds (#13390).
+        assertNull(model.getProperties().get("profile.pom.property"));
+        // POM-declared property via <condition> must also be suppressed (#13390):
+        // ConditionProfileActivator.doGetProperty() calls getModelProperty() directly,
+        // so the sandbox must return null from getModelProperty() to close the gap.
+        assertNull(model.getProperties().get("profile.pom.condition"));
         // Negated-property profile (!skip.defaults) fires because 'skip.defaults' is absent
         // from the sandboxed context (user properties are suppressed; system properties do not
         // contain it). This is the common opt-out flag pattern: the publisher's default-on
@@ -266,6 +278,11 @@ class DefaultModelBuilderTest {
         assertEquals("activated", model.getProperties().get("profile.property"));
         assertEquals("activated", model.getProperties().get("profile.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // POM-declared properties do not drive profile activation even in caller-supplied builds.
+        assertNull(model.getProperties().get("profile.pom.property"));
+        // POM-declared property via <condition>: caller-supplied model uses non-sandboxed context,
+        // so getModelProperty() returns real POM properties and the condition fires.
+        assertEquals("activated", model.getProperties().get("profile.pom.condition"));
         assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
@@ -347,6 +364,10 @@ class DefaultModelBuilderTest {
         assertEquals("activated", projectParentModel.getProperties().get("profile.property"));
         assertEquals("activated", projectParentModel.getProperties().get("profile.condition"));
         assertEquals("activated", projectParentModel.getProperties().get("profile.jdk"));
+        // POM-declared property via <condition>: the activation context uses an empty model
+        // (parentActivationContext passes Model.newInstance()), so getModelProperty() returns null
+        // and the condition does not fire even in the non-sandboxed project parent path.
+        assertNull(projectParentModel.getProperties().get("profile.pom.condition"));
         assertTrue(projectParentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
 
         DefaultModelBuilder.ModelBuilderSessionState dependencyState =
@@ -359,6 +380,8 @@ class DefaultModelBuilderTest {
         assertNull(dependencyParentModel.getProperties().get("profile.property"));
         assertNull(dependencyParentModel.getProperties().get("profile.condition"));
         assertEquals("activated", dependencyParentModel.getProperties().get("profile.jdk"));
+        // POM-declared property via <condition>: dependency parent is sandboxed, so must be null (#13390).
+        assertNull(dependencyParentModel.getProperties().get("profile.pom.condition"));
         assertTrue(dependencyParentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
 
         // The first (fully activated) result must not have been altered by the second read.
@@ -439,6 +462,8 @@ class DefaultModelBuilderTest {
         assertNull(grandparentModel.getProperties().get("profile.property"));
         assertNull(grandparentModel.getProperties().get("profile.condition"));
         assertEquals("activated", grandparentModel.getProperties().get("profile.jdk"));
+        // POM-declared property via <condition>: grandparent is sandboxed (externalOrigin), must be null.
+        assertNull(grandparentModel.getProperties().get("profile.pom.condition"));
         // Repositories from legitimately-active profiles (JDK-activated) must be honored.
         // See #13100, #13141.
         assertTrue(grandparentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
