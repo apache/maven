@@ -47,6 +47,7 @@ import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
 import org.apache.maven.api.settings.Activation;
 import org.apache.maven.api.settings.IdentifiableBase;
+import org.apache.maven.api.settings.Mirror;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Proxy;
 import org.apache.maven.api.settings.Repository;
@@ -72,6 +73,26 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     private final SettingsMerger settingsMerger = new SettingsMerger() {
         @Override
         protected KeyComputer<Repository> getRepositoryKey() {
+            return IdentifiableBase::getId;
+        }
+
+        @Override
+        protected KeyComputer<Mirror> getMirrorKey() {
+            return IdentifiableBase::getId;
+        }
+
+        @Override
+        protected KeyComputer<Server> getServerKey() {
+            return IdentifiableBase::getId;
+        }
+
+        @Override
+        protected KeyComputer<Proxy> getProxyKey() {
+            return IdentifiableBase::getId;
+        }
+
+        @Override
+        protected KeyComputer<Profile> getProfileKey() {
             return IdentifiableBase::getId;
         }
     };
