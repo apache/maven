@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.nio.file.Path;
+import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,24 +26,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MavenITgh13306PackagingProviderTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh13306PackagingProviderTest() {
+        super("[4.0.0,)");
+    }
+
     @Test
     void providerFromProjectExtensionIsVisibleOnlyToItsProject() throws Exception {
-        Path testDir = extractResources("gh-13306-packaging-provider");
+        File testDir = extractResources("/gh-13306-packaging-provider");
 
-        Verifier verifier = newVerifier(testDir.resolve("extension"));
+        Verifier verifier = newVerifier(new File(testDir, "extension").getPath());
         verifier.setAutoclean(false);
         verifier.deleteArtifacts("org.apache.maven.its.gh13306");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("client"));
+        verifier = newVerifier(new File(testDir, "client").getPath());
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        verifier = newVerifier(testDir.resolve("reactor"));
+        verifier = newVerifier(new File(testDir, "reactor").getPath());
         verifier.setAutoclean(false);
         verifier.addCliArgument("validate");
         try {
