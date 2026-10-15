@@ -166,6 +166,16 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     private Map<String, String> systemProperties = Collections.emptyMap();
     private Map<String, String> userProperties = Collections.emptyMap();
     private Model model;
+    /**
+     * Properties used only for path interpolation (e.g. parent's {@code <properties>} when
+     * activating parent profiles). These are intentionally NOT exposed through
+     * {@link #getModelProperty} so that a parent POM's own declared properties cannot
+     * self-activate its condition-based or property-based profiles (see #13390).
+     * When non-null this map is checked first inside {@link #interpolate} before falling back
+     * to the model's own properties.
+     */
+    private Map<String, String> interpolationProperties;
+
     final Record record;
 
     public DefaultProfileActivationContext(RootLocator rootLocator, Interpolator interpolator) {
@@ -191,6 +201,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
                 systemProperties,
                 userProperties,
                 model,
+                null,
                 null);
     }
 
@@ -204,6 +215,29 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
             Map<String, String> userProperties,
             Model model,
             Record record) {
+        this(
+                rootLocator,
+                interpolator,
+                activeProfileIds,
+                inactiveProfileIds,
+                systemProperties,
+                userProperties,
+                model,
+                null,
+                record);
+    }
+
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    private DefaultProfileActivationContext(
+            RootLocator rootLocator,
+            Interpolator interpolator,
+            List<String> activeProfileIds,
+            List<String> inactiveProfileIds,
+            Map<String, String> systemProperties,
+            Map<String, String> userProperties,
+            Model model,
+            Map<String, String> interpolationProperties,
+            Record record) {
         this.rootLocator = rootLocator;
         this.interpolator = interpolator;
         this.activeProfileIds = activeProfileIds;
@@ -211,6 +245,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
         this.systemProperties = systemProperties;
         this.userProperties = userProperties;
         this.model = model;
+        this.interpolationProperties = interpolationProperties;
         this.record = record;
     }
 
@@ -223,15 +258,23 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
                 systemProperties,
                 userProperties,
                 model,
+                null,
                 new Record());
     }
 
     /**
-     * Like {@link #start()}, but overrides the model's properties with the given map.
+     * Like {@link #start()}, but makes the given map available for path interpolation only.
+     * The model's properties (exposed via {@link #getModelProperty}) are NOT overridden, so
+     * POM-declared properties in {@code interpolationProperties} cannot self-activate
+     * property-based or condition-based profiles (see #13390). The map is used exclusively
+     * inside {@link #interpolatePath} to resolve placeholders such as {@code ${message.file}}
+     * when activating parent-model file profiles with the parent's own property values
+     * (see #10375).
+     * <p>
      * The model's other attributes (basedir, packaging, artifactId) are preserved
      * so that file-exists profile conditions resolve against the original project directory.
      */
-    DefaultProfileActivationContext start(Map<String, String> modelProperties) {
+    DefaultProfileActivationContext start(Map<String, String> interpolationProperties) {
         return new DefaultProfileActivationContext(
                 rootLocator,
                 interpolator,
@@ -239,7 +282,8 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
                 inactiveProfileIds,
                 systemProperties,
                 userProperties,
-                model != null ? model.withProperties(modelProperties) : null,
+                model,
+                interpolationProperties,
                 new Record());
     }
 
@@ -484,7 +528,14 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
             if ("project.rootDirectory".equals(s)) {
                 return getModelRootDirectory();
             }
-            String r = getModelProperty(s);
+            // Check interpolationProperties first: these are parent-model properties made
+            // available for path interpolation (e.g. ${message.file} in a file profile
+            // condition) without being exposed through getModelProperty() and thus without
+            // being able to self-activate property-based or condition-based profiles (#13390).
+            String r = interpolationProperties != null ? interpolationProperties.get(s) : null;
+            if (r == null) {
+                r = getModelProperty(s);
+            }
             if (r == null) {
                 r = getUserProperty(s);
             }
