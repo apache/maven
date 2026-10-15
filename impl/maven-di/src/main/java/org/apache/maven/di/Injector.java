@@ -166,7 +166,7 @@ public interface Injector {
      * @param key the class representing the type to retrieve
      * @return an instance of the requested type
      * @throws NullPointerException if key is null
-     * @throws DIException if no binding can be provided or bindings are ambiguous
+     * @throws IllegalStateException if no binding can be provided or bindings are ambiguous
      */
     @Nonnull
     <T> T getInstance(@Nonnull Class<T> key);
@@ -181,7 +181,7 @@ public interface Injector {
      * @param key the key identifying the instance to retrieve
      * @return an instance matching the requested key
      * @throws NullPointerException if key is null
-     * @throws DIException if no binding can be provided or bindings are ambiguous
+     * @throws IllegalStateException if no binding can be provided or bindings are ambiguous
      */
     @Nonnull
     <T> T getInstance(@Nonnull Key<T> key);
