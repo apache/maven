@@ -492,6 +492,20 @@ under the License.
                   </arguments>
                 </configuration>
               </execution>
+              <execution>
+                <id>test-mvn-jvm-config</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <skip>${skipTests}</skip>
+                  <executable>sh</executable>
+                  <arguments>
+                    <argument>${project.basedir}/src/test/scripts/test-mvn-jvm-config.sh</argument>
+                  </arguments>
+                </configuration>
+              </execution>
             </executions>
           </plugin>
         </plugins>
