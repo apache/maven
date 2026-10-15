@@ -35,6 +35,8 @@ import org.apache.maven.di.impl.Binding;
 import org.apache.maven.di.impl.InjectorImpl;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -50,10 +52,11 @@ class ApiRunnerSettingsTest {
     @TempDir
     Path tempDir;
 
-    @Test
-    void testNamedSessionProviderDoesNotReplaceStandaloneSession() throws IOException {
+    @ParameterizedTest
+    @ValueSource(strings = {"requested-repository", "requested-%20-repository"})
+    void testNamedSessionProviderDoesNotReplaceStandaloneSession(String repositoryName) throws IOException {
         Path installation = Files.createDirectories(tempDir.resolve("installation"));
-        Path localRepository = Files.createDirectories(tempDir.resolve("requested-repository"));
+        Path localRepository = Files.createDirectories(tempDir.resolve(repositoryName));
         String oldHome = System.getProperty("user.home");
         String oldMavenHome = System.getProperty("maven.home");
         try {
