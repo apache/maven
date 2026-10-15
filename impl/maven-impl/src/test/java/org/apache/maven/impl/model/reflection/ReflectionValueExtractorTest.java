@@ -45,6 +45,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * ReflectionValueExtractorTest class.
@@ -85,6 +87,37 @@ public class ReflectionValueExtractorTest {
      *
      * @throws Exception if any.
      */
+    @Test
+    void preservesExceptionTypeMessageAndCause() throws Exception {
+        IllegalStateException cause = new IllegalStateException("getter failure");
+        IntrospectionException error = assertThrows(
+                IntrospectionException.class,
+                () -> ReflectionValueExtractor.evaluate("bean.value", new ThrowingBean(cause)));
+        assertEquals(cause.toString(), error.getMessage());
+        assertSame(cause, error.getCause());
+
+        IntrospectionException invalidType = assertThrows(
+                IntrospectionException.class,
+                () -> ReflectionValueExtractor.evaluate("bean.value[0]", new ValueHolder("text")));
+        assertNull(invalidType.getCause());
+        assertEquals(
+                "The token 'value[' at position '5' refers to a java.util.List or an array, but the value "
+                        + "seems is an instance of 'class java.lang.String'",
+                invalidType.getMessage());
+    }
+
+    public static class ThrowingBean {
+        private final IllegalStateException failure;
+
+        public ThrowingBean(IllegalStateException failure) {
+            this.failure = failure;
+        }
+
+        public Object getValue() {
+            throw failure;
+        }
+    }
+
     @Test
     void testValueExtraction() throws Exception {
         // ----------------------------------------------------------------------
