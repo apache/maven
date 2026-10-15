@@ -45,7 +45,7 @@ When an aggregating goal is invoked from the command line:
          ? Collections.singletonMap(rootProject, allProjects.get(rootProject))
          : allProjects;
      ```
-4. **Ordering**: Task segments are produced in CLI argument order — there is no automatic re-sorting. In `mvn clean install site:stage`, the non-aggregating `clean install` segment runs first (across all modules), then the aggregating `site:stage` segment runs once on the root. If the user writes `mvn site:stage install`, the aggregating segment runs first.
+4. **Ordering**: Tasks are executed in CLI argument order — task segments are produced in CLI argument order with no automatic re-sorting. In `mvn clean install site:stage`, the non-aggregating `clean install` segment runs first (across all modules), then the aggregating `site:stage` segment runs once on the root. If the user writes `mvn site:stage install`, the aggregating segment runs first.
 
 ### 1.2 Lifecycle-Bound Execution (`<phase>...</phase>`)
 When an aggregator Mojo is bound to a phase in a `pom.xml`:

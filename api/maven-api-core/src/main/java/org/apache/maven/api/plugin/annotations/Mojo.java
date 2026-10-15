@@ -81,7 +81,7 @@ public @interface Mojo {
      * <b>Execution semantics:</b>
      * <ul>
      *   <li>When invoked directly via CLI (e.g. {@code mvn plugin:goal}), an aggregator Mojo executes
-     *       only once on the top-level project of the reactor (tasks are executed in CLI argument order).</li>
+     *       only once on the top-level project of the reactor.</li>
      *   <li>When bound to a lifecycle phase, the goal executes during that phase for each subproject in the
      *       reactor unless explicitly configured with {@code <inherited>false</inherited>}.</li>
      * </ul>
