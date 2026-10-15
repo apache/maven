@@ -113,12 +113,15 @@ class MavenBasicComponentConfiguratorTest {
         assertEquals("", mojo.direct);
     }
 
+    @SuppressWarnings({"checkstyle:VisibilityModifier", "VisibilityModifier"})
     public static class TestMojo {
-        public String direct = "defaultDirect";
-        public TestSettings settings = new TestSettings();
+        String direct = "defaultDirect";
+        TestSettings settings = new TestSettings();
     }
 
+    @SuppressWarnings({"checkstyle:VisibilityModifier", "VisibilityModifier"})
     public static class TestSettings {
-        public String docClassesToTargets = "article,report,book";
+        String docClassesToTargets = "article,report,book";
     }
 }
+

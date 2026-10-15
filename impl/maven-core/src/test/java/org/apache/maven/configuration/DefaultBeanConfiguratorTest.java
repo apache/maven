@@ -249,18 +249,20 @@ class DefaultBeanConfiguratorTest {
         assertEquals("${undefined}", bean.settings.docClassesToTargets);
     }
 
+    @SuppressWarnings({"checkstyle:VisibilityModifier", "VisibilityModifier"})
     public static class PluginConfigBean {
 
-        public Settings settings = new Settings();
+        Settings settings = new Settings();
     }
 
+    @SuppressWarnings({"checkstyle:VisibilityModifier", "VisibilityModifier"})
     public static class Settings {
 
-        public String docClassesToTargets = "article,report,book";
+        String docClassesToTargets = "article,report,book";
 
-        public int count = 42;
+        int count = 42;
 
-        public boolean skip = true;
+        boolean skip = true;
     }
 
     static class SomeBean {
