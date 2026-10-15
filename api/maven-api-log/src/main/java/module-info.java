@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 module org.apache.maven.api.logging {
     requires transitive org.apache.maven.api.annotations;
 
