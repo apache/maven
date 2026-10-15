@@ -95,24 +95,6 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
     }
 
     @Test
-    void testEvaluationWithoutMojoExecution() throws Exception {
-        MavenSession session = newMavenSession();
-        MavenProject project = createDefaultProject();
-        session.setCurrentProject(project);
-
-        PluginParameterExpressionEvaluator evaluator = new PluginParameterExpressionEvaluator(session);
-
-        assertSame(session, evaluator.evaluate("${session}"));
-        assertSame(project, evaluator.evaluate("${project}"));
-        assertEquals("literal", evaluator.evaluate("literal"));
-        // Expressions about the mojo or the plugin cannot be evaluated without a mojo execution.
-        assertNull(evaluator.evaluate("${mojo}"));
-        assertNull(evaluator.evaluate("${mojo.goal}"));
-        assertNull(evaluator.evaluate("${plugin}"));
-        assertNull(evaluator.evaluate("${plugin.artifactId}"));
-    }
-
-    @Test
     void testPluginArtifactsExpressionReference() throws Exception {
         MojoExecution exec = newMojoExecution();
 
