@@ -20,6 +20,7 @@
 package org.apache.maven.it;
 
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
@@ -52,16 +53,27 @@ class MavenITgh13413QuotedValuesInMavenArgsTest extends AbstractMavenIntegration
                 ? List.of("cmd.exe", "/c", bin.resolve("mvn.cmd").toString(), "-B", "validate")
                 : List.of(bin.resolve("mvn").toString(), "-B", "validate");
 
-        ProcessBuilder builder = new ProcessBuilder(command).directory(basedir.toFile()).redirectErrorStream(true);
+        // the output goes to a file, so that waiting for the end of Maven is what the timeout applies to
+        Path log = basedir.resolve("mvn-output.txt");
+        ProcessBuilder builder = new ProcessBuilder(command)
+                .directory(basedir.toFile())
+                .redirectErrorStream(true)
+                .redirectOutput(log.toFile());
         builder.environment().put("MAVEN_ARGS", "\"-Dmaven.repo.local=" + localRepo + "\" -Dprop.plain=plain");
         builder.environment().put("MAVEN_SKIP_RC", "true");
         builder.environment().remove("MAVEN_OPTS");
         builder.environment().remove("MAVEN_CONFIG");
         Process process = builder.start();
-        String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
-        assertTrue(process.waitFor(2, TimeUnit.MINUTES), "Maven did not end in time:\n" + output);
+        boolean ended = process.waitFor(2, TimeUnit.MINUTES);
+        if (!ended) {
+            process.destroyForcibly();
+        }
+        String output = new String(Files.readAllBytes(log), StandardCharsets.UTF_8);
 
+        assertTrue(ended, "Maven did not end in time:\n" + output);
         assertEquals(0, process.exitValue(), output);
         assertTrue(output.contains("BUILD SUCCESS"), output);
+        // Maven created the local repository at the path with the space, so that MAVEN_ARGS was not ignored
+        assertTrue(Files.isDirectory(localRepo), "No local repository at " + localRepo + ":\n" + output);
     }
 }
