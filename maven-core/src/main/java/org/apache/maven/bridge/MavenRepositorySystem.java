@@ -23,8 +23,10 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.io.File;
+import java.net.InetAddress;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -34,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.artifact.Artifact;
@@ -803,8 +806,33 @@ public class MavenRepositorySystem {
         }
     }
 
+    /** An IPv4 address of the loopback range 127.0.0.0/8. */
+    private static final Pattern IPV4_LOOPBACK = Pattern.compile("127(\\.(25[0-5]|2[0-4]\\d|1?\\d?\\d)){3}");
+
+    /**
+     * Checks whether a host names the local machine: {@code localhost}, an IPv4 address of the loopback
+     * range {@code 127.0.0.0/8} or an IPv6 loopback address in brackets. An IPv4-mapped IPv6 address is judged by its
+     * IPv4 address. The names are not resolved.
+     *
+     * @param host the host of a repository URL, may be {@code null}
+     * @return true if the host is local
+     */
     private static boolean isLocal(String host) {
-        return "localhost".equals(host) || "127.0.0.1".equals(host);
+        if (host == null) {
+            return false;
+        }
+        if ("localhost".equals(host) || IPV4_LOOPBACK.matcher(host).matches()) {
+            return true;
+        }
+        if (host.startsWith("[") && host.endsWith("]")) {
+            try {
+                // an IP literal is parsed without any name lookup
+                return InetAddress.getByName(host).isLoopbackAddress();
+            } catch (UnknownHostException e) {
+                return false;
+            }
+        }
+        return false;
     }
 
     /**
