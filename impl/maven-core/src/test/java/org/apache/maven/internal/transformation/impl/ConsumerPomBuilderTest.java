@@ -1521,6 +1521,12 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 .version("1")
                 .scope("runtime")
                 .build();
+        org.apache.maven.api.model.Dependency implementationDep = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId("g")
+                .artifactId("implementation-dep")
+                .version("1")
+                .scope("implementation")
+                .build();
         org.apache.maven.api.model.Dependency unscopedDep = org.apache.maven.api.model.Dependency.newBuilder()
                 .groupId("g")
                 .artifactId("unscoped-dep")
@@ -1531,12 +1537,12 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 .groupId("test")
                 .artifactId("test")
                 .version("1.0")
-                .dependencies(List.of(compileDep, apiDep, runtimeDep, unscopedDep))
+                .dependencies(List.of(compileDep, apiDep, runtimeDep, implementationDep, unscopedDep))
                 .build();
 
         Model transformed = DefaultConsumerPomBuilder.transformNonPom(model, new MavenProject(model));
         assertNotNull(transformed.getDependencies());
-        // All four should be retained
+        // All five should be retained
         assertTrue(
                 transformed.getDependencies().stream().anyMatch(d -> "compile-dep".equals(d.getArtifactId())),
                 "compile-scoped dep should be retained");
@@ -1551,6 +1557,14 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         assertTrue(
                 transformed.getDependencies().stream().anyMatch(d -> "runtime-dep".equals(d.getArtifactId())),
                 "runtime-scoped dep should be retained");
+        assertTrue(
+                transformed.getDependencies().stream().anyMatch(d -> "implementation-dep".equals(d.getArtifactId())),
+                "implementation-scoped dep should be retained");
+        assertTrue(
+                transformed.getDependencies().stream()
+                        .filter(d -> "implementation-dep".equals(d.getArtifactId()))
+                        .allMatch(d -> "runtime".equals(d.getScope())),
+                "implementation-scoped dep should be remapped to runtime scope in consumer POM");
         assertTrue(
                 transformed.getDependencies().stream().anyMatch(d -> "unscoped-dep".equals(d.getArtifactId())),
                 "unscoped (default compile) dep should be retained");

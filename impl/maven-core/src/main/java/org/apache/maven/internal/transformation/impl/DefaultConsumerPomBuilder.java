@@ -584,8 +584,6 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             });
             // Only keep consumer-visible scopes (compile, api, runtime, implementation)
             directDependencies.values().removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
-            // Map 4.2.0 scopes to their 4.0.0 consumer POM equivalents (api→compile, implementation→runtime)
-            directDependencies.replaceAll((k, v) -> mapScopeForConsumerPom(v));
             managedDependencies.keySet().removeAll(directDependencies.keySet());
 
             model = model.withDependencyManagement(
@@ -604,8 +602,6 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                             LinkedHashMap::new));
             // Only keep consumer-visible scopes (compile, api, runtime, implementation)
             directDependencies.values().removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
-            // Map 4.2.0 scopes to their 4.0.0 consumer POM equivalents (api→compile, implementation→runtime)
-            directDependencies.replaceAll((k, v) -> mapScopeForConsumerPom(v));
             model = model.withDependencies(directDependencies.isEmpty() ? null : directDependencies.values());
         }
 
