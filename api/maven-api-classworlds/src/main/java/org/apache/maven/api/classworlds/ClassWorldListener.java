@@ -38,12 +38,12 @@ public interface ClassWorldListener {
      *
      * @param realm the newly created realm
      */
-    void realmCreated(@Nonnull ClassRealm realm);
+    default void realmCreated(@Nonnull ClassRealm realm) {}
 
     /**
      * Called when a class realm is disposed.
      *
      * @param realm the disposed realm
      */
-    void realmDisposed(@Nonnull ClassRealm realm);
+    default void realmDisposed(@Nonnull ClassRealm realm) {}
 }

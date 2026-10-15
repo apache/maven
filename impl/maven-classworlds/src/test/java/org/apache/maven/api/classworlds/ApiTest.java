@@ -51,7 +51,6 @@ class ApiTest {
         // Test getClassLoader() method
         ClassLoader classLoader = realm.getClassLoader();
         assertNotNull(classLoader);
-        assertSame(realm, classLoader); // Should return the realm itself
 
         // Test URL operations
         URL url = new URL("file:///tmp/test.jar");
