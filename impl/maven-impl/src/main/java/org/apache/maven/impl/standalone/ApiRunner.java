@@ -39,6 +39,7 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.BuildEnvironment;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.MonotonicClock;
@@ -374,6 +375,11 @@ public class ApiRunner {
         @Override
         public Version getMavenVersion() {
             return mavenVersion;
+        }
+
+        @Override
+        public BuildEnvironment buildEnvironment() {
+            throw new UnsupportedOperationException("buildEnvironment() is not available in standalone mode");
         }
 
         @Override
