@@ -19,5 +19,6 @@
 
 module org.apache.maven.api.classworlds {
     requires transitive org.apache.maven.api.annotations;
+
     exports org.apache.maven.api.classworlds;
 }
