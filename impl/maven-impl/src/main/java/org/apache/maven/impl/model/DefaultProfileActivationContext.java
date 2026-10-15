@@ -226,6 +226,23 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
                 new Record());
     }
 
+    /**
+     * Like {@link #start()}, but overrides the model's properties with the given map.
+     * The model's other attributes (basedir, packaging, artifactId) are preserved
+     * so that file-exists profile conditions resolve against the original project directory.
+     */
+    DefaultProfileActivationContext start(Map<String, String> modelProperties) {
+        return new DefaultProfileActivationContext(
+                rootLocator,
+                interpolator,
+                activeProfileIds,
+                inactiveProfileIds,
+                systemProperties,
+                userProperties,
+                model != null ? model.withProperties(modelProperties) : null,
+                new Record());
+    }
+
     Record stop() {
         Objects.requireNonNull(record, "start() must be called before stop()");
         return new Record(record); // Return immutable copy for thread-safe caching

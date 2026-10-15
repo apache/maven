@@ -1740,6 +1740,31 @@ class DefaultModelBuilderTest {
     }
 
     @Test
+    void testMng8710ParentFileProfileWithPropertyActivationAppliesToChild() {
+        Path pom = Paths.get("src/test/resources/poms/factory/mng-8710/pom.xml").toAbsolutePath();
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .recursive(true)
+                        .source(Sources.buildSource(pom))
+                        .build());
+
+        Model parentModel = result.getEffectiveModel();
+        assertEquals("activated", parentModel.getProperties().get("profile.from.parent"));
+
+        ModelBuilderResult childResult = result.getChildren().stream()
+                .filter(r -> "mng-8710-child".equals(r.getEffectiveModel().getArtifactId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("child result missing: " + result.getChildren()));
+        Model childModel = childResult.getEffectiveModel();
+        assertEquals(
+                "activated",
+                childModel.getProperties().get("profile.from.parent"),
+                "Parent file profile interpolating ${message.file} must inject into child (MNG-8710)");
+    }
+
+    @Test
     void testBomImportWarningFromParentProfileActivatedForChild() {
         Path pom = Paths.get("src/test/resources/poms/factory/mng-8450-profile-context/pom.xml")
                 .toAbsolutePath();
