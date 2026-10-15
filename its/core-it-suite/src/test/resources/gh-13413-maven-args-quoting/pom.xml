@@ -23,37 +23,8 @@
   <groupId>org.apache.maven.its.gh13413</groupId>
   <artifactId>test</artifactId>
   <version>1.0</version>
+  <packaging>pom</packaging>
 
   <name>Maven Integration Test :: GH-13413</name>
   <description>Verify that a quoted value with white space in MAVEN_ARGS reaches Maven as one argument.</description>
-
-  <properties>
-    <pom.prop.spaced>${prop.spaced}</pom.prop.spaced>
-    <pom.prop.plain>${prop.plain}</pom.prop.plain>
-  </properties>
-
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.its.plugins</groupId>
-        <artifactId>maven-it-plugin-expression</artifactId>
-        <version>2.1-SNAPSHOT</version>
-        <executions>
-          <execution>
-            <id>test</id>
-            <goals>
-              <goal>eval</goal>
-            </goals>
-            <phase>validate</phase>
-            <configuration>
-              <outputFile>target/pom.properties</outputFile>
-              <expressions>
-                <expression>project/properties</expression>
-              </expressions>
-            </configuration>
-          </execution>
-        </executions>
-      </plugin>
-    </plugins>
-  </build>
 </project>
