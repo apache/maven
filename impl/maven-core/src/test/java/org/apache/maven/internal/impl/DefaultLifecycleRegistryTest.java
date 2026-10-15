@@ -18,14 +18,112 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.util.Collection;
+import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+
+import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.spi.LifecycleProvider;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class DefaultLifecycleRegistryTest {
 
     @Test
     void returnsNullImplementationVersionWhenClassHasNoPackage() {
         assertNull(DefaultLifecycleRegistry.getImplementationVersion(int.class));
+    }
+
+    @Test
+    void findsLifecycleFromDynamicProviderLookup() {
+        Lookup lookup = mock(Lookup.class);
+        Lifecycle custom = stubLifecycle("app-lifecycle");
+        LifecycleProvider provider = () -> List.of(custom);
+        when(lookup.lookupList(LifecycleProvider.class)).thenReturn(List.of(provider));
+
+        DefaultLifecycleRegistry registry = new DefaultLifecycleRegistry(lookup, List.of());
+
+        assertTrue(registry.lookup("app-lifecycle").isPresent());
+        assertSame(custom, registry.lookup("app-lifecycle").get());
+    }
+
+    @Test
+    void dynamicProviderTakesPriorityOverInjectedProvider() {
+        Lifecycle injected = stubLifecycle("my-lifecycle");
+        Lifecycle dynamic = stubLifecycle("my-lifecycle");
+
+        Lookup lookup = mock(Lookup.class);
+        LifecycleProvider dynamicProvider = () -> List.of(dynamic);
+        when(lookup.lookupList(LifecycleProvider.class)).thenReturn(List.of(dynamicProvider));
+
+        DefaultLifecycleRegistry registry = new DefaultLifecycleRegistry(lookup, List.of(() -> List.of(injected)));
+
+        assertSame(dynamic, registry.lookup("my-lifecycle").get());
+        assertNotSame(injected, registry.lookup("my-lifecycle").get());
+    }
+
+    @Test
+    void doesNotRetainDynamicLifecycleAcrossProjects() {
+        Lifecycle custom = stubLifecycle("app-lifecycle");
+        LifecycleProvider provider = () -> List.of(custom);
+        AtomicReference<List<LifecycleProvider>> visible = new AtomicReference<>(List.of(provider));
+
+        Lookup lookup = mock(Lookup.class);
+        when(lookup.lookupList(LifecycleProvider.class)).thenAnswer(inv -> visible.get());
+
+        DefaultLifecycleRegistry registry = new DefaultLifecycleRegistry(lookup, List.of());
+
+        // project A: provider is visible
+        assertSame(custom, registry.lookup("app-lifecycle").get());
+
+        // project B: provider is gone (different project classloader)
+        visible.set(List.of());
+        assertTrue(
+                registry.lookup("app-lifecycle").isEmpty(),
+                "Dynamic lifecycle must not leak into a project that does not declare the extension");
+    }
+
+    @Test
+    void builtinLifecyclesAlwaysPresent() {
+        DefaultLifecycleRegistry registry = new DefaultLifecycleRegistry(List.of());
+        assertTrue(registry.lookup("default").isPresent());
+        assertTrue(registry.lookup("clean").isPresent());
+        assertTrue(registry.lookup("site").isPresent());
+    }
+
+    @Test
+    void builtinLifecyclesAlwaysPresentWithLookup() {
+        Lookup lookup = mock(Lookup.class);
+        when(lookup.lookupList(LifecycleProvider.class)).thenReturn(List.of());
+        DefaultLifecycleRegistry registry = new DefaultLifecycleRegistry(lookup, List.of());
+        assertTrue(registry.lookup("default").isPresent());
+        assertTrue(registry.lookup("clean").isPresent());
+        assertTrue(registry.lookup("site").isPresent());
+    }
+
+    private static Lifecycle stubLifecycle(String id) {
+        return new Lifecycle() {
+            @Override
+            public String id() {
+                return id;
+            }
+
+            @Override
+            public Collection<Phase> phases() {
+                return List.of();
+            }
+
+            @Override
+            public Collection<Alias> aliases() {
+                return List.of();
+            }
+        };
     }
 }
