@@ -137,6 +137,12 @@ public abstract class BaseParser implements Parser {
         // top/root
         try {
             context.topDirectory = getTopDirectory(context);
+        } catch (IllegalArgumentException e) {
+            // User-facing error (e.g. -f points to a non-existent file): report the message directly,
+            // without wrapping it in an internal "Error determining top directory" prefix.
+            context.parsingFailed = true;
+            context.topDirectory = context.cwd;
+            parserRequest.logger().error(e.getMessage());
         } catch (Exception e) {
             context.parsingFailed = true;
             context.topDirectory = context.cwd;
@@ -144,6 +150,10 @@ public abstract class BaseParser implements Parser {
         }
         try {
             context.rootDirectory = getRootDirectory(context);
+        } catch (IllegalArgumentException e) {
+            context.parsingFailed = true;
+            context.rootDirectory = context.cwd;
+            parserRequest.logger().error(e.getMessage());
         } catch (Exception e) {
             context.parsingFailed = true;
             context.rootDirectory = context.cwd;
