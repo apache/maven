@@ -2284,8 +2284,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             //
             // Use the child's activation context (passed as parameter) to determine
             // which parent profiles should be active, ensuring consistency.
-            List<Profile> parentActivePomProfiles =
-                    getActiveProfiles(parent.getProfiles(), childProfileActivationContext);
+            // Evaluate with the parent's properties but the child's basedir (as Maven 3 does);
+            // parent properties are kept out of the cache key since they derive from the source.
+            DefaultProfileActivationContext parentActivationContext =
+                    childProfileActivationContext.start(parent.getProperties());
+            List<Profile> parentActivePomProfiles = getActiveProfiles(parent.getProfiles(), parentActivationContext);
+            replayRecordIntoContext(parentActivationContext.stop(), childProfileActivationContext, false);
 
             // Inject profiles into parent model
             Model injectedParentModel = profileInjector
@@ -2711,6 +2715,13 @@ public class DefaultModelBuilder implements ModelBuilder {
          */
         private void replayRecordIntoContext(
                 DefaultProfileActivationContext.Record cachedRecord, DefaultProfileActivationContext targetContext) {
+            replayRecordIntoContext(cachedRecord, targetContext, true);
+        }
+
+        private void replayRecordIntoContext(
+                DefaultProfileActivationContext.Record cachedRecord,
+                DefaultProfileActivationContext targetContext,
+                boolean includeModelProperties) {
             if (targetContext.record == null) {
                 return; // Target context is not recording
             }
@@ -2732,7 +2743,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             cachedRecord.usedUserProperties.forEach(targetRecord.usedUserProperties::putIfAbsent);
 
             // Replay model properties
-            cachedRecord.usedModelProperties.forEach(targetRecord.usedModelProperties::putIfAbsent);
+            if (includeModelProperties) {
+                cachedRecord.usedModelProperties.forEach(targetRecord.usedModelProperties::putIfAbsent);
+            }
 
             // Replay model infos
             cachedRecord.usedModelInfos.forEach(targetRecord.usedModelInfos::putIfAbsent);
