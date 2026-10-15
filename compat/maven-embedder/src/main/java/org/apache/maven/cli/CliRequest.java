@@ -23,9 +23,9 @@ import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.maven.api.classworlds.ClassWorld;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
-import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * CliRequest
@@ -72,8 +72,8 @@ public class CliRequest {
         return commandLine;
     }
 
-    public ClassWorld getClassWorld() {
-        return classWorld;
+    public org.codehaus.plexus.classworlds.ClassWorld getClassWorld() {
+        return (org.codehaus.plexus.classworlds.ClassWorld) classWorld;
     }
 
     public String getWorkingDirectory() {

@@ -23,13 +23,13 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.classworlds.ClassWorld;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvnval.ValidateInvoker;
 import org.apache.maven.cling.invoker.mvnval.ValidateParser;
-import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * Maven POM validation CLI "new-gen".
@@ -75,7 +75,12 @@ public class MavenValCling extends ClingSupport {
     @Override
     protected Invoker createInvoker() {
         return new ValidateInvoker(
-                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build(), null);
+                ProtoLookup.builder()
+                        .addMapping(
+                                org.codehaus.plexus.classworlds.ClassWorld.class,
+                                (org.codehaus.plexus.classworlds.ClassWorld) classWorld)
+                        .build(),
+                null);
     }
 
     @Override
