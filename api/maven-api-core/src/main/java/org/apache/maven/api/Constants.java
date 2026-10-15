@@ -790,5 +790,18 @@ public final class Constants {
     @Config(type = "java.lang.Boolean", defaultValue = "false")
     public static final String MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL = "maven.model.dependencyInterpolation.full";
 
+    /**
+     * System property to disable the {@code site} lifecycle.
+     * When set to {@code true} via {@code -Dmaven.site.lifecycle.disabled=true}, the {@code site}
+     * lifecycle is excluded from the default lifecycles, so Maven will not resolve or bind the
+     * {@code maven-site-plugin} unless it is explicitly configured in the POM.
+     * This is a JVM system property only (read via {@link Boolean#getBoolean(String)});
+     * it is not resolved through Maven's property mechanism (pom.xml, profiles, settings.xml).
+     *
+     * @since 4.0.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false", source = Config.Source.SYSTEM_PROPERTIES)
+    public static final String MAVEN_SITE_LIFECYCLE_DISABLED = "maven.site.lifecycle.disabled";
+
     private Constants() {}
 }

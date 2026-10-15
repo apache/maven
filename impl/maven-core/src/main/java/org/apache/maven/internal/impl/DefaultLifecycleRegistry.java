@@ -37,6 +37,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.model.InputLocation;
@@ -154,9 +155,15 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
             lookup.lookupList(LifecycleProvider.class).stream()
                     .flatMap(p -> p.provides().stream())
                     .forEach(lf -> result.put(lf.id(), lf));
-            return result.values().stream();
+            return result.values().stream()
+                    .filter(lf -> !Boolean.getBoolean(Constants.MAVEN_SITE_LIFECYCLE_DISABLED)
+                            || !Lifecycle.SITE.equals(lf.id()));
         }
-        return providers.stream().map(ExtensibleEnumProvider::provides).flatMap(Collection::stream);
+        return providers.stream()
+                .map(ExtensibleEnumProvider::provides)
+                .flatMap(Collection::stream)
+                .filter(lf -> !Boolean.getBoolean(Constants.MAVEN_SITE_LIFECYCLE_DISABLED)
+                        || !Lifecycle.SITE.equals(lf.id()));
     }
 
     @Override
