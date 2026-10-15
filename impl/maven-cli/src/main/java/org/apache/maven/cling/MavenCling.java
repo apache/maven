@@ -23,15 +23,16 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.classworlds.ClassWorld;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.cling.invoker.ProtoLookup;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
-import org.codehaus.plexus.classworlds.ClassWorld;
 
 /**
  * Maven CLI "new-gen".
@@ -64,7 +65,7 @@ public class MavenCling extends ClingSupport {
      * This makes {@code MavenCling} the default entry point that external tools (such as the Maven Wrapper
      * or IDEs) can rely on without needing to set the {@code maven.mainClass} property.
      */
-    public static int main(String[] args, ClassWorld world) throws IOException {
+    public static int main(String[] args, org.codehaus.plexus.classworlds.ClassWorld world) throws IOException {
         String mainClass = System.getProperty(MAVEN_MAIN_CLASS_PROPERTY);
         if (mainClass != null && !MavenCling.class.getName().equals(mainClass)) {
             return delegateMain(mainClass, args, world);
@@ -72,10 +73,34 @@ public class MavenCling extends ClingSupport {
         return new MavenCling(world).run(args, null, null, null, false);
     }
 
-    private static int delegateMain(String mainClass, String[] args, ClassWorld world) throws IOException {
+    private static int delegateMain(String mainClass, String[] args, org.codehaus.plexus.classworlds.ClassWorld world)
+            throws IOException {
         try {
-            Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(mainClass);
-            Method method = clazz.getMethod("main", String[].class, ClassWorld.class);
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            Class<?> clazz = cl.loadClass(mainClass);
+            // Try both the impl ClassWorld and the stable API ClassWorld interface.
+            // Entry points using impl ClassWorld (e.g. MavenEncCling, MavenShellCling, MavenUpCling) are
+            // found by the first candidate; entry points using the stable API (e.g. MavenValCling) by the second.
+            String[] cwClassNames = {
+                org.codehaus.plexus.classworlds.ClassWorld.class.getName(),
+                org.apache.maven.api.classworlds.ClassWorld.class.getName()
+            };
+            Method method = null;
+            for (String cwClassName : cwClassNames) {
+                try {
+                    Class<?> cwClass = cl.loadClass(cwClassName);
+                    Method m = clazz.getMethod("main", String[].class, cwClass);
+                    if (Modifier.isStatic(m.getModifiers()) && Modifier.isPublic(m.getModifiers())) {
+                        method = m;
+                        break;
+                    }
+                } catch (NoSuchMethodException ignored) {
+                    // try next candidate
+                }
+            }
+            if (method == null) {
+                throw new NoSuchMethodException(mainClass + ".main(String[], ClassWorld)");
+            }
             return (int) method.invoke(null, args, world);
         } catch (ClassNotFoundException e) {
             throw new IOException("Cannot find maven.mainClass: " + mainClass, e);
@@ -103,7 +128,7 @@ public class MavenCling extends ClingSupport {
      */
     public static int main(
             String[] args,
-            ClassWorld world,
+            org.codehaus.plexus.classworlds.ClassWorld world,
             @Nullable InputStream stdIn,
             @Nullable OutputStream stdOut,
             @Nullable OutputStream stdErr)
