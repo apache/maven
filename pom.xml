@@ -1372,7 +1372,7 @@ under the License.
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>versions-maven-plugin</artifactId>
-            <version>2.22.0</version>
+            <version>2.23.0</version>
             <configuration>
               <generateBackupPoms>false</generateBackupPoms>
               <allowMajorUpdates>false</allowMajorUpdates>
