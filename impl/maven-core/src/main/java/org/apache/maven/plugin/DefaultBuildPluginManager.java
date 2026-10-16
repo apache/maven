@@ -30,7 +30,6 @@ import java.util.function.Supplier;
 
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Service;
-import org.apache.maven.api.classworlds.ClassRealm;
 import org.apache.maven.api.services.MavenException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
@@ -44,6 +43,7 @@ import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.logging.Log;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.slf4j.LoggerFactory;
@@ -113,7 +113,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
         }
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(pluginRealm.getClassLoader());
+        Thread.currentThread().setContextClassLoader(pluginRealm);
 
         MavenSession oldSession = legacySupport.getSession();
 

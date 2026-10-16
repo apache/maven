@@ -62,7 +62,7 @@ import org.codehaus.plexus.classworlds.strategy.StrategyFactory;
  * @author <a href="mailto:bob@eng.werken.com">bob mcwhirter</a>
  * @author Jason van Zyl
  */
-public class ClassRealm extends URLClassLoader implements org.apache.maven.api.classworlds.ClassRealm {
+public class ClassRealm extends URLClassLoader {
 
     private final ClassWorld world;
 
@@ -115,11 +115,6 @@ public class ClassRealm extends URLClassLoader implements org.apache.maven.api.c
 
     public ClassWorld getWorld() {
         return this.world;
-    }
-
-    @Override
-    public ClassLoader getClassLoader() {
-        return this;
     }
 
     public void importFromParent(String packageName) {

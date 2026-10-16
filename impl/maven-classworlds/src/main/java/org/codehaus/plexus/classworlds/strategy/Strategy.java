@@ -44,7 +44,7 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
  * A strategy is a class for defining how classes and resources are located
  * in classworlds.
  */
-public interface Strategy extends org.apache.maven.api.classworlds.Strategy {
+public interface Strategy {
 
     Class<?> loadClass(String name) throws ClassNotFoundException;
 

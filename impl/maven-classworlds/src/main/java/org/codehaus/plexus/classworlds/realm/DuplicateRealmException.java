@@ -42,7 +42,7 @@ import org.codehaus.plexus.classworlds.ClassWorld;
  *
  * @author <a href="mailto:bob@eng.werken.com">bob mcwhirter</a>
  */
-public class DuplicateRealmException extends org.apache.maven.api.classworlds.DuplicateRealmException {
+public class DuplicateRealmException extends org.codehaus.plexus.classworlds.ClassWorldException {
     // ------------------------------------------------------------
     //     Instance members
     // ------------------------------------------------------------
@@ -63,7 +63,7 @@ public class DuplicateRealmException extends org.apache.maven.api.classworlds.Du
      * @param id    The realm id.
      */
     public DuplicateRealmException(ClassWorld world, String id) {
-        super(world, id);
+        super(world, "Duplicate realm: " + id);
         this.id = id;
     }
 
@@ -78,14 +78,5 @@ public class DuplicateRealmException extends org.apache.maven.api.classworlds.Du
      */
     public String getId() {
         return this.id;
-    }
-
-    /**
-     * Retrieve the world.
-     *
-     * @return The world.
-     */
-    public ClassWorld getWorld() {
-        return (ClassWorld) super.getWorld();
     }
 }

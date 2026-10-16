@@ -23,13 +23,13 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 
-import org.apache.maven.api.classworlds.ClassRealm;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.internal.impl.internal.DefaultCoreRealm;
 import org.apache.maven.model.Model;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.artifact.Artifact;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;

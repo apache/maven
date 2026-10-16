@@ -54,7 +54,6 @@ mkdir -p "$maven_home/bin" "$maven_home/boot" "$maven_home/lib"
 
 cp "$mvn_script" "$maven_home/bin/mvn"
 touch "$maven_home/boot/maven-classworlds-9.9.9.jar"
-touch "$maven_home/boot/maven-api-classworlds-9.9.9.jar"
 # Minimal jar for -v --enc fallback (not used in fast path, but needed for
 # the non-fast-path case where MAVEN_MAIN_CLASS is set).
 touch "$maven_home/lib/maven-core-9.9.9.jar"

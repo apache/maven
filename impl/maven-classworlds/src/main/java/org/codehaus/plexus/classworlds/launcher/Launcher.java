@@ -163,22 +163,12 @@ public class Launcher {
      */
     protected Method getEnhancedMainMethod()
             throws ClassNotFoundException, NoSuchMethodException, NoSuchRealmException {
-        // Try both the impl ClassWorld and the stable API ClassWorld interface.
-        // Entry points using impl ClassWorld (e.g. MavenCling) are found by the first candidate;
-        // entry points using the stable API (e.g. MavenValCling) are found by the second.
-        String[] cwClassNames = {ClassWorld.class.getName(), "org.apache.maven.api.classworlds.ClassWorld"};
-        for (String cwClassName : cwClassNames) {
-            try {
-                Class<?> cwClass = getMainRealm().loadClass(cwClassName);
-                Method m = getMainClass().getMethod("main", String[].class, cwClass);
-                int modifiers = m.getModifiers();
-                if (Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) {
-                    if (m.getReturnType() == Integer.TYPE || m.getReturnType() == Void.TYPE) {
-                        return m;
-                    }
-                }
-            } catch (NoSuchMethodException | ClassNotFoundException ignored) {
-                // try next candidate
+        Class<?> cwClass = getMainRealm().loadClass(ClassWorld.class.getName());
+        Method m = getMainClass().getMethod("main", String[].class, cwClass);
+        int modifiers = m.getModifiers();
+        if (Modifier.isStatic(modifiers) && Modifier.isPublic(modifiers)) {
+            if (m.getReturnType() == Integer.TYPE || m.getReturnType() == Void.TYPE) {
+                return m;
             }
         }
         throw new NoSuchMethodException("public static void main(String[] args, ClassWorld world)");
@@ -293,7 +283,7 @@ public class Launcher {
         ClassRealm mainRealm = getMainRealm();
         Class<?> mainClass = getMainClass();
         Method mainMethod = getMainMethod();
-        Thread.currentThread().setContextClassLoader(mainRealm.getClassLoader());
+        Thread.currentThread().setContextClassLoader(mainRealm);
         Object ret = mainMethod.invoke(mainClass, new Object[] {args});
         if (ret instanceof Integer) {
             exitCode = (Integer) ret;

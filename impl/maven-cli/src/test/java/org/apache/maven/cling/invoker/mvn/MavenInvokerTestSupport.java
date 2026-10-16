@@ -29,12 +29,12 @@ import java.util.List;
 import java.util.Map;
 
 import eu.maveniverse.maven.mimir.testing.MimirInfuser;
-import org.apache.maven.api.classworlds.ClassWorld;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
+import org.codehaus.plexus.classworlds.ClassWorld;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

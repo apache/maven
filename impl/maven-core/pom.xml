@@ -174,10 +174,6 @@ under the License.
     <!-- Sisu/Eclipse DI -->
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-api-classworlds</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
       <artifactId>maven-classworlds</artifactId>
     </dependency>
     <dependency>

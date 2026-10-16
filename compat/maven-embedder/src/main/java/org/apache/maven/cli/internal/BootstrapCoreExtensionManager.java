@@ -33,8 +33,6 @@ import java.util.stream.Collectors;
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
-import org.apache.maven.api.classworlds.ClassRealm;
-import org.apache.maven.api.classworlds.ClassWorld;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.services.ArtifactCoordinatesFactory;
@@ -67,6 +65,8 @@ import org.apache.maven.resolver.MavenChainedWorkspaceReader;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
@@ -176,7 +176,7 @@ public class BootstrapCoreExtensionManager {
         Set<String> providedArtifacts = Collections.emptySet();
         String classLoadingStrategy = extension.getClassLoadingStrategy();
         if (STRATEGY_PARENT_FIRST.equals(classLoadingStrategy)) {
-            realm.importFrom(parentRealm.getClassLoader(), "");
+            realm.importFrom(parentRealm, "");
         } else if (STRATEGY_PLUGIN.equals(classLoadingStrategy)) {
             coreExports.getExportedPackages().forEach((p, cl) -> realm.importFrom(cl, p));
             providedArtifacts = coreExports.getExportedArtifacts();

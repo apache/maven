@@ -36,7 +36,7 @@ package org.codehaus.plexus.classworlds;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
-public interface ClassWorldListener extends org.apache.maven.api.classworlds.ClassWorldListener {
+public interface ClassWorldListener {
     void realmCreated(ClassRealm realm);
 
     void realmDisposed(ClassRealm realm);
