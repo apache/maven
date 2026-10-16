@@ -127,4 +127,13 @@ class MavenParserAliasTest {
                 () -> MavenParser.expandAlias(List.of("clean"), rc),
                 "Blank alias name must throw");
     }
+
+    @Test
+    void duplicateAliasNameThrows() {
+        ReactorConfig rc = config(alias("ci", "clean", "install"), alias("ci", "verify"));
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> MavenParser.expandAlias(List.of("ci"), rc),
+                "Duplicate alias name must throw");
+    }
 }
