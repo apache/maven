@@ -136,4 +136,37 @@ class MavenParserAliasTest {
                 () -> MavenParser.expandAlias(List.of("ci"), rc),
                 "Duplicate alias name must throw");
     }
+
+    // --- resolveReactorOptions ---
+
+    @Test
+    void resolveReactorOptionsFromInlineOptions() {
+        ReactorConfig rc = ReactorConfig.newBuilder().options("-B -q").build();
+        assertEquals(List.of("-B", "-q"), MavenParser.resolveReactorOptions(rc));
+    }
+
+    @Test
+    void resolveReactorOptionsFromStructuredOptionArgs() {
+        ReactorConfig rc =
+                ReactorConfig.newBuilder().optionArgs(List.of("-B", "-q")).build();
+        assertEquals(List.of("-B", "-q"), MavenParser.resolveReactorOptions(rc));
+    }
+
+    @Test
+    void resolveReactorOptionsEmptyWhenNeitherSet() {
+        ReactorConfig rc = ReactorConfig.newBuilder().build();
+        assertEquals(List.of(), MavenParser.resolveReactorOptions(rc));
+    }
+
+    @Test
+    void resolveReactorOptionsBothSetThrows() {
+        ReactorConfig rc = ReactorConfig.newBuilder()
+                .options("-B")
+                .optionArgs(List.of("-q"))
+                .build();
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> MavenParser.resolveReactorOptions(rc),
+                "Both options and optionArgs set must throw");
+    }
 }
