@@ -47,10 +47,7 @@ public abstract class ClingSupport {
      * Ctor that creates "managed" ClassWorld. This constructor is not used in "normal" circumstances.
      */
     public ClingSupport() {
-        this(
-                new ClassWorld(
-                        CORE_CLASS_REALM_ID, Thread.currentThread().getContextClassLoader()),
-                true);
+        this(new ClassWorld(CORE_CLASS_REALM_ID, Thread.currentThread().getContextClassLoader()), true);
     }
 
     /**

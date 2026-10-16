@@ -75,10 +75,7 @@ public class MavenValCling extends ClingSupport {
     @Override
     protected Invoker createInvoker() {
         return new ValidateInvoker(
-                ProtoLookup.builder()
-                        .addMapping(ClassWorld.class, classWorld)
-                        .build(),
-                null);
+                ProtoLookup.builder().addMapping(ClassWorld.class, classWorld).build(), null);
     }
 
     @Override
