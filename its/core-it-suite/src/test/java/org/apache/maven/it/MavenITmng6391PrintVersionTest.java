@@ -54,6 +54,7 @@ public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTest
         verifier.setAutoclean(false);
 
         verifier.setLogFileName("version-log.txt");
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArgument("clean");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -95,6 +96,7 @@ public class MavenITmng6391PrintVersionTest extends AbstractMavenIntegrationTest
         verifier.setAutoclean(false);
 
         verifier.setLogFileName("version-log.txt");
+        verifier.addCliArgument("--console=verbose");
         verifier.addCliArguments("clean");
         verifier.execute();
         verifier.verifyErrorFreeLog();
