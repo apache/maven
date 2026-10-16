@@ -19,6 +19,7 @@
 package org.codehaus.plexus.classworlds.realm;
 
 import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.ClassWorldException;
 
 /*
  * Copyright 2001-2006 Codehaus Foundation.
@@ -42,7 +43,7 @@ import org.codehaus.plexus.classworlds.ClassWorld;
  *
  * @author <a href="mailto:bob@eng.werken.com">bob mcwhirter</a>
  */
-public class DuplicateRealmException extends org.codehaus.plexus.classworlds.ClassWorldException {
+public class DuplicateRealmException extends ClassWorldException {
     // ------------------------------------------------------------
     //     Instance members
     // ------------------------------------------------------------
