@@ -129,7 +129,8 @@ class BuildPlanCreatorTest {
     @SuppressWarnings("checkstyle:UnusedLocalVariable")
     private BuildPlan calculateLifecycleMappings(Map<MavenProject, List<MavenProject>> projects, String phase) {
         DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
-        BuildPlanExecutor builder = new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles);
+        BuildPlanExecutor builder =
+                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles, null);
         BuildPlanExecutor.BuildContext context = builder.new BuildContext();
         return context.calculateLifecycleMappings(projects, phase);
     }
