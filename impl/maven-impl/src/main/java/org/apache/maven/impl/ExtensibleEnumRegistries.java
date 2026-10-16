@@ -18,6 +18,8 @@
  */
 package org.apache.maven.impl;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -118,6 +120,11 @@ public class ExtensibleEnumRegistries {
          * thousands; callers that need to look up the same value repeatedly in a tight loop should
          * cache the result themselves.</p>
          *
+         * <p><b>Classloader visibility:</b> providers contributed by project extensions are only
+         * visible when the current thread's context classloader can load the provider's class.
+         * This prevents extension-scoped providers from leaking across reactor modules during
+         * parallel builds.</p>
+         *
          * @param id the enum value id, must not be {@code null}
          * @return the matching value, or {@code Optional.empty()} if not found
          */
@@ -125,7 +132,9 @@ public class ExtensibleEnumRegistries {
         public Optional<T> lookup(String id) {
             String key = requireNonNull(id, "id").toLowerCase(Locale.ROOT);
             if (lookup != null && providerType != null) {
+                ClassLoader tccl = Thread.currentThread().getContextClassLoader();
                 Optional<T> result = lookup.lookupList(providerType).stream()
+                        .filter(p -> isVisibleFrom(p, tccl))
                         .flatMap(p -> p.provides().stream())
                         .filter(t -> key.equals(t.id().toLowerCase(Locale.ROOT)))
                         .findFirst();
@@ -134,6 +143,49 @@ public class ExtensibleEnumRegistries {
                 }
             }
             return Optional.ofNullable(values.get(key));
+        }
+
+        /**
+         * Checks whether a provider is visible from the given classloader.
+         * Providers from project extensions are loaded by extension-specific classloaders
+         * (realms) that are only imported into the project realm that declared the extension.
+         */
+        private boolean isVisibleFrom(P provider, ClassLoader classLoader) {
+            if (classLoader == null) {
+                return true;
+            }
+            Class<?> providerClass = provider.getClass();
+            ClassLoader providerCl = providerClass.getClassLoader();
+            if (providerCl == null) {
+                return true;
+            }
+            // Check loadClass — works for standard classloaders and ClassRealm with package-level exports
+            try {
+                if (classLoader.loadClass(providerClass.getName()) == providerClass) {
+                    return true;
+                }
+            } catch (ClassNotFoundException e) {
+                // Not loadable by name (hidden class or realm-ID import) — check further
+            }
+            // Walk the Java classloader parent chain
+            for (ClassLoader cl = classLoader; cl != null; cl = cl.getParent()) {
+                if (cl == providerCl) {
+                    return true;
+                }
+            }
+            // Check ClassRealm foreign imports via reflection — handles the common case
+            // where Maven imports extension realms using the realm ID rather than package names
+            return isImportedRealm(classLoader, providerCl);
+        }
+
+        private static boolean isImportedRealm(ClassLoader classLoader, ClassLoader providerCl) {
+            try {
+                Method method = classLoader.getClass().getMethod("getImportRealms");
+                Collection<?> importedRealms = (Collection<?>) method.invoke(classLoader);
+                return importedRealms.contains(providerCl);
+            } catch (ReflectiveOperationException | ClassCastException e) {
+                return false;
+            }
         }
     }
 }
