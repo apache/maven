@@ -26,7 +26,9 @@ import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.api.MonotonicClock;
@@ -68,6 +70,8 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     private int maxProjectNameLength;
     private int totalProjects;
     private volatile int currentVisitedProjectCount;
+    // a project built again, for instance by an aggregator goal on the command line, keeps its number
+    private final Map<MavenProject, Integer> projectNumbers = new HashMap<>();
 
     public ExecutionEventLogger(MessageBuilderFactory messageBuilderFactory) {
         this(messageBuilderFactory, LoggerFactory.getLogger(ExecutionEventLogger.class));
@@ -398,7 +402,12 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                 // display progress [i/n]
                 int number;
                 synchronized (this) {
-                    number = ++currentVisitedProjectCount;
+                    Integer known = projectNumbers.get(event.getProject());
+                    if (known == null) {
+                        known = ++currentVisitedProjectCount;
+                        projectNumbers.put(event.getProject(), known);
+                    }
+                    number = known;
                 }
                 String progress = " [" + number + '/' + totalProjects + ']';
 
