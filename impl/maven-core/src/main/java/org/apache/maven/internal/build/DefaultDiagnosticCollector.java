@@ -27,6 +27,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.LongAdder;
 
 import org.apache.maven.api.services.BuilderProblem;
@@ -72,7 +73,7 @@ public final class DefaultDiagnosticCollector {
     private final List<String> orderedKeys = Collections.synchronizedList(new ArrayList<>());
 
     /** Counter for problems without a key, used to generate synthetic keys. */
-    private final LongAdder noKeyCounter = new LongAdder();
+    private final AtomicLong noKeyCounter = new AtomicLong();
 
     /**
      * Keys to suppress. Problems with a key in this set are silently dropped.
@@ -110,8 +111,7 @@ public final class DefaultDiagnosticCollector {
 
         // Problems without a key get a synthetic key for storage
         if (key == null) {
-            noKeyCounter.increment();
-            key = "__no_key__" + noKeyCounter.longValue();
+            key = "__no_key__" + noKeyCounter.incrementAndGet();
         }
 
         // Check suppression: exact match or prefix wildcard (e.g. "auto:*")

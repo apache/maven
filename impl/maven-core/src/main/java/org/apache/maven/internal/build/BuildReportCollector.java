@@ -249,16 +249,16 @@ public final class BuildReportCollector extends AbstractEventSpy {
 
         // --warning-mode=fail: fail the build if any warnings were collected
         if ("fail".equalsIgnoreCase(warningMode) && diagnosticCollector.hasWarnings()) {
-            int warningCount = 0;
+            int diagnosticCount = 0;
             for (DefaultDiagnosticSummary entry : diagnosticCollector.getSummary()) {
-                if (entry.problem().getSeverity() == BuilderProblem.Severity.WARNING) {
-                    warningCount += entry.count();
+                if (entry.problem().getSeverity().ordinal() <= BuilderProblem.Severity.WARNING.ordinal()) {
+                    diagnosticCount += entry.count();
                 }
             }
             endSession
                     .getResult()
                     .addException(new RuntimeException(
-                            "Build has " + warningCount + " warning(s) and --warning-mode=fail is set"));
+                            "Build has " + diagnosticCount + " diagnostic(s) and --warning-mode=fail is set"));
         }
     }
 
