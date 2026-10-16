@@ -367,4 +367,29 @@ public class ComparableVersionTest {
             checkVersionsEqual("2.0." + x, "2.0.0." + x); // previously ordered, now equals
         }
     }
+
+    /**
+     * Test <a href="https://issues.apache.org/jira/browse/MNG-7594">MNG-7594</a>: a zero between hyphens
+     * must not be dropped from the canonical form, which has to stay consistent with the ordering.
+     */
+    @Test
+    public void testMng7594() {
+        assertEquals("1--1", new ComparableVersion("1-0-1").getCanonical());
+        assertEquals("1--1", new ComparableVersion("1--1").getCanonical());
+        assertEquals("1---1", new ComparableVersion("1-0-0-1").getCanonical());
+        assertEquals("1-1", new ComparableVersion("1-1").getCanonical());
+        assertEquals("1-1", new ComparableVersion("1.0-1").getCanonical());
+
+        // 1-0-1 sorts below 1-1, so the canonical forms must differ
+        checkVersionsOrder("1-0-1", "1-1");
+        checkVersionsOrder("1-0-0-1", "1-0-1");
+        checkVersionsEqual("1-0-1", "1--1");
+
+        // the canonical form must parse back to an equal version
+        for (String v : new String[] {"1-0-1", "1-0-0-1", "1-0-1.1", "1-0-2", "1.0-1", "1-0.1"}) {
+            ComparableVersion c = new ComparableVersion(v);
+            assertEquals(
+                    c, new ComparableVersion(c.getCanonical()), v + " must round-trip through " + c.getCanonical());
+        }
+    }
 }
