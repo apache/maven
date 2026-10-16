@@ -150,7 +150,7 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
      */
     private static List<Phase> injectMaven4(List<Phase> phases, InjectedPhase inj) {
         if (inj.parent() == null) {
-            return insertAmongSiblings(phases, inj, null);
+            return insertAmongSiblings(phases, inj);
         }
         Optional<List<Phase>> result = tryInjectIntoParent(phases, inj);
         if (result.isPresent()) {
@@ -174,8 +174,7 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
             Phase phase = phases.get(i);
             if (inj.parent().equals(phase.name())) {
                 // Found the parent: insert among its children
-                String leftSiblingLink = null; // computed by insertAmongSiblings
-                List<Phase> newChildren = insertAmongSiblings(new ArrayList<>(phase.phases()), inj, leftSiblingLink);
+                List<Phase> newChildren = insertAmongSiblings(new ArrayList<>(phase.phases()), inj);
                 List<Phase> result = new ArrayList<>(phases);
                 result.set(i, withChildren(phase, newChildren));
                 return Optional.of(result);
@@ -281,9 +280,8 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
      *
      * @param siblings         the mutable sibling list to insert into
      * @param inj              the injection descriptor
-     * @param ignoredLinkHint  reserved for future use; pass {@code null}
      */
-    private static List<Phase> insertAmongSiblings(List<Phase> siblings, InjectedPhase inj, String ignoredLinkHint) {
+    private static List<Phase> insertAmongSiblings(List<Phase> siblings, InjectedPhase inj) {
         int insertAt = siblings.size(); // default: append
 
         if (inj.after() != null) {

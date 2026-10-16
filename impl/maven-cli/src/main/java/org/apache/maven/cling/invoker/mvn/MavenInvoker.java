@@ -317,7 +317,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         }
 
         // Store ReactorConfig on the request data map so it is accessible to other components
-        // (e.g. future ReactorXmlPhaseInjector) without adding a dependency on maven-cli.
+        // (e.g. future ReactorXmlLifecycleProcessor) without adding a dependency on maven-cli.
         context.invokerRequest
                 .reactorConfig()
                 .ifPresent(rc -> request.getData().put(ReactorConfig.class.getName(), rc));
