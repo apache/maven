@@ -800,7 +800,11 @@ public final class Constants {
      *
      * @since 4.0.0
      */
-    @Config(type = "java.lang.Boolean", defaultValue = "false", source = Config.Source.SYSTEM_PROPERTIES, readOnly = true)
+    @Config(
+            type = "java.lang.Boolean",
+            defaultValue = "false",
+            source = Config.Source.SYSTEM_PROPERTIES,
+            readOnly = true)
     public static final String MAVEN_SITE_LIFECYCLE_DISABLED = "maven.site.lifecycle.disabled";
 
     private Constants() {}
