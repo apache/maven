@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api;
 
+import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -104,6 +105,12 @@ public interface BuildInvocation {
      * {@code maven.home}, {@code user.home}, {@code user.name},
      * and {@code available.processors} (from {@code Runtime.getRuntime()}).
      *
+     * <p><b>Privacy note:</b> {@code user.home} and {@code user.name} reflect the OS
+     * user identity and may be considered personally identifiable information (PII)
+     * in shared build environments, CI logs, or published build reports. Callers
+     * should consider redacting these values before persisting or transmitting
+     * build invocation data externally.
+     *
      * <p>The full {@code System.getProperties()} map is intentionally not captured:
      * it is large, mostly irrelevant, and may contain sensitive values.
      *
@@ -115,10 +122,10 @@ public interface BuildInvocation {
     /**
      * The path to the local repository used for this build.
      *
-     * @return the local repository path string, never {@code null}
+     * @return the local repository path, never {@code null}
      */
     @Nonnull
-    String localRepository();
+    Path localRepository();
 
     /**
      * Profiles explicitly activated ({@code -P profileId}) or deactivated
@@ -153,17 +160,10 @@ public interface BuildInvocation {
      * The reactor failure behavior, corresponding to the {@code -ff} / {@code -fae} /
      * {@code -fn} flags.
      *
-     * <p>Possible values (matching {@code MavenExecutionRequest} constants):
-     * <ul>
-     *   <li>{@code "FAIL_FAST"} — stop at first failure ({@code -ff}, default)</li>
-     *   <li>{@code "FAIL_AT_END"} — build all, report failures at end ({@code -fae})</li>
-     *   <li>{@code "FAIL_NEVER"} — always exit with success ({@code -fn})</li>
-     * </ul>
-     *
-     * @return the failure behavior string, never {@code null}
+     * @return the failure behavior, never {@code null}
      */
     @Nonnull
-    String reactorFailureBehavior();
+    ReactorFailureBehavior reactorFailureBehavior();
 
     /**
      * Whether the build was invoked in offline mode ({@code -o} / {@code --offline}).
