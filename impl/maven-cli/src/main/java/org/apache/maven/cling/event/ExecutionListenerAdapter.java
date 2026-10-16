@@ -578,6 +578,16 @@ public class ExecutionListenerAdapter implements ExecutionListener {
                                                 .version(mojo.getVersion())
                                                 .build();
                                     }
+                                    if ("toString".equals(pMethod.getName())) {
+                                        return "PluginAdapter[" + mojo.getGroupId() + ":" + mojo.getArtifactId() + ":"
+                                                + mojo.getVersion() + "]";
+                                    }
+                                    if ("hashCode".equals(pMethod.getName())) {
+                                        return System.identityHashCode(pProxy);
+                                    }
+                                    if ("equals".equals(pMethod.getName())) {
+                                        return pProxy == (pArgs != null && pArgs.length > 0 ? pArgs[0] : null);
+                                    }
                                     return null;
                                 });
                     }
