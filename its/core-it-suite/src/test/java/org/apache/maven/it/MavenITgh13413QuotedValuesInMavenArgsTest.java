@@ -19,9 +19,9 @@
 
 package org.apache.maven.it;
 
+import java.io.File;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
@@ -41,24 +41,28 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 class MavenITgh13413QuotedValuesInMavenArgsTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh13413QuotedValuesInMavenArgsTest() {
+        super(ALL_MAVEN_VERSIONS);
+    }
+
     @Test
     void testQuotedValueWithSpace() throws Exception {
-        Path basedir = extractResources("gh-13413-maven-args-quoting");
+        File basedir = extractResources("gh-13413-maven-args-quoting");
         // a path with a space, as the Jenkins Pipeline Maven plugin builds for a workspace like that
-        Path localRepo = basedir.resolve("local repo");
+        File localRepo = new File(basedir, "local repo");
 
         boolean windows = System.getProperty("os.name", "").toLowerCase(Locale.ROOT).startsWith("windows");
-        Path bin = Path.of(System.getProperty("maven.home")).resolve("bin");
+        File bin = new File(System.getProperty("maven.home"), "bin");
         List<String> command = windows
-                ? List.of("cmd.exe", "/c", bin.resolve("mvn.cmd").toString(), "-B", "validate")
-                : List.of(bin.resolve("mvn").toString(), "-B", "validate");
+                ? List.of("cmd.exe", "/c", new File(bin, "mvn.cmd").toString(), "-B", "validate")
+                : List.of(new File(bin, "mvn").toString(), "-B", "validate");
 
         // the output goes to a file, so that waiting for the end of Maven is what the timeout applies to
-        Path log = basedir.resolve("mvn-output.txt");
+        File log = new File(basedir, "mvn-output.txt");
         ProcessBuilder builder = new ProcessBuilder(command)
-                .directory(basedir.toFile())
+                .directory(basedir)
                 .redirectErrorStream(true)
-                .redirectOutput(log.toFile());
+                .redirectOutput(log);
         builder.environment().put("MAVEN_ARGS", "\"-Dmaven.repo.local=" + localRepo + "\" -Dprop.plain=plain");
         builder.environment().put("MAVEN_SKIP_RC", "true");
         builder.environment().remove("MAVEN_OPTS");
@@ -68,12 +72,12 @@ class MavenITgh13413QuotedValuesInMavenArgsTest extends AbstractMavenIntegration
         if (!ended) {
             process.destroyForcibly();
         }
-        String output = new String(Files.readAllBytes(log), StandardCharsets.UTF_8);
+        String output = new String(Files.readAllBytes(log.toPath()), StandardCharsets.UTF_8);
 
         assertTrue(ended, "Maven did not end in time:\n" + output);
         assertEquals(0, process.exitValue(), output);
         assertTrue(output.contains("BUILD SUCCESS"), output);
         // Maven created the local repository at the path with the space, so that MAVEN_ARGS was not ignored
-        assertTrue(Files.isDirectory(localRepo), "No local repository at " + localRepo + ":\n" + output);
+        assertTrue(localRepo.isDirectory(), "No local repository at " + localRepo + ":\n" + output);
     }
 }
