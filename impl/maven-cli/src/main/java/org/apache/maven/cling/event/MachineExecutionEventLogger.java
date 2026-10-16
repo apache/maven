@@ -20,6 +20,8 @@ package org.apache.maven.cling.event;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -27,56 +29,60 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.ExecutionEvent;
+import org.apache.maven.api.ExecutionListener;
+import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Session;
 import org.apache.maven.cling.event.MachineBuildEventListener.JsonLine;
-import org.apache.maven.execution.AbstractExecutionListener;
-import org.apache.maven.execution.BuildFailure;
-import org.apache.maven.execution.BuildSuccess;
-import org.apache.maven.execution.BuildSummary;
-import org.apache.maven.execution.ExecutionEvent;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.plugin.MojoExecution;
-import org.apache.maven.project.MavenProject;
 
 /**
  * Execution event logger for machine-readable output ({@code --console=machine}).
  * <p>
  * Emits one JSON line per lifecycle event to the shared
  * {@link MachineBuildEventListener#emitEvent(String)} writer. This logger
- * handles the {@link org.apache.maven.execution.ExecutionListener} events:
+ * handles the {@link org.apache.maven.api.ExecutionListener} events:
  * session start/end, project start/success/failure/skip, and mojo
  * start/success/failure/skip.
- * <p>
- * Together with {@link MachineBuildEventListener} (which handles log messages,
- * transfers, and execution failures), this provides a complete, typed event
- * stream suitable for piping to external tools, CI systems, and LLM agents.
- * <p>
- * Example output:
- * <pre>
- * {"event":"build.started","timestamp":"...","projectCount":12,"goals":"clean install"}
- * {"event":"module.started","timestamp":"...","module":"maven-core","groupId":"org.apache.maven","artifactId":"maven-core","version":"4.1.0-SNAPSHOT","index":1,"total":12}
- * {"event":"mojo.started","timestamp":"...","module":"maven-core","plugin":"maven-compiler-plugin","goal":"compile","phase":"compile"}
- * {"event":"mojo.succeeded","timestamp":"...","module":"maven-core","plugin":"maven-compiler-plugin","goal":"compile","duration":1.2}
- * {"event":"module.succeeded","timestamp":"...","module":"maven-core","duration":2.1}
- * {"event":"build.finished","timestamp":"...","status":"SUCCESS","duration":32.1,"total":12,"passed":12,"failed":0,"skipped":0}
- * </pre>
- *
- * Selected via {@code --console=machine}.
  *
  * @since 4.1.0
  * @see MachineBuildEventListener
  */
-public class MachineExecutionEventLogger extends AbstractExecutionListener {
+public class MachineExecutionEventLogger implements ExecutionListener {
 
     private final MachineBuildEventListener machineBel;
 
-    // Track mojo start times for duration calculation
+    // Track mojo and project start times for duration calculation
     private final Map<String, Instant> mojoStartTimes = new ConcurrentHashMap<>();
+    private final Map<String, Instant> projectStartTimes = new ConcurrentHashMap<>();
+    private final Map<String, Duration> projectDurations = new ConcurrentHashMap<>();
 
-    // Reactor state
+    // Reactor and outcome state
     private final AtomicInteger totalProjects = new AtomicInteger();
     private final AtomicInteger currentVisitedProjectCount = new AtomicInteger();
+    private final AtomicInteger passedCount = new AtomicInteger();
+    private final AtomicInteger failedCount = new AtomicInteger();
+    private final AtomicInteger skippedCount = new AtomicInteger();
     private volatile Instant buildStartTime;
+    private volatile boolean buildFailed;
+
+    public void recordProjectDuration(String key, Duration duration) {
+        if (key != null && duration != null) {
+            projectDurations.put(key, duration);
+        }
+    }
+
+    public void syncResult(boolean hasExceptions, int passed, int failed, int skipped) {
+        if (hasExceptions) {
+            buildFailed = true;
+        }
+        if (passedCount.get() == 0 && failedCount.get() == 0 && skippedCount.get() == 0) {
+            passedCount.set(passed);
+            failedCount.set(failed);
+            skippedCount.set(skipped);
+        }
+    }
 
     public MachineExecutionEventLogger(MachineBuildEventListener machineBel) {
         this.machineBel = Objects.requireNonNull(machineBel, "machineBel cannot be null");
@@ -86,21 +92,26 @@ public class MachineExecutionEventLogger extends AbstractExecutionListener {
 
     @Override
     public void sessionStarted(ExecutionEvent event) {
-        MavenSession session = event.getSession();
-        List<MavenProject> projects = session.getProjects();
-        List<MavenProject> allProjects = session.getAllProjects();
-
-        totalProjects.set(allProjects.size());
-        currentVisitedProjectCount.set(allProjects.size() - projects.size());
+        Session session = event.session();
+        List<Project> allProjects = getAllProjects(session);
+        List<Project> projects = (session != null && session.getProjects() != null) ? session.getProjects() : List.of();
+        if (allProjects != null && !allProjects.isEmpty()) {
+            totalProjects.set(allProjects.size());
+            currentVisitedProjectCount.set(allProjects.size() - projects.size());
+        } else {
+            totalProjects.set(projects.size());
+            currentVisitedProjectCount.set(0);
+        }
         buildStartTime = MonotonicClock.now();
 
-        String goals = session.getRequest().getGoals().stream().collect(Collectors.joining(" "));
+        JsonLine line = new JsonLine("build.started").field("projectCount", totalProjects.get());
 
-        JsonLine line = new JsonLine("build.started")
-                .field("projectCount", totalProjects.get())
-                .field("goals", goals);
+        String goals = getGoals(session);
+        if (goals != null && !goals.isEmpty()) {
+            line.field("goals", goals);
+        }
 
-        List<String> profiles = session.getRequest().getActiveProfiles();
+        List<String> profiles = getActiveProfiles(session);
         if (profiles != null && !profiles.isEmpty()) {
             line.field("profiles", String.join(",", profiles));
         }
@@ -110,23 +121,10 @@ public class MachineExecutionEventLogger extends AbstractExecutionListener {
 
     @Override
     public void sessionEnded(ExecutionEvent event) {
-        MavenSession session = event.getSession();
-
-        int passed = 0;
-        int failed = 0;
-        int skipped = 0;
-        for (MavenProject project : session.getProjects()) {
-            BuildSummary summary = session.getResult().getBuildSummary(project);
-            if (summary instanceof BuildSuccess) {
-                passed++;
-            } else if (summary instanceof BuildFailure) {
-                failed++;
-            } else {
-                skipped++;
-            }
+        if (event.exception().isPresent()) {
+            buildFailed = true;
         }
-
-        String status = session.getResult().hasExceptions() ? "FAILURE" : "SUCCESS";
+        String status = (buildFailed || failedCount.get() > 0) ? "FAILURE" : "SUCCESS";
         double duration = 0;
         if (buildStartTime != null) {
             duration = Duration.between(buildStartTime, MonotonicClock.now()).toMillis() / 1000.0;
@@ -136,9 +134,9 @@ public class MachineExecutionEventLogger extends AbstractExecutionListener {
                 .field("status", status)
                 .field("duration", duration)
                 .field("total", totalProjects.get())
-                .field("passed", passed)
-                .field("failed", failed)
-                .field("skipped", skipped)
+                .field("passed", passedCount.get())
+                .field("failed", failedCount.get())
+                .field("skipped", skippedCount.get())
                 .build());
     }
 
@@ -146,14 +144,18 @@ public class MachineExecutionEventLogger extends AbstractExecutionListener {
 
     @Override
     public void projectStarted(ExecutionEvent event) {
-        MavenProject project = event.getProject();
+        Project project = event.project().orElse(null);
+        if (project == null) {
+            return;
+        }
+        projectStartTimes.put(projectKey(project), MonotonicClock.now());
         int index = currentVisitedProjectCount.incrementAndGet();
 
         machineBel.emitEvent(new JsonLine("module.started")
-                .field("module", project.getName())
-                .field("groupId", project.getGroupId())
-                .field("artifactId", project.getArtifactId())
-                .field("version", project.getVersion())
+                .field("module", getProjectDisplayName(project))
+                .field("groupId", project.groupId())
+                .field("artifactId", project.artifactId())
+                .field("version", project.version())
                 .field("index", index)
                 .field("total", totalProjects.get())
                 .build());
@@ -161,39 +163,45 @@ public class MachineExecutionEventLogger extends AbstractExecutionListener {
 
     @Override
     public void projectSucceeded(ExecutionEvent event) {
+        passedCount.incrementAndGet();
         logModuleFinished(event, "module.succeeded");
     }
 
     @Override
     public void projectFailed(ExecutionEvent event) {
+        failedCount.incrementAndGet();
+        buildFailed = true;
         logModuleFinished(event, "module.failed");
     }
 
     @Override
     public void projectSkipped(ExecutionEvent event) {
-        MavenProject project = event.getProject();
-        machineBel.emitEvent(new JsonLine("module.skipped")
-                .field("module", project.getName())
-                .build());
+        skippedCount.incrementAndGet();
+        Project project = event.project().orElse(null);
+        String name = getProjectDisplayName(project);
+        machineBel.emitEvent(
+                new JsonLine("module.skipped").field("module", name).build());
     }
 
     // ---- Mojo lifecycle ----
 
     @Override
     public void mojoStarted(ExecutionEvent event) {
-        MavenProject project = event.getProject();
-        MojoExecution mojo = event.getMojoExecution();
+        Project project = event.project().orElse(null);
+        MojoExecution mojo = event.mojoExecution().orElse(null);
+        if (project == null || mojo == null) {
+            return;
+        }
 
-        String mojoKey = project.getGroupId() + ":" + project.getArtifactId() + ":" + mojo.getExecutionId() + ":"
-                + mojo.getGoal();
+        String mojoKey = mojoKey(project, mojo);
         mojoStartTimes.put(mojoKey, MonotonicClock.now());
 
         machineBel.emitEvent(new JsonLine("mojo.started")
-                .field("module", project.getName())
-                .field("plugin", mojo.getArtifactId())
-                .field("goal", mojo.getGoal())
-                .field("phase", mojo.getLifecyclePhase())
-                .field("executionId", mojo.getExecutionId())
+                .field("module", getProjectDisplayName(project))
+                .field("plugin", mojoPlugin(mojo))
+                .field("goal", mojoGoal(mojo))
+                .field("phase", mojoPhase(mojo))
+                .field("executionId", mojoExecutionId(mojo))
                 .build());
     }
 
@@ -204,36 +212,39 @@ public class MachineExecutionEventLogger extends AbstractExecutionListener {
 
     @Override
     public void mojoFailed(ExecutionEvent event) {
-        MavenProject project = event.getProject();
-        MojoExecution mojo = event.getMojoExecution();
+        Project project = event.project().orElse(null);
+        MojoExecution mojo = event.mojoExecution().orElse(null);
+        if (project == null || mojo == null) {
+            return;
+        }
 
-        String mojoKey = project.getGroupId() + ":" + project.getArtifactId() + ":" + mojo.getExecutionId() + ":"
-                + mojo.getGoal();
+        String mojoKey = mojoKey(project, mojo);
         Instant start = mojoStartTimes.remove(mojoKey);
 
         JsonLine line = new JsonLine("mojo.failed")
-                .field("module", project.getName())
-                .field("plugin", mojo.getArtifactId())
-                .field("goal", mojo.getGoal());
+                .field("module", getProjectDisplayName(project))
+                .field("plugin", mojoPlugin(mojo))
+                .field("goal", mojoGoal(mojo));
         if (start != null) {
             double duration = Duration.between(start, MonotonicClock.now()).toMillis() / 1000.0;
             line.field("duration", duration);
         }
-        if (event.getException() != null) {
-            line.field("error", event.getException().getMessage());
-        }
+        event.exception().ifPresent(e -> line.field("error", e.getMessage()));
         machineBel.emitEvent(line.build());
     }
 
     @Override
     public void mojoSkipped(ExecutionEvent event) {
-        MavenProject project = event.getProject();
-        MojoExecution mojo = event.getMojoExecution();
+        Project project = event.project().orElse(null);
+        MojoExecution mojo = event.mojoExecution().orElse(null);
+        String moduleName = getProjectDisplayName(project);
+        String pluginName = mojoPlugin(mojo);
+        String goalName = mojoGoal(mojo);
 
         machineBel.emitEvent(new JsonLine("mojo.skipped")
-                .field("module", project.getName())
-                .field("plugin", mojo.getArtifactId())
-                .field("goal", mojo.getGoal())
+                .field("module", moduleName)
+                .field("plugin", pluginName)
+                .field("goal", goalName)
                 .build());
     }
 
@@ -241,63 +252,177 @@ public class MachineExecutionEventLogger extends AbstractExecutionListener {
 
     @Override
     public void forkStarted(ExecutionEvent event) {
-        MavenProject project = event.getProject();
-        MojoExecution mojo = event.getMojoExecution();
+        Project project = event.project().orElse(null);
+        MojoExecution mojo = event.mojoExecution().orElse(null);
+        String moduleName = getProjectDisplayName(project);
+        String pluginName = mojoPlugin(mojo);
+        String goalName = mojoGoal(mojo);
 
         machineBel.emitEvent(new JsonLine("fork.started")
-                .field("module", project.getName())
-                .field("plugin", mojo.getArtifactId())
-                .field("goal", mojo.getGoal())
+                .field("module", moduleName)
+                .field("plugin", pluginName)
+                .field("goal", goalName)
                 .build());
     }
 
     @Override
     public void forkSucceeded(ExecutionEvent event) {
-        MavenProject project = event.getProject();
+        Project project = event.project().orElse(null);
         machineBel.emitEvent(new JsonLine("fork.succeeded")
-                .field("module", project.getName())
+                .field("module", getProjectDisplayName(project))
                 .build());
     }
 
     @Override
     public void forkFailed(ExecutionEvent event) {
-        MavenProject project = event.getProject();
-        JsonLine line = new JsonLine("fork.failed").field("module", project.getName());
-        if (event.getException() != null) {
-            line.field("error", event.getException().getMessage());
-        }
+        Project project = event.project().orElse(null);
+        JsonLine line = new JsonLine("fork.failed").field("module", getProjectDisplayName(project));
+        event.exception().ifPresent(e -> line.field("error", e.getMessage()));
         machineBel.emitEvent(line.build());
     }
 
     // ---- Helpers ----
 
-    private void logModuleFinished(ExecutionEvent event, String eventType) {
-        MavenProject project = event.getProject();
-        MavenSession session = event.getSession();
-        BuildSummary summary = session.getResult().getBuildSummary(project);
+    private static String mojoKey(Project project, MojoExecution mojo) {
+        return project.groupId() + ":" + project.artifactId() + ":" + mojoExecutionId(mojo) + ":" + mojoGoal(mojo);
+    }
 
-        JsonLine line = new JsonLine(eventType).field("module", project.getName());
-        if (summary != null) {
-            line.field("duration", summary.getExecTime().toMillis() / 1000.0);
+    private static String mojoPlugin(MojoExecution mojo) {
+        if (mojo == null || mojo.plugin() == null) {
+            return "unknown";
         }
-        if ("module.failed".equals(eventType) && event.getException() != null) {
-            line.field("error", event.getException().getMessage());
+        if (mojo.plugin().getDescriptor() != null
+                && mojo.plugin().getDescriptor().getArtifactId() != null) {
+            return mojo.plugin().getDescriptor().getArtifactId();
+        }
+        if (mojo.plugin().getModel() != null && mojo.plugin().getModel().getArtifactId() != null) {
+            return mojo.plugin().getModel().getArtifactId();
+        }
+        return "unknown";
+    }
+
+    private static String mojoGoal(MojoExecution mojo) {
+        return (mojo != null) ? mojo.goal() : "unknown";
+    }
+
+    private static String mojoPhase(MojoExecution mojo) {
+        return (mojo != null) ? mojo.lifecyclePhase().orElse("") : "";
+    }
+
+    private static String mojoExecutionId(MojoExecution mojo) {
+        return (mojo != null) ? mojo.executionId().orElse("") : "";
+    }
+
+    private static String projectKey(Project project) {
+        String gid = project.groupId();
+        String aid = project.artifactId();
+        return (gid != null ? gid : "") + ":" + (aid != null ? aid : "");
+    }
+
+    private static String getProjectDisplayName(Project project) {
+        if (project == null) {
+            return "unknown";
+        }
+        String name = null;
+        try {
+            if (project.model() != null) {
+                name = project.model().getName();
+            }
+        } catch (Exception ignored) {
+        }
+        if (name != null && !name.isBlank()) {
+            return name;
+        }
+        return (project.artifactId() != null) ? project.artifactId() : "unknown";
+    }
+
+    private void logModuleFinished(ExecutionEvent event, String eventType) {
+        Project project = event.project().orElse(null);
+        if (project == null) {
+            return;
+        }
+        Duration recorded = projectDurations.remove(projectKey(project));
+        double duration = 0;
+        if (recorded != null) {
+            duration = recorded.toMillis() / 1000.0;
+        } else {
+            Instant start = projectStartTimes.remove(projectKey(project));
+            if (start != null) {
+                duration = Duration.between(start, MonotonicClock.now()).toMillis() / 1000.0;
+            }
+        }
+
+        JsonLine line = new JsonLine(eventType).field("module", getProjectDisplayName(project));
+        if (duration > 0) {
+            line.field("duration", duration);
+        }
+        if ("module.failed".equals(eventType)) {
+            event.exception().ifPresent(e -> line.field("error", e.getMessage()));
         }
         machineBel.emitEvent(line.build());
     }
 
-    private void logMojoFinished(ExecutionEvent event, String eventType) {
-        MavenProject project = event.getProject();
-        MojoExecution mojo = event.getMojoExecution();
+    private static String getGoals(Session session) {
+        if (session == null) {
+            return "";
+        }
+        try {
+            java.lang.reflect.Method m = session.getClass().getMethod("getGoals");
+            Object res = m.invoke(session);
+            if (res instanceof Collection<?> col) {
+                return col.stream().map(Object::toString).collect(Collectors.joining(" "));
+            }
+        } catch (Exception ignored) {
+        }
+        return "";
+    }
 
-        String mojoKey = project.getGroupId() + ":" + project.getArtifactId() + ":" + mojo.getExecutionId() + ":"
-                + mojo.getGoal();
+    private static List<String> getActiveProfiles(Session session) {
+        if (session == null) {
+            return Collections.emptyList();
+        }
+        try {
+            java.lang.reflect.Method m = session.getClass().getMethod("getActiveProfiles");
+            Object res = m.invoke(session);
+            if (res instanceof Collection<?> col) {
+                return col.stream().map(Object::toString).toList();
+            }
+        } catch (Exception ignored) {
+        }
+        return Collections.emptyList();
+    }
+
+    private static List<Project> getAllProjects(Session session) {
+        if (session == null) {
+            return null;
+        }
+        try {
+            java.lang.reflect.Method m = session.getClass().getMethod("getAllProjects");
+            Object res = m.invoke(session);
+            if (res instanceof List<?> list) {
+                @SuppressWarnings("unchecked")
+                List<Project> projs = (List<Project>) list;
+                return projs;
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
+    }
+
+    private void logMojoFinished(ExecutionEvent event, String eventType) {
+        Project project = event.project().orElse(null);
+        MojoExecution mojo = event.mojoExecution().orElse(null);
+        if (project == null || mojo == null) {
+            return;
+        }
+
+        String mojoKey = mojoKey(project, mojo);
         Instant start = mojoStartTimes.remove(mojoKey);
 
         JsonLine line = new JsonLine(eventType)
-                .field("module", project.getName())
-                .field("plugin", mojo.getArtifactId())
-                .field("goal", mojo.getGoal());
+                .field("module", getProjectDisplayName(project))
+                .field("plugin", mojoPlugin(mojo))
+                .field("goal", mojoGoal(mojo));
         if (start != null) {
             double duration = Duration.between(start, MonotonicClock.now()).toMillis() / 1000.0;
             line.field("duration", duration);

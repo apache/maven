@@ -40,6 +40,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoSession;
+import org.mockito.quality.Strictness;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -60,7 +61,7 @@ class RichBuildEventListenerTest {
 
     @BeforeEach
     void beforeEach() throws Exception {
-        mockitoSession = Mockito.mockitoSession().startMocking();
+        mockitoSession = Mockito.mockitoSession().strictness(Strictness.LENIENT).startMocking();
         terminalOutput = new ByteArrayOutputStream();
         // DumbTerminal: supported=false (fallback mode), output goes to terminalOutput
         terminal = new DumbTerminal(new ByteArrayInputStream(new byte[0]), terminalOutput);

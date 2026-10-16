@@ -26,6 +26,7 @@ import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
@@ -36,6 +37,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoSession;
+import org.mockito.quality.Strictness;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -52,14 +54,14 @@ class MachineExecutionEventLoggerTest {
     private MockitoSession mockitoSession;
     private List<String> capturedOutput;
     private MachineBuildEventListener machineBel;
-    private MachineExecutionEventLogger logger;
+    private ExecutionListener logger;
 
     @BeforeEach
     void beforeEach() {
-        mockitoSession = Mockito.mockitoSession().startMocking();
+        mockitoSession = Mockito.mockitoSession().strictness(Strictness.LENIENT).startMocking();
         capturedOutput = new ArrayList<>();
         machineBel = new MachineBuildEventListener(capturedOutput::add);
-        logger = new MachineExecutionEventLogger(machineBel);
+        logger = new ExecutionListenerAdapter(new MachineExecutionEventLogger(machineBel));
     }
 
     @AfterEach

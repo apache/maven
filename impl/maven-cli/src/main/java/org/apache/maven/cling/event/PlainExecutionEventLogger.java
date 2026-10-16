@@ -19,21 +19,22 @@
 package org.apache.maven.cling.event;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.maven.api.ExecutionEvent;
+import org.apache.maven.api.ExecutionListener;
+import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.cling.utils.CLIReportingUtils;
-import org.apache.maven.execution.AbstractExecutionListener;
-import org.apache.maven.execution.BuildFailure;
-import org.apache.maven.execution.BuildSuccess;
-import org.apache.maven.execution.BuildSummary;
-import org.apache.maven.execution.ExecutionEvent;
-import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +61,7 @@ import static org.apache.maven.cling.utils.CLIReportingUtils.formatDuration;
  * @since 4.1.0
  * @see ExecutionEventLogger
  */
-public class PlainExecutionEventLogger extends AbstractExecutionListener {
+public class PlainExecutionEventLogger implements ExecutionListener {
 
     private static final int MAX_LOG_PREFIX_SIZE = 8; // "[ERROR] "
     private static final int PROJECT_STATUS_SUFFIX_SIZE = 20; // "SUCCESS [  0.000 s]"
@@ -76,6 +77,32 @@ public class PlainExecutionEventLogger extends AbstractExecutionListener {
     private int maxProjectNameLength;
     private int totalProjects;
     private int currentVisitedProjectCount;
+
+    // Track project durations and build results natively
+    private final Map<String, Instant> projectStartTimes = new ConcurrentHashMap<>();
+    private final Map<String, Duration> projectDurations = new ConcurrentHashMap<>();
+    private final AtomicInteger passedCount = new AtomicInteger();
+    private final AtomicInteger failedCount = new AtomicInteger();
+    private final AtomicInteger skippedCount = new AtomicInteger();
+    private volatile Instant sessionStartTime;
+    private volatile boolean buildFailed;
+
+    public void recordProjectDuration(String key, Duration duration) {
+        if (key != null && duration != null) {
+            projectDurations.put(key, duration);
+        }
+    }
+
+    public void syncResult(boolean hasExceptions, int passed, int failed, int skipped) {
+        if (hasExceptions) {
+            buildFailed = true;
+        }
+        if (passedCount.get() == 0 && failedCount.get() == 0 && skippedCount.get() == 0) {
+            passedCount.set(passed);
+            failedCount.set(failed);
+            skippedCount.set(skipped);
+        }
+    }
 
     public PlainExecutionEventLogger(MessageBuilderFactory messageBuilderFactory) {
         this(messageBuilderFactory, LoggerFactory.getLogger(PlainExecutionEventLogger.class));
@@ -130,21 +157,48 @@ public class PlainExecutionEventLogger extends AbstractExecutionListener {
     public void sessionStarted(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
             init();
-            List<MavenProject> projects = event.getSession().getProjects();
-            List<MavenProject> allProjects = event.getSession().getAllProjects();
-
-            currentVisitedProjectCount = allProjects.size() - projects.size();
-            totalProjects = allProjects.size();
+            sessionStartTime = MonotonicClock.now();
+            Session session = event.session();
+            List<Project> allProjects = getAllProjects(session);
+            List<Project> projects =
+                    (session != null && session.getProjects() != null) ? session.getProjects() : List.of();
+            if (allProjects != null && !allProjects.isEmpty()) {
+                totalProjects = allProjects.size();
+                currentVisitedProjectCount = allProjects.size() - projects.size();
+            } else {
+                totalProjects = projects.size();
+                currentVisitedProjectCount = 0;
+            }
         }
+    }
+
+    private static List<Project> getAllProjects(Session session) {
+        if (session == null) {
+            return null;
+        }
+        try {
+            java.lang.reflect.Method m = session.getClass().getMethod("getAllProjects");
+            Object res = m.invoke(session);
+            if (res instanceof List<?> list) {
+                @SuppressWarnings("unchecked")
+                List<Project> projs = (List<Project>) list;
+                return projs;
+            }
+        } catch (Exception ignored) {
+        }
+        return null;
     }
 
     @Override
     public void sessionEnded(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
             init();
+            if (event.exception().isPresent()) {
+                buildFailed = true;
+            }
             logger.info("");
-            logResult(event.getSession());
-            logStats(event.getSession());
+            logResult(event.session());
+            logStats(event.session());
         }
     }
 
@@ -152,13 +206,16 @@ public class PlainExecutionEventLogger extends AbstractExecutionListener {
 
     @Override
     public void projectStarted(ExecutionEvent event) {
-        // In plain mode, we only log when a project finishes (succeeded/failed/skipped)
+        event.project().ifPresent(project -> {
+            projectStartTimes.put(projectKey(project), MonotonicClock.now());
+        });
     }
 
     @Override
     public void projectSucceeded(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
             init();
+            passedCount.incrementAndGet();
             logProjectLine(event, "SUCCESS");
         }
     }
@@ -167,6 +224,8 @@ public class PlainExecutionEventLogger extends AbstractExecutionListener {
     public void projectFailed(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
             init();
+            failedCount.incrementAndGet();
+            buildFailed = true;
             logProjectLine(event, "FAILURE");
         }
     }
@@ -175,6 +234,7 @@ public class PlainExecutionEventLogger extends AbstractExecutionListener {
     public void projectSkipped(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
             init();
+            skippedCount.incrementAndGet();
             logProjectLine(event, "SKIPPED");
         }
     }
@@ -189,9 +249,8 @@ public class PlainExecutionEventLogger extends AbstractExecutionListener {
     @Override
     public void mojoSkipped(ExecutionEvent event) {
         if (logger.isWarnEnabled()) {
-            logger.warn(
-                    "Goal '{}' requires online mode for execution but Maven is currently offline, skipping",
-                    event.getMojoExecution().getGoal());
+            String goal = event.mojoExecution().map(MojoExecution::goal).orElse("unknown");
+            logger.warn("Goal '{}' requires online mode for execution but Maven is currently offline, skipping", goal);
         }
     }
 
@@ -207,14 +266,49 @@ public class PlainExecutionEventLogger extends AbstractExecutionListener {
 
     // ---- Formatting helpers ----
 
+    private static String projectKey(Project project) {
+        String gid = project.groupId();
+        String aid = project.artifactId();
+        return (gid != null ? gid : "") + ":" + (aid != null ? aid : "");
+    }
+
+    private static String getProjectDisplayName(Project project) {
+        if (project == null) {
+            return "";
+        }
+        String name = null;
+        try {
+            if (project.model() != null) {
+                name = project.model().getName();
+            }
+        } catch (Exception ignored) {
+        }
+        if (name != null && !name.isBlank()) {
+            return name;
+        }
+        return project.artifactId() != null ? project.artifactId() : "";
+    }
+
+    private Duration getProjectDuration(Project project) {
+        if (project == null) {
+            return null;
+        }
+        Duration recorded = projectDurations.remove(projectKey(project));
+        if (recorded != null) {
+            return recorded;
+        }
+        Instant start = projectStartTimes.remove(projectKey(project));
+        return (start != null) ? Duration.between(start, MonotonicClock.now()) : null;
+    }
+
     private void logProjectLine(ExecutionEvent event, String status) {
-        MavenProject project = event.getProject();
-        MavenSession session = event.getSession();
-        MavenExecutionResult result = session.getResult();
-        BuildSummary buildSummary = result.getBuildSummary(project);
+        Project project = event.project().orElse(null);
+        if (project == null) {
+            return;
+        }
 
         StringBuilder buffer = new StringBuilder(128);
-        buffer.append(project.getName());
+        buffer.append(getProjectDisplayName(project));
         buffer.append(' ');
 
         if (totalProjects > 1) {
@@ -251,9 +345,10 @@ public class PlainExecutionEventLogger extends AbstractExecutionListener {
         }
 
         // Duration
-        if (buildSummary != null) {
+        Duration execDuration = getProjectDuration(project);
+        if (execDuration != null) {
             mb.a(" [");
-            String duration = formatDuration(buildSummary.getExecTime());
+            String duration = formatDuration(execDuration);
             int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - duration.length();
             if (padSize > 0) {
                 mb.a(chars(' ', padSize));
@@ -265,29 +360,20 @@ public class PlainExecutionEventLogger extends AbstractExecutionListener {
         logger.info(mb.toString());
     }
 
-    private void logResult(MavenSession session) {
+    private void logResult(Session session) {
         MessageBuilder buffer = builder();
-        if (session.getResult().hasExceptions()) {
+        boolean hasExceptions = buildFailed || failedCount.get() > 0;
+        if (hasExceptions) {
             buffer.failure("BUILD FAILURE");
         } else {
             buffer.success("BUILD SUCCESS");
         }
 
-        int passed = 0;
-        int failed = 0;
-        int skipped = 0;
-        for (MavenProject project : session.getProjects()) {
-            BuildSummary summary = session.getResult().getBuildSummary(project);
-            if (summary instanceof BuildSuccess) {
-                passed++;
-            } else if (summary instanceof BuildFailure) {
-                failed++;
-            } else {
-                skipped++;
-            }
-        }
+        int passed = passedCount.get();
+        int failed = failedCount.get();
+        int skipped = skippedCount.get();
 
-        if (session.getResult().hasExceptions()) {
+        if (hasExceptions) {
             logger.error(buffer.toString());
         } else {
             logger.info(buffer.toString());
@@ -306,13 +392,15 @@ public class PlainExecutionEventLogger extends AbstractExecutionListener {
         }
     }
 
-    private void logStats(MavenSession session) {
-        Duration time = Duration.between(session.getRequest().getStartInstant(), MonotonicClock.now());
-        String wallClock = session.getRequest().getDegreeOfConcurrency() > 1 ? " (Wall Clock)" : "";
+    private void logStats(Session session) {
+        Duration time =
+                (sessionStartTime != null) ? Duration.between(sessionStartTime, MonotonicClock.now()) : Duration.ZERO;
+        int concurrency = (session != null) ? session.getDegreeOfConcurrency() : 1;
+        String wallClock = concurrency > 1 ? " (Wall Clock)" : "";
         logger.info("Total time:  {}{}", formatDuration(time), wallClock);
 
         // On failure, show Maven and Java version to help with bug reports (MNG-7372)
-        if (session.getResult().hasExceptions()) {
+        if (buildFailed || failedCount.get() > 0) {
             logger.info("Maven:       {}", CLIReportingUtils.showVersionMinimal());
             logger.info(
                     "Java:        {} ({})",

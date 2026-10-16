@@ -49,6 +49,7 @@ import org.apache.maven.api.services.ToolchainsBuilderResult;
 import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.api.toolchain.PersistedToolchains;
 import org.apache.maven.cling.event.ExecutionEventLogger;
+import org.apache.maven.cling.event.ExecutionListenerAdapter;
 import org.apache.maven.cling.event.MachineBuildEventListener;
 import org.apache.maven.cling.event.MachineExecutionEventLogger;
 import org.apache.maven.cling.event.PlainExecutionEventLogger;
@@ -366,24 +367,27 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             case "machine":
                 BuildEventListener machineBel = determineBuildEventListener(context);
                 if (machineBel instanceof MachineBuildEventListener machineListener) {
-                    listener = new MachineExecutionEventLogger(machineListener);
+                    listener = new ExecutionListenerAdapter(new MachineExecutionEventLogger(machineListener));
                 } else {
                     // Fallback if machine listener couldn't be created
-                    listener = new PlainExecutionEventLogger(context.invokerRequest.messageBuilderFactory());
+                    listener = new ExecutionListenerAdapter(
+                            new PlainExecutionEventLogger(context.invokerRequest.messageBuilderFactory()));
                 }
                 break;
             case "rich":
                 BuildEventListener richBel = determineBuildEventListener(context);
                 if (richBel instanceof RichBuildEventListener richListener) {
-                    listener =
-                            new RichExecutionEventLogger(context.invokerRequest.messageBuilderFactory(), richListener);
+                    listener = new ExecutionListenerAdapter(
+                            new RichExecutionEventLogger(context.invokerRequest.messageBuilderFactory(), richListener));
                 } else {
                     // Fallback if status bar couldn't be created
-                    listener = new PlainExecutionEventLogger(context.invokerRequest.messageBuilderFactory());
+                    listener = new ExecutionListenerAdapter(
+                            new PlainExecutionEventLogger(context.invokerRequest.messageBuilderFactory()));
                 }
                 break;
             case "plain":
-                listener = new PlainExecutionEventLogger(context.invokerRequest.messageBuilderFactory());
+                listener = new ExecutionListenerAdapter(
+                        new PlainExecutionEventLogger(context.invokerRequest.messageBuilderFactory()));
                 break;
             default:
                 listener = new ExecutionEventLogger(context.invokerRequest.messageBuilderFactory());
