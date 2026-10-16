@@ -279,6 +279,15 @@ public class ExecutionListenerAdapter implements ExecutionListener {
                         if ("isIncludesDependencies".equals(name)) {
                             return false;
                         }
+                        if ("toString".equals(name)) {
+                            return "Type[" + id + "]";
+                        }
+                        if ("hashCode".equals(name)) {
+                            return id.hashCode();
+                        }
+                        if ("equals".equals(name)) {
+                            return proxy == (args != null && args.length > 0 ? args[0] : null);
+                        }
                         return null;
                     });
         }
