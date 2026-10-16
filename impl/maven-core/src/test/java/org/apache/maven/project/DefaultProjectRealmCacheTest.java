@@ -26,6 +26,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.maven.internal.cache.DefaultCacheFactory;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.graph.DependencyFilter;
@@ -43,7 +44,7 @@ class DefaultProjectRealmCacheTest {
 
     @Test
     void testPutReturnsSameRecordForDuplicateKey() throws Exception {
-        DefaultProjectRealmCache cache = new DefaultProjectRealmCache();
+        DefaultProjectRealmCache cache = new DefaultProjectRealmCache(new DefaultCacheFactory());
         ClassWorld world = new ClassWorld();
         ClassRealm realm1 = world.newRealm("test-realm-1");
         ClassRealm realm2 = world.newRealm("test-realm-2");
@@ -66,7 +67,7 @@ class DefaultProjectRealmCacheTest {
 
     @Test
     void testConcurrentPutWithSameKeyDoesNotThrow() throws Exception {
-        DefaultProjectRealmCache cache = new DefaultProjectRealmCache();
+        DefaultProjectRealmCache cache = new DefaultProjectRealmCache(new DefaultCacheFactory());
         ClassWorld world = new ClassWorld();
 
         // Create a shared extension realm for the cache key

@@ -18,18 +18,23 @@
  */
 package org.apache.maven.plugin;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.spi.CacheFactory;
+import org.apache.maven.api.spi.MavenCache;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.internal.cache.MavenCacheHolder;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
@@ -37,12 +42,68 @@ import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
+import org.eclipse.sisu.Typed;
 
 /**
+ * Default cache for resolved plugin artifacts.
  */
 @Named
 @Singleton
-public class DefaultPluginArtifactsCache implements PluginArtifactsCache {
+@Typed({PluginArtifactsCache.class, MavenCacheHolder.class})
+public class DefaultPluginArtifactsCache implements PluginArtifactsCache, MavenCacheHolder {
+
+    /**
+     * Internal {@link CacheRecord} wrapper for a plugin artifacts entry.
+     * Exposes artifact file paths as dependency paths; no realm disposal on invalidation.
+     */
+    protected static class PluginArtifactsRecord implements org.apache.maven.api.spi.CacheRecord {
+
+        private final List<Artifact> artifacts;
+        private final PluginResolutionException exception;
+
+        PluginArtifactsRecord(List<Artifact> artifacts) {
+            this.artifacts = Collections.unmodifiableList(new ArrayList<>(artifacts));
+            this.exception = null;
+        }
+
+        PluginArtifactsRecord(PluginResolutionException exception) {
+            this.artifacts = null;
+            this.exception = exception;
+        }
+
+        public List<Artifact> getArtifacts() {
+            return artifacts;
+        }
+
+        public PluginResolutionException getException() {
+            return exception;
+        }
+
+        @Override
+        public Stream<Path> getDependencyPaths() {
+            if (artifacts == null) {
+                return Stream.empty();
+            }
+            return artifacts.stream()
+                    .map(Artifact::getFile)
+                    .filter(Objects::nonNull)
+                    .map(File::toPath);
+        }
+
+        @Override
+        public void invalidate() {
+            // No resources to release for artifact resolution entries
+        }
+
+        /** Converts to the public {@link PluginArtifactsCache.CacheRecord} view. */
+        PluginArtifactsCache.CacheRecord toCacheRecord() {
+            if (exception != null) {
+                return new PluginArtifactsCache.CacheRecord(exception);
+            }
+            return new PluginArtifactsCache.CacheRecord(artifacts);
+        }
+    }
+
     /**
      * CacheKey
      */
@@ -114,7 +175,12 @@ public class DefaultPluginArtifactsCache implements PluginArtifactsCache {
         }
     }
 
-    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
+    protected final MavenCache<Key, PluginArtifactsRecord> cache;
+
+    @Inject
+    public DefaultPluginArtifactsCache(CacheFactory cacheFactory) {
+        this.cache = cacheFactory.createCache();
+    }
 
     @Override
     public Key createKey(
@@ -126,50 +192,46 @@ public class DefaultPluginArtifactsCache implements PluginArtifactsCache {
     }
 
     @Override
-    public CacheRecord get(Key key) throws PluginResolutionException {
-        CacheRecord cacheRecord = cache.get(key);
+    public PluginArtifactsCache.CacheRecord get(Key key) throws PluginResolutionException {
+        PluginArtifactsRecord record = cache.get(key);
 
-        if (cacheRecord != null && cacheRecord.getException() != null) {
-            throw cacheRecord.getException();
+        if (record != null && record.getException() != null) {
+            throw record.getException();
         }
 
-        return cacheRecord;
+        return record != null ? record.toCacheRecord() : null;
     }
 
     @Override
-    public CacheRecord put(Key key, List<Artifact> pluginArtifacts) {
+    public PluginArtifactsCache.CacheRecord put(Key key, List<Artifact> pluginArtifacts) {
         Objects.requireNonNull(pluginArtifacts, "pluginArtifacts cannot be null");
 
-        CacheRecord record = new CacheRecord(Collections.unmodifiableList(new ArrayList<>(pluginArtifacts)));
-
-        CacheRecord existing = cache.putIfAbsent(key, record);
-
-        return existing != null ? existing : record;
-    }
-
-    /**
-     * @deprecated No longer used. The put methods now use {@link ConcurrentHashMap#putIfAbsent} directly.
-     */
-    @Deprecated
-    protected void assertUniqueKey(Key key) {
-        if (cache.containsKey(key)) {
-            throw new IllegalStateException("Duplicate artifact resolution result for plugin " + key);
-        }
+        PluginArtifactsRecord newRecord = new PluginArtifactsRecord(pluginArtifacts);
+        PluginArtifactsRecord winner = cache.computeIfAbsent(key, k -> newRecord);
+        return winner.toCacheRecord();
     }
 
     @Override
-    public CacheRecord put(Key key, PluginResolutionException exception) {
+    public PluginArtifactsCache.CacheRecord put(Key key, PluginResolutionException exception) {
         Objects.requireNonNull(exception, "exception cannot be null");
 
-        CacheRecord record = new CacheRecord(exception);
-
-        CacheRecord existing = cache.putIfAbsent(key, record);
-
-        return existing != null ? existing : record;
+        PluginArtifactsRecord newRecord = new PluginArtifactsRecord(exception);
+        PluginArtifactsRecord winner = cache.computeIfAbsent(key, k -> newRecord);
+        return winner.toCacheRecord();
     }
 
     @Override
     public void flush() {
+        cache.clear();
+    }
+
+    @Override
+    public void invalidatePath(Path path) {
+        cache.removeIf((k, v) -> v.getDependencyPaths().anyMatch(path::equals));
+    }
+
+    @Override
+    public void flushCache() {
         cache.clear();
     }
 
@@ -182,7 +244,7 @@ public class DefaultPluginArtifactsCache implements PluginArtifactsCache {
     }
 
     @Override
-    public void register(MavenProject project, Key cacheKey, CacheRecord record) {
+    public void register(MavenProject project, Key cacheKey, PluginArtifactsCache.CacheRecord record) {
         // default cache does not track record usage
     }
 }

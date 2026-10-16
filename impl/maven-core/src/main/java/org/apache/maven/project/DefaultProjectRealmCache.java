@@ -18,26 +18,83 @@
  */
 package org.apache.maven.project;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.nio.file.Path;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
+import org.apache.maven.api.spi.CacheFactory;
+import org.apache.maven.api.spi.MavenCache;
+import org.apache.maven.internal.cache.MavenCacheHolder;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.sisu.Typed;
 
 /**
  * Default project realm cache implementation. Assumes cached data does not change.
  */
 @Named
 @Singleton
-public class DefaultProjectRealmCache implements ProjectRealmCache, Disposable {
+@Typed({ProjectRealmCache.class, MavenCacheHolder.class})
+public class DefaultProjectRealmCache implements ProjectRealmCache, MavenCacheHolder, Disposable {
+
+    /**
+     * Internal {@link CacheRecord} wrapper for a project realm entry.
+     *
+     * <p>Project realms are keyed by their constituent extension realms; they have no
+     * explicit artifact file list of their own, so {@link #getDependencyPaths()} returns
+     * an empty stream. Invalidation must be triggered via the constituent extension realm
+     * caches instead.
+     */
+    protected static class ProjectRealmRecord implements org.apache.maven.api.spi.CacheRecord {
+
+        private final ClassRealm realm;
+        private final DependencyFilter extensionArtifactFilter;
+        private final ProjectRealmCache.CacheRecord publicRecord;
+
+        ProjectRealmRecord(ClassRealm realm, DependencyFilter extensionArtifactFilter) {
+            this.realm = realm;
+            this.extensionArtifactFilter = extensionArtifactFilter;
+            this.publicRecord = new ProjectRealmCache.CacheRecord(realm, extensionArtifactFilter);
+        }
+
+        public ClassRealm getRealm() {
+            return realm;
+        }
+
+        public DependencyFilter getExtensionArtifactFilter() {
+            return extensionArtifactFilter;
+        }
+
+        @Override
+        public Stream<Path> getDependencyPaths() {
+            // Project realms are composed from extension realms; no direct artifact
+            // file paths are tracked at this level.
+            return Stream.empty();
+        }
+
+        @Override
+        public void invalidate() {
+            try {
+                realm.getWorld().disposeRealm(realm.getId());
+            } catch (NoSuchRealmException e) {
+                // realm was already disposed — ignore
+            }
+        }
+
+        /** Converts to the public {@link ProjectRealmCache.CacheRecord} view (same instance always). */
+        ProjectRealmCache.CacheRecord toCacheRecord() {
+            return publicRecord;
+        }
+    }
+
     /**
      * CacheKey
      */
@@ -78,7 +135,12 @@ public class DefaultProjectRealmCache implements ProjectRealmCache, Disposable {
         }
     }
 
-    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
+    protected final MavenCache<Key, ProjectRealmRecord> cache;
+
+    @Inject
+    public DefaultProjectRealmCache(CacheFactory cacheFactory) {
+        this.cache = cacheFactory.createCache();
+    }
 
     @Override
     public Key createKey(List<? extends ClassRealm> extensionRealms) {
@@ -86,41 +148,46 @@ public class DefaultProjectRealmCache implements ProjectRealmCache, Disposable {
     }
 
     @Override
-    public CacheRecord get(Key key) {
-        return cache.get(key);
+    public ProjectRealmCache.CacheRecord get(Key key) {
+        ProjectRealmRecord record = cache.get(key);
+        return record != null ? record.toCacheRecord() : null;
     }
 
     @Override
-    public CacheRecord put(Key key, ClassRealm projectRealm, DependencyFilter extensionArtifactFilter) {
+    public ProjectRealmCache.CacheRecord put(
+            Key key, ClassRealm projectRealm, DependencyFilter extensionArtifactFilter) {
         Objects.requireNonNull(projectRealm, "projectRealm cannot be null");
 
-        CacheRecord record = new CacheRecord(projectRealm, extensionArtifactFilter);
-
-        CacheRecord existing = cache.putIfAbsent(key, record);
-
-        return existing != null ? existing : record;
+        ProjectRealmRecord newRecord = new ProjectRealmRecord(projectRealm, extensionArtifactFilter);
+        // Use computeIfAbsent for putIfAbsent semantics: all concurrent callers get the same winner
+        ProjectRealmRecord winner = cache.computeIfAbsent(key, k -> newRecord);
+        return winner.toCacheRecord();
     }
 
     @Override
     public void flush() {
-        for (CacheRecord record : cache.values()) {
-            ClassRealm realm = record.getRealm();
-            try {
-                realm.getWorld().disposeRealm(realm.getId());
-            } catch (NoSuchRealmException e) {
-                // ignore
-            }
-        }
         cache.clear();
     }
 
     @Override
-    public void register(MavenProject project, Key key, CacheRecord record) {
+    public void invalidatePath(Path path) {
+        // Project realm entries have no direct file dependencies; flush all on any invalidation
+        // because we cannot determine which project realms depend on the changed file.
+        cache.clear();
+    }
+
+    @Override
+    public void flushCache() {
+        cache.clear();
+    }
+
+    @Override
+    public void register(MavenProject project, Key key, ProjectRealmCache.CacheRecord record) {
         // default cache does not track record usage
     }
 
     @Override
     public void dispose() {
-        cache.clear();
+        cache.clearSilently();
     }
 }
