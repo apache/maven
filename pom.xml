@@ -126,7 +126,7 @@ under the License.
 
   <properties>
     <javaVersion>8</javaVersion>
-    <version.sisu-maven-plugin>1.1.0</version.sisu-maven-plugin>
+    <version.sisu-maven-plugin>1.1.1-SNAPSHOT</version.sisu-maven-plugin>
     <asmVersion>9.11</asmVersion>
     <classWorldsVersion>2.12.1</classWorldsVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
@@ -529,6 +529,20 @@ under the License.
       </dependency>
     </dependencies>
   </dependencyManagement>
+
+  <repositories>
+    <repository>
+      <releases>
+        <enabled>false</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+      <id>central-portal-snapshots</id>
+      <name>Central Portal Snapshots</name>
+      <url>https://central.sonatype.com/repository/maven-snapshots/</url>
+    </repository>
+  </repositories>
 
   <build>
     <pluginManagement>
