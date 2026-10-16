@@ -32,6 +32,9 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  * <p>
  * Higher values indicate higher priority. When multiple implementations of the same
  * type exist, the one with the highest priority will be selected for injection.
+ * For an unqualified single-instance lookup, the standalone injector prefers beans without a
+ * qualifier or with an empty {@link Named} qualifier when priorities are equal.
+ * If equally preferred beans remain, that lookup fails.
  * <p>
  * Example usage:
  * <pre>
