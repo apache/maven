@@ -90,6 +90,8 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     private static final String MAVEN_PLUGINS = "org.apache.maven.plugins:";
 
+    private static final boolean SITE_DISABLED = Boolean.getBoolean(Constants.MAVEN_SITE_LIFECYCLE_DISABLED);
+
     public static final String DEFAULT_LIFECYCLE_MODELID = "org.apache.maven:maven-core:"
             + getImplementationVersion(DefaultLifecycleRegistry.class)
             + ":default-lifecycle-bindings";
@@ -155,15 +157,12 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
             lookup.lookupList(LifecycleProvider.class).stream()
                     .flatMap(p -> p.provides().stream())
                     .forEach(lf -> result.put(lf.id(), lf));
-            return result.values().stream()
-                    .filter(lf -> !Boolean.getBoolean(Constants.MAVEN_SITE_LIFECYCLE_DISABLED)
-                            || !Lifecycle.SITE.equals(lf.id()));
+            return result.values().stream().filter(lf -> !SITE_DISABLED || !Lifecycle.SITE.equals(lf.id()));
         }
         return providers.stream()
                 .map(ExtensibleEnumProvider::provides)
                 .flatMap(Collection::stream)
-                .filter(lf -> !Boolean.getBoolean(Constants.MAVEN_SITE_LIFECYCLE_DISABLED)
-                        || !Lifecycle.SITE.equals(lf.id()));
+                .filter(lf -> !SITE_DISABLED || !Lifecycle.SITE.equals(lf.id()));
     }
 
     @Override
