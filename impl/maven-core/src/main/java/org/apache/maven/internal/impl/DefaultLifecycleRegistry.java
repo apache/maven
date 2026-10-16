@@ -93,8 +93,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     private static final boolean SITE_DISABLED = Boolean.getBoolean(Constants.MAVEN_SITE_LIFECYCLE_DISABLED);
 
-    private static final Predicate<Lifecycle> SITE_FILTER =
-            lf -> !SITE_DISABLED || !Lifecycle.SITE.equals(lf.id());
+    private static final Predicate<Lifecycle> SITE_FILTER = lf -> !SITE_DISABLED || !Lifecycle.SITE.equals(lf.id());
 
     public static final String DEFAULT_LIFECYCLE_MODELID = "org.apache.maven:maven-core:"
             + getImplementationVersion(DefaultLifecycleRegistry.class)
