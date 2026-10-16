@@ -120,6 +120,9 @@ public class MavenParser extends BaseParser {
             if (name == null || name.isBlank()) {
                 throw new IllegalArgumentException("Alias name must not be blank in reactor.xml");
             }
+            if (aliasMap.containsKey(name)) {
+                throw new IllegalArgumentException("Duplicate alias name '" + name + "' in reactor.xml");
+            }
             aliasMap.put(name, resolveAlias(alias));
         }
 

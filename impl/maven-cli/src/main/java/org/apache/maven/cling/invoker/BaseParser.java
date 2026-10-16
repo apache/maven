@@ -551,6 +551,7 @@ public abstract class BaseParser implements Parser {
                             .artifactId(re.getArtifactId())
                             .version(re.getVersion())
                             .classLoadingStrategy(re.getClassLoadingStrategy())
+                            .configuration(re.getConfiguration())
                             .build())
                     .collect(Collectors.toList());
             if (reactorXml != null && !loaded.isEmpty()) {
