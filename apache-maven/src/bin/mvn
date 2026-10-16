@@ -23,7 +23,8 @@
 # Environment Variable Prerequisites
 #
 #   JAVA_HOME       Must point at your Java Development Kit installation.
-#   MAVEN_ARGS      (Optional) Arguments passed to Maven before CLI arguments.
+#   MAVEN_ARGS      (Optional) Arguments passed to Maven before CLI arguments, separated by white space.
+#                   Single or double quotes group a value containing white space.
 #   MAVEN_OPTS      (Optional) Java runtime options used when Maven is executed.
 #   MAVEN_SKIP_RC   (Optional) Flag to disable loading of mavenrc files.
 # -----------------------------------------------------------------------------
@@ -253,6 +254,66 @@ if "$JAVACMD" --enable-native-access=ALL-UNNAMED -version >/dev/null 2>&1; then
   fi
 fi
 
+# Parse MAVEN_ARGS: words are separated by white space, single or double quotes group a
+# word containing white space. Nothing else is interpreted (no backslash, no ${...},
+# no globbing, no command substitution). The words go in front of the user arguments.
+if [ -n "$MAVEN_ARGS" ]; then
+  maven_args_user_count=$#
+  maven_args_rest=$MAVEN_ARGS
+  maven_args_word=
+  maven_args_in_word=false
+  maven_args_quote=
+  maven_args_tab=`printf '\t'`
+  maven_args_nl='
+'
+  while [ -n "$maven_args_rest" ]; do
+    maven_args_tail=${maven_args_rest#?}
+    maven_args_char=${maven_args_rest%"$maven_args_tail"}
+    maven_args_rest=$maven_args_tail
+    if [ -n "$maven_args_quote" ]; then
+      if [ "$maven_args_char" = "$maven_args_quote" ]; then
+        maven_args_quote=
+      else
+        maven_args_word=$maven_args_word$maven_args_char
+      fi
+    else
+      case $maven_args_char in
+        '"' | "'")
+          maven_args_quote=$maven_args_char
+          maven_args_in_word=true
+          ;;
+        ' ' | "$maven_args_tab" | "$maven_args_nl")
+          if [ "$maven_args_in_word" = true ]; then
+            set -- "$@" "$maven_args_word"
+            maven_args_word=
+            maven_args_in_word=false
+          fi
+          ;;
+        *)
+          maven_args_word=$maven_args_word$maven_args_char
+          maven_args_in_word=true
+          ;;
+      esac
+    fi
+  done
+  if [ -n "$maven_args_quote" ]; then
+    echo "Warning: MAVEN_ARGS has an unterminated $maven_args_quote quote, the rest of the value is treated as part of the last word" >&2
+  fi
+  if [ "$maven_args_in_word" = true ]; then
+    set -- "$@" "$maven_args_word"
+  fi
+  while [ "$maven_args_user_count" -gt 0 ]; do
+    set -- "$@" "$1"
+    shift
+    maven_args_user_count=$((maven_args_user_count - 1))
+  done
+fi
+
+if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
+  echo "[DEBUG] Launching JVM with arguments:" >&2
+  printf ' "%s"' "$@" >&2; echo >&2
+fi
+
 exec "$JAVACMD" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \
@@ -262,4 +323,4 @@ exec "$JAVACMD" \
   "-Dlibrary.jline.path=$JLINE_NATIVE_PATH" \
   "-Dorg.jline.terminal.exec.redirectPipeCreationMode=native,reflection" \
   "-Dmaven.multiModuleProjectDirectory=${MAVEN_PROJECTBASEDIR}" \
-  ${CLASSWORLDS_LAUNCHER} ${MAVEN_ARGS} "$@"
+  ${CLASSWORLDS_LAUNCHER} "$@"
