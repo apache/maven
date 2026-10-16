@@ -89,7 +89,8 @@ class MavenITmng13249ReactorXmlPhaseInjectionTest extends AbstractMavenIntegrati
     /**
      * Verify the injected phase runs in the correct position: after unit-test
      * related phases but before integration-test phases. We check log ordering
-     * by looking for the touch plugin log line relative to known phase markers.
+     * by looking for the execution banner lines ({@code [INFO] ---}) which only
+     * appear at actual phase-execution time, not at plan-calculation time.
      */
     @Test
     void injectedPhaseRunsInCorrectOrder() throws Exception {
@@ -108,17 +109,19 @@ class MavenITmng13249ReactorXmlPhaseInjectionTest extends AbstractMavenIntegrati
         int compileIdx = -1;
         for (int i = 0; i < logLines.size(); i++) {
             String line = logLines.get(i);
-            if (line.contains("maven-compiler-plugin") && line.contains("compile")) {
+            // Match the execution banner "[INFO] --- maven-compiler-plugin" which only
+            // appears when the compiler goal actually executes, not during plan calculation.
+            if (line.contains("[INFO] ---") && line.contains("maven-compiler-plugin")) {
                 if (compileIdx == -1) {
                     compileIdx = i;
                 }
             }
-            if (line.contains("pre-integration-marker.txt") || line.contains("touch-in-custom-phase")) {
+            if (line.contains("touch-in-custom-phase")) {
                 touchIdx = i;
             }
         }
 
-        assertTrue(compileIdx >= 0, "compiler plugin must appear in log");
+        assertTrue(compileIdx >= 0, "compiler plugin execution banner must appear in log");
         assertTrue(touchIdx >= 0, "touch plugin for pre-integration must appear in log");
         assertTrue(
                 compileIdx < touchIdx,
