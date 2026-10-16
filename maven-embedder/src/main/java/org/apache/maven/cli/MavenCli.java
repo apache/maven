@@ -952,7 +952,8 @@ public class MavenCli {
         return new ArrayList<>(selectedExtensions.values());
     }
 
-    private ClassRealm setupContainerRealm(
+    // package-private for testing
+    ClassRealm setupContainerRealm(
             ClassWorld classWorld, ClassRealm coreRealm, List<File> extClassPath, List<CoreExtensionEntry> extensions)
             throws Exception {
         if (!extClassPath.isEmpty() || !extensions.isEmpty()) {
@@ -978,6 +979,8 @@ public class MavenCli {
                     // sisu uses realm imports to establish component visibility
                     extRealm.importFrom(realm, realm.getId());
                 }
+                // reverse import allows Sisu to discover container components from within the extension realm
+                realm.importFrom(extRealm, extRealm.getId());
             }
 
             return extRealm;
