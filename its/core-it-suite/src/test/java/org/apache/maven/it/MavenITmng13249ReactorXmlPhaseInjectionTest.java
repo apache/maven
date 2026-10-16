@@ -109,7 +109,9 @@ class MavenITmng13249ReactorXmlPhaseInjectionTest extends AbstractMavenIntegrati
         int compileIdx = -1;
         for (int i = 0; i < logLines.size(); i++) {
             String line = logLines.get(i);
-            if (line.contains("compiler") && line.contains(":compile")) {
+            // Match the execution banner "[INFO] --- compiler:...:compile" which only
+            // appears when the compiler goal actually executes, not during plan calculation.
+            if (line.contains("[INFO] ---") && line.contains("compiler") && line.contains(":compile")) {
                 if (compileIdx == -1) {
                     compileIdx = i;
                 }
@@ -119,7 +121,7 @@ class MavenITmng13249ReactorXmlPhaseInjectionTest extends AbstractMavenIntegrati
             }
         }
 
-        assertTrue(compileIdx >= 0, "compiler plugin must appear in log");
+        assertTrue(compileIdx >= 0, "compiler plugin execution banner must appear in log");
         assertTrue(touchIdx >= 0, "touch plugin for pre-integration must appear in log");
         assertTrue(
                 compileIdx < touchIdx,
