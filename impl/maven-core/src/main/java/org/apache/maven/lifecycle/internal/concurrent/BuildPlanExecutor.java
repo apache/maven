@@ -278,8 +278,17 @@ public class BuildPlanExecutor {
                 for (Plugin plugin : project.getBuild().getPlugins()) {
                     MavenProject pluginProject = reactorGavs.get(gav(plugin));
                     if (pluginProject != null && pluginProject != project) {
-                        plan.step(project, PLAN)
-                                .ifPresent(pp -> plan.step(pluginProject, READY).ifPresent(pp::executeAfter));
+                        plan.step(project, PLAN).ifPresent(pp -> {
+                            plan.step(pluginProject, READY).ifPresent(readyStep -> {
+                                pp.executeAfter(readyStep);
+                                // Force the plugin project to reach READY even if the
+                                // requested phase is earlier (e.g. initialize).
+                                readyStep
+                                        .allPredecessors()
+                                        .filter(s -> s.project == pluginProject)
+                                        .forEach(s -> s.skip.set(false));
+                            });
+                        });
                     }
                 }
             }
