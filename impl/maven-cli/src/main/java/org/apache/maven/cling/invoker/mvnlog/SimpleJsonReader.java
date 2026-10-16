@@ -35,8 +35,11 @@ import java.util.Map;
  */
 final class SimpleJsonReader {
 
+    private static final int MAX_DEPTH = 512;
+
     private final String json;
     private int pos;
+    private int depth;
 
     private SimpleJsonReader(String json) {
         this.json = json;
@@ -88,52 +91,66 @@ final class SimpleJsonReader {
     }
 
     private Map<String, Object> parseObject() {
-        expect('{');
-        Map<String, Object> map = new LinkedHashMap<>();
-        skipWhitespace();
-        if (pos < json.length() && json.charAt(pos) == '}') {
-            pos++;
-            return map;
+        if (++depth > MAX_DEPTH) {
+            throw new IllegalArgumentException("JSON nesting too deep (max " + MAX_DEPTH + ")");
         }
-        while (true) {
+        try {
+            expect('{');
+            Map<String, Object> map = new LinkedHashMap<>();
             skipWhitespace();
-            String key = parseString();
-            skipWhitespace();
-            expect(':');
-            Object value = parseValue();
-            map.put(key, value);
-            skipWhitespace();
-            if (pos < json.length() && json.charAt(pos) == ',') {
+            if (pos < json.length() && json.charAt(pos) == '}') {
                 pos++;
-            } else {
-                break;
+                return map;
             }
+            while (true) {
+                skipWhitespace();
+                String key = parseString();
+                skipWhitespace();
+                expect(':');
+                Object value = parseValue();
+                map.put(key, value);
+                skipWhitespace();
+                if (pos < json.length() && json.charAt(pos) == ',') {
+                    pos++;
+                } else {
+                    break;
+                }
+            }
+            skipWhitespace();
+            expect('}');
+            return map;
+        } finally {
+            depth--;
         }
-        skipWhitespace();
-        expect('}');
-        return map;
     }
 
     private List<Object> parseArray() {
-        expect('[');
-        List<Object> list = new ArrayList<>();
-        skipWhitespace();
-        if (pos < json.length() && json.charAt(pos) == ']') {
-            pos++;
-            return list;
+        if (++depth > MAX_DEPTH) {
+            throw new IllegalArgumentException("JSON nesting too deep (max " + MAX_DEPTH + ")");
         }
-        while (true) {
-            list.add(parseValue());
+        try {
+            expect('[');
+            List<Object> list = new ArrayList<>();
             skipWhitespace();
-            if (pos < json.length() && json.charAt(pos) == ',') {
+            if (pos < json.length() && json.charAt(pos) == ']') {
                 pos++;
-            } else {
-                break;
+                return list;
             }
+            while (true) {
+                list.add(parseValue());
+                skipWhitespace();
+                if (pos < json.length() && json.charAt(pos) == ',') {
+                    pos++;
+                } else {
+                    break;
+                }
+            }
+            skipWhitespace();
+            expect(']');
+            return list;
+        } finally {
+            depth--;
         }
-        skipWhitespace();
-        expect(']');
-        return list;
     }
 
     private String parseString() {
