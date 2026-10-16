@@ -467,7 +467,7 @@ public class DefaultMaven implements Maven {
         ClassLoader originalContextClassLoader = currentThread.getContextClassLoader();
         try {
             for (MavenProject project : projects) {
-                ClassLoader projectRealm = project.getClassRealm() != null ? project.getClassRealm() : null;
+                ClassLoader projectRealm = project.getClassRealm();
 
                 if (projectRealm != null && scannedRealms.add(projectRealm)) {
                     currentThread.setContextClassLoader(projectRealm);
