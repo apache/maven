@@ -54,6 +54,8 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
                 } else {
                     result = evaluator.evaluate(value);
                 }
+            } else if (null != value && (type == String.class || type == CharSequence.class || type == Object.class || type == null)) {
+                result = "";
             }
             if (null == result && configuration.getChildCount() == 0) {
                 value = configuration.getAttribute("default-value");

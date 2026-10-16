@@ -30,6 +30,7 @@ class EnhancedConverterLookup implements ConverterLookup {
     EnhancedConverterLookup() {
         registerConverter(new DefaultBeanConfigurator.PathConverter());
         registerConverter(new DefaultBeanConfigurator.XmlConverter());
+        registerConverter(new EnhancedStringConverter());
     }
 
     @Override

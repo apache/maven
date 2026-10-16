@@ -172,6 +172,99 @@ class DefaultBeanConfiguratorTest {
         assertTrue(e.getMessage().contains("is ambiguous for sealed type " + AmbiguousSealedType.class.getName()));
     }
 
+    @Test
+    void testNestedSettingOverridesPreInitializedDefaultWhenEmpty() throws BeanConfigurationException {
+        PluginConfigBean bean = new PluginConfigBean();
+        assertEquals("article,report,book", bean.settings.docClassesToTargets);
+
+        Xpp3Dom config = toConfig("<settings><docClassesToTargets></docClassesToTargets></settings>");
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        configurator.configureBean(request);
+        assertEquals("", bean.settings.docClassesToTargets);
+    }
+
+    @Test
+    void testNestedSettingPreservesPreInitializedDefaultWhenSelfClosing() throws BeanConfigurationException {
+        PluginConfigBean bean = new PluginConfigBean();
+        assertEquals("article,report,book", bean.settings.docClassesToTargets);
+
+        Xpp3Dom config = toConfig("<settings><docClassesToTargets/></settings>");
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        configurator.configureBean(request);
+        assertEquals("article,report,book", bean.settings.docClassesToTargets);
+    }
+
+    @Test
+    void testNestedSettingEmptyOverridesDefaultValueAttribute() throws BeanConfigurationException {
+        PluginConfigBean bean = new PluginConfigBean();
+        assertEquals("article,report,book", bean.settings.docClassesToTargets);
+
+        Xpp3Dom config =
+                toConfig("<settings><docClassesToTargets default-value=\"fallback\"></docClassesToTargets></settings>");
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        configurator.configureBean(request);
+        assertEquals("", bean.settings.docClassesToTargets);
+    }
+
+    @Test
+    void testNonStringEmptyTagPreservesDefault() throws BeanConfigurationException {
+        PluginConfigBean bean = new PluginConfigBean();
+        assertEquals(42, bean.settings.count);
+
+        Xpp3Dom config = toConfig("<settings><count></count></settings>");
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        configurator.configureBean(request);
+        assertEquals(42, bean.settings.count);
+    }
+
+    @Test
+    void testBooleanSelfClosingTagPreservesDefault() throws BeanConfigurationException {
+        PluginConfigBean bean = new PluginConfigBean();
+        assertTrue(bean.settings.skip);
+
+        Xpp3Dom config = toConfig("<settings><skip/></settings>");
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        configurator.configureBean(request);
+        assertTrue(bean.settings.skip);
+    }
+
+    @Test
+    void testUnresolvableExpressionPassesThrough() throws BeanConfigurationException {
+        PluginConfigBean bean = new PluginConfigBean();
+        Xpp3Dom config = toConfig("<settings><docClassesToTargets>${undefined}</docClassesToTargets></settings>");
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        configurator.configureBean(request);
+        assertEquals("${undefined}", bean.settings.docClassesToTargets);
+    }
+
+    @SuppressWarnings({"checkstyle:VisibilityModifier", "VisibilityModifier"})
+    public static class PluginConfigBean {
+
+        Settings settings = new Settings();
+    }
+
+    @SuppressWarnings({"checkstyle:VisibilityModifier", "VisibilityModifier"})
+    public static class Settings {
+
+        String docClassesToTargets = "article,report,book";
+
+        int count = 42;
+
+        boolean skip = true;
+    }
+
     static class SomeBean {
 
         File file;
