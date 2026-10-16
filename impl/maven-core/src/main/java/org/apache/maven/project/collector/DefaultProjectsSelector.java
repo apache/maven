@@ -26,7 +26,9 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.internal.build.DefaultDiagnosticCollector;
 import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelProblemUtils;
 import org.apache.maven.project.MavenProject;
@@ -45,10 +47,12 @@ import org.slf4j.LoggerFactory;
 public class DefaultProjectsSelector implements ProjectsSelector {
     private static final Logger LOGGER = LoggerFactory.getLogger(DefaultProjectsSelector.class);
     private final ProjectBuilder projectBuilder;
+    private final DefaultDiagnosticCollector diagnosticCollector;
 
     @Inject
-    public DefaultProjectsSelector(ProjectBuilder projectBuilder) {
+    public DefaultProjectsSelector(ProjectBuilder projectBuilder, DefaultDiagnosticCollector diagnosticCollector) {
         this.projectBuilder = projectBuilder;
+        this.diagnosticCollector = diagnosticCollector;
     }
 
     @Override
@@ -83,6 +87,14 @@ public class DefaultProjectsSelector implements ProjectsSelector {
                         LOGGER.warn("{}{}", problem.getMessage(), ((loc != null && !loc.isEmpty()) ? " @ " + loc : ""));
                     }
                 }
+
+                // Pipe structured problems directly to DiagnosticCollector so that
+                // source location and severity are preserved in the build report
+                // (instead of being lost to plain-text logging). The SLF4J hook
+                // excludes this logger to avoid double-counting.
+                for (ModelProblem problem : result.getProblems()) {
+                    diagnosticCollector.report(toBuilderProblem(problem));
+                }
             }
         }
 
@@ -99,5 +111,27 @@ public class DefaultProjectsSelector implements ProjectsSelector {
         }
 
         return projects;
+    }
+
+    /**
+     * Converts a compat {@link ModelProblem} to the Maven 4 {@link BuilderProblem} API,
+     * preserving source, line, column, severity, and message.
+     */
+    private static BuilderProblem toBuilderProblem(ModelProblem problem) {
+        BuilderProblem.Severity severity =
+                switch (problem.getSeverity()) {
+                    case FATAL -> BuilderProblem.Severity.FATAL;
+                    case ERROR -> BuilderProblem.Severity.ERROR;
+                    default -> BuilderProblem.Severity.WARNING;
+                };
+        return BuilderProblem.builder()
+                .source(problem.getSource())
+                .lineNumber(problem.getLineNumber())
+                .columnNumber(problem.getColumnNumber())
+                .exception(problem.getException())
+                .message(problem.getMessage())
+                .severity(severity)
+                .key("model:" + problem.getMessage().hashCode())
+                .build();
     }
 }

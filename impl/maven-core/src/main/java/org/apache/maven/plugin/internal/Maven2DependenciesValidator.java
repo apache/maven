@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.plugin.PluginValidationManager;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.Artifact;
@@ -64,7 +65,12 @@ class Maven2DependenciesValidator extends AbstractMavenPluginDependenciesValidat
                     PluginValidationManager.IssueLocality.EXTERNAL,
                     session,
                     pluginArtifact,
-                    "Plugin is a Maven 2.x plugin, which will be not supported in Maven 4.x");
+                    BuilderProblem.builder()
+                            .message("Plugin is a Maven 2.x plugin, which will be not supported in Maven 4.x")
+                            .severity(BuilderProblem.Severity.WARNING)
+                            .key("plugin-validation:maven2-plugin")
+                            .suggestion("Upgrade to a Maven 3.x/4.x compatible version of this plugin")
+                            .build());
         }
     }
 }

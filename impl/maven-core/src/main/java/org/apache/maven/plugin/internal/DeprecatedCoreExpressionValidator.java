@@ -64,6 +64,11 @@ class DeprecatedCoreExpressionValidator extends AbstractMavenPluginParametersVal
     }
 
     @Override
+    protected String getValidationKeyPrefix() {
+        return "deprecated-expr";
+    }
+
+    @Override
     protected void doValidate(
             MavenSession mavenSession,
             MojoDescriptor mojoDescriptor,
@@ -76,9 +81,13 @@ class DeprecatedCoreExpressionValidator extends AbstractMavenPluginParametersVal
 
         mojoDescriptor.getParameters().stream()
                 .filter(this::isDeprecated)
-                .map(this::formatParameter)
-                .forEach(m -> pluginValidationManager.reportPluginMojoValidationIssue(
-                        PluginValidationManager.IssueLocality.EXTERNAL, mavenSession, mojoDescriptor, mojoClass, m));
+                .map(this::buildParameterProblem)
+                .forEach(problem -> pluginValidationManager.reportPluginMojoValidationIssue(
+                        PluginValidationManager.IssueLocality.EXTERNAL,
+                        mavenSession,
+                        mojoDescriptor,
+                        mojoClass,
+                        problem));
     }
 
     private boolean isDeprecated(Parameter parameter) {

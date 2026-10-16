@@ -18,6 +18,7 @@
  */
 package org.apache.maven.plugin.internal;
 
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.PluginValidationManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -97,6 +98,11 @@ abstract class AbstractMavenPluginParametersValidator implements MavenPluginConf
 
     protected abstract String getParameterLogReason(Parameter parameter);
 
+    /**
+     * Returns the validation key prefix for this validator (e.g. "deprecated-param", "readonly-param").
+     */
+    protected abstract String getValidationKeyPrefix();
+
     protected String formatParameter(Parameter parameter) {
         StringBuilder stringBuilder = new StringBuilder()
                 .append("Parameter '")
@@ -111,5 +117,13 @@ abstract class AbstractMavenPluginParametersValidator implements MavenPluginConf
         stringBuilder.append(" ").append(getParameterLogReason(parameter));
 
         return stringBuilder.toString();
+    }
+
+    protected BuilderProblem buildParameterProblem(Parameter parameter) {
+        return BuilderProblem.builder()
+                .message(formatParameter(parameter))
+                .severity(BuilderProblem.Severity.WARNING)
+                .key("plugin-validation:" + getValidationKeyPrefix() + ":" + parameter.getName())
+                .build();
     }
 }

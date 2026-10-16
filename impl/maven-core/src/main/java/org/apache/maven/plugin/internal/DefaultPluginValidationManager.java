@@ -18,6 +18,7 @@
  */
 package org.apache.maven.plugin.internal;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
@@ -39,9 +40,11 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.build.DefaultDiagnosticCollector;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.plugin.PluginValidationManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
@@ -82,6 +85,13 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
     }
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    private final DefaultDiagnosticCollector diagnosticCollector;
+
+    @Inject
+    DefaultPluginValidationManager(DefaultDiagnosticCollector diagnosticCollector) {
+        this.diagnosticCollector = diagnosticCollector;
+    }
 
     @Override
     public void onEvent(Object event) {
@@ -158,28 +168,30 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
 
     @Override
     public void reportPluginValidationIssue(
-            IssueLocality locality, RepositorySystemSession session, Artifact pluginArtifact, String issue) {
+            IssueLocality locality, RepositorySystemSession session, Artifact pluginArtifact, BuilderProblem problem) {
         String pluginKey = pluginKey(pluginArtifact);
         if (validationPluginExcludes(session).contains(pluginKey)) {
             return;
         }
         PluginValidationIssues pluginIssues =
                 pluginIssues(session).computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
-        pluginIssues.reportPluginIssue(locality, null, issue);
-        mayReportInline(session, locality, issue);
+        pluginIssues.reportPluginIssue(locality, null, problem.getMessage());
+        diagnosticCollector.report(problem);
+        mayReportInline(session, locality, problem.getMessage());
     }
 
     @Override
     public void reportPluginValidationIssue(
-            IssueLocality locality, MavenSession mavenSession, MojoDescriptor mojoDescriptor, String issue) {
+            IssueLocality locality, MavenSession mavenSession, MojoDescriptor mojoDescriptor, BuilderProblem problem) {
         String pluginKey = pluginKey(mojoDescriptor);
         if (validationPluginExcludes(mavenSession.getRepositorySession()).contains(pluginKey)) {
             return;
         }
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
-        pluginIssues.reportPluginIssue(locality, pluginDeclaration(mavenSession, mojoDescriptor), issue);
-        mayReportInline(mavenSession.getRepositorySession(), locality, issue);
+        pluginIssues.reportPluginIssue(locality, pluginDeclaration(mavenSession, mojoDescriptor), problem.getMessage());
+        diagnosticCollector.report(problem);
+        mayReportInline(mavenSession.getRepositorySession(), locality, problem.getMessage());
     }
 
     @Override
@@ -188,7 +200,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
             MavenSession mavenSession,
             MojoDescriptor mojoDescriptor,
             Class<?> mojoClass,
-            String issue) {
+            BuilderProblem problem) {
         String pluginKey = pluginKey(mojoDescriptor);
         if (validationPluginExcludes(mavenSession.getRepositorySession()).contains(pluginKey)) {
             return;
@@ -196,8 +208,12 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         PluginValidationIssues pluginIssues = pluginIssues(mavenSession.getRepositorySession())
                 .computeIfAbsent(pluginKey, k -> new PluginValidationIssues());
         pluginIssues.reportPluginMojoIssue(
-                locality, pluginDeclaration(mavenSession, mojoDescriptor), mojoInfo(mojoDescriptor, mojoClass), issue);
-        mayReportInline(mavenSession.getRepositorySession(), locality, issue);
+                locality,
+                pluginDeclaration(mavenSession, mojoDescriptor),
+                mojoInfo(mojoDescriptor, mojoClass),
+                problem.getMessage());
+        diagnosticCollector.report(problem);
+        mayReportInline(mavenSession.getRepositorySession(), locality, problem.getMessage());
     }
 
     private void reportSessionCollectedValidationIssues(MavenSession mavenSession) {
