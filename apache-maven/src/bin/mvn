@@ -278,7 +278,7 @@ if [ -n "$MAVEN_ARGS" ]; then
       fi
     else
       case $maven_args_char in
-        '"'"'"'"' | "'"'"'"'"'")
+        '"' | "'")
           maven_args_quote=$maven_args_char
           maven_args_in_word=true
           ;;
@@ -307,6 +307,11 @@ if [ -n "$MAVEN_ARGS" ]; then
     shift
     maven_args_user_count=$((maven_args_user_count - 1))
   done
+fi
+
+if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
+  echo "[DEBUG] Launching JVM with arguments:" >&2
+  printf ' "%s"' "$@" >&2; echo >&2
 fi
 
 exec "$JAVACMD" \
