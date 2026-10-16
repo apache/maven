@@ -26,10 +26,10 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Describes the invocation context of a Maven build: the flags, properties, and
- * environment settings that were active when the build started.
+ * Describes the invocation context of a Maven build: the goals, flags, properties,
+ * and platform settings that were active when the build started.
  *
- * <p>An instance is available via {@link Session#buildEnvironment()} during the build,
+ * <p>An instance is available via {@link Session#buildInvocation()} during the build,
  * and is also recorded in the structured build report for post-mortem analysis and
  * reproducibility.
  *
@@ -65,11 +65,11 @@ import org.apache.maven.api.annotations.Nonnull;
  * </ul>
  *
  * @since 4.1.0
- * @see Session#buildEnvironment()
+ * @see Session#buildInvocation()
  */
 @Experimental
 @Immutable
-public interface BuildEnvironment {
+public interface BuildInvocation {
 
     /**
      * The goals or lifecycle phases that were requested on the command line.
