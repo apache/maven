@@ -26,26 +26,23 @@ import org.junit.jupiter.api.Test;
  * This is a test for
  * <a href="https://github.com/apache/maven/issues/12534">MNG-12534</a>.
  * <p>
- * Verifies that {@code afterLinks} in a V2 plugin descriptor
- * ({@code http://maven.apache.org/PLUGIN/2.0.0}) are correctly loaded
- * and processed by the build plan executor without errors.
- * <p>
- * The test plugin uses a handcrafted V2 plugin.xml with a
- * {@code <afterLink>} of type PROJECT to test runtime descriptor
- * parsing independently of maven-plugin-tools (which generates
- * these from {@code @After} annotations since 4.0.0-beta-3).
+ * Verifies the full {@code @After} annotation chain: maven-plugin-plugin
+ * scans the annotation, generates {@code <afterLink>} elements in the
+ * V2 plugin descriptor, and the build plan executor creates the correct
+ * DAG ordering edges at runtime.
  */
 class MavenITmng12534AfterAnnotationTest extends AbstractMavenIntegrationTestCase {
 
     /**
-     * Verify that a plugin with {@code afterLinks} in its V2 descriptor
-     * is correctly loaded and the mojo executes under the concurrent builder.
+     * Verify that {@code @After} annotations are scanned by maven-plugin-plugin,
+     * generate correct descriptor entries, and produce working DAG edges
+     * in the concurrent builder.
      */
     @Test
     void testAfterLinksLoadedAndMojoExecutes() throws Exception {
         Path testDir = extractResources("/mng-12534-after-annotation");
 
-        // Step 1: install the test plugin with a handcrafted V2 plugin descriptor
+        // Step 1: build and install the test plugin (maven-plugin-plugin generates the descriptor)
         Verifier pluginVerifier = newVerifier(testDir.resolve("plugin"));
         pluginVerifier.addCliArgument("install");
         pluginVerifier.execute();

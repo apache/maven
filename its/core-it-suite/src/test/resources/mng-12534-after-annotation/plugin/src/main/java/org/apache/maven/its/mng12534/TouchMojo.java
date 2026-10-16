@@ -18,7 +18,6 @@
  */
 package org.apache.maven.its.mng12534;
 
-import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 
@@ -36,10 +35,8 @@ import org.apache.maven.api.plugin.annotations.Mojo;
  * (compile depends on sources, not resources) — so without this
  * {@code @After} link, compile could start before resources completes.
  * <p>
- * This IT uses a handcrafted V2 plugin descriptor to test the
- * runtime's ability to parse {@code <afterLink>} elements directly.
- * Note: maven-plugin-tools 4.0.0-beta-3+ generates these from
- * {@code @After} annotations automatically.
+ * The plugin descriptor ({@code <afterLink>} elements) is generated
+ * by maven-plugin-plugin from these annotations at build time.
  */
 @Mojo(name = "touch", defaultPhase = "compile")
 @After(phase = "resources")
