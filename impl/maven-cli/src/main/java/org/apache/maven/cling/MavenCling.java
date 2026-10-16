@@ -73,8 +73,7 @@ public class MavenCling extends ClingSupport {
         return new MavenCling(world).run(args, null, null, null, false);
     }
 
-    private static int delegateMain(String mainClass, String[] args, ClassWorld world)
-            throws IOException {
+    private static int delegateMain(String mainClass, String[] args, ClassWorld world) throws IOException {
         try {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             Class<?> clazz = cl.loadClass(mainClass);
