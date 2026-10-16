@@ -58,6 +58,7 @@ import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
+import org.apache.maven.model.interpolation.AbstractStringBasedModelInterpolator;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.management.DependencyManagementInjector;
@@ -288,7 +289,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         Collection<String> parentIds = new LinkedHashSet<>();
         List<ModelData> lineage = new ArrayList<>();
 
-        // Models built to resolve a dependency (a dependency POM, one of its parents, or an
         // Models resolved for dependency, parent or BOM POMs evaluate only platform-derived
         // activation (JDK, OS, activeByDefault).
         boolean externalModel = isExternalModelBuildingRequest(request);
@@ -509,10 +509,13 @@ public class DefaultModelBuilder implements ModelBuilder {
      * rather than a POM belonging to the project being built. Such requests use
      * {@link ModelBuildingRequest#VALIDATION_LEVEL_MINIMAL}, see for instance
      * {@code DefaultArtifactDescriptorReader#loadPom}; a project build uses
-     * {@link ModelBuildingRequest#VALIDATION_LEVEL_MAVEN_2_0} or higher.
+     * {@link ModelBuildingRequest#VALIDATION_LEVEL_MAVEN_2_0} or higher. A request that sets
+     * {@value AbstractStringBasedModelInterpolator#FULL_EXTERNAL_INTERPOLATION_PROPERTY} is never external, so
+     * that tools building their own projects at a low validation level can opt out.
      */
     private static boolean isExternalModelBuildingRequest(ModelBuildingRequest request) {
-        return request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
+        return request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
+                && !AbstractStringBasedModelInterpolator.isFullExternalModelBuild(request);
     }
 
     /**

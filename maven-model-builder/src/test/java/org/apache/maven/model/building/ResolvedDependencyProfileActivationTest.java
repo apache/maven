@@ -21,6 +21,7 @@ package org.apache.maven.model.building;
 import java.util.Properties;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.interpolation.AbstractStringBasedModelInterpolator;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -235,6 +236,33 @@ class ResolvedDependencyProfileActivationTest {
         assertNull(
                 model.getProperties().get("profile.user.property"),
                 "user-property profile must NOT fire in external model build (consumer -D suppressed)");
+    }
+
+    @Test
+    void testFullExternalInterpolationEvaluatesAllActivators() throws Exception {
+        // maven.model.dependencyInterpolation.full opts a MINIMAL build out of the external
+        // restrictions, for tools that build their own projects at that validation level (#13347).
+        Properties up = userPropertiesWithTestValues();
+        up.setProperty(AbstractStringBasedModelInterpolator.FULL_EXTERNAL_INTERPOLATION_PROPERTY, "true");
+        Model model = build(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, systemPropertiesWithTestValues(), up);
+
+        assertEquals("activated", model.getProperties().get("profile.file"), "file profile must fire");
+        assertEquals(
+                "activated", model.getProperties().get("profile.user.property"), "user-property profile must fire");
+        assertEquals(
+                "activated", model.getProperties().get("profile.sys.property"), "system-property profile must fire");
+        assertNull(
+                model.getProperties().get("profile.pom.property"), "POM-declared-property profile must still NOT fire");
+    }
+
+    @Test
+    void testFullExternalInterpolationAsSystemPropertyEvaluatesUserPropertyProfile() throws Exception {
+        Properties sp = systemPropertiesWithTestValues();
+        sp.setProperty(AbstractStringBasedModelInterpolator.FULL_EXTERNAL_INTERPOLATION_PROPERTY, "true");
+        Model model = build(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, sp, userPropertiesWithTestValues());
+
+        assertEquals(
+                "activated", model.getProperties().get("profile.user.property"), "user-property profile must fire");
     }
 
     @Test
