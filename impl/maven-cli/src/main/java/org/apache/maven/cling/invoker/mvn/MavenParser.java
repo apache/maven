@@ -84,10 +84,14 @@ public class MavenParser extends BaseParser {
      */
     private static List<String> resolveReactorOptions(ReactorConfig rc) {
         List<String> optionArgs = rc.getOptionArgs();
+        String options = rc.getOptions();
+        if (optionArgs != null && !optionArgs.isEmpty() && options != null && !options.isBlank()) {
+            throw new IllegalArgumentException(
+                    "reactor.xml: <options> and <optionArgs> are mutually exclusive; set only one");
+        }
         if (optionArgs != null && !optionArgs.isEmpty()) {
             return optionArgs;
         }
-        String options = rc.getOptions();
         if (options != null && !options.isBlank()) {
             return ArgumentTokenizer.tokenize(options);
         }
