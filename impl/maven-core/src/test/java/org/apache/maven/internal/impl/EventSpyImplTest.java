@@ -18,10 +18,14 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.maven.api.DependencyResolutionEvent;
+import org.apache.maven.api.DependencyResolutionEventType;
+import org.apache.maven.api.DependencyResolutionListener;
 import org.apache.maven.api.Event;
 import org.apache.maven.api.EventType;
 import org.apache.maven.api.ExecutionEvent;
@@ -31,19 +35,28 @@ import org.apache.maven.api.Listener;
 import org.apache.maven.api.RepositoryEvent;
 import org.apache.maven.api.RepositoryListener;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.MavenRepositoryListener;
+import org.apache.maven.project.DependencyResolutionRequest;
+import org.apache.maven.project.DependencyResolutionResult;
+import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.graph.Dependency;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -129,6 +142,98 @@ class EventSpyImplTest {
     }
 
     @Test
+    void forwardsSuccessfulDependencyResolution() throws Exception {
+        TestContext context = new TestContext(lookup());
+        RecordingResolutionListener listener = new RecordingResolutionListener();
+        context.session.registerListener(listener);
+        Dependency dependency = new Dependency(new DefaultArtifact("g:a:1"), "compile");
+        DependencyResolutionResult result = result(List.of(dependency), List.of(), List.of());
+
+        EventSpyImpl spy = new EventSpyImpl();
+        DependencyResolutionRequest request = context.resolution();
+        spy.onEvent(request);
+        spy.onEvent(result);
+
+        assertEquals(
+                List.of(DependencyResolutionEventType.STARTED, DependencyResolutionEventType.SUCCEEDED),
+                listener.types);
+        DependencyResolutionEvent event = listener.events.get(1);
+        assertSame(context.session, event.session());
+        assertNotNull(event.project());
+        assertEquals(1, event.resolvedDependencies().size());
+        assertEquals("a", event.resolvedDependencies().get(0).getArtifactId());
+        assertTrue(event.unresolvedDependencies().isEmpty());
+        assertTrue(event.exception().isEmpty());
+        assertTrue(listener.events.get(0).resolvedDependencies().isEmpty());
+    }
+
+    @Test
+    void forwardsFailedDependencyResolution() throws Exception {
+        TestContext context = new TestContext(lookup());
+        RecordingResolutionListener listener = new RecordingResolutionListener();
+        context.session.registerListener(listener);
+        Dependency dependency = new Dependency(new DefaultArtifact("g:a:1"), "compile");
+        Exception failure = new Exception("not found");
+        DependencyResolutionResult result = result(List.of(), List.of(dependency), List.of());
+        when(result.getResolutionErrors(dependency)).thenReturn(List.of(failure));
+
+        EventSpyImpl spy = new EventSpyImpl();
+        spy.onEvent(context.resolution());
+        spy.onEvent(result);
+
+        assertEquals(
+                List.of(DependencyResolutionEventType.STARTED, DependencyResolutionEventType.FAILED), listener.types);
+        DependencyResolutionEvent event = listener.events.get(1);
+        assertEquals(1, event.unresolvedDependencies().size());
+        assertSame(failure, event.exception().orElseThrow());
+    }
+
+    @Test
+    void ignoresDependencyResolutionResultWithoutRequest() throws Exception {
+        TestContext context = new TestContext();
+        RecordingResolutionListener listener = new RecordingResolutionListener();
+        context.session.registerListener(listener);
+        new EventSpyImpl().onEvent(result(List.of(), List.of(), List.of()));
+        assertTrue(listener.types.isEmpty());
+    }
+
+    /**
+     * Pins the pairing only: the requests are strongly referenced by the test, so this does not exercise
+     * the weak reference that keeps an abandoned request from being retained by an idle thread.
+     */
+    @Test
+    void matchesResultWithTheLatestRequestWhenAnEarlierOneGotNoResult() throws Exception {
+        TestContext context = new TestContext(lookup());
+        RecordingResolutionListener listener = new RecordingResolutionListener();
+        context.session.registerListener(listener);
+
+        EventSpyImpl spy = new EventSpyImpl();
+        DependencyResolutionRequest abandoned = context.resolution("abandoned");
+        DependencyResolutionRequest current = context.resolution("current");
+        spy.onEvent(abandoned);
+        spy.onEvent(current);
+        spy.onEvent(result(List.of(), List.of(), List.of()));
+
+        assertEquals(3, listener.events.size());
+        assertEquals("current", listener.events.get(2).project().getArtifactId());
+    }
+
+    @Test
+    void ignoresDependencyResolutionOfProjectWithoutBaseDirectory() throws Exception {
+        TestContext context = new TestContext(lookup());
+        RecordingResolutionListener listener = new RecordingResolutionListener();
+        context.session.registerListener(listener);
+        DependencyResolutionRequest request = context.resolution();
+        when(request.getMavenProject()).thenReturn(mock(MavenProject.class));
+
+        EventSpyImpl spy = new EventSpyImpl();
+        spy.onEvent(request);
+        spy.onEvent(result(List.of(), List.of(), List.of()));
+
+        assertTrue(listener.types.isEmpty());
+    }
+
+    @Test
     void rejectsNullRegistrationAndRemoval() {
         TestContext context = new TestContext();
         assertThrows(NullPointerException.class, () -> context.session.registerListener(null));
@@ -191,13 +296,34 @@ class EventSpyImplTest {
         assertSame(failure, event.getException().orElseThrow());
     }
 
+    /** A lookup which answers every service with a stub, enough to convert dependencies. */
+    private static Lookup lookup() {
+        Lookup lookup = mock(Lookup.class);
+        when(lookup.lookup(any(Class.class)))
+                .thenAnswer(invocation -> mock(invocation.<Class<?>>getArgument(0), RETURNS_DEEP_STUBS));
+        return lookup;
+    }
+
+    private static DependencyResolutionResult result(
+            List<Dependency> resolved, List<Dependency> unresolved, List<Exception> collectionErrors) {
+        DependencyResolutionResult result = mock(DependencyResolutionResult.class);
+        when(result.getResolvedDependencies()).thenReturn(resolved);
+        when(result.getUnresolvedDependencies()).thenReturn(unresolved);
+        when(result.getCollectionErrors()).thenReturn(collectionErrors);
+        return result;
+    }
+
     private static class TestContext {
         final DefaultRepositorySystemSession resolver = new DefaultRepositorySystemSession(h -> false);
         final MavenSession maven = new MavenSession(null, resolver, new DefaultMavenExecutionRequest(), null);
-        final DefaultSession session =
-                new DefaultSession(maven, mock(RepositorySystem.class), List.of(), null, null, null);
+        final DefaultSession session;
 
         TestContext() {
+            this(null);
+        }
+
+        TestContext(Lookup lookup) {
+            session = new DefaultSession(maven, mock(RepositorySystem.class), List.of(), null, lookup, null);
             maven.setSession(session);
             resolver.getData().set(InternalSession.class, session);
         }
@@ -209,11 +335,50 @@ class EventSpyImplTest {
             new EventSpyImpl().onEvent(event);
         }
 
+        DependencyResolutionRequest resolution() {
+            return resolution("a");
+        }
+
+        DependencyResolutionRequest resolution(String artifactId) {
+            DependencyResolutionRequest request = mock(DependencyResolutionRequest.class);
+            when(request.getRepositorySession()).thenReturn(resolver);
+            MavenProject project = new MavenProject();
+            project.setArtifactId(artifactId);
+            project.setFile(new File("target/pom.xml").getAbsoluteFile());
+            when(request.getMavenProject()).thenReturn(project);
+            return request;
+        }
+
         void repository() {
             new MavenRepositoryListener()
                     .artifactResolving(new org.eclipse.aether.RepositoryEvent.Builder(
                                     resolver, org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_RESOLVING)
                             .build());
+        }
+    }
+
+    private static class RecordingResolutionListener implements DependencyResolutionListener {
+        final List<DependencyResolutionEventType> types = new ArrayList<>();
+        final List<DependencyResolutionEvent> events = new ArrayList<>();
+
+        @Override
+        public void dependencyResolutionStarted(DependencyResolutionEvent event) {
+            record(event);
+        }
+
+        @Override
+        public void dependencyResolutionSucceeded(DependencyResolutionEvent event) {
+            record(event);
+        }
+
+        @Override
+        public void dependencyResolutionFailed(DependencyResolutionEvent event) {
+            record(event);
+        }
+
+        private void record(DependencyResolutionEvent event) {
+            types.add(event.type());
+            events.add(event);
         }
     }
 

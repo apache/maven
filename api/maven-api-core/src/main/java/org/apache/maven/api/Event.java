@@ -31,6 +31,7 @@ import org.apache.maven.api.annotations.Nonnull;
  *
  * @see ExecutionEvent
  * @see RepositoryEvent
+ * @see DependencyResolutionEvent
  * @see Listener
  * @since 4.0.0
  */
