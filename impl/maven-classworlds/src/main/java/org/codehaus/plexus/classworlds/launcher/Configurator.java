@@ -140,8 +140,8 @@ public class Configurator implements ConfigurationHandler {
      * @throws IOException             If an error occurs reading the config file.
      * @throws MalformedURLException   If the config file contains invalid URLs.
      * @throws ConfigurationException  If the config file is corrupt.
-     * @throws org.codehaus.plexus.classworlds.realm.DuplicateRealmException If the config file defines two realms with the same id.
-     * @throws org.codehaus.plexus.classworlds.realm.NoSuchRealmException    If the config file defines a main entry point in
+     * @throws DuplicateRealmException If the config file defines two realms with the same id.
+     * @throws NoSuchRealmException    If the config file defines a main entry point in
      *                                 a non-existent realm.
      */
     public void configure(InputStream is)
