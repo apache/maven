@@ -26,6 +26,8 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyScope;
@@ -59,6 +61,9 @@ import org.slf4j.LoggerFactory;
 @Named
 @Singleton
 public class DefaultProjectDependenciesResolver implements ProjectDependenciesResolver {
+    private static final String RELOCATION_WARNINGS =
+            DefaultProjectDependenciesResolver.class.getName() + ".relocationWarnings";
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final RepositorySystem repoSystem;
     private final List<RepositorySessionDecorator> decorators;
@@ -96,6 +101,9 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
             }
         }
 
+        final Set<String> excludedScopes =
+                request instanceof DefaultDependencyResolutionRequest scoped ? scoped.getExcludedScopes() : Set.of();
+
         CollectRequest collect = new CollectRequest();
         collect.setRootArtifact(RepositoryUtils.toArtifact(project.getArtifact()));
         collect.setRequestContext("project");
@@ -110,6 +118,9 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
                         || dependency.getVersion() == null
                         || dependency.getVersion().isEmpty()) {
                     // guard against case where best-effort resolution for invalid models is requested
+                    continue;
+                }
+                if (isExcluded(excludedScopes, dependency.getScope())) {
                     continue;
                 }
                 collect.addDependency(RepositoryUtils.toDependency(dependency, stereotypes));
@@ -139,6 +150,9 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
                     org.eclipse.aether.artifact.Artifact art = dep.getArtifact();
                     art = art.setFile(null).setVersion(art.getBaseVersion());
                     dep = dep.setArtifact(art);
+                }
+                if (isExcluded(excludedScopes, dep.getScope())) {
+                    continue;
                 }
                 collect.addDependency(dep);
             }
@@ -175,13 +189,21 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         depRequest.setRoot(node);
 
         if (logger.isWarnEnabled()) {
+            // The dependencies of a project are resolved for each combination of scopes a mojo asks for,
+            // while a relocation is worth a single warning per project.
+            @SuppressWarnings("unchecked")
+            Set<String> warned = (Set<String>)
+                    session.getData().computeIfAbsent(RELOCATION_WARNINGS, () -> ConcurrentHashMap.newKeySet());
             for (DependencyNode child : node.getChildren()) {
                 if (!child.getRelocations().isEmpty()) {
                     org.eclipse.aether.artifact.Artifact artifact =
                             child.getDependency().getArtifact();
                     String message = artifact instanceof RelocatedArtifact relocated ? relocated.getMessage() : null;
-                    logger.warn("The artifact " + child.getRelocations().get(0) + " has been relocated to " + artifact
-                            + (message != null ? ": " + message : ""));
+                    String warning = "The artifact " + child.getRelocations().get(0) + " has been relocated to "
+                            + artifact + (message != null ? ": " + message : "");
+                    if (warned.add(project.getId() + ' ' + warning)) {
+                        logger.warn(warning);
+                    }
                 }
             }
         }
@@ -200,6 +222,10 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         }
 
         return result;
+    }
+
+    private static boolean isExcluded(Set<String> excludedScopes, String scope) {
+        return excludedScopes.contains(scope == null || scope.isEmpty() ? DependencyScope.COMPILE.id() : scope);
     }
 
     private static boolean containsPlaceholder(String value) {

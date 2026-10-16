@@ -24,8 +24,10 @@ import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Properties;
 import java.util.Set;
+import java.util.TreeSet;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
@@ -35,6 +37,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentTestCase {
     @Inject
@@ -78,5 +81,42 @@ class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentTestCase
                 war.getArtifactMap()
                         .get("org.apache.maven.its.mng6300:mng6300-lib")
                         .getFile());
+    }
+
+    /**
+     * The project depends on a:2.0, which depends on b:2.0, and declares b:1.0 with test scope (MNG-6058).
+     * The test dependency must override b:2.0 only when the test scope is requested.
+     */
+    @Test
+    void testTestDependencyOverridesApplicationDependencyOnlyForTestScope() throws Exception {
+        MavenSession session =
+                createMavenSession(new File("src/test/projects/lifecycle-dependency-resolver-scopes/pom.xml"));
+        MavenProject project = session.getCurrentProject();
+        project.setArtifactFilter(artifact -> true);
+
+        List<String> compileScopes = List.of("compile", "system", "provided");
+        List<String> runtimeScopes = List.of("compile", "runtime");
+        List<String> testScopes = List.of("compile", "system", "provided", "runtime", "test");
+
+        assertEquals(Set.of("a:2.0", "b:2.0"), resolve(session, project, compileScopes));
+        assertEquals(Set.of("a:2.0", "b:2.0"), resolve(session, project, runtimeScopes));
+        assertEquals(Set.of("a:2.0", "b:1.0"), resolve(session, project, testScopes));
+        // the graph of the test scope must not leak into the graphs requested afterwards
+        assertEquals(Set.of("a:2.0", "b:2.0"), resolve(session, project, compileScopes));
+        assertEquals(Set.of("a:2.0", "b:2.0"), resolve(session, project, runtimeScopes));
+
+        for (Artifact artifact : project.getArtifacts()) {
+            assertTrue(artifact.getFile().isFile(), artifact.toString());
+        }
+    }
+
+    private Set<String> resolve(MavenSession session, MavenProject project, Collection<String> scopesToResolve)
+            throws Exception {
+        resolver.resolveProjectDependencies(project, null, scopesToResolve, session, false, Collections.emptySet());
+        Set<String> result = new TreeSet<>();
+        for (Artifact artifact : project.getArtifacts()) {
+            result.add(artifact.getArtifactId() + ":" + artifact.getVersion());
+        }
+        return result;
     }
 }

@@ -361,7 +361,26 @@ public class MojoExecutor {
         MavenProject project = dependencyContext.getProject();
         boolean aggregating = mojoDescriptor.isAggregator();
 
-        if (dependencyContext.isResolutionRequiredForCurrentProject()) {
+        Collection<String> mojoScopesToCollect = toScopes(mojoDescriptor.getDependencyCollectionRequired());
+        Collection<String> mojoScopesToResolve = toScopes(mojoDescriptor.getDependencyResolutionRequired());
+
+        if (!mojoScopesToCollect.isEmpty() || !mojoScopesToResolve.isEmpty()) {
+            // Each mojo gets the graph of the scopes it asked for: a dependency of a scope the mojo does not
+            // use, a test dependency for a compilation for instance, must not mediate that graph.
+            // The results are cached per combination of scopes, and the project is left alone when it already
+            // is in the state of that combination.
+            if (dependencyContext.isResolutionRequiredForCurrentProject(mojoScopesToCollect, mojoScopesToResolve)) {
+                lifeCycleDependencyResolver.resolveProjectDependencies(
+                        project,
+                        mojoScopesToCollect,
+                        mojoScopesToResolve,
+                        session,
+                        aggregating,
+                        Collections.emptySet());
+
+                dependencyContext.synchronizeWithProjectState(mojoScopesToCollect, mojoScopesToResolve);
+            }
+        } else if (dependencyContext.isResolutionRequiredForCurrentProject()) {
             Collection<String> scopesToCollect = dependencyContext.getScopesToCollectForCurrentProject();
             Collection<String> scopesToResolve = dependencyContext.getScopesToResolveForCurrentProject();
 

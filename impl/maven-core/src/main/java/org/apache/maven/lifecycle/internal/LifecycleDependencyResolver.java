@@ -33,6 +33,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
@@ -64,6 +65,12 @@ import org.slf4j.LoggerFactory;
 @Named
 public class LifecycleDependencyResolver {
     private final Logger logger = LoggerFactory.getLogger(getClass());
+
+    /**
+     * The scopes of the dependencies of the tests only.
+     */
+    private static final Set<String> TEST_SCOPES =
+            Set.of(DependencyScope.TEST.id(), DependencyScope.TEST_ONLY.id(), DependencyScope.TEST_RUNTIME.id());
 
     private final ProjectDependenciesResolver dependenciesResolver;
 
@@ -153,8 +160,19 @@ public class LifecycleDependencyResolver {
 
             project.setResolvedArtifacts(resolvedArtifacts);
 
+            Set<String> resolvedScopes = new HashSet<>();
+            if (scopesToCollect != null) {
+                resolvedScopes.addAll(scopesToCollect);
+            }
+            if (scopesToResolve != null) {
+                resolvedScopes.addAll(scopesToResolve);
+            }
+
             for (Artifact artifact : project.getDependencyArtifacts()) {
-                if (artifact.getFile() == null) {
+                // a dependency of another scope is not part of the graph: a node of that graph with the same
+                // identifier is a transitive dependency which must not replace the dependency as declared
+                String scope = artifact.getScope() != null ? artifact.getScope() : Artifact.SCOPE_COMPILE;
+                if (artifact.getFile() == null && resolvedScopes.contains(scope)) {
                     Artifact resolved = map.get(artifact.getDependencyConflictId());
                     if (resolved != null) {
                         artifact.setFile(resolved.getFile());
@@ -254,6 +272,10 @@ public class LifecycleDependencyResolver {
             DefaultDependencyResolutionRequest request =
                     new DefaultDependencyResolutionRequest(project, session.getRepositorySession());
             request.setResolutionFilter(resolutionFilter);
+            if (!scopesToCollect.contains(Artifact.SCOPE_TEST)) {
+                // a test dependency must not override a dependency of the application when no test scope is asked
+                request.setExcludedScopes(TEST_SCOPES);
+            }
 
             eventSpyDispatcher.onEvent(request);
 

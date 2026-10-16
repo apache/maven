@@ -23,7 +23,6 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -35,7 +34,9 @@ public class MavenITmng4789ScopeInheritanceMeetsConflictTest extends AbstractMav
 
     /**
      * Test that scope inheritance considers the effective scope of parent nodes as enforced by direct dependency
-     * declarations.
+     * declarations. The exception is the test scope, which only applies to the test class path
+     * (<a href="https://issues.apache.org/jira/browse/MNG-6058">MNG-6058</a>): a test dependency does not remove a
+     * transitive dependency of the application, nor its dependencies, from the other class paths.
      *
      * @throws Exception in case of failure
      */
@@ -55,14 +56,14 @@ public class MavenITmng4789ScopeInheritanceMeetsConflictTest extends AbstractMav
         verifier.verifyErrorFreeLog();
 
         List<String> compile = verifier.loadLines("target/compile.txt");
-        assertFalse(compile.contains("a-0.1.jar"), compile.toString());
+        assertTrue(compile.contains("a-0.1.jar"), compile.toString());
         assertTrue(compile.contains("b-0.1.jar"), compile.toString());
-        assertFalse(compile.contains("x-0.1.jar"), compile.toString());
+        assertTrue(compile.contains("x-0.1.jar"), compile.toString());
 
         List<String> runtime = verifier.loadLines("target/runtime.txt");
-        assertFalse(runtime.contains("a-0.1.jar"), runtime.toString());
+        assertTrue(runtime.contains("a-0.1.jar"), runtime.toString());
         assertTrue(runtime.contains("b-0.1.jar"), runtime.toString());
-        assertFalse(runtime.contains("x-0.1.jar"), runtime.toString());
+        assertTrue(runtime.contains("x-0.1.jar"), runtime.toString());
 
         List<String> test = verifier.loadLines("target/test.txt");
         assertTrue(test.contains("a-0.1.jar"), test.toString());
