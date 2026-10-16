@@ -24,11 +24,11 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
-import org.apache.maven.api.BuildEnvironment;
+import org.apache.maven.api.BuildInvocation;
 import org.apache.maven.execution.MavenSession;
 
 /**
- * Internal immutable implementation of {@link BuildEnvironment}.
+ * Internal immutable implementation of {@link BuildInvocation}.
  *
  * @param goals                  requested goals/phases
  * @param userProperties         user properties with sensitive values redacted
@@ -44,7 +44,7 @@ import org.apache.maven.execution.MavenSession;
  * @param batchMode              whether batch mode was active
  * @param threads                degree of concurrency
  */
-public record DefaultBuildEnvironment(
+public record DefaultBuildInvocation(
         List<String> goals,
         Map<String, String> userProperties,
         Map<String, String> systemInfo,
@@ -58,7 +58,7 @@ public record DefaultBuildEnvironment(
         boolean noTransferProgress,
         boolean batchMode,
         int threads)
-        implements BuildEnvironment {
+        implements BuildInvocation {
 
     private static final Set<String> SENSITIVE_KEY_FRAGMENTS =
             Set.of("password", "passwd", "secret", "token", "apikey", "api_key", "credential", "passphrase");
@@ -89,12 +89,12 @@ public record DefaultBuildEnvironment(
     }
 
     /**
-     * Creates a {@link BuildEnvironment} snapshot from the current session state.
+     * Creates a {@link BuildInvocation} snapshot from the current session state.
      *
      * @param session the Maven session
-     * @return a new immutable build environment instance
+     * @return a new immutable build invocation instance
      */
-    public static BuildEnvironment from(MavenSession session) {
+    public static BuildInvocation from(MavenSession session) {
         var request = session.getRequest();
 
         List<String> goals = request.getGoals() != null ? List.copyOf(request.getGoals()) : List.of();
@@ -135,7 +135,7 @@ public record DefaultBuildEnvironment(
         String failureBehavior =
                 request.getReactorFailureBehavior() != null ? request.getReactorFailureBehavior() : "FAIL_FAST";
 
-        return new DefaultBuildEnvironment(
+        return new DefaultBuildInvocation(
                 goals,
                 userProps,
                 sysInfo,

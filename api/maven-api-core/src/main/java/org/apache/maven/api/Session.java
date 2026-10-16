@@ -47,14 +47,14 @@ import org.apache.maven.api.toolchain.ToolchainModel;
 public interface Session extends ProtoSession {
 
     /**
-     * Returns the environment context of this build: the flags, properties, and
-     * platform settings that were active when the session started.
+     * Returns the invocation context of this build: the goals, flags, properties,
+     * and platform settings that were active when the session started.
      *
-     * @return the build environment, never {@code null}
+     * @return the build invocation, never {@code null}
      * @since 4.1.0
      */
     @Nonnull
-    BuildEnvironment buildEnvironment();
+    BuildInvocation buildInvocation();
 
     /**
      * Returns the current maven version.
