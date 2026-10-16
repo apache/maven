@@ -20,22 +20,20 @@ package org.apache.maven.cling.event;
 
 import java.time.Duration;
 import java.time.Instant;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.stream.Collectors;
 
 import org.apache.maven.api.ExecutionEvent;
-import org.apache.maven.api.ExecutionListener;
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
 import org.apache.maven.cling.event.MachineBuildEventListener.JsonLine;
+import org.apache.maven.internal.impl.InternalMavenSession;
 
 /**
  * Execution event logger for machine-readable output ({@code --console=machine}).
@@ -49,40 +47,17 @@ import org.apache.maven.cling.event.MachineBuildEventListener.JsonLine;
  * @since 4.1.0
  * @see MachineBuildEventListener
  */
-public class MachineExecutionEventLogger implements ExecutionListener {
+public class MachineExecutionEventLogger extends AbstractExecutionEventLogger {
 
     private final MachineBuildEventListener machineBel;
 
-    // Track mojo and project start times for duration calculation
+    // Track mojo start times for duration calculation
     private final Map<String, Instant> mojoStartTimes = new ConcurrentHashMap<>();
-    private final Map<String, Instant> projectStartTimes = new ConcurrentHashMap<>();
-    private final Map<String, Duration> projectDurations = new ConcurrentHashMap<>();
 
     // Reactor and outcome state
     private final AtomicInteger totalProjects = new AtomicInteger();
     private final AtomicInteger currentVisitedProjectCount = new AtomicInteger();
-    private final AtomicInteger passedCount = new AtomicInteger();
-    private final AtomicInteger failedCount = new AtomicInteger();
-    private final AtomicInteger skippedCount = new AtomicInteger();
     private volatile Instant buildStartTime;
-    private volatile boolean buildFailed;
-
-    public void recordProjectDuration(String key, Duration duration) {
-        if (key != null && duration != null) {
-            projectDurations.put(key, duration);
-        }
-    }
-
-    public void syncResult(boolean hasExceptions, int passed, int failed, int skipped) {
-        if (hasExceptions) {
-            buildFailed = true;
-        }
-        if (passedCount.get() == 0 && failedCount.get() == 0 && skippedCount.get() == 0) {
-            passedCount.set(passed);
-            failedCount.set(failed);
-            skippedCount.set(skipped);
-        }
-    }
 
     public MachineExecutionEventLogger(MachineBuildEventListener machineBel) {
         this.machineBel = Objects.requireNonNull(machineBel, "machineBel cannot be null");
@@ -313,29 +288,6 @@ public class MachineExecutionEventLogger implements ExecutionListener {
         return (mojo != null) ? mojo.executionId().orElse("") : "";
     }
 
-    private static String projectKey(Project project) {
-        String gid = project.groupId();
-        String aid = project.artifactId();
-        return (gid != null ? gid : "") + ":" + (aid != null ? aid : "");
-    }
-
-    private static String getProjectDisplayName(Project project) {
-        if (project == null) {
-            return "unknown";
-        }
-        String name = null;
-        try {
-            if (project.model() != null) {
-                name = project.model().getName();
-            }
-        } catch (Exception ignored) {
-        }
-        if (name != null && !name.isBlank()) {
-            return name;
-        }
-        return (project.artifactId() != null) ? project.artifactId() : "unknown";
-    }
-
     private void logModuleFinished(ExecutionEvent event, String eventType) {
         Project project = event.project().orElse(null);
         if (project == null) {
@@ -366,13 +318,26 @@ public class MachineExecutionEventLogger implements ExecutionListener {
         if (session == null) {
             return "";
         }
-        try {
-            java.lang.reflect.Method m = session.getClass().getMethod("getGoals");
-            Object res = m.invoke(session);
-            if (res instanceof Collection<?> col) {
-                return col.stream().map(Object::toString).collect(Collectors.joining(" "));
+        if (session instanceof InternalMavenSession ims) {
+            try {
+                org.apache.maven.execution.MavenSession ms = ims.getMavenSession();
+                if (ms != null) {
+                    List<String> goals = ms.getGoals();
+                    if (goals != null && !goals.isEmpty()) {
+                        return String.join(" ", goals);
+                    }
+                    if (ms.getRequest() != null && ms.getRequest().getGoals() != null) {
+                        return String.join(" ", ms.getRequest().getGoals());
+                    }
+                }
+            } catch (Exception ignored) {
             }
-        } catch (Exception ignored) {
+        }
+        if (session instanceof ExecutionListenerAdapter.SessionAdapterHelper helper) {
+            List<String> goals = helper.getGoals();
+            if (goals != null && !goals.isEmpty()) {
+                return String.join(" ", goals);
+            }
         }
         return "";
     }
@@ -381,32 +346,19 @@ public class MachineExecutionEventLogger implements ExecutionListener {
         if (session == null) {
             return Collections.emptyList();
         }
-        try {
-            java.lang.reflect.Method m = session.getClass().getMethod("getActiveProfiles");
-            Object res = m.invoke(session);
-            if (res instanceof Collection<?> col) {
-                return col.stream().map(Object::toString).toList();
+        if (session instanceof InternalMavenSession ims) {
+            try {
+                org.apache.maven.execution.MavenSession ms = ims.getMavenSession();
+                if (ms != null && ms.getRequest() != null && ms.getRequest().getActiveProfiles() != null) {
+                    return ms.getRequest().getActiveProfiles();
+                }
+            } catch (Exception ignored) {
             }
-        } catch (Exception ignored) {
+        }
+        if (session instanceof ExecutionListenerAdapter.SessionAdapterHelper helper) {
+            return helper.getActiveProfiles();
         }
         return Collections.emptyList();
-    }
-
-    private static List<Project> getAllProjects(Session session) {
-        if (session == null) {
-            return null;
-        }
-        try {
-            java.lang.reflect.Method m = session.getClass().getMethod("getAllProjects");
-            Object res = m.invoke(session);
-            if (res instanceof List<?> list) {
-                @SuppressWarnings("unchecked")
-                List<Project> projs = (List<Project>) list;
-                return projs;
-            }
-        } catch (Exception ignored) {
-        }
-        return null;
     }
 
     private void logMojoFinished(ExecutionEvent event, String eventType) {

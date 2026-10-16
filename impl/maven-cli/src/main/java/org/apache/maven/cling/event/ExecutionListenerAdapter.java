@@ -32,13 +32,16 @@ import java.util.Optional;
 
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.ExecutionEventType;
+import org.apache.maven.api.Language;
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.Plugin;
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.Type;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.execution.BuildFailure;
 import org.apache.maven.execution.BuildSuccess;
@@ -255,6 +258,37 @@ public class ExecutionListenerAdapter implements ExecutionListener {
         }
     }
 
+    record SimplePackaging(String id) implements Packaging {
+        @Override
+        public Type type() {
+            return (Type) Proxy.newProxyInstance(
+                    Type.class.getClassLoader(), new Class<?>[] {Type.class}, (proxy, method, args) -> {
+                        String name = method.getName();
+                        if ("id".equals(name) || "getExtension".equals(name)) {
+                            return id;
+                        }
+                        if ("getClassifier".equals(name)) {
+                            return "";
+                        }
+                        if ("getLanguage".equals(name)) {
+                            return Language.NONE;
+                        }
+                        if ("getPathTypes".equals(name)) {
+                            return Collections.emptySet();
+                        }
+                        if ("isIncludesDependencies".equals(name)) {
+                            return false;
+                        }
+                        return null;
+                    });
+        }
+
+        @Override
+        public Map<String, PluginContainer> plugins() {
+            return Collections.emptyMap();
+        }
+    }
+
     static class ProjectAdapter implements Project {
         private final MavenProject project;
 
@@ -284,7 +318,8 @@ public class ExecutionListenerAdapter implements ExecutionListener {
 
         @Override
         public Packaging packaging() {
-            return null;
+            String pkg = project.getPackaging();
+            return new SimplePackaging(pkg != null ? pkg : "jar");
         }
 
         @Override
@@ -332,7 +367,7 @@ public class ExecutionListenerAdapter implements ExecutionListener {
 
         @Override
         public boolean isRootProject() {
-            return false;
+            return project.isExecutionRoot();
         }
 
         @Override
@@ -558,24 +593,21 @@ public class ExecutionListenerAdapter implements ExecutionListener {
         if (event == null || event.getSession() == null || event.getProject() == null) {
             return;
         }
-        if (event.getSession().getResult() != null) {
+        if (event.getSession().getResult() != null && delegate instanceof BuildStatsSink sink) {
             BuildSummary bs = event.getSession().getResult().getBuildSummary(event.getProject());
             if (bs != null && bs.getTime() > 0) {
                 Duration dur = Duration.ofMillis(bs.getTime());
                 String key = projectKey(event.getProject());
-                if (delegate instanceof PlainExecutionEventLogger pel) {
-                    pel.recordProjectDuration(key, dur);
-                } else if (delegate instanceof RichExecutionEventLogger rel) {
-                    rel.recordProjectDuration(key, dur);
-                } else if (delegate instanceof MachineExecutionEventLogger mel) {
-                    mel.recordProjectDuration(key, dur);
-                }
+                sink.recordProjectDuration(key, dur);
             }
         }
     }
 
     private void syncSessionResult(ExecutionEvent event) {
         if (event == null || event.getSession() == null || event.getSession().getResult() == null) {
+            return;
+        }
+        if (!(delegate instanceof BuildStatsSink sink)) {
             return;
         }
         MavenExecutionResult res = event.getSession().getResult();
@@ -596,13 +628,7 @@ public class ExecutionListenerAdapter implements ExecutionListener {
                 }
             }
         }
-        if (delegate instanceof PlainExecutionEventLogger pel) {
-            pel.syncResult(hasExceptions, passed, failed, skipped);
-        } else if (delegate instanceof RichExecutionEventLogger rel) {
-            rel.syncResult(hasExceptions, passed, failed, skipped);
-        } else if (delegate instanceof MachineExecutionEventLogger mel) {
-            mel.syncResult(hasExceptions, passed, failed, skipped);
-        }
+        sink.syncResult(hasExceptions, passed, failed, skipped);
     }
 
     private static String projectKey(MavenProject project) {

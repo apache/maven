@@ -21,13 +21,9 @@ package org.apache.maven.cling.event;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.api.ExecutionEvent;
-import org.apache.maven.api.ExecutionListener;
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.Project;
@@ -61,7 +57,7 @@ import static org.apache.maven.cling.utils.CLIReportingUtils.formatDuration;
  * @since 4.1.0
  * @see ExecutionEventLogger
  */
-public class PlainExecutionEventLogger implements ExecutionListener {
+public class PlainExecutionEventLogger extends AbstractExecutionEventLogger {
 
     private static final int MAX_LOG_PREFIX_SIZE = 8; // "[ERROR] "
     private static final int PROJECT_STATUS_SUFFIX_SIZE = 20; // "SUCCESS [  0.000 s]"
@@ -77,32 +73,7 @@ public class PlainExecutionEventLogger implements ExecutionListener {
     private int maxProjectNameLength;
     private int totalProjects;
     private int currentVisitedProjectCount;
-
-    // Track project durations and build results natively
-    private final Map<String, Instant> projectStartTimes = new ConcurrentHashMap<>();
-    private final Map<String, Duration> projectDurations = new ConcurrentHashMap<>();
-    private final AtomicInteger passedCount = new AtomicInteger();
-    private final AtomicInteger failedCount = new AtomicInteger();
-    private final AtomicInteger skippedCount = new AtomicInteger();
     private volatile Instant sessionStartTime;
-    private volatile boolean buildFailed;
-
-    public void recordProjectDuration(String key, Duration duration) {
-        if (key != null && duration != null) {
-            projectDurations.put(key, duration);
-        }
-    }
-
-    public void syncResult(boolean hasExceptions, int passed, int failed, int skipped) {
-        if (hasExceptions) {
-            buildFailed = true;
-        }
-        if (passedCount.get() == 0 && failedCount.get() == 0 && skippedCount.get() == 0) {
-            passedCount.set(passed);
-            failedCount.set(failed);
-            skippedCount.set(skipped);
-        }
-    }
 
     public PlainExecutionEventLogger(MessageBuilderFactory messageBuilderFactory) {
         this(messageBuilderFactory, LoggerFactory.getLogger(PlainExecutionEventLogger.class));
@@ -170,23 +141,6 @@ public class PlainExecutionEventLogger implements ExecutionListener {
                 currentVisitedProjectCount = 0;
             }
         }
-    }
-
-    private static List<Project> getAllProjects(Session session) {
-        if (session == null) {
-            return null;
-        }
-        try {
-            java.lang.reflect.Method m = session.getClass().getMethod("getAllProjects");
-            Object res = m.invoke(session);
-            if (res instanceof List<?> list) {
-                @SuppressWarnings("unchecked")
-                List<Project> projs = (List<Project>) list;
-                return projs;
-            }
-        } catch (Exception ignored) {
-        }
-        return null;
     }
 
     @Override
@@ -265,41 +219,6 @@ public class PlainExecutionEventLogger implements ExecutionListener {
     }
 
     // ---- Formatting helpers ----
-
-    private static String projectKey(Project project) {
-        String gid = project.groupId();
-        String aid = project.artifactId();
-        return (gid != null ? gid : "") + ":" + (aid != null ? aid : "");
-    }
-
-    private static String getProjectDisplayName(Project project) {
-        if (project == null) {
-            return "";
-        }
-        String name = null;
-        try {
-            if (project.model() != null) {
-                name = project.model().getName();
-            }
-        } catch (Exception ignored) {
-        }
-        if (name != null && !name.isBlank()) {
-            return name;
-        }
-        return project.artifactId() != null ? project.artifactId() : "";
-    }
-
-    private Duration getProjectDuration(Project project) {
-        if (project == null) {
-            return null;
-        }
-        Duration recorded = projectDurations.remove(projectKey(project));
-        if (recorded != null) {
-            return recorded;
-        }
-        Instant start = projectStartTimes.remove(projectKey(project));
-        return (start != null) ? Duration.between(start, MonotonicClock.now()) : null;
-    }
 
     private void logProjectLine(ExecutionEvent event, String status) {
         Project project = event.project().orElse(null);
