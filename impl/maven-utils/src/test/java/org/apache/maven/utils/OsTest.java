@@ -19,16 +19,67 @@
 package org.apache.maven.utils;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Path;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class OsTest {
+    @Test
+    void usesUnknownWhenNoFamilyMatches() throws Exception {
+        String java = Path.of(System.getProperty("java.home"), "bin", "java").toString();
+        String testClasses = Path.of(OsTest.class
+                        .getProtectionDomain()
+                        .getCodeSource()
+                        .getLocation()
+                        .toURI())
+                .toString();
+        String utilities =
+                Os.class.getProtectionDomain().getCodeSource().getLocation().toExternalForm();
+        for (String name : new String[] {"unrecognised-platform", "unknown-platform"}) {
+            Process process = new ProcessBuilder(
+                            java,
+                            "-Dpath.separator=|",
+                            "-cp",
+                            testClasses,
+                            UnknownFamilyProbe.class.getName(),
+                            utilities,
+                            name)
+                    .redirectErrorStream(true)
+                    .start();
+            try {
+                assertTrue(process.waitFor(30, TimeUnit.SECONDS), "OS probe timed out");
+                String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+                assertEquals(0, process.exitValue(), output);
+                assertEquals("unknown", output.strip());
+            } finally {
+                process.destroyForcibly();
+            }
+        }
+    }
+
+    public static class UnknownFamilyProbe {
+        public static void main(String[] args) throws Exception {
+            System.setProperty("os.name", args[1]);
+            try (URLClassLoader loader =
+                    new URLClassLoader(new URL[] {URI.create(args[0]).toURL()}, null)) {
+                Class<?> os = loader.loadClass("org.apache.maven.utils.Os");
+                System.out.println(os.getField("OS_FAMILY").get(null));
+            }
+        }
+    }
+
     @Test
     void distinguishesWindowsNtFromWindows9x() {
         for (String name : new String[] {"windows 95", "windows 98", "windows me", "windows ce"}) {
@@ -107,7 +158,8 @@ class OsTest {
         for (String family : new String[] {"windows", "mac", "unix", "dos", "openvms", "custom"}) {
             assertEquals(Os.isFamily(family, Os.OS_NAME), Os.isFamily(family), family);
         }
-        if (Os.OS_FAMILY != null) {
+        assertNotNull(Os.OS_FAMILY);
+        if (!"unknown".equals(Os.OS_FAMILY)) {
             assertTrue(Os.isFamily(Os.OS_FAMILY));
         }
     }

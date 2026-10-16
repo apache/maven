@@ -34,14 +34,7 @@ public final class CleanArgument {
      * @return the cleaned arguments
      */
     public static String[] cleanArgs(String[] args) {
-        try {
-            return doCleanArgs(args);
-        } catch (RuntimeException e) {
-            for (String a : args) {
-                System.out.println("Arg: '" + a + "'");
-            }
-            throw e;
-        }
+        return doCleanArgs(args);
     }
 
     private static String[] doCleanArgs(String[] args) {

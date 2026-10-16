@@ -27,10 +27,7 @@ public class Os {
     public static final String OS_ARCH = org.apache.maven.utils.Os.OS_ARCH;
     public static final String OS_VERSION = org.apache.maven.utils.Os.OS_VERSION;
 
-    // Preserve this entry point's additional fallback for OS names containing "unknown".
-    public static final String OS_FAMILY = org.apache.maven.utils.Os.OS_FAMILY != null
-            ? org.apache.maven.utils.Os.OS_FAMILY
-            : org.apache.maven.utils.Os.isFamily("unknown") ? "unknown" : null;
+    public static final String OS_FAMILY = org.apache.maven.utils.Os.OS_FAMILY;
 
     public static final boolean IS_WINDOWS = org.apache.maven.utils.Os.IS_WINDOWS;
     public static final String FAMILY_NT = org.apache.maven.utils.Os.FAMILY_NT;

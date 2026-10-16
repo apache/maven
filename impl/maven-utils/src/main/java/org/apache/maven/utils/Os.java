@@ -43,7 +43,7 @@ public class Os {
     public static final String OS_VERSION = System.getProperty("os.version").toLowerCase(Locale.ENGLISH);
 
     /**
-     * OS Family
+     * The OS family, or {@code "unknown"} if no known family matches. Never {@code null}.
      */
     public static final String OS_FAMILY;
 
@@ -116,6 +116,11 @@ public class Os {
      * OS family that can be tested for. {@value}
      */
     private static final String FAMILY_OS400 = "os/400";
+
+    /**
+     * Unrecognized OS family. {@value}
+     */
+    private static final String FAMILY_UNKNOWN = "unknown";
 
     /**
      * OpenJDK is reported to call Mac OS X "Darwin"
@@ -217,6 +222,6 @@ public class Os {
                         FAMILY_ZOS)
                 .filter(Os::isFamily)
                 .findFirst()
-                .orElse(null);
+                .orElse(FAMILY_UNKNOWN);
     }
 }

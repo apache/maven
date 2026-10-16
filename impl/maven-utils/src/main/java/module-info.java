@@ -18,5 +18,11 @@
  */
 
 module org.apache.maven.utils {
-    exports org.apache.maven.utils;
+    exports org.apache.maven.utils to
+            org.apache.maven.impl,
+            org.apache.maven.cling,
+            org.apache.maven.core,
+            maven.compat,
+            maven.embedder,
+            maven.model.builder;
 }

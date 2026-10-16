@@ -18,11 +18,36 @@
  */
 package org.apache.maven.utils;
 
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
+import java.nio.charset.StandardCharsets;
+
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.api.parallel.Resources;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class CleanArgumentTest {
+    @Test
+    @ResourceLock(Resources.SYSTEM_OUT)
+    void propagatesFailuresWithoutPrintingArguments() {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        PrintStream original = System.out;
+        try (PrintStream capture = new PrintStream(output, true, StandardCharsets.UTF_8)) {
+            System.setOut(capture);
+            try {
+                assertThrows(NullPointerException.class, () -> CleanArgument.cleanArgs(new String[] {"test", null}));
+                assertThrows(NullPointerException.class, () -> CleanArgument.cleanArgs(null));
+            } finally {
+                System.setOut(original);
+            }
+        }
+        assertEquals("", output.toString(StandardCharsets.UTF_8));
+    }
+
     @Test
     void preservesEmptyArguments() {
         assertArrayEquals(new String[0], CleanArgument.cleanArgs(new String[0]));
