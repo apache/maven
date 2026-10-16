@@ -26,6 +26,7 @@ on:
       - edited
       - opened
       - reopened
+      - synchronize
 
 jobs:
   pr-signal:
