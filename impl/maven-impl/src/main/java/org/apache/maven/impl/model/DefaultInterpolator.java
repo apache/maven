@@ -199,7 +199,7 @@ public class DefaultInterpolator implements Interpolator {
             return StringInterpolator.substVars(
                     val, currentKey, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
         } catch (StringInterpolatorException e) {
-            throw new InterpolatorException(e.getMessage());
+            throw new InterpolatorException(e.getMessage(), e);
         }
     }
 

@@ -26,10 +26,14 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.services.InterpolatorException;
+import org.apache.maven.utils.StringInterpolator;
+import org.apache.maven.utils.StringInterpolatorException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.function.Executable;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -102,16 +106,62 @@ class MavenPropertiesCompatibilityTest {
     void preservesMavenExceptionsForRecursiveReferences() throws Exception {
         MavenProperties properties = new MavenProperties(false);
         properties.put("name", "${name}");
-        assertThrows(InterpolatorException.class, properties::substitute);
-        assertThrows(InterpolatorException.class, () -> MavenPropertiesLoader.substitute(properties, null));
-        assertThrows(InterpolatorException.class, () -> MavenPropertiesLoader.substVars("${name}", "name", null, null));
+        assertRecursiveFailure(properties::substitute);
+        assertRecursiveFailure(() -> MavenPropertiesLoader.substitute(properties, null));
+        assertRecursiveFailure(() -> MavenPropertiesLoader.substVars("${name}", "name", null, null));
 
         Path file = directory.resolve("recursive.properties");
         Files.writeString(file, "name=${name}\n");
-        assertThrows(InterpolatorException.class, () -> new MavenProperties(file));
-        assertThrows(
-                InterpolatorException.class,
+        assertRecursiveFailure(() -> new MavenProperties(file));
+        assertRecursiveFailure(
                 () -> MavenPropertiesLoader.loadProperties(new java.util.Properties(), file, null, false));
+    }
+
+    private void assertRecursiveFailure(Executable action) {
+        InterpolatorException error = assertThrows(InterpolatorException.class, action);
+        StringInterpolatorException cause = assertInstanceOf(StringInterpolatorException.class, error.getCause());
+        assertEquals("recursive variable reference: name", error.getMessage());
+        assertEquals(error.getMessage(), cause.getMessage());
+        assertTrue(java.util.Arrays.stream(cause.getStackTrace())
+                .anyMatch(frame -> StringInterpolator.class.getName().equals(frame.getClassName())));
+    }
+
+    @Test
+    void retainsTheOriginalUtilityExceptionAndItsCause() throws Exception {
+        StringInterpolatorException failure = new StringInterpolatorException("utility callback failed");
+        failure.initCause(new IllegalStateException("original failure"));
+        java.util.function.UnaryOperator<String> callback = key -> {
+            throw failure;
+        };
+        MavenProperties properties = new MavenProperties(false);
+        properties.put("message", "${external}");
+        assertSame(
+                failure,
+                assertThrows(InterpolatorException.class, () -> properties.substitute(callback))
+                        .getCause());
+        assertSame(
+                failure,
+                assertThrows(InterpolatorException.class, () -> MavenPropertiesLoader.substitute(properties, callback))
+                        .getCause());
+        assertSame(
+                failure,
+                assertThrows(
+                                InterpolatorException.class,
+                                () -> MavenPropertiesLoader.substVars("${external}", "message", null, callback))
+                        .getCause());
+        Path file = directory.resolve("callback.properties");
+        Files.writeString(file, "message=${external}\n");
+        assertSame(
+                failure,
+                assertThrows(InterpolatorException.class, () -> new MavenProperties(file, callback))
+                        .getCause());
+        assertSame(
+                failure,
+                assertThrows(
+                                InterpolatorException.class,
+                                () -> MavenPropertiesLoader.loadProperties(
+                                        new java.util.Properties(), file, callback, false))
+                        .getCause());
     }
 
     @Test

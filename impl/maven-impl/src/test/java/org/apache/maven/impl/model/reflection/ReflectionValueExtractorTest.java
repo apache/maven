@@ -95,11 +95,17 @@ public class ReflectionValueExtractorTest {
                 () -> ReflectionValueExtractor.evaluate("bean.value", new ThrowingBean(cause)));
         assertEquals(cause.toString(), error.getMessage());
         assertSame(cause, error.getCause());
+        assertEquals(
+                org.apache.maven.utils.ReflectionValueExtractor.class.getName(),
+                error.getStackTrace()[0].getClassName());
 
         IntrospectionException invalidType = assertThrows(
                 IntrospectionException.class,
                 () -> ReflectionValueExtractor.evaluate("bean.value[0]", new ValueHolder("text")));
         assertNull(invalidType.getCause());
+        assertEquals(
+                org.apache.maven.utils.ReflectionValueExtractor.class.getName(),
+                invalidType.getStackTrace()[0].getClassName());
         assertEquals(
                 "The token 'value[' at position '5' refers to a java.util.List or an array, but the value "
                         + "seems is an instance of 'class java.lang.String'",

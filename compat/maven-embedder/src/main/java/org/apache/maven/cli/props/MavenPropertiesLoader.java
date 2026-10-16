@@ -41,7 +41,7 @@ public class MavenPropertiesLoader {
         try {
             org.apache.maven.utils.MavenPropertiesLoader.loadProperties(properties, path, callback, escape);
         } catch (StringInterpolatorException e) {
-            throw new InterpolatorException(e.getMessage());
+            throw new InterpolatorException(e.getMessage(), e);
         }
     }
 
@@ -49,7 +49,7 @@ public class MavenPropertiesLoader {
         try {
             org.apache.maven.utils.MavenPropertiesLoader.substitute(props, callback);
         } catch (StringInterpolatorException e) {
-            throw new InterpolatorException(e.getMessage());
+            throw new InterpolatorException(e.getMessage(), e);
         }
     }
 
@@ -58,7 +58,7 @@ public class MavenPropertiesLoader {
         try {
             return org.apache.maven.utils.MavenPropertiesLoader.substVars(value, name, props, callback);
         } catch (StringInterpolatorException e) {
-            throw new InterpolatorException(e.getMessage());
+            throw new InterpolatorException(e.getMessage(), e);
         }
     }
 }

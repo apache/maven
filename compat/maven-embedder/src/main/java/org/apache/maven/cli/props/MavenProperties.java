@@ -74,7 +74,7 @@ public class MavenProperties extends org.apache.maven.utils.MavenProperties {
         try {
             super.substitute(callback);
         } catch (StringInterpolatorException e) {
-            throw new InterpolatorException(e.getMessage());
+            throw new InterpolatorException(e.getMessage(), e);
         }
     }
 

@@ -37,10 +37,12 @@ public class ReflectionValueExtractor {
         try {
             return org.apache.maven.utils.ReflectionValueExtractor.evaluate(expression, root, trimRootToken, false);
         } catch (org.apache.maven.utils.IntrospectionException e) {
-            if (e.getCause() != null) {
-                throw new IntrospectionException(e.getCause());
-            }
-            throw new IntrospectionException(e.getMessage());
+            IntrospectionException translated = e.getCause() != null
+                    ? new IntrospectionException(e.getCause())
+                    : new IntrospectionException(e.getMessage());
+            // Retain the shared helper's failure location without changing the legacy cause contract.
+            translated.setStackTrace(e.getStackTrace());
+            throw translated;
         }
     }
 }
