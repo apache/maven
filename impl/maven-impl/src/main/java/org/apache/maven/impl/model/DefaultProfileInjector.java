@@ -30,6 +30,7 @@ import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.BuildBase;
+import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.ModelBase;
 import org.apache.maven.api.model.Plugin;
@@ -44,14 +45,37 @@ import org.apache.maven.api.model.RepositoryBase;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ProfileInjector;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Handles profile injection into the model.
  *
+ * <p>In addition to standard profile property injection (where properties from active profiles
+ * are merged into the model properties using last-write-wins), properties from active profiles
+ * are also injected under the {@code profile.<id>.<property>} prefix. This allows expressions
+ * in the POM to reference properties defined in a specific active profile without collision
+ * (e.g., {@code ${profile.dev.server.port}}).</p>
+ *
+ * <h3>Conventions and Semantics</h3>
+ * <ul>
+ *   <li><b>Active Profiles Only:</b> Only active profiles have their properties injected. Inactive
+ *       profiles do not contribute scoped properties.</li>
+ *   <li><b>Reserved Namespace:</b> Property names of the form {@code profile.<id>.*} are reserved
+ *       for profile-scoped resolution. If an explicit model property clashes with an injected scoped key,
+ *       the profile value takes precedence and a warning is logged.</li>
+ *   <li><b>Prefix Exclusion:</b> Profile properties that already start with {@code profile.} are not
+ *       re-prefixed to prevent redundant double-scoping.</li>
+ *   <li><b>Profile ID Naming:</b> It is recommended to use hyphens or underscores in profile IDs
+ *       rather than dots (e.g., {@code my-profile} instead of {@code my.profile}) to avoid dot-delimiter
+ *       ambiguity across profiles with overlapping names.</li>
+ * </ul>
  */
 @Named
 @Singleton
 public class DefaultProfileInjector implements ProfileInjector {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultProfileInjector.class);
 
     private static final Map<Model, Map<List<Profile>, Model>> CACHE = Collections.synchronizedMap(new WeakHashMap<>());
 
@@ -101,6 +125,93 @@ public class DefaultProfileInjector implements ProfileInjector {
 
         public void mergeBuildBase(BuildBase.Builder builder, BuildBase target, BuildBase source) {
             mergeBuildBase(builder, target, source, true, Collections.emptyMap());
+        }
+
+        @Override
+        protected void mergeModelBase_Properties(
+                ModelBase.Builder builder,
+                ModelBase target,
+                ModelBase source,
+                boolean sourceDominant,
+                Map<Object, Object> context) {
+            Map<String, String> src = source.getProperties();
+            Map<String, String> tgt = target.getProperties();
+            Map<String, String> merged = new LinkedHashMap<>(tgt.size() + src.size() * 2);
+            if (sourceDominant) {
+                merged.putAll(tgt);
+                merged.putAll(src);
+            } else {
+                merged.putAll(src);
+                merged.putAll(tgt);
+            }
+
+            if (src.isEmpty()) {
+                builder.properties(merged);
+                builder.location(
+                        "properties",
+                        InputLocation.merge(
+                                target.getLocation("properties"), source.getLocation("properties"), sourceDominant));
+                return;
+            }
+
+            InputLocation propsLoc = source.getLocation("properties");
+            Map<Object, InputLocation> scopedLocs = new LinkedHashMap<>();
+            if (source instanceof Profile profile) {
+                String profileId = profile.getId();
+                if (profileId != null && !profileId.isEmpty()) {
+                    String prefix = "profile." + profileId + ".";
+                    // Note: Profile IDs containing dots (e.g., "foo.bar") may cause key collisions
+                    // if another profile (e.g., "foo") defines a property that shares the same prefix
+                    // (e.g., "bar.myprop"). In such cases, last-write-wins applies. Profile IDs without
+                    // dots or using hyphens are recommended.
+                    // Property names of the form "profile.<id>.*" are reserved for profile-scoped resolution.
+                    // If an existing model property matches a scoped key, the profile's value takes precedence
+                    // and a warning is logged.
+                    for (Map.Entry<String, String> entry : src.entrySet()) {
+                        String key = entry.getKey();
+                        String value = entry.getValue();
+                        // Skip re-prefixing: properties already in the profile.* namespace
+                        // are user-declared scoped references — don't double-prefix them.
+                        if (!key.startsWith("profile.")) {
+                            String scopedKey = prefix + key;
+                            if (tgt.containsKey(scopedKey)) {
+                                LOGGER.warn(
+                                        "Profile-scoped property '{}' from profile '{}' overrides an existing model property",
+                                        scopedKey,
+                                        profileId);
+                            }
+                            merged.put(scopedKey, value);
+                            if (propsLoc != null) {
+                                InputLocation loc = propsLoc.getLocation(key);
+                                if (loc != null) {
+                                    scopedLocs.put(scopedKey, loc);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+
+            builder.properties(merged);
+            InputLocation mergedPropsLoc = InputLocation.merge(
+                    target.getLocation("properties"), source.getLocation("properties"), sourceDominant);
+            if (!scopedLocs.isEmpty()) {
+                if (mergedPropsLoc != null) {
+                    Map<Object, InputLocation> allLocs = new LinkedHashMap<>(
+                            mergedPropsLoc.getLocations() != null
+                                    ? mergedPropsLoc.getLocations()
+                                    : Collections.emptyMap());
+                    allLocs.putAll(scopedLocs);
+                    mergedPropsLoc = InputLocation.of(
+                            mergedPropsLoc.getLineNumber(),
+                            mergedPropsLoc.getColumnNumber(),
+                            mergedPropsLoc.getSource(),
+                            allLocs);
+                } else {
+                    mergedPropsLoc = InputLocation.of(-1, -1, null, scopedLocs);
+                }
+            }
+            builder.location("properties", mergedPropsLoc);
         }
 
         @Override

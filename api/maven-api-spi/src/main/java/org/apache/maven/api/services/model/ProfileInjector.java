@@ -28,6 +28,23 @@ import org.apache.maven.api.services.ModelProblemCollector;
 /**
  * Handles profile injection into the model.
  *
+ * <p>In addition to injecting standard profile properties into the model, implementations
+ * are expected to surface profile-scoped properties under {@code profile.<id>.<property>}
+ * for active profiles. This enables POM interpolation to target properties from specific
+ * active profiles without cross-profile collisions.</p>
+ *
+ * <h3>Conventions and Semantics</h3>
+ * <ul>
+ *   <li><b>Active Profiles Only:</b> Only active profiles contribute profile-scoped properties.</li>
+ *   <li><b>Reserved Prefix:</b> Property names beginning with {@code profile.<id>.*} are reserved
+ *       for profile-scoped resolution. In case of collisions with explicit model properties,
+ *       the active profile value takes precedence and a warning is logged.</li>
+ *   <li><b>Prefix Exclusion:</b> Profile properties that already start with {@code profile.} are not
+ *       re-prefixed.</li>
+ *   <li><b>Profile ID Naming:</b> Using hyphens in profile IDs is recommended over dots to avoid
+ *       dot-delimiter collision ambiguities across overlapping profile IDs and property names.</li>
+ * </ul>
+ *
  * @since 4.0.0
  */
 public interface ProfileInjector {
