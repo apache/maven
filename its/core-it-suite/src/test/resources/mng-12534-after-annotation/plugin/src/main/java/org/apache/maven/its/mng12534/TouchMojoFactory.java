@@ -21,9 +21,8 @@ package org.apache.maven.its.mng12534;
 import org.apache.maven.api.di.Named;
 
 /**
- * DI factory for the TouchMojo. Normally maven-plugin-plugin generates this class
- * at build time, but since we use a handcrafted V2 plugin descriptor (to include
- * afterLinks), we must provide the factory manually.
+ * DI factory for the TouchMojo. This IT uses a handcrafted V2 plugin descriptor
+ * (to test runtime afterLink parsing), so the factory must be provided manually.
  *
  * The @Named value must match MojoDescriptor.getRoleHint() at runtime:
  * "groupId:artifactId:version:goal"

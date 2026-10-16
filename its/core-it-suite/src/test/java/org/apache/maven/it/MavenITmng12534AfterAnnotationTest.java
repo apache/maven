@@ -30,10 +30,10 @@ import org.junit.jupiter.api.Test;
  * ({@code http://maven.apache.org/PLUGIN/2.0.0}) are correctly loaded
  * and processed by the build plan executor without errors.
  * <p>
- * The test plugin carries a handcrafted V2 plugin.xml with a
- * {@code <afterLink>} of type PROJECT. The build plan executor
- * must parse the descriptor, create the ordering edges, and
- * execute the mojo successfully.
+ * The test plugin uses a handcrafted V2 plugin.xml with a
+ * {@code <afterLink>} of type PROJECT to test runtime descriptor
+ * parsing independently of maven-plugin-tools (which generates
+ * these from {@code @After} annotations since 4.0.0-beta-3).
  */
 class MavenITmng12534AfterAnnotationTest extends AbstractMavenIntegrationTestCase {
 

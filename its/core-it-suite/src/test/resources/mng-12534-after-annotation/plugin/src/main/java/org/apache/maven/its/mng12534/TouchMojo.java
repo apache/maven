@@ -36,9 +36,10 @@ import org.apache.maven.api.plugin.annotations.Mojo;
  * (compile depends on sources, not resources) — so without this
  * {@code @After} link, compile could start before resources completes.
  * <p>
- * The handcrafted V2 plugin descriptor mirrors this as an
- * {@code <afterLink>} element — once maven-plugin-tools learns to
- * scan {@code @After}, the descriptor will be generated automatically.
+ * This IT uses a handcrafted V2 plugin descriptor to test the
+ * runtime's ability to parse {@code <afterLink>} elements directly.
+ * Note: maven-plugin-tools 4.0.0-beta-3+ generates these from
+ * {@code @After} annotations automatically.
  */
 @Mojo(name = "touch", defaultPhase = "compile")
 @After(phase = "resources")
