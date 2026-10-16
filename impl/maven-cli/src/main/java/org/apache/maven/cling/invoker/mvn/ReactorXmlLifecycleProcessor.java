@@ -18,13 +18,11 @@
  */
 package org.apache.maven.cling.invoker.mvn;
 
-import javax.inject.Inject;
-import javax.inject.Named;
-import javax.inject.Singleton;
-
 import java.util.List;
 
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.di.Inject;
+import org.apache.maven.api.di.Named;
 import org.apache.maven.api.reactor.PhaseInjection;
 import org.apache.maven.api.reactor.ReactorConfig;
 import org.apache.maven.api.spi.LifecycleProcessor;
@@ -57,7 +55,6 @@ import org.slf4j.LoggerFactory;
  * @since 4.1.0
  */
 @Named
-@Singleton
 public class ReactorXmlLifecycleProcessor implements LifecycleProcessor {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ReactorXmlLifecycleProcessor.class);
