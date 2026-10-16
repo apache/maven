@@ -103,7 +103,7 @@ public class CacheConfigurationResolver {
             if (selector.matches(req)) {
                 if (mergedConfig == null) {
                     mergedConfig = selector.config();
-                    LOGGER.debug(
+                    LOGGER.trace(
                             "Cache config for {}: matched selector '{}' with config {}",
                             req.getClass().getSimpleName(),
                             selector,
@@ -111,7 +111,7 @@ public class CacheConfigurationResolver {
                 } else {
                     PartialCacheConfig previousConfig = mergedConfig;
                     mergedConfig = mergedConfig.mergeWith(selector.config());
-                    LOGGER.debug(
+                    LOGGER.trace(
                             "Cache config for {}: merged selector '{}' with previous config {} -> {}",
                             req.getClass().getSimpleName(),
                             selector,
@@ -134,7 +134,7 @@ public class CacheConfigurationResolver {
                 finalConfig =
                         new CacheConfig(finalConfig.scope(), finalConfig.referenceType(), keyRefType, valueRefType);
             }
-            LOGGER.debug("Final cache config for {}: {}", req.getClass().getSimpleName(), finalConfig);
+            LOGGER.trace("Final cache config for {}: {}", req.getClass().getSimpleName(), finalConfig);
             return finalConfig;
         }
 
@@ -142,7 +142,7 @@ public class CacheConfigurationResolver {
         if (legacyRetention != null) {
             CacheConfig config = new CacheConfig(
                     legacyRetention, getDefaultReferenceType(legacyRetention), keyRefType, valueRefType);
-            LOGGER.debug(
+            LOGGER.trace(
                     "Cache config for {}: {} (legacy CacheMetadata)",
                     req.getClass().getSimpleName(),
                     config);
@@ -152,14 +152,14 @@ public class CacheConfigurationResolver {
         if (keyRefType != null && valueRefType != null) {
             CacheConfig config = new CacheConfig(
                     CacheConfig.DEFAULT.scope(), CacheConfig.DEFAULT.referenceType(), keyRefType, valueRefType);
-            LOGGER.debug(
+            LOGGER.trace(
                     "Cache config for {}: {} (with key/value refs)",
                     req.getClass().getSimpleName(),
                     config);
             return config;
         }
 
-        LOGGER.debug("Cache config for {}: {} (default)", req.getClass().getSimpleName(), CacheConfig.DEFAULT);
+        LOGGER.trace("Cache config for {}: {} (default)", req.getClass().getSimpleName(), CacheConfig.DEFAULT);
         return CacheConfig.DEFAULT;
     }
 
