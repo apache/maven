@@ -18,6 +18,8 @@
  */
 package org.apache.maven.impl;
 
+import java.lang.reflect.Method;
+import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -153,17 +155,35 @@ public class ExtensibleEnumRegistries {
                 return true;
             }
             Class<?> providerClass = provider.getClass();
+            ClassLoader providerCl = providerClass.getClassLoader();
+            if (providerCl == null) {
+                return true;
+            }
+            // Check loadClass — works for standard classloaders and ClassRealm with package-level exports
             try {
-                return classLoader.loadClass(providerClass.getName()) == providerClass;
-            } catch (ClassNotFoundException e) {
-                // Hidden classes (lambdas, dynamic proxies) cannot be loaded by name;
-                // fall back to classloader hierarchy check.
-                ClassLoader providerCl = providerClass.getClassLoader();
-                for (ClassLoader cl = classLoader; cl != null; cl = cl.getParent()) {
-                    if (cl == providerCl) {
-                        return true;
-                    }
+                if (classLoader.loadClass(providerClass.getName()) == providerClass) {
+                    return true;
                 }
+            } catch (ClassNotFoundException e) {
+                // Not loadable by name (hidden class or realm-ID import) — check further
+            }
+            // Walk the Java classloader parent chain
+            for (ClassLoader cl = classLoader; cl != null; cl = cl.getParent()) {
+                if (cl == providerCl) {
+                    return true;
+                }
+            }
+            // Check ClassRealm foreign imports via reflection — handles the common case
+            // where Maven imports extension realms using the realm ID rather than package names
+            return isImportedRealm(classLoader, providerCl);
+        }
+
+        private static boolean isImportedRealm(ClassLoader classLoader, ClassLoader providerCl) {
+            try {
+                Method method = classLoader.getClass().getMethod("getImportRealms");
+                Collection<?> importedRealms = (Collection<?>) method.invoke(classLoader);
+                return importedRealms.contains(providerCl);
+            } catch (ReflectiveOperationException | ClassCastException e) {
                 return false;
             }
         }
