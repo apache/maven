@@ -72,8 +72,8 @@ public class CliRequest {
         return commandLine;
     }
 
-    public org.codehaus.plexus.classworlds.ClassWorld getClassWorld() {
-        return (org.codehaus.plexus.classworlds.ClassWorld) classWorld;
+    public ClassWorld getClassWorld() {
+        return classWorld;
     }
 
     public String getWorkingDirectory() {

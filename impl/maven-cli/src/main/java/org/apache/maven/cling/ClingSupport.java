@@ -48,7 +48,7 @@ public abstract class ClingSupport {
      */
     public ClingSupport() {
         this(
-                new org.codehaus.plexus.classworlds.ClassWorld(
+                new ClassWorld(
                         CORE_CLASS_REALM_ID, Thread.currentThread().getContextClassLoader()),
                 true);
     }

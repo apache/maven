@@ -302,7 +302,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
             for (ClassRealmManagerDelegate delegate : delegates) {
                 try {
-                    delegate.setupRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm, request);
+                    delegate.setupRealm(classRealm, request);
                 } catch (Exception e) {
                     logger.error(
                             delegate.getClass().getName() + " failed to setup class realm " + classRealm + ": "
@@ -353,7 +353,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             for (String imp : parentImports) {
                 logger.debug("  Imported: {} < {}", imp, getId(classRealm.getParentClassLoader()));
 
-                ((org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm).importFromParent(imp);
+                classRealm.importFromParent(imp);
             }
         }
     }

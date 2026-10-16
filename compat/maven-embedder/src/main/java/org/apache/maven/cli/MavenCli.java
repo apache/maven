@@ -285,7 +285,7 @@ public class MavenCli {
         final Set<String> realms;
         if (classWorld != null) {
             realms = new HashSet<>();
-            for (ClassRealm realm : ((org.codehaus.plexus.classworlds.ClassWorld) classWorld).getRealms()) {
+            for (ClassRealm realm : classWorld.getRealms()) {
                 realms.add(realm.getId());
             }
         } else {
@@ -324,8 +324,7 @@ public class MavenCli {
                 }
             }
             if (classWorld != null) {
-                for (ClassRealm realm :
-                        new ArrayList<>(((org.codehaus.plexus.classworlds.ClassWorld) classWorld).getRealms())) {
+                for (ClassRealm realm : new ArrayList<>(classWorld.getRealms())) {
                     String realmId = realm.getId();
                     if (!realms.contains(realmId)) {
                         try {
@@ -757,16 +756,13 @@ public class MavenCli {
 
     PlexusContainer container(CliRequest cliRequest) throws Exception {
         if (cliRequest.classWorld == null) {
-            cliRequest.classWorld = new org.codehaus.plexus.classworlds.ClassWorld(
-                    "plexus.core", Thread.currentThread().getContextClassLoader());
+            cliRequest.classWorld =
+                    new ClassWorld("plexus.core", Thread.currentThread().getContextClassLoader());
         }
 
         ClassRealm coreRealm = cliRequest.classWorld.getClassRealm("plexus.core");
         if (coreRealm == null) {
-            coreRealm = ((org.codehaus.plexus.classworlds.ClassWorld) cliRequest.classWorld)
-                    .getRealms()
-                    .iterator()
-                    .next();
+            coreRealm = cliRequest.classWorld.getRealms().iterator().next();
         }
 
         List<File> extClassPath = parseExtClasspath(cliRequest);
@@ -778,8 +774,8 @@ public class MavenCli {
         ClassRealm containerRealm = setupContainerRealm(cliRequest.classWorld, coreRealm, extClassPath, extensions);
 
         ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .setClassWorld((org.codehaus.plexus.classworlds.ClassWorld) cliRequest.classWorld)
-                .setRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) containerRealm)
+                .setClassWorld(cliRequest.classWorld)
+                .setRealm(containerRealm)
                 .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
                 .setAutoWiring(true)
                 .setJSR250Lifecycle(true)
@@ -821,7 +817,7 @@ public class MavenCli {
         };
         for (CoreExtensionEntry extension : extensions) {
             container.discoverComponents(
-                    (org.codehaus.plexus.classworlds.realm.ClassRealm) extension.getClassRealm(),
+                    extension.getClassRealm(),
                     new AbstractModule() {
                         @Override
                         protected void configure() {
@@ -894,8 +890,8 @@ public class MavenCli {
         }
 
         ContainerConfiguration cc = new DefaultContainerConfiguration() //
-                .setClassWorld((org.codehaus.plexus.classworlds.ClassWorld) cliRequest.classWorld) //
-                .setRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) containerRealm) //
+                .setClassWorld(cliRequest.classWorld) //
+                .setRealm(containerRealm) //
                 .setClassPathScanning(PlexusConstants.SCANNING_INDEX) //
                 .setAutoWiring(true) //
                 .setJSR250Lifecycle(true) //
@@ -961,8 +957,7 @@ public class MavenCli {
         if (!extClassPath.isEmpty() || !extensions.isEmpty()) {
             ClassRealm extRealm = classWorld.newRealm("maven.ext", null);
 
-            ((org.codehaus.plexus.classworlds.realm.ClassRealm) extRealm)
-                    .setParentRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) coreRealm);
+            extRealm.setParentRealm(coreRealm);
 
             slf4jLogger.debug("Populating class realm '{}'", extRealm.getId());
 
