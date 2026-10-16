@@ -245,7 +245,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
      * The model's properties (exposed via {@link #getModelProperty}) are NOT overridden, so
      * POM-declared properties in {@code interpolationProperties} cannot self-activate
      * property-based or condition-based profiles (see #13390). The map is used exclusively
-     * inside {@link #interpolatePath} to resolve placeholders such as {@code ${message.file}}
+     * inside {@link #interpolate} to resolve path placeholders such as {@code ${message.file}}
      * when activating parent-model file profiles with the parent's own property values
      * (see #10375).
      * <p>
