@@ -118,6 +118,11 @@ public class ExtensibleEnumRegistries {
          * thousands; callers that need to look up the same value repeatedly in a tight loop should
          * cache the result themselves.</p>
          *
+         * <p><b>Classloader visibility:</b> providers contributed by project extensions are only
+         * visible when the current thread's context classloader can load the provider's class.
+         * This prevents extension-scoped providers from leaking across reactor modules during
+         * parallel builds.</p>
+         *
          * @param id the enum value id, must not be {@code null}
          * @return the matching value, or {@code Optional.empty()} if not found
          */
@@ -125,7 +130,9 @@ public class ExtensibleEnumRegistries {
         public Optional<T> lookup(String id) {
             String key = requireNonNull(id, "id").toLowerCase(Locale.ROOT);
             if (lookup != null && providerType != null) {
+                ClassLoader tccl = Thread.currentThread().getContextClassLoader();
                 Optional<T> result = lookup.lookupList(providerType).stream()
+                        .filter(p -> isVisibleFrom(p, tccl))
                         .flatMap(p -> p.provides().stream())
                         .filter(t -> key.equals(t.id().toLowerCase(Locale.ROOT)))
                         .findFirst();
@@ -134,6 +141,31 @@ public class ExtensibleEnumRegistries {
                 }
             }
             return Optional.ofNullable(values.get(key));
+        }
+
+        /**
+         * Checks whether a provider is visible from the given classloader.
+         * Providers from project extensions are loaded by extension-specific classloaders
+         * (realms) that are only imported into the project realm that declared the extension.
+         */
+        private boolean isVisibleFrom(P provider, ClassLoader classLoader) {
+            if (classLoader == null) {
+                return true;
+            }
+            Class<?> providerClass = provider.getClass();
+            try {
+                return classLoader.loadClass(providerClass.getName()) == providerClass;
+            } catch (ClassNotFoundException e) {
+                // Hidden classes (lambdas, dynamic proxies) cannot be loaded by name;
+                // fall back to classloader hierarchy check.
+                ClassLoader providerCl = providerClass.getClassLoader();
+                for (ClassLoader cl = classLoader; cl != null; cl = cl.getParent()) {
+                    if (cl == providerCl) {
+                        return true;
+                    }
+                }
+                return false;
+            }
         }
     }
 }
