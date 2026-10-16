@@ -44,6 +44,7 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.impl.MappedCollection;
 import org.apache.maven.impl.MappedList;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.SourceQueries;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
@@ -99,10 +100,17 @@ public class DefaultProject implements Project {
 
         ArrayList<ProducedArtifact> result = new ArrayList<>(2);
         result.add(session.getArtifact(ProducedArtifact.class, pomArtifact));
-        if (!ArtifactIdUtils.equalsVersionlessId(pomArtifact, projectArtifact)) {
+        if (producesMainArtifact() && !ArtifactIdUtils.equalsVersionlessId(pomArtifact, projectArtifact)) {
             result.add(session.getArtifact(ProducedArtifact.class, projectArtifact));
         }
         return Collections.unmodifiableList(result);
+    }
+
+    @Override
+    public boolean producesMainArtifact() {
+        return packaging != null
+                && packaging.producesMainArtifact()
+                && !SourceQueries.usesModuleSourceHierarchy(project);
     }
 
     @Nonnull
