@@ -493,7 +493,7 @@ JLINE_NATIVE_PATH="$MAVEN_HOME/lib/jline-native"
 if $cygwin || $mingw ; then
   [ -n "$JAVA_HOME" ] &&
     JAVA_HOME=`cygpath --windows "$JAVA_HOME"`
-  LAUNCHER_JAR=`cygpath --path --windows "$LAUNCHER_JAR"`
+  LAUNCHER_JAR=`cygpath --windows "$LAUNCHER_JAR"`
   CLASSWORLDS_CONF=`cygpath --windows "$CLASSWORLDS_CONF"`
   MAVEN_HOME=`cygpath --windows "$MAVEN_HOME"`
   # converted separately, appending to the already converted MAVEN_HOME would
