@@ -25,6 +25,10 @@ under the License.
       <includes>
         <include>org.apache.maven:maven-classworlds</include>
       </includes>
+      <!-- Preserve the legacy plexus-classworlds-*.jar file name for backward compatibility:
+           wrapper scripts, CI tooling, and IDEs that glob boot/plexus-classworlds-*.jar continue
+           to work without change after the internalization. -->
+      <outputFileNameMapping>plexus-classworlds-${artifact.version}.jar</outputFileNameMapping>
     </dependencySet>
     <dependencySet>
       <useProjectArtifact>false</useProjectArtifact>
