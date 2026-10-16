@@ -36,6 +36,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.maven.eventspy.AbstractEventSpy;
@@ -61,6 +62,8 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
     static final Collection<String> EXPECTED_PROVIDED_SCOPE_EXCLUSIONS_GA =
             Collections.unmodifiableCollection(Arrays.asList(
                     "org.apache.maven:maven-archiver", "org.apache.maven:maven-jxr", "org.apache.maven:plexus-utils"));
+
+    private static final Pattern SCHEME = Pattern.compile("[A-Za-z][A-Za-z0-9+.-]+:");
 
     private static final String ISSUES_KEY = DefaultPluginValidationManager.class.getName() + ".issues";
 
@@ -313,7 +316,7 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
             stringBuilder.append(inputLocation.getSource().getModelId());
             String location = inputLocation.getSource().getLocation();
             if (location != null) {
-                if (location.contains("://")) {
+                if (isUrl(location)) {
                     stringBuilder.append(" (").append(location).append(")");
                 } else {
                     Path topLevelBasedir =
@@ -331,6 +334,14 @@ public final class DefaultPluginValidationManager extends AbstractEventSpy imple
         } else {
             return "unknown";
         }
+    }
+
+    /**
+     * Tells whether the location of a model is a URL, such as the {@code jar:file:/...} one of the super POM, rather
+     * than a file path. A scheme has at least two characters, so that the drive of a Windows path is not taken for one.
+     */
+    static boolean isUrl(String location) {
+        return SCHEME.matcher(location).lookingAt();
     }
 
     private String mojoInfo(MojoDescriptor mojoDescriptor, Class<?> mojoClass) {
