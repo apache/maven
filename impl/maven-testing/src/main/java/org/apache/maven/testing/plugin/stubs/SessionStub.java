@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.BuildEnvironment;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.DependencyScope;
@@ -100,6 +101,11 @@ public class SessionStub implements Session {
         if (userProperties != null) {
             this.userProperties.putAll(userProperties);
         }
+    }
+
+    @Override
+    public BuildEnvironment buildEnvironment() {
+        return null;
     }
 
     @Override
