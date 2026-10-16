@@ -65,7 +65,7 @@ project_dir="$work_dir/project"
 mkdir -p "$stub_dir" "$maven_home/bin" "$maven_home/boot" "$project_dir/.mvn" "$project_dir/module"
 
 cp "$mvn_script" "$maven_home/bin/mvn"
-touch "$maven_home/bin/m2.conf" "$maven_home/boot/maven-classworlds-9.9.9.jar"
+touch "$maven_home/bin/m2.conf" "$maven_home/boot/plexus-classworlds-9.9.9.jar"
 
 # uname(1) stub: the emulated OS is taken from the FAKE_UNAME variable.
 cat > "$stub_dir/uname" <<'STUB'
