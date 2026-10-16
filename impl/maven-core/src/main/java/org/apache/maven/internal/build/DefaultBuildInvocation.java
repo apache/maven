@@ -18,13 +18,16 @@
  */
 package org.apache.maven.internal.build;
 
+import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.maven.api.BuildInvocation;
+import org.apache.maven.api.ReactorFailureBehavior;
 import org.apache.maven.execution.MavenSession;
 
 /**
@@ -48,11 +51,11 @@ public record DefaultBuildInvocation(
         List<String> goals,
         Map<String, String> userProperties,
         Map<String, String> systemInfo,
-        String localRepository,
+        Path localRepository,
         List<String> activeProfiles,
         List<String> selectedProjects,
         String resumeFrom,
-        String reactorFailureBehavior,
+        ReactorFailureBehavior reactorFailureBehavior,
         boolean offline,
         boolean updateSnapshots,
         boolean noTransferProgress,
@@ -63,29 +66,12 @@ public record DefaultBuildInvocation(
     private static final Set<String> SENSITIVE_KEY_FRAGMENTS =
             Set.of("password", "passwd", "secret", "token", "apikey", "api_key", "credential", "passphrase");
 
-    @Override
-    public List<String> goals() {
-        return List.copyOf(goals);
-    }
-
-    @Override
-    public Map<String, String> userProperties() {
-        return Map.copyOf(userProperties);
-    }
-
-    @Override
-    public Map<String, String> systemInfo() {
-        return Map.copyOf(systemInfo);
-    }
-
-    @Override
-    public List<String> activeProfiles() {
-        return List.copyOf(activeProfiles);
-    }
-
-    @Override
-    public List<String> selectedProjects() {
-        return List.copyOf(selectedProjects);
+    public DefaultBuildInvocation {
+        goals = List.copyOf(goals);
+        userProperties = Map.copyOf(userProperties);
+        systemInfo = Map.copyOf(systemInfo);
+        activeProfiles = List.copyOf(activeProfiles);
+        selectedProjects = List.copyOf(selectedProjects);
     }
 
     /**
@@ -120,9 +106,9 @@ public record DefaultBuildInvocation(
         addSystemProp(sysInfo, "user.name");
         sysInfo.put("available.processors", String.valueOf(Runtime.getRuntime().availableProcessors()));
 
-        String localRepo = request.getLocalRepositoryPath() != null
-                ? request.getLocalRepositoryPath().getAbsolutePath()
-                : "";
+        Path localRepo = request.getLocalRepositoryPath() != null
+                ? request.getLocalRepositoryPath().toPath()
+                : Path.of("");
 
         List<String> activeProfiles =
                 request.getActiveProfiles() != null ? List.copyOf(request.getActiveProfiles()) : List.of();
@@ -132,13 +118,18 @@ public record DefaultBuildInvocation(
 
         String resumeFrom = request.getResumeFrom();
 
-        String failureBehavior =
-                request.getReactorFailureBehavior() != null ? request.getReactorFailureBehavior() : "FAIL_FAST";
+        ReactorFailureBehavior failureBehavior = ReactorFailureBehavior.FAIL_FAST;
+        if (request.getReactorFailureBehavior() != null) {
+            try {
+                failureBehavior = ReactorFailureBehavior.fromString(request.getReactorFailureBehavior());
+            } catch (IllegalArgumentException ignored) {
+            }
+        }
 
         return new DefaultBuildInvocation(
                 goals,
-                userProps,
-                sysInfo,
+                Map.copyOf(userProps),
+                Map.copyOf(sysInfo),
                 localRepo,
                 activeProfiles,
                 selectedProjects,
@@ -151,8 +142,8 @@ public record DefaultBuildInvocation(
                 request.getDegreeOfConcurrency());
     }
 
-    private static boolean isSensitiveKey(String key) {
-        String lower = key.toLowerCase(java.util.Locale.ROOT);
+    static boolean isSensitiveKey(String key) {
+        String lower = key.toLowerCase(Locale.ROOT);
         for (String fragment : SENSITIVE_KEY_FRAGMENTS) {
             if (lower.contains(fragment)) {
                 return true;

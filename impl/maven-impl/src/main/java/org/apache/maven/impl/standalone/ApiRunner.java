@@ -39,7 +39,6 @@ import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import org.apache.maven.api.Artifact;
-import org.apache.maven.api.BuildInvocation;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.MonotonicClock;
@@ -375,11 +374,6 @@ public class ApiRunner {
         @Override
         public Version getMavenVersion() {
             return mavenVersion;
-        }
-
-        @Override
-        public BuildInvocation buildInvocation() {
-            throw new UnsupportedOperationException("buildInvocation() is not available in standalone mode");
         }
 
         @Override

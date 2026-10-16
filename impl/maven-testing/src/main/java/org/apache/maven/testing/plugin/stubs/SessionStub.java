@@ -28,7 +28,6 @@ import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinates;
-import org.apache.maven.api.BuildInvocation;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.DependencyScope;
@@ -106,11 +105,6 @@ public class SessionStub implements Session {
     @Override
     public Settings getSettings() {
         return settings;
-    }
-
-    @Override
-    public BuildInvocation buildInvocation() {
-        return null;
     }
 
     @Override

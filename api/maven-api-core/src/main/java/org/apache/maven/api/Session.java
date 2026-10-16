@@ -54,7 +54,9 @@ public interface Session extends ProtoSession {
      * @since 4.1.0
      */
     @Nonnull
-    BuildInvocation buildInvocation();
+    default BuildInvocation buildInvocation() {
+        throw new UnsupportedOperationException("buildInvocation() is not supported by this Session implementation");
+    }
 
     /**
      * Returns the current maven version.

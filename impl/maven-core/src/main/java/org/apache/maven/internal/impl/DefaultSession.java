@@ -65,6 +65,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     private final MavenRepositorySystem mavenRepositorySystem;
     private final RuntimeInformation runtimeInformation;
     private final Map<String, Project> allProjects = new ConcurrentHashMap<>();
+    private final Object buildInvocationLock = new Object();
     private volatile BuildInvocation buildInvocation;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
@@ -179,7 +180,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     @Override
     public BuildInvocation buildInvocation() {
         if (buildInvocation == null) {
-            synchronized (this) {
+            synchronized (buildInvocationLock) {
                 if (buildInvocation == null) {
                     buildInvocation = DefaultBuildInvocation.from(getMavenSession());
                 }
