@@ -29,8 +29,8 @@ under the License.
   <description>Test that the concurrent builder automatically builds a reactor plugin project up to READY
     when another project uses that plugin, even if the requested phase is before "compile".</description>
 
-  <modules>
-    <module>plugin</module>
-    <module>client</module>
-  </modules>
+  <subprojects>
+    <subproject>plugin</subproject>
+    <subproject>client</subproject>
+  </subprojects>
 </project>
