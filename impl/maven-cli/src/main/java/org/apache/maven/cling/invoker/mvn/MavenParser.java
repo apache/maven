@@ -82,7 +82,7 @@ public class MavenParser extends BaseParser {
      * <p>When the config has structured {@code <arg>} children ({@code optionArgs}), those are used as-is.
      * When it has inline text content ({@code options}), it is tokenized with {@link ArgumentTokenizer}.
      */
-    private static List<String> resolveReactorOptions(ReactorConfig rc) {
+    static List<String> resolveReactorOptions(ReactorConfig rc) {
         List<String> optionArgs = rc.getOptionArgs();
         String options = rc.getOptions();
         if (optionArgs != null && !optionArgs.isEmpty() && options != null && !options.isBlank()) {
