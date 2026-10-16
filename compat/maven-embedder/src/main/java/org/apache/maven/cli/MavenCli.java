@@ -60,9 +60,6 @@ import org.apache.maven.BuildAbort;
 import org.apache.maven.InternalErrorException;
 import org.apache.maven.Maven;
 import org.apache.maven.api.Constants;
-import org.apache.maven.api.classworlds.ClassRealm;
-import org.apache.maven.api.classworlds.ClassWorld;
-import org.apache.maven.api.classworlds.NoSuchRealmException;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.extensions.InputSource;
 import org.apache.maven.api.services.MessageBuilder;
@@ -121,6 +118,9 @@ import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import org.codehaus.plexus.logging.LoggerManager;
@@ -796,7 +796,7 @@ public class MavenCli {
 
         final CoreExports exports = new CoreExports(containerRealm, exportedArtifacts, exportedPackages);
 
-        Thread.currentThread().setContextClassLoader(containerRealm.getClassLoader());
+        Thread.currentThread().setContextClassLoader(containerRealm);
 
         DefaultPlexusContainer container = new DefaultPlexusContainer(cc, new AbstractModule() {
             @Override
@@ -827,9 +827,7 @@ public class MavenCli {
                         @Override
                         protected void configure() {
                             try {
-                                container
-                                        .lookup(Injector.class)
-                                        .discover(extension.getClassRealm().getClassLoader());
+                                container.lookup(Injector.class).discover(extension.getClassRealm());
                             } catch (Throwable e) {
                                 // ignore
                                 e.printStackTrace();
@@ -979,11 +977,11 @@ public class MavenCli {
                 Set<String> exportedPackages = entry.getExportedPackages();
                 ClassRealm realm = entry.getClassRealm();
                 for (String exportedPackage : exportedPackages) {
-                    extRealm.importFrom(realm.getClassLoader(), exportedPackage);
+                    extRealm.importFrom(realm, exportedPackage);
                 }
                 if (exportedPackages.isEmpty()) {
                     // sisu uses realm imports to establish component visibility
-                    extRealm.importFrom(realm.getClassLoader(), realm.getId());
+                    extRealm.importFrom(realm, realm.getId());
                 }
             }
 

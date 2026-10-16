@@ -60,10 +60,7 @@ public class DefaultProject implements Project {
         ClassLoader ttcl = Thread.currentThread().getContextClassLoader();
         try {
             Thread.currentThread()
-                    .setContextClassLoader(
-                            project.getClassRealm() != null
-                                    ? project.getClassRealm().getClassLoader()
-                                    : null);
+                    .setContextClassLoader(project.getClassRealm() != null ? project.getClassRealm() : null);
             this.packaging = session.requirePackaging(project.getPackaging());
         } finally {
             Thread.currentThread().setContextClassLoader(ttcl);

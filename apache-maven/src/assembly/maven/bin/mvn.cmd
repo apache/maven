@@ -394,7 +394,6 @@ goto processArgs
 call :processArgs %*
 
 for %%i in ("%MAVEN_HOME%"\boot\maven-classworlds-*) do set LAUNCHER_JAR="%%i"
-for %%i in ("%MAVEN_HOME%"\boot\maven-api-classworlds-*) do set LAUNCHER_JAR=%LAUNCHER_JAR%;"%%i"
 set LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 if "%MAVEN_MAIN_CLASS%"=="" @set MAVEN_MAIN_CLASS=org.apache.maven.cling.MavenCling
 

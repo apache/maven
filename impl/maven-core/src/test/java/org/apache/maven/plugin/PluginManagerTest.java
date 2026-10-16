@@ -23,7 +23,6 @@ import javax.inject.Inject;
 import java.util.List;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
-import org.apache.maven.api.classworlds.ClassRealm;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
@@ -32,6 +31,7 @@ import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.junit.jupiter.api.Test;
 

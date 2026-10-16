@@ -39,7 +39,7 @@ package org.codehaus.plexus.classworlds;
  *
  * @author <a href="mailto:bob@eng.werken.com">bob mcwhirter</a>
  */
-public class ClassWorldException extends org.apache.maven.api.classworlds.ClassWorldException {
+public class ClassWorldException extends Exception {
     // ------------------------------------------------------------
     //     Instance members
     // ------------------------------------------------------------
@@ -59,7 +59,6 @@ public class ClassWorldException extends org.apache.maven.api.classworlds.ClassW
      * @param world The world.
      */
     public ClassWorldException(final ClassWorld world) {
-        super(world);
         this.world = world;
     }
 
@@ -70,7 +69,7 @@ public class ClassWorldException extends org.apache.maven.api.classworlds.ClassW
      * @param msg   The detail message.
      */
     public ClassWorldException(final ClassWorld world, final String msg) {
-        super(world, msg);
+        super(msg);
         this.world = world;
     }
 

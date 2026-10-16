@@ -42,7 +42,7 @@ import org.codehaus.plexus.classworlds.ClassWorld;
  *
  * @author <a href="mailto:bob@eng.werken.com">bob mcwhirter</a>
  */
-public class NoSuchRealmException extends org.apache.maven.api.classworlds.NoSuchRealmException {
+public class NoSuchRealmException extends org.codehaus.plexus.classworlds.ClassWorldException {
     // ------------------------------------------------------------
     //     Instance members
     // ------------------------------------------------------------
@@ -63,7 +63,7 @@ public class NoSuchRealmException extends org.apache.maven.api.classworlds.NoSuc
      * @param id    The realm id.
      */
     public NoSuchRealmException(ClassWorld world, String id) {
-        super(world, id);
+        super(world, "No such realm: " + id);
         this.id = id;
     }
 
@@ -78,14 +78,5 @@ public class NoSuchRealmException extends org.apache.maven.api.classworlds.NoSuc
      */
     public String getId() {
         return this.id;
-    }
-
-    /**
-     * Retrieve the world.
-     *
-     * @return The world.
-     */
-    public ClassWorld getWorld() {
-        return (ClassWorld) super.getWorld();
     }
 }

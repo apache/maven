@@ -152,7 +152,6 @@ under the License.
 
     <exportedArtifact>classworlds:classworlds</exportedArtifact>
     <exportedArtifact>org.apache.maven:maven-classworlds</exportedArtifact>
-    <exportedArtifact>org.apache.maven:maven-api-classworlds</exportedArtifact>
     <exportedArtifact>org.codehaus.plexus:plexus-component-api</exportedArtifact>
     <exportedArtifact>org.codehaus.plexus:plexus-container-default</exportedArtifact>
     <exportedArtifact>plexus:plexus-container-default</exportedArtifact>

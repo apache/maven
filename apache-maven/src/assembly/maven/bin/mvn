@@ -485,7 +485,7 @@ fi
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
   printf '[DEBUG] Final MAVEN_OPTS: %s\n' "$MAVEN_OPTS" >&2
 fi
-LAUNCHER_JAR=`echo "$MAVEN_HOME"/boot/maven-classworlds-*.jar`:`echo "$MAVEN_HOME"/boot/maven-api-classworlds-*.jar`
+LAUNCHER_JAR=`echo "$MAVEN_HOME"/boot/maven-classworlds-*.jar`
 LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 JLINE_NATIVE_PATH="$MAVEN_HOME/lib/jline-native"
 

@@ -31,8 +31,6 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
-import org.apache.maven.api.classworlds.ClassRealm;
-import org.apache.maven.api.classworlds.ClassWorld;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.services.MessageBuilderFactory;
@@ -57,6 +55,8 @@ import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.slf4j.ILoggerFactory;
 
@@ -111,13 +111,12 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 containerRealm,
                 collectExportedArtifacts(coreEntry, loadedExtensionsEntries),
                 collectExportedPackages(coreEntry, loadedExtensionsEntries));
-        Thread.currentThread().setContextClassLoader(containerRealm.getClassLoader());
+        Thread.currentThread().setContextClassLoader(containerRealm);
         DefaultPlexusContainer container = new DefaultPlexusContainer(cc, getCustomModule(context, exports));
 
         // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
         container.setLookupRealm(null);
-        Thread.currentThread()
-                .setContextClassLoader(container.getContainerRealm().getClassLoader());
+        Thread.currentThread().setContextClassLoader(container.getContainerRealm());
 
         container.setLoggerManager(createLoggerManager());
         ProtoSession protoSession = context.protoSession;
@@ -133,10 +132,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                             try {
                                 container
                                         .lookup(Injector.class)
-                                        .discover(extension
-                                                .entry()
-                                                .getClassRealm()
-                                                .getClassLoader());
+                                        .discover(extension.entry().getClassRealm());
                             } catch (Throwable e) {
                                 failures.add(new IllegalStateException(
                                         "Injection failure in "
@@ -252,11 +248,11 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 Set<String> exportedPackages = entry.getExportedPackages();
                 ClassRealm realm = entry.getClassRealm();
                 for (String exportedPackage : exportedPackages) {
-                    extRealm.importFrom(realm.getClassLoader(), exportedPackage);
+                    extRealm.importFrom(realm, exportedPackage);
                 }
                 if (exportedPackages.isEmpty()) {
                     // sisu uses realm imports to establish component visibility
-                    extRealm.importFrom(realm.getClassLoader(), realm.getId());
+                    extRealm.importFrom(realm, realm.getId());
                 }
                 // Make the container realm (maven.ext) visible from extension realms.
                 // Beans discovered in the container are sourced from maven.ext, but extension
@@ -264,7 +260,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 // chain alone. Without this import, Sisu 1.1.0's FilteredBeans (enabled by
                 // jsr330ComponentVisibilityFollowsPlexusVisibility) would hide container-sourced
                 // beans when TCCL is set to an extension realm during lifecycle callbacks.
-                realm.importFrom(extRealm.getClassLoader(), extRealm.getId());
+                realm.importFrom(extRealm, extRealm.getId());
             }
 
             return extRealm;
@@ -305,8 +301,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             container.setLookupRealm(null);
             container.setLoggerManager(createLoggerManager());
             container.getLoggerManager().setThresholds(toPlexusLoggingLevel(context.loggerLevel));
-            Thread.currentThread()
-                    .setContextClassLoader(container.getContainerRealm().getClassLoader());
+            Thread.currentThread().setContextClassLoader(container.getContainerRealm());
 
             settingsCleaner = invoker.settings(context, false, container.lookup(SettingsBuilder.class));
 

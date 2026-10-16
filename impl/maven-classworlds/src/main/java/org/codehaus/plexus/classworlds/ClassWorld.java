@@ -39,7 +39,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -55,16 +54,13 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
  *
  * @author <a href="mailto:bob@eng.werken.com">bob mcwhirter</a>
  */
-public class ClassWorld implements org.apache.maven.api.classworlds.ClassWorld, Closeable {
+public class ClassWorld implements Closeable {
 
     private static final System.Logger LOGGER = System.getLogger(ClassWorld.class.getName());
 
     private Map<String, ClassRealm> realms;
 
     private final List<ClassWorldListener> listeners = new ArrayList<>();
-
-    private final Map<org.apache.maven.api.classworlds.ClassWorldListener, ClassWorldListener> wrappedListeners =
-            new IdentityHashMap<>();
 
     private ModuleLayer moduleLayer;
 
@@ -305,50 +301,5 @@ public class ClassWorld implements org.apache.maven.api.classworlds.ClassWorld, 
 
     public synchronized void removeListener(ClassWorldListener listener) {
         listeners.remove(listener);
-    }
-
-    // API interface methods - newRealm with filter is already implemented above
-
-    @Override
-    public synchronized void addListener(org.apache.maven.api.classworlds.ClassWorldListener listener) {
-        if (listener instanceof ClassWorldListener cwl) {
-            addListener(cwl);
-        } else {
-            ClassWorldListener wrapper = new ClassWorldListener() {
-                @Override
-                public void realmCreated(ClassRealm realm) {
-                    listener.realmCreated(realm);
-                }
-
-                @Override
-                public void realmDisposed(ClassRealm realm) {
-                    listener.realmDisposed(realm);
-                }
-
-                @Override
-                public void realmCreated(org.apache.maven.api.classworlds.ClassRealm realm) {
-                    listener.realmCreated(realm);
-                }
-
-                @Override
-                public void realmDisposed(org.apache.maven.api.classworlds.ClassRealm realm) {
-                    listener.realmDisposed(realm);
-                }
-            };
-            wrappedListeners.put(listener, wrapper);
-            addListener(wrapper);
-        }
-    }
-
-    @Override
-    public synchronized void removeListener(org.apache.maven.api.classworlds.ClassWorldListener listener) {
-        if (listener instanceof ClassWorldListener cwl) {
-            removeListener(cwl);
-        } else {
-            ClassWorldListener wrapper = wrappedListeners.remove(listener);
-            if (wrapper != null) {
-                removeListener(wrapper);
-            }
-        }
     }
 }

@@ -20,8 +20,8 @@ package org.apache.maven.internal;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.classworlds.ClassRealm;
-import org.apache.maven.api.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 /**
  * Access to core {@link ClassRealm}.

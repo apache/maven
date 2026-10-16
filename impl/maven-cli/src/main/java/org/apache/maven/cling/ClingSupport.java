@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.classworlds.ClassWorld;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.Parser;
@@ -31,6 +30,7 @@ import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.cling.invoker.logging.SystemLogger;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
+import org.codehaus.plexus.classworlds.ClassWorld;
 
 import static java.util.Objects.requireNonNull;
 

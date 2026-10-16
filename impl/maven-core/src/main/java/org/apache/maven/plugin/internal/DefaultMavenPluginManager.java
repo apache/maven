@@ -55,8 +55,6 @@ import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
-import org.apache.maven.api.classworlds.ClassRealm;
-import org.apache.maven.api.classworlds.NoSuchRealmException;
 import org.apache.maven.api.plugin.descriptor.Resolution;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
@@ -112,6 +110,8 @@ import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.composition.CycleDetectedInComponentGraphException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurationException;
 import org.codehaus.plexus.component.configurator.ComponentConfigurator;
@@ -455,7 +455,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 }
             }
 
-            Thread.currentThread().setContextClassLoader(pluginRealm.getClassLoader());
+            Thread.currentThread().setContextClassLoader(pluginRealm);
             ((DefaultPlexusContainer) container)
                     .discoverComponents(
                             (org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm,
@@ -491,12 +491,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
         ClassRealm projectRealm = project.getClassRealm();
         if (projectRealm != null) {
-            foreignImports.put("", projectRealm.getClassLoader());
+            foreignImports.put("", projectRealm);
         } else {
             foreignImports.put(
-                    "",
-                    (v4api ? classRealmManager.getMaven4ApiRealm() : classRealmManager.getMavenApiRealm())
-                            .getClassLoader());
+                    "", v4api ? classRealmManager.getMaven4ApiRealm() : classRealmManager.getMavenApiRealm());
         }
 
         if (parent != null && imports != null) {
@@ -539,7 +537,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 container.setLookupRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm);
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
-        Thread.currentThread().setContextClassLoader(pluginRealm.getClassLoader());
+        Thread.currentThread().setContextClassLoader(pluginRealm);
 
         try {
             if (mojoDescriptor.isV4Api()) {
@@ -572,7 +570,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         try {
             // Discover components from the effective ClassLoader (module layer loader for modular plugins)
             Injector injector = Injector.create();
-            injector.discover(pluginRealm.getClassLoader());
+            injector.discover(pluginRealm);
             // Add known classes
             // TODO: get those from the existing plexus scopes ?
             injector.bindInstance(Session.class, sessionV4);
@@ -583,9 +581,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             Map<Class<? extends Service>, Supplier<? extends Service>> services = sessionV4.getAllServices();
             services.forEach((itf, svc) -> injector.bindSupplier((Class<Service>) itf, (Supplier<Service>) svc));
 
-            mojo = mojoInterface.cast(injector.getInstance(Key.of(
-                    pluginRealm.getClassLoader().loadClass(mojoDescriptor.getImplementation()),
-                    mojoDescriptor.getRoleHint())));
+            mojo = mojoInterface.cast(injector.getInstance(
+                    Key.of(pluginRealm.loadClass(mojoDescriptor.getImplementation()), mojoDescriptor.getRoleHint())));
 
         } catch (Exception e) {
             throw new PluginContainerException(mojoDescriptor, pluginRealm, "Unable to lookup Mojo", e);
