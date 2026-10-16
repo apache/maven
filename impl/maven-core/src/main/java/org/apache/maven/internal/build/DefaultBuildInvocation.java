@@ -128,7 +128,7 @@ public record DefaultBuildInvocation(
             try {
                 failureBehavior = ReactorFailureBehavior.fromString(request.getReactorFailureBehavior());
             } catch (IllegalArgumentException e) {
-                LOGGER.warn(
+                LOGGER.debug(
                         "Unknown reactor failure behavior '{}', defaulting to FAIL_FAST",
                         request.getReactorFailureBehavior());
             }
