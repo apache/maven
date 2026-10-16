@@ -76,9 +76,7 @@ public class MavenValCling extends ClingSupport {
     protected Invoker createInvoker() {
         return new ValidateInvoker(
                 ProtoLookup.builder()
-                        .addMapping(
-                                org.codehaus.plexus.classworlds.ClassWorld.class,
-                                (org.codehaus.plexus.classworlds.ClassWorld) classWorld)
+                        .addMapping(ClassWorld.class, classWorld)
                         .build(),
                 null);
     }

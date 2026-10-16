@@ -363,10 +363,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             List<Artifact> pluginArtifacts = extensionRecord.getArtifacts();
 
             for (ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents()) {
-                componentDescriptor.setRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm);
+                componentDescriptor.setRealm(pluginRealm);
             }
 
-            pluginDescriptor.setClassRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm);
+            pluginDescriptor.setClassRealm(pluginRealm);
             pluginDescriptor.setArtifacts(pluginArtifacts);
         } else {
             boolean v4api = pluginDescriptor.getMojos().stream().anyMatch(MojoDescriptor::isV4Api);
@@ -389,11 +389,11 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                         pluginDescriptor.getDependencyNode());
             });
 
-            pluginDescriptor.setClassRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) cacheRecord.getRealm());
+            pluginDescriptor.setClassRealm(cacheRecord.getRealm());
             pluginDescriptor.setArtifacts(new ArrayList<>(cacheRecord.getArtifacts()));
             pluginDescriptor.setDependencyNode(cacheRecord.getDependencyNode());
             for (ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents()) {
-                componentDescriptor.setRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) cacheRecord.getRealm());
+                componentDescriptor.setRealm(cacheRecord.getRealm());
             }
 
             pluginRealmCache.register(project, cacheKey, cacheRecord);
@@ -437,7 +437,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         discoverPluginComponents(pluginRealm, plugin, pluginDescriptor);
 
         pluginDescriptor.setDependencyNode(result.getRoot());
-        pluginDescriptor.setClassRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm);
+        pluginDescriptor.setClassRealm(pluginRealm);
         pluginDescriptor.setArtifacts(pluginArtifacts);
     }
 
@@ -449,7 +449,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             if (pluginDescriptor != null) {
                 for (MojoDescriptor mojo : pluginDescriptor.getMojos()) {
                     if (!mojo.isV4Api()) {
-                        mojo.setRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm);
+                        mojo.setRealm(pluginRealm);
                         container.addComponentDescriptor(mojo);
                     }
                 }
@@ -458,7 +458,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             Thread.currentThread().setContextClassLoader(pluginRealm);
             ((DefaultPlexusContainer) container)
                     .discoverComponents(
-                            (org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm,
+                            pluginRealm,
                             new SessionScopeModule(container.lookup(SessionScope.class)),
                             new MojoExecutionScopeModule(container.lookup(MojoExecutionScope.class)),
                             new PluginConfigurationModule(plugin.getDelegate()),
@@ -533,8 +533,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         // We are forcing the use of the plugin realm for all lookups that might occur during
         // the lifecycle that is part of the lookup. Here we are specifically trying to keep
         // lookups that occur in contextualize calls in line with the right realm.
-        ClassRealm oldLookupRealm =
-                container.setLookupRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm);
+        ClassRealm oldLookupRealm = container.setLookupRealm(pluginRealm);
 
         ClassLoader oldClassLoader = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(pluginRealm);
@@ -547,7 +546,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             }
         } finally {
             Thread.currentThread().setContextClassLoader(oldClassLoader);
-            container.setLookupRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) oldLookupRealm);
+            container.setLookupRealm(oldLookupRealm);
         }
     }
 
@@ -719,7 +718,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 ps.println("Unable to load the mojo '" + mojoDescriptor.getGoal() + "' in the plugin '"
                         + pluginDescriptor.getId() + "'. A required class is missing: "
                         + cause.getMessage());
-                ((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm).display(ps);
+                pluginRealm.display(ps);
 
                 throw new PluginContainerException(mojoDescriptor, pluginRealm, os.toString(), cause);
             } else if (cause instanceof LinkageError) {
@@ -728,7 +727,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 ps.println("Unable to load the mojo '" + mojoDescriptor.getGoal() + "' in the plugin '"
                         + pluginDescriptor.getId() + "' due to an API incompatibility: "
                         + e.getClass().getName() + ": " + cause.getMessage());
-                ((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm).display(ps);
+                pluginRealm.display(ps);
 
                 throw new PluginContainerException(mojoDescriptor, pluginRealm, os.toString(), cause);
             }
@@ -838,12 +837,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                         + configuratorId + " configurator -->");
             }
 
-            configurator.configureComponent(
-                    mojo,
-                    configuration,
-                    expressionEvaluator,
-                    (org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm,
-                    validator);
+            configurator.configureComponent(mojo, configuration, expressionEvaluator, pluginRealm, validator);
 
             logger.debug("-- end configuration --");
 
@@ -879,7 +873,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             PrintStream ps = new PrintStream(os);
             ps.println("A required class was missing during configuration of mojo " + mojoDescriptor.getId() + ": "
                     + e.getMessage());
-            ((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm).display(ps);
+            pluginRealm.display(ps);
 
             throw new PluginConfigurationException(mojoDescriptor.getPluginDescriptor(), os.toString(), e);
         } catch (LinkageError e) {
@@ -887,7 +881,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             PrintStream ps = new PrintStream(os);
             ps.println("An API incompatibility was encountered during configuration of mojo " + mojoDescriptor.getId()
                     + ": " + e.getClass().getName() + ": " + e.getMessage());
-            ((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm).display(ps);
+            pluginRealm.display(ps);
 
             throw new PluginConfigurationException(mojoDescriptor.getPluginDescriptor(), os.toString(), e);
         } finally {

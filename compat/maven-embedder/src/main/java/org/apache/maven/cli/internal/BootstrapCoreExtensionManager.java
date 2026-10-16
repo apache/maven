@@ -181,8 +181,7 @@ public class BootstrapCoreExtensionManager {
             coreExports.getExportedPackages().forEach((p, cl) -> realm.importFrom(cl, p));
             providedArtifacts = coreExports.getExportedArtifacts();
         } else if (STRATEGY_SELF_FIRST.equals(classLoadingStrategy)) {
-            ((org.codehaus.plexus.classworlds.realm.ClassRealm) realm)
-                    .setParentRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) parentRealm);
+            realm.setParentRealm(parentRealm);
         } else {
             throw new IllegalArgumentException("Unsupported class-loading strategy '"
                     + classLoadingStrategy + "'. Supported values are: " + STRATEGY_PARENT_FIRST

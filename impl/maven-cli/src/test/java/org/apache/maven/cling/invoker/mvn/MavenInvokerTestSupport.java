@@ -156,7 +156,7 @@ public abstract class MavenInvokerTestSupport {
     }
 
     protected ClassWorld createClassWorld() {
-        return new org.codehaus.plexus.classworlds.ClassWorld("plexus.core", ClassLoader.getSystemClassLoader());
+        return new ClassWorld("plexus.core", ClassLoader.getSystemClassLoader());
     }
 
     protected abstract Invoker createInvoker(ClassWorld classWorld);

@@ -98,8 +98,8 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
         ClassRealm containerRealm =
                 setupContainerRealm(context.logger, classWorld, coreRealm, extClassPath, loadedExtensionsEntries);
         ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .setClassWorld((org.codehaus.plexus.classworlds.ClassWorld) classWorld)
-                .setRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) containerRealm)
+                .setClassWorld(classWorld)
+                .setRealm(containerRealm)
                 .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
                 .setAutoWiring(true)
                 .setJSR250Lifecycle(true)
@@ -124,8 +124,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
         List<Throwable> failures = new ArrayList<>();
         for (LoadedCoreExtension extension : loadedExtensions) {
             container.discoverComponents(
-                    (org.codehaus.plexus.classworlds.realm.ClassRealm)
-                            extension.entry().getClassRealm(),
+                    extension.entry().getClassRealm(),
                     new AbstractModule() {
                         @Override
                         protected void configure() {
@@ -232,8 +231,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
         if (!extClassPath.isEmpty() || !extensions.isEmpty()) {
             ClassRealm extRealm = classWorld.newRealm("maven.ext", null);
 
-            ((org.codehaus.plexus.classworlds.realm.ClassRealm) extRealm)
-                    .setParentRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) coreRealm);
+            extRealm.setParentRealm(coreRealm);
 
             logger.debug("Populating class realm '" + extRealm.getId() + "'");
 
@@ -280,8 +278,8 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             return List.of();
         }
         ContainerConfiguration cc = new DefaultContainerConfiguration()
-                .setClassWorld((org.codehaus.plexus.classworlds.ClassWorld) containerRealm.getWorld())
-                .setRealm((org.codehaus.plexus.classworlds.realm.ClassRealm) containerRealm)
+                .setClassWorld(containerRealm.getWorld())
+                .setRealm(containerRealm)
                 .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
                 .setAutoWiring(true)
                 .setJSR250Lifecycle(true)

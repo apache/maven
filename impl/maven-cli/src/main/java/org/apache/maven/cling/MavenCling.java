@@ -65,7 +65,7 @@ public class MavenCling extends ClingSupport {
      * This makes {@code MavenCling} the default entry point that external tools (such as the Maven Wrapper
      * or IDEs) can rely on without needing to set the {@code maven.mainClass} property.
      */
-    public static int main(String[] args, org.codehaus.plexus.classworlds.ClassWorld world) throws IOException {
+    public static int main(String[] args, ClassWorld world) throws IOException {
         String mainClass = System.getProperty(MAVEN_MAIN_CLASS_PROPERTY);
         if (mainClass != null && !MavenCling.class.getName().equals(mainClass)) {
             return delegateMain(mainClass, args, world);
@@ -73,12 +73,12 @@ public class MavenCling extends ClingSupport {
         return new MavenCling(world).run(args, null, null, null, false);
     }
 
-    private static int delegateMain(String mainClass, String[] args, org.codehaus.plexus.classworlds.ClassWorld world)
+    private static int delegateMain(String mainClass, String[] args, ClassWorld world)
             throws IOException {
         try {
             ClassLoader cl = Thread.currentThread().getContextClassLoader();
             Class<?> clazz = cl.loadClass(mainClass);
-            Class<?> cwClass = cl.loadClass(org.codehaus.plexus.classworlds.ClassWorld.class.getName());
+            Class<?> cwClass = cl.loadClass(ClassWorld.class.getName());
             Method method = clazz.getMethod("main", String[].class, cwClass);
             if (!Modifier.isStatic(method.getModifiers()) || !Modifier.isPublic(method.getModifiers())) {
                 throw new NoSuchMethodException(mainClass + ".main(String[], ClassWorld)");
@@ -110,7 +110,7 @@ public class MavenCling extends ClingSupport {
      */
     public static int main(
             String[] args,
-            org.codehaus.plexus.classworlds.ClassWorld world,
+            ClassWorld world,
             @Nullable InputStream stdIn,
             @Nullable OutputStream stdOut,
             @Nullable OutputStream stdErr)

@@ -171,7 +171,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
             PrintStream ps = new PrintStream(os);
             ps.println(
                     "A required class was missing while executing " + mojoDescriptor.getId() + ": " + e.getMessage());
-            ((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm).display(ps);
+            pluginRealm.display(ps);
             Exception wrapper = new PluginContainerException(mojoDescriptor, pluginRealm, os.toString(), e);
             throw new PluginExecutionException(mojoExecution, project, wrapper);
         } catch (LinkageError e) {
@@ -181,7 +181,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
             PrintStream ps = new PrintStream(os);
             ps.println("An API incompatibility was encountered while executing " + mojoDescriptor.getId() + ": "
                     + e.getClass().getName() + ": " + e.getMessage());
-            ((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm).display(ps);
+            pluginRealm.display(ps);
             Exception wrapper = new PluginContainerException(mojoDescriptor, pluginRealm, os.toString(), e);
             throw new PluginExecutionException(mojoExecution, project, wrapper);
         } catch (ClassCastException e) {
@@ -191,7 +191,7 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
             PrintStream ps = new PrintStream(os);
             ps.println("A type incompatibility occurred while executing " + mojoDescriptor.getId() + ": "
                     + e.getMessage());
-            ((org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm).display(ps);
+            pluginRealm.display(ps);
             throw new PluginExecutionException(mojoExecution, project, os.toString(), e);
         } catch (RuntimeException e) {
             mojoExecutionListener.afterExecutionFailure(
