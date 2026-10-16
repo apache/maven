@@ -459,4 +459,4 @@ fi
 # The arguments ("$@") are passed outside the eval'd string to preserve literal
 # values (backslashes, ${...} placeholders) without shell re-parsing.
 # Only the base command uses eval for MAVEN_OPTS word splitting.
-eval exec "$cmd" '"$@"
+eval exec "$cmd" '"$@"'
