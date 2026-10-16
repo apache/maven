@@ -18,8 +18,9 @@
 name: PR check
 
 on:
-  pull_request_target:
-    types: [opened, edited, reopened, synchronize]
+  workflow_run:
+    workflows: [PR Signal]
+    types: [completed]
 
 jobs:
   pr-check:
