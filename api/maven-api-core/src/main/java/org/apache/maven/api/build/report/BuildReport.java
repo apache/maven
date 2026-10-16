@@ -48,6 +48,25 @@ import org.apache.maven.api.services.BuilderProblem;
 public interface BuildReport {
 
     /**
+     * Semantic version of the report format (e.g. {@code "1.0"}).
+     * <p>
+     * Versioning policy:
+     * <ul>
+     *   <li><b>Minor</b> increments (1.0 &rarr; 1.1) are purely additive &mdash;
+     *       new fields may appear, but existing fields keep their name, type, and
+     *       meaning. Consumers that ignore unknown fields are forward-compatible.</li>
+     *   <li><b>Major</b> increments (1.x &rarr; 2.0) signal a breaking change &mdash;
+     *       fields may be removed, renamed, or change type. Consumers should check
+     *       the major version and refuse to parse an unsupported major.</li>
+     * </ul>
+     *
+     * @return the semver report version string, never {@code null}
+     * @since 4.1.0
+     */
+    @Nonnull
+    String reportVersion();
+
+    /**
      * The invocation context of this build: flags, properties, and platform settings
      * that were active when the session started.
      *
