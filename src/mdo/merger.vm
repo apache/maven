@@ -208,11 +208,7 @@ public class ${className} {
 #foreach ( $class in $model.allClasses )
   #if ( $class.name != "InputSource" && $class.name != "InputLocation" )
     protected KeyComputer<${class.name}> get${class.name}Key() {
-    #if ( $class.superClass == "IdentifiableBase" )
-        return IdentifiableBase::getId;
-    #else
         return v -> v;
-    #end
     }
   #end
 #end

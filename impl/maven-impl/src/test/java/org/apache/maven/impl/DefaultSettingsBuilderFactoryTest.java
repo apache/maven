@@ -18,6 +18,9 @@
  */
 package org.apache.maven.impl;
 
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
@@ -31,6 +34,7 @@ import org.apache.maven.api.services.SettingsBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilderResult;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
+import org.apache.maven.api.settings.Mirror;
 import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.impl.model.DefaultInterpolator;
@@ -187,6 +191,97 @@ class DefaultSettingsBuilderFactoryTest {
         assertFalse(localRepository.isEmpty());
         Path repoPath = Paths.get(localRepository);
         assertTrue(repoPath.isAbsolute(), "Relative local repository should be resolved to absolute");
+    }
+
+    @Test
+    void testMergeUserSettingsOverInstallationSettings() {
+        SettingsBuilder builder =
+                new DefaultSettingsBuilder(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), Map.of());
+
+        Source userSource = new Source() {
+            @Override
+            public Path getPath() {
+                return null;
+            }
+
+            @Override
+            public InputStream openStream() {
+                String xml = "<settings xmlns='http://maven.apache.org/SETTINGS/1.0.0'>"
+                        + "<mirrors>"
+                        + "<mirror>"
+                        + "<id>shared-mirror</id>"
+                        + "<url>http://dominant.example.com/</url>"
+                        + "<mirrorOf>central</mirrorOf>"
+                        + "</mirror>"
+                        + "</mirrors>"
+                        + "</settings>";
+                return new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+            }
+
+            @Override
+            public String getLocation() {
+                return "user-settings.xml";
+            }
+
+            @Override
+            public Source resolve(String relative) {
+                return null;
+            }
+        };
+
+        Source installationSource = new Source() {
+            @Override
+            public Path getPath() {
+                return null;
+            }
+
+            @Override
+            public InputStream openStream() {
+                String xml = "<settings xmlns='http://maven.apache.org/SETTINGS/1.0.0'>"
+                        + "<mirrors>"
+                        + "<mirror>"
+                        + "<id>shared-mirror</id>"
+                        + "<url>http://recessive.example.com/</url>"
+                        + "<mirrorOf>central</mirrorOf>"
+                        + "</mirror>"
+                        + "<mirror>"
+                        + "<id>maven-default-http-blocker</id>"
+                        + "<url>http://0.0.0.0/</url>"
+                        + "<mirrorOf>external:http:*</mirrorOf>"
+                        + "<blocked>true</blocked>"
+                        + "</mirror>"
+                        + "</mirrors>"
+                        + "</settings>";
+                return new ByteArrayInputStream(xml.getBytes(StandardCharsets.UTF_8));
+            }
+
+            @Override
+            public String getLocation() {
+                return "installation-settings.xml";
+            }
+
+            @Override
+            public Source resolve(String relative) {
+                return null;
+            }
+        };
+
+        SettingsBuilderRequest request = SettingsBuilderRequest.builder()
+                .session(session)
+                .userSettingsSource(userSource)
+                .installationSettingsSource(installationSource)
+                .build();
+
+        SettingsBuilderResult result = builder.build(request);
+        assertNotNull(result);
+        Settings effective = result.getEffectiveSettings();
+        assertNotNull(effective);
+
+        List<Mirror> mirrors = effective.getMirrors();
+        assertEquals(2, mirrors.size());
+        assertEquals("shared-mirror", mirrors.get(0).getId());
+        assertEquals("http://dominant.example.com/", mirrors.get(0).getUrl());
+        assertEquals("maven-default-http-blocker", mirrors.get(1).getId());
     }
 
     private Path getSettings(String name) {

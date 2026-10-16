@@ -183,6 +183,29 @@ class SettingsUtilsTest {
     }
 
     @Test
+    void testDominantMirrorWinsOnConflict() {
+        org.apache.maven.api.settings.Mirror dominantMirror = org.apache.maven.api.settings.Mirror.newBuilder()
+                .id("shared-mirror")
+                .url("http://dominant.example.com/")
+                .build();
+        org.apache.maven.api.settings.Mirror recessiveMirror = org.apache.maven.api.settings.Mirror.newBuilder()
+                .id("shared-mirror")
+                .url("http://recessive.example.com/")
+                .build();
+
+        Settings dominant = Settings.newBuilder().mirrors(List.of(dominantMirror)).build();
+        Settings recessive = Settings.newBuilder().mirrors(List.of(recessiveMirror)).build();
+
+        Settings merged = SettingsUtilsV4.merge(dominant, recessive);
+
+        List<org.apache.maven.api.settings.Mirror> mirrors = merged.getMirrors();
+        assertNotNull(mirrors);
+        assertEquals(1, mirrors.size());
+        assertEquals("shared-mirror", mirrors.get(0).getId());
+        assertEquals("http://dominant.example.com/", mirrors.get(0).getUrl());
+    }
+
+    @Test
     void testDominantSettingsValuesPrecedeRecessive() {
         Settings dominant = Settings.newBuilder()
                 .localRepository("/dominant/path")
@@ -195,4 +218,3 @@ class SettingsUtilsTest {
         assertEquals("/dominant/path", merged.getLocalRepository());
     }
 }
-

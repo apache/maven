@@ -70,7 +70,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private final DefaultSettingsValidator settingsValidator = new DefaultSettingsValidator();
 
-    private final SettingsMerger settingsMerger = new SettingsMerger() {
+    static final SettingsMerger SETTINGS_MERGER = new SettingsMerger() {
         @Override
         protected KeyComputer<Repository> getRepositoryKey() {
             return IdentifiableBase::getId;
@@ -96,6 +96,8 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             return IdentifiableBase::getId;
         }
     };
+
+    private final SettingsMerger settingsMerger = SETTINGS_MERGER;
 
     private final SettingsParser xmlSettingsParser;
 

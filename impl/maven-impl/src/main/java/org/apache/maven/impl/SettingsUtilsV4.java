@@ -69,7 +69,7 @@ public final class SettingsUtilsV4 {
      * @param recessive
      */
     public static Settings merge(Settings dominant, Settings recessive) {
-        return new SettingsMerger().merge(dominant, recessive, false, Collections.emptyMap());
+        return DefaultSettingsBuilder.SETTINGS_MERGER.merge(dominant, recessive, false, Collections.emptyMap());
     }
 
     /**
