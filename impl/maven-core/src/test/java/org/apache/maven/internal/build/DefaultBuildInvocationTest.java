@@ -44,6 +44,12 @@ import static org.mockito.Mockito.when;
 
 class DefaultBuildInvocationTest {
 
+    private static MavenExecutionRequest newRequest() {
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepositoryPath(new File("/tmp/test-repo"));
+        return request;
+    }
+
     @Test
     void fromBasicRequest() {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
@@ -69,7 +75,7 @@ class DefaultBuildInvocationTest {
 
     @Test
     void fromNullGoals() {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        MavenExecutionRequest request = newRequest();
         MavenSession session = mock(MavenSession.class);
         when(session.getRequest()).thenReturn(request);
 
@@ -81,7 +87,7 @@ class DefaultBuildInvocationTest {
 
     @Test
     void fromNullActiveProfiles() {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        MavenExecutionRequest request = newRequest();
         MavenSession session = mock(MavenSession.class);
         when(session.getRequest()).thenReturn(request);
 
@@ -93,7 +99,7 @@ class DefaultBuildInvocationTest {
 
     @Test
     void fromNullSelectedProjects() {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        MavenExecutionRequest request = newRequest();
         MavenSession session = mock(MavenSession.class);
         when(session.getRequest()).thenReturn(request);
 
@@ -104,19 +110,17 @@ class DefaultBuildInvocationTest {
     }
 
     @Test
-    void fromNullLocalRepositoryPath() {
+    void fromNullLocalRepositoryPathThrows() {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         MavenSession session = mock(MavenSession.class);
         when(session.getRequest()).thenReturn(request);
 
-        BuildInvocation inv = DefaultBuildInvocation.from(session);
-
-        assertNotNull(inv.localRepository());
+        assertThrows(IllegalStateException.class, () -> DefaultBuildInvocation.from(session));
     }
 
     @Test
     void fromNullReactorFailureBehaviorDefaultsToFailFast() {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        MavenExecutionRequest request = newRequest();
         MavenSession session = mock(MavenSession.class);
         when(session.getRequest()).thenReturn(request);
 
@@ -127,7 +131,7 @@ class DefaultBuildInvocationTest {
 
     @Test
     void resumeFrom() {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        MavenExecutionRequest request = newRequest();
         request.setResumeFrom(":my-module");
         MavenSession session = mock(MavenSession.class);
         when(session.getRequest()).thenReturn(request);
@@ -139,7 +143,7 @@ class DefaultBuildInvocationTest {
 
     @Test
     void resumeFromNull() {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        MavenExecutionRequest request = newRequest();
         MavenSession session = mock(MavenSession.class);
         when(session.getRequest()).thenReturn(request);
 
@@ -150,7 +154,7 @@ class DefaultBuildInvocationTest {
 
     @Test
     void noTransferProgress() {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        MavenExecutionRequest request = newRequest();
         request.setNoTransferProgress(true);
         MavenSession session = mock(MavenSession.class);
         when(session.getRequest()).thenReturn(request);
@@ -162,7 +166,7 @@ class DefaultBuildInvocationTest {
 
     @Test
     void sensitiveKeyRedaction() {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        MavenExecutionRequest request = newRequest();
         Properties userProps = new Properties();
         userProps.setProperty("my.password", "secret123");
         userProps.setProperty("api_key", "key123");
@@ -205,7 +209,7 @@ class DefaultBuildInvocationTest {
 
     @Test
     void systemInfoCapturesExpectedKeys() {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        MavenExecutionRequest request = newRequest();
         MavenSession session = mock(MavenSession.class);
         when(session.getRequest()).thenReturn(request);
 
@@ -248,7 +252,7 @@ class DefaultBuildInvocationTest {
 
     @Test
     void reactorFailureBehaviorValues() {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        MavenExecutionRequest request = newRequest();
         MavenSession session = mock(MavenSession.class);
         when(session.getRequest()).thenReturn(request);
 
@@ -266,5 +270,40 @@ class DefaultBuildInvocationTest {
         assertEquals(
                 ReactorFailureBehavior.FAIL_NEVER,
                 DefaultBuildInvocation.from(session).reactorFailureBehavior());
+    }
+
+    @Test
+    void unrecognizedReactorFailureBehaviorDefaultsToFailFast() {
+        MavenExecutionRequest request = newRequest();
+        request.setReactorFailureBehavior("UNKNOWN_VALUE");
+        MavenSession session = mock(MavenSession.class);
+        when(session.getRequest()).thenReturn(request);
+
+        BuildInvocation inv = DefaultBuildInvocation.from(session);
+
+        assertEquals(ReactorFailureBehavior.FAIL_FAST, inv.reactorFailureBehavior());
+    }
+
+    @Test
+    void threadsDefault() {
+        MavenExecutionRequest request = newRequest();
+        MavenSession session = mock(MavenSession.class);
+        when(session.getRequest()).thenReturn(request);
+
+        BuildInvocation inv = DefaultBuildInvocation.from(session);
+
+        assertEquals(1, inv.threads());
+    }
+
+    @Test
+    void threadsExplicit() {
+        MavenExecutionRequest request = newRequest();
+        request.setDegreeOfConcurrency(4);
+        MavenSession session = mock(MavenSession.class);
+        when(session.getRequest()).thenReturn(request);
+
+        BuildInvocation inv = DefaultBuildInvocation.from(session);
+
+        assertEquals(4, inv.threads());
     }
 }

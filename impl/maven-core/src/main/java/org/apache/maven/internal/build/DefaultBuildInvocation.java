@@ -29,6 +29,8 @@ import java.util.TreeMap;
 import org.apache.maven.api.BuildInvocation;
 import org.apache.maven.api.ReactorFailureBehavior;
 import org.apache.maven.execution.MavenSession;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Internal immutable implementation of {@link BuildInvocation}.
@@ -62,6 +64,8 @@ public record DefaultBuildInvocation(
         boolean batchMode,
         int threads)
         implements BuildInvocation {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultBuildInvocation.class);
 
     private static final Set<String> SENSITIVE_KEY_FRAGMENTS =
             Set.of("password", "passwd", "secret", "token", "apikey", "api_key", "credential", "passphrase");
@@ -106,9 +110,10 @@ public record DefaultBuildInvocation(
         addSystemProp(sysInfo, "user.name");
         sysInfo.put("available.processors", String.valueOf(Runtime.getRuntime().availableProcessors()));
 
-        Path localRepo = request.getLocalRepositoryPath() != null
-                ? request.getLocalRepositoryPath().toPath()
-                : Path.of("");
+        if (request.getLocalRepositoryPath() == null) {
+            throw new IllegalStateException("localRepositoryPath is not set on the execution request");
+        }
+        Path localRepo = request.getLocalRepositoryPath().toPath();
 
         List<String> activeProfiles =
                 request.getActiveProfiles() != null ? List.copyOf(request.getActiveProfiles()) : List.of();
@@ -122,7 +127,10 @@ public record DefaultBuildInvocation(
         if (request.getReactorFailureBehavior() != null) {
             try {
                 failureBehavior = ReactorFailureBehavior.fromString(request.getReactorFailureBehavior());
-            } catch (IllegalArgumentException ignored) {
+            } catch (IllegalArgumentException e) {
+                LOGGER.warn(
+                        "Unknown reactor failure behavior '{}', defaulting to FAIL_FAST",
+                        request.getReactorFailureBehavior());
             }
         }
 
