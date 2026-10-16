@@ -102,7 +102,7 @@ public class DeduplicateDependenciesStrategy extends AbstractUpgradeStrategy {
                 hasIssues |= fixDuplicatePlugins(pomDocument, context);
 
                 if (hasIssues) {
-                    context.success("Duplicate declarations removed");
+                    logChange(context, "Duplicate declaration removal");
                     modifiedPoms.add(pomPath);
                 } else {
                     context.success("No duplicate declarations found");

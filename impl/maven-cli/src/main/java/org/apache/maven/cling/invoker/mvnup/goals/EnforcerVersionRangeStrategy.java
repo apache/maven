@@ -133,7 +133,7 @@ public class EnforcerVersionRangeStrategy extends AbstractUpgradeStrategy {
 
                 if (hasUpgrades) {
                     modifiedPoms.add(pomPath);
-                    context.success("RequireMavenVersion ranges widened to allow Maven 4");
+                    logChange(context, "RequireMavenVersion range widening to allow Maven 4");
                 } else {
                     context.success("No RequireMavenVersion range restrictions found");
                 }
