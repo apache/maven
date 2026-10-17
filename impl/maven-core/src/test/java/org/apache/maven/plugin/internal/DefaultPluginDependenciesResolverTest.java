@@ -67,6 +67,7 @@ class DefaultPluginDependenciesResolverTest {
         Set<String> exportedArtifacts = new LinkedHashSet<>();
         exportedArtifacts.add("org.apache.maven:maven-core");
         exportedArtifacts.add("org.apache.maven.test:dummy-missing");
+        exportedArtifacts.add("org.slf4j:slf4j-api");
 
         CoreExports coreExports = new CoreExports(classRealm, exportedArtifacts, Collections.emptySet());
 
@@ -127,6 +128,10 @@ class DefaultPluginDependenciesResolverTest {
         boolean dummyPresent = managedDeps.stream()
                 .anyMatch(d -> "org.apache.maven.test".equals(d.getArtifact().getGroupId()));
         assertFalse(dummyPresent, "Artifact without pom.properties should be safely omitted");
+
+        boolean slf4jPresent = managedDeps.stream()
+                .anyMatch(d -> "org.slf4j".equals(d.getArtifact().getGroupId()));
+        assertFalse(slf4jPresent, "Third-party exported library slf4j-api should not be in managed dependencies");
     }
 
     @Test
@@ -173,5 +178,161 @@ class DefaultPluginDependenciesResolverTest {
         CollectRequest captured = requestCaptor.getValue();
         assertTrue(captured.getManagedDependencies() == null
                 || captured.getManagedDependencies().isEmpty());
+    }
+
+    @Test
+    void testResolvePluginPreservesDirectPluginDependencies() throws Exception {
+        RepositorySystem repoSystem = mock(RepositorySystem.class);
+        List<MavenPluginDependenciesValidator> validators = Collections.emptyList();
+
+        ClassWorld classWorld = new ClassWorld();
+        ClassRealm classRealm =
+                classWorld.newRealm("test.core.direct", getClass().getClassLoader());
+
+        Set<String> exportedArtifacts = new LinkedHashSet<>();
+        exportedArtifacts.add("org.apache.maven:maven-core");
+
+        CoreExports coreExports = new CoreExports(classRealm, exportedArtifacts, Collections.emptySet());
+
+        DefaultPluginDependenciesResolver resolver =
+                new DefaultPluginDependenciesResolver(repoSystem, validators, coreExports);
+
+        Plugin plugin = new Plugin();
+        plugin.setGroupId("org.apache.maven.plugins");
+        plugin.setArtifactId("maven-compiler-plugin");
+        plugin.setVersion("3.13.0");
+
+        org.apache.maven.model.Dependency coreDep = new org.apache.maven.model.Dependency();
+        coreDep.setGroupId("org.apache.maven");
+        coreDep.setArtifactId("maven-core");
+        coreDep.setVersion("3.9.0");
+        coreDep.setScope("compile");
+        plugin.addDependency(coreDep);
+
+        org.apache.maven.model.Dependency nonCoreDep = new org.apache.maven.model.Dependency();
+        nonCoreDep.setGroupId("commons-io");
+        nonCoreDep.setArtifactId("commons-io");
+        nonCoreDep.setVersion("2.11.0");
+        nonCoreDep.setScope("compile");
+        plugin.addDependency(nonCoreDep);
+
+        Artifact pluginArtifact =
+                new DefaultArtifact("org.apache.maven.plugins", "maven-compiler-plugin", "jar", "3.13.0");
+
+        ArtifactTypeRegistry typeRegistry = mock(ArtifactTypeRegistry.class);
+        ArtifactType pluginType = mock(ArtifactType.class);
+        when(pluginType.getExtension()).thenReturn("jar");
+        when(typeRegistry.get("maven-plugin")).thenReturn(pluginType);
+        when(typeRegistry.get("jar")).thenReturn(pluginType);
+
+        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
+        session.setArtifactTypeRegistry(typeRegistry);
+        InternalSession internalSession = mock(InternalSession.class);
+        InternalSession.associate(session, internalSession);
+
+        DependencyNode rootNode = mock(DependencyNode.class);
+        CollectResult collectResult = new CollectResult(new CollectRequest());
+        collectResult.setRoot(rootNode);
+        when(repoSystem.collectDependencies(any(), any(CollectRequest.class))).thenReturn(collectResult);
+
+        DependencyResult dependencyResult = new DependencyResult(new DependencyRequest());
+        when(repoSystem.resolveDependencies(any(), any(DependencyRequest.class)))
+                .thenReturn(dependencyResult);
+
+        DependencyFilter filter = mock(DependencyFilter.class);
+
+        resolver.resolvePluginAndFlatten(plugin, pluginArtifact, filter, Collections.emptyList(), session);
+
+        ArgumentCaptor<CollectRequest> requestCaptor = ArgumentCaptor.forClass(CollectRequest.class);
+        verify(repoSystem).collectDependencies(any(), requestCaptor.capture());
+
+        CollectRequest captured = requestCaptor.getValue();
+        List<Dependency> capturedDeps = captured.getDependencies();
+        assertEquals(2, capturedDeps.size());
+
+        Dependency directCore = capturedDeps.stream()
+                .filter(d -> "org.apache.maven".equals(d.getArtifact().getGroupId())
+                        && "maven-core".equals(d.getArtifact().getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(directCore, "Direct core dependency should be present");
+        assertEquals("runtime", directCore.getScope(), "Direct core dependency scope should be preserved as runtime");
+        assertEquals(
+                "3.9.0", directCore.getArtifact().getVersion(), "Direct core dependency version should be preserved");
+
+        Dependency directNonCore = capturedDeps.stream()
+                .filter(d -> "commons-io".equals(d.getArtifact().getGroupId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(directNonCore, "Direct non-core dependency should be present");
+        assertEquals("runtime", directNonCore.getScope());
+        assertEquals("2.11.0", directNonCore.getArtifact().getVersion());
+
+        boolean coreInManaged = captured.getManagedDependencies().stream()
+                .anyMatch(d -> "org.apache.maven".equals(d.getArtifact().getGroupId())
+                        && "maven-core".equals(d.getArtifact().getArtifactId()));
+        assertFalse(coreInManaged, "Explicit direct dependencies should not be injected into managed dependencies");
+    }
+
+    @Test
+    void testResolveCoreExtensionDoesNotInjectManagedDependencies() throws Exception {
+        RepositorySystem repoSystem = mock(RepositorySystem.class);
+        List<MavenPluginDependenciesValidator> validators = Collections.emptyList();
+
+        ClassWorld classWorld = new ClassWorld();
+        ClassRealm classRealm = classWorld.newRealm("test.core.ext", getClass().getClassLoader());
+
+        Set<String> exportedArtifacts = new LinkedHashSet<>();
+        exportedArtifacts.add("org.apache.maven:maven-core");
+
+        CoreExports coreExports = new CoreExports(classRealm, exportedArtifacts, Collections.emptySet());
+
+        DefaultPluginDependenciesResolver resolver =
+                new DefaultPluginDependenciesResolver(repoSystem, validators, coreExports);
+
+        Plugin plugin = new Plugin();
+        plugin.setGroupId("eu.maveniverse.maven.mimir");
+        plugin.setArtifactId("extension3");
+        plugin.setVersion("0.12.3");
+
+        Artifact pluginArtifact = new DefaultArtifact("eu.maveniverse.maven.mimir", "extension3", "jar", "0.12.3");
+
+        ArtifactTypeRegistry typeRegistry = mock(ArtifactTypeRegistry.class);
+        ArtifactType pluginType = mock(ArtifactType.class);
+        when(pluginType.getExtension()).thenReturn("jar");
+        when(typeRegistry.get("maven-plugin")).thenReturn(pluginType);
+
+        DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
+        session.setArtifactTypeRegistry(typeRegistry);
+        InternalSession internalSession = mock(InternalSession.class);
+        InternalSession.associate(session, internalSession);
+
+        org.eclipse.aether.resolution.ArtifactDescriptorResult descriptorResult =
+                new org.eclipse.aether.resolution.ArtifactDescriptorResult(
+                        new org.eclipse.aether.resolution.ArtifactDescriptorRequest());
+        descriptorResult.setArtifact(pluginArtifact);
+        when(repoSystem.readArtifactDescriptor(any(), any())).thenReturn(descriptorResult);
+
+        DependencyNode rootNode = mock(DependencyNode.class);
+        CollectResult collectResult = new CollectResult(new CollectRequest());
+        collectResult.setRoot(rootNode);
+        when(repoSystem.collectDependencies(any(), any(CollectRequest.class))).thenReturn(collectResult);
+
+        DependencyResult dependencyResult = new DependencyResult(new DependencyRequest());
+        when(repoSystem.resolveDependencies(any(), any(DependencyRequest.class)))
+                .thenReturn(dependencyResult);
+
+        DependencyFilter filter = mock(DependencyFilter.class);
+
+        resolver.resolveCoreExtensionAndFlatten(plugin, filter, Collections.emptyList(), session);
+
+        ArgumentCaptor<CollectRequest> requestCaptor = ArgumentCaptor.forClass(CollectRequest.class);
+        verify(repoSystem).collectDependencies(any(), requestCaptor.capture());
+
+        CollectRequest captured = requestCaptor.getValue();
+        assertTrue(
+                captured.getManagedDependencies() == null
+                        || captured.getManagedDependencies().isEmpty(),
+                "Core extension resolution should not receive managed dependencies");
     }
 }

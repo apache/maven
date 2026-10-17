@@ -24,17 +24,18 @@ import javax.inject.Singleton;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
@@ -84,6 +85,13 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
     private static final String MANAGED_DEPENDENCIES_KEY =
             DefaultPluginDependenciesResolver.class.getName() + ".managedDependencies";
 
+    private static final Set<String> EXCLUDED_FROM_CORE_MANAGED_DEPENDENCIES = Set.of(
+            "org.slf4j:slf4j-api",
+            "javax.inject:javax.inject",
+            "javax.annotation:javax.annotation-api",
+            "org.fusesource.jansi:jansi",
+            "org.codehaus.plexus:plexus-interactivity-api");
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final RepositorySystem repoSystem;
@@ -92,6 +100,11 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
     private final CoreExports coreExports;
 
+    /**
+     * Backward-compatible constructor without {@link CoreExports}.
+     * Core managed dependencies are not injected in this mode.
+     */
+    @Deprecated
     public DefaultPluginDependenciesResolver(
             RepositorySystem repoSystem, List<MavenPluginDependenciesValidator> dependenciesValidators) {
         this(repoSystem, dependenciesValidators, null);
@@ -101,7 +114,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
     public DefaultPluginDependenciesResolver(
             RepositorySystem repoSystem,
             List<MavenPluginDependenciesValidator> dependenciesValidators,
-            CoreExports coreExports) {
+            @Nullable CoreExports coreExports) {
         this.repoSystem = repoSystem;
         this.dependenciesValidators = dependenciesValidators;
         this.coreExports = coreExports;
@@ -220,7 +233,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                         pluginArtifact,
                         message);
             }
-            return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session);
+            return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session, false);
         } catch (ArtifactDescriptorException e) {
             throw new PluginResolutionException(plugin, e.getResult().getExceptions(), e);
         }
@@ -246,7 +259,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             List<RemoteRepository> repositories,
             RepositorySystemSession session)
             throws PluginResolutionException {
-        return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session);
+        return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session, true);
     }
 
     @Override
@@ -257,7 +270,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             List<RemoteRepository> repositories,
             RepositorySystemSession session)
             throws PluginResolutionException {
-        return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session)
+        return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session, true)
                 .getRoot();
     }
 
@@ -266,7 +279,8 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             Artifact pluginArtifact,
             DependencyFilter dependencyFilter,
             List<RemoteRepository> repositories,
-            RepositorySystemSession session)
+            RepositorySystemSession session,
+            boolean injectCoreManagedDeps)
             throws PluginResolutionException {
         InternalSession iSession = InternalSession.from(session);
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(iSession, plugin.getDelegate());
@@ -290,7 +304,18 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             request.setRequestContext(REPOSITORY_CONTEXT);
             request.setRepositories(repositories);
             request.setRoot(new org.eclipse.aether.graph.Dependency(pluginArtifact, null));
-            request.setManagedDependencies(getManagedDependencies(session));
+            Map<String, org.eclipse.aether.graph.Dependency> core =
+                    injectCoreManagedDeps ? getCoreDependenciesMap(session) : Collections.emptyMap();
+            if (injectCoreManagedDeps && !core.isEmpty()) {
+                Set<String> explicitDeps = plugin.getDependencies().stream()
+                        .map(d -> d.getGroupId() + ":" + d.getArtifactId())
+                        .collect(Collectors.toSet());
+                List<org.eclipse.aether.graph.Dependency> managed = core.entrySet().stream()
+                        .filter(e -> !explicitDeps.contains(e.getKey()))
+                        .map(Map.Entry::getValue)
+                        .collect(Collectors.toList());
+                request.setManagedDependencies(managed);
+            }
             for (Dependency dependency : plugin.getDependencies()) {
                 org.eclipse.aether.graph.Dependency pluginDep =
                         RepositoryUtils.toDependency(dependency, session.getArtifactTypeRegistry());
@@ -329,24 +354,31 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
     }
 
     @SuppressWarnings("unchecked")
-    private List<org.eclipse.aether.graph.Dependency> getManagedDependencies(RepositorySystemSession session) {
+    private Map<String, org.eclipse.aether.graph.Dependency> getCoreDependenciesMap(RepositorySystemSession session) {
         if (coreExports == null) {
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
-        return (List<org.eclipse.aether.graph.Dependency>)
-                session.getData().computeIfAbsent(MANAGED_DEPENDENCIES_KEY, this::computeManagedDependencies);
+        return (Map<String, org.eclipse.aether.graph.Dependency>)
+                session.getData().computeIfAbsent(MANAGED_DEPENDENCIES_KEY, this::computeCoreDependenciesMap);
     }
 
-    private List<org.eclipse.aether.graph.Dependency> computeManagedDependencies() {
+    /**
+     * Computes managed dependencies for core artifacts exported by Maven.
+     * Each managed dependency is set to {@code provided} scope so that the
+     * {@link org.eclipse.aether.util.filter.ScopeDependencyFilter} in
+     * {@link #resolveInternal} excludes them from the plugin classpath — they are
+     * already available through the core classloader.
+     */
+    private Map<String, org.eclipse.aether.graph.Dependency> computeCoreDependenciesMap() {
         if (coreExports == null || coreExports.getExportedArtifacts() == null) {
-            return Collections.emptyList();
+            return Collections.emptyMap();
         }
-        List<org.eclipse.aether.graph.Dependency> managed = new ArrayList<>();
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        if (cl == null) {
-            cl = getClass().getClassLoader();
-        }
+        Map<String, org.eclipse.aether.graph.Dependency> managed = new LinkedHashMap<>();
+        ClassLoader cl = getClass().getClassLoader();
         for (String ga : coreExports.getExportedArtifacts()) {
+            if (EXCLUDED_FROM_CORE_MANAGED_DEPENDENCIES.contains(ga)) {
+                continue;
+            }
             int idx = ga.indexOf(':');
             if (idx <= 0 || idx >= ga.length() - 1) {
                 continue;
@@ -358,25 +390,21 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             try (InputStream is = cl.getResourceAsStream(resource)) {
                 if (is != null) {
                     props.load(is);
-                } else if (cl != getClass().getClassLoader()) {
-                    try (InputStream fallbackIs = getClass().getClassLoader().getResourceAsStream(resource)) {
-                        if (fallbackIs != null) {
-                            props.load(fallbackIs);
-                        }
-                    }
                 }
             } catch (IOException e) {
-                logger.debug("Could not read " + resource, e);
+                logger.debug("Could not read {}", resource, e);
             }
             String version = props.getProperty("version");
             if (version != null) {
                 version = version.trim();
                 if (!version.isEmpty() && !version.startsWith("${")) {
                     Artifact artifact = new DefaultArtifact(groupId, artifactId, "jar", version);
-                    managed.add(new org.eclipse.aether.graph.Dependency(artifact, DependencyScope.PROVIDED.id()));
+                    managed.put(
+                            groupId + ":" + artifactId,
+                            new org.eclipse.aether.graph.Dependency(artifact, DependencyScope.PROVIDED.id()));
                 }
             }
         }
-        return Collections.unmodifiableList(managed);
+        return Collections.unmodifiableMap(managed);
     }
 }
