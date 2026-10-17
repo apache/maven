@@ -70,6 +70,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private final DefaultSettingsValidator settingsValidator = new DefaultSettingsValidator();
 
+    // Package-private so SettingsUtilsV4 can reuse the same configured merger instance.
     static final SettingsMerger SETTINGS_MERGER = new SettingsMerger() {
         @Override
         protected KeyComputer<Repository> getRepositoryKey() {

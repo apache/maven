@@ -217,4 +217,15 @@ class SettingsUtilsTest {
         Settings merged = SettingsUtilsV4.merge(dominant, recessive);
         assertEquals("/dominant/path", merged.getLocalRepository());
     }
+
+    @Test
+    void testRecessiveSettingsValuesFillGaps() {
+        Settings dominant = Settings.newBuilder().build();
+        Settings recessive = Settings.newBuilder()
+                .localRepository("/recessive/path")
+                .build();
+
+        Settings merged = SettingsUtilsV4.merge(dominant, recessive);
+        assertEquals("/recessive/path", merged.getLocalRepository());
+    }
 }
