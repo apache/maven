@@ -203,13 +203,14 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
                             ? RepositoryPolicy.UPDATE_POLICY_NEVER
                             : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null);
         } else {
-            // we go "new" way
-            if (request.getArtifactsUpdatePolicy() != null) {
-                sessionBuilder.setArtifactUpdatePolicy(request.getArtifactsUpdatePolicy());
-            }
-            if (request.getMetadataUpdatePolicy() != null) {
-                sessionBuilder.setMetadataUpdatePolicy(request.getMetadataUpdatePolicy());
-            }
+            // we go "new" way: derive legacy-flag policy for any dimension not set explicitly
+            String legacyPolicy = request.isNoSnapshotUpdates()
+                    ? RepositoryPolicy.UPDATE_POLICY_NEVER
+                    : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null;
+            sessionBuilder.setArtifactUpdatePolicy(
+                    request.getArtifactsUpdatePolicy() != null ? request.getArtifactsUpdatePolicy() : legacyPolicy);
+            sessionBuilder.setMetadataUpdatePolicy(
+                    request.getMetadataUpdatePolicy() != null ? request.getMetadataUpdatePolicy() : legacyPolicy);
         }
 
         int errorPolicy = 0;
