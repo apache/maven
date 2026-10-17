@@ -21,7 +21,9 @@ package org.apache.maven.di.impl;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.PrintStream;
 import java.lang.annotation.Annotation;
+import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -65,6 +67,12 @@ public class InjectorImpl implements Injector {
     private final Set<String> loadedUrls = new HashSet<>();
     private final ThreadLocal<Set<Key<?>>> resolutionStack = new ThreadLocal<>();
 
+    // Registration, as with the binding map itself, must not race with resolution.
+    private volatile long registryRevision;
+    private final Object diagnosticLock = new Object();
+    private volatile DiagnosticState diagnosticState;
+    private int registrationDepth;
+
     public InjectorImpl() {
         bindScope(Singleton.class, new SingletonScope());
     }
@@ -84,6 +92,7 @@ public class InjectorImpl implements Injector {
     @SuppressWarnings("unchecked")
     @Override
     public <T> void injectInstance(@Nonnull T instance) {
+        debugBindings();
         ReflectionUtils.generateInjectingInitializer(Key.of((Class<T>) instance.getClass()))
                 .compile(this::getCompiledBinding)
                 .accept(instance);
@@ -92,6 +101,8 @@ public class InjectorImpl implements Injector {
     @Nonnull
     @Override
     public Injector discover(@Nonnull ClassLoader classLoader) {
+        registrationDepth++;
+        boolean complete = false;
         try {
             Enumeration<URL> enumeration = classLoader.getResources("META-INF/maven/org.apache.maven.api.di.Inject");
             while (enumeration.hasMoreElements()) {
@@ -111,8 +122,13 @@ public class InjectorImpl implements Injector {
                     }
                 }
             }
+            complete = true;
         } catch (Exception e) {
             throw new DIException("Error while discovering DI classes from classLoader", e);
+        } finally {
+            if (--registrationDepth == 0) {
+                debugBindings("discovery", !complete);
+            }
         }
         return this;
     }
@@ -126,7 +142,10 @@ public class InjectorImpl implements Injector {
     @Nonnull
     @Override
     public Injector bindScope(@Nonnull Class<? extends Annotation> scopeAnnotation, @Nonnull Supplier<Scope> scope) {
-        if (scopes.put(scopeAnnotation, scope) != null) {
+        Supplier<Scope> previous = scopes.put(scopeAnnotation, scope);
+        registryRevision++;
+        if (previous != null) {
+            debugBindings("registration", true);
             throw new DIException(
                     "Cannot rebind scope annotation class to a different implementation: " + scopeAnnotation);
         }
@@ -151,39 +170,64 @@ public class InjectorImpl implements Injector {
     @Nonnull
     @Override
     public Injector bindImplicit(@Nonnull Class<?> clazz) {
-        Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
-        if (clazz.isInterface()) {
-            bindings.computeIfAbsent(key, $ -> new HashSet<>());
-            if (key.getQualifier() != null) {
-                bindings.computeIfAbsent(Key.ofType(clazz), $ -> new HashSet<>());
+        registrationDepth++;
+        boolean complete = false;
+        try {
+            Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
+            if (clazz.isInterface()) {
+                bindEmptyKey(key);
+                if (key.getQualifier() != null) {
+                    bindEmptyKey(Key.ofType(clazz));
+                }
+            } else if (!Modifier.isAbstract(clazz.getModifiers())) {
+                Binding<?> binding = ReflectionUtils.generateImplicitBinding(key);
+                doBind(key, binding);
             }
-        } else if (!Modifier.isAbstract(clazz.getModifiers())) {
-            Binding<?> binding = ReflectionUtils.generateImplicitBinding(key);
-            doBind(key, binding);
+            complete = true;
+            return this;
+        } finally {
+            if (--registrationDepth == 0 && !complete) {
+                debugBindings("registration", true);
+            }
         }
-        return this;
+    }
+
+    private void bindEmptyKey(Key<?> key) {
+        if (!bindings.containsKey(key)) {
+            bindings.put(key, new HashSet<>());
+            registryRevision++;
+        }
     }
 
     private final LinkedHashSet<Key<?>> current = new LinkedHashSet<>();
 
     private Injector doBind(Key<?> key, Binding<?> binding) {
-        if (!current.add(key)) {
-            current.add(key);
-            throw new DIException("Circular references: " + current);
-        }
+        registrationDepth++;
+        boolean complete = false;
         try {
-            doBindImplicit(key, binding);
-            Class<?> cls = key.getRawType().getSuperclass();
-            while (cls != Object.class && cls != null) {
-                doBindImplicit(Key.of(cls, key.getQualifier()), binding);
-                if (key.getQualifier() != null) {
-                    bind(Key.ofType(cls), binding);
-                }
-                cls = cls.getSuperclass();
+            if (!current.add(key)) {
+                current.add(key);
+                throw new DIException("Circular references: " + current);
             }
-            return this;
+            try {
+                doBindImplicit(key, binding);
+                Class<?> cls = key.getRawType().getSuperclass();
+                while (cls != Object.class && cls != null) {
+                    doBindImplicit(Key.of(cls, key.getQualifier()), binding);
+                    if (key.getQualifier() != null) {
+                        bind(Key.ofType(cls), binding);
+                    }
+                    cls = cls.getSuperclass();
+                }
+                complete = true;
+                return this;
+            } finally {
+                current.remove(key);
+            }
         } finally {
-            current.remove(key);
+            if (--registrationDepth == 0 && !complete) {
+                debugBindings("registration", true);
+            }
         }
     }
 
@@ -191,6 +235,7 @@ public class InjectorImpl implements Injector {
         Set<Binding<?>> bindingSet = bindings.computeIfAbsent(key, $ -> new HashSet<>());
         if (bindingSet.stream().noneMatch(existing -> isSameBinding(existing, b))) {
             bindingSet.add(b);
+            registryRevision++;
         }
         return this;
     }
@@ -236,6 +281,7 @@ public class InjectorImpl implements Injector {
     }
 
     public <Q> Supplier<Q> getCompiledBinding(Dependency<Q> dep) {
+        debugBindings();
         Key<Q> key = dep.key();
         Supplier<Q> originalSupplier = doGetCompiledBinding(dep);
         return () -> {
@@ -516,6 +562,91 @@ public class InjectorImpl implements Injector {
     }
 
     /**
+     * Captures a human-readable snapshot of the current native registry for Maven internals,
+     * including direct binding map and metadata changes, without resolving components.
+     * Registration must not run concurrently with this method.
+     */
+    public String dumpBindings() {
+        return BindingSnapshot.render(
+                this, registryRevision, "explicit", false, BindingSnapshot.capture(bindings, scopes));
+    }
+
+    /** Diagnostic checkpoint for native and bridge resolution entry points. */
+    protected final void debugBindings() {
+        debugBindings("lookup", false);
+    }
+
+    private void debugBindings(String reason, boolean partial) {
+        if (!debugEnabled()) {
+            if (diagnosticState != null) {
+                synchronized (diagnosticLock) {
+                    diagnosticState = null;
+                }
+            }
+            return;
+        }
+        PrintStream output = System.out;
+        DiagnosticState state = diagnosticState;
+        if (!partial && state != null && state.capturedRevision == registryRevision && state.output.get() == output) {
+            return;
+        }
+        writeBindings(output, reason, partial);
+    }
+
+    private static boolean debugEnabled() {
+        try {
+            String property = System.getProperty("sisu.debug");
+            return property != null && (property.isEmpty() || Boolean.parseBoolean(property));
+        } catch (RuntimeException e) {
+            return false;
+        }
+    }
+
+    private void writeBindings(PrintStream output, String reason, boolean partial) {
+        DiagnosticState state = null;
+        long revision = -1;
+        try {
+            List<String> snapshot;
+            synchronized (diagnosticLock) {
+                state = diagnosticState;
+                if (state == null) {
+                    state = new DiagnosticState();
+                    diagnosticState = state;
+                }
+                revision = registryRevision;
+                if (!partial && state.capturedRevision == revision && state.output.get() == output) {
+                    return;
+                }
+                snapshot = BindingSnapshot.capture(bindings, scopes);
+                state.output = new WeakReference<>(output);
+                state.capturedRevision = revision;
+            }
+            // Final block rendering and output run outside the diagnostic state lock.
+            writeDump(output, BindingSnapshot.render(this, revision, reason, partial, snapshot));
+        } catch (RuntimeException e) {
+            // Diagnostics must not replace a registration or resolution failure. Retry on the next checkpoint.
+            synchronized (diagnosticLock) {
+                if (state != null
+                        && diagnosticState == state
+                        && state.capturedRevision == revision
+                        && state.output.get() == output) {
+                    state.capturedRevision = -1;
+                }
+            }
+        }
+    }
+
+    protected void writeDump(PrintStream output, String dump) {
+        output.println(dump);
+    }
+
+    private static final class DiagnosticState {
+        volatile long capturedRevision = -1;
+        // A reused injector must not retain a previous embedded invocation's output stream.
+        volatile WeakReference<PrintStream> output = new WeakReference<>(null);
+    }
+
+    /**
      * Release all internal state so this Injector can be GC’d
      * (and so that subsequent tests start from a clean slate).
      * @since 4.1
@@ -533,5 +664,7 @@ public class InjectorImpl implements Injector {
         scopes.clear();
         loadedUrls.clear();
         resolutionStack.remove();
+        diagnosticState = null;
+        registryRevision++;
     }
 }

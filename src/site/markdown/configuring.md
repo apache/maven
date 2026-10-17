@@ -112,3 +112,32 @@ prepended to the actual list of command line arguments.
 For example, options and goals could be defined with the value
 `-B -V checkstyle:checkstyle`.
 
+## Dependency Injection Diagnostics
+
+Set the `sisu.debug` Java system property to print the bindings known to Maven DI:
+
+```sh
+MAVEN_OPTS="-Dsisu.debug=true" mvn validate
+```
+
+The property accepts `true` (case insensitive) or an empty value. Native dumps
+are disabled when the property is unset or has any other value, including `false`.
+Set it before startup to include bindings discovered during container creation.
+The property also enables Sisu's own diagnostics.
+
+Each block starts with `Maven DI native registry` and identifies the injector and
+registry revision. Sorted rows list all keys and candidates, including aliases,
+priorities, scopes, sources and declared dependencies. Keys without candidates
+are listed too. Class loader identities distinguish types from different realms.
+The blocks go to standard output, where Maven may prefix lines with `[stdout]`.
+
+Snapshots are printed after discovery and when lookup or injection observes
+changed registrations, including context bindings added before a Maven 4 Mojo
+runs. Repeated lookups of an unchanged registry do not print another block.
+Discovery or registration failures produce a block marked `partial`.
+
+Snapshots do not create components, call providers or initializers, or obtain
+scope instances. Bound instances, suppliers and annotation qualifiers appear by
+type and identity, without exposing values or calling their `toString()` methods.
+Only the native registry is included; components supplied on demand by Sisu or
+Guice may be absent.
