@@ -16,29 +16,31 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.cling.logging.impl;
+package org.apache.maven.api.build.report;
 
-import org.apache.maven.cling.logging.BaseSlf4jConfiguration;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
 
 /**
- * Configuration for slf4j-log4j2.
+ * The outcome of a build, module, or mojo execution.
  *
- * @since 3.1.0
+ * @since 4.1.0
  */
-public class Log4j2Configuration extends BaseSlf4jConfiguration {
-    @Override
-    public void setRootLoggerLevel(Level level) {
-        String value =
-                switch (level) {
-                    case DEBUG -> "debug";
-                    case INFO -> "info";
-                    default -> "error";
-                };
-        System.setProperty("maven.logging.root.level", value);
-    }
+@Experimental
+@Immutable
+public enum BuildStatus {
+    /**
+     * Completed successfully.
+     */
+    SUCCESS,
 
-    @Override
-    public void activate() {
-        // no op
-    }
+    /**
+     * Failed with an error.
+     */
+    FAILURE,
+
+    /**
+     * Skipped (e.g. because a dependency failed).
+     */
+    SKIPPED
 }

@@ -139,6 +139,12 @@ public abstract class AbstractMavenIntegrationTestCase {
 
         verifier.setAutoclean(false);
 
+        // Force verbose console mode so that CI auto-detection (CI → plain) does not
+        // suppress output that ITs rely on (e.g. mojo-start banners, Reactor Summary lines).
+        // Using --console=verbose instead of removeCIEnvironmentVariables() avoids switching
+        // the executor from embedded to forked mode (environment variables trigger forked mode).
+        verifier.addCliArgument("--console=verbose");
+
         if (settings != null) {
             Path settingsPath;
             if (!settings.isEmpty()) {

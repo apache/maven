@@ -28,6 +28,7 @@ module org.apache.maven.api {
     requires java.compiler;
 
     exports org.apache.maven.api;
+    exports org.apache.maven.api.build.report;
     exports org.apache.maven.api.cache;
     exports org.apache.maven.api.feature;
     exports org.apache.maven.api.plugin;
