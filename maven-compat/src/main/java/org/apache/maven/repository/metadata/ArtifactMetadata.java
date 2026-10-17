@@ -321,7 +321,7 @@ public class ArtifactMetadata {
     }
 
     public boolean isError() {
-        return error == null;
+        return error != null;
     }
 
     public String getDependencyConflictId() {
