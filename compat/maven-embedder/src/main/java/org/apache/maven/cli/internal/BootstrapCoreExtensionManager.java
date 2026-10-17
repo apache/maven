@@ -176,7 +176,7 @@ public class BootstrapCoreExtensionManager {
         Set<String> providedArtifacts = Collections.emptySet();
         String classLoadingStrategy = extension.getClassLoadingStrategy();
         if (STRATEGY_PARENT_FIRST.equals(classLoadingStrategy)) {
-            realm.importFrom(parentRealm, "");
+            realm.importFrom(parentRealm.getClassLoader(), "");
         } else if (STRATEGY_PLUGIN.equals(classLoadingStrategy)) {
             coreExports.getExportedPackages().forEach((p, cl) -> realm.importFrom(cl, p));
             providedArtifacts = coreExports.getExportedArtifacts();

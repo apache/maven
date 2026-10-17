@@ -791,7 +791,7 @@ public class MavenCli {
 
         final CoreExports exports = new CoreExports(containerRealm, exportedArtifacts, exportedPackages);
 
-        Thread.currentThread().setContextClassLoader(containerRealm);
+        Thread.currentThread().setContextClassLoader(containerRealm.getClassLoader());
 
         DefaultPlexusContainer container = new DefaultPlexusContainer(cc, new AbstractModule() {
             @Override
@@ -817,12 +817,14 @@ public class MavenCli {
         };
         for (CoreExtensionEntry extension : extensions) {
             container.discoverComponents(
-                    extension.getClassRealm(),
+                    (ClassRealm) extension.getClassRealm(),
                     new AbstractModule() {
                         @Override
                         protected void configure() {
                             try {
-                                container.lookup(Injector.class).discover(extension.getClassRealm());
+                                container
+                                        .lookup(Injector.class)
+                                        .discover(extension.getClassRealm().getClassLoader());
                             } catch (Throwable e) {
                                 // ignore
                                 e.printStackTrace();
@@ -969,13 +971,13 @@ public class MavenCli {
 
             for (CoreExtensionEntry entry : reverse(extensions)) {
                 Set<String> exportedPackages = entry.getExportedPackages();
-                ClassRealm realm = entry.getClassRealm();
+                ClassRealm realm = (ClassRealm) entry.getClassRealm();
                 for (String exportedPackage : exportedPackages) {
-                    extRealm.importFrom(realm, exportedPackage);
+                    extRealm.importFrom(realm.getClassLoader(), exportedPackage);
                 }
                 if (exportedPackages.isEmpty()) {
                     // sisu uses realm imports to establish component visibility
-                    extRealm.importFrom(realm, realm.getId());
+                    extRealm.importFrom(realm.getClassLoader(), realm.getId());
                 }
             }
 
