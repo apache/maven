@@ -159,12 +159,14 @@ public class SisuDiBridgeModule extends AbstractModule {
 
             @Override
             public T get() {
+                debugBindings();
                 return compile(binding).get();
             }
         }
 
         @Override
         public <Q> Supplier<Q> getCompiledBinding(Dependency<Q> dep) {
+            debugBindings();
             Key<Q> key = dep.key();
             Class<Q> rawType = key.getRawType();
             if (rawType == List.class) {
@@ -268,6 +270,7 @@ public class SisuDiBridgeModule extends AbstractModule {
         }
 
         private <Q> Q getInstance(Binding<Q> binding) {
+            debugBindings();
             return compile(binding).get();
         }
 

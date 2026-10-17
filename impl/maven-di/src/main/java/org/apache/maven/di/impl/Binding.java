@@ -142,6 +142,11 @@ public abstract class Binding<T> {
             }
 
             @Override
+            String getDiagnosticSource() {
+                return Binding.this.getDiagnosticSource() + " initialized by " + identityString(bindingInitializer);
+            }
+
+            @Override
             Object getRegistrationIdentity() {
                 return registrationIdentity != null ? registrationIdentity : this;
             }
@@ -170,7 +175,11 @@ public abstract class Binding<T> {
         return this;
     }
 
-    private static String identityString(Object object) {
+    String getDiagnosticSource() {
+        return identityString(this);
+    }
+
+    static String identityString(Object object) {
         return object == null
                 ? "null"
                 : object.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(object));
@@ -204,6 +213,11 @@ public abstract class Binding<T> {
         }
 
         @Override
+        String getDiagnosticSource() {
+            return "instance " + identityString(instance);
+        }
+
+        @Override
         public String toString() {
             return "BindingToInstance[" + getOriginalKey() + ", " + identityString(instance) + "]" + getDependencies();
         }
@@ -220,6 +234,11 @@ public abstract class Binding<T> {
         @Override
         public Supplier<T> compile(Function<Dependency<?>, Supplier<?>> compiler) {
             return supplier;
+        }
+
+        @Override
+        String getDiagnosticSource() {
+            return "supplier " + identityString(supplier);
         }
 
         @Override
@@ -252,6 +271,14 @@ public abstract class Binding<T> {
                         Stream.of(this.args).map(compiler).map(Supplier::get).toArray();
                 return constructor.create(args);
             };
+        }
+
+        @Override
+        String getDiagnosticSource() {
+            return source != null
+                    ? source + " [loader="
+                            + identityString(source.getDeclaringClass().getClassLoader()) + "]"
+                    : "constructor " + identityString(constructor);
         }
 
         @Override
