@@ -266,10 +266,10 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
         context.println();
         context.info(getDescription() + " Summary:");
         context.indent();
-        context.info(result.modifiedCount() + (context.isDryRun() ? " POM(s) would be modified" : " POM(s) modified"));
-        context.info(result.unmodifiedCount() + " POM(s) needed no changes");
+        context.info(result.modifiedCount() + (context.isDryRun() ? " POMs would be modified" : " POMs modified"));
+        context.info(result.unmodifiedCount() + " POMs needed no changes");
         if (result.errorCount() > 0) {
-            context.info(result.errorCount() + " POM(s) had errors");
+            context.info(result.errorCount() + " POMs had errors");
         }
         context.unindent();
     }
