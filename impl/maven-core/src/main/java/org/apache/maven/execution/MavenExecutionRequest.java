@@ -258,6 +258,28 @@ public interface MavenExecutionRequest {
 
     boolean isNoSnapshotUpdates();
 
+    // Resolver 2.x artifact and metadata update policies
+
+    /**
+     * @since 4.0.0
+     */
+    MavenExecutionRequest setArtifactsUpdatePolicy(String policy);
+
+    /**
+     * @since 4.0.0
+     */
+    String getArtifactsUpdatePolicy();
+
+    /**
+     * @since 4.0.0
+     */
+    MavenExecutionRequest setMetadataUpdatePolicy(String policy);
+
+    /**
+     * @since 4.0.0
+     */
+    String getMetadataUpdatePolicy();
+
     // Checksum policy
     MavenExecutionRequest setGlobalChecksumPolicy(String globalChecksumPolicy);
 

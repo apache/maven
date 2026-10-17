@@ -79,6 +79,26 @@ public interface MavenOptions extends Options {
     Optional<Boolean> suppressSnapshotUpdates();
 
     /**
+     * The update policy to apply to artifacts ('always', 'daily', 'never', 'interval:N').
+     * The --UA flag overrides this with 'always'.
+     *
+     * @return an {@link Optional} containing the artifacts update policy, or empty if not specified
+     * @since 4.0.0
+     */
+    @Nonnull
+    Optional<String> artifactsUpdatePolicy();
+
+    /**
+     * The update policy to apply to metadata ('always', 'daily', 'never', 'interval:N').
+     * The --UM flag overrides this with 'always'.
+     *
+     * @return an {@link Optional} containing the metadata update policy, or empty if not specified
+     * @since 4.0.0
+     */
+    @Nonnull
+    Optional<String> metadataUpdatePolicy();
+
+    /**
      * Indicates whether Maven should use strict checksum verification.
      *
      * @return an {@link Optional} containing true if strict checksum verification is enabled, false if not, or empty if not specified

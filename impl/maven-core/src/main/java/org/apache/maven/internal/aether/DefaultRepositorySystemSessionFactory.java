@@ -195,10 +195,23 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
 
         sessionBuilder.setOffline(request.isOffline());
         sessionBuilder.setChecksumPolicy(request.getGlobalChecksumPolicy());
-        sessionBuilder.setUpdatePolicy(
-                request.isNoSnapshotUpdates()
-                        ? RepositoryPolicy.UPDATE_POLICY_NEVER
-                        : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null);
+
+        if (request.getArtifactsUpdatePolicy() == null && request.getMetadataUpdatePolicy() == null) {
+            // we go "old" way
+            sessionBuilder.setUpdatePolicy(
+                    request.isNoSnapshotUpdates()
+                            ? RepositoryPolicy.UPDATE_POLICY_NEVER
+                            : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null);
+        } else {
+            // we go "new" way: derive legacy-flag policy for any dimension not set explicitly
+            String legacyPolicy = request.isNoSnapshotUpdates()
+                    ? RepositoryPolicy.UPDATE_POLICY_NEVER
+                    : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null;
+            sessionBuilder.setArtifactUpdatePolicy(
+                    request.getArtifactsUpdatePolicy() != null ? request.getArtifactsUpdatePolicy() : legacyPolicy);
+            sessionBuilder.setMetadataUpdatePolicy(
+                    request.getMetadataUpdatePolicy() != null ? request.getMetadataUpdatePolicy() : legacyPolicy);
+        }
 
         int errorPolicy = 0;
         errorPolicy |= request.isCacheNotFound()

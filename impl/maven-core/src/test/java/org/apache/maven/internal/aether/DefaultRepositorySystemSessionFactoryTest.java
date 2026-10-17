@@ -498,6 +498,81 @@ public class DefaultRepositorySystemSessionFactoryTest {
         return new RemoteRepository.Builder(id, "default", url).build();
     }
 
+    // -------------------------------------------------------------------------
+    // Tests for artifact/metadata update policy (Resolver 2.x granular control)
+    // -------------------------------------------------------------------------
+
+    @Test
+    void artifactsUpdatePolicyOnlyTest() throws InvalidRepositoryException {
+        DefaultRepositorySystemSessionFactory systemSessionFactory = newSystemSessionFactory();
+
+        // only artifact policy set → metadata policy falls back to null (no legacy flags)
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setArtifactsUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_DAILY);
+
+        var session = systemSessionFactory.newRepositorySession(request);
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_DAILY, session.getArtifactUpdatePolicy());
+        assertNull(session.getMetadataUpdatePolicy());
+    }
+
+    @Test
+    void metadataUpdatePolicyOnlyTest() throws InvalidRepositoryException {
+        DefaultRepositorySystemSessionFactory systemSessionFactory = newSystemSessionFactory();
+
+        // only metadata policy set → artifact policy falls back to null (no legacy flags)
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setMetadataUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_NEVER);
+
+        var session = systemSessionFactory.newRepositorySession(request);
+        assertNull(session.getArtifactUpdatePolicy());
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_NEVER, session.getMetadataUpdatePolicy());
+    }
+
+    @Test
+    void bothUpdatePoliciesSetTest() throws InvalidRepositoryException {
+        DefaultRepositorySystemSessionFactory systemSessionFactory = newSystemSessionFactory();
+
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setArtifactsUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
+        request.setMetadataUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_DAILY);
+
+        var session = systemSessionFactory.newRepositorySession(request);
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_ALWAYS, session.getArtifactUpdatePolicy());
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_DAILY, session.getMetadataUpdatePolicy());
+    }
+
+    @Test
+    void newPolicyMixedWithLegacyFlagTest() throws InvalidRepositoryException {
+        DefaultRepositorySystemSessionFactory systemSessionFactory = newSystemSessionFactory();
+
+        // -U (updateSnapshots) combined with --metadata-update-policy daily:
+        // artifact dimension gets ALWAYS from -U; metadata gets "daily" from explicit policy.
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setUpdateSnapshots(true); // equivalent to -U
+        request.setMetadataUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_DAILY);
+
+        var session = systemSessionFactory.newRepositorySession(request);
+        // artifact policy not explicitly set → falls back to legacy -U → ALWAYS
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_ALWAYS, session.getArtifactUpdatePolicy());
+        // metadata policy explicitly set → daily wins over -U
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_DAILY, session.getMetadataUpdatePolicy());
+    }
+
+    private DefaultRepositorySystemSessionFactory newSystemSessionFactory() {
+        return new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Collections.emptyMap(),
+                versionFilterBuilder);
+    }
+
     protected ArtifactRepository getLocalRepository() throws InvalidRepositoryException {
         File repoDir = new File(getBasedir(), "target/local-repo").getAbsoluteFile();
 
