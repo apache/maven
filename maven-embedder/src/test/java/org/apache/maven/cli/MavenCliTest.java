@@ -26,15 +26,24 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.Collections;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
+import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
+import org.codehaus.plexus.ContainerConfiguration;
+import org.codehaus.plexus.DefaultContainerConfiguration;
+import org.codehaus.plexus.DefaultPlexusContainer;
+import org.codehaus.plexus.PlexusConstants;
 import org.codehaus.plexus.PlexusContainer;
+import org.codehaus.plexus.classworlds.ClassWorld;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
+import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.impl.DumbTerminal;
 import org.junit.jupiter.api.AfterEach;
@@ -42,6 +51,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
+import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -606,5 +616,67 @@ public class MavenCliTest {
             MavenCli.ExitException ex = invokeCommands(request);
             assertNull(ex, "Expected no ExitException when -f/--file is specified");
         }
+    }
+
+    @Test
+    public void testCoreExtensionComponentVisibility() throws Exception {
+        Field f = MavenCli.class.getDeclaredField("slf4jLogger");
+        f.setAccessible(true);
+        f.set(cli, LoggerFactory.getLogger(MavenCli.class));
+
+        ClassWorld classWorld = new ClassWorld();
+        ClassRealm coreRealm =
+                classWorld.newRealm("plexus.core", Thread.currentThread().getContextClassLoader());
+        ClassRealm extRealm1 =
+                classWorld.newRealm("coreExtension>ext1", Thread.currentThread().getContextClassLoader());
+
+        CoreExtensionEntry entry = new CoreExtensionEntry(extRealm1, Collections.emptyList(), Collections.emptyList());
+        ClassRealm containerRealm = cli.setupContainerRealm(
+                classWorld, coreRealm, Collections.emptyList(), Collections.singletonList(entry));
+
+        // Structural validation: verify the bidirectional realm import
+        assertTrue(
+                extRealm1.getImportRealms().contains(containerRealm),
+                "Extension realm must import container realm for Sisu component visibility");
+
+        // Behavioral validation: verify that Plexus/Sisu component lookup from the container
+        // succeeds even when TCCL is set to the extension realm
+        ContainerConfiguration cc = new DefaultContainerConfiguration()
+                .setClassWorld(classWorld)
+                .setRealm(containerRealm)
+                .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
+                .setAutoWiring(true)
+                .setJSR250Lifecycle(true)
+                .setName("maven");
+
+        DefaultPlexusContainer container = new DefaultPlexusContainer(cc);
+        try {
+            container.setLookupRealm(null);
+
+            ComponentDescriptor<Runnable> descriptor = new ComponentDescriptor<>();
+            descriptor.setRole(Runnable.class.getName());
+            descriptor.setRoleHint("test");
+            descriptor.setImplementationClass(MyLazyComponent.class);
+            container.addComponentDescriptor(descriptor);
+
+            ClassLoader originalTccl = Thread.currentThread().getContextClassLoader();
+            try {
+                // Simulate DefaultMaven setting TCCL to the core extension realm
+                Thread.currentThread().setContextClassLoader(extRealm1);
+
+                Runnable lookedUp = container.lookup(Runnable.class, "test");
+                assertNotNull(lookedUp);
+                assertTrue(lookedUp instanceof MyLazyComponent);
+            } finally {
+                Thread.currentThread().setContextClassLoader(originalTccl);
+            }
+        } finally {
+            container.dispose();
+        }
+    }
+
+    public static class MyLazyComponent implements Runnable {
+        @Override
+        public void run() {}
     }
 }
