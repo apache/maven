@@ -22,12 +22,10 @@ under the License.
 
     <groupId>gh-13521-phase-config</groupId>
     <artifactId>base-project</artifactId>
-    <!-- CI-friendly version defined only in <properties>, NOT via -D on command line -->
     <version>${revision}</version>
     <packaging>pom</packaging>
 
     <properties>
-        <!-- revision is defined here in the POM, not on the CLI -->
         <revision>1.0.0</revision>
     </properties>
 

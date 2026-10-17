@@ -22,10 +22,11 @@ import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
-class MavenITGh13521PhaseConfigurationTest extends AbstractMavenIntegrationTestCase {
+/**
+ * This is a test set for <a href="https://github.com/apache/maven/issues/13521">GH-13521</a>.
+ * Tests that phase configuration is applied to forked executions with no prior configuration.
+ */
+class MavenITgh13521PhaseConfigurationTest extends AbstractMavenIntegrationTestCase {
 
     @Test
     void testPhaseConfigurationAppliedToUnconfiguredExecution() throws Exception {
@@ -41,5 +42,4 @@ class MavenITGh13521PhaseConfigurationTest extends AbstractMavenIntegrationTestC
         verifier.verifyFilePresent("target/phase-config/touch.txt");
         verifier.verifyFileNotPresent("target/touch.txt");
     }
-
 }
