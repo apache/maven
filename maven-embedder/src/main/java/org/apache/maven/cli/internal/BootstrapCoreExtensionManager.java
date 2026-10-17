@@ -63,6 +63,8 @@ public class BootstrapCoreExtensionManager {
     public static final String STRATEGY_PLUGIN = "plugin";
     public static final String STRATEGY_SELF_FIRST = "self-first";
 
+    private static final String CORE_EXTENSION_REALM_NAME_PREFIX = "coreExtension>";
+
     private final Logger log;
 
     private final PluginDependenciesResolver pluginDependenciesResolver;
@@ -103,6 +105,11 @@ public class BootstrapCoreExtensionManager {
         }
     }
 
+    public static boolean isContextRealmCoreExtensionRealm() {
+        ClassRealm classRealm = contextRealm();
+        return classRealm != null && classRealm.getId().startsWith(CORE_EXTENSION_REALM_NAME_PREFIX);
+    }
+
     private List<CoreExtensionEntry> resolveCoreExtensions(
             RepositorySystemSession repoSession,
             List<RemoteRepository> repositories,
@@ -126,8 +133,8 @@ public class BootstrapCoreExtensionManager {
     }
 
     private CoreExtensionEntry createExtension(CoreExtension extension, List<Artifact> artifacts) throws Exception {
-        String realmId = "coreExtension>" + extension.getGroupId() + ":" + extension.getArtifactId() + ":"
-                + extension.getVersion();
+        String realmId = CORE_EXTENSION_REALM_NAME_PREFIX + extension.getGroupId() + ":" + extension.getArtifactId()
+                + ":" + extension.getVersion();
         final ClassRealm realm = classWorld.newRealm(realmId, null);
         Set<String> providedArtifacts = Collections.emptySet();
         String classLoadingStrategy = extension.getClassLoadingStrategy();
@@ -191,5 +198,17 @@ public class BootstrapCoreExtensionManager {
         interpolator.addValueSource(new MapBasedValueSource(request.getUserProperties()));
         interpolator.addValueSource(new MapBasedValueSource(request.getSystemProperties()));
         return interpolator;
+    }
+
+    /**
+     * Helper method to return current TCCL set {@link ClassRealm} or {@code null}, if TCCL is not a class realm.
+     */
+    private static ClassRealm contextRealm() {
+        for (ClassLoader tccl = Thread.currentThread().getContextClassLoader(); tccl != null; tccl = tccl.getParent()) {
+            if (tccl instanceof ClassRealm) {
+                return (ClassRealm) tccl;
+            }
+        }
+        return null;
     }
 }
