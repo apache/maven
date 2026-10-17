@@ -1270,13 +1270,8 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 .getParent()
                                 .withRelativePath(resultModel.getParent().getRelativePath())));
             }
-
             // effective model validation
-            modelValidator.validateEffectiveModel(
-                    session,
-                    resultModel,
-                    isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
-                    this);
+            modelValidator.validateEffectiveModel(session, resultModel, getValidationLevel(), this);
 
             if (hasErrors()) {
                 throw newModelBuilderException();
@@ -2183,11 +2178,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 rawModel = transformer.transformRawModel(rawModel);
             }
 
-            modelValidator.validateRawModel(
-                    session,
-                    rawModel,
-                    isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
-                    this);
+            modelValidator.validateRawModel(session, rawModel, getValidationLevel(), this);
 
             if (hasFatalErrors()) {
                 throw newModelBuilderException();
@@ -2989,6 +2980,14 @@ public class DefaultModelBuilder implements ModelBuilder {
             return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
                     || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
                     || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER;
+        }
+
+        int getValidationLevel() {
+            Integer validationLevel = request.getValidationLevel();
+            if (validationLevel != null) {
+                return validationLevel;
+            }
+            return isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL;
         }
 
         boolean isBuildRequestWithActivation() {

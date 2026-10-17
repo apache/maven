@@ -90,9 +90,9 @@ import org.apache.maven.impl.DefaultSourceRoot;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.resolver.ArtifactDescriptorUtils;
 import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.FileModelSource;
-import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.ModelSource2;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.plugin.PluginManagerException;
@@ -466,19 +466,20 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             && source.getLocation().endsWith("/org/apache/maven/project/standalone.xml");
 
                     ModelBuilderRequest.ModelBuilderRequestBuilder builder = getModelBuildingRequest();
-                    ModelBuilderRequest.RequestType type = reactorMember
-                                    || isStandalone
-                                    || (pomFile != null
-                                            && request.isProcessPlugins()
-                                            && request.getValidationLevel()
-                                                    == ModelBuildingRequest.VALIDATION_LEVEL_STRICT)
-                            ? ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
-                            : (parent
-                                    ? ModelBuilderRequest.RequestType.CONSUMER_PARENT
-                                    : ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY);
+                   ModelBuilderRequest.RequestType type = reactorMember
+        || isStandalone
+        || (pomFile != null
+                && request.isProcessPlugins()
+                && request.getValidationLevel() == ModelBuildingRequest.VALIDATION_LEVEL_STRICT)
+        ? ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
+        : (parent
+                ? ModelBuilderRequest.RequestType.CONSUMER_PARENT
+                : ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY);
+
                     MavenProject theProject = project;
                     ModelBuilderRequest modelRequest = builder.source(source)
                             .requestType(type)
+                            .validationLevel(request.getValidationLevel())
                             .locationTracking(true)
                             .lifecycleBindingsInjector(
                                     (m, r, p) -> injectLifecycleBindings(m, r, p, theProject, request))

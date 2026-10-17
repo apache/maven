@@ -199,6 +199,11 @@ class CacheConfigurationTest {
         }
 
         @Override
+        public Integer getValidationLevel() {
+            return null;
+        }
+
+        @Override
         public boolean isLocationTracking() {
             return false;
         }
