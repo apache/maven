@@ -352,7 +352,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
 
         for (org.apache.maven.api.model.Dependency dependency : model.getDependencies()) {
             if (hasUninterpolatedExpression(dependency)) {
-                logger.debug("Filtered dependency with uninterpolated expression: {}", dependency);
+                logger.trace("Filtered dependency with uninterpolated expression: {}", dependency);
                 continue;
             }
             result.addDependency(convert(dependency, stereotypes));
@@ -362,7 +362,7 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
         if (dependencyManagement != null) {
             for (org.apache.maven.api.model.Dependency dependency : dependencyManagement.getDependencies()) {
                 if (hasUninterpolatedExpression(dependency)) {
-                    logger.debug("Filtered managed dependency with uninterpolated expression: {}", dependency);
+                    logger.trace("Filtered managed dependency with uninterpolated expression: {}", dependency);
                     continue;
                 }
                 result.addManagedDependency(convert(dependency, stereotypes));
@@ -440,21 +440,21 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
     private void filterUninterpolated(ArtifactDescriptorResult result) {
         result.getRepositories().removeIf(repo -> {
             if (containsPlaceholder(repo.getId()) || containsPlaceholder(repo.getUrl())) {
-                logger.debug("Filtered repository with uninterpolated expression: {}", repo);
+                logger.trace("Filtered repository with uninterpolated expression: {}", repo);
                 return true;
             }
             return false;
         });
         result.getDependencies().removeIf(dep -> {
             if (hasUninterpolatedExpression(dep.getArtifact())) {
-                logger.debug("Filtered dependency with uninterpolated expression: {}", dep);
+                logger.trace("Filtered dependency with uninterpolated expression: {}", dep);
                 return true;
             }
             return false;
         });
         result.getManagedDependencies().removeIf(dep -> {
             if (hasUninterpolatedExpression(dep.getArtifact())) {
-                logger.debug("Filtered managed dependency with uninterpolated expression: {}", dep);
+                logger.trace("Filtered managed dependency with uninterpolated expression: {}", dep);
                 return true;
             }
             return false;
