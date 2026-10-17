@@ -85,6 +85,17 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.Elements.PARENT;
 public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
 
     /**
+     * Logs a change using dry-run wording when the goal is checking rather than saving.
+     */
+    protected void logChange(UpgradeContext context, String description) {
+        if (context.isDryRun()) {
+            context.action(description + " would be applied");
+        } else {
+            context.success(description + " applied");
+        }
+    }
+
+    /**
      * DI-injected standalone Maven 4 API Session, produced by {@link MvnupSessionHolder}.
      * Sharing the session avoids recreating the heavyweight standalone DI container
      * for each strategy. The Session's {@link org.apache.maven.api.cache.RequestCache}
@@ -255,10 +266,10 @@ public abstract class AbstractUpgradeStrategy implements UpgradeStrategy {
         context.println();
         context.info(getDescription() + " Summary:");
         context.indent();
-        context.info(result.modifiedCount() + " POM(s) modified");
-        context.info(result.unmodifiedCount() + " POM(s) needed no changes");
+        context.info(result.modifiedCount() + (context.isDryRun() ? " POMs would be modified" : " POMs modified"));
+        context.info(result.unmodifiedCount() + " POMs needed no changes");
         if (result.errorCount() > 0) {
-            context.info(result.errorCount() + " POM(s) had errors");
+            context.info(result.errorCount() + " POMs had errors");
         }
         context.unindent();
     }

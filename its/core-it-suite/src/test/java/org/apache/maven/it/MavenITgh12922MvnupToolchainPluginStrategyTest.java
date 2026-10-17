@@ -69,7 +69,7 @@ public class MavenITgh12922MvnupToolchainPluginStrategyTest extends AbstractMave
         verifier.verifyErrorFreeLog();
 
         // Verify mvnup reported adding the plugin
-        verifier.verifyTextInLog("Added maven-toolchains-plugin with select-jdk-toolchain goal");
+        verifier.verifyTextInLog("maven-toolchains-plugin addition with select-jdk-toolchain goal");
 
         // Verify the POM was modified to include the toolchains plugin
         String pomContent = Files.readString(testDir.toPath().resolve("pom.xml"));
