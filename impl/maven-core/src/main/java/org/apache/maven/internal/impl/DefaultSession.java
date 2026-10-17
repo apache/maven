@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.BuildInvocation;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
@@ -46,6 +47,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.AbstractSession;
 import org.apache.maven.impl.DefaultRemoteRepository;
 import org.apache.maven.impl.PropertiesAsMap;
+import org.apache.maven.internal.build.DefaultBuildInvocation;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -63,6 +65,8 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     private final MavenRepositorySystem mavenRepositorySystem;
     private final RuntimeInformation runtimeInformation;
     private final Map<String, Project> allProjects = new ConcurrentHashMap<>();
+    private final Object buildInvocationLock = new Object();
+    private volatile BuildInvocation buildInvocation;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultSession(
@@ -170,6 +174,19 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     @Override
     public int getDegreeOfConcurrency() {
         return getMavenSession().getRequest().getDegreeOfConcurrency();
+    }
+
+    @Nonnull
+    @Override
+    public BuildInvocation buildInvocation() {
+        if (buildInvocation == null) {
+            synchronized (buildInvocationLock) {
+                if (buildInvocation == null) {
+                    buildInvocation = DefaultBuildInvocation.from(getMavenSession());
+                }
+            }
+        }
+        return buildInvocation;
     }
 
     @Nonnull

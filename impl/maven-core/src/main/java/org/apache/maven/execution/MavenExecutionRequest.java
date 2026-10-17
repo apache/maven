@@ -279,6 +279,15 @@ public interface MavenExecutionRequest {
 
     boolean isInteractiveMode();
 
+    // Transfer progress
+    default MavenExecutionRequest setNoTransferProgress(boolean noTransferProgress) {
+        return this;
+    }
+
+    default boolean isNoTransferProgress() {
+        return false;
+    }
+
     // Offline
     MavenExecutionRequest setOffline(boolean offline);
 
