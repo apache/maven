@@ -27,6 +27,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.CommonsCliOptions;
+import org.eclipse.aether.repository.RepositoryPolicy;
 
 public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOptions {
     public static CommonsCliMavenOptions parse(String source, String[] args) throws ParseException {
@@ -74,6 +75,28 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     public Optional<Boolean> suppressSnapshotUpdates() {
         if (commandLine.hasOption(CLIManager.SUPPRESS_SNAPSHOT_UPDATES)) {
             return Optional.of(Boolean.TRUE);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<String> artifactsUpdatePolicy() {
+        if (commandLine.hasOption(CLIManager.UPDATE_ARTIFACTS)) {
+            return Optional.of(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
+        }
+        if (commandLine.hasOption(CLIManager.ARTIFACTS_UPDATE_POLICY)) {
+            return Optional.of(commandLine.getOptionValue(CLIManager.ARTIFACTS_UPDATE_POLICY));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<String> metadataUpdatePolicy() {
+        if (commandLine.hasOption(CLIManager.UPDATE_METADATA)) {
+            return Optional.of(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
+        }
+        if (commandLine.hasOption(CLIManager.METADATA_UPDATE_POLICY)) {
+            return Optional.of(commandLine.getOptionValue(CLIManager.METADATA_UPDATE_POLICY));
         }
         return Optional.empty();
     }
@@ -251,6 +274,10 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
         public static final String CACHE_ARTIFACT_NOT_FOUND = "canf";
         public static final String STRICT_ARTIFACT_DESCRIPTOR_POLICY = "sadp";
         public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
+        public static final String UPDATE_METADATA = "UM";
+        public static final String UPDATE_ARTIFACTS = "UA";
+        public static final String ARTIFACTS_UPDATE_POLICY = "artifacts-update-policy";
+        public static final String METADATA_UPDATE_POLICY = "metadata-update-policy";
         public static final String AT_FILE = "af";
 
         @Override
@@ -353,6 +380,27 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
             options.addOption(Option.builder(IGNORE_TRANSITIVE_REPOSITORIES)
                     .longOpt("ignore-transitive-repositories")
                     .desc("If set, Maven will ignore remote repositories introduced by transitive dependencies.")
+                    .get());
+            options.addOption(Option.builder(UPDATE_METADATA)
+                    .longOpt("update-metadata")
+                    .desc(
+                            "Forces updates of remote repository metadata (updates plugin prefixes, version ranges and snapshots)")
+                    .get());
+            options.addOption(Option.builder(UPDATE_ARTIFACTS)
+                    .longOpt("update-artifacts")
+                    .desc("Forces checks for missing artifacts (retries cached retrieval errors)")
+                    .get());
+            options.addOption(Option.builder()
+                    .longOpt(ARTIFACTS_UPDATE_POLICY)
+                    .hasArg(true)
+                    .desc(
+                            "The update policy to apply onto artifacts ('always', 'daily', 'never'); The -UA option overrides this option with 'always'")
+                    .get());
+            options.addOption(Option.builder()
+                    .longOpt(METADATA_UPDATE_POLICY)
+                    .hasArg(true)
+                    .desc(
+                            "The update policy to apply onto metadata ('always', 'daily', 'never'); The -UM option overrides this option with 'always'")
                     .get());
             options.addOption(Option.builder(AT_FILE)
                     .longOpt("at-file")
