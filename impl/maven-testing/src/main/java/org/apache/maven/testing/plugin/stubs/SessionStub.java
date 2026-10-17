@@ -53,6 +53,8 @@ import org.apache.maven.api.VersionRange;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Repository;
+import org.apache.maven.api.services.ModelProblem;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.toolchain.ToolchainModel;
@@ -73,6 +75,8 @@ public class SessionStub implements Session {
     private Map<String, String> systemProperties;
 
     private final Settings settings;
+
+    private final ProblemCollector<ModelProblem> modelProblemCollector = ProblemCollector.create(100);
 
     public SessionStub(Settings settings) {
         this(null, null, settings);
@@ -151,6 +155,12 @@ public class SessionStub implements Session {
     @Override
     public SessionData getData() {
         return null;
+    }
+
+    @Nonnull
+    @Override
+    public ProblemCollector<ModelProblem> getModelProblemCollector() {
+        return modelProblemCollector;
     }
 
     @Override

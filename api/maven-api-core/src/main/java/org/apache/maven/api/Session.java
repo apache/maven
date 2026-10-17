@@ -32,6 +32,8 @@ import org.apache.maven.api.annotations.ThreadSafe;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.DependencyCoordinatesFactory;
+import org.apache.maven.api.services.ModelProblem;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.VersionResolverException;
 import org.apache.maven.api.settings.Settings;
@@ -93,6 +95,14 @@ public interface Session extends ProtoSession {
      */
     @Nonnull
     SessionData getData();
+
+    /**
+     * Returns the model problems encountered while discovering the projects in this session's reactor.
+     *
+     * @return the session model problem collector, never {@code null}
+     */
+    @Nonnull
+    ProblemCollector<ModelProblem> getModelProblemCollector();
 
     /**
      * Default implementation at {@link ProtoSession} level, as the notion of project
