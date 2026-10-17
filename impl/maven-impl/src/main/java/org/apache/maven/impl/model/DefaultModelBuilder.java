@@ -2047,13 +2047,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
 
                 setSource(model);
-                modelValidator.validateFileModel(
-                        session,
-                        model,
-                        isBuildRequest()
-                                ? ModelValidator.VALIDATION_LEVEL_STRICT
-                                : ModelValidator.VALIDATION_LEVEL_MINIMAL,
-                        this);
+                modelValidator.validateFileModel(session, model, getValidationLevel(), this);
                 InternalSession internalSession = InternalSession.from(session);
                 if (Features.mavenMaven3Personality(internalSession.getSession().getConfigProperties())
                         && Objects.equals(ModelBuilder.MODEL_VERSION_4_1_0, model.getModelVersion())) {

@@ -299,7 +299,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         Path childPom = Files.createDirectory(tempDir.resolve("child")).resolve("pom.xml");
         Files.writeString(childPom, """
             <project>
-              <modelVersion>4.0.0</modelVersion>
+              <modelVersion>4.1.0</modelVersion>
               <parent>
                 <groupId>test</groupId>
                 <artifactId>parent</artifactId>
@@ -322,12 +322,22 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 request.setRepositorySession(session.getRepositorySession());
                 request.setValidationLevel(validationLevel);
                 request.setProcessPlugins(processPlugins);
-
-                MavenProject child = builder.build(childPom.toFile(), request).getProject();
+                ProjectBuildingResult result = builder.build(childPom.toFile(), request);
+                MavenProject child = result.getProject();
 
                 assertNotNull(child.getParentArtifact());
                 assertEquals("parent", child.getParentArtifact().getArtifactId());
                 assertEquals(parentPom.toFile(), child.getParentFile());
+
+                boolean hasRelativePathWarning = result.getProblems().stream()
+                        .anyMatch(problem -> problem.getMessage()
+                                .contains("only specify relativePath or groupId/artifactId"));
+
+                assertEquals(
+                        validationLevel == ModelBuildingRequest.VALIDATION_LEVEL_STRICT,
+                        hasRelativePathWarning,
+                        "Unexpected validation result for level " + validationLevel
+                                + " and processPlugins=" + processPlugins);
             }
         }
     }

@@ -93,7 +93,14 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
 
     @Nonnull
     RequestType getRequestType();
-
+    /**
+     * Returns the explicit validation level to apply, or {@code null} to use the default
+     * level based on the {@linkplain #getRequestType() request type}.
+     *
+     * @return the validation level, or {@code null}
+     * @see org.apache.maven.api.services.model.ModelValidator
+     */
+    @Nullable
     Integer getValidationLevel();
 
     boolean isLocationTracking();
@@ -224,7 +231,7 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
             return this;
         }
 
-        public ModelBuilderRequestBuilder validationLevel(int validationLevel) {
+        public ModelBuilderRequestBuilder validationLevel(Integer validationLevel) {
             this.validationLevel = validationLevel;
             return this;
         }
