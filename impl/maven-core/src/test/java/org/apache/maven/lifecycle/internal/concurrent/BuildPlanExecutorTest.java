@@ -206,7 +206,8 @@ class BuildPlanExecutorTest {
                 Map.of(),
                 null,
                 null,
-                new DefaultLifecycleRegistry(Collections.emptyList()));
+                new DefaultLifecycleRegistry(Collections.emptyList()),
+                null);
     }
 
     private MavenProject newProject() {
