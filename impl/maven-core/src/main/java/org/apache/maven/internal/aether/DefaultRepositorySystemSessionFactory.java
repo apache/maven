@@ -197,10 +197,27 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
 
         sessionBuilder.setOffline(request.isOffline());
         sessionBuilder.setChecksumPolicy(request.getGlobalChecksumPolicy());
-        sessionBuilder.setUpdatePolicy(
-                request.isNoSnapshotUpdates()
-                        ? RepositoryPolicy.UPDATE_POLICY_NEVER
-                        : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null);
+
+        if (request.getArtifactsUpdatePolicy() == null && request.getMetadataUpdatePolicy() == null) {
+            // we go "old" way
+            sessionBuilder.setUpdatePolicy(
+                    request.isNoSnapshotUpdates()
+                            ? RepositoryPolicy.UPDATE_POLICY_NEVER
+                            : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null);
+        } else {
+            // New-style per-type policies take precedence; warn if old-style flags were also set
+            if (request.isNoSnapshotUpdates() || request.isUpdateSnapshots()) {
+                logger.warn(
+                        "Both new-style update policy options and legacy snapshot flags (-U/-nsu) were specified. "
+                                + "The new-style policies take precedence; the legacy flags are ignored.");
+            }
+            if (request.getArtifactsUpdatePolicy() != null) {
+                sessionBuilder.setArtifactUpdatePolicy(request.getArtifactsUpdatePolicy());
+            }
+            if (request.getMetadataUpdatePolicy() != null) {
+                sessionBuilder.setMetadataUpdatePolicy(request.getMetadataUpdatePolicy());
+            }
+        }
 
         int errorPolicy = 0;
         errorPolicy |= request.isCacheNotFound()
