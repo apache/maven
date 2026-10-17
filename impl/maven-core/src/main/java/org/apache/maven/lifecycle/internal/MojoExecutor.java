@@ -398,6 +398,12 @@ public class MojoExecutor {
         }
     }
 
+    /**
+     * Returns the filter for the scopes a mojo declared it needs, or {@code null} if it declared none. A {@code null}
+     * filter is itself a meaningful value that {@link #ensureDependenciesAreResolved} writes to the shared
+     * {@link MavenProject}: it clears whatever filter an earlier mojo may have left there, so that a mojo with no
+     * declared scope sees no project dependencies, not another mojo's leftover ones (MNG-3297).
+     */
     private ArtifactFilter getArtifactFilter(MojoDescriptor mojoDescriptor) {
         String scopeToResolve = mojoDescriptor.getDependencyResolutionRequired();
         String scopeToCollect = mojoDescriptor.getDependencyCollectionRequired();
