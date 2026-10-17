@@ -205,7 +205,12 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
                             ? RepositoryPolicy.UPDATE_POLICY_NEVER
                             : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null);
         } else {
-            // we go "new" way
+            // New-style per-type policies take precedence; warn if old-style flags were also set
+            if (request.isNoSnapshotUpdates() || request.isUpdateSnapshots()) {
+                logger.warn(
+                        "Both new-style update policy options and legacy snapshot flags (-U/-nsu) were specified. "
+                                + "The new-style policies take precedence; the legacy flags are ignored.");
+            }
             if (request.getArtifactsUpdatePolicy() != null) {
                 sessionBuilder.setArtifactUpdatePolicy(request.getArtifactsUpdatePolicy());
             }

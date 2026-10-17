@@ -261,22 +261,38 @@ public interface MavenExecutionRequest {
     // Resolver 2.x artifact and metadata update policies
 
     /**
-     * @since 4.0.0
+     * Sets the update policy to apply to artifact resolution.
+     * Valid values: {@code always}, {@code daily}, {@code interval:N} (minutes), {@code never}.
+     *
+     * @param policy the update policy string, or {@code null} to use the legacy snapshot flags
+     * @return this request
+     * @since 4.1.0
      */
     MavenExecutionRequest setArtifactsUpdatePolicy(String policy);
 
     /**
-     * @since 4.0.0
+     * Returns the update policy to apply to artifact resolution.
+     *
+     * @return the policy string, or {@code null} if the legacy snapshot flags are used
+     * @since 4.1.0
      */
     String getArtifactsUpdatePolicy();
 
     /**
-     * @since 4.0.0
+     * Sets the update policy to apply to metadata resolution.
+     * Valid values: {@code always}, {@code daily}, {@code interval:N} (minutes), {@code never}.
+     *
+     * @param policy the update policy string, or {@code null} to use the legacy snapshot flags
+     * @return this request
+     * @since 4.1.0
      */
     MavenExecutionRequest setMetadataUpdatePolicy(String policy);
 
     /**
-     * @since 4.0.0
+     * Returns the update policy to apply to metadata resolution.
+     *
+     * @return the policy string, or {@code null} if the legacy snapshot flags are used
+     * @since 4.1.0
      */
     String getMetadataUpdatePolicy();
 

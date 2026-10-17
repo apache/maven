@@ -79,21 +79,21 @@ public interface MavenOptions extends Options {
     Optional<Boolean> suppressSnapshotUpdates();
 
     /**
-     * The update policy to apply to artifacts ('always', 'daily', 'never').
+     * The update policy to apply to artifacts ('always', 'daily', 'interval:N', 'never').
      * The --UA flag overrides this with 'always'.
      *
      * @return an {@link Optional} containing the artifacts update policy, or empty if not specified
-     * @since 4.0.0
+     * @since 4.1.0
      */
     @Nonnull
     Optional<String> artifactsUpdatePolicy();
 
     /**
-     * The update policy to apply to metadata ('always', 'daily', 'never').
+     * The update policy to apply to metadata ('always', 'daily', 'interval:N', 'never').
      * The --UM flag overrides this with 'always'.
      *
      * @return an {@link Optional} containing the metadata update policy, or empty if not specified
-     * @since 4.0.0
+     * @since 4.1.0
      */
     @Nonnull
     Optional<String> metadataUpdatePolicy();

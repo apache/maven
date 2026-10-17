@@ -361,13 +361,13 @@ public class CLIManager {
                 .longOpt(ARTIFACTS_UPDATE_POLICY)
                 .hasArg(true)
                 .desc(
-                        "The update policy to apply onto artifacts ('always', 'daily', 'never'); The -UA option overrides this option with 'always'")
+                        "The update policy to apply onto artifacts ('always', 'daily', 'interval:N', 'never'); The -UA option overrides this option with 'always'")
                 .build());
         options.addOption(Option.builder()
                 .longOpt(METADATA_UPDATE_POLICY)
                 .hasArg(true)
                 .desc(
-                        "The update policy to apply onto metadata ('always', 'daily', 'never'); The -UM option overrides this option with 'always'")
+                        "The update policy to apply onto metadata ('always', 'daily', 'interval:N', 'never'); The -UM option overrides this option with 'always'")
                 .build());
 
         // Parameters handled by script
