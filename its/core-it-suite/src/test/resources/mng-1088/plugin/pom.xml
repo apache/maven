@@ -17,8 +17,8 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.1.0">
+  <modelVersion>4.1.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng1088</groupId>
   <artifactId>p</artifactId>
@@ -26,17 +26,8 @@ under the License.
   <packaging>maven-plugin</packaging>
 
   <name>Maven Integration Test :: MNG-1088 :: Plugin</name>
-  <description>Test that the plugin manager falls back to resolution from the repository if a plugin is part of the reactor
-    (i.e. an active project artifact) but the lifecycle has not been executed far enough to produce a file for
-    the plugin (i.e. a phase before "compile").</description>
-
-  <distributionManagement>
-    <repository>
-      <uniqueVersion>false</uniqueVersion>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-    </repository>
-  </distributionManagement>
+  <description>Test that the concurrent builder automatically builds a reactor plugin project up to READY
+    when another project uses that plugin, even if the requested phase is before "compile".</description>
 
   <properties>
     <maven.test.skip>true</maven.test.skip>
@@ -57,17 +48,15 @@ under the License.
   </dependencies>
 
   <build>
-    <resources>
-      <resource>
-        <directory>.</directory>
-        <includes>
-          <include>pom.xml</include>
-          <include>src/**</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>4.0.0-beta-1</version>
+        <configuration>
+          <goalPrefix>coreit</goalPrefix>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>
