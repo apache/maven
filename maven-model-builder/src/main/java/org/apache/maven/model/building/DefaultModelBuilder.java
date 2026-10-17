@@ -506,13 +506,16 @@ public class DefaultModelBuilder implements ModelBuilder {
     /**
      * Determines whether the given request builds a model to resolve a dependency, i.e. a POM
      * read from a remote repository (a dependency POM, one of its parents, or an imported BOM)
-     * rather than a POM belonging to the project being built. Such requests use
+     * rather than a POM belonging to the project being built. Such requests have no POM file
+     * (see {@link ModelBuildingRequest#setPomFile(File)}) and use
      * {@link ModelBuildingRequest#VALIDATION_LEVEL_MINIMAL}, see for instance
-     * {@code DefaultArtifactDescriptorReader#loadPom}; a project build uses
-     * {@link ModelBuildingRequest#VALIDATION_LEVEL_MAVEN_2_0} or higher.
+     * {@code DefaultArtifactDescriptorReader#loadPom}. A request with a POM file is in project
+     * mode whatever its validation level, so an embedder that builds its own project at
+     * {@code VALIDATION_LEVEL_MINIMAL} keeps full profile activation.
      */
     private static boolean isExternalModelBuildingRequest(ModelBuildingRequest request) {
-        return request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
+        return request.getPomFile() == null
+                && request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
     }
 
     /**
