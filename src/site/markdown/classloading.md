@@ -301,6 +301,53 @@ For plugins, `DefaultMavenPluginManager.discoverPluginComponents()`
 sets the TCCL to the plugin's realm before discovering components. Sisu
 then scans only the plugin's realm and its imports.
 
+### Maven 4 Plugin Visibility (maven-di)
+
+Maven 4 plugins — those using `org.apache.maven.api.di.Inject`
+annotations — follow a different component visibility model than
+Maven 3 plugins. The differences stem from how mojos are instantiated.
+
+**Maven 3 mojos** are instantiated by Sisu via
+`container.lookup(Mojo.class, roleHint)`. The lookup is filtered by the
+plugin realm's import chain, so the mojo can see components from Maven
+Core, core extensions, and build extensions (if the project realm
+imports them).
+
+**Maven 4 mojos** are instantiated by a plain `maven-di` injector
+(`Injector.create()`) scoped to the plugin's classloader. This injector
+has no Sisu access and no realm awareness. Core services (`Session`,
+`Project`, `MojoExecution`, `Log`, and all API services) are manually
+bound into the injector. The mojo can only see:
+
+- Components discovered from its own plugin realm classloader
+  (its own classes and dependencies)
+- The manually bound core services
+
+It **cannot** see:
+
+- Build extension components
+- Sisu beans from any realm
+- Components from other plugins
+
+| | Maven 3 plugin | Maven 4 plugin |
+|---|---|---|
+| Instantiation | Sisu lookup (realm-filtered) | Plain maven-di injector |
+| Core services | Injected by Sisu from container realm | Manually bound |
+| Build extension components | Visible if project realm imports the extension | Not visible |
+| Other plugin components | Not visible (separate realms) | Not visible (separate injectors) |
+| Sisu beans | Yes, filtered by realm imports | No |
+
+This means Maven 4 plugins have a stricter isolation model by default.
+A Maven 4 plugin that needs to interact with build extension components
+must do so through the Maven API services, not through direct injection.
+
+> **Note:** During the component **discovery** phase,
+> `DefaultMavenPluginManager` also creates a `SisuDiBridgeModule` that
+> bridges maven-di bindings into Sisu's registry. This bridge is used
+> for component *registration* (making the plugin's components visible
+> to the container), not for mojo *instantiation*. The mojo itself is
+> created by a separate, plain maven-di injector.
+
 ### Limitations
 
 Sisu's visibility filtering has known limitations:
