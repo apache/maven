@@ -116,16 +116,17 @@ final class BindingSnapshot {
             return variable.getName();
         }
         if (type instanceof WildcardType wildcard) {
+            Type[] lowerBounds = wildcard.getLowerBounds();
+            if (lowerBounds.length > 0) {
+                return "? super "
+                        + Arrays.stream(lowerBounds).map(BindingSnapshot::type).collect(Collectors.joining(" & "));
+            }
+            Type[] upperBounds = wildcard.getUpperBounds();
+            if (upperBounds.length == 1 && upperBounds[0] == Object.class) {
+                return "?";
+            }
             return "? extends "
-                    + Arrays.stream(wildcard.getUpperBounds())
-                            .map(BindingSnapshot::type)
-                            .collect(Collectors.joining(" & "))
-                    + (wildcard.getLowerBounds().length == 0
-                            ? ""
-                            : " super "
-                                    + Arrays.stream(wildcard.getLowerBounds())
-                                            .map(BindingSnapshot::type)
-                                            .collect(Collectors.joining(" & ")));
+                    + Arrays.stream(upperBounds).map(BindingSnapshot::type).collect(Collectors.joining(" & "));
         }
         return Binding.identityString(type);
     }
