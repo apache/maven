@@ -31,6 +31,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.CountDownLatch;
@@ -140,6 +141,26 @@ class InjectorDiagnosticsTest {
         assertTrue(snapshot.contains("supplier "));
         assertFalse(snapshot.contains("secret-value"));
         assertEquals(body(snapshot), body(injector.dumps.get(0)));
+    }
+
+    @Test
+    void snapshotsRenderWildcardsInOwnerTypes() {
+        class Outer<T> {
+            class Inner<U> {}
+        }
+
+        // Key simplifies its type arguments, but preserves wildcards in parameterized owners.
+        String bound = Number.class.getName() + " [loader=null]";
+        Map<Key<?>, String> cases = Map.of(
+                new Key<Outer<?>.Inner<String>>() {}, "<?>",
+                new Key<Outer<? extends Number>.Inner<String>>() {}, "<? extends " + bound + ">",
+                new Key<Outer<? super Number>.Inner<String>>() {}, "<? super " + bound + ">");
+        cases.forEach((key, expected) -> {
+            InjectorImpl injector = new InjectorImpl();
+            injector.getBindings().put(key, Set.of());
+            String dump = injector.dumpBindings();
+            assertTrue(dump.contains(expected), dump);
+        });
     }
 
     @Test
