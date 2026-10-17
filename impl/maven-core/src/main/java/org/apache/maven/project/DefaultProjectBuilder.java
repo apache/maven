@@ -82,6 +82,7 @@ import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
+import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -476,9 +477,20 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             : (parent
                                     ? ModelBuilderRequest.RequestType.CONSUMER_PARENT
                                     : ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY);
+                    Integer validationLevel = request.getValidationLevel();
+                    if (validationLevel != null) {
+                        if (validationLevel == ModelBuildingRequest.VALIDATION_LEVEL_STRICT) {
+                            validationLevel = ModelValidator.VALIDATION_LEVEL_STRICT;
+                        } else if (validationLevel == ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL) {
+                            validationLevel = ModelValidator.VALIDATION_LEVEL_MINIMAL;
+                        } else {
+                            validationLevel = null;
+                        }
+                    }
                     MavenProject theProject = project;
                     ModelBuilderRequest modelRequest = builder.source(source)
                             .requestType(type)
+                            .validationLevel(validationLevel)
                             .locationTracking(true)
                             .lifecycleBindingsInjector(
                                     (m, r, p) -> injectLifecycleBindings(m, r, p, theProject, request))
