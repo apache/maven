@@ -22,7 +22,9 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -30,9 +32,12 @@ import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.artifact.repository.ArtifactRepository;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.impl.resolver.RelocatedArtifact;
+import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.PluginResolutionException;
@@ -98,19 +103,70 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                 session.getArtifactTypeRegistry().get("maven-plugin"));
     }
 
+    /**
+     * Ensures plugin resolution always has a usable repository list.
+     *
+     * <p>In a pom-less (standalone) build the stub project carries no {@code <pluginRepositories>},
+     * so the repository list handed to plugin resolution is empty. Maven Resolver 2.x tracks which
+     * remote repository each locally-cached artifact was downloaded from and, when that origin
+     * repository is not part of the current resolution context, treats the cached artifact as
+     * unavailable and re-verifies it against the (empty) repository list, failing with
+     * "Can't resolve the plugin locally". To restore the behaviour of Resolver 1.x / Maven 3.9.x,
+     * fall back to the repositories configured on the execution request (which already include the
+     * standard {@code central} and any settings plugin repositories) so the origin of cached
+     * artifacts can be matched. Regular (non pom-less) builds pass a non-empty list and are
+     * unaffected.</p>
+     *
+     * @param repositories the repository list provided by the caller, possibly empty
+     * @param session the current repository session
+     * @return the repositories to actually use for resolution
+     */
+    private List<RemoteRepository> effectiveRepositories(
+            List<RemoteRepository> repositories, RepositorySystemSession session) {
+        if (repositories != null && !repositories.isEmpty()) {
+            return repositories;
+        }
+        InternalSession iSession = InternalSession.from(session);
+        if (iSession instanceof InternalMavenSession mavenSession) {
+            MavenExecutionRequest request = mavenSession.getMavenSession().getRequest();
+            if (!request.isProjectPresent()) {
+                List<ArtifactRepository> pluginRepositories = request.getPluginArtifactRepositories();
+                List<ArtifactRepository> remoteRepositories = request.getRemoteRepositories();
+                if ((pluginRepositories == null || pluginRepositories.isEmpty())
+                        && (remoteRepositories == null || remoteRepositories.isEmpty())) {
+                    return repositories;
+                }
+                LinkedHashSet<RemoteRepository> merged = new LinkedHashSet<>();
+                if (pluginRepositories != null) {
+                    for (ArtifactRepository repository : pluginRepositories) {
+                        merged.add(RepositoryUtils.toRepo(repository));
+                    }
+                }
+                if (remoteRepositories != null) {
+                    for (ArtifactRepository repository : remoteRepositories) {
+                        merged.add(RepositoryUtils.toRepo(repository));
+                    }
+                }
+                return repoSystem.newResolutionRepositories(session, new ArrayList<>(merged));
+            }
+        }
+        return repositories;
+    }
+
     @Override
     public Artifact resolve(Plugin plugin, List<RemoteRepository> repositories, RepositorySystemSession session)
             throws PluginResolutionException {
         RequestTrace trace = RequestTrace.newChild(null, plugin);
 
         Artifact pluginArtifact = toArtifact(plugin, session);
+        List<RemoteRepository> effectiveRepositories = effectiveRepositories(repositories, session);
 
         try {
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession(session);
             pluginSession.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, false));
 
             ArtifactDescriptorRequest request =
-                    new ArtifactDescriptorRequest(pluginArtifact, repositories, REPOSITORY_CONTEXT);
+                    new ArtifactDescriptorRequest(pluginArtifact, effectiveRepositories, REPOSITORY_CONTEXT);
             request.setTrace(trace);
             ArtifactDescriptorResult result = repoSystem.readArtifactDescriptor(pluginSession, request);
 
@@ -141,7 +197,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         }
 
         try {
-            ArtifactRequest request = new ArtifactRequest(pluginArtifact, repositories, REPOSITORY_CONTEXT);
+            ArtifactRequest request = new ArtifactRequest(pluginArtifact, effectiveRepositories, REPOSITORY_CONTEXT);
             request.setTrace(trace);
             pluginArtifact = repoSystem.resolveArtifact(session, request).getArtifact();
         } catch (ArtifactResolutionException e) {
@@ -176,13 +232,14 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         RequestTrace trace = RequestTrace.newChild(null, plugin);
 
         Artifact pluginArtifact = toArtifact(plugin, session);
+        List<RemoteRepository> effectiveRepositories = effectiveRepositories(repositories, session);
 
         try {
             DefaultRepositorySystemSession pluginSession = new DefaultRepositorySystemSession(session);
             pluginSession.setArtifactDescriptorPolicy(new SimpleArtifactDescriptorPolicy(true, false));
 
             ArtifactDescriptorRequest request =
-                    new ArtifactDescriptorRequest(pluginArtifact, repositories, REPOSITORY_CONTEXT);
+                    new ArtifactDescriptorRequest(pluginArtifact, effectiveRepositories, REPOSITORY_CONTEXT);
             request.setTrace(trace);
             ArtifactDescriptorResult result = repoSystem.readArtifactDescriptor(pluginSession, request);
 
@@ -201,7 +258,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                         pluginArtifact,
                         message);
             }
-            return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session);
+            return resolveInternal(plugin, pluginArtifact, dependencyFilter, effectiveRepositories, session);
         } catch (ArtifactDescriptorException e) {
             throw new PluginResolutionException(plugin, e.getResult().getExceptions(), e);
         }
@@ -255,6 +312,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         if (pluginArtifact == null) {
             pluginArtifact = toArtifact(plugin, session);
         }
+        List<RemoteRepository> effectiveRepositories = effectiveRepositories(repositories, session);
 
         DependencyFilter collectionFilter = new ScopeDependencyFilter("provided", "test");
         DependencyFilter resolutionFilter = AndDependencyFilter.newInstance(collectionFilter, dependencyFilter);
@@ -269,7 +327,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
 
             CollectRequest request = new CollectRequest();
             request.setRequestContext(REPOSITORY_CONTEXT);
-            request.setRepositories(repositories);
+            request.setRepositories(effectiveRepositories);
             request.setRoot(new org.eclipse.aether.graph.Dependency(pluginArtifact, null));
             for (Dependency dependency : plugin.getDependencies()) {
                 org.eclipse.aether.graph.Dependency pluginDep =
