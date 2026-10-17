@@ -114,7 +114,8 @@ For example, options and goals could be defined with the value
 
 ## Dependency Injection Diagnostics
 
-Set the `sisu.debug` Java system property to print the bindings known to Maven DI:
+Set the `sisu.debug` Java system property to print the bindings known to Maven DI.
+For example, to run the `validate` phase with diagnostics enabled:
 
 ```sh
 MAVEN_OPTS="-Dsisu.debug=true" mvn validate
