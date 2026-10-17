@@ -25,35 +25,11 @@ classloaders (called **realms**) so that plugins, extensions and the
 Maven core can each see only the classes they are supposed to see.
 
 The following diagram gives an overview of the realm hierarchy during a
-typical Maven build:
+typical Maven build. Solid arrows indicate the parent classloader
+relationship. Dashed blue arrows indicate package imports. Dashed green
+arrows indicate export feeds.
 
-```
-JVM System ClassLoader
-│   plexus-classworlds + -javaagent classes
-│
-├── plexus.core  ─────────────────────────────── Maven Core
-│   │   ${maven.home}/lib/*.jar
-│   │
-│   ├── maven.ext  ───────────────────────────── Extensions aggregator
-│   │       (only if core extensions or maven.ext.class.path exist)
-│   │
-│   ├── coreExtension>G:A:V  ─────────────────── Core Extension (one per entry)
-│   │
-│   ├── maven.api  ───────────────────────────── Maven API
-│   │   │   (aggregates exported packages from core + core extensions)
-│   │   │
-│   │   ├── maven.api.v4  ────────────────────── Maven 4 API
-│   │   │       (org.apache.maven.api + org.slf4j only)
-│   │   │
-│   │   └── project>G:A:V  ──────────────────── Project
-│   │           (parent=maven.api; imports build extension exports)
-│   │
-│   ├── extension>G:A:V  ─────────────────────── Build Extension (one per entry)
-│   │       (parent=System CL; imports all of maven.api)
-│   │
-│   └── plugin>G:A:V  ────────────────────────── Plugin (one per GAV+deps)
-│           (parent=System CL; imports maven.api or project realm)
-```
+![Maven 4.x Classloader Hierarchy](images/classloading.svg)
 
 Each realm is described in detail below.
 
@@ -175,17 +151,21 @@ This is the classloader that plugins and build extensions see as the
 "Maven API." It provides a clean, well-defined surface regardless of
 how Maven was launched.
 
-The parent classloader is the JVM Bootstrap ClassLoader (approximately
-`ClassLoader.getSystemClassLoader().getParent()`). This ensures the
+This realm has **no parent classloader** (`null`). It only contains
+what is explicitly imported from `CoreExports`. This ensures the
 Maven API classpath is consistent and does not include application or
 `-javaagent` classes.
 
 ## Maven 4 API Realm (`maven.api.v4`)
 
-A more restricted view containing only:
+A more restricted view of the core, separate from `maven.api`, containing
+only:
 
 - `org.apache.maven.api` — the Maven 4 API surface
 - `org.slf4j` — logging
+
+Like `maven.api`, this realm has **no parent classloader** and imports
+directly from the container realm — it is not a child of `maven.api`.
 
 Maven 4 plugins (those using the new Maven 4 API) use this realm
 instead of `maven.api`. This ensures Maven 4 plugins only depend on
