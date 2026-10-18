@@ -35,8 +35,6 @@ import java.util.stream.Collectors;
 import org.apache.maven.lifecycle.providers.lifecycle.CleanLifecycleProvider;
 import org.apache.maven.lifecycle.providers.lifecycle.DefaultLifecycleProvider;
 import org.apache.maven.lifecycle.providers.lifecycle.SiteLifecycleProvider;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -67,9 +65,6 @@ public class DefaultLifecycles {
 
     @Inject
     private Logger logger;
-
-    @Inject
-    private PlexusContainer plexusContainer;
 
     public DefaultLifecycles() {}
 
@@ -132,24 +127,8 @@ public class DefaultLifecycles {
     public List<Lifecycle> getLifeCycles() {
         // ensure canonical order of standard lifecycles
 
-        Map<String, Lifecycle> lifecycles = new LinkedHashMap<>();
-
-        // filter by visibility (plexus vs sisu diff; "realms" are plexus thing)
-        // in some tests container is not injected
-        if (this.plexusContainer != null) {
-            for (String name : this.lifecycles.keySet()) {
-                if (!isEnabled(name)) {
-                    continue;
-                }
-                try {
-                    lifecycles.put(name, plexusContainer.lookup(Lifecycle.class, name));
-                } catch (ComponentLookupException e) {
-                    // skip it
-                }
-            }
-        } else {
-            lifecycles.putAll(this.lifecycles);
-        }
+        // take "snapshot": will filter by visibility
+        Map<String, Lifecycle> lifecycles = new LinkedHashMap<>(this.lifecycles);
 
         LinkedHashSet<String> lifecycleNames = new LinkedHashSet<>(getStandardLifecycles());
         lifecycleNames.addAll(lifecycles.keySet());
