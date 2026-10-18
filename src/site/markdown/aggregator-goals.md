@@ -165,9 +165,9 @@ This decomposition means new Maven 4 plugins should **not** use `@Mojo(aggregato
 
 - Bind the goal to `after:all` (or `before:all`) for reactor-scoped execution.
 - Use `@Resolution` fields for dependency injection, which is already orthogonal to aggregator.
-- Express ordering constraints via `@After` / `AfterLink` with `PROJECT`, `DEPENDENCIES`, or `CHILDREN` pointers.
+- Express ordering constraints via `@After` with `PROJECT`, `DEPENDENCIES`, or `CHILDREN` type values.
 
-For backward compatibility, existing plugin descriptors declaring `aggregator=true` will continue to work — the runtime maps the flag to the equivalent DAG constraints internally.
+For backward compatibility, existing plugin descriptors declaring `aggregator=true` will continue to work in Maven 4.x; the target for Maven 5.x is to map the flag to equivalent DAG constraints internally (see §3.6 roadmap).
 
 ### 3.5 Deprecating Forked Lifecycles (`@Execute`)
 
@@ -178,7 +178,7 @@ Forked lifecycles (`@Execute(phase = ...)`) let a mojo fork a lifecycle phase in
 | maven-javadoc-plugin | `@Execute(phase = COMPILE)` | Compiled classes must exist |
 | maven-source-plugin | `@Execute(phase = GENERATE_SOURCES)` | Generated sources must exist |
 | maven-dependency-plugin | `@Execute(phase = TEST_COMPILE)` | Classes compiled for analysis |
-| maven-pmd-plugin | `@Execute(phase = TEST_COMPILE)`, `@Execute(goal = "pmd")` | Classes compiled; PMD report generated |
+| maven-pmd-plugin | `@Execute(phase = TEST_COMPILE)` | Classes compiled for analysis |
 | maven-surefire (report) | `@Execute(lifecycle = "surefire", phase = TEST)` | Test results must exist |
 
 Every case reduces to "phase X must have completed before I run" — a DAG edge, not an isolated execution context. The `-no-fork` mojo variants (`javadoc-no-fork`, `aggregate-no-fork`, `jxr-no-fork`) exist only to opt out of unwanted forking, confirming that the fork is the wrong abstraction.
@@ -187,10 +187,10 @@ The Maven 4 replacement is `@After` constraints:
 
 ```java
 // Instead of @Execute(phase = LifecyclePhase.COMPILE)
-@After(phase = "compile", scope = AfterLink.Pointer.PROJECT)
+@After(phase = "compile", type = After.Type.PROJECT)
 
-// Instead of @Execute(goal = "pmd")
-@After(goal = "pmd:pmd")
+// Instead of @Execute(phase = LifecyclePhase.TEST_COMPILE)
+@After(phase = "test-compile", type = After.Type.PROJECT)
 ```
 
 The `computeForkPlan()` machinery, `$plan$` sentinel detection, and `getExecutionProject()` API can be deprecated for v4 mojos. Maven 3 plugin descriptors declaring `@Execute` will be translated into equivalent `@After` constraints at descriptor load time.
