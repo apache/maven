@@ -150,16 +150,58 @@ This executes `maven-javadoc-plugin:aggregate` exactly once on the root project,
 completed its `all` phase (which includes compilation and packaging). No distribution submodule workaround
 required.
 
-### 3.4 Remaining Work for `aggregator = true`
+### 3.4 Decomposing `aggregator = true`
 
-The `before:`/`after:` phase system is an alternative approach to aggregation. Existing plugins that rely
-on `@Mojo(aggregator = true)` still exhibit the legacy shortcomings described in section 2, regardless of
-the POM model version in use. The `before:`/`after:` system does not automatically fix those plugins; it
-provides a better foundation for new plugin designs. The open design question tracked in
-[MNG-7991](https://github.com/apache/maven/issues/8718) covers how to bridge this gap cleanly.
+The `aggregator` flag is a **compound attribute** that bundles four distinct runtime behaviors. Maven 4 already provides orthogonal replacements for each:
 
-### 3.5 Forking Deduplication (open)
-- Forked lifecycles initiated by an aggregator must verify previously satisfied phases in the reactor session cache to avoid repeating work already accomplished in the current build.
+| Behavior | What `aggregator=true` does | Maven 4 replacement | Status |
+| :--- | :--- | :--- | :--- |
+| **Execution scope** | Run once on the root project, not per-module | Bind to `all` phase (`before:all`, `after:all`) | Available |
+| **Dependency resolution scope** | Resolve dependencies for all reactor projects | `@Resolution` annotation (per-field, per-project injection in `DefaultMavenPluginManager`) | Available |
+| **Exclusive locking** | Acquire reactor-wide write lock in `-T` builder | DAG edges enforce ordering in the concurrent builder — no lock needed | Available |
+| **Fork scope** | Forked lifecycles include all subprojects | Ordering constraints via `@After` (forks deprecated — see section 3.5) | Available |
+
+This decomposition means new Maven 4 plugins should **not** use `@Mojo(aggregator = true)`. Instead:
+
+- Bind the goal to `after:all` (or `before:all`) for reactor-scoped execution.
+- Use `@Resolution` fields for dependency injection, which is already orthogonal to aggregator.
+- Express ordering constraints via `@After` / `AfterLink` with `PROJECT`, `DEPENDENCIES`, or `CHILDREN` pointers.
+
+For backward compatibility, existing plugin descriptors declaring `aggregator=true` will continue to work — the runtime maps the flag to the equivalent DAG constraints internally.
+
+### 3.5 Deprecating Forked Lifecycles (`@Execute`)
+
+Forked lifecycles (`@Execute(phase = ...)`) let a mojo fork a lifecycle phase in a separate execution context before running. Analysis of all Apache Maven plugins using `@Execute` shows that **none require fork isolation** — every use is purely an ordering guarantee:
+
+| Plugin | `@Execute` target | Actual need |
+| :--- | :--- | :--- |
+| maven-javadoc-plugin | `@Execute(phase = COMPILE)` | Compiled classes must exist |
+| maven-source-plugin | `@Execute(phase = GENERATE_SOURCES)` | Generated sources must exist |
+| maven-dependency-plugin | `@Execute(phase = TEST_COMPILE)` | Classes compiled for analysis |
+| maven-pmd-plugin | `@Execute(phase = TEST_COMPILE)`, `@Execute(goal = "pmd")` | Classes compiled; PMD report generated |
+| maven-surefire (report) | `@Execute(lifecycle = "surefire", phase = TEST)` | Test results must exist |
+
+Every case reduces to "phase X must have completed before I run" — a DAG edge, not an isolated execution context. The `-no-fork` mojo variants (`javadoc-no-fork`, `aggregate-no-fork`, `jxr-no-fork`) exist only to opt out of unwanted forking, confirming that the fork is the wrong abstraction.
+
+The Maven 4 replacement is `@After` constraints:
+
+```java
+// Instead of @Execute(phase = LifecyclePhase.COMPILE)
+@After(phase = "compile", scope = AfterLink.Pointer.PROJECT)
+
+// Instead of @Execute(goal = "pmd")
+@After(goal = "pmd:pmd")
+```
+
+The `computeForkPlan()` machinery, `$plan$` sentinel detection, and `getExecutionProject()` API can be deprecated for v4 mojos. Maven 3 plugin descriptors declaring `@Execute` will be translated into equivalent `@After` constraints at descriptor load time.
+
+### 3.6 Migration Roadmap
+
+| Phase | Action |
+| :--- | :--- |
+| **Maven 4.0** | `before:`/`after:` phases available; `aggregator` and `@Execute` still supported |
+| **Maven 4.x** | Document `aggregator` and `@Execute` as deprecated for new plugins; provide migration guide |
+| **Maven 5.x** | Remove forked lifecycle machinery; `aggregator` mapped to phase binding internally |
 
 ---
 
@@ -176,3 +218,4 @@ provides a better foundation for new plugin designs. The open design question tr
 | MNG-7672 | [#8780](https://github.com/apache/maven/issues/8780) | Aggregate goals executed in a submodule forks the whole reactor | Submodule isolation |
 | MNG-4504 | [#5543](https://github.com/apache/maven/issues/5543) | Disallowing all aggregator bindings to any lifecycle is too broad | Lifecycle policy |
 | MNG-7900 | [#9015](https://github.com/apache/maven/issues/9015) | Wrapper lifecycle in multi module project should be executed only in root module | Wrapper lifecycle |
+| - | [#13529](https://github.com/apache/maven/issues/13529) | Concurrent builder drops later lifecycle phases when merging overlapping task segments (fixed in [#13532](https://github.com/apache/maven/pull/13532)) | Task segment merging |
