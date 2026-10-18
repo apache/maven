@@ -298,7 +298,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         Path childPom = Files.createDirectory(tempDir.resolve("child")).resolve("pom.xml");
         Files.writeString(childPom, """
-            <project>
+            <project xmlns="http://maven.apache.org/POM/4.1.0">
               <modelVersion>4.1.0</modelVersion>
               <parent>
                 <groupId>test</groupId>
@@ -330,14 +330,14 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                 assertEquals(parentPom.toFile(), child.getParentFile());
 
                 boolean hasRelativePathWarning = result.getProblems().stream()
-                        .anyMatch(problem -> problem.getMessage()
-                                .contains("only specify relativePath or groupId/artifactId"));
+                        .anyMatch(problem ->
+                                problem.getMessage().contains("only specify relativePath or groupId/artifactId"));
 
                 assertEquals(
                         validationLevel == ModelBuildingRequest.VALIDATION_LEVEL_STRICT,
                         hasRelativePathWarning,
-                        "Unexpected validation result for level " + validationLevel
-                                + " and processPlugins=" + processPlugins);
+                        "Unexpected validation result for level " + validationLevel + " and processPlugins="
+                                + processPlugins);
             }
         }
     }

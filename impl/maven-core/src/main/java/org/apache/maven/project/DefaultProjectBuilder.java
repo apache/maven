@@ -82,7 +82,6 @@ import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.model.LifecycleBindingsInjector;
-import org.apache.maven.api.services.model.ModelValidator;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -467,26 +466,20 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             && source.getLocation().endsWith("/org/apache/maven/project/standalone.xml");
 
                     ModelBuilderRequest.ModelBuilderRequestBuilder builder = getModelBuildingRequest();
-                    ModelBuilderRequest.RequestType type = reactorMember
-                                    || isStandalone
-                                    || (pomFile != null
-                                            && request.isProcessPlugins()
-                                            && request.getValidationLevel()
-                                                    == ModelBuildingRequest.VALIDATION_LEVEL_STRICT)
+                    ModelBuilderRequest.RequestType type = reactorMember || isStandalone || pomFile != null
                             ? ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
                             : (parent
                                     ? ModelBuilderRequest.RequestType.CONSUMER_PARENT
                                     : ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY);
-                    Integer validationLevel = request.getValidationLevel();
-                    if (validationLevel != null) {
-                        if (validationLevel == ModelBuildingRequest.VALIDATION_LEVEL_STRICT) {
-                            validationLevel = ModelValidator.VALIDATION_LEVEL_STRICT;
-                        } else if (validationLevel == ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL) {
-                            validationLevel = ModelValidator.VALIDATION_LEVEL_MINIMAL;
-                        } else {
-                            validationLevel = null;
-                        }
+
+                    // Maven 3 STRICT (30) is not the SPI STRICT (42): leave it to the default of a build request.
+                    // The lower levels have the same values in both APIs and are forwarded as they are.
+                    Integer validationLevel = null;
+                    if (type == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
+                            && request.getValidationLevel() != ModelBuildingRequest.VALIDATION_LEVEL_STRICT) {
+                        validationLevel = request.getValidationLevel();
                     }
+
                     MavenProject theProject = project;
                     ModelBuilderRequest modelRequest = builder.source(source)
                             .requestType(type)
