@@ -22,6 +22,11 @@ on:
       - master
   workflow_dispatch:
 
+permissions: {}
+
 jobs:
-   update_release_draft:
-      uses: apache/maven-gh-actions-shared/.github/workflows/release-drafter.yml@v5
+  update_release_draft:
+    permissions:
+      contents: write
+      issues: write
+    uses: apache/maven-gh-actions-shared/.github/workflows/release-drafter.yml@8599b638c78a2bec146a98d75d4c8b4e8458324f # v5
