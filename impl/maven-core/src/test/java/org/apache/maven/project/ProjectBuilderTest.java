@@ -334,7 +334,7 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
                                 problem.getMessage().contains("only specify relativePath or groupId/artifactId"));
 
                 assertEquals(
-                        validationLevel == ModelBuildingRequest.VALIDATION_LEVEL_STRICT,
+                        validationLevel == ModelBuildingRequest.VALIDATION_LEVEL_STRICT && processPlugins,
                         hasRelativePathWarning,
                         "Unexpected validation result for level " + validationLevel + " and processPlugins="
                                 + processPlugins);

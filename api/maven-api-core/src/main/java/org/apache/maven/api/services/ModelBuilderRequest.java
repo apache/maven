@@ -93,6 +93,7 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
 
     @Nonnull
     RequestType getRequestType();
+
     /**
      * Returns the explicit validation level to apply, or {@code null} to use the default
      * level based on the {@linkplain #getRequestType() request type}.
