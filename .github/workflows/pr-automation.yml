@@ -17,9 +17,9 @@
 
 name: PR Automation
 on:
-  pull_request_target:
-    types:
-      - closed
+  push:
+    branches:
+      - maven-3.9.x
 
 jobs:
   pr-automation:
