@@ -201,7 +201,7 @@ public class BootstrapCoreExtensionManager {
     }
 
     /**
-     * Helper method to return current TCCL set {@link ClassRealm} or {@code null}, if TCCL is not a class realm.
+     * Returns the first ClassRealm found in the TCCL parent chain, or {@code null} if none is found.
      */
     private static ClassRealm contextRealm() {
         for (ClassLoader tccl = Thread.currentThread().getContextClassLoader(); tccl != null; tccl = tccl.getParent()) {
