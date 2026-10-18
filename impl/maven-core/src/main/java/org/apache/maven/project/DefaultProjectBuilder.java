@@ -466,7 +466,8 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                             && source.getLocation().endsWith("/org/apache/maven/project/standalone.xml");
 
                     ModelBuilderRequest.ModelBuilderRequestBuilder builder = getModelBuildingRequest();
-                    ModelBuilderRequest.RequestType type = reactorMember || isStandalone || pomFile != null
+                    ModelBuilderRequest.RequestType type = reactorMember || isStandalone
+                                    || (pomFile != null && request.isProcessPlugins())
                             ? ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
                             : (parent
                                     ? ModelBuilderRequest.RequestType.CONSUMER_PARENT
