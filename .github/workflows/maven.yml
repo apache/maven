@@ -140,9 +140,7 @@ jobs:
           java-version: ${{ matrix.java }}
           # Temurin comes from the runners' tool cache; it has no JDK 8 for macOS on Apple Silicon
           distribution: ${{ (runner.os == 'macOS' && matrix.java == 8) && 'zulu' || 'temurin' }}
-          cache: 'maven'
-          # pull requests restore the caches of the branch they target without saving their own copies
-          cache-read-only: ${{ github.event_name == 'pull_request' }}
+          # no cache: 'maven' here - the it-m2-repo cache above already restores and saves ~/.m2/repository
           show-download-progress: true # ITs verify transfer progress output
 
       - name: Set up Maven
