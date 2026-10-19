@@ -242,6 +242,15 @@ class DefaultSettingsBuilderFactoryTest {
 
     @Test
     void testProxyFieldInterpolation() {
+        // Note: in Maven 4 the settings model stores proxy.port and proxy.active as
+        // String-backed fields (portString / activeString), so both the pre-parse
+        // interpolateSource() step and the post-parse SettingsTransformer-based
+        // interpolate() step can resolve ${...} placeholders for these fields.
+        // The pre-parse step is retained for:
+        //   - forward compatibility with model changes that may introduce true typed fields
+        //   - custom SettingsParser implementations that bypass the transformer
+        //   - consistency with the Maven 3.x fix for the same issue
+        // This test verifies end-to-end that proxy field interpolation works correctly.
         Map<String, String> userProperties = Map.of(
                 "test.proxy.active", "true",
                 "test.proxy.port", "9090",
@@ -261,6 +270,8 @@ class DefaultSettingsBuilderFactoryTest {
         assertEquals("http", proxy.getProtocol());
         assertEquals("proxy.example.org", proxy.getHost());
 
+        // Also verify that a custom interpolationSource (bypassing session properties) works.
+        // This exercises the interpolationSource branch in both interpolateSource() and interpolate().
         Mockito.lenient().when(session.getUserProperties()).thenReturn(Map.of());
         Mockito.lenient().when(session.getSystemProperties()).thenReturn(Map.of());
         Mockito.lenient().when(session.getEffectiveProperties()).thenReturn(Map.of());
@@ -281,11 +292,14 @@ class DefaultSettingsBuilderFactoryTest {
 
     @Test
     void testInterpolationWithXmlMarkupInPropertyValue() {
+        // Regression test for MNG-4625: interpolating a property whose value contains XML special
+        // characters (& < >) must not produce malformed XML and must preserve the raw value.
         Map<String, String> userProperties = Map.of("test.prop", "&x=y<>");
 
         Settings settings =
                 execute("settings-xml-markup-interpolation", userProperties).getEffectiveSettings();
 
+        // The jdbcUrl property should contain the raw (unescaped) value, not XML entities
         String jdbcUrl = settings.getProfiles().stream()
                 .filter(p -> "xml-markup".equals(p.getId()))
                 .findFirst()
@@ -299,16 +313,19 @@ class DefaultSettingsBuilderFactoryTest {
     void testStrictParsingReportsError() {
         Map<String, String> systemProperties = Map.of("maven.settings.strictParsing", "true");
 
+        // Valid settings should parse fine even in strict mode
         Settings validSettings =
                 execute("settings-simple", Map.of(), systemProperties).getEffectiveSettings();
         assertNotNull(validSettings);
 
+        // Settings with an unknown element must throw with a fatal problem in strict mode
         SettingsBuilderException ex = assertThrows(
                 SettingsBuilderException.class, () -> execute("settings-unknown-element", Map.of(), systemProperties));
         assertTrue(
                 ex.getProblemCollector().hasFatalProblems(),
                 "Strict parsing must produce a fatal problem for unknown XML elements");
 
+        // Without strict mode, the same settings should only produce a warning, not throw
         SettingsBuilderResult lenientResult = execute("settings-unknown-element");
         assertFalse(
                 lenientResult.getProblems().hasFatalProblems(),
