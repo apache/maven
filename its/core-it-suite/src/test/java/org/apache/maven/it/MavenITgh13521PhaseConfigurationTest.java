@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.nio.file.Path;
+import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
@@ -26,13 +26,17 @@ import org.junit.jupiter.api.Test;
  * This is a test set for <a href="https://github.com/apache/maven/issues/13521">GH-13521</a>.
  * Tests that phase configuration is applied to forked executions with no prior configuration.
  */
-class MavenITgh13521PhaseConfigurationTest extends AbstractMavenIntegrationTestCase {
+public class MavenITgh13521PhaseConfigurationTest extends AbstractMavenIntegrationTestCase {
+
+    public MavenITgh13521PhaseConfigurationTest() {
+        super("(4.0.0,)");
+    }
 
     @Test
-    void testPhaseConfigurationAppliedToUnconfiguredExecution() throws Exception {
-        Path testDir = extractResources("gh-13521-phase-configuration");
+    public void testPhaseConfigurationAppliedToUnconfiguredExecution() throws Exception {
+        File testDir = extractResources("/gh-13521-phase-configuration");
 
-        Verifier verifier = newVerifier(testDir);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.deleteDirectory("target");
         verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-fork:fork-phase-config");
