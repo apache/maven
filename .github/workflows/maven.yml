@@ -158,3 +158,23 @@ jobs:
         with:
           path: ~/.m2/repository
           key: it-m2-repo-${{ matrix.os }}-${{ hashFiles('maven-integration-testing/**/pom.xml') }}
+
+  prune-caches:
+    name: Prune superseded integration-test caches
+    # every change to the IT POMs saves a new generation; restores only use the exact key or the newest fallback
+    needs: integration-test
+    if: ${{ !cancelled() && github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Delete all but the newest it-m2-repo cache per OS on this branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh cache list --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF" --key it-m2-repo- --limit 100 --json id,key,createdAt \
+            --jq 'group_by(.key | sub("-[0-9a-f]{64}$"; "")) | .[] | sort_by(.createdAt) | .[:-1][] | "\(.id) \(.key)"' |
+          while read -r id key; do
+            echo "Deleting $key"
+            gh cache delete "$id" --repo "$GITHUB_REPOSITORY"
+          done
