@@ -344,6 +344,10 @@ public interface XmlNode {
     }
 
     /**
+     * @param dominant the node
+     * @param recessive if {@code null}, nothing will happen
+     * @param childMergeOverride overrides child merge behavior
+     * @return the merged node
      * @deprecated Use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
