@@ -34,7 +34,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.1.0
  */
 @Experimental
-public interface LifecycleExecutor extends Service {
+public interface LifecyclePlanExecutor extends Service {
 
     /**
      * Calculates the execution plan for the supplied tasks, retains the executions accepted by the filter, and
@@ -48,7 +48,7 @@ public interface LifecycleExecutor extends Service {
      * @param project the project for which to execute the plan
      * @param tasks lifecycle phases or plugin goals used to calculate the plan
      * @param filter predicate deciding which configured executions remain in the plan
-     * @throws LifecycleExecutionException if plan calculation or execution fails
+     * @throws LifecyclePlanExecutionException if plan calculation or execution fails
      * @throws NullPointerException if any argument or task is {@code null}
      */
     void execute(

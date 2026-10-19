@@ -33,7 +33,7 @@ import org.apache.maven.api.annotations.ThreadSafe;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.DependencyCoordinatesFactory;
-import org.apache.maven.api.services.LifecycleExecutor;
+import org.apache.maven.api.services.LifecyclePlanExecutor;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.VersionResolverException;
 import org.apache.maven.api.settings.Settings;
@@ -226,12 +226,12 @@ public interface Session extends ProtoSession {
      * @param project the project for which to execute the lifecycle
      * @param tasks lifecycle phases or plugin goals used to calculate the plan
      * @param filter predicate deciding which configured executions remain in the plan
-     * @throws org.apache.maven.api.services.LifecycleExecutionException if plan calculation or execution fails
+     * @throws org.apache.maven.api.services.LifecyclePlanExecutionException if plan calculation or execution fails
      * @since 4.1.0
      */
     default void executeLifecycle(
             @Nonnull Project project, @Nonnull List<String> tasks, @Nonnull Predicate<MojoExecution> filter) {
-        getService(LifecycleExecutor.class).execute(this, project, tasks, filter);
+        getService(LifecyclePlanExecutor.class).execute(this, project, tasks, filter);
     }
 
     /**

@@ -31,8 +31,8 @@ import org.apache.maven.api.Project;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.services.LifecycleExecutionException;
-import org.apache.maven.api.services.LifecycleExecutor;
+import org.apache.maven.api.services.LifecyclePlanExecutionException;
+import org.apache.maven.api.services.LifecyclePlanExecutor;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
@@ -46,16 +46,16 @@ import static java.util.Objects.requireNonNull;
 import static org.apache.maven.internal.impl.CoreUtils.cast;
 
 @Named
-@Typed({LifecycleExecutor.class, Service.class})
+@Typed({LifecyclePlanExecutor.class, Service.class})
 @Singleton
-public class DefaultLifecycleExecutor implements LifecycleExecutor {
+public class DefaultLifecyclePlanExecutor implements LifecyclePlanExecutor {
 
     private final LifecycleTaskSegmentCalculator taskSegmentCalculator;
     private final LifecycleExecutionPlanCalculator executionPlanCalculator;
     private final MojoExecutor mojoExecutor;
 
     @Inject
-    public DefaultLifecycleExecutor(
+    public DefaultLifecyclePlanExecutor(
             LifecycleTaskSegmentCalculator taskSegmentCalculator,
             LifecycleExecutionPlanCalculator executionPlanCalculator,
             MojoExecutor mojoExecutor) {
@@ -81,26 +81,41 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
                 cast(DefaultProject.class, project, "project").getProject();
         MavenProject previousProject = mavenSession.getCurrentProject();
 
+        mavenSession.setCurrentProject(mavenProject);
         try {
-            mavenSession.setCurrentProject(mavenProject);
-            List<TaskSegment> taskSegments = taskSegmentCalculator.calculateTaskSegments(mavenSession, tasks);
-            List<org.apache.maven.plugin.MojoExecution> filteredPlan = new ArrayList<>();
+            List<org.apache.maven.plugin.MojoExecution> plan;
+            try {
+                plan = calculatePlan(mavenSession, mavenProject, tasks);
+            } catch (Exception e) {
+                throw new LifecyclePlanExecutionException("Unable to calculate lifecycle plan", e);
+            }
 
-            for (TaskSegment taskSegment : taskSegments) {
-                MavenExecutionPlan executionPlan = executionPlanCalculator.calculateExecutionPlan(
-                        mavenSession, mavenProject, taskSegment.getTasks());
-                for (org.apache.maven.plugin.MojoExecution execution : executionPlan.getMojoExecutions()) {
-                    if (filter.test(new DefaultMojoExecution(internalSession, execution))) {
-                        filteredPlan.add(execution);
-                    }
+            List<org.apache.maven.plugin.MojoExecution> filteredPlan = new ArrayList<>();
+            for (org.apache.maven.plugin.MojoExecution execution : plan) {
+                if (filter.test(new DefaultMojoExecution(internalSession, execution))) {
+                    filteredPlan.add(execution);
                 }
             }
 
-            mojoExecutor.execute(mavenSession, filteredPlan);
-        } catch (Exception e) {
-            throw new LifecycleExecutionException("Unable to execute filtered lifecycle plan", e);
+            try {
+                mojoExecutor.execute(mavenSession, filteredPlan);
+            } catch (org.apache.maven.lifecycle.LifecycleExecutionException e) {
+                throw new LifecyclePlanExecutionException("Unable to execute filtered lifecycle plan", e);
+            }
         } finally {
             mavenSession.setCurrentProject(previousProject);
         }
+    }
+
+    private List<org.apache.maven.plugin.MojoExecution> calculatePlan(
+            MavenSession session, MavenProject project, List<String> tasks) throws Exception {
+        List<TaskSegment> taskSegments = taskSegmentCalculator.calculateTaskSegments(session, tasks);
+        List<org.apache.maven.plugin.MojoExecution> plan = new ArrayList<>();
+        for (TaskSegment taskSegment : taskSegments) {
+            MavenExecutionPlan executionPlan =
+                    executionPlanCalculator.calculateExecutionPlan(session, project, taskSegment.getTasks());
+            plan.addAll(executionPlan.getMojoExecutions());
+        }
+        return plan;
     }
 }

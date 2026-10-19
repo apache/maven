@@ -26,9 +26,9 @@ import org.apache.maven.api.annotations.Experimental;
  * @since 4.1.0
  */
 @Experimental
-public class LifecycleExecutionException extends MavenException {
+public class LifecyclePlanExecutionException extends MavenException {
 
-    public LifecycleExecutionException(String message, Throwable cause) {
+    public LifecyclePlanExecutionException(String message, Throwable cause) {
         super(message, cause);
     }
 }
