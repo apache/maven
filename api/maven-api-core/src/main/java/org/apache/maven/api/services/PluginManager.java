@@ -42,6 +42,7 @@ public interface PluginManager extends Service {
      * @param plugin the plugin declaration from the project's model
      * @return the resolved plugin runtime
      * @throws PluginManagerException if the plugin cannot be resolved or loaded
+     * @throws IllegalArgumentException if the plugin is not declared by the given project
      * @throws NullPointerException if any argument is {@code null}
      */
     @Nonnull
