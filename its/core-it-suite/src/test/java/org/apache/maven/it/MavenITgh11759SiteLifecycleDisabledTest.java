@@ -18,7 +18,7 @@
  */
 package org.apache.maven.it;
 
-import java.nio.file.Path;
+import java.io.File;
 
 import org.junit.jupiter.api.Test;
 
@@ -32,15 +32,19 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
  */
 class MavenITgh11759SiteLifecycleDisabledTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITgh11759SiteLifecycleDisabledTest() {
+        super("[4.0.0-rc-3,)");
+    }
+
     /**
      * Verifies that with {@code maven.site.lifecycle.disabled=true} the site lifecycle
      * is absent and invoking the {@code site} phase causes a build failure.
      */
     @Test
     void testSiteLifecycleDisabledViaSystemProperty() throws Exception {
-        Path testDir = extractResources("/gh-11759-site-lifecycle-disabled");
+        File testDir = extractResources("/gh-11759-site-lifecycle-disabled");
 
-        Verifier verifier = newVerifier(testDir);
+        Verifier verifier = newVerifier(testDir.getAbsolutePath());
         verifier.setAutoclean(false);
         verifier.setLogFileName("log-disabled.txt");
         // Pass the flag as a JVM system property to the Maven process.
