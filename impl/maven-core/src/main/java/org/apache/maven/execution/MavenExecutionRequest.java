@@ -258,6 +258,48 @@ public interface MavenExecutionRequest {
 
     boolean isNoSnapshotUpdates();
 
+    // Resolver 2.x artifact and metadata update policies
+
+    /**
+     * Sets the update policy to apply to artifact resolution.
+     * Valid values: {@code always}, {@code daily}, {@code interval:N} (minutes), {@code never}.
+     *
+     * @param policy the update policy string, or {@code null} to defer to the legacy snapshot flags
+     *               (only when the metadata update policy is also {@code null}); a lone {@code null}
+     *               here simply leaves the artifact dimension unset in the session
+     * @return this request
+     * @since 4.0.0
+     */
+    MavenExecutionRequest setArtifactsUpdatePolicy(String policy);
+
+    /**
+     * Returns the update policy to apply to artifact resolution.
+     *
+     * @return the policy string, or {@code null} if not explicitly set
+     * @since 4.0.0
+     */
+    String getArtifactsUpdatePolicy();
+
+    /**
+     * Sets the update policy to apply to metadata resolution.
+     * Valid values: {@code always}, {@code daily}, {@code interval:N} (minutes), {@code never}.
+     *
+     * @param policy the update policy string, or {@code null} to defer to the legacy snapshot flags
+     *               (only when the artifacts update policy is also {@code null}); a lone {@code null}
+     *               here simply leaves the metadata dimension unset in the session
+     * @return this request
+     * @since 4.0.0
+     */
+    MavenExecutionRequest setMetadataUpdatePolicy(String policy);
+
+    /**
+     * Returns the update policy to apply to metadata resolution.
+     *
+     * @return the policy string, or {@code null} if not explicitly set
+     * @since 4.0.0
+     */
+    String getMetadataUpdatePolicy();
+
     // Checksum policy
     MavenExecutionRequest setGlobalChecksumPolicy(String globalChecksumPolicy);
 
