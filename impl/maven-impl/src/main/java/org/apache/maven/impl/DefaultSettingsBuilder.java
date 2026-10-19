@@ -123,9 +123,6 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         Settings effective =
                 settingsMerger.merge(user, settingsMerger.merge(project, installation, false, null), false, null);
 
-        // If no repository is defined in the user/global settings,
-        // it means that we have "old" settings (as those are new in 4.0)
-        // so add central to the computed settings for backward compatibility.
         // Each list is checked independently: a user may define <repositories>
         // (e.g. an internal mirror) without defining <pluginRepositories>, and
         // plugin resolution still needs central.

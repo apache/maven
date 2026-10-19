@@ -241,6 +241,17 @@ class DefaultSettingsBuilderFactoryTest {
     }
 
     @Test
+    void bothReposDefinedDoesNotInjectCentral() {
+        Settings settings = execute("settings-both-repos").getEffectiveSettings();
+
+        assertEquals(1, settings.getRepositories().size());
+        assertEquals("internal", settings.getRepositories().get(0).getId());
+
+        assertEquals(1, settings.getPluginRepositories().size());
+        assertEquals("internal-plugins", settings.getPluginRepositories().get(0).getId());
+    }
+
+    @Test
     void testProxyFieldInterpolation() {
         // Note: in Maven 4 the settings model stores proxy.port and proxy.active as
         // String-backed fields (portString / activeString), so both the pre-parse
