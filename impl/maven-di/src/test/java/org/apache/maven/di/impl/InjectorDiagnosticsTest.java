@@ -159,7 +159,7 @@ class InjectorDiagnosticsTest {
             InjectorImpl injector = new InjectorImpl();
             injector.getBindings().put(key, Set.of());
             String dump = injector.dumpBindings();
-            assertTrue(dump.contains(expected), dump);
+            assertTrue(dump.contains(expected + ".Inner [loader="), dump);
         });
     }
 
