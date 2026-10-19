@@ -498,6 +498,61 @@ public class DefaultRepositorySystemSessionFactoryTest {
         return new RemoteRepository.Builder(id, "default", url).build();
     }
 
+    @Test
+    void artifactsUpdatePolicyTest() throws InvalidRepositoryException {
+        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Collections.emptyMap(),
+                versionFilterBuilder);
+
+        // No policy set: legacy path, no per-type policy
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        org.eclipse.aether.RepositorySystemSession session = systemSessionFactory.newRepositorySession(request);
+        assertNull(session.getArtifactUpdatePolicy());
+        assertNull(session.getMetadataUpdatePolicy());
+
+        // Artifacts policy only
+        request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setArtifactsUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
+        session = systemSessionFactory.newRepositorySession(request);
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_ALWAYS, session.getArtifactUpdatePolicy());
+        assertNull(session.getMetadataUpdatePolicy());
+
+        // Metadata policy only
+        request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setMetadataUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_NEVER);
+        session = systemSessionFactory.newRepositorySession(request);
+        assertNull(session.getArtifactUpdatePolicy());
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_NEVER, session.getMetadataUpdatePolicy());
+
+        // Both per-type policies set (interval:N)
+        request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setArtifactsUpdatePolicy("interval:30");
+        request.setMetadataUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_DAILY);
+        session = systemSessionFactory.newRepositorySession(request);
+        assertEquals("interval:30", session.getArtifactUpdatePolicy());
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_DAILY, session.getMetadataUpdatePolicy());
+
+        // Mixed: new-style metadata policy set with legacy -U flag (-U is silently superseded, warning logged)
+        // Only metadata dimension is set explicitly; artifact dimension remains null (resolver default applies).
+        // The legacy -U flag is ignored when any new-style policy is present.
+        request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setMetadataUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_DAILY);
+        request.setUpdateSnapshots(true); // simulates -U; superseded by new-style policy, warning logged
+        session = systemSessionFactory.newRepositorySession(request);
+        assertNull(session.getArtifactUpdatePolicy()); // -U not bridged; explicit-only semantics
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_DAILY, session.getMetadataUpdatePolicy());
+    }
+
     protected ArtifactRepository getLocalRepository() throws InvalidRepositoryException {
         File repoDir = new File(getBasedir(), "target/local-repo").getAbsoluteFile();
 

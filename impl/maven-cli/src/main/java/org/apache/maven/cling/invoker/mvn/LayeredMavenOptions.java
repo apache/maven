@@ -75,6 +75,16 @@ public class LayeredMavenOptions<O extends MavenOptions> extends LayeredOptions<
     }
 
     @Override
+    public Optional<String> artifactsUpdatePolicy() {
+        return returnFirstPresentOrEmpty(MavenOptions::artifactsUpdatePolicy);
+    }
+
+    @Override
+    public Optional<String> metadataUpdatePolicy() {
+        return returnFirstPresentOrEmpty(MavenOptions::metadataUpdatePolicy);
+    }
+
+    @Override
     public Optional<Boolean> strictChecksums() {
         return returnFirstPresentOrEmpty(MavenOptions::strictChecksums);
     }

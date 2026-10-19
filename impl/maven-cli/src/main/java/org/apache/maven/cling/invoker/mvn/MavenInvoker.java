@@ -251,6 +251,8 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         request.setOffline(context.options().offline().orElse(request.isOffline()));
         request.setUpdateSnapshots(context.options().updateSnapshots().orElse(false));
         request.setGlobalChecksumPolicy(determineGlobalChecksumPolicy(context));
+        context.options().artifactsUpdatePolicy().ifPresent(request::setArtifactsUpdatePolicy);
+        context.options().metadataUpdatePolicy().ifPresent(request::setMetadataUpdatePolicy);
 
         Path pom = determinePom(context, lookup);
         if (pom != null) {

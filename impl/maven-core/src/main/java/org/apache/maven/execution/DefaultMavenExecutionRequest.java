@@ -168,6 +168,10 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
      */
     private boolean noSnapshotUpdates = false;
 
+    private String artifactsUpdatePolicy = null;
+
+    private String metadataUpdatePolicy = null;
+
     private boolean useLegacyLocalRepositoryManager = false;
 
     private Map<String, Object> data;
@@ -208,11 +212,13 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setLoggingLevel(original.getLoggingLevel());
         copy.setGlobalChecksumPolicy(original.getGlobalChecksumPolicy());
         copy.setUpdateSnapshots(original.isUpdateSnapshots());
+        copy.setNoSnapshotUpdates(original.isNoSnapshotUpdates());
+        copy.setArtifactsUpdatePolicy(original.getArtifactsUpdatePolicy());
+        copy.setMetadataUpdatePolicy(original.getMetadataUpdatePolicy());
         copy.setRemoteRepositories(original.getRemoteRepositories());
         copy.setPluginArtifactRepositories(original.getPluginArtifactRepositories());
         copy.setRepositoryCache(original.getRepositoryCache());
         copy.setWorkspaceReader(original.getWorkspaceReader());
-        copy.setNoSnapshotUpdates(original.isNoSnapshotUpdates());
         copy.setExecutionListener(original.getExecutionListener());
         copy.setUseLegacyLocalRepository(original.isUseLegacyLocalRepository());
         copy.setBuilderId(original.getBuilderId());
@@ -660,6 +666,28 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         this.noSnapshotUpdates = noSnapshotUpdates;
 
         return this;
+    }
+
+    @Override
+    public MavenExecutionRequest setArtifactsUpdatePolicy(String policy) {
+        this.artifactsUpdatePolicy = policy;
+        return this;
+    }
+
+    @Override
+    public String getArtifactsUpdatePolicy() {
+        return artifactsUpdatePolicy;
+    }
+
+    @Override
+    public MavenExecutionRequest setMetadataUpdatePolicy(String policy) {
+        this.metadataUpdatePolicy = policy;
+        return this;
+    }
+
+    @Override
+    public String getMetadataUpdatePolicy() {
+        return metadataUpdatePolicy;
     }
 
     @Override
