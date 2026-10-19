@@ -97,13 +97,15 @@ final class BindingSnapshot {
 
     private static String type(Type type) {
         if (type instanceof Class<?> clazz) {
-            return clazz.isArray()
-                    ? type(clazz.getComponentType()) + "[]"
-                    : clazz.getName() + " [loader=" + Binding.identityString(clazz.getClassLoader()) + "]";
+            return clazz.isArray() ? type(clazz.getComponentType()) + "[]" : classType(clazz, clazz.getName());
         }
         if (type instanceof ParameterizedType parameterized) {
-            return (parameterized.getOwnerType() == null ? "" : type(parameterized.getOwnerType()) + ".")
-                    + type(parameterized.getRawType()) + "<"
+            Type owner = parameterized.getOwnerType();
+            Type raw = parameterized.getRawType();
+            String name = owner != null && raw instanceof Class<?> clazz
+                    ? classType(clazz, clazz.getSimpleName())
+                    : type(raw);
+            return (owner == null ? "" : type(owner) + ".") + name + "<"
                     + Arrays.stream(parameterized.getActualTypeArguments())
                             .map(BindingSnapshot::type)
                             .collect(Collectors.joining(", "))
@@ -129,6 +131,10 @@ final class BindingSnapshot {
                     + Arrays.stream(upperBounds).map(BindingSnapshot::type).collect(Collectors.joining(" & "));
         }
         return Binding.identityString(type);
+    }
+
+    private static String classType(Class<?> clazz, String name) {
+        return name + " [loader=" + Binding.identityString(clazz.getClassLoader()) + "]";
     }
 
     private static String escape(String value) {
