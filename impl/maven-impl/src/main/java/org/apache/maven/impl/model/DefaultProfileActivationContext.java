@@ -263,13 +263,20 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     }
 
     /**
-     * Like {@link #start()}, but makes the given map available for path interpolation only.
-     * The model's properties (exposed via {@link #getModelProperty}) are NOT overridden, so
-     * POM-declared properties in {@code interpolationProperties} cannot self-activate
-     * property-based or condition-based profiles (see #13390). The map is used exclusively
-     * inside {@link #interpolatePath} to resolve placeholders such as {@code ${message.file}}
+     * Like {@link #start()}, but makes the given map available as the model's properties
+     * (exposed via {@link #getModelProperty}) and for path interpolation.
+     * <p>
+     * For non-sandboxed contexts (project parents), {@link #getModelProperty} returns
+     * these values so that condition-based profiles can fire.  For sandboxed contexts
+     * (dependency parents), {@link #withoutUserPropertiesAndFilesystem()} overrides
+     * {@link #getModelProperty} to return {@code null}, preventing POM-declared
+     * properties from self-activating profiles (see #13390).
+     * <p>
+     * The map is also stored as {@code interpolationProperties} for
+     * {@link #interpolatePath} to resolve placeholders such as {@code ${message.file}}
      * when activating parent-model file profiles with the parent's own property values
-     * (see #10375).
+     * (see #10375).  The sandbox delegates {@code interpolatePath} back to this context,
+     * so path interpolation works in both sandboxed and non-sandboxed paths.
      * <p>
      * The model's other attributes (basedir, packaging, artifactId) are preserved
      * so that file-exists profile conditions resolve against the original project directory.
@@ -282,7 +289,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
                 inactiveProfileIds,
                 systemProperties,
                 userProperties,
-                model,
+                model != null ? model.withProperties(interpolationProperties) : null,
                 interpolationProperties,
                 new Record());
     }
