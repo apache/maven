@@ -71,6 +71,30 @@ class WrapperNode extends AbstractNode {
 
     @Override
     @Nonnull
+    public Optional<Node> winner() {
+        return delegate.winner();
+    }
+
+    @Override
+    @Nonnull
+    public Optional<String> premanagedVersion() {
+        return delegate.premanagedVersion();
+    }
+
+    @Override
+    @Nonnull
+    public Optional<String> premanagedScope() {
+        return delegate.premanagedScope();
+    }
+
+    @Override
+    @Nonnull
+    public Optional<String> originalScope() {
+        return delegate.originalScope();
+    }
+
+    @Override
+    @Nonnull
     public String asString() {
         return delegate.asString();
     }

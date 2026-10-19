@@ -23,7 +23,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
@@ -158,10 +160,30 @@ public class InjectorImplTest {
 
     @Test
     public void bindInterfacesTest() {
-        Injector injector = Injector.create().bindImplicit(BindInterfaces.class);
+        Injector injector = Injector.create().bindImplicit(BindInterfaces.ClassImpl.class);
         BindInterfaces.TestInterface<String> inst =
                 injector.getInstance(new Key<BindInterfaces.TestInterface<String>>() {});
-        assertNotNull(inst);
+        assertInstanceOf(BindInterfaces.ClassImpl.class, inst);
+    }
+
+    @Test
+    void bindTypedInterfacesTest() {
+        Injector injector = Injector.create().bindImplicit(BindInterfaces.TypedClassImpl.class);
+        BindInterfaces.TestInterface<String> inst =
+                injector.getInstance(new Key<BindInterfaces.TestInterface<String>>() {});
+        assertInstanceOf(BindInterfaces.TypedClassImpl.class, inst);
+    }
+
+    @Test
+    void bindingOuterClassRegistersBothInnerImplementations() {
+        Injector injector = Injector.create().bindImplicit(BindInterfaces.class);
+        List<BindInterfaces.TestInterface<String>> instances =
+                injector.getInstance(new Key<List<BindInterfaces.TestInterface<String>>>() {});
+
+        assertEquals(
+                Set.of(BindInterfaces.ClassImpl.class, BindInterfaces.TypedClassImpl.class),
+                instances.stream().map(Object::getClass).collect(Collectors.toSet()));
+        assertThrows(DIException.class, () -> injector.getInstance(new Key<BindInterfaces.TestInterface<String>>() {}));
     }
 
     static class BindInterfaces {

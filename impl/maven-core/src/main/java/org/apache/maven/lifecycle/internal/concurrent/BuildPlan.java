@@ -96,15 +96,75 @@ public class BuildPlan {
     }
 
     private Map<String, BuildStep> merge(Map<String, BuildStep> org, Map<String, BuildStep> add) {
-        // all new phases should be added after the existing ones
-        List<BuildStep> lasts =
-                org.values().stream().filter(b -> b.successors.isEmpty()).toList();
-        List<BuildStep> firsts =
-                add.values().stream().filter(b -> b.predecessors.isEmpty()).toList();
-        firsts.stream()
-                .filter(addNode -> !org.containsKey(addNode.name))
-                .forEach(addNode -> lasts.forEach(orgNode -> addNode.executeAfter(orgNode)));
-        add.forEach((name, node) -> org.merge(name, node, this::merge));
+        // When add contains the infrastructure $plan$ step, this merge is from
+        // computeForkPlan (execution plan merged into a fork). In that case, use the
+        // original terminal-step chaining to avoid creating cycles with the frontier approach.
+        boolean isSegmentMerge = !add.containsKey(BuildStep.PLAN);
+
+        if (isSegmentMerge) {
+            // Track which steps are currently skipped before the merge
+            Set<String> skippedInOrg = org.entrySet().stream()
+                    .filter(e -> e.getValue().skip.get())
+                    .map(Map.Entry::getKey)
+                    .collect(Collectors.toSet());
+
+            // The "active frontier" consists of non-skipped steps that have at least one
+            // skipped same-project successor. This is the boundary between the active and
+            // skipped regions — the right insertion point for new non-lifecycle steps
+            // (e.g., aggregator goals). Using the frontier avoids creating transitive
+            // dependencies on all lifecycle phases through wrapper steps like after:ALL.
+            List<BuildStep> activeFrontier = org.values().stream()
+                    .filter(b -> !b.skip.get())
+                    .filter(b -> b.successors.stream().anyMatch(s -> s.project == b.project && s.skip.get()))
+                    .toList();
+            if (activeFrontier.isEmpty()) {
+                activeFrontier = org.values().stream()
+                        .filter(b -> !b.skip.get())
+                        .filter(b -> b.successors.isEmpty())
+                        .toList();
+            }
+
+            // Chain truly new steps (not in org at all) after the active frontier
+            List<BuildStep> insertionPoints = activeFrontier;
+            List<BuildStep> firsts =
+                    add.values().stream().filter(b -> b.predecessors.isEmpty()).toList();
+            firsts.stream()
+                    .filter(addNode -> !org.containsKey(addNode.name))
+                    .forEach(addNode -> insertionPoints.forEach(orgNode -> addNode.executeAfter(orgNode)));
+
+            // Merge all steps by name
+            add.forEach((name, node) -> org.merge(name, node, this::merge));
+
+            // Chain newly-activated entry points after non-lifecycle goal steps.
+            // When a follow-up plan un-skips phases beyond the existing plan, those
+            // newly-active phases must wait for any non-lifecycle steps (e.g., aggregator
+            // goals) that were inserted at the frontier.
+            List<BuildStep> goalLasts = org.values().stream()
+                    .filter(b -> b.successors.stream().noneMatch(s -> s.project == b.project))
+                    .filter(b -> !b.skip.get())
+                    .filter(b -> b.phase == null)
+                    .toList();
+            if (!goalLasts.isEmpty()) {
+                org.values().stream()
+                        .filter(step -> skippedInOrg.contains(step.name))
+                        .filter(step -> !step.skip.get())
+                        .filter(step -> step.predecessors.stream()
+                                .filter(p -> p.project == step.project)
+                                .allMatch(p -> !skippedInOrg.contains(p.name)))
+                        .forEach(step -> goalLasts.forEach(step::executeAfter));
+            }
+        } else {
+            // computeForkPlan path: use simple terminal-step chaining
+            List<BuildStep> lasts =
+                    org.values().stream().filter(b -> b.successors.isEmpty()).toList();
+            List<BuildStep> firsts =
+                    add.values().stream().filter(b -> b.predecessors.isEmpty()).toList();
+            firsts.stream()
+                    .filter(addNode -> !org.containsKey(addNode.name))
+                    .forEach(addNode -> lasts.forEach(orgNode -> addNode.executeAfter(orgNode)));
+            add.forEach((name, node) -> org.merge(name, node, this::merge));
+        }
+
         return org;
     }
 
@@ -112,6 +172,11 @@ public class BuildPlan {
         node1.predecessors.addAll(node2.predecessors);
         node1.successors.addAll(node2.successors);
         node2.mojos.forEach((k, v) -> node1.mojos.merge(k, v, this::mergeMojos));
+        // Un-skip the surviving step if the merged-in step is active.
+        // Without this, plan() silently drops mojos via addMojo()'s skip guard.
+        if (!node2.skip.get()) {
+            node1.skip.set(false);
+        }
         return node1;
     }
 

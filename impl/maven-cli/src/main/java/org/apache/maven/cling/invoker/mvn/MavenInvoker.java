@@ -36,6 +36,7 @@ import org.apache.maven.Maven;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenOptions;
@@ -131,6 +132,15 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             logger.info("Disabling strict checksum verification on all artifact downloads.");
         } else if (context.options().strictChecksums().orElse(false)) {
             logger.info("Enabling strict checksum verification on all artifact downloads.");
+        }
+
+        // If no goals/phases were specified and there is no POM in the current directory,
+        // print usage (like `mvn -h`) and exit successfully instead of failing with
+        // "No goals have been specified for this build."
+        // When a POM is present the default goal (if any) may apply, so let Maven proceed normally.
+        if (context.options().goals().orElse(List.of()).isEmpty() && determinePom(context, context.lookup) == null) {
+            context.options().displayHelp(context.invokerRequest.parserRequest(), determineWriter(context));
+            throw new InvokerException.ExitException(0);
         }
     }
 
@@ -402,7 +412,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                         if (selector.charAt(0) == '-' || selector.charAt(0) == '!') {
                             active = false;
                             selector = selector.substring(1);
-                        } else if (token.charAt(0) == '+') {
+                        } else if (selector.charAt(0) == '+') {
                             selector = selector.substring(1);
                         }
                     }
@@ -429,7 +439,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                         if (profileId.charAt(0) == '-' || profileId.charAt(0) == '!') {
                             active = false;
                             profileId = profileId.substring(1);
-                        } else if (token.charAt(0) == '+') {
+                        } else if (profileId.charAt(0) == '+') {
                             profileId = profileId.substring(1);
                         }
                     }

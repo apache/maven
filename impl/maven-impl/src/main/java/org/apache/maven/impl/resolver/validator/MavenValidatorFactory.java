@@ -18,6 +18,10 @@
  */
 package org.apache.maven.impl.resolver.validator;
 
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -40,11 +44,26 @@ public class MavenValidatorFactory implements ValidatorFactory {
 
     @Override
     public Validator newInstance(RepositorySystemSession session) {
-        return switch (ConfigUtils.getEnum(
-                session, ValidationLevel.class, ValidationLevel.DEFAULT, Constants.MAVEN_RESOLVER_VALIDATION)) {
+        return switch (getValidationLevel(session)) {
             case DEFAULT -> defaultValidator;
             case MILD -> mildValidator;
             case OFF -> NOOP;
         };
+    }
+
+    private static ValidationLevel getValidationLevel(RepositorySystemSession session) {
+        String value =
+                ConfigUtils.getString(session, ValidationLevel.DEFAULT.name(), Constants.MAVEN_RESOLVER_VALIDATION);
+        try {
+            return ValidationLevel.valueOf(value.trim().toUpperCase(Locale.ROOT));
+        } catch (IllegalArgumentException e) {
+            throw new IllegalArgumentException(
+                    "Invalid value '" + value + "' for " + Constants.MAVEN_RESOLVER_VALIDATION
+                            + ", supported values are: "
+                            + Arrays.stream(ValidationLevel.values())
+                                    .map(level -> level.name().toLowerCase(Locale.ROOT))
+                                    .collect(Collectors.joining(", ")),
+                    e);
+        }
     }
 }

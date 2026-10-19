@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 
@@ -38,9 +39,9 @@ public interface Plugin {
     /**
      * Returns the POM model element for this plugin.
      *
-     * @return the plugin model, never {@code null}
+     * @return the plugin model, or {@code null} if not available
      */
-    @Nonnull
+    @Nullable
     org.apache.maven.api.model.Plugin getModel();
 
     /**
@@ -70,9 +71,9 @@ public interface Plugin {
     /**
      * Returns the artifact for this plugin.
      *
-     * @return the plugin artifact, never {@code null}
+     * @return the plugin artifact, or {@code null} if not available
      */
-    @Nonnull
+    @Nullable
     Artifact getArtifact();
 
     /**

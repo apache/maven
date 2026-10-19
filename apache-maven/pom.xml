@@ -209,6 +209,21 @@ under the License.
         <artifactId>maven-compiler-plugin</artifactId>
         <executions>
           <execution>
+            <!-- compiled here so that the launchers do not pay for source-launch compilation on every run -->
+            <id>compile-jvm-config-parser</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <compileSourceRoots>
+                <compileSourceRoot>${project.basedir}/src/assembly/maven/bin</compileSourceRoot>
+              </compileSourceRoots>
+              <includes>
+                <include>JvmConfigParser.java</include>
+              </includes>
+            </configuration>
+          </execution>
+          <execution>
             <id>test-compile</id>
             <goals>
               <goal>testCompile</goal>
@@ -521,6 +536,34 @@ under the License.
                   <executable>sh</executable>
                   <arguments>
                     <argument>${project.basedir}/src/test/scripts/test-mvn-fast-version.sh</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>test-mvn-args</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <skip>${skipTests}</skip>
+                  <executable>sh</executable>
+                  <arguments>
+                    <argument>${project.basedir}/src/test/scripts/test-mvn-args.sh</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>test-mvn-jvm-config</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <skip>${skipTests}</skip>
+                  <executable>sh</executable>
+                  <arguments>
+                    <argument>${project.basedir}/src/test/scripts/test-mvn-jvm-config.sh</argument>
                   </arguments>
                 </configuration>
               </execution>
