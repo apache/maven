@@ -186,7 +186,7 @@ class DefaultBeanConfiguratorTest {
     }
 
     @Test
-    void testNestedSettingPreservesPreInitializedDefaultWhenSelfClosing() throws BeanConfigurationException {
+    void testNestedSettingOverridesPreInitializedDefaultWhenSelfClosing() throws BeanConfigurationException {
         PluginConfigBean bean = new PluginConfigBean();
         assertEquals("article,report,book", bean.settings.docClassesToTargets);
 
@@ -195,11 +195,11 @@ class DefaultBeanConfiguratorTest {
         request.setBean(bean).setConfiguration(config);
 
         configurator.configureBean(request);
-        assertEquals("article,report,book", bean.settings.docClassesToTargets);
+        assertEquals("", bean.settings.docClassesToTargets);
     }
 
     @Test
-    void testNestedSettingEmptyOverridesDefaultValueAttribute() throws BeanConfigurationException {
+    void testNestedSettingEmptyUsesDefaultValueAttribute() throws BeanConfigurationException {
         PluginConfigBean bean = new PluginConfigBean();
         assertEquals("article,report,book", bean.settings.docClassesToTargets);
 
@@ -209,7 +209,7 @@ class DefaultBeanConfiguratorTest {
         request.setBean(bean).setConfiguration(config);
 
         configurator.configureBean(request);
-        assertEquals("", bean.settings.docClassesToTargets);
+        assertEquals("fallback", bean.settings.docClassesToTargets);
     }
 
     @Test

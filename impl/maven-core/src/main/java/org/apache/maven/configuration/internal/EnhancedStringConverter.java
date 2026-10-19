@@ -29,9 +29,8 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 
 /**
  * Converter for String, CharSequence, StringBuilder, and StringBuffer that properly handles
- * explicit empty configuration elements (e.g. {@code <setting></setting>}) by converting them
- * to empty strings, while preserving existing behavior for self-closing tags without default-values
- * (e.g. {@code <setting/>}) by returning {@code null} to keep the bean field's Java default.
+ * empty configuration elements (both {@code <setting></setting>} and {@code <setting/>}) by converting them
+ * to empty strings when no default-value is specified, overriding pre-initialized Java defaults.
  */
 class EnhancedStringConverter extends AbstractConfigurationConverter {
 
@@ -79,11 +78,7 @@ class EnhancedStringConverter extends AbstractConfigurationConverter {
                                 value, configuration.getName()),
                         e);
             }
-        } else if (value != null) {
-            // Explicit empty content: <element></element>
-            result = "";
         } else {
-            // value == null: self-closing tag <element/>
             String defaultValue = configuration.getAttribute("default-value");
             if (defaultValue != null && !defaultValue.isEmpty()) {
                 try {
@@ -102,17 +97,13 @@ class EnhancedStringConverter extends AbstractConfigurationConverter {
                                     defaultValue, configuration.getName()),
                             e);
                 }
+            } else {
+                result = "";
             }
-            // For self-closing <tag/> without default-value, leave result null
-            // to preserve existing behavior (keep bean field's Java default)
         }
 
         if (result == null) {
             return null;
-        }
-
-        if (!type.isInstance(result) && !(result instanceof CharSequence)) {
-            failIfNotTypeCompatible(result, type, configuration);
         }
 
         String str = result.toString();

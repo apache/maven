@@ -51,20 +51,24 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
             if (null != value && !value.isEmpty()) {
                 if (evaluator instanceof TypeAwareExpressionEvaluator typeAwareExpressionEvaluator) {
                     result = typeAwareExpressionEvaluator.evaluate(value, type);
-                } else {
+                } else if (evaluator != null) {
                     result = evaluator.evaluate(value);
+                } else {
+                    result = value;
                 }
-            } else if (null != value && (type == String.class || type == CharSequence.class || type == Object.class || type == null)) {
-                result = "";
             }
             if (null == result && configuration.getChildCount() == 0) {
                 value = configuration.getAttribute("default-value");
                 if (null != value && !value.isEmpty()) {
                     if (evaluator instanceof TypeAwareExpressionEvaluator typeAwareExpressionEvaluator) {
                         result = typeAwareExpressionEvaluator.evaluate(value, type);
-                    } else {
+                    } else if (evaluator != null) {
                         result = evaluator.evaluate(value);
+                    } else {
+                        result = value;
                     }
+                } else if (isStringType(type)) {
+                    result = createEmptyStringResult(type);
                 }
             }
             failIfNotTypeCompatible(result, type, configuration);
@@ -183,6 +187,24 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
             }
             helper.setProperty(bean, propertyName, valueType, element);
         }
+    }
+
+    private static boolean isStringType(Class<?> type) {
+        return type == String.class
+                || type == CharSequence.class
+                || type == StringBuilder.class
+                || type == StringBuffer.class
+                || type == Object.class
+                || type == null;
+    }
+
+    private static Object createEmptyStringResult(Class<?> type) {
+        if (type == StringBuilder.class) {
+            return new StringBuilder("");
+        } else if (type == StringBuffer.class) {
+            return new StringBuffer("");
+        }
+        return "";
     }
 
     /**

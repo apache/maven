@@ -317,17 +317,18 @@ public final class EnhancedCompositeBeanHelper {
     }
 
     /**
-     * Fallback to provide an empty instance (e.g. empty String) for explicit empty tags
-     * ({@code <tag></tag>}) if a converter returned null (for instance when standard Plexus
+     * Fallback to provide an empty instance (e.g. empty String) for empty tags
+     * (both {@code <tag></tag>} and {@code <tag/>}) if a converter returned null (for instance when standard Plexus
      * converters are used without EnhancedStringConverter) or in the setDefault path.
-     * Note: for self-closing tags ({@code <tag/>}), this returns null to preserve the bean's
-     * Java-initialized default values.
      */
     private Object getEmptyValueForType(Class<?> type, PlexusConfiguration configuration) {
         if (configuration.getChildCount() == 0) {
             String value = configuration.getValue();
-            if (value != null && value.isEmpty()) {
-                return createEmptyValue(type);
+            if (value == null || value.isEmpty()) {
+                String defaultValue = configuration.getAttribute("default-value");
+                if (defaultValue == null || defaultValue.isEmpty()) {
+                    return createEmptyValue(type);
+                }
             }
         }
         return null;

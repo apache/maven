@@ -70,14 +70,14 @@ class MavenBasicComponentConfiguratorTest {
     }
 
     @Test
-    void testDirectSettingPreservesPreInitializedDefaultWhenSelfClosing() throws Exception {
+    void testDirectSettingOverridesPreInitializedDefaultWhenSelfClosing() throws Exception {
         TestMojo mojo = new TestMojo();
         assertEquals("defaultDirect", mojo.direct);
 
         PlexusConfiguration config = toConfig("<direct/>");
         configurator.configureComponent(mojo, config, evaluator, realm, null);
 
-        assertEquals("defaultDirect", mojo.direct);
+        assertEquals("", mojo.direct);
     }
 
     @Test
@@ -92,25 +92,54 @@ class MavenBasicComponentConfiguratorTest {
     }
 
     @Test
-    void testNestedSettingPreservesPreInitializedDefaultWhenSelfClosing() throws Exception {
+    void testNestedSettingOverridesPreInitializedDefaultWhenSelfClosing() throws Exception {
         TestMojo mojo = new TestMojo();
         assertEquals("article,report,book", mojo.settings.docClassesToTargets);
 
         PlexusConfiguration config = toConfig("<settings><docClassesToTargets/></settings>");
         configurator.configureComponent(mojo, config, evaluator, realm, null);
 
-        assertEquals("article,report,book", mojo.settings.docClassesToTargets);
+        assertEquals("", mojo.settings.docClassesToTargets);
     }
 
     @Test
-    void testEmptyTagOverridesDefaultValueAttribute() throws Exception {
+    void testEmptyTagUsesDefaultValueAttribute() throws Exception {
         TestMojo mojo = new TestMojo();
         assertEquals("defaultDirect", mojo.direct);
 
         PlexusConfiguration config = toConfig("<direct default-value=\"fallback\"></direct>");
         configurator.configureComponent(mojo, config, evaluator, realm, null);
 
-        assertEquals("", mojo.direct);
+        assertEquals("fallback", mojo.direct);
+    }
+
+    @Test
+    void testSelfClosingTagUsesDefaultValueAttribute() throws Exception {
+        TestMojo mojo = new TestMojo();
+        assertEquals("defaultDirect", mojo.direct);
+
+        PlexusConfiguration config = toConfig("<direct default-value=\"fallback\"/>");
+        configurator.configureComponent(mojo, config, evaluator, realm, null);
+
+        assertEquals("fallback", mojo.direct);
+    }
+
+    @Test
+    void testExpressionEvaluatorReturningNonCharSequenceConvertsToString() throws Exception {
+        TestMojo mojo = new TestMojo();
+        ExpressionEvaluator fileEvaluator = new ExpressionEvaluator() {
+            public Object evaluate(String expr) {
+                return new java.io.File("/path/to/basedir");
+            }
+
+            public java.io.File alignToBaseDirectory(java.io.File f) {
+                return f;
+            }
+        };
+        PlexusConfiguration config = toConfig("<direct>${basedir}</direct>");
+        configurator.configureComponent(mojo, config, fileEvaluator, realm, null);
+
+        assertEquals(new java.io.File("/path/to/basedir").toString(), mojo.direct);
     }
 
     @SuppressWarnings({"checkstyle:VisibilityModifier", "VisibilityModifier"})
