@@ -50,7 +50,11 @@ import org.codehaus.plexus.util.StringUtils;
 public class DefaultLifecycles {
     private static final List<String> BUILT_IN_LIFECYCLES =
             Arrays.asList(CleanLifecycleProvider.NAME, DefaultLifecycleProvider.NAME, SiteLifecycleProvider.NAME);
-    private static final boolean SITE_DISABLED = Boolean.getBoolean("maven.site.lifecycle.disabled");
+
+    /**
+     * Java System Property, as it must be "early discovered", that disables site lifecycle.
+     */
+    private static final String CONFIG_PROP_SITE_DISABLED = "maven.site.lifecycle.disabled";
 
     /**
      * @deprecated Use {@link #getStandardLifecycles()} instead.
@@ -75,7 +79,7 @@ public class DefaultLifecycles {
 
     private boolean isEnabled(String lifecycleId) {
         if (SiteLifecycleProvider.NAME.equals(lifecycleId)) {
-            return !SITE_DISABLED;
+            return !Boolean.getBoolean(CONFIG_PROP_SITE_DISABLED);
         } else {
             return true;
         }
@@ -129,6 +133,8 @@ public class DefaultLifecycles {
 
         // take "snapshot": will filter by visibility
         Map<String, Lifecycle> lifecycles = new LinkedHashMap<>(this.lifecycles);
+        // apply enabled
+        lifecycles.entrySet().removeIf(e -> !isEnabled(e.getKey()));
 
         LinkedHashSet<String> lifecycleNames = new LinkedHashSet<>(getStandardLifecycles());
         lifecycleNames.addAll(lifecycles.keySet());
@@ -136,8 +142,8 @@ public class DefaultLifecycles {
         ArrayList<Lifecycle> result = new ArrayList<>();
         for (String name : lifecycleNames) {
             Lifecycle lifecycle = lifecycles.get(name);
-            if (lifecycle.getId() == null) {
-                throw new NullPointerException("A lifecycle must have an id.");
+            if (lifecycle == null || lifecycle.getId() == null) {
+                throw new NullPointerException("A lifecycle must be non-null and must have an id.");
             }
             result.add(lifecycle);
         }
