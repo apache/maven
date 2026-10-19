@@ -198,6 +198,14 @@ public final class Constants {
 
     public static final String MAVEN_SETTINGS_SECURITY_FILE_NAME = "settings-security4.xml";
 
+    /**
+     * When set to {@code "true"}, settings parsing errors are fatal instead of warnings.
+     *
+     * @since 4.1.0
+     */
+    @Config(defaultValue = "false")
+    public static final String MAVEN_SETTINGS_STRICT_PARSING = "maven.settings.strictParsing";
+
     public static final String MAVEN_STYLE_PREFIX = "maven.style.";
 
     // Style Names
