@@ -42,6 +42,7 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
 class DefaultPluginManagerTest {
@@ -91,13 +92,48 @@ class DefaultPluginManagerTest {
 
         assertSame(model.getDelegate(), result.getModel());
         assertSame(apiDescriptor, result.getDescriptor());
-        assertSame(realm, result.getRealm().getClassLoader());
-        assertEquals(Optional.empty(), result.getRealm().getModuleLayer());
+        assertSame(realm, result.getRealm().classLoader());
+        assertEquals(Optional.empty(), result.getRealm().moduleLayer());
         assertEquals(List.of(dependency), result.getDependencies().stream().toList());
         assertSame(dependency, result.getDependenciesMap().get("org.example:plugin-spi"));
         verify(executionSession).setCurrentProject(mavenProject);
         verify(lifecyclePluginResolver).resolveMissingPluginVersions(mavenProject, executionSession);
         verify(legacyPluginManager).setupPluginRealm(descriptor, executionSession, null, null, null);
+    }
+
+    @Test
+    void preservesUndeclaredPluginError() throws Exception {
+        MavenPluginManager legacyPluginManager = mock(MavenPluginManager.class);
+        LifecyclePluginResolver lifecyclePluginResolver = mock(LifecyclePluginResolver.class);
+        InternalMavenSession session = mock(InternalMavenSession.class);
+        MavenSession mavenSession = mock(MavenSession.class);
+        MavenSession executionSession = mock(MavenSession.class);
+        DefaultProject project = mock(DefaultProject.class);
+        MavenProject mavenProject = new MavenProject();
+        Build build = new Build();
+        org.apache.maven.model.Plugin model = new org.apache.maven.model.Plugin();
+        model.setGroupId("org.example");
+        model.setArtifactId("missing-plugin");
+        mavenProject.setGroupId("org.example");
+        mavenProject.setArtifactId("example-project");
+        mavenProject.setVersion("1.0");
+        mavenProject.setBuild(build);
+
+        when(session.getMavenSession()).thenReturn(mavenSession);
+        when(mavenSession.clone()).thenReturn(executionSession);
+        when(project.getProject()).thenReturn(mavenProject);
+
+        DefaultPluginManager manager =
+                new DefaultPluginManager(legacyPluginManager, lifecyclePluginResolver, mock(Lookup.class));
+
+        IllegalArgumentException failure = assertThrows(
+                IllegalArgumentException.class, () -> manager.loadPlugin(session, project, model.getDelegate()));
+
+        assertEquals(
+                "Plugin org.example:missing-plugin is not declared by project " + mavenProject.getId(),
+                failure.getMessage());
+        verify(lifecyclePluginResolver).resolveMissingPluginVersions(mavenProject, executionSession);
+        verifyNoInteractions(legacyPluginManager);
     }
 
     @Test
@@ -117,12 +153,12 @@ class DefaultPluginManagerTest {
         });
         DefaultPluginRealm realm = new DefaultPluginRealm(pluginClassLoader, lookup);
 
-        assertSame(service, realm.getLookup().lookup(Object.class));
-        assertSame(service, realm.getLookup().lookup(Object.class, "service"));
-        assertEquals(Optional.of(service), realm.getLookup().lookupOptional(Object.class));
-        assertEquals(Optional.of(service), realm.getLookup().lookupOptional(Object.class, "service"));
-        assertEquals(List.of(service), realm.getLookup().lookupList(Object.class));
-        assertEquals(Map.of("service", service), realm.getLookup().lookupMap(Object.class));
+        assertSame(service, realm.lookup().lookup(Object.class));
+        assertSame(service, realm.lookup().lookup(Object.class, "service"));
+        assertEquals(Optional.of(service), realm.lookup().lookupOptional(Object.class));
+        assertEquals(Optional.of(service), realm.lookup().lookupOptional(Object.class, "service"));
+        assertEquals(List.of(service), realm.lookup().lookupList(Object.class));
+        assertEquals(Map.of("service", service), realm.lookup().lookupMap(Object.class));
         assertSame(originalClassLoader, Thread.currentThread().getContextClassLoader());
     }
 
@@ -143,8 +179,7 @@ class DefaultPluginManagerTest {
 
         assertSame(
                 failure,
-                assertThrows(
-                        IllegalStateException.class, () -> realm.getLookup().lookupList(Object.class)));
+                assertThrows(IllegalStateException.class, () -> realm.lookup().lookupList(Object.class)));
         assertSame(originalClassLoader, Thread.currentThread().getContextClassLoader());
     }
 }

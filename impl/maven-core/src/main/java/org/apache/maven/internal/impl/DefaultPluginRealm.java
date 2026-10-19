@@ -45,17 +45,17 @@ final class DefaultPluginRealm implements PluginRealm {
     }
 
     @Override
-    public ClassLoader getClassLoader() {
+    public ClassLoader classLoader() {
         return classLoader;
     }
 
     @Override
-    public Optional<ModuleLayer> getModuleLayer() {
+    public Optional<ModuleLayer> moduleLayer() {
         return moduleLayer;
     }
 
     @Override
-    public Lookup getLookup() {
+    public Lookup lookup() {
         return lookup;
     }
 

@@ -34,19 +34,25 @@ public interface PluginRealm {
 
     /**
      * Returns the classloader for this realm.
+     *
+     * @return the classloader, never {@code null}
      */
     @Nonnull
-    ClassLoader getClassLoader();
+    ClassLoader classLoader();
 
     /**
      * Returns the JPMS module layer when this plugin runs as a modular plugin.
+     *
+     * @return the module layer, or an empty optional for a classpath-based realm
      */
     @Nonnull
-    Optional<ModuleLayer> getModuleLayer();
+    Optional<ModuleLayer> moduleLayer();
 
     /**
      * Returns component lookup scoped to this realm's visibility.
+     *
+     * @return the realm-scoped component lookup, never {@code null}
      */
     @Nonnull
-    Lookup getLookup();
+    Lookup lookup();
 }

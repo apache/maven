@@ -95,17 +95,17 @@ public class PluginStub implements Plugin {
     public void setClassLoader(ClassLoader classLoader) {
         this.realm = new PluginRealm() {
             @Override
-            public ClassLoader getClassLoader() {
+            public ClassLoader classLoader() {
                 return classLoader;
             }
 
             @Override
-            public Optional<ModuleLayer> getModuleLayer() {
+            public Optional<ModuleLayer> moduleLayer() {
                 return Optional.empty();
             }
 
             @Override
-            public Lookup getLookup() {
+            public Lookup lookup() {
                 return LookupStub.EMPTY;
             }
         };

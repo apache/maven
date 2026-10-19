@@ -34,6 +34,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.LifecyclePluginResolver;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 
 import static java.util.Objects.requireNonNull;
@@ -69,7 +70,14 @@ public final class DefaultPluginManager implements PluginManager {
 
         try {
             lifecyclePluginResolver.resolveMissingPluginVersions(mavenProject, executionSession);
-            org.apache.maven.model.Plugin legacyPlugin = findPlugin(mavenProject, plugin);
+        } catch (PluginVersionResolutionException e) {
+            throw new PluginManagerException(
+                    "Unable to resolve plugin " + plugin.getGroupId() + ":" + plugin.getArtifactId(), e);
+        }
+
+        org.apache.maven.model.Plugin legacyPlugin = findPlugin(mavenProject, plugin);
+
+        try {
             PluginDescriptor descriptor = pluginManager.getPluginDescriptor(
                     legacyPlugin, mavenProject.getRemotePluginRepositories(), executionSession.getRepositorySession());
             pluginManager.setupPluginRealm(descriptor, executionSession, null, null, null);

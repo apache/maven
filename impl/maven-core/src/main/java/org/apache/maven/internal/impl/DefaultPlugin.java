@@ -31,6 +31,7 @@ import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Plugin;
 import org.apache.maven.api.PluginRealm;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 import org.apache.maven.api.services.Lookup;
@@ -54,7 +55,7 @@ final class DefaultPlugin implements Plugin {
 
     DefaultPlugin(
             InternalMavenSession session,
-            org.apache.maven.model.Plugin model,
+            @Nullable org.apache.maven.model.Plugin model,
             org.apache.maven.plugin.descriptor.PluginDescriptor descriptor,
             Lookup lookup) {
         requireNonNull(session, "session");
