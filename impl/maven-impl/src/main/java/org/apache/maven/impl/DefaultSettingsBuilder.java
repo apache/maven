@@ -123,8 +123,11 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         // If no repository is defined in the user/global settings,
         // it means that we have "old" settings (as those are new in 4.0)
         // so add central to the computed settings for backward compatibility.
+        // Each list is checked independently: a user may define <repositories>
+        // (e.g. an internal mirror) without defining <pluginRepositories>, and
+        // plugin resolution still needs central.
         if (effective.getRepositories().isEmpty()
-                && effective.getPluginRepositories().isEmpty()) {
+                || effective.getPluginRepositories().isEmpty()) {
             Repository central = Repository.newBuilder()
                     .id("central")
                     .name("Central Repository")
@@ -133,10 +136,14 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     .build();
             Repository centralWithNoUpdate = central.withReleases(
                     RepositoryPolicy.newBuilder().updatePolicy("never").build());
-            effective = Settings.newBuilder(effective)
-                    .repositories(List.of(central))
-                    .pluginRepositories(List.of(centralWithNoUpdate))
-                    .build();
+            Settings.Builder builder = Settings.newBuilder(effective);
+            if (effective.getRepositories().isEmpty()) {
+                builder.repositories(List.of(central));
+            }
+            if (effective.getPluginRepositories().isEmpty()) {
+                builder.pluginRepositories(List.of(centralWithNoUpdate));
+            }
+            effective = builder.build();
         }
 
         // resolve relative local repository paths to absolute to save plugins from trouble.

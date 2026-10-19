@@ -189,6 +189,39 @@ class DefaultSettingsBuilderFactoryTest {
         assertTrue(repoPath.isAbsolute(), "Relative local repository should be resolved to absolute");
     }
 
+    @Test
+    void emptySettingsGetCentralInBothRepoLists() {
+        Settings settings = execute("settings-simple").getEffectiveSettings();
+
+        assertEquals(1, settings.getRepositories().size());
+        assertEquals("central", settings.getRepositories().get(0).getId());
+
+        assertEquals(1, settings.getPluginRepositories().size());
+        assertEquals("central", settings.getPluginRepositories().get(0).getId());
+    }
+
+    @Test
+    void reposOnlySettingsGetCentralInPluginRepos() {
+        Settings settings = execute("settings-repos-only").getEffectiveSettings();
+
+        assertFalse(settings.getRepositories().isEmpty());
+        assertEquals("internal", settings.getRepositories().get(0).getId());
+
+        assertEquals(1, settings.getPluginRepositories().size());
+        assertEquals("central", settings.getPluginRepositories().get(0).getId());
+    }
+
+    @Test
+    void pluginReposOnlySettingsGetCentralInRepos() {
+        Settings settings = execute("settings-plugin-repos-only").getEffectiveSettings();
+
+        assertEquals(1, settings.getRepositories().size());
+        assertEquals("central", settings.getRepositories().get(0).getId());
+
+        assertFalse(settings.getPluginRepositories().isEmpty());
+        assertEquals("internal-plugins", settings.getPluginRepositories().get(0).getId());
+    }
+
     private Path getSettings(String name) {
         return Paths.get("src/test/resources/settings/" + name + ".xml").toAbsolutePath();
     }
