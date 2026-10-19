@@ -257,7 +257,7 @@ public class StringInterpolator {
      * @param callback the callback to obtain substitution values
      * @param defaultsToEmptyString sets an empty string if a replacement value is not found, leaves intact otherwise
      * @return The value of the specified string after system property substitution.
-     * @throws IllegalArgumentException If there was a syntax error in the
+     * @throws StringInterpolatorException If there was a syntax error in the
      *         property placeholder syntax or a recursive variable reference.
      **/
     public static String substVars(
