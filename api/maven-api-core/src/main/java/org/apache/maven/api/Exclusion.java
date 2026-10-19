@@ -36,8 +36,6 @@ public interface Exclusion {
     String groupId();
 
     /**
-     * {@return the group identifier of the excluded dependency, or {@code null} for a wildcard}.
-     *
      * @deprecated Use {@link #groupId()} instead.
      */
     @Deprecated(since = "4.1.0", forRemoval = true)
@@ -53,8 +51,6 @@ public interface Exclusion {
     String artifactId();
 
     /**
-     * {@return the artifact identifier of the excluded dependency, or {@code null} for a wildcard}.
-     *
      * @deprecated Use {@link #artifactId()} instead.
      */
     @Deprecated(since = "4.1.0", forRemoval = true)
