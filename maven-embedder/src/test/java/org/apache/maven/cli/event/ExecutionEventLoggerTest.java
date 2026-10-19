@@ -19,6 +19,7 @@
 package org.apache.maven.cli.event;
 
 import java.io.File;
+import java.util.Arrays;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.maven.execution.ExecutionEvent;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.slf4j.Logger;
 
+import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -117,6 +119,52 @@ public class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("Building Apache Maven Project Info Reports Plugin 3.0.0-SNAPSHOT");
         inOrder.verify(logger).info(adaptDirSeparator("  from pom.xml"));
         inOrder.verify(logger).info("----------------------------[ maven-plugin ]----------------------------");
+    }
+
+    @Test
+    public void testMultiModuleProjectBuiltAgainKeepsItsNumber() {
+        // an aggregator goal on the command line builds the first project once more after the last one (#10291)
+        Logger logger = mock(Logger.class);
+        when(logger.isInfoEnabled()).thenReturn(true);
+        executionEventLogger = new ExecutionEventLogger(logger);
+
+        MavenProject project1 = project("Apache Maven Embedder 1");
+        MavenProject project2 = project("Apache Maven Embedder 2");
+        MavenProject project3 = project("Apache Maven Embedder 3");
+
+        MavenSession session = mock(MavenSession.class);
+        when(session.getProjects()).thenReturn(Arrays.asList(project1, project2, project3));
+
+        ExecutionEvent sessionStartedEvent = mock(ExecutionEvent.class);
+        when(sessionStartedEvent.getSession()).thenReturn(session);
+
+        // execute
+        executionEventLogger.sessionStarted(sessionStartedEvent);
+        executionEventLogger.projectStarted(projectStarted(project1));
+        executionEventLogger.projectStarted(projectStarted(project2));
+        executionEventLogger.projectStarted(projectStarted(project3));
+        executionEventLogger.projectStarted(projectStarted(project1));
+
+        // verify
+        InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 1.*\\[1/3\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 2.*\\[2/3\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 3.*\\[3/3\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 1.*\\[1/3\\]"));
+    }
+
+    private static MavenProject project(String name) {
+        MavenProject project = mock(MavenProject.class);
+        when(project.getPackaging()).thenReturn("jar");
+        when(project.getVersion()).thenReturn("3.5.4-SNAPSHOT");
+        when(project.getName()).thenReturn(name);
+        return project;
+    }
+
+    private static ExecutionEvent projectStarted(MavenProject project) {
+        ExecutionEvent event = mock(ExecutionEvent.class);
+        when(event.getProject()).thenReturn(project);
+        return event;
     }
 
     @Test
