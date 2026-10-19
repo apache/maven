@@ -58,6 +58,7 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.MDC;
 
 /**
  * Collects build lifecycle events and produces a structured {@link BuildReport}
@@ -84,6 +85,8 @@ public final class BuildReportCollector extends AbstractEventSpy {
 
     static final String REPORT_DIR = "build-reports";
     static final String REPORT_LATEST = "build-report-latest.json";
+    static final String TRACE_ID_MDC_KEY = "otel.trace_id";
+    static final String SPAN_ID_MDC_KEY = "otel.span_id";
 
     private static final int MAX_STACKTRACE_LINES = 30;
 
@@ -101,8 +104,14 @@ public final class BuildReportCollector extends AbstractEventSpy {
     /** Per-project start instants for duration computation. */
     private final Map<String, Instant> projectStartTimes = new ConcurrentHashMap<>();
 
+    /** Per-project trace context captured when the project starts. */
+    private final Map<String, TraceContext> projectTraceContexts = new ConcurrentHashMap<>();
+
     /** Per-mojo start instants for duration computation. */
     private final Map<String, Instant> mojoStartTimes = new ConcurrentHashMap<>();
+
+    /** Per-mojo trace context captured when the mojo starts. */
+    private final Map<String, TraceContext> mojoTraceContexts = new ConcurrentHashMap<>();
 
     /** Session-level state - set once on SessionStarted. */
     private volatile MavenSession session;
@@ -196,6 +205,7 @@ public final class BuildReportCollector extends AbstractEventSpy {
     private void onProjectStarted(ExecutionEvent event) {
         String key = projectKey(event.getProject());
         projectStartTimes.put(key, MonotonicClock.now());
+        projectTraceContexts.put(key, currentTraceContext());
         mojoTimings.putIfAbsent(key, Collections.synchronizedList(new ArrayList<>()));
         moduleLogBuffers.put(key, Collections.synchronizedList(new ArrayList<>()));
         currentProjectByThread.put(Thread.currentThread().getId(), key);
@@ -210,6 +220,7 @@ public final class BuildReportCollector extends AbstractEventSpy {
     private void onMojoStarted(ExecutionEvent event) {
         String mKey = mojoKey(event.getProject(), event.getMojoExecution());
         mojoStartTimes.put(mKey, MonotonicClock.now());
+        mojoTraceContexts.put(mKey, currentTraceContext());
 
         // Register the current mojo for this thread so the log event sink
         // can associate events with this mojo execution
@@ -228,6 +239,10 @@ public final class BuildReportCollector extends AbstractEventSpy {
 
         Instant now = MonotonicClock.now();
         Instant startInstant = mojoStartTimes.remove(mKey);
+        TraceContext traceContext = mojoTraceContexts.remove(mKey);
+        if (traceContext == null) {
+            traceContext = TraceContext.EMPTY;
+        }
         if (startInstant == null) {
             startInstant = now;
         }
@@ -250,6 +265,8 @@ public final class BuildReportCollector extends AbstractEventSpy {
                 status,
                 startInstant,
                 duration,
+                traceContext.traceId,
+                traceContext.spanId,
                 output);
 
         mojoTimings
@@ -263,6 +280,7 @@ public final class BuildReportCollector extends AbstractEventSpy {
         String pKey = projectKey(project);
 
         Instant now = MonotonicClock.now();
+        TraceContext traceContext = TraceContext.EMPTY;
 
         MojoTiming timing = new MojoTiming(
                 mojo.getGroupId(),
@@ -274,6 +292,8 @@ public final class BuildReportCollector extends AbstractEventSpy {
                 BuildStatus.SKIPPED,
                 now,
                 Duration.ZERO,
+                traceContext.traceId,
+                traceContext.spanId,
                 List.of());
 
         mojoTimings
@@ -446,6 +466,8 @@ public final class BuildReportCollector extends AbstractEventSpy {
                             t.status,
                             t.startTime,
                             t.duration,
+                            t.traceId,
+                            t.spanId,
                             t.output))
                     .toList();
         }
@@ -457,6 +479,8 @@ public final class BuildReportCollector extends AbstractEventSpy {
             moduleOutput = List.copyOf(moduleLogBuffer);
         }
 
+        TraceContext traceContext = projectTraceContexts.getOrDefault(key, TraceContext.EMPTY);
+
         return new DefaultModuleReport(
                 project.getGroupId(),
                 project.getArtifactId(),
@@ -464,6 +488,8 @@ public final class BuildReportCollector extends AbstractEventSpy {
                 status,
                 moduleStartTime,
                 duration,
+                traceContext.traceId,
+                traceContext.spanId,
                 mojoReports,
                 moduleOutput);
     }
@@ -572,6 +598,14 @@ public final class BuildReportCollector extends AbstractEventSpy {
         return projectKey(project) + "#" + mojo.getGoal() + "@" + mojo.getExecutionId();
     }
 
+    private static TraceContext currentTraceContext() {
+        return new TraceContext(nonBlank(MDC.get(TRACE_ID_MDC_KEY)), nonBlank(MDC.get(SPAN_ID_MDC_KEY)));
+    }
+
+    private static String nonBlank(String value) {
+        return value == null || value.isBlank() ? null : value;
+    }
+
     static String truncateStackTrace(Throwable t) {
         StringWriter sw = new StringWriter();
         t.printStackTrace(new PrintWriter(sw));
@@ -600,5 +634,11 @@ public final class BuildReportCollector extends AbstractEventSpy {
             BuildStatus status,
             Instant startTime,
             Duration duration,
+            String traceId,
+            String spanId,
             List<LogEvent> output) {}
+
+    private record TraceContext(String traceId, String spanId) {
+        private static final TraceContext EMPTY = new TraceContext(null, null);
+    }
 }

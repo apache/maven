@@ -39,13 +39,16 @@ import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.slf4j.MDC;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BuildReportCollectorTest {
@@ -58,6 +61,11 @@ class BuildReportCollectorTest {
     @BeforeEach
     void setUp() {
         collector = new BuildReportCollector();
+    }
+
+    @AfterEach
+    void clearMdc() {
+        MDC.clear();
     }
 
     @Test
@@ -97,6 +105,10 @@ class BuildReportCollectorTest {
         assertEquals(1, report.modules().get(0).mojos().size());
         assertEquals("compile", report.modules().get(0).mojos().get(0).goal());
         assertEquals(BuildStatus.SUCCESS, report.modules().get(0).mojos().get(0).status());
+        assertNull(report.modules().get(0).traceId());
+        assertNull(report.modules().get(0).spanId());
+        assertNull(report.modules().get(0).mojos().get(0).traceId());
+        assertNull(report.modules().get(0).mojos().get(0).spanId());
         assertTrue(report.failures().isEmpty());
         assertTrue(report.problems().isEmpty());
 
@@ -108,6 +120,36 @@ class BuildReportCollectorTest {
         assertNotNull(report.environment().systemInfo());
         assertFalse(report.environment().systemInfo().isEmpty());
         assertTrue(report.environment().systemInfo().containsKey("available.processors"));
+    }
+
+    @Test
+    void testTraceContextIsCapturedFromMdc() {
+        MavenProject project = createProject("org.example", "my-app", "1.0.0");
+        MavenSession session = createSession(project);
+
+        collector.onEvent(createEvent(ExecutionEvent.Type.SessionStarted, session, project, null));
+
+        MDC.put(BuildReportCollector.TRACE_ID_MDC_KEY, "module-trace");
+        MDC.put(BuildReportCollector.SPAN_ID_MDC_KEY, "module-span");
+        collector.onEvent(createEvent(ExecutionEvent.Type.ProjectStarted, session, project, null));
+
+        MojoExecution mojo = createMojoExecution(
+                "org.apache.maven.plugins", "maven-compiler-plugin", "3.15.0", "compile", "default-compile", "compile");
+        MDC.put(BuildReportCollector.TRACE_ID_MDC_KEY, "mojo-trace");
+        MDC.put(BuildReportCollector.SPAN_ID_MDC_KEY, "mojo-span");
+        collector.onEvent(createEvent(ExecutionEvent.Type.MojoStarted, session, project, mojo));
+        MDC.clear();
+        collector.onEvent(createEvent(ExecutionEvent.Type.MojoSucceeded, session, project, mojo));
+
+        session.getResult().addBuildSummary(new BuildSuccess(project, 1000));
+        collector.onEvent(createEvent(ExecutionEvent.Type.ProjectSucceeded, session, project, null));
+
+        BuildReport report = collector.buildReport(session);
+        var module = report.modules().get(0);
+        assertEquals("module-trace", module.traceId());
+        assertEquals("module-span", module.spanId());
+        assertEquals("mojo-trace", module.mojos().get(0).traceId());
+        assertEquals("mojo-span", module.mojos().get(0).spanId());
     }
 
     @Test

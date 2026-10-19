@@ -110,6 +110,30 @@ public interface MojoReport {
     Duration duration();
 
     /**
+     * The trace identifier associated with this mojo execution.
+     * <p>
+     * Tracing extensions can provide this value by setting the
+     * {@code otel.trace_id} key in the SLF4J MDC before the mojo starts.
+     *
+     * @return the trace identifier, or {@code null} if no tracing context was provided
+     * @since 4.1.0
+     */
+    @Nullable
+    String traceId();
+
+    /**
+     * The span identifier associated with this mojo execution.
+     * <p>
+     * Tracing extensions can provide this value by setting the
+     * {@code otel.span_id} key in the SLF4J MDC before the mojo starts.
+     *
+     * @return the span identifier, or {@code null} if no tracing context was provided
+     * @since 4.1.0
+     */
+    @Nullable
+    String spanId();
+
+    /**
      * Structured log events captured during this mojo's execution.
      * <p>
      * The list may be truncated if the mojo produced excessive output.
