@@ -214,28 +214,6 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
             Map<String, String> systemProperties,
             Map<String, String> userProperties,
             Model model,
-            Record record) {
-        this(
-                rootLocator,
-                interpolator,
-                activeProfileIds,
-                inactiveProfileIds,
-                systemProperties,
-                userProperties,
-                model,
-                null,
-                record);
-    }
-
-    @SuppressWarnings("checkstyle:ParameterNumber")
-    private DefaultProfileActivationContext(
-            RootLocator rootLocator,
-            Interpolator interpolator,
-            List<String> activeProfileIds,
-            List<String> inactiveProfileIds,
-            Map<String, String> systemProperties,
-            Map<String, String> userProperties,
-            Model model,
             Map<String, String> interpolationProperties,
             Record record) {
         this.rootLocator = rootLocator;
@@ -267,7 +245,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
      * The model's properties (exposed via {@link #getModelProperty}) are NOT overridden, so
      * POM-declared properties in {@code interpolationProperties} cannot self-activate
      * property-based or condition-based profiles (see #13390). The map is used exclusively
-     * inside {@link #interpolatePath} to resolve placeholders such as {@code ${message.file}}
+     * inside {@link #interpolate} to resolve path placeholders such as {@code ${message.file}}
      * when activating parent-model file profiles with the parent's own property values
      * (see #10375).
      * <p>
