@@ -272,6 +272,31 @@ public class BuildPlanExecutor {
             // Handle reactor plugins: if a project uses a plugin that is also a reactor module,
             // the project's PLAN step must wait for the plugin project's READY step.
             // This must be done after PLAN/READY steps are created above.
+            applyReactorPluginConstraints(plan);
+
+            return plan;
+        }
+
+        /**
+         * Applies reactor-plugin ordering and skip-clearing constraints to a plan.
+         * <p>
+         * For each project that uses a plugin which is itself a reactor module, this method:
+         * <ol>
+         *   <li>Makes the consumer project's PLAN step wait for the plugin project's READY step.</li>
+         *   <li>Clears the {@code skip} flag on the plugin project's READY step and all its
+         *       predecessors within the same project, so that the plugin is always built to
+         *       READY even when the requested phase would otherwise stop before READY
+         *       (e.g. {@code initialize}).</li>
+         * </ol>
+         * <p>
+         * This method is package-private so that unit tests can exercise the logic independently
+         * of the full {@link #buildInitialPlan} setup (which requires a live {@code MavenSession}).
+         * Callers must ensure that PLAN steps for consumer projects and lifecycle steps (including
+         * READY) for plugin projects have already been added to the plan before calling this method.
+         *
+         * @param plan the build plan to mutate; must already contain PLAN steps for every project
+         */
+        void applyReactorPluginConstraints(BuildPlan plan) {
             Map<String, MavenProject> reactorGavs =
                     plan.getAllProjects().keySet().stream().collect(Collectors.toMap(BuildPlanExecutor::gav, p -> p));
             for (MavenProject project : plan.getAllProjects().keySet()) {
@@ -292,8 +317,6 @@ public class BuildPlanExecutor {
                     }
                 }
             }
-
-            return plan;
         }
 
         private void checkUnboundVersions(BuildPlan buildPlan) {

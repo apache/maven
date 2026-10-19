@@ -495,18 +495,39 @@ class BuildPlanCreatorTest {
         projects.put(p1, Collections.emptyList());
         projects.put(p2, Collections.singletonList(p1));
 
-        // Use a phase before "compile" — this is the path that triggers the skip-clearing logic
-        BuildPlan plan = calculateLifecycleMappings(projects, "initialize");
+        // Use a phase before "compile" — this is the path that triggers the skip-clearing logic.
+        // Without the fix, "ready" (and compile/package/…) would be skipped for p2 because
+        // "initialize" ends well before "ready" in the lifecycle.
+        DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
+        BuildPlanExecutor.BuildContext context =
+                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles).new BuildContext();
 
-        // The READY step of the plugin project (p2) must NOT be skipped, even though
-        // "initialize" is before "compile" and most of p2's lifecycle steps would normally be skipped.
+        BuildPlan plan = context.calculateLifecycleMappings(projects, "initialize");
+
+        // Baseline: without the fix, "ready" on the plugin project IS skipped (initialize < ready).
+        assertTrue(
+                plan.requiredStep(p2, "ready").skip.get(),
+                "Baseline: ready step of plugin project should be skipped before applyReactorPluginConstraints");
+
+        // Simulate what buildInitialPlan does: add PLAN steps for each project so that
+        // applyReactorPluginConstraints can wire the PLAN→READY ordering constraint.
+        for (MavenProject project : projects.keySet()) {
+            BuildStep planStep = new BuildStep(BuildStep.PLAN, project, null);
+            planStep.status.set(BuildStep.PLANNING);
+            plan.addStep(project, BuildStep.PLAN, planStep);
+        }
+
+        // Apply the reactor-plugin constraints (the fix under test).
+        context.applyReactorPluginConstraints(plan);
+
+        // After the fix: the READY step of the plugin project (p2) must NOT be skipped.
         assertFalse(
-                plan.requiredStep(p2, "READY").skip.get(),
-                "READY step of the reactor plugin project must not be skipped");
+                plan.requiredStep(p2, "ready").skip.get(),
+                "READY step of the reactor plugin project must not be skipped after applyReactorPluginConstraints");
 
-        // All predecessors of READY within p2 must also not be skipped (they are needed
-        // to reach READY: resources, compile, etc.)
-        plan.requiredStep(p2, "READY")
+        // All predecessors of "ready" within p2 must also not be skipped — they are needed
+        // to reach READY (resources, compile, package, …).
+        plan.requiredStep(p2, "ready")
                 .allPredecessors()
                 .filter(s -> s.project == p2)
                 .forEach(s -> assertFalse(
