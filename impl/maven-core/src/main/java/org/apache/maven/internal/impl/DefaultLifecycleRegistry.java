@@ -34,9 +34,11 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.model.InputLocation;
@@ -88,6 +90,10 @@ import static org.apache.maven.internal.impl.Lifecycles.plugin;
 public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     private static final String MAVEN_PLUGINS = "org.apache.maven.plugins:";
+
+    private static final boolean SITE_DISABLED = Boolean.getBoolean(Constants.MAVEN_SITE_LIFECYCLE_DISABLED);
+
+    private static final Predicate<Lifecycle> SITE_FILTER = lf -> !SITE_DISABLED || !Lifecycle.SITE.equals(lf.id());
 
     public static final String DEFAULT_LIFECYCLE_MODELID = "org.apache.maven:maven-core:"
             + getImplementationVersion(DefaultLifecycleRegistry.class)
@@ -154,9 +160,12 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
             lookup.lookupList(LifecycleProvider.class).stream()
                     .flatMap(p -> p.provides().stream())
                     .forEach(lf -> result.put(lf.id(), lf));
-            return result.values().stream();
+            return result.values().stream().filter(SITE_FILTER);
         }
-        return providers.stream().map(ExtensibleEnumProvider::provides).flatMap(Collection::stream);
+        return providers.stream()
+                .map(ExtensibleEnumProvider::provides)
+                .flatMap(Collection::stream)
+                .filter(SITE_FILTER);
     }
 
     @Override
