@@ -46,7 +46,8 @@ class MavenPropertiesCompatibilityTest {
     @Test
     void preservesConstructorsAndSavedLayout() throws Exception {
         Path file = directory.resolve("settings.properties");
-        String text = "# Configuration\nname=Sahil\nmessage=Hello ${name}\n";
+        String sep = System.lineSeparator();
+        String text = "# Configuration" + sep + "name=Sahil" + sep + "message=Hello ${name}" + sep;
         Files.writeString(file, text);
 
         MavenProperties properties = new MavenProperties(file);
