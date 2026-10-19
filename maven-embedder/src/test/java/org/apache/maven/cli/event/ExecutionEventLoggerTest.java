@@ -46,6 +46,7 @@ import org.slf4j.Logger;
 
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
@@ -166,6 +167,46 @@ public class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("------------------< org.apache.maven:standalone-pom >-------------------");
         inOrder.verify(logger).info("Building Maven Stub Project (No POM) 1");
         inOrder.verify(logger).info("--------------------------------[ pom ]---------------------------------");
+    }
+
+    @Test
+    public void testMultiModuleProjectBuiltAgainKeepsItsNumber() {
+        // an aggregator goal on the command line builds the first project once more after the last one (#10291)
+        MavenProject project1 = project("Apache Maven Embedder 1");
+        MavenProject project2 = project("Apache Maven Embedder 2");
+        MavenProject project3 = project("Apache Maven Embedder 3");
+
+        MavenSession session = mock(MavenSession.class);
+        when(session.getProjects()).thenReturn(Arrays.asList(project1, project2, project3));
+
+        ExecutionEvent sessionStartedEvent = mock(ExecutionEvent.class);
+        when(sessionStartedEvent.getSession()).thenReturn(session);
+
+        executionEventLogger.sessionStarted(sessionStartedEvent);
+        executionEventLogger.projectStarted(projectStarted(project1));
+        executionEventLogger.projectStarted(projectStarted(project2));
+        executionEventLogger.projectStarted(projectStarted(project3));
+        executionEventLogger.projectStarted(projectStarted(project1));
+
+        InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 1.*\\[1\\/3\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 2.*\\[2\\/3\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 3.*\\[3\\/3\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 1.*\\[1\\/3\\]"));
+    }
+
+    private static MavenProject project(String name) {
+        MavenProject project = mock(MavenProject.class);
+        lenient().when(project.getPackaging()).thenReturn("jar");
+        lenient().when(project.getVersion()).thenReturn("3.5.4-SNAPSHOT");
+        lenient().when(project.getName()).thenReturn(name);
+        return project;
+    }
+
+    private static ExecutionEvent projectStarted(MavenProject project) {
+        ExecutionEvent event = mock(ExecutionEvent.class);
+        when(event.getProject()).thenReturn(project);
+        return event;
     }
 
     @Test
