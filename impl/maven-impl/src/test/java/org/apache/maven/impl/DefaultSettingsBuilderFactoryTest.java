@@ -323,6 +323,50 @@ class DefaultSettingsBuilderFactoryTest {
         assertNotNull(lenientResult.getEffectiveSettings());
     }
 
+    @Test
+    void emptySettingsGetCentralInBothRepoLists() {
+        Settings settings = execute("settings-simple").getEffectiveSettings();
+
+        assertEquals(1, settings.getRepositories().size());
+        assertEquals("central", settings.getRepositories().get(0).getId());
+
+        assertEquals(1, settings.getPluginRepositories().size());
+        assertEquals("central", settings.getPluginRepositories().get(0).getId());
+    }
+
+    @Test
+    void reposOnlySettingsGetCentralInPluginRepos() {
+        Settings settings = execute("settings-repos-only").getEffectiveSettings();
+
+        assertEquals(1, settings.getRepositories().size());
+        assertEquals("internal", settings.getRepositories().get(0).getId());
+
+        assertEquals(1, settings.getPluginRepositories().size());
+        assertEquals("central", settings.getPluginRepositories().get(0).getId());
+    }
+
+    @Test
+    void pluginReposOnlySettingsGetCentralInRepos() {
+        Settings settings = execute("settings-plugin-repos-only").getEffectiveSettings();
+
+        assertEquals(1, settings.getRepositories().size());
+        assertEquals("central", settings.getRepositories().get(0).getId());
+
+        assertEquals(1, settings.getPluginRepositories().size());
+        assertEquals("internal-plugins", settings.getPluginRepositories().get(0).getId());
+    }
+
+    @Test
+    void bothReposDefinedDoesNotInjectCentral() {
+        Settings settings = execute("settings-both-repos").getEffectiveSettings();
+
+        assertEquals(1, settings.getRepositories().size());
+        assertEquals("internal", settings.getRepositories().get(0).getId());
+
+        assertEquals(1, settings.getPluginRepositories().size());
+        assertEquals("internal-plugins", settings.getPluginRepositories().get(0).getId());
+    }
+
     private Path getSettings(String name) {
         return Paths.get("src/test/resources/settings/" + name + ".xml").toAbsolutePath();
     }
