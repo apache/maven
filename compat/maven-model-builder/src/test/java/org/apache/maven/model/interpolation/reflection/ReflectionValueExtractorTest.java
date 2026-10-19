@@ -347,11 +347,9 @@ public class ReflectionValueExtractorTest {
      */
     @Test
     public void testIllegalIndexedType() throws Exception {
-        try {
-            ReflectionValueExtractor.evaluate("h.value[1]", new ValueHolder("string"));
-        } catch (Exception e) {
-            // TODO assert exception message
-        }
+        assertThrows(
+                IntrospectionException.class,
+                () -> ReflectionValueExtractor.evaluate("h.value[1]", new ValueHolder("string")));
     }
 
     /**
@@ -361,11 +359,9 @@ public class ReflectionValueExtractorTest {
      */
     @Test
     public void testIllegalMappedType() throws Exception {
-        try {
-            ReflectionValueExtractor.evaluate("h.value(key)", new ValueHolder("string"));
-        } catch (Exception e) {
-            // TODO assert exception message
-        }
+        assertThrows(
+                IntrospectionException.class,
+                () -> ReflectionValueExtractor.evaluate("h.value(key)", new ValueHolder("string")));
     }
 
     /**

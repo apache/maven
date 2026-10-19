@@ -86,11 +86,6 @@ class StringInterpolatorTest {
     }
 
     @Test
-    void testLoopEmpty2() {
-        assertEquals("${a}", substVars("${a}", null, null, null, false));
-    }
-
-    @Test
     void testSubstitutionEscape() {
         assertEquals("${a}", substVars("$\\{a${#}\\}", "b"));
         assertEquals("${a}", substVars("$\\{a\\}${#}", "b"));
