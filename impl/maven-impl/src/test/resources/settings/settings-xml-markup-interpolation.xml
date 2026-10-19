@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
+
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
 or more contributor license agreements.  See the NOTICE file
@@ -17,20 +18,23 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0">
-  <modelVersion>4.0.0</modelVersion>
-  <groupId>org.apache.maven.its.gh13306</groupId>
-  <artifactId>client</artifactId>
-  <version>1.0-SNAPSHOT</version>
-  <packaging>app-client</packaging>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.its.gh13306</groupId>
-        <artifactId>packaging-extension</artifactId>
-        <version>1.0-SNAPSHOT</version>
-        <extensions>true</extensions>
-      </plugin>
-    </plugins>
-  </build>
-</project>
+
+<!--
+  Settings file that uses a property whose value contains XML special characters
+  (e.g. &, <, >) to verify that interpolateSource() XML-escapes resolved values
+  before substituting them into the raw XML string (MNG-4625 regression test).
+-->
+<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0">
+  <profiles>
+    <profile>
+      <id>xml-markup</id>
+      <properties>
+        <!-- test.prop value is "&x=y<>" (raw, contains XML special characters) -->
+        <jdbcUrl>${test.prop}</jdbcUrl>
+      </properties>
+    </profile>
+  </profiles>
+  <activeProfiles>
+    <activeProfile>xml-markup</activeProfile>
+  </activeProfiles>
+</settings>
