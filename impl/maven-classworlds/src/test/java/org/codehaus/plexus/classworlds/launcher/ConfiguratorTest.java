@@ -167,15 +167,10 @@ class ConfiguratorTest extends AbstractClassWorldsTestCase {
 
         URL[] urls = globRealm.getURLs();
 
-        String basedir = TestUtil.getBasedir();
-        assertArrayContains(
-                urls, new File(basedir, "src/test/test-data/nested.jar").toURI().toURL());
-        assertArrayContains(
-                urls, new File(basedir, "src/test/test-data/a.jar").toURI().toURL());
-        assertArrayContains(
-                urls, new File(basedir, "src/test/test-data/b.jar").toURI().toURL());
-        assertArrayContains(
-                urls, new File(basedir, "src/test/test-data/c.jar").toURI().toURL());
+        assertArrayContains(urls, TestUtil.getTestResourceUrl("nested.jar"));
+        assertArrayContains(urls, TestUtil.getTestResourceUrl("a.jar"));
+        assertArrayContains(urls, TestUtil.getTestResourceUrl("b.jar"));
+        assertArrayContains(urls, TestUtil.getTestResourceUrl("c.jar"));
     }
 
     @Test

@@ -37,24 +37,33 @@ package org.codehaus.plexus.classworlds;
 import java.io.File;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 /**
  * @author <a href="bwalding@jakarta.org">Ben Walding</a>
  */
 public class TestUtil {
 
+    /**
+     * Returns the URL for a test fixture JAR (or resource file) by name.
+     *
+     * <p>JARs are looked up in {@code target/test-jars/} where {@link TestJarGenerator} writes them.
+     * The {@code resources/} sub-directory (e.g. {@code werkflow.jar}) lives under
+     * {@code target/test-jars/resources/}.
+     */
     public static URL getTestResourceUrl(String resourceName) {
-        File baseDir = new File(getBasedir());
-
-        File testDir = new File(baseDir, "src/test/test-data");
-
-        File resourceFile = new File(testDir, resourceName);
-
+        File resourceFile = getTestJarsDir().resolve(resourceName).toFile();
         try {
             return resourceFile.toURI().toURL();
         } catch (MalformedURLException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    /** Directory where generated test JARs are written ({@code <basedir>/target/test-jars/}). */
+    public static Path getTestJarsDir() {
+        return Paths.get(getBasedir(), "target", "test-jars");
     }
 
     public static String getBasedir() {

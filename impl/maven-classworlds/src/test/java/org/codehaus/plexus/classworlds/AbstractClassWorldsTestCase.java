@@ -36,10 +36,25 @@ package org.codehaus.plexus.classworlds;
 
 import java.net.URL;
 
+import org.junit.jupiter.api.BeforeAll;
+
 /**
  * @author Jason van Zyl
  */
 public abstract class AbstractClassWorldsTestCase {
+
+    /**
+     * Generate test fixture JARs once per test run into {@code target/test-jars/}.
+     * Using JUnit 5 {@code @BeforeAll} with a non-static method requires
+     * {@code @TestInstance(Lifecycle.PER_CLASS)}, but a static method works with default lifecycle.
+     * We keep it static so subclasses need no annotation.
+     */
+    @BeforeAll
+    static void generateTestJars() throws Exception {
+        TestJarGenerator generator = new TestJarGenerator(TestUtil.getTestJarsDir());
+        generator.generate();
+    }
+
     protected URL getJarUrl(String jarName) {
         return TestUtil.getTestResourceUrl(jarName);
     }
