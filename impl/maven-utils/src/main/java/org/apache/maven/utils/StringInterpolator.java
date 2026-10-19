@@ -197,8 +197,7 @@ public class StringInterpolator {
      * @param cycleMap Map of variable references used to detect nested cycles.
      * @param configProps Set of configuration properties.
      * @return The value of the specified string after system property substitution.
-     * @throws StringInterpolatorException If there was a syntax error in the
-     *         property placeholder syntax or a recursive variable reference.
+     * @throws StringInterpolatorException if a recursive variable reference is detected
      **/
     public String substVars(String val, String currentKey, Set<String> cycleMap, Map<String, String> configProps) {
         return substVars(val, currentKey, cycleMap, configProps, null);
@@ -224,8 +223,7 @@ public class StringInterpolator {
      * @param configProps Set of configuration properties.
      * @param callback the callback to obtain substitution values
      * @return The value of the specified string after system property substitution.
-     * @throws StringInterpolatorException If there was a syntax error in the
-     *         property placeholder syntax or a recursive variable reference.
+     * @throws StringInterpolatorException if a recursive variable reference is detected
      **/
     public String substVars(
             String val,
@@ -257,8 +255,7 @@ public class StringInterpolator {
      * @param callback the callback to obtain substitution values
      * @param defaultsToEmptyString sets an empty string if a replacement value is not found, leaves intact otherwise
      * @return The value of the specified string after system property substitution.
-     * @throws StringInterpolatorException If there was a syntax error in the
-     *         property placeholder syntax or a recursive variable reference.
+     * @throws StringInterpolatorException if a recursive variable reference is detected
      **/
     public static String substVars(
             String val,
