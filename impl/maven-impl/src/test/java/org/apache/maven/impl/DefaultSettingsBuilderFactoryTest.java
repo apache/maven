@@ -204,7 +204,7 @@ class DefaultSettingsBuilderFactoryTest {
     void reposOnlySettingsGetCentralInPluginRepos() {
         Settings settings = execute("settings-repos-only").getEffectiveSettings();
 
-        assertFalse(settings.getRepositories().isEmpty());
+        assertEquals(1, settings.getRepositories().size());
         assertEquals("internal", settings.getRepositories().get(0).getId());
 
         assertEquals(1, settings.getPluginRepositories().size());
@@ -218,7 +218,7 @@ class DefaultSettingsBuilderFactoryTest {
         assertEquals(1, settings.getRepositories().size());
         assertEquals("central", settings.getRepositories().get(0).getId());
 
-        assertFalse(settings.getPluginRepositories().isEmpty());
+        assertEquals(1, settings.getPluginRepositories().size());
         assertEquals("internal-plugins", settings.getPluginRepositories().get(0).getId());
     }
 
