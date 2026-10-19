@@ -48,8 +48,8 @@ import java.util.jar.Manifest;
  * eliminating the need to commit pre-compiled binary JARs to version control.
  *
  * <p>All JARs are written to {@code target/test-jars/} under the module base directory.
- * The generator is idempotent: if the directory already exists and is non-empty it is wiped
- * and rebuilt to ensure freshness.
+ * The generator is idempotent: existing JARs are overwritten on each run. Note that
+ * JARs from a previous run whose names are no longer generated are not deleted.
  *
  * <p>Called once per test run from {@link AbstractClassWorldsTestCase#generateTestJars()}.
  */
