@@ -21,9 +21,11 @@ package org.apache.maven.impl;
 import javax.xml.stream.Location;
 import javax.xml.stream.XMLStreamException;
 
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.HashMap;
@@ -155,17 +157,37 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             return Settings.newInstance();
         }
 
+        // Determine if strict parsing mode is requested
+        boolean strictParsing = Boolean.parseBoolean(
+                request.getSession().getEffectiveProperties().get(Constants.MAVEN_SETTINGS_STRICT_PARSING));
+
         Settings settings;
 
+        // Interpolate the raw XML before parsing so that non-String fields
+        // (e.g. proxy.port, proxy.active) are resolved at the text level
+        // before Modello converts them to int/boolean.
+        Source interpolatedSource = interpolateSource(settingsSource, request);
+
         try {
-            try (InputStream is = settingsSource.openStream()) {
+            try (InputStream is = interpolatedSource.openStream()) {
                 settings = settingsXmlFactory.read(XmlReaderRequest.builder()
                         .inputStream(is)
                         .location(settingsSource.getLocation())
                         .strict(true)
                         .build());
             } catch (XmlReaderException e) {
-                try (InputStream is = settingsSource.openStream()) {
+                if (strictParsing) {
+                    Location loc = e.getCause() instanceof XMLStreamException xe ? xe.getLocation() : null;
+                    problems.reportProblem(new DefaultBuilderProblem(
+                            settingsSource.getLocation(),
+                            loc != null ? loc.getLineNumber() : -1,
+                            loc != null ? loc.getColumnNumber() : -1,
+                            e,
+                            e.getMessage(),
+                            BuilderProblem.Severity.FATAL));
+                    return Settings.newInstance();
+                }
+                try (InputStream is = interpolatedSource.openStream()) {
                     settings = settingsXmlFactory.read(XmlReaderRequest.builder()
                             .inputStream(is)
                             .location(settingsSource.getLocation())
@@ -243,6 +265,99 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private Server serverAlias(Server server, String id) {
         return Server.newBuilder(server, true).id(id).aliases(List.of()).build();
+    }
+
+    /**
+     * XML-escapes a value so that it can be safely embedded in XML text content.
+     * Replaces the five predefined XML entities: {@code &}, {@code <}, {@code >},
+     * {@code "}, and {@code '}.
+     */
+    private static String xmlEscape(String value) {
+        if (value == null) {
+            return null;
+        }
+        // Quick check: if none of the special chars are present, return as-is
+        if (value.indexOf('&') < 0
+                && value.indexOf('<') < 0
+                && value.indexOf('>') < 0
+                && value.indexOf('"') < 0
+                && value.indexOf('\'') < 0) {
+            return value;
+        }
+        StringBuilder sb = new StringBuilder(value.length() + 16);
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            switch (c) {
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                case '\'':
+                    sb.append("&apos;");
+                    break;
+                default:
+                    sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Wraps the source so that when {@code openStream()} is called, the raw XML is read,
+     * interpolated as a string (resolving non-String fields like {@code <port>${test.port}</port>}
+     * before Modello converts them to int/boolean), and returned as a new stream.
+     *
+     * <p>Resolved property values are XML-escaped before substitution so that values containing
+     * XML special characters (e.g. {@code &x=y<>}) do not corrupt the XML structure.</p>
+     */
+    private Source interpolateSource(Source settingsSource, SettingsBuilderRequest request) {
+        UnaryOperator<String> src;
+        if (request.getInterpolationSource().isPresent()) {
+            src = request.getInterpolationSource().get();
+        } else {
+            Map<String, String> userProperties = request.getSession().getUserProperties();
+            Map<String, String> systemProperties = request.getSession().getSystemProperties();
+            src = Interpolator.chain(userProperties::get, systemProperties::get);
+        }
+
+        return new Source() {
+            @Override
+            public Path getPath() {
+                return settingsSource.getPath();
+            }
+
+            @Override
+            public InputStream openStream() throws IOException {
+                String rawXml;
+                try (InputStream in = settingsSource.openStream()) {
+                    byte[] bytes = in.readAllBytes();
+                    rawXml = new String(bytes, StandardCharsets.UTF_8);
+                }
+                // XML-escape resolved values so that property values containing XML special
+                // characters (e.g. &, <, >) do not produce malformed XML after substitution.
+                String interpolatedXml =
+                        interpolator.interpolate(rawXml, src, (name, value) -> xmlEscape(value), false);
+                return new ByteArrayInputStream(interpolatedXml.getBytes(StandardCharsets.UTF_8));
+            }
+
+            @Override
+            public String getLocation() {
+                return settingsSource.getLocation();
+            }
+
+            @Override
+            public Source resolve(String relative) {
+                return settingsSource.resolve(relative);
+            }
+        };
     }
 
     private Settings interpolate(
