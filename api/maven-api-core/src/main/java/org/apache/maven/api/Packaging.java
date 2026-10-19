@@ -89,4 +89,14 @@ public interface Packaging extends ExtensibleEnum {
      */
     @Nonnull
     Map<String, PluginContainer> plugins();
+
+    /**
+     * {@return whether this packaging produces a main artifact}.
+     * Packaging types such as {@code pom} or {@code bom} do not produce a main artifact.
+     *
+     * @since 4.1.0
+     */
+    default boolean producesMainArtifact() {
+        return true;
+    }
 }

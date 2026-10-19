@@ -23,7 +23,6 @@ name: PR Signal
 on:
   pull_request:
     types:
-      - closed
       - edited
       - opened
       - reopened

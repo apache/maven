@@ -349,13 +349,14 @@ class DefaultSettingsParserTest {
     }
 
     @Test
-    void xmlStreamsAreClosedAfterBothAttempts() throws Exception {
+    void xmlStreamIsClosedAfterReadFailure() throws Exception {
         Source source = mock(Source.class);
         when(source.getLocation()).thenReturn("settings.xml");
         var streams = new ArrayList<InputStream>();
         when(source.openStream()).thenAnswer(invocation -> {
             InputStream stream = mock(InputStream.class);
             when(stream.read(any(byte[].class), anyInt(), anyInt())).thenThrow(new IOException("Read failed"));
+            when(stream.readAllBytes()).thenThrow(new IOException("Read failed"));
             streams.add(stream);
             return stream;
         });
