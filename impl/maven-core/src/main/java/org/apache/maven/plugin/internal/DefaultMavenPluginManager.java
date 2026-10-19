@@ -613,6 +613,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 mojoExecution.getExecutionId(),
                 mojoDescriptor,
                 pluginRealm,
+                dom,
                 pomConfiguration,
                 expressionEvaluator);
 
@@ -798,6 +799,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 mojoExecution.getExecutionId(),
                 mojoDescriptor,
                 pluginRealm,
+                dom,
                 pomConfiguration,
                 expressionEvaluator);
 
@@ -809,6 +811,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             String executionId,
             MojoDescriptor mojoDescriptor,
             ClassRealm pluginRealm,
+            XmlNode configurationDom,
             PlexusConfiguration configuration,
             ExpressionEvaluator expressionEvaluator)
             throws PluginConfigurationException {
@@ -821,6 +824,18 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         }
 
         try {
+            if (mojoDescriptor.isV4Api() && "enhanced".equals(configuratorId)) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Configuring mojo execution '" + mojoDescriptor.getId() + ':' + executionId
+                            + "' with Maven XML configurator -->");
+                }
+                new V4MojoConfigurator(expressionEvaluator, pluginRealm, mojoDescriptor.getPluginDescriptor())
+                        .configure(mojo, configurationDom);
+                validateParameters(mojoDescriptor, configuration, expressionEvaluator);
+                logger.debug("-- end configuration --");
+                return;
+            }
+
             // TODO could the configuration be passed to lookup and the configurator known to plexus via the descriptor
             // so that this method could entirely be handled by a plexus lookup?
             configurator = container.lookup(ComponentConfigurator.class, configuratorId);
