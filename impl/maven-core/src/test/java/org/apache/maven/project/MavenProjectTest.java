@@ -212,6 +212,12 @@ class MavenProjectTest extends AbstractMavenProjectTestCase {
         assertEquals(1, project.getCompileSourceRoots().size());
     }
 
+    @Test
+    void pluginManagementShouldReturnNotNull() {
+        MavenProject project = new MavenProject();
+        assertNotNull(project.getPluginManagement());
+    }
+
     private void assertNoNulls(List<String> elements) {
         assertFalse(elements.contains(null));
     }
