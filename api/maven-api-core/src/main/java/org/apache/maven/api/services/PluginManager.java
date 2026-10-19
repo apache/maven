@@ -18,8 +18,6 @@
  */
 package org.apache.maven.api.services;
 
-import java.util.List;
-
 import org.apache.maven.api.Plugin;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Service;
@@ -37,7 +35,7 @@ public interface PluginManager extends Service {
 
     /**
      * Resolves a plugin, creates its classloader when necessary, and returns its runtime metadata.
-     * The returned plugin exposes its descriptor, resolved dependencies, artifact, and classloader.
+     * The returned plugin exposes its descriptor, resolved dependencies, artifact, and runtime realm.
      *
      * @param session the session in which to resolve the plugin
      * @param project the project declaring the plugin
@@ -49,17 +47,4 @@ public interface PluginManager extends Service {
     @Nonnull
     Plugin loadPlugin(
             @Nonnull Session session, @Nonnull Project project, @Nonnull org.apache.maven.api.model.Plugin plugin);
-
-    /**
-     * Looks up components visible from a plugin's classloader.
-     *
-     * @param plugin the resolved plugin runtime that defines the lookup scope
-     * @param type the component type
-     * @param <T> the component type
-     * @return an immutable list of matching components, possibly empty
-     * @throws LookupException if component provisioning fails
-     * @throws NullPointerException if any argument is {@code null}
-     */
-    @Nonnull
-    <T> List<T> lookupList(@Nonnull Plugin plugin, @Nonnull Class<T> type);
 }

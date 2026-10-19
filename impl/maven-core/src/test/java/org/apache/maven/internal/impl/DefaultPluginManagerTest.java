@@ -19,6 +19,8 @@
 package org.apache.maven.internal.impl;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 import org.apache.maven.api.Plugin;
 import org.apache.maven.api.services.Lookup;
@@ -89,7 +91,8 @@ class DefaultPluginManagerTest {
 
         assertSame(model.getDelegate(), result.getModel());
         assertSame(apiDescriptor, result.getDescriptor());
-        assertSame(realm, result.getClassLoader());
+        assertSame(realm, result.getRealm().getClassLoader());
+        assertEquals(Optional.empty(), result.getRealm().getModuleLayer());
         assertEquals(List.of(dependency), result.getDependencies().stream().toList());
         assertSame(dependency, result.getDependenciesMap().get("org.example:plugin-spi"));
         verify(executionSession).setCurrentProject(mavenProject);
@@ -99,48 +102,49 @@ class DefaultPluginManagerTest {
 
     @Test
     void looksUpComponentsWithPluginClassLoaderAndRestoresOriginal() {
-        MavenPluginManager legacyPluginManager = mock(MavenPluginManager.class);
-        LifecyclePluginResolver lifecyclePluginResolver = mock(LifecyclePluginResolver.class);
-        Lookup lookup = mock(Lookup.class);
-        DefaultPluginManager manager = new DefaultPluginManager(legacyPluginManager, lifecyclePluginResolver, lookup);
-        Plugin plugin = mock(Plugin.class);
         ClassLoader pluginClassLoader = new ClassLoader() {};
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         Object service = new Object();
-
-        when(plugin.getClassLoader()).thenReturn(pluginClassLoader);
-        when(lookup.lookupList(Object.class)).thenAnswer(invocation -> {
+        Lookup lookup = mock(Lookup.class, invocation -> {
             assertSame(pluginClassLoader, Thread.currentThread().getContextClassLoader());
-            return List.of(service);
+            return switch (invocation.getMethod().getName()) {
+                case "lookup" -> service;
+                case "lookupOptional" -> Optional.of(service);
+                case "lookupList" -> List.of(service);
+                case "lookupMap" -> Map.of("service", service);
+                default -> throw new AssertionError(invocation.getMethod());
+            };
         });
+        DefaultPluginRealm realm = new DefaultPluginRealm(pluginClassLoader, lookup);
 
-        List<Object> result = manager.lookupList(plugin, Object.class);
-
-        assertEquals(List.of(service), result);
+        assertSame(service, realm.getLookup().lookup(Object.class));
+        assertSame(service, realm.getLookup().lookup(Object.class, "service"));
+        assertEquals(Optional.of(service), realm.getLookup().lookupOptional(Object.class));
+        assertEquals(Optional.of(service), realm.getLookup().lookupOptional(Object.class, "service"));
+        assertEquals(List.of(service), realm.getLookup().lookupList(Object.class));
+        assertEquals(Map.of("service", service), realm.getLookup().lookupMap(Object.class));
         assertSame(originalClassLoader, Thread.currentThread().getContextClassLoader());
-        assertThrows(UnsupportedOperationException.class, () -> result.add(new Object()));
     }
 
     @Test
     void restoresOriginalClassLoaderWhenLookupFails() {
-        MavenPluginManager legacyPluginManager = mock(MavenPluginManager.class);
-        LifecyclePluginResolver lifecyclePluginResolver = mock(LifecyclePluginResolver.class);
         Lookup lookup = mock(Lookup.class);
-        DefaultPluginManager manager = new DefaultPluginManager(legacyPluginManager, lifecyclePluginResolver, lookup);
-        Plugin plugin = mock(Plugin.class);
         ClassLoader pluginClassLoader = new ClassLoader() {};
         ClassLoader originalClassLoader = Thread.currentThread().getContextClassLoader();
         IllegalStateException failure = new IllegalStateException("boom");
 
-        when(plugin.getClassLoader()).thenReturn(pluginClassLoader);
         doAnswer(invocation -> {
                     assertSame(pluginClassLoader, Thread.currentThread().getContextClassLoader());
                     throw failure;
                 })
                 .when(lookup)
                 .lookupList(Object.class);
+        DefaultPluginRealm realm = new DefaultPluginRealm(pluginClassLoader, lookup);
 
-        assertSame(failure, assertThrows(IllegalStateException.class, () -> manager.lookupList(plugin, Object.class)));
+        assertSame(
+                failure,
+                assertThrows(
+                        IllegalStateException.class, () -> realm.getLookup().lookupList(Object.class)));
         assertSame(originalClassLoader, Thread.currentThread().getContextClassLoader());
     }
 }

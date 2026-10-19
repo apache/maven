@@ -30,8 +30,10 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Plugin;
+import org.apache.maven.api.PluginRealm;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.impl.DefaultNode;
 import org.eclipse.aether.graph.DependencyNode;
 import org.slf4j.Logger;
@@ -46,20 +48,21 @@ final class DefaultPlugin implements Plugin {
     private final org.apache.maven.api.model.Plugin model;
     private final PluginDescriptor descriptor;
     private final List<Lifecycle> lifecycles;
-    private final ClassLoader classLoader;
+    private final PluginRealm realm;
     private final Artifact artifact;
     private final Map<String, Dependency> dependencies;
 
     DefaultPlugin(
             InternalMavenSession session,
             org.apache.maven.model.Plugin model,
-            org.apache.maven.plugin.descriptor.PluginDescriptor descriptor) {
+            org.apache.maven.plugin.descriptor.PluginDescriptor descriptor,
+            Lookup lookup) {
         requireNonNull(session, "session");
         requireNonNull(descriptor, "descriptor");
 
         this.model = model != null ? model.getDelegate() : null;
         this.descriptor = requireNonNull(descriptor.getPluginDescriptorV4(), "descriptor.pluginDescriptorV4");
-        this.classLoader = descriptor.getClassRealm();
+        this.realm = new DefaultPluginRealm(descriptor.getClassRealm(), lookup);
 
         org.apache.maven.artifact.Artifact legacyArtifact = descriptor.getPluginArtifact();
         org.eclipse.aether.artifact.Artifact resolverArtifact = RepositoryUtils.toArtifact(legacyArtifact);
@@ -103,8 +106,8 @@ final class DefaultPlugin implements Plugin {
     }
 
     @Override
-    public ClassLoader getClassLoader() {
-        return classLoader;
+    public PluginRealm getRealm() {
+        return realm;
     }
 
     @Override

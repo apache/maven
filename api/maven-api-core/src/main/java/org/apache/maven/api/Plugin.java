@@ -46,7 +46,7 @@ public interface Plugin {
     List<Lifecycle> getLifecycles();
 
     @Nonnull
-    ClassLoader getClassLoader();
+    PluginRealm getRealm();
 
     @Nullable
     Artifact getArtifact();

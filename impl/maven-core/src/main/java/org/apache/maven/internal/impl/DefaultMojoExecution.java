@@ -25,6 +25,7 @@ import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Plugin;
 import org.apache.maven.api.model.PluginExecution;
 import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.xml.XmlNode;
 
 import static java.util.Objects.requireNonNull;
@@ -64,7 +65,8 @@ public class DefaultMojoExecution implements MojoExecution {
         org.apache.maven.plugin.descriptor.MojoDescriptor legacyDescriptor = delegate.getMojoDescriptor();
         org.apache.maven.plugin.descriptor.PluginDescriptor legacyPluginDescriptor =
                 legacyDescriptor.getPluginDescriptor();
-        return new DefaultPlugin(session, delegate.getPlugin(), legacyPluginDescriptor);
+        return new DefaultPlugin(
+                session, delegate.getPlugin(), legacyPluginDescriptor, session.getService(Lookup.class));
     }
 
     private static Optional<PluginExecution> buildModel(org.apache.maven.plugin.MojoExecution delegate) {

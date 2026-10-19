@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.List;
 import java.util.Objects;
 
 import org.apache.maven.api.Plugin;
@@ -74,7 +73,7 @@ public final class DefaultPluginManager implements PluginManager {
             PluginDescriptor descriptor = pluginManager.getPluginDescriptor(
                     legacyPlugin, mavenProject.getRemotePluginRepositories(), executionSession.getRepositorySession());
             pluginManager.setupPluginRealm(descriptor, executionSession, null, null, null);
-            return new DefaultPlugin(internalSession, legacyPlugin, descriptor);
+            return new DefaultPlugin(internalSession, legacyPlugin, descriptor, lookup);
         } catch (Exception e) {
             throw new PluginManagerException(
                     "Unable to load plugin " + plugin.getGroupId() + ":" + plugin.getArtifactId(), e);
@@ -89,20 +88,5 @@ public final class DefaultPluginManager implements PluginManager {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Plugin " + requestedPlugin.getGroupId() + ":"
                         + requestedPlugin.getArtifactId() + " is not declared by project " + project.getId()));
-    }
-
-    @Override
-    public <T> List<T> lookupList(Plugin plugin, Class<T> type) {
-        requireNonNull(plugin, "plugin");
-        requireNonNull(type, "type");
-
-        Thread thread = Thread.currentThread();
-        ClassLoader originalClassLoader = thread.getContextClassLoader();
-        try {
-            thread.setContextClassLoader(plugin.getClassLoader());
-            return List.copyOf(lookup.lookupList(type));
-        } finally {
-            thread.setContextClassLoader(originalClassLoader);
-        }
     }
 }
