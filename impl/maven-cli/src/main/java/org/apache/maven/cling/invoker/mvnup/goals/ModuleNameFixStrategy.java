@@ -237,8 +237,9 @@ public class ModuleNameFixStrategy extends AbstractUpgradeStrategy {
         }
 
         moduleNameElement.textContent(fixed);
-        context.success(
-                "Fixed Automatic-Module-Name in " + pluginArtifactId + ": '" + moduleName + "' → '" + fixed + "'");
+        logChange(
+                context,
+                "Automatic-Module-Name fix in " + pluginArtifactId + ": '" + moduleName + "' → '" + fixed + "'");
         return true;
     }
 
