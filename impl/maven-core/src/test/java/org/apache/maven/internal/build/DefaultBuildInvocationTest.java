@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.api.BuildInvocation;
+import org.apache.maven.api.MakeBehavior;
 import org.apache.maven.api.ReactorFailureBehavior;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -71,6 +72,10 @@ class DefaultBuildInvocationTest {
         assertTrue(inv.batchMode());
         assertEquals(ReactorFailureBehavior.FAIL_AT_END, inv.reactorFailureBehavior());
         assertEquals(Path.of("/tmp/repo"), inv.localRepository());
+        assertTrue(inv.recursive());
+        assertFalse(inv.resume());
+        assertNull(inv.makeBehavior());
+        assertTrue(inv.excludedProjects().isEmpty());
     }
 
     @Test
@@ -231,11 +236,15 @@ class DefaultBuildInvocationTest {
                 Path.of("/tmp/repo"),
                 List.of("profile1"),
                 List.of(":module1"),
+                List.of(":excluded"),
+                null,
                 null,
                 ReactorFailureBehavior.FAIL_FAST,
                 false,
                 false,
                 false,
+                false,
+                true,
                 false,
                 1);
 
@@ -247,6 +256,9 @@ class DefaultBuildInvocationTest {
         assertThrows(
                 UnsupportedOperationException.class,
                 () -> inv.selectedProjects().add(":m2"));
+        assertThrows(
+                UnsupportedOperationException.class,
+                () -> inv.excludedProjects().add(":m3"));
         assertThrows(UnsupportedOperationException.class, () -> inv.systemInfo().put("k", "v"));
     }
 
@@ -305,5 +317,79 @@ class DefaultBuildInvocationTest {
         BuildInvocation inv = DefaultBuildInvocation.from(session);
 
         assertEquals(4, inv.threads());
+    }
+
+    @Test
+    void excludedProjects() {
+        MavenExecutionRequest request = newRequest();
+        request.setExcludedProjects(List.of(":slow-module", ":flaky-module"));
+        MavenSession session = mock(MavenSession.class);
+        when(session.getRequest()).thenReturn(request);
+
+        BuildInvocation inv = DefaultBuildInvocation.from(session);
+
+        assertEquals(2, inv.excludedProjects().size());
+        assertTrue(inv.excludedProjects().contains(":slow-module"));
+        assertTrue(inv.excludedProjects().contains(":flaky-module"));
+    }
+
+    @Test
+    void makeBehaviorUpstream() {
+        MavenExecutionRequest request = newRequest();
+        request.setMakeBehavior(MavenExecutionRequest.REACTOR_MAKE_UPSTREAM);
+        MavenSession session = mock(MavenSession.class);
+        when(session.getRequest()).thenReturn(request);
+
+        assertEquals(MakeBehavior.UPSTREAM, DefaultBuildInvocation.from(session).makeBehavior());
+    }
+
+    @Test
+    void makeBehaviorDownstream() {
+        MavenExecutionRequest request = newRequest();
+        request.setMakeBehavior(MavenExecutionRequest.REACTOR_MAKE_DOWNSTREAM);
+        MavenSession session = mock(MavenSession.class);
+        when(session.getRequest()).thenReturn(request);
+
+        assertEquals(
+                MakeBehavior.DOWNSTREAM, DefaultBuildInvocation.from(session).makeBehavior());
+    }
+
+    @Test
+    void makeBehaviorBoth() {
+        MavenExecutionRequest request = newRequest();
+        request.setMakeBehavior(MavenExecutionRequest.REACTOR_MAKE_BOTH);
+        MavenSession session = mock(MavenSession.class);
+        when(session.getRequest()).thenReturn(request);
+
+        assertEquals(MakeBehavior.BOTH, DefaultBuildInvocation.from(session).makeBehavior());
+    }
+
+    @Test
+    void makeBehaviorNull() {
+        MavenExecutionRequest request = newRequest();
+        MavenSession session = mock(MavenSession.class);
+        when(session.getRequest()).thenReturn(request);
+
+        assertNull(DefaultBuildInvocation.from(session).makeBehavior());
+    }
+
+    @Test
+    void nonRecursive() {
+        MavenExecutionRequest request = newRequest();
+        request.setRecursive(false);
+        MavenSession session = mock(MavenSession.class);
+        when(session.getRequest()).thenReturn(request);
+
+        assertFalse(DefaultBuildInvocation.from(session).recursive());
+    }
+
+    @Test
+    void resume() {
+        MavenExecutionRequest request = newRequest();
+        request.setResume(true);
+        MavenSession session = mock(MavenSession.class);
+        when(session.getRequest()).thenReturn(request);
+
+        assertTrue(DefaultBuildInvocation.from(session).resume());
     }
 }

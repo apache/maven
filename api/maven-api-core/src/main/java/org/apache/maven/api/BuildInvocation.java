@@ -44,8 +44,11 @@ import org.apache.maven.api.annotations.Nonnull;
  *       Maven home, and available processors</li>
  *   <li>Local repository path ({@link #localRepository()})</li>
  *   <li>Explicitly activated or deactivated profiles ({@link #activeProfiles()})</li>
- *   <li>Selected projects ({@link #selectedProjects()}) and resume-from
- *       ({@link #resumeFrom()})</li>
+ *   <li>Selected projects ({@link #selectedProjects()}) and excluded projects
+ *       ({@link #excludedProjects()})</li>
+ *   <li>Make behavior ({@link #makeBehavior()}): upstream/downstream dependency building</li>
+ *   <li>Resume-from ({@link #resumeFrom()}) and resume mode ({@link #resume()})</li>
+ *   <li>Recursive mode ({@link #recursive()})</li>
  *   <li>Reactor failure behavior ({@link #reactorFailureBehavior()})</li>
  *   <li>Offline mode ({@link #offline()}) and snapshot update policy
  *       ({@link #updateSnapshots()})</li>
@@ -150,6 +153,22 @@ public interface BuildInvocation {
     List<String> selectedProjects();
 
     /**
+     * Projects explicitly excluded via {@code -pl !module} / {@code --projects !module}.
+     *
+     * @return the excluded project selectors, never {@code null}; empty if no exclusions
+     */
+    @Nonnull
+    List<String> excludedProjects();
+
+    /**
+     * The reactor make behavior ({@code -am} / {@code -amd}), controlling whether
+     * upstream and/or downstream dependencies of selected projects are also built.
+     *
+     * @return the make behavior, or {@code null} if not specified
+     */
+    MakeBehavior makeBehavior();
+
+    /**
      * The project to resume from, as specified via {@code -rf} / {@code --resume-from}.
      *
      * @return the resume-from selector, or {@code null} if not specified
@@ -193,6 +212,22 @@ public interface BuildInvocation {
      * @return {@code true} if batch mode was active
      */
     boolean batchMode();
+
+    /**
+     * Whether the build processes child modules recursively ({@code true} by default).
+     * Set to {@code false} by the {@code -N} / {@code --non-recursive} flag.
+     *
+     * @return {@code true} if recursive processing is enabled
+     */
+    boolean recursive();
+
+    /**
+     * Whether the build should resume from the data in the resume.properties file
+     * ({@code --resume} flag).
+     *
+     * @return {@code true} if resume mode was active
+     */
+    boolean resume();
 
     /**
      * The degree of concurrency ({@code -T} flag), or {@code 1} for sequential builds.

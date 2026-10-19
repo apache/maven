@@ -27,6 +27,7 @@ import java.util.Set;
 import java.util.TreeMap;
 
 import org.apache.maven.api.BuildInvocation;
+import org.apache.maven.api.MakeBehavior;
 import org.apache.maven.api.ReactorFailureBehavior;
 import org.apache.maven.execution.MavenSession;
 import org.slf4j.Logger;
@@ -41,12 +42,16 @@ import org.slf4j.LoggerFactory;
  * @param localRepository        local repository path
  * @param activeProfiles         explicitly activated profiles
  * @param selectedProjects       projects selected via {@code -pl}
+ * @param excludedProjects       projects excluded via {@code -pl !module}
+ * @param makeBehavior           reactor make behavior ({@code -am}/{@code -amd}), or {@code null}
  * @param resumeFrom             resume-from selector, or {@code null}
  * @param reactorFailureBehavior reactor failure behavior
  * @param offline                whether offline mode was active
  * @param updateSnapshots        whether snapshot updates were forced
  * @param noTransferProgress     whether transfer progress was suppressed
  * @param batchMode              whether batch mode was active
+ * @param recursive              whether recursive processing is enabled
+ * @param resume                 whether resume mode was active
  * @param threads                degree of concurrency
  */
 public record DefaultBuildInvocation(
@@ -56,12 +61,16 @@ public record DefaultBuildInvocation(
         Path localRepository,
         List<String> activeProfiles,
         List<String> selectedProjects,
+        List<String> excludedProjects,
+        MakeBehavior makeBehavior,
         String resumeFrom,
         ReactorFailureBehavior reactorFailureBehavior,
         boolean offline,
         boolean updateSnapshots,
         boolean noTransferProgress,
         boolean batchMode,
+        boolean recursive,
+        boolean resume,
         int threads)
         implements BuildInvocation {
 
@@ -76,6 +85,7 @@ public record DefaultBuildInvocation(
         systemInfo = Map.copyOf(systemInfo);
         activeProfiles = List.copyOf(activeProfiles);
         selectedProjects = List.copyOf(selectedProjects);
+        excludedProjects = List.copyOf(excludedProjects);
     }
 
     /**
@@ -121,6 +131,18 @@ public record DefaultBuildInvocation(
         List<String> selectedProjects =
                 request.getSelectedProjects() != null ? List.copyOf(request.getSelectedProjects()) : List.of();
 
+        List<String> excludedProjects =
+                request.getExcludedProjects() != null ? List.copyOf(request.getExcludedProjects()) : List.of();
+
+        MakeBehavior makeBehavior = null;
+        if (request.getMakeBehavior() != null) {
+            try {
+                makeBehavior = MakeBehavior.fromString(request.getMakeBehavior());
+            } catch (IllegalArgumentException e) {
+                LOGGER.debug("Unknown make behavior '{}', ignoring", request.getMakeBehavior());
+            }
+        }
+
         String resumeFrom = request.getResumeFrom();
 
         ReactorFailureBehavior failureBehavior = ReactorFailureBehavior.FAIL_FAST;
@@ -141,12 +163,16 @@ public record DefaultBuildInvocation(
                 localRepo,
                 activeProfiles,
                 selectedProjects,
+                excludedProjects,
+                makeBehavior,
                 resumeFrom,
                 failureBehavior,
                 request.isOffline(),
                 request.isUpdateSnapshots(),
                 request.isNoTransferProgress(),
                 !request.isInteractiveMode(),
+                request.isRecursive(),
+                request.isResume(),
                 request.getDegreeOfConcurrency());
     }
 
