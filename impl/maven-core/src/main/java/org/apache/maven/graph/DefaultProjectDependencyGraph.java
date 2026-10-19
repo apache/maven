@@ -87,10 +87,37 @@ public class DefaultProjectDependencyGraph implements ProjectDependencyGraph {
      * @throws CycleDetectedException
      * @since 4.0.0
      */
+    /**
+     * Creates a new project dependency graph based on the specified projects.
+     *
+     * @param allProjects All collected projects.
+     * @param projects    The projects to create the dependency graph with.
+     * @throws DuplicateProjectException
+     * @throws CycleDetectedException
+     * @since 4.0.0
+     */
     public DefaultProjectDependencyGraph(Collection<MavenProject> allProjects, Collection<MavenProject> projects)
             throws CycleDetectedException, DuplicateProjectException {
+        this(allProjects, projects, Collections.emptyMap());
+    }
+
+    /**
+     * Creates a new project dependency graph based on the specified projects and transitive dependencies.
+     *
+     * @param allProjects            All collected projects.
+     * @param projects               The projects to create the dependency graph with.
+     * @param transitiveDependencies Transitive dependencies discovered for reactor projects.
+     * @throws DuplicateProjectException
+     * @throws CycleDetectedException
+     * @since 4.0.0
+     */
+    public DefaultProjectDependencyGraph(
+            Collection<MavenProject> allProjects,
+            Collection<MavenProject> projects,
+            Map<MavenProject, ? extends Collection<?>> transitiveDependencies)
+            throws CycleDetectedException, DuplicateProjectException {
         this.allProjects = Collections.unmodifiableList(new ArrayList<>(allProjects));
-        this.sorter = new ProjectSorter(projects);
+        this.sorter = new ProjectSorter(projects, transitiveDependencies);
         this.order = new HashMap<>();
         this.projects = new HashMap<>();
         List<MavenProject> sorted = this.sorter.getSortedProjects();

@@ -49,6 +49,10 @@ import org.apache.maven.project.collector.MultiModuleCollectionStrategy;
 import org.apache.maven.project.collector.PomlessCollectionStrategy;
 import org.apache.maven.project.collector.ProjectsSelector;
 import org.apache.maven.project.collector.RequestPomCollectionStrategy;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.CollectResult;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -370,6 +374,73 @@ class DefaultGraphBuilderTest {
         List<MavenProject> actualReactorProjects = result.get().getSortedProjects();
         assertEquals(2, actualReactorProjects.size());
         assertEquals("pom", actualReactorProjects.get(1).getPackaging());
+    }
+
+    @Test
+    void testTransitiveReactorDependencyFromExternalDependency() throws Exception {
+        RepositorySystem repoSystem = mock(RepositorySystem.class);
+        graphBuilder = new DefaultGraphBuilder(
+                mock(BuildResumptionDataRepository.class),
+                pomlessCollectionStrategy,
+                multiModuleCollectionStrategy,
+                requestPomCollectionStrategy,
+                repoSystem);
+
+        MavenProject projectA = getMavenProject("module-a");
+        MavenProject projectB = getMavenProject("module-b");
+
+        Dependency externalDep = new Dependency();
+        externalDep.setGroupId("external.group");
+        externalDep.setArtifactId("external-artifact");
+        externalDep.setVersion("1.0");
+        projectA.getModel().getDependencies().add(externalDep);
+
+        when(session.getRequest()).thenReturn(mavenExecutionRequest);
+        when(session.getProjects()).thenReturn(null);
+        RepositorySystemSession repoSession = mock(RepositorySystemSession.class);
+        when(session.getRepositorySession()).thenReturn(repoSession);
+        when(repoSession.getArtifactTypeRegistry())
+                .thenReturn(mock(org.eclipse.aether.artifact.ArtifactTypeRegistry.class));
+        when(repoSession.getData()).thenReturn(mock(org.eclipse.aether.SessionData.class));
+
+        when(mavenExecutionRequest.getProjectBuildingRequest()).thenReturn(mock(ProjectBuildingRequest.class));
+        List<ProjectBuildingResult> projectBuildingResults =
+                createProjectBuildingResultMocks(List.of(projectA, projectB));
+        when(projectBuilder.build(anyList(), anyBoolean(), any(ProjectBuildingRequest.class)))
+                .thenReturn(projectBuildingResults);
+
+        ProjectActivation projectActivation = new ProjectActivation();
+        when(mavenExecutionRequest.getProjectActivation()).thenReturn(projectActivation);
+        when(mavenExecutionRequest.getPom()).thenReturn(null);
+
+        org.eclipse.aether.graph.DependencyNode rootNode = mock(org.eclipse.aether.graph.DependencyNode.class);
+        org.eclipse.aether.graph.DependencyNode externalNode = mock(org.eclipse.aether.graph.DependencyNode.class);
+        org.eclipse.aether.graph.DependencyNode bNode = mock(org.eclipse.aether.graph.DependencyNode.class);
+
+        org.eclipse.aether.artifact.Artifact bArtifact =
+                new org.eclipse.aether.artifact.DefaultArtifact(GROUP_ID, "module-b", "jar", "1.0");
+        when(bNode.getArtifact()).thenReturn(bArtifact);
+        when(bNode.getChildren()).thenReturn(emptyList());
+
+        org.eclipse.aether.artifact.Artifact extArtifact =
+                new org.eclipse.aether.artifact.DefaultArtifact("external.group", "external-artifact", "jar", "1.0");
+        when(externalNode.getArtifact()).thenReturn(extArtifact);
+        when(externalNode.getChildren()).thenReturn(singletonList(bNode));
+
+        when(rootNode.getChildren()).thenReturn(singletonList(externalNode));
+
+        CollectResult collectResult = new CollectResult(new CollectRequest());
+        collectResult.setRoot(rootNode);
+        when(repoSystem.collectDependencies(any(RepositorySystemSession.class), any(CollectRequest.class)))
+                .thenReturn(collectResult);
+
+        Result<ProjectDependencyGraph> result = graphBuilder.build(session);
+
+        assertFalse(result.hasErrors(), "Expected result not to have errors");
+        List<MavenProject> sorted = result.get().getSortedProjects();
+        assertEquals(2, sorted.size());
+        assertEquals(projectB, sorted.get(0));
+        assertEquals(projectA, sorted.get(1));
     }
 
     @BeforeEach

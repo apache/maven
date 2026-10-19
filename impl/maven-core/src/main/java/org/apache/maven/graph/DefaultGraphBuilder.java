@@ -28,12 +28,15 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.ProjectCycleException;
+import org.apache.maven.RepositoryUtils;
+import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -50,6 +53,12 @@ import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.collector.MultiModuleCollectionStrategy;
 import org.apache.maven.project.collector.PomlessCollectionStrategy;
 import org.apache.maven.project.collector.RequestPomCollectionStrategy;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.artifact.ArtifactTypeRegistry;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.collection.CollectResult;
+import org.eclipse.aether.collection.DependencyCollectionException;
+import org.eclipse.aether.graph.DependencyNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,14 +77,15 @@ public class DefaultGraphBuilder implements GraphBuilder {
     private final MultiModuleCollectionStrategy multiModuleCollectionStrategy;
     private final RequestPomCollectionStrategy requestPomCollectionStrategy;
     private final ProjectSelector projectSelector;
+    private final RepositorySystem repoSystem;
 
     /**
      * @deprecated Use {@link #DefaultGraphBuilder(BuildResumptionDataRepository, PomlessCollectionStrategy,
-     * MultiModuleCollectionStrategy, RequestPomCollectionStrategy)} instead or rely on JSR 330
+     * MultiModuleCollectionStrategy, RequestPomCollectionStrategy, RepositorySystem)} instead or rely on JSR 330
      */
     @Deprecated
     public DefaultGraphBuilder() {
-        this(null, null, null, null);
+        this(null, null, null, null, null);
     }
 
     @Inject
@@ -83,12 +93,27 @@ public class DefaultGraphBuilder implements GraphBuilder {
             BuildResumptionDataRepository buildResumptionDataRepository,
             PomlessCollectionStrategy pomlessCollectionStrategy,
             MultiModuleCollectionStrategy multiModuleCollectionStrategy,
-            RequestPomCollectionStrategy requestPomCollectionStrategy) {
+            RequestPomCollectionStrategy requestPomCollectionStrategy,
+            RepositorySystem repoSystem) {
         this.buildResumptionDataRepository = buildResumptionDataRepository;
         this.pomlessCollectionStrategy = pomlessCollectionStrategy;
         this.multiModuleCollectionStrategy = multiModuleCollectionStrategy;
         this.requestPomCollectionStrategy = requestPomCollectionStrategy;
+        this.repoSystem = repoSystem;
         this.projectSelector = new ProjectSelector(); // if necessary switch to DI
+    }
+
+    public DefaultGraphBuilder(
+            BuildResumptionDataRepository buildResumptionDataRepository,
+            PomlessCollectionStrategy pomlessCollectionStrategy,
+            MultiModuleCollectionStrategy multiModuleCollectionStrategy,
+            RequestPomCollectionStrategy requestPomCollectionStrategy) {
+        this(
+                buildResumptionDataRepository,
+                pomlessCollectionStrategy,
+                multiModuleCollectionStrategy,
+                requestPomCollectionStrategy,
+                null);
     }
 
     @Override
@@ -98,6 +123,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
 
             if (result == null) {
                 final List<MavenProject> projects = getProjectsForMavenReactor(session);
+                session.setAllProjects(projects);
                 processPackagingAttribute(projects, session.getRequest());
                 enrichRequestFromResumptionData(projects, session.getRequest());
                 result = reactorDependencyGraph(session, projects);
@@ -119,7 +145,10 @@ public class DefaultGraphBuilder implements GraphBuilder {
         Result<ProjectDependencyGraph> result = null;
 
         if (session.getProjectDependencyGraph() != null || session.getProjects() != null) {
-            ProjectDependencyGraph graph = new DefaultProjectDependencyGraph(session.getAllProjects());
+            Map<MavenProject, Set<Artifact>> transitiveDeps =
+                    getTransitiveReactorDependencies(session, session.getAllProjects());
+            ProjectDependencyGraph graph =
+                    new DefaultProjectDependencyGraph(session.getAllProjects(), session.getAllProjects(), transitiveDeps);
             if (session.getProjects() != null) {
                 graph = new FilteredProjectDependencyGraph(graph, session.getProjects());
             }
@@ -132,7 +161,9 @@ public class DefaultGraphBuilder implements GraphBuilder {
 
     private Result<ProjectDependencyGraph> reactorDependencyGraph(MavenSession session, List<MavenProject> projects)
             throws CycleDetectedException, DuplicateProjectException, MavenExecutionException {
-        ProjectDependencyGraph projectDependencyGraph = new DefaultProjectDependencyGraph(projects);
+        Map<MavenProject, Set<Artifact>> transitiveDeps = getTransitiveReactorDependencies(session, projects);
+        ProjectDependencyGraph projectDependencyGraph =
+                new DefaultProjectDependencyGraph(projects, projects, transitiveDeps);
         List<MavenProject> activeProjects = projectDependencyGraph.getSortedProjects();
         List<MavenProject> allSortedProjects = projectDependencyGraph.getSortedProjects();
         activeProjects = trimProjectsToRequest(activeProjects, projectDependencyGraph, session.getRequest());
@@ -412,6 +443,140 @@ public class DefaultGraphBuilder implements GraphBuilder {
                         p.getName());
                 p.setPackaging("pom");
             }
+        }
+    }
+
+    private Map<MavenProject, Set<Artifact>> getTransitiveReactorDependencies(
+            MavenSession session, List<MavenProject> projects) {
+        if (repoSystem == null
+                || session == null
+                || session.getRepositorySession() == null
+                || projects == null
+                || projects.isEmpty()) {
+            return Collections.emptyMap();
+        }
+
+        String sessionDataKey = "DefaultGraphBuilder.transitiveReactorDependencies";
+        if (session.getRepositorySession().getData() != null) {
+            Object cached = session.getRepositorySession().getData().get(sessionDataKey);
+            if (cached instanceof Map) {
+                @SuppressWarnings("unchecked")
+                Map<MavenProject, Set<Artifact>> cachedMap = (Map<MavenProject, Set<Artifact>>) cached;
+                return cachedMap;
+            }
+        }
+
+        Set<String> reactorKeys = new HashSet<>(projects.size() * 2);
+        for (MavenProject p : projects) {
+            reactorKeys.add(ArtifactUtils.versionlessKey(p.getGroupId(), p.getArtifactId()));
+        }
+
+        Map<MavenProject, Set<Artifact>> result = new HashMap<>();
+        ArtifactTypeRegistry stereotypes = session.getRepositorySession().getArtifactTypeRegistry();
+
+        for (MavenProject project : projects) {
+            List<org.apache.maven.model.Dependency> dependencies = project.getDependencies();
+            if (dependencies == null || dependencies.isEmpty()) {
+                continue;
+            }
+
+            boolean hasExternal = false;
+            for (org.apache.maven.model.Dependency dep : dependencies) {
+                if (dep.getGroupId() != null && dep.getArtifactId() != null) {
+                    String key = ArtifactUtils.versionlessKey(dep.getGroupId(), dep.getArtifactId());
+                    if (!reactorKeys.contains(key)) {
+                        hasExternal = true;
+                        break;
+                    }
+                }
+            }
+
+            if (!hasExternal) {
+                continue;
+            }
+
+            CollectRequest collectRequest = new CollectRequest();
+            collectRequest.setRequestContext("project");
+            collectRequest.setRepositories(project.getRemoteProjectRepositories());
+            if (project.getArtifact() != null && project.getArtifact().getGroupId() != null) {
+                collectRequest.setRootArtifact(RepositoryUtils.toArtifact(project.getArtifact()));
+            }
+
+            for (org.apache.maven.model.Dependency dependency : dependencies) {
+                if (dependency.getGroupId() == null
+                        || dependency.getGroupId().isEmpty()
+                        || dependency.getArtifactId() == null
+                        || dependency.getArtifactId().isEmpty()
+                        || dependency.getVersion() == null
+                        || dependency.getVersion().isEmpty()) {
+                    continue;
+                }
+                collectRequest.addDependency(RepositoryUtils.toDependency(dependency, stereotypes));
+            }
+
+            org.apache.maven.model.DependencyManagement depMgmt = project.getDependencyManagement();
+            if (depMgmt != null && depMgmt.getDependencies() != null) {
+                for (org.apache.maven.model.Dependency dependency : depMgmt.getDependencies()) {
+                    if (dependency.getGroupId() == null
+                            || dependency.getGroupId().isEmpty()
+                            || dependency.getArtifactId() == null
+                            || dependency.getArtifactId().isEmpty()
+                            || dependency.getVersion() == null
+                            || dependency.getVersion().isEmpty()) {
+                        continue;
+                    }
+                    collectRequest.addManagedDependency(RepositoryUtils.toDependency(dependency, stereotypes));
+                }
+            }
+
+            DependencyNode root = null;
+            try {
+                CollectResult collectResult =
+                        repoSystem.collectDependencies(session.getRepositorySession(), collectRequest);
+                root = collectResult.getRoot();
+            } catch (DependencyCollectionException e) {
+                if (e.getResult() != null) {
+                    root = e.getResult().getRoot();
+                }
+                LOGGER.debug("Could not fully collect dependencies for project {}: {}", project.getId(), e.getMessage());
+            } catch (Exception e) {
+                LOGGER.debug("Could not collect dependencies for project {}: {}", project.getId(), e.getMessage());
+            }
+
+            if (root != null) {
+                Set<Artifact> projectTransitiveReactorDeps = new LinkedHashSet<>();
+                collectTransitiveReactorDependencies(root, reactorKeys, projectTransitiveReactorDeps, new HashSet<>());
+                if (!projectTransitiveReactorDeps.isEmpty()) {
+                    result.put(project, projectTransitiveReactorDeps);
+                }
+            }
+        }
+
+        if (session.getRepositorySession().getData() != null) {
+            session.getRepositorySession().getData().set(sessionDataKey, result);
+        }
+
+        return result;
+    }
+
+    private void collectTransitiveReactorDependencies(
+            DependencyNode node,
+            Set<String> reactorKeys,
+            Set<Artifact> result,
+            Set<DependencyNode> visited) {
+        if (node == null || !visited.add(node)) {
+            return;
+        }
+
+        for (DependencyNode child : node.getChildren()) {
+            org.eclipse.aether.artifact.Artifact childArtifact = child.getArtifact();
+            if (childArtifact != null) {
+                String key = ArtifactUtils.versionlessKey(childArtifact.getGroupId(), childArtifact.getArtifactId());
+                if (reactorKeys.contains(key)) {
+                    result.add(RepositoryUtils.toArtifact(childArtifact));
+                }
+            }
+            collectTransitiveReactorDependencies(child, reactorKeys, result, visited);
         }
     }
 }

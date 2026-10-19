@@ -67,6 +67,13 @@ public class ProjectSorter {
     // in a different lifecycle. Though the compiler-plugin has a valid use case, although
     // that seems to work fine. We need to take versions and lifecycle into account.
     public ProjectSorter(Collection<MavenProject> projects) throws CycleDetectedException, DuplicateProjectException {
+        this(projects, Collections.emptyMap());
+    }
+
+    public ProjectSorter(
+            Collection<MavenProject> projects,
+            Map<MavenProject, ? extends Collection<?>> transitiveDependencies)
+            throws CycleDetectedException, DuplicateProjectException {
         graph = new Graph();
 
         // groupId:artifactId:version -> project
@@ -111,6 +118,74 @@ public class ProjectSorter {
                         dependency.getVersion(),
                         false,
                         false);
+            }
+
+            if (project.getArtifacts() != null) {
+                for (org.apache.maven.artifact.Artifact artifact : project.getArtifacts()) {
+                    addEdge(
+                            projectMap,
+                            vertexMap,
+                            project,
+                            projectVertex,
+                            artifact.getGroupId(),
+                            artifact.getArtifactId(),
+                            artifact.getVersion(),
+                            false,
+                            true);
+                }
+            }
+
+            if (transitiveDependencies != null) {
+                Collection<?> extra = transitiveDependencies.get(project);
+                if (extra != null) {
+                    for (Object dep : extra) {
+                        if (dep instanceof org.apache.maven.artifact.Artifact artifact) {
+                            addEdge(
+                                    projectMap,
+                                    vertexMap,
+                                    project,
+                                    projectVertex,
+                                    artifact.getGroupId(),
+                                    artifact.getArtifactId(),
+                                    artifact.getVersion(),
+                                    false,
+                                    true);
+                        } else if (dep instanceof org.eclipse.aether.artifact.Artifact artifact) {
+                            addEdge(
+                                    projectMap,
+                                    vertexMap,
+                                    project,
+                                    projectVertex,
+                                    artifact.getGroupId(),
+                                    artifact.getArtifactId(),
+                                    artifact.getVersion(),
+                                    false,
+                                    true);
+                        } else if (dep instanceof org.apache.maven.api.model.Dependency dependency) {
+                            addEdge(
+                                    projectMap,
+                                    vertexMap,
+                                    project,
+                                    projectVertex,
+                                    dependency.getGroupId(),
+                                    dependency.getArtifactId(),
+                                    dependency.getVersion(),
+                                    false,
+                                    true);
+                        } else if (dep instanceof org.apache.maven.model.Dependency dependency) {
+                            addEdge(
+                                    projectMap,
+                                    vertexMap,
+                                    project,
+                                    projectVertex,
+                                    dependency.getGroupId(),
+                                    dependency.getArtifactId(),
+                                    dependency.getVersion(),
+                                    false,
+                                    true);
+                        }
+                    }
+                }
             }
 
             org.apache.maven.model.Model originalModel = project.getOriginalModel();

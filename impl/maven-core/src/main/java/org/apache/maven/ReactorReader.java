@@ -575,14 +575,22 @@ class ReactorReader implements MavenWorkspaceReader {
     private Map<String, Map<String, Map<String, MavenProject>>> getProjects() {
         // compute the projects mapping
         if (projects == null) {
-            List<MavenProject> projects = session.getProjects();
-            if (projects != null) {
+            List<MavenProject> sessionProjects = session.getProjects();
+            if (sessionProjects != null) {
                 Map<String, Map<String, Map<String, MavenProject>>> map = new HashMap<>();
-                projects.forEach(project -> map.computeIfAbsent(project.getGroupId(), k -> new HashMap<>())
+                sessionProjects.forEach(project -> map.computeIfAbsent(project.getGroupId(), k -> new HashMap<>())
                         .computeIfAbsent(project.getArtifactId(), k -> new HashMap<>())
                         .put(project.getVersion(), project));
                 this.projects = map;
             } else {
+                List<MavenProject> allProjects = session.getAllProjects();
+                if (allProjects != null) {
+                    Map<String, Map<String, Map<String, MavenProject>>> map = new HashMap<>();
+                    allProjects.forEach(project -> map.computeIfAbsent(project.getGroupId(), k -> new HashMap<>())
+                            .computeIfAbsent(project.getArtifactId(), k -> new HashMap<>())
+                            .put(project.getVersion(), project));
+                    return map;
+                }
                 return Collections.emptyMap();
             }
         }

@@ -19,9 +19,13 @@
 package org.apache.maven.project;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Extension;
@@ -333,5 +337,49 @@ class ProjectSorterTest {
 
         assertEquals(pluginProject, projects.get(0));
         assertEquals(usingProject, projects.get(1));
+    }
+
+    @Test
+    void testTransitiveReactorDependencyPrecedesProjectViaArtifacts() throws Exception {
+        List<MavenProject> projects = new ArrayList<>();
+
+        MavenProject projectA = createProject("group", "project-a", "1.0");
+        projects.add(projectA);
+        // projectA declares an external dependency
+        projectA.getModel().addDependency(createDependency("other.group", "external-dep", "1.0"));
+
+        MavenProject projectB = createProject("group", "project-b", "1.0");
+        projects.add(projectB);
+
+        // projectA has projectB in its resolved artifacts (transitively via external-dep)
+        Artifact artifactB = new DefaultArtifact("group", "project-b", "1.0", "compile", "jar", "", null);
+        projectA.setArtifacts(Collections.singleton(artifactB));
+
+        projects = new ProjectSorter(projects).getSortedProjects();
+
+        assertEquals(projectB, projects.get(0));
+        assertEquals(projectA, projects.get(1));
+    }
+
+    @Test
+    void testTransitiveReactorDependencyPrecedesProjectViaTransitiveDependenciesMap() throws Exception {
+        List<MavenProject> projects = new ArrayList<>();
+
+        MavenProject projectA = createProject("group", "project-a", "1.0");
+        projects.add(projectA);
+        // projectA declares an external dependency
+        projectA.getModel().addDependency(createDependency("other.group", "external-dep", "1.0"));
+
+        MavenProject projectB = createProject("group", "project-b", "1.0");
+        projects.add(projectB);
+
+        Artifact artifactB = new DefaultArtifact("group", "project-b", "1.0", "test", "jar", "", null);
+        Map<MavenProject, Collection<?>> transitiveDependencies =
+                Collections.singletonMap(projectA, Collections.singletonList(artifactB));
+
+        projects = new ProjectSorter(projects, transitiveDependencies).getSortedProjects();
+
+        assertEquals(projectB, projects.get(0));
+        assertEquals(projectA, projects.get(1));
     }
 }
