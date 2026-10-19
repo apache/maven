@@ -466,4 +466,50 @@ class BuildPlanCreatorTest {
                     pred -> assertTrue(plan.step(pred.project, pred.name).isPresent(), "Phase not present: " + pred));
         });
     }
+
+    /**
+     * Verifies that when the requested phase is before "compile" (e.g. "initialize"),
+     * the new skip-clearing logic forces the reactor plugin project and all its
+     * predecessors to reach READY so that the plugin is available when needed.
+     */
+    @Test
+    void testReactorPluginPreCompilePhase() {
+        MavenProject p1 = new MavenProject();
+        p1.setGroupId("g");
+        p1.setArtifactId("p1");
+        p1.setVersion("1.0");
+        p1.setCollectedProjects(List.of());
+        Plugin plugin = new Plugin();
+        plugin.setGroupId("g");
+        plugin.setArtifactId("p2");
+        plugin.setVersion("1.0");
+        p1.getBuild().addPlugin(plugin);
+
+        MavenProject p2 = new MavenProject();
+        p2.setGroupId("g");
+        p2.setArtifactId("p2");
+        p2.setVersion("1.0");
+        p2.setCollectedProjects(List.of());
+
+        Map<MavenProject, List<MavenProject>> projects = new HashMap<>();
+        projects.put(p1, Collections.emptyList());
+        projects.put(p2, Collections.singletonList(p1));
+
+        // Use a phase before "compile" — this is the path that triggers the skip-clearing logic
+        BuildPlan plan = calculateLifecycleMappings(projects, "initialize");
+
+        // The READY step of the plugin project (p2) must NOT be skipped, even though
+        // "initialize" is before "compile" and most of p2's lifecycle steps would normally be skipped.
+        assertFalse(
+                plan.requiredStep(p2, "READY").skip.get(),
+                "READY step of the reactor plugin project must not be skipped");
+
+        // All predecessors of READY within p2 must also not be skipped (they are needed
+        // to reach READY: resources, compile, etc.)
+        plan.requiredStep(p2, "READY")
+                .allPredecessors()
+                .filter(s -> s.project == p2)
+                .forEach(s -> assertFalse(
+                        s.skip.get(), "Predecessor step " + s.name + " of plugin project must not be skipped"));
+    }
 }
