@@ -29,7 +29,7 @@ under the License.
 
   <groupId>org.apache.maven.its</groupId>
   <artifactId>core-its</artifactId>
-  <version>4.1.0-SNAPSHOT</version>
+  <version>4.2.0-SNAPSHOT</version>
 
   <packaging>pom</packaging>
 
@@ -77,7 +77,7 @@ under the License.
 
     <maven-plugin-tools-version>3.16.0</maven-plugin-tools-version>
     <!-- Maven version being tested - must match the parent project version -->
-    <maven-version>4.1.0-SNAPSHOT</maven-version>
+    <maven-version>4.2.0-SNAPSHOT</maven-version>
     <!-- Support artifacts version - kept separate from Maven version -->
     <core-it-support-version>2.1-SNAPSHOT</core-it-support-version>
 
