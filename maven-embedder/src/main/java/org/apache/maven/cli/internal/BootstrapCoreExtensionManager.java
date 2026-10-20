@@ -63,6 +63,8 @@ public class BootstrapCoreExtensionManager {
     public static final String STRATEGY_PLUGIN = "plugin";
     public static final String STRATEGY_SELF_FIRST = "self-first";
 
+    private static final String CORE_EXTENSION_REALM_NAME_PREFIX = "coreExtension>";
+
     private final Logger log;
 
     private final PluginDependenciesResolver pluginDependenciesResolver;
@@ -103,6 +105,24 @@ public class BootstrapCoreExtensionManager {
         }
     }
 
+    /**
+     * Helper method that returns {@code true} when current thread context classloader, or any in its parent chain,
+     * is instance of {@link ClassRealm} and belongs to a Core Extension loaded by Maven.
+     *
+     * @return {@code true} if current TCCL or any realm in parent chain of it is "core extension" class realm.
+     * @since 3.10.1
+     */
+    public static boolean isContextRealmCoreExtensionRealm() {
+        ClassRealm classRealm = contextRealmOrChild(Thread.currentThread().getContextClassLoader());
+        while (classRealm != null) {
+            if (classRealm.getId().startsWith(CORE_EXTENSION_REALM_NAME_PREFIX)) {
+                return true;
+            }
+            classRealm = contextRealmOrChild(classRealm.getParent());
+        }
+        return false;
+    }
+
     private List<CoreExtensionEntry> resolveCoreExtensions(
             RepositorySystemSession repoSession,
             List<RemoteRepository> repositories,
@@ -126,8 +146,8 @@ public class BootstrapCoreExtensionManager {
     }
 
     private CoreExtensionEntry createExtension(CoreExtension extension, List<Artifact> artifacts) throws Exception {
-        String realmId = "coreExtension>" + extension.getGroupId() + ":" + extension.getArtifactId() + ":"
-                + extension.getVersion();
+        String realmId = CORE_EXTENSION_REALM_NAME_PREFIX + extension.getGroupId() + ":" + extension.getArtifactId()
+                + ":" + extension.getVersion();
         final ClassRealm realm = classWorld.newRealm(realmId, null);
         Set<String> providedArtifacts = Collections.emptySet();
         String classLoadingStrategy = extension.getClassLoadingStrategy();
@@ -191,5 +211,20 @@ public class BootstrapCoreExtensionManager {
         interpolator.addValueSource(new MapBasedValueSource(request.getUserProperties()));
         interpolator.addValueSource(new MapBasedValueSource(request.getSystemProperties()));
         return interpolator;
+    }
+
+    /**
+     * Returns the first {@link ClassRealm} found in the classloader parent chain, or {@code null}, if none is found.
+     * Method uses given realm as starting point, otherwise will use TCCL as starting point.
+     *
+     * @param cl The starting classloader instance, may be {@code null}, in which case method returns {@code null}
+     */
+    private static ClassRealm contextRealmOrChild(ClassLoader cl) {
+        for (ClassLoader ccl = cl; ccl != null; ccl = ccl.getParent()) {
+            if (ccl instanceof ClassRealm) {
+                return (ClassRealm) ccl;
+            }
+        }
+        return null;
     }
 }

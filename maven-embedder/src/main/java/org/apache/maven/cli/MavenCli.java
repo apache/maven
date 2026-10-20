@@ -748,6 +748,13 @@ public class MavenCli {
                 .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
                 .setAutoWiring(true)
                 .setJSR250Lifecycle(true)
+                .setVisibilityPredicateSupplierTransformer(s -> () -> {
+                    if (BootstrapCoreExtensionManager.isContextRealmCoreExtensionRealm()) {
+                        return null;
+                    } else {
+                        return s.get();
+                    }
+                })
                 .setName("maven");
 
         Set<String> exportedArtifacts = new HashSet<>(coreEntry.getExportedArtifacts());
