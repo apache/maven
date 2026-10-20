@@ -64,16 +64,26 @@ public class MojoExecutor extends org.apache.maven.lifecycle.internal.MojoExecut
             (SessionData.Key) SessionData.key(Map.class, MojoExecutor.class);
 
     /**
-     * Prepares the dependencies of a mojo by replacing the resolved artifacts and the artifact filter of the shared
-     * {@link MavenProject}, which the mojo reads when it is configured. This is done for every mojo, also for the
-     * ones that need no dependency, which get a {@code null} filter: that is itself a meaningful write, it clears
-     * whatever an earlier mojo may have left there, so that a mojo with no requirement sees no project dependencies,
-     * not another mojo's leftover ones (MNG-3297). The executions of a single project are therefore serialized,
-     * otherwise a mojo may be configured with the artifacts or the filter prepared for another one, so that the
-     * compiler misses {@code provided} dependencies. Executions of different projects still run in parallel.
+     * The concurrent builder runs independent steps of the same project in parallel, for instance
+     * {@code process-resources} next to {@code compile}. Before a mojo runs,
+     * {@link #ensureDependenciesAreResolved} replaces the resolved artifacts and the artifact filter
+     * on the shared {@link MavenProject}, and the mojo reads them back while it executes.
+     *
+     * <p>This is done for every legacy (non-v4) mojo, including the ones that need no dependency:
+     * a {@code null} filter clears whatever an earlier mojo left, so that a mojo with no requirement
+     * sees no project dependencies rather than another mojo's leftover ones (MNG-3297). The executions
+     * of a single project are therefore serialized for legacy mojos.
+     *
+     * <p>Maven 4 mojos using {@code @Resolution} get their dependencies injected directly by
+     * {@code DefaultMavenPluginManager} and never read from {@link MavenProject}, so they skip both
+     * {@code ensureDependenciesAreResolved} and this lock. Executions on different projects are
+     * never serialized.
      */
     @Override
     protected NoExceptionCloseable getProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
+        if (mojoDescriptor.isV4Api()) {
+            return () -> {};
+        }
         Map<MavenProject, ReentrantLock> locks =
                 session.getSession().getData().computeIfAbsent(PROJECT_EXECUTION_LOCKS, ConcurrentHashMap::new);
         ReentrantLock lock = locks.computeIfAbsent(session.getCurrentProject(), p -> new ReentrantLock());

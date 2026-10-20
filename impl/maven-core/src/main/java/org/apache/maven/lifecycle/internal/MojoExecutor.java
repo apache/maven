@@ -305,7 +305,9 @@ public class MojoExecutor {
         List<MavenProject> forkedProjects = executeForkedExecutions(mojoExecution, session);
 
         try (NoExceptionCloseable lock = getProjectLock(session, mojoDescriptor)) {
-            ensureDependenciesAreResolved(mojoDescriptor, session, dependencyContext);
+            if (!mojoDescriptor.isV4Api()) {
+                ensureDependenciesAreResolved(mojoDescriptor, session, dependencyContext);
+            }
 
             doExecute2(session, mojoExecution);
         } finally {

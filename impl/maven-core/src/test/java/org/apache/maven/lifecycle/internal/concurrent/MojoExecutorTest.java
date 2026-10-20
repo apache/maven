@@ -78,6 +78,15 @@ class MojoExecutorTest {
         return new MojoDescriptor();
     }
 
+    private static MojoDescriptor v4Mojo() {
+        return new MojoDescriptor(
+                null,
+                org.apache.maven.api.plugin.descriptor.MojoDescriptor.newBuilder()
+                        .goal("test")
+                        .dependencyResolution("compile")
+                        .build());
+    }
+
     @Test
     void testExecutionsOfTheSameProjectDoNotOverlap() throws Exception {
         MavenSession session = session(project("a"));
@@ -104,6 +113,37 @@ class MojoExecutorTest {
             release.countDown();
             first.get(5, TimeUnit.SECONDS);
             second.get(5, TimeUnit.SECONDS);
+        } finally {
+            threads.shutdownNow();
+        }
+    }
+
+    @Test
+    void testV4MojosOfTheSameProjectRunInParallel() throws Exception {
+        MavenSession session = session(project("a"));
+        ExecutorService threads = Executors.newFixedThreadPool(2);
+        try {
+            CountDownLatch holding = new CountDownLatch(1);
+            CountDownLatch release = new CountDownLatch(1);
+            Future<?> first = threads.submit(() -> {
+                try (AutoCloseable lock = executor.getProjectLock(session, v4Mojo())) {
+                    holding.countDown();
+                    release.await();
+                }
+                return null;
+            });
+            assertTrue(holding.await(5, TimeUnit.SECONDS));
+
+            Future<Boolean> second = threads.submit(() -> {
+                try (AutoCloseable lock = executor.getProjectLock(session, v4Mojo())) {
+                    return true;
+                }
+            });
+            assertTrue(second.get(5, TimeUnit.SECONDS));
+            assertFalse(first.isDone());
+
+            release.countDown();
+            first.get(5, TimeUnit.SECONDS);
         } finally {
             threads.shutdownNow();
         }
