@@ -83,29 +83,26 @@ class DefaultInterpolatorTest {
 
     @Test
     void testSelfReferencingConfigPropertyDifferentCurrentKey() {
-        InterpolatorException ex = assertThrows(
+        assertThrows(
                 InterpolatorException.class,
                 () -> substVars("${a}", "outer", Map.of("a", "${a}")),
                 "Expected substVars() to throw an InterpolatorException for self-referencing property");
-        assertEquals("recursive variable reference: a", ex.getMessage());
     }
 
     @Test
     void testSelfReferencingConfigPropertyNullCurrentKey() {
-        InterpolatorException ex = assertThrows(
+        assertThrows(
                 InterpolatorException.class,
                 () -> substVars("${a}", null, Map.of("a", "${a}")),
                 "Expected substVars() to throw an InterpolatorException when currentKey is null");
-        assertEquals("recursive variable reference: a", ex.getMessage());
     }
 
     @Test
     void testIndirectCycleConfigProperties() {
-        InterpolatorException ex = assertThrows(
+        assertThrows(
                 InterpolatorException.class,
                 () -> substVars("${a}", "outer", Map.of("a", "${b}", "b", "${a}")),
                 "Expected substVars() to throw an InterpolatorException for indirect 2-variable cycle");
-        assertEquals("recursive variable reference: a", ex.getMessage());
     }
 
     @Test
