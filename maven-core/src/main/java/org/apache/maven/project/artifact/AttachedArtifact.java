@@ -126,7 +126,8 @@ public class AttachedArtifact extends DefaultArtifact {
     }
 
     public String getVersion() {
-        return parent.getVersion();
+        // the superclass constructor validates its arguments, and builds the error message, before the parent is set
+        return parent != null ? parent.getVersion() : super.getVersion();
     }
 
     public void setVersion(String version) {
