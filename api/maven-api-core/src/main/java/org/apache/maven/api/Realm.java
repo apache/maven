@@ -25,9 +25,8 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.Lookup;
 
 /**
- * A runtime scope that bundles classloading with scoped component discovery.
- * Used uniformly for sessions, projects, and plugins — the difference is
- * what the {@link #lookup()} sees, not the type.
+ * A runtime scope that bundles classloading information with component lookup.
+ * Lookup operations run with this realm's classloader set as the thread context classloader.
  *
  * @since 4.1.0
  */
@@ -51,9 +50,11 @@ public interface Realm {
     Optional<ModuleLayer> moduleLayer();
 
     /**
-     * Returns component lookup scoped to this realm's visibility.
+     * Returns component lookup that delegates to the container with this realm's
+     * classloader set as the thread context classloader. The visibility of discovered
+     * components depends on the container's TCCL-based filtering behavior.
      *
-     * @return the realm-scoped component lookup, never {@code null}
+     * @return the realm-aware component lookup, never {@code null}
      */
     @Nonnull
     Lookup lookup();
