@@ -51,7 +51,7 @@ import static eu.maveniverse.domtrip.maven.MavenPomElements.ModelVersions.MODEL_
 
 /**
  * Strategy for collapsing dependency coordinate child elements into compact {@code id} attributes.
- * Only applies to POMs at model version 4.2.0 or higher.
+ * Only applies to POMs at model version 4.2.0.
  *
  * <p>Transforms verbose dependency declarations:
  * <pre>{@code

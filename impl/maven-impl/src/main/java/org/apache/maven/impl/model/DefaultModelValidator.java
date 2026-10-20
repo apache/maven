@@ -382,7 +382,7 @@ public class DefaultModelValidator implements ModelValidator {
                         && !m.getGav().isEmpty()) {
                     String gav = m.getGav();
                     String[] parts = gav.split(":");
-                    if (parts.length != 3) {
+                    if (parts.length != 3 || parts[0].isEmpty() || parts[1].isEmpty() || parts[2].isEmpty()) {
                         addViolation(
                                 problems,
                                 Severity.ERROR,
@@ -1437,7 +1437,11 @@ public class DefaultModelValidator implements ModelValidator {
                     "must not be specified when 'id' attribute is used.",
                     dependency);
         }
-        if (colonCount >= 3 && !isNullOrEmpty(dependency.getType()) && !"jar".equals(dependency.getType())) {
+        String[] parts = remaining.split(":", -1);
+        if (parts.length >= 3
+                && !parts[2].isEmpty()
+                && !isNullOrEmpty(dependency.getType())
+                && !"jar".equals(dependency.getType())) {
             addViolation(
                     problems,
                     Severity.ERROR,
@@ -1447,7 +1451,7 @@ public class DefaultModelValidator implements ModelValidator {
                     "must not be specified when 'id' attribute includes type.",
                     dependency);
         }
-        if (colonCount >= 4 && !isNullOrEmpty(dependency.getClassifier())) {
+        if (parts.length >= 4 && !parts[3].isEmpty() && !isNullOrEmpty(dependency.getClassifier())) {
             addViolation(
                     problems,
                     Severity.ERROR,
@@ -1498,6 +1502,19 @@ public class DefaultModelValidator implements ModelValidator {
         }
         int colonCount = id.length() - id.replace(":", "").length();
         if (colonCount != 1) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "exclusions.exclusion.id",
+                    null,
+                    "has invalid format '" + id + "', must be 'groupId:artifactId'.",
+                    exclusion);
+            return;
+        }
+        // Ensure both segments are non-empty
+        String[] parts = id.split(":", -1);
+        if (parts[0].isEmpty() || parts[1].isEmpty()) {
             addViolation(
                     problems,
                     Severity.ERROR,
