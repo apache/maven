@@ -50,8 +50,10 @@ class MavenITmng4559SpacesInJvmOptsTest extends AbstractMavenIntegrationTestCase
         Properties props = verifier.loadProperties("target/pom.properties");
         // On Windows CI, mvn.cmd occasionally fails to read .mvn/jvm.config on the first
         // attempt due to filesystem flush delays, leaving properties as unresolved placeholders.
+        // TODO: remove once https://github.com/apache/maven/pull/13652 is merged and available.
         String jvmOpts = props.getProperty("project.properties.pom.prop.jvm-opts");
-        if (jvmOpts != null && jvmOpts.contains("${")) {
+        if (jvmOpts != null && jvmOpts.contains("${") && System.getProperty("os.name", "").toLowerCase().contains("windows")) {
+            Thread.sleep(500); // give the OS time to flush the file
             verifier.execute();
             verifier.verifyErrorFreeLog();
             props = verifier.loadProperties("target/pom.properties");

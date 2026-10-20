@@ -55,8 +55,10 @@ public class MavenITmng4559MultipleJvmArgsTest extends AbstractMavenIntegrationT
         Properties props = verifier.loadProperties("target/jvm.properties");
         // On Windows CI, mvn.cmd occasionally fails to read .mvn/jvm.config on the first
         // attempt due to filesystem flush delays, leaving properties as unresolved placeholders.
+        // TODO: remove once https://github.com/apache/maven/pull/13652 is merged and available.
         String prop1 = props.getProperty("project.properties.pom.test.prop1");
-        if (prop1 != null && prop1.contains("${")) {
+        if (prop1 != null && prop1.contains("${") && System.getProperty("os.name", "").toLowerCase().contains("windows")) {
+            Thread.sleep(500); // give the OS time to flush the file
             verifier.execute();
             verifier.verifyErrorFreeLog();
             props = verifier.loadProperties("target/jvm.properties");
