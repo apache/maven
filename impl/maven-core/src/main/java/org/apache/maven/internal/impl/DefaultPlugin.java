@@ -30,7 +30,7 @@ import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Plugin;
-import org.apache.maven.api.PluginRealm;
+import org.apache.maven.api.Realm;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
@@ -49,7 +49,7 @@ final class DefaultPlugin implements Plugin {
     private final org.apache.maven.api.model.Plugin model;
     private final PluginDescriptor descriptor;
     private final List<Lifecycle> lifecycles;
-    private final PluginRealm realm;
+    private final Realm realm;
     private final Artifact artifact;
     private final Map<String, Dependency> dependencies;
 
@@ -63,7 +63,7 @@ final class DefaultPlugin implements Plugin {
 
         this.model = model != null ? model.getDelegate() : null;
         this.descriptor = requireNonNull(descriptor.getPluginDescriptorV4(), "descriptor.pluginDescriptorV4");
-        this.realm = new DefaultPluginRealm(descriptor.getClassRealm(), lookup);
+        this.realm = new DefaultRealm(descriptor.getClassRealm(), lookup);
 
         org.apache.maven.artifact.Artifact legacyArtifact = descriptor.getPluginArtifact();
         org.eclipse.aether.artifact.Artifact resolverArtifact = RepositoryUtils.toArtifact(legacyArtifact);
@@ -107,7 +107,7 @@ final class DefaultPlugin implements Plugin {
     }
 
     @Override
-    public PluginRealm getRealm() {
+    public Realm getRealm() {
         return realm;
     }
 

@@ -25,12 +25,14 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.services.Lookup;
 
 /**
- * Represents the runtime scope of a Maven plugin.
+ * A runtime scope that bundles classloading with scoped component discovery.
+ * Used uniformly for sessions, projects, and plugins — the difference is
+ * what the {@link #lookup()} sees, not the type.
  *
  * @since 4.1.0
  */
 @Experimental
-public interface PluginRealm {
+public interface Realm {
 
     /**
      * Returns the classloader for this realm.
@@ -41,7 +43,7 @@ public interface PluginRealm {
     ClassLoader classLoader();
 
     /**
-     * Returns the JPMS module layer when this plugin runs as a modular plugin.
+     * Returns the JPMS module layer when this realm runs in a modular configuration.
      *
      * @return the module layer, or an empty optional for a classpath-based realm
      */

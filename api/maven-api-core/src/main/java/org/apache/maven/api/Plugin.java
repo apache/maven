@@ -52,7 +52,7 @@ public interface Plugin {
      * @since 4.1.0
      */
     @Nonnull
-    PluginRealm getRealm();
+    Realm getRealm();
 
     @Nullable
     Artifact getArtifact();

@@ -26,7 +26,7 @@ import java.util.Optional;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Plugin;
-import org.apache.maven.api.PluginRealm;
+import org.apache.maven.api.Realm;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 import org.apache.maven.api.services.Lookup;
@@ -55,7 +55,7 @@ public class PluginStub implements Plugin {
     org.apache.maven.api.model.Plugin model;
     PluginDescriptor descriptor;
     List<Lifecycle> lifecycles = Collections.emptyList();
-    PluginRealm realm;
+    Realm realm;
     Artifact artifact;
     List<Dependency> dependencies = Collections.emptyList();
     Map<String, Dependency> dependenciesMap = Collections.emptyMap();
@@ -88,12 +88,12 @@ public class PluginStub implements Plugin {
     }
 
     @Override
-    public PluginRealm getRealm() {
+    public Realm getRealm() {
         return realm;
     }
 
     public void setClassLoader(ClassLoader classLoader) {
-        this.realm = new PluginRealm() {
+        this.realm = new Realm() {
             @Override
             public ClassLoader classLoader() {
                 return classLoader;
@@ -111,7 +111,7 @@ public class PluginStub implements Plugin {
         };
     }
 
-    public void setRealm(PluginRealm realm) {
+    public void setRealm(Realm realm) {
         this.realm = realm;
     }
 

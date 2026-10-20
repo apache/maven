@@ -151,7 +151,7 @@ class DefaultPluginManagerTest {
                 default -> throw new AssertionError(invocation.getMethod());
             };
         });
-        DefaultPluginRealm realm = new DefaultPluginRealm(pluginClassLoader, lookup);
+        DefaultRealm realm = new DefaultRealm(pluginClassLoader, lookup);
 
         assertSame(service, realm.lookup().lookup(Object.class));
         assertSame(service, realm.lookup().lookup(Object.class, "service"));
@@ -175,7 +175,7 @@ class DefaultPluginManagerTest {
                 })
                 .when(lookup)
                 .lookupList(Object.class);
-        DefaultPluginRealm realm = new DefaultPluginRealm(pluginClassLoader, lookup);
+        DefaultRealm realm = new DefaultRealm(pluginClassLoader, lookup);
 
         assertSame(
                 failure,

@@ -23,22 +23,22 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.function.Supplier;
 
-import org.apache.maven.api.PluginRealm;
+import org.apache.maven.api.Realm;
 import org.apache.maven.api.services.Lookup;
 
 import static java.util.Objects.requireNonNull;
 
-final class DefaultPluginRealm implements PluginRealm {
+final class DefaultRealm implements Realm {
 
     private final ClassLoader classLoader;
     private final Optional<ModuleLayer> moduleLayer;
     private final Lookup lookup;
 
-    DefaultPluginRealm(ClassLoader classLoader, Lookup lookup) {
+    DefaultRealm(ClassLoader classLoader, Lookup lookup) {
         this(classLoader, null, lookup);
     }
 
-    DefaultPluginRealm(ClassLoader classLoader, ModuleLayer moduleLayer, Lookup lookup) {
+    DefaultRealm(ClassLoader classLoader, ModuleLayer moduleLayer, Lookup lookup) {
         this.classLoader = requireNonNull(classLoader, "classLoader");
         this.moduleLayer = Optional.ofNullable(moduleLayer);
         this.lookup = new RealmLookup(classLoader, requireNonNull(lookup, "lookup"));
