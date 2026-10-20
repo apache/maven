@@ -994,8 +994,8 @@ public class DefaultModelValidatorTest {
      */
     @Test
     public void testConcurrentValidation() throws Exception {
-        int threadCount = 10;
-        int iterationsPerThread = 100;
+        int threadCount = 50;
+        int iterationsPerThread = 1000;
         CountDownLatch startLatch = new CountDownLatch(1);
         CountDownLatch doneLatch = new CountDownLatch(threadCount);
         AtomicReference<Throwable> failure = new AtomicReference<>();
