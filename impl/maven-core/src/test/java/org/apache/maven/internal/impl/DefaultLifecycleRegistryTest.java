@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.spi.LifecycleProvider;
@@ -96,6 +97,19 @@ class DefaultLifecycleRegistryTest {
         assertTrue(registry.lookup("default").isPresent());
         assertTrue(registry.lookup("clean").isPresent());
         assertTrue(registry.lookup("site").isPresent());
+    }
+
+    /**
+     * Verifies that when {@code maven.site.lifecycle.disabled} is not set,
+     * the site lifecycle is present in the default stream.
+     */
+    @Test
+    void siteLifecyclePresentWhenPropertyNotSet() {
+        assertNull(
+                System.getProperty(Constants.MAVEN_SITE_LIFECYCLE_DISABLED),
+                "System property must not be set in this test JVM");
+        DefaultLifecycleRegistry registry = new DefaultLifecycleRegistry(List.of());
+        assertTrue(registry.lookup("site").isPresent(), "site lifecycle present when property is not set");
     }
 
     @Test
