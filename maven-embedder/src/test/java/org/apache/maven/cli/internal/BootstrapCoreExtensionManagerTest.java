@@ -74,8 +74,7 @@ class BootstrapCoreExtensionManagerTest {
     @Test
     void childRealmWithoutNameOfCoreExtensionRealmTccl() throws Exception {
         Thread.currentThread()
-                .setContextClassLoader(
-                        world.newRealm("child", world.newRealm("coreExtension>g:a:1", null)));
+                .setContextClassLoader(world.newRealm("child", world.newRealm("coreExtension>g:a:1", null)));
         assertTrue(BootstrapCoreExtensionManager.isContextRealmCoreExtensionRealm());
     }
 
