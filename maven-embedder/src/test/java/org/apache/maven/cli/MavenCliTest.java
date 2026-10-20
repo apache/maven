@@ -82,6 +82,35 @@ public class MavenCliTest {
         }
     }
 
+    /**
+     * With redirected streams there is no console, and the password is read from the standard input, as the
+     * encryption printed an empty result otherwise (MNG-8398).
+     */
+    @Test
+    public void testReadPasswordFromRedirectedInput() throws Exception {
+        ByteArrayInputStream in = new ByteArrayInputStream("secret\nignored\n".getBytes(StandardCharsets.UTF_8));
+
+        assertEquals("secret", MavenCli.readPassword(null, in, "Password: "));
+    }
+
+    @Test
+    public void testReadPasswordFromRedirectedInputIsDecodedAsUtf8() throws Exception {
+        ByteArrayInputStream in = new ByteArrayInputStream("p\u00e4ss\u20ac\n".getBytes(StandardCharsets.UTF_8));
+
+        assertEquals("p\u00e4ss\u20ac", MavenCli.readPassword(null, in, "Password: "));
+    }
+
+    @Test
+    public void testReadPasswordRejectsMissingPassword() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> MavenCli.readPassword(null, new ByteArrayInputStream(new byte[0]), "Password: "));
+        assertThrows(
+                IllegalStateException.class,
+                () -> MavenCli.readPassword(
+                        null, new ByteArrayInputStream("\n".getBytes(StandardCharsets.UTF_8)), "Password: "));
+    }
+
     @Test
     public void testCalculateDegreeOfConcurrency() {
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0"));
