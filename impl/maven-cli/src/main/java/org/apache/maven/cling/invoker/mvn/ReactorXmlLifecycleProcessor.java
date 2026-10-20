@@ -36,14 +36,16 @@ import org.slf4j.LoggerFactory;
  * A {@link LifecycleProcessor} that injects custom phases declared in {@code .mvn/reactor.xml}
  * into the lifecycle DAG.
  *
- * <p>Phases are declared in the {@code <phases>} section of {@code reactor.xml}:
+ * <p>Phases are declared in {@code reactor.xml}:
  * <pre>{@code
  * <reactor>
- *   <phases>
- *     <phase name="pre-integration" parent="verify" after="unit-test" before="integration-test"/>
- *   </phases>
+ *   <phase name="pre-integration" parent="verify" after="unit-test" before="integration-test"/>
+ *   <phase name="post-all" parent="verify" after="unit-test,integration-test"/>
  * </reactor>
  * }</pre>
+ *
+ * <p>Both {@code after} and {@code before} accept comma-separated lists and can be
+ * combined to constrain the insertion from both sides.
  *
  * <p>This processor only enriches the {@code default} lifecycle. Injected phases have no
  * plugin bindings by default — mojos must bind to them explicitly in their POM via
