@@ -49,6 +49,66 @@ import static java.util.Objects.requireNonNull;
 
 public class ExtensibleEnumRegistries {
 
+    private static final ClassValue<Optional<Method>> GET_IMPORT_REALMS = new ClassValue<>() {
+        @Override
+        protected Optional<Method> computeValue(Class<?> type) {
+            try {
+                return Optional.of(type.getMethod("getImportRealms"));
+            } catch (NoSuchMethodException | SecurityException e) {
+                return Optional.empty();
+            }
+        }
+    };
+
+    /**
+     * Checks whether a provider is visible from the given classloader.
+     * Providers from project extensions are loaded by extension-specific classloaders
+     * (realms) that are only imported into the project realm that declared the extension.
+     * This prevents extension-scoped providers from leaking across reactor modules
+     * during parallel builds.
+     *
+     * @param provider the SPI provider to check
+     * @param classLoader the classloader to check visibility from (typically the TCCL)
+     * @return {@code true} if the provider is visible, {@code false} otherwise
+     */
+    public static boolean isVisibleFrom(Object provider, ClassLoader classLoader) {
+        if (classLoader == null) {
+            return true;
+        }
+        Class<?> providerClass = provider.getClass();
+        ClassLoader providerCl = providerClass.getClassLoader();
+        if (providerCl == null) {
+            return true;
+        }
+        try {
+            if (classLoader.loadClass(providerClass.getName()) == providerClass) {
+                return true;
+            }
+        } catch (ClassNotFoundException | LinkageError e) {
+            // Not loadable by name (hidden class, realm-ID import, or broken link) — check further
+        }
+        for (ClassLoader cl = classLoader; cl != null; cl = cl.getParent()) {
+            if (cl == providerCl) {
+                return true;
+            }
+        }
+        return isImportedRealm(classLoader, providerCl);
+    }
+
+    private static boolean isImportedRealm(ClassLoader classLoader, ClassLoader providerCl) {
+        return GET_IMPORT_REALMS
+                .get(classLoader.getClass())
+                .map(method -> {
+                    try {
+                        Collection<?> importedRealms = (Collection<?>) method.invoke(classLoader);
+                        return importedRealms.contains(providerCl);
+                    } catch (ReflectiveOperationException | ClassCastException e) {
+                        return false;
+                    }
+                })
+                .orElse(false);
+    }
+
     @Named
     @SessionScoped
     public static class DefaultPathScopeRegistry extends DefaultExtensibleEnumRegistry<PathScope, PathScopeProvider>
@@ -143,49 +203,6 @@ public class ExtensibleEnumRegistries {
                 }
             }
             return Optional.ofNullable(values.get(key));
-        }
-
-        /**
-         * Checks whether a provider is visible from the given classloader.
-         * Providers from project extensions are loaded by extension-specific classloaders
-         * (realms) that are only imported into the project realm that declared the extension.
-         */
-        private boolean isVisibleFrom(P provider, ClassLoader classLoader) {
-            if (classLoader == null) {
-                return true;
-            }
-            Class<?> providerClass = provider.getClass();
-            ClassLoader providerCl = providerClass.getClassLoader();
-            if (providerCl == null) {
-                return true;
-            }
-            // Check loadClass — works for standard classloaders and ClassRealm with package-level exports
-            try {
-                if (classLoader.loadClass(providerClass.getName()) == providerClass) {
-                    return true;
-                }
-            } catch (ClassNotFoundException e) {
-                // Not loadable by name (hidden class or realm-ID import) — check further
-            }
-            // Walk the Java classloader parent chain
-            for (ClassLoader cl = classLoader; cl != null; cl = cl.getParent()) {
-                if (cl == providerCl) {
-                    return true;
-                }
-            }
-            // Check ClassRealm foreign imports via reflection — handles the common case
-            // where Maven imports extension realms using the realm ID rather than package names
-            return isImportedRealm(classLoader, providerCl);
-        }
-
-        private static boolean isImportedRealm(ClassLoader classLoader, ClassLoader providerCl) {
-            try {
-                Method method = classLoader.getClass().getMethod("getImportRealms");
-                Collection<?> importedRealms = (Collection<?>) method.invoke(classLoader);
-                return importedRealms.contains(providerCl);
-            } catch (ReflectiveOperationException | ClassCastException e) {
-                return false;
-            }
         }
     }
 }

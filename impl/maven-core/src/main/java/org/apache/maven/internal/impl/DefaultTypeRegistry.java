@@ -37,6 +37,7 @@ import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.artifact.handler.manager.LegacyArtifactHandlerManager;
 import org.apache.maven.eventspy.AbstractEventSpy;
 import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.impl.ExtensibleEnumRegistries;
 import org.apache.maven.impl.resolver.type.DefaultType;
 
 import static java.util.Objects.requireNonNull;
@@ -79,7 +80,9 @@ public class DefaultTypeRegistry extends AbstractEventSpy implements TypeRegistr
     public Type require(String id) {
         requireNonNull(id, "id cannot be null");
         return usedTypes.computeIfAbsent(id, i -> {
+            ClassLoader tccl = Thread.currentThread().getContextClassLoader();
             Type type = lookup.lookupList(TypeProvider.class).stream()
+                    .filter(p -> ExtensibleEnumRegistries.isVisibleFrom(p, tccl))
                     .flatMap(p -> p.provides().stream())
                     .filter(t -> Objects.equals(id, t.id()))
                     .findFirst()
