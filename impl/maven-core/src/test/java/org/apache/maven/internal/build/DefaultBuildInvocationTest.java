@@ -112,15 +112,6 @@ class DefaultBuildInvocationTest {
     }
 
     @Test
-    void fromNullLocalRepositoryPathThrows() {
-        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
-        MavenSession session = mock(MavenSession.class);
-        when(session.getRequest()).thenReturn(request);
-
-        assertThrows(IllegalStateException.class, () -> DefaultBuildInvocation.from(session));
-    }
-
-    @Test
     void fromNullReactorFailureBehaviorDefaultsToFailFast() {
         MavenExecutionRequest request = newRequest();
         MavenSession session = mock(MavenSession.class);

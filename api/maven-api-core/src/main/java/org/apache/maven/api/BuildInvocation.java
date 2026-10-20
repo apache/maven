@@ -24,6 +24,7 @@ import java.util.Map;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Describes the invocation context of a Maven build: the goals, flags, properties,
@@ -156,6 +157,7 @@ public interface BuildInvocation {
      *
      * @return the make behavior, or {@code null} if not specified
      */
+    @Nullable
     MakeBehavior makeBehavior();
 
     /**
@@ -163,6 +165,7 @@ public interface BuildInvocation {
      *
      * @return the resume-from selector, or {@code null} if not specified
      */
+    @Nullable
     String resumeFrom();
 
     /**
