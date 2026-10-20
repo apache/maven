@@ -26,7 +26,7 @@ import org.eclipse.sisu.Priority;
 
 /**
  * A {@link BasicComponentConfigurator} for the {@code basic} role-hint that uses
- * {@link EnhancedStringConverter} to properly handle empty configuration tags for Maven 3 plugins.
+ * {@link EnhancedStringConverter} to properly handle empty configuration elements for Maven 3 plugins.
  */
 @Singleton
 @Named("basic")

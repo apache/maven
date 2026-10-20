@@ -103,7 +103,7 @@ class MavenBasicComponentConfiguratorTest {
     }
 
     @Test
-    void testEmptyTagUsesDefaultValueAttribute() throws Exception {
+    void testEmptyElementUsesDefaultValueAttribute() throws Exception {
         TestMojo mojo = new TestMojo();
         assertEquals("defaultDirect", mojo.direct);
 
@@ -114,7 +114,7 @@ class MavenBasicComponentConfiguratorTest {
     }
 
     @Test
-    void testSelfClosingTagUsesDefaultValueAttribute() throws Exception {
+    void testSelfClosingElementUsesDefaultValueAttribute() throws Exception {
         TestMojo mojo = new TestMojo();
         assertEquals("defaultDirect", mojo.direct);
 

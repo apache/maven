@@ -213,7 +213,7 @@ class DefaultBeanConfiguratorTest {
     }
 
     @Test
-    void testNonStringEmptyTagPreservesDefault() throws BeanConfigurationException {
+    void testNonStringEmptyElementPreservesDefault() throws BeanConfigurationException {
         PluginConfigBean bean = new PluginConfigBean();
         assertEquals(42, bean.settings.count);
 
@@ -226,7 +226,7 @@ class DefaultBeanConfiguratorTest {
     }
 
     @Test
-    void testBooleanSelfClosingTagPreservesDefault() throws BeanConfigurationException {
+    void testBooleanSelfClosingElementPreservesDefault() throws BeanConfigurationException {
         PluginConfigBean bean = new PluginConfigBean();
         assertTrue(bean.settings.skip);
 
@@ -239,7 +239,7 @@ class DefaultBeanConfiguratorTest {
     }
 
     @Test
-    void testObjectEmptyTagPreservesDefault() throws BeanConfigurationException {
+    void testObjectEmptyElementPreservesDefault() throws BeanConfigurationException {
         PluginConfigBean bean = new PluginConfigBean();
         assertEquals("initialObject", bean.settings.customObject);
 

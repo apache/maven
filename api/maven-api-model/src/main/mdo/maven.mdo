@@ -2589,12 +2589,9 @@
             <li>{@code combine.self}: available values are {@code merge} (default) and {@code override}.</li>
             </ul>
 
-            <p>In Maven 4+, empty string plugin parameters (whether specified as {@code <param></param>}
-            or {@code <param/>}) override the mojo's pre-initialized Java default with an empty value
-            (empty string for {@code String}, {@code CharSequence}, {@code StringBuilder} and
-            {@code StringBuffer} fields).</p>
-            <p>Note: for non-string scalar types (e.g. {@code int}, {@code boolean}), an empty element is
-            treated as absent and the Java-initialized default is always preserved.</p>
+            <p>In Maven 4+, an empty configuration element (such as {@code <param></param>}
+            or {@code <param/>}) for a string parameter explicitly sets that parameter to an empty string,
+            allowing users to override non-empty default values.</p>
 
             @see <a href="https://maven.apache.org/pom.html#Plugins">POM Reference documentation</a>
             @see <a href="https://codehaus-plexus.github.io/plexus-utils/apidocs/org/codehaus/plexus/util/xml/Xpp3DomUtils.html">Xpp3DomUtils</a>

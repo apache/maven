@@ -317,8 +317,8 @@ public final class EnhancedCompositeBeanHelper {
     }
 
     /**
-     * Fallback to provide an empty instance (e.g. empty String) for empty tags
-     * (both {@code <tag></tag>} and {@code <tag/>}) if a converter returned null (for instance when standard Plexus
+     * Fallback to provide an empty instance (e.g. empty String) for empty elements
+     * (both {@code <element></element>} and {@code <element/>}) if a converter returned null (for instance when standard Plexus
      * converters are used without EnhancedStringConverter) or in the setDefault path.
      */
     private Object getEmptyValueForType(Class<?> type, PlexusConfiguration configuration) {
