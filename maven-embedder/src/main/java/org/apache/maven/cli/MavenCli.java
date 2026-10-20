@@ -1471,26 +1471,7 @@ public class MavenCli {
 
         List<String> inactiveProfiles = new ArrayList<>();
 
-        if (commandLine.hasOption(CLIManager.ACTIVATE_PROFILES)) {
-            String[] profileOptionValues = commandLine.getOptionValues(CLIManager.ACTIVATE_PROFILES);
-            if (profileOptionValues != null) {
-                for (String profileOptionValue : profileOptionValues) {
-                    StringTokenizer profileTokens = new StringTokenizer(profileOptionValue, ",");
-
-                    while (profileTokens.hasMoreTokens()) {
-                        String profileAction = profileTokens.nextToken().trim();
-
-                        if (profileAction.startsWith("-") || profileAction.startsWith("!")) {
-                            inactiveProfiles.add(profileAction.substring(1));
-                        } else if (profileAction.startsWith("+")) {
-                            activeProfiles.add(profileAction.substring(1));
-                        } else {
-                            activeProfiles.add(profileAction);
-                        }
-                    }
-                }
-            }
-        }
+        performProfileActivation(commandLine, activeProfiles, inactiveProfiles);
 
         TransferListener transferListener;
 
@@ -1675,6 +1656,47 @@ public class MavenCli {
             } catch (NumberFormatException e) {
                 throw new IllegalArgumentException(
                         "Invalid threads value: '" + threadConfiguration + "'. Supported are integer values.");
+            }
+        }
+    }
+
+    // Visible for testing
+    static void performProfileActivation(
+            final CommandLine commandLine, final List<String> activeProfiles, final List<String> inactiveProfiles) {
+        if (commandLine.hasOption(CLIManager.ACTIVATE_PROFILES)) {
+            String[] profileOptionValues = commandLine.getOptionValues(CLIManager.ACTIVATE_PROFILES);
+            if (profileOptionValues != null) {
+                for (String profileOptionValue : profileOptionValues) {
+                    StringTokenizer profileTokens = new StringTokenizer(profileOptionValue, ",");
+
+                    while (profileTokens.hasMoreTokens()) {
+                        String profileId = profileTokens.nextToken().trim();
+                        boolean active = true;
+
+                        if (profileId.startsWith("-") || profileId.startsWith("!")) {
+                            active = false;
+                            profileId = profileId.substring(1);
+                        } else if (profileId.startsWith("+")) {
+                            profileId = profileId.substring(1);
+                        }
+
+                        // "?id" is an optional profile in Maven 4; Maven 3 never fails on a missing profile,
+                        // so the prefix only has to be removed
+                        if (profileId.startsWith("?")) {
+                            profileId = profileId.substring(1);
+                        }
+
+                        if (profileId.isEmpty()) {
+                            continue;
+                        }
+
+                        if (active) {
+                            activeProfiles.add(profileId);
+                        } else {
+                            inactiveProfiles.add(profileId);
+                        }
+                    }
+                }
             }
         }
     }
