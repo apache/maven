@@ -20,13 +20,9 @@ package org.apache.maven.internal.impl;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.function.Supplier;
 
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.api.Session;
-import org.apache.maven.api.SessionData;
 import org.apache.maven.api.spi.LifecycleParticipant;
 import org.apache.maven.api.spi.LifecycleParticipantException;
 import org.apache.maven.execution.MavenSession;
@@ -77,43 +73,5 @@ class LifecycleParticipantDispatcherTest {
                 }
             }
         };
-    }
-
-    private static final class MapBackedSessionData implements SessionData {
-        private final ConcurrentHashMap<Key<?>, Object> map = new ConcurrentHashMap<>();
-
-        @Override
-        public <T> void set(Key<T> key, T value) {
-            Objects.requireNonNull(key, "key");
-            if (value == null) {
-                map.remove(key);
-            } else {
-                map.put(key, value);
-            }
-        }
-
-        @Override
-        public <T> boolean replace(Key<T> key, T oldValue, T newValue) {
-            Objects.requireNonNull(key, "key");
-            if (newValue == null) {
-                return map.remove(key, oldValue);
-            }
-            return map.replace(key, oldValue, newValue);
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public <T> T get(Key<T> key) {
-            Objects.requireNonNull(key, "key");
-            return (T) map.get(key);
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public <T> T computeIfAbsent(Key<T> key, Supplier<T> supplier) {
-            Objects.requireNonNull(key, "key");
-            Objects.requireNonNull(supplier, "supplier");
-            return (T) map.computeIfAbsent(key, ignored -> supplier.get());
-        }
     }
 }

@@ -21,14 +21,10 @@ package org.apache.maven.lifecycle.internal.concurrent;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
-import java.util.function.Supplier;
 
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.Project;
-import org.apache.maven.api.SessionData;
 import org.apache.maven.api.spi.LifecycleParticipant;
 import org.apache.maven.api.spi.LifecycleParticipantException;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -41,6 +37,7 @@ import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.internal.impl.LifecycleParticipantDispatcher;
+import org.apache.maven.internal.impl.MapBackedSessionData;
 import org.apache.maven.internal.transformation.TransformerManager;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
@@ -306,44 +303,6 @@ class BuildPlanExecutorTest {
 
         @Override
         public void injectTransformedArtifacts(RepositorySystemSession repositorySession, MavenProject project) {}
-    }
-
-    private static final class MapBackedSessionData implements SessionData {
-        private final ConcurrentHashMap<Key<?>, Object> map = new ConcurrentHashMap<>();
-
-        @Override
-        public <T> void set(Key<T> key, T value) {
-            Objects.requireNonNull(key, "key");
-            if (value == null) {
-                map.remove(key);
-            } else {
-                map.put(key, value);
-            }
-        }
-
-        @Override
-        public <T> boolean replace(Key<T> key, T oldValue, T newValue) {
-            Objects.requireNonNull(key, "key");
-            if (newValue == null) {
-                return map.remove(key, oldValue);
-            }
-            return map.replace(key, oldValue, newValue);
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public <T> T get(Key<T> key) {
-            Objects.requireNonNull(key, "key");
-            return (T) map.get(key);
-        }
-
-        @SuppressWarnings("unchecked")
-        @Override
-        public <T> T computeIfAbsent(Key<T> key, Supplier<T> supplier) {
-            Objects.requireNonNull(key, "key");
-            Objects.requireNonNull(supplier, "supplier");
-            return (T) map.computeIfAbsent(key, ignored -> supplier.get());
-        }
     }
 
     @FunctionalInterface
