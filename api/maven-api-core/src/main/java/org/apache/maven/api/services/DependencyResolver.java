@@ -163,7 +163,8 @@ public interface DependencyResolver extends Service {
 
     /**
      * Resolves a dependency in the context of a project. The project's dependency management and repositories are
-     * applied to the dependency and its transitive dependencies.
+     * applied to the dependency and its transitive dependencies. The path scope defaults to
+     * {@link PathScope#MAIN_RUNTIME}; use the scope-taking overload to select another scope.
      */
     @Nonnull
     default DependencyResolverResult resolve(
@@ -188,7 +189,8 @@ public interface DependencyResolver extends Service {
 
     /**
      * Resolves dependencies in the context of a project. The project's dependency management and repositories are
-     * applied to the dependencies and their transitive dependencies.
+     * applied to the dependencies and their transitive dependencies. The path scope defaults to
+     * {@link PathScope#MAIN_RUNTIME}; use the scope-taking overload to select another scope.
      */
     @Nonnull
     default DependencyResolverResult resolve(

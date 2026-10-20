@@ -129,6 +129,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 Project project = request.getProject().get();
                 rootArtifact = project.getPomArtifact();
                 root = null;
+                // Caller-supplied dependencies take precedence to allow plugin-specific resolution in project context.
                 dependencies =
                         request.getDependencies().isEmpty() ? project.getDependencies() : request.getDependencies();
                 managedDependencies = project.getManagedDependencies();
@@ -218,7 +219,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 artifact = artifact.setVersion(management.getArtifact().getVersion());
             }
             String scope = dependency.getScope();
-            if (scope == null || scope.isEmpty()) {
+            if (scope.isEmpty()) {
                 scope = management.getScope();
             }
             Collection<org.eclipse.aether.graph.Exclusion> exclusions = dependency.getExclusions();

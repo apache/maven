@@ -155,6 +155,10 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
                 .build();
     }
 
+    /**
+     * Builds a project-context request for one dependency using {@link PathScope#MAIN_RUNTIME}.
+     * Use the scope-taking overload to select another scope.
+     */
     @Nonnull
     static DependencyResolverRequest build(
             Session session, RequestType requestType, Project project, DependencyCoordinates dependency) {
@@ -177,6 +181,10 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
                 .build();
     }
 
+    /**
+     * Builds a project-context request for dependencies using {@link PathScope#MAIN_RUNTIME}.
+     * Use the scope-taking overload to select another scope.
+     */
     @Nonnull
     static DependencyResolverRequest build(
             Session session, RequestType requestType, Project project, List<DependencyCoordinates> dependencies) {
