@@ -140,9 +140,13 @@ public interface Session extends ProtoSession {
     /**
      * Returns the degree of concurrency for the build.
      *
-     * @return  the degree of concurrency
+     * @return the degree of concurrency
+     * @deprecated Use {@link #buildInvocation()}{@code .threads()} instead.
      */
-    int getDegreeOfConcurrency();
+    @Deprecated
+    default int getDegreeOfConcurrency() {
+        return buildInvocation().threads();
+    }
 
     /**
      * Retrieves a list of projects associated with the session.

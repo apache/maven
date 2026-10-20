@@ -171,11 +171,6 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
         return parseVersion(runtimeInformation.getMavenVersion());
     }
 
-    @Override
-    public int getDegreeOfConcurrency() {
-        return getMavenSession().getRequest().getDegreeOfConcurrency();
-    }
-
     @Nonnull
     @Override
     public BuildInvocation buildInvocation() {
