@@ -21,9 +21,16 @@ package org.apache.maven.lifecycle.internal.concurrent;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.SessionData;
+import org.apache.maven.api.spi.LifecycleParticipant;
+import org.apache.maven.api.spi.LifecycleParticipantException;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -32,6 +39,8 @@ import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
+import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.internal.impl.LifecycleParticipantDispatcher;
 import org.apache.maven.internal.transformation.TransformerManager;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
@@ -49,6 +58,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class BuildPlanExecutorTest {
 
@@ -154,6 +165,32 @@ class BuildPlanExecutorTest {
                 "an Error must halt the reactor even when a second failure is recorded for the same project, but"
                         + " the build was not halted; recorded exceptions: "
                         + session.getResult().getExceptions());
+    }
+
+    @Test
+    void lifecycleParticipantFailureAfterSuccessfulExecutionFailsTheBuild() throws Exception {
+        LifecycleParticipantException thrown = new LifecycleParticipantException("callback failed");
+        MavenProject project = newProject();
+        MavenSession session = newSession(project);
+        InternalMavenSession apiSession = mock(InternalMavenSession.class);
+        when(apiSession.getData()).thenReturn(new MapBackedSessionData());
+        when(apiSession.getProject(project)).thenReturn(mock(Project.class));
+        session.setSession(apiSession);
+        LifecycleParticipantDispatcher.setParticipants(session, List.of(new LifecycleParticipant() {
+            @Override
+            public void afterProjectExecution(org.apache.maven.api.spi.ProjectExecutionEvent event)
+                    throws LifecycleParticipantException {
+                throw thrown;
+            }
+        }));
+
+        ReactorContext reactorContext = execute(session, project, event -> {});
+
+        List<Throwable> exceptions = session.getResult().getExceptions();
+        assertEquals(1, exceptions.size());
+        assertSame(thrown, exceptions.get(0).getCause());
+        assertTrue(session.getResult().getBuildSummary(project) instanceof org.apache.maven.execution.BuildFailure);
+        assertTrue(reactorContext.getReactorBuildStatus().isHalted());
     }
 
     private ReactorContext execute(MavenSession session, MavenProject project, BeforeProjectExecution listener)
@@ -269,6 +306,44 @@ class BuildPlanExecutorTest {
 
         @Override
         public void injectTransformedArtifacts(RepositorySystemSession repositorySession, MavenProject project) {}
+    }
+
+    private static final class MapBackedSessionData implements SessionData {
+        private final ConcurrentHashMap<Key<?>, Object> map = new ConcurrentHashMap<>();
+
+        @Override
+        public <T> void set(Key<T> key, T value) {
+            Objects.requireNonNull(key, "key");
+            if (value == null) {
+                map.remove(key);
+            } else {
+                map.put(key, value);
+            }
+        }
+
+        @Override
+        public <T> boolean replace(Key<T> key, T oldValue, T newValue) {
+            Objects.requireNonNull(key, "key");
+            if (newValue == null) {
+                return map.remove(key, oldValue);
+            }
+            return map.replace(key, oldValue, newValue);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> T get(Key<T> key) {
+            Objects.requireNonNull(key, "key");
+            return (T) map.get(key);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> T computeIfAbsent(Key<T> key, Supplier<T> supplier) {
+            Objects.requireNonNull(key, "key");
+            Objects.requireNonNull(supplier, "supplier");
+            return (T) map.computeIfAbsent(key, ignored -> supplier.get());
+        }
     }
 
     @FunctionalInterface

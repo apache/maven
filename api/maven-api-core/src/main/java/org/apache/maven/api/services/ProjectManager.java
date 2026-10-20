@@ -66,6 +66,7 @@ public interface ProjectManager extends Service {
      *
      * @param project the project to update
      * @param dependencies the new direct dependencies
+     * @since 4.1.0
      */
     void setDependencies(@Nonnull Project project, @Nonnull List<DependencyCoordinates> dependencies);
 

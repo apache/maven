@@ -115,13 +115,25 @@ public final class LifecycleParticipantDispatcher {
         }
         Thread thread = Thread.currentThread();
         ClassLoader originalClassLoader = thread.getContextClassLoader();
+        LifecycleParticipantException failure = null;
         try {
             for (LifecycleParticipant participant : participants) {
                 thread.setContextClassLoader(participant.getClass().getClassLoader());
-                call.run(participant);
+                try {
+                    call.run(participant);
+                } catch (LifecycleParticipantException e) {
+                    if (failure == null) {
+                        failure = e;
+                    } else {
+                        failure.addSuppressed(e);
+                    }
+                }
             }
         } finally {
             thread.setContextClassLoader(originalClassLoader);
+        }
+        if (failure != null) {
+            throw failure;
         }
     }
 

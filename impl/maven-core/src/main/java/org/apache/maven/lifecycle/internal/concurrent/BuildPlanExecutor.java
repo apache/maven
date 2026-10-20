@@ -580,8 +580,13 @@ public class BuildPlanExecutor {
                         List<MojoExecution> successfulPlan = executionPlan(step.project);
                         projectExecutionListener.afterProjectExecutionSuccess(
                                 new ProjectExecutionEvent(session, step.project, successfulPlan));
-                        LifecycleParticipantDispatcher.afterProjectExecution(
-                                session, step.project, successfulPlan, null);
+                        try {
+                            LifecycleParticipantDispatcher.afterProjectExecution(
+                                    session, step.project, successfulPlan, null);
+                        } catch (LifecycleExecutionException e) {
+                            handleBuildError(reactorContext, session, step.project, e, true);
+                            return;
+                        }
                         reactorContext
                                 .getResult()
                                 .addBuildSummary(new BuildSuccess(step.project, clock.wallTime(), clock.execTime()));
