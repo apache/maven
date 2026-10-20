@@ -25,6 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
@@ -59,6 +60,15 @@ import org.apache.maven.api.annotations.Nullable;
  */
 @Experimental
 public interface ProjectManager extends Service {
+    /**
+     * Replaces the direct dependencies of the given project for the current build session.
+     * This method does not modify the project's POM on disk.
+     *
+     * @param project the project to update
+     * @param dependencies the new direct dependencies
+     */
+    void setDependencies(@Nonnull Project project, @Nonnull List<DependencyCoordinates> dependencies);
+
     /**
      * Returns the path to the built project artifact file, if the project has been built.
      * This path is only available after the artifact has been produced during the build lifecycle.

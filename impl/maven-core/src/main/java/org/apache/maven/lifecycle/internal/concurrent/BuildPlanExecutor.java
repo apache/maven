@@ -59,6 +59,7 @@ import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.impl.util.PhasingExecutor;
 import org.apache.maven.internal.MultilineMessageHelper;
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
+import org.apache.maven.internal.impl.LifecycleParticipantDispatcher;
 import org.apache.maven.internal.transformation.TransformerManager;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.LifecycleNotFoundException;
@@ -516,6 +517,10 @@ public class BuildPlanExecutor {
                     attachToThread(step);
                     transformerManager.injectTransformedArtifacts(session.getRepositorySession(), step.project);
                     projectExecutionListener.beforeProjectExecution(new ProjectExecutionEvent(session, step.project));
+                    List<MojoExecution> executionPlan = executionPlan(step.project);
+                    projectExecutionListener.beforeProjectLifecycleExecution(
+                            new ProjectExecutionEvent(session, step.project, executionPlan));
+                    LifecycleParticipantDispatcher.beforeProjectExecution(session, step.project, executionPlan);
                     eventCatapult.fire(ExecutionEvent.Type.ProjectStarted, session, null);
                     break;
                 case TEARDOWN:
@@ -560,11 +565,23 @@ public class BuildPlanExecutor {
                             failure = new LifecycleExecutionException("Error building project");
                             failures.forEach(failure::addSuppressed);
                         }
+                        List<MojoExecution> failedPlan = executionPlan(step.project);
+                        projectExecutionListener.afterProjectExecutionFailure(
+                                new ProjectExecutionEvent(session, step.project, failedPlan, failure));
+                        try {
+                            LifecycleParticipantDispatcher.afterProjectExecution(
+                                    session, step.project, failedPlan, failure);
+                        } catch (LifecycleExecutionException e) {
+                            failure.addSuppressed(e);
+                        }
                         handleBuildError(reactorContext, session, step.project, failure, isFatal(failures));
                     } else if (projectStarted && allWorkExecuted) {
                         // If there were no failures, report success
+                        List<MojoExecution> successfulPlan = executionPlan(step.project);
                         projectExecutionListener.afterProjectExecutionSuccess(
-                                new ProjectExecutionEvent(session, step.project, Collections.emptyList()));
+                                new ProjectExecutionEvent(session, step.project, successfulPlan));
+                        LifecycleParticipantDispatcher.afterProjectExecution(
+                                session, step.project, successfulPlan, null);
                         reactorContext
                                 .getResult()
                                 .addBuildSummary(new BuildSuccess(step.project, clock.wallTime(), clock.execTime()));
@@ -679,6 +696,10 @@ public class BuildPlanExecutor {
             } finally {
                 lock.writeLock().unlock();
             }
+        }
+
+        private List<MojoExecution> executionPlan(MavenProject project) {
+            return plan.steps(project).flatMap(BuildStep::executions).toList();
         }
 
         /**

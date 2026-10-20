@@ -45,6 +45,7 @@ import org.apache.maven.api.model.Prerequisites;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
+import org.apache.maven.api.spi.LifecycleParticipant;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.execution.BuildResumptionAnalyzer;
 import org.apache.maven.execution.BuildResumptionDataRepository;
@@ -61,6 +62,7 @@ import org.apache.maven.graph.GraphBuilder;
 import org.apache.maven.graph.ProjectSelector;
 import org.apache.maven.internal.impl.DefaultSessionFactory;
 import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.internal.impl.LifecycleParticipantDispatcher;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.ExecutionEventCatapult;
 import org.apache.maven.lifecycle.internal.LifecycleStarter;
@@ -359,10 +361,31 @@ public class DefaultMaven implements Maven {
 
     private void afterProjectsRead(MavenSession session) throws MavenExecutionException {
         callListeners(session, AbstractMavenLifecycleParticipant::afterProjectsRead);
+        Collection<LifecycleParticipant> participants =
+                getExtensionComponents(session.getProjects(), LifecycleParticipant.class);
+        LifecycleParticipantDispatcher.setParticipants(session, participants);
+        LifecycleParticipantDispatcher.afterProjectsRead(session);
     }
 
     private void afterSessionEnd(MavenSession session) throws MavenExecutionException {
-        callListeners(session, AbstractMavenLifecycleParticipant::afterSessionEnd);
+        MavenExecutionException failure = null;
+        try {
+            callListeners(session, AbstractMavenLifecycleParticipant::afterSessionEnd);
+        } catch (MavenExecutionException e) {
+            failure = e;
+        }
+        try {
+            LifecycleParticipantDispatcher.afterSessionEnd(session);
+        } catch (MavenExecutionException e) {
+            if (failure == null) {
+                failure = e;
+            } else {
+                failure.addSuppressed(e);
+            }
+        }
+        if (failure != null) {
+            throw failure;
+        }
     }
 
     @FunctionalInterface
