@@ -28,14 +28,30 @@ import org.apache.maven.api.annotations.Experimental;
 @Experimental
 public class LifecycleParticipantException extends Exception {
 
+    /**
+     * Creates a new exception with the given message.
+     *
+     * @param message the detail message
+     */
     public LifecycleParticipantException(String message) {
         super(message);
     }
 
+    /**
+     * Creates a new exception with the given message and cause.
+     *
+     * @param message the detail message
+     * @param cause the root cause
+     */
     public LifecycleParticipantException(String message, Throwable cause) {
         super(message, cause);
     }
 
+    /**
+     * Creates a new exception with the given cause.
+     *
+     * @param cause the root cause
+     */
     public LifecycleParticipantException(Throwable cause) {
         super(cause);
     }

@@ -127,6 +127,7 @@ public class LifecycleModuleBuilder {
 
             eventCatapult.fire(ExecutionEvent.Type.ProjectSucceeded, session, null);
         } catch (Throwable t) {
+            boolean projectSuccessReported = participantAfterCalled;
             if (!participantAfterCalled) {
                 participantAfterCalled = true;
                 try {
@@ -137,8 +138,10 @@ public class LifecycleModuleBuilder {
             }
             builderCommon.handleBuildError(reactorContext, rootSession, session, currentProject, t, buildStartTime);
 
-            projectExecutionListener.afterProjectExecutionFailure(
-                    new ProjectExecutionEvent(session, currentProject, t));
+            if (!projectSuccessReported) {
+                projectExecutionListener.afterProjectExecutionFailure(
+                        new ProjectExecutionEvent(session, currentProject, t));
+            }
 
             // rethrow original errors and runtime exceptions
             if (t instanceof RuntimeException runtimeException) {

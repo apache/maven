@@ -24,13 +24,27 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Supplier;
 
+import org.apache.maven.api.Project;
+import org.apache.maven.api.SessionData;
+import org.apache.maven.api.spi.LifecycleParticipant;
+import org.apache.maven.api.spi.LifecycleParticipantException;
 import org.apache.maven.execution.AbstractExecutionListener;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.execution.ProjectExecutionEvent;
+import org.apache.maven.execution.ProjectExecutionListener;
+import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.internal.impl.LifecycleParticipantDispatcher;
+import org.apache.maven.internal.transformation.TransformerManager;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.lifecycle.MavenExecutionPlan;
+import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.lifecycle.internal.stub.MojoExecutorStub;
 import org.apache.maven.lifecycle.internal.stub.ProjectDependencyGraphStub;
 import org.apache.maven.plugin.MojoExecution;
@@ -42,6 +56,12 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 @PlexusTest
 class LifecycleModuleBuilderTest {
@@ -89,6 +109,84 @@ class LifecycleModuleBuilderTest {
                         ProjectDependencyGraphStub.Y,
                         ProjectDependencyGraphStub.Z),
                 currentProjects);
+    }
+
+    @Test
+    void participantFailureAfterSuccessDoesNotNotifyProjectFailure() throws Exception {
+        MojoExecutor mojoExecutor = mock(MojoExecutor.class);
+        BuilderCommon builderCommon = mock(BuilderCommon.class);
+        ExecutionEventCatapult eventCatapult = mock(ExecutionEventCatapult.class);
+        ProjectExecutionListener projectExecutionListener = mock(ProjectExecutionListener.class);
+        TransformerManager transformerManager = mock(TransformerManager.class);
+        LifecycleModuleBuilder moduleBuilder = new LifecycleModuleBuilder(
+                mojoExecutor, builderCommon, eventCatapult, List.of(projectExecutionListener), transformerManager);
+
+        MavenProject project = new MavenProject();
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        DefaultMavenExecutionResult result = new DefaultMavenExecutionResult();
+        MavenSession session = new MavenSession(null, new DefaultRepositorySystemSession(h -> false), request, result);
+        InternalMavenSession apiSession = mock(InternalMavenSession.class);
+        when(apiSession.getData()).thenReturn(new MapBackedSessionData());
+        when(apiSession.getProject(project)).thenReturn(mock(Project.class));
+        session.setSession(apiSession);
+        LifecycleParticipantDispatcher.setParticipants(session, List.of(new LifecycleParticipant() {
+            @Override
+            public void afterProjectExecution(org.apache.maven.api.spi.ProjectExecutionEvent event)
+                    throws LifecycleParticipantException {
+                throw new LifecycleParticipantException("callback failed");
+            }
+        }));
+
+        when(builderCommon.resolveBuildPlan(eq(session), eq(project), any(), any()))
+                .thenReturn(new MavenExecutionPlan(List.of(), null));
+        ReactorContext reactorContext = new ReactorContext(
+                result,
+                Thread.currentThread().getContextClassLoader(),
+                new ReactorBuildStatus(new ProjectDependencyGraphStub()));
+
+        moduleBuilder.buildProject(session, reactorContext, project, new TaskSegment(false));
+
+        verify(projectExecutionListener).afterProjectExecutionSuccess(any(ProjectExecutionEvent.class));
+        verify(projectExecutionListener, never()).afterProjectExecutionFailure(any(ProjectExecutionEvent.class));
+        verify(builderCommon).handleBuildError(eq(reactorContext), eq(session), eq(session), eq(project), any(), any());
+    }
+
+    private static final class MapBackedSessionData implements SessionData {
+        private final ConcurrentHashMap<Key<?>, Object> map = new ConcurrentHashMap<>();
+
+        @Override
+        public <T> void set(Key<T> key, T value) {
+            Objects.requireNonNull(key, "key");
+            if (value == null) {
+                map.remove(key);
+            } else {
+                map.put(key, value);
+            }
+        }
+
+        @Override
+        public <T> boolean replace(Key<T> key, T oldValue, T newValue) {
+            Objects.requireNonNull(key, "key");
+            if (newValue == null) {
+                return map.remove(key, oldValue);
+            }
+            return map.replace(key, oldValue, newValue);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> T get(Key<T> key) {
+            Objects.requireNonNull(key, "key");
+            return (T) map.get(key);
+        }
+
+        @SuppressWarnings("unchecked")
+        @Override
+        public <T> T computeIfAbsent(Key<T> key, Supplier<T> supplier) {
+            Objects.requireNonNull(key, "key");
+            Objects.requireNonNull(supplier, "supplier");
+            return (T) map.computeIfAbsent(key, ignored -> supplier.get());
+        }
     }
 
     static void set(Object obj, String field, Object v) throws NoSuchFieldException, IllegalAccessException {

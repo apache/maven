@@ -136,20 +136,24 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
 
         @Override
         public void beforeProjectExecution(ProjectExecutionEvent event) {
-            CALLBACKS.add("before:" + event.project().artifactId() + ':'
-                    + event.executionPlan().get(0).goal());
+            CALLBACKS.add("before:" + event.project().artifactId() + ':' + goal(event));
         }
 
         @Override
         public void afterProjectExecution(ProjectExecutionEvent event) {
-            CALLBACKS.add("after:" + event.project().artifactId() + ':'
-                    + event.executionPlan().get(0).goal() + ':'
+            CALLBACKS.add("after:" + event.project().artifactId() + ':' + goal(event) + ':'
                     + event.failure().isEmpty());
         }
 
         @Override
         public void afterSessionEnd(Session session) {
             CALLBACKS.add("afterSessionEnd");
+        }
+
+        private String goal(ProjectExecutionEvent event) {
+            return event.executionPlan().isEmpty()
+                    ? "(no plan)"
+                    : event.executionPlan().get(0).goal();
         }
     }
 
