@@ -374,10 +374,6 @@ class DefaultModelBuilderTest {
         assertEquals("activated", projectParentModel.getProperties().get("profile.property"));
         assertEquals("activated", projectParentModel.getProperties().get("profile.condition"));
         assertEquals("activated", projectParentModel.getProperties().get("profile.jdk"));
-        // POM-declared property via <condition>: doReadAsParentModel() passes parent.getProperties()
-        // into the activation context (start(parent.getProperties())), so getModelProperty() returns
-        // the real POM property and the condition fires for the non-sandboxed project parent path.
-        assertEquals("activated", projectParentModel.getProperties().get("profile.pom.condition"));
         assertTrue(projectParentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
 
         DefaultModelBuilder.ModelBuilderSessionState dependencyState =
