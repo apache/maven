@@ -156,6 +156,50 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
     }
 
     @Nonnull
+    static DependencyResolverRequest build(
+            Session session, RequestType requestType, Project project, DependencyCoordinates dependency) {
+        return build(session, requestType, project, dependency, PathScope.MAIN_RUNTIME);
+    }
+
+    @Nonnull
+    static DependencyResolverRequest build(
+            Session session,
+            RequestType requestType,
+            Project project,
+            DependencyCoordinates dependency,
+            PathScope scope) {
+        return new DependencyResolverRequestBuilder()
+                .session(session)
+                .requestType(requestType)
+                .project(project)
+                .dependency(dependency)
+                .pathScope(scope)
+                .build();
+    }
+
+    @Nonnull
+    static DependencyResolverRequest build(
+            Session session, RequestType requestType, Project project, List<DependencyCoordinates> dependencies) {
+        return build(session, requestType, project, dependencies, PathScope.MAIN_RUNTIME);
+    }
+
+    @Nonnull
+    static DependencyResolverRequest build(
+            Session session,
+            RequestType requestType,
+            Project project,
+            List<DependencyCoordinates> dependencies,
+            PathScope scope) {
+        return new DependencyResolverRequestBuilder()
+                .session(session)
+                .requestType(requestType)
+                .project(project)
+                .dependencies(dependencies)
+                .pathScope(scope)
+                .build();
+    }
+
+    @Nonnull
     static DependencyResolverRequest build(Session session, RequestType requestType, DependencyCoordinates dependency) {
         return build(session, requestType, dependency, PathScope.MAIN_RUNTIME);
     }

@@ -20,7 +20,9 @@ package org.apache.maven.impl;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -127,7 +129,8 @@ public class DefaultDependencyResolver implements DependencyResolver {
                 Project project = request.getProject().get();
                 rootArtifact = project.getPomArtifact();
                 root = null;
-                dependencies = project.getDependencies();
+                dependencies =
+                        request.getDependencies().isEmpty() ? project.getDependencies() : request.getDependencies();
                 managedDependencies = project.getManagedDependencies();
                 remoteRepositories = request.getRepositories() != null
                         ? request.getRepositories()
@@ -147,11 +150,18 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         .getResolutionScope(request.getPathScope().id())
                         .orElseThrow();
             }
+            List<org.eclipse.aether.graph.Dependency> resolverDependencies =
+                    session.toDependencies(dependencies, false);
+            List<org.eclipse.aether.graph.Dependency> resolverManagedDependencies =
+                    session.toDependencies(managedDependencies, true);
+            if (request.getProject().isPresent() && !request.getDependencies().isEmpty()) {
+                resolverDependencies = applyDependencyManagement(resolverDependencies, resolverManagedDependencies);
+            }
             CollectRequest collectRequest = new CollectRequest()
                     .setRootArtifact(rootArtifact != null ? session.toArtifact(rootArtifact) : null)
                     .setRoot(root != null ? session.toDependency(root, false) : null)
-                    .setDependencies(session.toDependencies(dependencies, false))
-                    .setManagedDependencies(session.toDependencies(managedDependencies, true))
+                    .setDependencies(resolverDependencies)
+                    .setManagedDependencies(resolverManagedDependencies)
                     .setRepositories(session.toResolvingRepositories(remoteRepositories))
                     .setRequestContext(trace.context())
                     .setTrace(trace.trace());
@@ -180,6 +190,51 @@ public class DefaultDependencyResolver implements DependencyResolver {
         } finally {
             RequestTraceHelper.exit(trace);
         }
+    }
+
+    /**
+     * Applies dependency management to dependencies supplied outside the project model. Resolver applies managed
+     * dependencies only below the root's direct dependencies, while project model building normally performs this
+     * merge before resolution. Dependencies supplied by a plugin therefore need the same merge here.
+     */
+    static List<org.eclipse.aether.graph.Dependency> applyDependencyManagement(
+            Collection<org.eclipse.aether.graph.Dependency> dependencies,
+            Collection<org.eclipse.aether.graph.Dependency> managedDependencies) {
+        Map<String, org.eclipse.aether.graph.Dependency> managed = new HashMap<>();
+        for (org.eclipse.aether.graph.Dependency dependency : managedDependencies) {
+            managed.put(dependencyKey(dependency), dependency);
+        }
+
+        List<org.eclipse.aether.graph.Dependency> result = new ArrayList<>(dependencies.size());
+        for (org.eclipse.aether.graph.Dependency dependency : dependencies) {
+            org.eclipse.aether.graph.Dependency management = managed.get(dependencyKey(dependency));
+            if (management == null) {
+                result.add(dependency);
+                continue;
+            }
+
+            org.eclipse.aether.artifact.Artifact artifact = dependency.getArtifact();
+            if (artifact.getVersion().isEmpty()) {
+                artifact = artifact.setVersion(management.getArtifact().getVersion());
+            }
+            String scope = dependency.getScope();
+            if (scope == null || scope.isEmpty()) {
+                scope = management.getScope();
+            }
+            Collection<org.eclipse.aether.graph.Exclusion> exclusions = dependency.getExclusions();
+            if (exclusions.isEmpty()) {
+                exclusions = management.getExclusions();
+            }
+            result.add(new org.eclipse.aether.graph.Dependency(artifact, scope, dependency.getOptional(), exclusions));
+        }
+        return result;
+    }
+
+    private static String dependencyKey(org.eclipse.aether.graph.Dependency dependency) {
+        org.eclipse.aether.artifact.Artifact artifact = dependency.getArtifact();
+        String type =
+                artifact.getProperty(org.eclipse.aether.artifact.ArtifactProperties.TYPE, artifact.getExtension());
+        return artifact.getGroupId() + ':' + artifact.getArtifactId() + ':' + type + ':' + artifact.getClassifier();
     }
 
     @Nonnull

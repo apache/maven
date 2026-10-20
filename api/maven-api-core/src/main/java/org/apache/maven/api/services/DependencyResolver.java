@@ -161,6 +161,56 @@ public interface DependencyResolver extends Service {
                 session, DependencyResolverRequest.RequestType.RESOLVE, project, scope));
     }
 
+    /**
+     * Resolves a dependency in the context of a project. The project's dependency management and repositories are
+     * applied to the dependency and its transitive dependencies.
+     */
+    @Nonnull
+    default DependencyResolverResult resolve(
+            @Nonnull Session session, @Nonnull Project project, @Nonnull DependencyCoordinates dependency) {
+        return resolve(DependencyResolverRequest.build(
+                session, DependencyResolverRequest.RequestType.RESOLVE, project, dependency));
+    }
+
+    /**
+     * Resolves a dependency in the context of a project for the given path scope. The project's dependency management
+     * and repositories are applied to the dependency and its transitive dependencies.
+     */
+    @Nonnull
+    default DependencyResolverResult resolve(
+            @Nonnull Session session,
+            @Nonnull Project project,
+            @Nonnull DependencyCoordinates dependency,
+            @Nonnull PathScope scope) {
+        return resolve(DependencyResolverRequest.build(
+                session, DependencyResolverRequest.RequestType.RESOLVE, project, dependency, scope));
+    }
+
+    /**
+     * Resolves dependencies in the context of a project. The project's dependency management and repositories are
+     * applied to the dependencies and their transitive dependencies.
+     */
+    @Nonnull
+    default DependencyResolverResult resolve(
+            @Nonnull Session session, @Nonnull Project project, @Nonnull List<DependencyCoordinates> dependencies) {
+        return resolve(DependencyResolverRequest.build(
+                session, DependencyResolverRequest.RequestType.RESOLVE, project, dependencies));
+    }
+
+    /**
+     * Resolves dependencies in the context of a project for the given path scope. The project's dependency management
+     * and repositories are applied to the dependencies and their transitive dependencies.
+     */
+    @Nonnull
+    default DependencyResolverResult resolve(
+            @Nonnull Session session,
+            @Nonnull Project project,
+            @Nonnull List<DependencyCoordinates> dependencies,
+            @Nonnull PathScope scope) {
+        return resolve(DependencyResolverRequest.build(
+                session, DependencyResolverRequest.RequestType.RESOLVE, project, dependencies, scope));
+    }
+
     @Nonnull
     default DependencyResolverResult resolve(@Nonnull Session session, @Nonnull DependencyCoordinates dependency) {
         return resolve(
