@@ -230,16 +230,18 @@
         </field>
         <field xml.attribute="true">
           <name>after</name>
-          <description>The name of a sibling phase (child of the same parent) that this phase must come after.
-          Takes precedence over {@code before} for positioning.</description>
+          <description>Comma-separated names of sibling phases (children of the same parent) that this phase
+          must come after. When multiple names are given, the phase is inserted after the latest (rightmost)
+          anchor. Can be combined with {@code before} to constrain both bounds.</description>
           <version>1.0.0+</version>
           <required>false</required>
           <type>String</type>
         </field>
         <field xml.attribute="true">
           <name>before</name>
-          <description>The name of a sibling phase (child of the same parent) that this phase must come before.
-          Used only for positioning when {@code after} is absent.</description>
+          <description>Comma-separated names of sibling phases (children of the same parent) that this phase
+          must come before. When multiple names are given, the phase is inserted before the earliest (leftmost)
+          anchor. Can be combined with {@code after} to constrain both bounds.</description>
           <version>1.0.0+</version>
           <required>false</required>
           <type>String</type>
