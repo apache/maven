@@ -18,88 +18,106 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.util.List;
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.maven.api.Language;
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.Type;
+import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.TypeRegistry;
-import org.apache.maven.api.spi.PackagingProvider;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.junit.jupiter.api.Test;
+import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 class DefaultPackagingRegistryTest {
 
     @Test
-    void findsProviderVisibleThroughProjectLookup() {
-        Lookup lookup = mock(Lookup.class);
-        TypeRegistry types = mock(TypeRegistry.class);
-        Packaging packaging = packaging("app-client");
-        PackagingProvider provider = () -> List.of(packaging);
-        when(lookup.lookupList(PackagingProvider.class)).thenReturn(List.of(provider));
+    void defaultProducesMainArtifactIsTrue() {
+        Packaging custom = new Packaging() {
+            @Override
+            public String id() {
+                return "custom";
+            }
 
-        DefaultPackagingRegistry registry = new DefaultPackagingRegistry(lookup, types, List.of());
+            @Override
+            public Type type() {
+                return Mockito.mock(Type.class);
+            }
 
-        assertSame(packaging, registry.lookup("APP-CLIENT").orElseThrow());
+            @Override
+            public Language language() {
+                return Language.JAVA_FAMILY;
+            }
+
+            @Override
+            public Map<String, PluginContainer> plugins() {
+                return Collections.emptyMap();
+            }
+        };
+        assertTrue(custom.producesMainArtifact());
     }
 
     @Test
-    void doesNotRetainProviderFromAnotherProjectLookup() {
-        Lookup lookup = mock(Lookup.class);
-        Packaging packaging = packaging("app-client");
-        PackagingProvider provider = () -> List.of(packaging);
-        AtomicReference<List<PackagingProvider>> visible = new AtomicReference<>(List.of(provider));
-        when(lookup.lookupList(PackagingProvider.class)).thenAnswer(invocation -> visible.get());
+    void pomPackagingDoesNotProduceMainArtifact() {
+        Lookup lookup = Mockito.mock(Lookup.class);
+        TypeRegistry typeRegistry = Mockito.mock(TypeRegistry.class);
+        LifecycleMapping lifecycleMapping = Mockito.mock(LifecycleMapping.class);
+        when(lifecycleMapping.getLifecycles()).thenReturn(Collections.emptyMap());
+        Type pomType = Mockito.mock(Type.class);
+        when(pomType.id()).thenReturn(Type.POM);
 
-        DefaultPackagingRegistry registry = new DefaultPackagingRegistry(lookup, mock(TypeRegistry.class), List.of());
+        when(lookup.lookupOptional(LifecycleMapping.class, "pom")).thenReturn(Optional.of(lifecycleMapping));
+        when(typeRegistry.lookup("pom")).thenReturn(Optional.of(pomType));
 
-        assertSame(packaging, registry.lookup("app-client").orElseThrow());
-        visible.set(List.of());
-        assertTrue(registry.lookup("app-client").isEmpty());
+        DefaultPackagingRegistry registry = new DefaultPackagingRegistry(lookup, typeRegistry, Collections.emptyList());
+        Optional<Packaging> packaging = registry.lookup("pom");
+
+        assertTrue(packaging.isPresent());
+        assertFalse(packaging.get().producesMainArtifact());
     }
 
     @Test
-    void findsProviderInjectedWhenRegistryWasConstructed() {
-        Lookup lookup = mock(Lookup.class);
-        Packaging packaging = packaging("app-client");
-        PackagingProvider provider = () -> List.of(packaging);
+    void bomPackagingDoesNotProduceMainArtifact() {
+        Lookup lookup = Mockito.mock(Lookup.class);
+        TypeRegistry typeRegistry = Mockito.mock(TypeRegistry.class);
+        LifecycleMapping lifecycleMapping = Mockito.mock(LifecycleMapping.class);
+        when(lifecycleMapping.getLifecycles()).thenReturn(Collections.emptyMap());
+        Type bomType = Mockito.mock(Type.class);
+        when(bomType.id()).thenReturn(Type.BOM);
 
-        DefaultPackagingRegistry registry =
-                new DefaultPackagingRegistry(lookup, mock(TypeRegistry.class), List.of(provider));
+        when(lookup.lookupOptional(LifecycleMapping.class, "bom")).thenReturn(Optional.of(lifecycleMapping));
+        when(typeRegistry.lookup("bom")).thenReturn(Optional.of(bomType));
 
-        assertSame(packaging, registry.lookup("app-client").orElseThrow());
+        DefaultPackagingRegistry registry = new DefaultPackagingRegistry(lookup, typeRegistry, Collections.emptyList());
+        Optional<Packaging> packaging = registry.lookup("bom");
+
+        assertTrue(packaging.isPresent());
+        assertFalse(packaging.get().producesMainArtifact());
     }
 
     @Test
-    void retainsLegacyLifecycleMappingFallback() {
-        Lookup lookup = mock(Lookup.class);
-        TypeRegistry types = mock(TypeRegistry.class);
-        LifecycleMapping mapping = mock(LifecycleMapping.class);
-        Type type = mock(Type.class);
-        when(lookup.lookupOptional(LifecycleMapping.class, "jar")).thenReturn(Optional.of(mapping));
-        when(mapping.getLifecycles()).thenReturn(Map.of());
-        when(types.lookup("jar")).thenReturn(Optional.of(type));
+    void jarPackagingProducesMainArtifact() {
+        Lookup lookup = Mockito.mock(Lookup.class);
+        TypeRegistry typeRegistry = Mockito.mock(TypeRegistry.class);
+        LifecycleMapping lifecycleMapping = Mockito.mock(LifecycleMapping.class);
+        when(lifecycleMapping.getLifecycles()).thenReturn(Collections.emptyMap());
+        Type jarType = Mockito.mock(Type.class);
+        when(jarType.id()).thenReturn(Type.JAR);
 
-        DefaultPackagingRegistry registry = new DefaultPackagingRegistry(lookup, types, List.of());
-        Packaging packaging = registry.lookup("jar").orElseThrow();
+        when(lookup.lookupOptional(LifecycleMapping.class, "jar")).thenReturn(Optional.of(lifecycleMapping));
+        when(typeRegistry.lookup("jar")).thenReturn(Optional.of(jarType));
 
-        assertEquals("jar", packaging.id());
-        assertSame(type, packaging.type());
-        assertTrue(packaging.plugins().isEmpty());
-    }
+        DefaultPackagingRegistry registry = new DefaultPackagingRegistry(lookup, typeRegistry, Collections.emptyList());
+        Optional<Packaging> packaging = registry.lookup("jar");
 
-    private static Packaging packaging(String id) {
-        Packaging packaging = mock(Packaging.class);
-        when(packaging.id()).thenReturn(id);
-        return packaging;
+        assertTrue(packaging.isPresent());
+        assertTrue(packaging.get().producesMainArtifact());
     }
 }

@@ -1781,6 +1781,58 @@ class DefaultModelBuilderTest {
                 "Parent file profile interpolating ${message.file} must inject into child (MNG-8710)");
     }
 
+    /**
+     * Combined invariant test for MNG-8710 + #13390.
+     * <p>
+     * A parent property used to resolve a file-profile path (via {@code interpolationProperties})
+     * must NOT simultaneously self-activate a property-based profile on that same parent.
+     * The file profile fires because the path interpolates correctly (#10375).
+     * The property-based profile must not fire because {@code interpolationProperties} is
+     * intentionally hidden from {@code getModelProperty()} (#13390).
+     */
+    @Test
+    void testMng8710ParentFileProfileFiresButPropertyProfileDoesNot() {
+        Path pom = Paths.get("src/test/resources/poms/factory/mng-8710-combined/pom.xml")
+                .toAbsolutePath();
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .recursive(true)
+                        .source(Sources.buildSource(pom))
+                        .build());
+
+        Model parentModel = result.getEffectiveModel();
+
+        // The file profile MUST activate: ${message.file} resolves via interpolationProperties (#10375)
+        assertEquals(
+                "true",
+                parentModel.getProperties().get("profile.file.activated"),
+                "File profile interpolating ${message.file} must activate (MNG-8710)");
+
+        // The property-based profile MUST NOT activate: interpolationProperties must not be
+        // visible through getModelProperty(), preventing self-activation (#13390)
+        assertNull(
+                parentModel.getProperties().get("profile.property.activated"),
+                "Property-based profile on ${message.file} must NOT activate via interpolationProperties (#13390)");
+
+        // Verify the same invariant holds for child modules
+        ModelBuilderResult childResult = result.getChildren().stream()
+                .filter(r ->
+                        "mng-8710-combined-child".equals(r.getEffectiveModel().getArtifactId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("child result missing: " + result.getChildren()));
+        Model childModel = childResult.getEffectiveModel();
+
+        assertEquals(
+                "true",
+                childModel.getProperties().get("profile.file.activated"),
+                "File profile must also activate for child module (MNG-8710)");
+        assertNull(
+                childModel.getProperties().get("profile.property.activated"),
+                "Property-based profile must not activate for child module either (#13390)");
+    }
+
     @Test
     void testBomImportWarningFromParentProfileActivatedForChild() {
         Path pom = Paths.get("src/test/resources/poms/factory/mng-8450-profile-context/pom.xml")

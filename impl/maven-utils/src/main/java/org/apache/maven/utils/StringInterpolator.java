@@ -441,6 +441,10 @@ public class StringInterpolator {
         // Try configuration properties first
         if (configProps != null) {
             substValue = configProps.get(variable);
+            if (substValue != null && substValue.contains(DELIM_START)) {
+                substValue = doSubstVars(
+                        substValue, variable, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
+            }
         }
         if (substValue == null && !variable.isEmpty() && callback != null) {
             String s1 = callback.apply(variable);

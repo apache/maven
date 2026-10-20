@@ -16,25 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.its.gh13306;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+package org.apache.maven.plugin.coreit;
 
-import org.apache.maven.api.Packaging;
-import org.apache.maven.api.Type;
-import org.apache.maven.api.di.Named;
-import org.apache.maven.api.model.PluginContainer;
-import org.apache.maven.api.spi.PackagingProvider;
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
 
-@Named
-public class CustomPackagingProvider implements PackagingProvider {
+@Mojo(name = "fork-phase-config")
+@Execute(phase = LifecyclePhase.GENERATE_RESOURCES, lifecycle = "phase-config")
+public class ForkPhaseConfigMojo extends AbstractMojo {
 
     @Override
-    public Collection<Packaging> provides() {
-        return List.of(new CustomPackaging("app-client", new CustomTypeProvider.CustomType(), Map.of()));
-    }
-
-    private record CustomPackaging(String id, Type type, Map<String, PluginContainer> plugins) implements Packaging {}
+    public void execute() {}
 }

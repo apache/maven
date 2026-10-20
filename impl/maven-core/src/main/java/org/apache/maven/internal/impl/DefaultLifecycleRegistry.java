@@ -34,16 +34,17 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.services.LifecycleRegistry;
-import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 import org.apache.maven.api.spi.ExtensibleEnumProvider;
 import org.apache.maven.api.spi.LifecycleProvider;
@@ -89,6 +90,10 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     private static final String MAVEN_PLUGINS = "org.apache.maven.plugins:";
 
+    private static final boolean SITE_DISABLED = Boolean.getBoolean(Constants.MAVEN_SITE_LIFECYCLE_DISABLED);
+
+    private static final Predicate<Lifecycle> SITE_FILTER = lf -> !SITE_DISABLED || !Lifecycle.SITE.equals(lf.id());
+
     public static final String DEFAULT_LIFECYCLE_MODELID = "org.apache.maven:maven-core:"
             + getImplementationVersion(DefaultLifecycleRegistry.class)
             + ":default-lifecycle-bindings";
@@ -102,26 +107,18 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
     public static final String SCOPE_TEST = DependencyScope.TEST.id();
 
     private final List<LifecycleProvider> providers;
-    private final Lookup lookup;
 
     public DefaultLifecycleRegistry() {
         this(Collections.emptyList());
     }
 
-    public DefaultLifecycleRegistry(List<LifecycleProvider> providers) {
-        this(null, providers);
-    }
-
     @Inject
-    public DefaultLifecycleRegistry(Lookup lookup, List<LifecycleProvider> providers) {
-        this.lookup = lookup;
+    public DefaultLifecycleRegistry(List<LifecycleProvider> providers) {
         List<LifecycleProvider> p = new ArrayList<>(providers);
         p.add(() -> List.of(new CleanLifecycle(), new DefaultLifecycle(), new SiteLifecycle()));
         this.providers = p;
-        // validate lifecycle using only injected providers (safe during construction —
-        // dynamic lookup may not be usable yet)
-        for (Lifecycle lifecycle :
-                providers.stream().flatMap(pr -> pr.provides().stream()).toList()) {
+        // validate lifecycle
+        for (Lifecycle lifecycle : this) {
             Set<String> set = new HashSet<>();
             lifecycle.allPhases().forEach(phase -> {
                 if (!set.add(phase.name())) {
@@ -144,19 +141,10 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
 
     @Override
     public Stream<Lifecycle> stream() {
-        if (lookup != null) {
-            // Dynamic discovery includes constructor-injected + project-extension providers.
-            // Built-in lifecycles (clean, default, site) are added as a lambda and not
-            // discoverable via Lookup, so we always include the injected providers too.
-            // Deduplicate by id, with dynamic providers taking priority.
-            Map<String, Lifecycle> result = new LinkedHashMap<>();
-            providers.stream().flatMap(p -> p.provides().stream()).forEach(lf -> result.put(lf.id(), lf));
-            lookup.lookupList(LifecycleProvider.class).stream()
-                    .flatMap(p -> p.provides().stream())
-                    .forEach(lf -> result.put(lf.id(), lf));
-            return result.values().stream();
-        }
-        return providers.stream().map(ExtensibleEnumProvider::provides).flatMap(Collection::stream);
+        return providers.stream()
+                .map(ExtensibleEnumProvider::provides)
+                .flatMap(Collection::stream)
+                .filter(SITE_FILTER);
     }
 
     @Override

@@ -133,6 +133,14 @@ public class CLIManager {
 
     public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
 
+    public static final String UPDATE_METADATA = "UM";
+
+    public static final String UPDATE_ARTIFACTS = "UA";
+
+    public static final String ARTIFACTS_UPDATE_POLICY = "artifacts-update-policy";
+
+    public static final String METADATA_UPDATE_POLICY = "metadata-update-policy";
+
     public static final String DEBUG = "debug";
     public static final String ENC = "enc";
     public static final String YJP = "yjp";
@@ -340,6 +348,27 @@ public class CLIManager {
         options.addOption(Option.builder(IGNORE_TRANSITIVE_REPOSITORIES)
                 .longOpt("ignore-transitive-repositories")
                 .desc("If set, Maven will ignore remote repositories introduced by transitive dependencies.")
+                .build());
+        options.addOption(Option.builder(UPDATE_METADATA)
+                .longOpt("update-metadata")
+                .desc(
+                        "Forces updates of remote repository metadata (updates plugin prefixes, version ranges and snapshots)")
+                .build());
+        options.addOption(Option.builder(UPDATE_ARTIFACTS)
+                .longOpt("update-artifacts")
+                .desc("Forces checks for missing artifacts (retries cached retrieval errors)")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(ARTIFACTS_UPDATE_POLICY)
+                .hasArg(true)
+                .desc(
+                        "The update policy to apply onto artifacts ('always', 'daily', 'interval:N', 'never'); The -UA option overrides this option with 'always'")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(METADATA_UPDATE_POLICY)
+                .hasArg(true)
+                .desc(
+                        "The update policy to apply onto metadata ('always', 'daily', 'interval:N', 'never'); The -UM option overrides this option with 'always'")
                 .build());
 
         // Parameters handled by script

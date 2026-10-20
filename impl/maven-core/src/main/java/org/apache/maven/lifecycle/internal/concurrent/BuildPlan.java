@@ -96,8 +96,8 @@ public class BuildPlan {
     }
 
     private Map<String, BuildStep> merge(Map<String, BuildStep> org, Map<String, BuildStep> add) {
-        // When add contains infrastructure steps ($plan$, $setup$, $teardown$), this merge
-        // is from computeForkPlan (execution plan merged into a fork). In that case, use the
+        // When add contains the infrastructure $plan$ step, this merge is from
+        // computeForkPlan (execution plan merged into a fork). In that case, use the
         // original terminal-step chaining to avoid creating cycles with the frontier approach.
         boolean isSegmentMerge = !add.containsKey(BuildStep.PLAN);
 
@@ -119,6 +119,7 @@ public class BuildPlan {
                     .toList();
             if (activeFrontier.isEmpty()) {
                 activeFrontier = org.values().stream()
+                        .filter(b -> !b.skip.get())
                         .filter(b -> b.successors.isEmpty())
                         .toList();
             }

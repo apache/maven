@@ -81,6 +81,38 @@ class StringInterpolatorTest {
     }
 
     @Test
+    void testSelfReferencingConfigPropertyDifferentCurrentKey() {
+        assertThrows(
+                StringInterpolatorException.class,
+                () -> substVars("${a}", "outer", Map.of("a", "${a}")),
+                "Expected substVars() to throw a StringInterpolatorException for self-referencing property");
+    }
+
+    @Test
+    void testSelfReferencingConfigPropertyNullCurrentKey() {
+        assertThrows(
+                StringInterpolatorException.class,
+                () -> substVars("${a}", null, Map.of("a", "${a}")),
+                "Expected substVars() to throw a StringInterpolatorException when currentKey is null");
+    }
+
+    @Test
+    void testIndirectCycleConfigProperties() {
+        assertThrows(
+                StringInterpolatorException.class,
+                () -> substVars("${a}", "outer", Map.of("a", "${b}", "b", "${a}")),
+                "Expected substVars() to throw a StringInterpolatorException for indirect 2-variable cycle");
+    }
+
+    @Test
+    void testValidChainedReferenceConfigProperties() {
+        assertEquals(
+                "hello",
+                substVars("${a}", "outer", Map.of("a", "${b}", "b", "hello")),
+                "Expected substVars() to resolve chained reference");
+    }
+
+    @Test
     void testLoopEmpty() {
         assertEquals("${a}", substVars("${a}", null, null, null, false));
     }

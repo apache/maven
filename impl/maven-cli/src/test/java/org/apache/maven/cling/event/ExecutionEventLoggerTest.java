@@ -241,6 +241,39 @@ class ExecutionEventLoggerTest {
     }
 
     @Test
+    void testMultiModuleProjectBuiltAgainKeepsItsNumber() {
+        // an aggregator goal on the command line builds the first project once more after the last one (#10291)
+        MavenProject project1 = generateMavenProject("Apache Maven Embedder 1");
+        MavenProject project2 = generateMavenProject("Apache Maven Embedder 2");
+        MavenProject project3 = generateMavenProject("Apache Maven Embedder 3");
+
+        MavenSession session = mock(MavenSession.class);
+        when(session.getProjects()).thenReturn(List.of(project1, project2, project3));
+        when(session.getAllProjects()).thenReturn(List.of(project1, project2, project3));
+
+        ExecutionEvent sessionStartedEvent = mock(ExecutionEvent.class);
+        when(sessionStartedEvent.getSession()).thenReturn(session);
+        ExecutionEvent projectStartedEvent1 = mock(ExecutionEvent.class);
+        when(projectStartedEvent1.getProject()).thenReturn(project1);
+        ExecutionEvent projectStartedEvent2 = mock(ExecutionEvent.class);
+        when(projectStartedEvent2.getProject()).thenReturn(project2);
+        ExecutionEvent projectStartedEvent3 = mock(ExecutionEvent.class);
+        when(projectStartedEvent3.getProject()).thenReturn(project3);
+
+        executionEventLogger.sessionStarted(sessionStartedEvent);
+        executionEventLogger.projectStarted(projectStartedEvent1);
+        executionEventLogger.projectStarted(projectStartedEvent2);
+        executionEventLogger.projectStarted(projectStartedEvent3);
+        executionEventLogger.projectStarted(projectStartedEvent1);
+
+        InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 1.*\\[1\\/3\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 2.*\\[2\\/3\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 3.*\\[3\\/3\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 1.*\\[1\\/3\\]"));
+    }
+
+    @Test
     void testMultiModuleProjectResumeFromProgress() {
         // prepare
         MavenProject project1 = generateMavenProject("Apache Maven Embedder 1");
