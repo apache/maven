@@ -193,9 +193,7 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
         return type == String.class
                 || type == CharSequence.class
                 || type == StringBuilder.class
-                || type == StringBuffer.class
-                || type == Object.class
-                || type == null;
+                || type == StringBuffer.class;
     }
 
     private static Object createEmptyStringResult(Class<?> type) {

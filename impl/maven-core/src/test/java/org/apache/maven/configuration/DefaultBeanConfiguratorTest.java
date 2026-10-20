@@ -239,6 +239,19 @@ class DefaultBeanConfiguratorTest {
     }
 
     @Test
+    void testObjectEmptyTagPreservesDefault() throws BeanConfigurationException {
+        PluginConfigBean bean = new PluginConfigBean();
+        assertEquals("initialObject", bean.settings.customObject);
+
+        Xpp3Dom config = toConfig("<settings><customObject></customObject></settings>");
+        DefaultBeanConfigurationRequest request = new DefaultBeanConfigurationRequest();
+        request.setBean(bean).setConfiguration(config);
+
+        configurator.configureBean(request);
+        assertEquals("initialObject", bean.settings.customObject);
+    }
+
+    @Test
     void testUnresolvableExpressionPassesThrough() throws BeanConfigurationException {
         PluginConfigBean bean = new PluginConfigBean();
         Xpp3Dom config = toConfig("<settings><docClassesToTargets>${undefined}</docClassesToTargets></settings>");
@@ -263,6 +276,8 @@ class DefaultBeanConfiguratorTest {
         int count = 42;
 
         boolean skip = true;
+
+        Object customObject = "initialObject";
     }
 
     static class SomeBean {
