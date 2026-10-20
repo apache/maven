@@ -39,8 +39,6 @@ import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.InputSource;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.util.StringUtils;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.slf4j.Logger;
@@ -67,9 +65,6 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
     @Inject
     private DefaultLifecycles defaultLifeCycles;
 
-    @Inject
-    private PlexusContainer plexusContainer;
-
     public DefaultLifecyclePluginAnalyzer() {}
 
     // These methods deal with construction intact Plugin object that look like they come from a standard
@@ -88,20 +83,8 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
                     + Thread.currentThread().getContextClassLoader());
         }
 
-        Map<String, LifecycleMapping> filtered = new HashMap<>();
-        // filter by visibility (plexus vs sisu diff; "realms" are plexus thing)
-        // in some tests container is not injected
-        if (this.plexusContainer != null) {
-            for (String name : this.lifecycleMappings.keySet()) {
-                try {
-                    filtered.put(name, plexusContainer.lookup(LifecycleMapping.class, name));
-                } catch (ComponentLookupException e) {
-                    // skip it
-                }
-            }
-        } else {
-            filtered.putAll(this.lifecycleMappings);
-        }
+        // take "snapshot": will filter by visibility
+        Map<String, LifecycleMapping> filtered = new HashMap<>(this.lifecycleMappings);
 
         LifecycleMapping lifecycleMappingForPackaging = filtered.get(packaging);
 

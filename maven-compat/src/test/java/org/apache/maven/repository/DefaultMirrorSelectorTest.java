@@ -23,6 +23,7 @@ import org.apache.maven.artifact.repository.DefaultArtifactRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class DefaultMirrorSelectorTest {
 
@@ -33,5 +34,42 @@ public class DefaultMirrorSelectorTest {
         boolean matches = DefaultMirrorSelector.matchPattern(repository, pattern);
         System.out.println(matches);
         assertFalse(matches);
+    }
+
+    @Test
+    void testLoopbackAddressesAreLocal() {
+        for (String url : new String[] {
+            "http://127.0.0.2/m2/",
+            "http://127.255.255.254:8080/m2/",
+            "http://[::1]/m2/",
+            "http://[::1]:8080/m2/",
+            "http://[0:0:0:0:0:0:0:1]:8080/m2/",
+            // an IPv4 loopback address written as IPv4-mapped IPv6 address
+            "http://[::ffff:127.0.0.1]/m2/",
+            "http://[::ffff:7f00:1]:8080/m2/"
+        }) {
+            assertFalse(DefaultMirrorSelector.isExternalRepo(repo(url)), url);
+            assertFalse(DefaultMirrorSelector.isExternalHttpRepo(repo(url)), url);
+        }
+    }
+
+    @Test
+    void testOtherAddressesAreExternal() {
+        for (String url : new String[] {
+            "http://128.0.0.1/m2/",
+            "http://127.0.0.1.example.com/m2/",
+            "http://127.example.com/m2/",
+            "http://[2001:db8::1]/m2/",
+            "http://[2001:db8::1]:8080/m2/",
+            // an IPv4-mapped IPv6 address which is not a loopback one
+            "http://[::ffff:8.8.8.8]/m2/"
+        }) {
+            assertTrue(DefaultMirrorSelector.isExternalRepo(repo(url)), url);
+            assertTrue(DefaultMirrorSelector.isExternalHttpRepo(repo(url)), url);
+        }
+    }
+
+    private static ArtifactRepository repo(String url) {
+        return new DefaultArtifactRepository("test", url, null);
     }
 }

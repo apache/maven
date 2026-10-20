@@ -22,13 +22,19 @@ import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.PrintStream;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.Maven;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.jline.MessageUtils;
+import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.PlexusContainer;
@@ -44,6 +50,7 @@ import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -53,6 +60,7 @@ import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.when;
 
 public class MavenCliTest {
     MavenCli cli;
@@ -72,6 +80,35 @@ public class MavenCliTest {
         } else {
             System.getProperties().remove(MavenCli.MULTIMODULE_PROJECT_DIRECTORY);
         }
+    }
+
+    /**
+     * With redirected streams there is no console, and the password is read from the standard input, as the
+     * encryption printed an empty result otherwise (MNG-8398).
+     */
+    @Test
+    public void testReadPasswordFromRedirectedInput() throws Exception {
+        ByteArrayInputStream in = new ByteArrayInputStream("secret\nignored\n".getBytes(StandardCharsets.UTF_8));
+
+        assertEquals("secret", MavenCli.readPassword(null, in, "Password: "));
+    }
+
+    @Test
+    public void testReadPasswordFromRedirectedInputIsDecodedAsUtf8() throws Exception {
+        ByteArrayInputStream in = new ByteArrayInputStream("p\u00e4ss\u20ac\n".getBytes(StandardCharsets.UTF_8));
+
+        assertEquals("p\u00e4ss\u20ac", MavenCli.readPassword(null, in, "Password: "));
+    }
+
+    @Test
+    public void testReadPasswordRejectsMissingPassword() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> MavenCli.readPassword(null, new ByteArrayInputStream(new byte[0]), "Password: "));
+        assertThrows(
+                IllegalStateException.class,
+                () -> MavenCli.readPassword(
+                        null, new ByteArrayInputStream("\n".getBytes(StandardCharsets.UTF_8)), "Password: "));
     }
 
     @Test
@@ -102,6 +139,34 @@ public class MavenCliTest {
         assertEquals(1, cli.calculateDegreeOfConcurrency(" 1 "));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("-2.2C"));
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0C"));
+    }
+
+    @Test
+    public void testOptionalProfiles() throws Exception {
+        List<String> active = new ArrayList<>();
+        List<String> inactive = new ArrayList<>();
+
+        MavenCli.performProfileActivation(
+                new CLIManager().parse(new String[] {
+                    "-P", "?run-its,+?docs,-?slow,!?legacy,plain,-off,!gone", "-P", " ?spaced , +?more "
+                }),
+                active,
+                inactive);
+
+        assertEquals(Arrays.asList("run-its", "docs", "plain", "spaced", "more"), active);
+        assertEquals(Arrays.asList("slow", "legacy", "off", "gone"), inactive);
+    }
+
+    @Test
+    public void testDegenerateProfileTokens() throws Exception {
+        List<String> active = new ArrayList<>();
+        List<String> inactive = new ArrayList<>();
+
+        MavenCli.performProfileActivation(
+                new CLIManager().parse(new String[] {"-P", "?,!,+,-,+?,-?,!?,,"}), active, inactive);
+
+        assertTrue(active.isEmpty());
+        assertTrue(inactive.isEmpty());
     }
 
     @Test
@@ -533,6 +598,73 @@ public class MavenCliTest {
             assertEquals(url, request.getSystemProperties().getProperty("maven.repo.central"));
         } finally {
             System.clearProperty("env.MAVEN_REPO_CENTRAL");
+        }
+    }
+
+    /**
+     * Verifies that {@code commands()} prints usage and exits with 0 when no goals are specified
+     * and no POM exists in the working directory — the main behavioural change in MNG-8346 / PR #13269.
+     * Also verifies that the check is skipped when {@code -f}/{@code --file} is specified.
+     */
+    @Nested
+    class CommandsHelpOnEmpty {
+
+        private MavenCli.ExitException invokeCommands(CliRequest request) throws Exception {
+            Method m = MavenCli.class.getDeclaredMethod("commands", CliRequest.class);
+            m.setAccessible(true);
+            try {
+                m.invoke(cli, request);
+                return null;
+            } catch (java.lang.reflect.InvocationTargetException ite) {
+                Throwable cause = ite.getCause();
+                if (cause instanceof MavenCli.ExitException) {
+                    return (MavenCli.ExitException) cause;
+                }
+                throw new RuntimeException(cause);
+            }
+        }
+
+        private void injectModelProcessor(ModelProcessor processor) throws Exception {
+            Field f = MavenCli.class.getDeclaredField("modelProcessor");
+            f.setAccessible(true);
+            f.set(cli, processor);
+        }
+
+        @Test
+        void displaysHelpAndExits0WhenNoGoalsAndNoPom() throws Exception {
+            System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, ".");
+
+            // A ModelProcessor that always returns a non-existent file (simulates no POM)
+            ModelProcessor mockProcessor = mock(ModelProcessor.class);
+            when(mockProcessor.locatePom(any(File.class))).thenReturn(new File("nonexistent-pom.xml"));
+            injectModelProcessor(mockProcessor);
+
+            CliRequest request = new CliRequest(new String[0], null);
+            request.workingDirectory = System.getProperty("user.dir");
+            cli.cli(request);
+
+            MavenCli.ExitException ex = invokeCommands(request);
+
+            assertNotNull(ex, "Expected ExitException when no goals and no POM");
+            assertEquals(0, ex.exitCode, "Expected exit code 0 (graceful help display)");
+        }
+
+        @Test
+        void skipsCheckWhenAlternatePomFileSpecified() throws Exception {
+            System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, ".");
+
+            // ModelProcessor is injected but should NOT be consulted when -f is set
+            ModelProcessor mockProcessor = mock(ModelProcessor.class);
+            when(mockProcessor.locatePom(any(File.class))).thenReturn(new File("nonexistent-pom.xml"));
+            injectModelProcessor(mockProcessor);
+
+            CliRequest request = new CliRequest(new String[] {"-f", "/some/other/project"}, null);
+            request.workingDirectory = System.getProperty("user.dir");
+            cli.cli(request);
+
+            // Should NOT throw — the -f flag skips the POM-existence check
+            MavenCli.ExitException ex = invokeCommands(request);
+            assertNull(ex, "Expected no ExitException when -f/--file is specified");
         }
     }
 }

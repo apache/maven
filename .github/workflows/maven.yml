@@ -17,7 +17,11 @@
 
 name: Java CI
 
-on: [push, pull_request]
+on:
+  push:
+    branches: [ maven-3.10.x ]
+  pull_request:
+    branches: [ maven-3.10.x ]
 
 # allow single build per branch or PR
 concurrency:
@@ -29,9 +33,6 @@ permissions: {}
 
 jobs:
   build:
-
-    # execute on any push or pull request from forked repo
-    if: github.event_name == 'push' || ( github.event_name == 'pull_request' && github.event.pull_request.head.repo.fork )
 
     strategy:
       matrix:
@@ -45,21 +46,23 @@ jobs:
         with:
           persist-credentials: false
 
-      - uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+      - uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: 25
-          distribution: 'zulu'
+          distribution: 'temurin'
           cache: 'maven'
+          # pull requests restore the caches of the branch they target without saving their own copies
+          cache-read-only: ${{ github.event_name == 'pull_request' }}
 
       - name: Set up Maven
         run:
-          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=3.10.0-rc-1"
+          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=3.10.0"
 
       - name: Build with Maven
         run: ./mvnw verify -e -B -V -DdistributionFileName=apache-maven
 
       - name: Upload built Maven
-        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
         if: ${{ matrix.os == 'ubuntu-latest' }}
         with:
           name: built-maven
@@ -70,7 +73,7 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, windows-latest, macOS-latest]
-        java: [8, 25, 26]
+        java: [8, 25, 27]
 
       fail-fast: false
     runs-on: ${{ matrix.os }}
@@ -116,8 +119,9 @@ jobs:
           persist-credentials: false
 
 
-      - name: Set up cache for ~/.m2/repository
-        uses: actions/cache@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+      - name: Restore ~/.m2/repository
+        id: it-m2-repo
+        uses: actions/cache/restore@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
         with:
           path: ~/.m2/repository
           key: it-m2-repo-${{ matrix.os }}-${{ hashFiles('maven-integration-testing/**/pom.xml') }}
@@ -125,23 +129,52 @@ jobs:
             it-m2-repo-${{ matrix.os }}-
 
       - name: Download built Maven
-        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        uses: actions/download-artifact@9000827ccba6bdab643e8b6fd33ac0654aef8333 # v8.0.2
         with:
           name: built-maven
           path: built-maven/
 
       - name: Set up JDK
-        uses: actions/setup-java@de7274f081f381c8f8158605e0321c36c376e2e6 # v6.0.1
+        uses: actions/setup-java@b843ebf9b913146b38da2eaa7aeddf76074ae1ad # v6.1.0
         with:
           java-version: ${{ matrix.java }}
-          distribution: 'zulu'
-          cache: 'maven'
+          # Temurin comes from the runners' tool cache; it has no JDK 8 for macOS on Apple Silicon
+          distribution: ${{ (runner.os == 'macOS' && matrix.java == 8) && 'zulu' || 'temurin' }}
+          # no cache: 'maven' here - the it-m2-repo cache above already restores and saves ~/.m2/repository
           show-download-progress: true # ITs verify transfer progress output
 
       - name: Set up Maven
         run:
-          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=3.10.0-rc-1"
+          mvn --errors --batch-mode --show-version org.apache.maven.plugins:maven-wrapper-plugin:3.3.4:wrapper "-Dmaven=3.10.0"
 
       - name: Running integration tests
         shell: bash
         run: ./mvnw install -e -B -V -Prun-its,embedded -Dmaven.repo.local="$HOME/.m2/repository" -DmavenDistro="$GITHUB_WORKSPACE/built-maven/apache-maven-bin.zip" -f maven-integration-testing/pom.xml
+
+      - name: Save ~/.m2/repository
+        # pull requests restore the cache without saving their own copy
+        if: ${{ github.event_name == 'push' && steps.it-m2-repo.outputs.cache-hit != 'true' && !cancelled() && !failure() }}
+        uses: actions/cache/save@55cc8345863c7cc4c66a329aec7e433d2d1c52a9 # v6.1.0
+        with:
+          path: ~/.m2/repository
+          key: it-m2-repo-${{ matrix.os }}-${{ hashFiles('maven-integration-testing/**/pom.xml') }}
+
+  prune-caches:
+    name: Prune superseded integration-test caches
+    # every change to the IT POMs saves a new generation; restores only use the exact key or the newest fallback
+    needs: integration-test
+    if: ${{ !cancelled() && github.event_name == 'push' }}
+    runs-on: ubuntu-latest
+    permissions:
+      actions: write
+    steps:
+      - name: Delete all but the newest it-m2-repo cache per OS on this branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh cache list --repo "$GITHUB_REPOSITORY" --ref "$GITHUB_REF" --key it-m2-repo- --limit 100 --json id,key,createdAt \
+            --jq 'group_by(.key | sub("-[0-9a-f]{64}$"; "")) | .[] | sort_by(.createdAt) | .[:-1][] | "\(.id) \(.key)"' |
+          while read -r id key; do
+            echo "Deleting $key"
+            gh cache delete "$id" --repo "$GITHUB_REPOSITORY"
+          done

@@ -235,8 +235,20 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
 
     private static boolean restrictExternalModelInterpolation(ModelBuildingRequest config) {
         return config.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
-                && !Boolean.parseBoolean(config.getSystemProperties().getProperty(FULL_EXTERNAL_INTERPOLATION_PROPERTY))
-                && !Boolean.parseBoolean(config.getUserProperties().getProperty(FULL_EXTERNAL_INTERPOLATION_PROPERTY));
+                && !isFullExternalModelBuild(config);
+    }
+
+    /**
+     * Tells whether {@value #FULL_EXTERNAL_INTERPOLATION_PROPERTY} is set, as a system or a user property,
+     * which exempts models built below {@link ModelBuildingRequest#VALIDATION_LEVEL_MAVEN_2_0} from the
+     * restrictions that apply to models resolved from a repository.
+     *
+     * @param config the model building request
+     * @return {@code true} if the property is set to {@code true}
+     */
+    public static boolean isFullExternalModelBuild(ModelBuildingRequest config) {
+        return Boolean.parseBoolean(config.getSystemProperties().getProperty(FULL_EXTERNAL_INTERPOLATION_PROPERTY))
+                || Boolean.parseBoolean(config.getUserProperties().getProperty(FULL_EXTERNAL_INTERPOLATION_PROPERTY));
     }
 
     private static ValueSource restrictToSafeExpressions(ValueSource source) {

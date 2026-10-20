@@ -35,8 +35,6 @@ import java.util.stream.Collectors;
 import org.apache.maven.lifecycle.providers.lifecycle.CleanLifecycleProvider;
 import org.apache.maven.lifecycle.providers.lifecycle.DefaultLifecycleProvider;
 import org.apache.maven.lifecycle.providers.lifecycle.SiteLifecycleProvider;
-import org.codehaus.plexus.PlexusContainer;
-import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.util.StringUtils;
 
@@ -52,7 +50,11 @@ import org.codehaus.plexus.util.StringUtils;
 public class DefaultLifecycles {
     private static final List<String> BUILT_IN_LIFECYCLES =
             Arrays.asList(CleanLifecycleProvider.NAME, DefaultLifecycleProvider.NAME, SiteLifecycleProvider.NAME);
-    private static final boolean SITE_DISABLED = Boolean.getBoolean("maven.site.lifecycle.disabled");
+
+    /**
+     * Java System Property, as it must be "early discovered", that disables site lifecycle.
+     */
+    private static final String CONFIG_PROP_SITE_DISABLED = "maven.site.lifecycle.disabled";
 
     /**
      * @deprecated Use {@link #getStandardLifecycles()} instead.
@@ -68,9 +70,6 @@ public class DefaultLifecycles {
     @Inject
     private Logger logger;
 
-    @Inject
-    private PlexusContainer plexusContainer;
-
     public DefaultLifecycles() {}
 
     public DefaultLifecycles(Map<String, Lifecycle> lifecycles, Logger logger) {
@@ -80,7 +79,7 @@ public class DefaultLifecycles {
 
     private boolean isEnabled(String lifecycleId) {
         if (SiteLifecycleProvider.NAME.equals(lifecycleId)) {
-            return !SITE_DISABLED;
+            return !Boolean.getBoolean(CONFIG_PROP_SITE_DISABLED);
         } else {
             return true;
         }
@@ -132,24 +131,10 @@ public class DefaultLifecycles {
     public List<Lifecycle> getLifeCycles() {
         // ensure canonical order of standard lifecycles
 
-        Map<String, Lifecycle> lifecycles = new LinkedHashMap<>();
-
-        // filter by visibility (plexus vs sisu diff; "realms" are plexus thing)
-        // in some tests container is not injected
-        if (this.plexusContainer != null) {
-            for (String name : this.lifecycles.keySet()) {
-                if (!isEnabled(name)) {
-                    continue;
-                }
-                try {
-                    lifecycles.put(name, plexusContainer.lookup(Lifecycle.class, name));
-                } catch (ComponentLookupException e) {
-                    // skip it
-                }
-            }
-        } else {
-            lifecycles.putAll(this.lifecycles);
-        }
+        // take "snapshot": will filter by visibility
+        Map<String, Lifecycle> lifecycles = new LinkedHashMap<>(this.lifecycles);
+        // apply enabled
+        lifecycles.entrySet().removeIf(e -> !isEnabled(e.getKey()));
 
         LinkedHashSet<String> lifecycleNames = new LinkedHashSet<>(getStandardLifecycles());
         lifecycleNames.addAll(lifecycles.keySet());
@@ -157,8 +142,9 @@ public class DefaultLifecycles {
         ArrayList<Lifecycle> result = new ArrayList<>();
         for (String name : lifecycleNames) {
             Lifecycle lifecycle = lifecycles.get(name);
-            if (lifecycle.getId() == null) {
-                throw new NullPointerException("A lifecycle must have an id.");
+            // defensive check lifecycleNames is subset (or equal) of lifecycles.keySet
+            if (lifecycle == null || lifecycle.getId() == null) {
+                throw new NullPointerException("A lifecycle must be non-null and must have an id.");
             }
             result.add(lifecycle);
         }

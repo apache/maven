@@ -126,8 +126,8 @@ under the License.
 
   <properties>
     <javaVersion>8</javaVersion>
-    <version.sisu-maven-plugin>1.1.0</version.sisu-maven-plugin>
-    <asmVersion>9.10.1</asmVersion>
+    <version.sisu-maven-plugin>1.1.1</version.sisu-maven-plugin>
+    <asmVersion>9.11</asmVersion>
     <classWorldsVersion>2.12.1</classWorldsVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
     <commonsIoVersion>2.22.0</commonsIoVersion>
@@ -746,6 +746,20 @@ under the License.
   </build>
 
   <profiles>
+    <profile>
+      <!-- palantir-java-format crashes on JDK 27 (palantir/palantir-java-format#1786);
+           drop this profile once maven-parent ships a fixed release -->
+      <id>jdk27-skip-spotless</id>
+      <activation>
+        <property>
+          <name>java.specification.version</name>
+          <value>27</value>
+        </property>
+      </activation>
+      <properties>
+        <spotless.skip>true</spotless.skip>
+      </properties>
+    </profile>
     <profile>
       <id>apache-release</id>
       <build>
