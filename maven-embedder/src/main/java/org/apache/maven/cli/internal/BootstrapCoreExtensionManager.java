@@ -105,9 +105,22 @@ public class BootstrapCoreExtensionManager {
         }
     }
 
+    /**
+     * Helper method that returns {@code true} when current thread context classloader, or any in its parent chain,
+     * is instance of {@link ClassRealm} and belongs to a Core Extension loaded by Maven.
+     *
+     * @return {@code true} if current TCCL or any realm in parent chain of it is "core extension" class realm.
+     * @since 3.10.1
+     */
     public static boolean isContextRealmCoreExtensionRealm() {
-        ClassRealm classRealm = contextRealm();
-        return classRealm != null && classRealm.getId().startsWith(CORE_EXTENSION_REALM_NAME_PREFIX);
+        ClassRealm classRealm = contextRealmOrChild(Thread.currentThread().getContextClassLoader());
+        while (classRealm != null) {
+            if (classRealm.getId().startsWith(CORE_EXTENSION_REALM_NAME_PREFIX)) {
+                return true;
+            }
+            classRealm = contextRealmOrChild(classRealm.getParent());
+        }
+        return false;
     }
 
     private List<CoreExtensionEntry> resolveCoreExtensions(
@@ -201,12 +214,15 @@ public class BootstrapCoreExtensionManager {
     }
 
     /**
-     * Returns the first ClassRealm found in the TCCL parent chain, or {@code null} if none is found.
+     * Returns the first {@link ClassRealm} found in the classloader parent chain, or {@code null}, if none is found.
+     * Method uses given realm as starting point, otherwise will use TCCL as starting point.
+     *
+     * @param cl The starting classloader instance, may be {@code null}, in which case method returns {@code null}
      */
-    private static ClassRealm contextRealm() {
-        for (ClassLoader tccl = Thread.currentThread().getContextClassLoader(); tccl != null; tccl = tccl.getParent()) {
-            if (tccl instanceof ClassRealm) {
-                return (ClassRealm) tccl;
+    private static ClassRealm contextRealmOrChild(ClassLoader cl) {
+        for (ClassLoader ccl = cl; ccl != null; ccl = ccl.getParent()) {
+            if (ccl instanceof ClassRealm) {
+                return (ClassRealm) ccl;
             }
         }
         return null;

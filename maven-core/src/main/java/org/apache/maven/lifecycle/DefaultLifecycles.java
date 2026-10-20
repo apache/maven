@@ -142,6 +142,7 @@ public class DefaultLifecycles {
         ArrayList<Lifecycle> result = new ArrayList<>();
         for (String name : lifecycleNames) {
             Lifecycle lifecycle = lifecycles.get(name);
+            // defensive check lifecycleNames is subset (or equal) of lifecycles.keySet
             if (lifecycle == null || lifecycle.getId() == null) {
                 throw new NullPointerException("A lifecycle must be non-null and must have an id.");
             }

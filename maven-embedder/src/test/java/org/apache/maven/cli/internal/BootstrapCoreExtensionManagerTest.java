@@ -55,11 +55,39 @@ class BootstrapCoreExtensionManagerTest {
         assertTrue(BootstrapCoreExtensionManager.isContextRealmCoreExtensionRealm());
     }
 
+    /**
+     * This situation cannot happen in real life, unless Extension itself creates an "isolated" URL classloader beneath itself.
+     * Notice, how child classloader is not even a realm, but an URL classloader.
+     */
     @Test
-    void childOfCoreExtensionRealmTccl() throws Exception {
+    void childClassloaderOfCoreExtensionRealmTccl() throws Exception {
         Thread.currentThread()
                 .setContextClassLoader(
                         new java.net.URLClassLoader(new java.net.URL[0], world.newRealm("coreExtension>g:a:1", null)));
+        assertTrue(BootstrapCoreExtensionManager.isContextRealmCoreExtensionRealm());
+    }
+
+    /**
+     * This situation cannot happen in real life, unless Extension itself creates an "isolated" class realm beneath itself.
+     * Notice, how realm name in this case is unrelated and do not follow the "core extension realm" naming scheme.
+     */
+    @Test
+    void childRealmWithoutNameOfCoreExtensionRealmTccl() throws Exception {
+        Thread.currentThread()
+                .setContextClassLoader(
+                        world.newRealm("child", world.newRealm("coreExtension>g:a:1", null)));
+        assertTrue(BootstrapCoreExtensionManager.isContextRealmCoreExtensionRealm());
+    }
+
+    /**
+     * This situation cannot happen in real life, unless Extension itself creates an "isolated" realm beneath itself.
+     * Notice, how realm name in this case is reused, follows the "core extension realm" naming scheme (appends to it).
+     */
+    @Test
+    void childRealmWithNameOfCoreExtensionRealmTccl() throws Exception {
+        Thread.currentThread()
+                .setContextClassLoader(
+                        world.newRealm("coreExtension>g:a:1>child", world.newRealm("coreExtension>g:a:1", null)));
         assertTrue(BootstrapCoreExtensionManager.isContextRealmCoreExtensionRealm());
     }
 
