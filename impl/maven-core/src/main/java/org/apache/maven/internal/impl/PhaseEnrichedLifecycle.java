@@ -19,10 +19,12 @@
 package org.apache.maven.internal.impl;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Lifecycle;
@@ -53,9 +55,13 @@ import org.apache.maven.api.model.Plugin;
  * <p>Only {@code AFTER} links are emitted; {@code BEFORE} links are omitted to avoid
  * introducing cycles when {@code addPhases()} also adds implicit sibling-ordering edges.
  *
- * <p>Example {@code reactor.xml} declaration:
+ * <p>{@code after} and {@code before} accept comma-separated lists when multiple anchors are
+ * needed, and both can be specified together to constrain the insertion from both sides.
+ *
+ * <p>Example {@code reactor.xml} declarations:
  * <pre>{@code
  * <phase name="pre-integration" parent="verify" after="unit-test" before="integration-test"/>
+ * <phase name="post-all" parent="verify" after="unit-test,integration-test"/>
  * }</pre>
  *
  * @since 4.1.0
@@ -68,10 +74,10 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
      * @param name   name of the new phase
      * @param parent name of the parent container phase (in the Maven 4 tree) whose children
      *               list receives the injection
-     * @param after  sibling anchor: insert after this phase (takes precedence over
-     *               {@code before}); also used as the DAG anchor in v3phases (nullable)
-     * @param before sibling anchor: insert before this phase (nullable; used when
-     *               {@code after} is absent)
+     * @param after  comma-separated sibling anchor(s): insert after the latest (rightmost)
+     *               match; also used as DAG anchor(s) in v3phases (nullable)
+     * @param before comma-separated sibling anchor(s): insert before the earliest (leftmost)
+     *               match (nullable). Can be combined with {@code after}.
      */
     public record InjectedPhase(String name, String parent, String after, String before) {}
 
@@ -197,27 +203,35 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
     // -------------------------------------------------------------------------
 
     /**
-     * Injects into the v3 tree by searching for the {@code after}/{@code before} anchor anywhere
-     * in the tree and inserting the new phase as its sibling with an explicit {@code AFTER} link.
+     * Injects into the v3 tree by searching for the {@code after}/{@code before} anchors anywhere
+     * in the tree and inserting the new phase as a sibling with explicit {@code AFTER} links to
+     * all {@code after} anchors.
      *
-     * <p>The explicit link is what {@code computePhases()} uses for DAG ordering — the exact
-     * position in the v3 tree is secondary.  Falls back to top-level append when the anchor is
-     * not found in the v3 tree.
+     * <p>The explicit links are what {@code computePhases()} uses for DAG ordering — the exact
+     * position in the v3 tree is secondary.  Falls back to top-level append when no anchor is
+     * found in the v3 tree.
      */
     private static List<Phase> injectV3(List<Phase> phases, InjectedPhase inj) {
-        String anchor = inj.after() != null ? inj.after() : inj.before();
-        boolean insertAfter = inj.after() != null;
+        List<String> afterAnchors = inj.after() != null ? splitAnchors(inj.after()) : List.of();
+        List<String> beforeAnchors = inj.before() != null ? splitAnchors(inj.before()) : List.of();
 
-        Optional<List<Phase>> result = tryInjectV3Sibling(phases, anchor, inj.name(), insertAfter);
+        // Primary anchor for tree positioning: prefer the last after anchor,
+        // fall back to the first before anchor
+        String primaryAnchor = !afterAnchors.isEmpty()
+                ? afterAnchors.get(afterAnchors.size() - 1)
+                : (!beforeAnchors.isEmpty() ? beforeAnchors.get(0) : null);
+        boolean insertAfter = !afterAnchors.isEmpty();
+
+        // All after anchors become DAG links
+        List<String> dagLinks = new ArrayList<>(afterAnchors);
+
+        Optional<List<Phase>> result = tryInjectV3Sibling(phases, primaryAnchor, inj.name(), insertAfter, dagLinks);
         if (result.isPresent()) {
             return result.get();
         }
         // Anchor not found — append at top level.
-        // Use an AFTER link only for 'after' anchors; 'before' anchors can't safely be used
-        // as AFTER links since we'd be after integration-test but claiming to be before it.
-        String fallbackLink = insertAfter ? anchor : null;
         List<Phase> fallback = new ArrayList<>(phases);
-        fallback.add(buildPhase(inj.name(), fallbackLink));
+        fallback.add(buildPhaseWithLinks(inj.name(), dagLinks));
         return fallback;
     }
 
@@ -228,10 +242,11 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
      * @param anchor      name of the anchor phase ({@code after} or {@code before} target)
      * @param newName     name of the phase to inject
      * @param insertAfter {@code true} to insert after the anchor, {@code false} to insert before
+     * @param dagLinks    phase names to create AFTER links to (all {@code after} anchors)
      * @return updated list wrapped in {@code Optional}, or empty if not found
      */
     private static Optional<List<Phase>> tryInjectV3Sibling(
-            List<Phase> phases, String anchor, String newName, boolean insertAfter) {
+            List<Phase> phases, String anchor, String newName, boolean insertAfter, List<String> dagLinks) {
         if (anchor == null) {
             return Optional.empty();
         }
@@ -239,12 +254,15 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
         for (int i = 0; i < phases.size(); i++) {
             if (anchor.equals(phases.get(i).name())) {
                 int insertAt = insertAfter ? i + 1 : i;
-                // For AFTER anchor: link points to the anchor (= left sibling).
-                // For BEFORE anchor: link points to the left sibling of insertAt (may be null
-                // when inserting at position 0), NOT the anchor — pointing to the anchor would
-                // create a cycle since addPhases() already adds an edge from the anchor to us.
-                String afterLink = insertAt > 0 ? phases.get(insertAt - 1).name() : null;
-                Phase newPhase = buildPhase(newName, afterLink);
+                List<String> links;
+                if (!dagLinks.isEmpty()) {
+                    links = dagLinks;
+                } else {
+                    // before-only: link to left sibling (not the anchor — that would create a cycle)
+                    String leftSibling = insertAt > 0 ? phases.get(insertAt - 1).name() : null;
+                    links = leftSibling != null ? List.of(leftSibling) : List.of();
+                }
+                Phase newPhase = buildPhaseWithLinks(newName, links);
                 List<Phase> result = new ArrayList<>(phases);
                 result.add(insertAt, newPhase);
                 return Optional.of(result);
@@ -255,7 +273,7 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
             Phase phase = phases.get(i);
             if (!phase.phases().isEmpty()) {
                 Optional<List<Phase>> sub =
-                        tryInjectV3Sibling(new ArrayList<>(phase.phases()), anchor, newName, insertAfter);
+                        tryInjectV3Sibling(new ArrayList<>(phase.phases()), anchor, newName, insertAfter, dagLinks);
                 if (sub.isPresent()) {
                     List<Phase> result = new ArrayList<>(phases);
                     result.set(i, withChildren(phase, sub.get()));
@@ -274,6 +292,12 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
      * Inserts the new phase into {@code siblings} at the position given by
      * {@code inj.after()}/{@code inj.before()}, defaulting to append.
      *
+     * <p>Both {@code after} and {@code before} are comma-separated lists. When both are present,
+     * the insertion point is constrained to be after the latest {@code after} anchor and before
+     * the earliest {@code before} anchor. An {@link IllegalStateException} is thrown if the
+     * constraints conflict (i.e. the latest {@code after} anchor appears at or after the earliest
+     * {@code before} anchor).
+     *
      * <p>The injected phase's {@code AFTER} link points to its immediate left sibling so that,
      * together with the implicit sibling-ordering edges added by {@code addPhases()}, the DAG
      * correctly orders the new phase relative to its neighbours.
@@ -282,23 +306,36 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
      * @param inj              the injection descriptor
      */
     private static List<Phase> insertAmongSiblings(List<Phase> siblings, InjectedPhase inj) {
-        int insertAt = siblings.size(); // default: append
+        int lowerBound = -1; // insert after this index (exclusive)
+        int upperBound = siblings.size(); // insert before this index (exclusive)
 
         if (inj.after() != null) {
-            for (int i = 0; i < siblings.size(); i++) {
-                if (inj.after().equals(siblings.get(i).name())) {
-                    insertAt = i + 1;
-                    break;
-                }
-            }
-        } else if (inj.before() != null) {
-            for (int i = 0; i < siblings.size(); i++) {
-                if (inj.before().equals(siblings.get(i).name())) {
-                    insertAt = i;
-                    break;
+            for (String anchor : splitAnchors(inj.after())) {
+                for (int i = 0; i < siblings.size(); i++) {
+                    if (anchor.equals(siblings.get(i).name()) && i > lowerBound) {
+                        lowerBound = i;
+                    }
                 }
             }
         }
+        if (inj.before() != null) {
+            for (String anchor : splitAnchors(inj.before())) {
+                for (int i = 0; i < siblings.size(); i++) {
+                    if (anchor.equals(siblings.get(i).name()) && i < upperBound) {
+                        upperBound = i;
+                    }
+                }
+            }
+        }
+
+        if (lowerBound >= 0 && upperBound < siblings.size() && lowerBound >= upperBound) {
+            throw new IllegalStateException("reactor.xml: custom phase '" + inj.name()
+                    + "' has conflicting constraints — 'after' anchor '"
+                    + siblings.get(lowerBound).name() + "' is not before 'before' anchor '"
+                    + siblings.get(upperBound).name() + "'");
+        }
+
+        int insertAt = lowerBound >= 0 ? lowerBound + 1 : upperBound < siblings.size() ? upperBound : siblings.size();
 
         // AFTER link = left sibling in the final list
         String afterAnchor = insertAt > 0 ? siblings.get(insertAt - 1).name() : null;
@@ -306,6 +343,13 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
         List<Phase> result = new ArrayList<>(siblings);
         result.add(insertAt, newPhase);
         return result;
+    }
+
+    private static List<String> splitAnchors(String anchors) {
+        return Arrays.stream(anchors.split(","))
+                .map(String::trim)
+                .filter(s -> !s.isEmpty())
+                .toList();
     }
 
     // -------------------------------------------------------------------------
@@ -350,6 +394,15 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
      */
     private static Phase buildPhase(String name, String afterAnchor) {
         Collection<Link> links = afterAnchor != null ? List.of(afterLink(afterAnchor)) : Collections.emptyList();
+        return new InjectedPhaseImpl(name, links);
+    }
+
+    /**
+     * Builds a leaf phase with {@link Lifecycle.Link.Kind#AFTER} links to all given anchors.
+     */
+    private static Phase buildPhaseWithLinks(String name, List<String> afterAnchors) {
+        Collection<Link> links =
+                afterAnchors.stream().map(PhaseEnrichedLifecycle::afterLink).collect(Collectors.toList());
         return new InjectedPhaseImpl(name, links);
     }
 

@@ -25,6 +25,7 @@ import org.apache.maven.api.Lifecycle;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -218,6 +219,85 @@ class PhaseEnrichedLifecycleTest {
         long enrichedCount = enriched.allPhases().count();
 
         assertEquals(originalCount + 1, enrichedCount, "exactly one phase should be added");
+    }
+
+    // -------------------------------------------------------------------------
+    // Comma-separated after/before anchors
+    // -------------------------------------------------------------------------
+
+    @Test
+    void commaSeparatedAfterAnchorsUsesLatest() {
+        Lifecycle base = defaultLifecycle();
+        // after="unit-test,integration-test" → insert after integration-test (the latest)
+        PhaseEnrichedLifecycle enriched =
+                new PhaseEnrichedLifecycle(base, List.of(ip("post-all", "verify", "unit-test,integration-test", null)));
+
+        List<String> computed = registry().computePhases(enriched);
+
+        int unitTestIdx = computed.indexOf("unit-test");
+        int itIdx = computed.indexOf("integration-test");
+        int newIdx = computed.indexOf("post-all");
+        assertTrue(unitTestIdx >= 0, "'unit-test' must appear");
+        assertTrue(itIdx >= 0, "'integration-test' must appear");
+        assertTrue(newIdx >= 0, "'post-all' must appear");
+        assertTrue(itIdx < newIdx, "'post-all' must come after 'integration-test'");
+    }
+
+    @Test
+    void commaSeparatedBeforeAnchorsUsesEarliest() {
+        Lifecycle base = defaultLifecycle();
+        // before="unit-test,integration-test" → insert before unit-test (the earliest)
+        PhaseEnrichedLifecycle enriched =
+                new PhaseEnrichedLifecycle(base, List.of(ip("pre-all", "verify", null, "unit-test,integration-test")));
+
+        List<String> computed = registry().computePhases(enriched);
+
+        int unitTestIdx = computed.indexOf("unit-test");
+        int newIdx = computed.indexOf("pre-all");
+        assertTrue(unitTestIdx >= 0, "'unit-test' must appear");
+        assertTrue(newIdx >= 0, "'pre-all' must appear");
+        assertTrue(newIdx < unitTestIdx, "'pre-all' must come before 'unit-test'");
+    }
+
+    @Test
+    void bothAfterAndBeforeHonored() {
+        Lifecycle base = defaultLifecycle();
+        PhaseEnrichedLifecycle enriched =
+                new PhaseEnrichedLifecycle(base, List.of(ip("mid-phase", "verify", "unit-test", "integration-test")));
+
+        List<String> computed = registry().computePhases(enriched);
+
+        int unitTestIdx = computed.indexOf("unit-test");
+        int itIdx = computed.indexOf("integration-test");
+        int newIdx = computed.indexOf("mid-phase");
+        assertTrue(unitTestIdx >= 0 && itIdx >= 0 && newIdx >= 0);
+        assertTrue(unitTestIdx < newIdx, "'mid-phase' must come after 'unit-test'");
+        assertTrue(newIdx < itIdx, "'mid-phase' must come before 'integration-test'");
+    }
+
+    @Test
+    void conflictingAfterAndBeforeThrows() {
+        Lifecycle base = defaultLifecycle();
+        // after="integration-test" before="unit-test" — conflict since integration-test comes after unit-test
+        assertThrows(
+                IllegalStateException.class,
+                () -> new PhaseEnrichedLifecycle(base, List.of(ip("bad", "verify", "integration-test", "unit-test"))));
+    }
+
+    @Test
+    void commaSeparatedWithSpaces() {
+        Lifecycle base = defaultLifecycle();
+        // spaces around commas should be trimmed
+        PhaseEnrichedLifecycle enriched = new PhaseEnrichedLifecycle(
+                base, List.of(ip("post-all", "verify", "unit-test , integration-test", null)));
+
+        List<String> computed = registry().computePhases(enriched);
+
+        int itIdx = computed.indexOf("integration-test");
+        int newIdx = computed.indexOf("post-all");
+        assertTrue(itIdx >= 0, "'integration-test' must appear");
+        assertTrue(newIdx >= 0, "'post-all' must appear");
+        assertTrue(itIdx < newIdx, "'post-all' must come after 'integration-test'");
     }
 
     // -------------------------------------------------------------------------
