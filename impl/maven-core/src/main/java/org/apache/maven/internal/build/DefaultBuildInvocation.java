@@ -18,7 +18,6 @@
  */
 package org.apache.maven.internal.build;
 
-import java.nio.file.Path;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
@@ -39,7 +38,6 @@ import org.slf4j.LoggerFactory;
  * @param goals                  requested goals/phases
  * @param userProperties         user properties with sensitive values redacted
  * @param systemInfo             curated system properties for reproducibility
- * @param localRepository        local repository path
  * @param activeProfiles         explicitly activated profiles
  * @param selectedProjects       projects selected via {@code -pl}
  * @param excludedProjects       projects excluded via {@code -pl !module}
@@ -58,7 +56,6 @@ public record DefaultBuildInvocation(
         List<String> goals,
         Map<String, String> userProperties,
         Map<String, String> systemInfo,
-        Path localRepository,
         List<String> activeProfiles,
         List<String> selectedProjects,
         List<String> excludedProjects,
@@ -120,11 +117,6 @@ public record DefaultBuildInvocation(
         addSystemProp(sysInfo, "user.name");
         sysInfo.put("available.processors", String.valueOf(Runtime.getRuntime().availableProcessors()));
 
-        if (request.getLocalRepositoryPath() == null) {
-            throw new IllegalStateException("localRepositoryPath is not set on the execution request");
-        }
-        Path localRepo = request.getLocalRepositoryPath().toPath();
-
         List<String> activeProfiles =
                 request.getActiveProfiles() != null ? List.copyOf(request.getActiveProfiles()) : List.of();
 
@@ -160,7 +152,6 @@ public record DefaultBuildInvocation(
                 goals,
                 Map.copyOf(userProps),
                 Map.copyOf(sysInfo),
-                localRepo,
                 activeProfiles,
                 selectedProjects,
                 excludedProjects,

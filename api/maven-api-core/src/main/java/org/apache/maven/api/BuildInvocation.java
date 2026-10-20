@@ -18,7 +18,6 @@
  */
 package org.apache.maven.api;
 
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 
@@ -42,7 +41,6 @@ import org.apache.maven.api.annotations.Nonnull;
  *   <li>A curated subset of system properties relevant to reproducibility
  *       ({@link #systemInfo()}): OS name/arch/version, Java vendor and VM name/version,
  *       Maven home, and available processors</li>
- *   <li>Local repository path ({@link #localRepository()})</li>
  *   <li>Explicitly activated or deactivated profiles ({@link #activeProfiles()})</li>
  *   <li>Selected projects ({@link #selectedProjects()}) and excluded projects
  *       ({@link #excludedProjects()})</li>
@@ -121,14 +119,6 @@ public interface BuildInvocation {
      */
     @Nonnull
     Map<String, String> systemInfo();
-
-    /**
-     * The path to the local repository used for this build.
-     *
-     * @return the local repository path, never {@code null}
-     */
-    @Nonnull
-    Path localRepository();
 
     /**
      * Profiles explicitly activated ({@code -P profileId}) or deactivated

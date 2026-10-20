@@ -19,7 +19,6 @@
 package org.apache.maven.internal.build;
 
 import java.io.File;
-import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -59,7 +58,6 @@ class DefaultBuildInvocationTest {
         request.setUpdateSnapshots(true);
         request.setInteractiveMode(false);
         request.setReactorFailureBehavior(MavenExecutionRequest.REACTOR_FAIL_AT_END);
-        request.setLocalRepositoryPath(new File("/tmp/repo"));
 
         MavenSession session = mock(MavenSession.class);
         when(session.getRequest()).thenReturn(request);
@@ -71,7 +69,6 @@ class DefaultBuildInvocationTest {
         assertTrue(inv.updateSnapshots());
         assertTrue(inv.batchMode());
         assertEquals(ReactorFailureBehavior.FAIL_AT_END, inv.reactorFailureBehavior());
-        assertEquals(Path.of("/tmp/repo"), inv.localRepository());
         assertTrue(inv.recursive());
         assertFalse(inv.resume());
         assertNull(inv.makeBehavior());
@@ -233,7 +230,6 @@ class DefaultBuildInvocationTest {
                 List.of("compile"),
                 Map.of("key", "val"),
                 Map.of("os.name", "Linux"),
-                Path.of("/tmp/repo"),
                 List.of("profile1"),
                 List.of(":module1"),
                 List.of(":excluded"),
