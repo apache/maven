@@ -1213,6 +1213,21 @@ class DefaultModelValidatorTest {
         assertContains(result.getErrors().get(0), "must not be specified when 'id' attribute contains '?'");
     }
 
+    @Test
+    void testDependencyIdDuplicateSameVersion() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-duplicate-same-version.xml");
+        assertViolations(result, 0, 1, 0);
+        assertContains(result.getErrors().get(0), "must be unique");
+        assertContains(result.getErrors().get(0), "duplicate declaration of version");
+    }
+
+    @Test
+    void testDependencyIdDuplicateDifferentVersions() throws Exception {
+        SimpleProblemCollector result = validateFile("dependency-id-duplicate-versions.xml");
+        assertViolations(result, 0, 1, 0);
+        assertContains(result.getErrors().get(0), "must be unique");
+    }
+
     // ===== exclusion id attribute tests =====
 
     @Test

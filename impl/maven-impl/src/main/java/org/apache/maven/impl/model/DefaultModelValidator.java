@@ -1243,7 +1243,7 @@ public class DefaultModelValidator implements ModelValidator {
             // for deduplication, since normalization has not yet run
             String key;
             if (dependency.getId() != null && !dependency.getId().isEmpty()) {
-                key = stripScopeAndOptional(dependency.getId());
+                key = managementKeyFromId(dependency.getId());
             } else {
                 key = dependency.getManagementKey();
             }
@@ -1438,7 +1438,7 @@ public class DefaultModelValidator implements ModelValidator {
                     dependency);
         }
         String[] parts = remaining.split(":", -1);
-        if (parts.length >= 3
+        if (parts.length >= 4
                 && !parts[2].isEmpty()
                 && !isNullOrEmpty(dependency.getType())
                 && !"jar".equals(dependency.getType())) {
@@ -1451,7 +1451,7 @@ public class DefaultModelValidator implements ModelValidator {
                     "must not be specified when 'id' attribute includes type.",
                     dependency);
         }
-        if (parts.length >= 4 && !parts[3].isEmpty() && !isNullOrEmpty(dependency.getClassifier())) {
+        if (parts.length >= 5 && !parts[3].isEmpty() && !isNullOrEmpty(dependency.getClassifier())) {
             addViolation(
                     problems,
                     Severity.ERROR,
@@ -1483,7 +1483,25 @@ public class DefaultModelValidator implements ModelValidator {
         }
     }
 
-    private static String stripScopeAndOptional(String id) {
+    /**
+     * Derives a management-key equivalent from an {@code id} attribute value, to enable
+     * duplicate-detection in the validator (before normalization has run and expanded the
+     * individual coordinate fields).
+     *
+     * <p>The management key format is {@code groupId:artifactId:type[:classifier]}, i.e. it
+     * intentionally excludes the version (the validator flags same-key/different-version pairs
+     * as errors, just as it does for the regular field-based syntax).</p>
+     *
+     * <p>id formats and their management-key equivalents:
+     * <ul>
+     *   <li>{@code g:a}               → {@code g:a:jar}             (2 parts)</li>
+     *   <li>{@code g:a:v}             → {@code g:a:jar}             (3 parts, version only)</li>
+     *   <li>{@code g:a:type:v}        → {@code g:a:type}            (4 parts, explicit type)</li>
+     *   <li>{@code g:a:type:cls:v}    → {@code g:a:type:cls}        (5 parts, type+classifier)</li>
+     * </ul>
+     * The optional {@code @scope} suffix and trailing {@code ?} are stripped before parsing.</p>
+     */
+    private static String managementKeyFromId(String id) {
         String remaining = id;
         if (remaining.endsWith("?")) {
             remaining = remaining.substring(0, remaining.length() - 1);
@@ -1492,7 +1510,30 @@ public class DefaultModelValidator implements ModelValidator {
         if (atIndex >= 0) {
             remaining = remaining.substring(0, atIndex);
         }
-        return remaining;
+        String[] parts = remaining.split(":", -1);
+        // Malformed id (fewer than 2 segments) — return raw string; the validator will
+        // catch the format error separately; there's no management key to derive here.
+        if (parts.length < 2) {
+            return remaining;
+        }
+        // parts[0]=groupId, parts[1]=artifactId
+        // 2 parts: g:a           -> key: g:a:jar
+        // 3 parts: g:a:v         -> key: g:a:jar  (version-only shorthand, type defaults to jar)
+        // 4 parts: g:a:type:v    -> key: g:a:type
+        // 5 parts: g:a:type:c:v  -> key: g:a:type:classifier
+        if (parts.length <= 3) {
+            return parts[0] + ":" + parts[1] + ":jar";
+        } else if (parts.length == 4) {
+            return parts[0] + ":" + parts[1] + ":" + (parts[2].isEmpty() ? "jar" : parts[2]);
+        } else {
+            // 5 parts: include classifier when non-empty, mirroring getManagementKey()
+            String type = parts[2].isEmpty() ? "jar" : parts[2];
+            if (!parts[3].isEmpty()) {
+                return parts[0] + ":" + parts[1] + ":" + type + ":" + parts[3];
+            } else {
+                return parts[0] + ":" + parts[1] + ":" + type;
+            }
+        }
     }
 
     private void validateExclusionIdAttribute(ModelProblemCollector problems, Exclusion exclusion, String prefix) {
