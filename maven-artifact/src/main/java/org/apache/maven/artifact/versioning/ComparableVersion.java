@@ -501,8 +501,12 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
         public String toString() {
             StringBuilder buffer = new StringBuilder();
             for (Item item : this) {
-                if (buffer.length() > 0) {
-                    buffer.append((item instanceof ListItem) ? '-' : '.');
+                if (item instanceof ListItem) {
+                    // a nested list always starts with a hyphen, even when it begins with a nested list itself,
+                    // otherwise 1-0-1 ([1, [[1]]]) would be rendered as 1-1 although it sorts below it
+                    buffer.append('-');
+                } else if (buffer.length() > 0) {
+                    buffer.append('.');
                 }
                 buffer.append(item);
             }
