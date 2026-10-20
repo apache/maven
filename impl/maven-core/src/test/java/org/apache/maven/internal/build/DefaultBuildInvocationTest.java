@@ -361,6 +361,16 @@ class DefaultBuildInvocationTest {
     }
 
     @Test
+    void makeBehaviorUnknownStringReturnsNull() {
+        MavenExecutionRequest request = newRequest();
+        request.setMakeBehavior("invalid-value");
+        MavenSession session = mock(MavenSession.class);
+        when(session.getRequest()).thenReturn(request);
+
+        assertNull(DefaultBuildInvocation.from(session).makeBehavior());
+    }
+
+    @Test
     void nonRecursive() {
         MavenExecutionRequest request = newRequest();
         request.setRecursive(false);
