@@ -582,7 +582,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 }
                 return dependency;
             });
-            // Only keep transitive scopes (null/empty => COMPILE)
+            // Only keep consumer-visible scopes (compile, api, runtime, implementation)
             directDependencies.values().removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
             managedDependencies.keySet().removeAll(directDependencies.keySet());
 
@@ -600,7 +600,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                             Function.identity(),
                             this::merge,
                             LinkedHashMap::new));
-            // Only keep transitive scopes
+            // Only keep consumer-visible scopes (compile, api, runtime, implementation)
             directDependencies.values().removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
             model = model.withDependencies(directDependencies.isEmpty() ? null : directDependencies.values());
         }
@@ -608,7 +608,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         return model;
     }
 
-    private static boolean hasDependencyScope(Dependency dependency) {
+    static boolean hasDependencyScope(Dependency dependency) {
         String scopeId = dependency.getScope();
         DependencyScope scope;
         if (scopeId == null || scopeId.isEmpty()) {
@@ -616,7 +616,54 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         } else {
             scope = DependencyScope.forId(scopeId);
         }
-        return scope == null || !scope.isTransitive();
+        return scope != DependencyScope.COMPILE
+                && scope != DependencyScope.RUNTIME
+                && scope != DependencyScope.API
+                && scope != DependencyScope.IMPLEMENTATION;
+    }
+
+    /**
+     * Maps a 4.2.0 dependency scope to its 4.0.0 consumer POM equivalent.
+     * <ul>
+     *   <li>{@code api} → {@code compile} (semantically identical, expresses intent)</li>
+     *   <li>{@code implementation} → {@code runtime} (consumers cannot compile against it, present at runtime)</li>
+     * </ul>
+     */
+    static Dependency mapScopeForConsumerPom(Dependency dependency) {
+        String scope = dependency.getScope();
+        if (DependencyScope.API.id().equals(scope)) {
+            return dependency.withScope("compile");
+        } else if (DependencyScope.IMPLEMENTATION.id().equals(scope)) {
+            return dependency.withScope("runtime");
+        }
+        return dependency;
+    }
+
+    private static Model mapScopesForConsumerPom(Model model) {
+        model = model.withDependencies(model.getDependencies().stream()
+                .map(DefaultConsumerPomBuilder::mapScopeForConsumerPom)
+                .toList());
+
+        if (model.getDependencyManagement() != null) {
+            model = model.withDependencyManagement(model.getDependencyManagement()
+                    .withDependencies(model.getDependencyManagement().getDependencies().stream()
+                            .map(DefaultConsumerPomBuilder::mapScopeForConsumerPom)
+                            .toList()));
+        }
+
+        return model.withProfiles(model.getProfiles().stream()
+                .map(profile -> profile.withDependencies(profile.getDependencies().stream()
+                                .map(DefaultConsumerPomBuilder::mapScopeForConsumerPom)
+                                .toList())
+                        .withDependencyManagement(
+                                profile.getDependencyManagement() == null
+                                        ? null
+                                        : profile.getDependencyManagement()
+                                                .withDependencies(
+                                                        profile.getDependencyManagement().getDependencies().stream()
+                                                                .map(DefaultConsumerPomBuilder::mapScopeForConsumerPom)
+                                                                .toList())))
+                .toList());
     }
 
     private Dependency merge(Dependency dep1, Dependency dep2) {
@@ -724,7 +771,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                                 : null);
         builder.profiles(prune(model.getProfiles()));
 
-        model = builder.build();
+        model = mapScopesForConsumerPom(builder.build());
         String modelVersion = new MavenModelVersion().getModelVersion(model);
         if (!ModelBuilder.MODEL_VERSION_4_0_0.equals(modelVersion) && !preserveModelVersion) {
             warnNotDowngraded(project);
@@ -749,7 +796,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         builder.packaging(POM_PACKAGING);
         builder.profiles(prune(model.getProfiles()));
 
-        model = builder.build();
+        model = mapScopesForConsumerPom(builder.build());
         String modelVersion = new MavenModelVersion().getModelVersion(model);
         if (!ModelBuilder.MODEL_VERSION_4_0_0.equals(modelVersion) && !preserveModelVersion) {
             warnNotDowngraded(project);
@@ -770,6 +817,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         if (parent != null) {
             model = model.withParent(parent.withRelativePath(null));
         }
+        model = mapScopesForConsumerPom(model);
         var projectSources = project.getBuild().getDelegate().getSources();
         if (SourceQueries.usesModuleSourceHierarchy(projectSources)) {
             // Dependencies are dispatched by maven-jar-plugin in the POM generated for each module.
