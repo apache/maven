@@ -337,8 +337,10 @@ if exist "%JVM_CONFIG_TEMP%" (
     type "%JVM_CONFIG_TEMP%"
   )
   set /p JVM_CONFIG_MAVEN_OPTS=<"%JVM_CONFIG_TEMP%" 2>nul
-  rem Retry once after a brief delay if the read failed (Windows Defender file lock)
-  if not defined JVM_CONFIG_MAVEN_OPTS (
+  rem Retry once after a brief delay if the read returned empty (Windows Defender file lock).
+  rem Note: use string comparison instead of 'if not defined' because 'set JVM_CONFIG_MAVEN_OPTS='
+  rem (empty assignment) counts as defined, so 'if not defined' would never trigger the retry.
+  if "%JVM_CONFIG_MAVEN_OPTS%"=="" (
     if defined MAVEN_DEBUG_SCRIPT (
       echo [DEBUG] First read returned empty, retrying after delay...
     )

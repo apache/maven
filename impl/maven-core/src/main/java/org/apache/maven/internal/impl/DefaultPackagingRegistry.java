@@ -196,5 +196,13 @@ public class DefaultPackagingRegistry
         return id;
     }
 
-    private record DefaultPackaging(String id, Type type, Map<String, PluginContainer> plugins) implements Packaging {}
+    private record DefaultPackaging(String id, Type type, Map<String, PluginContainer> plugins) implements Packaging {
+        @Override
+        public boolean producesMainArtifact() {
+            return !Type.POM.equals(id)
+                    && !Type.BOM.equals(id)
+                    && !Type.POM.equals(type.id())
+                    && !Type.BOM.equals(type.id());
+        }
+    }
 }
