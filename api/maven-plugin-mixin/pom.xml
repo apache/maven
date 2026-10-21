@@ -26,14 +26,14 @@
     <version>4.1.0-SNAPSHOT</version>
   </parent>
 
-  <artifactId>maven-api-plugin-processor</artifactId>
-  <name>Maven 4 API :: Plugin Descriptor Annotation Processor</name>
-  <description>Maven 4 API - JSR 269 annotation processor that generates plugin descriptors (plugin.xml)
-    and DI factory classes at compile time from @Mojo-annotated classes.</description>
+  <artifactId>maven-plugin-mixin</artifactId>
+  <name>Maven Plugin Mixin</name>
+  <description>Mixin for Maven 4 plugin projects. Provides the annotation processor that generates
+    plugin descriptors (plugin.xml) and DI factory classes at compile time from @Mojo-annotated classes.
+    Use as a mixin in your POM to get zero-config plugin descriptor generation.</description>
 
   <properties>
     <javaModuleName>org.apache.maven.plugin.processor</javaModuleName>
-    <!-- Prevent self-processing: this module IS the processor -->
     <maven.compiler.proc>none</maven.compiler.proc>
   </properties>
 
@@ -44,4 +44,31 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>build-helper-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>attach-mixin</id>
+            <goals>
+              <goal>attach-artifact</goal>
+            </goals>
+            <phase>package</phase>
+            <configuration>
+              <artifacts>
+                <artifact>
+                  <file>src/main/mixin/mixin.xml</file>
+                  <type>pom</type>
+                  <classifier>mixin</classifier>
+                </artifact>
+              </artifacts>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>

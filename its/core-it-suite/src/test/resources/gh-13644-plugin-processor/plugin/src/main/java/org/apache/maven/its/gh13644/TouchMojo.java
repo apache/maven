@@ -29,7 +29,7 @@ import org.apache.maven.api.plugin.annotations.Parameter;
 
 /**
  * A minimal V4 mojo whose descriptor is generated entirely by
- * {@code maven-api-plugin-processor} — no {@code maven-plugin-plugin} involved.
+ * {@code maven-plugin-mixin} — no {@code maven-plugin-plugin} involved.
  *
  * @since 1.0-SNAPSHOT
  */

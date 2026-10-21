@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" root="true" preserve.model.version="true" xsi:schemaLocation="http://maven.apache.org/POM/4.2.0 https://maven.apache.org/xsd/maven-4.2.0.xsd">
+  <modelVersion>4.2.0</modelVersion>
 
   <groupId>org.apache.maven.its.gh13644</groupId>
   <artifactId>gh13644-plugin</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
-  <name>GH-13644 Test Plugin — uses maven-api-plugin-processor</name>
+  <name>GH-13644 Test Plugin — uses maven-plugin-mixin</name>
 
   <properties>
     <javaVersion>17</javaVersion>
@@ -28,28 +28,12 @@
     </dependency>
   </dependencies>
 
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <configuration>
-          <annotationProcessorPaths>
-            <path>
-              <groupId>org.apache.maven</groupId>
-              <artifactId>maven-api-plugin-processor</artifactId>
-              <version>${mavenVersion}</version>
-            </path>
-            <!-- DiIndexProcessor is bundled in maven-api-di and will be picked up automatically -->
-            <path>
-              <groupId>org.apache.maven</groupId>
-              <artifactId>maven-api-di</artifactId>
-              <version>${mavenVersion}</version>
-            </path>
-          </annotationProcessorPaths>
-          <!-- No -A options needed: processor reads groupId/artifactId/version from pom.xml -->
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
+  <mixins>
+    <mixin>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-mixin</artifactId>
+      <version>${maven-version}</version>
+      <classifier>mixin</classifier>
+    </mixin>
+  </mixins>
 </project>

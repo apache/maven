@@ -222,7 +222,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                     .getMessager()
                     .printMessage(
                             Diagnostic.Kind.ERROR,
-                            "maven-api-plugin-processor: could not determine plugin coordinates. "
+                            "maven-plugin-mixin: could not determine plugin coordinates. "
                                     + "Either place a pom.xml at the project root, or supply "
                                     + "-Amaven.plugin.groupId, -Amaven.plugin.artifactId and "
                                     + "-Amaven.plugin.version to the maven-compiler-plugin.");
