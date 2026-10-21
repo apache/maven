@@ -36,10 +36,14 @@ import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojosExecutionStrategy;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 @Named("concurrent")
 @Singleton
 public class MojoExecutor extends org.apache.maven.lifecycle.internal.MojoExecutor {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(MojoExecutor.class);
 
     @Inject
     public MojoExecutor(
@@ -94,14 +98,16 @@ public class MojoExecutor extends org.apache.maven.lifecycle.internal.MojoExecut
             if (!lock.tryLock()) {
                 Thread owner = lock.getOwner();
                 MojoDescriptor ownerMojo = owner != null ? mojos.get(owner) : null;
-                String str = ownerMojo != null ? " The " + ownerMojo.getId() : "A";
-                String msg = str
-                        + " legacy (Maven 3) mojo is preventing full intra-project parallelism in the concurrent builder "
-                        + "on the project " + currentProject.getGroupId()
-                        + ":" + currentProject.getArtifactId() + ". "
-                        + "This mojo execution will be blocked until the mojo is done. "
-                        + "Consider migrating plugins to the Maven 4 API to benefit from full intra-project concurrency.";
-                warn(msg);
+                if (LOGGER.isDebugEnabled()) {
+                    LOGGER.debug(
+                            "{} legacy (Maven 3) mojo is preventing full intra-project parallelism in the "
+                                    + "concurrent builder on the project {}:{}. This mojo execution will be blocked "
+                                    + "until the mojo is done. Consider migrating plugins to the Maven 4 API to "
+                                    + "benefit from full intra-project concurrency.",
+                            ownerMojo != null ? "The " + ownerMojo.getId() : "A",
+                            currentProject.getGroupId(),
+                            currentProject.getArtifactId());
+                }
                 lock.lock();
             }
         }
