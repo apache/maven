@@ -48,6 +48,32 @@
   <build>
     <plugins>
       <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-resources-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>filter-mixin</id>
+            <goals>
+              <goal>copy-resources</goal>
+            </goals>
+            <phase>process-resources</phase>
+            <configuration>
+              <outputDirectory>${project.build.directory}/mixin</outputDirectory>
+              <resources>
+                <resource>
+                  <directory>src/main/mixin</directory>
+                  <filtering>true</filtering>
+                </resource>
+              </resources>
+              <useDefaultDelimiters>false</useDefaultDelimiters>
+              <delimiters>
+                <delimiter>@</delimiter>
+              </delimiters>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>build-helper-maven-plugin</artifactId>
         <executions>
@@ -60,7 +86,7 @@
             <configuration>
               <artifacts>
                 <artifact>
-                  <file>src/main/mixin/mixin.xml</file>
+                  <file>${project.build.directory}/mixin/mixin.xml</file>
                   <type>pom</type>
                   <classifier>mixin</classifier>
                 </artifact>

@@ -52,12 +52,12 @@
               <path>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-plugin-mixin</artifactId>
-                <version>4.1.0-SNAPSHOT</version>
+                <version>@project.version@</version>
               </path>
               <path>
                 <groupId>org.apache.maven</groupId>
                 <artifactId>maven-api-di</artifactId>
-                <version>4.1.0-SNAPSHOT</version>
+                <version>@project.version@</version>
               </path>
             </annotationProcessorPaths>
             <compilerArgs>
