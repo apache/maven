@@ -1,21 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.2.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" preserve.model.version="true" xsi:schemaLocation="http://maven.apache.org/POM/4.2.0 https://maven.apache.org/xsd/maven-4.2.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
   <groupId>org.apache.maven.its.mng12534</groupId>
   <artifactId>mng12534-plugin</artifactId>
   <version>1.0-SNAPSHOT</version>
-  <packaging>jar</packaging>
+  <packaging>maven-plugin</packaging>
   <name>MNG-12534 Test Plugin</name>
-
   <properties>
     <javaVersion>17</javaVersion>
+    <mavenVersion>${maven-version}</mavenVersion>
   </properties>
 
-  <mixins>
-    <mixin>
+  <dependencies>
+    <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-plugin-mixin</artifactId>
-      <version>${maven-version}</version>
-      <classifier>mixin</classifier>
-    </mixin>
-  </mixins>
+      <artifactId>maven-api-core</artifactId>
+      <version>${mavenVersion}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-di</artifactId>
+      <version>${mavenVersion}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <version>4.0.0-beta-3</version>
+        <configuration>
+          <goalPrefix>mng12534</goalPrefix>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
 </project>
