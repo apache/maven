@@ -141,9 +141,11 @@ public class ProjectBuildLogAppender implements AutoCloseable {
     }
 
     private final BuildEventListener buildEventListener;
+    private final boolean suppressInlineWarnings;
 
-    public ProjectBuildLogAppender(BuildEventListener buildEventListener) {
+    public ProjectBuildLogAppender(BuildEventListener buildEventListener, String warningMode) {
         this.buildEventListener = buildEventListener;
+        this.suppressInlineWarnings = "summary".equalsIgnoreCase(warningMode);
         MavenSimpleLogger.setLogSink(this::accept);
     }
 
@@ -187,7 +189,9 @@ public class ProjectBuildLogAppender implements AutoCloseable {
                 sourceMethodName,
                 threadId,
                 seq);
-        buildEventListener.projectLogMessage(projectId, event);
+        if (!(suppressInlineWarnings && logLevel == LogLevel.WARN)) {
+            buildEventListener.projectLogMessage(projectId, event);
+        }
 
         // Forward to build report collector (if active)
         Consumer<LogEvent> capture = reportCapture;

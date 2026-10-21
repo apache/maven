@@ -353,8 +353,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             MessageUtils.registerShutdownHook(); // safety belt
 
             // Create the build log appender; also sets MavenSimpleLogger sink
-            ProjectBuildLogAppender projectBuildLogAppender =
-                    new ProjectBuildLogAppender(determineBuildEventListener(context));
+            ProjectBuildLogAppender projectBuildLogAppender = new ProjectBuildLogAppender(
+                    determineBuildEventListener(context),
+                    context.options().warningMode().orElse("summary"));
             context.closeables.add(projectBuildLogAppender);
         } else {
             doConfigureWithTerminal(context, context.terminal);
