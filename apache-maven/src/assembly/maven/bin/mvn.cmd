@@ -336,17 +336,21 @@ if exist "%JVM_CONFIG_TEMP%" (
     echo [DEBUG] Temp file contents:
     type "%JVM_CONFIG_TEMP%"
   )
+  setlocal EnableDelayedExpansion
   set /p JVM_CONFIG_MAVEN_OPTS=<"%JVM_CONFIG_TEMP%" 2>nul
   rem Retry once after a brief delay if the read returned empty (Windows Defender file lock).
   rem Note: use string comparison instead of 'if not defined' because 'set JVM_CONFIG_MAVEN_OPTS='
   rem (empty assignment) counts as defined, so 'if not defined' would never trigger the retry.
-  if "%JVM_CONFIG_MAVEN_OPTS%"=="" (
+  rem Note: use delayed expansion (!VAR! instead of %VAR%) because cmd.exe expands %VAR% at
+  rem parse time for the entire compound block, before 'set /p' above has run at runtime.
+  if "!JVM_CONFIG_MAVEN_OPTS!"=="" (
     if defined MAVEN_DEBUG_SCRIPT (
       echo [DEBUG] First read returned empty, retrying after delay...
     )
     ping -n 2 127.0.0.1 >nul 2>nul
     set /p JVM_CONFIG_MAVEN_OPTS=<"%JVM_CONFIG_TEMP%" 2>nul
   )
+  endlocal & set "JVM_CONFIG_MAVEN_OPTS=!JVM_CONFIG_MAVEN_OPTS!"
   del "%JVM_CONFIG_TEMP%" 2>nul
 )
 
