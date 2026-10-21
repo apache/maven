@@ -26,7 +26,7 @@ import org.junit.jupiter.api.Test;
  * Integration test for
  * <a href="https://github.com/apache/maven/issues/13644">GH-13644</a>.
  * <p>
- * Verifies that {@code maven-api-plugin-processor} can generate a complete,
+ * Verifies that {@code maven-plugin-mixin} can generate a complete,
  * functional plugin descriptor ({@code META-INF/maven/plugin.xml}) and the
  * required DI factory classes at compile time — with no dependency on
  * {@code maven-plugin-plugin} or {@code maven-plugin-tools}.
@@ -37,7 +37,7 @@ import org.junit.jupiter.api.Test;
 class MavenITgh13644PluginProcessorTest extends AbstractMavenIntegrationTestCase {
 
     /**
-     * Verify that a plugin built with {@code maven-api-plugin-processor}:
+     * Verify that a plugin built with {@code maven-plugin-mixin}:
      * <ul>
      *   <li>generates a valid {@code META-INF/maven/plugin.xml} at compile time</li>
      *   <li>generates a {@code $MojoFactory} class picked up by {@code DiIndexProcessor}</li>

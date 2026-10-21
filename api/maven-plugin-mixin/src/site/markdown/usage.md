@@ -57,37 +57,44 @@ public class GreetMojo implements Mojo {
 }
 ```
 
-POM configuration:
+POM configuration (model version 4.2.0, using the mixin):
 
 ```xml
-<build>
-  <plugins>
-    <plugin>
-      <groupId>org.apache.maven.plugins</groupId>
-      <artifactId>maven-compiler-plugin</artifactId>
-      <configuration>
-        <annotationProcessorPaths>
-          <path>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-api-plugin-processor</artifactId>
-            <version>${maven.version}</version>
-          </path>
-          <path>
-            <groupId>org.apache.maven</groupId>
-            <artifactId>maven-api-di</artifactId>
-            <version>${maven.version}</version>
-          </path>
-        </annotationProcessorPaths>
-        <compilerArgs>
-          <arg>-Amaven.plugin.groupId=${project.groupId}</arg>
-          <arg>-Amaven.plugin.artifactId=${project.artifactId}</arg>
-          <arg>-Amaven.plugin.version=${project.version}</arg>
-        </compilerArgs>
-      </configuration>
-    </plugin>
-  </plugins>
-</build>
+<project xmlns="http://maven.apache.org/POM/4.2.0" root="true" ...>
+  <modelVersion>4.2.0</modelVersion>
+
+  <groupId>com.example</groupId>
+  <artifactId>greet-maven-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-core</artifactId>
+      <version>${maven.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-di</artifactId>
+      <version>${maven.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <mixins>
+    <mixin>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-mixin</artifactId>
+      <version>${maven.version}</version>
+    </mixin>
+  </mixins>
+</project>
 ```
+
+The mixin configures the compiler plugin automatically — no
+`annotationProcessorPaths` or `-A` options to set up manually.
 
 At compile time, the processor generates:
 
@@ -124,7 +131,7 @@ fields (unless overridden by `@Mojo.dependencyResolutionPathScopes()`).
 
 ## Packaging note
 
-Because `maven-api-plugin-processor` generates the plugin descriptor at compile
+Because `maven-plugin-mixin` generates the plugin descriptor at compile
 time, the plugin does **not** use `<packaging>maven-plugin</packaging>`. Use
 standard `<packaging>jar</packaging>` (or omit packaging, which defaults to
 `jar`). Maven 4 loads the plugin from the descriptor in the JAR, not from the

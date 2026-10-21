@@ -72,8 +72,8 @@ class MojoDescriptorProcessorTest {
     static void resolveClasspath() {
         // Processor JAR — built from this module
         processorJar = resolveFile(
-                "api/maven-api-plugin-processor/target/maven-api-plugin-processor-4.1.0-SNAPSHOT.jar",
-                "maven-api-plugin-processor/4.1.0-SNAPSHOT/maven-api-plugin-processor-4.1.0-SNAPSHOT.jar");
+                "api/maven-plugin-mixin/target/maven-plugin-mixin-4.1.0-SNAPSHOT.jar",
+                "maven-plugin-mixin/4.1.0-SNAPSHOT/maven-plugin-mixin-4.1.0-SNAPSHOT.jar");
 
         // Annotation JARs needed on the compilation classpath
         File apiCore = resolveFile(

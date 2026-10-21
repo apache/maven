@@ -1,4 +1,4 @@
-title: Maven API Plugin Processor
+title: Maven Plugin Mixin
 author: Maven Team
 date: ${project.version}
 
@@ -21,12 +21,12 @@ specific language governing permissions and limitations
 under the License.
 -->
 
-# Maven API Plugin Processor
+# Maven Plugin Mixin
 
-`maven-api-plugin-processor` is a JSR 269 annotation processor that generates
-Maven 4 plugin descriptors (`META-INF/maven/plugin.xml`) and DI factory classes
-at compile time — with **no dependency on `maven-plugin-plugin`** or
-`maven-plugin-tools`.
+`maven-plugin-mixin` is a mixin for Maven 4 plugin projects. It bundles a JSR 269
+annotation processor that generates Maven 4 plugin descriptors
+(`META-INF/maven/plugin.xml`) and DI factory classes at compile time — with
+**no dependency on `maven-plugin-plugin`** or `maven-plugin-tools`.
 
 ## Overview
 
@@ -42,55 +42,54 @@ the processor fires during `javac` and produces:
    (from `maven-api-di`) picks these up automatically and registers them in
    `META-INF/maven/org.apache.maven.api.di.Inject`.
 
+## Usage
+
+Add the mixin to your plugin's POM (requires model version 4.2.0):
+
+```xml
+<project xmlns="http://maven.apache.org/POM/4.2.0" root="true" ...>
+  <modelVersion>4.2.0</modelVersion>
+
+  <groupId>com.example</groupId>
+  <artifactId>my-maven-plugin</artifactId>
+  <version>1.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-core</artifactId>
+      <version>${maven.version}</version>
+      <scope>provided</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-di</artifactId>
+      <version>${maven.version}</version>
+      <scope>provided</scope>
+    </dependency>
+  </dependencies>
+
+  <mixins>
+    <mixin>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-plugin-mixin</artifactId>
+      <version>${maven.version}</version>
+    </mixin>
+  </mixins>
+</project>
+```
+
+The mixin automatically configures the compiler plugin with the annotation
+processor and passes the resolved project coordinates (`groupId`, `artifactId`,
+`version`) as `-A` options. No manual compiler configuration required.
+
 ## Why factories?
 
 `DefaultMavenPluginManager.loadV4Mojo()` looks up mojos by
 `Key.of(implementationClass, roleHint)` where `roleHint = "g:a:v:goal"`.
 The `@Named` qualifier on the factory class matches this key so the DI container
 can locate and instantiate the mojo.
-
-## Usage
-
-Add `maven-api-plugin-processor` (and `maven-api-di`, which bundles
-`DiIndexProcessor`) to the `annotationProcessorPaths` of `maven-compiler-plugin`,
-and pass the required `-A` options:
-
-```xml
-<plugin>
-  <groupId>org.apache.maven.plugins</groupId>
-  <artifactId>maven-compiler-plugin</artifactId>
-  <configuration>
-    <annotationProcessorPaths>
-      <path>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-api-plugin-processor</artifactId>
-        <version>${maven.version}</version>
-      </path>
-      <path>
-        <groupId>org.apache.maven</groupId>
-        <artifactId>maven-api-di</artifactId>
-        <version>${maven.version}</version>
-      </path>
-    </annotationProcessorPaths>
-    <compilerArgs>
-      <arg>-Amaven.plugin.groupId=${project.groupId}</arg>
-      <arg>-Amaven.plugin.artifactId=${project.artifactId}</arg>
-      <arg>-Amaven.plugin.version=${project.version}</arg>
-      <!-- Optional: defaults to artifactId with maven-/-plugin stripped -->
-      <arg>-Amaven.plugin.goalPrefix=myprefix</arg>
-    </compilerArgs>
-  </configuration>
-</plugin>
-```
-
-## Compiler options
-
-| Option | Required | Description |
-|--------|----------|-------------|
-| `maven.plugin.groupId` | **yes** | Plugin group ID — written into the descriptor |
-| `maven.plugin.artifactId` | **yes** | Plugin artifact ID |
-| `maven.plugin.version` | **yes** | Plugin version |
-| `maven.plugin.goalPrefix` | no | Goal prefix; if absent, derived from artifactId by stripping the `maven-` prefix and `-plugin` suffix |
 
 ## Supported annotations
 
