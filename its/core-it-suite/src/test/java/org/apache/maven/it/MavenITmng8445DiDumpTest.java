@@ -36,6 +36,9 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 
 @Execution(ExecutionMode.SAME_THREAD)
 class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
+    private static final String MAVEN_DI_DEBUG = "maven.di.debug";
+    private static final String SISU_DEBUG = "sisu.debug";
+    private static final String SISU_DUMP_MARKER = "-----[explicit bindings]";
     private static final List<String> MODULE_PATHS = List.of("", "a/", "b/");
 
     @TestFactory
@@ -53,17 +56,21 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
                 new BuilderCase("quiet", List.of("-q", "-T", "2"), true));
         return builders.stream()
                 .flatMap(builder -> Stream.of(false, true)
-                        .map(enabled -> dynamicTest(
-                                builder.name() + " diagnostics=" + enabled,
-                                () -> verifyDump(directory.resolve("project"), builder, enabled))));
+                        .flatMap(nativeEnabled -> Stream.of(false, true)
+                                .map(sisuEnabled -> dynamicTest(
+                                        builder.name() + " native=" + nativeEnabled + " sisu=" + sisuEnabled,
+                                        () -> verifyDump(
+                                                directory.resolve("project"), builder, nativeEnabled, sisuEnabled)))));
     }
 
-    private void verifyDump(Path project, BuilderCase builder, boolean enabled) throws Exception {
+    private void verifyDump(Path project, BuilderCase builder, boolean nativeEnabled, boolean sisuEnabled)
+            throws Exception {
         Verifier verifier = newVerifier(project);
-        String logfile = "build-" + builder.name() + "-" + enabled + ".txt";
+        String logfile = "build-" + builder.name() + "-native-" + nativeEnabled + "-sisu-" + sisuEnabled + ".txt";
         verifier.setLogFileName(logfile);
         verifier.setForkJvm(true);
-        verifier.addJvmArgument("-Dsisu.debug=" + enabled);
+        verifier.addJvmArgument("-D" + MAVEN_DI_DEBUG + "=" + nativeEnabled);
+        verifier.addJvmArgument("-D" + SISU_DEBUG + "=" + sisuEnabled);
         verifier.addCliArguments(builder.arguments().toArray(String[]::new));
         verifier.addCliArgument("validate");
         for (String module : MODULE_PATHS) {
@@ -84,11 +91,12 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
         }
         List<String> nativeRows = new ArrayList<>();
         int dumps = collectNativeRows(lines, nativeRows);
-        Path stdout = project.resolve(logfile.replace(".txt", "-stdout.txt"));
-        if (Files.isRegularFile(stdout)) {
-            dumps += collectNativeRows(Files.readAllLines(stdout), nativeRows);
-        }
-        if (enabled) {
+        List<String> stdoutLines = verifier.getStdout().lines().toList();
+        dumps += collectNativeRows(stdoutLines, nativeRows);
+        boolean sisuDump = Stream.concat(lines.stream(), stdoutLines.stream())
+                .anyMatch(line -> line.contains(SISU_DUMP_MARKER));
+        assertEquals(sisuEnabled, sisuDump, "Sisu dump must depend only on sisu.debug");
+        if (nativeEnabled) {
             // Each module creates its own Mojo injector.
             assertTrue(dumps >= MODULE_PATHS.size());
             assertTrue(nativeRows.stream().anyMatch(line -> line.contains("mng8445.CheckMojo")));

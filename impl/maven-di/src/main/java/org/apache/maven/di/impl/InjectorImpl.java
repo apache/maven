@@ -63,6 +63,8 @@ import static org.apache.maven.di.impl.Binding.getPriorityComparator;
 
 public class InjectorImpl implements Injector {
 
+    private static final String DEBUG_PROPERTY = "maven.di.debug";
+
     private final Map<Key<?>, Set<Binding<?>>> bindings = new HashMap<>();
     private final Map<Class<? extends Annotation>, Supplier<Scope>> scopes = new HashMap<>();
     private final Set<String> loadedUrls = new HashSet<>();
@@ -614,7 +616,7 @@ public class InjectorImpl implements Injector {
 
     private static boolean debugEnabled() {
         try {
-            String property = System.getProperty("sisu.debug");
+            String property = System.getProperty(DEBUG_PROPERTY);
             return property != null && (property.isEmpty() || Boolean.parseBoolean(property));
         } catch (RuntimeException e) {
             return false;

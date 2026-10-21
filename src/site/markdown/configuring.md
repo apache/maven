@@ -114,17 +114,22 @@ For example, options and goals could be defined with the value
 
 ## Dependency Injection Diagnostics
 
-Set the `sisu.debug` Java system property to print the bindings known to Maven DI.
+Set the `maven.di.debug` Java system property to print the bindings known to Maven DI.
 For example, to run the `validate` phase with diagnostics enabled:
 
 ```sh
-MAVEN_OPTS="-Dsisu.debug=true" mvn validate
+MAVEN_OPTS="-Dmaven.di.debug=true" mvn validate
 ```
 
 The property accepts `true` (case insensitive) or an empty value. Native dumps
 are disabled when the property is unset or has any other value, including `false`.
 Set it before startup to include bindings discovered during container creation.
-The property also enables Sisu's own diagnostics.
+Sisu's diagnostics are controlled separately by `sisu.debug`. Set both properties
+to inspect both containers:
+
+```sh
+MAVEN_OPTS="-Dmaven.di.debug=true -Dsisu.debug=true" mvn validate
+```
 
 Each block starts with `Maven DI native registry` and identifies the injector and
 registry revision. Sorted rows list all keys and candidates, including aliases,

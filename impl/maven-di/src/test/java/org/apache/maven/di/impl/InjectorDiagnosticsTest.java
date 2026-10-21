@@ -66,27 +66,32 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.parallel.Resources.SYSTEM_OUT;
+import static org.junit.jupiter.api.parallel.Resources.SYSTEM_PROPERTIES;
 
-@ResourceLock("java.lang.System.properties")
-@ResourceLock("java.lang.System.out")
+@ResourceLock(SYSTEM_PROPERTIES)
+@ResourceLock(SYSTEM_OUT)
 @Timeout(30)
 class InjectorDiagnosticsTest {
+    private static final String MAVEN_DI_DEBUG = "maven.di.debug";
+    private static final String SISU_DEBUG = "sisu.debug";
+
     private String previousProperty;
     private PrintStream previousOutput;
 
     @BeforeEach
     void enableDiagnostics() {
-        previousProperty = System.getProperty("sisu.debug");
+        previousProperty = System.getProperty(MAVEN_DI_DEBUG);
         previousOutput = System.out;
-        System.setProperty("sisu.debug", "true");
+        System.setProperty(MAVEN_DI_DEBUG, "true");
     }
 
     @AfterEach
     void restoreEnvironment() {
         if (previousProperty == null) {
-            System.clearProperty("sisu.debug");
+            System.clearProperty(MAVEN_DI_DEBUG);
         } else {
-            System.setProperty("sisu.debug", previousProperty);
+            System.setProperty(MAVEN_DI_DEBUG, previousProperty);
         }
         System.setOut(previousOutput);
     }
@@ -249,6 +254,28 @@ class InjectorDiagnosticsTest {
     }
 
     @Test
+    void sisuFlagDoesNotEnableNativeDiagnostics() {
+        String previous = System.getProperty(SISU_DEBUG);
+        try {
+            System.setProperty(SISU_DEBUG, "true");
+            RecordingInjector injector = new RecordingInjector();
+            injector.bindInstance(String.class, "value");
+            System.clearProperty(MAVEN_DI_DEBUG);
+            assertEquals("value", injector.getInstance(String.class));
+            assertTrue(injector.dumps.isEmpty());
+            System.setProperty(MAVEN_DI_DEBUG, "false");
+            injector.checkpoint();
+            assertTrue(injector.dumps.isEmpty());
+        } finally {
+            if (previous == null) {
+                System.clearProperty(SISU_DEBUG);
+            } else {
+                System.setProperty(SISU_DEBUG, previous);
+            }
+        }
+    }
+
+    @Test
     void flagIsReadAgainForReusedInjector() {
         RecordingInjector injector = new RecordingInjector();
         AtomicInteger descriptions = new AtomicInteger();
@@ -262,23 +289,23 @@ class InjectorDiagnosticsTest {
         injector.bind(Key.of(String.class), binding);
         injector.bind(Key.of(String.class, "alias"), binding);
         for (String value : List.of("false", "yes", "1")) {
-            System.setProperty("sisu.debug", value);
+            System.setProperty(MAVEN_DI_DEBUG, value);
             assertEquals("value", injector.getInstance(String.class));
         }
-        System.clearProperty("sisu.debug");
+        System.clearProperty(MAVEN_DI_DEBUG);
         injector.checkpoint();
         assertTrue(injector.dumps.isEmpty());
         assertEquals(0, descriptions.get());
         for (String value : List.of("", "TRUE", "true")) {
-            System.setProperty("sisu.debug", value);
+            System.setProperty(MAVEN_DI_DEBUG, value);
             injector.checkpoint();
             injector.checkpoint();
-            System.setProperty("sisu.debug", "false");
+            System.setProperty(MAVEN_DI_DEBUG, "false");
             injector.checkpoint();
         }
         assertEquals(3, injector.dumps.size());
         assertEquals(3, descriptions.get());
-        System.setProperty("sisu.debug", "true");
+        System.setProperty(MAVEN_DI_DEBUG, "true");
         injector.checkpoint();
         System.setOut(new PrintStream(new ByteArrayOutputStream()));
         injector.checkpoint();
