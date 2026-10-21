@@ -40,11 +40,9 @@ import javax.tools.JavaFileObject;
 import javax.tools.StandardLocation;
 import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
-import javax.xml.stream.XMLStreamReader;
 import javax.xml.stream.XMLStreamWriter;
 
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.io.Writer;
@@ -59,19 +57,14 @@ import java.util.Set;
  * JSR 269 annotation processor that generates Maven plugin descriptors ({@code META-INF/maven/plugin.xml})
  * and DI factory classes at compile time from {@code @Mojo}-annotated classes.
  *
- * <p>The processor reads plugin coordinates (groupId, artifactId, version, goalPrefix) from the
- * project's {@code pom.xml}, located via the filer's source path. Any of these values can be
- * overridden with compiler {@code -A} options:
+ * <p>The processor reads plugin coordinates from compiler {@code -A} options, typically
+ * provided by the {@code maven-plugin-mixin}:
  * <ul>
- *   <li>{@code maven.plugin.groupId} — overrides the POM groupId</li>
- *   <li>{@code maven.plugin.artifactId} — overrides the POM artifactId</li>
- *   <li>{@code maven.plugin.version} — overrides the POM version</li>
- *   <li>{@code maven.plugin.goalPrefix} — overrides the derived goal prefix</li>
+ *   <li>{@code maven.plugin.groupId} — plugin group ID (required)</li>
+ *   <li>{@code maven.plugin.artifactId} — plugin artifact ID (required)</li>
+ *   <li>{@code maven.plugin.version} — plugin version (required)</li>
+ *   <li>{@code maven.plugin.goalPrefix} — goal prefix (optional, derived from artifactId)</li>
  * </ul>
- *
- * <p>Goal prefix is derived from the artifactId by stripping the {@code maven-} prefix and
- * {@code -plugin} / {@code -maven-plugin} suffix when not explicitly configured in the POM
- * or via {@code -A}.
  *
  * <p>The generated {@code plugin.xml} follows the {@code http://maven.apache.org/PLUGIN/2.0.0} namespace.
  * One factory class is generated per mojo; the factory is annotated with
@@ -197,160 +190,42 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
     // -------------------------------------------------------------------------
 
     /**
-     * Resolves plugin coordinates from the project {@code pom.xml}, with any
-     * {@code -A} compiler options taking precedence. The result is cached after
-     * the first successful resolution.
+     * Resolves plugin coordinates from {@code -A} compiler options.
+     * The result is cached after the first successful resolution.
      *
-     * @return resolved coordinates, or {@code null} if the POM cannot be found
-     *         and no {@code -A} options are provided
+     * @return resolved coordinates, or {@code null} if required options are missing
      */
     PomCoordinates resolveCoordinates() {
         if (resolvedCoordinates != null) {
             return resolvedCoordinates;
         }
-        PomCoordinates pom = readPomCoordinates();
 
-        String groupId = override(getOption(OPT_GROUP_ID), pom != null ? pom.groupId : null);
-        String artifactId = override(getOption(OPT_ARTIFACT_ID), pom != null ? pom.artifactId : null);
-        String version = override(getOption(OPT_VERSION), pom != null ? pom.version : null);
-        String goalPrefix = override(
-                getOption(OPT_GOAL_PREFIX),
-                pom != null && pom.goalPrefix != null ? pom.goalPrefix : deriveGoalPrefix(artifactId));
+        String groupId = getOption(OPT_GROUP_ID);
+        String artifactId = getOption(OPT_ARTIFACT_ID);
+        String version = getOption(OPT_VERSION);
+        String goalPrefix = getOption(OPT_GOAL_PREFIX);
+        if (goalPrefix == null || goalPrefix.isEmpty()) {
+            goalPrefix = deriveGoalPrefix(artifactId);
+        }
 
-        if (groupId == null || artifactId == null || version == null) {
+        if (groupId == null
+                || groupId.isEmpty()
+                || artifactId == null
+                || artifactId.isEmpty()
+                || version == null
+                || version.isEmpty()) {
             processingEnv
                     .getMessager()
                     .printMessage(
                             Diagnostic.Kind.ERROR,
                             "maven-plugin-mixin: could not determine plugin coordinates. "
-                                    + "Either place a pom.xml at the project root, or supply "
-                                    + "-Amaven.plugin.groupId, -Amaven.plugin.artifactId and "
-                                    + "-Amaven.plugin.version to the maven-compiler-plugin.");
+                                    + "Supply -Amaven.plugin.groupId, -Amaven.plugin.artifactId and "
+                                    + "-Amaven.plugin.version via the maven-plugin-mixin.");
             return null;
         }
 
         resolvedCoordinates = new PomCoordinates(groupId, artifactId, version, goalPrefix);
         return resolvedCoordinates;
-    }
-
-    private static String override(String explicit, String fallback) {
-        return (explicit != null && !explicit.isEmpty()) ? explicit : fallback;
-    }
-
-    /**
-     * Attempts to read plugin coordinates from the nearest {@code pom.xml} reachable
-     * via the annotation processor filer's source path.
-     * Also reads {@code goalPrefix} from the {@code maven-plugin-plugin} configuration
-     * when present.
-     *
-     * @return parsed coordinates, or {@code null} if no {@code pom.xml} is found
-     */
-    PomCoordinates readPomCoordinates() {
-        for (StandardLocation loc :
-                new StandardLocation[] {StandardLocation.SOURCE_PATH, StandardLocation.CLASS_OUTPUT}) {
-            try {
-                FileObject fo = processingEnv.getFiler().getResource(loc, "", "pom.xml");
-                try (InputStream in = fo.openInputStream()) {
-                    return parsePom(in);
-                }
-            } catch (IOException | UnsupportedOperationException ignored) {
-                // Try next location or fall back to -A options
-            } catch (RuntimeException e) {
-                // javac's ClientCodeWrapper can re-wrap UnsupportedOperationException as RuntimeException
-                if (!(e.getCause() instanceof UnsupportedOperationException)) {
-                    throw e;
-                }
-                // Otherwise: filer doesn't support this location — try next
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Minimal StAX parser that extracts groupId, artifactId, version and the
-     * goalPrefix configured under
-     * {@code /project/build/plugins/plugin[artifactId='maven-plugin-plugin']/configuration/goalPrefix}.
-     */
-    static PomCoordinates parsePom(InputStream in) throws IOException {
-        try {
-            javax.xml.stream.XMLInputFactory factory = javax.xml.stream.XMLInputFactory.newInstance();
-            factory.setProperty(javax.xml.stream.XMLInputFactory.IS_REPLACING_ENTITY_REFERENCES, false);
-            factory.setProperty(javax.xml.stream.XMLInputFactory.SUPPORT_DTD, false);
-            XMLStreamReader reader = factory.createXMLStreamReader(in);
-            try {
-                return doParsePom(reader);
-            } finally {
-                reader.close();
-            }
-        } catch (javax.xml.stream.XMLStreamException e) {
-            throw new IOException("Failed to parse pom.xml", e);
-        }
-    }
-
-    private static PomCoordinates doParsePom(XMLStreamReader r) throws javax.xml.stream.XMLStreamException {
-        String groupId = null;
-        String artifactId = null;
-        String version = null;
-        String goalPrefix = null;
-
-        // Simple depth-tracked path: only capture top-level <groupId>, <artifactId>, <version>
-        // and the goalPrefix inside the maven-plugin-plugin configuration.
-        List<String> path = new ArrayList<>();
-        String currentPluginArtifactId = null;
-        boolean inPluginPluginConfig = false;
-
-        while (r.hasNext()) {
-            int event = r.next();
-            if (event == XMLStreamReader.START_ELEMENT) {
-                path.add(r.getLocalName());
-
-                if (matches(path, "project", "groupId") && groupId == null) {
-                    groupId = r.getElementText();
-                    path.remove(path.size() - 1);
-                } else if (matches(path, "project", "artifactId") && artifactId == null) {
-                    artifactId = r.getElementText();
-                    path.remove(path.size() - 1);
-                } else if (matches(path, "project", "version") && version == null) {
-                    version = r.getElementText();
-                    path.remove(path.size() - 1);
-                } else if (matches(path, "project", "build", "plugins", "plugin", "artifactId")) {
-                    currentPluginArtifactId = r.getElementText();
-                    path.remove(path.size() - 1);
-                    if ("maven-plugin-plugin".equals(currentPluginArtifactId)) {
-                        inPluginPluginConfig = true;
-                    }
-                } else if (inPluginPluginConfig
-                        && matches(path, "project", "build", "plugins", "plugin", "configuration", "goalPrefix")) {
-                    goalPrefix = r.getElementText();
-                    path.remove(path.size() - 1);
-                }
-            } else if (event == XMLStreamReader.END_ELEMENT) {
-                String leaving = path.isEmpty() ? "" : path.get(path.size() - 1);
-                if (!path.isEmpty()) {
-                    path.remove(path.size() - 1);
-                }
-                if ("plugin".equals(leaving)) {
-                    inPluginPluginConfig = false;
-                    currentPluginArtifactId = null;
-                }
-            }
-        }
-        if (artifactId == null) {
-            return null;
-        }
-        return new PomCoordinates(groupId, artifactId, version, goalPrefix);
-    }
-
-    private static boolean matches(List<String> path, String... expected) {
-        if (path.size() != expected.length) {
-            return false;
-        }
-        for (int i = 0; i < expected.length; i++) {
-            if (!expected[i].equals(path.get(i))) {
-                return false;
-            }
-        }
-        return true;
     }
 
     private String getOption(String key) {

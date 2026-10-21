@@ -47,7 +47,6 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -389,81 +388,6 @@ class MojoDescriptorProcessorTest {
         //  which doesn't end with "-plugin" but IS "plugin" — no further strip)
         // Wait, let's check: s = "plugin", s.endsWith("-plugin") → false
         assertEquals("plugin", MojoDescriptorProcessor.deriveGoalPrefix("maven-plugin"));
-    }
-
-    // -------------------------------------------------------------------------
-    // Tests: parsePom extracts coordinates and goalPrefix from pom.xml
-    // -------------------------------------------------------------------------
-
-    @Test
-    void parsePomExtractsBasicCoordinates() throws Exception {
-        String pom = """
-                <?xml version="1.0"?>
-                <project>
-                  <groupId>com.example</groupId>
-                  <artifactId>my-plugin</artifactId>
-                  <version>2.3.0</version>
-                </project>
-                """;
-        MojoDescriptorProcessor.PomCoordinates coords =
-                MojoDescriptorProcessor.parsePom(new java.io.ByteArrayInputStream(pom.getBytes()));
-        assertNotNull(coords);
-        assertEquals("com.example", coords.groupId);
-        assertEquals("my-plugin", coords.artifactId);
-        assertEquals("2.3.0", coords.version);
-        assertNull(coords.goalPrefix);
-    }
-
-    @Test
-    void parsePomExtractsGoalPrefixFromMavenPluginPlugin() throws Exception {
-        String pom = """
-                <?xml version="1.0"?>
-                <project>
-                  <groupId>com.example</groupId>
-                  <artifactId>my-plugin</artifactId>
-                  <version>1.0</version>
-                  <build>
-                    <plugins>
-                      <plugin>
-                        <artifactId>maven-plugin-plugin</artifactId>
-                        <configuration>
-                          <goalPrefix>myprefix</goalPrefix>
-                        </configuration>
-                      </plugin>
-                    </plugins>
-                  </build>
-                </project>
-                """;
-        MojoDescriptorProcessor.PomCoordinates coords =
-                MojoDescriptorProcessor.parsePom(new java.io.ByteArrayInputStream(pom.getBytes()));
-        assertNotNull(coords);
-        assertEquals("myprefix", coords.goalPrefix);
-    }
-
-    @Test
-    void parsePomIgnoresGoalPrefixFromOtherPlugins() throws Exception {
-        String pom = """
-                <?xml version="1.0"?>
-                <project>
-                  <groupId>com.example</groupId>
-                  <artifactId>my-plugin</artifactId>
-                  <version>1.0</version>
-                  <build>
-                    <plugins>
-                      <plugin>
-                        <artifactId>maven-compiler-plugin</artifactId>
-                        <configuration>
-                          <goalPrefix>wrong</goalPrefix>
-                        </configuration>
-                      </plugin>
-                    </plugins>
-                  </build>
-                </project>
-                """;
-        MojoDescriptorProcessor.PomCoordinates coords =
-                MojoDescriptorProcessor.parsePom(new java.io.ByteArrayInputStream(pom.getBytes()));
-        assertNotNull(coords);
-        assertNull(coords.goalPrefix);
     }
 
     // -------------------------------------------------------------------------
