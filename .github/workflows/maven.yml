@@ -173,7 +173,7 @@ jobs:
 
       - name: Install Graphviz (Ubuntu)
         if: runner.os == 'Linux'
-        run: sudo apt-get install graphviz
+        run: sudo apt-get install graphviz libgvplugin-neato-layout8
 
       - name: Install Graphviz (Windows)
         if: runner.os == 'Windows'
