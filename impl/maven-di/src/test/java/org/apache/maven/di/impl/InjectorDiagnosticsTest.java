@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
+import java.lang.reflect.Member;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.nio.charset.StandardCharsets;
@@ -30,6 +31,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -142,10 +144,75 @@ class InjectorDiagnosticsTest {
         assertEquals(0, Unconstructed.CALLS.get());
         assertTrue(snapshot.contains("initialized by"));
         assertTrue(snapshot.contains("Provider.provide"));
-        assertTrue(snapshot.contains("scope " + SessionScoped.class.getName()));
+        assertTrue(snapshot.contains("  scopes:\n") && snapshot.contains(SessionScoped.class.getName()));
         assertTrue(snapshot.contains("supplier "));
         assertFalse(snapshot.contains("secret-value"));
         assertEquals(body(snapshot), body(injector.dumps.get(0)));
+    }
+
+    @Test
+    void snapshotGroupsCandidatesAndListsDependenciesAndClassLoaders() {
+        RecordingInjector injector = new RecordingInjector();
+        Key<String> key = Key.of(String.class);
+        Binding<String> factory = Binding.to(key, args -> "unused", new Dependency<?>[] {
+                    new Dependency<>(Key.of(Integer.class), false), new Dependency<>(Key.of(Long.class), true)
+                })
+                .prioritize(10);
+        injector.bind(key, factory);
+        injector.bind(key, Binding.toInstance("other").withKey(key));
+        injector.bind(Key.of(String.class, "alias"), factory);
+
+        String snapshot = injector.dumpBindings();
+        assertEquals(
+                1,
+                snapshot.lines()
+                        .filter(line -> line.equals("  key: java.lang.String [loader=bootstrap]"))
+                        .count());
+        assertEquals(3, bindingRows(snapshot).size());
+        assertTrue(snapshot.contains("  key: java.lang.String [loader=bootstrap]\n"
+                + "    candidate: java.lang.String [loader=bootstrap]\n      priority: 10\n"));
+        assertTrue(snapshot.contains("      dependencies:\n"
+                + "        - ?java.lang.Long [loader=bootstrap]\n"
+                + "        - java.lang.Integer [loader=bootstrap]"));
+        assertTrue(snapshot.contains(
+                "\n  class loaders:\n    L1: " + Binding.identityString(Singleton.class.getClassLoader())));
+        assertTrue(snapshot.contains("    " + Singleton.class.getName() + " [loader=L1]\n      supplier: "));
+    }
+
+    @Test
+    void snapshotSeparatesSourceParametersExceptionsAndInitializers() {
+        RecordingInjector injector = new RecordingInjector();
+        injector.bindImplicit(DetailedSource.class);
+        injector.bindImplicit(Provider.class);
+
+        String snapshot = injector.dumpBindings();
+        assertTrue(
+                snapshot.contains("      source:\n        " + DetailedSource.class.getName() + "(\n"
+                        + "          java.lang.String [loader=bootstrap],\n"
+                        + "          int [loader=bootstrap]\n"
+                        + "        ) [loader=L1]\n"
+                        + "        throws java.io.IOException [loader=bootstrap]\n"
+                        + "        initialized by "),
+                snapshot);
+        assertTrue(
+                snapshot.contains("      source:\n"
+                        + "        java.lang.String [loader=bootstrap]\n"
+                        + "        " + Provider.class.getName() + ".provide() [loader=L1]\n"),
+                snapshot);
+    }
+
+    @Test
+    void snapshotPreservesDefaultMethodModifier() throws Exception {
+        RecordingInjector injector = new RecordingInjector();
+        injector.bind(
+                Key.of(String.class),
+                ReflectionUtils.bindingFromMethod(DefaultProvider.class.getDeclaredMethod("provideDefault")));
+
+        String snapshot = injector.dumpBindings();
+        assertTrue(
+                snapshot.contains("        public default java.lang.String [loader=bootstrap]\n" + "        "
+                        + DefaultProvider.class.getName() + ".provideDefault() [loader=L1]"),
+                snapshot);
     }
 
     @Test
@@ -155,7 +222,7 @@ class InjectorDiagnosticsTest {
         }
 
         // Key simplifies its type arguments, but preserves wildcards in parameterized owners.
-        String bound = Number.class.getName() + " [loader=null]";
+        String bound = Number.class.getName() + " [loader=bootstrap]";
         Map<Key<?>, String> cases = Map.of(
                 new Key<Outer<?>.Inner<String>>() {}, "<?>",
                 new Key<Outer<? extends Number>.Inner<String>>() {}, "<? extends " + bound + ">",
@@ -189,13 +256,16 @@ class InjectorDiagnosticsTest {
         assertThrows(DIException.class, () -> injector.getInstance(String.class));
         assertEquals(5, bindingRows(injector.dumps.get(1)).size());
         assertEquals(body(injector.dumpBindings()), body(injector.dumps.get(1)));
-        List<String> rows = bindingRows(injector.dumps.get(1));
-        assertEquals(rows.stream().sorted().toList(), rows);
+        List<String> keys = body(injector.dumps.get(1))
+                .lines()
+                .filter(line -> line.startsWith("  key: "))
+                .toList();
+        assertEquals(keys.stream().sorted().toList(), keys);
         injector.checkpoint();
         assertEquals(2, injector.dumps.size());
         first.prioritize(42);
-        assertTrue(injector.dumpBindings().contains("priority=42"));
-        assertFalse(injector.dumps.get(1).contains("priority=42"));
+        assertTrue(injector.dumpBindings().contains("priority: 42"));
+        assertFalse(injector.dumps.get(1).contains("priority: 42"));
     }
 
     @Test
@@ -281,9 +351,9 @@ class InjectorDiagnosticsTest {
         AtomicInteger descriptions = new AtomicInteger();
         Binding<String> binding = new Binding.BindingToInstance<>("value") {
             @Override
-            String getDiagnosticSource() {
+            List<String> getDiagnosticSourceLines(Function<Member, List<String>> memberSource) {
                 descriptions.incrementAndGet();
-                return super.getDiagnosticSource();
+                return super.getDiagnosticSourceLines(memberSource);
             }
         }.withKey(Key.of(String.class));
         injector.bind(Key.of(String.class), binding);
@@ -362,7 +432,7 @@ class InjectorDiagnosticsTest {
     }
 
     @Test
-    void separateRealmsWithTheSameBinaryNameRemainVisible() throws Exception {
+    void separateRealmsRemainDistinctRegardlessOfDependencyOrder() throws Exception {
         String name = Hostile.class.getName();
         byte[] bytes;
         try (var input = Hostile.class.getResourceAsStream("InjectorDiagnosticsTest$Hostile.class")) {
@@ -383,6 +453,23 @@ class InjectorDiagnosticsTest {
         List<String> rows = bindingRows(injector.dumpBindings());
         assertEquals(2, rows.size());
         assertNotEquals(rows.get(0), rows.get(1));
+
+        Dependency<?> firstDependency = new Dependency<>(Key.ofType(first), false);
+        Dependency<?> secondDependency = new Dependency<>(Key.ofType(second), false);
+        Set<Dependency<?>> dependencies = new LinkedHashSet<>(List.of(firstDependency, secondDependency));
+        RecordingInjector dependent = new RecordingInjector();
+        Key<String> key = Key.of(String.class);
+        dependent.bind(key, new Binding<String>(key, dependencies) {
+            @Override
+            public Supplier<String> compile(Function<Dependency<?>, Supplier<?>> compiler) {
+                throw new AssertionError("binding compiled for diagnostics");
+            }
+        });
+        String before = dependent.dumpBindings();
+        dependencies.clear();
+        dependencies.add(secondDependency);
+        dependencies.add(firstDependency);
+        assertEquals(before, dependent.dumpBindings());
     }
 
     @Test
@@ -424,7 +511,7 @@ class InjectorDiagnosticsTest {
         RecordingInjector injector = new RecordingInjector() {
             @Override
             protected void writeDump(PrintStream output, String dump) {
-                if (dump.contains("original=java.lang.String") && !dump.contains("original=java.lang.Integer")) {
+                if (dump.contains("candidate: java.lang.String") && !dump.contains("candidate: java.lang.Integer")) {
                     firstOutput.countDown();
                     try {
                         assertTrue(releaseOutput.await(10, TimeUnit.SECONDS));
@@ -474,7 +561,10 @@ class InjectorDiagnosticsTest {
     }
 
     private static List<String> bindingRows(String dump) {
-        return body(dump).lines().filter(line -> !line.startsWith("  scope ")).toList();
+        return body(dump)
+                .lines()
+                .filter(line -> line.startsWith("    candidate: "))
+                .toList();
     }
 
     static class RecordingInjector extends InjectorImpl {
@@ -548,6 +638,18 @@ class InjectorDiagnosticsTest {
         @Named("provided")
         String provide() {
             throw new AssertionError("provider called for diagnostics");
+        }
+    }
+
+    static class DetailedSource {
+        DetailedSource(String text, int count) throws IOException {
+            throw new AssertionError("constructor called for diagnostics");
+        }
+    }
+
+    interface DefaultProvider {
+        default String provideDefault() {
+            throw new AssertionError("default method called for diagnostics");
         }
     }
 

@@ -132,9 +132,15 @@ MAVEN_OPTS="-Dmaven.di.debug=true -Dsisu.debug=true" mvn validate
 ```
 
 Each block starts with `Maven DI native registry` and identifies the injector and
-registry revision. Sorted rows list all keys and candidates, including aliases,
-priorities, scopes, sources and declared dependencies. Keys without candidates
-are listed too. Class loader identities distinguish types from different realms.
+registry revision. Sorted key blocks group all candidates, including aliases.
+Candidates appear in descending priority order. Each candidate lists its
+priority, scope, source and declared dependencies on separate lines. Constructor
+and factory method parameters, declared exceptions and initializers are listed
+on separate lines too. Optional dependencies start with `?`; keys without
+candidates are listed too. Class loader references such as `L1` are local to
+each snapshot and resolve to full identities in its final legend. `bootstrap`
+identifies the bootstrap class loader. These references distinguish types from
+different realms.
 The blocks go to standard output, where Maven may prefix lines with `[stdout]`.
 
 Snapshots are printed after discovery and when lookup or injection observes

@@ -102,13 +102,23 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
             assertTrue(nativeRows.stream().anyMatch(line -> line.contains("mng8445.CheckMojo")));
             assertTrue(nativeRows.stream().anyMatch(line -> line.contains("CheckMojo$Unused")));
             assertTrue(nativeRows.stream().anyMatch(line -> line.contains("Unused.provide")));
-            assertTrue(nativeRows.stream()
-                    .anyMatch(line ->
-                            line.contains("source=instance ") && line.contains("org.apache.maven.api.Session")));
+            assertTrue(hasInstanceBinding(nativeRows, "org.apache.maven.api.Session"));
         } else {
             assertEquals(0, dumps);
-            assertFalse(lines.stream().anyMatch(line -> line.startsWith("  scope ")));
+            assertFalse(lines.stream().anyMatch(line -> line.startsWith("  scopes:")));
         }
+    }
+
+    private static boolean hasInstanceBinding(List<String> lines, String type) {
+        boolean matchingKey = false;
+        for (String line : lines) {
+            if (line.startsWith("  key: ")) {
+                matchingKey = line.startsWith("  key: " + type + " [loader=");
+            } else if (matchingKey && line.startsWith("      source: instance ")) {
+                return true;
+            }
+        }
+        return false;
     }
 
     private static int collectNativeRows(List<String> lines, List<String> rows) {
