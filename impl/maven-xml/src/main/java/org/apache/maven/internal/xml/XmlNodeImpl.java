@@ -251,6 +251,10 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     // Helpers
     // ----------------------------------------------------------------------
 
+    /**
+     * @deprecated use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @SuppressWarnings("checkstyle:MethodLength")
     public static XmlNode merge(XmlNode dominant, XmlNode recessive, Boolean childMergeOverride) {
         return XmlService.merge(dominant, recessive, childMergeOverride);

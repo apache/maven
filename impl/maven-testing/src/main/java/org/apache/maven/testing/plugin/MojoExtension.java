@@ -640,7 +640,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                     parameterConfiguration = config.child(parameter.getAlias());
                 }
                 XmlNode parameterDefaults = defaultConfiguration.child(parameter.getName());
-                parameterConfiguration = XmlNode.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
+                parameterConfiguration = XmlService.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
                 if (parameterConfiguration != null) {
                     Map<String, String> attributes = new HashMap<>(parameterConfiguration.attributes());
                     parameterConfiguration = XmlNode.newInstance(
