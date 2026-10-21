@@ -321,7 +321,7 @@ public class MojoExecutor {
         void close();
     }
 
-    public NoExceptionCloseable getProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
+    protected NoExceptionCloseable getProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
         if (useProjectLock(session)) {
             Thread currentThread = Thread.currentThread();
             mojos.put(currentThread, mojoDescriptor);
