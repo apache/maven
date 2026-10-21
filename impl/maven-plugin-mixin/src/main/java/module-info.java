@@ -24,6 +24,7 @@ module org.apache.maven.plugin.processor {
     requires java.xml;
     requires org.apache.maven.api;
     requires org.apache.maven.api.plugin.descriptor;
+    requires org.apache.maven.support;
 
     provides javax.annotation.processing.Processor with
             org.apache.maven.plugin.processor.MojoDescriptorProcessor;
