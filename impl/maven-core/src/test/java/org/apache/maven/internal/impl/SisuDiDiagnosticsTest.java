@@ -38,18 +38,22 @@ import org.junit.jupiter.api.parallel.ResourceLock;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.parallel.Resources.SYSTEM_OUT;
+import static org.junit.jupiter.api.parallel.Resources.SYSTEM_PROPERTIES;
 
-@ResourceLock("java.lang.System.properties")
-@ResourceLock("java.lang.System.out")
+@ResourceLock(SYSTEM_PROPERTIES)
+@ResourceLock(SYSTEM_OUT)
 class SisuDiDiagnosticsTest {
+    private static final String MAVEN_DI_DEBUG = "maven.di.debug";
+
     @Test
     void bridgeProvidersAndLazyCollectionsObserveLateRegistrations() throws Exception {
-        String previous = System.getProperty("sisu.debug");
+        String previous = System.getProperty(MAVEN_DI_DEBUG);
         PrintStream output = System.out;
         ByteArrayOutputStream captured = new ByteArrayOutputStream();
         LazyNative.CALLS.set(0);
         try (PrintStream sink = new PrintStream(captured, true, StandardCharsets.UTF_8)) {
-            System.setProperty("sisu.debug", "true");
+            System.setProperty(MAVEN_DI_DEBUG, "true");
             System.setOut(sink);
             DefaultPlexusContainer container =
                     new DefaultPlexusContainer(new DefaultContainerConfiguration(), new SisuDiBridgeModule(false) {
@@ -92,9 +96,9 @@ class SisuDiDiagnosticsTest {
         } finally {
             System.setOut(output);
             if (previous == null) {
-                System.clearProperty("sisu.debug");
+                System.clearProperty(MAVEN_DI_DEBUG);
             } else {
-                System.setProperty("sisu.debug", previous);
+                System.setProperty(MAVEN_DI_DEBUG, previous);
             }
         }
     }
