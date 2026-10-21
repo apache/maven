@@ -36,7 +36,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-26.04, windows-latest, macOS-latest]
       fail-fast: false
 
     runs-on: ${{ matrix.os }}
@@ -63,7 +63,7 @@ jobs:
 
       - name: Upload built Maven
         uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
-        if: ${{ matrix.os == 'ubuntu-latest' }}
+        if: ${{ matrix.os == 'ubuntu-26.04' }}
         with:
           name: built-maven
           path: apache-maven/target/
@@ -72,7 +72,7 @@ jobs:
     needs: build
     strategy:
       matrix:
-        os: [ubuntu-latest, windows-latest, macOS-latest]
+        os: [ubuntu-26.04, windows-latest, macOS-latest]
         java: [8, 25, 27]
 
       fail-fast: false
@@ -164,7 +164,7 @@ jobs:
     # every change to the IT POMs saves a new generation; restores only use the exact key or the newest fallback
     needs: integration-test
     if: ${{ !cancelled() && github.event_name == 'push' }}
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     permissions:
       actions: write
     steps:
