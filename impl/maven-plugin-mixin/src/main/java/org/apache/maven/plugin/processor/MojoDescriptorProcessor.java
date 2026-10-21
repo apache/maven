@@ -23,8 +23,6 @@ import javax.annotation.processing.RoundEnvironment;
 import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedOptions;
 import javax.lang.model.SourceVersion;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
@@ -53,9 +51,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.apache.maven.api.plugin.annotations.After;
+import org.apache.maven.api.plugin.annotations.Execute;
+import org.apache.maven.api.plugin.annotations.Mojo;
+import org.apache.maven.api.plugin.annotations.Resolution;
+import org.apache.maven.api.plugin.descriptor.AfterLink;
+import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
+
 /**
  * JSR 269 annotation processor that generates Maven plugin descriptors ({@code META-INF/maven/plugin.xml})
- * and DI factory classes at compile time from {@code @Mojo}-annotated classes.
+ * and DI factory classes at compile time from {@link Mojo @Mojo}-annotated classes.
  *
  * <p>The processor reads plugin coordinates from compiler {@code -A} options, typically
  * provided by the {@code maven-plugin-mixin}:
@@ -64,25 +70,6 @@ import java.util.Set;
  *   <li>{@code maven.plugin.artifactId} — plugin artifact ID (required)</li>
  *   <li>{@code maven.plugin.version} — plugin version (required)</li>
  *   <li>{@code maven.plugin.goalPrefix} — goal prefix (optional, derived from artifactId)</li>
- * </ul>
- *
- * <p>The generated {@code plugin.xml} follows the {@code http://maven.apache.org/PLUGIN/2.0.0} namespace.
- * One factory class is generated per mojo; the factory is annotated with
- * {@code @org.apache.maven.api.di.Named("groupId:artifactId:version:goal")} so that the DI container
- * can locate it by the role-hint used in {@code DefaultMavenPluginManager.loadV4Mojo()}.
- * The {@code DiIndexProcessor} (from {@code maven-api-di}) picks up the {@code @Named} factory in the
- * next processing round and registers it in {@code META-INF/maven/org.apache.maven.api.di.Inject}.
- *
- * <p>Design notes:
- * <ul>
- *   <li>Returns {@code false} from {@code process()} — does not claim {@code @Mojo}; other processors
- *       and IDEs can still see it.</li>
- *   <li>Annotation references are string-based — no compile dependency on {@code maven-api-core} or
- *       {@code maven-api-di}; mirror names are compared as strings.</li>
- *   <li>Full type hierarchy is walked to collect {@code @Parameter} and {@code @Resolution} fields,
- *       including those declared in parent classes from dependency JARs.</li>
- *   <li>Javadoc is extracted via {@code Elements.getDocComment()} — only available for source elements;
- *       inherited parameters from binary JARs will have {@code null} descriptions.</li>
  * </ul>
  *
  * @since 4.1.0
@@ -101,23 +88,11 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
     static final String OPT_VERSION = "maven.plugin.version";
     static final String OPT_GOAL_PREFIX = "maven.plugin.goalPrefix";
 
-    private static final String MOJO_ANN = "org.apache.maven.api.plugin.annotations.Mojo";
-    private static final String PARAMETER_ANN = "org.apache.maven.api.plugin.annotations.Parameter";
-    private static final String RESOLUTION_ANN = "org.apache.maven.api.plugin.annotations.Resolution";
-    private static final String EXECUTE_ANN = "org.apache.maven.api.plugin.annotations.Execute";
-    private static final String AFTER_ANN = "org.apache.maven.api.plugin.annotations.After";
-    private static final String AFTERS_ANN = "org.apache.maven.api.plugin.annotations.Afters";
-
     private static final String PLUGIN_NS = "http://maven.apache.org/PLUGIN/2.0.0";
 
-    /** Mojos collected across all rounds (FQN → TypeElement). */
     private final Map<String, TypeElement> mojoElements = new LinkedHashMap<>();
-
-    /** Factory class names generated in previous rounds — skip re-processing them. */
     private final Set<String> generatedFactoryNames = new LinkedHashSet<>();
-
-    /** Coordinates resolved lazily on first use (from POM + -A overrides). */
-    private PomCoordinates resolvedCoordinates;
+    private String[] resolvedCoordinates;
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -132,11 +107,9 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                     continue;
                 }
                 String fqn = typeElement.getQualifiedName().toString();
-                // Skip factory classes we generated in a previous round
                 if (generatedFactoryNames.contains(fqn)) {
                     continue;
                 }
-                // Validate: must be a concrete class
                 if (typeElement.getKind() == ElementKind.INTERFACE) {
                     processingEnv
                             .getMessager()
@@ -152,10 +125,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                 }
                 if (!mojoElements.containsKey(fqn)) {
                     mojoElements.put(fqn, typeElement);
-                    // Generate factory immediately in this round so DiIndexProcessor can pick it
-                    // up in the next round. Factories generated in processingOver() are invisible
-                    // to subsequent processors because there are no more rounds after the last one.
-                    PomCoordinates coords = resolveCoordinates();
+                    String[] coords = resolveCoordinates();
                     if (coords != null) {
                         try {
                             generateFactory(typeElement, coords);
@@ -171,7 +141,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
             if (mojoElements.isEmpty()) {
                 return false;
             }
-            PomCoordinates coords = resolveCoordinates();
+            String[] coords = resolveCoordinates();
             if (coords == null) {
                 return false;
             }
@@ -182,20 +152,14 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
             }
         }
 
-        return false; // do not claim the annotation
+        return false;
     }
 
     // -------------------------------------------------------------------------
-    // Coordinate resolution (POM + -A overrides)
+    // Coordinate resolution
     // -------------------------------------------------------------------------
 
-    /**
-     * Resolves plugin coordinates from {@code -A} compiler options.
-     * The result is cached after the first successful resolution.
-     *
-     * @return resolved coordinates, or {@code null} if required options are missing
-     */
-    PomCoordinates resolveCoordinates() {
+    String[] resolveCoordinates() {
         if (resolvedCoordinates != null) {
             return resolvedCoordinates;
         }
@@ -224,7 +188,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
             return null;
         }
 
-        resolvedCoordinates = new PomCoordinates(groupId, artifactId, version, goalPrefix);
+        resolvedCoordinates = new String[] {groupId, artifactId, version, goalPrefix};
         return resolvedCoordinates;
     }
 
@@ -236,154 +200,108 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
     // plugin.xml generation
     // -------------------------------------------------------------------------
 
-    private void writePluginXml(PomCoordinates coords) throws IOException, XMLStreamException {
-        String groupId = coords.groupId;
-        String artifactId = coords.artifactId;
-        String version = coords.version;
-        String goalPrefix = coords.goalPrefix;
+    private void writePluginXml(String[] coords) throws IOException, XMLStreamException {
+        String groupId = coords[0];
+        String artifactId = coords[1];
+        String version = coords[2];
+        String goalPrefix = coords[3];
+
+        List<MojoDescriptor> mojos = new ArrayList<>();
+        for (TypeElement mojoType : mojoElements.values()) {
+            MojoDescriptor mojo = buildMojoDescriptor(mojoType);
+            if (mojo != null) {
+                mojos.add(mojo);
+            }
+        }
+
+        PluginDescriptor descriptor = PluginDescriptor.newBuilder(true)
+                .name(artifactId)
+                .groupId(groupId)
+                .artifactId(artifactId)
+                .version(version)
+                .goalPrefix(goalPrefix)
+                .mojos(mojos)
+                .build();
 
         FileObject out =
                 processingEnv.getFiler().createResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/maven/plugin.xml");
-
         try (Writer w = out.openWriter()) {
-            XMLOutputFactory factory = XMLOutputFactory.newInstance();
-            XMLStreamWriter xml = factory.createXMLStreamWriter(w);
-            try {
-                xml.writeStartDocument("UTF-8", "1.0");
-                xml.writeCharacters("\n");
-                xml.writeStartElement("plugin");
-                xml.writeDefaultNamespace(PLUGIN_NS);
-                xml.writeCharacters("\n");
-
-                writeElement(xml, "name", artifactId, 2);
-                writeElement(xml, "groupId", groupId, 2);
-                writeElement(xml, "artifactId", artifactId, 2);
-                writeElement(xml, "version", version, 2);
-                writeElement(xml, "goalPrefix", goalPrefix, 2);
-
-                xml.writeCharacters("  ");
-                xml.writeStartElement("mojos");
-                xml.writeCharacters("\n");
-
-                for (TypeElement mojoType : mojoElements.values()) {
-                    writeMojo(xml, mojoType, groupId, artifactId, version);
-                }
-
-                xml.writeCharacters("  ");
-                xml.writeEndElement(); // mojos
-                xml.writeCharacters("\n");
-                xml.writeEndElement(); // plugin
-                xml.writeCharacters("\n");
-                xml.writeEndDocument();
-            } finally {
-                xml.close();
-            }
+            writeDescriptorXml(w, descriptor);
         }
-        note("Generated META-INF/maven/plugin.xml with " + mojoElements.size() + " mojo(s)");
+        note("Generated META-INF/maven/plugin.xml with " + mojos.size() + " mojo(s)");
     }
 
-    private void writeMojo(XMLStreamWriter xml, TypeElement mojoType, String groupId, String artifactId, String version)
-            throws XMLStreamException {
-        AnnotationMirror mojoAnn = findAnnotation(mojoType, MOJO_ANN);
+    private MojoDescriptor buildMojoDescriptor(TypeElement mojoType) {
+        Mojo mojoAnn = mojoType.getAnnotation(Mojo.class);
         if (mojoAnn == null) {
-            return;
+            return null;
+        }
+
+        String goal = mojoAnn.name();
+        if (goal.isEmpty()) {
+            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "@Mojo.name() must not be empty", mojoType);
+            return null;
         }
 
         String fqn = mojoType.getQualifiedName().toString();
-        String goal = getStringValue(mojoAnn, "name", "");
-        if (goal.isEmpty()) {
-            processingEnv.getMessager().printMessage(Diagnostic.Kind.ERROR, "@Mojo.name() must not be empty", mojoType);
-            return;
-        }
-
-        // Javadoc for the mojo class
         JavadocInfo mojoDoc = parseJavadoc(processingEnv.getElementUtils().getDocComment(mojoType));
 
-        xml.writeCharacters("    ");
-        xml.writeStartElement("mojo");
-        xml.writeCharacters("\n");
+        MojoDescriptor.Builder builder = MojoDescriptor.newBuilder(true)
+                .goal(goal)
+                .implementation(fqn)
+                .projectRequired(mojoAnn.projectRequired())
+                .onlineRequired(mojoAnn.onlineRequired())
+                .aggregator(mojoAnn.aggregator());
 
-        writeElement(xml, "goal", goal, 6);
-        writeElementIfNotEmpty(xml, "phase", getStringValue(mojoAnn, "defaultPhase", ""), 6);
-        writeElement(xml, "implementation", fqn, 6);
-        writeElement(xml, "language", "java", 6);
-        writeElementIfNotEmpty(xml, "description", mojoDoc.description, 6);
-        writeElementIfNotEmpty(xml, "since", mojoDoc.since, 6);
-        writeElementIfNotEmpty(xml, "deprecated", mojoDoc.deprecated, 6);
-        writeElement(xml, "projectRequired", String.valueOf(getBooleanValue(mojoAnn, "projectRequired", true)), 6);
-        writeElement(xml, "onlineRequired", String.valueOf(getBooleanValue(mojoAnn, "onlineRequired", false)), 6);
-        writeElement(xml, "aggregator", String.valueOf(getBooleanValue(mojoAnn, "aggregator", false)), 6);
-        writeElementIfNotEmpty(xml, "configurator", getStringValue(mojoAnn, "configurator", ""), 6);
+        if (!mojoAnn.defaultPhase().isEmpty()) {
+            builder.phase(mojoAnn.defaultPhase());
+        }
+        if (!mojoAnn.configurator().isEmpty()) {
+            builder.configurator(mojoAnn.configurator());
+        }
+        if (!mojoAnn.dependencyResolutionPathScopes().isEmpty()) {
+            builder.dependencyResolution(mojoAnn.dependencyResolutionPathScopes());
+        }
+        if (mojoAnn.dependencyCollection()) {
+            builder.dependencyCollection("true");
+        }
+        if (mojoDoc.description != null) {
+            builder.description(mojoDoc.description);
+        }
+        if (mojoDoc.since != null) {
+            builder.since(mojoDoc.since);
+        }
+        if (mojoDoc.deprecated != null) {
+            builder.deprecated(mojoDoc.deprecated);
+        }
 
         // @Execute
-        AnnotationMirror executeAnn = findAnnotation(mojoType, EXECUTE_ANN);
+        Execute executeAnn = mojoType.getAnnotation(Execute.class);
         if (executeAnn != null) {
-            writeElementIfNotEmpty(xml, "executePhase", getStringValue(executeAnn, "phase", ""), 6);
-            writeElementIfNotEmpty(xml, "executeGoal", getStringValue(executeAnn, "goal", ""), 6);
-            writeElementIfNotEmpty(xml, "executeLifecycle", getStringValue(executeAnn, "lifecycle", ""), 6);
-        }
-
-        // dependencyResolution / dependencyCollection from @Mojo
-        writeElementIfNotEmpty(
-                xml, "dependencyResolution", getStringValue(mojoAnn, "dependencyResolutionPathScopes", ""), 6);
-        boolean depCollection = getBooleanValue(mojoAnn, "dependencyCollection", false);
-        if (depCollection) {
-            writeElement(xml, "dependencyCollection", "true", 6);
-        }
-
-        // @Parameter fields — walk the full type hierarchy
-        List<ParameterInfo> params = collectParameters(mojoType);
-        if (!params.isEmpty()) {
-            xml.writeCharacters("      ");
-            xml.writeStartElement("parameters");
-            xml.writeCharacters("\n");
-            for (ParameterInfo p : params) {
-                writeParameter(xml, p);
+            if (!executeAnn.phase().isEmpty()) {
+                builder.executePhase(executeAnn.phase());
             }
-            xml.writeCharacters("      ");
-            xml.writeEndElement(); // parameters
-            xml.writeCharacters("\n");
-        }
-
-        // @Resolution fields
-        List<ResolutionInfo> resolutions = collectResolutions(mojoType);
-        if (!resolutions.isEmpty()) {
-            xml.writeCharacters("      ");
-            xml.writeStartElement("resolutions");
-            xml.writeCharacters("\n");
-            for (ResolutionInfo r : resolutions) {
-                writeResolution(xml, r);
+            if (!executeAnn.goal().isEmpty()) {
+                builder.executeGoal(executeAnn.goal());
             }
-            xml.writeCharacters("      ");
-            xml.writeEndElement(); // resolutions
-            xml.writeCharacters("\n");
-        }
-
-        // @After / @Afters
-        List<AfterInfo> afters = collectAfters(mojoType);
-        if (!afters.isEmpty()) {
-            xml.writeCharacters("      ");
-            xml.writeStartElement("afterLinks");
-            xml.writeCharacters("\n");
-            for (AfterInfo a : afters) {
-                writeAfterLink(xml, a);
+            if (!executeAnn.lifecycle().isEmpty()) {
+                builder.executeLifecycle(executeAnn.lifecycle());
             }
-            xml.writeCharacters("      ");
-            xml.writeEndElement(); // afterLinks
-            xml.writeCharacters("\n");
         }
 
-        xml.writeCharacters("    ");
-        xml.writeEndElement(); // mojo
-        xml.writeCharacters("\n");
+        builder.parameters(collectParameters(mojoType));
+        builder.resolutions(collectResolutions(mojoType));
+        builder.afterLinks(collectAfterLinks(mojoType));
+
+        return builder.build();
     }
 
     // -------------------------------------------------------------------------
     // Parameter collection
     // -------------------------------------------------------------------------
 
-    private List<ParameterInfo> collectParameters(TypeElement mojoType) {
-        List<ParameterInfo> result = new ArrayList<>();
+    private List<org.apache.maven.api.plugin.descriptor.Parameter> collectParameters(TypeElement mojoType) {
+        List<org.apache.maven.api.plugin.descriptor.Parameter> result = new ArrayList<>();
         Set<String> seen = new LinkedHashSet<>();
         TypeElement current = mojoType;
         while (current != null && !isObject(current)) {
@@ -391,17 +309,15 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                 if (enclosed.getKind() != ElementKind.FIELD && enclosed.getKind() != ElementKind.METHOD) {
                     continue;
                 }
-                AnnotationMirror paramAnn = findAnnotation(enclosed, PARAMETER_ANN);
+                org.apache.maven.api.plugin.annotations.Parameter paramAnn =
+                        enclosed.getAnnotation(org.apache.maven.api.plugin.annotations.Parameter.class);
                 if (paramAnn == null) {
                     continue;
                 }
-                String fieldName = enclosed.getSimpleName().toString();
-                String paramName = getStringValue(paramAnn, "name", "");
-                if (paramName.isEmpty()) {
-                    paramName = fieldName;
-                }
+                String paramName =
+                        paramAnn.name().isEmpty() ? enclosed.getSimpleName().toString() : paramAnn.name();
                 if (seen.contains(paramName)) {
-                    continue; // subclass overrides parent
+                    continue;
                 }
                 seen.add(paramName);
 
@@ -409,61 +325,56 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                 if (enclosed.getKind() == ElementKind.FIELD) {
                     type = ((VariableElement) enclosed).asType().toString();
                 } else {
-                    // method: use parameter type of setter, or return type of getter
                     ExecutableElement method = (ExecutableElement) enclosed;
-                    if (!method.getParameters().isEmpty()) {
-                        type = method.getParameters().get(0).asType().toString();
-                    } else {
-                        type = method.getReturnType().toString();
-                    }
+                    type = !method.getParameters().isEmpty()
+                            ? method.getParameters().get(0).asType().toString()
+                            : method.getReturnType().toString();
                 }
 
                 JavadocInfo doc = parseJavadoc(processingEnv.getElementUtils().getDocComment(enclosed));
 
-                ParameterInfo p = new ParameterInfo();
-                p.name = paramName;
-                p.alias = getStringValue(paramAnn, "alias", "");
-                p.type = type;
-                p.required = getBooleanValue(paramAnn, "required", false);
-                p.editable = !getBooleanValue(paramAnn, "readonly", false); // inverted!
-                p.expression = getStringValue(paramAnn, "property", "");
-                if (!p.expression.isEmpty() && !p.expression.startsWith("${")) {
-                    p.expression = "${" + p.expression + "}";
+                String expression = paramAnn.property();
+                if (!expression.isEmpty() && !expression.startsWith("${")) {
+                    expression = "${" + expression + "}";
                 }
-                p.defaultValue = getStringValue(paramAnn, "defaultValue", "");
-                p.description = doc.description;
-                p.since = doc.since;
-                p.deprecated = doc.deprecated;
-                result.add(p);
+
+                org.apache.maven.api.plugin.descriptor.Parameter.Builder pb =
+                        org.apache.maven.api.plugin.descriptor.Parameter.newBuilder(true)
+                                .name(paramName)
+                                .type(type)
+                                .required(paramAnn.required())
+                                .editable(!paramAnn.readonly());
+                if (!paramAnn.alias().isEmpty()) {
+                    pb.alias(paramAnn.alias());
+                }
+                if (!expression.isEmpty()) {
+                    pb.expression(expression);
+                }
+                if (!paramAnn.defaultValue().isEmpty()) {
+                    pb.defaultValue(paramAnn.defaultValue());
+                }
+                if (doc.description != null) {
+                    pb.description(doc.description);
+                }
+                if (doc.since != null) {
+                    pb.since(doc.since);
+                }
+                if (doc.deprecated != null) {
+                    pb.deprecated(doc.deprecated);
+                }
+                result.add(pb.build());
             }
             current = superTypeElement(current);
         }
         return result;
     }
 
-    private void writeParameter(XMLStreamWriter xml, ParameterInfo p) throws XMLStreamException {
-        xml.writeCharacters("        ");
-        xml.writeStartElement("parameter");
-        xml.writeCharacters("\n");
-        writeElement(xml, "name", p.name, 10);
-        writeElementIfNotEmpty(xml, "alias", p.alias, 10);
-        writeElement(xml, "type", p.type, 10);
-        writeElement(xml, "required", String.valueOf(p.required), 10);
-        writeElement(xml, "editable", String.valueOf(p.editable), 10);
-        writeElementIfNotEmpty(xml, "description", p.description, 10);
-        writeElementIfNotEmpty(xml, "expression", p.expression, 10);
-        writeElementIfNotEmpty(xml, "defaultValue", p.defaultValue, 10);
-        xml.writeCharacters("        ");
-        xml.writeEndElement(); // parameter
-        xml.writeCharacters("\n");
-    }
-
     // -------------------------------------------------------------------------
     // Resolution collection
     // -------------------------------------------------------------------------
 
-    private List<ResolutionInfo> collectResolutions(TypeElement mojoType) {
-        List<ResolutionInfo> result = new ArrayList<>();
+    private List<org.apache.maven.api.plugin.descriptor.Resolution> collectResolutions(TypeElement mojoType) {
+        List<org.apache.maven.api.plugin.descriptor.Resolution> result = new ArrayList<>();
         Set<String> seen = new LinkedHashSet<>();
         TypeElement current = mojoType;
         while (current != null && !isObject(current)) {
@@ -471,7 +382,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                 if (enclosed.getKind() != ElementKind.FIELD) {
                     continue;
                 }
-                AnnotationMirror resAnn = findAnnotation(enclosed, RESOLUTION_ANN);
+                Resolution resAnn = enclosed.getAnnotation(Resolution.class);
                 if (resAnn == null) {
                     continue;
                 }
@@ -481,90 +392,51 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                 }
                 seen.add(fieldName);
 
-                ResolutionInfo r = new ResolutionInfo();
-                r.field = fieldName;
-                r.pathScope = getStringValue(resAnn, "pathScope", "");
-                r.requestType = getStringValue(resAnn, "requestType", "");
-                result.add(r);
+                org.apache.maven.api.plugin.descriptor.Resolution.Builder rb =
+                        org.apache.maven.api.plugin.descriptor.Resolution.newBuilder(true)
+                                .field(fieldName);
+                if (!resAnn.pathScope().isEmpty()) {
+                    rb.pathScope(resAnn.pathScope());
+                }
+                if (!resAnn.requestType().isEmpty()) {
+                    rb.requestType(resAnn.requestType());
+                }
+                result.add(rb.build());
             }
             current = superTypeElement(current);
         }
         return result;
     }
 
-    private void writeResolution(XMLStreamWriter xml, ResolutionInfo r) throws XMLStreamException {
-        xml.writeCharacters("        ");
-        xml.writeStartElement("resolution");
-        xml.writeCharacters("\n");
-        writeElement(xml, "field", r.field, 10);
-        writeElementIfNotEmpty(xml, "pathScope", r.pathScope, 10);
-        writeElementIfNotEmpty(xml, "requestType", r.requestType, 10);
-        xml.writeCharacters("        ");
-        xml.writeEndElement(); // resolution
-        xml.writeCharacters("\n");
-    }
-
     // -------------------------------------------------------------------------
-    // @After / @Afters collection
+    // @After collection
     // -------------------------------------------------------------------------
 
-    private List<AfterInfo> collectAfters(TypeElement mojoType) {
-        List<AfterInfo> result = new ArrayList<>();
-        // Check for @Afters (container) first
-        AnnotationMirror aftersAnn = findAnnotation(mojoType, AFTERS_ANN);
-        if (aftersAnn != null) {
-            AnnotationValue valueAttr = getAnnotationValue(aftersAnn, "value");
-            if (valueAttr != null && valueAttr.getValue() instanceof List<?> list) {
-                for (Object item : list) {
-                    if (item instanceof AnnotationValue av && av.getValue() instanceof AnnotationMirror afterMirror) {
-                        result.add(extractAfter(afterMirror));
-                    }
-                }
-            }
+    private List<AfterLink> collectAfterLinks(TypeElement mojoType) {
+        After[] afters = mojoType.getAnnotationsByType(After.class);
+        if (afters.length == 0) {
+            return List.of();
         }
-        // Also check for a single @After directly on the class
-        AnnotationMirror afterAnn = findAnnotation(mojoType, AFTER_ANN);
-        if (afterAnn != null && aftersAnn == null) {
-            result.add(extractAfter(afterAnn));
+        List<AfterLink> result = new ArrayList<>();
+        for (After after : afters) {
+            AfterLink.Builder ab = AfterLink.newBuilder(true)
+                    .phase(after.phase())
+                    .type(after.type().name());
+            if (!after.scope().isEmpty()) {
+                ab.scope(after.scope());
+            }
+            result.add(ab.build());
         }
         return result;
-    }
-
-    private AfterInfo extractAfter(AnnotationMirror ann) {
-        AfterInfo a = new AfterInfo();
-        a.phase = getStringValue(ann, "phase", "");
-        a.type = getEnumValue(ann, "type", "PROJECT");
-        a.scope = getStringValue(ann, "scope", "");
-        return a;
-    }
-
-    private void writeAfterLink(XMLStreamWriter xml, AfterInfo a) throws XMLStreamException {
-        xml.writeCharacters("        ");
-        xml.writeStartElement("afterLink");
-        xml.writeCharacters("\n");
-        writeElementIfNotEmpty(xml, "phase", a.phase, 10);
-        writeElement(xml, "type", a.type, 10);
-        writeElementIfNotEmpty(xml, "scope", a.scope, 10);
-        xml.writeCharacters("        ");
-        xml.writeEndElement(); // afterLink
-        xml.writeCharacters("\n");
     }
 
     // -------------------------------------------------------------------------
     // Factory class generation
     // -------------------------------------------------------------------------
 
-    private void generateFactory(TypeElement mojoType, PomCoordinates coords) throws IOException {
-        String groupId = coords.groupId;
-        String artifactId = coords.artifactId;
-        String version = coords.version;
-
-        AnnotationMirror mojoAnn = findAnnotation(mojoType, MOJO_ANN);
-        if (mojoAnn == null) {
-            return;
-        }
-        String goal = getStringValue(mojoAnn, "name", "");
-        if (goal.isEmpty()) {
+    private void generateFactory(TypeElement mojoType, String[] coords) throws IOException {
+        Mojo mojoAnn = mojoType.getAnnotation(Mojo.class);
+        if (mojoAnn == null || mojoAnn.name().isEmpty()) {
             return;
         }
 
@@ -573,9 +445,8 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         String simpleName = mojoType.getSimpleName().toString();
         String factorySimpleName = simpleName + "$MojoFactory";
         String factoryFqn = pkg.isEmpty() ? factorySimpleName : pkg + "." + factorySimpleName;
-        String roleHint = groupId + ":" + artifactId + ":" + version + ":" + goal;
+        String roleHint = coords[0] + ":" + coords[1] + ":" + coords[2] + ":" + mojoAnn.name();
 
-        // Collect non-private constructors to replicate in the factory
         List<ExecutableElement> ctors = new ArrayList<>();
         for (Element enc : mojoType.getEnclosedElements()) {
             if (enc.getKind() == ElementKind.CONSTRUCTOR) {
@@ -593,34 +464,27 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                 pw.println("package " + pkg + ";");
                 pw.println();
             }
-            pw.println("/**");
-            pw.println(" * DI factory for the {@code " + goal + "} mojo.");
-            pw.println(" * Generated by {@link org.apache.maven.plugin.processor.MojoDescriptorProcessor}.");
-            pw.println(" *");
-            pw.println(" * @since 4.1.0");
-            pw.println(" */");
             pw.println("@org.apache.maven.api.di.Named(\"" + roleHint + "\")");
             pw.println("public class " + factorySimpleName + " extends " + simpleName + " {");
             pw.println();
 
-            if (!ctors.isEmpty() && !hasOnlyDefaultCtor(ctors)) {
+            if (!ctors.isEmpty()
+                    && !(ctors.size() == 1 && ctors.get(0).getParameters().isEmpty())) {
                 for (ExecutableElement ctor : ctors) {
                     if (ctor.getParameters().isEmpty()) {
-                        continue; // default ctor — implicit delegation to super
+                        continue;
                     }
                     pw.print("    public " + factorySimpleName + "(");
                     List<? extends VariableElement> params = ctor.getParameters();
                     StringBuilder args = new StringBuilder();
                     for (int i = 0; i < params.size(); i++) {
                         VariableElement param = params.get(i);
-                        String typeName = param.asType().toString();
-                        String paramName = param.getSimpleName().toString();
                         if (i > 0) {
                             pw.print(", ");
                             args.append(", ");
                         }
-                        pw.print(typeName + " " + paramName);
-                        args.append(paramName);
+                        pw.print(param.asType() + " " + param.getSimpleName());
+                        args.append(param.getSimpleName());
                     }
                     pw.println(") {");
                     pw.println("        super(" + args + ");");
@@ -633,11 +497,158 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         }
 
         generatedFactoryNames.add(factoryFqn);
-        note("Generated factory " + factoryFqn + " for goal '" + goal + "'");
+        note("Generated factory " + factoryFqn + " for goal '" + mojoAnn.name() + "'");
     }
 
-    private boolean hasOnlyDefaultCtor(List<ExecutableElement> ctors) {
-        return ctors.size() == 1 && ctors.get(0).getParameters().isEmpty();
+    // -------------------------------------------------------------------------
+    // XML writing (using JDK XMLStreamWriter to avoid woodstox dependency)
+    // -------------------------------------------------------------------------
+
+    private static void writeDescriptorXml(Writer w, PluginDescriptor descriptor)
+            throws IOException, XMLStreamException {
+        XMLOutputFactory factory = XMLOutputFactory.newInstance();
+        XMLStreamWriter xml = factory.createXMLStreamWriter(w);
+        try {
+            xml.writeStartDocument("UTF-8", "1.0");
+            xml.writeCharacters("\n");
+            xml.writeStartElement("plugin");
+            xml.writeDefaultNamespace(PLUGIN_NS);
+            xml.writeCharacters("\n");
+
+            writeElement(xml, "name", descriptor.getName(), 2);
+            writeElement(xml, "groupId", descriptor.getGroupId(), 2);
+            writeElement(xml, "artifactId", descriptor.getArtifactId(), 2);
+            writeElement(xml, "version", descriptor.getVersion(), 2);
+            writeElement(xml, "goalPrefix", descriptor.getGoalPrefix(), 2);
+
+            if (descriptor.getMojos() != null && !descriptor.getMojos().isEmpty()) {
+                xml.writeCharacters("  ");
+                xml.writeStartElement("mojos");
+                xml.writeCharacters("\n");
+                for (MojoDescriptor mojo : descriptor.getMojos()) {
+                    writeMojoXml(xml, mojo);
+                }
+                xml.writeCharacters("  ");
+                xml.writeEndElement();
+                xml.writeCharacters("\n");
+            }
+
+            xml.writeEndElement();
+            xml.writeCharacters("\n");
+            xml.writeEndDocument();
+        } finally {
+            xml.close();
+        }
+    }
+
+    private static void writeMojoXml(XMLStreamWriter xml, MojoDescriptor mojo) throws XMLStreamException {
+        xml.writeCharacters("    ");
+        xml.writeStartElement("mojo");
+        xml.writeCharacters("\n");
+
+        writeElement(xml, "goal", mojo.getGoal(), 6);
+        writeOptional(xml, "phase", mojo.getPhase(), 6);
+        writeElement(xml, "implementation", mojo.getImplementation(), 6);
+        writeElement(xml, "language", mojo.getLanguage(), 6);
+        writeOptional(xml, "description", mojo.getDescription(), 6);
+        writeOptional(xml, "since", mojo.getSince(), 6);
+        writeOptional(xml, "deprecated", mojo.getDeprecated(), 6);
+        writeElement(xml, "projectRequired", String.valueOf(mojo.isProjectRequired()), 6);
+        writeElement(xml, "onlineRequired", String.valueOf(mojo.isOnlineRequired()), 6);
+        writeElement(xml, "aggregator", String.valueOf(mojo.isAggregator()), 6);
+        writeOptional(xml, "configurator", mojo.getConfigurator(), 6);
+        writeOptional(xml, "executePhase", mojo.getExecutePhase(), 6);
+        writeOptional(xml, "executeGoal", mojo.getExecuteGoal(), 6);
+        writeOptional(xml, "executeLifecycle", mojo.getExecuteLifecycle(), 6);
+        writeOptional(xml, "dependencyResolution", mojo.getDependencyResolution(), 6);
+        writeOptional(xml, "dependencyCollection", mojo.getDependencyCollection(), 6);
+
+        if (mojo.getParameters() != null && !mojo.getParameters().isEmpty()) {
+            xml.writeCharacters("      ");
+            xml.writeStartElement("parameters");
+            xml.writeCharacters("\n");
+            for (org.apache.maven.api.plugin.descriptor.Parameter p : mojo.getParameters()) {
+                xml.writeCharacters("        ");
+                xml.writeStartElement("parameter");
+                xml.writeCharacters("\n");
+                writeElement(xml, "name", p.getName(), 10);
+                writeOptional(xml, "alias", p.getAlias(), 10);
+                writeElement(xml, "type", p.getType(), 10);
+                writeElement(xml, "required", String.valueOf(p.isRequired()), 10);
+                writeElement(xml, "editable", String.valueOf(p.isEditable()), 10);
+                writeOptional(xml, "description", p.getDescription(), 10);
+                writeOptional(xml, "since", p.getSince(), 10);
+                writeOptional(xml, "deprecated", p.getDeprecated(), 10);
+                writeOptional(xml, "expression", p.getExpression(), 10);
+                writeOptional(xml, "defaultValue", p.getDefaultValue(), 10);
+                xml.writeCharacters("        ");
+                xml.writeEndElement();
+                xml.writeCharacters("\n");
+            }
+            xml.writeCharacters("      ");
+            xml.writeEndElement();
+            xml.writeCharacters("\n");
+        }
+
+        if (mojo.getResolutions() != null && !mojo.getResolutions().isEmpty()) {
+            xml.writeCharacters("      ");
+            xml.writeStartElement("resolutions");
+            xml.writeCharacters("\n");
+            for (org.apache.maven.api.plugin.descriptor.Resolution r : mojo.getResolutions()) {
+                xml.writeCharacters("        ");
+                xml.writeStartElement("resolution");
+                xml.writeCharacters("\n");
+                writeElement(xml, "field", r.getField(), 10);
+                writeOptional(xml, "pathScope", r.getPathScope(), 10);
+                writeOptional(xml, "requestType", r.getRequestType(), 10);
+                xml.writeCharacters("        ");
+                xml.writeEndElement();
+                xml.writeCharacters("\n");
+            }
+            xml.writeCharacters("      ");
+            xml.writeEndElement();
+            xml.writeCharacters("\n");
+        }
+
+        if (mojo.getAfterLinks() != null && !mojo.getAfterLinks().isEmpty()) {
+            xml.writeCharacters("      ");
+            xml.writeStartElement("afterLinks");
+            xml.writeCharacters("\n");
+            for (AfterLink a : mojo.getAfterLinks()) {
+                xml.writeCharacters("        ");
+                xml.writeStartElement("afterLink");
+                xml.writeCharacters("\n");
+                writeOptional(xml, "phase", a.getPhase(), 10);
+                writeElement(xml, "type", a.getType(), 10);
+                writeOptional(xml, "scope", a.getScope(), 10);
+                xml.writeCharacters("        ");
+                xml.writeEndElement();
+                xml.writeCharacters("\n");
+            }
+            xml.writeCharacters("      ");
+            xml.writeEndElement();
+            xml.writeCharacters("\n");
+        }
+
+        xml.writeCharacters("    ");
+        xml.writeEndElement();
+        xml.writeCharacters("\n");
+    }
+
+    private static void writeElement(XMLStreamWriter xml, String tag, String value, int indent)
+            throws XMLStreamException {
+        xml.writeCharacters(" ".repeat(indent));
+        xml.writeStartElement(tag);
+        xml.writeCharacters(value != null ? value : "");
+        xml.writeEndElement();
+        xml.writeCharacters("\n");
+    }
+
+    private static void writeOptional(XMLStreamWriter xml, String tag, String value, int indent)
+            throws XMLStreamException {
+        if (value != null && !value.isEmpty()) {
+            writeElement(xml, tag, value, indent);
+        }
     }
 
     // -------------------------------------------------------------------------
@@ -649,17 +660,13 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         if (raw == null || raw.isBlank()) {
             return info;
         }
-        // Split on block Javadoc tags (tags at start of a line, possibly with leading whitespace)
         String[] parts = raw.split("(?m)^\\s*@");
         String body = parts[0];
-
-        // Strip inline tags like {@code ...}, {@link ...} etc. — replace with their text content
         body = body.replaceAll("\\{@\\w+\\s+([^}]*)}", "$1");
-        // Remove HTML tags
         body = body.replaceAll("<[^>]+>", "");
-        info.description = normalizeWhitespace(body);
+        String trimmed = body.strip();
+        info.description = trimmed.isEmpty() ? null : trimmed.replaceAll("\\s+", " ");
 
-        // Parse @since, @deprecated from remaining parts
         for (int i = 1; i < parts.length; i++) {
             String tag = parts[i].trim();
             if (tag.startsWith("since")) {
@@ -669,75 +676,6 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
             }
         }
         return info;
-    }
-
-    private static String normalizeWhitespace(String s) {
-        if (s == null) {
-            return null;
-        }
-        String trimmed = s.strip();
-        if (trimmed.isEmpty()) {
-            return null;
-        }
-        // Collapse internal whitespace runs to a single space
-        return trimmed.replaceAll("\\s+", " ");
-    }
-
-    // -------------------------------------------------------------------------
-    // Annotation mirror utilities
-    // -------------------------------------------------------------------------
-
-    private static AnnotationMirror findAnnotation(Element element, String annotationFqn) {
-        for (AnnotationMirror am : element.getAnnotationMirrors()) {
-            if (am.getAnnotationType().toString().equals(annotationFqn)) {
-                return am;
-            }
-        }
-        return null;
-    }
-
-    private static AnnotationValue getAnnotationValue(AnnotationMirror am, String methodName) {
-        for (Map.Entry<? extends ExecutableElement, ? extends AnnotationValue> entry :
-                am.getElementValues().entrySet()) {
-            if (entry.getKey().getSimpleName().toString().equals(methodName)) {
-                return entry.getValue();
-            }
-        }
-        return null;
-    }
-
-    private static String getStringValue(AnnotationMirror am, String methodName, String defaultValue) {
-        AnnotationValue av = getAnnotationValue(am, methodName);
-        if (av == null) {
-            return defaultValue;
-        }
-        Object v = av.getValue();
-        return v != null ? v.toString() : defaultValue;
-    }
-
-    private static boolean getBooleanValue(AnnotationMirror am, String methodName, boolean defaultValue) {
-        AnnotationValue av = getAnnotationValue(am, methodName);
-        if (av == null) {
-            return defaultValue;
-        }
-        Object v = av.getValue();
-        return v instanceof Boolean ? (Boolean) v : defaultValue;
-    }
-
-    /**
-     * Returns the simple name of an enum value from an annotation attribute.
-     * Enum values in annotation mirrors are represented as {@link VariableElement}.
-     */
-    private static String getEnumValue(AnnotationMirror am, String methodName, String defaultValue) {
-        AnnotationValue av = getAnnotationValue(am, methodName);
-        if (av == null) {
-            return defaultValue;
-        }
-        Object v = av.getValue();
-        if (v instanceof VariableElement ve) {
-            return ve.getSimpleName().toString();
-        }
-        return defaultValue;
     }
 
     // -------------------------------------------------------------------------
@@ -760,38 +698,9 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
     }
 
     // -------------------------------------------------------------------------
-    // XML writing helpers
-    // -------------------------------------------------------------------------
-
-    private static void writeElement(XMLStreamWriter xml, String tag, String value) throws XMLStreamException {
-        writeElement(xml, tag, value, 4);
-    }
-
-    private static void writeElement(XMLStreamWriter xml, String tag, String value, int indent)
-            throws XMLStreamException {
-        xml.writeCharacters(" ".repeat(indent));
-        xml.writeStartElement(tag);
-        xml.writeCharacters(value != null ? value : "");
-        xml.writeEndElement();
-        xml.writeCharacters("\n");
-    }
-
-    private static void writeElementIfNotEmpty(XMLStreamWriter xml, String tag, String value, int indent)
-            throws XMLStreamException {
-        if (value != null && !value.isEmpty()) {
-            writeElement(xml, tag, value, indent);
-        }
-    }
-
-    // -------------------------------------------------------------------------
     // Goal prefix derivation
     // -------------------------------------------------------------------------
 
-    /**
-     * Derives the Maven goal prefix from the artifact ID by stripping the
-     * {@code maven-} prefix and {@code -plugin} suffix (or vice-versa).
-     * For example: {@code maven-compiler-plugin} → {@code compiler}.
-     */
     static String deriveGoalPrefix(String artifactId) {
         if (artifactId == null || artifactId.isEmpty()) {
             return "";
@@ -800,7 +709,6 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         if (s.startsWith("maven-")) {
             s = s.substring("maven-".length());
         }
-        // Check longer suffix first to avoid -plugin swallowing part of -maven-plugin
         if (s.endsWith("-maven-plugin")) {
             s = s.substring(0, s.length() - "-maven-plugin".length());
         } else if (s.endsWith("-plugin")) {
@@ -826,10 +734,6 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                         Diagnostic.Kind.ERROR,
                         message + "\n" + e.getClass().getName() + ": " + e.getMessage() + "\n" + sw);
     }
-
-    // -------------------------------------------------------------------------
-    // License header helper
-    // -------------------------------------------------------------------------
 
     private static void writeLicenseHeader(PrintWriter pw) {
         pw.println("/*");
@@ -860,44 +764,5 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         String description;
         String since;
         String deprecated;
-    }
-
-    private static class ParameterInfo {
-        String name;
-        String alias;
-        String type;
-        boolean required;
-        boolean editable;
-        String expression;
-        String defaultValue;
-        String description;
-        String since;
-        String deprecated;
-    }
-
-    private static class ResolutionInfo {
-        String field;
-        String pathScope;
-        String requestType;
-    }
-
-    private static class AfterInfo {
-        String phase;
-        String type;
-        String scope;
-    }
-
-    static class PomCoordinates {
-        final String groupId;
-        final String artifactId;
-        final String version;
-        final String goalPrefix;
-
-        PomCoordinates(String groupId, String artifactId, String version, String goalPrefix) {
-            this.groupId = groupId;
-            this.artifactId = artifactId;
-            this.version = version;
-            this.goalPrefix = goalPrefix;
-        }
     }
 }
