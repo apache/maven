@@ -72,7 +72,7 @@ class MojoDescriptorProcessorTest {
     static void resolveClasspath() {
         // Processor JAR — built from this module
         processorJar = resolveFile(
-                "api/maven-plugin-mixin/target/maven-plugin-mixin-4.1.0-SNAPSHOT.jar",
+                "impl/maven-plugin-mixin/target/maven-plugin-mixin-4.1.0-SNAPSHOT.jar",
                 "maven-plugin-mixin/4.1.0-SNAPSHOT/maven-plugin-mixin-4.1.0-SNAPSHOT.jar");
 
         // Annotation JARs needed on the compilation classpath
