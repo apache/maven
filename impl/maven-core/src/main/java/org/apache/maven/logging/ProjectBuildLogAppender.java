@@ -143,6 +143,14 @@ public class ProjectBuildLogAppender implements AutoCloseable {
     private final BuildEventListener buildEventListener;
     private final boolean suppressInlineWarnings;
 
+    /**
+     * Creates a new appender that forwards log events to the given listener.
+     *
+     * @param buildEventListener the listener to forward events to
+     * @param warningMode the warning display mode ({@code "summary"}, {@code "all"},
+     *                    {@code "none"}, {@code "fail"}); {@code "summary"} suppresses
+     *                    inline WARN events while preserving them for the build report
+     */
     public ProjectBuildLogAppender(BuildEventListener buildEventListener, String warningMode) {
         this.buildEventListener = buildEventListener;
         this.suppressInlineWarnings = "summary".equalsIgnoreCase(warningMode);
