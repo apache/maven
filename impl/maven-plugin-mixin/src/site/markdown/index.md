@@ -47,28 +47,12 @@ the processor fires during `javac` and produces:
 Add the mixin to your plugin's POM (requires model version 4.2.0):
 
 ```xml
-<project xmlns="http://maven.apache.org/POM/4.2.0" root="true" ...>
-  <modelVersion>4.2.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.2.0" ...>
 
   <groupId>com.example</groupId>
   <artifactId>my-maven-plugin</artifactId>
   <version>1.0-SNAPSHOT</version>
   <packaging>jar</packaging>
-
-  <dependencies>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-api-core</artifactId>
-      <version>${maven.version}</version>
-      <scope>provided</scope>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
-      <artifactId>maven-api-di</artifactId>
-      <version>${maven.version}</version>
-      <scope>provided</scope>
-    </dependency>
-  </dependencies>
 
   <mixins>
     <mixin>
