@@ -22,15 +22,14 @@
 
   <parent>
     <groupId>org.apache.maven</groupId>
-    <artifactId>maven-api</artifactId>
+    <artifactId>maven-impl-modules</artifactId>
     <version>4.1.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-plugin-mixin</artifactId>
   <name>Maven Plugin Mixin</name>
-  <description>Mixin for Maven 4 plugin projects. Provides the annotation processor that generates
-    plugin descriptors (plugin.xml) and DI factory classes at compile time from @Mojo-annotated classes.
-    Use as a mixin in your POM to get zero-config plugin descriptor generation.</description>
+  <description>Mixin and annotation processor for Maven 4 plugin projects. The mixin provides
+    zero-config plugin descriptor generation at compile time from @Mojo-annotated classes.</description>
 
   <properties>
     <javaModuleName>org.apache.maven.plugin.processor</javaModuleName>
