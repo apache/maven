@@ -20,10 +20,12 @@ package org.apache.maven.di.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -142,8 +144,10 @@ public abstract class Binding<T> {
             }
 
             @Override
-            String getDiagnosticSource() {
-                return Binding.this.getDiagnosticSource() + " initialized by " + identityString(bindingInitializer);
+            List<String> getDiagnosticSourceLines(Function<Member, List<String>> memberSource) {
+                List<String> lines = new ArrayList<>(Binding.this.getDiagnosticSourceLines(memberSource));
+                lines.add("initialized by " + identityString(bindingInitializer));
+                return List.copyOf(lines);
             }
 
             @Override
@@ -175,8 +179,9 @@ public abstract class Binding<T> {
         return this;
     }
 
-    String getDiagnosticSource() {
-        return identityString(this);
+    /** Returns unescaped source lines; the caller handles escaping and indentation. */
+    List<String> getDiagnosticSourceLines(Function<Member, List<String>> memberSource) {
+        return List.of(identityString(this));
     }
 
     static String identityString(Object object) {
@@ -213,8 +218,8 @@ public abstract class Binding<T> {
         }
 
         @Override
-        String getDiagnosticSource() {
-            return "instance " + identityString(instance);
+        List<String> getDiagnosticSourceLines(Function<Member, List<String>> memberSource) {
+            return List.of("instance " + identityString(instance));
         }
 
         @Override
@@ -237,8 +242,8 @@ public abstract class Binding<T> {
         }
 
         @Override
-        String getDiagnosticSource() {
-            return "supplier " + identityString(supplier);
+        List<String> getDiagnosticSourceLines(Function<Member, List<String>> memberSource) {
+            return List.of("supplier " + identityString(supplier));
         }
 
         @Override
@@ -274,11 +279,8 @@ public abstract class Binding<T> {
         }
 
         @Override
-        String getDiagnosticSource() {
-            return source != null
-                    ? source + " [loader="
-                            + identityString(source.getDeclaringClass().getClassLoader()) + "]"
-                    : "constructor " + identityString(constructor);
+        List<String> getDiagnosticSourceLines(Function<Member, List<String>> memberSource) {
+            return source != null ? memberSource.apply(source) : List.of("constructor " + identityString(constructor));
         }
 
         @Override
