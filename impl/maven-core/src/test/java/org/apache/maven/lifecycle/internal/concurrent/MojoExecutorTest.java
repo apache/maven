@@ -30,8 +30,10 @@ import java.util.function.Supplier;
 
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
+import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 
@@ -60,8 +62,11 @@ class MojoExecutorTest {
         });
         Session apiSession = mock(Session.class);
         when(apiSession.getData()).thenReturn(sessionData);
+        MavenExecutionRequest request = mock(MavenExecutionRequest.class);
+        when(request.getDegreeOfConcurrency()).thenReturn(2);
         MavenSession session = mock(MavenSession.class);
         when(session.getSession()).thenReturn(apiSession);
+        when(session.getRequest()).thenReturn(request);
         when(session.getCurrentProject()).thenReturn(project);
         return session;
     }
@@ -75,7 +80,9 @@ class MojoExecutorTest {
     }
 
     private static MojoDescriptor mojoWithoutDependencies() {
-        return new MojoDescriptor();
+        MojoDescriptor mojo = new MojoDescriptor();
+        mojo.setPluginDescriptor(new PluginDescriptor());
+        return mojo;
     }
 
     private static MojoDescriptor v4Mojo() {

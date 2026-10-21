@@ -25,7 +25,6 @@ import javax.inject.Singleton;
 
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.locks.ReentrantLock;
 
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.services.MessageBuilderFactory;
@@ -59,10 +58,6 @@ public class MojoExecutor extends org.apache.maven.lifecycle.internal.MojoExecut
                 messageBuilderFactory);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    private static final SessionData.Key<Map<MavenProject, ReentrantLock>> PROJECT_EXECUTION_LOCKS =
-            (SessionData.Key) SessionData.key(Map.class, MojoExecutor.class);
-
     /**
      * The concurrent builder runs independent steps of the same project in parallel, for instance
      * {@code process-resources} next to {@code compile}. Before a mojo runs,
@@ -80,14 +75,40 @@ public class MojoExecutor extends org.apache.maven.lifecycle.internal.MojoExecut
      * never serialized.
      */
     @Override
-    protected NoExceptionCloseable getProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
+    protected NoExceptionCloseable createProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
         if (mojoDescriptor.isV4Api()) {
-            return () -> {};
+            return NO_LOCK;
         }
-        Map<MavenProject, ReentrantLock> locks =
-                session.getSession().getData().computeIfAbsent(PROJECT_EXECUTION_LOCKS, ConcurrentHashMap::new);
-        ReentrantLock lock = locks.computeIfAbsent(session.getCurrentProject(), p -> new ReentrantLock());
-        lock.lock();
-        return lock::unlock;
+        return new ConcurrentProjectLock(session, mojoDescriptor);
+    }
+
+    protected class ConcurrentProjectLock implements NoExceptionCloseable {
+
+        final OwnerReentrantLock lock;
+
+        ConcurrentProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
+            SessionData data = session.getSession().getData();
+            Map<MavenProject, OwnerReentrantLock> locks = data.computeIfAbsent(PROJECT_LOCKS, ConcurrentHashMap::new);
+            MavenProject currentProject = session.getCurrentProject();
+            lock = locks.computeIfAbsent(currentProject, p -> new OwnerReentrantLock());
+            if (!lock.tryLock()) {
+                Thread owner = lock.getOwner();
+                MojoDescriptor ownerMojo = owner != null ? mojos.get(owner) : null;
+                String str = ownerMojo != null ? " The " + ownerMojo.getId() : "A";
+                String msg = str
+                        + " legacy (Maven 3) mojo is preventing full intra-project parallelism in the concurrent builder "
+                        + "on the project " + currentProject.getGroupId()
+                        + ":" + currentProject.getArtifactId() + ". "
+                        + "This mojo execution will be blocked until the mojo is done. "
+                        + "Consider migrating plugins to the Maven 4 API to benefit from full intra-project concurrency.";
+                warn(msg);
+                lock.lock();
+            }
+        }
+
+        @Override
+        public void close() {
+            lock.unlock();
+        }
     }
 }

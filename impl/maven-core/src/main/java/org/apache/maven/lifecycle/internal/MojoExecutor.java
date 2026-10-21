@@ -78,8 +78,10 @@ public class MojoExecutor {
     private static final SessionData.Key<ProjectIndex> PROJECT_INDEX = SessionData.key(ProjectIndex.class);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private static final SessionData.Key<Map<MavenProject, OwnerReentrantLock>> PROJECT_LOCKS =
+    protected static final SessionData.Key<Map<MavenProject, OwnerReentrantLock>> PROJECT_LOCKS =
             (SessionData.Key) SessionData.key(Map.class, ProjectLock.class);
+
+    protected static final NoExceptionCloseable NO_LOCK = new NoLock();
 
     private final BuildPluginManager pluginManager;
     private final MavenPluginManager mavenPluginManager;
@@ -92,7 +94,7 @@ public class MojoExecutor {
 
     private final MessageBuilderFactory messageBuilderFactory;
 
-    private final Map<Thread, MojoDescriptor> mojos = new ConcurrentHashMap<>();
+    protected final Map<Thread, MojoDescriptor> mojos = new ConcurrentHashMap<>();
 
     @Inject
     public MojoExecutor(
@@ -226,18 +228,18 @@ public class MojoExecutor {
      * by concurrently running mojo executions. To prevent race conditions, an aggregating execution will block
      * all other executions until finished.
      * We also lock on a given project to forbid a forked lifecycle to be executed concurrently with the project.
-     * TODO: ideally, the builder should take care of the ordering in a smarter way
-     * TODO: and concurrency issues fixed with MNG-7157
      */
     protected class ProjectLock implements NoExceptionCloseable {
         final Lock acquiredAggregatorLock;
         final OwnerReentrantLock acquiredProjectLock;
 
         ProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
-            mojos.put(Thread.currentThread(), mojoDescriptor);
             boolean aggregator = mojoDescriptor.isAggregator();
             acquiredAggregatorLock = aggregator ? aggregatorLock.writeLock() : aggregatorLock.readLock();
-            acquiredProjectLock = getProjectLock(session);
+            SessionData data = session.getSession().getData();
+            Map<MavenProject, OwnerReentrantLock> locks = data.computeIfAbsent(PROJECT_LOCKS, ConcurrentHashMap::new);
+            MavenProject currentProject = session.getCurrentProject();
+            acquiredProjectLock = locks.computeIfAbsent(currentProject, p -> new OwnerReentrantLock());
             if (!acquiredAggregatorLock.tryLock()) {
                 Thread owner = aggregatorLock.getOwner();
                 MojoDescriptor ownerMojo = owner != null ? mojos.get(owner) : null;
@@ -254,8 +256,8 @@ public class MojoExecutor {
                 MojoDescriptor ownerMojo = owner != null ? mojos.get(owner) : null;
                 String str = ownerMojo != null ? " The " + ownerMojo.getId() : "A";
                 String msg = str + " mojo is already being executed "
-                        + "on the project " + session.getCurrentProject().getGroupId()
-                        + ":" + session.getCurrentProject().getArtifactId() + ". "
+                        + "on the project " + currentProject.getGroupId()
+                        + ":" + currentProject.getArtifactId() + ". "
                         + "This mojo execution will be blocked "
                         + "until the mojo is done.";
                 warn(msg);
@@ -268,31 +270,28 @@ public class MojoExecutor {
             // release the lock in the reverse order of the acquisition
             acquiredProjectLock.unlock();
             acquiredAggregatorLock.unlock();
-            mojos.remove(Thread.currentThread());
-        }
-
-        private OwnerReentrantLock getProjectLock(MavenSession session) {
-            SessionData data = session.getSession().getData();
-            Map<MavenProject, OwnerReentrantLock> locks = data.computeIfAbsent(PROJECT_LOCKS, ConcurrentHashMap::new);
-            return locks.computeIfAbsent(session.getCurrentProject(), p -> new OwnerReentrantLock());
         }
     }
 
-    static class OwnerReentrantLock extends ReentrantLock {
+    protected static class OwnerReentrantLock extends ReentrantLock {
+        public OwnerReentrantLock() {}
+
         @Override
         public Thread getOwner() {
             return super.getOwner();
         }
     }
 
-    static class OwnerReentrantReadWriteLock extends ReentrantReadWriteLock {
+    protected static class OwnerReentrantReadWriteLock extends ReentrantReadWriteLock {
+        public OwnerReentrantReadWriteLock() {}
+
         @Override
         public Thread getOwner() {
             return super.getOwner();
         }
     }
 
-    private static void warn(String msg) {
+    protected static void warn(String msg) {
         for (String s : MultilineMessageHelper.format(msg)) {
             LOGGER.warn(s);
         }
@@ -322,12 +321,25 @@ public class MojoExecutor {
         void close();
     }
 
-    protected NoExceptionCloseable getProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
+    public NoExceptionCloseable getProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
         if (useProjectLock(session)) {
-            return new ProjectLock(session, mojoDescriptor);
+            Thread currentThread = Thread.currentThread();
+            mojos.put(currentThread, mojoDescriptor);
+            NoExceptionCloseable lock = createProjectLock(session, mojoDescriptor);
+            return () -> {
+                try {
+                    lock.close();
+                } finally {
+                    mojos.remove(currentThread);
+                }
+            };
         } else {
-            return new NoLock();
+            return NO_LOCK;
         }
+    }
+
+    protected NoExceptionCloseable createProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
+        return new ProjectLock(session, mojoDescriptor);
     }
 
     protected boolean useProjectLock(MavenSession session) {
