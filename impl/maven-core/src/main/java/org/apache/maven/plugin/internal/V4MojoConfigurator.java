@@ -169,7 +169,14 @@ public final class V4MojoConfigurator {
             return evaluateNode(node, type);
         }
         if (type == Path.class || type == File.class) {
-            String value = evaluateNodeAsString(node);
+            Object evaluated = evaluateNode(node, type);
+            if (evaluated instanceof Path p) {
+                return type == File.class ? p.toFile() : p;
+            }
+            if (evaluated instanceof File f) {
+                return type == File.class ? f : f.toPath();
+            }
+            String value = evaluated != null ? String.valueOf(evaluated) : null;
             if (value == null) {
                 return null;
             }
@@ -180,7 +187,11 @@ public final class V4MojoConfigurator {
             return type == File.class ? path.toFile() : path;
         }
         if (type == URI.class) {
-            String s = evaluateNodeAsString(node);
+            Object evaluated = evaluateNode(node, URI.class);
+            if (evaluated instanceof URI uri) {
+                return uri;
+            }
+            String s = evaluated != null ? String.valueOf(evaluated) : null;
             return s == null ? null : URI.create(s);
         }
         if (type == boolean.class || type == Boolean.class) {
