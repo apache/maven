@@ -85,6 +85,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
     private final Map<String, TypeElement> mojoElements = new LinkedHashMap<>();
     private final Set<String> generatedFactoryNames = new LinkedHashSet<>();
     private String[] resolvedCoordinates;
+    private boolean coordinateErrorEmitted = false;
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -152,9 +153,12 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
             name = artifactId;
         }
         if (isBlank(groupId) || isBlank(artifactId) || isBlank(version)) {
-            error("Could not determine plugin coordinates. "
-                    + "Supply -Amaven.plugin.groupId, -Amaven.plugin.artifactId and "
-                    + "-Amaven.plugin.version via the maven-plugin-mixin.");
+            if (!coordinateErrorEmitted) {
+                coordinateErrorEmitted = true;
+                error("Could not determine plugin coordinates. "
+                        + "Supply -Amaven.plugin.groupId, -Amaven.plugin.artifactId and "
+                        + "-Amaven.plugin.version via the maven-plugin-mixin.");
+            }
             return null;
         }
         resolvedCoordinates = new String[] {groupId, artifactId, version, goalPrefix, name};
