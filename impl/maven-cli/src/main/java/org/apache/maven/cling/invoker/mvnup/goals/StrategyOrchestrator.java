@@ -160,7 +160,7 @@ public class StrategyOrchestrator {
             context.indent();
             context.info("Processed: " + result.processedPoms().size() + " POMs");
             if (context.isDryRun()) {
-                context.action(result.modifiedPoms().size() + " POM(s) would be modified");
+                context.action(result.modifiedPoms().size() + " POMs would be modified");
             } else {
                 context.success("Modified: " + result.modifiedPoms().size() + " POMs");
             }

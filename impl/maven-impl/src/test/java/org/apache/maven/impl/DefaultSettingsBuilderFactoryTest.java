@@ -208,6 +208,50 @@ class DefaultSettingsBuilderFactoryTest {
     }
 
     @Test
+    void emptySettingsGetCentralInBothRepoLists() {
+        Settings settings = execute("settings-simple").getEffectiveSettings();
+
+        assertEquals(1, settings.getRepositories().size());
+        assertEquals("central", settings.getRepositories().get(0).getId());
+
+        assertEquals(1, settings.getPluginRepositories().size());
+        assertEquals("central", settings.getPluginRepositories().get(0).getId());
+    }
+
+    @Test
+    void reposOnlySettingsGetCentralInPluginRepos() {
+        Settings settings = execute("settings-repos-only").getEffectiveSettings();
+
+        assertEquals(1, settings.getRepositories().size());
+        assertEquals("internal", settings.getRepositories().get(0).getId());
+
+        assertEquals(1, settings.getPluginRepositories().size());
+        assertEquals("central", settings.getPluginRepositories().get(0).getId());
+    }
+
+    @Test
+    void pluginReposOnlySettingsGetCentralInRepos() {
+        Settings settings = execute("settings-plugin-repos-only").getEffectiveSettings();
+
+        assertEquals(1, settings.getRepositories().size());
+        assertEquals("central", settings.getRepositories().get(0).getId());
+
+        assertEquals(1, settings.getPluginRepositories().size());
+        assertEquals("internal-plugins", settings.getPluginRepositories().get(0).getId());
+    }
+
+    @Test
+    void bothReposDefinedDoesNotInjectCentral() {
+        Settings settings = execute("settings-both-repos").getEffectiveSettings();
+
+        assertEquals(1, settings.getRepositories().size());
+        assertEquals("internal", settings.getRepositories().get(0).getId());
+
+        assertEquals(1, settings.getPluginRepositories().size());
+        assertEquals("internal-plugins", settings.getPluginRepositories().get(0).getId());
+    }
+
+    @Test
     void testProxyFieldInterpolation() {
         // Note: in Maven 4 the settings model stores proxy.port and proxy.active as
         // String-backed fields (portString / activeString), so both the pre-parse

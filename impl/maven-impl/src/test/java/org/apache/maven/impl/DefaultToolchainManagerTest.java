@@ -32,6 +32,8 @@ import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Source;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ToolchainFactory;
+import org.apache.maven.api.services.ToolchainFactoryException;
+import org.apache.maven.api.services.ToolchainManagerException;
 import org.apache.maven.api.toolchain.ToolchainModel;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -41,6 +43,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.slf4j.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -413,5 +416,37 @@ class DefaultToolchainManagerTest {
         when(lookup.lookupOptional(Project.class)).thenReturn(Optional.empty());
 
         assertEquals(-1, manager.getProjectRequiredSourceLevel(session));
+    }
+
+    @Test
+    void getToolchainsThrowsOnMisconfiguredToolchain() {
+        // When a ToolchainFactory throws ToolchainFactoryException (e.g. invalid jdkHome),
+        // getToolchains() must propagate it as ToolchainManagerException, not swallow it.
+        ToolchainFactoryException factoryError =
+                new ToolchainFactoryException("Non-existing JDK home configuration at /bogus/path");
+        toolchainModel = ToolchainModel.newBuilder().type("jdk").build();
+        when(session.getToolchains()).thenReturn(List.of(toolchainModel));
+        when(jdkFactory.createToolchain(toolchainModel)).thenThrow(factoryError);
+
+        ToolchainManagerException ex = assertThrows(
+                ToolchainManagerException.class, () -> manager.getToolchains(session, "jdk", Map.of("version", "17")));
+
+        assertTrue(ex.getMessage().contains("jdk"), "message should contain toolchain type");
+        assertInstanceOf(ToolchainFactoryException.class, ex.getCause());
+    }
+
+    @Test
+    void getToolchainsValidNonmatchingToolchainDoesNotThrow() {
+        // A valid toolchain that simply does not match the requirements should return
+        // an empty list — no exception.
+        toolchainModel = ToolchainModel.newBuilder().type("jdk").build();
+        when(session.getToolchains()).thenReturn(List.of(toolchainModel));
+        when(jdkFactory.createToolchain(toolchainModel)).thenReturn(mockToolchain);
+        when(jdkFactory.createDefaultToolchain()).thenReturn(Optional.empty());
+        when(mockToolchain.matchesRequirements(any())).thenReturn(false);
+
+        List<Toolchain> result = manager.getToolchains(session, "jdk", Map.of("version", "21"));
+
+        assertTrue(result.isEmpty(), "Non-matching toolchain should yield empty list");
     }
 }
