@@ -83,7 +83,7 @@ The mixin configures the compiler plugin automatically — no
 At compile time, the processor generates:
 
 - `target/classes/META-INF/maven/plugin.xml` — the plugin descriptor
-- `target/generated-sources/annotations/com/example/GreetMojo$MojoFactory.java`
+- `target/generated-sources/annotations/com/example/GreetMojoMojoFactory.java`
   — the DI factory, compiled and registered in the DI index automatically
 
 ## Using `@After` ordering constraints

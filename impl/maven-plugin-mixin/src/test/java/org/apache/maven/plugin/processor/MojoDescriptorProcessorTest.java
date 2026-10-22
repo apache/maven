@@ -85,15 +85,20 @@ class MojoDescriptorProcessorTest {
     }
 
     /**
-     * Try to resolve a JAR first from the worktree build output, then from the local Maven repo.
+     * Try to resolve a JAR first from the Maven multi-module project build output, then from the local Maven repo.
+     *
+     * <p>In a Maven build, {@code maven.multiModuleProjectDirectory} points to the project root, so
+     * {@code worktreeRelative} is resolved against that directory to find freshly-compiled JARs.
+     * The {@code processor.worktree} system property can override the root for IDE / manual runs.</p>
      */
     private static File resolveFile(String worktreeRelative, String m2Relative) {
+        // Prefer the Maven multi-module project directory (set by Maven during build)
         String worktreeBase =
-                System.getProperty("processor.worktree", "/opt/data/oss/maven/.worktrees/plugin-processor");
+                System.getProperty("processor.worktree", System.getProperty("maven.multiModuleProjectDirectory", ""));
         String m2Base = System.getProperty(
                 "processor.m2", System.getProperty("user.home") + "/.m2/repository/org/apache/maven");
 
-        if (worktreeRelative != null) {
+        if (worktreeRelative != null && !worktreeBase.isEmpty()) {
             File f = new File(worktreeBase, worktreeRelative);
             if (f.isFile()) {
                 return f;
