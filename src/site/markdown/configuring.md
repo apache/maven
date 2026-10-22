@@ -90,6 +90,16 @@ from `${session.rootDirectory}/.mvn/maven-user.properties`.
 
 For the complete list of available Maven configuration properties and options, see [Maven Configuration Options](configuration.html).
 
+## Parallel build safety
+
+In a parallel build, Maven serializes concurrent executions of a mojo that is not marked `@threadSafe`. Maven emits a warning only when an execution must wait for that serialization. If a build relies on the legacy behavior, disable serialization with:
+
+```
+-Dmaven.plugin.nonThreadSafeSerializer=false
+```
+
+Disable this safeguard only when the affected mojo is known to be safe for concurrent execution.
+
 ## Settings
 
 Settings are configured in the `~/.m2/settings.xml` file (user level),
