@@ -79,6 +79,7 @@ import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.SimplexTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
+import org.apache.maven.cling.invoker.MsysPaths;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cling.logging.Slf4jLoggerManager;
@@ -211,6 +212,18 @@ public class MavenCli {
     private FileSystem fileSystem = FileSystems.getDefault();
 
     private static final Pattern NEXT_LINE = Pattern.compile("\r?\n");
+
+    /**
+     * Converts a POSIX-style Windows path as used by MSYS2 and Git Bash,
+     * e.g. "/c/Users/alice/file.txt", to a native Windows path "C:\Users\alice\file.txt".
+     * Returns the original string if it is not such a path, a native Windows path for instance.
+     * <p>
+     * This only exists in the Maven 4 line, where this class is kept for compatibility. It is not backported to the
+     * Maven 3.x branches.
+     */
+    static String msysToWindowsPath(final String path) {
+        return MsysPaths.toNativePath(path, true);
+    }
 
     public MavenCli() {
         this(null);
@@ -441,6 +454,25 @@ public class MavenCli {
         // Windows paths.
         //
         String mavenHome = System.getProperty(Constants.MAVEN_HOME);
+
+        if (System.getProperty("os.name", "").toLowerCase(Locale.ROOT).startsWith("windows")) {
+            final String userHome = System.getProperty("user.home");
+            if (userHome != null) {
+                System.setProperty("user.home", msysToWindowsPath(userHome));
+            }
+
+            for (final String key : new String[] {
+                Constants.MAVEN_REPO_LOCAL, // -Dmaven.repo.local
+                "user.settings", // -s / --settings
+                "alternateSettings",
+                "user.toolchains"
+            }) {
+                final String value = System.getProperty(key);
+                if (value != null) {
+                    System.setProperty(key, msysToWindowsPath(value));
+                }
+            }
+        }
 
         if (mavenHome != null) {
             System.setProperty(
