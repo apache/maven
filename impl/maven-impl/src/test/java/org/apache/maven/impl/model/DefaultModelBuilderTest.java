@@ -375,6 +375,12 @@ class DefaultModelBuilderTest {
         assertEquals("activated", projectParentModel.getProperties().get("profile.condition"));
         assertEquals("activated", projectParentModel.getProperties().get("profile.jdk"));
         assertTrue(projectParentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+        // After #13555, parent POM properties are NOT exposed through getModelProperty() in the
+        // project-parent activation path — condition profiles relying on POM-declared properties
+        // must not self-activate (#13390).
+        assertNull(
+                projectParentModel.getProperties().get("profile.pom.condition"),
+                "profile.pom.condition must not self-activate in the project-parent path");
 
         DefaultModelBuilder.ModelBuilderSessionState dependencyState =
                 dependencyAncestorState.derive(sharedParentRequest);
