@@ -349,7 +349,7 @@
       <version>1.0.0+</version>
       <superClass>IdentifiableBase</superClass>
       <description>
-        The {@code &lt;proxy&gt;} element contains information required to a proxy settings.
+        The <code>&lt;proxy&gt;</code> element contains information required to a proxy settings.
       </description>
       <fields>
         <field xml.tagName="active">
@@ -475,7 +475,7 @@
       <version>1.0.0+</version>
       <superClass>IdentifiableBase</superClass>
       <description>
-        The {@code &lt;server&gt;} element contains information required to a server settings.
+        The <code>&lt;server&gt;</code> element contains information required to a server settings.
       </description>
       <fields>
         <field>
@@ -555,8 +555,8 @@
             with the same id, see the {@code maven.repository.credentialScope} user property. The origins
             listed here are added to those; nothing is replaced. Declaring them is needed when the repository
             using these credentials is not known when the session is created, for example a repository
-            declared in a {@code settings.xml} profile that is not listed in {@code &lt;activeProfiles&gt;}
-            but activated through {@code &lt;activation&gt;} or {@code -P}.
+            declared in a {@code settings.xml} profile that is not listed in <code>&lt;activeProfiles&gt;</code>
+            but activated through <code>&lt;activation&gt;</code> or {@code -P}.
             Comparison is case insensitive and the default ports 80 (http) and 443 (https) are equivalent to
             no port. This element is not supported in project settings and is dropped there.</description>
           <association>
@@ -684,7 +684,7 @@
           <name>properties</name>
           <description>
             Extended configuration specific to this profile goes here.
-            Contents take the form of {@code &lt;property.name&gt;property.value&lt;/property.name&gt;}
+            Contents take the form of <code>&lt;property.name&gt;property.value&lt;/property.name&gt;</code>
           </description>
           <type>Properties</type>
           <association xml.mapStyle="inline">
