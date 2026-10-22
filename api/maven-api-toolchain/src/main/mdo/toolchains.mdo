@@ -87,8 +87,10 @@
       <name>PersistedToolchains</name>
       <superClass>TrackableBase</superClass>
       <description>
+        <![CDATA[
         The {@code &lt;toolchains&gt;} element is the root of the descriptor.
         The following table lists all the possible child elements.
+        ]]>
       </description>
       <version>1.0.0+</version>
       <fields>
@@ -124,12 +126,14 @@
           <version>1.0.0+</version>
           <!-- <identifier>true</identifier> -->
           <description>
+            <![CDATA[
             Type of toolchain:&lt;ul>
             &lt;li>{@code jdk} for &lt;a
             href="https://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/jdk.html">JDK Standard Toolchain&lt;/a>,&lt;/li>
             &lt;li>other value for &lt;a
             href="https://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/custom.html">Custom Toolchain&lt;/a>&lt;/li>
             &lt;/ul>
+            ]]>
           </description>
           <type>String</type>
         </field>
@@ -138,11 +142,13 @@
           <version>1.0.0/1.0.99</version> <!-- fake upperbound, it's inclusive -->
           <type>DOM</type>
           <description>
+            <![CDATA[
             Toolchain identification information, which will be matched against project requirements.
             &lt;p>Actual content structure is completely open: each toolchain type will define its own format and
             semantics.
             &lt;p>This is generally a properties format: {@code &lt;name&gt;value&lt;/name&gt;} with predefined
             properties names.
+            ]]>
           </description>
         </field>
         <field>
@@ -155,8 +161,10 @@
           </association>
           <!-- <identifier>true</identifier> -->
           <description>
+            <![CDATA[
             Toolchain identification information, which will be matched against project requirements.
             &lt;p>Each toolchain defines its own properties names and semantics.
+            ]]>
           </description>
         </field>
         <field>
@@ -164,11 +172,13 @@
           <version>1.0.0+</version>
           <type>DOM</type>
           <description>
+            <![CDATA[
             Toolchain configuration information, like location or any information that is to be retrieved.
             &lt;p>Actual content structure is completely open: each toolchain type will define its own format and
             semantics.
             &lt;p>In general, this is a properties format: {@code &lt;name&gt;value&lt;/name&gt;} with per-toolchain
             defined properties names.
+            ]]>
           </description>
         </field>
       </fields>

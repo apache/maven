@@ -166,10 +166,12 @@ under the License.
           <version>1.0.0</version>
           <type>String</type>
           <description>
+            <![CDATA[
             Defines a default phase to bind a Mojo execution to if the user does not explicitly set a phase in the POM.
             &lt;p>&lt;b>Note:&lt;/b> This will not automagically make a Mojo run when the plugin declaration is added
             to the POM. It merely enables the user to omit the {@code &lt;phase&gt;} element from the
             surrounding {@code &lt;execution&gt;} element.&lt;/p>
+            ]]>
           </description>
         </field>
         <field>
@@ -401,6 +403,7 @@ under the License.
           <type>boolean</type>
           <defaultValue>true</defaultValue>
           <description>
+            <![CDATA[
             Specifies that this parameter can be configured directly by the user (as in the case of POM-specified
             configuration). This is useful when you want to force the user to use common POM elements rather than
             plugin configurations, as in the case where you want to use the artifact's final name as a parameter. In
@@ -408,6 +411,7 @@ under the License.
             than specifying a value for finalName directly in the plugin configuration section. It is also useful to
             ensure that - for example - a List-typed parameter which expects items of type Artifact doesn't get a List
             full of Strings.
+            ]]>
           </description>
         </field>
         <field>

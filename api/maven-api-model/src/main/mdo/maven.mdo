@@ -70,8 +70,10 @@
       <name>Model</name>
       <superClass>ModelBase</superClass>
       <description>
-        The {@code &lt;project>} element is the root of the descriptor.
+        <![CDATA[
+        The {@code &lt;project&gt;} element is the root of the descriptor.
         The following table lists all of the possible child elements.
+        ]]>
       </description>
       <version>3.0.0+</version>
       <fields>
@@ -579,9 +581,11 @@
           <name>properties</name>
           <version>4.0.0+</version>
           <description>
+            <![CDATA[
             Properties that can be used throughout the POM as a substitution, and
             are used as filters in resources if enabled.
             The format is {@code &lt;name>value&lt;/name>}.
+            ]]>
           </description>
           <type>Properties</type>
           <association xml.mapStyle="inline">
@@ -606,12 +610,14 @@
           <name>dependencies</name>
           <version>3.0.0+</version>
           <description>
+            <![CDATA[
             This element describes all the dependencies associated with a project.
             These dependencies are used to construct a classpath for your
             project during the build process. They are automatically downloaded from the
             repositories defined in this project.
 
             @see &lt;a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">Dependency mechanism&lt;/a>
+            ]]>
           </description>
           <association>
             <type>Dependency</type>
@@ -796,12 +802,14 @@
           <name>resources</name>
           <version>3.0.0+</version>
           <description>
+            <![CDATA[
             This element describes all the classpath resources such as properties
             files associated with a project. These resources are often included in the final
             package.
             The default value is {@code src/main/resources}.
 
             @deprecated Replaced by {@code &lt;Source&gt;} with {@code main} scope and {@code resources} language.
+            ]]>
           </description>
           <association>
             <type>Resource</type>
@@ -815,11 +823,13 @@
           <name>testResources</name>
           <version>4.0.0+</version>
           <description>
+            <![CDATA[
             This element describes all the classpath resources such as properties
             files associated with a project's unit tests.
             The default value is {@code src/test/resources}.
 
             @deprecated Replaced by {@code &lt;Source&gt;} with {@code test} scope and {@code resources} language.
+            ]]>
           </description>
           <association>
             <type>Resource</type>
@@ -880,8 +890,10 @@
       <version>3.0.0+</version>
       <superClass>BuildBase</superClass>
       <description>
+        <![CDATA[
         The {@code &lt;build>} element contains information required to build the project.
         Default values are defined in Super POM.
+        ]]>
       </description>
       <fields>
         <field>
@@ -903,12 +915,14 @@
           <name>sourceDirectory</name>
           <version>3.0.0+</version>
           <description>
+            <![CDATA[
             This element specifies a directory containing the source of the project. The
             generated build system will compile the sources from this directory when the project is
             built. The path given is relative to the project descriptor.
             The default value is {@code src/main/java}.
 
             @deprecated Replaced by {@code &lt;Source&gt;} with {@code main} scope.
+            ]]>
           </description>
           <type>String</type>
           <annotations>
@@ -919,6 +933,7 @@
           <name>scriptSourceDirectory</name>
           <version>4.0.0+</version>
           <description>
+            <![CDATA[
             This element specifies a directory containing the script sources of the
             project. This directory is meant to be different from the sourceDirectory, in that its
             contents will be copied to the output directory in most cases (since scripts are
@@ -928,6 +943,7 @@
             @deprecated since 4.0.0.
             Use {@code &lt;source&gt;} elements with {@code script} language
             to configure script sources.
+            ]]>
           </description>
           <type>String</type>
           <annotations>
@@ -938,12 +954,14 @@
           <name>testSourceDirectory</name>
           <version>4.0.0+</version>
           <description>
+            <![CDATA[
             This element specifies a directory containing the unit test source of the
             project. The generated build system will compile these directories when the project is
             being tested. The path given is relative to the project descriptor.
             The default value is {@code src/test/java}.
 
             @deprecated Replaced by {@code &lt;Source&gt;} with {@code test} scope.
+            ]]>
           </description>
           <type>String</type>
           <annotations>
@@ -1878,8 +1896,10 @@
       <name>Scm</name>
       <version>4.0.0+</version>
       <description>
+        <![CDATA[
         The {@code &lt;scm>} element contains information required to the SCM
         (Source Control Management) of the project.
+        ]]>
       </description>
       <fields>
         <field>
@@ -2240,10 +2260,10 @@
     </class>
     <class>
       <name>Resource</name>
-      <description>This element describes all of the classpath resources associated with a project
+      <description><![CDATA[This element describes all of the classpath resources associated with a project
         or unit tests.
 
-        @deprecated Replaced by {@code &lt;Source&gt;} with {@code resources} language.
+        @deprecated Replaced by {@code &lt;Source&gt;} with {@code resources} language.]]>
       </description>
       <version>3.0.0+</version>
       <superClass>FileSet</superClass>
@@ -2642,7 +2662,9 @@
       <version>4.0.0+</version>
       <superClass>ConfigurationContainer</superClass>
       <description>
+        <![CDATA[
         The {@code &lt;plugin>} element contains information required for a plugin.
+        ]]>
       </description>
       <fields>
         <field>
@@ -3331,12 +3353,12 @@
     <class>
       <name>ActivationFile</name>
       <version>4.0.0+</version>
-      <description>This is the file specification used to activate the profile. The {@code missing} value
+      <description><![CDATA[This is the file specification used to activate the profile. The {@code missing} value
         is the location of a file that needs to exist, and if it doesn't, the profile will be
         activated. On the other hand, {@code exists} will test for the existence of the file and if it is
         there, the profile will be activated.
         &lt;p>Variable interpolation for these file specifications is limited to {@code ${project.basedir}},
-        system properties and user properties.&lt;/p></description>
+        system properties and user properties.&lt;/p>]]></description>
       <fields>
         <field>
           <name>missing</name>
@@ -3662,7 +3684,9 @@
           <version>4.0.0+</version>
           <type>String</type>
           <description>
+            <![CDATA[
             The identifier of the POM in the format {@code &lt;groupId>:&lt;artifactId>:&lt;version>}.
+            ]]>
           </description>
         </field>
         <field>
