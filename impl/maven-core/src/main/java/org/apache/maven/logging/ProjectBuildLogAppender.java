@@ -44,6 +44,8 @@ import org.slf4j.spi.LocationAwareLogger;
  */
 public class ProjectBuildLogAppender implements AutoCloseable {
 
+    public static final String DEFAULT_WARNING_MODE = "summary";
+
     private static final String KEY_PROJECT_ID = "maven.project.id";
     private static final String KEY_MOJO_ID = "maven.mojo.id";
     private static final ThreadLocal<String> PROJECT_ID = new InheritableThreadLocal<>();
@@ -141,9 +143,20 @@ public class ProjectBuildLogAppender implements AutoCloseable {
     }
 
     private final BuildEventListener buildEventListener;
+    private final boolean suppressInlineWarnings;
 
-    public ProjectBuildLogAppender(BuildEventListener buildEventListener) {
+    /**
+     * Creates a new appender that forwards log events to the given listener.
+     *
+     * @param buildEventListener the listener to forward events to
+     * @param warningMode the warning display mode ({@code "summary"}, {@code "all"},
+     *                    {@code "none"}, {@code "fail"}); {@code "summary"} suppresses
+     *                    inline WARN events while preserving them for the build report;
+     *                    {@code null} is treated as non-summary (all events flow inline)
+     */
+    public ProjectBuildLogAppender(BuildEventListener buildEventListener, String warningMode) {
         this.buildEventListener = buildEventListener;
+        this.suppressInlineWarnings = "summary".equalsIgnoreCase(warningMode);
         MavenSimpleLogger.setLogSink(this::accept);
     }
 
@@ -187,7 +200,9 @@ public class ProjectBuildLogAppender implements AutoCloseable {
                 sourceMethodName,
                 threadId,
                 seq);
-        buildEventListener.projectLogMessage(projectId, event);
+        if (!(suppressInlineWarnings && logLevel == LogLevel.WARN)) {
+            buildEventListener.projectLogMessage(projectId, event);
+        }
 
         // Forward to build report collector (if active)
         Consumer<LogEvent> capture = reportCapture;
