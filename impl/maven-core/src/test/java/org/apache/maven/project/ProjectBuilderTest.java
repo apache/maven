@@ -317,28 +317,26 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
 
         for (int validationLevel :
                 List.of(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, ModelBuildingRequest.VALIDATION_LEVEL_STRICT)) {
-            for (boolean processPlugins : List.of(true)) {
-                ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
-                request.setRepositorySession(session.getRepositorySession());
-                request.setValidationLevel(validationLevel);
-                request.setProcessPlugins(processPlugins);
-                ProjectBuildingResult result = builder.build(childPom.toFile(), request);
-                MavenProject child = result.getProject();
+            ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
+            request.setRepositorySession(session.getRepositorySession());
+            request.setValidationLevel(validationLevel);
+            // processPlugins=false would be a consumer request, which never looks up a local parent
+            request.setProcessPlugins(true);
+            ProjectBuildingResult result = builder.build(childPom.toFile(), request);
+            MavenProject child = result.getProject();
 
-                assertNotNull(child.getParentArtifact());
-                assertEquals("parent", child.getParentArtifact().getArtifactId());
-                assertEquals(parentPom.toFile(), child.getParentFile());
+            assertNotNull(child.getParentArtifact());
+            assertEquals("parent", child.getParentArtifact().getArtifactId());
+            assertEquals(parentPom.toFile(), child.getParentFile());
 
-                boolean hasRelativePathWarning = result.getProblems().stream()
-                        .anyMatch(problem ->
-                                problem.getMessage().contains("only specify relativePath or groupId/artifactId"));
+            boolean hasRelativePathWarning = result.getProblems().stream()
+                    .anyMatch(problem ->
+                            problem.getMessage().contains("only specify relativePath or groupId/artifactId"));
 
-                assertEquals(
-                        validationLevel == ModelBuildingRequest.VALIDATION_LEVEL_STRICT && processPlugins,
-                        hasRelativePathWarning,
-                        "Unexpected validation result for level " + validationLevel + " and processPlugins="
-                                + processPlugins);
-            }
+            assertEquals(
+                    validationLevel == ModelBuildingRequest.VALIDATION_LEVEL_STRICT,
+                    hasRelativePathWarning,
+                    "Unexpected validation result for level " + validationLevel);
         }
     }
 
