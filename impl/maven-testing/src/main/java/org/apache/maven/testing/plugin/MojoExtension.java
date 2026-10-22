@@ -74,19 +74,18 @@ import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.api.xml.XmlService;
-import org.apache.maven.configuration.internal.EnhancedComponentConfigurator;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.model.DefaultModelPathTranslator;
 import org.apache.maven.internal.impl.DefaultLog;
-import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.model.v4.MavenMerger;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluatorV4;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxReader;
+import org.apache.maven.plugin.internal.V4MojoConfigurator;
 import org.apache.maven.testing.di.MavenDIExtension;
 import org.apache.maven.testing.plugin.stubs.MojoExecutionStub;
 import org.apache.maven.testing.plugin.stubs.PluginStub;
@@ -311,9 +310,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             ExpressionEvaluator evaluator = new WrapEvaluator(
                     getInjector(), new PluginParameterExpressionEvaluatorV4(session, project, mojoExecution));
 
-            EnhancedComponentConfigurator configurator = new EnhancedComponentConfigurator();
-            configurator.configureComponent(
-                    mojo, new XmlPlexusConfiguration(pluginConfiguration), evaluator, null, null);
+            new V4MojoConfigurator(evaluator, mojo.getClass().getClassLoader(), null)
+                    .configure(mojo, pluginConfiguration);
             return mojo;
         } catch (Exception e) {
             throw new ParameterResolutionException("Unable to resolve mojo", e);
