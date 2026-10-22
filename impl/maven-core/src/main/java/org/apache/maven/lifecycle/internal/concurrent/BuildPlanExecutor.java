@@ -526,7 +526,7 @@ public class BuildPlanExecutor {
                     List<Throwable> failures = null;
                     boolean allWorkExecuted = true;
                     for (BuildStep projectStep : plan.steps(step.project).toList()) {
-                        Exception exception = projectStep.exception;
+                        Throwable exception = projectStep.exception;
                         if (exception != null) {
                             if (failures == null) {
                                 failures = new ArrayList<>();
