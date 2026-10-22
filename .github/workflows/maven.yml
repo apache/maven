@@ -46,7 +46,7 @@ env:
 
 jobs:
   initial-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       pom-hash: ${{ steps.pom-hash.outputs.hash }}
     steps:
@@ -155,7 +155,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-26.04, macos-latest, windows-latest]
         java: ['17', '25', '27']
     steps:
       - name: Set up JDK ${{ matrix.java }}
@@ -173,7 +173,7 @@ jobs:
 
       - name: Install Graphviz (Ubuntu)
         if: runner.os == 'Linux'
-        run: sudo apt-get install graphviz
+        run: sudo apt-get install graphviz libgvplugin-neato-layout8
 
       - name: Install Graphviz (Windows)
         if: runner.os == 'Windows'
@@ -273,7 +273,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-26.04, macos-latest, windows-latest]
         java: ['17', '25', '27']
     steps:
       - name: Set up JDK ${{ matrix.java }}
@@ -384,7 +384,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-26.04, macos-latest, windows-latest]
     needs:
       - initial-build
       - full-build
