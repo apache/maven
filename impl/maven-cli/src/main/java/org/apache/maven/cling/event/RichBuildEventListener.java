@@ -33,6 +33,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.build.report.LogEvent;
 import org.apache.maven.api.build.report.LogLevel;
 import org.apache.maven.execution.ExecutionEvent;
@@ -152,6 +154,81 @@ public class RichBuildEventListener implements BuildEventListener {
     }
 
     // ---- Reactor lifecycle ----
+
+    /**
+     * Initialize reactor state from a v4 session. Called by {@link RichExecutionEventLogger}
+     * during {@code sessionStarted}.
+     */
+    public void initReactor(Session session) {
+        if (session == null) {
+            return;
+        }
+        List<Project> projects = session.getProjects();
+        if (projects == null) {
+            projects = List.of();
+        }
+        this.totalProjects = projects.size();
+        this.completedProjects.set(0);
+        this.buildStartTime = MonotonicClock.now();
+
+        for (Project project : projects) {
+            projectOrder.add(project.artifactId());
+            String name = (project.model() != null
+                            && project.model().getName() != null
+                            && !project.model().getName().isBlank())
+                    ? project.model().getName()
+                    : project.artifactId();
+            projectNames.put(project.artifactId(), name);
+        }
+
+        this.headerLine = buildHeaderLine(session);
+
+        int concurrency = 1;
+        try {
+            concurrency = Math.max(1, session.getDegreeOfConcurrency());
+        } catch (Exception e) {
+            // fallback to 1
+        }
+        int slotCount = Math.min(concurrency, 8);
+        this.statusHeight = slotCount + 3;
+
+        if (supported) {
+            setupDisplay();
+        }
+    }
+
+    private String buildHeaderLine(Session session) {
+        StringBuilder h = new StringBuilder();
+        h.append(' ').append(BOLD);
+
+        String mavenVersion = session.getSystemProperties() != null
+                ? session.getSystemProperties().get("maven.version")
+                : null;
+        if (mavenVersion != null) {
+            h.append("Maven ").append(mavenVersion);
+        } else {
+            h.append("Maven");
+        }
+        h.append(RESET);
+
+        List<Project> projects = session.getProjects();
+        if (projects != null && !projects.isEmpty()) {
+            Project top = projects.get(0);
+            h.append(DIM).append(" \u2500 ").append(RESET);
+            h.append("building ");
+            String name = (top.model() != null
+                            && top.model().getName() != null
+                            && !top.model().getName().isBlank())
+                    ? top.model().getName()
+                    : top.artifactId();
+            h.append(CYAN).append(name).append(RESET);
+            if (top.version() != null) {
+                h.append(' ').append(DIM).append(top.version()).append(RESET);
+            }
+        }
+
+        return h.toString();
+    }
 
     /**
      * Initialize reactor state from the session. Called by {@link RichExecutionEventLogger}
@@ -361,6 +438,39 @@ public class RichBuildEventListener implements BuildEventListener {
         synchronized (outputLock) {
             if (displayActive) {
                 display.updateAnsi(buildStatusLines(), 0);
+            }
+        }
+    }
+
+    /**
+     * Update active mojo state from a v4 execution event.
+     */
+    public void mojoStarted(org.apache.maven.api.ExecutionEvent event) {
+        if (event == null) {
+            return;
+        }
+        String projectId = event.project().map(Project::artifactId).orElse(null);
+        if (projectId != null) {
+            ProjectState state = activeProjects.get(projectId);
+            if (state != null) {
+                state.currentMojo = event.mojoExecution()
+                        .map(m -> {
+                            String pluginId = "";
+                            if (m.plugin() != null) {
+                                if (m.plugin().getDescriptor() != null) {
+                                    pluginId = m.plugin().getDescriptor().getArtifactId();
+                                } else if (m.plugin().getModel() != null) {
+                                    pluginId = m.plugin().getModel().getArtifactId();
+                                }
+                            }
+                            return (pluginId != null ? pluginId : "") + ":" + m.goal();
+                        })
+                        .orElse(null);
+            }
+            synchronized (outputLock) {
+                if (displayActive) {
+                    display.updateAnsi(buildStatusLines(), 0);
+                }
             }
         }
     }

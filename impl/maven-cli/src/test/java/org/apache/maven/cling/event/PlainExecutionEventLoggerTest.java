@@ -25,6 +25,7 @@ import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
@@ -39,6 +40,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.mockito.MockitoSession;
+import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -59,7 +61,7 @@ class PlainExecutionEventLoggerTest {
     private MockitoSession mockitoSession;
 
     private Logger logger;
-    private PlainExecutionEventLogger plainLogger;
+    private ExecutionListener plainLogger;
     private final JLineMessageBuilderFactory messageBuilderFactory = new JLineMessageBuilderFactory();
 
     @BeforeAll
@@ -74,11 +76,11 @@ class PlainExecutionEventLoggerTest {
 
     @BeforeEach
     void beforeEach() {
-        mockitoSession = Mockito.mockitoSession().startMocking();
+        mockitoSession = Mockito.mockitoSession().strictness(Strictness.LENIENT).startMocking();
         logger = mock(Logger.class);
         lenient().when(logger.isInfoEnabled()).thenReturn(true);
         lenient().when(logger.isWarnEnabled()).thenReturn(true);
-        plainLogger = new PlainExecutionEventLogger(messageBuilderFactory, logger);
+        plainLogger = new ExecutionListenerAdapter(new PlainExecutionEventLogger(messageBuilderFactory, logger));
     }
 
     @AfterEach

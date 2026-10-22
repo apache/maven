@@ -28,6 +28,7 @@ import org.apache.maven.execution.BuildSuccess;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.ExecutionEvent;
+import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.execution.MavenSession;
@@ -45,6 +46,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.MockitoSession;
+import org.mockito.quality.Strictness;
 import org.slf4j.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -71,7 +73,7 @@ class RichExecutionEventLoggerTest {
     private Terminal terminal;
     private ByteArrayOutputStream terminalOutput;
     private RichBuildEventListener buildEventListener;
-    private RichExecutionEventLogger richLogger;
+    private ExecutionListener richLogger;
     private final JLineMessageBuilderFactory messageBuilderFactory = new JLineMessageBuilderFactory();
 
     @BeforeAll
@@ -86,7 +88,7 @@ class RichExecutionEventLoggerTest {
 
     @BeforeEach
     void beforeEach() throws Exception {
-        mockitoSession = Mockito.mockitoSession().startMocking();
+        mockitoSession = Mockito.mockitoSession().strictness(Strictness.LENIENT).startMocking();
         logger = mock(Logger.class);
         lenient().when(logger.isInfoEnabled()).thenReturn(true);
         lenient().when(logger.isWarnEnabled()).thenReturn(true);
@@ -94,7 +96,8 @@ class RichExecutionEventLoggerTest {
         terminal = new DumbTerminal(System.in, terminalOutput);
         terminal.setSize(new Size(120, 40));
         buildEventListener = new RichBuildEventListener(terminal, msg -> {});
-        richLogger = new RichExecutionEventLogger(messageBuilderFactory, buildEventListener, logger);
+        richLogger = new ExecutionListenerAdapter(
+                new RichExecutionEventLogger(messageBuilderFactory, buildEventListener, logger));
     }
 
     @AfterEach

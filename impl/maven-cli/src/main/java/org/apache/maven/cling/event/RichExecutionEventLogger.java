@@ -19,21 +19,18 @@
 package org.apache.maven.cling.event;
 
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
+import org.apache.maven.api.ExecutionEvent;
+import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.cling.utils.CLIReportingUtils;
-import org.apache.maven.execution.AbstractExecutionListener;
-import org.apache.maven.execution.BuildFailure;
-import org.apache.maven.execution.BuildSuccess;
-import org.apache.maven.execution.BuildSummary;
-import org.apache.maven.execution.ExecutionEvent;
-import org.apache.maven.execution.MavenExecutionResult;
-import org.apache.maven.execution.MavenSession;
-import org.apache.maven.project.MavenProject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -66,7 +63,7 @@ import static org.apache.maven.cling.utils.CLIReportingUtils.formatDuration;
  * @see RichBuildEventListener
  * @see PlainExecutionEventLogger
  */
-public class RichExecutionEventLogger extends AbstractExecutionListener {
+public class RichExecutionEventLogger extends AbstractExecutionEventLogger {
 
     private static final int MAX_LOG_PREFIX_SIZE = 8; // "[ERROR] "
     private static final int PROJECT_STATUS_SUFFIX_SIZE = 20; // "SUCCESS [  0.000 s]"
@@ -83,6 +80,7 @@ public class RichExecutionEventLogger extends AbstractExecutionListener {
     private int maxProjectNameLength;
     private int totalProjects;
     private int currentVisitedProjectCount;
+    private volatile Instant sessionStartTime;
 
     public RichExecutionEventLogger(
             MessageBuilderFactory messageBuilderFactory, RichBuildEventListener buildEventListener) {
@@ -140,12 +138,18 @@ public class RichExecutionEventLogger extends AbstractExecutionListener {
     public void sessionStarted(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
             init();
-            MavenSession session = event.getSession();
-            List<MavenProject> projects = session.getProjects();
-            List<MavenProject> allProjects = session.getAllProjects();
-
-            currentVisitedProjectCount = allProjects.size() - projects.size();
-            totalProjects = allProjects.size();
+            sessionStartTime = MonotonicClock.now();
+            Session session = event.session();
+            List<Project> allProjects = getAllProjects(session);
+            List<Project> projects =
+                    (session != null && session.getProjects() != null) ? session.getProjects() : List.of();
+            if (allProjects != null && !allProjects.isEmpty()) {
+                totalProjects = allProjects.size();
+                currentVisitedProjectCount = allProjects.size() - projects.size();
+            } else {
+                totalProjects = projects.size();
+                currentVisitedProjectCount = 0;
+            }
 
             // Initialize the status bar
             buildEventListener.initReactor(session);
@@ -160,34 +164,39 @@ public class RichExecutionEventLogger extends AbstractExecutionListener {
             // Tear down the status bar before printing summary
             buildEventListener.tearDown();
 
-            // Write summary directly through the terminal writer (via buildEventListener.log)
-            // rather than logger.info() — all SLF4J output is routed through
-            // ProjectBuildLogAppender → projectLogMessage which filters INFO in rich mode.
             buildEventListener.log("");
-            logResult(event.getSession());
-            logStats(event.getSession());
+            if (event.exception().isPresent()) {
+                buildFailed = true;
+            }
+            logResult(event.session());
+            logStats(event.session());
         }
     }
 
     // ---- Module lifecycle ----
     // In rich mode, per-module success lines are suppressed — the status bar already
-    // shows ✓/●/○ indicators and the [n/total] counter for every module.
+    // shows checkmarks and the counter for every module.
     // Only FAILURE and SKIPPED scroll above the status bar since they're actionable.
 
     @Override
     public void projectStarted(ExecutionEvent event) {
-        // Suppressed — the status bar shows active modules
+        event.project().ifPresent(project -> {
+            projectStartTimes.put(projectKey(project), MonotonicClock.now());
+        });
     }
 
     @Override
     public void projectSucceeded(ExecutionEvent event) {
-        // Suppressed — the status bar checkmarks already indicate completion
+        passedCount.incrementAndGet();
+        // Suppressed in rich mode — status bar checkmarks indicate completion
     }
 
     @Override
     public void projectFailed(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
             init();
+            failedCount.incrementAndGet();
+            buildFailed = true;
             logProjectLine(event, "FAILURE");
         }
     }
@@ -196,6 +205,7 @@ public class RichExecutionEventLogger extends AbstractExecutionListener {
     public void projectSkipped(ExecutionEvent event) {
         if (logger.isInfoEnabled()) {
             init();
+            skippedCount.incrementAndGet();
             logProjectLine(event, "SKIPPED");
         }
     }
@@ -204,15 +214,14 @@ public class RichExecutionEventLogger extends AbstractExecutionListener {
 
     @Override
     public void mojoStarted(ExecutionEvent event) {
-        // Suppressed — the status bar shows the active mojo
+        buildEventListener.mojoStarted(event);
     }
 
     @Override
     public void mojoSkipped(ExecutionEvent event) {
         if (logger.isWarnEnabled()) {
-            logger.warn(
-                    "Goal '{}' requires online mode for execution but Maven is currently offline, skipping",
-                    event.getMojoExecution().getGoal());
+            String goal = event.mojoExecution().map(MojoExecution::goal).orElse("unknown");
+            logger.warn("Goal '{}' requires online mode for execution but Maven is currently offline, skipping", goal);
         }
     }
 
@@ -226,30 +235,30 @@ public class RichExecutionEventLogger extends AbstractExecutionListener {
         // Suppressed in rich mode
     }
 
-    // ---- Formatting helpers (reuses PlainExecutionEventLogger patterns) ----
+    // ---- Formatting helpers ----
 
     private void logProjectLine(ExecutionEvent event, String status) {
-        MavenProject project = event.getProject();
-        MavenSession session = event.getSession();
-        MavenExecutionResult result = session.getResult();
-        BuildSummary buildSummary = result.getBuildSummary(project);
+        Project project = event.project().orElse(null);
+        if (project == null) {
+            return;
+        }
 
         StringBuilder buffer = new StringBuilder(128);
 
         // Status icon
         switch (status) {
             case "SUCCESS":
-                buffer.append(" ✓ ");
+                buffer.append(" \u2713 ");
                 break;
             case "FAILURE":
-                buffer.append(" ✗ ");
+                buffer.append(" \u2717 ");
                 break;
             default:
-                buffer.append(" ○ ");
+                buffer.append(" \u25cb ");
                 break;
         }
 
-        buffer.append(project.getName());
+        buffer.append(getProjectDisplayName(project));
         buffer.append(' ');
 
         if (totalProjects > 1) {
@@ -287,9 +296,10 @@ public class RichExecutionEventLogger extends AbstractExecutionListener {
         }
 
         // Duration
-        if (buildSummary != null) {
+        Duration execDuration = getProjectDuration(project);
+        if (execDuration != null) {
             mb.a(" [");
-            String duration = formatDuration(buildSummary.getExecTime());
+            String duration = formatDuration(execDuration);
             int padSize = MAX_PADDED_BUILD_TIME_DURATION_LENGTH - duration.length();
             if (padSize > 0) {
                 mb.a(chars(' ', padSize));
@@ -301,27 +311,18 @@ public class RichExecutionEventLogger extends AbstractExecutionListener {
         buildEventListener.log(mb.toString());
     }
 
-    private void logResult(MavenSession session) {
+    private void logResult(Session session) {
         MessageBuilder buffer = builder();
-        if (session.getResult().hasExceptions()) {
+        boolean hasExceptions = buildFailed || failedCount.get() > 0;
+        if (hasExceptions) {
             buffer.failure("BUILD FAILURE");
         } else {
             buffer.success("BUILD SUCCESS");
         }
 
-        int passed = 0;
-        int failed = 0;
-        int skipped = 0;
-        for (MavenProject project : session.getProjects()) {
-            BuildSummary summary = session.getResult().getBuildSummary(project);
-            if (summary instanceof BuildSuccess) {
-                passed++;
-            } else if (summary instanceof BuildFailure) {
-                failed++;
-            } else {
-                skipped++;
-            }
-        }
+        int passed = passedCount.get();
+        int failed = failedCount.get();
+        int skipped = skippedCount.get();
 
         buildEventListener.log(buffer.toString());
 
@@ -355,18 +356,20 @@ public class RichExecutionEventLogger extends AbstractExecutionListener {
             if (errors > 0) {
                 diag.failure(errors + " error" + (errors > 1 ? "s" : ""));
             }
-            diag.a(" — run ").strong("mvnlog").a(" to see details");
+            diag.a(" \u2014 run ").strong("mvnlog").a(" to see details");
             buildEventListener.log(diag.toString());
         }
     }
 
-    private void logStats(MavenSession session) {
-        Duration time = Duration.between(session.getRequest().getStartInstant(), MonotonicClock.now());
-        String wallClock = session.getRequest().getDegreeOfConcurrency() > 1 ? " (Wall Clock)" : "";
+    private void logStats(Session session) {
+        Duration time =
+                (sessionStartTime != null) ? Duration.between(sessionStartTime, MonotonicClock.now()) : Duration.ZERO;
+        int concurrency = (session != null) ? session.getDegreeOfConcurrency() : 1;
+        String wallClock = concurrency > 1 ? " (Wall Clock)" : "";
         buildEventListener.log("Total time:  " + formatDuration(time) + wallClock);
 
         // On failure, show Maven and Java version to help with bug reports (MNG-7372)
-        if (session.getResult().hasExceptions()) {
+        if (buildFailed || failedCount.get() > 0) {
             buildEventListener.log("Maven:       " + CLIReportingUtils.showVersionMinimal());
             buildEventListener.log("Java:        " + System.getProperty("java.version", "<unknown>") + " ("
                     + System.getProperty("java.vendor", "<unknown>") + ")");
