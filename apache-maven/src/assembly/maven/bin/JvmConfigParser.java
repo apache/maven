@@ -128,7 +128,10 @@ public class JvmConfigParser {
     }
 
     /**
-     * Append parsed arguments as quoted strings to the result builder.
+     * Append parsed arguments in Java {@code @argfile} format: one argument per line.
+     * Arguments are quoted when they contain whitespace, double-quotes, or backslashes.
+     * Quoting is always valid in {@code @argfile} format and ensures safe parsing
+     * by both the Windows and Unix JVM {@code @argfile} consumers.
      */
     private static void appendQuotedArguments(StringBuilder result, List<String> args) {
         for (String arg : args) {
