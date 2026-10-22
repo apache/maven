@@ -60,6 +60,8 @@ class BuildReportJsonWriterTest {
                 BuildStatus.SUCCESS,
                 BASE_TIME.plusSeconds(5),
                 Duration.ofMillis(2100),
+                "0123456789abcdef0123456789abcdef",
+                "0123456789abcdef",
                 mojoOutput);
 
         List<LogEvent> moduleOutput = List.of(new DefaultLogEvent(
@@ -76,6 +78,8 @@ class BuildReportJsonWriterTest {
                 BuildStatus.SUCCESS,
                 BASE_TIME.plusSeconds(1),
                 Duration.ofMillis(12345),
+                "fedcba9876543210fedcba9876543210",
+                "fedcba9876543210",
                 List.of(mojo),
                 moduleOutput);
 
@@ -102,6 +106,7 @@ class BuildReportJsonWriterTest {
         String json = BuildReportJsonWriter.toJson(report);
 
         assertTrue(json.contains("\"formatVersion\": 1"));
+        assertTrue(json.contains("\"reportVersion\": \"1.1\""));
         assertTrue(json.contains("\"status\": \"SUCCESS\""));
         assertTrue(json.contains("\"mavenVersion\": \"4.1.0-SNAPSHOT\""));
         assertTrue(json.contains("\"javaVersion\": \"21.0.1\""));
@@ -112,6 +117,10 @@ class BuildReportJsonWriterTest {
         assertTrue(json.contains("\"artifactId\": \"maven-core\""));
         assertTrue(json.contains("\"goal\": \"compile\""));
         assertTrue(json.contains("\"executionId\": \"default-compile\""));
+        assertTrue(json.contains("\"traceId\": \"0123456789abcdef0123456789abcdef\""));
+        assertTrue(json.contains("\"spanId\": \"0123456789abcdef\""));
+        assertTrue(json.contains("\"traceId\": \"fedcba9876543210fedcba9876543210\""));
+        assertTrue(json.contains("\"spanId\": \"fedcba9876543210\""));
         assertTrue(json.contains("\"failures\": []"));
         // Module and mojo start times
         assertTrue(json.contains("\"startTime\": \"2025-01-15T10:30:01Z\""), "module startTime");
@@ -251,6 +260,8 @@ class BuildReportJsonWriterTest {
                 BuildStatus.SUCCESS,
                 BASE_TIME.plusSeconds(1),
                 Duration.ofSeconds(5),
+                null,
+                null,
                 List.of(),
                 List.of());
         ModuleReport mod2 = new DefaultModuleReport(
@@ -260,6 +271,8 @@ class BuildReportJsonWriterTest {
                 BuildStatus.SUCCESS,
                 BASE_TIME.plusSeconds(6),
                 Duration.ofSeconds(10),
+                null,
+                null,
                 List.of(),
                 List.of());
         ModuleReport mod3 = new DefaultModuleReport(
@@ -269,6 +282,8 @@ class BuildReportJsonWriterTest {
                 BuildStatus.SKIPPED,
                 BASE_TIME.plusSeconds(16),
                 Duration.ZERO,
+                null,
+                null,
                 List.of(),
                 List.of());
 
@@ -310,6 +325,8 @@ class BuildReportJsonWriterTest {
                 BuildStatus.SUCCESS,
                 BASE_TIME.plusSeconds(1),
                 Duration.ofMillis(500),
+                null,
+                null,
                 List.of());
 
         String json = BuildReportJsonWriter.toJson(new DefaultBuildReport(
@@ -330,6 +347,8 @@ class BuildReportJsonWriterTest {
                         BuildStatus.SUCCESS,
                         BASE_TIME,
                         Duration.ofSeconds(1),
+                        null,
+                        null,
                         List.of(mojo),
                         List.of())),
                 List.of(),
@@ -372,6 +391,8 @@ class BuildReportJsonWriterTest {
                 BuildStatus.SUCCESS,
                 BASE_TIME,
                 Duration.ofMillis(1000),
+                null,
+                null,
                 List.of(julEvent, slf4jEvent));
 
         BuildReport report = new DefaultBuildReport(
@@ -392,6 +413,8 @@ class BuildReportJsonWriterTest {
                         BuildStatus.SUCCESS,
                         BASE_TIME,
                         Duration.ofSeconds(1),
+                        null,
+                        null,
                         List.of(mojo),
                         List.of())),
                 List.of(),

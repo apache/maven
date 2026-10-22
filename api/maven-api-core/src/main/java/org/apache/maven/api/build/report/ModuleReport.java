@@ -27,6 +27,7 @@ import java.util.Optional;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Build results for a single module in a reactor build.
@@ -85,6 +86,30 @@ public interface ModuleReport {
      */
     @Nonnull
     Duration duration();
+
+    /**
+     * The trace identifier associated with this module build.
+     * <p>
+     * Tracing extensions can provide this value by setting the
+     * {@code otel.trace_id} key in the SLF4J MDC before the module starts.
+     *
+     * @return the trace identifier, or {@code null} if no tracing context was provided
+     * @since 4.1.0
+     */
+    @Nullable
+    String traceId();
+
+    /**
+     * The span identifier associated with this module build.
+     * <p>
+     * Tracing extensions can provide this value by setting the
+     * {@code otel.span_id} key in the SLF4J MDC before the module starts.
+     *
+     * @return the span identifier, or {@code null} if no tracing context was provided
+     * @since 4.1.0
+     */
+    @Nullable
+    String spanId();
 
     /**
      * The mojo executions that ran within this module, in execution order.

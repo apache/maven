@@ -208,6 +208,8 @@ final class BuildReportJsonWriter {
         writeField(sb, indent + 1, "status", module.status().name());
         writeField(sb, indent + 1, "startTime", module.startTime().toString());
         writeField(sb, indent + 1, "duration", module.duration().toString());
+        writeNullableField(sb, indent + 1, "traceId", module.traceId());
+        writeNullableField(sb, indent + 1, "spanId", module.spanId());
 
         // mojos array
         writeIndent(sb, indent + 1);
@@ -248,6 +250,8 @@ final class BuildReportJsonWriter {
         writeField(sb, indent + 1, "status", mojo.status().name());
         writeField(sb, indent + 1, "startTime", mojo.startTime().toString());
         writeField(sb, indent + 1, "duration", mojo.duration().toString());
+        writeNullableField(sb, indent + 1, "traceId", mojo.traceId());
+        writeNullableField(sb, indent + 1, "spanId", mojo.spanId());
 
         // output array — captured log lines
         writeOutputArray(sb, indent + 1, mojo.output());
