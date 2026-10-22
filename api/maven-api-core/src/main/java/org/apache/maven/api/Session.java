@@ -50,6 +50,9 @@ public interface Session extends ProtoSession {
      * Returns the environment context of this build: the flags, properties, and
      * platform settings that were active when the session started.
      *
+     * <p>The returned instance is immutable and captures a snapshot of the invocation
+     * context (offline mode, user properties, selected projects, etc.).
+     *
      * @return the build environment, never {@code null}
      * @since 4.1.0
      */

@@ -69,6 +69,75 @@ import org.apache.maven.api.toolchain.ToolchainModel;
  */
 public class SessionStub implements Session {
 
+    // NOTE: If BuildEnvironment gains new abstract methods, update this constant
+    // (same as ApiRunner.EMPTY_BUILD_ENVIRONMENT — keep both in sync).
+    private static final BuildEnvironment EMPTY_BUILD_ENVIRONMENT = new BuildEnvironment() {
+        @Override
+        public java.util.List<String> goals() {
+            return java.util.List.of();
+        }
+
+        @Override
+        public java.util.Map<String, String> userProperties() {
+            return java.util.Map.of();
+        }
+
+        @Override
+        public java.util.Map<String, String> systemInfo() {
+            return java.util.Map.of();
+        }
+
+        @Override
+        public String localRepository() {
+            return "";
+        }
+
+        @Override
+        public java.util.List<String> activeProfiles() {
+            return java.util.List.of();
+        }
+
+        @Override
+        public java.util.List<String> selectedProjects() {
+            return java.util.List.of();
+        }
+
+        @Override
+        public String resumeFrom() {
+            return null;
+        }
+
+        @Override
+        public String reactorFailureBehavior() {
+            return "FAIL_FAST";
+        }
+
+        @Override
+        public boolean offline() {
+            return false;
+        }
+
+        @Override
+        public boolean updateSnapshots() {
+            return false;
+        }
+
+        @Override
+        public boolean noTransferProgress() {
+            return false;
+        }
+
+        @Override
+        public boolean batchMode() {
+            return false;
+        }
+
+        @Override
+        public int threads() {
+            return 1;
+        }
+    };
+
     private Map<String, String> userProperties;
 
     private Map<String, String> systemProperties;
@@ -157,6 +226,11 @@ public class SessionStub implements Session {
     @Override
     public SessionData getData() {
         return null;
+    }
+
+    @Override
+    public BuildEnvironment buildEnvironment() {
+        return EMPTY_BUILD_ENVIRONMENT;
     }
 
     @Override
