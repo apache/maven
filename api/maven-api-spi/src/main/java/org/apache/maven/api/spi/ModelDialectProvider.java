@@ -38,7 +38,7 @@ import org.apache.maven.api.di.Named;
 @Experimental
 @Consumer
 @Named
-public interface ModelDialectProvider {
+public interface ModelDialectProvider extends SpiService {
 
     /**
      * The {@link Dialect} this provider handles.

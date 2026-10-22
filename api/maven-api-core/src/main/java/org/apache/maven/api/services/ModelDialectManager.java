@@ -25,6 +25,7 @@ import java.util.Set;
 
 import org.apache.maven.api.Dialect;
 import org.apache.maven.api.Service;
+import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
@@ -36,6 +37,7 @@ import org.apache.maven.api.model.Model;
  *
  * @since 4.1.0
  */
+@Experimental
 public interface ModelDialectManager extends Service {
 
     /**
@@ -50,12 +52,17 @@ public interface ModelDialectManager extends Service {
 
     /**
      * Reads a Maven model from the specified directory using the specified dialect.
+     * The dialect's parser is asked to {@code locate()} a file in the directory; if none
+     * is found, an empty {@link Optional} is returned.
      *
      * @param dir the directory from which to read the model, must not be {@code null}.
      * @param dialect the dialect to be used for reading, must not be {@code null}.
      * @param options optional parameters for reading, may be {@code null}.
-     * @return an {@link Optional} containing the read model, or an empty {@link Optional} if reading fails.
+     * @return an {@link Optional} containing the read model, or an empty {@link Optional}
+     *         if the dialect's parser finds no file in the given directory.
      * @throws IllegalArgumentException if an unrecognized dialect is provided.
+     *         A {@code ModelParserException} (from {@code maven-api-spi}) is propagated
+     *         if a model file is located but cannot be parsed.
      */
     @Nonnull
     Optional<Model> readModel(@Nonnull Path dir, @Nonnull Dialect dialect, @Nullable Map<String, ?> options);
@@ -70,6 +77,8 @@ public interface ModelDialectManager extends Service {
      * @return an {@link Optional} containing the path of the written file,
      *         or an empty {@link Optional} if the write operation is refused by the implementation.
      * @throws IllegalArgumentException if an unrecognized dialect is provided.
+     *         A {@code ModelWriterException} (from {@code maven-api-spi}) is propagated
+     *         if a target path is resolved but the model cannot be written.
      */
     @Nonnull
     Optional<Path> writeModel(

@@ -53,8 +53,8 @@ public interface Dialect extends ExtensibleEnum {
      * as a map key or in collections.
      * <p>
      * This factory method is intended for use by extension authors who implement
-     * {@link org.apache.maven.api.spi.DialectProvider} or
-     * {@link org.apache.maven.api.spi.ModelDialectProvider} and need to declare
+     * {@code org.apache.maven.api.spi.DialectProvider} or
+     * {@code org.apache.maven.api.spi.ModelDialectProvider} and need to declare
      * a custom {@code Dialect} constant.
      *
      * @param id the unique identifier for the dialect, never {@code null}
