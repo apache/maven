@@ -592,12 +592,18 @@ public class ApiRunner {
         // Set the Maven version
         session.setMavenVersion(detectMavenVersion(lookup));
 
-        // Preserve Path values; the String constructor parses repository URLs.
-        LocalRepository localRepository = settings.getLocalRepository() != null
-                        && !settings.getLocalRepository().isEmpty()
-                ? new LocalRepository(settings.getLocalRepository())
-                : localRepoProvider != null && localRepoProvider.getLocalRepo() != null
-                        ? new LocalRepository(localRepoProvider.getLocalRepo().toAbsolutePath())
+        // Preserve Path values; the String constructor resolves the path with File.getCanonicalFile(),
+        // which asks the OS to resolve it and can follow a symlink, junction, or mapped drive to a
+        // different location (same class of issue fixed for multiModuleProjectDirectory in #13650).
+        // Path.toAbsolutePath() only normalizes lexically, so use it on both sides. An explicit
+        // localRepo argument takes precedence over settings.xml, which in turn takes precedence over
+        // the default.
+        LocalRepository localRepository = localRepoProvider != null && localRepoProvider.getLocalRepo() != null
+                ? new LocalRepository(localRepoProvider.getLocalRepo().toAbsolutePath())
+                : settings.getLocalRepository() != null
+                                && !settings.getLocalRepository().isEmpty()
+                        ? new LocalRepository(
+                                Path.of(settings.getLocalRepository()).toAbsolutePath())
                         : new LocalRepository(
                                 mavenUserHome.resolve("repository").toAbsolutePath());
         LocalRepositoryManager llm = system.newLocalRepositoryManager(rsession, localRepository);
