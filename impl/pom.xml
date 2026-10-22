@@ -40,6 +40,7 @@ under the License.
     <module>maven-core</module>
     <module>maven-cli</module>
     <module>maven-testing</module>
+    <module>maven-plugin-mixin</module>
   </modules>
 
   <properties>
