@@ -126,7 +126,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
             if (coords != null) {
                 try {
                     writePluginXml(coords);
-                } catch (Exception e) {
+                } catch (IOException e) {
                     error("Failed to generate plugin.xml", e);
                 }
             }
@@ -323,7 +323,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         String fqn = mojoType.getQualifiedName().toString();
         String pkg = fqn.contains(".") ? fqn.substring(0, fqn.lastIndexOf('.')) : "";
         String simpleName = mojoType.getSimpleName().toString();
-        String factoryName = simpleName + "$MojoFactory";
+        String factoryName = simpleName + "MojoFactory";
         String factoryFqn = pkg.isEmpty() ? factoryName : pkg + "." + factoryName;
         String roleHint = coords[0] + ":" + coords[1] + ":" + coords[2] + ":" + mojoAnn.name();
 
@@ -356,7 +356,14 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                     pw.print(p.asType() + " " + p.getSimpleName());
                     args.append(p.getSimpleName());
                 }
-                pw.println(") { super(" + args + "); }");
+                List<? extends TypeMirror> thrown = ctor.getThrownTypes();
+                if (!thrown.isEmpty()) {
+                    pw.print(") throws ");
+                    pw.print(thrown.stream().map(Object::toString).reduce((a, b) -> a + ", " + b).orElse(""));
+                    pw.println(" { super(" + args + "); }");
+                } else {
+                    pw.println(") { super(" + args + "); }");
+                }
             }
             pw.println("}");
         }
@@ -368,7 +375,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         if (raw == null || raw.isBlank()) {
             return new JavadocInfo(null, null, null);
         }
-        String[] parts = raw.split("(?m)^\\s*@");
+        String[] parts = raw.split("(?m)^\\s*@(?=param|return|throws|exception|since|deprecated|see|author|version|serial|serialField|serialData)\\b");
         String body = parts[0].replaceAll("\\{@\\w+\\s+([^}]*)}", "$1")
                 .replaceAll("<[^>]+>", "")
                 .strip()

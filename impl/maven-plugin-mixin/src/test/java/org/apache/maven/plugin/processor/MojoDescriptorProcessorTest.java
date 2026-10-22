@@ -148,11 +148,11 @@ class MojoDescriptorProcessorTest {
         assertContains(pluginXml, "<projectRequired>true</projectRequired>");
 
         // Factory class assertion
-        String factorySource = result.getGeneratedSource("com.example.GreetMojo$MojoFactory");
+        String factorySource = result.getGeneratedSource("com.example.GreetMojoMojoFactory");
         assertNotNull(factorySource, "Factory source must be generated");
         assertContains(
                 factorySource, "@org.apache.maven.api.di.Named(\"com.example:example-maven-plugin:1.0.0:greet\")");
-        assertContains(factorySource, "public class GreetMojo$MojoFactory extends GreetMojo");
+        assertContains(factorySource, "public class GreetMojoMojoFactory extends GreetMojo");
     }
 
     // -------------------------------------------------------------------------

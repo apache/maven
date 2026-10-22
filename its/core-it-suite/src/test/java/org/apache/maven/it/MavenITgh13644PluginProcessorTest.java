@@ -40,7 +40,7 @@ class MavenITgh13644PluginProcessorTest extends AbstractMavenIntegrationTestCase
      * Verify that a plugin built with {@code maven-plugin-mixin}:
      * <ul>
      *   <li>generates a valid {@code META-INF/maven/plugin.xml} at compile time</li>
-     *   <li>generates a {@code $MojoFactory} class picked up by {@code DiIndexProcessor}</li>
+     *   <li>generates a {@code MojoFactory} class picked up by {@code DiIndexProcessor}</li>
      *   <li>produces a plugin JAR that Maven can load and execute at runtime</li>
      *   <li>correctly wires {@code @Parameter} injection (goal prefix, default value, property)</li>
      * </ul>
