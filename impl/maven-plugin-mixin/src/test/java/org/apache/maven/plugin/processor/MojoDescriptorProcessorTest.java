@@ -78,8 +78,9 @@ class MojoDescriptorProcessorTest {
         File apiCore = resolveFile(
                 "api/maven-api-core/target/maven-api-core-4.1.0-SNAPSHOT.jar",
                 "maven-api-core/4.1.0-SNAPSHOT/maven-api-core-4.1.0-SNAPSHOT.jar");
-        File apiAnnotations =
-                resolveFile(null, "maven-api-annotations/4.1.0-SNAPSHOT/maven-api-annotations-4.1.0-SNAPSHOT.jar");
+        File apiAnnotations = resolveFile(
+                "api/maven-api-annotations/target/maven-api-annotations-4.1.0-SNAPSHOT.jar",
+                "maven-api-annotations/4.1.0-SNAPSHOT/maven-api-annotations-4.1.0-SNAPSHOT.jar");
 
         classpathJars = List.of(apiCore, apiAnnotations);
     }
@@ -148,9 +149,12 @@ class MojoDescriptorProcessorTest {
         assertContains(pluginXml, "<version>1.0.0</version>");
         // goalPrefix derived from "example-maven-plugin": strips "-maven-plugin" suffix → "example"
         assertContains(pluginXml, "<goalPrefix>example</goalPrefix>");
-        assertContains(pluginXml, "<language>java</language>");
-        // default projectRequired = true
-        assertContains(pluginXml, "<projectRequired>true</projectRequired>");
+        // language="java" and projectRequired=true are default values and are NOT written to plugin.xml
+        assertFalse(
+                pluginXml.contains("<language>java</language>"), "language=java is the default and must be omitted");
+        assertFalse(
+                pluginXml.contains("<projectRequired>true</projectRequired>"),
+                "projectRequired=true is the default and must be omitted");
 
         // Factory class assertion
         String factorySource = result.getGeneratedSource("com.example.GreetMojoMojoFactory");
@@ -225,12 +229,13 @@ class MojoDescriptorProcessorTest {
         assertContains(pluginXml, "<name>customName</name>");
         assertContains(pluginXml, "<alias>alt</alias>");
 
-        // sourceVersion: readonly defaults to false → editable=true
-        // We need to check that the sourceVersion parameter has editable=true
-        // Since there are multiple editable elements, verify non-readonly defaults to editable=true
-        assertTrue(
+        // sourceVersion: readonly defaults to false → editable=true is the DEFAULT and omitted
+        // Verify that editable=false appears exactly once (only for the readonly basedir param)
+        int editableFalseCount = pluginXml.split("<editable>false</editable>", -1).length - 1;
+        assertEquals(1, editableFalseCount, "Only the readonly basedir param should have editable=false");
+        assertFalse(
                 pluginXml.contains("<editable>true</editable>"),
-                "readonly=false (default) should produce editable=true");
+                "editable=true is the default value and must be omitted from plugin.xml");
     }
 
     // -------------------------------------------------------------------------
@@ -318,7 +323,7 @@ class MojoDescriptorProcessorTest {
         // Omit all required -A options
         CompilationResult result = compile(List.of(inMemorySource("com.example.NoopMojo", source)), Map.of());
 
-        // The processor should emit ERROR diagnostics for each missing option
+        // The processor emits one combined error diagnostic naming all three required options
         assertFalse(result.success, "Compilation should fail when required -A options are missing");
 
         String errors = result.diagnosticsToString();
