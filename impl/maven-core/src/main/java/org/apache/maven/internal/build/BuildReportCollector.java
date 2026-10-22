@@ -238,7 +238,9 @@ public final class BuildReportCollector extends AbstractEventSpy {
         }
 
         // Read warning mode from user properties (set by MavenInvoker from --warning-mode)
-        String warningMode = endSession.getUserProperties().getProperty("maven.build.warningMode", "summary");
+        String warningMode = endSession
+                .getUserProperties()
+                .getProperty("maven.build.warningMode", ProjectBuildLogAppender.DEFAULT_WARNING_MODE);
 
         BuildReport report = buildReport(endSession);
         writeReport(report, endSession);

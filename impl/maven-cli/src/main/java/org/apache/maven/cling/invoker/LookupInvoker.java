@@ -355,7 +355,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             // Create the build log appender; also sets MavenSimpleLogger sink
             ProjectBuildLogAppender projectBuildLogAppender = new ProjectBuildLogAppender(
                     determineBuildEventListener(context),
-                    context.options().warningMode().orElse("summary"));
+                    context.options().warningMode().orElse(ProjectBuildLogAppender.DEFAULT_WARNING_MODE));
             context.closeables.add(projectBuildLogAppender);
         } else {
             doConfigureWithTerminal(context, context.terminal);

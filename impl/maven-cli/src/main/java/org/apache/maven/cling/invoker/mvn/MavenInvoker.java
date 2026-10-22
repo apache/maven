@@ -74,6 +74,7 @@ import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingExecutionListener;
 import org.apache.maven.logging.MavenTransferListener;
+import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.eclipse.aether.DefaultRepositoryCache;
@@ -265,7 +266,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
         // Propagate warning mode and diagnostic suppression to the session so
         // BuildReportCollector (an EventSpy) can read them from user properties
-        String warningMode = context.options().warningMode().orElse("summary");
+        String warningMode = context.options().warningMode().orElse(ProjectBuildLogAppender.DEFAULT_WARNING_MODE);
         request.getUserProperties().put("maven.build.warningMode", warningMode);
 
         request.setTransferListener(determineTransferListener(

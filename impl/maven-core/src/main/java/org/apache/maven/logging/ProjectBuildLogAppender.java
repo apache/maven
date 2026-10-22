@@ -44,6 +44,8 @@ import org.slf4j.spi.LocationAwareLogger;
  */
 public class ProjectBuildLogAppender implements AutoCloseable {
 
+    public static final String DEFAULT_WARNING_MODE = "summary";
+
     private static final String KEY_PROJECT_ID = "maven.project.id";
     private static final String KEY_MOJO_ID = "maven.mojo.id";
     private static final ThreadLocal<String> PROJECT_ID = new InheritableThreadLocal<>();
