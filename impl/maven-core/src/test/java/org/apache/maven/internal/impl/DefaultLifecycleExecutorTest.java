@@ -42,6 +42,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.anyList;
@@ -166,6 +167,19 @@ class DefaultLifecycleExecutorTest {
         assertSame(filterFailure, thrown);
         verify(mojoExecutor, never()).execute(eq(mavenSession), anyList());
         verify(mavenSession, times(2)).setCurrentProject(same(previousProject));
+    }
+
+    @Test
+    void rejectsPlansNotProducedByThisServiceWithoutLeakingImplementationDetails() {
+        LifecyclePlan externalPlan = mock(LifecyclePlan.class);
+
+        IllegalArgumentException thrown = assertThrows(
+                IllegalArgumentException.class,
+                () -> executor.execute(LifecycleExecutionRequest.build(session, externalPlan)));
+
+        assertEquals("plan was not produced by this lifecycle executor", thrown.getMessage());
+        assertFalse(thrown.getMessage().contains(DefaultLifecyclePlan.class.getName()));
+        verify(mavenSession, never()).setCurrentProject(project);
     }
 
     private static MojoExecution execution(String goal, String phase) {

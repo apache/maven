@@ -42,6 +42,7 @@ public interface LifecycleExecutor extends Service {
      *
      * @param request the planning request
      * @return the planning result
+     * @throws LifecycleExecutorException if the lifecycle plan cannot be calculated
      */
     @Nonnull
     LifecyclePlanResult plan(@Nonnull LifecyclePlanRequest request);
@@ -51,6 +52,8 @@ public interface LifecycleExecutor extends Service {
      *
      * @param request the execution request
      * @return the execution result
+     * @throws LifecycleExecutorException if lifecycle execution fails
+     * @throws IllegalArgumentException if the plan was not produced by this service
      */
     @Nonnull
     LifecycleExecutionResult execute(@Nonnull LifecycleExecutionRequest request);

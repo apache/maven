@@ -99,7 +99,9 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
         requireNonNull(request, "request");
         InternalMavenSession internalSession = InternalMavenSession.from(request.getSession());
         MavenSession mavenSession = internalSession.getMavenSession();
-        DefaultLifecyclePlan plan = cast(DefaultLifecyclePlan.class, request.plan(), "plan");
+        if (!(request.plan() instanceof DefaultLifecyclePlan plan)) {
+            throw new IllegalArgumentException("plan was not produced by this lifecycle executor");
+        }
         MavenProject mavenProject =
                 cast(DefaultProject.class, plan.project(), "project").getProject();
         MavenProject previousProject = mavenSession.getCurrentProject();

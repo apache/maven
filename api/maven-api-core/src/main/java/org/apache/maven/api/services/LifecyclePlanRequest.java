@@ -105,8 +105,9 @@ public interface LifecyclePlanRequest extends Request<Session> {
                     Session session, RequestTrace trace, Project project, List<String> tasks) {
                 super(requireNonNull(session, "session cannot be null"), trace);
                 this.project = requireNonNull(project, "project cannot be null");
-                this.tasks = List.copyOf(requireNonNull(tasks, "tasks cannot be null"));
-                this.tasks.forEach(task -> requireNonNull(task, "task cannot be null"));
+                requireNonNull(tasks, "tasks cannot be null");
+                tasks.forEach(task -> requireNonNull(task, "task cannot be null"));
+                this.tasks = List.copyOf(tasks);
             }
 
             @Override
