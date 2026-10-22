@@ -30,7 +30,6 @@ A complete, functional Maven 4 plugin with one mojo and one `@Parameter`:
 ```java
 package com.example;
 
-import org.apache.maven.api.plugin.Mojo;
 import org.apache.maven.api.plugin.annotations.Mojo;
 import org.apache.maven.api.plugin.annotations.Parameter;
 
@@ -40,7 +39,7 @@ import org.apache.maven.api.plugin.annotations.Parameter;
  * @since 1.0.0
  */
 @Mojo(name = "greet", defaultPhase = "compile")
-public class GreetMojo implements Mojo {
+public class GreetMojo implements org.apache.maven.api.plugin.Mojo {
 
     /**
      * The name to greet.

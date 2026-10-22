@@ -95,6 +95,10 @@
             </goals>
             <phase>process-test-classes</phase>
           </execution>
+          <execution>
+            <id>default-jar</id>
+            <phase>none</phase>
+          </execution>
         </executions>
       </plugin>
       <plugin>
