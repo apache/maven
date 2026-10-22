@@ -16,19 +16,32 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.api.services;
+package org.apache.maven.api;
+
+import java.util.List;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Thrown when Maven cannot calculate or execute a lifecycle plan.
+ * An immutable execution plan for one project.
  *
  * @since 4.1.0
  */
 @Experimental
-public class LifecyclePlanExecutionException extends MavenException {
+@Immutable
+public interface LifecyclePlan {
 
-    public LifecyclePlanExecutionException(String message, Throwable cause) {
-        super(message, cause);
-    }
+    /** {@return the project for which this plan was calculated} */
+    @Nonnull
+    Project project();
+
+    /** {@return the lifecycle phases and plugin goals used to calculate this plan} */
+    @Nonnull
+    List<String> tasks();
+
+    /** {@return the configured mojo executions in lifecycle order} */
+    @Nonnull
+    List<MojoExecution> executions();
 }
