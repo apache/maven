@@ -381,11 +381,12 @@ public class MavenCli {
                 throw new ExitException(1);
             }
             File basedir = basedirProperty != null ? new File(basedirProperty) : new File("");
-            try {
-                cliRequest.multiModuleProjectDirectory = basedir.getCanonicalFile();
-            } catch (IOException e) {
-                cliRequest.multiModuleProjectDirectory = basedir.getAbsoluteFile();
-            }
+            // Resolve lexically rather than through getCanonicalFile(), which asks the OS to resolve the path
+            // and can substitute it with a different one when a segment is a symlink, junction, or (on Windows)
+            // a mapped network drive, corrupting the reactor root that every relative module/parent path is
+            // later resolved against (MNG-11167).
+            cliRequest.multiModuleProjectDirectory =
+                    getCanonicalPath(basedir.toPath()).toFile();
         }
 
         // We need to locate the top level project which may be pointed at using
@@ -1850,11 +1851,7 @@ public class MavenCli {
     }
 
     private static Path getCanonicalPath(Path path) {
-        try {
-            return path.toRealPath();
-        } catch (IOException e) {
-            return getCanonicalPath(path.getParent()).resolve(path.getFileName());
-        }
+        return path.toAbsolutePath().normalize();
     }
 
     static class ExitException extends Exception {
