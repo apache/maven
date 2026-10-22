@@ -313,7 +313,8 @@ class ExecutionEventLoggerTest {
 
         MavenSession session = mock(MavenSession.class);
         when(session.getProjects()).thenReturn(List.of(project1, project2, project3, project4));
-        lenient().when(session.getAllProjects())
+        lenient()
+                .when(session.getAllProjects())
                 .thenReturn(List.of(project5, project6, project1, project2, project3, project4));
 
         ExecutionEvent sessionStartedEvent = mock(ExecutionEvent.class);
