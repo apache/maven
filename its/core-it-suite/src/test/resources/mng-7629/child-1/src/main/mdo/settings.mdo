@@ -422,7 +422,7 @@
       <superClass>IdentifiableBase</superClass>
       <description>
         <![CDATA[
-        The <code>&lt;proxy&gt;</code> element contains informations required to a proxy settings.
+        The &lt;code&gt;&lt;proxy&gt;&lt;/code&gt; element contains informations required to a proxy settings.
         ]]></description>
       <fields>
         <field>
@@ -508,7 +508,7 @@
       <superClass>IdentifiableBase</superClass>
       <description>
         <![CDATA[
-        The <code>&lt;server&gt;</code> element contains informations required to a server settings.
+        The &lt;code&gt;&gt;&lt;server&gt;&lt;/code&gt; element contains informations required to a server settings.
         ]]></description>
       <fields>
         <field>
@@ -700,7 +700,7 @@
             <![CDATA[
             Extended configuration specific to this profile goes here.
             Contents take the form of
-            <code>&lt;property.name&gt;property.value&lt;/property.name&gt;</code>
+            &lt;code&gt;&gt;&lt;property.name&gt;property.value&lt;/property.name&gt;&lt;/code&gt;
             ]]>
           </description>
           <type>Properties</type>

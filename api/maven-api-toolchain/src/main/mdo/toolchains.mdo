@@ -127,12 +127,12 @@
           <!-- <identifier>true</identifier> -->
           <description>
             <![CDATA[
-            Type of toolchain:&lt;ul>
-            &lt;li>{@code jdk} for &lt;a
-            href="https://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/jdk.html">JDK Standard Toolchain&lt;/a>,&lt;/li>
-            &lt;li>other value for &lt;a
-            href="https://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/custom.html">Custom Toolchain&lt;/a>&lt;/li>
-            &lt;/ul>
+            Type of toolchain:&lt;ul&gt;
+            &lt;li&gt;{@code jdk} for &lt;a
+            href="https://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/jdk.html"&gt;JDK Standard Toolchain&lt;/a&gt;,&lt;/li&gt;
+            &lt;li&gt;other value for &lt;a
+            href="https://maven.apache.org/plugins/maven-toolchains-plugin/toolchains/custom.html"&gt;Custom Toolchain&lt;/a&gt;&lt;/li&gt;
+            &lt;/ul&gt;
             ]]>
           </description>
           <type>String</type>
@@ -144,9 +144,9 @@
           <description>
             <![CDATA[
             Toolchain identification information, which will be matched against project requirements.
-            &lt;p>Actual content structure is completely open: each toolchain type will define its own format and
+            &lt;p&gt;Actual content structure is completely open: each toolchain type will define its own format and
             semantics.
-            &lt;p>This is generally a properties format: {@code &lt;name&gt;value&lt;/name&gt;} with predefined
+            &lt;p&gt;This is generally a properties format: {@code &lt;name&gt;value&lt;/name&gt;} with predefined
             properties names.
             ]]>
           </description>
@@ -163,7 +163,7 @@
           <description>
             <![CDATA[
             Toolchain identification information, which will be matched against project requirements.
-            &lt;p>Each toolchain defines its own properties names and semantics.
+            &lt;p&gt;Each toolchain defines its own properties names and semantics.
             ]]>
           </description>
         </field>
@@ -174,9 +174,9 @@
           <description>
             <![CDATA[
             Toolchain configuration information, like location or any information that is to be retrieved.
-            &lt;p>Actual content structure is completely open: each toolchain type will define its own format and
+            &lt;p&gt;Actual content structure is completely open: each toolchain type will define its own format and
             semantics.
-            &lt;p>In general, this is a properties format: {@code &lt;name&gt;value&lt;/name&gt;} with per-toolchain
+            &lt;p&gt;In general, this is a properties format: {@code &lt;name&gt;value&lt;/name&gt;} with per-toolchain
             defined properties names.
             ]]>
           </description>

@@ -584,7 +584,7 @@
             <![CDATA[
             Properties that can be used throughout the POM as a substitution, and
             are used as filters in resources if enabled.
-            The format is {@code &lt;name>value&lt;/name>}.
+            The format is {@code &lt;name&gt;value&lt;/name&gt;}.
             ]]>
           </description>
           <type>Properties</type>
@@ -616,7 +616,7 @@
             project during the build process. They are automatically downloaded from the
             repositories defined in this project.
 
-            @see &lt;a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">Dependency mechanism&lt;/a>
+            @see &lt;a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html"&gt;Dependency mechanism&lt;/a&gt;
             ]]>
           </description>
           <association>
@@ -891,7 +891,7 @@
       <superClass>BuildBase</superClass>
       <description>
         <![CDATA[
-        The {@code &lt;build>} element contains information required to build the project.
+        The {@code &lt;build&gt;} element contains information required to build the project.
         Default values are defined in Super POM.
         ]]>
       </description>
@@ -1897,7 +1897,7 @@
       <version>4.0.0+</version>
       <description>
         <![CDATA[
-        The {@code &lt;scm>} element contains information required to the SCM
+        The {@code &lt;scm&gt;} element contains information required to the SCM
         (Source Control Management) of the project.
         ]]>
       </description>
@@ -2663,7 +2663,7 @@
       <superClass>ConfigurationContainer</superClass>
       <description>
         <![CDATA[
-        The {@code &lt;plugin>} element contains information required for a plugin.
+        The {@code &lt;plugin&gt;} element contains information required for a plugin.
         ]]>
       </description>
       <fields>
@@ -3170,7 +3170,7 @@
 
             <h2>Cascading Profile Activation</h2>
 
-            <p>When a profile is activated and defines properties (via {@code &lt;properties&gt;}),
+            <p>When a profile is activated and defines properties (via {@code <properties>}),
             those properties are immediately available to trigger the activation of other
             profiles in the same POM. Maven iterates through the remaining inactive profiles
             until no new profiles are activated (a fixed-point is reached).</p>
@@ -3357,8 +3357,8 @@
         is the location of a file that needs to exist, and if it doesn't, the profile will be
         activated. On the other hand, {@code exists} will test for the existence of the file and if it is
         there, the profile will be activated.
-        &lt;p>Variable interpolation for these file specifications is limited to {@code ${project.basedir}},
-        system properties and user properties.&lt;/p>]]></description>
+        &lt;p&gt;Variable interpolation for these file specifications is limited to {@code ${project.basedir}},
+        system properties and user properties.&lt;/p&gt;]]></description>
       <fields>
         <field>
           <name>missing</name>
@@ -3685,7 +3685,7 @@
           <type>String</type>
           <description>
             <![CDATA[
-            The identifier of the POM in the format {@code &lt;groupId>:&lt;artifactId>:&lt;version>}.
+            The identifier of the POM in the format {@code &lt;groupId&gt;:&lt;artifactId&gt;:&lt;version&gt;}.
             ]]>
           </description>
         </field>
