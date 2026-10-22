@@ -37,7 +37,7 @@ the processor fires during `javac` and produces:
    describing every mojo's goal name, default phase, parameters, dependency
    resolution requirements, `@After` ordering constraints, and more.
 
-2. **One factory class per mojo** — e.g. `TouchMojo$MojoFactory`, annotated with
+2. **One factory class per mojo** — e.g. `TouchMojoMojoFactory`, annotated with
    `@Named("groupId:artifactId:version:goal")`. The DI index processor
    (from `maven-api-di`) picks these up automatically and registers them in
    `META-INF/maven/org.apache.maven.api.di.Inject`.
@@ -99,14 +99,28 @@ unavailable.
 
 ## Design principles
 
-- **Zero external dependencies** — only the JDK `java.compiler` and `java.xml`
-  modules are required.
+- **Maven API dependencies** — the processor depends on `maven-api-core` and `maven-api-plugin`
+  for direct annotation and descriptor access. Plugin authors who use `annotationProcessorPaths`
+  will need these on the processor classpath; since Maven plugin projects always declare them as
+  `provided`, this is automatic in practice.
 - **Self-processing disabled** — `<maven.compiler.proc>none</maven.compiler.proc>`
   prevents the processor from attempting to process itself.
 - **Non-claiming** — the processor returns `false` from `process()`, so other
   processors and IDEs can still observe `@Mojo` annotations.
-- **String-based annotation lookup** — annotation type names are compared as
-  strings; no compile-time dependency on `maven-api-core` or `maven-api-di`.
 - **Factories generated in normal rounds** — factory source files are emitted
   during the round in which the mojo is first seen (not in `processingOver()`),
   ensuring that `DiIndexProcessor` can process `@Named` in a subsequent round.
+
+## Processor options
+
+The following `-A` options are recognised. The mixin wires the first four automatically
+from the Maven project coordinates; only `maven.plugin.name` and `maven.plugin.goalPrefix`
+can be overridden manually if needed.
+
+| Option | Required | Description |
+|--------|----------|-------------|
+| `maven.plugin.groupId` | yes | Plugin group ID |
+| `maven.plugin.artifactId` | yes | Plugin artifact ID |
+| `maven.plugin.version` | yes | Plugin version |
+| `maven.plugin.name` | no | Human-readable plugin name (defaults to `artifactId`). The mixin passes `${project.name}`. |
+| `maven.plugin.goalPrefix` | no | Goal prefix (auto-derived from `artifactId` if omitted) |

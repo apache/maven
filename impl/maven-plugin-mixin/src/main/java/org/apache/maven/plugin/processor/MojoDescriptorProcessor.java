@@ -71,7 +71,8 @@ import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxWriter;
     MojoDescriptorProcessor.OPT_GROUP_ID,
     MojoDescriptorProcessor.OPT_ARTIFACT_ID,
     MojoDescriptorProcessor.OPT_VERSION,
-    MojoDescriptorProcessor.OPT_GOAL_PREFIX
+    MojoDescriptorProcessor.OPT_GOAL_PREFIX,
+    MojoDescriptorProcessor.OPT_NAME
 })
 public class MojoDescriptorProcessor extends AbstractProcessor {
 
@@ -79,6 +80,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
     static final String OPT_ARTIFACT_ID = "maven.plugin.artifactId";
     static final String OPT_VERSION = "maven.plugin.version";
     static final String OPT_GOAL_PREFIX = "maven.plugin.goalPrefix";
+    static final String OPT_NAME = "maven.plugin.name";
 
     private final Map<String, TypeElement> mojoElements = new LinkedHashMap<>();
     private final Set<String> generatedFactoryNames = new LinkedHashSet<>();
@@ -142,8 +144,12 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         String artifactId = getOption(OPT_ARTIFACT_ID);
         String version = getOption(OPT_VERSION);
         String goalPrefix = getOption(OPT_GOAL_PREFIX);
+        String name = getOption(OPT_NAME);
         if (isBlank(goalPrefix)) {
             goalPrefix = deriveGoalPrefix(artifactId);
+        }
+        if (isBlank(name)) {
+            name = artifactId;
         }
         if (isBlank(groupId) || isBlank(artifactId) || isBlank(version)) {
             error("Could not determine plugin coordinates. "
@@ -151,7 +157,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                     + "-Amaven.plugin.version via the maven-plugin-mixin.");
             return null;
         }
-        resolvedCoordinates = new String[] {groupId, artifactId, version, goalPrefix};
+        resolvedCoordinates = new String[] {groupId, artifactId, version, goalPrefix, name};
         return resolvedCoordinates;
     }
 
@@ -168,7 +174,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
             }
         }
         PluginDescriptor descriptor = PluginDescriptor.newBuilder(true)
-                .name(coords[1])
+                .name(coords[4])
                 .groupId(coords[0])
                 .artifactId(coords[1])
                 .version(coords[2])

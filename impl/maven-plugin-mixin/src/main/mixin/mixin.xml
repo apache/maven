@@ -144,6 +144,7 @@
               <arg>-Amaven.plugin.groupId=${project.groupId}</arg>
               <arg>-Amaven.plugin.artifactId=${project.artifactId}</arg>
               <arg>-Amaven.plugin.version=${project.version}</arg>
+              <arg>-Amaven.plugin.name=${project.name}</arg>
             </compilerArgs>
           </configuration>
         </plugin>
