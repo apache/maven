@@ -75,4 +75,21 @@ class ArtifactUtilsTest {
         assertNotNull(map);
         assertEquals(list, new ArrayList<>(map.values()));
     }
+
+    /**
+     * Two artifacts with the same groupId and artifactId but different classifiers collide under the same
+     * versionless key, so only one of them is reachable (MNG-5552).
+     */
+    @Test
+    void testArtifactMapByVersionlessIdCollidesOnClassifier() {
+        Artifact jar = new DefaultArtifact(
+                "group", "artifact", VersionRange.createFromVersion("1.0"), "compile", "jar", "", null);
+        Artifact testsJar = new DefaultArtifact(
+                "group", "artifact", VersionRange.createFromVersion("1.0"), "test", "jar", "tests", null);
+
+        Map<String, Artifact> map = ArtifactUtils.artifactMapByVersionlessId(List.of(jar, testsJar));
+
+        assertEquals(1, map.size());
+        assertEquals(testsJar, map.get("group:artifact"));
+    }
 }

@@ -23,9 +23,12 @@ import java.io.IOException;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.api.Language;
 import org.apache.maven.api.ProjectScope;
+import org.apache.maven.artifact.Artifact;
+import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.impl.DefaultSourceRoot;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Model;
@@ -263,6 +266,27 @@ class MavenProjectTest extends AbstractMavenProjectTestCase {
     void pluginManagementShouldReturnNotNull() {
         MavenProject project = new MavenProject();
         assertNotNull(project.getPluginManagement());
+    }
+
+    /**
+     * Two artifacts with the same groupId and artifactId but different classifiers collide in
+     * {@link MavenProject#getArtifactMap()}, so only one of them is reachable (MNG-5552).
+     * {@link MavenProject#getArtifactMapByDependencyConflictId()} keeps both.
+     */
+    @Test
+    void getArtifactMapByDependencyConflictIdKeepsBothClassifiers() {
+        Artifact jar = new DefaultArtifact("group", "artifact", "1.0", "compile", "jar", "", null);
+        Artifact testsJar = new DefaultArtifact("group", "artifact", "1.0", "test", "jar", "tests", null);
+
+        MavenProject project = new MavenProject();
+        project.setArtifacts(Set.of(jar, testsJar));
+
+        assertEquals(1, project.getArtifactMap().size());
+
+        Map<String, Artifact> byConflictId = project.getArtifactMapByDependencyConflictId();
+        assertEquals(2, byConflictId.size());
+        assertEquals(jar, byConflictId.get("group:artifact:jar"));
+        assertEquals(testsJar, byConflictId.get("group:artifact:jar:tests"));
     }
 
     private void assertNoNulls(List<String> elements) {
