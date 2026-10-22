@@ -26,6 +26,7 @@ import java.nio.file.PathMatcher;
 import java.nio.file.Paths;
 import java.nio.file.SimpleFileVisitor;
 import java.nio.file.attribute.BasicFileAttributes;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,6 +35,7 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.ModelBuilderException;
@@ -165,6 +167,7 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
     private List<String> inactiveProfileIds = Collections.emptyList();
     private Map<String, String> systemProperties = Collections.emptyMap();
     private Map<String, String> userProperties = Collections.emptyMap();
+    private Map<String, String> cascadedProfileProperties = Collections.emptyMap();
     private Model model;
     /**
      * Properties used only for path interpolation (e.g. parent's {@code <properties>} when
@@ -359,6 +362,36 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
         }
     }
 
+    /**
+     * Gets a model property INCLUDING cascaded profile properties.
+     * This should ONLY be used for profile activation to enable cascading.
+     * Regular property lookups should use getModelProperty() which excludes cascaded properties.
+     */
+    private String getModelPropertyForActivation(String key) {
+        // Do NOT use the usedModelProperties cache here because getModelProperty()
+        // may have already cached a value without cascaded properties for this key.
+        // Cascaded properties change between activation rounds, so we must always
+        // check them fresh.
+        String value = cascadedProfileProperties.get(key);
+        if (value != null) {
+            return value;
+        }
+        // Fall back to regular model property (which may use the cache)
+        return getModelProperty(key);
+    }
+
+    /**
+     * Gets a property ONLY from cascaded profile properties (properties contributed by
+     * previously-activated profiles during cascading activation).
+     * Unlike {@link #getModelPropertyForActivation}, this does NOT fall back to the model's
+     * own {@code <properties>} — a POM's static properties must not self-activate profiles
+     * via {@link org.apache.maven.impl.model.profile.PropertyProfileActivator}.
+     */
+    @Override
+    public String getCascadedProfileProperty(String key) {
+        return cascadedProfileProperties.get(key);
+    }
+
     @Override
     public String getModelBaseDirectory() {
         if (record != null) {
@@ -487,6 +520,11 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
             public boolean exists(String path, boolean glob) {
                 return false;
             }
+
+            @Override
+            public void addProfileProperties(Collection<Profile> activatedProfiles) {
+                // Sandboxed context: profile properties are not propagated
+            }
         };
     }
 
@@ -495,6 +533,8 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
         return DefaultPathTranslator.alignToBaseDirectory(interpolate(path), model.getProjectDirectory());
     }
 
+    // Lookup order matches ConditionProfileActivator.doGetProperty:
+    // user → system → cascaded/model (for file-existence conditions).
     private String interpolate(String path) throws InterpolatorException {
         if (path == null) {
             return null;
@@ -519,6 +559,9 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
             }
             if (r == null) {
                 r = getSystemProperty(s);
+            }
+            if (r == null) {
+                r = getModelPropertyForActivation(s);
             }
             return r;
         });
@@ -592,5 +635,36 @@ public class DefaultProfileActivationContext implements ProfileActivationContext
 
     private static Map<String, String> unmodifiable(Map<String, String> map) {
         return map != null ? Collections.unmodifiableMap(map) : Collections.emptyMap();
+    }
+
+    // Cascading profile activation methods
+
+    @Override
+    public void addProfileProperties(Collection<Profile> activatedProfiles) {
+        // Inject properties from activated profiles for cascading activation
+        // Store them separately instead of mutating the model
+        if (activatedProfiles != null && !activatedProfiles.isEmpty()) {
+            Map<String, String> newCascadedProperties = new HashMap<>(cascadedProfileProperties);
+
+            // Add properties from each activated profile
+            for (Profile profile : activatedProfiles) {
+                if (profile.getProperties() != null) {
+                    newCascadedProperties.putAll(profile.getProperties());
+                }
+            }
+
+            // Update the cascaded properties map
+            this.cascadedProfileProperties = Collections.unmodifiableMap(newCascadedProperties);
+        }
+    }
+
+    /**
+     * Clear all cascaded profile properties.
+     * This should be called after profile activation is complete to prevent cascaded properties
+     * from leaking into subsequent uses of the context.
+     */
+    @Override
+    public void clearCascadedProfileProperties() {
+        this.cascadedProfileProperties = Collections.emptyMap();
     }
 }

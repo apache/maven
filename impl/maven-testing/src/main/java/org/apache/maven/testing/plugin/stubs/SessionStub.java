@@ -158,8 +158,10 @@ public class SessionStub implements Session {
         return null;
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public int getDegreeOfConcurrency() {
+        // Override required: buildInvocation() is not supported in stub mode.
         return 0;
     }
 
