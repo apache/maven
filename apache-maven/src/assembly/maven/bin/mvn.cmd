@@ -279,27 +279,19 @@ cd /d "%EXEC_DIR%"
 
 :endDetectBaseDir
 
-rem Initialize JVM_CONFIG_MAVEN_OPTS to empty to avoid inheriting from environment
-set JVM_CONFIG_MAVEN_OPTS=
+rem Initialize JVM_CONFIG_ARGFILE_ARG to empty
+set "JVM_CONFIG_ARGFILE_ARG="
 
 if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadJvmConfig
 
-rem Use the precompiled JvmConfigParser to parse jvm.config
-rem This avoids batch script parsing issues with special characters (pipes, quotes, @, etc.)
-rem Java writes parsed output to a temp file; we read it with 'set /p' + input redirect.
+rem Use the precompiled JvmConfigParser to parse jvm.config and write the result
+rem to a temp file in Java @argfile format. The JVM reads the file directly at
+rem launch time via @"%JVM_CONFIG_TEMP%", so cmd.exe never holds the raw content
+rem in a variable — no quoting, expansion, or metacharacter issues on any value.
 rem
-rem Why 'set /p <file' instead of 'for /f ... in (file)':
-rem   - 'for /f' silently produces no output when the file is briefly locked
-rem     (e.g. by Windows Defender real-time scanning), leaving JVM_CONFIG_MAVEN_OPTS empty
-rem     and causing hard-to-diagnose Maven startup failures.
-rem   - 'set /p <file' uses a transient input-redirect open with different sharing flags,
-rem     making it far less susceptible to lock contention. If the file IS locked, it
-rem     emits a visible error to stderr rather than failing silently.
-rem
-rem Why not capture stdout directly ('for /f ... in (`command`)')?
-rem   - cmd.exe's child shell interprets special characters (pipes |, ampersands &, etc.)
-rem     in the captured output, which breaks jvm.config values like
-rem     -Dhttp.nonProxyHosts=de|*.de  (the core use case for JvmConfigParser).
+rem Why write to a temp file instead of capturing stdout via 'for /f ... in (`cmd`)'?
+rem   cmd.exe's child shell interprets special characters (pipes |, ampersands &, etc.)
+rem   in the captured output — breaking values like -Dhttp.nonProxyHosts=de|*.de.
 
 set "JVM_CONFIG_TEMP=%TEMP%\mvn-jvm-config-%RANDOM%-%RANDOM%.txt"
 
@@ -336,20 +328,19 @@ if exist "%JVM_CONFIG_TEMP%" (
     echo [DEBUG] Temp file contents:
     type "%JVM_CONFIG_TEMP%"
   )
-  set /p JVM_CONFIG_MAVEN_OPTS=<"%JVM_CONFIG_TEMP%" 2>nul
-  rem Retry once after a brief delay if the read failed (Windows Defender file lock)
-  if not defined JVM_CONFIG_MAVEN_OPTS (
-    if defined MAVEN_DEBUG_SCRIPT (
-      echo [DEBUG] First read returned empty, retrying after delay...
-    )
-    ping -n 2 127.0.0.1 >nul 2>nul
-    set /p JVM_CONFIG_MAVEN_OPTS=<"%JVM_CONFIG_TEMP%" 2>nul
+  rem Check whether the file is non-empty (JvmConfigParser found JVM opts to pass).
+  rem We use 'set /p' only to test emptiness — no quoting issues arise from this.
+  set "JVM_CONFIG_NONEMPTY="
+  set /p JVM_CONFIG_NONEMPTY=<"%JVM_CONFIG_TEMP%" 2>nul
+  if defined JVM_CONFIG_NONEMPTY (
+    set JVM_CONFIG_ARGFILE_ARG=@"%JVM_CONFIG_TEMP%"
   )
-  del "%JVM_CONFIG_TEMP%" 2>nul
+  rem Do NOT delete the temp file here — the JVM reads it at launch time.
+  rem It is deleted after the JVM exits (see below).
 )
 
 if defined MAVEN_DEBUG_SCRIPT (
-  echo [DEBUG] Final JVM_CONFIG_MAVEN_OPTS: %JVM_CONFIG_MAVEN_OPTS%
+  echo [DEBUG] JVM_CONFIG_ARGFILE_ARG: %JVM_CONFIG_ARGFILE_ARG%
 )
 
 :endReadJvmConfig
@@ -401,13 +392,13 @@ if not "%MAVEN_MAIN_CLASS%"=="org.apache.maven.cling.MavenCling" set "MAVEN_ARGS
 
 if defined MAVEN_DEBUG_SCRIPT (
   echo [DEBUG] Launching JVM with command:
-  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS% %MAVEN_DEBUG_OPTS% --enable-native-access=ALL-UNNAMED -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %MAVEN_VERSION_PRINTED% %LAUNCHER_CLASS% %MAVEN_ARGS% %*
+  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_ARGFILE_ARG% %MAVEN_DEBUG_OPTS% --enable-native-access=ALL-UNNAMED -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %MAVEN_VERSION_PRINTED% %LAUNCHER_CLASS% %MAVEN_ARGS% %*
 )
 
 "%JAVACMD%" ^
   %INTERNAL_MAVEN_OPTS% ^
   %MAVEN_OPTS% ^
-  %JVM_CONFIG_MAVEN_OPTS% ^
+  %JVM_CONFIG_ARGFILE_ARG% ^
   %MAVEN_DEBUG_OPTS% ^
   --enable-native-access=ALL-UNNAMED ^
   -classpath %LAUNCHER_JAR% ^
@@ -420,7 +411,10 @@ if defined MAVEN_DEBUG_SCRIPT (
   %LAUNCHER_CLASS% ^
   %MAVEN_ARGS% ^
   %*
-if ERRORLEVEL 1 goto error
+set JVM_CONFIG_EXIT_CODE=%ERRORLEVEL%
+rem Cleanup the jvm.config temp file now that the JVM has exited (must be before @endlocal)
+if defined JVM_CONFIG_TEMP del "%JVM_CONFIG_TEMP%" 2>nul
+if %JVM_CONFIG_EXIT_CODE% neq 0 goto error
 goto end
 
 :error

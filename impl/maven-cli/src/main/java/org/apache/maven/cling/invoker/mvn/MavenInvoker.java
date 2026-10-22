@@ -251,6 +251,8 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         request.setOffline(context.options().offline().orElse(request.isOffline()));
         request.setUpdateSnapshots(context.options().updateSnapshots().orElse(false));
         request.setGlobalChecksumPolicy(determineGlobalChecksumPolicy(context));
+        context.options().artifactsUpdatePolicy().ifPresent(request::setArtifactsUpdatePolicy);
+        context.options().metadataUpdatePolicy().ifPresent(request::setMetadataUpdatePolicy);
 
         Path pom = determinePom(context, lookup);
         if (pom != null) {
@@ -412,7 +414,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                         if (selector.charAt(0) == '-' || selector.charAt(0) == '!') {
                             active = false;
                             selector = selector.substring(1);
-                        } else if (token.charAt(0) == '+') {
+                        } else if (selector.charAt(0) == '+') {
                             selector = selector.substring(1);
                         }
                     }
@@ -439,7 +441,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                         if (profileId.charAt(0) == '-' || profileId.charAt(0) == '!') {
                             active = false;
                             profileId = profileId.substring(1);
-                        } else if (token.charAt(0) == '+') {
+                        } else if (profileId.charAt(0) == '+') {
                             profileId = profileId.substring(1);
                         }
                     }

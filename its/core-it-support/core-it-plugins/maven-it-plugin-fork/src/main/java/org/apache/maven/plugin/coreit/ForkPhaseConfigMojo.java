@@ -16,17 +16,18 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.its.mng12534;
 
-import org.apache.maven.api.di.Named;
+package org.apache.maven.plugin.coreit;
 
-/**
- * DI factory for the TouchMojo. Normally maven-plugin-plugin generates this class
- * at build time, but since we use a handcrafted V2 plugin descriptor (to include
- * afterLinks), we must provide the factory manually.
- *
- * The @Named value must match MojoDescriptor.getRoleHint() at runtime:
- * "groupId:artifactId:version:goal"
- */
-@Named("org.apache.maven.its.mng12534:mng12534-plugin:1.0-SNAPSHOT:touch")
-public class TouchMojoFactory extends TouchMojo {}
+import org.apache.maven.plugin.AbstractMojo;
+import org.apache.maven.plugins.annotations.Execute;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
+import org.apache.maven.plugins.annotations.Mojo;
+
+@Mojo(name = "fork-phase-config")
+@Execute(phase = LifecyclePhase.GENERATE_RESOURCES, lifecycle = "phase-config")
+public class ForkPhaseConfigMojo extends AbstractMojo {
+
+    @Override
+    public void execute() {}
+}

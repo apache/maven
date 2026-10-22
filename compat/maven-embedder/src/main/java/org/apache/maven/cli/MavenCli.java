@@ -125,6 +125,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.eclipse.aether.DefaultRepositoryCache;
+import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.transfer.TransferListener;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.impl.DumbTerminal;
@@ -389,11 +390,12 @@ public class MavenCli {
                 throw new ExitException(1);
             }
             File basedir = new File(basedirProperty);
-            try {
-                cliRequest.multiModuleProjectDirectory = basedir.getCanonicalFile();
-            } catch (IOException e) {
-                cliRequest.multiModuleProjectDirectory = basedir.getAbsoluteFile();
-            }
+            // Resolve lexically rather than through getCanonicalFile(), which asks the OS to resolve the path
+            // and can substitute it with a different one when a segment is a symlink, junction, or (on Windows)
+            // a mapped network drive, corrupting the reactor root that every relative module/parent path is
+            // later resolved against (MNG-11167).
+            cliRequest.multiModuleProjectDirectory =
+                    getCanonicalPath(basedir.toPath()).toFile();
         }
 
         // We need to locate the top level project which may be pointed at using
@@ -1394,6 +1396,25 @@ public class MavenCli {
         enableOnPresentOption(commandLine, CLIManager.OFFLINE, request::setOffline);
         enableOnPresentOption(commandLine, CLIManager.UPDATE_SNAPSHOTS, request::setUpdateSnapshots);
         request.setGlobalChecksumPolicy(determineGlobalCheckPolicy(commandLine));
+
+        // Update policy options
+        String artifactsUpdatePolicy = null;
+        String metadataUpdatePolicy = null;
+        if (commandLine.hasOption(CLIManager.UPDATE_ARTIFACTS)) {
+            artifactsUpdatePolicy = RepositoryPolicy.UPDATE_POLICY_ALWAYS;
+        }
+        if (artifactsUpdatePolicy == null && commandLine.hasOption(CLIManager.ARTIFACTS_UPDATE_POLICY)) {
+            artifactsUpdatePolicy = commandLine.getOptionValue(CLIManager.ARTIFACTS_UPDATE_POLICY);
+        }
+        if (commandLine.hasOption(CLIManager.UPDATE_METADATA)) {
+            metadataUpdatePolicy = RepositoryPolicy.UPDATE_POLICY_ALWAYS;
+        }
+        if (metadataUpdatePolicy == null && commandLine.hasOption(CLIManager.METADATA_UPDATE_POLICY)) {
+            metadataUpdatePolicy = commandLine.getOptionValue(CLIManager.METADATA_UPDATE_POLICY);
+        }
+        request.setArtifactsUpdatePolicy(artifactsUpdatePolicy);
+        request.setMetadataUpdatePolicy(metadataUpdatePolicy);
+
         request.setBaseDirectory(baseDirectory);
         request.setSystemProperties(cliRequest.systemProperties);
         request.setUserProperties(cliRequest.userProperties);

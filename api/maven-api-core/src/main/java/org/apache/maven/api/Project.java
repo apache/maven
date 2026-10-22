@@ -203,6 +203,19 @@ public interface Project {
     }
 
     /**
+     * {@return whether this project produces a main artifact}.
+     * A project produces a main artifact if its packaging produces one
+     * and the project does not use a module source hierarchy.
+     *
+     * @see Packaging#producesMainArtifact()
+     * @see #mainArtifact()
+     * @since 4.1.0
+     */
+    default boolean producesMainArtifact() {
+        return mainArtifact().isPresent();
+    }
+
+    /**
      * {@return the project artifacts as immutable list}. Elements are the project POM artifact and the artifact
      * produced by this project build, if applicable. Hence, the returned list may have one or two elements
      * (never less than 1, never more than 2), depending on project packaging.
