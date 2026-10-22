@@ -327,6 +327,65 @@ class ApiRunnerSettingsTest {
     }
 
     @Test
+    void testExplicitLocalRepoTakesPrecedenceOverSettings() throws IOException {
+        Path m2Dir = tempDir.resolve(".m2");
+        Path settingsRepository = Files.createDirectories(tempDir.resolve("settings-repository"));
+        Path explicitRepository = Files.createDirectories(tempDir.resolve("explicit-repository"));
+        Files.createDirectories(m2Dir);
+        Files.writeString(m2Dir.resolve("settings.xml"), """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">
+                  <localRepository>%s</localRepository>
+                </settings>
+                """.formatted(settingsRepository));
+
+        String oldHome = System.getProperty("user.home");
+        try {
+            System.setProperty("user.home", tempDir.toString());
+            Session session = ApiRunner.createSession(null, explicitRepository, ApiRunner.SecurityMode.NONE);
+            // Compare real paths: settings.xml round-trips the path through a String, and some CI
+            // runners (e.g. GitHub Actions Windows images) mount the temp directory under more than
+            // one drive letter, which Files.isSameFile does not always recognize as identical.
+            assertEquals(
+                    explicitRepository.toRealPath(),
+                    session.getLocalRepository().getPath().toRealPath(),
+                    () -> "Expected the explicit localRepo argument " + explicitRepository
+                            + " to take precedence over settings.xml, but was "
+                            + session.getLocalRepository().getPath());
+        } finally {
+            System.setProperty("user.home", oldHome);
+        }
+    }
+
+    @Test
+    void testSettingsLocalRepositoryUsedWhenNoExplicitLocalRepo() throws IOException {
+        Path m2Dir = tempDir.resolve(".m2");
+        Path settingsRepository = Files.createDirectories(tempDir.resolve("settings-repository"));
+        Files.createDirectories(m2Dir);
+        Files.writeString(m2Dir.resolve("settings.xml"), """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <settings xmlns="http://maven.apache.org/SETTINGS/1.2.0">
+                  <localRepository>%s</localRepository>
+                </settings>
+                """.formatted(settingsRepository));
+
+        String oldHome = System.getProperty("user.home");
+        try {
+            System.setProperty("user.home", tempDir.toString());
+            Session session = ApiRunner.createSession(null, null, ApiRunner.SecurityMode.NONE);
+            // See the real-path comment in testExplicitLocalRepoTakesPrecedenceOverSettings above.
+            assertEquals(
+                    settingsRepository.toRealPath(),
+                    session.getLocalRepository().getPath().toRealPath(),
+                    () -> "Expected settings.xml's localRepository " + settingsRepository
+                            + " to be used when no explicit localRepo is given, but was "
+                            + session.getLocalRepository().getPath());
+        } finally {
+            System.setProperty("user.home", oldHome);
+        }
+    }
+
+    @Test
     void testSettingsOfflineMode() throws IOException {
         Path m2Dir = tempDir.resolve(".m2");
         Files.createDirectories(m2Dir);
