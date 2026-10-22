@@ -39,6 +39,8 @@ record DefaultMojoReport(
         BuildStatus status,
         Instant startTime,
         Duration duration,
+        String traceId,
+        String spanId,
         List<LogEvent> output)
         implements MojoReport {
 

@@ -37,6 +37,8 @@ record DefaultModuleReport(
         BuildStatus status,
         Instant startTime,
         Duration duration,
+        String traceId,
+        String spanId,
         List<MojoReport> mojos,
         List<LogEvent> output)
         implements ModuleReport {

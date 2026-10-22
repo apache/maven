@@ -50,7 +50,7 @@ record DefaultBuildReport(
         List<LogEvent> output)
         implements BuildReport {
 
-    private static final String REPORT_VERSION = "1.0";
+    private static final String REPORT_VERSION = "1.1";
     private static final int FORMAT_VERSION = 1;
 
     @Override
