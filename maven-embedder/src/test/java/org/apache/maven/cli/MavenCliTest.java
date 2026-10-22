@@ -21,10 +21,13 @@ package org.apache.maven.cli;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -44,6 +47,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InOrder;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
@@ -56,6 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -201,6 +206,29 @@ public class MavenCliTest {
         } catch (ParseException expected) {
 
         }
+    }
+
+    /**
+     * MNG-11167: {@code multiModuleProjectDirectory} must keep the path as given, not the path that
+     * {@link File#getCanonicalFile()} resolves a symlinked (or, on Windows, a mapped network drive)
+     * segment to, or every module/parent path resolved relative to it inherits the wrong base.
+     */
+    @Test
+    public void testMultiModuleProjectDirectoryIsNotResolvedThroughASymlink(@TempDir Path tempDir) throws Exception {
+        Path real = Files.createDirectories(tempDir.resolve("real"));
+        Path link = tempDir.resolve("link");
+        try {
+            Files.createSymbolicLink(link, real);
+        } catch (IOException | UnsupportedOperationException e) {
+            assumeTrue(false, "symbolic links are not supported on this machine");
+        }
+
+        System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, link.toString());
+        CliRequest request = new CliRequest(new String[0], null);
+
+        cli.initialize(request);
+
+        assertEquals(link.toString(), request.multiModuleProjectDirectory.getPath());
     }
 
     /**
