@@ -350,7 +350,18 @@ if exist "%JVM_CONFIG_TEMP%" (
     ping -n 2 127.0.0.1 >nul 2>nul
     set /p JVM_CONFIG_MAVEN_OPTS=<"%JVM_CONFIG_TEMP%" 2>nul
   )
-  endlocal & set "JVM_CONFIG_MAVEN_OPTS=!JVM_CONFIG_MAVEN_OPTS!"
+  rem Export JVM_CONFIG_MAVEN_OPTS from the setlocal scope using FOR /F.
+  rem The 'endlocal & set' idiom cannot use !VAR! after endlocal because delayed
+  rem expansion is disabled in the outer scope (@setlocal at line 53 has no
+  rem EnableDelayedExpansion). FOR /F captures the value while still inside the
+  rem delayed-expansion scope, then endlocal inside the loop body restores the
+  rem outer scope — at which point %%V is already bound to the correct value.
+  rem Use the dbenham double-double-quote idiom: wrap in ""..."" and use %%~V to
+  rem strip the outer quotes. This safely handles values containing embedded ".
+  for /f "delims=" %%V in (""!JVM_CONFIG_MAVEN_OPTS!"") do (
+    endlocal
+    set "JVM_CONFIG_MAVEN_OPTS=%%~V"
+  )
   del "%JVM_CONFIG_TEMP%" 2>nul
 )
 
