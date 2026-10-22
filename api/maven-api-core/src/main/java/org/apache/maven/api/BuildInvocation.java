@@ -52,7 +52,7 @@ import org.apache.maven.api.annotations.Nullable;
  *   <li>Offline mode ({@link #offline()}) and snapshot update policy
  *       ({@link #updateSnapshots()})</li>
  *   <li>Degree of concurrency ({@link #threads()})</li>
- *   <li>Transfer-progress suppression ({@link #noTransferProgress()}) and batch mode ({@link #batchMode()})</li>
+ *   <li>Batch mode ({@link #batchMode()})</li>
  * </ul>
  *
  * <h2>What is not yet captured</h2>
@@ -190,13 +190,6 @@ public interface BuildInvocation {
      * @return {@code true} if snapshot updates were forced
      */
     boolean updateSnapshots();
-
-    /**
-     * Whether transfer progress output was suppressed ({@code --no-transfer-progress} / {@code -ntp}).
-     *
-     * @return {@code true} if transfer progress was disabled
-     */
-    boolean noTransferProgress();
 
     /**
      * Whether the build was invoked in non-interactive (batch) mode ({@code --batch-mode} / {@code -B}).

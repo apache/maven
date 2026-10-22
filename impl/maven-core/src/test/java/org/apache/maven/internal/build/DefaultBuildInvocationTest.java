@@ -146,18 +146,6 @@ class DefaultBuildInvocationTest {
     }
 
     @Test
-    void noTransferProgress() {
-        MavenExecutionRequest request = newRequest();
-        request.setNoTransferProgress(true);
-        MavenSession session = mock(MavenSession.class);
-        when(session.getRequest()).thenReturn(request);
-
-        BuildInvocation inv = DefaultBuildInvocation.from(session);
-
-        assertTrue(inv.noTransferProgress());
-    }
-
-    @Test
     void sensitiveKeyRedaction() {
         MavenExecutionRequest request = newRequest();
         Properties userProps = new Properties();
@@ -227,7 +215,6 @@ class DefaultBuildInvocationTest {
                 null,
                 null,
                 ReactorFailureBehavior.FAIL_FAST,
-                false,
                 false,
                 false,
                 false,

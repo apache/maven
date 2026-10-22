@@ -46,7 +46,6 @@ import org.slf4j.LoggerFactory;
  * @param reactorFailureBehavior reactor failure behavior
  * @param offline                whether offline mode was active
  * @param updateSnapshots        whether snapshot updates were forced
- * @param noTransferProgress     whether transfer progress was suppressed
  * @param batchMode              whether batch mode was active
  * @param recursive              whether recursive processing is enabled
  * @param resume                 whether resume mode was active
@@ -64,7 +63,6 @@ public record DefaultBuildInvocation(
         ReactorFailureBehavior reactorFailureBehavior,
         boolean offline,
         boolean updateSnapshots,
-        boolean noTransferProgress,
         boolean batchMode,
         boolean recursive,
         boolean resume,
@@ -160,7 +158,6 @@ public record DefaultBuildInvocation(
                 failureBehavior,
                 request.isOffline(),
                 request.isUpdateSnapshots(),
-                request.isNoTransferProgress(),
                 !request.isInteractiveMode(),
                 request.isRecursive(),
                 request.isResume(),
