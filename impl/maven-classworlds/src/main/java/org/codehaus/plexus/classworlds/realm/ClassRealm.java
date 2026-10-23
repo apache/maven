@@ -248,7 +248,6 @@ public class ClassRealm extends URLClassLoader {
         this.moduleLayerController = controller;
     }
 
-    @Override
     public ModuleLayer getModuleLayer() {
         return moduleLayer;
     }
@@ -257,7 +256,6 @@ public class ClassRealm extends URLClassLoader {
         return moduleLayerController;
     }
 
-    @Override
     public boolean isModular() {
         return moduleLayer != null;
     }
