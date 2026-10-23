@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -32,6 +33,9 @@ import org.apache.maven.api.annotations.ThreadSafe;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ArtifactCoordinatesFactory;
 import org.apache.maven.api.services.DependencyCoordinatesFactory;
+import org.apache.maven.api.services.LifecycleExecutionResult;
+import org.apache.maven.api.services.LifecycleExecutor;
+import org.apache.maven.api.services.LifecyclePlanResult;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.VersionResolverException;
 import org.apache.maven.api.settings.Settings;
@@ -232,6 +236,73 @@ public interface Session extends ProtoSession {
      */
     @Nonnull
     Collection<Listener> getListeners();
+
+    /**
+     * Calculates a lifecycle plan that can be inspected before execution.
+     *
+     * @param project the project for which to calculate the plan
+     * @param tasks lifecycle phases or plugin goals used to calculate the plan
+     * @return the lifecycle planning result
+     * @since 4.1.0
+     */
+    @Nonnull
+    default LifecyclePlanResult planLifecycle(@Nonnull Project project, @Nonnull List<String> tasks) {
+        return getService(LifecycleExecutor.class).plan(this, project, tasks);
+    }
+
+    /**
+     * Executes a previously calculated lifecycle plan.
+     *
+     * @param plan the lifecycle plan to execute
+     * @return the lifecycle execution result
+     * @since 4.1.0
+     */
+    @Nonnull
+    default LifecycleExecutionResult executeLifecycle(@Nonnull LifecyclePlan plan) {
+        return getService(LifecycleExecutor.class).execute(this, plan);
+    }
+
+    /**
+     * Executes the entries of a previously calculated lifecycle plan that are accepted by the supplied filter.
+     *
+     * @param plan the lifecycle plan to execute
+     * @param filter predicate deciding which configured mojo executions are executed
+     * @return the lifecycle execution result
+     * @since 4.1.0
+     */
+    @Nonnull
+    default LifecycleExecutionResult executeLifecycle(
+            @Nonnull LifecyclePlan plan, @Nonnull Predicate<MojoExecution> filter) {
+        return getService(LifecycleExecutor.class).execute(this, plan, filter);
+    }
+
+    /**
+     * Calculates and executes a lifecycle plan.
+     *
+     * @param project the project for which to execute the lifecycle
+     * @param tasks lifecycle phases or plugin goals used to calculate the plan
+     * @return the lifecycle execution result
+     * @since 4.1.0
+     */
+    @Nonnull
+    default LifecycleExecutionResult executeLifecycle(@Nonnull Project project, @Nonnull List<String> tasks) {
+        return getService(LifecycleExecutor.class).planAndExecute(this, project, tasks);
+    }
+
+    /**
+     * Calculates a lifecycle plan and executes the entries accepted by the supplied filter.
+     *
+     * @param project the project for which to execute the lifecycle
+     * @param tasks lifecycle phases or plugin goals used to calculate the plan
+     * @param filter predicate deciding which configured mojo executions are executed
+     * @return the lifecycle execution result
+     * @since 4.1.0
+     */
+    @Nonnull
+    default LifecycleExecutionResult executeLifecycle(
+            @Nonnull Project project, @Nonnull List<String> tasks, @Nonnull Predicate<MojoExecution> filter) {
+        return getService(LifecycleExecutor.class).planAndExecute(this, project, tasks, filter);
+    }
 
     /**
      * Shortcut for {@code getService(RepositoryFactory.class).createLocal(...)}.
