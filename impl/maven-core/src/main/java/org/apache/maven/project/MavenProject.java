@@ -916,6 +916,10 @@ public class MavenProject implements Cloneable {
         }
         return artifactMap;
     }
+    /** @see ArtifactMaps#byDependencyConflictId(java.util.Collection) @since 4.1.0 */
+    public Map<String, Artifact> getArtifactMapByDependencyConflictId() {
+        return ArtifactMaps.byDependencyConflictId(getArtifacts());
+    }
 
     public void setPluginArtifacts(Set<Artifact> pluginArtifacts) {
         this.pluginArtifacts = pluginArtifacts;
