@@ -20,6 +20,7 @@ package org.apache.maven.di.impl;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.annotation.Retention;
@@ -30,6 +31,7 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Enumeration;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -43,6 +45,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -254,9 +257,10 @@ class InjectorDiagnosticsTest {
         injector.bind(key, Binding.to(key, factory, new Class<?>[0]));
         injector.bind(Key.of(Integer.class), Binding.toInstance(5).withKey(Key.of(Integer.class)));
         assertThrows(DIException.class, () -> injector.getInstance(String.class));
-        assertEquals(5, bindingRows(injector.dumps.get(1)).size());
-        assertEquals(body(injector.dumpBindings()), body(injector.dumps.get(1)));
-        List<String> keys = body(injector.dumps.get(1))
+        assertEquals(2, bindingRows(injector.dumps.get(1)).size());
+        assertTrue(injector.dumps.get(1).contains(", delta"));
+        assertFalse(injector.dumps.get(1).contains("@Named(\"a\\u000ab\\u000d\\u0009c\")"));
+        List<String> keys = body(injector.dumpBindings())
                 .lines()
                 .filter(line -> line.startsWith("  key: "))
                 .toList();
@@ -294,7 +298,8 @@ class InjectorDiagnosticsTest {
         String explicit = injector.dumpBindings();
         injector.checkpoint();
         assertEquals(0, memberCalls.get());
-        assertEquals(body(explicit), body(injector.dumps.get(2)));
+        assertTrue(explicit.contains("[qualifier="));
+        assertTrue(injector.dumps.get(2).contains("+ candidate:"));
     }
 
     @Test
@@ -306,7 +311,8 @@ class InjectorDiagnosticsTest {
         injector.bindInstance(Runnable.class, () -> {});
         injector.checkpoint();
         assertFalse(injector.dumps.get(1).contains("<no candidates>"));
-        assertEquals(body(injector.dumpBindings()), body(injector.dumps.get(1)));
+        assertTrue(injector.dumps.get(1).contains("+ candidate: java.lang.Runnable"));
+        assertTrue(injector.dumps.get(1).contains(", delta"));
         injector.bindScope(SessionScoped.class, new Scope() {
             @Override
             public <T> Supplier<T> scope(Key<T> key, Supplier<T> supplier) {
@@ -314,13 +320,15 @@ class InjectorDiagnosticsTest {
             }
         });
         injector.checkpoint();
-        assertEquals(body(injector.dumpBindings()), body(injector.dumps.get(2)));
+        assertTrue(injector.dumps.get(2).contains("+ scopes:"));
+        assertFalse(injector.dumps.get(2).contains("candidate:"));
         injector.dispose();
         injector.checkpoint();
         assertEquals("", body(injector.dumps.get(3)));
         injector.bindInstance(Integer.class, 1);
         injector.checkpoint();
-        assertEquals(body(injector.dumpBindings()), body(injector.dumps.get(4)));
+        assertTrue(injector.dumps.get(4).contains("+ key: java.lang.Integer"));
+        assertTrue(injector.dumps.get(4).contains(", delta"));
     }
 
     @Test
@@ -375,11 +383,6 @@ class InjectorDiagnosticsTest {
         }
         assertEquals(3, injector.dumps.size());
         assertEquals(3, descriptions.get());
-        System.setProperty(MAVEN_DI_DEBUG, "true");
-        injector.checkpoint();
-        System.setOut(new PrintStream(new ByteArrayOutputStream()));
-        injector.checkpoint();
-        assertEquals(5, injector.dumps.size());
     }
 
     @Test
@@ -413,7 +416,7 @@ class InjectorDiagnosticsTest {
         AtomicInteger attempts = new AtomicInteger();
         RecordingInjector brokenSink = new RecordingInjector() {
             @Override
-            protected void writeDump(PrintStream output, String dump) {
+            void writeDump(PrintStream output, String dump) {
                 if (attempts.getAndIncrement() == 0) {
                     throw new IllegalStateException("output failed");
                 }
@@ -505,13 +508,13 @@ class InjectorDiagnosticsTest {
     }
 
     @Test
-    void oldOutputCannotSuppressNewRevisionOrHoldTheStateLock() throws Exception {
+    void delayedOutputPreservesCaptureOrderAndAppliesBackpressure() throws Exception {
         CountDownLatch firstOutput = new CountDownLatch(1);
         CountDownLatch releaseOutput = new CountDownLatch(1);
         RecordingInjector injector = new RecordingInjector() {
             @Override
-            protected void writeDump(PrintStream output, String dump) {
-                if (dump.contains("candidate: java.lang.String") && !dump.contains("candidate: java.lang.Integer")) {
+            void writeDump(PrintStream output, String dump) {
+                if (dumps.isEmpty()) {
                     firstOutput.countDown();
                     try {
                         assertTrue(releaseOutput.await(10, TimeUnit.SECONDS));
@@ -524,23 +527,362 @@ class InjectorDiagnosticsTest {
             }
         };
         injector.bindInstance(String.class, "value");
-        ExecutorService worker = Executors.newSingleThreadExecutor();
+        ExecutorService workers = Executors.newFixedThreadPool(2);
         try {
-            Future<?> first = worker.submit(injector::checkpoint);
+            Future<?> first = workers.submit(injector::checkpoint);
             assertTrue(firstOutput.await(10, TimeUnit.SECONDS));
-            // The old snapshot is detached: registration no longer races with its capture.
             injector.bindInstance(Integer.class, 1);
-            injector.checkpoint();
-            assertEquals(1, injector.dumps.size());
+            AtomicReference<Thread> producer = new AtomicReference<>();
+            Future<Boolean> second = workers.submit(() -> {
+                producer.set(Thread.currentThread());
+                injector.checkpoint();
+                return Thread.currentThread().isInterrupted();
+            });
+            awaitQueued(injector, 1);
+            producer.get().interrupt();
+            assertFalse(second.isDone());
+            assertEquals(0, injector.dumps.size());
             releaseOutput.countDown();
             first.get(10, TimeUnit.SECONDS);
+            assertTrue(second.get(10, TimeUnit.SECONDS));
             injector.checkpoint();
             assertEquals(2, injector.dumps.size());
-            assertEquals(body(injector.dumpBindings()), body(injector.dumps.get(0)));
+            assertFalse(injector.dumps.get(0).contains("candidate: java.lang.Integer"));
+            assertTrue(injector.dumps.get(1).contains("+ key: java.lang.Integer"));
+            assertFalse(injector.dumps.get(1).contains("candidate: java.lang.String"));
         } finally {
             releaseOutput.countDown();
-            worker.shutdownNow();
+            workers.shutdownNow();
         }
+    }
+
+    @Test
+    void initializerSourcesSurviveCombinationWithoutExecutingUserCode() {
+        RecordingInjector injector = new RecordingInjector();
+        injector.bindImplicit(InjectedMembers.class);
+        String dump = injector.dumpBindings();
+        assertTrue(dump.contains("initialized by field injector:"), dump);
+        assertTrue(dump.contains(InjectedMembers.class.getName() + ".field"), dump);
+        assertTrue(dump.contains("initialized by method injector:"), dump);
+        assertTrue(dump.contains(InjectedMembers.class.getName() + ".initialize("), dump);
+        long candidates = dump.lines()
+                .filter(line -> line.contains("candidate: " + InjectedMembers.class.getName()))
+                .count();
+        assertEquals(
+                candidates,
+                dump.lines()
+                        .filter(line -> line.contains("initialized by field injector:"))
+                        .count());
+        assertEquals(
+                candidates,
+                dump.lines()
+                        .filter(line -> line.contains("initialized by method injector:"))
+                        .count());
+        assertFalse(dump.contains("initialized by method injector: )"), dump);
+        assertTrue(dump.contains("\n            java.lang.Integer [loader=bootstrap]\n"), dump);
+    }
+
+    @Test
+    void outputChangesAndFailedDeltasRestartWithFullSnapshots() {
+        AtomicInteger attempts = new AtomicInteger();
+        RecordingInjector injector = new RecordingInjector() {
+            @Override
+            void writeDump(PrintStream output, String dump) {
+                if (attempts.incrementAndGet() == 2) {
+                    throw new IllegalStateException("delta output failed");
+                }
+                super.writeDump(output, dump);
+            }
+        };
+        injector.bindInstance(String.class, "value");
+        injector.checkpoint();
+        injector.bindInstance(Integer.class, 1);
+        injector.checkpoint();
+        assertEquals(1, injector.dumps.size());
+        injector.checkpoint();
+        assertEquals(2, injector.dumps.size());
+        assertFalse(injector.dumps.get(1).contains(", delta"));
+        assertTrue(injector.dumps.get(1).contains("candidate: java.lang.String"));
+        try (PrintStream other = new PrintStream(new ByteArrayOutputStream())) {
+            System.setOut(other);
+            injector.checkpoint();
+            assertEquals(3, injector.dumps.size());
+            assertFalse(injector.dumps.get(2).contains(", delta"));
+            assertEquals(body(injector.dumps.get(1)), body(injector.dumps.get(2)));
+        }
+    }
+
+    @Test
+    void printStreamErrorsDoNotCommitAnUnwrittenSnapshot() {
+        ByteArrayOutputStream captured = new ByteArrayOutputStream();
+        AtomicInteger writes = new AtomicInteger();
+        try (PrintStream sink =
+                new PrintStream(
+                        new OutputStream() {
+                            @Override
+                            public void write(int value) throws IOException {
+                                if (writes.getAndIncrement() == 0) {
+                                    throw new IOException("output unavailable");
+                                }
+                                captured.write(value);
+                            }
+                        },
+                        true,
+                        StandardCharsets.UTF_8) {
+                    @Override
+                    public boolean checkError() {
+                        boolean failed = super.checkError();
+                        clearError();
+                        return failed;
+                    }
+                }) {
+            System.setOut(sink);
+            InjectorImpl injector = new InjectorImpl();
+            injector.bindInstance(String.class, "value");
+            assertEquals("value", injector.getInstance(String.class));
+            captured.reset();
+            assertEquals("value", injector.getInstance(String.class));
+            String retry = captured.toString(StandardCharsets.UTF_8);
+            assertTrue(retry.contains("candidate: java.lang.String"), retry);
+            assertFalse(retry.contains(", delta"), retry);
+        }
+    }
+
+    @Test
+    void stickyPrintStreamErrorKeepsRetryingFullSnapshotsUntilOutputChanges() {
+        ByteArrayOutputStream failed = new ByteArrayOutputStream();
+        ByteArrayOutputStream recovered = new ByteArrayOutputStream();
+        try (PrintStream sink = new PrintStream(failed, true, StandardCharsets.UTF_8) {
+                    {
+                        setError();
+                    }
+                };
+                PrintStream recovery = new PrintStream(recovered, true, StandardCharsets.UTF_8)) {
+            InjectorImpl injector = new InjectorImpl();
+            injector.bindInstance(String.class, "fixture");
+            System.setOut(sink);
+            injector.debugBindings();
+            injector.debugBindings();
+            String attempts = failed.toString(StandardCharsets.UTF_8);
+            assertEquals(
+                    2,
+                    attempts.lines()
+                            .filter(line -> line.startsWith("Maven DI native registry "))
+                            .count());
+            assertFalse(attempts.contains(", delta"), attempts);
+            System.setOut(recovery);
+            injector.debugBindings();
+            String success = recovered.toString(StandardCharsets.UTF_8);
+            assertTrue(success.contains("candidate: java.lang.String"), success);
+            assertFalse(success.contains(", delta"), success);
+        }
+    }
+
+    @Test
+    void queuedCapturesShareLoaderLabelsAndFormOneRevisionChain() throws Exception {
+        byte[] bytes;
+        try (var input = Hostile.class.getResourceAsStream("InjectorDiagnosticsTest$Hostile.class")) {
+            bytes = input.readAllBytes();
+        }
+        class Realm extends ClassLoader {
+            Class<?> define() {
+                return defineClass(Hostile.class.getName(), bytes, 0, bytes.length);
+            }
+        }
+        CountDownLatch delayed = new CountDownLatch(1);
+        CountDownLatch release = new CountDownLatch(1);
+        RecordingInjector injector = new RecordingInjector() {
+            @Override
+            void writeDump(PrintStream output, String dump) {
+                if (dump.contains("@Named(\"z\")")) {
+                    delayed.countDown();
+                    try {
+                        assertTrue(release.await(10, TimeUnit.SECONDS));
+                    } catch (InterruptedException e) {
+                        Thread.currentThread().interrupt();
+                        throw new AssertionError(e);
+                    }
+                }
+                super.writeDump(output, dump);
+            }
+        };
+        injector.bindInstance(String.class, "first");
+        injector.checkpoint();
+        Key<Object> z = Key.ofType(new Realm().define(), "z");
+        Key<Object> a = Key.ofType(new Realm().define(), "a");
+        Key<Object> b = Key.ofType(new Realm().define(), "b");
+        injector.bind(z, Binding.toInstance(new Object()).withKey(z));
+        ExecutorService workers = Executors.newFixedThreadPool(3);
+        try {
+            Future<?> first = workers.submit(injector::checkpoint);
+            assertTrue(delayed.await(10, TimeUnit.SECONDS));
+            injector.bind(a, Binding.toInstance(new Object()).withKey(a));
+            Future<?> second = workers.submit(injector::checkpoint);
+            awaitQueued(injector, 1);
+            injector.bind(b, Binding.toInstance(new Object()).withKey(b));
+            Future<?> third = workers.submit(injector::checkpoint);
+            awaitQueued(injector, 2);
+            assertFalse(second.isDone());
+            assertFalse(third.isDone());
+            release.countDown();
+            first.get(10, TimeUnit.SECONDS);
+            second.get(10, TimeUnit.SECONDS);
+            third.get(10, TimeUnit.SECONDS);
+            assertEquals(4, injector.dumps.size());
+            String revision = revision(injector.dumps.get(0));
+            for (int i = 1; i < injector.dumps.size(); i++) {
+                String[] transition = revision(injector.dumps.get(i)).split("->");
+                assertEquals(revision, transition[0]);
+                revision = transition[1];
+            }
+            assertTrue(injector.dumps.get(1).contains("@Named(\"z\") " + Hostile.class.getName() + " [loader=L2]"));
+            assertTrue(injector.dumps.get(2).contains("@Named(\"a\") " + Hostile.class.getName() + " [loader=L3]"));
+            assertTrue(injector.dumps.get(3).contains("@Named(\"b\") " + Hostile.class.getName() + " [loader=L4]"));
+            assertFalse(injector.dumps.get(2).contains("@Named(\"z\")"));
+            assertFalse(injector.dumps.get(3).contains("@Named(\"a\")"));
+        } finally {
+            release.countDown();
+            workers.shutdownNow();
+        }
+    }
+
+    private static String revision(String dump) {
+        return dump.lines().findFirst().orElseThrow().split("revision=")[1].split(" ")[0];
+    }
+
+    private static void awaitQueued(InjectorImpl injector, int count) throws Exception {
+        // Wait for capture to finish before mutating the registry, which does not support concurrent registration.
+        var lockField = InjectorImpl.class.getDeclaredField("diagnosticLock");
+        var queueField = InjectorImpl.class.getDeclaredField("diagnosticQueue");
+        lockField.setAccessible(true);
+        queueField.setAccessible(true);
+        Object lock = lockField.get(injector);
+        long deadline = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
+        while (System.nanoTime() < deadline) {
+            synchronized (lock) {
+                if (((Collection<?>) queueField.get(injector)).size() == count) {
+                    return;
+                }
+            }
+            Thread.sleep(1);
+        }
+        throw new AssertionError("checkpoint did not finish capture");
+    }
+
+    @Test
+    void resetWhileWritingKeepsOneWriterAndStartsANewFullHistory() throws Exception {
+        for (String reset : List.of("output", "off", "dispose")) {
+            CountDownLatch writing = new CountDownLatch(1);
+            CountDownLatch release = new CountDownLatch(1);
+            AtomicInteger active = new AtomicInteger();
+            AtomicInteger maximum = new AtomicInteger();
+            RecordingInjector injector = new RecordingInjector() {
+                @Override
+                void writeDump(PrintStream output, String dump) {
+                    maximum.accumulateAndGet(active.incrementAndGet(), Math::max);
+                    try {
+                        if (dumps.isEmpty()) {
+                            writing.countDown();
+                            try {
+                                assertTrue(release.await(10, TimeUnit.SECONDS));
+                            } catch (InterruptedException e) {
+                                Thread.currentThread().interrupt();
+                                throw new AssertionError(e);
+                            }
+                        }
+                        super.writeDump(output, dump);
+                    } finally {
+                        active.decrementAndGet();
+                    }
+                }
+            };
+            System.setProperty(MAVEN_DI_DEBUG, "true");
+            injector.bindInstance(String.class, "first");
+            ExecutorService workers = Executors.newFixedThreadPool(2);
+            try (PrintStream other = new PrintStream(new ByteArrayOutputStream())) {
+                Future<?> first = workers.submit(injector::checkpoint);
+                assertTrue(writing.await(10, TimeUnit.SECONDS));
+                switch (reset) {
+                    case "output" -> System.setOut(other);
+                    case "off" -> {
+                        System.clearProperty(MAVEN_DI_DEBUG);
+                        injector.checkpoint();
+                        System.setProperty(MAVEN_DI_DEBUG, "true");
+                    }
+                    case "dispose" -> injector.dispose();
+                    default -> throw new AssertionError(reset);
+                }
+                injector.bindInstance(Integer.class, 1);
+                Future<?> second = workers.submit(injector::checkpoint);
+                awaitQueued(injector, 1);
+                release.countDown();
+                first.get(10, TimeUnit.SECONDS);
+                second.get(10, TimeUnit.SECONDS);
+                assertEquals(1, maximum.get(), reset);
+                assertEquals(2, injector.dumps.size(), reset);
+                assertFalse(injector.dumps.get(1).contains(", delta"), reset);
+                injector.checkpoint();
+                assertEquals(2, injector.dumps.size(), reset);
+            } finally {
+                release.countDown();
+                workers.shutdownNow();
+                System.setOut(previousOutput);
+            }
+        }
+    }
+
+    @Test
+    void failedWriteRetriesQueuedStateAsFullSnapshot() {
+        AtomicInteger writes = new AtomicInteger();
+        RecordingInjector injector = new RecordingInjector() {
+            @Override
+            void writeDump(PrintStream output, String dump) {
+                if (writes.incrementAndGet() == 2) {
+                    bindInstance(Long.class, 2L);
+                    checkpoint();
+                    throw new IllegalStateException("partially written block");
+                }
+                super.writeDump(output, dump);
+            }
+        };
+        injector.bindInstance(String.class, "first");
+        injector.checkpoint();
+        injector.bindInstance(Integer.class, 1);
+        injector.checkpoint();
+        assertEquals(2, injector.dumps.size());
+        assertFalse(injector.dumps.get(1).contains(", delta"));
+        assertTrue(injector.dumps.get(1).contains("candidate: java.lang.Long"));
+        injector.checkpoint();
+        assertEquals(2, injector.dumps.size());
+    }
+
+    @Test
+    void captureFailureRetainsTheLastSuccessfulBaseline() {
+        AtomicInteger captures = new AtomicInteger();
+        RecordingInjector injector = new RecordingInjector();
+        injector.bindInstance(String.class, "first");
+        injector.checkpoint();
+        Key<Integer> key = Key.of(Integer.class);
+        injector.bind(key, new Binding<Integer>(key, Set.of()) {
+            @Override
+            public Supplier<Integer> compile(Function<Dependency<?>, Supplier<?>> compiler) {
+                throw new AssertionError("compiled for diagnostics");
+            }
+
+            @Override
+            List<String> getDiagnosticSourceLines(Function<Member, List<String>> source) {
+                if (captures.getAndIncrement() == 0) {
+                    throw new IllegalStateException("capture unavailable");
+                }
+                return List.of("test source");
+            }
+        });
+        injector.checkpoint();
+        assertEquals(1, injector.dumps.size());
+        injector.checkpoint();
+        assertEquals(2, injector.dumps.size());
+        assertTrue(injector.dumps.get(1).contains(", delta"));
+        assertTrue(injector.dumps.get(1).contains("+ key: java.lang.Integer"));
     }
 
     private static URLClassLoader indexLoader(Path directory, String content) throws Exception {
@@ -563,7 +905,7 @@ class InjectorDiagnosticsTest {
     private static List<String> bindingRows(String dump) {
         return body(dump)
                 .lines()
-                .filter(line -> line.startsWith("    candidate: "))
+                .filter(line -> line.matches("    (?:[+~-] )?candidate: .*"))
                 .toList();
     }
 
@@ -575,7 +917,7 @@ class InjectorDiagnosticsTest {
         }
 
         @Override
-        protected void writeDump(PrintStream output, String dump) {
+        void writeDump(PrintStream output, String dump) {
             dumps.add(dump);
         }
     }
@@ -641,6 +983,16 @@ class InjectorDiagnosticsTest {
         }
     }
 
+    static class InjectedMembers {
+        @Inject
+        String field;
+
+        @Inject
+        void initialize(Integer count) {
+            throw new AssertionError("initializer executed for diagnostics");
+        }
+    }
+
     static class DetailedSource {
         DetailedSource(String text, int count) throws IOException {
             throw new AssertionError("constructor called for diagnostics");
@@ -657,42 +1009,6 @@ class InjectorDiagnosticsTest {
         @Provides
         <T> T provide() {
             return null;
-        }
-    }
-
-    @Test
-    void initializerSourcesSurviveCombinationWithoutExecutingUserCode() {
-        RecordingInjector injector = new RecordingInjector();
-        injector.bindImplicit(InjectedMembers.class);
-        String dump = injector.dumpBindings();
-        assertTrue(dump.contains("initialized by field injector:"), dump);
-        assertTrue(dump.contains(InjectedMembers.class.getName() + ".field"), dump);
-        assertTrue(dump.contains("initialized by method injector:"), dump);
-        assertTrue(dump.contains(InjectedMembers.class.getName() + ".initialize("), dump);
-        long candidates = dump.lines()
-                .filter(line -> line.contains("candidate: " + InjectedMembers.class.getName()))
-                .count();
-        assertEquals(
-                candidates,
-                dump.lines()
-                        .filter(line -> line.contains("initialized by field injector:"))
-                        .count());
-        assertEquals(
-                candidates,
-                dump.lines()
-                        .filter(line -> line.contains("initialized by method injector:"))
-                        .count());
-        assertFalse(dump.contains("initialized by method injector: )"), dump);
-        assertTrue(dump.contains("\n            java.lang.Integer [loader=bootstrap]\n"), dump);
-    }
-
-    static class InjectedMembers {
-        @Inject
-        String field;
-
-        @Inject
-        void initialize(Integer count) {
-            throw new AssertionError("initializer executed for diagnostics");
         }
     }
 }

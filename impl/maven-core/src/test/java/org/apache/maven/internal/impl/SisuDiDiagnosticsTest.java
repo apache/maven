@@ -83,6 +83,7 @@ class SisuDiDiagnosticsTest {
                 injector.bindInstance(Another.class, new Another());
                 assertNotNull(map.get("native"));
                 assertEquals(1, blocks(captured));
+                assertTrue(captured.toString(StandardCharsets.UTF_8).contains(Another.class.getName()));
 
                 captured.reset();
                 injector.bindInstance(Extra.class, new Extra());
@@ -90,6 +91,7 @@ class SisuDiDiagnosticsTest {
                 injector.injectInstance(client);
                 assertNotNull(client.service);
                 assertEquals(1, blocks(captured));
+                assertTrue(captured.toString(StandardCharsets.UTF_8).contains("+ candidate: " + Extra.class.getName()));
             } finally {
                 container.dispose();
             }
