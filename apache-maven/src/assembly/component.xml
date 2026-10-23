@@ -30,11 +30,21 @@ under the License.
            to work without change after the internalization. -->
       <outputFileNameMapping>plexus-classworlds-${artifact.version}.jar</outputFileNameMapping>
     </dependencySet>
+
+    <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
+      <outputDirectory>lib/modules</outputDirectory>
+      <includes>
+        <include>org.jline:*</include>
+      </includes>
+    </dependencySet>
+
     <dependencySet>
       <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>lib</outputDirectory>
       <excludes>
         <exclude>org.apache.maven:maven-classworlds</exclude>
+        <exclude>org.jline:*</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>

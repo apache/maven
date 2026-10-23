@@ -971,7 +971,7 @@ public class MavenCli {
 
             for (CoreExtensionEntry entry : reverse(extensions)) {
                 Set<String> exportedPackages = entry.getExportedPackages();
-                ClassRealm realm = entry.getClassRealm();
+                ClassRealm realm = (ClassRealm) entry.getClassRealm();
                 for (String exportedPackage : exportedPackages) {
                     extRealm.importFrom(realm, exportedPackage);
                 }
