@@ -18,18 +18,24 @@
  */
 package org.apache.maven.plugin;
 
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.spi.CacheFactory;
+import org.apache.maven.api.spi.MavenCache;
 import org.apache.maven.artifact.Artifact;
+import org.apache.maven.internal.cache.MavenCacheHolder;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
@@ -41,13 +47,69 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
+import org.eclipse.sisu.Typed;
 
 /**
  * Default PluginCache implementation. Assumes cached data does not change.
  */
 @Named
 @Singleton
-public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
+@Typed({PluginRealmCache.class, MavenCacheHolder.class})
+public class DefaultPluginRealmCache implements PluginRealmCache, MavenCacheHolder, Disposable {
+
+    /**
+     * Internal {@link org.apache.maven.api.spi.CacheRecord} wrapper for a plugin realm entry.
+     * Exposes dependency paths (from artifact files) and disposes the realm on invalidation.
+     */
+    protected static class PluginRealmRecord implements org.apache.maven.api.spi.CacheRecord {
+
+        private final ClassRealm realm;
+        private final List<Artifact> artifacts;
+        private final DependencyNode dependencyNode;
+        private final PluginRealmCache.CacheRecord publicRecord;
+
+        PluginRealmRecord(ClassRealm realm, List<Artifact> artifacts, DependencyNode dependencyNode) {
+            this.realm = realm;
+            this.artifacts = Collections.unmodifiableList(new ArrayList<>(artifacts));
+            this.dependencyNode = dependencyNode;
+            this.publicRecord = new PluginRealmCache.CacheRecord(realm, this.artifacts, dependencyNode);
+        }
+
+        public ClassRealm getRealm() {
+            return realm;
+        }
+
+        public List<Artifact> getArtifacts() {
+            return artifacts;
+        }
+
+        public DependencyNode getDependencyNode() {
+            return dependencyNode;
+        }
+
+        @Override
+        public Stream<Path> getDependencyPaths() {
+            return artifacts.stream()
+                    .map(Artifact::getFile)
+                    .filter(Objects::nonNull)
+                    .map(File::toPath);
+        }
+
+        @Override
+        public void invalidate() {
+            try {
+                realm.getWorld().disposeRealm(realm.getId());
+            } catch (NoSuchRealmException e) {
+                // realm was already disposed — ignore
+            }
+        }
+
+        /** Converts to the public {@link PluginRealmCache.CacheRecord} view (same instance always). */
+        PluginRealmCache.CacheRecord toCacheRecord() {
+            return publicRecord;
+        }
+    }
+
     /**
      * CacheKey
      */
@@ -132,7 +194,12 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
         }
     }
 
-    protected final Map<Key, CacheRecord> cache = new ConcurrentHashMap<>();
+    protected final MavenCache<Key, PluginRealmRecord> cache;
+
+    @Inject
+    public DefaultPluginRealmCache(CacheFactory cacheFactory) {
+        this.cache = cacheFactory.createCache();
+    }
 
     @Override
     public Key createKey(
@@ -147,20 +214,23 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
 
     @Override
     public CacheRecord get(Key key) {
-        return cache.get(key);
+        PluginRealmRecord record = cache.get(key);
+        return record != null ? record.toCacheRecord() : null;
     }
 
     @Override
     public CacheRecord get(Key key, PluginRealmSupplier supplier)
             throws PluginResolutionException, PluginContainerException {
         try {
-            return cache.computeIfAbsent(key, k -> {
+            PluginRealmRecord record = cache.computeIfAbsent(key, k -> {
                 try {
-                    return supplier.load();
+                    CacheRecord cr = supplier.load();
+                    return new PluginRealmRecord(cr.getRealm(), cr.getArtifacts(), cr.getDependencyNode());
                 } catch (PluginResolutionException | PluginContainerException e) {
                     throw new RuntimeException(e);
                 }
             });
+            return record.toCacheRecord();
         } catch (RuntimeException e) {
             if (e.getCause() instanceof PluginResolutionException pluginResolutionException) {
                 throw pluginResolutionException;
@@ -183,27 +253,26 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
         Objects.requireNonNull(pluginRealm, "pluginRealm cannot be null");
         Objects.requireNonNull(pluginArtifacts, "pluginArtifacts cannot be null");
 
-        if (cache.containsKey(key)) {
+        PluginRealmRecord newRecord = new PluginRealmRecord(pluginRealm, pluginArtifacts, dependencyNode);
+        PluginRealmRecord existing = cache.put(key, newRecord);
+        if (existing != null) {
             throw new IllegalStateException("Duplicate plugin realm for plugin " + key);
         }
-
-        CacheRecord record = new CacheRecord(pluginRealm, pluginArtifacts, dependencyNode);
-
-        cache.put(key, record);
-
-        return record;
+        return newRecord.toCacheRecord();
     }
 
     @Override
     public void flush() {
-        for (CacheRecord record : cache.values()) {
-            ClassRealm realm = record.getRealm();
-            try {
-                realm.getWorld().disposeRealm(realm.getId());
-            } catch (NoSuchRealmException e) {
-                // ignore
-            }
-        }
+        cache.clear();
+    }
+
+    @Override
+    public void invalidatePath(Path path) {
+        cache.removeIf((k, v) -> v.getDependencyPaths().anyMatch(path::equals));
+    }
+
+    @Override
+    public void flushCache() {
         cache.clear();
     }
 
@@ -222,6 +291,6 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
 
     @Override
     public void dispose() {
-        cache.clear();
+        cache.clearSilently();
     }
 }

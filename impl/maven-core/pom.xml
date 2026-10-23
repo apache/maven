@@ -485,6 +485,18 @@ under the License.
               <exclude>org.apache.maven.toolchain.ToolchainManagerPrivate</exclude>
               <exclude>org.apache.maven.toolchain.ToolchainPrivate</exclude>
               <exclude>org.apache.maven.toolchain.ToolchainsBuilder</exclude>
+              <!-- CacheFactory SPI: injected constructors replace no-arg; cache field now MavenCache-typed -->
+              <exclude>org.apache.maven.plugin.DefaultExtensionRealmCache#DefaultExtensionRealmCache()</exclude>
+              <exclude>org.apache.maven.plugin.DefaultExtensionRealmCache#cache</exclude>
+              <exclude>org.apache.maven.plugin.DefaultPluginArtifactsCache#assertUniqueKey(org.apache.maven.plugin.PluginArtifactsCache$Key)</exclude>
+              <exclude>org.apache.maven.plugin.DefaultPluginArtifactsCache#DefaultPluginArtifactsCache()</exclude>
+              <exclude>org.apache.maven.plugin.DefaultPluginArtifactsCache#cache</exclude>
+              <exclude>org.apache.maven.plugin.DefaultPluginDescriptorCache#DefaultPluginDescriptorCache()</exclude>
+              <exclude>org.apache.maven.plugin.DefaultPluginRealmCache#DefaultPluginRealmCache()</exclude>
+              <exclude>org.apache.maven.plugin.DefaultPluginRealmCache#cache</exclude>
+              <exclude>org.apache.maven.plugin.DefaultPluginRealmCache#invalidate(org.apache.maven.api.Artifact)</exclude>
+              <exclude>org.apache.maven.project.DefaultProjectRealmCache#DefaultProjectRealmCache()</exclude>
+              <exclude>org.apache.maven.project.DefaultProjectRealmCache#cache</exclude>
             </excludes>
           </parameter>
         </configuration>
