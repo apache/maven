@@ -408,7 +408,7 @@ if defined IS_MAIN_OVERRIDE (
 
 if defined MAVEN_DEBUG_SCRIPT (
   echo [DEBUG] Launching JVM with command:
-  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS% %MAVEN_DEBUG_OPTS% %MAVEN_MODULE_OPTS% -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %LAUNCHER_CLASS% %MAVEN_EFFECTIVE_ARGS% %*
+  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_ARGFILE_ARG% %MAVEN_DEBUG_OPTS% %MAVEN_MODULE_OPTS% -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %LAUNCHER_CLASS% %MAVEN_EFFECTIVE_ARGS% %*
 )
 
 "%JAVACMD%" ^
