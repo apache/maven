@@ -23,11 +23,8 @@ import java.util.Locale;
 import java.util.stream.Stream;
 
 /**
- * OS support
- *
- * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
+ * OS support.
  */
-@Deprecated(since = "4.0.0")
 public class Os {
 
     /**
@@ -36,7 +33,7 @@ public class Os {
     public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
 
     /**
-     * The OA architecture.
+     * The OS architecture.
      */
     public static final String OS_ARCH = System.getProperty("os.arch").toLowerCase(Locale.ENGLISH);
 
@@ -46,7 +43,7 @@ public class Os {
     public static final String OS_VERSION = System.getProperty("os.version").toLowerCase(Locale.ENGLISH);
 
     /**
-     * OS Family
+     * The OS family, or {@code "unknown"} if no known family matches. Never {@code null}.
      */
     public static final String OS_FAMILY;
 
@@ -121,7 +118,12 @@ public class Os {
     private static final String FAMILY_OS400 = "os/400";
 
     /**
-     * OpenJDK is reported to call MacOS X "Darwin"
+     * Unrecognized OS family. {@value}
+     */
+    private static final String FAMILY_UNKNOWN = "unknown";
+
+    /**
+     * OpenJDK is reported to call Mac OS X "Darwin"
      *
      * @see <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=44889">bugzilla issue</a>
      * @see <a href="https://issues.apache.org/jira/browse/HADOOP-3318">HADOOP-3318</a>
@@ -131,7 +133,7 @@ public class Os {
     /**
      * The path separator.
      */
-    private static final String PATH_SEP = System.getProperty("path.separator");
+    private static final String PATH_SEP = File.pathSeparator;
 
     static {
         // Those two public constants are initialized here, as they need all the private constants
@@ -175,7 +177,7 @@ public class Os {
                     || actualOsName.contains("98")
                     || actualOsName.contains("me")
                     // wince isn't really 9x, but crippled enough to
-                    // be a muchness. Maven doesnt run on CE, anyway.
+                    // be a muchness. Maven doesn't run on CE, anyway.
                     || actualOsName.contains("ce"));
             isNT = !is9x;
         }
@@ -185,11 +187,11 @@ public class Os {
             case FAMILY_NT -> isWindows && isNT;
             case FAMILY_OS2 -> actualOsName.contains(FAMILY_OS2);
             case FAMILY_NETWARE -> actualOsName.contains(FAMILY_NETWARE);
-            case FAMILY_DOS -> File.pathSeparatorChar == ';' && !isFamily(FAMILY_NETWARE, actualOsName) && !isWindows;
+            case FAMILY_DOS -> PATH_SEP.equals(";") && !isFamily(FAMILY_NETWARE, actualOsName) && !isWindows;
             case FAMILY_MAC -> actualOsName.contains(FAMILY_MAC) || actualOsName.contains(DARWIN);
             case FAMILY_TANDEM -> actualOsName.contains("nonstop_kernel");
             case FAMILY_UNIX ->
-                File.pathSeparatorChar == ':'
+                PATH_SEP.equals(":")
                         && !isFamily(FAMILY_OPENVMS, actualOsName)
                         && (!isFamily(FAMILY_MAC, actualOsName) || actualOsName.endsWith("x"));
             case FAMILY_ZOS -> actualOsName.contains(FAMILY_ZOS) || actualOsName.contains(FAMILY_OS390);
@@ -220,6 +222,6 @@ public class Os {
                         FAMILY_ZOS)
                 .filter(Os::isFamily)
                 .findFirst()
-                .orElse(null);
+                .orElse(FAMILY_UNKNOWN);
     }
 }
