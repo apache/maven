@@ -262,5 +262,4 @@ public class ClassWorld implements Closeable {
     public synchronized void removeListener(ClassWorldListener listener) {
         listeners.remove(listener);
     }
-
 }
