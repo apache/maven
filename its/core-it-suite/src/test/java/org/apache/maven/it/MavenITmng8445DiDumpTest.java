@@ -41,6 +41,7 @@ import static org.junit.jupiter.api.DynamicTest.dynamicTest;
 class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
     private static final String MAVEN_DI_DEBUG = "maven.di.debug";
     private static final String SISU_DEBUG = "sisu.debug";
+    private static final String AMBIGUOUS = "ambiguous";
     private static final Pattern REVISION = Pattern.compile(" revision=([0-9]+)(?:->([0-9]+))?");
     private static final Pattern LOADER = Pattern.compile("    (L[0-9]+): (.+)");
     private static final String SISU_DUMP_MARKER = "-----[explicit bindings]";
@@ -59,7 +60,7 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
                 new BuilderCase("eight-threads", List.of("-T", "8"), true));
         // Exercise flag independence with both builders; output modes only need diagnostics enabled.
         Stream<DynamicTest> flags = builders.stream()
-                .flatMap(builder -> Stream.of("false", "true")
+                .flatMap(builder -> Stream.of("false", "true", AMBIGUOUS)
                         .flatMap(nativeMode -> Stream.of(false, true)
                                 .map(sisuEnabled -> dynamicTest(
                                         builder.name() + " native=" + nativeMode + " sisu=" + sisuEnabled,
@@ -75,6 +76,7 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
     private void verifyDump(Path project, BuilderCase builder, String nativeMode, boolean sisuEnabled)
             throws Exception {
         boolean nativeEnabled = !"false".equals(nativeMode);
+        boolean ambiguous = AMBIGUOUS.equals(nativeMode);
         Verifier verifier = newVerifier(project);
         String logfile = "build-" + builder.name() + "-native-" + nativeMode + "-sisu-" + sisuEnabled + ".txt";
         verifier.setLogFileName(logfile);
@@ -110,11 +112,16 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
         if (nativeEnabled) {
             // Each module creates its own Mojo injector.
             assertTrue(dumps >= MODULE_PATHS.size());
-            assertTrue(nativeRows.stream().anyMatch(line -> line.contains("mng8445.CheckMojo")));
-            assertTrue(nativeRows.stream().anyMatch(line -> line.contains("CheckMojo$Unused")));
-            assertTrue(nativeRows.stream().anyMatch(line -> line.contains("Unused.provide")));
-            assertTrue(hasInstanceBinding(nativeRows, "org.apache.maven.api.Session"));
-            assertTrue(nativeRows.stream().anyMatch(line -> line.contains("field injector:") && line.contains(".session")));
+            if (ambiguous) {
+                assertFalse(nativeRows.stream().anyMatch(line -> line.matches(
+                        "  (?:[+~-] )?key: .*CheckMojo(?:\\$Unused)? \\[loader=.*")));
+            } else {
+                assertTrue(nativeRows.stream().anyMatch(line -> line.contains("mng8445.CheckMojo")));
+                assertTrue(nativeRows.stream().anyMatch(line -> line.contains("CheckMojo$Unused")));
+                assertTrue(nativeRows.stream().anyMatch(line -> line.contains("Unused.provide")));
+                assertTrue(hasInstanceBinding(nativeRows, "org.apache.maven.api.Session"));
+                assertTrue(nativeRows.stream().anyMatch(line -> line.contains("field injector:") && line.contains(".session")));
+            }
         } else {
             assertEquals(0, dumps);
         }

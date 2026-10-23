@@ -583,6 +583,48 @@ class InjectorDiagnosticsTest {
     }
 
     @Test
+    void ambiguousModeFiltersByCandidateCountAndResetsOnModeChanges() {
+        RecordingInjector injector = new RecordingInjector();
+        injector.bindInstance(String.class, "single");
+        injector.bindImplicit(Runnable.class);
+        System.setProperty(MAVEN_DI_DEBUG, "ambiguous");
+        injector.checkpoint();
+        assertTrue(injector.dumps.get(0).contains(", ambiguous"));
+        assertTrue(injector.dumps.get(0).contains("key: java.lang.Runnable"));
+        assertFalse(injector.dumps.get(0).contains("java.lang.String"));
+        injector.bind(Key.of(String.class), Binding.toInstance("second").withKey(Key.of(String.class)));
+        injector.checkpoint();
+        assertTrue(injector.dumps.get(1).contains("+ key: java.lang.String"));
+        assertEquals(2, bindingRows(injector.dumps.get(1)).size());
+        injector.bindInstance(Runnable.class, () -> {});
+        injector.checkpoint();
+        assertTrue(injector.dumps.get(2).contains("- key: java.lang.Runnable"));
+        System.setProperty(MAVEN_DI_DEBUG, "true");
+        injector.checkpoint();
+        assertFalse(injector.dumps.get(3).contains(", delta"));
+        assertTrue(injector.dumps.get(3).contains("key: java.lang.Runnable"));
+        System.setProperty(MAVEN_DI_DEBUG, "AMBIGUOUS");
+        injector.checkpoint();
+        assertFalse(injector.dumps.get(4).contains(", delta"));
+        assertFalse(injector.dumps.get(4).contains("java.lang.Runnable"));
+    }
+
+    @Test
+    void changesHiddenByAmbiguousFilterDoNotPrintEmptyDeltas() {
+        System.setProperty(MAVEN_DI_DEBUG, "ambiguous");
+        RecordingInjector injector = new RecordingInjector();
+        injector.checkpoint();
+        injector.bindInstance(String.class, "single");
+        injector.checkpoint();
+        injector.checkpoint();
+        assertEquals(1, injector.dumps.size());
+        injector.bindImplicit(Runnable.class);
+        injector.checkpoint();
+        assertEquals(2, injector.dumps.size());
+        assertTrue(injector.dumps.get(1).contains("+ key: java.lang.Runnable"));
+    }
+
+    @Test
     void outputChangesAndFailedDeltasRestartWithFullSnapshots() {
         AtomicInteger attempts = new AtomicInteger();
         RecordingInjector injector = new RecordingInjector() {
@@ -770,8 +812,33 @@ class InjectorDiagnosticsTest {
     }
 
     @Test
+    void reentrantOutputKeepsEveryObservedAmbiguousStateInOrder() {
+        System.setProperty(MAVEN_DI_DEBUG, "ambiguous");
+        AtomicInteger writes = new AtomicInteger();
+        RecordingInjector injector = new RecordingInjector() {
+            @Override
+            void writeDump(PrintStream output, String dump) {
+                if (writes.getAndIncrement() == 0) {
+                    bindInstance(String.class, "second");
+                    checkpoint();
+                    getBindings().get(Key.of(String.class)).clear();
+                    bindInstance(String.class, "third");
+                    checkpoint();
+                }
+                super.writeDump(output, dump);
+            }
+        };
+        injector.bindInstance(String.class, "first");
+        injector.checkpoint();
+        assertEquals(3, injector.dumps.size());
+        assertFalse(injector.dumps.get(0).contains(", delta"));
+        assertTrue(injector.dumps.get(1).contains("+ key: java.lang.String"));
+        assertTrue(injector.dumps.get(2).contains("- key: java.lang.String"));
+    }
+
+    @Test
     void resetWhileWritingKeepsOneWriterAndStartsANewFullHistory() throws Exception {
-        for (String reset : List.of("output", "off", "dispose")) {
+        for (String reset : List.of("output", "mode", "off", "dispose")) {
             CountDownLatch writing = new CountDownLatch(1);
             CountDownLatch release = new CountDownLatch(1);
             AtomicInteger active = new AtomicInteger();
@@ -804,6 +871,7 @@ class InjectorDiagnosticsTest {
                 assertTrue(writing.await(10, TimeUnit.SECONDS));
                 switch (reset) {
                     case "output" -> System.setOut(other);
+                    case "mode" -> System.setProperty(MAVEN_DI_DEBUG, "ambiguous");
                     case "off" -> {
                         System.clearProperty(MAVEN_DI_DEBUG);
                         injector.checkpoint();

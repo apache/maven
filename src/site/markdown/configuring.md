@@ -122,7 +122,16 @@ run the `validate` phase with diagnostics:
 MAVEN_OPTS="-Dmaven.di.debug=true" mvn validate
 ```
 
-Use `true` (case insensitive) or an empty value to show all bindings.
+Use `true` (case insensitive) or an empty value to show all bindings. Use
+`ambiguous` to show only keys with zero or multiple candidates:
+
+```sh
+MAVEN_OPTS="-Dmaven.di.debug=ambiguous" mvn validate
+```
+
+The filter counts registered candidates without checking whether priority
+selection or dependency resolution will succeed. It omits scope registrations
+and marks keys leaving the filter as removals.
 
 An unset property or any other value, including `false`, disables native dumps.
 Sisu diagnostics use the separate `sisu.debug` property. Set both to inspect
@@ -154,14 +163,14 @@ registrations, including context bindings added before a Maven 4 Mojo runs. The
 first block is a full snapshot. Later blocks show changed keys, individual
 candidates and scopes: `+` for additions, `-` for removals and `~` for changes.
 Delta headers give the previous and current registry revisions. Repeated lookups
-of an unchanged registry produce no output. Discovery or registration failures
-produce a block marked `partial`.
+of an unchanged registry and changes hidden by the filter produce no output.
+Discovery or registration failures produce a block marked `partial`.
 
 Snapshots print in capture order. Parallel callers wait until their snapshot is
 processed. Checkpoints from callbacks on the writer thread queue until the
-callback returns. Changing the stream resets the history. Output failures and
-checkpoints that observe diagnostics disabled also reset it. The next output
-starts with a full snapshot.
+callback returns. Changing the stream or diagnostic mode resets the history.
+Output failures and checkpoints that observe diagnostics disabled also reset it.
+The next output starts with a full snapshot.
 
 Snapshots do not create components, call providers or initializers, or obtain
 scope instances. Bound instances, suppliers and annotation qualifiers appear by

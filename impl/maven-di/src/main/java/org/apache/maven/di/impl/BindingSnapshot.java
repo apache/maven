@@ -55,13 +55,19 @@ final class BindingSnapshot {
     private static final String REMOVED = "- ";
     private static final String CHANGED = "~ ";
     private final long revision;
+    private final boolean ambiguous;
     private final List<KeyBindings> keys;
     private final List<ScopeBinding> scopes;
     private final Map<String, String> loaders;
 
     private BindingSnapshot(
-            long revision, List<KeyBindings> keys, List<ScopeBinding> scopes, Map<String, String> loaders) {
+            long revision,
+            boolean ambiguous,
+            List<KeyBindings> keys,
+            List<ScopeBinding> scopes,
+            Map<String, String> loaders) {
         this.revision = revision;
+        this.ambiguous = ambiguous;
         this.keys = List.copyOf(keys);
         this.scopes = List.copyOf(scopes);
         this.loaders = Collections.unmodifiableMap(new LinkedHashMap<>(loaders));
@@ -71,12 +77,14 @@ final class BindingSnapshot {
             Map<Key<?>, Set<Binding<?>>> bindings,
             Map<Class<? extends Annotation>, Supplier<Scope>> scopes,
             DiagnosticIdentity identities,
+            boolean ambiguous,
             long revision) {
         Capture format = new Capture(identities);
         List<KeyBindings> keys = new ArrayList<>();
         Map<Binding<?>, Candidate> descriptions = new IdentityHashMap<>();
         Comparator<Binding<?>> candidateOrder = Binding.getPriorityComparator().thenComparing(Binding::identityString);
         var registrations = bindings.entrySet().stream()
+                .filter(entry -> !ambiguous || entry.getValue().size() != 1)
                 .map(entry -> Map.entry(
                         Capture.key(entry.getKey(), Binding::identityString).plain(), entry))
                 .sorted(Map.Entry.comparingByKey())
@@ -90,15 +98,17 @@ final class BindingSnapshot {
                     .toList();
             keys.add(new KeyBindings(format.keyIdentity(registration.getKey()), name, candidates));
         }
-        List<ScopeBinding> scopeRows = scopes.entrySet().stream()
-                .sorted(Comparator.comparing(entry -> Capture.type(entry.getKey(), Binding::identityString)))
-                .map(entry -> new ScopeBinding(
-                        identities.token(entry.getKey()),
-                        format.type(entry.getKey()),
-                        identities.token(entry.getValue()),
-                        Binding.identityString(entry.getValue())))
-                .toList();
-        return new BindingSnapshot(revision, keys, scopeRows, identities.loaders());
+        List<ScopeBinding> scopeRows = ambiguous
+                ? List.of()
+                : scopes.entrySet().stream()
+                        .sorted(Comparator.comparing(entry -> Capture.type(entry.getKey(), Binding::identityString)))
+                        .map(entry -> new ScopeBinding(
+                                identities.token(entry.getKey()),
+                                format.type(entry.getKey()),
+                                identities.token(entry.getValue()),
+                                Binding.identityString(entry.getValue())))
+                        .toList();
+        return new BindingSnapshot(revision, ambiguous, keys, scopeRows, identities.loaders());
     }
 
     String render(Object injector, String reason, boolean partial, BindingSnapshot previous) {
@@ -152,7 +162,7 @@ final class BindingSnapshot {
         String registry = "Maven DI native registry " + Binding.identityString(injector);
         String revisions = previous == null ? Long.toString(revision) : previous.revision + "->" + revision;
         String header = registry + " revision=" + revisions + " (" + reason
-                + (previous == null ? "" : ", delta")
+                + (previous == null ? "" : ", delta") + (ambiguous ? ", ambiguous" : "")
                 + (partial ? ", partial" : "") + ") {";
         return String.join("\n", header, String.join("\n\n", blocks), "} " + registry);
     }
