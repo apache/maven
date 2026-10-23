@@ -46,6 +46,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.ProjectArtifactsCache;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
@@ -112,9 +113,12 @@ public class LifecycleDependencyResolver {
             throws LifecycleExecutionException {
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         try {
-            ClassLoader projectRealm = project.getClassRealm();
-            if (projectRealm != null && projectRealm != tccl) {
-                Thread.currentThread().setContextClassLoader(projectRealm);
+            ClassRealm projectRealm = project.getClassRealm();
+            if (projectRealm != null) {
+                ClassLoader projectClassLoader = projectRealm;
+                if (projectClassLoader != tccl) {
+                    Thread.currentThread().setContextClassLoader(projectClassLoader);
+                }
             }
 
             if (project.getDependencyArtifacts() == null) {
