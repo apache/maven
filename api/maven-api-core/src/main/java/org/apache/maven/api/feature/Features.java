@@ -84,6 +84,16 @@ public final class Features {
         return doGet(userProperties, Constants.MAVEN_DEPLOY_BUILD_POM, true);
     }
 
+    /**
+     * Check if warnings about cross-lifecycle managed executions being filtered out are enabled.
+     * When {@code true} (the default), Maven emits a warning when a pluginManagement execution
+     * is silently dropped because its phase belongs to a different lifecycle than the one
+     * introducing the plugin via lifecycle bindings.
+     */
+    public static boolean warnOnCrossLifecycleManagedExecution(@Nullable Map<String, ?> userProperties) {
+        return doGet(userProperties, Constants.MAVEN_WARN_CROSS_LIFECYCLE_MANAGED_EXECUTION, true);
+    }
+
     private static boolean doGet(Map<String, ?> userProperties, String key, boolean def) {
         return doGet(userProperties != null ? userProperties.get(key) : null, def);
     }
