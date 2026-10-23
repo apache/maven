@@ -1,0 +1,131 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 720" font-family="'Segoe UI', 'Helvetica Neue', Arial, sans-serif" font-size="13">
+  <defs>
+    <marker id="arrow" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#666" stroke-width="1.2"/>
+    </marker>
+    <marker id="arrow-blue" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#4a90d9" stroke-width="1.2"/>
+    </marker>
+    <marker id="arrow-green" markerWidth="8" markerHeight="6" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6" fill="none" stroke="#5ba85b" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="900" height="720" fill="#fafafa" rx="4"/>
+
+  <!-- Title -->
+  <text x="450" y="30" text-anchor="middle" font-size="18" font-weight="bold" fill="#333">Maven 4.x Classloader Hierarchy</text>
+
+  <!-- Legend -->
+  <g transform="translate(620, 50)">
+    <rect width="260" height="90" fill="#fff" stroke="#ddd" rx="4"/>
+    <text x="10" y="20" font-size="11" font-weight="bold" fill="#666">Legend</text>
+    <line x1="10" y1="38" x2="50" y2="38" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
+    <text x="58" y="42" font-size="11" fill="#666">Parent classloader</text>
+    <line x1="10" y1="58" x2="50" y2="58" stroke="#4a90d9" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-blue)"/>
+    <text x="58" y="62" font-size="11" fill="#666">Package imports</text>
+    <line x1="10" y1="78" x2="50" y2="78" stroke="#5ba85b" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-green)"/>
+    <text x="58" y="82" font-size="11" fill="#666">Export feeds into</text>
+  </g>
+
+  <!-- JVM System ClassLoader -->
+  <g transform="translate(300, 60)">
+    <rect width="260" height="44" fill="#f5f0e8" stroke="#c9b98a" rx="6" stroke-width="1.5"/>
+    <text x="130" y="20" text-anchor="middle" font-weight="bold" fill="#665520">JVM System ClassLoader</text>
+    <text x="130" y="36" text-anchor="middle" font-size="11" fill="#998855">plexus-classworlds + -javaagent</text>
+  </g>
+
+  <!-- plexus.core (Maven Core) -->
+  <g transform="translate(300, 140)">
+    <rect width="260" height="44" fill="#fff3e0" stroke="#e6a23c" rx="6" stroke-width="1.5"/>
+    <text x="130" y="20" text-anchor="middle" font-weight="bold" fill="#b37a1a">plexus.core</text>
+    <text x="130" y="36" text-anchor="middle" font-size="11" fill="#c9913a">Maven Core — ${maven.home}/lib/*.jar</text>
+  </g>
+
+  <!-- Parent arrow: System CL -> plexus.core -->
+  <line x1="430" y1="104" x2="430" y2="138" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- Core Extension -->
+  <g transform="translate(30, 240)">
+    <rect width="200" height="44" fill="#e8f5e9" stroke="#66bb6a" rx="6" stroke-width="1.5"/>
+    <text x="100" y="20" text-anchor="middle" font-weight="bold" fill="#2e7d32">coreExtension>G:A:V</text>
+    <text x="100" y="36" text-anchor="middle" font-size="11" fill="#4caf50">.mvn/extensions.xml entries</text>
+  </g>
+  <!-- Parent arrow: plexus.core -> coreExtension -->
+  <path d="M350,184 L350,200 L130,200 L130,238" fill="none" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
+
+  <!-- maven.ext -->
+  <g transform="translate(260, 240)">
+    <rect width="200" height="44" fill="#fce4ec" stroke="#ef9a9a" rx="6" stroke-width="1.5"/>
+    <text x="100" y="20" text-anchor="middle" font-weight="bold" fill="#c62828">maven.ext</text>
+    <text x="100" y="36" text-anchor="middle" font-size="11" fill="#e57373">Extensions aggregator (optional)</text>
+  </g>
+  <!-- Parent arrow: plexus.core -> maven.ext -->
+  <line x1="400" y1="184" x2="400" y2="238" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Import arrow: coreExtension exports -> maven.ext -->
+  <line x1="230" y1="262" x2="258" y2="262" stroke="#5ba85b" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-green)"/>
+
+  <!-- maven.api -->
+  <g transform="translate(40, 360)">
+    <rect width="200" height="44" fill="#e3f2fd" stroke="#64b5f6" rx="6" stroke-width="1.5"/>
+    <text x="100" y="20" text-anchor="middle" font-weight="bold" fill="#1565c0">maven.api</text>
+    <text x="100" y="36" text-anchor="middle" font-size="11" fill="#42a5f5">CoreExports packages</text>
+  </g>
+  <!-- Import arrow: container realm (maven.ext/plexus.core) -> maven.api -->
+  <path d="M360,284 L360,330 L200,330 L200,358" fill="none" stroke="#4a90d9" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-blue)"/>
+
+  <!-- maven.api.v4 -->
+  <g transform="translate(280, 360)">
+    <rect width="200" height="44" fill="#e8eaf6" stroke="#9fa8da" rx="6" stroke-width="1.5"/>
+    <text x="100" y="20" text-anchor="middle" font-weight="bold" fill="#283593">maven.api.v4</text>
+    <text x="100" y="36" text-anchor="middle" font-size="11" fill="#5c6bc0">o.a.m.api + org.slf4j only</text>
+  </g>
+  <!-- Import arrow: container realm -> maven.api.v4 -->
+  <path d="M410,284 L410,330 L440,330 L440,358" fill="none" stroke="#4a90d9" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-blue)"/>
+
+  <!-- Build Extension -->
+  <g transform="translate(540, 360)">
+    <rect width="200" height="44" fill="#e8f5e9" stroke="#66bb6a" rx="6" stroke-width="1.5"/>
+    <text x="100" y="20" text-anchor="middle" font-weight="bold" fill="#2e7d32">extension>G:A:V</text>
+    <text x="100" y="36" text-anchor="middle" font-size="11" fill="#4caf50">Build Extension</text>
+  </g>
+  <!-- Parent arrow: System CL -> Build Extension -->
+  <path d="M530,82 L820,82 L820,340 L700,340 L700,358" fill="none" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Import arrow: maven.api -> Build Extension -->
+  <path d="M240,382 L270,382 L270,420 L580,420 L580,404" fill="none" stroke="#4a90d9" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-blue)"/>
+
+  <!-- Project Realm -->
+  <g transform="translate(40, 490)">
+    <rect width="200" height="44" fill="#f3e5f5" stroke="#ce93d8" rx="6" stroke-width="1.5"/>
+    <text x="100" y="20" text-anchor="middle" font-weight="bold" fill="#6a1b9a">project>G:A:V</text>
+    <text x="100" y="36" text-anchor="middle" font-size="11" fill="#ab47bc">Project Realm</text>
+  </g>
+  <!-- Parent arrow: maven.api -> Project -->
+  <line x1="140" y1="404" x2="140" y2="488" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Import arrow: Build Extension exports -> Project -->
+  <path d="M640,404 L640,460 L200,460 L200,488" fill="none" stroke="#5ba85b" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-green)"/>
+
+  <!-- Plugin Realm -->
+  <g transform="translate(300, 560)">
+    <rect width="260" height="58" fill="#fff9c4" stroke="#fdd835" rx="6" stroke-width="1.5"/>
+    <text x="130" y="20" text-anchor="middle" font-weight="bold" fill="#9e8600">plugin>G:A:V</text>
+    <text x="130" y="36" text-anchor="middle" font-size="11" fill="#c6a700">Plugin Realm</text>
+    <text x="130" y="50" text-anchor="middle" font-size="10" fill="#c6a700" font-style="italic">imports maven.api or project realm</text>
+  </g>
+  <!-- Parent arrow: System CL -> Plugin -->
+  <path d="M560,82 L860,82 L860,560 L860,589 L562,589" fill="none" stroke="#666" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <!-- Import arrow: maven.api -> Plugin (without extensions) -->
+  <path d="M80,404 L80,589 L298,589" fill="none" stroke="#4a90d9" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-blue)"/>
+  <!-- Import arrow: Project -> Plugin (with extensions) - slightly offset -->
+  <path d="M100,534 L100,575 L298,575" fill="none" stroke="#4a90d9" stroke-width="1.5" stroke-dasharray="6,3" marker-end="url(#arrow-blue)"/>
+
+  <!-- Annotations for the two plugin import paths -->
+  <text x="108" y="560" font-size="10" fill="#4a90d9" font-style="italic">without extensions</text>
+  <text x="108" y="588" font-size="10" fill="#4a90d9" font-style="italic">with extensions</text>
+
+  <!-- Footer note -->
+  <text x="450" y="660" text-anchor="middle" font-size="11" fill="#999">Solid arrows = parent classloader    Dashed blue = package imports    Dashed green = export feeds</text>
+  <text x="450" y="678" text-anchor="middle" font-size="11" fill="#999">maven.ext realm is only created when core extensions or -Dmaven.ext.class.path exist</text>
+  <text x="450" y="696" text-anchor="middle" font-size="11" fill="#999">maven.api and maven.api.v4 both have no parent — they import directly from the container realm</text>
+</svg>
