@@ -18,6 +18,8 @@
  */
 package org.apache.maven.di.impl;
 
+import java.lang.reflect.Member;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -41,12 +43,32 @@ public abstract class BindingInitializer<T> {
 
     public abstract Consumer<T> compile(Function<Dependency<?>, Supplier<?>> compiler);
 
+    /** Returns unescaped source lines without compiling or executing the initializer. */
+    List<String> getDiagnosticSourceLines(Function<Member, List<String>> memberSource) {
+        return List.of("initialized by " + Binding.identityString(this));
+    }
+
+    static List<String> sourceLines(String kind, List<String> source) {
+        List<String> lines = new ArrayList<>();
+        for (int i = 0; i < source.size(); i++) {
+            lines.add((i == 0 ? "initialized by " + kind + ": " : "  ") + source.get(i));
+        }
+        return List.copyOf(lines);
+    }
+
     public static <T> BindingInitializer<T> combine(List<BindingInitializer<T>> bindingInitializers) {
         Set<Dependency<?>> deps = bindingInitializers.stream()
                 .map(BindingInitializer::getDependencies)
                 .flatMap(Collection::stream)
                 .collect(toSet());
         return new BindingInitializer<>(deps) {
+            @Override
+            List<String> getDiagnosticSourceLines(Function<Member, List<String>> memberSource) {
+                return bindingInitializers.stream()
+                        .flatMap(initializer -> initializer.getDiagnosticSourceLines(memberSource).stream())
+                        .toList();
+            }
+
             @Override
             public Consumer<T> compile(Function<Dependency<?>, Supplier<?>> compiler) {
                 return instance -> bindingInitializers.stream()

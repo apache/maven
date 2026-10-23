@@ -112,44 +112,48 @@ prepended to the actual list of command line arguments.
 For example, options and goals could be defined with the value
 `-B -V checkstyle:checkstyle`.
 
-## Dependency Injection Diagnostics
+## Dependency injection diagnostics
 
-Set the `maven.di.debug` Java system property to print the bindings known to Maven DI.
-For example, to run the `validate` phase with diagnostics enabled:
+Set the `maven.di.debug` Java system property before startup to print Maven DI
+bindings, including those discovered during container creation. For example, to
+run the `validate` phase with diagnostics:
 
 ```sh
 MAVEN_OPTS="-Dmaven.di.debug=true" mvn validate
 ```
 
-The property accepts `true` (case insensitive) or an empty value. Native dumps
-are disabled when the property is unset or has any other value, including `false`.
-Set it before startup to include bindings discovered during container creation.
-Sisu's diagnostics are controlled separately by `sisu.debug`. Set both properties
-to inspect both containers:
+Use `true` (case insensitive) or an empty value to show all bindings.
+
+An unset property or any other value, including `false`, disables native dumps.
+Sisu diagnostics use the separate `sisu.debug` property. Set both to inspect
+both containers:
 
 ```sh
 MAVEN_OPTS="-Dmaven.di.debug=true -Dsisu.debug=true" mvn validate
 ```
 
-Each block starts with `Maven DI native registry` and identifies the injector and
-registry revision. Sorted key blocks group all candidates, including aliases.
-Candidates appear in descending priority order. Each candidate lists its
-priority, scope, source and declared dependencies on separate lines. Constructor
-and factory method parameters, declared exceptions and initializers are listed
-on separate lines too. Optional dependencies start with `?`; keys without
-candidates are listed too. Class loader references such as `L1` are local to
-each snapshot and resolve to full identities in its final legend. `bootstrap`
-identifies the bootstrap class loader. These references distinguish types from
-different realms.
-The blocks go to standard output, where Maven may prefix lines with `[stdout]`.
+Each block starts with `Maven DI native registry` and identifies the injector
+and registry revision. Snapshots list keys in sorted order, including aliases
+and keys without candidates. Candidates within each key appear in descending
+priority order. Output goes to standard output; Maven may prefix lines with
+`[stdout]`.
 
-Snapshots are printed after discovery and when lookup or injection observes
-changed registrations, including context bindings added before a Maven 4 Mojo
-runs. Repeated lookups of an unchanged registry do not print another block.
-Discovery or registration failures produce a block marked `partial`.
+Candidate details list priority, scope, source, declared dependencies,
+constructor and factory method parameters, declared exceptions and initializers
+on separate lines. Initializers identify injected fields and methods. Optional
+dependencies start with `?`.
+
+Class loader references such as `L1` distinguish types from different realms.
+They are local to each snapshot, which ends with a legend of their full
+identities. `bootstrap` identifies the bootstrap class loader.
+
+Snapshots print after discovery and when lookup or injection observes changed
+registrations, including context bindings added before a Maven 4 Mojo runs.
+Repeated lookups of an unchanged registry produce no output. Discovery or
+registration failures produce a block marked `partial`.
 
 Snapshots do not create components, call providers or initializers, or obtain
 scope instances. Bound instances, suppliers and annotation qualifiers appear by
-type and identity, without exposing values or calling their `toString()` methods.
-Only the native registry is included; components supplied on demand by Sisu or
-Guice may be absent.
+type and identity, without exposing values or calling their `toString()`
+methods. Only the native registry is included; components supplied on demand by
+Sisu or Guice may be absent.

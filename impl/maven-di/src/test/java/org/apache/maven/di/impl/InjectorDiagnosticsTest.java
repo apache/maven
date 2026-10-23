@@ -47,6 +47,7 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 
+import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Qualifier;
@@ -180,7 +181,7 @@ class InjectorDiagnosticsTest {
     }
 
     @Test
-    void snapshotSeparatesSourceParametersExceptionsAndInitializers() {
+    void snapshotSeparatesSourceParametersAndExceptions() {
         RecordingInjector injector = new RecordingInjector();
         injector.bindImplicit(DetailedSource.class);
         injector.bindImplicit(Provider.class);
@@ -191,8 +192,7 @@ class InjectorDiagnosticsTest {
                         + "          java.lang.String [loader=bootstrap],\n"
                         + "          int [loader=bootstrap]\n"
                         + "        ) [loader=L1]\n"
-                        + "        throws java.io.IOException [loader=bootstrap]\n"
-                        + "        initialized by "),
+                        + "        throws java.io.IOException [loader=bootstrap]"),
                 snapshot);
         assertTrue(
                 snapshot.contains("      source:\n"
@@ -657,6 +657,42 @@ class InjectorDiagnosticsTest {
         @Provides
         <T> T provide() {
             return null;
+        }
+    }
+
+    @Test
+    void initializerSourcesSurviveCombinationWithoutExecutingUserCode() {
+        RecordingInjector injector = new RecordingInjector();
+        injector.bindImplicit(InjectedMembers.class);
+        String dump = injector.dumpBindings();
+        assertTrue(dump.contains("initialized by field injector:"), dump);
+        assertTrue(dump.contains(InjectedMembers.class.getName() + ".field"), dump);
+        assertTrue(dump.contains("initialized by method injector:"), dump);
+        assertTrue(dump.contains(InjectedMembers.class.getName() + ".initialize("), dump);
+        long candidates = dump.lines()
+                .filter(line -> line.contains("candidate: " + InjectedMembers.class.getName()))
+                .count();
+        assertEquals(
+                candidates,
+                dump.lines()
+                        .filter(line -> line.contains("initialized by field injector:"))
+                        .count());
+        assertEquals(
+                candidates,
+                dump.lines()
+                        .filter(line -> line.contains("initialized by method injector:"))
+                        .count());
+        assertFalse(dump.contains("initialized by method injector: )"), dump);
+        assertTrue(dump.contains("\n            java.lang.Integer [loader=bootstrap]\n"), dump);
+    }
+
+    static class InjectedMembers {
+        @Inject
+        String field;
+
+        @Inject
+        void initialize(Integer count) {
+            throw new AssertionError("initializer executed for diagnostics");
         }
     }
 }
