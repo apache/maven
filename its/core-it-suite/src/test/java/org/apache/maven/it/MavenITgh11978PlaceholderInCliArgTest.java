@@ -53,7 +53,6 @@ class MavenITgh11978PlaceholderInCliArgTest extends AbstractMavenIntegrationTest
         // Unknown ${...} expressions are preserved as literals (Maven 3 semantics, see gh-12507);
         // they are not replaced with empty strings at CLI parse time.
         Properties props = verifier.loadProperties("target/pom.properties");
-        assertEquals(
-                "-value_${some.maven.placeholder}_end-", props.getProperty("project.properties.pom.placeholder"));
+        assertEquals("-value_${some.maven.placeholder}_end-", props.getProperty("project.properties.pom.placeholder"));
     }
 }

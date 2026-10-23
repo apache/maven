@@ -66,8 +66,6 @@ class MavenITgh12507CliParamNestedInterpolationTest extends AbstractMavenIntegra
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties("target/config.properties");
-        assertEquals(
-                "PRE-" + basedir.resolve("target") + "-POST",
-                props.getProperty("stringParam"));
+        assertEquals("PRE-" + basedir.resolve("target") + "-POST", props.getProperty("stringParam"));
     }
 }
