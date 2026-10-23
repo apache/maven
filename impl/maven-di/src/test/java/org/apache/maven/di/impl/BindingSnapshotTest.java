@@ -115,6 +115,38 @@ class BindingSnapshotTest {
     }
 
     @Test
+    void stylingDoesNotChangeSnapshotComparisonOrEscapedContent() {
+        Key<String> key = Key.of(String.class, "quote\"\n");
+        Binding<String> binding = Binding.toInstance("unused").withKey(key);
+        Map<Key<?>, Set<Binding<?>>> registry = Map.of(key, Set.of(binding));
+        BindingSnapshot snapshot = capture(registry, 1);
+        BindingStyler styled = new BindingStyler() {
+            @Override
+            public String key(String text) {
+                return "<K>" + text + "</K>";
+            }
+
+            @Override
+            public String qualifier(String text) {
+                return "<Q>" + text + "</Q>";
+            }
+
+            @Override
+            public String header(String text) {
+                return "<H>" + text + "</H>";
+            }
+        };
+        String plain = render(snapshot, null);
+        String colored = snapshot.render(injector, "test", false, null, styled);
+        assertTrue(colored.contains("<K>java.lang.String [loader=bootstrap]</K>"), colored);
+        assertTrue(colored.contains("<Q>@Named("), colored);
+        assertTrue(colored.contains("<H>key:</H>"), colored);
+        assertEquals(plain, colored.replaceAll("</?[KQH]>", ""));
+        assertTrue(plain.contains("quote\\\"\\u000a"), plain);
+        assertNull(capture(registry, 2).render(injector, "test", false, snapshot, styled));
+    }
+
+    @Test
     void scopeChangesAreComparedIndependentlyOfBindings() {
         var singleton = Singleton.class;
         Supplier<Scope> first = () -> {
@@ -288,7 +320,7 @@ class BindingSnapshotTest {
     }
 
     private String render(BindingSnapshot snapshot, BindingSnapshot previous) {
-        return snapshot.render(injector, "test", false, previous);
+        return snapshot.render(injector, "test", false, previous, BindingStyler.NONE);
     }
 
     static class Sample {}

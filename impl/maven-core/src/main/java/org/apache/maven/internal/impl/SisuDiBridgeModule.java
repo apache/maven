@@ -39,10 +39,12 @@ import com.google.inject.name.Names;
 import com.google.inject.spi.ProviderInstanceBinding;
 import org.apache.maven.api.di.MojoExecutionScoped;
 import org.apache.maven.api.di.SessionScoped;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.Scope;
 import org.apache.maven.di.impl.Binding;
+import org.apache.maven.di.impl.BindingStyler;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.di.impl.Dependency;
 import org.apache.maven.di.impl.InjectorImpl;
@@ -58,6 +60,7 @@ import static org.apache.maven.di.impl.Binding.getPriorityComparator;
 @Named
 public class SisuDiBridgeModule extends AbstractModule {
 
+    private final MessageBuilderFactory messageBuilderFactory;
     protected final boolean discover;
     protected InjectorImpl injector;
 
@@ -66,14 +69,30 @@ public class SisuDiBridgeModule extends AbstractModule {
     }
 
     public SisuDiBridgeModule(boolean discover) {
+        this(discover, null);
+    }
+
+    public SisuDiBridgeModule(boolean discover, MessageBuilderFactory messageBuilderFactory) {
         this.discover = discover;
+        this.messageBuilderFactory = messageBuilderFactory;
+    }
+
+    // Plexus installs explicit modules before scanning; Guice deduplicates Sisu's automatic instance.
+    @Override
+    public boolean equals(Object other) {
+        return other != null && getClass() == other.getClass();
+    }
+
+    @Override
+    public int hashCode() {
+        return getClass().hashCode();
     }
 
     @Override
     protected void configure() {
         Provider<PlexusContainer> containerProvider = getProvider(PlexusContainer.class);
         Provider<BeanLocator> beanLocatorProvider = getProvider(BeanLocator.class);
-        injector = new BridgeInjectorImpl(beanLocatorProvider, binder());
+        injector = new BridgeInjectorImpl(beanLocatorProvider, binder(), messageBuilderFactory);
         bindScope(injector, containerProvider, SessionScoped.class, SessionScope.class);
         bindScope(injector, containerProvider, MojoExecutionScoped.class, MojoExecutionScope.class);
         injector.bindInstance(Injector.class, injector);
@@ -105,10 +124,19 @@ public class SisuDiBridgeModule extends AbstractModule {
     static class BridgeInjectorImpl extends InjectorImpl {
         final Provider<BeanLocator> locator;
         final Binder binder;
+        final MessageBuilderFactory messageBuilderFactory;
 
-        BridgeInjectorImpl(Provider<BeanLocator> locator, Binder binder) {
+        BridgeInjectorImpl(Provider<BeanLocator> locator, Binder binder, MessageBuilderFactory messageBuilderFactory) {
             this.locator = locator;
             this.binder = binder;
+            this.messageBuilderFactory = messageBuilderFactory;
+        }
+
+        @Override
+        protected BindingStyler getBindingStyler() {
+            return messageBuilderFactory == null
+                    ? BindingStyler.NONE
+                    : new MessageBuilderBindingStyler(messageBuilderFactory);
         }
 
         @Override
