@@ -1,0 +1,12 @@
+<project>
+  <modelVersion>4.2.0</modelVersion>
+  <artifactId>aid</artifactId>
+  <groupId>gid</groupId>
+  <version>0.1</version>
+
+  <dependencies>
+    <!-- EXPECT: 1 error — same dependency declared twice via id (same version) -->
+    <dependency id="org.slf4j:slf4j-api:2.0.17"/>
+    <dependency id="org.slf4j:slf4j-api:2.0.17"/>
+  </dependencies>
+</project>

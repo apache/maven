@@ -1,0 +1,12 @@
+<project xmlns="http://maven.apache.org/POM/4.2.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.2.0 https://maven.apache.org/xsd/maven-4.2.0.xsd">
+  <modelVersion>4.2.0</modelVersion>
+  <groupId>test</groupId>
+  <artifactId>test</artifactId>
+  <version>1.0</version>
+  <dependencies>
+    <!-- EXPECT: 1 error — "invalid format": id must contain at least one colon (g:a or g:a:v) -->
+    <dependency id="invalid-no-colons"/>
+  </dependencies>
+</project>
