@@ -66,6 +66,7 @@ public class InjectorImpl implements Injector {
 
     private static final String DEBUG_PROPERTY = "maven.di.debug";
     private static final long NO_CAPTURED_REVISION = -1;
+    private static final String AMBIGUOUS = "ambiguous";
 
     private final Map<Key<?>, Set<Binding<?>>> bindings = new HashMap<>();
     private final Map<Class<? extends Annotation>, Supplier<Scope>> scopes = new HashMap<>();
@@ -572,7 +573,7 @@ public class InjectorImpl implements Injector {
      * Registration must not run concurrently with this method.
      */
     public String dumpBindings() {
-        return BindingSnapshot.capture(bindings, scopes, new DiagnosticIdentity(), registryRevision)
+        return BindingSnapshot.capture(bindings, scopes, new DiagnosticIdentity(), false, registryRevision)
                 .render(this, "explicit", false, null);
     }
 
@@ -582,7 +583,8 @@ public class InjectorImpl implements Injector {
     }
 
     private void debugBindings(String reason, boolean partial) {
-        if (!debugEnabled()) {
+        DiagnosticMode mode = diagnosticMode();
+        if (mode == DiagnosticMode.OFF) {
             if (diagnosticState != null) {
                 synchronized (diagnosticLock) {
                     diagnosticState = null;
@@ -592,27 +594,37 @@ public class InjectorImpl implements Injector {
         }
         PrintStream output = System.out;
         DiagnosticState state = diagnosticState;
-        if (!partial && state != null && state.capturedRevision == registryRevision && state.output.get() == output) {
+        if (!partial
+                && state != null
+                && state.mode == mode
+                && state.capturedRevision == registryRevision
+                && state.output.get() == output) {
             return;
         }
-        writeBindings(output, reason, partial);
+        writeBindings(output, reason, partial, mode);
     }
 
-    private static boolean debugEnabled() {
+    private static DiagnosticMode diagnosticMode() {
         try {
             String property = System.getProperty(DEBUG_PROPERTY);
-            return property != null && (property.isEmpty() || Boolean.parseBoolean(property));
+            if (property == null) {
+                return DiagnosticMode.OFF;
+            }
+            if (property.isEmpty() || Boolean.parseBoolean(property)) {
+                return DiagnosticMode.ALL;
+            }
+            return AMBIGUOUS.equalsIgnoreCase(property) ? DiagnosticMode.AMBIGUOUS : DiagnosticMode.OFF;
         } catch (RuntimeException e) {
-            return false;
+            return DiagnosticMode.OFF;
         }
     }
 
-    private void writeBindings(PrintStream output, String reason, boolean partial) {
+    private void writeBindings(PrintStream output, String reason, boolean partial, DiagnosticMode mode) {
         DiagnosticWork work;
         synchronized (diagnosticLock) {
             DiagnosticState state = diagnosticState;
-            if (state == null || state.output.get() != output) {
-                state = new DiagnosticState(output);
+            if (state == null || state.mode != mode || state.output.get() != output) {
+                state = new DiagnosticState(mode, output);
                 diagnosticState = state;
             }
             long revision = registryRevision;
@@ -620,7 +632,8 @@ public class InjectorImpl implements Injector {
                 return;
             }
             try {
-                BindingSnapshot snapshot = BindingSnapshot.capture(bindings, scopes, state.identities, revision);
+                BindingSnapshot snapshot = BindingSnapshot.capture(
+                        bindings, scopes, state.identities, mode == DiagnosticMode.AMBIGUOUS, revision);
                 work = new DiagnosticWork(state, snapshot, output, reason, partial);
                 state.capturedRevision = revision;
                 if (diagnosticQueue == null) {
@@ -715,6 +728,12 @@ public class InjectorImpl implements Injector {
         }
     }
 
+    private enum DiagnosticMode {
+        OFF,
+        ALL,
+        AMBIGUOUS
+    }
+
     private static final class DiagnosticWork {
         final DiagnosticState state;
         final BindingSnapshot snapshot;
@@ -735,12 +754,14 @@ public class InjectorImpl implements Injector {
 
     private static final class DiagnosticState {
         final DiagnosticIdentity identities = new DiagnosticIdentity();
+        final DiagnosticMode mode;
         volatile long capturedRevision = NO_CAPTURED_REVISION;
         // A reused injector must not retain a previous embedded invocation's output stream.
         final WeakReference<PrintStream> output;
         BindingSnapshot emittedSnapshot;
 
-        DiagnosticState(PrintStream output) {
+        DiagnosticState(DiagnosticMode mode, PrintStream output) {
+            this.mode = mode;
             this.output = new WeakReference<>(output);
         }
     }

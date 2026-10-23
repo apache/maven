@@ -123,8 +123,8 @@ class BindingSnapshotTest {
         Supplier<Scope> second = () -> {
             throw new AssertionError("scope provisioned");
         };
-        BindingSnapshot before = BindingSnapshot.capture(Map.of(), Map.of(singleton, first), identities, 1);
-        BindingSnapshot after = BindingSnapshot.capture(Map.of(), Map.of(singleton, second), identities, 2);
+        BindingSnapshot before = BindingSnapshot.capture(Map.of(), Map.of(singleton, first), identities, false, 1);
+        BindingSnapshot after = BindingSnapshot.capture(Map.of(), Map.of(singleton, second), identities, false, 2);
         String delta = render(after, before);
         assertTrue(delta.contains("- scopes:"), delta);
         assertTrue(delta.contains("+ scopes:"), delta);
@@ -140,17 +140,19 @@ class BindingSnapshotTest {
         Binding<String> first = Binding.to(key, factory, new Class<?>[0]);
         Binding<String> second = Binding.to(key, factory, new Class<?>[0]);
         Binding<String> third = Binding.to(key, factory, new Class<?>[0]);
-        BindingSnapshot initial = BindingSnapshot.capture(Map.of(key, Set.of(first)), Map.of(), colliding, 1);
-        BindingSnapshot before = BindingSnapshot.capture(Map.of(key, Set.of(first, second)), Map.of(), colliding, 2);
+        BindingSnapshot initial = BindingSnapshot.capture(Map.of(key, Set.of(first)), Map.of(), colliding, false, 1);
+        BindingSnapshot before =
+                BindingSnapshot.capture(Map.of(key, Set.of(first, second)), Map.of(), colliding, false, 2);
         String added = render(before, initial);
         assertEquals(
                 1, added.lines().filter(line -> line.contains("+ candidate:")).count());
         assertFalse(added.contains("- candidate:"));
-        BindingSnapshot after = BindingSnapshot.capture(Map.of(key, Set.of(second)), Map.of(), colliding, 3);
+        BindingSnapshot after = BindingSnapshot.capture(Map.of(key, Set.of(second)), Map.of(), colliding, false, 3);
         String removed = render(after, before);
         assertEquals(
                 1, removed.lines().filter(line -> line.contains("- candidate:")).count());
-        BindingSnapshot replacement = BindingSnapshot.capture(Map.of(key, Set.of(third)), Map.of(), colliding, 4);
+        BindingSnapshot replacement =
+                BindingSnapshot.capture(Map.of(key, Set.of(third)), Map.of(), colliding, false, 4);
         String replaced = render(replacement, after);
         assertEquals(
                 1,
@@ -282,7 +284,7 @@ class BindingSnapshotTest {
     }
 
     private BindingSnapshot capture(Map<Key<?>, Set<Binding<?>>> registry, long revision) {
-        return BindingSnapshot.capture(registry, Map.of(), identities, revision);
+        return BindingSnapshot.capture(registry, Map.of(), identities, false, revision);
     }
 
     private String render(BindingSnapshot snapshot, BindingSnapshot previous) {
