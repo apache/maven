@@ -33,6 +33,8 @@ import java.util.Properties;
 import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.DependencyCoordinates;
+import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
@@ -71,6 +73,43 @@ public class DefaultProjectManager implements ProjectManager {
     public DefaultProjectManager(InternalMavenSession session, ArtifactManager artifactManager) {
         this.session = session;
         this.artifactManager = artifactManager;
+    }
+
+    @Override
+    public void setDependencies(@Nonnull Project project, @Nonnull List<DependencyCoordinates> dependencies) {
+        requireNonNull(project, "project cannot be null");
+        requireNonNull(dependencies, "dependencies cannot be null");
+        getMavenProject(project)
+                .setDependencies(dependencies.stream()
+                        .map(DefaultProjectManager::toDependency)
+                        .map(org.apache.maven.model.Dependency::new)
+                        .toList());
+    }
+
+    private static org.apache.maven.api.model.Dependency toDependency(DependencyCoordinates dependency) {
+        requireNonNull(dependency, "dependency cannot be null");
+        org.apache.maven.api.model.Dependency.Builder builder = org.apache.maven.api.model.Dependency.newBuilder()
+                .groupId(dependency.groupId())
+                .artifactId(dependency.artifactId())
+                .version(dependency.versionConstraint().toString())
+                .type(dependency.type().id())
+                .classifier(dependency.classifier())
+                .scope(dependency.scope().id())
+                .exclusions(dependency.exclusions().stream()
+                        .map(DefaultProjectManager::toExclusion)
+                        .toList());
+        if (dependency.optional() != null) {
+            builder.optional(dependency.optional().toString());
+        }
+        return builder.build();
+    }
+
+    private static org.apache.maven.api.model.Exclusion toExclusion(Exclusion exclusion) {
+        requireNonNull(exclusion, "exclusion cannot be null");
+        return org.apache.maven.api.model.Exclusion.newBuilder()
+                .groupId(exclusion.groupId())
+                .artifactId(exclusion.artifactId())
+                .build();
     }
 
     @Nonnull

@@ -24,6 +24,9 @@ import java.util.Map;
 import java.util.function.Consumer;
 
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.Project;
+import org.apache.maven.api.spi.LifecycleParticipant;
+import org.apache.maven.api.spi.LifecycleParticipantException;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -32,6 +35,9 @@ import org.apache.maven.execution.ProjectDependencyGraph;
 import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
+import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.internal.impl.LifecycleParticipantDispatcher;
+import org.apache.maven.internal.impl.MapBackedSessionData;
 import org.apache.maven.internal.transformation.TransformerManager;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
@@ -49,6 +55,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class BuildPlanExecutorTest {
 
@@ -154,6 +162,32 @@ class BuildPlanExecutorTest {
                 "an Error must halt the reactor even when a second failure is recorded for the same project, but"
                         + " the build was not halted; recorded exceptions: "
                         + session.getResult().getExceptions());
+    }
+
+    @Test
+    void lifecycleParticipantFailureAfterSuccessfulExecutionFailsTheBuild() throws Exception {
+        LifecycleParticipantException thrown = new LifecycleParticipantException("callback failed");
+        MavenProject project = newProject();
+        MavenSession session = newSession(project);
+        InternalMavenSession apiSession = mock(InternalMavenSession.class);
+        when(apiSession.getData()).thenReturn(new MapBackedSessionData());
+        when(apiSession.getProject(project)).thenReturn(mock(Project.class));
+        session.setSession(apiSession);
+        LifecycleParticipantDispatcher.setParticipants(session, List.of(new LifecycleParticipant() {
+            @Override
+            public void afterProjectExecution(org.apache.maven.api.spi.ProjectExecutionEvent event)
+                    throws LifecycleParticipantException {
+                throw thrown;
+            }
+        }));
+
+        ReactorContext reactorContext = execute(session, project, event -> {});
+
+        List<Throwable> exceptions = session.getResult().getExceptions();
+        assertEquals(1, exceptions.size());
+        assertSame(thrown, exceptions.get(0).getCause());
+        assertTrue(session.getResult().getBuildSummary(project) instanceof org.apache.maven.execution.BuildFailure);
+        assertTrue(reactorContext.getReactorBuildStatus().isHalted());
     }
 
     private ReactorContext execute(MavenSession session, MavenProject project, BeforeProjectExecution listener)
