@@ -31,9 +31,11 @@ import java.net.URL;
 import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
+import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -63,6 +65,7 @@ import static org.apache.maven.di.impl.Binding.getPriorityComparator;
 public class InjectorImpl implements Injector {
 
     private static final String DEBUG_PROPERTY = "maven.di.debug";
+    private static final long NO_CAPTURED_REVISION = -1;
 
     private final Map<Key<?>, Set<Binding<?>>> bindings = new HashMap<>();
     private final Map<Class<? extends Annotation>, Supplier<Scope>> scopes = new HashMap<>();
@@ -73,6 +76,8 @@ public class InjectorImpl implements Injector {
     private volatile long registryRevision;
     private final Object diagnosticLock = new Object();
     private volatile DiagnosticState diagnosticState;
+    private Deque<DiagnosticWork> diagnosticQueue;
+    private Thread diagnosticWriter;
     private int registrationDepth;
 
     public InjectorImpl() {
@@ -537,29 +542,27 @@ public class InjectorImpl implements Injector {
     }
 
     private static class SingletonScope implements Scope {
-        Map<Key<?>, java.util.function.Supplier<?>> cache = new ConcurrentHashMap<>();
+        Map<Key<?>, Supplier<?>> cache = new ConcurrentHashMap<>();
 
         @Nonnull
         @SuppressWarnings("unchecked")
         @Override
-        public <T> java.util.function.Supplier<T> scope(
-                @Nonnull Key<T> key, @Nonnull java.util.function.Supplier<T> unscoped) {
-            return (java.util.function.Supplier<T>) cache.computeIfAbsent(
-                    key, k -> new java.util.function.Supplier<T>() {
-                        volatile T instance;
+        public <T> Supplier<T> scope(@Nonnull Key<T> key, @Nonnull Supplier<T> unscoped) {
+            return (Supplier<T>) cache.computeIfAbsent(key, k -> new Supplier<T>() {
+                volatile T instance;
 
-                        @Override
-                        public T get() {
+                @Override
+                public T get() {
+                    if (instance == null) {
+                        synchronized (this) {
                             if (instance == null) {
-                                synchronized (this) {
-                                    if (instance == null) {
-                                        instance = unscoped.get();
-                                    }
-                                }
+                                instance = unscoped.get();
                             }
-                            return instance;
                         }
-                    });
+                    }
+                    return instance;
+                }
+            });
         }
     }
 
@@ -569,8 +572,8 @@ public class InjectorImpl implements Injector {
      * Registration must not run concurrently with this method.
      */
     public String dumpBindings() {
-        return BindingSnapshot.render(
-                this, registryRevision, "explicit", false, BindingSnapshot.capture(bindings, scopes));
+        return BindingSnapshot.capture(bindings, scopes, new DiagnosticIdentity(), registryRevision)
+                .render(this, "explicit", false, null);
     }
 
     /** Diagnostic checkpoint for native and bridge resolution entry points. */
@@ -605,47 +608,141 @@ public class InjectorImpl implements Injector {
     }
 
     private void writeBindings(PrintStream output, String reason, boolean partial) {
-        DiagnosticState state = null;
-        long revision = -1;
-        try {
-            List<String> snapshot;
-            synchronized (diagnosticLock) {
-                state = diagnosticState;
-                if (state == null) {
-                    state = new DiagnosticState();
-                    diagnosticState = state;
+        DiagnosticWork work;
+        synchronized (diagnosticLock) {
+            DiagnosticState state = diagnosticState;
+            if (state == null || state.output.get() != output) {
+                state = new DiagnosticState(output);
+                diagnosticState = state;
+            }
+            long revision = registryRevision;
+            if (!partial && state.capturedRevision == revision) {
+                return;
+            }
+            try {
+                BindingSnapshot snapshot = BindingSnapshot.capture(bindings, scopes, state.identities, revision);
+                work = new DiagnosticWork(state, snapshot, output, reason, partial);
+                state.capturedRevision = revision;
+                if (diagnosticQueue == null) {
+                    diagnosticQueue = new ArrayDeque<>();
                 }
-                revision = registryRevision;
-                if (!partial && state.capturedRevision == revision && state.output.get() == output) {
+                diagnosticQueue.addLast(work);
+            } catch (RuntimeException e) {
+                // Diagnostics must not replace a registration or resolution failure. Retry on the next checkpoint.
+                return;
+            }
+            if (diagnosticWriter != null) {
+                // A callback on the writer cannot wait for itself; its captured state is drained after this block.
+                if (diagnosticWriter == Thread.currentThread()) {
                     return;
                 }
-                snapshot = BindingSnapshot.capture(bindings, scopes);
-                state.output = new WeakReference<>(output);
-                state.capturedRevision = revision;
+                boolean interrupted = false;
+                while (!work.done) {
+                    try {
+                        diagnosticLock.wait();
+                    } catch (InterruptedException e) {
+                        interrupted = true;
+                    }
+                }
+                if (interrupted) {
+                    Thread.currentThread().interrupt();
+                }
+                return;
             }
-            // Final block rendering and output run outside the diagnostic state lock.
-            writeDump(output, BindingSnapshot.render(this, revision, reason, partial, snapshot));
-        } catch (RuntimeException e) {
-            // Diagnostics must not replace a registration or resolution failure. Retry on the next checkpoint.
+            diagnosticWriter = Thread.currentThread();
+        }
+        drainDiagnostics();
+    }
+
+    private void drainDiagnostics() {
+        try {
+            while (true) {
+                DiagnosticWork work;
+                BindingSnapshot previous;
+                synchronized (diagnosticLock) {
+                    work = diagnosticQueue.pollFirst();
+                    if (work == null) {
+                        diagnosticWriter = null;
+                        return;
+                    }
+                    if (diagnosticState != work.state) {
+                        work.done = true;
+                        diagnosticLock.notifyAll();
+                        continue;
+                    }
+                    previous = work.state.emittedSnapshot;
+                }
+                try {
+                    String dump = work.snapshot.render(this, work.reason, work.partial, previous);
+                    if (dump != null) {
+                        writeDump(work.output, dump);
+                        synchronized (diagnosticLock) {
+                            if (diagnosticState == work.state) {
+                                work.state.emittedSnapshot = work.snapshot;
+                            }
+                        }
+                    }
+                } catch (RuntimeException e) {
+                    synchronized (diagnosticLock) {
+                        work.state.emittedSnapshot = null;
+                        work.state.capturedRevision = NO_CAPTURED_REVISION;
+                    }
+                } finally {
+                    synchronized (diagnosticLock) {
+                        work.done = true;
+                        diagnosticLock.notifyAll();
+                    }
+                }
+            }
+        } finally {
             synchronized (diagnosticLock) {
-                if (state != null
-                        && diagnosticState == state
-                        && state.capturedRevision == revision
-                        && state.output.get() == output) {
-                    state.capturedRevision = -1;
+                if (diagnosticWriter == Thread.currentThread()) {
+                    diagnosticWriter = null;
+                    diagnosticState = null;
+                    diagnosticQueue.forEach(work -> work.done = true);
+                    diagnosticQueue.clear();
+                    diagnosticLock.notifyAll();
                 }
             }
         }
     }
 
-    protected void writeDump(PrintStream output, String dump) {
+    /** Writes a complete block; a separate hook lets tests exercise slow and failing output. */
+    void writeDump(PrintStream output, String dump) {
         output.println(dump);
+        if (output.checkError()) {
+            throw new IllegalStateException("Unable to write Maven DI diagnostics");
+        }
+    }
+
+    private static final class DiagnosticWork {
+        final DiagnosticState state;
+        final BindingSnapshot snapshot;
+        final PrintStream output;
+        final String reason;
+        final boolean partial;
+        boolean done;
+
+        DiagnosticWork(
+                DiagnosticState state, BindingSnapshot snapshot, PrintStream output, String reason, boolean partial) {
+            this.state = state;
+            this.snapshot = snapshot;
+            this.output = output;
+            this.reason = reason;
+            this.partial = partial;
+        }
     }
 
     private static final class DiagnosticState {
-        volatile long capturedRevision = -1;
+        final DiagnosticIdentity identities = new DiagnosticIdentity();
+        volatile long capturedRevision = NO_CAPTURED_REVISION;
         // A reused injector must not retain a previous embedded invocation's output stream.
-        volatile WeakReference<PrintStream> output = new WeakReference<>(null);
+        final WeakReference<PrintStream> output;
+        BindingSnapshot emittedSnapshot;
+
+        DiagnosticState(PrintStream output) {
+            this.output = new WeakReference<>(output);
+        }
     }
 
     /**
@@ -666,7 +763,9 @@ public class InjectorImpl implements Injector {
         scopes.clear();
         loadedUrls.clear();
         resolutionStack.remove();
-        diagnosticState = null;
+        synchronized (diagnosticLock) {
+            diagnosticState = null;
+        }
         registryRevision++;
     }
 }

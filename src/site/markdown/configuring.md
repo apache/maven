@@ -133,24 +133,35 @@ MAVEN_OPTS="-Dmaven.di.debug=true -Dsisu.debug=true" mvn validate
 ```
 
 Each block starts with `Maven DI native registry` and identifies the injector
-and registry revision. Snapshots list keys in sorted order, including aliases
-and keys without candidates. Candidates within each key appear in descending
-priority order. Output goes to standard output; Maven may prefix lines with
-`[stdout]`.
+and registry revision. Full snapshots list keys in sorted order, including
+aliases and keys without candidates. Candidates within each key appear in
+descending priority order. Deltas use the same order for new or changed
+candidates, followed by removals. Output goes to standard output; Maven may
+prefix lines with `[stdout]`.
 
 Candidate details list priority, scope, source, declared dependencies,
 constructor and factory method parameters, declared exceptions and initializers
 on separate lines. Initializers identify injected fields and methods. Optional
-dependencies start with `?`.
+dependencies start with `?`; this does not mean they are missing.
 
 Class loader references such as `L1` distinguish types from different realms.
-They are local to each snapshot, which ends with a legend of their full
-identities. `bootstrap` identifies the bootstrap class loader.
+They remain stable across a full snapshot and its deltas; each block ends with a
+legend of their full identities. `bootstrap` identifies the bootstrap class
+loader.
 
 Snapshots print after discovery and when lookup or injection observes changed
-registrations, including context bindings added before a Maven 4 Mojo runs.
-Repeated lookups of an unchanged registry produce no output. Discovery or
-registration failures produce a block marked `partial`.
+registrations, including context bindings added before a Maven 4 Mojo runs. The
+first block is a full snapshot. Later blocks show changed keys, individual
+candidates and scopes: `+` for additions, `-` for removals and `~` for changes.
+Delta headers give the previous and current registry revisions. Repeated lookups
+of an unchanged registry produce no output. Discovery or registration failures
+produce a block marked `partial`.
+
+Snapshots print in capture order. Parallel callers wait until their snapshot is
+processed. Checkpoints from callbacks on the writer thread queue until the
+callback returns. Changing the stream resets the history. Output failures and
+checkpoints that observe diagnostics disabled also reset it. The next output
+starts with a full snapshot.
 
 Snapshots do not create components, call providers or initializers, or obtain
 scope instances. Bound instances, suppliers and annotation qualifiers appear by
