@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.function.Consumer;
 import java.util.function.Predicate;
 
 import org.apache.maven.api.services.model.ModelProcessor;
@@ -62,12 +63,19 @@ public class MultiModuleCollectionStrategy implements ProjectCollectionStrategy 
 
     @Override
     public List<MavenProject> collectProjects(MavenExecutionRequest request) throws ProjectBuildingException {
+        return collectProjects(request, problem -> {});
+    }
+
+    public List<MavenProject> collectProjects(MavenExecutionRequest request, Consumer<ModelProblem> problemConsumer)
+            throws ProjectBuildingException {
         File moduleProjectPomFile = getRootProject(request);
         List<File> files = Collections.singletonList(moduleProjectPomFile.getAbsoluteFile());
         try {
-            List<MavenProject> projects = projectsSelector.selectProjects(files, request);
+            List<ModelProblem> problems = new ArrayList<>();
+            List<MavenProject> projects = projectsSelector.selectProjects(files, request, problems::add);
             boolean isRequestedProjectCollected = isRequestedProjectCollected(request, projects);
             if (isRequestedProjectCollected) {
+                problems.forEach(problemConsumer);
                 return projects;
             } else {
                 LOGGER.debug(
