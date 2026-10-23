@@ -23,7 +23,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.PrintStream;
 import java.lang.annotation.Annotation;
-import java.lang.ref.WeakReference;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
@@ -31,11 +30,9 @@ import java.net.URL;
 import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
-import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Deque;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -64,21 +61,12 @@ import static org.apache.maven.di.impl.Binding.getPriorityComparator;
 
 public class InjectorImpl implements Injector {
 
-    private static final String DEBUG_PROPERTY = "maven.di.debug";
-    private static final long NO_CAPTURED_REVISION = -1;
-    private static final String AMBIGUOUS = "ambiguous";
-
     private final Map<Key<?>, Set<Binding<?>>> bindings = new HashMap<>();
     private final Map<Class<? extends Annotation>, Supplier<Scope>> scopes = new HashMap<>();
     private final Set<String> loadedUrls = new HashSet<>();
     private final ThreadLocal<Set<Key<?>>> resolutionStack = new ThreadLocal<>();
 
-    // Registration, as with the binding map itself, must not race with resolution.
-    private volatile long registryRevision;
-    private final Object diagnosticLock = new Object();
-    private volatile DiagnosticState diagnosticState;
-    private Deque<DiagnosticWork> diagnosticQueue;
-    private Thread diagnosticWriter;
+    private final InjectorDiagnostics diagnostics = new InjectorDiagnostics(this, bindings, scopes);
     private int registrationDepth;
 
     public InjectorImpl() {
@@ -151,7 +139,7 @@ public class InjectorImpl implements Injector {
     @Override
     public Injector bindScope(@Nonnull Class<? extends Annotation> scopeAnnotation, @Nonnull Supplier<Scope> scope) {
         Supplier<Scope> previous = scopes.put(scopeAnnotation, scope);
-        registryRevision++;
+        diagnostics.registryChanged();
         if (previous != null) {
             debugBindings("registration", true);
             throw new DIException(
@@ -203,7 +191,7 @@ public class InjectorImpl implements Injector {
     private void bindEmptyKey(Key<?> key) {
         if (!bindings.containsKey(key)) {
             bindings.put(key, new HashSet<>());
-            registryRevision++;
+            diagnostics.registryChanged();
         }
     }
 
@@ -243,7 +231,7 @@ public class InjectorImpl implements Injector {
         Set<Binding<?>> bindingSet = bindings.computeIfAbsent(key, $ -> new HashSet<>());
         if (bindingSet.stream().noneMatch(existing -> isSameBinding(existing, b))) {
             bindingSet.add(b);
-            registryRevision++;
+            diagnostics.registryChanged();
         }
         return this;
     }
@@ -573,8 +561,7 @@ public class InjectorImpl implements Injector {
      * Registration must not run concurrently with this method.
      */
     public String dumpBindings() {
-        return BindingSnapshot.capture(bindings, scopes, new DiagnosticIdentity(), false, registryRevision)
-                .render(this, "explicit", false, null, getBindingStyler());
+        return diagnostics.dumpBindings();
     }
 
     /** Diagnostic checkpoint for native and bridge resolution entry points. */
@@ -583,141 +570,7 @@ public class InjectorImpl implements Injector {
     }
 
     private void debugBindings(String reason, boolean partial) {
-        DiagnosticMode mode = diagnosticMode();
-        if (mode == DiagnosticMode.OFF) {
-            if (diagnosticState != null) {
-                synchronized (diagnosticLock) {
-                    diagnosticState = null;
-                }
-            }
-            return;
-        }
-        PrintStream output = System.out;
-        DiagnosticState state = diagnosticState;
-        if (!partial
-                && state != null
-                && state.mode == mode
-                && state.capturedRevision == registryRevision
-                && state.output.get() == output) {
-            return;
-        }
-        writeBindings(output, reason, partial, mode);
-    }
-
-    private static DiagnosticMode diagnosticMode() {
-        try {
-            String property = System.getProperty(DEBUG_PROPERTY);
-            if (property == null) {
-                return DiagnosticMode.OFF;
-            }
-            if (property.isEmpty() || Boolean.parseBoolean(property)) {
-                return DiagnosticMode.ALL;
-            }
-            return AMBIGUOUS.equalsIgnoreCase(property) ? DiagnosticMode.AMBIGUOUS : DiagnosticMode.OFF;
-        } catch (RuntimeException e) {
-            return DiagnosticMode.OFF;
-        }
-    }
-
-    private void writeBindings(PrintStream output, String reason, boolean partial, DiagnosticMode mode) {
-        DiagnosticWork work;
-        synchronized (diagnosticLock) {
-            DiagnosticState state = diagnosticState;
-            if (state == null || state.mode != mode || state.output.get() != output) {
-                state = new DiagnosticState(mode, output);
-                diagnosticState = state;
-            }
-            long revision = registryRevision;
-            if (!partial && state.capturedRevision == revision) {
-                return;
-            }
-            try {
-                BindingSnapshot snapshot = BindingSnapshot.capture(
-                        bindings, scopes, state.identities, mode == DiagnosticMode.AMBIGUOUS, revision);
-                work = new DiagnosticWork(state, snapshot, output, reason, partial);
-                state.capturedRevision = revision;
-                if (diagnosticQueue == null) {
-                    diagnosticQueue = new ArrayDeque<>();
-                }
-                diagnosticQueue.addLast(work);
-            } catch (RuntimeException e) {
-                // Diagnostics must not replace a registration or resolution failure. Retry on the next checkpoint.
-                return;
-            }
-            if (diagnosticWriter != null) {
-                // A callback on the writer cannot wait for itself; its captured state is drained after this block.
-                if (diagnosticWriter == Thread.currentThread()) {
-                    return;
-                }
-                boolean interrupted = false;
-                while (!work.done) {
-                    try {
-                        diagnosticLock.wait();
-                    } catch (InterruptedException e) {
-                        interrupted = true;
-                    }
-                }
-                if (interrupted) {
-                    Thread.currentThread().interrupt();
-                }
-                return;
-            }
-            diagnosticWriter = Thread.currentThread();
-        }
-        drainDiagnostics();
-    }
-
-    private void drainDiagnostics() {
-        try {
-            while (true) {
-                DiagnosticWork work;
-                BindingSnapshot previous;
-                synchronized (diagnosticLock) {
-                    work = diagnosticQueue.pollFirst();
-                    if (work == null) {
-                        diagnosticWriter = null;
-                        return;
-                    }
-                    if (diagnosticState != work.state) {
-                        work.done = true;
-                        diagnosticLock.notifyAll();
-                        continue;
-                    }
-                    previous = work.state.emittedSnapshot;
-                }
-                try {
-                    String dump = work.snapshot.render(this, work.reason, work.partial, previous, getBindingStyler());
-                    if (dump != null) {
-                        writeDump(work.output, dump);
-                        synchronized (diagnosticLock) {
-                            if (diagnosticState == work.state) {
-                                work.state.emittedSnapshot = work.snapshot;
-                            }
-                        }
-                    }
-                } catch (RuntimeException e) {
-                    synchronized (diagnosticLock) {
-                        work.state.emittedSnapshot = null;
-                        work.state.capturedRevision = NO_CAPTURED_REVISION;
-                    }
-                } finally {
-                    synchronized (diagnosticLock) {
-                        work.done = true;
-                        diagnosticLock.notifyAll();
-                    }
-                }
-            }
-        } finally {
-            synchronized (diagnosticLock) {
-                if (diagnosticWriter == Thread.currentThread()) {
-                    diagnosticWriter = null;
-                    diagnosticState = null;
-                    diagnosticQueue.forEach(work -> work.done = true);
-                    diagnosticQueue.clear();
-                    diagnosticLock.notifyAll();
-                }
-            }
-        }
+        diagnostics.checkpoint(reason, partial);
     }
 
     /** Supplies diagnostic styling without resolving components from this injector. */
@@ -730,44 +583,6 @@ public class InjectorImpl implements Injector {
         output.println(dump);
         if (output.checkError()) {
             throw new IllegalStateException("Unable to write Maven DI diagnostics");
-        }
-    }
-
-    private enum DiagnosticMode {
-        OFF,
-        ALL,
-        AMBIGUOUS
-    }
-
-    private static final class DiagnosticWork {
-        final DiagnosticState state;
-        final BindingSnapshot snapshot;
-        final PrintStream output;
-        final String reason;
-        final boolean partial;
-        boolean done;
-
-        DiagnosticWork(
-                DiagnosticState state, BindingSnapshot snapshot, PrintStream output, String reason, boolean partial) {
-            this.state = state;
-            this.snapshot = snapshot;
-            this.output = output;
-            this.reason = reason;
-            this.partial = partial;
-        }
-    }
-
-    private static final class DiagnosticState {
-        final DiagnosticIdentity identities = new DiagnosticIdentity();
-        final DiagnosticMode mode;
-        volatile long capturedRevision = NO_CAPTURED_REVISION;
-        // A reused injector must not retain a previous embedded invocation's output stream.
-        final WeakReference<PrintStream> output;
-        BindingSnapshot emittedSnapshot;
-
-        DiagnosticState(DiagnosticMode mode, PrintStream output) {
-            this.mode = mode;
-            this.output = new WeakReference<>(output);
         }
     }
 
@@ -789,9 +604,7 @@ public class InjectorImpl implements Injector {
         scopes.clear();
         loadedUrls.clear();
         resolutionStack.remove();
-        synchronized (diagnosticLock) {
-            diagnosticState = null;
-        }
-        registryRevision++;
+        diagnostics.reset();
+        diagnostics.registryChanged();
     }
 }
