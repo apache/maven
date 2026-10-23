@@ -111,24 +111,24 @@ final class BindingSnapshot {
         return new BindingSnapshot(revision, ambiguous, keys, scopeRows, identities.loaders());
     }
 
-    String render(Object injector, String reason, boolean partial, BindingSnapshot previous) {
+    String render(Object injector, String reason, boolean partial, BindingSnapshot previous, BindingStyler styler) {
         List<String> blocks = new ArrayList<>();
         if (previous == null) {
-            keys.forEach(key -> blocks.add(renderKey(key, "")));
+            keys.forEach(key -> blocks.add(renderKey(key, "", styler)));
             if (!scopes.isEmpty()) {
-                blocks.add(renderScopes(scopes, ""));
+                blocks.add(renderScopes(scopes, "", styler));
             }
         } else {
             Map<List<?>, KeyBindings> oldKeys = new LinkedHashMap<>();
             previous.keys.forEach(key -> oldKeys.put(key.identity, key));
             for (KeyBindings key : keys) {
                 KeyBindings old = oldKeys.remove(key.identity);
-                String changes = old == null ? renderKey(key, ADDED) : renderChanges(old, key);
+                String changes = old == null ? renderKey(key, ADDED, styler) : renderChanges(old, key, styler);
                 if (!changes.isEmpty()) {
                     blocks.add(changes);
                 }
             }
-            oldKeys.values().forEach(key -> blocks.add(renderKey(key, REMOVED)));
+            oldKeys.values().forEach(key -> blocks.add(renderKey(key, REMOVED, styler)));
             Map<Long, ScopeBinding> oldScopes = new LinkedHashMap<>();
             previous.scopes.forEach(scope -> oldScopes.put(scope.identity, scope));
             List<ScopeBinding> removed = new ArrayList<>();
@@ -144,17 +144,17 @@ final class BindingSnapshot {
             }
             removed.addAll(oldScopes.values());
             if (!removed.isEmpty()) {
-                blocks.add(renderScopes(removed, REMOVED));
+                blocks.add(renderScopes(removed, REMOVED, styler));
             }
             if (!added.isEmpty()) {
-                blocks.add(renderScopes(added, ADDED));
+                blocks.add(renderScopes(added, ADDED, styler));
             }
             if (blocks.isEmpty() && !partial) {
                 return null;
             }
         }
         if (!loaders.isEmpty()) {
-            blocks.add("  " + "class loaders:" + "\n"
+            blocks.add("  " + styler.header("class loaders:") + "\n"
                     + loaders.entrySet().stream()
                             .map(entry -> "    " + entry.getKey() + ": " + entry.getValue())
                             .collect(Collectors.joining("\n")));
@@ -164,51 +164,53 @@ final class BindingSnapshot {
         String header = registry + " revision=" + revisions + " (" + reason
                 + (previous == null ? "" : ", delta") + (ambiguous ? ", ambiguous" : "")
                 + (partial ? ", partial" : "") + ") {";
-        return String.join("\n", header, String.join("\n\n", blocks), "} " + registry);
+        return String.join("\n", styler.header(header), String.join("\n\n", blocks), styler.header("} " + registry));
     }
 
-    private static String renderChanges(KeyBindings before, KeyBindings after) {
+    private static String renderChanges(KeyBindings before, KeyBindings after, BindingStyler styler) {
         Map<Long, Candidate> oldCandidates = new LinkedHashMap<>();
         before.candidates.forEach(candidate -> oldCandidates.put(candidate.identity, candidate));
         List<String> changes = new ArrayList<>();
         for (Candidate candidate : after.candidates) {
             Candidate old = oldCandidates.remove(candidate.identity);
             if (!candidate.equals(old)) {
-                changes.add(renderCandidate(candidate, old == null ? ADDED : CHANGED));
+                changes.add(renderCandidate(candidate, old == null ? ADDED : CHANGED, styler));
             }
         }
-        oldCandidates.values().forEach(candidate -> changes.add(renderCandidate(candidate, REMOVED)));
+        oldCandidates.values().forEach(candidate -> changes.add(renderCandidate(candidate, REMOVED, styler)));
         if (changes.isEmpty()) {
             return "";
         }
         if (after.candidates.isEmpty()) {
             changes.add("    " + NO_CANDIDATES);
         }
-        return "  " + (CHANGED + "key:") + " " + after.name.plain() + "\n" + String.join("\n\n", changes);
+        return "  " + styler.header(CHANGED + "key:") + " " + after.name.render(styler) + "\n"
+                + String.join("\n\n", changes);
     }
 
-    private static String renderKey(KeyBindings key, String marker) {
+    private static String renderKey(KeyBindings key, String marker, BindingStyler styler) {
         String candidates = key.candidates.isEmpty()
-                ? "    " + (marker + NO_CANDIDATES)
+                ? "    " + styler.header(marker + NO_CANDIDATES)
                 : key.candidates.stream()
-                        .map(candidate -> renderCandidate(candidate, marker))
+                        .map(candidate -> renderCandidate(candidate, marker, styler))
                         .collect(Collectors.joining("\n\n"));
-        return "  " + (marker + "key:") + " " + key.name.plain() + "\n" + candidates;
+        return "  " + styler.header(marker + "key:") + " " + key.name.render(styler) + "\n" + candidates;
     }
 
-    private static String renderScopes(List<ScopeBinding> scopes, String marker) {
-        return "  " + (marker + "scopes:") + "\n"
+    private static String renderScopes(List<ScopeBinding> scopes, String marker, BindingStyler styler) {
+        return "  " + styler.header(marker + "scopes:") + "\n"
                 + scopes.stream()
-                        .map(scope -> "    " + scope.type + "\n      supplier: " + scope.supplier)
+                        .map(scope -> "    " + styler.scope(scope.type, true) + "\n      supplier: " + scope.supplier)
                         .collect(Collectors.joining("\n"));
     }
 
-    private static String renderCandidate(Candidate candidate, String marker) {
+    private static String renderCandidate(Candidate candidate, String marker, BindingStyler styler) {
         StringJoiner lines = new StringJoiner("\n");
-        lines.add("    " + (marker + "candidate:") + " "
-                + (candidate.original == null ? NONE : candidate.original.plain()));
-        lines.add("      priority: " + candidate.priority);
-        lines.add("      scope: " + (candidate.scope == null ? NONE : candidate.scope));
+        lines.add("    " + styler.header(marker + "candidate:") + " "
+                + (candidate.original == null ? NONE : candidate.original.render(styler)));
+        lines.add("      priority: " + styler.priority(Integer.toString(candidate.priority), candidate.priority != 0));
+        lines.add("      scope: "
+                + styler.scope(candidate.scope == null ? NONE : candidate.scope, candidate.scope != null));
         if (candidate.source.size() == 1) {
             lines.add("      source: " + escape(candidate.source.get(0)));
         } else if (!candidate.source.isEmpty()) {
@@ -219,8 +221,8 @@ final class BindingSnapshot {
             lines.add("      dependencies: " + NONE);
         } else {
             lines.add("      dependencies:");
-            candidate.dependencies.forEach(
-                    dependency -> lines.add("        - " + (dependency.optional ? "?" : "") + dependency.key.plain()));
+            candidate.dependencies.forEach(dependency -> lines.add("        - "
+                    + (dependency.optional ? styler.optionalDependency("?") : "") + dependency.key.render(styler)));
         }
         return lines.toString();
     }
@@ -228,6 +230,10 @@ final class BindingSnapshot {
     private record KeyText(String qualifier, String type) {
         String plain() {
             return (qualifier.isEmpty() ? "" : qualifier + " ") + type;
+        }
+
+        String render(BindingStyler styler) {
+            return (qualifier.isEmpty() ? "" : styler.qualifier(qualifier) + " ") + styler.key(type);
         }
     }
 

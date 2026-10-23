@@ -42,6 +42,8 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
     private static final String MAVEN_DI_DEBUG = "maven.di.debug";
     private static final String SISU_DEBUG = "sisu.debug";
     private static final String AMBIGUOUS = "ambiguous";
+    private static final Pattern ANSI_STYLE = Pattern.compile("\u001B\\[[0-9;]*m");
+    private static final Pattern RED_OPTIONAL_MARKER = Pattern.compile("\u001B\\[(?:[0-9]+;)*31(?:;[0-9]+)*m\\?");
     private static final Pattern REVISION = Pattern.compile(" revision=([0-9]+)(?:->([0-9]+))?");
     private static final Pattern LOADER = Pattern.compile("    (L[0-9]+): (.+)");
     private static final String SISU_DUMP_MARKER = "-----[explicit bindings]";
@@ -68,7 +70,9 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
                                                 directory.resolve("project"), builder, nativeMode, sisuEnabled)))));
         List<BuilderCase> outputModes = List.of(
                 new BuilderCase("raw-streams", List.of("--raw-streams", "-T", "2"), true),
-                new BuilderCase("quiet", List.of("-q", "-T", "2"), true));
+                new BuilderCase("quiet", List.of("-q", "-T", "2"), true),
+                new BuilderCase("color-always", List.of("--color", "always", "-T", "2"), true),
+                new BuilderCase("color-never", List.of("--color", "never", "-T", "2"), true));
         return Stream.concat(flags, outputModes.stream().map(builder -> dynamicTest(
                 builder.name(), () -> verifyDump(directory.resolve("project"), builder, "true", true))));
     }
@@ -108,6 +112,19 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
         List<String> outputLines = Stream.concat(lines.stream(), stdoutLines.stream()).toList();
         boolean sisuDump = outputLines.stream().anyMatch(line -> line.contains(SISU_DUMP_MARKER));
         assertEquals(sisuEnabled, sisuDump, "Sisu dump must depend only on sisu.debug");
+        if (nativeEnabled && !ambiguous && "color-always".equals(builder.name())) {
+            assertTrue(outputLines.stream()
+                    .anyMatch(line -> line.contains("field injector:") && line.contains(".session")));
+            assertTrue(outputLines.stream()
+                    .anyMatch(line -> line.contains("candidate:") && line.contains("CheckMojo")
+                            && ANSI_STYLE.matcher(line).find()));
+            assertTrue(outputLines.stream()
+                    .anyMatch(line -> line.contains("java.lang.Runnable")
+                            && RED_OPTIONAL_MARKER.matcher(line).find()));
+        }
+        if ("color-never".equals(builder.name())) {
+            assertFalse(outputLines.stream().anyMatch(line -> ANSI_STYLE.matcher(line).find()));
+        }
 
         if (nativeEnabled) {
             // Each module creates its own Mojo injector.
@@ -149,7 +166,7 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
         String header = null;
         int dumps = 0;
         for (String original : lines) {
-            String plain = original;
+            String plain = ANSI_STYLE.matcher(original).replaceAll("");
             int decoration = plain.indexOf(stdoutPrefix);
             String line = decoration < 0 ? plain : plain.substring(decoration + stdoutPrefix.length());
             if (line.startsWith(headerPrefix)) {

@@ -172,6 +172,28 @@ callback returns. Changing the stream or diagnostic mode resets the history.
 Output failures and checkpoints that observe diagnostics disabled also reset it.
 The next output starts with a full snapshot.
 
+Maven uses its configured console styles when colors are enabled. Force colors
+on or off with `--color`:
+
+```sh
+MAVEN_OPTS="-Dmaven.di.debug=true" mvn --color always validate
+MAVEN_OPTS="-Dmaven.di.debug=true" mvn --color never validate
+```
+
+The default styles are:
+
+| Element | Style |
+| --- | --- |
+| Types in keys, candidates and dependencies | Cyan |
+| Qualifiers such as `@Named` | Yellow |
+| Scope annotations | Green |
+| Scope `<none>` | Gray |
+| Nonzero priorities | Yellow (warning style) |
+| Optional dependency marker `?` | Red |
+| Section headers such as `key:` and `candidate:` | Bold |
+
+Standalone Maven DI uses plain text. Color does not affect snapshot comparison.
+
 Snapshots do not create components, call providers or initializers, or obtain
 scope instances. Bound instances, suppliers and annotation qualifiers appear by
 type and identity, without exposing values or calling their `toString()`

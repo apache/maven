@@ -953,6 +953,32 @@ class InjectorDiagnosticsTest {
         assertTrue(injector.dumps.get(1).contains("+ key: java.lang.Integer"));
     }
 
+    @Test
+    void reentrantStylerIsQueuedAndRenderFailureRetries() {
+        AtomicInteger styles = new AtomicInteger();
+        RecordingInjector injector = new RecordingInjector() {
+            @Override
+            protected BindingStyler getBindingStyler() {
+                return new BindingStyler() {
+                    @Override
+                    public String header(String text) {
+                        if (styles.getAndIncrement() == 0) {
+                            bindInstance(Integer.class, 1);
+                            checkpoint();
+                            throw new IllegalStateException("styler failed");
+                        }
+                        return text;
+                    }
+                };
+            }
+        };
+        injector.bindInstance(String.class, "first");
+        injector.checkpoint();
+        assertEquals(1, injector.dumps.size());
+        assertFalse(injector.dumps.get(0).contains(", delta"));
+        assertTrue(injector.dumps.get(0).contains("candidate: java.lang.Integer"));
+    }
+
     private static URLClassLoader indexLoader(Path directory, String content) throws Exception {
         Path index = directory.resolve("META-INF/maven/org.apache.maven.api.di.Inject");
         Files.createDirectories(index.getParent());

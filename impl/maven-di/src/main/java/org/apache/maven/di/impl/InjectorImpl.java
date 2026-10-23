@@ -574,7 +574,7 @@ public class InjectorImpl implements Injector {
      */
     public String dumpBindings() {
         return BindingSnapshot.capture(bindings, scopes, new DiagnosticIdentity(), false, registryRevision)
-                .render(this, "explicit", false, null);
+                .render(this, "explicit", false, null, getBindingStyler());
     }
 
     /** Diagnostic checkpoint for native and bridge resolution entry points. */
@@ -686,7 +686,7 @@ public class InjectorImpl implements Injector {
                     previous = work.state.emittedSnapshot;
                 }
                 try {
-                    String dump = work.snapshot.render(this, work.reason, work.partial, previous);
+                    String dump = work.snapshot.render(this, work.reason, work.partial, previous, getBindingStyler());
                     if (dump != null) {
                         writeDump(work.output, dump);
                         synchronized (diagnosticLock) {
@@ -718,6 +718,11 @@ public class InjectorImpl implements Injector {
                 }
             }
         }
+    }
+
+    /** Supplies diagnostic styling without resolving components from this injector. */
+    protected BindingStyler getBindingStyler() {
+        return BindingStyler.NONE;
     }
 
     /** Writes a complete block; a separate hook lets tests exercise slow and failing output. */

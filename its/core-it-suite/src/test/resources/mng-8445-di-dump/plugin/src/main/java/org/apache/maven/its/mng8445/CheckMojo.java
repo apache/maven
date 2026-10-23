@@ -23,6 +23,7 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
@@ -54,6 +55,10 @@ public class CheckMojo implements Mojo {
 
     @Named
     public static class Unused {
+        @Inject
+        @Nullable
+        Runnable optional;
+
         public Unused() {
             throw new IllegalStateException("Diagnostics provisioned an unused component");
         }
