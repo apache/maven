@@ -162,8 +162,9 @@ class ValidateInvokerTest {
         @ParameterizedTest
         @ValueSource(booleans = {false, true})
         @ResourceLock(SYSTEM_PROPERTIES)
-        @DisplayName("should use standalone repositories and override the settings local repository")
-        void shouldUseStandaloneRepositories(boolean configuredRepository) throws Exception {
+        @DisplayName("should use settings repositories or Central and override the local repository")
+        void shouldUseSettingsRepositoriesOrCentralWithRequestedLocalRepository(boolean configuredRepository)
+                throws Exception {
             Path settings = Files.createDirectories(tempDir.resolve(".m2")).resolve("settings.xml");
             String repositories = configuredRepository ? """
                       <repositories>
