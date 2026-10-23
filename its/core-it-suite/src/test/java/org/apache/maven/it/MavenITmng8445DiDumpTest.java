@@ -103,6 +103,7 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
             assertTrue(nativeRows.stream().anyMatch(line -> line.contains("CheckMojo$Unused")));
             assertTrue(nativeRows.stream().anyMatch(line -> line.contains("Unused.provide")));
             assertTrue(hasInstanceBinding(nativeRows, "org.apache.maven.api.Session"));
+            assertTrue(nativeRows.stream().anyMatch(line -> line.contains("field injector:") && line.contains(".session")));
         } else {
             assertEquals(0, dumps);
             assertFalse(lines.stream().anyMatch(line -> line.startsWith("  scopes:")));

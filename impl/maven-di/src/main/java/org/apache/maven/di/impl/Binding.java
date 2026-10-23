@@ -146,7 +146,7 @@ public abstract class Binding<T> {
             @Override
             List<String> getDiagnosticSourceLines(Function<Member, List<String>> memberSource) {
                 List<String> lines = new ArrayList<>(Binding.this.getDiagnosticSourceLines(memberSource));
-                lines.add("initialized by " + identityString(bindingInitializer));
+                lines.addAll(bindingInitializer.getDiagnosticSourceLines(memberSource));
                 return List.copyOf(lines);
             }
 
