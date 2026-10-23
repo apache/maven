@@ -88,14 +88,34 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
         REQUEST_DOMINANT,
     }
 
+    /**
+     * Gets the source from which the model should be built.
+     *
+     * @return the model source
+     */
     @Nonnull
     ModelSource getSource();
 
+    /**
+     * Gets the type of build request.
+     *
+     * @return the request type
+     */
     @Nonnull
     RequestType getRequestType();
 
+    /**
+     * Returns whether input location tracking is enabled for the model.
+     *
+     * @return {@code true} if location tracking is enabled
+     */
     boolean isLocationTracking();
 
+    /**
+     * Returns whether the build should recursively process sub-projects.
+     *
+     * @return {@code true} if recursive processing is enabled
+     */
     boolean isRecursive();
 
     /**
@@ -130,12 +150,29 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
     @Nonnull
     Map<String, String> getUserProperties();
 
+    /**
+     * Gets the strategy for merging repositories from the POM with those from the request.
+     *
+     * @return the repository merging strategy
+     */
     @Nonnull
     RepositoryMerging getRepositoryMerging();
 
+    /**
+     * Gets the model transformer used to inject lifecycle bindings.
+     *
+     * @return the lifecycle bindings injector, or {@code null} if none
+     */
     @Nullable
     ModelTransformer getLifecycleBindingsInjector();
 
+    /**
+     * Creates a new request by copying an existing request and replacing the source.
+     *
+     * @param request the original request to copy
+     * @param source the new model source
+     * @return the new request
+     */
     @Nonnull
     static ModelBuilderRequest build(@Nonnull ModelBuilderRequest request, @Nonnull ModelSource source) {
         return builder(requireNonNull(request, "request cannot be null"))
@@ -143,6 +180,13 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
                 .build();
     }
 
+    /**
+     * Creates a new request for the given session and source.
+     *
+     * @param session the session
+     * @param source the model source
+     * @return the new request
+     */
     @Nonnull
     static ModelBuilderRequest build(@Nonnull Session session, @Nonnull ModelSource source) {
         return builder()
@@ -151,6 +195,13 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
                 .build();
     }
 
+    /**
+     * Creates a new request for the given session and POM path.
+     *
+     * @param session the session
+     * @param path the path to the POM file
+     * @return the new request
+     */
     @Nonnull
     static ModelBuilderRequest build(@Nonnull Session session, @Nonnull Path path) {
         return builder()
@@ -159,11 +210,22 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
                 .build();
     }
 
+    /**
+     * Creates a new builder for constructing a {@code ModelBuilderRequest}.
+     *
+     * @return a new builder
+     */
     @Nonnull
     static ModelBuilderRequestBuilder builder() {
         return new ModelBuilderRequestBuilder();
     }
 
+    /**
+     * Creates a new builder initialized from the given request.
+     *
+     * @param request the request to copy values from
+     * @return a new builder pre-populated with the request's values
+     */
     @Nonnull
     static ModelBuilderRequestBuilder builder(ModelBuilderRequest request) {
         return new ModelBuilderRequestBuilder(request);

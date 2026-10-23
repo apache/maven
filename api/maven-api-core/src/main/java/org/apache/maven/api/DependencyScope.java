@@ -129,10 +129,18 @@ public enum DependencyScope {
         return id;
     }
 
+    /**
+     * {@return whether dependencies in this scope are included transitively}.
+     */
     public boolean isTransitive() {
         return transitive;
     }
 
+    /**
+     * {@return whether this scope's {@linkplain #id() id} equals the given identifier}.
+     *
+     * @param id the identifier to compare against
+     */
     public boolean is(String id) {
         return id().equals(id);
     }

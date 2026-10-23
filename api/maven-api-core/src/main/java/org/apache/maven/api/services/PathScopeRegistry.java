@@ -20,4 +20,9 @@ package org.apache.maven.api.services;
 
 import org.apache.maven.api.PathScope;
 
+/**
+ * Registry for {@link PathScope} extensible enum values.
+ *
+ * @since 4.0.0
+ */
 public interface PathScopeRegistry extends ExtensibleEnumRegistry<PathScope> {}

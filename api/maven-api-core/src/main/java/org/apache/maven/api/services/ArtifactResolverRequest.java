@@ -42,14 +42,23 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface ArtifactResolverRequest extends RepositoryAwareRequest {
 
+    /** @return the coordinates of the artifacts to resolve, never {@code null} */
     @Nonnull
     Collection<? extends ArtifactCoordinates> getCoordinates();
 
+    /** @return a new builder instance */
     @Nonnull
     static ArtifactResolverRequestBuilder builder() {
         return new ArtifactResolverRequestBuilder();
     }
 
+    /**
+     * Builds a request to resolve artifacts from their coordinates.
+     *
+     * @param session the session
+     * @param coordinates the artifact coordinates to resolve
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static ArtifactResolverRequest build(
             @Nonnull Session session, @Nonnull Collection<? extends ArtifactCoordinates> coordinates) {
@@ -59,6 +68,14 @@ public interface ArtifactResolverRequest extends RepositoryAwareRequest {
                 .build();
     }
 
+    /**
+     * Builds a request to resolve artifacts from specific repositories.
+     *
+     * @param session the session
+     * @param coordinates the artifact coordinates to resolve
+     * @param repositories the remote repositories to resolve from
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static ArtifactResolverRequest build(
             @Nonnull Session session,

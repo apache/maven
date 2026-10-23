@@ -41,19 +41,31 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface ArtifactDeployerRequest extends Request<Session> {
 
+    /** @return the remote repository to deploy to, never {@code null} */
     @Nonnull
     RemoteRepository getRepository();
 
+    /** @return the artifacts to deploy, never {@code null} */
     @Nonnull
     Collection<ProducedArtifact> getArtifacts();
 
+    /** @return the number of times to retry a failed deployment */
     int getRetryFailedDeploymentCount();
 
+    /** @return a new builder instance */
     @Nonnull
     static ArtifactDeployerRequestBuilder builder() {
         return new ArtifactDeployerRequestBuilder();
     }
 
+    /**
+     * Builds a request to deploy artifacts to a remote repository.
+     *
+     * @param session the session
+     * @param repository the target remote repository
+     * @param artifacts the artifacts to deploy
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static ArtifactDeployerRequest build(
             @Nonnull Session session,

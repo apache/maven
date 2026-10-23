@@ -38,32 +38,82 @@ import org.apache.maven.api.annotations.Nullable;
 @Immutable
 public interface XmlReaderRequest {
 
+    /**
+     * Returns the path to the XML file to read, or {@code null} if another input source is used.
+     *
+     * @return the file path, or {@code null}
+     */
     @Nullable
     Path getPath();
 
+    /**
+     * Returns the root directory for resolving relative paths, or {@code null} if not set.
+     *
+     * @return the root directory, or {@code null}
+     */
     @Nullable
     Path getRootDirectory();
 
+    /**
+     * Returns the URL to read the XML from, or {@code null} if another input source is used.
+     *
+     * @return the URL, or {@code null}
+     */
     @Nullable
     URL getURL();
 
+    /**
+     * Returns the input stream to read the XML from, or {@code null} if another input source is used.
+     *
+     * @return the input stream, or {@code null}
+     */
     @Nullable
     InputStream getInputStream();
 
+    /**
+     * Returns the reader to read the XML from, or {@code null} if another input source is used.
+     *
+     * @return the reader, or {@code null}
+     */
     @Nullable
     Reader getReader();
 
+    /**
+     * Returns the transformer to apply during parsing, or {@code null} if none is set.
+     *
+     * @return the transformer, or {@code null}
+     */
     @Nullable
     Transformer getTransformer();
 
+    /**
+     * Returns whether strict parsing should be enforced.
+     *
+     * @return {@code true} if strict parsing is enabled
+     */
     boolean isStrict();
 
+    /**
+     * Returns the identifier of the model being parsed, used for error reporting.
+     *
+     * @return the model identifier, or {@code null}
+     */
     @Nullable
     String getModelId();
 
+    /**
+     * Returns the location description used for error reporting.
+     *
+     * @return the location string, or {@code null}
+     */
     @Nullable
     String getLocation();
 
+    /**
+     * Returns whether default XML entities should be added during parsing.
+     *
+     * @return {@code true} if default entities should be added
+     */
     boolean isAddDefaultEntities();
 
     /**
@@ -92,6 +142,11 @@ public interface XmlReaderRequest {
         String transform(String source, String fieldName);
     }
 
+    /**
+     * Creates a new builder for constructing {@code XmlReaderRequest} instances.
+     *
+     * @return a new builder
+     */
     @Nonnull
     static XmlReaderRequestBuilder builder() {
         return new XmlReaderRequestBuilder();

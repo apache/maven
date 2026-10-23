@@ -42,14 +42,23 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface ArtifactInstallerRequest extends Request<Session> {
 
+    /** @return the artifacts to install, never {@code null} */
     @Nonnull
     Collection<ProducedArtifact> getArtifacts();
 
+    /** @return a new builder instance */
     @Nonnull
     static ArtifactInstallerRequestBuilder builder() {
         return new ArtifactInstallerRequestBuilder();
     }
 
+    /**
+     * Builds a request to install artifacts in the local repository.
+     *
+     * @param session the session
+     * @param artifacts the artifacts to install
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static ArtifactInstallerRequest build(Session session, Collection<ProducedArtifact> artifacts) {
         return builder()
