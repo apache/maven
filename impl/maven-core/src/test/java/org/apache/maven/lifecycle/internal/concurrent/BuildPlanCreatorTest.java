@@ -466,4 +466,71 @@ class BuildPlanCreatorTest {
                     pred -> assertTrue(plan.step(pred.project, pred.name).isPresent(), "Phase not present: " + pred));
         });
     }
+
+    /**
+     * Verifies that when the requested phase is before "compile" (e.g. "initialize"),
+     * the new skip-clearing logic forces the reactor plugin project and all its
+     * predecessors to reach READY so that the plugin is available when needed.
+     */
+    @Test
+    void testReactorPluginPreCompilePhase() {
+        MavenProject p1 = new MavenProject();
+        p1.setGroupId("g");
+        p1.setArtifactId("p1");
+        p1.setVersion("1.0");
+        p1.setCollectedProjects(List.of());
+        Plugin plugin = new Plugin();
+        plugin.setGroupId("g");
+        plugin.setArtifactId("p2");
+        plugin.setVersion("1.0");
+        p1.getBuild().addPlugin(plugin);
+
+        MavenProject p2 = new MavenProject();
+        p2.setGroupId("g");
+        p2.setArtifactId("p2");
+        p2.setVersion("1.0");
+        p2.setCollectedProjects(List.of());
+
+        Map<MavenProject, List<MavenProject>> projects = new HashMap<>();
+        projects.put(p1, Collections.emptyList());
+        projects.put(p2, Collections.singletonList(p1));
+
+        // Use a phase before "compile" — this is the path that triggers the skip-clearing logic.
+        // Without the fix, "ready" (and compile/package/…) would be skipped for p2 because
+        // "initialize" ends well before "ready" in the lifecycle.
+        DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
+        BuildPlanExecutor.BuildContext context =
+                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles).new BuildContext();
+
+        BuildPlan plan = context.calculateLifecycleMappings(projects, "initialize");
+
+        // Baseline: without the fix, "ready" on the plugin project IS skipped (initialize < ready).
+        assertTrue(
+                plan.requiredStep(p2, "ready").skip.get(),
+                "Baseline: ready step of plugin project should be skipped before applyReactorPluginConstraints");
+
+        // Simulate what buildInitialPlan does: add PLAN steps for each project so that
+        // applyReactorPluginConstraints can wire the PLAN→READY ordering constraint.
+        for (MavenProject project : projects.keySet()) {
+            BuildStep planStep = new BuildStep(BuildStep.PLAN, project, null);
+            planStep.status.set(BuildStep.PLANNING);
+            plan.addStep(project, BuildStep.PLAN, planStep);
+        }
+
+        // Apply the reactor-plugin constraints (the fix under test).
+        context.applyReactorPluginConstraints(plan);
+
+        // After the fix: the READY step of the plugin project (p2) must NOT be skipped.
+        assertFalse(
+                plan.requiredStep(p2, "ready").skip.get(),
+                "READY step of the reactor plugin project must not be skipped after applyReactorPluginConstraints");
+
+        // All predecessors of "ready" within p2 must also not be skipped — they are needed
+        // to reach READY (resources, compile, package, …).
+        plan.requiredStep(p2, "ready")
+                .allPredecessors()
+                .filter(s -> s.project == p2)
+                .forEach(s -> assertFalse(
+                        s.skip.get(), "Predecessor step " + s.name + " of plugin project must not be skipped"));
+    }
 }

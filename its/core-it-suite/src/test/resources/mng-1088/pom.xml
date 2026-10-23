@@ -17,8 +17,8 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.1.0" root="true">
+  <modelVersion>4.1.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng1088</groupId>
   <artifactId>aggregator</artifactId>
@@ -26,12 +26,11 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-1088</name>
-  <description>Test that the plugin manager falls back to resolution from the repository if a plugin is part of the reactor
-    (i.e. an active project artifact) but the lifecycle has not been executed far enough to produce a file for
-    the plugin (i.e. a phase before "compile").</description>
+  <description>Test that the concurrent builder automatically builds a reactor plugin project up to READY
+    when another project uses that plugin, even if the requested phase is before "compile".</description>
 
-  <modules>
-    <module>plugin</module>
-    <module>client</module>
-  </modules>
+  <subprojects>
+    <subproject>plugin</subproject>
+    <subproject>client</subproject>
+  </subprojects>
 </project>
