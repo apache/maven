@@ -134,10 +134,21 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                 logger.info("{}{}[{}]", project.getName(), chars(' ', (len > 0) ? len : 1), project.getPackaging());
             }
 
-            final List<MavenProject> allProjects = event.getSession().getAllProjects();
-
-            currentVisitedProjectCount = allProjects.size() - projects.size();
-            totalProjects = allProjects.size();
+            // session.getAllProjects() always returns the full reactor, even under -pl, because
+            // FilteredProjectDependencyGraph.getAllProjects() delegates to the unfiltered parent
+            // graph. Offsetting the counter against that full size only makes sense for -rf
+            // (resume-from), where the selected projects really are the tail of a larger reactor
+            // and the absolute position is meaningful; for a plain -pl subset it produced a
+            // misleading [N-k/N]..[N/N] counter regardless of how many projects were selected.
+            String resumeFrom = event.getSession().getRequest().getResumeFrom();
+            if (resumeFrom != null && !resumeFrom.isEmpty()) {
+                final List<MavenProject> allProjects = event.getSession().getAllProjects();
+                currentVisitedProjectCount = allProjects.size() - projects.size();
+                totalProjects = allProjects.size();
+            } else {
+                currentVisitedProjectCount = 0;
+                totalProjects = projects.size();
+            }
         }
     }
 

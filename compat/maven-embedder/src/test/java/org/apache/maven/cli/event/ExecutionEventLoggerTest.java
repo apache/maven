@@ -216,7 +216,7 @@ class ExecutionEventLoggerTest {
 
         MavenSession session = mock(MavenSession.class);
         when(session.getProjects()).thenReturn(List.of(project1, project2, project3));
-        when(session.getAllProjects()).thenReturn(List.of(project1, project2, project3));
+        when(session.getRequest()).thenReturn(new DefaultMavenExecutionRequest());
 
         ExecutionEvent sessionStartedEvent = mock(ExecutionEvent.class);
         when(sessionStartedEvent.getSession()).thenReturn(session);
@@ -249,7 +249,7 @@ class ExecutionEventLoggerTest {
 
         MavenSession session = mock(MavenSession.class);
         when(session.getProjects()).thenReturn(List.of(project1, project2, project3));
-        when(session.getAllProjects()).thenReturn(List.of(project1, project2, project3));
+        when(session.getRequest()).thenReturn(new DefaultMavenExecutionRequest());
 
         ExecutionEvent sessionStartedEvent = mock(ExecutionEvent.class);
         when(sessionStartedEvent.getSession()).thenReturn(session);
@@ -275,14 +275,19 @@ class ExecutionEventLoggerTest {
 
     @Test
     void testMultiModuleProjectResumeFromProgress() {
-        // prepare
+        // prepare: -rf project2, so the reactor really is the tail of a larger build and the
+        // absolute [N/allProjects] position is meaningful
         MavenProject project1 = generateMavenProject("Apache Maven Embedder 1");
         MavenProject project2 = generateMavenProject("Apache Maven Embedder 2");
         MavenProject project3 = generateMavenProject("Apache Maven Embedder 3");
 
+        MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
+        executionRequest.setResumeFrom(":apache-maven-embedder-2");
+
         MavenSession session = mock(MavenSession.class);
         when(session.getProjects()).thenReturn(List.of(project2, project3));
         when(session.getAllProjects()).thenReturn(List.of(project1, project2, project3));
+        when(session.getRequest()).thenReturn(executionRequest);
 
         ExecutionEvent sessionStartedEvent = mock(ExecutionEvent.class);
         when(sessionStartedEvent.getSession()).thenReturn(session);
@@ -301,6 +306,36 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger, never()).info(matches(".*Apache Maven Embedder 1.*\\[1\\/3\\]"));
         inOrder.verify(logger).info(matches(".*Apache Maven Embedder 2.*\\[2\\/3\\]"));
         inOrder.verify(logger).info(matches(".*Apache Maven Embedder 3.*\\[3\\/3\\]"));
+    }
+
+    @Test
+    void testMultiModuleProjectSubsetProgressIsRelativeToSelection() {
+        // prepare: a 3-project reactor where -pl selects only project2 and project3, without
+        // -rf, so the counter must be relative to the 2-project selection, not to the full
+        // reactor (#13690)
+        MavenProject project2 = generateMavenProject("Apache Maven Embedder 2");
+        MavenProject project3 = generateMavenProject("Apache Maven Embedder 3");
+
+        MavenSession session = mock(MavenSession.class);
+        when(session.getProjects()).thenReturn(List.of(project2, project3));
+        when(session.getRequest()).thenReturn(new DefaultMavenExecutionRequest());
+
+        ExecutionEvent sessionStartedEvent = mock(ExecutionEvent.class);
+        when(sessionStartedEvent.getSession()).thenReturn(session);
+        ExecutionEvent projectStartedEvent2 = mock(ExecutionEvent.class);
+        when(projectStartedEvent2.getProject()).thenReturn(project2);
+        ExecutionEvent projectStartedEvent3 = mock(ExecutionEvent.class);
+        when(projectStartedEvent3.getProject()).thenReturn(project3);
+
+        // execute
+        executionEventLogger.sessionStarted(sessionStartedEvent);
+        executionEventLogger.projectStarted(projectStartedEvent2);
+        executionEventLogger.projectStarted(projectStartedEvent3);
+
+        // verify
+        InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 2.*\\[1\\/2\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 3.*\\[2\\/2\\]"));
     }
 
     @Test
