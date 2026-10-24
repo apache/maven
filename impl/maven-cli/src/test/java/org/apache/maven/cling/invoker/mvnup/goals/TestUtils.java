@@ -24,9 +24,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
+import org.apache.maven.api.logging.Logger;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 
 import static org.mockito.ArgumentMatchers.anyString;
@@ -105,9 +105,10 @@ public final class TestUtils {
                 .error(anyString());
 
         when(request.parserRequest()).thenReturn(parserRequest);
-        when(parserRequest.logger()).thenReturn(logger);
 
-        return new UpgradeContext(request, options);
+        UpgradeContext context = new UpgradeContext(request, options);
+        context.logger = logger;
+        return context;
     }
 
     /**

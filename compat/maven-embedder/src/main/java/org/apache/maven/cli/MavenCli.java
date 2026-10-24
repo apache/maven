@@ -62,6 +62,8 @@ import org.apache.maven.Maven;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.extensions.InputSource;
+import org.apache.maven.api.logging.LogLevel;
+import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.building.FileSource;
@@ -79,9 +81,7 @@ import org.apache.maven.cli.transfer.QuietMavenTransferListener;
 import org.apache.maven.cli.transfer.SimplexTransferListener;
 import org.apache.maven.cli.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
-import org.apache.maven.cling.logging.Slf4jConfiguration;
-import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
-import org.apache.maven.cling.logging.Slf4jLoggerManager;
+import org.apache.maven.cling.logging.LogApiLoggerManager;
 import org.apache.maven.di.Injector;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
@@ -102,7 +102,6 @@ import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
-import org.apache.maven.logging.api.LogLevelRecorder;
 import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.project.MavenProject;
@@ -123,7 +122,6 @@ import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
-import org.codehaus.plexus.logging.LoggerManager;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.transfer.TransferListener;
@@ -184,7 +182,7 @@ public class MavenCli {
 
     private ClassWorld classWorld;
 
-    private LoggerManager plexusLoggerManager;
+    private org.codehaus.plexus.logging.LoggerManager plexusLoggerManager;
 
     private ILoggerFactory slf4jLoggerFactory;
 
@@ -586,14 +584,13 @@ public class MavenCli {
         }
 
         slf4jLoggerFactory = LoggerFactory.getILoggerFactory();
-        Slf4jConfiguration slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(slf4jLoggerFactory);
 
         if (cliRequest.verbose) {
             cliRequest.request.setLoggingLevel(MavenExecutionRequest.LOGGING_LEVEL_DEBUG);
-            slf4jConfiguration.setRootLoggerLevel(Slf4jConfiguration.Level.DEBUG);
+            LoggerManager.get().setRootLoggerLevel(LogLevel.DEBUG);
         } else if (cliRequest.quiet) {
             cliRequest.request.setLoggingLevel(MavenExecutionRequest.LOGGING_LEVEL_ERROR);
-            slf4jConfiguration.setRootLoggerLevel(Slf4jConfiguration.Level.ERROR);
+            LoggerManager.get().setRootLoggerLevel(LogLevel.ERROR);
         }
         // else fall back to default log level specified in conf
         // see https://issues.apache.org/jira/browse/MNG-2570
@@ -615,33 +612,22 @@ public class MavenCli {
             }
         }
 
-        slf4jConfiguration.activate();
+        LoggerManager.get().reconfigure();
 
-        plexusLoggerManager = new Slf4jLoggerManager();
+        plexusLoggerManager = new LogApiLoggerManager();
         slf4jLogger = slf4jLoggerFactory.getLogger(this.getClass().getName());
 
         if (commandLine.hasOption(CLIManager.FAIL_ON_SEVERITY)) {
             String logLevelThreshold = commandLine.getOptionValue(CLIManager.FAIL_ON_SEVERITY);
 
-            if (slf4jLoggerFactory instanceof LogLevelRecorder recorder) {
-                LogLevelRecorder.Level level =
-                        switch (logLevelThreshold.toLowerCase(Locale.ENGLISH)) {
-                            case "warn", "warning" -> LogLevelRecorder.Level.WARN;
-                            case "error" -> LogLevelRecorder.Level.ERROR;
-                            default ->
-                                throw new IllegalArgumentException(
-                                        logLevelThreshold
-                                                + " is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.");
-                        };
-                recorder.setMaxLevelAllowed(level);
-                slf4jLogger.info("Enabled to break the build on log level {}.", logLevelThreshold);
-            } else {
-                slf4jLogger.warn(
-                        "Expected LoggerFactory to be of type '{}', but found '{}' instead. "
-                                + "The --fail-on-severity flag will not take effect.",
-                        LogLevelRecorder.class.getName(),
-                        slf4jLoggerFactory.getClass().getName());
-            }
+            cliRequest.failOnSeverity = switch (logLevelThreshold.toLowerCase(Locale.ENGLISH)) {
+                case "warn", "warning" -> LogLevel.WARN;
+                case "error" -> LogLevel.ERROR;
+                default ->
+                    throw new IllegalArgumentException(logLevelThreshold
+                            + " is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.");
+            };
+            slf4jLogger.info("Enabled to break the build on log level {}.", logLevelThreshold);
         }
 
         // check for presence of deprecated options and print warning
@@ -1423,7 +1409,7 @@ public class MavenCli {
         request.setTopDirectory(cliRequest.topDirectory);
         request.setPom(determinePom(commandLine, workingDirectory, baseDirectory));
         request.setTransferListener(determineTransferListener(quiet, verbose, commandLine, request));
-        request.setExecutionListener(determineExecutionListener());
+        request.setExecutionListener(determineExecutionListener(cliRequest));
 
         if ((request.getPom() != null) && (request.getPom().getParentFile() != null)) {
             request.setBaseDirectory(request.getPom().getParentFile());
@@ -1602,8 +1588,12 @@ public class MavenCli {
         }
     }
 
-    private ExecutionListener determineExecutionListener() {
-        ExecutionListener executionListener = new ExecutionEventLogger(messageBuilderFactory);
+    private ExecutionListener determineExecutionListener(CliRequest cliRequest) {
+        ExecutionListener executionListener = new ExecutionEventLogger(
+                messageBuilderFactory,
+                org.slf4j.LoggerFactory.getLogger(ExecutionEventLogger.class),
+                -1,
+                cliRequest.failOnSeverity);
         if (eventSpyDispatcher != null) {
             return eventSpyDispatcher.chainListener(executionListener);
         } else {

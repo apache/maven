@@ -38,6 +38,8 @@ under the License.
     <module>maven-xml</module>
     <module>maven-jline</module>
     <module>maven-logging</module>
+    <module>maven-logging-slf4j</module>
+    <module>maven-logging-jul</module>
     <module>maven-core</module>
     <module>maven-cli</module>
     <module>maven-testing</module>

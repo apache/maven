@@ -28,9 +28,9 @@ import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.logging.LogLevel;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.model.RootLocator;
-import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.model.DefaultInterpolator;
 import org.codehaus.plexus.logging.Logger;
@@ -112,20 +112,22 @@ public final class CliUtils {
         };
     }
 
-    public static int toMavenExecutionRequestLoggingLevel(Slf4jConfiguration.Level level) {
+    public static int toMavenExecutionRequestLoggingLevel(LogLevel level) {
         requireNonNull(level, "level");
         return switch (level) {
-            case DEBUG -> MavenExecutionRequest.LOGGING_LEVEL_DEBUG;
+            case TRACE, DEBUG -> MavenExecutionRequest.LOGGING_LEVEL_DEBUG;
             case INFO -> MavenExecutionRequest.LOGGING_LEVEL_INFO;
+            case WARN -> MavenExecutionRequest.LOGGING_LEVEL_WARN;
             case ERROR -> MavenExecutionRequest.LOGGING_LEVEL_ERROR;
         };
     }
 
-    public static int toPlexusLoggingLevel(Slf4jConfiguration.Level level) {
+    public static int toPlexusLoggingLevel(LogLevel level) {
         requireNonNull(level, "level");
         return switch (level) {
-            case DEBUG -> Logger.LEVEL_DEBUG;
+            case TRACE, DEBUG -> Logger.LEVEL_DEBUG;
             case INFO -> Logger.LEVEL_INFO;
+            case WARN -> Logger.LEVEL_WARN;
             case ERROR -> Logger.LEVEL_ERROR;
         };
     }

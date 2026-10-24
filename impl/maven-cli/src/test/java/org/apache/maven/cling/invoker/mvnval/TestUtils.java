@@ -26,9 +26,9 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.mvnval.ValidateOptions;
+import org.apache.maven.api.logging.Logger;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.impl.model.DefaultModelProblem;
@@ -87,9 +87,13 @@ final class TestUtils {
                 .error(anyString());
 
         when(request.parserRequest()).thenReturn(parserRequest);
-        when(parserRequest.logger()).thenReturn(logger);
+        when(parserRequest.args()).thenReturn(List.of());
+        org.apache.maven.api.cli.Logger cliLogger = mock(org.apache.maven.api.cli.Logger.class);
+        when(cliLogger.drain()).thenReturn(List.of());
+        when(parserRequest.logger()).thenReturn(cliLogger);
 
         ValidateContext context = new ValidateContext(request, options);
+        context.logger = logger;
         // LookupInvoker.createTerminal fills this in on a real run; the invoker installs its
         // interrupt handler on it, so a test driving execute() directly needs one here.
         context.terminal = mock(Terminal.class);

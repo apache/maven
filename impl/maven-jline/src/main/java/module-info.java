@@ -32,6 +32,7 @@ module org.apache.maven.jline {
 
     exports org.apache.maven.jline to
             org.apache.maven.logging,
+            org.apache.maven.logging.slf4j,
             org.apache.maven.cling,
             org.apache.maven.embedder;
 

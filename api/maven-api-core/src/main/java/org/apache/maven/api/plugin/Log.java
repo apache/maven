@@ -33,6 +33,7 @@ import org.apache.maven.api.annotations.Provider;
  *
  * @since 4.0.0
  */
+@Deprecated(since = "4.1.0", forRemoval = true)
 @Experimental
 @Provider
 public interface Log {
@@ -244,20 +245,26 @@ public interface Log {
      * Returns a child logger whose name is derived from this logger's name
      * by appending a dot and the given suffix.
      *
-     * <p>For example, if a plugin's logger is named
-     * {@code "org.apache.maven.plugins.compiler.CompilerMojo"},
-     * then {@code child("diagnostics")} returns a logger named
-     * {@code "org.apache.maven.plugins.compiler.CompilerMojo.diagnostics"}.
-     * This lets sub-components log under an independently filterable name
-     * without requiring a separate injection point.</p>
+     * <p>The child logger inherits this logger's structured context —
+     * {@code projectId}, {@code mojoId} and the active {@link org.apache.maven.api.logging.LogSink} —
+     * so events emitted by sub-components are automatically tagged with the
+     * correct project and mojo execution without any additional injection.
+     * This is the preferred way for a mojo to pass a scoped logger to a
+     * helper or service it delegates to.</p>
+     *
+     * <p>Example: a compiler mojo delegates to a {@code Javac} helper:</p>
+     * <pre>{@code
+     * // Maven injects Log with projectId/mojoId already set
+     * void execute() {
+     *     new Javac(log.child("javac")).compile(sources);
+     * }
+     * }</pre>
      *
      * <p>The default implementation returns {@code this}, so existing
-     * {@code Log} implementations continue to work without changes.
-     * Implementations that wrap a hierarchical logging backend (such as
-     * SLF4J) should override this to create a real child logger.</p>
+     * {@code Log} implementations continue to work without changes.</p>
      *
      * @param name the suffix to append (must not be {@code null} or blank)
-     * @return a child logger — never {@code null}
+     * @return a child logger that inherits this logger's context — never {@code null}
      */
     default Log child(String name) {
         return this;

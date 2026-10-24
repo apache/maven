@@ -21,6 +21,7 @@ package org.apache.maven.cling;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.PrintStream;
 
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Invoker;
@@ -28,7 +29,6 @@ import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.services.MessageBuilderFactory;
-import org.apache.maven.cling.invoker.logging.SystemLogger;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.codehaus.plexus.classworlds.ClassWorld;
 
@@ -84,7 +84,9 @@ public abstract class ClingSupport {
             return e.getExitCode();
         } catch (Exception e) {
             // last resort; as ideally we should get ExitException only
-            new SystemLogger(stdErr).error(e.getMessage(), e);
+            PrintStream err = stdErr instanceof PrintStream ps ? ps : new PrintStream(stdErr, true);
+            err.println("[ERROR] " + e.getMessage());
+            e.printStackTrace(err);
             return 1;
         } finally {
             if (classWorldManaged) {

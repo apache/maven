@@ -38,6 +38,8 @@ import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
 import java.util.logging.Handler;
+import java.util.logging.Level;
+import java.util.logging.LogManager;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
@@ -45,9 +47,10 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.cisupport.CIInfo;
-import org.apache.maven.api.cli.logging.AccumulatingLogger;
+import org.apache.maven.api.logging.LogLevel;
+import org.apache.maven.api.logging.Logger;
+import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MavenException;
@@ -68,24 +71,18 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.bridge.MavenRepositorySystem;
-import org.apache.maven.cling.invoker.logging.Slf4jLogger;
-import org.apache.maven.cling.invoker.logging.SystemLogger;
 import org.apache.maven.cling.invoker.spi.PropertyContributorsHolder;
-import org.apache.maven.cling.logging.Slf4jConfiguration;
-import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.SettingsUtilsV4;
 import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
-import org.apache.maven.logging.AsyncDrainWriter;
 import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingOutputStream;
 import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.apache.maven.logging.SimpleBuildEventListener;
-import org.apache.maven.logging.api.LogLevelRecorder;
-import org.apache.maven.slf4j.MavenSimpleLogger;
+import org.apache.maven.logging.jul.MavenJulHandler;
 import org.codehaus.plexus.PlexusContainer;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
@@ -93,8 +90,6 @@ import org.jline.terminal.impl.AbstractPosixTerminal;
 import org.jline.terminal.spi.TerminalExt;
 import org.jline.utils.OSUtils;
 import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.slf4j.spi.LocationAwareLogger;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.cling.invoker.CliUtils.toMavenExecutionRequestLoggingLevel;
@@ -125,8 +120,15 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         Properties oldProps = new Properties();
         oldProps.putAll(System.getProperties());
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
-        // activateLogging() replaces them with SLF4JBridgeHandler, whose classes live in Maven's realm
-        Handler[] oldRootLoggerHandlers = java.util.logging.Logger.getLogger("").getHandlers();
+        // activateLogging() replaces them with MavenJulHandler, whose classes live in Maven's realm
+        java.util.logging.Logger julRoot = java.util.logging.Logger.getLogger("");
+        // Only manipulate JUL root handlers when the default LogManager is active.
+        // Embedded-Maven scenarios (IDE plugins, app servers) may run a custom
+        // LogManager (e.g. Log4j2-JUL); trampling their handler list causes
+        // the host's logging to break after the Maven invocation completes.
+        boolean isDefaultLogManager = LogManager.getLogManager().getClass() == LogManager.class;
+        Handler[] oldRootLoggerHandlers = isDefaultLogManager ? julRoot.getHandlers() : new Handler[0];
+        java.util.logging.Level oldRootLoggerLevel = isDefaultLogManager ? julRoot.getLevel() : null;
         try (C context = createContext(invokerRequest)) {
             if (contextConsumer != null) {
                 contextConsumer.accept(context);
@@ -150,22 +152,30 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         } finally {
             Thread.currentThread().setContextClassLoader(oldCL);
             System.setProperties(oldProps);
-            restoreRootLoggerHandlers(oldRootLoggerHandlers);
+            restoreRootLoggerHandlers(oldRootLoggerHandlers, oldRootLoggerLevel);
         }
     }
 
     /**
-     * Puts back the handlers the {@code java.util.logging} root logger had before the invocation. When Maven runs inside
-     * another JVM, the root logger belongs to that JVM, and a {@code SLF4JBridgeHandler} left on it would route the
-     * host's logging to Maven and fail once Maven's class realm is closed.
+     * Puts back the handlers and root level the {@code java.util.logging} root logger had before the invocation.
+     * When Maven runs inside another JVM, the root logger belongs to that JVM, and a {@code MavenJulHandler} left
+     * on it would route the host's logging to Maven and fail once Maven's class realm is closed. Similarly, the
+     * level change (e.g. {@code SEVERE} in quiet mode) must be reverted so the host's logging is not suppressed
+     * after the invocation completes.
      */
-    private static void restoreRootLoggerHandlers(Handler[] handlers) {
+    private static void restoreRootLoggerHandlers(Handler[] handlers, java.util.logging.Level level) {
+        if (handlers.length == 0 && level == null) {
+            return; // custom LogManager — we didn't touch anything
+        }
         java.util.logging.Logger root = java.util.logging.Logger.getLogger("");
         for (Handler handler : root.getHandlers()) {
             root.removeHandler(handler);
         }
         for (Handler handler : handlers) {
             root.addHandler(handler);
+        }
+        if (level != null) {
+            root.setLevel(level);
         }
     }
 
@@ -190,52 +200,48 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected InvokerException.ExitException handleException(C context, Exception e) {
-        printErrors(
-                context,
-                context.options().showErrors().orElse(false),
-                List.of(new Logger.Entry(Logger.Level.ERROR, e.getMessage(), e.getCause())),
-                context.logger);
+        printError(context, context.options().showErrors().orElse(false), e.getMessage(), e.getCause());
         return new InvokerException.ExitException(2);
     }
 
-    protected void printErrors(C context, boolean showStackTrace, List<Logger.Entry> entries, Logger logger) {
-        // if accumulating logger passed, this is "early failure", swap logger for stdErr and use that to emit log
-        if (logger instanceof AccumulatingLogger) {
-            logger = new SystemLogger(context.invokerRequest.stdErr().orElse(null));
-        }
-        // this is important message; many Maven IT assert for presence of this message
-        logger.error("Error executing " + context.invokerRequest.parserRequest().commandName() + ".");
-        for (Logger.Entry entry : entries) {
-            if (showStackTrace) {
-                logger.log(entry.level(), entry.message(), entry.error());
-            } else {
-                logger.error(entry.message());
-                for (Throwable cause = entry.error();
-                        cause != null && cause != cause.getCause();
-                        cause = cause.getCause()) {
-                    logger.log(entry.level(), "Caused by: " + cause.getMessage());
-                }
+    protected void printError(C context, boolean showStackTrace, String message, Throwable error) {
+        // Write to stderr directly — this is the fatal error exit path and must
+        // be visible even if the logging infrastructure is not fully set up.
+        PrintWriter err = new PrintWriter(context.invokerRequest.stdErr().orElse(System.err), true);
+        err.println("[ERROR] Error executing "
+                + context.invokerRequest.parserRequest().commandName() + ".");
+        if (showStackTrace && error != null) {
+            err.println("[ERROR] " + message);
+            error.printStackTrace(err);
+        } else {
+            err.println("[ERROR] " + message);
+            for (Throwable cause = error; cause != null && cause != cause.getCause(); cause = cause.getCause()) {
+                err.println("[ERROR] Caused by: " + cause.getMessage());
             }
         }
     }
 
     protected abstract C createContext(InvokerRequest invokerRequest);
 
+    @SuppressWarnings("deprecation")
     protected void validate(C context) throws Exception {
         if (context.invokerRequest.parsingFailed()) {
-            // in case of parser errors: report errors and bail out; invokerRequest contents may be incomplete
-            // in case of mvnsh the context.logger != context.invokerRequest.parserRequest.logger
-            List<Logger.Entry> entries =
+            boolean showStackTrace = context.invokerRequest
+                    .parserRequest()
+                    .args()
+                    .contains(CommonsCliOptions.CLIManager.SHOW_ERRORS_CLI_ARG);
+            // Drain parser errors and write to stderr
+            List<org.apache.maven.api.cli.Logger.Entry> entries =
                     context.invokerRequest.parserRequest().logger().drain();
-            printErrors(
-                    context,
-                    context.invokerRequest
-                            .parserRequest()
-                            .args()
-                            .contains(CommonsCliOptions.CLIManager.SHOW_ERRORS_CLI_ARG),
-                    entries,
-                    context.logger);
-            // we skip handleException above as we did output
+            PrintWriter err = new PrintWriter(context.invokerRequest.stdErr().orElse(System.err), true);
+            err.println("[ERROR] Error executing "
+                    + context.invokerRequest.parserRequest().commandName() + ".");
+            for (org.apache.maven.api.cli.Logger.Entry entry : entries) {
+                err.println("[ERROR] " + entry.message());
+                if (showStackTrace && entry.error() != null) {
+                    entry.error().printStackTrace(err);
+                }
+            }
             throw new InvokerException.ExitException(1);
         }
 
@@ -306,18 +312,34 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         context.loggerFactory = LoggerFactory.getILoggerFactory();
-        context.slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(context.loggerFactory);
 
         if (context.invokerRequest.effectiveVerbose()) {
-            context.loggerLevel = Slf4jConfiguration.Level.DEBUG;
-            context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
+            context.loggerLevel = LogLevel.DEBUG;
+            LoggerManager.get().setRootLoggerLevel(context.loggerLevel);
         } else if (context.options().quiet().orElse(false)) {
-            context.loggerLevel = Slf4jConfiguration.Level.ERROR;
-            context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
+            context.loggerLevel = LogLevel.ERROR;
+            LoggerManager.get().setRootLoggerLevel(context.loggerLevel);
+            // Install the JUL handler early and clamp the JUL root to SEVERE
+            // so that JLine terminal-init DEBUG events (emitted via java.util.logging
+            // before activateLogging() runs) are suppressed at source.
+            // createTerminal() executes after configureLogging() but before
+            // activateLogging(), so without this guard those DEBUG lines leak
+            // into the build output even when -q is in effect, causing
+            // MavenITmng4387QuietLoggingTest to fail on Windows.
+            // Setting SEVERE here is safe: it only blocks events, so it
+            // cannot trigger the SLF4J-bootstrap reentrancy flood that
+            // Level.ALL would cause.
+            LogManager logManager = LogManager.getLogManager();
+            if (logManager.getClass() == LogManager.class && !MavenJulHandler.isInstalled()) {
+                MavenJulHandler.install();
+            }
+            if (logManager.getClass() == LogManager.class) {
+                logManager.getLogger("").setLevel(Level.SEVERE);
+            }
         } else {
             // fall back to default log level specified in conf
             // see https://issues.apache.org/jira/browse/MNG-2570 and https://github.com/apache/maven/issues/11199
-            context.loggerLevel = Slf4jConfiguration.Level.INFO; // default for display purposes
+            context.loggerLevel = LogLevel.INFO; // default for display purposes
         }
     }
 
@@ -418,17 +440,14 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
      * Override this method to add some special handling for "raw streams" <em>disabled</em> option.
      */
     protected void doConfigureWithTerminalWithRawStreamsDisabled(C context) {
-        MavenSimpleLogger stdout = (MavenSimpleLogger) context.loggerFactory.getLogger("stdout");
-        MavenSimpleLogger stderr = (MavenSimpleLogger) context.loggerFactory.getLogger("stderr");
-        stdout.setLogLevel(LocationAwareLogger.INFO_INT);
-        stderr.setLogLevel(LocationAwareLogger.INFO_INT);
-        PrintStream psOut = new LoggingOutputStream(s -> stdout.info("[stdout] " + s)).printStream();
+        Logger stdout = LoggerManager.get().getLogger("stdout");
+        Logger stderr = LoggerManager.get().getLogger("stderr");
+        PrintStream psOut = new LoggingOutputStream(s -> stdout.atInfo().log("[stdout] " + s)).printStream();
         context.closeables.add(() -> LoggingOutputStream.forceFlush(psOut));
-        PrintStream psErr = new LoggingOutputStream(s -> stderr.warn("[stderr] " + s)).printStream();
+        PrintStream psErr = new LoggingOutputStream(s -> stderr.atWarn().log("[stderr] " + s)).printStream();
         context.closeables.add(() -> LoggingOutputStream.forceFlush(psErr));
         System.setOut(psOut);
         System.setErr(psErr);
-        // no need to set them back, this is already handled by MessageUtils.systemUninstall() above
     }
 
     protected Consumer<String> determineWriter(C context) {
@@ -458,47 +477,51 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 pw.flush();
             };
         }
-        // Wrap with lock-free async drain to eliminate PrintWriter synchronized contention
-        // when multiple PhasingExecutor threads log concurrently during parallel model building.
-        AsyncDrainWriter asyncWriter = new AsyncDrainWriter(raw);
-        context.closeables.add(asyncWriter);
-        return asyncWriter;
+        return raw;
     }
 
     protected void activateLogging(C context) throws Exception {
-        if (!SLF4JBridgeHandler.isInstalled()) {
-            SLF4JBridgeHandler.removeHandlersForRootLogger();
-            SLF4JBridgeHandler.install();
+        LogManager logManager = LogManager.getLogManager();
+        if (logManager.getClass() == LogManager.class && !MavenJulHandler.isInstalled()) {
+            MavenJulHandler.install();
         }
 
-        context.slf4jConfiguration.activate();
+        LoggerManager.get().reconfigure();
+
+        // Now that SLF4J is fully initialized, set the JUL root logger level
+        // to match the effective log level.  This must happen AFTER install()
+        // + activate() to avoid flooding JUL events during SLF4J bootstrap
+        // (ConcurrentHashMap.computeIfAbsent reentrancy).
+        // In quiet mode keep the JUL root at SEVERE so that INFO/WARN/DEBUG JUL
+        // events are suppressed at source — relying solely on the SLF4J-level
+        // check in MavenJulHandler.isLevelEnabled() is racy: newly created
+        // SLF4J loggers may briefly see the default INFO level before
+        // quiet-mode propagation completes, leaking output that
+        // MavenITmng4387QuietLoggingTest detects as a flaky failure.
+        // SEVERE matches the SLF4J ERROR threshold exactly, blocking both
+        // INFO and WARNING JUL events at source during the race window.
+        Level julRootLevel;
+        if (context.options().quiet().orElse(false)) {
+            julRootLevel = Level.SEVERE;
+        } else if (context.invokerRequest.effectiveVerbose()) {
+            julRootLevel = Level.ALL;
+        } else {
+            julRootLevel = Level.INFO;
+        }
+        if (logManager.getClass() == LogManager.class) {
+            logManager.getLogger("").setLevel(julRootLevel);
+        }
         if (context.options().failOnSeverity().isPresent()) {
             String logLevelThreshold = context.options().failOnSeverity().get();
-            if (context.loggerFactory instanceof LogLevelRecorder recorder) {
-                LogLevelRecorder.Level level =
-                        switch (logLevelThreshold.toLowerCase(Locale.ENGLISH)) {
-                            case "warn", "warning" -> LogLevelRecorder.Level.WARN;
-                            case "error" -> LogLevelRecorder.Level.ERROR;
-                            default ->
-                                throw new IllegalArgumentException(
-                                        logLevelThreshold
-                                                + " is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.");
-                        };
-                recorder.setMaxLevelAllowed(level);
-                context.logger.info("Enabled to break the build on log level " + logLevelThreshold + ".");
-            } else {
-                context.logger.warn("Expected LoggerFactory to be of type '" + LogLevelRecorder.class.getName()
-                        + "', but found '"
-                        + context.loggerFactory.getClass().getName() + "' instead. "
-                        + "The --fail-on-severity flag will not take effect.");
-            }
+            context.failOnSeverity = switch (logLevelThreshold.toLowerCase(Locale.ENGLISH)) {
+                case "warn", "warning" -> LogLevel.WARN;
+                case "error" -> LogLevel.ERROR;
+                default ->
+                    throw new IllegalArgumentException(logLevelThreshold
+                            + " is not a valid log severity threshold. Valid severities are WARN/WARNING and ERROR.");
+            };
+            context.logger.info("Enabled to break the build on log level " + logLevelThreshold + ".");
         }
-
-        // at this point logging is set up, reply so far accumulated logs, if any and swap logger with real one
-        Logger logger =
-                new Slf4jLogger(context.loggerFactory.getLogger(getClass().getName()));
-        context.logger.drain().forEach(e -> logger.log(e.level(), e.message(), e.error()));
-        context.logger = logger;
     }
 
     protected void helpOrVersionAndMayExit(C context) throws Exception {
