@@ -52,6 +52,8 @@ import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.logging.Logger;
+import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.ConfigurationContainer;
 import org.apache.maven.api.model.Model;
@@ -80,7 +82,6 @@ import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.model.DefaultModelPathTranslator;
-import org.apache.maven.internal.impl.DefaultLog;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.model.v4.MavenMerger;
@@ -108,7 +109,6 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.platform.commons.support.AnnotationSupport;
-import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 
@@ -352,7 +352,6 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         /*
            binder.install(ProviderMethodsModule.forObject(context.getRequiredTestInstance()));
            binder.requestInjection(context.getRequiredTestInstance());
-           binder.bind(Log.class).toInstance(new DefaultLog(LoggerFactory.getLogger("anonymous")));
            binder.bind(ExtensionContext.class).toInstance(context);
            // Load maven 4 api Services interfaces and try to bind them to the (possible) mock instances
            // returned by the (possibly) mock InternalSession
@@ -528,8 +527,22 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             @Provides
             @Singleton
             @Priority(-10)
-            private Log createLog() {
-                return new DefaultLog(LoggerFactory.getLogger("anonymous"));
+            private Logger createLogger() {
+                return LoggerManager.get().getLogger("anonymous");
+            }
+
+            @Provides
+            @Singleton
+            @Priority(-10)
+            @SuppressWarnings("deprecation")
+            private Log createLog(Logger logger) {
+                // DefaultLogger implements both Logger and Log; cast is safe here
+                if (logger instanceof Log log) {
+                    return log;
+                }
+                throw new IllegalStateException(
+                        "Logger implementation does not implement the deprecated Log interface: "
+                                + logger.getClass().getName());
             }
 
             @Provides

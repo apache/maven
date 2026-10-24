@@ -1401,7 +1401,7 @@ class PluginUpgradeStrategyTest {
             assertTrue(result.processedPoms().contains(Paths.get("pom.xml")), "POM should be marked as processed");
 
             verify(context.logger, atLeastOnce())
-                    .warn(argThat(msg -> msg.contains("Failed to analyze effective model")));
+                    .warn(argThat((String msg) -> msg.contains("Failed to analyze effective model")));
         }
 
         @Test

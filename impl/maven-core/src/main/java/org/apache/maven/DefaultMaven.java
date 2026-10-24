@@ -78,7 +78,6 @@ import org.eclipse.aether.repository.WorkspaceReader;
 import org.eclipse.sisu.Nullable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.slf4j.helpers.MessageFormatter;
 
 import static java.util.stream.Collectors.toSet;
 
@@ -563,12 +562,8 @@ public class DefaultMaven implements Maven {
                 .collect(toSet());
 
         if (!notFoundRequiredProfiles.isEmpty()) {
-            // Use SLF4J formatter for consistency with warnings reported by logger
-            final String message = MessageFormatter.format(
-                            "The requested profiles {} could not be activated or deactivated because they do not"
-                                    + " exist.",
-                            notFoundRequiredProfiles)
-                    .getMessage();
+            final String message = "The requested profiles " + notFoundRequiredProfiles
+                    + " could not be activated or deactivated because they do not exist.";
             addExceptionToResult(session.getResult(), new MissingProfilesException(message));
         }
     }

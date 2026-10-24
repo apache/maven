@@ -31,14 +31,14 @@ import com.google.inject.AbstractModule;
 import com.google.inject.Module;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
-import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.extensions.CoreExtension;
+import org.apache.maven.api.logging.Logger;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.cling.extensions.BootstrapCoreExtensionManager;
 import org.apache.maven.cling.extensions.ExtensionConfigurationModule;
 import org.apache.maven.cling.extensions.LoadedCoreExtension;
-import org.apache.maven.cling.logging.Slf4jLoggerManager;
+import org.apache.maven.cling.logging.LogApiLoggerManager;
 import org.apache.maven.di.Injector;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -191,7 +191,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
     }
 
     protected LoggerManager createLoggerManager() {
-        return new Slf4jLoggerManager();
+        return new LogApiLoggerManager();
     }
 
     protected void customizeContainerConfiguration(C context, ContainerConfiguration configuration) throws Exception {}
