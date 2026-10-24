@@ -26,7 +26,6 @@ module org.apache.maven.api.cli {
     exports org.apache.maven.api.cli;
     exports org.apache.maven.api.cli.cisupport;
     exports org.apache.maven.api.cli.extensions;
-    exports org.apache.maven.api.cli.logging;
     exports org.apache.maven.api.cli.mvn;
     exports org.apache.maven.api.cli.mvnenc;
     exports org.apache.maven.api.cli.mvnsh;

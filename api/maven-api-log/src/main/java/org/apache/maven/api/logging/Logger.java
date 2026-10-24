@@ -28,10 +28,9 @@ import org.apache.maven.api.annotations.Provider;
 /**
  * Unified logging interface for Maven plugins and CLI bootstrap code.
  * <p>
- * Replaces both {@code org.apache.maven.api.plugin.Log} (mojo logging) and
- * {@code org.apache.maven.api.cli.Logger} (CLI bootstrap logging) with a single
- * interface that supports a fluent builder API, structured key-value pairs, and
- * lazy message evaluation.
+ * Unified interface that supports a fluent builder API, structured key-value
+ * pairs, and lazy message evaluation. Used by both mojo logging and CLI
+ * bootstrap logging.
  * <p>
  * Instances are obtained via dependency injection. A {@code @Singleton} bean
  * may hold a long-lived {@code Logger} instance safely: context fields such as

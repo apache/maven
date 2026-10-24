@@ -92,8 +92,8 @@ public class DefaultLoggerManager implements LoggerManager {
         // Drain BEFORE making the new sink visible to concurrent doLog() callers.
         // If we swapped first, a concurrent logger could write directly to the new sink
         // while drainTo() is still replaying older buffered events — breaking ordering.
-        if (old instanceof AccumulatingLogSink acc && sink != null) {
-            acc.drainTo(sink);
+        if (old != null && sink != null) {
+            old.drainTo(sink);
         }
         this.logSink = sink;
     }
@@ -115,7 +115,8 @@ public class DefaultLoggerManager implements LoggerManager {
             events.add(event);
         }
 
-        void drainTo(LogSink target) {
+        @Override
+        public void drainTo(LogSink target) {
             LogEvent event;
             while ((event = events.poll()) != null) {
                 target.accept(event);

@@ -47,10 +47,10 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.cisupport.CIInfo;
-import org.apache.maven.api.cli.logging.AccumulatingLogger;
 import org.apache.maven.api.logging.LogLevel;
+import org.apache.maven.api.logging.LogSink;
+import org.apache.maven.api.logging.Logger;
 import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Lookup;
@@ -72,8 +72,6 @@ import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
 import org.apache.maven.artifact.repository.layout.DefaultRepositoryLayout;
 import org.apache.maven.bridge.MavenRepositorySystem;
-import org.apache.maven.cling.invoker.logging.LogManagerLogger;
-import org.apache.maven.cling.invoker.logging.SystemLogger;
 import org.apache.maven.cling.invoker.spi.PropertyContributorsHolder;
 import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
@@ -203,52 +201,40 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected InvokerException.ExitException handleException(C context, Exception e) {
-        printErrors(
-                context,
-                context.options().showErrors().orElse(false),
-                List.of(new Logger.Entry(Logger.Level.ERROR, e.getMessage(), e.getCause())),
-                context.logger);
-        return new InvokerException.ExitException(2);
-    }
-
-    protected void printErrors(C context, boolean showStackTrace, List<Logger.Entry> entries, Logger logger) {
-        // if accumulating logger passed, this is "early failure", swap logger for stdErr and use that to emit log
-        if (logger instanceof AccumulatingLogger) {
-            logger = new SystemLogger(context.invokerRequest.stdErr().orElse(null));
-        }
-        // this is important message; many Maven IT assert for presence of this message
+        Logger logger = context.logger;
         logger.error("Error executing " + context.invokerRequest.parserRequest().commandName() + ".");
-        for (Logger.Entry entry : entries) {
-            if (showStackTrace) {
-                logger.log(entry.level(), entry.message(), entry.error());
-            } else {
-                logger.error(entry.message());
-                for (Throwable cause = entry.error();
-                        cause != null && cause != cause.getCause();
-                        cause = cause.getCause()) {
-                    logger.log(entry.level(), "Caused by: " + cause.getMessage());
-                }
+        boolean showStackTrace = context.options().showErrors().orElse(false);
+        if (showStackTrace) {
+            logger.error(e.getMessage(), e.getCause());
+        } else {
+            logger.error(e.getMessage());
+            for (Throwable cause = e.getCause(); cause != null && cause != cause.getCause(); cause = cause.getCause()) {
+                logger.error("Caused by: " + cause.getMessage());
             }
         }
+        return new InvokerException.ExitException(2);
     }
 
     protected abstract C createContext(InvokerRequest invokerRequest);
 
     protected void validate(C context) throws Exception {
         if (context.invokerRequest.parsingFailed()) {
-            // in case of parser errors: report errors and bail out; invokerRequest contents may be incomplete
-            // in case of mvnsh the context.logger != context.invokerRequest.parserRequest.logger
-            List<Logger.Entry> entries =
-                    context.invokerRequest.parserRequest().logger().drain();
-            printErrors(
-                    context,
-                    context.invokerRequest
-                            .parserRequest()
-                            .args()
-                            .contains(CommonsCliOptions.CLIManager.SHOW_ERRORS_CLI_ARG),
-                    entries,
-                    context.logger);
-            // we skip handleException above as we did output
+            boolean showStackTrace = context.invokerRequest
+                    .parserRequest()
+                    .args()
+                    .contains(CommonsCliOptions.CLIManager.SHOW_ERRORS_CLI_ARG);
+            PrintWriter err = new PrintWriter(context.invokerRequest.stdErr().orElse(System.err), true);
+            err.println("[ERROR] Error executing "
+                    + context.invokerRequest.parserRequest().commandName() + ".");
+            LogSink currentSink = LoggerManager.get().getLogSink();
+            if (currentSink != null) {
+                currentSink.drainTo(event -> {
+                    err.println("[" + event.level() + "] " + event.message());
+                    if (showStackTrace && event.throwable() != null) {
+                        event.throwable().printStackTrace(err);
+                    }
+                });
+            }
             throw new InvokerException.ExitException(1);
         }
 
@@ -533,11 +519,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             };
             context.logger.info("Enabled to break the build on log level " + logLevelThreshold + ".");
         }
-
-        // Drain the accumulated early log queue into a logger backed by LoggerManager.
-        Logger logger = new LogManagerLogger(getClass().getName());
-        context.logger.drain().forEach(e -> logger.log(e.level(), e.message(), e.error()));
-        context.logger = logger;
     }
 
     protected void helpOrVersionAndMayExit(C context) throws Exception {

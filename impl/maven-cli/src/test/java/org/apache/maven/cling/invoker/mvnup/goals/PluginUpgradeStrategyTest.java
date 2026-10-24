@@ -35,13 +35,12 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -882,7 +881,7 @@ class PluginUpgradeStrategyTest {
                 assertEquals("3.5.0", propertyValue, "Property should remain at 3.5.0 (no upgrade needed)");
 
                 // No spurious "not found" warning should have been emitted
-                verify(context.logger, never()).warn(contains("not found"));
+                verify(context.logger, never()).warn(ArgumentMatchers.<String>contains("not found"));
             } finally {
                 try (var walk = Files.walk(tempDir)) {
                     walk.sorted(java.util.Comparator.reverseOrder()).forEach(p -> {
@@ -1401,7 +1400,7 @@ class PluginUpgradeStrategyTest {
             assertTrue(result.processedPoms().contains(Paths.get("pom.xml")), "POM should be marked as processed");
 
             verify(context.logger, atLeastOnce())
-                    .warn(argThat(msg -> msg.contains("Failed to analyze effective model")));
+                    .warn(ArgumentMatchers.<String>argThat(msg -> msg.contains("Failed to analyze effective model")));
         }
 
         @Test

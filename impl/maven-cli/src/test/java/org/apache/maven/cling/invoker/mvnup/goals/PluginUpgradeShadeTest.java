@@ -30,10 +30,10 @@ import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
@@ -108,7 +108,7 @@ class PluginUpgradeShadeTest {
 
         // Verify a warning was logged
         verify(context.logger, atLeastOnce())
-                .warn(argThat(msg -> msg.contains("Skipping maven-shade-plugin upgrade")
+                .warn(ArgumentMatchers.<String>argThat(msg -> msg.contains("Skipping maven-shade-plugin upgrade")
                         && msg.contains("custom ResourceTransformer")
                         && msg.contains("BeansXmlTransformer")));
     }

@@ -30,10 +30,10 @@ import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.verify;
 
@@ -390,7 +390,7 @@ class PluginUpgradeQuarkusTest {
 
         // Verify warning was emitted about the version gap
         verify(context.logger, atLeastOnce())
-                .warn(argThat(msg -> msg.contains("quarkus-maven-plugin upgraded to 3.26.0")
+                .warn(ArgumentMatchers.<String>argThat(msg -> msg.contains("quarkus-maven-plugin upgraded to 3.26.0")
                         && msg.contains("3.16.3")
                         && msg.contains("mismatched plugin and platform")));
     }

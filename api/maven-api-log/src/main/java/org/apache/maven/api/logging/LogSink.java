@@ -58,4 +58,16 @@ public interface LogSink {
     default boolean needsMetadata() {
         return false;
     }
+
+    /**
+     * Transfers any buffered events to the given target sink.
+     * <p>
+     * Called by {@link LoggerManager#setLogSink(LogSink)} when replacing
+     * this sink with a new one, so that events accumulated during early
+     * bootstrap are not lost. The default implementation does nothing
+     * (appropriate for non-buffering sinks).
+     *
+     * @param target the sink to replay buffered events into, never {@code null}
+     */
+    default void drainTo(@Nonnull LogSink target) {}
 }

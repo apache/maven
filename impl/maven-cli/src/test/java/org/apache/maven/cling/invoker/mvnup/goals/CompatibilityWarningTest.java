@@ -28,8 +28,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 
-import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.atLeastOnce;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -87,7 +87,8 @@ class CompatibilityWarningTest {
             UpgradeContext context = createMockContext();
             strategy.doApply(context, pomMap);
 
-            verify(context.logger, never()).warn(argThat(msg -> msg.contains("Known Maven 4 incompatibility")));
+            verify(context.logger, never())
+                    .warn(ArgumentMatchers.<String>argThat(msg -> msg.contains("Known Maven 4 incompatibility")));
         }
 
         @Test
@@ -118,7 +119,8 @@ class CompatibilityWarningTest {
             UpgradeContext context = createMockContext();
             strategy.doApply(context, pomMap);
 
-            verify(context.logger, never()).warn(argThat(msg -> msg.contains("Known Maven 4 incompatibility")));
+            verify(context.logger, never())
+                    .warn(ArgumentMatchers.<String>argThat(msg -> msg.contains("Known Maven 4 incompatibility")));
         }
     }
 
@@ -152,7 +154,7 @@ class CompatibilityWarningTest {
             strategy.doApply(context, pomMap);
 
             verify(context.logger, atLeastOnce())
-                    .warn(argThat(msg ->
+                    .warn(ArgumentMatchers.<String>argThat(msg ->
                             msg.contains("spark-${spark.compat.version}") && msg.contains("property expression")));
         }
 
@@ -180,7 +182,8 @@ class CompatibilityWarningTest {
             UpgradeContext context = createMockContext();
             strategy.doApply(context, pomMap);
 
-            verify(context.logger, never()).warn(argThat(msg -> msg.contains("property expression")));
+            verify(context.logger, never())
+                    .warn(ArgumentMatchers.<String>argThat(msg -> msg.contains("property expression")));
         }
 
         @Test
@@ -212,7 +215,8 @@ class CompatibilityWarningTest {
             strategy.doApply(context, pomMap);
 
             verify(context.logger, atLeastOnce())
-                    .warn(argThat(msg -> msg.contains("spark-${spark.version}") && msg.contains("profile")));
+                    .warn(ArgumentMatchers.<String>argThat(
+                            msg -> msg.contains("spark-${spark.version}") && msg.contains("profile")));
         }
     }
 
@@ -253,7 +257,7 @@ class CompatibilityWarningTest {
             strategy.doApply(context, pomMap);
 
             verify(context.logger, atLeastOnce())
-                    .warn(argThat(msg -> msg.contains("CI-friendly")
+                    .warn(ArgumentMatchers.<String>argThat(msg -> msg.contains("CI-friendly")
                             && msg.contains("${revision}")
                             && msg.contains("2 dependencies")));
         }
@@ -286,7 +290,7 @@ class CompatibilityWarningTest {
             UpgradeContext context = createMockContext();
             strategy.doApply(context, pomMap);
 
-            verify(context.logger, never()).warn(argThat(msg -> msg.contains("CI-friendly")));
+            verify(context.logger, never()).warn(ArgumentMatchers.<String>argThat(msg -> msg.contains("CI-friendly")));
         }
 
         @Test
@@ -318,7 +322,7 @@ class CompatibilityWarningTest {
             UpgradeContext context = createMockContext();
             strategy.doApply(context, pomMap);
 
-            verify(context.logger, never()).warn(argThat(msg -> msg.contains("CI-friendly")));
+            verify(context.logger, never()).warn(ArgumentMatchers.<String>argThat(msg -> msg.contains("CI-friendly")));
         }
 
         @Test
@@ -349,7 +353,8 @@ class CompatibilityWarningTest {
             UpgradeContext context = createMockContext();
             strategy.doApply(context, pomMap);
 
-            verify(context.logger, atLeastOnce()).warn(argThat(msg -> msg.contains("CI-friendly")));
+            verify(context.logger, atLeastOnce())
+                    .warn(ArgumentMatchers.<String>argThat(msg -> msg.contains("CI-friendly")));
         }
 
         @Test
@@ -377,7 +382,7 @@ class CompatibilityWarningTest {
             UpgradeContext context = createMockContext();
             strategy.doApply(context, pomMap);
 
-            verify(context.logger, never()).warn(argThat(msg -> msg.contains("CI-friendly")));
+            verify(context.logger, never()).warn(ArgumentMatchers.<String>argThat(msg -> msg.contains("CI-friendly")));
         }
     }
 }

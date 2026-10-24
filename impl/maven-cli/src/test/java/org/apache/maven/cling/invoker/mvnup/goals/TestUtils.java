@@ -24,13 +24,11 @@ import java.util.Map;
 import java.util.Optional;
 
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.mvnup.UpgradeOptions;
+import org.apache.maven.api.logging.Logger;
 import org.apache.maven.cling.invoker.mvnup.UpgradeContext;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -92,22 +90,13 @@ public final class TestUtils {
         when(request.systemProperties()).thenReturn(Map.of());
         when(request.options()).thenReturn(Optional.ofNullable(options));
 
-        // Mock parserRequest and logger
         ParserRequest parserRequest = mock(ParserRequest.class);
-        Logger logger = mock(Logger.class);
-
-        // Capture error messages for debugging
-        doAnswer(invocation -> {
-                    System.err.println("[ERROR] " + invocation.getArgument(0));
-                    return null;
-                })
-                .when(logger)
-                .error(anyString());
 
         when(request.parserRequest()).thenReturn(parserRequest);
-        when(parserRequest.logger()).thenReturn(logger);
 
-        return new UpgradeContext(request, options);
+        UpgradeContext context = new UpgradeContext(request, options);
+        context.logger = mock(Logger.class);
+        return context;
     }
 
     /**

@@ -30,9 +30,9 @@ import java.util.function.Consumer;
 import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.logging.LogLevel;
+import org.apache.maven.api.logging.Logger;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.toolchain.PersistedToolchains;
@@ -59,7 +59,7 @@ public class LookupContext implements AutoCloseable {
         this.userDirectory = CliUtils.getCanonicalPath(invokerRequest.userHomeDirectory());
         this.containerCapsuleManaged = containerCapsuleManaged;
         this.options = options;
-        this.logger = invokerRequest.parserRequest().logger();
+        this.logger = Logger.of(getClass());
 
         Map<String, String> user = new HashMap<>(invokerRequest.userProperties());
         user.put("session.topDirectory", invokerRequest.topDirectory().toString());
