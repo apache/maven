@@ -20,4 +20,10 @@ package org.apache.maven.api.plugin.testing.stubs;
 
 /** @deprecated Use {@link org.apache.maven.testing.plugin.stubs.ArtifactStub} instead */
 @Deprecated(since = "4.0.0-rc-6", forRemoval = true)
-public class ArtifactStub extends org.apache.maven.testing.plugin.stubs.ArtifactStub {}
+public class ArtifactStub extends org.apache.maven.testing.plugin.stubs.ArtifactStub {
+    public ArtifactStub() {}
+
+    public ArtifactStub(String groupId, String artifactId, String classifier, String version, String extension) {
+        super(groupId, artifactId, classifier, version, extension);
+    }
+}
