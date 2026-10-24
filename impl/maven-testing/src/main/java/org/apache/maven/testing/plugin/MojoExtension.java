@@ -54,11 +54,11 @@ import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.logging.Logger;
 import org.apache.maven.api.logging.LoggerManager;
-import org.apache.maven.api.plugin.Log;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.ConfigurationContainer;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Source;
+import org.apache.maven.api.plugin.Log;
 import org.apache.maven.api.plugin.Mojo;
 import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.api.plugin.descriptor.Parameter;
@@ -545,8 +545,9 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                 if (logger instanceof Log log) {
                     return log;
                 }
-                throw new IllegalStateException("Logger implementation does not implement the deprecated Log interface: "
-                        + logger.getClass().getName());
+                throw new IllegalStateException(
+                        "Logger implementation does not implement the deprecated Log interface: "
+                                + logger.getClass().getName());
             }
 
             @Provides
