@@ -19,9 +19,11 @@
 package org.apache.maven.logging.impl;
 
 import java.io.InputStream;
+import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.Constants;
@@ -63,6 +65,7 @@ public class DefaultLoggerManager implements LoggerManager {
     private final AtomicReference<LogLevel> maxReached = new AtomicReference<>(null);
     private final Properties properties = new Properties();
     private final ConcurrentHashMap<String, Integer> levelCache = new ConcurrentHashMap<>();
+    private final List<Runnable> reconfigurationListeners = new CopyOnWriteArrayList<>();
 
     public DefaultLoggerManager() {
         this.logSink = new AccumulatingLogSink();
@@ -147,6 +150,20 @@ public class DefaultLoggerManager implements LoggerManager {
     public void reconfigure() {
         loadConfiguration();
         maxReached.set(null);
+        for (Runnable listener : reconfigurationListeners) {
+            listener.run();
+        }
+    }
+
+    /**
+     * Registers a listener that is called whenever the logging configuration is reloaded
+     * (e.g. when the root log level changes). The SLF4J adapter layer uses this to propagate
+     * level changes to already-created SLF4J logger instances.
+     *
+     * @param listener the callback to invoke on reconfiguration; must not be {@code null}
+     */
+    public void addReconfigurationListener(Runnable listener) {
+        reconfigurationListeners.add(listener);
     }
 
     // -- LogManager: severity tracking --

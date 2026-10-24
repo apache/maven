@@ -39,6 +39,7 @@ public class MavenLoggerFactory implements ILoggerFactory {
     public MavenLoggerFactory() {
         instance = this;
         logManager = new DefaultLoggerManager();
+        logManager.addReconfigurationListener(this::updateExistingLoggers);
         MavenSimpleLogger.lazyInit();
     }
 
@@ -55,7 +56,12 @@ public class MavenLoggerFactory implements ILoggerFactory {
     }
 
     public void reconfigure() {
+        // Calling LoggerManager.reconfigure() will fire the reconfigurationListener,
+        // which calls updateExistingLoggers() — no need to call it here explicitly.
         LoggerManager.get().reconfigure();
+    }
+
+    private void updateExistingLoggers() {
         loggerMap.values().forEach(l -> {
             if (l instanceof MavenSimpleLogger msl) {
                 msl.configure(logManager.getDefaultLogLevel());

@@ -20,7 +20,6 @@ package org.apache.maven.cling.invoker.logging;
 
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.logging.LogEventBuilder;
-import org.apache.maven.api.logging.LoggerManager;
 
 import static java.util.Objects.requireNonNull;
 
@@ -34,8 +33,7 @@ public class LogManagerLogger implements Logger {
     private final org.apache.maven.api.logging.Logger logger;
 
     public LogManagerLogger(String name) {
-        this.logger = requireNonNull(LoggerManager.get(), "LoggerManager not initialized")
-                .getLogger(requireNonNull(name, "name"));
+        this.logger = org.apache.maven.api.logging.Logger.of(requireNonNull(name, "name"));
     }
 
     @Override

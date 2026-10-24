@@ -54,6 +54,7 @@ import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.logging.Logger;
 import org.apache.maven.api.logging.LoggerManager;
+import org.apache.maven.api.plugin.Log;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.ConfigurationContainer;
 import org.apache.maven.api.model.Model;
@@ -533,6 +534,19 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                             "LoggerManager not initialized — DefaultLoggerManager must be constructed before MojoExtension");
                 }
                 return mgr.getLogger("anonymous");
+            }
+
+            @Provides
+            @Singleton
+            @Priority(-10)
+            @SuppressWarnings("deprecation")
+            private Log createLog(Logger logger) {
+                // DefaultLogger implements both Logger and Log; cast is safe here
+                if (logger instanceof Log log) {
+                    return log;
+                }
+                throw new IllegalStateException("Logger implementation does not implement the deprecated Log interface: "
+                        + logger.getClass().getName());
             }
 
             @Provides

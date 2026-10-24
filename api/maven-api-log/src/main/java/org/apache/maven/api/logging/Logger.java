@@ -351,11 +351,17 @@ public interface Logger {
      *
      * @param clazz the class whose name is used as the logger name, never {@code null}
      * @return a {@code Logger} instance, never {@code null}
+     * @throws IllegalStateException if the {@link LoggerManager} has not been initialized yet
      * @since 4.1.0
      */
     @Nonnull
     static Logger of(@Nonnull Class<?> clazz) {
-        return LoggerManager.get().getLogger(clazz);
+        LoggerManager mgr = LoggerManager.get();
+        if (mgr == null) {
+            throw new IllegalStateException(
+                    "LoggerManager not initialized — call LoggerManager.set() before Logger.of()");
+        }
+        return mgr.getLogger(clazz);
     }
 
     /**
@@ -369,11 +375,17 @@ public interface Logger {
      *
      * @param name the logger name, never {@code null}
      * @return a {@code Logger} instance, never {@code null}
+     * @throws IllegalStateException if the {@link LoggerManager} has not been initialized yet
      * @since 4.1.0
      */
     @Nonnull
     static Logger of(@Nonnull String name) {
-        return LoggerManager.get().getLogger(name);
+        LoggerManager mgr = LoggerManager.get();
+        if (mgr == null) {
+            throw new IllegalStateException(
+                    "LoggerManager not initialized — call LoggerManager.set() before Logger.of()");
+        }
+        return mgr.getLogger(name);
     }
 
     // ---- Child logger ----
