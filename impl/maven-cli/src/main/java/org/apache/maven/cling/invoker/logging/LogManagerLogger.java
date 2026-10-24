@@ -25,7 +25,7 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * CLI {@link Logger} that delegates to a {@link org.apache.maven.api.logging.Logger}
- * obtained from {@link LoggerManager}. Replaces the SLF4J-based implementation
+ * obtained from {@link org.apache.maven.api.logging.LoggerManager}. Replaces the SLF4J-based implementation
  * used after the early bootstrap drain.
  */
 @SuppressWarnings("deprecation")
