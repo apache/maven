@@ -87,6 +87,10 @@ final class TestUtils {
                 .error(anyString());
 
         when(request.parserRequest()).thenReturn(parserRequest);
+        when(parserRequest.args()).thenReturn(List.of());
+        org.apache.maven.api.cli.Logger cliLogger = mock(org.apache.maven.api.cli.Logger.class);
+        when(cliLogger.drain()).thenReturn(List.of());
+        when(parserRequest.logger()).thenReturn(cliLogger);
 
         ValidateContext context = new ValidateContext(request, options);
         context.logger = logger;
