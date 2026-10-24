@@ -18,6 +18,24 @@
  */
 package org.apache.maven.api.plugin.testing.stubs;
 
+import java.util.Map;
+
+import org.apache.maven.api.settings.Settings;
+
 /** @deprecated Use {@link org.apache.maven.testing.plugin.stubs.SessionStub} instead */
 @Deprecated(since = "4.0.0-rc-6", forRemoval = true)
-public class SessionStub extends org.apache.maven.testing.plugin.stubs.SessionStub {}
+public class SessionStub extends org.apache.maven.testing.plugin.stubs.SessionStub {
+    public SessionStub() {}
+
+    public SessionStub(Settings settings) {
+        super(settings);
+    }
+
+    public SessionStub(Map<String, String> userProperties) {
+        super(userProperties);
+    }
+
+    public SessionStub(Map<String, String> systemProperties, Map<String, String> userProperties, Settings settings) {
+        super(systemProperties, userProperties, settings);
+    }
+}
