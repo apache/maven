@@ -27,6 +27,5 @@ module org.apache.maven.logging {
             org.apache.maven.logging.jul,
             org.apache.maven.core,
             org.apache.maven.cling,
-            org.apache.maven.embedder,
-            org.apache.maven.testing;
+            org.apache.maven.embedder;
 }
