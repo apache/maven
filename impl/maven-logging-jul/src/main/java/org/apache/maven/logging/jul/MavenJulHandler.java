@@ -36,6 +36,7 @@ import org.apache.maven.api.logging.LogLevel;
 import org.apache.maven.api.logging.LogSink;
 import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.logging.impl.DefaultLogEvent;
+import org.apache.maven.logging.impl.DefaultLoggerManager;
 
 /**
  * A JUL {@link Handler} that routes {@code java.util.logging} events into
@@ -160,6 +161,10 @@ public class MavenJulHandler extends Handler {
                     null);
 
             sink.accept(event);
+
+            if (mgr instanceof DefaultLoggerManager dlm) {
+                dlm.record(level);
+            }
         } finally {
             IN_PUBLISH.remove();
         }

@@ -19,10 +19,9 @@
 package org.apache.maven.logging.impl;
 
 import java.io.InputStream;
-import java.util.List;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.Constants;
@@ -100,9 +99,14 @@ public class DefaultLoggerManager implements LoggerManager {
     /**
      * A sink that buffers events until a real sink is installed.
      * Used as the default during early bootstrap.
+     * <p>
+     * Uses {@link ConcurrentLinkedQueue} with {@code poll()}-based draining to avoid
+     * the TOCTOU race inherent in {@code CopyOnWriteArrayList}: iterating a snapshot
+     * and then calling {@code clear()} can silently drop events added concurrently
+     * between the end of the iteration and the {@code clear()} call.
      */
     private static class AccumulatingLogSink implements LogSink {
-        private final List<LogEvent> events = new CopyOnWriteArrayList<>();
+        private final ConcurrentLinkedQueue<LogEvent> events = new ConcurrentLinkedQueue<>();
 
         @Override
         public void accept(LogEvent event) {
@@ -110,10 +114,10 @@ public class DefaultLoggerManager implements LoggerManager {
         }
 
         void drainTo(LogSink target) {
-            for (LogEvent event : events) {
+            LogEvent event;
+            while ((event = events.poll()) != null) {
                 target.accept(event);
             }
-            events.clear();
         }
     }
 
