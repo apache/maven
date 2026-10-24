@@ -64,7 +64,7 @@ public interface Logger {
      * @return the logger name, never {@code null}
      */
     @Nonnull
-    String getName();
+    String name();
 
     /**
      * Returns {@code true} if the given level is enabled for this logger.

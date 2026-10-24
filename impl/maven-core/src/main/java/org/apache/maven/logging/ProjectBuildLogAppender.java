@@ -128,7 +128,7 @@ public class ProjectBuildLogAppender implements AutoCloseable {
     private final BuildEventListener buildEventListener;
     private final ConcurrentLinkedQueue<LogEvent> queue = new ConcurrentLinkedQueue<>();
     private final ReentrantLock drainLock = new ReentrantLock();
-    private boolean needsMetadata;
+    private volatile boolean needsMetadata;
 
     public ProjectBuildLogAppender(BuildEventListener buildEventListener) {
         this.buildEventListener = buildEventListener;

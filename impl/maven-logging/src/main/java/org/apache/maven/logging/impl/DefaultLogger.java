@@ -74,7 +74,7 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
     // ---- org.apache.maven.api.logging.Logger ----
 
     @Override
-    public String getName() {
+    public String name() {
         return name;
     }
 
@@ -137,7 +137,7 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
     // ---- Internal dispatch ----
 
     void doLog(LogLevel level, String message, Throwable throwable) {
-        doLog(level, message, null, null, null, throwable);
+        doLog(level, message, null, null, null, throwable, null, null);
     }
 
     @SuppressWarnings("deprecation") // Thread.getId()
@@ -148,6 +148,19 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
             Object[] messageArgs,
             Map<String, String> keyValues,
             Throwable throwable) {
+        doLog(level, message, messageTemplate, messageArgs, keyValues, throwable, null, null);
+    }
+
+    @SuppressWarnings("deprecation") // Thread.getId()
+    void doLog(
+            LogLevel level,
+            String message,
+            String messageTemplate,
+            Object[] messageArgs,
+            Map<String, String> keyValues,
+            Throwable throwable,
+            String projectIdOverride,
+            String mojoIdOverride) {
         LoggerManager mgr = LoggerManager.get();
         if (mgr == null) {
             return;
@@ -186,13 +199,17 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
                 threadId,
                 seq,
                 threadName,
-                projectId,
-                mojoId,
+                projectIdOverride != null ? projectIdOverride : projectId,
+                mojoIdOverride != null ? mojoIdOverride : mojoId,
                 keyValues,
                 messageTemplate,
                 messageArgs);
 
         sink.accept(event);
+
+        if (mgr instanceof DefaultLoggerManager dlm) {
+            dlm.record(level);
+        }
     }
 
     private String resolveCallerMethod() {

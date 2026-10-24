@@ -28,7 +28,7 @@
 
   <artifactId>maven-api-log</artifactId>
   <name>Maven 4 API :: Logging</name>
-  <description>Maven 4 API - Unified Logging API (Log, LogBuilder, LogLevel, LogEvent, LogSink).</description>
+  <description>Maven 4 API - Unified Logging API (Logger, LogEventBuilder, LogLevel, LogEvent, LogSink).</description>
 
   <properties>
     <javaModuleName>org.apache.maven.api.logging</javaModuleName>

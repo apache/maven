@@ -61,7 +61,7 @@ public class DefaultLoggerManager implements LoggerManager {
 
     private volatile LogSink logSink;
     private volatile int defaultLogLevel = LOG_LEVEL_INFO;
-    private final AtomicReference<LogLevel> maxReached = new AtomicReference<>(LogLevel.DEBUG);
+    private final AtomicReference<LogLevel> maxReached = new AtomicReference<>(null);
     private final Properties properties = new Properties();
     private final ConcurrentHashMap<String, Integer> levelCache = new ConcurrentHashMap<>();
 
@@ -88,10 +88,13 @@ public class DefaultLoggerManager implements LoggerManager {
     @Override
     public void setLogSink(LogSink sink) {
         LogSink old = this.logSink;
-        this.logSink = sink;
+        // Drain BEFORE making the new sink visible to concurrent doLog() callers.
+        // If we swapped first, a concurrent logger could write directly to the new sink
+        // while drainTo() is still replaying older buffered events — breaking ordering.
         if (old instanceof AccumulatingLogSink acc && sink != null) {
             acc.drainTo(sink);
         }
+        this.logSink = sink;
     }
 
     /**
@@ -126,31 +129,34 @@ public class DefaultLoggerManager implements LoggerManager {
     public void setRootLoggerLevel(LogLevel level) {
         String value =
                 switch (level) {
-                    case TRACE, DEBUG -> "debug";
+                    case TRACE -> "trace";
+                    case DEBUG -> "debug";
                     case INFO -> "info";
                     case WARN -> "warn";
                     case ERROR -> "error";
                 };
         System.setProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL, value);
+        reconfigure();
     }
 
     @Override
     public void reconfigure() {
         loadConfiguration();
-        maxReached.set(LogLevel.DEBUG);
+        maxReached.set(null);
     }
 
     // -- LogManager: severity tracking --
 
     @Override
     public boolean hasReached(LogLevel level) {
-        return maxReached.get().ordinal() >= level.ordinal();
+        LogLevel reached = maxReached.get();
+        return reached != null && reached.ordinal() >= level.ordinal();
     }
 
     public void record(LogLevel level) {
         while (true) {
             LogLevel r = maxReached.get();
-            if (level.ordinal() > r.ordinal()) {
+            if (r == null || level.ordinal() > r.ordinal()) {
                 if (!maxReached.compareAndSet(r, level)) {
                     continue;
                 }

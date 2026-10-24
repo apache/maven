@@ -24,13 +24,13 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Fluent builder for a single log statement.
  * <p>
- * Instances are obtained from {@link Log#atTrace()}, {@link Log#atDebug()}, etc.
+ * Instances are obtained from {@link Logger#atTrace()}, {@link Logger#atDebug()}, etc.
  * A builder <em>must</em> be consumed in a single chained call; it must not be
  * stored in a variable across statements, as implementations may reuse
  * thread-local state for zero-allocation dispatch.
  * <p>
- * When the target level is disabled the {@code Log} returns a shared
- * {@code NopLogBuilder} singleton, making the entire fluent call chain a no-op
+ * When the target level is disabled the {@code Logger} returns a shared
+ * {@code NopLogEventBuilder} singleton, making the entire fluent call chain a no-op
  * with zero allocations.
  *
  * <pre>{@code

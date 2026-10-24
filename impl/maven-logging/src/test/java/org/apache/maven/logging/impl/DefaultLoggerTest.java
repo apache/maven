@@ -124,7 +124,7 @@ class DefaultLoggerTest {
 
         assertNotSame(parent, child);
         assertTrue(child instanceof DefaultLogger, "child should be a DefaultLogger");
-        assertEquals("com.example.MyMojo.diagnostics", ((DefaultLogger) child).getName());
+        assertEquals("com.example.MyMojo.diagnostics", ((DefaultLogger) child).name());
 
         // Child events carry the same projectId/mojoId
         child.info("child message");

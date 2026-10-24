@@ -24,7 +24,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Central dispatch point for log events.
  * <p>
- * All logging paths — the fluent {@link Log} API, SLF4J
+ * All logging paths — the fluent {@link Logger} API, SLF4J
  * ({@code MavenSimpleLogger}), and JUL ({@code MavenJulHandler}) — converge
  * here. A single {@code LogSink} implementation controls level filtering and
  * routing for all sources.

@@ -42,6 +42,8 @@ final class DefaultLogEventBuilder implements LogEventBuilder {
 
     private Map<String, String> kvMap;
     private Throwable throwable;
+    private String projectId;
+    private String mojoId;
 
     DefaultLogEventBuilder(DefaultLogger log, LogLevel level) {
         this.log = log;
@@ -73,37 +75,39 @@ final class DefaultLogEventBuilder implements LogEventBuilder {
 
     @Override
     public LogEventBuilder withProjectId(String projectId) {
+        this.projectId = projectId;
         return this;
     }
 
     @Override
     public LogEventBuilder withMojoId(String mojoId) {
+        this.mojoId = mojoId;
         return this;
     }
 
     @Override
     public void log(String message) {
-        log.doLog(level, message, null, null, kvMap, throwable);
+        log.doLog(level, message, null, null, kvMap, throwable, projectId, mojoId);
     }
 
     @Override
     public void log(String format, Object arg) {
-        log.doLog(level, null, format, new Object[] {arg}, kvMap, throwable);
+        log.doLog(level, null, format, new Object[] {arg}, kvMap, throwable, projectId, mojoId);
     }
 
     @Override
     public void log(String format, Object arg1, Object arg2) {
-        log.doLog(level, null, format, new Object[] {arg1, arg2}, kvMap, throwable);
+        log.doLog(level, null, format, new Object[] {arg1, arg2}, kvMap, throwable, projectId, mojoId);
     }
 
     @Override
     public void log(String format, Object... args) {
-        log.doLog(level, null, format, args, kvMap, throwable);
+        log.doLog(level, null, format, args, kvMap, throwable, projectId, mojoId);
     }
 
     @Override
     public void log(Supplier<String> messageSupplier) {
-        log.doLog(level, messageSupplier.get(), null, null, kvMap, throwable);
+        log.doLog(level, messageSupplier.get(), null, null, kvMap, throwable, projectId, mojoId);
     }
 
     private void ensureKv() {

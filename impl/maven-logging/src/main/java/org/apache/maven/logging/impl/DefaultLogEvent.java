@@ -221,7 +221,7 @@ public final class DefaultLogEvent implements LogEvent {
 
     @Override
     public Object[] messageArgs() {
-        return messageArgs;
+        return messageArgs != null ? messageArgs.clone() : null;
     }
 
     static String formatMessage(String template, Object[] args) {
