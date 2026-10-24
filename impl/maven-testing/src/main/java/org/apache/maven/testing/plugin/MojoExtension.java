@@ -528,6 +528,10 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             @Priority(-10)
             private Logger createLogger() {
                 LoggerManager mgr = LoggerManager.get();
+                if (mgr == null) {
+                    throw new IllegalStateException(
+                            "LoggerManager not initialized — DefaultLoggerManager must be constructed before MojoExtension");
+                }
                 return mgr.getLogger("anonymous");
             }
 

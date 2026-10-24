@@ -67,7 +67,7 @@ public interface LoggerManager {
 
     /**
      * Sets the root logger level (typically from {@code -X}, {@code -q} CLI flags).
-     * Takes effect after {@link #reconfigure()}.
+     * The new level takes effect immediately.
      */
     void setRootLoggerLevel(@Nonnull LogLevel level);
 
