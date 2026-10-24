@@ -107,9 +107,6 @@ public class MavenJulHandler extends Handler {
         }
 
         LoggerManager mgr = LoggerManager.get();
-        if (mgr == null) {
-            return;
-        }
 
         String loggerName = record.getLoggerName();
         if (loggerName == null) {

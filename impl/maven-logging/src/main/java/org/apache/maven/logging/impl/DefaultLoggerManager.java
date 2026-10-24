@@ -69,7 +69,6 @@ public class DefaultLoggerManager implements LoggerManager {
 
     public DefaultLoggerManager() {
         this.logSink = new AccumulatingLogSink();
-        LoggerManager.set(this);
         loadConfiguration();
     }
 

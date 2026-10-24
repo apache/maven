@@ -21,4 +21,6 @@ module org.apache.maven.api.logging {
     requires transitive org.apache.maven.api.annotations;
 
     exports org.apache.maven.api.logging;
+
+    uses org.apache.maven.api.logging.LoggerManager;
 }

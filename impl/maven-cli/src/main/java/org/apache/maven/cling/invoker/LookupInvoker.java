@@ -85,7 +85,6 @@ import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingOutputStream;
 import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.apache.maven.logging.SimpleBuildEventListener;
-import org.apache.maven.logging.impl.DefaultLoggerManager;
 import org.apache.maven.logging.jul.MavenJulHandler;
 import org.codehaus.plexus.PlexusContainer;
 import org.jline.terminal.Terminal;
@@ -320,10 +319,6 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         context.loggerFactory = LoggerFactory.getILoggerFactory();
-
-        if (LoggerManager.get() == null) {
-            new DefaultLoggerManager();
-        }
 
         if (context.invokerRequest.effectiveVerbose()) {
             context.loggerLevel = LogLevel.DEBUG;

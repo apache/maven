@@ -45,7 +45,7 @@ class DefaultLoggerTest {
     @BeforeEach
     void setUp() {
         originalLevel = System.getProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL);
-        new DefaultLoggerManager();
+        LoggerManager.set(new DefaultLoggerManager());
     }
 
     @AfterEach
@@ -86,7 +86,7 @@ class DefaultLoggerTest {
     @Test
     void traceDispatchesToSink() {
         System.setProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL, "trace");
-        new DefaultLoggerManager();
+        LoggerManager.set(new DefaultLoggerManager());
 
         CapturingSink sink = new CapturingSink();
         LoggerManager.get().setLogSink(sink);
@@ -102,7 +102,7 @@ class DefaultLoggerTest {
     @Test
     void traceIsNoOpWhenLevelDisablesIt() {
         System.setProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL, "warn");
-        new DefaultLoggerManager();
+        LoggerManager.set(new DefaultLoggerManager());
 
         CapturingSink sink = new CapturingSink();
         LoggerManager.get().setLogSink(sink);

@@ -38,7 +38,13 @@ public class MavenLoggerFactory implements ILoggerFactory {
 
     public MavenLoggerFactory() {
         instance = this;
-        logManager = new DefaultLoggerManager();
+        LoggerManager mgr = LoggerManager.get();
+        if (mgr instanceof DefaultLoggerManager dlm) {
+            logManager = dlm;
+        } else {
+            logManager = new DefaultLoggerManager();
+            LoggerManager.set(logManager);
+        }
         logManager.addReconfigurationListener(this::updateExistingLoggers);
         MavenSimpleLogger.lazyInit();
     }

@@ -344,51 +344,34 @@ public interface Logger {
      * class name as the logger name.
      * <p>
      * Shorthand for {@code LoggerManager.get().getLogger(clazz)}.
-     * Prefer instance-field initialization to avoid {@link IllegalStateException}
-     * if the class is loaded before {@link LoggerManager#set(LoggerManager)} is called:
-     * <pre>{@code
-     * private final Logger log = Logger.of(MyComponent.class);
-     * }</pre>
-     * For early-bootstrap classes (loaded before Maven's DI container initializes),
-     * use lazy initialization instead — see the {@code package-info.java} for this package.
+     * Safe to call at any point — even during early bootstrap before the
+     * real logging implementation is available. In that case, a bootstrap
+     * logger is returned that buffers events until the real implementation
+     * is discovered.
      *
      * @param clazz the class whose name is used as the logger name, never {@code null}
      * @return a {@code Logger} instance, never {@code null}
-     * @throws IllegalStateException if the {@link LoggerManager} has not been initialized yet
      * @since 4.1.0
      */
     @Nonnull
     static Logger of(@Nonnull Class<?> clazz) {
-        LoggerManager mgr = LoggerManager.get();
-        if (mgr == null) {
-            throw new IllegalStateException(
-                    "LoggerManager not initialized — call LoggerManager.set() before Logger.of()");
-        }
-        return mgr.getLogger(clazz);
+        return LoggerManager.get().getLogger(clazz);
     }
 
     /**
      * Returns a {@code Logger} with the given name.
      * <p>
      * Shorthand for {@code LoggerManager.get().getLogger(name)}. Intended for
-     * framework code or dynamic logger names:
-     * <pre>{@code
-     * Logger log = Logger.of("org.apache.maven.my-component");
-     * }</pre>
+     * framework code or dynamic logger names.
+     * Safe to call at any point — even during early bootstrap.
      *
      * @param name the logger name, never {@code null}
      * @return a {@code Logger} instance, never {@code null}
-     * @throws IllegalStateException if the {@link LoggerManager} has not been initialized yet
      * @since 4.1.0
      */
     @Nonnull
     static Logger of(@Nonnull String name) {
-        LoggerManager mgr = LoggerManager.get();
-        if (mgr == null) {
-            throw new IllegalStateException(
-                    "LoggerManager not initialized — call LoggerManager.set() before Logger.of()");
-        }
-        return mgr.getLogger(name);
+        return LoggerManager.get().getLogger(name);
     }
 
     // ---- Child logger ----

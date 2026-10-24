@@ -18,6 +18,8 @@
  */
 package org.apache.maven.api.logging;
 
+import java.util.ServiceLoader;
+
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
@@ -26,9 +28,22 @@ import org.apache.maven.api.annotations.Nullable;
  * Central entry point for Maven's logging system.
  * <p>
  * Provides access to loggers, the active {@link LogSink}, level configuration,
- * and severity tracking for {@code --fail-on-severity}. A single instance is
- * registered at startup via {@link #set(LoggerManager)} and accessed statically
- * via {@link #get()}.
+ * and severity tracking for {@code --fail-on-severity}.
+ * <p>
+ * The singleton is resolved lazily on the first {@link #get()} call using
+ * {@link ServiceLoader}. If no provider is found (e.g. during early classworlds
+ * bootstrap before the implementation jar is visible), a minimal
+ * {@link BootstrapLoggerManager} is installed that buffers events. When the
+ * real implementation is later discovered or installed via {@link #set(LoggerManager)},
+ * buffered events are drained in FIFO order.
+ *
+ * <h2>Three bootstrap tiers</h2>
+ * <ul>
+ *   <li><b>Tier 0</b> — before any impl jar: bootstrap manager buffers events</li>
+ *   <li><b>Tier 1</b> — impl jar appears: {@code ServiceLoader} discovers it,
+ *       bootstrap events are drained</li>
+ *   <li><b>Tier 2</b> — normal runtime: fast-path return of the cached manager</li>
+ * </ul>
  *
  * @since 4.1.0
  */
@@ -86,17 +101,34 @@ public interface LoggerManager {
     boolean hasReached(@Nonnull LogLevel level);
 
     /**
-     * Returns the global {@code LogManager} instance.
+     * Returns the global {@code LoggerManager} instance.
+     * <p>
+     * On the first call, attempts to discover an implementation via
+     * {@link ServiceLoader}. If none is found, installs a bootstrap
+     * manager that buffers events until a real implementation is
+     * {@linkplain #set(LoggerManager) installed}.
+     *
+     * @return the global manager, never {@code null}
      */
+    @Nonnull
     static LoggerManager get() {
-        return Holder.instance;
+        LoggerManager mgr = Holder.instance;
+        if (mgr != null && !(mgr instanceof BootstrapLoggerManager)) {
+            return mgr;
+        }
+        return Holder.discover();
     }
 
     /**
-     * Sets the global {@code LogManager} instance.
+     * Installs the global {@code LoggerManager} instance.
+     * <p>
+     * If a bootstrap manager was active, its buffered events and pending
+     * configuration are drained into the new manager.
+     *
+     * @param manager the manager to install, or {@code null} to clear
      */
     static void set(LoggerManager manager) {
-        Holder.instance = manager;
+        Holder.install(manager);
     }
 
     /**
@@ -106,5 +138,52 @@ public interface LoggerManager {
         private Holder() {}
 
         static volatile LoggerManager instance;
+
+        private static final ThreadLocal<Boolean> DISCOVERING = new ThreadLocal<>();
+
+        static synchronized LoggerManager discover() {
+            LoggerManager mgr = instance;
+            if (mgr != null && !(mgr instanceof BootstrapLoggerManager)) {
+                return mgr;
+            }
+
+            // Re-entrancy guard: if ServiceLoader loading triggers logging,
+            // return the bootstrap manager to avoid infinite recursion.
+            if (DISCOVERING.get() == Boolean.TRUE) {
+                return ensureBootstrap();
+            }
+
+            DISCOVERING.set(Boolean.TRUE);
+            try {
+                for (LoggerManager discovered :
+                        ServiceLoader.load(LoggerManager.class, LoggerManager.class.getClassLoader())) {
+                    install(discovered);
+                    return discovered;
+                }
+            } catch (Exception ignored) {
+                // ServiceLoader failure — fall through to bootstrap
+            } finally {
+                DISCOVERING.remove();
+            }
+
+            return ensureBootstrap();
+        }
+
+        private static LoggerManager ensureBootstrap() {
+            LoggerManager mgr = instance;
+            if (mgr == null) {
+                mgr = new BootstrapLoggerManager();
+                instance = mgr;
+            }
+            return mgr;
+        }
+
+        static void install(LoggerManager manager) {
+            LoggerManager old = instance;
+            instance = manager;
+            if (old instanceof BootstrapLoggerManager bootstrap && manager != null) {
+                bootstrap.drainTo(manager);
+            }
+        }
     }
 }

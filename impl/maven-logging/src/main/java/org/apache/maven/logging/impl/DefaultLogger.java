@@ -79,8 +79,7 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
     }
 
     private boolean isLevelEnabled(LogLevel level) {
-        LoggerManager mgr = LoggerManager.get();
-        return mgr != null && mgr.isLevelEnabled(name, level);
+        return LoggerManager.get().isLevelEnabled(name, level);
     }
 
     @Override
@@ -162,9 +161,6 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
             String projectIdOverride,
             String mojoIdOverride) {
         LoggerManager mgr = LoggerManager.get();
-        if (mgr == null) {
-            return;
-        }
         LogSink sink = mgr.getLogSink();
         if (sink == null) {
             return;

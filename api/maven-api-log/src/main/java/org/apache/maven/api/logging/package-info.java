@@ -71,26 +71,18 @@
  *
  * <h2>Getting a logger</h2>
  * <p>
- * The typical pattern for plugin and extension code (where the container has already
- * initialized the {@link org.apache.maven.api.logging.LoggerManager}) is:
+ * The typical pattern for plugin and extension code is:
  * </p>
  * <pre>{@code
  * private final Logger log = Logger.of(MyComponent.class);
  * }</pre>
  * <p>
- * <strong>Note:</strong> unlike {@code System.getLogger()}, {@code Logger.of()} throws
- * {@link IllegalStateException} if called before
- * {@link org.apache.maven.api.logging.LoggerManager#set(LoggerManager)} has been
- * invoked. Static field initializers run at class-load time, which can precede Maven's
- * bootstrap. Prefer instance-field initialization (as above) or lazy initialization
- * for classes that may be loaded during early bootstrap:
+ * {@code Logger.of()} is safe to call at any point, even during early bootstrap
+ * before the real logging implementation is available. In that case a bootstrap
+ * logger is returned that buffers events until the real implementation is
+ * discovered via {@link java.util.ServiceLoader} or installed via
+ * {@link org.apache.maven.api.logging.LoggerManager#set(LoggerManager)}.
  * </p>
- * <pre>{@code
- * // Safe for early-bootstrap classes:
- * private Logger log() {
- *     return Logger.of(MyComponent.class);
- * }
- * }</pre>
  * <p>
  * Framework code that does not have a class reference can use the string overload:
  * </p>

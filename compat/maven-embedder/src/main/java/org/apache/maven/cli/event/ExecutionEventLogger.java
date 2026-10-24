@@ -157,9 +157,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                 logReactorSummary(event.getSession());
             }
 
-            if (failOnSeverity != null
-                    && LoggerManager.get() != null
-                    && LoggerManager.get().hasReached(failOnSeverity)) {
+            if (failOnSeverity != null && LoggerManager.get().hasReached(failOnSeverity)) {
                 event.getSession()
                         .getResult()
                         .addException(

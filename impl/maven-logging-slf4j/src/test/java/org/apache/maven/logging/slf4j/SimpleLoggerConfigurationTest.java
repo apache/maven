@@ -51,9 +51,7 @@ class SimpleLoggerConfigurationTest {
         } else {
             System.clearProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL);
         }
-        if (LoggerManager.get() != null) {
-            LoggerManager.get().reconfigure();
-        }
+        LoggerManager.get().reconfigure();
     }
 
     @Test
@@ -131,8 +129,8 @@ class SimpleLoggerConfigurationTest {
     }
 
     private void ensureLogManager() {
-        if (LoggerManager.get() == null) {
-            new DefaultLoggerManager();
+        if (!(LoggerManager.get() instanceof DefaultLoggerManager)) {
+            LoggerManager.set(new DefaultLoggerManager());
         }
     }
 }

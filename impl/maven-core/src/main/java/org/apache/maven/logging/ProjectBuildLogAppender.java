@@ -30,7 +30,6 @@ import org.apache.maven.api.logging.LogEvent;
 import org.apache.maven.api.logging.LogSink;
 import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.logging.impl.DefaultLogEvent;
-import org.apache.maven.logging.impl.DefaultLoggerManager;
 
 /**
  * Forwards log messages to the client as structured {@link LogEvent} objects.
@@ -132,12 +131,7 @@ public class ProjectBuildLogAppender implements AutoCloseable {
 
     public ProjectBuildLogAppender(BuildEventListener buildEventListener) {
         this.buildEventListener = buildEventListener;
-        LoggerManager mgr = LoggerManager.get();
-        if (mgr == null) {
-            new DefaultLoggerManager();
-            mgr = LoggerManager.get();
-        }
-        mgr.setLogSink(new Sink());
+        LoggerManager.get().setLogSink(new Sink());
     }
 
     public void setNeedsMetadata(boolean needsMetadata) {
@@ -220,10 +214,7 @@ public class ProjectBuildLogAppender implements AutoCloseable {
         } finally {
             drainLock.unlock();
         }
-        LoggerManager mgr = LoggerManager.get();
-        if (mgr != null) {
-            mgr.setLogSink(null);
-        }
+        LoggerManager.get().setLogSink(null);
     }
 
     private static String formatStackTrace(Throwable t) {

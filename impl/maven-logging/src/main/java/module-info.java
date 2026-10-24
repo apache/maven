@@ -27,5 +27,9 @@ module org.apache.maven.logging {
             org.apache.maven.logging.jul,
             org.apache.maven.core,
             org.apache.maven.cling,
-            org.apache.maven.embedder;
+            org.apache.maven.embedder,
+            org.apache.maven.testing;
+
+    provides org.apache.maven.api.logging.LoggerManager with
+            org.apache.maven.logging.impl.DefaultLoggerManager;
 }
