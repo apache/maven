@@ -343,11 +343,14 @@ public interface Logger {
      * Returns a {@code Logger} for the given class, using the fully-qualified
      * class name as the logger name.
      * <p>
-     * Shorthand for {@code LoggerManager.get().getLogger(clazz)}. Intended for
-     * use at field-initialization time:
+     * Shorthand for {@code LoggerManager.get().getLogger(clazz)}.
+     * Prefer instance-field initialization to avoid {@link IllegalStateException}
+     * if the class is loaded before {@link LoggerManager#set(LoggerManager)} is called:
      * <pre>{@code
-     * private static final Logger log = Logger.of(MyComponent.class);
+     * private final Logger log = Logger.of(MyComponent.class);
      * }</pre>
+     * For early-bootstrap classes (loaded before Maven's DI container initializes),
+     * use lazy initialization instead — see the {@code package-info.java} for this package.
      *
      * @param clazz the class whose name is used as the logger name, never {@code null}
      * @return a {@code Logger} instance, never {@code null}
