@@ -337,6 +337,45 @@ public interface Logger {
         atError().withThrowable(t).log(message);
     }
 
+    // ---- Static factory ----
+
+    /**
+     * Returns a {@code Logger} for the given class, using the fully-qualified
+     * class name as the logger name.
+     * <p>
+     * Shorthand for {@code LoggerManager.get().getLogger(clazz)}. Intended for
+     * use at field-initialization time:
+     * <pre>{@code
+     * private static final Logger log = Logger.of(MyComponent.class);
+     * }</pre>
+     *
+     * @param clazz the class whose name is used as the logger name, never {@code null}
+     * @return a {@code Logger} instance, never {@code null}
+     * @since 4.1.0
+     */
+    @Nonnull
+    static Logger of(@Nonnull Class<?> clazz) {
+        return LoggerManager.get().getLogger(clazz);
+    }
+
+    /**
+     * Returns a {@code Logger} with the given name.
+     * <p>
+     * Shorthand for {@code LoggerManager.get().getLogger(name)}. Intended for
+     * framework code or dynamic logger names:
+     * <pre>{@code
+     * Logger log = Logger.of("org.apache.maven.my-component");
+     * }</pre>
+     *
+     * @param name the logger name, never {@code null}
+     * @return a {@code Logger} instance, never {@code null}
+     * @since 4.1.0
+     */
+    @Nonnull
+    static Logger of(@Nonnull String name) {
+        return LoggerManager.get().getLogger(name);
+    }
+
     // ---- Child logger ----
 
     /**
