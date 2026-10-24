@@ -51,6 +51,7 @@ jobs:
           java-version: 25
           distribution: 'temurin'
           cache: 'maven'
+          cache-jdk: false
           # pull requests restore the caches of the branch they target without saving their own copies
           cache-read-only: ${{ github.event_name == 'pull_request' }}
 
