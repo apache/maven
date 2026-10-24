@@ -151,7 +151,7 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
         doLog(level, message, messageTemplate, messageArgs, keyValues, throwable, null, null);
     }
 
-    @SuppressWarnings("deprecation") // Thread.getId()
+    @SuppressWarnings({"deprecation", "checkstyle:ParameterNumber"}) // Thread.getId()
     void doLog(
             LogLevel level,
             String message,
