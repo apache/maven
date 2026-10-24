@@ -26,6 +26,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.logging.LogEvent;
 
 /**
  * Report for a single mojo (plugin goal) execution within a module.

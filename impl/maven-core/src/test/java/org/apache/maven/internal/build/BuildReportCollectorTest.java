@@ -298,7 +298,7 @@ class BuildReportCollectorTest {
     }
 
     @Test
-    void testBuildEnvironmentSensitiveKeyRedaction() {
+    void testBuildInvocationSensitiveKeyRedaction() {
         MavenProject project = createProject("org.example", "my-app", "1.0.0");
         MavenSession session = createSession(project);
 
@@ -310,7 +310,7 @@ class BuildReportCollectorTest {
         userProps.setProperty("maven.compiler.release", "21");
         session.getRequest().setUserProperties(userProps);
 
-        var env = DefaultBuildEnvironment.from(session);
+        var env = DefaultBuildInvocation.from(session);
 
         assertEquals("***", env.userProperties().get("my.password"), "password key must be redacted");
         assertEquals("***", env.userProperties().get("db.secret"), "secret key must be redacted");
@@ -319,7 +319,7 @@ class BuildReportCollectorTest {
     }
 
     @Test
-    void testBuildEnvironmentOfflineAndProfiles() {
+    void testBuildInvocationOfflineAndProfiles() {
         MavenProject project = createProject("org.example", "my-app", "1.0.0");
         MavenSession session = createSession(project);
         session.getRequest().setOffline(true);
@@ -328,7 +328,7 @@ class BuildReportCollectorTest {
         session.getRequest().setSelectedProjects(List.of(":my-app"));
         session.getRequest().setResumeFrom(":other-module");
 
-        var env = DefaultBuildEnvironment.from(session);
+        var env = DefaultBuildInvocation.from(session);
 
         assertTrue(env.offline());
         assertTrue(env.updateSnapshots());

@@ -26,8 +26,8 @@ import org.apache.maven.api.BuildInvocation;
 import org.apache.maven.api.build.report.BuildReport;
 import org.apache.maven.api.build.report.BuildStatus;
 import org.apache.maven.api.build.report.FailureReport;
-import org.apache.maven.api.logging.LogEvent;
 import org.apache.maven.api.build.report.ModuleReport;
+import org.apache.maven.api.logging.LogEvent;
 import org.apache.maven.api.services.BuilderProblem;
 
 /**

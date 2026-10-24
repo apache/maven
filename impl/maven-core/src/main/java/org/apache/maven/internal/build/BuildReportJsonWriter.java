@@ -18,12 +18,12 @@
  */
 package org.apache.maven.internal.build;
 
-import org.apache.maven.api.BuildEnvironment;
+import org.apache.maven.api.BuildInvocation;
 import org.apache.maven.api.build.report.BuildReport;
 import org.apache.maven.api.build.report.FailureReport;
-import org.apache.maven.api.logging.LogEvent;
 import org.apache.maven.api.build.report.ModuleReport;
 import org.apache.maven.api.build.report.MojoReport;
+import org.apache.maven.api.logging.LogEvent;
 import org.apache.maven.api.services.BuilderProblem;
 
 /**
@@ -135,19 +135,21 @@ final class BuildReportJsonWriter {
         sb.append('}');
     }
 
-    private static void writeEnvironment(StringBuilder sb, BuildEnvironment env, int indent) {
+    private static void writeEnvironment(StringBuilder sb, BuildInvocation env, int indent) {
         sb.append("{\n");
         writeStringArray(sb, indent + 1, "goals", env.goals());
         writeStringMap(sb, indent + 1, "userProperties", env.userProperties());
         writeStringMap(sb, indent + 1, "systemInfo", env.systemInfo());
-        writeField(sb, indent + 1, "localRepository", env.localRepository());
         writeStringArray(sb, indent + 1, "activeProfiles", env.activeProfiles());
         writeStringArray(sb, indent + 1, "selectedProjects", env.selectedProjects());
         writeNullableField(sb, indent + 1, "resumeFrom", env.resumeFrom());
-        writeField(sb, indent + 1, "reactorFailureBehavior", env.reactorFailureBehavior());
+        writeField(
+                sb,
+                indent + 1,
+                "reactorFailureBehavior",
+                env.reactorFailureBehavior().name());
         writeField(sb, indent + 1, "offline", env.offline());
         writeField(sb, indent + 1, "updateSnapshots", env.updateSnapshots());
-        writeField(sb, indent + 1, "noTransferProgress", env.noTransferProgress());
         writeField(sb, indent + 1, "batchMode", env.batchMode());
         writeField(sb, indent + 1, "threads", env.threads());
         removeTrailingComma(sb);

@@ -28,6 +28,7 @@ import org.apache.maven.api.BuildInvocation;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.logging.LogEvent;
 import org.apache.maven.api.services.BuilderProblem;
 
 /**

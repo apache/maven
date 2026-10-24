@@ -23,9 +23,9 @@ import java.time.Instant;
 import java.util.List;
 
 import org.apache.maven.api.build.report.BuildStatus;
-import org.apache.maven.api.logging.LogEvent;
 import org.apache.maven.api.build.report.ModuleReport;
 import org.apache.maven.api.build.report.MojoReport;
+import org.apache.maven.api.logging.LogEvent;
 
 /**
  * Internal immutable implementation of {@link ModuleReport}.

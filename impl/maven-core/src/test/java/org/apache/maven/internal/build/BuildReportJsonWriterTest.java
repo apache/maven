@@ -23,14 +23,15 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.maven.api.BuildEnvironment;
+import org.apache.maven.api.BuildInvocation;
+import org.apache.maven.api.ReactorFailureBehavior;
 import org.apache.maven.api.build.report.BuildReport;
 import org.apache.maven.api.build.report.BuildStatus;
 import org.apache.maven.api.build.report.FailureReport;
-import org.apache.maven.api.logging.LogEvent;
-import org.apache.maven.api.logging.LogLevel;
 import org.apache.maven.api.build.report.ModuleReport;
 import org.apache.maven.api.build.report.MojoReport;
+import org.apache.maven.api.logging.LogEvent;
+import org.apache.maven.api.logging.LogLevel;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -39,16 +40,126 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BuildReportJsonWriterTest {
 
-    private static final BuildEnvironment EMPTY_ENV = new DefaultBuildEnvironment(
-            List.of(), Map.of(), Map.of(), "", List.of(), List.of(), null, "FAIL_FAST", false, false, false, false, 1);
+    private static LogEvent logEvent(Instant ts, LogLevel level, String msg, String logger) {
+        return new LogEvent() {
+            @Override
+            public Instant timestamp() {
+                return ts;
+            }
+
+            @Override
+            public LogLevel level() {
+                return level;
+            }
+
+            @Override
+            public String message() {
+                return msg;
+            }
+
+            @Override
+            public String loggerName() {
+                return logger;
+            }
+
+            @Override
+            public Throwable throwable() {
+                return null;
+            }
+
+            @Override
+            public String stackTrace() {
+                return null;
+            }
+        };
+    }
+
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    private static LogEvent logEventWithMeta(
+            Instant ts,
+            LogLevel level,
+            String msg,
+            String logger,
+            String srcClass,
+            String srcMethod,
+            long threadId,
+            long seqNum) {
+        return new LogEvent() {
+            @Override
+            public Instant timestamp() {
+                return ts;
+            }
+
+            @Override
+            public LogLevel level() {
+                return level;
+            }
+
+            @Override
+            public String message() {
+                return msg;
+            }
+
+            @Override
+            public String loggerName() {
+                return logger;
+            }
+
+            @Override
+            public Throwable throwable() {
+                return null;
+            }
+
+            @Override
+            public String stackTrace() {
+                return null;
+            }
+
+            @Override
+            public String sourceClassName() {
+                return srcClass;
+            }
+
+            @Override
+            public String sourceMethodName() {
+                return srcMethod;
+            }
+
+            @Override
+            public long threadId() {
+                return threadId;
+            }
+
+            @Override
+            public long sequenceNumber() {
+                return seqNum;
+            }
+        };
+    }
+
+    private static final BuildInvocation EMPTY_ENV = new DefaultBuildInvocation(
+            List.of(),
+            Map.of(),
+            Map.of(),
+            List.of(),
+            List.of(),
+            List.of(),
+            null,
+            null,
+            ReactorFailureBehavior.FAIL_FAST,
+            false,
+            false,
+            false,
+            true,
+            false,
+            1);
     private static final Instant BASE_TIME = Instant.parse("2025-01-15T10:30:00Z");
 
     @Test
     void testSuccessfulBuildReport() {
         List<LogEvent> mojoOutput = List.of(
-                new DefaultLogEvent(
-                        BASE_TIME.plusSeconds(6), LogLevel.INFO, "Compiling 42 source files", "o.a.m.compiler", null),
-                new DefaultLogEvent(BASE_TIME.plusSeconds(7), LogLevel.INFO, "BUILD SUCCESS", "o.a.m.compiler", null));
+                logEvent(BASE_TIME.plusSeconds(6), LogLevel.INFO, "Compiling 42 source files", "o.a.m.compiler"),
+                logEvent(BASE_TIME.plusSeconds(7), LogLevel.INFO, "BUILD SUCCESS", "o.a.m.compiler"));
 
         MojoReport mojo = new DefaultMojoReport(
                 "org.apache.maven.plugins",
@@ -64,12 +175,8 @@ class BuildReportJsonWriterTest {
                 "0123456789abcdef",
                 mojoOutput);
 
-        List<LogEvent> moduleOutput = List.of(new DefaultLogEvent(
-                BASE_TIME.plusSeconds(2),
-                LogLevel.INFO,
-                "Resolving dependencies for maven-core",
-                "o.a.m.resolver",
-                null));
+        List<LogEvent> moduleOutput = List.of(logEvent(
+                BASE_TIME.plusSeconds(2), LogLevel.INFO, "Resolving dependencies for maven-core", "o.a.m.resolver"));
 
         ModuleReport module = new DefaultModuleReport(
                 "org.apache.maven",
@@ -84,8 +191,8 @@ class BuildReportJsonWriterTest {
                 moduleOutput);
 
         List<LogEvent> buildOutput = List.of(
-                new DefaultLogEvent(BASE_TIME, LogLevel.INFO, "Reactor Build Order:", "o.a.m.reactor", null),
-                new DefaultLogEvent(BASE_TIME, LogLevel.INFO, "Maven Core", "o.a.m.reactor", null));
+                logEvent(BASE_TIME, LogLevel.INFO, "Reactor Build Order:", "o.a.m.reactor"),
+                logEvent(BASE_TIME, LogLevel.INFO, "Maven Core", "o.a.m.reactor"));
 
         BuildReport report = new DefaultBuildReport(
                 EMPTY_ENV,
@@ -362,24 +469,19 @@ class BuildReportJsonWriterTest {
 
     @Test
     void testLogEventWithJulMetadata() {
-        // LogEvent with JUL source class, method, thread ID, and sequence number
-        LogEvent julEvent = new DefaultLogEvent(
+        // LogEvent with source class and method metadata
+        LogEvent julEvent = logEventWithMeta(
                 BASE_TIME.plusSeconds(1),
                 LogLevel.WARN,
                 "Unsupported class file major version 65",
                 "org.apache.maven.plugins.compiler",
-                null,
-                null,
                 "com.sun.tools.javac.processing.JavacProcessingEnvironment",
                 "doProcessing",
                 42L,
-                1001L,
-                null,
-                null);
+                1001L);
 
         // LogEvent without JUL metadata (from SLF4J)
-        LogEvent slf4jEvent = new DefaultLogEvent(
-                BASE_TIME.plusSeconds(2), LogLevel.INFO, "Compiling 10 files", "o.a.m.compiler", null);
+        LogEvent slf4jEvent = logEvent(BASE_TIME.plusSeconds(2), LogLevel.INFO, "Compiling 10 files", "o.a.m.compiler");
 
         MojoReport mojo = new DefaultMojoReport(
                 "org.apache.maven.plugins",

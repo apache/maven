@@ -28,7 +28,7 @@ import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinates;
-import org.apache.maven.api.BuildEnvironment;
+import org.apache.maven.api.BuildInvocation;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.DependencyScope;
@@ -36,6 +36,7 @@ import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.Listener;
 import org.apache.maven.api.LocalRepository;
+import org.apache.maven.api.MakeBehavior;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.PathScope;
@@ -43,6 +44,7 @@ import org.apache.maven.api.PathType;
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
+import org.apache.maven.api.ReactorFailureBehavior;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
@@ -69,9 +71,8 @@ import org.apache.maven.api.toolchain.ToolchainModel;
  */
 public class SessionStub implements Session {
 
-    // NOTE: If BuildEnvironment gains new abstract methods, update this constant
-    // (same as ApiRunner.EMPTY_BUILD_ENVIRONMENT — keep both in sync).
-    private static final BuildEnvironment EMPTY_BUILD_ENVIRONMENT = new BuildEnvironment() {
+    // NOTE: If BuildInvocation gains new abstract methods, update this constant.
+    private static final BuildInvocation EMPTY_BUILD_INVOCATION = new BuildInvocation() {
         @Override
         public java.util.List<String> goals() {
             return java.util.List.of();
@@ -88,11 +89,6 @@ public class SessionStub implements Session {
         }
 
         @Override
-        public String localRepository() {
-            return "";
-        }
-
-        @Override
         public java.util.List<String> activeProfiles() {
             return java.util.List.of();
         }
@@ -103,13 +99,23 @@ public class SessionStub implements Session {
         }
 
         @Override
+        public java.util.List<String> excludedProjects() {
+            return java.util.List.of();
+        }
+
+        @Override
+        public MakeBehavior makeBehavior() {
+            return null;
+        }
+
+        @Override
         public String resumeFrom() {
             return null;
         }
 
         @Override
-        public String reactorFailureBehavior() {
-            return "FAIL_FAST";
+        public ReactorFailureBehavior reactorFailureBehavior() {
+            return ReactorFailureBehavior.FAIL_FAST;
         }
 
         @Override
@@ -123,12 +129,17 @@ public class SessionStub implements Session {
         }
 
         @Override
-        public boolean noTransferProgress() {
+        public boolean batchMode() {
             return false;
         }
 
         @Override
-        public boolean batchMode() {
+        public boolean recursive() {
+            return true;
+        }
+
+        @Override
+        public boolean resume() {
             return false;
         }
 
@@ -224,8 +235,8 @@ public class SessionStub implements Session {
     }
 
     @Override
-    public BuildEnvironment buildEnvironment() {
-        return EMPTY_BUILD_ENVIRONMENT;
+    public BuildInvocation buildInvocation() {
+        return EMPTY_BUILD_INVOCATION;
     }
 
     @Override
