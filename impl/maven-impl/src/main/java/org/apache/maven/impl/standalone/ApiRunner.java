@@ -376,7 +376,6 @@ public class ApiRunner {
             return mavenVersion;
         }
 
-        @SuppressWarnings("deprecation")
         @Override
         public int getDegreeOfConcurrency() {
             // Override required: buildInvocation() is not supported in standalone/test mode.

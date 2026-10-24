@@ -52,6 +52,8 @@ public class CliRequest {
 
     boolean showErrors = true;
 
+    org.apache.maven.api.logging.LogLevel failOnSeverity;
+
     Properties userProperties = new Properties();
 
     Properties systemProperties = new Properties();

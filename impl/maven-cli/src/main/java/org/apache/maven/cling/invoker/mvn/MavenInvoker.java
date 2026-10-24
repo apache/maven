@@ -269,8 +269,9 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             }
         }
 
-        request.setTransferListener(determineTransferListener(
-                context, context.options().noTransferProgress().orElse(false)));
+        boolean noTransferProgress = context.options().noTransferProgress().orElse(false);
+        request.setNoTransferProgress(noTransferProgress);
+        request.setTransferListener(determineTransferListener(context, noTransferProgress));
         request.setExecutionListener(determineExecutionListener(context));
 
         request.setResumeFrom(context.options().resumeFrom().orElse(null));
@@ -355,7 +356,11 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     protected ExecutionListener determineExecutionListener(MavenContext context) {
-        ExecutionListener listener = new ExecutionEventLogger(context.invokerRequest.messageBuilderFactory());
+        ExecutionListener listener = new ExecutionEventLogger(
+                context.invokerRequest.messageBuilderFactory(),
+                org.slf4j.LoggerFactory.getLogger(ExecutionEventLogger.class),
+                -1,
+                context.failOnSeverity);
         if (context.eventSpyDispatcher != null) {
             listener = context.eventSpyDispatcher.chainListener(listener);
         }

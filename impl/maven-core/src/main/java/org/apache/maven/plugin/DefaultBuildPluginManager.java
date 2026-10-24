@@ -35,9 +35,10 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
-import org.apache.maven.internal.impl.DefaultLog;
 import org.apache.maven.internal.impl.DefaultMojoExecution;
 import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.logging.ProjectBuildLogAppender;
+import org.apache.maven.logging.impl.DefaultLogger;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -46,7 +47,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.slf4j.LoggerFactory;
 
 // TODO the antrun plugin has its own configurator, the only plugin that does. might need to think about how that works
 // TODO remove the coreArtifactFilterManager
@@ -122,10 +122,13 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
         try {
             scope.seed(MavenProject.class, project);
             scope.seed(MojoExecution.class, mojoExecution);
-            scope.seed(
-                    org.apache.maven.api.plugin.Log.class,
-                    new DefaultLog(LoggerFactory.getLogger(
-                            mojoExecution.getMojoDescriptor().getImplementation())));
+            String mojoProjectId = ProjectBuildLogAppender.getProjectId();
+            String mojoExecutionId =
+                    mojoExecution.getMojoDescriptor().getFullGoalName() + "@" + mojoExecution.getExecutionId();
+            DefaultLogger mojoLog = new DefaultLogger(
+                    mojoExecution.getMojoDescriptor().getImplementation(), mojoProjectId, mojoExecutionId);
+            scope.seed(org.apache.maven.api.plugin.Log.class, mojoLog);
+            scope.seed(org.apache.maven.api.logging.Logger.class, mojoLog);
             InternalMavenSession sessionV4 = InternalMavenSession.from(session.getSession());
             scope.seed(Project.class, sessionV4.getProject(project));
             scope.seed(org.apache.maven.api.MojoExecution.class, new DefaultMojoExecution(sessionV4, mojoExecution));

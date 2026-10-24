@@ -32,6 +32,7 @@ import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.execution.AbstractExecutionListener;
@@ -44,7 +45,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,6 +65,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
     private final MessageBuilderFactory messageBuilderFactory;
     private final Logger logger;
+    private final org.apache.maven.api.logging.LogLevel failOnSeverity;
     private int terminalWidth;
     private int lineLength;
     private int maxProjectNameLength;
@@ -74,17 +75,26 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     private final Map<MavenProject, Integer> projectNumbers = new HashMap<>();
 
     public ExecutionEventLogger(MessageBuilderFactory messageBuilderFactory) {
-        this(messageBuilderFactory, LoggerFactory.getLogger(ExecutionEventLogger.class));
+        this(messageBuilderFactory, LoggerFactory.getLogger(ExecutionEventLogger.class), -1, null);
     }
 
     public ExecutionEventLogger(MessageBuilderFactory messageBuilderFactory, Logger logger) {
-        this(messageBuilderFactory, logger, -1);
+        this(messageBuilderFactory, logger, -1, null);
     }
 
     public ExecutionEventLogger(MessageBuilderFactory messageBuilderFactory, Logger logger, int terminalWidth) {
+        this(messageBuilderFactory, logger, terminalWidth, null);
+    }
+
+    public ExecutionEventLogger(
+            MessageBuilderFactory messageBuilderFactory,
+            Logger logger,
+            int terminalWidth,
+            org.apache.maven.api.logging.LogLevel failOnSeverity) {
         this.logger = Objects.requireNonNull(logger, "logger cannot be null");
         this.messageBuilderFactory = messageBuilderFactory;
         this.terminalWidth = terminalWidth;
+        this.failOnSeverity = failOnSeverity;
     }
 
     private static String chars(char c, int count) {
@@ -152,10 +162,9 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                 logReactorSummary(event.getSession());
             }
 
-            ILoggerFactory iLoggerFactory = LoggerFactory.getILoggerFactory();
-
-            if (iLoggerFactory instanceof org.apache.maven.logging.api.LogLevelRecorder recorder
-                    && recorder.hasReachedMaxLevel()) {
+            if (failOnSeverity != null
+                    && LoggerManager.get() != null
+                    && LoggerManager.get().hasReached(failOnSeverity)) {
                 event.getSession()
                         .getResult()
                         .addException(

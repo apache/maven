@@ -80,9 +80,9 @@ import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.model.DefaultModelPathTranslator;
-import org.apache.maven.internal.impl.DefaultLog;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
+import org.apache.maven.logging.impl.DefaultLogger;
 import org.apache.maven.model.v4.MavenMerger;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluatorV4;
@@ -108,7 +108,6 @@ import org.junit.jupiter.api.extension.ParameterContext;
 import org.junit.jupiter.api.extension.ParameterResolutionException;
 import org.junit.jupiter.api.extension.ParameterResolver;
 import org.junit.platform.commons.support.AnnotationSupport;
-import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 
@@ -352,7 +351,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         /*
            binder.install(ProviderMethodsModule.forObject(context.getRequiredTestInstance()));
            binder.requestInjection(context.getRequiredTestInstance());
-           binder.bind(Log.class).toInstance(new DefaultLog(LoggerFactory.getLogger("anonymous")));
+           binder.bind(Log.class).toInstance(new DefaultLogger(LoggerFactory.getLogger("anonymous")));
            binder.bind(ExtensionContext.class).toInstance(context);
            // Load maven 4 api Services interfaces and try to bind them to the (possible) mock instances
            // returned by the (possibly) mock InternalSession
@@ -529,7 +528,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             @Singleton
             @Priority(-10)
             private Log createLog() {
-                return new DefaultLog(LoggerFactory.getLogger("anonymous"));
+                return new DefaultLogger("anonymous");
             }
 
             @Provides

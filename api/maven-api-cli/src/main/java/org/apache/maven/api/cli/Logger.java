@@ -34,6 +34,7 @@ import org.apache.maven.api.annotations.Nullable;
  *
  * @since 4.0.0
  */
+@Deprecated(since = "4.1.0", forRemoval = true)
 @Experimental
 public interface Logger {
 

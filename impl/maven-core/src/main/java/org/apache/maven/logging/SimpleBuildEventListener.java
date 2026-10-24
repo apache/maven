@@ -20,6 +20,8 @@ package org.apache.maven.logging;
 
 import java.util.function.Consumer;
 
+import org.apache.maven.api.logging.LogEvent;
+import org.apache.maven.api.logging.LogLevel;
 import org.apache.maven.execution.ExecutionEvent;
 import org.eclipse.aether.transfer.TransferEvent;
 
@@ -38,8 +40,20 @@ public class SimpleBuildEventListener implements BuildEventListener {
     public void projectStarted(String projectId) {}
 
     @Override
-    public void projectLogMessage(String projectId, String event) {
-        log(event);
+    public void projectLogMessage(String projectId, LogEvent event) {
+        log("[" + renderLevel(event.level()) + "] " + event.message());
+        String stackTrace = event.stackTrace();
+        if (stackTrace != null) {
+            log(stackTrace);
+        }
+    }
+
+    /**
+     * Renders the log level for console output.
+     * Maven traditionally uses {@code WARNING} rather than SLF4J's {@code WARN}.
+     */
+    protected String renderLevel(LogLevel level) {
+        return level == LogLevel.WARN ? "WARNING" : level.name();
     }
 
     @Override

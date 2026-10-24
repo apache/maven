@@ -32,10 +32,10 @@ import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.Options;
+import org.apache.maven.api.logging.LogLevel;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.toolchain.PersistedToolchains;
-import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.logging.BuildEventListener;
 import org.jline.terminal.Terminal;
@@ -84,8 +84,8 @@ public class LookupContext implements AutoCloseable {
     public Set<String> pushedUserProperties;
 
     public ILoggerFactory loggerFactory;
-    public Slf4jConfiguration slf4jConfiguration;
-    public Slf4jConfiguration.Level loggerLevel;
+    public LogLevel loggerLevel;
+    public LogLevel failOnSeverity;
     public Boolean coloredOutput;
     public Terminal terminal;
     public Consumer<String> writer;
