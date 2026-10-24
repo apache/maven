@@ -283,6 +283,63 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
         }
     }
 
+    @Test
+    void testLocalParentResolutionWithValidationLevels(@TempDir Path tempDir) throws Exception {
+        Path parentPom = tempDir.resolve("pom.xml");
+        Files.writeString(parentPom, """
+            <project>
+              <modelVersion>4.0.0</modelVersion>
+              <groupId>test</groupId>
+              <artifactId>parent</artifactId>
+              <version>1</version>
+              <packaging>pom</packaging>
+            </project>
+            """);
+
+        Path childPom = Files.createDirectory(tempDir.resolve("child")).resolve("pom.xml");
+        Files.writeString(childPom, """
+            <project xmlns="http://maven.apache.org/POM/4.1.0">
+              <modelVersion>4.1.0</modelVersion>
+              <parent>
+                <groupId>test</groupId>
+                <artifactId>parent</artifactId>
+                <version>1</version>
+                <relativePath>../pom.xml</relativePath>
+              </parent>
+              <artifactId>child</artifactId>
+            </project>
+            """);
+
+        MavenSession session = createMavenSession(null);
+        session.getRequest().setRootDirectory(tempDir);
+        org.apache.maven.project.ProjectBuilder builder =
+                getContainer().lookup(org.apache.maven.project.ProjectBuilder.class);
+
+        for (int validationLevel :
+                List.of(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, ModelBuildingRequest.VALIDATION_LEVEL_STRICT)) {
+            ProjectBuildingRequest request = new DefaultProjectBuildingRequest();
+            request.setRepositorySession(session.getRepositorySession());
+            request.setValidationLevel(validationLevel);
+            // processPlugins=false would be a consumer request, which never looks up a local parent
+            request.setProcessPlugins(true);
+            ProjectBuildingResult result = builder.build(childPom.toFile(), request);
+            MavenProject child = result.getProject();
+
+            assertNotNull(child.getParentArtifact());
+            assertEquals("parent", child.getParentArtifact().getArtifactId());
+            assertEquals(parentPom.toFile(), child.getParentFile());
+
+            boolean hasRelativePathWarning = result.getProblems().stream()
+                    .anyMatch(problem ->
+                            problem.getMessage().contains("only specify relativePath or groupId/artifactId"));
+
+            assertEquals(
+                    validationLevel == ModelBuildingRequest.VALIDATION_LEVEL_STRICT,
+                    hasRelativePathWarning,
+                    "Unexpected validation result for level " + validationLevel);
+        }
+    }
+
     private void assertParentHierarchy(Path tempDir, int depth) throws Exception {
         for (int i = 0; i < depth; i++) {
             Path directory = Files.createDirectory(tempDir.resolve("parent-" + i));
