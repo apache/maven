@@ -94,7 +94,6 @@ class BuildReportCollectorTest {
 
         assertNotNull(report);
         assertEquals(BuildStatus.SUCCESS, report.status());
-        assertEquals(1, report.formatVersion());
         assertEquals("1.0.0", report.mavenVersion());
         assertFalse(report.multiModule());
         assertEquals(1, report.threads());
@@ -242,7 +241,6 @@ class BuildReportCollectorTest {
         assertTrue(Files.exists(latestFile), "build-report-latest.json should exist");
 
         String content = Files.readString(latestFile);
-        assertTrue(content.contains("\"formatVersion\": 1"));
         assertTrue(content.contains("\"status\": \"SUCCESS\""));
         assertTrue(content.contains("\"artifactId\": \"my-app\""));
     }

@@ -51,16 +51,10 @@ record DefaultBuildReport(
         implements BuildReport {
 
     private static final String REPORT_VERSION = "1.1";
-    private static final int FORMAT_VERSION = 1;
 
     @Override
     public String reportVersion() {
         return REPORT_VERSION;
-    }
-
-    @Override
-    public int formatVersion() {
-        return FORMAT_VERSION;
     }
 
     @Override

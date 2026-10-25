@@ -144,7 +144,6 @@ class BuildReportIntegrationTest {
         String json = Files.readString(latestFile);
 
         // Verify JSON structure
-        assertTrue(json.contains("\"formatVersion\": 1"));
         assertTrue(json.contains("\"status\": \"SUCCESS\""));
         assertTrue(json.contains("\"multiModule\": true"));
         assertTrue(json.contains("\"threads\": 1"));
@@ -232,7 +231,6 @@ class BuildReportIntegrationTest {
         Path latestFile = reportsDir.resolve(BuildReportCollector.REPORT_LATEST);
         String json = Files.readString(latestFile);
         assertTrue(json.startsWith("{"), "report should start with JSON object");
-        assertTrue(json.contains("\"formatVersion\": 1"), "report should contain format version");
     }
 
     // ---- Test helpers ----

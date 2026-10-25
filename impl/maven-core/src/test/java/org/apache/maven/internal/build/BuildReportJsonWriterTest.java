@@ -212,7 +212,6 @@ class BuildReportJsonWriterTest {
 
         String json = BuildReportJsonWriter.toJson(report);
 
-        assertTrue(json.contains("\"formatVersion\": 1"));
         assertTrue(json.contains("\"reportVersion\": \"1.1\""));
         assertTrue(json.contains("\"status\": \"SUCCESS\""));
         assertTrue(json.contains("\"mavenVersion\": \"4.1.0-SNAPSHOT\""));
@@ -355,7 +354,7 @@ class BuildReportJsonWriterTest {
                 List.of(),
                 List.of());
 
-        assertEquals(1, report.formatVersion());
+        assertEquals("1.1", report.reportVersion());
     }
 
     @Test

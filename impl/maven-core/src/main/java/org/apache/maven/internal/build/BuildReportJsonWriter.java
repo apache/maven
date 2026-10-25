@@ -50,7 +50,6 @@ final class BuildReportJsonWriter {
     private static void writeReport(StringBuilder sb, BuildReport report, int indent) {
         sb.append("{\n");
         writeField(sb, indent + 1, "reportVersion", report.reportVersion());
-        writeField(sb, indent + 1, "formatVersion", report.formatVersion());
         writeField(sb, indent + 1, "status", report.status().name());
         writeField(sb, indent + 1, "duration", report.duration().toString());
         writeField(sb, indent + 1, "startTime", report.startTime().toString());

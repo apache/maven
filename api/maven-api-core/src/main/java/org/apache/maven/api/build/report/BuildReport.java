@@ -78,14 +78,6 @@ public interface BuildReport {
     BuildInvocation environment();
 
     /**
-     * Schema version of the report format. Consumers should check this
-     * to handle forward compatibility.
-     *
-     * @return the format version, currently {@code 1}
-     */
-    int formatVersion();
-
-    /**
      * The overall build status.
      *
      * @return the build outcome, never {@code null}
