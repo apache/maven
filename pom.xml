@@ -151,7 +151,7 @@ under the License.
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
 
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
-    <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
+    <jakartaAnnotationApiVersion>1.3.5</jakartaAnnotationApiVersion>
     <jlineVersion>4.4.8</jlineVersion>
     <jmhVersion>1.37</jmhVersion>
     <junitVersion>6.1.3</junitVersion>
@@ -406,9 +406,9 @@ under the License.
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>javax.annotation</groupId>
-        <artifactId>javax.annotation-api</artifactId>
-        <version>${javaxAnnotationApiVersion}</version>
+        <groupId>jakarta.annotation</groupId>
+        <artifactId>jakarta.annotation-api</artifactId>
+        <version>${jakartaAnnotationApiVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
