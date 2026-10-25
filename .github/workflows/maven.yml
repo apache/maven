@@ -227,8 +227,8 @@ jobs:
           else
             tar xzf maven-dist/apache-maven-*-bin.tar.gz -C maven-local --strip-components 1
           fi
-          echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
-          echo "$PWD/maven-local/bin" >> $GITHUB_PATH
+          echo "MAVEN_HOME=$PWD/maven-local" >> "$GITHUB_ENV"
+          echo "$PWD/maven-local/bin" >> "$GITHUB_PATH"
 
       - name: Build with downloaded Maven
         shell: bash
@@ -333,8 +333,8 @@ jobs:
           else
             tar xzf maven-dist/apache-maven-*-bin.tar.gz -C maven-local --strip-components 1
           fi
-          echo "MAVEN_HOME=$PWD/maven-local" >> $GITHUB_ENV
-          echo "$PWD/maven-local/bin" >> $GITHUB_PATH
+          echo "MAVEN_HOME=$PWD/maven-local" >> "$GITHUB_ENV"
+          echo "$PWD/maven-local/bin" >> "$GITHUB_PATH"
 
       - name: Build Maven and ITs and run them
         shell: bash
