@@ -38,8 +38,8 @@ import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
-import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenOptions;
+import org.apache.maven.api.logging.Logger;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.Sources;
@@ -269,8 +269,9 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             }
         }
 
-        request.setTransferListener(determineTransferListener(
-                context, context.options().noTransferProgress().orElse(false)));
+        boolean noTransferProgress = context.options().noTransferProgress().orElse(false);
+        request.setNoTransferProgress(noTransferProgress);
+        request.setTransferListener(determineTransferListener(context, noTransferProgress));
         request.setExecutionListener(determineExecutionListener(context));
 
         request.setResumeFrom(context.options().resumeFrom().orElse(null));
@@ -355,7 +356,11 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
     }
 
     protected ExecutionListener determineExecutionListener(MavenContext context) {
-        ExecutionListener listener = new ExecutionEventLogger(context.invokerRequest.messageBuilderFactory());
+        ExecutionListener listener = new ExecutionEventLogger(
+                context.invokerRequest.messageBuilderFactory(),
+                org.slf4j.LoggerFactory.getLogger(ExecutionEventLogger.class),
+                -1,
+                context.failOnSeverity);
         if (context.eventSpyDispatcher != null) {
             listener = context.eventSpyDispatcher.chainListener(listener);
         }

@@ -50,7 +50,6 @@ public class LoggingOutputStream extends FilterOutputStream {
         super.write(b);
         if (buf.isEol()) {
             String line = new String(buf.toByteArray(), 0, buf.size() - LINE_SEP.length);
-            ProjectBuildLogAppender.updateMdc();
             consumer.accept(line);
             buf.reset();
         }
@@ -59,7 +58,6 @@ public class LoggingOutputStream extends FilterOutputStream {
     public void forceFlush() {
         if (buf.size() > 0) {
             String line = new String(buf.toByteArray(), 0, buf.size());
-            ProjectBuildLogAppender.updateMdc();
             consumer.accept(line);
             buf.reset();
         }

@@ -21,7 +21,9 @@ package org.apache.maven.cling.invoker;
 import java.util.Optional;
 
 import org.apache.maven.api.Constants;
-import org.apache.maven.cling.logging.Slf4jConfiguration;
+import org.apache.maven.api.logging.LogLevel;
+import org.apache.maven.api.logging.LoggerManager;
+import org.apache.maven.logging.impl.DefaultLoggerManager;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -39,15 +41,14 @@ class LookupInvokerLoggingTest {
 
     @BeforeEach
     void setUp() {
-        // Save original system property
         originalSystemProperty = System.getProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL);
-        // Clear system property to test configuration file loading
         System.clearProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL);
+        LoggerManager.set(new DefaultLoggerManager());
     }
 
     @AfterEach
     void tearDown() {
-        // Restore original system property
+        LoggerManager.set(null);
         if (originalSystemProperty != null) {
             System.setProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL, originalSystemProperty);
         } else {
@@ -57,71 +58,55 @@ class LookupInvokerLoggingTest {
 
     @Test
     void testNoCliOptionsDoesNotSetSystemProperty() {
-        // Simulate the scenario where no CLI options are specified
-        // This should NOT call setRootLoggerLevel, allowing configuration file to take effect
+        MockInvokerRequest invokerRequest = new MockInvokerRequest(false);
+        MockOptions options = new MockOptions(false);
+        int[] callCount = {0};
 
-        MockInvokerRequest invokerRequest = new MockInvokerRequest(false); // not verbose
-        MockOptions options = new MockOptions(false); // not quiet
-        MockSlf4jConfiguration slf4jConfiguration = new MockSlf4jConfiguration();
-
-        // Simulate the fixed logic from LookupInvoker.prepareLogging()
-        Slf4jConfiguration.Level loggerLevel;
+        LogLevel loggerLevel;
         if (invokerRequest.effectiveVerbose()) {
-            loggerLevel = Slf4jConfiguration.Level.DEBUG;
-            slf4jConfiguration.setRootLoggerLevel(loggerLevel);
+            loggerLevel = LogLevel.DEBUG;
+            LoggerManager.get().setRootLoggerLevel(loggerLevel);
+            callCount[0]++;
         } else if (options.quiet().orElse(false)) {
-            loggerLevel = Slf4jConfiguration.Level.ERROR;
-            slf4jConfiguration.setRootLoggerLevel(loggerLevel);
+            loggerLevel = LogLevel.ERROR;
+            LoggerManager.get().setRootLoggerLevel(loggerLevel);
+            callCount[0]++;
         } else {
-            // fall back to default log level specified in conf
-            loggerLevel = Slf4jConfiguration.Level.INFO; // default for display purposes
-            // Do NOT call setRootLoggerLevel - this is the fix!
+            loggerLevel = LogLevel.INFO;
         }
 
-        // Verify that setRootLoggerLevel was not called
-        assertEquals(0, slf4jConfiguration.setRootLoggerLevelCallCount);
-
-        // Verify that system property was not set
+        assertEquals(0, callCount[0]);
         assertNull(System.getProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL));
     }
 
     @Test
     void testVerboseOptionSetsSystemProperty() {
-        MockInvokerRequest invokerRequest = new MockInvokerRequest(true); // verbose
-        MockOptions options = new MockOptions(false); // not quiet
-        MockSlf4jConfiguration slf4jConfiguration = new MockSlf4jConfiguration();
+        MockInvokerRequest invokerRequest = new MockInvokerRequest(true);
+        MockOptions options = new MockOptions(false);
 
-        // Simulate the logic from LookupInvoker.prepareLogging()
         if (invokerRequest.effectiveVerbose()) {
-            slf4jConfiguration.setRootLoggerLevel(Slf4jConfiguration.Level.DEBUG);
+            LoggerManager.get().setRootLoggerLevel(LogLevel.DEBUG);
         } else if (options.quiet().orElse(false)) {
-            slf4jConfiguration.setRootLoggerLevel(Slf4jConfiguration.Level.ERROR);
+            LoggerManager.get().setRootLoggerLevel(LogLevel.ERROR);
         }
 
-        // Verify that setRootLoggerLevel was called
-        assertEquals(1, slf4jConfiguration.setRootLoggerLevelCallCount);
-        assertEquals(Slf4jConfiguration.Level.DEBUG, slf4jConfiguration.lastSetLevel);
+        assertEquals("debug", System.getProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL));
     }
 
     @Test
     void testQuietOptionSetsSystemProperty() {
-        MockInvokerRequest invokerRequest = new MockInvokerRequest(false); // not verbose
-        MockOptions options = new MockOptions(true); // quiet
-        MockSlf4jConfiguration slf4jConfiguration = new MockSlf4jConfiguration();
+        MockInvokerRequest invokerRequest = new MockInvokerRequest(false);
+        MockOptions options = new MockOptions(true);
 
-        // Simulate the logic from LookupInvoker.prepareLogging()
         if (invokerRequest.effectiveVerbose()) {
-            slf4jConfiguration.setRootLoggerLevel(Slf4jConfiguration.Level.DEBUG);
+            LoggerManager.get().setRootLoggerLevel(LogLevel.DEBUG);
         } else if (options.quiet().orElse(false)) {
-            slf4jConfiguration.setRootLoggerLevel(Slf4jConfiguration.Level.ERROR);
+            LoggerManager.get().setRootLoggerLevel(LogLevel.ERROR);
         }
 
-        // Verify that setRootLoggerLevel was called
-        assertEquals(1, slf4jConfiguration.setRootLoggerLevelCallCount);
-        assertEquals(Slf4jConfiguration.Level.ERROR, slf4jConfiguration.lastSetLevel);
+        assertEquals("error", System.getProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL));
     }
 
-    // Mock classes for testing
     private static class MockInvokerRequest {
         private final boolean verbose;
 
@@ -143,31 +128,6 @@ class LookupInvokerLoggingTest {
 
         Optional<Boolean> quiet() {
             return Optional.of(quiet);
-        }
-    }
-
-    private static class MockSlf4jConfiguration implements Slf4jConfiguration {
-        int setRootLoggerLevelCallCount = 0;
-        Level lastSetLevel = null;
-
-        @Override
-        public void setRootLoggerLevel(Level level) {
-            setRootLoggerLevelCallCount++;
-            lastSetLevel = level;
-
-            // Simulate what MavenSimpleConfiguration does
-            String value =
-                    switch (level) {
-                        case DEBUG -> "debug";
-                        case INFO -> "info";
-                        case ERROR -> "error";
-                    };
-            System.setProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL, value);
-        }
-
-        @Override
-        public void activate() {
-            // no-op for test
         }
     }
 }

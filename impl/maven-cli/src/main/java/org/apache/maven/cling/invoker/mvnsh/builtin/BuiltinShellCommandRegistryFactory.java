@@ -105,7 +105,7 @@ public class BuiltinShellCommandRegistryFactory implements ShellCommandRegistryF
             return result -> {
                 result.logger = shellContext.logger;
                 result.loggerFactory = shellContext.loggerFactory;
-                result.slf4jConfiguration = shellContext.slf4jConfiguration;
+                result.failOnSeverity = shellContext.failOnSeverity;
                 result.loggerLevel = shellContext.loggerLevel;
                 result.coloredOutput = shellContext.coloredOutput;
                 result.terminal = shellContext.terminal;

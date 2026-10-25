@@ -390,7 +390,7 @@ class PluginUpgradeQuarkusTest {
 
         // Verify warning was emitted about the version gap
         verify(context.logger, atLeastOnce())
-                .warn(argThat(msg -> msg.contains("quarkus-maven-plugin upgraded to 3.26.0")
+                .warn(argThat((String msg) -> msg.contains("quarkus-maven-plugin upgraded to 3.26.0")
                         && msg.contains("3.16.3")
                         && msg.contains("mismatched plugin and platform")));
     }

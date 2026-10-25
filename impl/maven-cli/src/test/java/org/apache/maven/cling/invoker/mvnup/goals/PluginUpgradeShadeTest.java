@@ -108,7 +108,7 @@ class PluginUpgradeShadeTest {
 
         // Verify a warning was logged
         verify(context.logger, atLeastOnce())
-                .warn(argThat(msg -> msg.contains("Skipping maven-shade-plugin upgrade")
+                .warn(argThat((String msg) -> msg.contains("Skipping maven-shade-plugin upgrade")
                         && msg.contains("custom ResourceTransformer")
                         && msg.contains("BeansXmlTransformer")));
     }
