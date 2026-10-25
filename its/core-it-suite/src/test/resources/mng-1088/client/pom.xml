@@ -17,8 +17,8 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.1.0">
+  <modelVersion>4.1.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng1088</groupId>
   <artifactId>client</artifactId>
@@ -26,14 +26,15 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-1088 :: Plugin Client</name>
-  <description>Test that the plugin manager falls back to resolution from the repository if a plugin is part of the reactor
-    (i.e. an active project artifact) but the lifecycle has not been executed far enough to produce a file for
-    the plugin (i.e. a phase before "compile").</description>
+  <description>
+    Uses the sibling plugin, which must be built by the concurrent builder
+    from source within this same reactor — no pre-installed version in the local repo.
+  </description>
 
   <build>
     <plugins>
       <plugin>
-        <!-- NOTE: That's exactly the same plugin as produced by the sibling project -->
+        <!-- This is the plugin produced by the sibling reactor module -->
         <groupId>org.apache.maven.its.mng1088</groupId>
         <artifactId>p</artifactId>
         <version>0.1-SNAPSHOT</version>
@@ -43,7 +44,7 @@ under the License.
             <goals>
               <goal>touch</goal>
             </goals>
-            <phase>initialize</phase>
+            <phase>package</phase>
             <configuration>
               <file>target/touch.txt</file>
             </configuration>
