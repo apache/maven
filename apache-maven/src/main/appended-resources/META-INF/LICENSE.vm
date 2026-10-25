@@ -231,7 +231,8 @@ subject to the terms and conditions of the following licenses:
 #**##foreach ( $license in $project.licenses ) ##
 #*  *##set ( $groupId = $project.artifact.groupId ) ##
 #*  *##set ( $directory = 'lib' ) ##
-#*  *##if ( !$apacheMavenGroupIds.contains( $groupId ) )
+#*  *### jakarta.annotation-api is dual-licensed EPL-2.0 OR GPL-2.0 with Classpath Exception: distributed under EPL-2.0
+#*  *##if ( !$apacheMavenGroupIds.contains( $groupId ) && $license.name != "GPL2 w/ CPE" )
 #*    *### advertise about each non-Maven dependency
 #*    *###
 #*    *### infer SPDX license id
@@ -240,7 +241,8 @@ subject to the terms and conditions of the following licenses:
 #*    *##elseif ( $license.name == "Eclipse Public License, Version 1.0" )
 #*      *##set ( $spdx = 'EPL-1.0' ) ##
 #*    *##elseif ( $license.name == "Eclipse Public License, Version 2.0"
-                    || $license.url.contains( "https://www.eclipse.org/legal/epl-v20.html" ) )
+                    || $license.url.contains( "https://www.eclipse.org/legal/epl-v20.html" )
+                    || $license.url.contains( "www.eclipse.org/legal/epl-2.0" ) )
 #*      *##set ( $spdx = 'EPL-2.0' ) ##
 #*    *##elseif ( $license.url.contains( "www.apache.org/licenses/LICENSE-2.0" )
                     || $license.url.contains( "https://raw.github.com/hunterhacker/jdom/master/LICENSE.txt" ) )
