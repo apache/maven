@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
+import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
@@ -34,6 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.mock;
 
 class DefaultDependencyManagementImporterTest {
+
     @Test
     void testUpdateWithImportedFromDependencyLocationAndBomLocationAreNullDependencyReturned() {
         final Dependency dependency = Dependency.newBuilder().build();
@@ -65,8 +67,7 @@ class DefaultDependencyManagementImporterTest {
     }
 
     @Test
-    public void testUpdateWithImportedFromSingleLevelImportedFromSet() {
-        // Arrange
+    void testUpdateWithImportedFromSingleLevelImportedFromSet() {
         final InputSource dependencySource = InputSource.of("DEPENDENCY", "DEPENDENCY");
         final InputSource bomSource = InputSource.of("BOM", "BOM");
         final Dependency dependency = Dependency.newBuilder()
@@ -76,10 +77,8 @@ class DefaultDependencyManagementImporterTest {
                 .location("", InputLocation.of(2, 2, bomSource))
                 .build();
 
-        // Act
         final Dependency result = DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, bom);
 
-        // Assert
         assertNotNull(result);
         String actualImportedFrom = result.getImportedFrom().toString();
         String expectedImportedFrom = bom.getLocation("").toString();
@@ -90,8 +89,7 @@ class DefaultDependencyManagementImporterTest {
     }
 
     @Test
-    public void testUpdateWithImportedFromMultiLevelImportedFromSetChanged() {
-        // Arrange
+    void testUpdateWithImportedFromMultiLevelImportedFromSetChanged() {
         final InputSource bomSource = InputSource.of("BOM", "BOM");
         final InputSource intermediateSource =
                 InputSource.of("INTERMEDIATE", "INTERMEDIATE", InputLocation.of(bomSource));
@@ -105,10 +103,8 @@ class DefaultDependencyManagementImporterTest {
         final DependencyManagement bom =
                 DependencyManagement.newBuilder().location("", bomLocation).build();
 
-        // Act
         final Dependency result = DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, bom);
 
-        // Assert
         String actualImportedFrom = result.getImportedFrom().toString();
         String expectedImportedFrom = bom.getLocation("").toString();
         assertEquals(
@@ -118,8 +114,7 @@ class DefaultDependencyManagementImporterTest {
     }
 
     @Test
-    public void testUpdateWithImportedFromMultiLevelAlreadyFoundInDifferentSourceImportedFromSetMaintained() {
-        // Arrange
+    void testUpdateWithImportedFromMultiLevelAlreadyFoundInDifferentSourceImportedFromSetMaintained() {
         final InputSource bomSource = InputSource.of("BOM", "BOM");
         final InputSource intermediateSource =
                 InputSource.of("INTERMEDIATE", "INTERMEDIATE", InputLocation.of(bomSource));
@@ -132,11 +127,9 @@ class DefaultDependencyManagementImporterTest {
                 .location("", InputLocation.of(2, 2, InputSource.of("BOM2", "BOM2")))
                 .build();
 
-        // Act
         final Dependency result =
                 DefaultDependencyManagementImporter.updateWithImportedFrom(dependency, differentSource);
 
-        // Assert
         String actualImportedFrom = result.getImportedFrom().toString();
         String expectedImportedFrom = differentSource.getLocation("").toString();
         assertEquals(
@@ -147,11 +140,16 @@ class DefaultDependencyManagementImporterTest {
 
     @Test
     void testImportManagementInheritsVersionFromImportedBomWhenLocalEntryHasNoVersion() {
-        // A locally-declared dep mgmt entry with scope=provided but no version
+        // A locally declared dependency-management entry has a scope and an exclusion,
+        // but no version.
         Dependency localDep = Dependency.newBuilder()
                 .groupId("org.junit.jupiter")
                 .artifactId("junit-jupiter-api")
                 .scope("provided")
+                .exclusions(List.of(Exclusion.newBuilder()
+                        .groupId("org.junit.vintage")
+                        .artifactId("junit-vintage-engine")
+                        .build()))
                 .build();
 
         Model target = Model.newBuilder()
@@ -160,7 +158,7 @@ class DefaultDependencyManagementImporterTest {
                         .build())
                 .build();
 
-        // An imported BOM providing the same dependency with a version
+        // An imported BOM provides the version for the same dependency.
         Dependency importedDep = Dependency.newBuilder()
                 .groupId("org.junit.jupiter")
                 .artifactId("junit-jupiter-api")
@@ -179,9 +177,18 @@ class DefaultDependencyManagementImporterTest {
         assertEquals(1, resultDeps.size());
 
         Dependency merged = resultDeps.get(0);
+
+        // Verify that the BOM supplies the missing version.
         assertEquals("org.junit.jupiter", merged.getGroupId());
         assertEquals("junit-jupiter-api", merged.getArtifactId());
         assertEquals("5.10.0", merged.getVersion());
+
+        // Verify that the locally declared scope is preserved.
         assertEquals("provided", merged.getScope());
+
+        // Verify that the locally declared exclusion is preserved.
+        assertEquals(1, merged.getExclusions().size());
+        assertEquals("org.junit.vintage", merged.getExclusions().get(0).getGroupId());
+        assertEquals("junit-vintage-engine", merged.getExclusions().get(0).getArtifactId());
     }
 }
