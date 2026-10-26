@@ -52,7 +52,6 @@ import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.RepositoryPolicy;
 import org.apache.maven.api.settings.Settings;
-import org.apache.maven.settings.v4.SettingsMerger;
 
 /**
  * Several convenience methods to handle settings
