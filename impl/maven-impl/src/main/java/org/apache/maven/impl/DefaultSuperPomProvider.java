@@ -18,8 +18,6 @@
  */
 package org.apache.maven.impl;
 
-import java.io.IOException;
-import java.io.InputStream;
 import java.net.URL;
 import java.util.Map;
 import java.util.Objects;
@@ -29,9 +27,12 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.SuperPomProvider;
 import org.apache.maven.api.services.model.ModelProcessor;
-import org.apache.maven.api.services.xml.XmlReaderRequest;
+import org.apache.maven.api.spi.ModelParser;
+import org.apache.maven.api.spi.ModelParserException;
+import org.apache.maven.impl.model.DefaultModelProcessor;
 
 @Named
 @Singleton
@@ -61,16 +62,12 @@ public class DefaultSuperPomProvider implements SuperPomProvider {
             throw new IllegalStateException("The super POM " + resource + " was not found"
                     + ", please verify the integrity of your Maven installation");
         }
-        try (InputStream is = url.openStream()) {
-            String modelId =
-                    "org.apache.maven:maven-api-impl:" + getImplementationVersion(getClass()) + ":super-pom-" + version;
-            return modelProcessor.read(XmlReaderRequest.builder()
-                    .modelId(modelId)
-                    .location(url.toExternalForm())
-                    .inputStream(is)
-                    .strict(false)
-                    .build());
-        } catch (IOException e) {
+        String modelId =
+                "org.apache.maven:maven-api-impl:" + getImplementationVersion(getClass()) + ":super-pom-" + version;
+        ModelSource source = DefaultModelProcessor.urlModelSource(url, modelId);
+        try {
+            return modelProcessor.read(source, Map.of(ModelParser.STRICT, false));
+        } catch (ModelParserException e) {
             throw new IllegalStateException(
                     "The super POM " + resource + " is damaged"
                             + ", please verify the integrity of your Maven installation",
