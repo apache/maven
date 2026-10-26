@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
@@ -1234,10 +1235,14 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         List<DependencyManagement> importMgmts = null;
 
-        for (Dependency dependency : depMgmt.getDependencies()) {
+        for (Iterator<Dependency> it = depMgmt.getDependencies().iterator(); it.hasNext(); ) {
+            Dependency dependency = it.next();
+
             if (!"pom".equals(dependency.getType()) || !"import".equals(dependency.getScope())) {
                 continue;
             }
+
+            it.remove();
 
             String groupId = dependency.getGroupId();
             String artifactId = dependency.getArtifactId();

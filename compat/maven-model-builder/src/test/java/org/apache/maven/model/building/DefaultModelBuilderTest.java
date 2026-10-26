@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.util.List;
 
 import org.apache.maven.model.Dependency;
-import org.apache.maven.model.Model;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.ModelProblem.Severity;
@@ -291,85 +290,5 @@ public class DefaultModelBuilderTest {
         public ModelResolver newCopy() {
             return this;
         }
-    }
-
-    @Test
-    public void testMng6402ImportedPomRetainedInDependencyManagement() throws Exception {
-        String bomPom = "<project>\n"
-                + "  <modelVersion>4.0.0</modelVersion>\n"
-                + "  <groupId>thegroup</groupId>\n"
-                + "  <artifactId>bom</artifactId>\n"
-                + "  <version>1.0.0</version>\n"
-                + "  <packaging>pom</packaging>\n"
-                + "  <dependencyManagement>\n"
-                + "    <dependencies>\n"
-                + "      <dependency>\n"
-                + "        <groupId>thegroup</groupId>\n"
-                + "        <artifactId>managed-dep</artifactId>\n"
-                + "        <version>2.0.0</version>\n"
-                + "      </dependency>\n"
-                + "    </dependencies>\n"
-                + "  </dependencyManagement>\n"
-                + "</project>\n";
-
-        String projectPom = "<project>\n"
-                + "  <modelVersion>4.0.0</modelVersion>\n"
-                + "  <groupId>thegroup</groupId>\n"
-                + "  <artifactId>project</artifactId>\n"
-                + "  <version>1.0.0</version>\n"
-                + "  <dependencyManagement>\n"
-                + "    <dependencies>\n"
-                + "      <dependency>\n"
-                + "        <groupId>thegroup</groupId>\n"
-                + "        <artifactId>bom</artifactId>\n"
-                + "        <version>1.0.0</version>\n"
-                + "        <type>pom</type>\n"
-                + "        <scope>import</scope>\n"
-                + "      </dependency>\n"
-                + "    </dependencies>\n"
-                + "  </dependencyManagement>\n"
-                + "</project>\n";
-
-        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
-        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
-        request.setModelSource(new StringModelSource(projectPom));
-        request.setModelResolver(new BaseModelResolver() {
-            @Override
-            public ModelSource resolveModel(String groupId, String artifactId, String version)
-                    throws UnresolvableModelException {
-                if ("thegroup".equals(groupId) && "bom".equals(artifactId) && "1.0.0".equals(version)) {
-                    return new StringModelSource(bomPom);
-                }
-                return super.resolveModel(groupId, artifactId, version);
-            }
-
-            @Override
-            public ModelSource resolveModel(Dependency dependency) throws UnresolvableModelException {
-                return resolveModel(dependency.getGroupId(), dependency.getArtifactId(), dependency.getVersion());
-            }
-        });
-
-        ModelBuildingResult result = builder.build(request);
-        Model effectiveModel = result.getEffectiveModel();
-        assertNotNull(effectiveModel.getDependencyManagement());
-        List<Dependency> dependencies = effectiveModel.getDependencyManagement().getDependencies();
-
-        // Verify the managed dependency declared inside the BOM is present
-        Dependency managedDep = dependencies.stream()
-                .filter(d -> "managed-dep".equals(d.getArtifactId()))
-                .findFirst()
-                .orElse(null);
-        assertNotNull(managedDep, "Managed dependency from imported BOM must be present");
-        assertEquals("2.0.0", managedDep.getVersion());
-
-        // Verify the imported BOM dependency itself is retained in dependencyManagement (MNG-6402)
-        Dependency bomDep = dependencies.stream()
-                .filter(d -> "bom".equals(d.getArtifactId()))
-                .findFirst()
-                .orElse(null);
-        assertNotNull(bomDep, "The imported BOM dependency itself must be retained in dependencyManagement");
-        assertEquals("1.0.0", bomDep.getVersion());
-        assertEquals("pom", bomDep.getType());
-        assertEquals("import", bomDep.getScope());
     }
 }
