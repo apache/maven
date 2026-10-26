@@ -1896,6 +1896,167 @@ class DefaultModelBuilderTest {
         return new ApacheTransporterFactory(checksumExtractor, pathProcessor);
     }
 
+    @Test
+    public void testOmitVersionInDependencyManagementWithExclusion(@TempDir Path tempDir) throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Path localRepoPath = tempDir.resolve("local-repo");
+        Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
+        Session session = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this), localRepoPath);
+        RemoteRepository remoteRepository = session.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
+        session = session.withRemoteRepositories(List.of(remoteRepository));
+        ModelBuilder builder = session.getService(ModelBuilder.class);
+
+        Files.createDirectory(tempDir.resolve(".mvn"));
+        Path projectPom = tempDir.resolve("pom.xml");
+        String pomContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>org.apache.maven.its</groupId>\n"
+                + "  <artifactId>test-project</artifactId>\n"
+                + "  <version>1.0</version>\n"
+                + "  <dependencyManagement>\n"
+                + "    <dependencies>\n"
+                + "      <dependency>\n"
+                + "        <groupId>org.apache.maven.its</groupId>\n"
+                + "        <artifactId>bom</artifactId>\n"
+                + "        <version>0.1</version>\n"
+                + "        <type>pom</type>\n"
+                + "        <scope>import</scope>\n"
+                + "      </dependency>\n"
+                + "      <dependency>\n"
+                + "        <groupId>org.apache.maven.its</groupId>\n"
+                + "        <artifactId>a</artifactId>\n"
+                + "        <exclusions>\n"
+                + "          <exclusion>\n"
+                + "            <groupId>org.apache.maven.its</groupId>\n"
+                + "            <artifactId>b</artifactId>\n"
+                + "          </exclusion>\n"
+                + "        </exclusions>\n"
+                + "      </dependency>\n"
+                + "    </dependencies>\n"
+                + "  </dependencyManagement>\n"
+                + "  <dependencies>\n"
+                + "    <dependency>\n"
+                + "      <groupId>org.apache.maven.its</groupId>\n"
+                + "      <artifactId>a</artifactId>\n"
+                + "    </dependency>\n"
+                + "  </dependencies>\n"
+                + "</project>\n";
+        Files.writeString(projectPom, pomContent);
+
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .source(Sources.buildSource(projectPom))
+                        .build());
+
+        assertNotNull(result);
+        Model model = result.getEffectiveModel();
+        assertNotNull(model);
+        Dependency dep = model.getDependencies().stream()
+                .filter(d -> "a".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(dep);
+        assertEquals("0.1", dep.getVersion());
+        assertEquals(1, dep.getExclusions().size());
+        assertEquals("b", dep.getExclusions().get(0).getArtifactId());
+    }
+
+    @Test
+    public void testOmitVersionInDependencyManagementWithExclusionInChild(@TempDir Path tempDir) throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Path localRepoPath = tempDir.resolve("local-repo");
+        Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
+        Session session = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this), localRepoPath);
+        RemoteRepository remoteRepository = session.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
+        session = session.withRemoteRepositories(List.of(remoteRepository));
+        ModelBuilder builder = session.getService(ModelBuilder.class);
+
+        Files.createDirectory(tempDir.resolve(".mvn"));
+        Path parentPom = tempDir.resolve("pom.xml");
+        String parentContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>org.apache.maven.its</groupId>\n"
+                + "  <artifactId>parent-project</artifactId>\n"
+                + "  <version>1.0</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "  <dependencyManagement>\n"
+                + "    <dependencies>\n"
+                + "      <dependency>\n"
+                + "        <groupId>org.apache.maven.its</groupId>\n"
+                + "        <artifactId>bom</artifactId>\n"
+                + "        <version>0.1</version>\n"
+                + "        <type>pom</type>\n"
+                + "        <scope>import</scope>\n"
+                + "      </dependency>\n"
+                + "    </dependencies>\n"
+                + "  </dependencyManagement>\n"
+                + "</project>\n";
+        Files.writeString(parentPom, parentContent);
+
+        Path childDir = tempDir.resolve("child");
+        Files.createDirectory(childDir);
+        Path childPom = childDir.resolve("pom.xml");
+        String childContent = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <parent>\n"
+                + "    <groupId>org.apache.maven.its</groupId>\n"
+                + "    <artifactId>parent-project</artifactId>\n"
+                + "    <version>1.0</version>\n"
+                + "    <relativePath>../pom.xml</relativePath>\n"
+                + "  </parent>\n"
+                + "  <artifactId>child-project</artifactId>\n"
+                + "  <dependencyManagement>\n"
+                + "    <dependencies>\n"
+                + "      <dependency>\n"
+                + "        <groupId>org.apache.maven.its</groupId>\n"
+                + "        <artifactId>a</artifactId>\n"
+                + "        <exclusions>\n"
+                + "          <exclusion>\n"
+                + "            <groupId>org.apache.maven.its</groupId>\n"
+                + "            <artifactId>b</artifactId>\n"
+                + "          </exclusion>\n"
+                + "        </exclusions>\n"
+                + "      </dependency>\n"
+                + "    </dependencies>\n"
+                + "  </dependencyManagement>\n"
+                + "  <dependencies>\n"
+                + "    <dependency>\n"
+                + "      <groupId>org.apache.maven.its</groupId>\n"
+                + "      <artifactId>a</artifactId>\n"
+                + "    </dependency>\n"
+                + "  </dependencies>\n"
+                + "</project>\n";
+        Files.writeString(childPom, childContent);
+
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .source(Sources.buildSource(childPom))
+                        .build());
+
+        assertNotNull(result);
+        Model model = result.getEffectiveModel();
+        assertNotNull(model);
+        Dependency dep = model.getDependencies().stream()
+                .filter(d -> "a".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(dep);
+        assertEquals("0.1", dep.getVersion());
+        assertEquals(1, dep.getExclusions().size());
+        assertEquals("b", dep.getExclusions().get(0).getArtifactId());
+    }
+
     private Path getPom(String name) {
         return Paths.get("src/test/resources/poms/factory/" + name + ".xml").toAbsolutePath();
     }
