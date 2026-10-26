@@ -158,17 +158,10 @@ jobs:
           cache-jdk: true
           cache-read-only: ${{ github.event_name == 'pull_request' }}
 
-      - name: Install Graphviz (MacOS)
-        if: runner.os == 'macOS'
-        run: brew install graphviz
-
-      - name: Install Graphviz (Ubuntu)
+      - name: Install Graphviz
+        # the site, which needs it for diagrams, is built on Linux only
         if: runner.os == 'Linux'
         run: sudo apt-get install graphviz libgvplugin-neato-layout8
-
-      - name: Install Graphviz (Windows)
-        if: runner.os == 'Windows'
-        run: choco install graphviz
 
       - name: Checkout maven
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -226,6 +219,8 @@ jobs:
         run: mvn verify -Papache-release -Dgpg.skip=true -e -B -V
 
       - name: Build site with downloaded Maven
+        # one OS covers the site; every JDK still builds it, since Javadoc changes with the JDK
+        if: runner.os == 'Linux'
         shell: bash
         run: mvn site -e -B -V -Preporting
 
