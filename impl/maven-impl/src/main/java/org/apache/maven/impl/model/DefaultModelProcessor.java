@@ -18,7 +18,11 @@
  */
 package org.apache.maven.impl.model;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -32,6 +36,8 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderException;
@@ -95,17 +101,16 @@ public class DefaultModelProcessor implements ModelProcessor {
     }
 
     @Override
-    public Model read(XmlReaderRequest request) throws IOException {
-        Objects.requireNonNull(request, "source cannot be null");
-        Path pomFile = request.getPath();
+    public Model read(Source source, Map<String, ?> options) throws ModelParserException {
+        Objects.requireNonNull(source, "source cannot be null");
+        Path pomFile = source.getPath();
         if (pomFile != null) {
             // a parser may locate the project directory itself rather than a file within it
             Path projectDirectory = Files.isDirectory(pomFile) ? pomFile : pomFile.getParent();
             Map<String, ModelParserException> exceptions = new LinkedHashMap<>();
             for (Map.Entry<String, ModelParser> parser : modelParsers.entrySet()) {
                 try {
-                    Optional<Model> model = parser.getValue()
-                            .locateAndParse(projectDirectory, Map.of(ModelParser.STRICT, request.isStrict()));
+                    Optional<Model> model = parser.getValue().locateAndParse(projectDirectory, options);
                     if (model.isPresent()) {
                         return model.get().withPomFile(pomFile);
                     }
@@ -114,19 +119,164 @@ public class DefaultModelProcessor implements ModelProcessor {
                 }
             }
             try {
-                return doRead(request);
-            } catch (IOException | XmlReaderException e) {
+                return doRead(source, options);
+            } catch (ModelParserException e) {
                 if (!exceptions.isEmpty()) {
-                    IOException ioException = new IOException(buildDetailedErrorMessage(pomFile, exceptions, e));
-                    exceptions.values().forEach(ioException::addSuppressed);
-                    ioException.addSuppressed(e);
-                    throw ioException;
+                    ModelParserException mpe =
+                            new ModelParserException(buildDetailedErrorMessage(pomFile, exceptions, e), e);
+                    exceptions.values().forEach(mpe::addSuppressed);
+                    mpe.addSuppressed(e);
+                    throw mpe;
                 }
                 throw e;
             }
         } else {
-            return doRead(request);
+            return doRead(source, options);
         }
+    }
+
+    /**
+     * Implements the deprecated bridge for backward compatibility.
+     * Delegates to {@link #read(Source, Map)}, then re-throws {@link XmlReaderException}
+     * or {@link IOException} from the cause when possible.
+     *
+     * @deprecated Use {@link #read(Source, Map)} instead.
+     */
+    @Deprecated(since = "4.0.0")
+    @Override
+    public Model read(XmlReaderRequest request) throws IOException, XmlReaderException {
+        Objects.requireNonNull(request, "request cannot be null");
+        Source source = toSource(request);
+        try {
+            return read(
+                    source,
+                    request.getTransformer() != null
+                            ? Map.of(
+                                    ModelParser.STRICT,
+                                    request.isStrict(),
+                                    ModelProcessor.TRANSFORMER,
+                                    request.getTransformer())
+                            : Map.of(ModelParser.STRICT, request.isStrict()));
+        } catch (ModelParserException e) {
+            // Unwrap one level: doRead wraps XmlReaderException/IOException as the direct cause
+            if (e.getCause() instanceof XmlReaderException xre) {
+                throw xre;
+            }
+            if (e.getCause() instanceof IOException ioe) {
+                throw ioe;
+            }
+            throw new XmlReaderException(e.getMessage(), null, e);
+        }
+    }
+
+    public static ModelSource urlModelSource(URL url, String modelId) {
+        return new UrlModelSource(url, modelId);
+    }
+
+    record UrlModelSource(URL url, String modelId) implements ModelSource {
+        UrlModelSource {
+            Objects.requireNonNull(url, "url cannot be null");
+        }
+
+        @Override
+        public Path getPath() {
+            return null;
+        }
+
+        @Override
+        public InputStream openStream() throws IOException {
+            return url.openStream();
+        }
+
+        @Override
+        public String getLocation() {
+            return url.toExternalForm();
+        }
+
+        @Override
+        public Source resolve(String relative) {
+            return null;
+        }
+
+        @Override
+        public ModelSource resolve(ModelLocator modelLocator, String relative) {
+            return null;
+        }
+
+        @Override
+        public String getModelId() {
+            return modelId;
+        }
+    }
+
+    private static Source toSource(XmlReaderRequest request) {
+        if (request.getInputStream() == null
+                && request.getPath() == null
+                && request.getReader() == null
+                && request.getURL() != null) {
+            return urlModelSource(request.getURL(), request.getModelId());
+        }
+        // Always return a ModelSource so modelId is preserved.
+        return new ModelSource() {
+            @Override
+            public Path getPath() {
+                return request.getPath();
+            }
+
+            @Override
+            public InputStream openStream() throws IOException {
+                if (request.getInputStream() != null) {
+                    return request.getInputStream();
+                } else if (request.getURL() != null) {
+                    return request.getURL().openStream();
+                } else if (request.getPath() != null) {
+                    return Files.newInputStream(request.getPath());
+                } else if (request.getReader() != null) {
+                    StringBuilder sb = new StringBuilder();
+                    char[] buf = new char[4096];
+                    int n;
+                    while ((n = request.getReader().read(buf)) != -1) {
+                        sb.append(buf, 0, n);
+                    }
+                    return new ByteArrayInputStream(sb.toString().getBytes(StandardCharsets.UTF_8));
+                }
+                throw new IOException("No input stream available in request");
+            }
+
+            @Override
+            public String getLocation() {
+                if (request.getLocation() != null) {
+                    return request.getLocation();
+                }
+                if (request.getPath() != null) {
+                    return request.getPath().toString();
+                }
+                if (request.getURL() != null) {
+                    return request.getURL().toExternalForm();
+                }
+                return "<unknown>";
+            }
+
+            @Override
+            public Source resolve(String relative) {
+                if (request.getPath() != null) {
+                    return toSource(XmlReaderRequest.builder()
+                            .path(request.getPath().resolve(relative))
+                            .build());
+                }
+                return null;
+            }
+
+            @Override
+            public ModelSource resolve(ModelLocator modelLocator, String relative) {
+                return null;
+            }
+
+            @Override
+            public String getModelId() {
+                return request.getModelId();
+            }
+        };
     }
 
     private Path doLocateExistingPom(Path project) {
@@ -143,8 +293,45 @@ public class DefaultModelProcessor implements ModelProcessor {
         }
     }
 
-    private Model doRead(XmlReaderRequest request) throws IOException {
-        return modelXmlFactory.read(request);
+    private Model doRead(Source source, Map<String, ?> options) throws ModelParserException {
+        boolean strict = isStrict(options);
+        XmlReaderRequest.Transformer transformer = getTransformer(options);
+        try (InputStream is = source.openStream()) {
+            XmlReaderRequest.XmlReaderRequestBuilder builder = XmlReaderRequest.builder()
+                    .strict(strict)
+                    .location(source.getLocation())
+                    .path(source.getPath())
+                    .inputStream(is)
+                    .transformer(transformer);
+            if (source instanceof ModelSource ms) {
+                builder.modelId(ms.getModelId());
+            }
+            return modelXmlFactory.read(builder.build());
+        } catch (XmlReaderException e) {
+            if (e.getLocation() != null) {
+                throw new ModelParserException(
+                        e.getMessage(),
+                        e.getLocation().getLineNumber(),
+                        e.getLocation().getColumnNumber(),
+                        e);
+            }
+            throw new ModelParserException(e.getMessage(), e);
+        } catch (IOException e) {
+            throw new ModelParserException(e.getMessage(), e);
+        }
+    }
+
+    private boolean isStrict(Map<String, ?> options) {
+        Object value = (options != null) ? options.get(ModelParser.STRICT) : null;
+        return value == null || Boolean.parseBoolean(value.toString());
+    }
+
+    private XmlReaderRequest.Transformer getTransformer(Map<String, ?> options) {
+        Object value = (options != null) ? options.get(ModelProcessor.TRANSFORMER) : null;
+        if (value instanceof XmlReaderRequest.Transformer t) {
+            return t;
+        }
+        return new ModelInterningTransformer();
     }
 
     private String buildDetailedErrorMessage(

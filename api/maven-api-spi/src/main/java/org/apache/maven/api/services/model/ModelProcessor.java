@@ -20,12 +20,15 @@ package org.apache.maven.api.services.model;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
+import org.apache.maven.api.spi.ModelParserException;
 
 /**
  * Locates and reads POM files from the filesystem.
@@ -35,6 +38,15 @@ import org.apache.maven.api.services.xml.XmlReaderRequest;
 public interface ModelProcessor {
 
     /**
+     * Option key for passing an {@link XmlReaderRequest.Transformer} through the options map.
+     * When present, the processor should use this transformer for XML parsing instead
+     * of any default transformer it would otherwise apply.
+     *
+     * @since 4.0.0
+     */
+    String TRANSFORMER = "transformer";
+
+    /**
      * Returns the file containing the pom to be parsed or null if a pom can not be found
      * at the given file or in the given directory.
      */
@@ -42,13 +54,26 @@ public interface ModelProcessor {
     Path locateExistingPom(@Nonnull Path project);
 
     /**
-     * Reads the model from the specified byte stream. The stream will be automatically closed before the method
-     * returns.
+     * Reads the model from the specified source.
+     *
+     * @param source The source to deserialize the model from, must not be {@code null}.
+     * @param options Possible reading options, may be {@code null}.
+     * @return The deserialized model, never {@code null}.
+     * @throws ModelParserException If the model could not be deserialized.
+     * @since 4.0.0
+     */
+    @Nonnull
+    Model read(@Nonnull Source source, @Nullable Map<String, ?> options) throws ModelParserException;
+
+    /**
+     * Reads the model from the specified reader request.
      *
      * @param request The reader request to deserialize the model, must not be {@code null}.
      * @return The deserialized model, never {@code null}.
      * @throws IOException If the model could not be deserialized.
      * @throws XmlReaderException If the input format could not be parsed.
+     * @deprecated Use {@link #read(Source, Map)} instead.
      */
+    @Deprecated(since = "4.0.0")
     Model read(XmlReaderRequest request) throws IOException, XmlReaderException;
 }
