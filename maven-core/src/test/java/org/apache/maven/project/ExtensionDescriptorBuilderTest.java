@@ -81,7 +81,7 @@ public class ExtensionDescriptorBuilderTest {
      * maven-core's own {@code META-INF/maven/extension.xml} must not export an artifact or package that
      * maven-core no longer actually bundles: a stale export causes {@link org.apache.maven.ArtifactFilterManager}
      * to filter that dependency out of a plugin's classpath even though Maven core does not provide it, breaking
-     * any plugin that declares it directly (see MNG-8724, jansi left exported after the JAnsi-to-JLine migration).
+     * any plugin that declares it directly (see #13726, jansi left exported after the JAnsi-to-JLine migration).
      */
     @Test
     public void testCoreExtensionDescriptorHasNoStaleExports() throws Exception {
