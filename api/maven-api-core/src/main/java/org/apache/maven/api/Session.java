@@ -227,6 +227,7 @@ public interface Session extends ProtoSession {
      * @param project the project for which to calculate the plan
      * @param tasks lifecycle phases or plugin goals used to calculate the plan
      * @return the lifecycle planning result
+     * @throws org.apache.maven.api.services.LifecycleExecutorException if the lifecycle plan cannot be calculated
      * @since 4.1.0
      */
     @Nonnull
@@ -239,6 +240,8 @@ public interface Session extends ProtoSession {
      *
      * @param plan the lifecycle plan to execute
      * @return the lifecycle execution result
+     * @throws org.apache.maven.api.services.LifecycleExecutorException if lifecycle execution fails
+     * @throws IllegalArgumentException if the plan was not produced by the lifecycle executor service
      * @since 4.1.0
      */
     @Nonnull
@@ -252,6 +255,8 @@ public interface Session extends ProtoSession {
      * @param plan the lifecycle plan to execute
      * @param filter predicate deciding which configured mojo executions are executed
      * @return the lifecycle execution result
+     * @throws org.apache.maven.api.services.LifecycleExecutorException if lifecycle execution fails
+     * @throws IllegalArgumentException if the plan was not produced by the lifecycle executor service
      * @since 4.1.0
      */
     @Nonnull
@@ -266,6 +271,9 @@ public interface Session extends ProtoSession {
      * @param project the project for which to execute the lifecycle
      * @param tasks lifecycle phases or plugin goals used to calculate the plan
      * @return the lifecycle execution result
+     * @throws org.apache.maven.api.services.LifecycleExecutorException if the lifecycle plan cannot be calculated or
+     *      executed
+     * @throws IllegalArgumentException if the calculated plan cannot be executed by the lifecycle executor service
      * @since 4.1.0
      */
     @Nonnull
@@ -280,6 +288,9 @@ public interface Session extends ProtoSession {
      * @param tasks lifecycle phases or plugin goals used to calculate the plan
      * @param filter predicate deciding which configured mojo executions are executed
      * @return the lifecycle execution result
+     * @throws org.apache.maven.api.services.LifecycleExecutorException if the lifecycle plan cannot be calculated or
+     *      executed
+     * @throws IllegalArgumentException if the calculated plan cannot be executed by the lifecycle executor service
      * @since 4.1.0
      */
     @Nonnull

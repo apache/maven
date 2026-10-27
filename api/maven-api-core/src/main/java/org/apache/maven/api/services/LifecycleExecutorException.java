@@ -32,6 +32,15 @@ public class LifecycleExecutorException extends MavenException {
      * Creates an exception for a lifecycle planning or execution failure.
      *
      * @param message the detail message
+     */
+    public LifecycleExecutorException(String message) {
+        super(message);
+    }
+
+    /**
+     * Creates an exception for a lifecycle planning or execution failure.
+     *
+     * @param message the detail message
      * @param cause the underlying failure
      */
     public LifecycleExecutorException(String message, Throwable cause) {

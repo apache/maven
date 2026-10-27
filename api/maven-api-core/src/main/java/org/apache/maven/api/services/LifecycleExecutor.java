@@ -32,6 +32,9 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Calculates, inspects, and executes Maven lifecycle plans for a single project.
  *
+ * <p>This is the Maven API v4 lifecycle executor service. The legacy
+ * {@code org.apache.maven.lifecycle.LifecycleExecutor} interface serves a different role in the compatibility layer.
+ *
  * @since 4.1.0
  */
 @Experimental
