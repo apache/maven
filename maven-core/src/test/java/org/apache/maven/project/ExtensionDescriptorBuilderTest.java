@@ -76,4 +76,28 @@ public class ExtensionDescriptorBuilderTest {
         assertEquals(Arrays.asList("a", "b", "c"), ed.getExportedPackages());
         assertEquals(Arrays.asList("x", "y", "z"), ed.getExportedArtifacts());
     }
+
+    /**
+     * maven-core's own {@code META-INF/maven/extension.xml} must not export an artifact or package that
+     * maven-core no longer actually bundles: a stale export causes {@link org.apache.maven.ArtifactFilterManager}
+     * to filter that dependency out of a plugin's classpath even though Maven core does not provide it, breaking
+     * any plugin that declares it directly (see MNG-8724, jansi left exported after the JAnsi-to-JLine migration).
+     */
+    @Test
+    public void testCoreExtensionDescriptorHasNoStaleExports() throws Exception {
+        try (InputStream in =
+                getClass().getClassLoader().getResourceAsStream(builder.getExtensionDescriptorLocation())) {
+            assertNotNull(in, "maven-core's own extension descriptor must be on the test classpath");
+
+            ExtensionDescriptor ed = builder.build(in);
+
+            assertTrue(
+                    ed.getExportedArtifacts().stream().noneMatch(a -> a.contains("jansi")),
+                    "jansi is no longer a maven-core dependency and must not be exported: "
+                            + ed.getExportedArtifacts());
+            assertTrue(
+                    ed.getExportedPackages().stream().noneMatch(p -> p.contains("jansi")),
+                    "jansi is no longer a maven-core dependency and must not be exported: " + ed.getExportedPackages());
+        }
+    }
 }
