@@ -63,7 +63,14 @@ final class DefaultPlugin implements Plugin {
 
         this.model = model != null ? model.getDelegate() : null;
         this.descriptor = requireNonNull(descriptor.getPluginDescriptorV4(), "descriptor.pluginDescriptorV4");
-        this.realm = new DefaultRealm(descriptor.getClassRealm(), lookup);
+        ClassLoader classLoader = descriptor.getClassRealm();
+        if (classLoader == null) {
+            classLoader = Thread.currentThread().getContextClassLoader();
+        }
+        if (classLoader == null) {
+            classLoader = DefaultPlugin.class.getClassLoader();
+        }
+        this.realm = new DefaultRealm(classLoader, lookup);
 
         org.apache.maven.artifact.Artifact legacyArtifact = descriptor.getPluginArtifact();
         org.eclipse.aether.artifact.Artifact resolverArtifact = RepositoryUtils.toArtifact(legacyArtifact);

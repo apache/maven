@@ -22,11 +22,11 @@ import org.apache.maven.api.services.Lookup;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -47,7 +47,6 @@ class DefaultMojoExecutionTest {
         pluginDescriptor.setArtifactId("maven-test-plugin");
         pluginDescriptor.setVersion("1.0");
         pluginDescriptor.setGoalPrefix("test");
-        pluginDescriptor.setClassRealm(mock(ClassRealm.class));
         // No plugin artifact, no dependency node → simulates a minimal CLI-invoked execution
 
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
@@ -67,7 +66,6 @@ class DefaultMojoExecutionTest {
         pluginDescriptor.setArtifactId("maven-test-plugin");
         pluginDescriptor.setVersion("1.0");
         pluginDescriptor.setGoalPrefix("test");
-        pluginDescriptor.setClassRealm(mock(ClassRealm.class));
 
         MojoDescriptor mojoDescriptor = new MojoDescriptor();
         mojoDescriptor.setGoal(goal);
@@ -91,6 +89,7 @@ class DefaultMojoExecutionTest {
         assertFalse(snapshot.lifecyclePhase().isPresent(), "lifecyclePhase should be empty for CLI invocation");
         assertFalse(snapshot.model().isPresent(), "model should be empty when no plugin in model");
         assertFalse(snapshot.configuration().isPresent(), "configuration should be empty when not set");
+        assertNotNull(snapshot.plugin().getRealm().classLoader());
     }
 
     @Test
