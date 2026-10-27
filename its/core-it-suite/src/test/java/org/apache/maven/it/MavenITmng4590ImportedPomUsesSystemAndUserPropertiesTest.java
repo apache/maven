@@ -57,11 +57,12 @@ public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest extends Ab
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties("target/pom.properties");
-        assertEquals("1", props.getProperty("project.dependencyManagement.dependencies"));
-        assertEquals("dep-a", props.getProperty("project.dependencyManagement.dependencies.0.artifactId"));
+        assertEquals("2", props.getProperty("project.dependencyManagement.dependencies"));
+        assertEquals("import", props.getProperty("project.dependencyManagement.dependencies.0.artifactId"));
+        assertEquals("dep-a", props.getProperty("project.dependencyManagement.dependencies.1.artifactId"));
         assertEquals(
                 testDir.resolve("pom.xml"),
-                Path.of(props.getProperty("project.dependencyManagement.dependencies.0.systemPath")));
+                Path.of(props.getProperty("project.dependencyManagement.dependencies.1.systemPath")));
     }
 
     /**
@@ -88,6 +89,7 @@ public class MavenITmng4590ImportedPomUsesSystemAndUserPropertiesTest extends Ab
         verifier.verifyErrorFreeLog();
 
         Properties props = verifier.loadProperties("target/pom.properties");
-        assertEquals("0", props.getProperty("project.dependencyManagement.dependencies"));
+        assertEquals("1", props.getProperty("project.dependencyManagement.dependencies"));
+        assertEquals("import", props.getProperty("project.dependencyManagement.dependencies.0.artifactId"));
     }
 }
