@@ -126,6 +126,13 @@ under the License.
     <exportedPackage>org.slf4j.spi.*</exportedPackage>
     <exportedPackage>org.slf4j.helpers.*</exportedPackage>
     <exportedPackage>org.slf4j.event.*</exportedPackage>
+
+    <!-- JAnsi: maven-jline ships Ansi.java, forwarding ANSI calls to the already-initialized JLine terminal, for
+         backward compatibility with code (e.g. maven-shared-utils) still calling the JAnsi API. The import falls
+         back to a plugin's own classpath for any other org.fusesource.jansi class the shim doesn't provide (see
+         ClassRealm#loadClassFromImport / SelfFirstStrategy), so this stays even though the jansi artifact itself
+         is no longer exported below. -->
+    <exportedPackage>org.fusesource.jansi.*</exportedPackage>
   </exportedPackages>
 
   <exportedArtifacts>
