@@ -61,28 +61,89 @@ public interface LifecycleExecutor extends Service {
     @Nonnull
     LifecycleExecutionResult execute(@Nonnull LifecycleExecutionRequest request);
 
+    /**
+     * Calculates a lifecycle plan without executing it.
+     *
+     * @param session the current session
+     * @param project the project for which to calculate the plan
+     * @param tasks lifecycle phases or plugin goals used to calculate the plan
+     * @return the lifecycle planning result
+     * @throws LifecycleExecutorException if the lifecycle plan cannot be calculated
+     * @see #plan(LifecyclePlanRequest)
+     * @since 4.1.0
+     */
     @Nonnull
     default LifecyclePlanResult plan(@Nonnull Session session, @Nonnull Project project, @Nonnull List<String> tasks) {
         return plan(LifecyclePlanRequest.build(session, project, tasks));
     }
 
+    /**
+     * Executes a previously calculated lifecycle plan.
+     *
+     * @param session the current session
+     * @param plan the lifecycle plan to execute
+     * @return the lifecycle execution result
+     * @throws LifecycleExecutorException if lifecycle execution fails
+     * @throws IllegalArgumentException if the plan was not produced by this service
+     * @see #execute(LifecycleExecutionRequest)
+     * @since 4.1.0
+     */
     @Nonnull
     default LifecycleExecutionResult execute(@Nonnull Session session, @Nonnull LifecyclePlan plan) {
         return execute(LifecycleExecutionRequest.build(session, plan));
     }
 
+    /**
+     * Executes the entries of a previously calculated lifecycle plan that are accepted by the supplied filter.
+     *
+     * @param session the current session
+     * @param plan the lifecycle plan to execute
+     * @param filter predicate deciding which configured mojo executions are executed
+     * @return the lifecycle execution result
+     * @throws LifecycleExecutorException if lifecycle execution fails
+     * @throws IllegalArgumentException if the plan was not produced by this service
+     * @see #execute(LifecycleExecutionRequest)
+     * @since 4.1.0
+     */
     @Nonnull
     default LifecycleExecutionResult execute(
             @Nonnull Session session, @Nonnull LifecyclePlan plan, @Nonnull Predicate<MojoExecution> filter) {
         return execute(LifecycleExecutionRequest.build(session, plan, filter));
     }
 
+    /**
+     * Calculates and executes a lifecycle plan.
+     *
+     * @param session the current session
+     * @param project the project for which to execute the lifecycle
+     * @param tasks lifecycle phases or plugin goals used to calculate the plan
+     * @return the lifecycle execution result
+     * @throws LifecycleExecutorException if the lifecycle plan cannot be calculated or executed
+     * @throws IllegalArgumentException if the calculated plan cannot be executed by this service
+     * @see #plan(LifecyclePlanRequest)
+     * @see #execute(LifecycleExecutionRequest)
+     * @since 4.1.0
+     */
     @Nonnull
     default LifecycleExecutionResult planAndExecute(
             @Nonnull Session session, @Nonnull Project project, @Nonnull List<String> tasks) {
         return execute(session, plan(session, project, tasks).plan());
     }
 
+    /**
+     * Calculates a lifecycle plan and executes the entries accepted by the supplied filter.
+     *
+     * @param session the current session
+     * @param project the project for which to execute the lifecycle
+     * @param tasks lifecycle phases or plugin goals used to calculate the plan
+     * @param filter predicate deciding which configured mojo executions are executed
+     * @return the lifecycle execution result
+     * @throws LifecycleExecutorException if the lifecycle plan cannot be calculated or executed
+     * @throws IllegalArgumentException if the calculated plan cannot be executed by this service
+     * @see #plan(LifecyclePlanRequest)
+     * @see #execute(LifecycleExecutionRequest)
+     * @since 4.1.0
+     */
     @Nonnull
     default LifecycleExecutionResult planAndExecute(
             @Nonnull Session session,
