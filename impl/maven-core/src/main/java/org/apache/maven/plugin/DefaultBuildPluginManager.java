@@ -221,6 +221,9 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
         if (mojoDescriptor.isThreadSafe() || !isNonThreadSafeMojoSerializationEnabled()) {
             mojo.execute();
         } else {
+            // Lock ordering is aggregatorLock -> projectLock -> mojoClassLock. Keep the mojo class lock innermost:
+            // code executed while holding it must not acquire either outer lock. The concurrent builder follows the
+            // projectLock -> mojoClassLock subset for legacy mojos; Maven 4 mojos are thread-safe and skip this lock.
             ReentrantLock lock = mojoLocks.computeIfAbsent(mojoLock, key -> new ReentrantLock());
             if (!lock.tryLock()) {
                 LOGGER.warn(

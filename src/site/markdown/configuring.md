@@ -92,13 +92,15 @@ For the complete list of available Maven configuration properties and options, s
 
 ## Parallel build safety
 
-In a parallel build, Maven serializes concurrent executions of a mojo that is not marked `@threadSafe`. Maven emits a warning only when an execution must wait for that serialization. If a build relies on the legacy behavior, disable serialization with:
+In a parallel build, Maven serializes concurrent executions of the same legacy mojo class when it is not marked `@threadSafe`. The lock is shared across all projects in the reactor, so an execution in one project blocks the same mojo class in another project even when those projects are otherwise independent. Maven emits a warning only when an execution actually has to wait, but this serialization can noticeably reduce effective parallelism in a large multi-module build.
+
+Some legacy plugins are safe for concurrent use but predate the `@threadSafe` declaration. As a temporary workaround while such a plugin is updated, the build owner can disable serialization globally with:
 
 ```
 -Dmaven.plugin.nonThreadSafeSerializer=false
 ```
 
-Disable this safeguard only when the affected mojo is known to be safe for concurrent execution.
+Disable this safeguard only when the affected mojos are known to be safe for concurrent execution. The long-term solution is for the plugin to declare its safe mojos `@threadSafe` or migrate to the Maven 4 plugin API. Maven 4 mojos are always considered thread-safe and are not subject to this serialization.
 
 ## Settings
 
