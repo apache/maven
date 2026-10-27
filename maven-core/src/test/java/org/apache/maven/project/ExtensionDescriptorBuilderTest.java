@@ -86,9 +86,10 @@ public class ExtensionDescriptorBuilderTest {
      * <p>
      * {@code exportedPackage} entries are a different, safer mechanism (a {@code ClassRealm} import with fallback
      * to the plugin's own classpath for anything the import doesn't resolve, see
-     * {@code ClassRealm#loadClassFromImport}), so {@code org.fusesource.jansi.*} staying there is intentional:
-     * maven-jline ships a compatibility {@code Ansi} class forwarding to the already-initialized JLine terminal,
-     * and plugins that need other real jansi classes still get them from their own classpath.
+     * {@code ClassRealm#loadClassFromImport}), so {@code org.fusesource.jansi.Ansi} staying there, named exactly
+     * rather than as the {@code org.fusesource.jansi.*} package, is intentional: maven-jline ships only that one
+     * compatibility class, forwarding to the already-initialized JLine terminal, and plugins that need other real
+     * jansi classes still get them from their own classpath.
      */
     @Test
     public void testCoreExtensionDescriptorHasNoStaleArtifactExports() throws Exception {
@@ -102,6 +103,10 @@ public class ExtensionDescriptorBuilderTest {
                     ed.getExportedArtifacts().stream().noneMatch(a -> a.contains("jansi")),
                     "jansi is no longer a maven-core dependency and must not be exported as an artifact: "
                             + ed.getExportedArtifacts());
+            assertTrue(
+                    ed.getExportedPackages().contains("org.fusesource.jansi.Ansi"),
+                    "the JAnsi compatibility shim export must stay, named exactly (not as the org.fusesource.jansi.*"
+                            + " package, which maven-jline does not fully provide): " + ed.getExportedPackages());
         }
     }
 }
