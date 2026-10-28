@@ -216,10 +216,14 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
         List<String> beforeAnchors = inj.before() != null ? splitAnchors(inj.before()) : List.of();
 
         // Primary anchor for tree positioning: prefer the last after anchor,
-        // fall back to the first before anchor
+        // fall back to the earliest (in lifecycle order) before anchor.
+        // "Earliest in lifecycle order" = the before anchor that appears at the lowest
+        // index in the flattened v3 phase list; this mirrors insertAmongSiblings' scan
+        // and avoids string-position bias when anchors are listed in reversed order
+        // (e.g. before="integration-test,unit-test" must still insert before unit-test).
         String primaryAnchor = !afterAnchors.isEmpty()
                 ? afterAnchors.get(afterAnchors.size() - 1)
-                : (!beforeAnchors.isEmpty() ? beforeAnchors.get(0) : null);
+                : earliestAnchor(phases, beforeAnchors);
         boolean insertAfter = !afterAnchors.isEmpty();
 
         // All after anchors become DAG links
@@ -350,6 +354,44 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
                 .map(String::trim)
                 .filter(s -> !s.isEmpty())
                 .toList();
+    }
+
+    /**
+     * Returns the anchor from {@code candidates} that appears earliest (lowest index) in the
+     * flattened {@code phases} tree, or {@code null} if {@code candidates} is empty.
+     *
+     * <p>This mirrors {@code insertAmongSiblings}'s minimum-scan for {@code before} anchors so
+     * that the v3 tree uses the same lifecycle-order semantics regardless of the string order in
+     * which the anchors were listed.
+     */
+    private static String earliestAnchor(List<Phase> phases, List<String> candidates) {
+        if (candidates.isEmpty()) {
+            return null;
+        }
+        String earliest = null;
+        int earliestPos = Integer.MAX_VALUE;
+        List<String> flat = flattenPhaseNames(phases);
+        for (String candidate : candidates) {
+            int pos = flat.indexOf(candidate);
+            if (pos >= 0 && pos < earliestPos) {
+                earliestPos = pos;
+                earliest = candidate;
+            }
+        }
+        // Fall back to candidates.get(0) if none found in the flat list
+        return earliest != null ? earliest : candidates.get(0);
+    }
+
+    /** Flattens a phase tree into a list of phase names in DFS order. */
+    private static List<String> flattenPhaseNames(List<Phase> phases) {
+        List<String> names = new ArrayList<>();
+        for (Phase p : phases) {
+            names.add(p.name());
+            if (!p.phases().isEmpty()) {
+                names.addAll(flattenPhaseNames(new ArrayList<>(p.phases())));
+            }
+        }
+        return names;
     }
 
     // -------------------------------------------------------------------------

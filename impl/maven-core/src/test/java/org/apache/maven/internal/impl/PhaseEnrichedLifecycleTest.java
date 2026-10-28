@@ -260,6 +260,24 @@ class PhaseEnrichedLifecycleTest {
     }
 
     @Test
+    void commaSeparatedBeforeAnchorsUsesEarliestRegardlessOfStringOrder() {
+        Lifecycle base = defaultLifecycle();
+        // before="integration-test,unit-test" — reversed string order, but unit-test is still the
+        // earliest in lifecycle order; the phase must be inserted before unit-test, not before
+        // integration-test (which would be wrong: integration-test comes after unit-test).
+        PhaseEnrichedLifecycle enriched =
+                new PhaseEnrichedLifecycle(base, List.of(ip("pre-all", "verify", null, "integration-test,unit-test")));
+
+        List<String> computed = registry().computePhases(enriched);
+
+        int unitTestIdx = computed.indexOf("unit-test");
+        int newIdx = computed.indexOf("pre-all");
+        assertTrue(unitTestIdx >= 0, "'unit-test' must appear");
+        assertTrue(newIdx >= 0, "'pre-all' must appear");
+        assertTrue(newIdx < unitTestIdx, "'pre-all' must come before 'unit-test' regardless of string order");
+    }
+
+    @Test
     void bothAfterAndBeforeHonored() {
         Lifecycle base = defaultLifecycle();
         PhaseEnrichedLifecycle enriched =
