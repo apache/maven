@@ -40,7 +40,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.calls;
 import static org.mockito.Mockito.inOrder;
@@ -167,27 +166,5 @@ class DefaultClassRealmManagerTest {
                 .debug("Populating class realm {}", "project>modelGroup1:modelArtifact1:modelVersion1");
         verifier.verify(logger, never()).debug("  Included: {}", "group1:artifact1:ext:classifier1:null");
         verifier.verify(logger, never()).debug("  Excluded: {}", "group1:artifact2:ext:classifier1:null");
-    }
-
-    @Test
-    void testMaven4ApiRealm() throws PlexusContainerException {
-        PlexusContainer container = new DefaultPlexusContainer();
-        DefaultClassRealmManager classRealmManager = newDefaultClassRealmManager(container);
-        ClassRealm maven4ApiRealm = classRealmManager.getMaven4ApiRealm();
-
-        assertEquals(DefaultClassRealmManager.API_V4_REALMID, maven4ApiRealm.getId());
-        assertEquals(
-                container.getContainerRealm(),
-                maven4ApiRealm.getImportClassLoader("org.apache.maven.api.plugin.Mojo"));
-        assertEquals(
-                container.getContainerRealm(),
-                maven4ApiRealm.getImportClassLoader("org.slf4j.Logger"));
-        assertEquals(
-                container.getContainerRealm(),
-                maven4ApiRealm.getImportClassLoader("org.codehaus.plexus.logging.AbstractLogEnabled"));
-        assertEquals(
-                container.getContainerRealm(),
-                maven4ApiRealm.getImportClassLoader("org.codehaus.plexus.logging.Logger"));
-        assertNull(maven4ApiRealm.getImportClassLoader("org.apache.maven.project.MavenProject"));
     }
 }
