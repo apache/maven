@@ -30,6 +30,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -46,6 +47,8 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 import org.apache.maven.artifact.ArtifactUtils;
+import org.apache.maven.di.Injector;
+import org.apache.maven.di.Key;
 import org.apache.maven.execution.BuildResumptionAnalyzer;
 import org.apache.maven.execution.BuildResumptionDataRepository;
 import org.apache.maven.execution.BuildResumptionPersistenceException;
@@ -71,6 +74,7 @@ import org.apache.maven.plugin.LegacySupport;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.resolver.MavenChainedWorkspaceReader;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
+import org.apache.maven.resolver.SpiWorkspaceReaderAdapter;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession.CloseableSession;
@@ -248,6 +252,20 @@ public class DefaultMaven implements Maven {
             return addExceptionToResult(result, e);
         }
 
+        // Register SPI workspace readers from the global container before project graph building.
+        // Core extensions declared in .mvn/extensions.xml are loaded into the global container
+        // before project scanning begins. Without this early registration, workspace readers from
+        // core extensions would miss the POM resolution phase (buildGraph), which resolves
+        // dependency POMs before setupWorkspaceReader() is called. Project-scoped readers (from
+        // per-project extensions) are added again in setupWorkspaceReader() after buildGraph().
+        // Note: SPI components registered by core extensions are discovered via the maven DI
+        // Injector (not Plexus lookupList) because the Guice binder used to bridge DI beans to
+        // Sisu/Plexus is only active during the initial container configuration phase; late-bound
+        // extension beans are only reliably accessible through the Injector's internal registry.
+        for (org.apache.maven.api.spi.WorkspaceReader spiReader : getSpiWorkspaceReadersFromInjector()) {
+            chainedWorkspaceReader.addReader(new SpiWorkspaceReaderAdapter(spiReader));
+        }
+
         eventCatapult.fire(ExecutionEvent.Type.ProjectDiscoveryStarted, session, null);
 
         Result<? extends ProjectDependencyGraph> graphResult = buildGraph(session);
@@ -342,15 +360,56 @@ public class DefaultMaven implements Maven {
         // 1) Reactor workspace reader
         WorkspaceReader reactorReader = lookup.lookup(WorkspaceReader.class, ReactorReader.HINT);
         workspaceReaders.add(reactorReader);
-        // 2) Repository system session-scoped workspace reader (contains ide and exec request reader)
+        // 2) Repository system session-scoped workspace reader (contains ide, exec request reader,
+        //    and SPI readers already registered from the global container before buildGraph()).
         for (WorkspaceReader repoWorkspaceReader : chainedWorkspaceReader.getReaders()) {
             if (repoWorkspaceReader != null && repoWorkspaceReader != reactorReader) {
                 workspaceReaders.add(repoWorkspaceReader);
             }
         }
-        // 3) .. n) Project-scoped workspace readers
+        // 3) .. n) Project-scoped legacy workspace readers (org.eclipse.aether)
         workspaceReaders.addAll(getProjectScopedExtensionComponents(session.getProjects(), WorkspaceReader.class));
+        // n+1) Project-scoped SPI workspace readers not yet registered (those loaded by project-level
+        //      build extensions, not core extensions).  Core-extension SPI readers are already
+        //      registered via getSpiWorkspaceReadersFromInjector() before buildGraph().
+        //      Collect already-registered SPI delegates (by identity) to avoid wrapping the same
+        //      reader twice.
+        Set<org.apache.maven.api.spi.WorkspaceReader> wrappedDelegates =
+                Collections.newSetFromMap(new IdentityHashMap<>());
+        workspaceReaders.stream()
+                .filter(r -> r instanceof SpiWorkspaceReaderAdapter)
+                .forEach(r -> wrappedDelegates.add(((SpiWorkspaceReaderAdapter) r).getDelegate()));
+        for (org.apache.maven.api.spi.WorkspaceReader spiReader : getProjectScopedExtensionComponents(
+                session.getProjects(), org.apache.maven.api.spi.WorkspaceReader.class)) {
+            if (!wrappedDelegates.contains(spiReader)) {
+                workspaceReaders.add(new SpiWorkspaceReaderAdapter(spiReader));
+            }
+        }
         chainedWorkspaceReader.setReaders(workspaceReaders);
+    }
+
+    /**
+     * Returns all {@link org.apache.maven.api.spi.WorkspaceReader SPI workspace readers} registered
+     * in the maven DI injector (which is the source of truth for core-extension DI beans).
+     *
+     * <p>SPI components registered by core extensions are discovered via the maven DI {@link Injector}
+     * rather than via {@link org.apache.maven.api.services.Lookup#lookupList}, because the Guice
+     * {@code Binder} used to bridge maven-DI beans into Sisu/Plexus is only active during the initial
+     * container configuration phase.  Beans that are discovered later — during
+     * {@code PlexusContainer.discoverComponents()} for each core extension — are registered into the
+     * {@code InjectorImpl}'s internal binding map but may not be successfully bridged into Guice/Sisu,
+     * so a plain Plexus {@code lookupList} would return an empty list for them.</p>
+     *
+     * @return list of SPI workspace readers (never {@code null}; empty if none registered)
+     */
+    private List<org.apache.maven.api.spi.WorkspaceReader> getSpiWorkspaceReadersFromInjector() {
+        try {
+            Injector injector = lookup.lookup(Injector.class);
+            return injector.getInstance(new Key<List<org.apache.maven.api.spi.WorkspaceReader>>() {});
+        } catch (LookupException e) {
+            logger.debug("No maven DI injector available, cannot look up SPI WorkspaceReaders: {}", e.getMessage());
+            return List.of();
+        }
     }
 
     private void afterSessionStart(MavenSession session) throws MavenExecutionException {
