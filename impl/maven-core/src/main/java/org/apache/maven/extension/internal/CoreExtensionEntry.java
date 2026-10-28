@@ -22,6 +22,7 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -110,7 +111,10 @@ public class CoreExtensionEntry {
             Enumeration<URL> urls = loader.getResources(BUILDER.getExtensionDescriptorLocation());
             while (urls.hasMoreElements()) {
 
-                try (InputStream is = urls.nextElement().openStream()) {
+                URLConnection connection = urls.nextElement().openConnection();
+                // Uncached, so that closing the stream closes the jar (JDK-8239054)
+                connection.setUseCaches(false);
+                try (InputStream is = connection.getInputStream()) {
                     ExtensionDescriptor descriptor = BUILDER.build(is);
                     artifacts.addAll(descriptor.getExportedArtifacts());
                     packages.addAll(descriptor.getExportedPackages());
