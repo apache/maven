@@ -18,14 +18,23 @@
  */
 package org.apache.maven.di.impl;
 
+import java.io.IOException;
+import java.io.OutputStream;
 import java.lang.annotation.Retention;
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.jar.JarOutputStream;
 import java.util.stream.Collectors;
+import java.util.zip.ZipEntry;
 
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
@@ -38,6 +47,7 @@ import org.apache.maven.api.di.Typed;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -51,6 +61,35 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 
 @SuppressWarnings("unused")
 public class InjectorImplTest {
+
+    @Test
+    void discoverReadsRewrittenJar(@TempDir Path tempDir) throws Exception {
+        Path jar = tempDir.resolve("plugin.jar");
+        writeIndex(jar, "# first");
+        discover(jar);
+
+        // Rewritten in place, as a plugin rebuilt in the reactor is.
+        writeIndex(jar, "# second, and longer than the first");
+        discover(jar);
+
+        // Nothing keeps the jar open, so it can be deleted (fails on Windows while it is open).
+        Files.delete(jar);
+    }
+
+    private static void discover(Path jar) throws IOException {
+        try (URLClassLoader loader = new URLClassLoader(new URL[] {jar.toUri().toURL()}, null)) {
+            Injector.create().discover(loader);
+        }
+    }
+
+    private static void writeIndex(Path jar, String content) throws IOException {
+        try (OutputStream out = Files.newOutputStream(jar);
+                JarOutputStream jarOut = new JarOutputStream(out)) {
+            jarOut.putNextEntry(new ZipEntry("META-INF/maven/org.apache.maven.api.di.Inject"));
+            jarOut.write(content.getBytes(StandardCharsets.UTF_8));
+            jarOut.closeEntry();
+        }
+    }
 
     @Test
     void markerQualifierTest() {
