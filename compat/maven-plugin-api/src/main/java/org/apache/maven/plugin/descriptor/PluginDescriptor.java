@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -446,7 +447,10 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
 
         if (pluginFile.isFile()) {
             try {
-                return new URL("jar:" + pluginFile.toURI() + "!/" + descriptor).openStream();
+                URLConnection connection = new URL("jar:" + pluginFile.toURI() + "!/" + descriptor).openConnection();
+                // Uncached, so that closing the stream closes the jar (JDK-8239054)
+                connection.setUseCaches(false);
+                return connection.getInputStream();
             } catch (MalformedURLException e) {
                 throw new IllegalStateException(e);
             }
