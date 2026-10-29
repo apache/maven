@@ -49,7 +49,7 @@ notifications:
   issues: issues@maven.apache.org
   pullrequests: issues@maven.apache.org
 
-# https://release-test.apache.org/projects/maven
+# https://releases.apache.org/projects/maven
 project:
   metadata:
     key: maven
@@ -70,6 +70,8 @@ project:
       - build-management
     programming_languages:
       - Java
+    version_method: semver
+    cycle_match: (\d+\.\d+)(?:[.\-].*)?
   policy:
     github_repository_name: maven
     download_path_suffix: maven-{{MAJOR_VERSION}}/{{VERSION}}
