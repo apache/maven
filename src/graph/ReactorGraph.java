@@ -50,7 +50,7 @@ public class ReactorGraph {
         CLUSTER_PATTERNS.put("Wagon", Pattern.compile("^org\\.apache\\.maven\\.wagon:.*"));
         CLUSTER_PATTERNS.put("SLF4j", Pattern.compile("^org\\.slf4j:.*"));
         CLUSTER_PATTERNS.put("Commons", Pattern.compile("^commons-cli:.*"));
-        CLUSTER_PATTERNS.put("Testing", Pattern.compile("^.*:(mockito-core|junit-jupiter-api):.*"));
+        CLUSTER_PATTERNS.put("Testing", Pattern.compile("^.*:(mockito-core|junit-jupiter-api|junit-platform-commons|opentest4j):.*"));
     }
     private static final Pattern HIDDEN_NODES = Pattern.compile(".*:(maven-docgen|roaster-api|roaster-jdt|velocity-engine-core|commons-lang3|asm|logback-classic|slf4j-simple|domtrip-core|domtrip-maven):.*");
 
