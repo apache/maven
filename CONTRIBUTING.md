@@ -55,7 +55,7 @@ There are some guidelines which will make applying PRs easier for us:
     If you feel the source code should be reformatted, create a separate PR for this change.
   + Check for unnecessary whitespace with `git diff --check` before committing.
 + Make sure you have added the necessary tests (JUnit/[Core IT tests][core-it]) for your changes.
-+ Run all the tests with `mvn -Prun-its verify` to assure nothing else was accidentally broken.
++ During development, run the relevant module tests first; before submitting, run all tests with `mvn -Prun-its verify` to check for regressions.
 + Submit a pull request to the repository in the Apache organization.
 
 If you plan to contribute on a regular basis, please consider filing a [contributor license agreement][cla].
