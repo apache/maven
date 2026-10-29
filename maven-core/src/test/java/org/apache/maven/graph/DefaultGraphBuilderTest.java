@@ -19,6 +19,7 @@
 package org.apache.maven.graph;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -38,14 +39,16 @@ import org.apache.maven.project.ProjectBuildingRequest;
 import org.apache.maven.project.ProjectBuildingResult;
 import org.codehaus.plexus.logging.Logger;
 import org.junit.jupiter.api.Test;
-import org.mockito.Mockito;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class DefaultGraphBuilderTest {
@@ -57,12 +60,15 @@ class DefaultGraphBuilderTest {
     @Test
     void warnsAboutExtensionInReactorOnlyWhenItIsBuilt() throws Exception {
         Logger warnings = mock(Logger.class);
+        buildReactor(warnings, Collections.<String>emptyList());
+        verify(warnings, times(1)).warn(anyString());
 
-        assertEquals(1, extensionWarnings(warnings, Collections.<String>emptyList()));
-        assertEquals(0, extensionWarnings(warnings, Collections.singletonList("org.apache.maven:test-0")));
+        Logger noWarnings = mock(Logger.class);
+        buildReactor(noWarnings, Collections.singletonList("org.apache.maven:test-0"));
+        verify(noWarnings, never()).warn(anyString());
     }
 
-    private int extensionWarnings(Logger logger, List<String> excludedProjects) throws Exception {
+    private void buildReactor(Logger logger, List<String> excludedProjects) throws Exception {
         Model pluginModel = new Model();
         pluginModel.setGroupId("org.apache.maven");
         pluginModel.setArtifactId("test-0");
@@ -102,13 +108,10 @@ class DefaultGraphBuilderTest {
 
         DefaultGraphBuilder graphBuilder = new DefaultGraphBuilder();
         graphBuilder.projectBuilder = projectBuilder;
-        graphBuilder.logger = logger;
+        Field loggerField = DefaultGraphBuilder.class.getDeclaredField("logger");
+        loggerField.setAccessible(true);
+        loggerField.set(graphBuilder, logger);
 
-        Mockito.clearInvocations(logger);
         assertFalse(graphBuilder.build(session).hasErrors());
-        return Mockito.mockingDetails(logger).getInvocations().stream()
-                .filter(invocation -> invocation.getMethod().getName().equals("warn"))
-                .mapToInt(invocation -> 1)
-                .sum();
     }
 }

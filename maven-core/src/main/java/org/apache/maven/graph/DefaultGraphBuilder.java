@@ -61,9 +61,8 @@ import org.codehaus.plexus.util.dag.CycleDetectedException;
 @Component(role = GraphBuilder.class, hint = GraphBuilder.HINT)
 public class DefaultGraphBuilder implements GraphBuilder {
 
-    // not private nor final, so that a test can capture what is logged
     @Requirement
-    Logger logger;
+    private Logger logger;
 
     @Requirement
     protected ProjectBuilder projectBuilder;
