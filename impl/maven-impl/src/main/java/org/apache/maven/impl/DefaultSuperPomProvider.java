@@ -28,11 +28,11 @@ import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.SuperPomProvider;
 import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.api.spi.ModelParserException;
-import org.apache.maven.impl.model.DefaultModelProcessor;
 
 @Named
 @Singleton
@@ -64,7 +64,7 @@ public class DefaultSuperPomProvider implements SuperPomProvider {
         }
         String modelId =
                 "org.apache.maven:maven-api-impl:" + getImplementationVersion(getClass()) + ":super-pom-" + version;
-        ModelSource source = DefaultModelProcessor.urlModelSource(url, modelId);
+        ModelSource source = Sources.urlSource(url, modelId);
         try {
             return modelProcessor.read(source, Map.of(ModelParser.STRICT, false));
         } catch (ModelParserException e) {

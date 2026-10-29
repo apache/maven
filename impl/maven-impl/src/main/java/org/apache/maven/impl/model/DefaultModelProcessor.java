@@ -21,7 +21,6 @@ package org.apache.maven.impl.model;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -38,6 +37,7 @@ import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.Source;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.model.ModelProcessor;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderException;
@@ -169,52 +169,12 @@ public class DefaultModelProcessor implements ModelProcessor {
         }
     }
 
-    public static ModelSource urlModelSource(URL url, String modelId) {
-        return new UrlModelSource(url, modelId);
-    }
-
-    record UrlModelSource(URL url, String modelId) implements ModelSource {
-        UrlModelSource {
-            Objects.requireNonNull(url, "url cannot be null");
-        }
-
-        @Override
-        public Path getPath() {
-            return null;
-        }
-
-        @Override
-        public InputStream openStream() throws IOException {
-            return url.openStream();
-        }
-
-        @Override
-        public String getLocation() {
-            return url.toExternalForm();
-        }
-
-        @Override
-        public Source resolve(String relative) {
-            return null;
-        }
-
-        @Override
-        public ModelSource resolve(ModelLocator modelLocator, String relative) {
-            return null;
-        }
-
-        @Override
-        public String getModelId() {
-            return modelId;
-        }
-    }
-
     private static Source toSource(XmlReaderRequest request) {
         if (request.getInputStream() == null
                 && request.getPath() == null
                 && request.getReader() == null
                 && request.getURL() != null) {
-            return urlModelSource(request.getURL(), request.getModelId());
+            return Sources.urlSource(request.getURL(), request.getModelId());
         }
         // Always return a ModelSource so modelId is preserved.
         return new ModelSource() {

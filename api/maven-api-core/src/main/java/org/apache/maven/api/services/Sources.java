@@ -21,6 +21,7 @@ package org.apache.maven.api.services;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
@@ -92,6 +93,92 @@ public final class Sources {
     @Nonnull
     public static ModelSource resolvedSource(@Nonnull Path path, @Nullable String modelId) {
         return new ResolvedPathSource(requireNonNull(path, "path"), path.toString(), modelId);
+    }
+
+    /**
+     * Creates a new source backed by a URL, with an optional model identifier.
+     * This is used for classpath-based sources such as the Maven super POM.
+     * The source does not support resolving related sources.
+     *
+     * @param url the URL to read from, must not be {@code null}
+     * @param modelId the modelId (groupId:artifactId:version coordinates), may be {@code null}
+     * @return a new ModelSource instance backed by the URL
+     * @throws NullPointerException if url is null
+     * @since 4.0.0
+     */
+    @Nonnull
+    public static ModelSource urlSource(@Nonnull URL url, @Nullable String modelId) {
+        return new UrlModelSource(requireNonNull(url, "url"), modelId);
+    }
+
+    /**
+     * Implementation of {@link ModelSource} backed by a URL (e.g. a classpath resource).
+     * Does not support resolving related sources.
+     */
+    static class UrlModelSource implements ModelSource {
+        private final URL url;
+
+        @Nullable
+        private final String modelId;
+
+        UrlModelSource(URL url, String modelId) {
+            this.url = requireNonNull(url, "url");
+            this.modelId = modelId;
+        }
+
+        @Override
+        @Nullable
+        public Path getPath() {
+            return null;
+        }
+
+        @Override
+        @Nonnull
+        public InputStream openStream() throws IOException {
+            return url.openStream();
+        }
+
+        @Override
+        @Nonnull
+        public String getLocation() {
+            return url.toExternalForm();
+        }
+
+        @Override
+        @Nullable
+        public Source resolve(@Nonnull String relative) {
+            return null;
+        }
+
+        @Override
+        @Nullable
+        public ModelSource resolve(@Nonnull ModelSource.ModelLocator modelLocator, @Nonnull String relative) {
+            return null;
+        }
+
+        @Override
+        @Nullable
+        public String getModelId() {
+            return modelId;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            return o == this
+                    || o instanceof UrlModelSource that
+                            && Objects.equals(url, that.url)
+                            && Objects.equals(modelId, that.modelId);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(url, modelId);
+        }
+
+        @Override
+        public String toString() {
+            return "UrlModelSource[url=" + url + ", modelId=" + modelId + "]";
+        }
     }
 
     /**
