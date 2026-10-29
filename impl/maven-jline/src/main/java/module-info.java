@@ -22,10 +22,8 @@ module org.apache.maven.jline {
     requires org.apache.maven.api.di;
     requires org.apache.maven.api.annotations;
     requires org.jline.reader;
-    requires org.jline.style;
     requires org.jline.builtins;
     requires org.jline.console;
-    requires org.jline.console.ui;
     requires org.jline.terminal;
     requires org.jline.terminal.jni;
     requires org.jline.jansi.core;
