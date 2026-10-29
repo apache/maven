@@ -116,8 +116,8 @@ under the License.
     <url>https://github.com/apache/maven/issues</url>
   </issueManagement>
   <ciManagement>
-    <system>Jenkins</system>
-    <url>https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/</url>
+    <system>GitHub</system>
+    <url>https://github.com/apache/maven/actions</url>
   </ciManagement>
   <distributionManagement>
     <site>
