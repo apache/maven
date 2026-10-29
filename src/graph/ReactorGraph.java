@@ -144,17 +144,6 @@ public class ReactorGraph {
                 }
             }
 
-            // Write intermediary graph to DOT file
-            String dotContent = Graphviz.fromGraph(clusteredGraph).render(Format.DOT).toString();
-            Files.write(Paths.get("target/graph/intermediary_graph.dot"), dotContent.getBytes());
-            System.out.println("Intermediary graph written to intermediary_graph.dot");
-
-            // Render graph to SVG
-            Graphviz.fromGraph(clusteredGraph)
-                    .engine(Engine.FDP)
-                    .render(Format.SVG).toFile(new File("target/graph/intermediary_graph.svg"));
-            System.out.println("Final graph rendered to intermediary_graph.svg");
-
             // Generate and render the high-level graph
             MutableGraph highLevelGraph = generateHighLevelGraph(clusteredGraph, clusters, nodeToCluster, nodeMap);
 
