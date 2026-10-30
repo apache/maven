@@ -168,7 +168,6 @@ public class MavenProject implements Cloneable {
 
     // calculated.
     private Map<String, Artifact> artifactMap;
-
     private Map<String, Artifact> artifactMapByDependencyConflictId;
 
     private Model originalModel;
@@ -883,7 +882,6 @@ public class MavenProject implements Cloneable {
 
     public void setArtifacts(Set<Artifact> artifacts) {
         this.artifacts = artifacts;
-        // flush the calculated artifactMap
         artifactMap = null;
         artifactMapByDependencyConflictId = null;
     }
@@ -921,11 +919,9 @@ public class MavenProject implements Cloneable {
     }
 
     /**
-     * Returns a map of artifacts keyed by {@link org.apache.maven.artifact.Artifact#getDependencyConflictId()}
-     * (groupId:artifactId:type[:classifier]). Unlike {@link #getArtifactMap()}, this map disambiguates
-     * artifacts that share the same groupId and artifactId but differ by classifier (e.g. a jar and its
-     * {@code tests}-classified companion), which would otherwise collide under the same key (MNG-5552).
-     *
+     * Like {@link #getArtifactMap()}, but keyed by {@link org.apache.maven.artifact.Artifact#getDependencyConflictId()}
+     * (groupId:artifactId:type[:classifier]), which disambiguates artifacts that share the same groupId:artifactId
+     * but differ by classifier (MNG-5552).
      * @return a mutable map keyed by dependency conflict id; if two artifacts share the same key the last one wins
      * @since 4.1.0
      */
@@ -938,7 +934,6 @@ public class MavenProject implements Cloneable {
 
     public void setPluginArtifacts(Set<Artifact> pluginArtifacts) {
         this.pluginArtifacts = pluginArtifacts;
-
         this.pluginArtifactMap = null;
     }
 
@@ -950,7 +945,6 @@ public class MavenProject implements Cloneable {
         if (pluginArtifactMap == null) {
             pluginArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getPluginArtifacts());
         }
-
         return pluginArtifactMap;
     }
 
@@ -1574,15 +1568,7 @@ public class MavenProject implements Cloneable {
     }
 
     // ----------------------------------------------------------------------------------------------------------------
-    //
-    //
-    // D E P R E C A T E D
-    //
-    //
-    // ----------------------------------------------------------------------------------------------------------------
-    //
-    // Everything below will be removed for Maven 4.0.0
-    //
+    // D E P R E C A T E D  -  Everything below will be removed for Maven 4.0.0
     // ----------------------------------------------------------------------------------------------------------------
 
     private ProjectBuildingRequest projectBuilderConfiguration;
@@ -1861,7 +1847,6 @@ public class MavenProject implements Cloneable {
     @Deprecated
     public void setReportArtifacts(Set<Artifact> reportArtifacts) {
         this.reportArtifacts = reportArtifacts;
-
         reportArtifactMap = null;
     }
 
@@ -1875,7 +1860,6 @@ public class MavenProject implements Cloneable {
         if (reportArtifactMap == null) {
             reportArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getReportArtifacts());
         }
-
         return reportArtifactMap;
     }
 
@@ -1895,7 +1879,6 @@ public class MavenProject implements Cloneable {
         if (extensionArtifactMap == null) {
             extensionArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getExtensionArtifacts());
         }
-
         return extensionArtifactMap;
     }
 
