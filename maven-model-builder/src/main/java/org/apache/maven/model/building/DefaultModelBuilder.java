@@ -58,6 +58,7 @@ import org.apache.maven.model.building.ModelProblem.Severity;
 import org.apache.maven.model.building.ModelProblem.Version;
 import org.apache.maven.model.composition.DependencyManagementImporter;
 import org.apache.maven.model.inheritance.InheritanceAssembler;
+import org.apache.maven.model.interpolation.AbstractStringBasedModelInterpolator;
 import org.apache.maven.model.interpolation.ModelInterpolator;
 import org.apache.maven.model.io.ModelParseException;
 import org.apache.maven.model.management.DependencyManagementInjector;
@@ -288,7 +289,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         Collection<String> parentIds = new LinkedHashSet<>();
         List<ModelData> lineage = new ArrayList<>();
 
-        // Models built to resolve a dependency (a dependency POM, one of its parents, or an
         // Models resolved for dependency, parent or BOM POMs evaluate only platform-derived
         // activation (JDK, OS, activeByDefault).
         boolean externalModel = isExternalModelBuildingRequest(request);
@@ -506,13 +506,20 @@ public class DefaultModelBuilder implements ModelBuilder {
     /**
      * Determines whether the given request builds a model to resolve a dependency, i.e. a POM
      * read from a remote repository (a dependency POM, one of its parents, or an imported BOM)
-     * rather than a POM belonging to the project being built. Such requests use
+     * rather than a POM belonging to the project being built. Such requests have no POM file
+     * (see {@link ModelBuildingRequest#setPomFile(File)}) and use
      * {@link ModelBuildingRequest#VALIDATION_LEVEL_MINIMAL}, see for instance
      * {@code DefaultArtifactDescriptorReader#loadPom}; a project build uses
-     * {@link ModelBuildingRequest#VALIDATION_LEVEL_MAVEN_2_0} or higher.
+     * {@link ModelBuildingRequest#VALIDATION_LEVEL_MAVEN_2_0} or higher. A request with a POM file is in project
+     * mode whatever its validation level, so an embedder that builds its own project at
+     * {@code VALIDATION_LEVEL_MINIMAL} keeps full profile activation. A request that sets
+     * {@value AbstractStringBasedModelInterpolator#FULL_EXTERNAL_INTERPOLATION_PROPERTY} is never external, so
+     * that tools building their own projects at a low validation level can opt out.
      */
     private static boolean isExternalModelBuildingRequest(ModelBuildingRequest request) {
-        return request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0;
+        return request.getPomFile() == null
+                && request.getValidationLevel() < ModelBuildingRequest.VALIDATION_LEVEL_MAVEN_2_0
+                && !AbstractStringBasedModelInterpolator.isFullExternalModelBuild(request);
     }
 
     /**
@@ -521,9 +528,10 @@ public class DefaultModelBuilder implements ModelBuilder {
      * <p>
      * The sandboxed context preserves system properties (so JDK/OS activation works).
      * User properties (consumer {@code -D} flags) are suppressed because they were not
-     * set for the dependency and must not accidentally activate its profiles. POM-defined
-     * properties are not exposed through the system-property lookup, so a dependency POM
-     * cannot activate its own property-based profiles.
+     * set for the dependency and must not accidentally activate its profiles.
+     * Model properties are <b>not</b> exposed through the system-property lookup — a
+     * dependency POM's own {@code <properties>} must not activate its own property-based
+     * profiles (see #13390).
      * File-based profiles are pre-filtered via {@link #withoutFileActivation(List)} before
      * reaching this context, so {@code getProjectDirectory()} is not relied on for file checks.
      *

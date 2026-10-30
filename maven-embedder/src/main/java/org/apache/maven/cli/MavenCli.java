@@ -25,6 +25,8 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -379,11 +381,12 @@ public class MavenCli {
                 throw new ExitException(1);
             }
             File basedir = basedirProperty != null ? new File(basedirProperty) : new File("");
-            try {
-                cliRequest.multiModuleProjectDirectory = basedir.getCanonicalFile();
-            } catch (IOException e) {
-                cliRequest.multiModuleProjectDirectory = basedir.getAbsoluteFile();
-            }
+            // Resolve lexically rather than through getCanonicalFile(), which asks the OS to resolve the path
+            // and can substitute it with a different one when a segment is a symlink, junction, or (on Windows)
+            // a mapped network drive, corrupting the reactor root that every relative module/parent path is
+            // later resolved against (MNG-11167).
+            cliRequest.multiModuleProjectDirectory =
+                    getCanonicalPath(basedir.toPath()).toFile();
         }
 
         // We need to locate the top level project which may be pointed at using
@@ -631,7 +634,7 @@ public class MavenCli {
         }
     }
 
-    private void commands(CliRequest cliRequest) {
+    private void commands(CliRequest cliRequest) throws ExitException {
         if (cliRequest.showErrors) {
             slf4jLogger.info("Error stacktraces are turned on.");
         }
@@ -640,6 +643,27 @@ public class MavenCli {
             slf4jLogger.info("Disabling strict checksum verification on all artifact downloads.");
         } else if (MavenExecutionRequest.CHECKSUM_POLICY_FAIL.equals(cliRequest.request.getGlobalChecksumPolicy())) {
             slf4jLogger.info("Enabling strict checksum verification on all artifact downloads.");
+        }
+
+        // If no goals/phases were specified and there is no POM in the current directory,
+        // print usage (like `mvn -h`) and exit successfully instead of failing with
+        // "No goals have been specified for this build."
+        // When a POM is present the default goal (if any) may apply, so let Maven proceed normally.
+        // Skip this check for encryption commands (--encrypt-password, --encrypt-master-password)
+        // which also have no goals and no POM, but are handled later by encryption().
+        // Also skip when -f/--file is specified: the alternate POM existence is validated later,
+        // and the working directory may legitimately have no pom.xml.
+        List<String> goals = cliRequest.commandLine.getArgList();
+        if (goals.isEmpty()
+                && modelProcessor != null
+                && !cliRequest.commandLine.hasOption(CLIManager.ALTERNATE_POM_FILE)
+                && !cliRequest.commandLine.hasOption(CLIManager.ENCRYPT_PASSWORD)
+                && !cliRequest.commandLine.hasOption(CLIManager.ENCRYPT_MASTER_PASSWORD)) {
+            File pom = modelProcessor.locatePom(new File(cliRequest.workingDirectory));
+            if (!pom.isFile()) {
+                cliManager.displayHelp(System.out);
+                throw new ExitException(0);
+            }
         }
 
         if (slf4jLogger.isDebugEnabled()) {
@@ -727,6 +751,13 @@ public class MavenCli {
                 .setClassPathScanning(PlexusConstants.SCANNING_INDEX)
                 .setAutoWiring(true)
                 .setJSR250Lifecycle(true)
+                .setVisibilityPredicateSupplierTransformer(s -> () -> {
+                    if (BootstrapCoreExtensionManager.isContextRealmCoreExtensionRealm()) {
+                        return null;
+                    } else {
+                        return s.get();
+                    }
+                })
                 .setName("maven");
 
         Set<String> exportedArtifacts = new HashSet<>(coreEntry.getExportedArtifacts());
@@ -992,6 +1023,40 @@ public class MavenCli {
         return jars;
     }
 
+    /**
+     * Reads a password from the console and, when there is none because the streams are redirected, from the first
+     * line of the given input.
+     *
+     * @param console the console, or {@code null} if the streams are redirected
+     * @param in the input to read the first line from when there is no console
+     * @param prompt the prompt shown by the console; it is not shown when the password is read from the input, as
+     *               the caller is then not interactive and the prompt would only pollute its output
+     * @return the password, never empty
+     * @throws IOException if the input cannot be read
+     * @throws IllegalStateException if no password could be read, so that an empty one is not encrypted
+     */
+    static String readPassword(Console console, InputStream in, String prompt) throws IOException {
+        String password;
+        if (console != null) {
+            char[] chars = console.readPassword(prompt);
+            password = (chars == null) ? null : String.copyValueOf(chars);
+
+            if (chars != null) {
+                // Sun/Oracle advises to empty the char array
+                java.util.Arrays.fill(chars, ' ');
+            }
+        } else {
+            // do not close the reader, that would close the standard input
+            password = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).readLine();
+        }
+
+        if (password == null || password.isEmpty()) {
+            throw new IllegalStateException("No password was provided");
+        }
+
+        return password;
+    }
+
     //
     // This should probably be a separate tool and not be baked into Maven.
     //
@@ -1000,15 +1065,7 @@ public class MavenCli {
             String passwd = cliRequest.commandLine.getOptionValue(CLIManager.ENCRYPT_MASTER_PASSWORD);
 
             if (passwd == null) {
-                Console cons = System.console();
-                char[] password = (cons == null) ? null : cons.readPassword("Master password: ");
-                if (password != null) {
-                    // Cipher uses Strings
-                    passwd = String.copyValueOf(password);
-
-                    // Sun/Oracle advises to empty the char array
-                    java.util.Arrays.fill(password, ' ');
-                }
+                passwd = readPassword(System.console(), System.in, "Master password: ");
             }
 
             DefaultPlexusCipher cipher = new DefaultPlexusCipher();
@@ -1020,15 +1077,7 @@ public class MavenCli {
             String passwd = cliRequest.commandLine.getOptionValue(CLIManager.ENCRYPT_PASSWORD);
 
             if (passwd == null) {
-                Console cons = System.console();
-                char[] password = (cons == null) ? null : cons.readPassword("Password: ");
-                if (password != null) {
-                    // Cipher uses Strings
-                    passwd = String.copyValueOf(password);
-
-                    // Sun/Oracle advises to empty the char array
-                    java.util.Arrays.fill(password, ' ');
-                }
+                passwd = readPassword(System.console(), System.in, "Password: ");
             }
 
             String configurationFile = dispatcher.getConfigurationFile();
@@ -1450,26 +1499,7 @@ public class MavenCli {
 
         List<String> inactiveProfiles = new ArrayList<>();
 
-        if (commandLine.hasOption(CLIManager.ACTIVATE_PROFILES)) {
-            String[] profileOptionValues = commandLine.getOptionValues(CLIManager.ACTIVATE_PROFILES);
-            if (profileOptionValues != null) {
-                for (String profileOptionValue : profileOptionValues) {
-                    StringTokenizer profileTokens = new StringTokenizer(profileOptionValue, ",");
-
-                    while (profileTokens.hasMoreTokens()) {
-                        String profileAction = profileTokens.nextToken().trim();
-
-                        if (profileAction.startsWith("-") || profileAction.startsWith("!")) {
-                            inactiveProfiles.add(profileAction.substring(1));
-                        } else if (profileAction.startsWith("+")) {
-                            activeProfiles.add(profileAction.substring(1));
-                        } else {
-                            activeProfiles.add(profileAction);
-                        }
-                    }
-                }
-            }
-        }
+        performProfileActivation(commandLine, activeProfiles, inactiveProfiles);
 
         TransferListener transferListener;
 
@@ -1658,6 +1688,47 @@ public class MavenCli {
         }
     }
 
+    // Visible for testing
+    static void performProfileActivation(
+            final CommandLine commandLine, final List<String> activeProfiles, final List<String> inactiveProfiles) {
+        if (commandLine.hasOption(CLIManager.ACTIVATE_PROFILES)) {
+            String[] profileOptionValues = commandLine.getOptionValues(CLIManager.ACTIVATE_PROFILES);
+            if (profileOptionValues != null) {
+                for (String profileOptionValue : profileOptionValues) {
+                    StringTokenizer profileTokens = new StringTokenizer(profileOptionValue, ",");
+
+                    while (profileTokens.hasMoreTokens()) {
+                        String profileId = profileTokens.nextToken().trim();
+                        boolean active = true;
+
+                        if (profileId.startsWith("-") || profileId.startsWith("!")) {
+                            active = false;
+                            profileId = profileId.substring(1);
+                        } else if (profileId.startsWith("+")) {
+                            profileId = profileId.substring(1);
+                        }
+
+                        // "?id" is an optional profile in Maven 4; Maven 3 never fails on a missing profile,
+                        // so the prefix only has to be removed
+                        if (profileId.startsWith("?")) {
+                            profileId = profileId.substring(1);
+                        }
+
+                        if (profileId.isEmpty()) {
+                            continue;
+                        }
+
+                        if (active) {
+                            activeProfiles.add(profileId);
+                        } else {
+                            inactiveProfiles.add(profileId);
+                        }
+                    }
+                }
+            }
+        }
+    }
+
     // ----------------------------------------------------------------------
     // Properties handling
     // ----------------------------------------------------------------------
@@ -1780,11 +1851,7 @@ public class MavenCli {
     }
 
     private static Path getCanonicalPath(Path path) {
-        try {
-            return path.toRealPath();
-        } catch (IOException e) {
-            return getCanonicalPath(path.getParent()).resolve(path.getFileName());
-        }
+        return path.toAbsolutePath().normalize();
     }
 
     static class ExitException extends Exception {

@@ -118,7 +118,17 @@ replace() {
 }
 
 case " $* " in
-  *" --windows "*) printf 'C:%s\n' "`replace "$path" '/' '\'`" ;;
+  *" --windows "*)
+    case "$path" in
+      /cygdrive/c/*)
+        path="`replace "$path" '/cygdrive/c/' ''`"
+        printf 'C:\%s\n' "`replace "$path" '/' '\'`"
+        ;;
+      *)
+        printf 'C:%s\n' "`replace "$path" '/' '\'`"
+        ;;
+    esac
+    ;;
   *" --unix "*) printf '%s\n' "`replace "${path#C:}" '\' '/'`" ;;
   *" --path "*)
     # --path with --windows
@@ -154,13 +164,72 @@ for stub in uname dirname java tr; do
   chmod +x "$nocygpath_dir/$stub"
 done
 
+
+# A third stub set whose cygpath re-roots every POSIX path under its own
+# installation prefix, like the cygpath shipped inside an Anaconda installation
+# does (issue #13414). The launcher must detect that the Windows form does not
+# exist on disk, warn, and fall back to unconverted POSIX paths.
+lying_dir="$work_dir/stubs-lying-cygpath"
+mkdir -p "$lying_dir"
+for stub in uname dirname tr java; do
+  cp "$stub_dir/$stub" "$lying_dir/$stub"
+  chmod +x "$lying_dir/$stub"
+done
+
+cat > "$lying_dir/cygpath" <<'LYING'
+#!/bin/sh
+# cygpath(1) stub re-rooting every POSIX path under its own prefix, like the
+# Anaconda-shipped cygpath that caused issue #13414.
+for arg in "$@"; do
+  case "$arg" in
+    --*) ;;
+    *) path="$arg" ;;
+  esac
+done
+
+replace() {
+  text="$1"; needle="$2"; value="$3"; out=""
+  while :; do
+    case "$text" in
+      *"$needle"*)
+        out="$out${text%%"$needle"*}$value"
+        text="${text#*"$needle"}"
+        ;;
+      *) break ;;
+    esac
+  done
+  printf '%s' "$out$text"
+}
+
+case " $* " in
+  *" --windows "*)
+    printf 'C:\Anaconda\Library\%s
+' "`replace "$path" '/' '\'`"
+    ;;
+  *)
+    printf '%s
+' "$path"
+    ;;
+esac
+LYING
+chmod +x "$lying_dir/cygpath"
+
 failures=0
 
 # run_mvn <uname-output> <stub-dir>
 run_mvn() {
+  run_mvn_with_args "$1" "$2" verify
+}
+
+# run_mvn_with_args <uname-output> <stub-dir> [args...]
+run_mvn_with_args() {
+  uname_out="$1"
+  shift
+  stub_dir_arg="$1"
+  shift
   ( cd "$project_dir/module" &&
-    FAKE_UNAME="$1" PATH="$2" JAVA_HOME= MAVEN_SKIP_RC=1 \
-      "$sh_bin" "$maven_home/bin/mvn" verify 2>/dev/null )
+    FAKE_UNAME="$uname_out" PATH="$stub_dir_arg" JAVA_HOME= MAVEN_SKIP_RC=1 \
+      "$sh_bin" "$maven_home/bin/mvn" "$@" 2>/dev/null )
 }
 
 # to_windows <posix-path>
@@ -177,6 +246,16 @@ to_windows() {
   done
   printf 'C:%s' "$out$text"
 }
+
+# bin/mvn verifies that the Windows form of the current directory exists on
+# disk before trusting the cygpath output. The stubbed cygpath produces
+# C:-prefixed paths, which exist on Windows only. POSIX filesystems accept
+# them literally (backslashes and colons are ordinary characters), so create
+# the directory here to let the verification pass with the stub as well. On
+# Windows creating it fails because the real directory exists: fine.
+# mkdir -p: on Windows the argument is a real multi-component path whose
+# parents may not exist yet; on POSIX it is a single oddly-named directory.
+( cd "$project_dir/module" && mkdir -p "`to_windows "$project_dir/module"`" 2>/dev/null || true )
 
 # contains <haystack> <needle>
 # Plain substring check. A case/glob comparison cannot be used, the haystack
@@ -232,6 +311,26 @@ for os in CYGWIN_NT-10.0 MINGW32_NT-6.2 MINGW64_NT-10.0 MSYS_NT-10.0; do
   assert_not_contains "$os: no path mixes both separators" "$output" "\\/"
 done
 
+# Cygwin: -f with an absolute POSIX path is converted
+output=`run_mvn_with_args CYGWIN_NT-10.0 "$stub_dir" -f /cygdrive/c/temp/pom.xml validate`
+assert_contains "cygwin: -f /cygdrive path converted" "$output" "[-f][C:\\temp\\pom.xml]"
+
+# Cygwin: -s with an absolute POSIX path is converted
+output=`run_mvn_with_args CYGWIN_NT-10.0 "$stub_dir" -s /cygdrive/c/settings.xml validate`
+assert_contains "cygwin: -s /cygdrive path converted" "$output" "[-s][C:\\settings.xml]"
+
+# Cygwin: --file= with an absolute POSIX path is converted
+output=`run_mvn_with_args CYGWIN_NT-10.0 "$stub_dir" --file=/cygdrive/c/temp/pom.xml validate`
+assert_contains "cygwin: --file= /cygdrive path converted" "$output" "[--file=C:\\temp\\pom.xml]"
+
+# Cygwin: a relative path is left unchanged
+output=`run_mvn_with_args CYGWIN_NT-10.0 "$stub_dir" -f ./relative/pom.xml validate`
+assert_contains "cygwin: relative -f path unchanged" "$output" "[-f][./relative/pom.xml]"
+
+# MinGW/MSYS2: the conversion does not run
+output=`run_mvn_with_args MINGW64_NT-10.0 "$stub_dir" -f /cygdrive/c/temp/pom.xml validate`
+assert_contains "mingw: -f path not converted" "$output" "[-f][/cygdrive/c/temp/pom.xml]"
+
 # Without cygpath the launcher must still work, using unconverted paths, rather
 # than passing empty paths to the JVM.
 output=`run_mvn MINGW64_NT-10.0 "$nocygpath_dir"`
@@ -241,6 +340,27 @@ assert_contains "missing cygpath: maven.home falls back to a POSIX path" "$outpu
   "[-Dmaven.home=$maven_home]"
 assert_not_contains "missing cygpath: no empty maven.home is passed" "$output" \
   "[-Dmaven.home=]"
+
+# A cygpath from a foreign emulation layer must be detected: the conversion is
+# skipped, the paths stay in their POSIX form, and warnings explain why.
+output=`run_mvn MINGW64_NT-10.0 "$lying_dir"`
+assert_contains "foreign cygpath: multiModuleProjectDirectory falls back to a POSIX path" "$output" \
+  "[-Dmaven.multiModuleProjectDirectory=$project_dir]"
+assert_contains "foreign cygpath: maven.home falls back to a POSIX path" "$output" \
+  "[-Dmaven.home=$maven_home]"
+assert_not_contains "foreign cygpath: no empty maven.home is passed" "$output" \
+  "[-Dmaven.home=]"
+
+# ... and the warnings name the offending cygpath and the bogus conversion.
+warn_output=`( cd "$project_dir/module" &&
+  FAKE_UNAME="MINGW64_NT-10.0" PATH="$lying_dir" JAVA_HOME= MAVEN_SKIP_RC=1 \
+    "$sh_bin" "$maven_home/bin/mvn" verify 2>&1 )`
+assert_contains "foreign cygpath: warning names the offending cygpath" "$warn_output" \
+  "does not convert paths to"
+assert_contains "foreign cygpath: warning shows the bogus Windows form" "$warn_output" \
+  "which does not exist"
+assert_contains "foreign cygpath: warning names the discovered cygpath" "$warn_output" \
+  "stubs-lying-cygpath/cygpath"
 
 if [ "$failures" -ne 0 ]; then
   printf '%s assertion(s) failed\n' "$failures"

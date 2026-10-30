@@ -18,10 +18,16 @@
  */
 package org.apache.maven.model.building;
 
+import java.io.File;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Properties;
 
 import org.apache.maven.model.Model;
+import org.apache.maven.model.interpolation.AbstractStringBasedModelInterpolator;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -41,7 +47,9 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  *   <li><b>Property (system)</b> — re-activated: system properties are platform facts
  *       ({@code java.version}, {@code os.name}, …).</li>
  *   <li><b>Property (POM-declared, from &lt;properties&gt;)</b> — suppressed: a dependency POM's
- *       own properties must not activate its profiles.</li>
+ *       own properties must not activate its own property-based profiles (see #13390).
+ *       This restores 3.9.x behavior where the {@code PropertyProfileActivator} only
+ *       consulted user and system properties, never model properties.</li>
  *   <li><b>Negated property (-D absent)</b> — re-activated (default-on): the property is absent from
  *       the sandboxed context, so {@code !foo} evaluates to true, preserving the publisher's intent.</li>
  *   <li><b>Profile repositories</b> — honored when the profile is legitimately active (JDK, OS,
@@ -165,6 +173,44 @@ class ResolvedDependencyProfileActivationTest {
         return builder.build(request).getEffectiveModel();
     }
 
+    private Model buildProjectAtMinimal(File pomFile, Properties systemProperties, Properties userProperties)
+            throws Exception {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setPomFile(pomFile);
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        request.setSystemProperties(systemProperties);
+        request.setUserProperties(userProperties);
+        request.setModelResolver(new DefaultModelBuilderTest.BaseModelResolver());
+
+        return builder.build(request).getEffectiveModel();
+    }
+
+    private Model buildFromRepositoryAtMinimal(File pomFile, Properties systemProperties, Properties userProperties)
+            throws Exception {
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new FileModelSource(pomFile));
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        request.setSystemProperties(systemProperties);
+        request.setUserProperties(userProperties);
+        request.setModelResolver(new DefaultModelBuilderTest.BaseModelResolver());
+
+        return builder.build(request).getEffectiveModel();
+    }
+
+    private File writePom(Path dir) throws Exception {
+        String pom = POM.replace(
+                "<pom.declared.prop>hello</pom.declared.prop>",
+                "<pom.declared.prop>hello</pom.declared.prop>\n"
+                        + "    <interpolated.user.property>${user.gating.prop}</interpolated.user.property>");
+        Path file = dir.resolve("pom.xml");
+        Files.write(file, pom.getBytes(StandardCharsets.UTF_8));
+        return file.toFile();
+    }
+
     private Properties systemPropertiesWithTestValues() {
         Properties sp = new Properties();
         sp.putAll(System.getProperties());
@@ -195,6 +241,8 @@ class ResolvedDependencyProfileActivationTest {
                 "activated",
                 model.getProperties().get("profile.sys.property"),
                 "system-property profile must fire in project build");
+        // POM-declared properties do not drive profile activation in any context:
+        // the PropertyProfileActivator only checks user → system properties.
         assertNull(
                 model.getProperties().get("profile.pom.property"),
                 "POM-declared-property profile must NOT fire in project build");
@@ -206,6 +254,42 @@ class ResolvedDependencyProfileActivationTest {
         assertTrue(
                 model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())),
                 "profile repository must be present in project build");
+    }
+
+    @Test
+    void testProjectModeAtMinimalValidationEvaluatesUserPropertyAndFileActivators(@TempDir Path dir) throws Exception {
+        // An embedder (an IDE) builds the operator's own project from its POM file at
+        // VALIDATION_LEVEL_MINIMAL for leniency. A POM file means project mode, so the
+        // repository-model sandbox must not apply.
+        Model model =
+                buildProjectAtMinimal(writePom(dir), systemPropertiesWithTestValues(), userPropertiesWithTestValues());
+
+        assertEquals(
+                "activated",
+                model.getProperties().get("profile.user.property"),
+                "user-property profile must fire for a project built from its POM file");
+        assertEquals(
+                "activated",
+                model.getProperties().get("profile.file"),
+                "file profile must fire for a project built from its POM file");
+        assertEquals(
+                "true",
+                model.getProperties().get("interpolated.user.property"),
+                "user properties must be interpolated for a project built from its POM file");
+    }
+
+    @Test
+    void testSamePomFromRepositoryAtMinimalValidationStaysSandboxed(@TempDir Path dir) throws Exception {
+        // The same POM loaded as a repository model (model source, no POM file) keeps the sandbox.
+        Model model = buildFromRepositoryAtMinimal(
+                writePom(dir), systemPropertiesWithTestValues(), userPropertiesWithTestValues());
+
+        assertNull(model.getProperties().get("profile.user.property"), "user-property profile must NOT fire");
+        assertNull(model.getProperties().get("profile.file"), "file profile must NOT fire");
+        assertEquals(
+                "${user.gating.prop}",
+                model.getProperties().get("interpolated.user.property"),
+                "user properties must stay literal in a repository model");
     }
 
     @Test
@@ -234,6 +318,33 @@ class ResolvedDependencyProfileActivationTest {
     }
 
     @Test
+    void testFullExternalInterpolationEvaluatesAllActivators() throws Exception {
+        // maven.model.dependencyInterpolation.full opts a MINIMAL build out of the external
+        // restrictions, for tools that build their own projects at that validation level (#13347).
+        Properties up = userPropertiesWithTestValues();
+        up.setProperty(AbstractStringBasedModelInterpolator.FULL_EXTERNAL_INTERPOLATION_PROPERTY, "true");
+        Model model = build(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, systemPropertiesWithTestValues(), up);
+
+        assertEquals("activated", model.getProperties().get("profile.file"), "file profile must fire");
+        assertEquals(
+                "activated", model.getProperties().get("profile.user.property"), "user-property profile must fire");
+        assertEquals(
+                "activated", model.getProperties().get("profile.sys.property"), "system-property profile must fire");
+        assertNull(
+                model.getProperties().get("profile.pom.property"), "POM-declared-property profile must still NOT fire");
+    }
+
+    @Test
+    void testFullExternalInterpolationAsSystemPropertyEvaluatesUserPropertyProfile() throws Exception {
+        Properties sp = systemPropertiesWithTestValues();
+        sp.setProperty(AbstractStringBasedModelInterpolator.FULL_EXTERNAL_INTERPOLATION_PROPERTY, "true");
+        Model model = build(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, sp, userPropertiesWithTestValues());
+
+        assertEquals(
+                "activated", model.getProperties().get("profile.user.property"), "user-property profile must fire");
+    }
+
+    @Test
     void testExternalModelSystemPropertyActivationIsPreserved() throws Exception {
         // System properties are platform facts and must drive activation even in external builds.
         Model model = build(
@@ -247,7 +358,9 @@ class ResolvedDependencyProfileActivationTest {
 
     @Test
     void testExternalModelPomDeclaredPropertyActivationIsSuppressed() throws Exception {
-        // A dependency POM's own <properties> must not activate a property-based profile.
+        // A dependency POM's own <properties> must not activate its own property-based profiles.
+        // This restores 3.9.x behavior: PropertyProfileActivator only checks user → system
+        // properties, never model properties. See #13390 (jruby-base self-activation bug).
         Model model = build(
                 ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, systemPropertiesWithTestValues(), new Properties());
 
@@ -305,6 +418,103 @@ class ResolvedDependencyProfileActivationTest {
         assertTrue(
                 model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())),
                 "repository from JDK-activated profile must be retained in external model build");
+    }
+
+    /**
+     * Reproduces #13390: a dependency POM declares a property (like jruby-base's {@code tzdata.version})
+     * and has a profile activated by the same property name. The profile is intended to be activated
+     * by the consumer via {@code -D}, not by the POM's own {@code <properties>} section.
+     * The sandbox must not let the POM's properties self-activate its profiles.
+     */
+    @Test
+    void testExternalModelPomPropertyDoesNotSelfActivateProfile() throws Exception {
+        String jrubyStylePom = "<project>\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>example</groupId>\n"
+                + "  <artifactId>jruby-style</artifactId>\n"
+                + "  <version>1.0</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "  <properties>\n"
+                + "    <tzdata.version>2024a</tzdata.version>\n"
+                + "  </properties>\n"
+                + "  <profiles>\n"
+                + "    <profile>\n"
+                + "      <id>tzdata-bundle</id>\n"
+                + "      <activation>\n"
+                + "        <property>\n"
+                + "          <name>tzdata.version</name>\n"
+                + "        </property>\n"
+                + "      </activation>\n"
+                + "      <properties>\n"
+                + "        <tzdata.activated>true</tzdata.activated>\n"
+                + "      </properties>\n"
+                + "    </profile>\n"
+                + "  </profiles>\n"
+                + "</project>\n";
+
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+
+        Properties systemProperties = new Properties();
+        systemProperties.putAll(System.getProperties());
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new StringModelSource(jrubyStylePom));
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        request.setSystemProperties(systemProperties);
+
+        Model model = builder.build(request).getEffectiveModel();
+
+        assertNull(
+                model.getProperties().get("tzdata.activated"),
+                "POM-declared property must not self-activate a profile in external model build (#13390)");
+    }
+
+    /**
+     * Verifies that a negated-property profile ({@code !resteasy.dependencies.eap}) in an external
+     * model fires correctly. This is the pattern used by RESTEasy's parent POM (#13084):
+     * the profile is active by default and can be opted out via {@code -D}. Since user
+     * properties are suppressed in the sandbox, the opt-out flag is absent and the profile
+     * must remain active.
+     */
+    @Test
+    void testExternalModelNegatedPropertyProfileFires() throws Exception {
+        String resteasyStylePom = "<project>\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>example</groupId>\n"
+                + "  <artifactId>resteasy-style</artifactId>\n"
+                + "  <version>1.0</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "  <profiles>\n"
+                + "    <profile>\n"
+                + "      <id>resteasy-default</id>\n"
+                + "      <activation>\n"
+                + "        <property>\n"
+                + "          <name>!resteasy.dependencies.eap</name>\n"
+                + "        </property>\n"
+                + "      </activation>\n"
+                + "      <properties>\n"
+                + "        <resteasy.defaults.active>true</resteasy.defaults.active>\n"
+                + "      </properties>\n"
+                + "    </profile>\n"
+                + "  </profiles>\n"
+                + "</project>\n";
+
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+
+        Properties systemProperties = new Properties();
+        systemProperties.putAll(System.getProperties());
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new StringModelSource(resteasyStylePom));
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        request.setSystemProperties(systemProperties);
+
+        Model model = builder.build(request).getEffectiveModel();
+
+        assertEquals(
+                "true",
+                model.getProperties().get("resteasy.defaults.active"),
+                "negated-property profile must fire in external model build (#13084)");
     }
 
     /**
