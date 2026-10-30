@@ -19,7 +19,6 @@
 package org.apache.maven.impl.model;
 
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BinaryOperator;
@@ -30,17 +29,12 @@ import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.InterpolatorException;
+import org.apache.maven.utils.StringInterpolator;
+import org.apache.maven.utils.StringInterpolatorException;
 
 @Named
 @Singleton
 public class DefaultInterpolator implements Interpolator {
-
-    private static final char ESCAPE_CHAR = '\\';
-    private static final String DELIM_START = "${";
-    private static final String DELIM_STOP = "}";
-    private static final String MARKER = "$__";
-    private static final String OP_DEFAULT = ":-";
-    private static final String OP_ALTERNATE = ":+";
 
     @Override
     public void interpolate(
@@ -201,240 +195,33 @@ public class DefaultInterpolator implements Interpolator {
             UnaryOperator<String> callback,
             BinaryOperator<String> postprocessor,
             boolean defaultsToEmptyString) {
-        return unescape(
-                doSubstVars(val, currentKey, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString));
-    }
-
-    private static String doSubstVars(
-            String val,
-            String currentKey,
-            Set<String> cycleMap,
-            Map<String, String> configProps,
-            UnaryOperator<String> callback,
-            BinaryOperator<String> postprocessor,
-            boolean defaultsToEmptyString) {
-        if (val == null || val.isEmpty()) {
-            return val;
+        try {
+            return StringInterpolator.substVars(
+                    val, currentKey, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
+        } catch (StringInterpolatorException e) {
+            throw new InterpolatorException(e.getMessage(), e);
         }
-        if (cycleMap == null) {
-            cycleMap = new HashSet<>();
-        }
-
-        // Put the current key in the cycle map.
-        if (currentKey != null) {
-            cycleMap.add(currentKey);
-        }
-
-        // Assume we have a value that is something like:
-        // "leading ${foo.${bar}} middle ${baz} trailing"
-
-        // Find the first ending '}' variable delimiter, which
-        // will correspond to the first deepest nested variable
-        // placeholder.
-        int startDelim;
-        int stopDelim = -1;
-        do {
-            stopDelim = val.indexOf(DELIM_STOP, stopDelim + 1);
-            while (stopDelim > 0 && val.charAt(stopDelim - 1) == ESCAPE_CHAR) {
-                stopDelim = val.indexOf(DELIM_STOP, stopDelim + 1);
-            }
-
-            // Find the matching starting "${" variable delimiter
-            // by looping until we find a start delimiter that is
-            // greater than the stop delimiter we have found.
-            startDelim = val.indexOf(DELIM_START);
-            while (stopDelim >= 0) {
-                int idx = val.indexOf(DELIM_START, startDelim + DELIM_START.length());
-                if ((idx < 0) || (idx > stopDelim)) {
-                    break;
-                } else if (idx < stopDelim) {
-                    startDelim = idx;
-                }
-            }
-        } while (startDelim >= 0 && stopDelim >= 0 && stopDelim < startDelim + DELIM_START.length());
-
-        // If we do not have a start or stop delimiter, then just
-        // return the existing value.
-        if ((startDelim < 0) || (stopDelim < 0)) {
-            cycleMap.remove(currentKey);
-            return val;
-        }
-
-        // At this point, we have found a variable placeholder so
-        // we must perform a variable substitution on it.
-        // Using the start and stop delimiter indices, extract
-        // the first, deepest nested variable placeholder.
-        String variable = val.substring(startDelim + DELIM_START.length(), stopDelim);
-
-        String substValue =
-                processSubstitution(variable, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
-
-        // Append the leading characters, the substituted value of
-        // the variable, and the trailing characters to get the new
-        // value.
-        val = val.substring(0, startDelim) + substValue + val.substring(stopDelim + DELIM_STOP.length());
-
-        // Now perform substitution again, since there could still
-        // be substitutions to make.
-        val = doSubstVars(val, currentKey, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
-
-        cycleMap.remove(currentKey);
-
-        // Return the value.
-        return val;
-    }
-
-    private static String processSubstitution(
-            String variable,
-            Set<String> cycleMap,
-            Map<String, String> configProps,
-            UnaryOperator<String> callback,
-            BinaryOperator<String> postprocessor,
-            boolean defaultsToEmptyString) {
-
-        // Process chained operators from left to right
-        int startIdx = 0;
-        String substValue = null;
-
-        while (startIdx < variable.length()) {
-            int idx1 = variable.indexOf(OP_DEFAULT, startIdx);
-            int idx2 = variable.indexOf(OP_ALTERNATE, startIdx);
-            int idx = idx1 >= 0 ? idx2 >= 0 ? Math.min(idx1, idx2) : idx1 : idx2;
-
-            if (idx < 0) {
-                // No more operators, process the final variable
-                if (substValue == null) {
-                    String currentVar = variable.substring(startIdx);
-                    substValue = resolveVariable(
-                            currentVar, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
-                }
-                break;
-            }
-
-            // Get the current variable part before the operator
-            String varPart = variable.substring(startIdx, idx);
-            if (substValue == null) {
-                substValue =
-                        resolveVariable(varPart, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
-            }
-
-            // Find the end of the current operator's value
-            int nextIdx1 = variable.indexOf(OP_DEFAULT, idx + 2);
-            int nextIdx2 = variable.indexOf(OP_ALTERNATE, idx + 2);
-            int nextIdx = nextIdx1 >= 0 ? nextIdx2 >= 0 ? Math.min(nextIdx1, nextIdx2) : nextIdx1 : nextIdx2;
-
-            String op = variable.substring(idx, idx + 2);
-            String opValue = variable.substring(idx + 2, nextIdx >= 0 ? nextIdx : variable.length());
-
-            // Process the operator value through substitution if it contains variables
-            String processedOpValue = doSubstVars(
-                    opValue, variable, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
-
-            // Apply the operator
-            if (OP_ALTERNATE.equals(op)) {
-                if (substValue != null && !substValue.isEmpty()) {
-                    substValue = processedOpValue;
-                    // Skip any remaining operators since we've made a decision
-                    break;
-                }
-            } else {
-                // OP_DEFAULT: op can only be OP_DEFAULT here since idx was found by indexOf
-                if (substValue == null || substValue.isEmpty()) {
-                    substValue = processedOpValue;
-                    // Skip any remaining operators since we've made a decision
-                    break;
-                }
-            }
-
-            startIdx = nextIdx >= 0 ? nextIdx : variable.length();
-        }
-
-        if (substValue == null) {
-            if (defaultsToEmptyString) {
-                substValue = "";
-            } else {
-                substValue = MARKER + "{" + variable + "}";
-            }
-        }
-
-        return substValue;
-    }
-
-    private static String resolveVariable(
-            String variable,
-            Set<String> cycleMap,
-            Map<String, String> configProps,
-            UnaryOperator<String> callback,
-            BinaryOperator<String> postprocessor,
-            boolean defaultsToEmptyString) {
-
-        // Verify that this is not a recursive variable reference
-        if (!cycleMap.add(variable)) {
-            throw new InterpolatorException("recursive variable reference: " + variable);
-        }
-
-        String substValue = null;
-        // Try configuration properties first
-        if (configProps != null) {
-            substValue = configProps.get(variable);
-            if (substValue != null && substValue.contains(DELIM_START)) {
-                substValue = doSubstVars(
-                        substValue, variable, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
-            }
-        }
-        if (substValue == null && !variable.isEmpty() && callback != null) {
-            String s1 = callback.apply(variable);
-            String s2 =
-                    doSubstVars(s1, variable, cycleMap, configProps, callback, postprocessor, defaultsToEmptyString);
-            substValue = postprocessor != null ? postprocessor.apply(variable, s2) : s2;
-        }
-
-        // Remove the variable from cycle map
-        cycleMap.remove(variable);
-        return substValue;
     }
 
     /**
-     * Escapes special characters in the given string to prevent unwanted interpolation.
+     * Escapes special characters to prevent interpolation.
      *
-     * @param val The string to be escaped.
-     * @return The escaped string.
+     * @param val the string to escape
+     * @return the escaped string
      */
     @Nullable
     public static String escape(@Nullable String val) {
-        if (val == null || val.isEmpty()) {
-            return val;
-        }
-        return val.replace("$", MARKER);
+        return StringInterpolator.escape(val);
     }
 
     /**
-     * Unescapes previously escaped characters in the given string.
+     * Unescapes previously escaped characters.
      *
-     * @param val The string to be unescaped.
-     * @return The unescaped string.
+     * @param val the string to unescape
+     * @return the unescaped string
      */
     @Nullable
     public static String unescape(@Nullable String val) {
-        if (val == null || val.isEmpty()) {
-            return val;
-        }
-        // Fast path: if the string contains neither the escape marker ($__)
-        // nor the escape char (\), there is nothing to unescape.
-        if (val.indexOf(MARKER.charAt(0)) < 0 && val.indexOf(ESCAPE_CHAR) < 0) {
-            return val;
-        }
-        if (val.contains(MARKER)) {
-            val = val.replace(MARKER, "$");
-        }
-        int escape = val.indexOf(ESCAPE_CHAR);
-        while (escape >= 0 && escape < val.length() - 1) {
-            char c = val.charAt(escape + 1);
-            if (c == '{' || c == '}') {
-                val = val.substring(0, escape) + val.substring(escape + 1);
-            }
-            escape = val.indexOf(ESCAPE_CHAR, escape + 1);
-        }
-        return val;
+        return StringInterpolator.unescape(val);
     }
 }
