@@ -28,6 +28,7 @@ import java.util.Set;
 
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.xml.XmlNodeImpl;
+import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
@@ -292,10 +293,14 @@ class V4MojoConfiguratorTest {
         ScalarMojo mojo = new ScalarMojo();
         XmlNode config = new XmlNodeImpl("configuration", null, Map.of(), List.of(new XmlNodeImpl("", "value")), null);
 
-        assertThrows(
-                Exception.class,
+        PluginConfigurationException ex = assertThrows(
+                PluginConfigurationException.class,
                 () -> configurator.configure(mojo, config),
-                "Empty element name must throw, not silently fail");
+                "Empty element name must throw PluginConfigurationException");
+        assertInstanceOf(
+                NoSuchFieldException.class,
+                ex.getCause(),
+                "Cause must be NoSuchFieldException from the empty-name guard, not StringIndexOutOfBoundsException");
     }
 
     // Package-private class with non-public constructor (issue #13459 / #13470)
