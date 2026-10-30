@@ -29,6 +29,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cli.cisupport.CIInfo;
+import org.apache.maven.api.reactor.ReactorConfig;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MessageBuilderFactory;
 
@@ -191,6 +192,20 @@ public interface InvokerRequest {
      */
     @Nonnull
     Optional<CIInfo> ciInfo();
+
+    /**
+     * Returns the parsed {@code .mvn/reactor.xml} configuration, if present.
+     *
+     * <p>The configuration is parsed once during invocation setup (pre-DI) and reused downstream.
+     * When {@code reactor.xml} is absent, this is empty and the legacy {@code maven.config} /
+     * {@code extensions.xml} files remain in use.
+     *
+     * @return an {@link Optional} containing the {@link ReactorConfig}, or empty if {@code reactor.xml}
+     *         was not found
+     * @since 4.1.0
+     */
+    @Nonnull
+    Optional<ReactorConfig> reactorConfig();
 
     /**
      * Returns the options associated with this invocation request.
