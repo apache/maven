@@ -27,6 +27,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -104,7 +105,10 @@ public class InjectorImpl implements Injector {
             while (enumeration.hasMoreElements()) {
                 URL url = enumeration.nextElement();
                 if (loadedUrls.add(url.toExternalForm())) {
-                    try (InputStream is = url.openStream();
+                    URLConnection connection = url.openConnection();
+                    // Uncached, so that closing the stream closes the jar (JDK-8239054)
+                    connection.setUseCaches(false);
+                    try (InputStream is = connection.getInputStream();
                             BufferedReader reader =
                                     new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
                         for (String line : reader.lines()
