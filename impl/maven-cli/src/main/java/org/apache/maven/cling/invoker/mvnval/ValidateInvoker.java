@@ -33,7 +33,6 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
-import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.InvokerException;
@@ -42,9 +41,6 @@ import org.apache.maven.api.cli.mvnval.ValidateOptions;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.model.Model;
-import org.apache.maven.api.model.Profile;
-import org.apache.maven.api.model.Repository;
-import org.apache.maven.api.model.RepositoryPolicy;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.api.services.ModelBuilder.ModelBuilderSession;
@@ -52,8 +48,6 @@ import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderRequest.RequestType;
 import org.apache.maven.api.services.ModelBuilderResult;
-import org.apache.maven.api.services.RepositoryFactory;
-import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
@@ -104,9 +98,6 @@ import org.jline.terminal.Terminal;
  * what is already on disk.
  */
 public class ValidateInvoker extends LookupInvoker<ValidateContext> {
-
-    /** Where Central lives, for the one case where no settings file names a repository. */
-    private static final String CENTRAL_URL = "https://repo.maven.apache.org/maven2";
 
     public static final int OK = 0;
     public static final int ERROR = 1;
@@ -360,12 +351,10 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
     protected Session createSession(@Nullable Path localRepository) {
         Session session = ApiRunner.createSession(injector -> injector.bindImplicit(TransporterFactoryConfig.class));
         if (localRepository != null) {
-            // Set on the session that came back, not passed to createSession, which prefers
-            // settings.getLocalRepository() over its argument and may in any case hand back a
-            // session another tool built. See derivedRepositories for why that happens.
+            // The CLI repository option must override the local repository in settings.xml.
             session = session.withLocalRepository(session.createLocalRepository(localRepository));
         }
-        return session.withRemoteRepositories(derivedRepositories(session));
+        return session;
     }
 
     /**
@@ -399,42 +388,6 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
                 (DefaultRepositorySystemSession) InternalSession.from(session).getSession();
         rsession.setWorkspaceReader(reader);
         return session;
-    }
-
-    /**
-     * The repositories to resolve from, derived here rather than taken as they came.
-     * <p>
-     * {@code ApiRunner.createSession} asks its injector for an unqualified {@code Session}, and
-     * {@code InjectorImpl} registers a qualified {@code @Provides} under the unqualified key as
-     * well, so a provider belonging to a sibling tool can answer it and bring its own hardcoded
-     * repositories. Deriving the list from the settings gives the same answer whichever session
-     * came back, and keeps the repositories an operator declared: a parent that lives only in an
-     * internal repository has to resolve here exactly as it does under {@code mvn}.
-     * <p>
-     * The fallback matters only where no settings file declares a repository, which for a real
-     * installation means never: {@code conf/settings.xml} ships Central. It states Central with
-     * snapshots off, as that file does, because the two-argument
-     * {@link Session#createRemoteRepository(String, String)} takes the resolver's defaults
-     * instead, which enable snapshots and lower checksum checking to a warning.
-     */
-    private static List<RemoteRepository> derivedRepositories(Session session) {
-        RepositoryFactory factory = session.getService(RepositoryFactory.class);
-        Profile settingsProfile = session.getService(SettingsBuilder.class)
-                .convert(org.apache.maven.api.settings.Profile.newBuilder()
-                        .repositories(session.getSettings().getRepositories())
-                        .build());
-        List<RemoteRepository> repositories = settingsProfile.getRepositories().stream()
-                .map(factory::createRemote)
-                .toList();
-        return repositories.isEmpty()
-                ? List.of(factory.createRemote(Repository.newBuilder()
-                        .id(RemoteRepository.CENTRAL_ID)
-                        .url(CENTRAL_URL)
-                        .releases(RepositoryPolicy.newBuilder().enabled("true").build())
-                        .snapshots(
-                                RepositoryPolicy.newBuilder().enabled("false").build())
-                        .build()))
-                : repositories;
     }
 
     /**
