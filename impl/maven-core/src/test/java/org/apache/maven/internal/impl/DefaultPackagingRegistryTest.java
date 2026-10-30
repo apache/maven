@@ -28,15 +28,29 @@ import org.apache.maven.api.Type;
 import org.apache.maven.api.model.PluginContainer;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.TypeRegistry;
+import org.apache.maven.api.spi.PackagingProvider;
 import org.apache.maven.lifecycle.mapping.LifecycleMapping;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 class DefaultPackagingRegistryTest {
+
+    @Test
+    void packagingProvidedByExtensionIsFound() {
+        Packaging packaging = Mockito.mock(Packaging.class);
+        when(packaging.id()).thenReturn("app-client");
+        PackagingProvider provider = () -> Collections.singletonList(packaging);
+
+        DefaultPackagingRegistry registry = new DefaultPackagingRegistry(
+                Mockito.mock(Lookup.class), Mockito.mock(TypeRegistry.class), Collections.singletonList(provider));
+
+        assertSame(packaging, registry.lookup("APP-CLIENT").orElseThrow());
+    }
 
     @Test
     void defaultProducesMainArtifactIsTrue() {
