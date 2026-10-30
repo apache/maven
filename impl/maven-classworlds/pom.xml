@@ -45,9 +45,9 @@ under the License.
         <groupId>org.apache.rat</groupId>
         <artifactId>apache-rat-plugin</artifactId>
         <configuration>
-          <excludes>
-            <exclude>src/test/test-data/**</exclude>
-          </excludes>
+          <inputExcludes>
+            <inputExclude>src/test/test-data/**</inputExclude>
+          </inputExcludes>
         </configuration>
       </plugin>
       <plugin>
