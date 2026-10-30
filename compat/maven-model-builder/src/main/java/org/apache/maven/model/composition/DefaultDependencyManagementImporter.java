@@ -22,9 +22,11 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
@@ -62,11 +64,21 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
                 target.setDependencyManagement(depMgmt);
             }
 
+            Set<String> directDependencies = new HashSet<>(dependencies.keySet());
+
             for (DependencyManagement source : sources) {
                 for (Dependency dependency : source.getDependencies()) {
                     String key = dependency.getManagementKey();
-                    if (!dependencies.containsKey(key)) {
+                    Dependency present = dependencies.get(key);
+                    if (present == null) {
                         dependencies.put(key, dependency);
+                    } else if (directDependencies.contains(key)
+                            && present.getVersion() == null
+                            && dependency.getVersion() != null) {
+                        Dependency updated = present.clone();
+                        updated.setVersion(dependency.getVersion());
+                        updated.setLocation("version", dependency.getLocation("version"));
+                        dependencies.put(key, updated);
                     }
                 }
             }
