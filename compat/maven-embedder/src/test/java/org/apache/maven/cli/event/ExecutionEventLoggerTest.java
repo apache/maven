@@ -216,7 +216,6 @@ class ExecutionEventLoggerTest {
 
         MavenSession session = mock(MavenSession.class);
         when(session.getProjects()).thenReturn(List.of(project1, project2, project3));
-        when(session.getAllProjects()).thenReturn(List.of(project1, project2, project3));
 
         ExecutionEvent sessionStartedEvent = mock(ExecutionEvent.class);
         when(sessionStartedEvent.getSession()).thenReturn(session);
@@ -249,7 +248,6 @@ class ExecutionEventLoggerTest {
 
         MavenSession session = mock(MavenSession.class);
         when(session.getProjects()).thenReturn(List.of(project1, project2, project3));
-        when(session.getAllProjects()).thenReturn(List.of(project1, project2, project3));
 
         ExecutionEvent sessionStartedEvent = mock(ExecutionEvent.class);
         when(sessionStartedEvent.getSession()).thenReturn(session);
@@ -276,13 +274,11 @@ class ExecutionEventLoggerTest {
     @Test
     void testMultiModuleProjectResumeFromProgress() {
         // prepare
-        MavenProject project1 = generateMavenProject("Apache Maven Embedder 1");
         MavenProject project2 = generateMavenProject("Apache Maven Embedder 2");
         MavenProject project3 = generateMavenProject("Apache Maven Embedder 3");
 
         MavenSession session = mock(MavenSession.class);
         when(session.getProjects()).thenReturn(List.of(project2, project3));
-        when(session.getAllProjects()).thenReturn(List.of(project1, project2, project3));
 
         ExecutionEvent sessionStartedEvent = mock(ExecutionEvent.class);
         when(sessionStartedEvent.getSession()).thenReturn(session);
@@ -298,9 +294,51 @@ class ExecutionEventLoggerTest {
 
         // verify
         InOrder inOrder = inOrder(logger);
-        inOrder.verify(logger, never()).info(matches(".*Apache Maven Embedder 1.*\\[1\\/3\\]"));
-        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 2.*\\[2\\/3\\]"));
-        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 3.*\\[3\\/3\\]"));
+        inOrder.verify(logger, never()).info(matches(".*Apache Maven Embedder 1.*\\[1\\/2\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 2.*\\[1\\/2\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 3.*\\[2\\/2\\]"));
+    }
+
+    @Test
+    void testMultiModuleProjectProgressIsRelativeToTheBuiltReactor() {
+        // the counters must be relative to the reactor under build, even when the reactor is only
+        // a subset of all the projects collected for the project (e.g. a -pl / subdirectory build)
+        MavenProject project1 = generateMavenProject("Apache Maven Embedder 1");
+        MavenProject project2 = generateMavenProject("Apache Maven Embedder 2");
+        MavenProject project3 = generateMavenProject("Apache Maven Embedder 3");
+        MavenProject project4 = generateMavenProject("Apache Maven Embedder 4");
+        // projects collected but not part of the built reactor
+        MavenProject project5 = generateMavenProject("Apache Maven Embedder 5");
+        MavenProject project6 = generateMavenProject("Apache Maven Embedder 6");
+
+        MavenSession session = mock(MavenSession.class);
+        when(session.getProjects()).thenReturn(List.of(project1, project2, project3, project4));
+        lenient()
+                .when(session.getAllProjects())
+                .thenReturn(List.of(project5, project6, project1, project2, project3, project4));
+
+        ExecutionEvent sessionStartedEvent = mock(ExecutionEvent.class);
+        when(sessionStartedEvent.getSession()).thenReturn(session);
+        ExecutionEvent projectStartedEvent1 = mock(ExecutionEvent.class);
+        when(projectStartedEvent1.getProject()).thenReturn(project1);
+        ExecutionEvent projectStartedEvent2 = mock(ExecutionEvent.class);
+        when(projectStartedEvent2.getProject()).thenReturn(project2);
+        ExecutionEvent projectStartedEvent3 = mock(ExecutionEvent.class);
+        when(projectStartedEvent3.getProject()).thenReturn(project3);
+        ExecutionEvent projectStartedEvent4 = mock(ExecutionEvent.class);
+        when(projectStartedEvent4.getProject()).thenReturn(project4);
+
+        executionEventLogger.sessionStarted(sessionStartedEvent);
+        executionEventLogger.projectStarted(projectStartedEvent1);
+        executionEventLogger.projectStarted(projectStartedEvent2);
+        executionEventLogger.projectStarted(projectStartedEvent3);
+        executionEventLogger.projectStarted(projectStartedEvent4);
+
+        InOrder inOrder = inOrder(logger);
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 1.*\\[1\\/4\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 2.*\\[2\\/4\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 3.*\\[3\\/4\\]"));
+        inOrder.verify(logger).info(matches(".*Apache Maven Embedder 4.*\\[4\\/4\\]"));
     }
 
     @Test

@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
 
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.cli.Invoker;
@@ -74,8 +75,13 @@ public class MavenCling extends ClingSupport {
 
     private static int delegateMain(String mainClass, String[] args, ClassWorld world) throws IOException {
         try {
-            Class<?> clazz = Thread.currentThread().getContextClassLoader().loadClass(mainClass);
-            Method method = clazz.getMethod("main", String[].class, ClassWorld.class);
+            ClassLoader cl = Thread.currentThread().getContextClassLoader();
+            Class<?> clazz = cl.loadClass(mainClass);
+            Class<?> cwClass = cl.loadClass(ClassWorld.class.getName());
+            Method method = clazz.getMethod("main", String[].class, cwClass);
+            if (!Modifier.isStatic(method.getModifiers()) || !Modifier.isPublic(method.getModifiers())) {
+                throw new NoSuchMethodException(mainClass + ".main(String[], ClassWorld)");
+            }
             return (int) method.invoke(null, args, world);
         } catch (ClassNotFoundException e) {
             throw new IOException("Cannot find maven.mainClass: " + mainClass, e);

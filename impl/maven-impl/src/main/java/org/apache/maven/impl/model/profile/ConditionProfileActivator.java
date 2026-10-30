@@ -77,7 +77,7 @@ public class ConditionProfileActivator implements ProfileActivator {
         String condition = profile.getActivation().getCondition();
         try {
             Map<String, ConditionParser.ExpressionFunction> functions = registerFunctions(context, versionParser);
-            UnaryOperator<String> propertyResolver = s -> property(context, s);
+            UnaryOperator<String> propertyResolver = s -> property(profile, context, s);
             return toBoolean(new ConditionParser(functions, propertyResolver).parse(condition));
         } catch (Exception e) {
             problems.add(
@@ -160,12 +160,16 @@ public class ConditionProfileActivator implements ProfileActivator {
      * @return The value of the property, or null if not found
      * @throws IllegalArgumentException if the number of arguments is not exactly one
      */
-    String property(ProfileActivationContext context, String name) {
-        String value = doGetProperty(context, name);
-        return interpolator.interpolate(value, s -> doGetProperty(context, s));
+    String property(Profile profile, ProfileActivationContext context, String name) {
+        String value = doGetProperty(profile, context, name);
+        return interpolator.interpolate(value, s -> doGetProperty(profile, context, s));
     }
 
-    static String doGetProperty(ProfileActivationContext context, String name) {
+    /**
+     * Property lookup order: user properties, system properties, cascaded profile
+     * properties, model properties (POM profiles only).
+     */
+    static String doGetProperty(Profile profile, ProfileActivationContext context, String name) {
         // Handle special project-related properties
         if ("project.basedir".equals(name)) {
             return context.getModelBaseDirectory();
@@ -183,14 +187,14 @@ public class ConditionProfileActivator implements ProfileActivator {
         // Check user properties
         String v = context.getUserProperty(name);
         if (v == null) {
-            // Check project properties
-            // TODO: this may leads to instability between file model activation and effective model activation
-            //       as the effective model properties may be different from the file model
-            v = context.getModelProperty(name);
-        }
-        if (v == null) {
             // Check system properties
             v = context.getSystemProperty(name);
+        }
+        if (v == null && profile != null && Profile.SOURCE_POM.equals(profile.getSource())) {
+            v = context.getCascadedProfileProperty(name);
+            if (v == null) {
+                v = context.getModelProperty(name);
+            }
         }
         return v;
     }

@@ -1726,8 +1726,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // profiles (JDK/OS/activeByDefault/system-property/negated-property)
                     // reach injection, and stripping their repositories would break the
                     // established project → dep1 → dep2 pattern. See #13100.
-                    // TODO(#13146): repositories contributed by external-model profiles can shadow
-                    // central; a WARN/FAIL policy for URL mismatches should be added separately.
+                    // #13146: same-id shadowing is already mitigated by REQUEST_DOMINANT
+                    // merging (the request's repositories take precedence), so no
+                    // additional WARN/FAIL policy is needed.
                     // Condition profiles using exists()/missing() are also pre-filtered for the
                     // same reason as file profiles: in the sandbox, context.exists() always returns
                     // false, so missing(path) evaluates to !false = true and fires unconditionally.
