@@ -407,7 +407,6 @@ under the License.
               <include>org.apache.maven.artifact</include>
               <include>org.apache.maven.classrealm</include>
               <include>org.apache.maven.cli</include>
-              <include>org.apache.maven.configuration</include>
               <include>org.apache.maven.exception</include>
               <include>org.apache.maven.execution</include>
               <include>org.apache.maven.execution.scope</include>
