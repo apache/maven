@@ -34,6 +34,16 @@ import java.util.Set;
 abstract class ExtensibleEnums {
 
     /**
+     * Creates a new Dialect instance with the specified ID.
+     *
+     * @param id the identifier for the dialect
+     * @return a new Dialect instance
+     */
+    static Dialect dialect(String id) {
+        return new DefaultDialect(id);
+    }
+
+    /**
      * Creates a new Language instance with the specified ID.
      *
      * @param id the identifier for the language
@@ -147,6 +157,16 @@ abstract class ExtensibleEnums {
         @Override
         public Set<DependencyScope> dependencyScopes() {
             return dependencyScopes;
+        }
+    }
+
+    /**
+     * Implementation of the Dialect interface.
+     */
+    private static class DefaultDialect extends DefaultExtensibleEnum implements Dialect {
+
+        DefaultDialect(String id) {
+            super(id);
         }
     }
 
