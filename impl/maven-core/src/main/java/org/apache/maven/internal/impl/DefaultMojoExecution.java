@@ -18,29 +18,15 @@
  */
 package org.apache.maven.internal.impl;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
-import org.apache.maven.RepositoryUtils;
-import org.apache.maven.api.Artifact;
-import org.apache.maven.api.Dependency;
 import org.apache.maven.api.MojoExecution;
-import org.apache.maven.api.Node;
 import org.apache.maven.api.Plugin;
 import org.apache.maven.api.model.PluginExecution;
 import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
-import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
-import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.impl.DefaultNode;
-import org.eclipse.aether.graph.DependencyNode;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 
@@ -51,8 +37,6 @@ import static java.util.Objects.requireNonNull;
  * {@link org.apache.maven.plugin.MojoExecution} is retained after construction.
  */
 public class DefaultMojoExecution implements MojoExecution {
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultMojoExecution.class);
 
     private final Plugin plugin;
     private final Optional<PluginExecution> model;
@@ -81,76 +65,8 @@ public class DefaultMojoExecution implements MojoExecution {
         org.apache.maven.plugin.descriptor.MojoDescriptor legacyDescriptor = delegate.getMojoDescriptor();
         org.apache.maven.plugin.descriptor.PluginDescriptor legacyPluginDescriptor =
                 legacyDescriptor.getPluginDescriptor();
-        PluginDescriptor pluginDescriptorV4 = legacyPluginDescriptor.getPluginDescriptorV4();
-
-        ClassLoader classLoader = legacyDescriptor.getRealm();
-
-        org.apache.maven.artifact.Artifact legacyArtifact = legacyPluginDescriptor.getPluginArtifact();
-        org.eclipse.aether.artifact.Artifact resolverArtifact = RepositoryUtils.toArtifact(legacyArtifact);
-        Artifact artifact = resolverArtifact != null ? session.getArtifact(resolverArtifact) : null;
-
-        DependencyNode resolverNode = legacyPluginDescriptor.getDependencyNode();
-        Map<String, Dependency> dependenciesMap = resolverNode != null
-                ? Collections.unmodifiableMap(new DefaultNode(session, resolverNode, false)
-                        .stream()
-                                .filter(Objects::nonNull)
-                                .map(Node::getDependency)
-                                .filter(Objects::nonNull)
-                                .collect(Collectors.toMap(
-                                        d -> d.getGroupId() + ":" + d.getArtifactId(),
-                                        d -> d,
-                                        (a, b) -> a))) // first-wins on duplicate groupId:artifactId
-                // (transitive duplicates are normal)
-                : Collections.emptyMap();
-
-        org.apache.maven.api.model.Plugin modelPlugin =
-                delegate.getPlugin() != null ? delegate.getPlugin().getDelegate() : null;
-
-        // Eagerly capture lifecycle mappings so the Plugin snapshot is truly immutable.
-        // getLifecycleMappings() reads from the plugin JAR; plugins that do not bundle
-        // custom lifecycle metadata will throw here — fall back to an empty list.
-        List<Lifecycle> lifecycles;
-        try {
-            lifecycles = Collections.unmodifiableList(new ArrayList<>(
-                    legacyPluginDescriptor.getLifecycleMappings().values()));
-        } catch (Exception e) {
-            LOGGER.debug(
-                    "Unable to load lifecycle mappings for {}: {}", legacyPluginDescriptor.getId(), e.getMessage());
-            lifecycles = Collections.emptyList();
-        }
-        final List<Lifecycle> snapshotLifecycles = lifecycles;
-
-        return new Plugin() {
-            @Override
-            public org.apache.maven.api.model.Plugin getModel() {
-                return modelPlugin;
-            }
-
-            @Override
-            public PluginDescriptor getDescriptor() {
-                return pluginDescriptorV4;
-            }
-
-            @Override
-            public List<Lifecycle> getLifecycles() {
-                return snapshotLifecycles;
-            }
-
-            @Override
-            public ClassLoader getClassLoader() {
-                return classLoader;
-            }
-
-            @Override
-            public Artifact getArtifact() {
-                return artifact;
-            }
-
-            @Override
-            public Map<String, Dependency> getDependenciesMap() {
-                return dependenciesMap;
-            }
-        };
+        return new DefaultPlugin(
+                session, delegate.getPlugin(), legacyPluginDescriptor, session.getService(Lookup.class));
     }
 
     private static Optional<PluginExecution> buildModel(org.apache.maven.plugin.MojoExecution delegate) {
