@@ -132,10 +132,14 @@ under the License.
          not as org.fusesource.jansi.*, since Ansi is the only class maven-jline provides; any other class in
          that package a plugin needs falls back to its own classpath (see ClassRealm#loadClassFromImport), so
          this stays even though the jansi artifact itself is no longer exported below.
-         This is deliberately not extended to cover more of jansi (e.g. AnsiConsole): plugins have no real use
-         case for touching the console directly - Maven already offers APIs to prompt the user and to print
-         colored messages - and letting a plugin call AnsiConsole.systemInstall()/systemUninstall() itself could
-         hijack the shared stdout/stderr. See the discussion on #13727. -->
+         This is deliberately not extended to cover more of jansi (e.g. AnsiConsole): Maven itself has no use
+         for it, since colored output already goes through MessageBuilderFactory, and exporting it would
+         present AnsiConsole as a Maven-sanctioned way for a plugin to touch the shared console, which, via
+         AnsiConsole.systemInstall()/systemUninstall(), can swap out the process-wide stdout/stderr streams.
+         A plugin that brings its own jansi dependency can still do that today - removing jansi from
+         exportedArtifact above only stops Maven from blocking that dependency, it doesn't stop the plugin
+         from using it - so this export list is simply not the place to add official support for it.
+         See the discussion on #13727. -->
     <exportedPackage>org.fusesource.jansi.Ansi</exportedPackage>
   </exportedPackages>
 
