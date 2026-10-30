@@ -16,17 +16,13 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.its.mng12534;
+package org.apache.maven.api.services;
 
-import org.apache.maven.api.di.Named;
+import org.apache.maven.api.Dialect;
 
 /**
- * DI factory for the TouchMojo. Normally maven-plugin-plugin generates this class
- * at build time, but since we use a handcrafted V2 plugin descriptor (to include
- * afterLinks), we must provide the factory manually.
+ * Registry for {@link Dialect} extensible enum values.
  *
- * The @Named value must match MojoDescriptor.getRoleHint() at runtime:
- * "groupId:artifactId:version:goal"
+ * @since 4.1.0
  */
-@Named("org.apache.maven.its.mng12534:mng12534-plugin:1.0-SNAPSHOT:touch")
-public class TouchMojoFactory extends TouchMojo {}
+public interface DialectRegistry extends ExtensibleEnumRegistry<Dialect> {}

@@ -343,6 +343,10 @@ public interface XmlNode {
         return XmlService.merge(dominant, recessive, null);
     }
 
+    /**
+     * @deprecated Use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     static XmlNode merge(
             @Nullable XmlNode dominant, @Nullable XmlNode recessive, @Nullable Boolean childMergeOverride) {
