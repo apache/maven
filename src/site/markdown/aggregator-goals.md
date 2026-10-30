@@ -95,15 +95,15 @@ Over successive Maven releases, multiple discrepancies and pain points have been
 
 ---
 
-## 3. Maven 4 Concurrent Builder: `before:`/`after:` Phase System
+## 3. Maven 4: `before:`/`after:` Phase System
 
-The Maven 4 concurrent builder introduces a first-class solution to several of the shortcomings above through
+Maven 4 introduces a first-class solution to several of the shortcomings above through
 the `before:` and `after:` phase prefixes and two special reactor-scoped phases: `all` and `each`.
 
-> **Note**: The `before:`/`after:` phase system and the `all`/`each` phases require the **concurrent builder**
-> (`ConcurrentLifecycleStarter`, activated via `-b concurrent`). They work with any POM model version
-> (4.0.0 or 4.1.0) — no model version upgrade is required. They are not supported by the legacy
-> singlethreaded or multithreaded builders (`DefaultLifecycleStarter`, the default when no `-b` flag is passed).
+> **Note**: The `before:`/`after:` phase system and the `all`/`each` phases work with **all** builders
+> (singlethreaded, multithreaded `-T`, and concurrent `-b concurrent`). They work with any POM model version
+> (4.0.0 or 4.1.0) — no model version upgrade is required. The concurrent builder additionally provides
+> DAG-based ordering enforcement (no `aggregatorLock`), while the legacy builders execute phases sequentially.
 
 ### 3.1 The `all` and `each` Phases
 
@@ -120,25 +120,26 @@ all                    ← reactor-scoped wrapper (children link)
     └── deploy
 ```
 
-The `all` phase carries a `children(all)` link, which the concurrent builder translates into DAG edges:
+The `all` phase carries a `children(all)` link, which is translated into ordering constraints:
 - The root project's `before:all` fires first; every child project's `before:all` waits for it to complete.
 - The root project's `after:all` fires only after every child's `after:all` has completed.
 
 This means a plugin goal bound to `after:all` on the root project is **guaranteed to run once, after all
-reactor subprojects have finished their full build** — enforced by the DAG, not by a global lock.
+reactor subprojects have finished their full build**. With the concurrent builder, this is enforced by DAG
+edges; with the legacy builders, by sequential phase execution order.
 
 ### 3.2 Solving the Aggregation Problems
 
-| Problem (section 2) | Concurrent builder solution |
+| Problem (section 2) | Solution |
 | :--- | :--- |
-| **CLI vs. lifecycle discrepancy** ([MNG-6336](https://github.com/apache/maven/issues/7529)) | Bind to `after:all` on the root project — runs once after the full reactor. The timing guarantee is enforced by the DAG regardless of whether the goal was invoked via CLI or lifecycle. Note: `<inherited>false</inherited>` is still required if the execution is declared in a parent POM, since the `before:`/`after:` system controls ordering, not inheritance. |
+| **CLI vs. lifecycle discrepancy** ([MNG-6336](https://github.com/apache/maven/issues/7529)) | Bind to `after:all` on the root project — runs once after the full reactor. The timing guarantee is enforced regardless of whether the goal was invoked via CLI or lifecycle, and works with all builders. Note: `<inherited>false</inherited>` is still required if the execution is declared in a parent POM, since the `before:`/`after:` system controls ordering, not inheritance. |
 | **Execution timing** (aggregator runs before children are built) | `after:all` fires after all children complete `all`, which includes `build`/`verify`. Artifact outputs are available. |
 | **`before:each` / `after:each`** | Goals bound to these phases run once per subproject, bracketing each module's full build. Useful for per-module setup/teardown. |
 
 ### 3.3 Example: Aggregated Javadoc after the Full Reactor
 
 ```xml
-<!-- requires -b concurrent; works with any model version -->
+<!-- works with any builder and any model version -->
 <execution>
   <id>aggregate-javadoc</id>
   <goals><goal>aggregate</goal></goals>
@@ -167,7 +168,7 @@ This decomposition means new Maven 4 plugins should **not** use `@Mojo(aggregato
 - Use `@Resolution` fields for dependency injection, which is already orthogonal to aggregator.
 - Express ordering constraints via `@After` with `PROJECT`, `DEPENDENCIES`, or `CHILDREN` type values.
 
-For backward compatibility, existing plugin descriptors declaring `aggregator=true` will continue to work in Maven 4.x; the target for Maven 5.x is to map the flag to equivalent DAG constraints internally (see §3.6 roadmap).
+For backward compatibility, existing plugin descriptors declaring `aggregator=true` will continue to work. The target is to automatically map the flag to equivalent DAG constraints internally so that legacy plugins benefit without source changes (see §3.6 roadmap and [#13763](https://github.com/apache/maven/issues/13763)).
 
 ### 3.5 Deprecating Forked Lifecycles (`@Execute`)
 
@@ -193,15 +194,15 @@ The Maven 4 replacement is `@After` constraints:
 @After(phase = "test-compile", type = After.Type.PROJECT)
 ```
 
-The `computeForkPlan()` machinery, `$plan$` sentinel detection, and `getExecutionProject()` API can be deprecated for v4 mojos. Maven 3 plugin descriptors declaring `@Execute` will be translated into equivalent `@After` constraints at descriptor load time.
+The `computeForkPlan()` machinery, `$plan$` sentinel detection, and `getExecutionProject()` API can be deprecated for v4 mojos. As part of the migration roadmap, Maven 3 plugin descriptors declaring `@Execute` should be translated into equivalent `@After` constraints at descriptor load time.
 
 ### 3.6 Migration Roadmap
 
 | Phase | Action |
 | :--- | :--- |
-| **Maven 4.0** | `before:`/`after:` phases available; `aggregator` and `@Execute` still supported |
-| **Maven 4.x** | Document `aggregator` and `@Execute` as deprecated for new plugins; provide migration guide |
-| **Maven 5.x** | Remove forked lifecycle machinery; `aggregator` mapped to phase binding internally |
+| **Maven 4.0** | `before:`/`after:` phases available with all builders; `aggregator` and `@Execute` still supported |
+| **Maven 4.x** | Deprecate `aggregator` and `@Execute` with runtime warnings ([#13762](https://github.com/apache/maven/issues/13762)); auto-map `aggregator=true` to DAG constraints in the concurrent builder ([#13763](https://github.com/apache/maven/issues/13763)); provide migration guide ([#13764](https://github.com/apache/maven/issues/13764)) |
+| **Maven 5.x** | Remove forked lifecycle machinery; remove `aggregator` flag |
 
 ---
 
@@ -219,3 +220,6 @@ The `computeForkPlan()` machinery, `$plan$` sentinel detection, and `getExecutio
 | MNG-4504 | [#5543](https://github.com/apache/maven/issues/5543) | Disallowing all aggregator bindings to any lifecycle is too broad | Lifecycle policy |
 | MNG-7900 | [#9015](https://github.com/apache/maven/issues/9015) | Wrapper lifecycle in multi module project should be executed only in root module | Wrapper lifecycle |
 | - | [#13529](https://github.com/apache/maven/issues/13529) | Concurrent builder drops later lifecycle phases when merging overlapping task segments (fixed in [#13532](https://github.com/apache/maven/pull/13532)) | Task segment merging |
+| - | [#13762](https://github.com/apache/maven/issues/13762) | Deprecate `aggregator=true` and `@Execute` with runtime warnings | Deprecation |
+| - | [#13763](https://github.com/apache/maven/issues/13763) | Auto-map `aggregator=true` to DAG constraints in the concurrent builder | Auto-migration |
+| - | [#13764](https://github.com/apache/maven/issues/13764) | Plugin author migration guide for `aggregator=true` to `after:all` | Documentation |
