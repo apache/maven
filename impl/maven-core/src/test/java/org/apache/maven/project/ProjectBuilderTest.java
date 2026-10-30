@@ -296,6 +296,9 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
             </project>
             """);
 
+        // The child POM intentionally uses modelVersion 4.1.0: the validation warning
+        // "only specify relativePath or groupId/artifactId" is only emitted for non-4.0.0 model
+        // versions when the parent declares both a relativePath and explicit groupId/artifactId.
         Path childPom = Files.createDirectory(tempDir.resolve("child")).resolve("pom.xml");
         Files.writeString(childPom, """
             <project xmlns="http://maven.apache.org/POM/4.1.0">
@@ -329,9 +332,11 @@ class ProjectBuilderTest extends AbstractCoreMavenComponentTestCase {
             assertEquals("parent", child.getParentArtifact().getArtifactId());
             assertEquals(parentPom.toFile(), child.getParentFile());
 
+            // Match on severity + field name rather than the full message body to stay resilient to wording changes.
+            // The validator emits: "'parent.relativePath' only specify relativePath or groupId/artifactId …"
             boolean hasRelativePathWarning = result.getProblems().stream()
-                    .anyMatch(problem ->
-                            problem.getMessage().contains("only specify relativePath or groupId/artifactId"));
+                    .anyMatch(problem -> problem.getSeverity() == ModelProblem.Severity.WARNING
+                            && problem.getMessage().contains("'parent.relativePath'"));
 
             assertEquals(
                     validationLevel == ModelBuildingRequest.VALIDATION_LEVEL_STRICT,

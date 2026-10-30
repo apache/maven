@@ -2990,6 +2990,13 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
+        /**
+         * Whether the request uses project-level semantics (local parent lookup, profile activation, etc.).
+         * This includes both strict build requests and the lenient {@link ModelBuilderRequest.RequestType#LOAD_PROJECT}
+         * type, which behaves like a build request for resolution purposes but does not enforce strict validation.
+         *
+         * @see #isStrictRequest() for requests that also require strict parsing and validation
+         */
         boolean isBuildRequest() {
             return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
                     || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
@@ -3003,7 +3010,9 @@ public class DefaultModelBuilder implements ModelBuilder {
          * (local parents, profile activation) and keeps the lenient defaults of the consumer requests.
          */
         boolean isStrictRequest() {
-            return isBuildRequest() && request.getRequestType() != ModelBuilderRequest.RequestType.LOAD_PROJECT;
+            return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER;
         }
 
         boolean isBuildRequestWithActivation() {
