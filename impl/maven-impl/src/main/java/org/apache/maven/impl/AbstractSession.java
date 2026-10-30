@@ -159,14 +159,24 @@ public abstract class AbstractSession implements InternalSession {
         this.repositories = getRepositories(repositories, resolverRepositories);
         this.lookup = lookup;
         this.injector = lookup != null ? lookup.lookupOptional(Injector.class).orElse(null) : null;
-        this.listeners = getListeners(session);
+        this.listeners = getListeners(session, lookup);
         this.context = context;
     }
 
     @SuppressWarnings("unchecked")
-    private static List<Listener> getListeners(RepositorySystemSession session) {
+    private static List<Listener> getListeners(RepositorySystemSession session, Lookup lookup) {
         // Both event families share the registration scope of the underlying repository system session.
-        return (List<Listener>) session.getData().computeIfAbsent(Listener.class, CopyOnWriteArrayList::new);
+        return (List<Listener>) session.getData().computeIfAbsent(Listener.class, () -> {
+            List<Listener> list = new CopyOnWriteArrayList<>();
+            if (lookup != null) {
+                for (Listener listener : lookup.lookupList(Listener.class)) {
+                    if (!list.contains(listener)) {
+                        list.add(listener);
+                    }
+                }
+            }
+            return list;
+        });
     }
 
     @SuppressWarnings("unchecked")
