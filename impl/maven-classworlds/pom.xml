@@ -111,7 +111,7 @@ under the License.
                 <artifactItem>
                   <groupId>jakarta.xml.bind</groupId>
                   <artifactId>jakarta.xml.bind-api</artifactId>
-                  <version>4.0.2</version>
+                  <version>4.0.5</version>
                 </artifactItem>
               </artifactItems>
               <outputDirectory>${project.build.directory}/test-lib</outputDirectory>
