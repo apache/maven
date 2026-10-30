@@ -40,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -262,6 +263,39 @@ class V4MojoConfiguratorTest {
         assertEquals(Set.of("e"), mojo.set);
         assertEquals(Map.of("k1", "v1", "k2", "v2"), mojo.map);
         assertEquals("pv1", mojo.properties.getProperty("p1"));
+    }
+
+    @Test
+    void testPropertiesNullSafetyOnUnresolvedExpression() throws Exception {
+        ExpressionEvaluator nullEvaluator = mock(ExpressionEvaluator.class);
+        when(nullEvaluator.evaluate(anyString())).thenReturn(null);
+        V4MojoConfigurator nullConfigurator =
+                new V4MojoConfigurator(nullEvaluator, getClass().getClassLoader(), pluginDescriptor);
+
+        CollectionsMojo mojo = new CollectionsMojo();
+        XmlNode config = new XmlNodeImpl(
+                "configuration",
+                null,
+                Map.of(),
+                List.of(new XmlNodeImpl(
+                        "properties", null, Map.of(), List.of(new XmlNodeImpl("key", "${unresolved.value}")), null)),
+                null);
+
+        // Must not throw NullPointerException (Properties extends Hashtable, which rejects null values)
+        nullConfigurator.configure(mojo, config);
+        assertNotNull(mojo.properties);
+        assertTrue(mojo.properties.isEmpty(), "Null-valued property entry must be silently skipped");
+    }
+
+    @Test
+    void testEmptyElementNameThrows() {
+        ScalarMojo mojo = new ScalarMojo();
+        XmlNode config = new XmlNodeImpl("configuration", null, Map.of(), List.of(new XmlNodeImpl("", "value")), null);
+
+        assertThrows(
+                Exception.class,
+                () -> configurator.configure(mojo, config),
+                "Empty element name must throw, not silently fail");
     }
 
     // Package-private class with non-public constructor (issue #13459 / #13470)
