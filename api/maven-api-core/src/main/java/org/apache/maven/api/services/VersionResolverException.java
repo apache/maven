@@ -22,6 +22,8 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
+ * Exception thrown when resolving a meta-version (such as {@code LATEST} or {@code RELEASE}) fails.
+ *
  * @since 4.0.0
  */
 @Experimental
