@@ -129,8 +129,6 @@ under the License.
 
   <properties>
     <javaVersion>17</javaVersion>
-    <maven.compiler.source>${javaVersion}</maven.compiler.source>
-    <maven.compiler.target>${javaVersion}</maven.compiler.target>
     <maven.compiler.proc>full</maven.compiler.proc>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <maven.baseline>3.9.8</maven.baseline>

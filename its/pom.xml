@@ -72,8 +72,6 @@ under the License.
     <maven.site.path>core-its</maven.site.path>
     <maven.site.cache>${user.home}/maven-sites</maven.site.cache>
     <rat.ignoreErrors>true</rat.ignoreErrors>
-    <!--    <maven.compiler.source>8</maven.compiler.source>-->
-    <!--    <maven.compiler.target>8</maven.compiler.target>-->
 
     <maven-plugin-tools-version>3.16.0</maven-plugin-tools-version>
     <!-- Maven version being tested - must match the parent project version -->
