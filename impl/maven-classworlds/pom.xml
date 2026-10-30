@@ -96,6 +96,7 @@ under the License.
             </goals>
             <phase>generate-test-resources</phase>
             <configuration>
+              <stripVersion>true</stripVersion>
               <artifactItems>
                 <artifactItem>
                   <groupId>org.apache.ant</groupId>
