@@ -33,6 +33,18 @@ import org.apache.maven.api.annotations.Nonnull;
  * For a given dependency, the scope is directly derived from the
  * {@link org.apache.maven.api.model.Dependency#getScope()} and will be used when using {@link PathScope}
  * and the {@link org.apache.maven.api.services.DependencyResolver}.
+ * <p>
+ * Each scope controls which {@link PathScope} classpaths the dependency appears on
+ * (see {@link PathScope#MAIN_COMPILE}, {@link PathScope#MAIN_RUNTIME},
+ * {@link PathScope#TEST_COMPILE}, {@link PathScope#TEST_RUNTIME}),
+ * and whether the dependency is propagated transitively to downstream projects
+ * (see {@link #isTransitive()}).
+ * <p>
+ * When resolving the transitive graph of a dependency, the effective scope of its transitive
+ * dependencies may be narrowed. In particular, transitive {@code compile} and {@code runtime}
+ * dependencies of a {@link #PROVIDED} dependency are pulled in with effective {@code provided}
+ * scope, while transitive {@code provided} and {@code test} dependencies of a {@code provided}
+ * dependency are omitted entirely.
  *
  * @since 4.0.0
  * @see org.apache.maven.api.model.Dependency#getScope()
@@ -59,16 +71,17 @@ public enum DependencyScope {
     /**
      * Compile only.
      * <p>
-     * A dependency required for compiling the main project code, but not included in the main runtime classpath.
+     * A dependency required for compiling the main project code, but available only on the main
+     * compile classpath. It is not available on the main runtime, test compile, or test runtime
+     * classpaths.
      */
     COMPILE_ONLY("compile-only", false),
 
     /**
      * Compile.
      * <p>
-     * The default scope used when no scope is explicitly given for a direct dependency.
-     * Dependencies in this scope are required for compiling, testing, and running the project,
-     * and are transitive.
+     * A dependency required for compiling, testing, and running the project.
+     * Dependencies in this scope are available on all classpaths and are transitive.
      */
     COMPILE("compile", true),
 
@@ -76,7 +89,9 @@ public enum DependencyScope {
      * Runtime.
      * <p>
      * A dependency not required for compiling the project source code, but required for executing
-     * and testing the project. Dependencies in this scope are transitive.
+     * the project and running tests. Dependencies in this scope are available on the main runtime
+     * and test runtime classpaths, but not on the main compile or test compile classpaths.
+     * Dependencies in this scope are transitive.
      */
     RUNTIME("runtime", true),
 
@@ -84,19 +99,9 @@ public enum DependencyScope {
      * Provided.
      * <p>
      * A dependency required for compilation and testing that is expected to be provided at runtime
-     * by the JDK or the runtime environment/container.
-     * <p>
-     * <b>Transitivity and classpath behavior:</b>
-     * <ul>
-     *   <li><b>Downstream transitivity:</b> Dependencies in this scope are not transitive to projects
-     *       that depend on this project.</li>
-     *   <li><b>Upstream transitivity:</b> Transitive {@code compile} and {@code runtime} dependencies
-     *       of a provided dependency are included and assigned effective {@code provided} scope.</li>
-     *   <li><b>Omitted dependencies:</b> Transitive {@code provided} and {@code test} dependencies of
-     *       a provided dependency are omitted.</li>
-     *   <li><b>Classpaths:</b> Available on compile and test classpaths, but not on the main runtime
-     *       classpath.</li>
-     * </ul>
+     * by the JDK or the runtime environment/container. Dependencies in this scope are available on
+     * the main compile, test compile, and test runtime classpaths, but not on the main runtime
+     * classpath. Dependencies in this scope are not transitive to downstream projects.
      */
     PROVIDED("provided", false),
 
