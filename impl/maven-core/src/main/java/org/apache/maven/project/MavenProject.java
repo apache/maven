@@ -169,6 +169,8 @@ public class MavenProject implements Cloneable {
     // calculated.
     private Map<String, Artifact> artifactMap;
 
+    private Map<String, Artifact> artifactMapByDependencyConflictId;
+
     private Model originalModel;
 
     private Map<String, Artifact> pluginArtifactMap;
@@ -883,6 +885,7 @@ public class MavenProject implements Cloneable {
         this.artifacts = artifacts;
         // flush the calculated artifactMap
         artifactMap = null;
+        artifactMapByDependencyConflictId = null;
     }
 
     /**
@@ -916,9 +919,21 @@ public class MavenProject implements Cloneable {
         }
         return artifactMap;
     }
-    /** @see ArtifactMaps#byDependencyConflictId(java.util.Collection) @since 4.1.0 */
+
+    /**
+     * Returns a map of artifacts keyed by {@link org.apache.maven.artifact.Artifact#getDependencyConflictId()}
+     * (groupId:artifactId:type[:classifier]). Unlike {@link #getArtifactMap()}, this map disambiguates
+     * artifacts that share the same groupId and artifactId but differ by classifier (e.g. a jar and its
+     * {@code tests}-classified companion), which would otherwise collide under the same key (MNG-5552).
+     *
+     * @return a mutable map keyed by dependency conflict id; if two artifacts share the same key the last one wins
+     * @since 4.1.0
+     */
     public Map<String, Artifact> getArtifactMapByDependencyConflictId() {
-        return ArtifactMaps.byDependencyConflictId(getArtifacts());
+        if (artifactMapByDependencyConflictId == null) {
+            artifactMapByDependencyConflictId = ArtifactMaps.byDependencyConflictId(getArtifacts());
+        }
+        return artifactMapByDependencyConflictId;
     }
 
     public void setPluginArtifacts(Set<Artifact> pluginArtifacts) {
@@ -1517,6 +1532,7 @@ public class MavenProject implements Cloneable {
         this.resolvedArtifacts = (artifacts != null) ? artifacts : Collections.emptySet();
         this.artifacts = null;
         this.artifactMap = null;
+        this.artifactMapByDependencyConflictId = null;
     }
 
     /**
@@ -1531,6 +1547,7 @@ public class MavenProject implements Cloneable {
         this.artifactFilter = artifactFilter;
         this.artifacts = null;
         this.artifactMap = null;
+        this.artifactMapByDependencyConflictId = null;
     }
 
     /**
