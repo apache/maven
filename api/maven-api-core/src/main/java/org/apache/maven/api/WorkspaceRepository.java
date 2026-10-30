@@ -34,7 +34,7 @@ public interface WorkspaceRepository extends Repository {
      */
     @Nonnull
     @Override
-    default String getType() {
+    default String type() {
         return "workspace";
     }
 }

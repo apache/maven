@@ -202,7 +202,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         this.dependencyManagementImporter = dependencyManagementImporter;
         this.pluginConfigurationExpander = pluginConfigurationExpander;
         this.versionParser = versionParser;
-        this.transformers = transformers;
+        this.transformers = transformers != null ? transformers : List.of();
         this.modelResolver = modelResolver;
         this.interpolator = interpolator;
         this.rootLocator = rootLocator;
@@ -228,15 +228,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
             try {
                 // Create or derive a session based on the request
-                ModelBuilderSessionState session;
-                if (mainSession == null) {
-                    mainSession = new ModelBuilderSessionState(request);
-                    session = mainSession;
-                } else {
-                    session = mainSession.deriveTopLevel(
-                            request,
-                            new DefaultModelBuilderResult(request, ProblemCollector.create(mainSession.session)));
-                }
+                ModelBuilderSessionState session = sessionFor(request);
                 // Build the request
                 if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
                     // build the build poms
@@ -260,6 +252,38 @@ public class DefaultModelBuilder implements ModelBuilder {
                 RequestTraceHelper.exit(trace);
             }
         }
+
+        /**
+         * Stops after the raw model, so no inheritance, interpolation or profile injection
+         * happens: only the source, the file model, the raw model and the problems are populated
+         * on the result. Reaches no repository. The checks run at strict level for any build
+         * request type; {@code BUILD_PROJECT} additionally looks for a parent beside the POM.
+         */
+        @Override
+        public ModelBuilderResult validate(ModelBuilderRequest request) throws ModelBuilderException {
+            RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
+            try {
+                ModelBuilderSessionState session = sessionFor(request);
+                // Map the reactor first: a 4.1.0 subproject may leave out its parent version,
+                // taken from the parent's own file model, so without this a valid subproject
+                // fails with "'parent.version' is missing". A POM outside any project still reads.
+                session.loadReactor(false, false);
+                session.readRawModel();
+                return session.result;
+            } finally {
+                RequestTraceHelper.exit(trace);
+            }
+        }
+
+        /** Creates the session on the first request, then derives one with its own result. */
+        private ModelBuilderSessionState sessionFor(ModelBuilderRequest request) {
+            if (mainSession == null) {
+                mainSession = new ModelBuilderSessionState(request);
+                return mainSession;
+            }
+            return mainSession.deriveTopLevel(
+                    request, new DefaultModelBuilderResult(request, ProblemCollector.create(mainSession.session)));
+        }
     }
 
     protected class ModelBuilderSessionState implements ModelProblemCollector {
@@ -270,6 +294,9 @@ public class DefaultModelBuilder implements ModelBuilder {
         final Map<GAKey, Set<ModelSource>> mappedSources;
         final Set<ImportWarningKey> reportedImportWarnings;
         final Map<String, ProblemCollector<ModelProblem>> reactorProblemCollectors;
+
+        /** See {@link #loadReactor(boolean, boolean)}. */
+        private boolean reportReactorLoadFailures = true;
 
         String source;
         Model sourceModel;
@@ -338,10 +365,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             LinkedHashMap<String, RemoteRepository> byId = new LinkedHashMap<>();
             boolean hasDuplicates = false;
             for (RemoteRepository repo : repos) {
-                RemoteRepository existing = byId.putIfAbsent(repo.getId(), repo);
+                RemoteRepository existing = byId.putIfAbsent(repo.id(), repo);
                 if (existing != null) {
                     hasDuplicates = true;
-                    byId.put(repo.getId(), mergeRepositoryPolicies(existing, repo));
+                    byId.put(repo.id(), mergeRepositoryPolicies(existing, repo));
                 }
             }
             return hasDuplicates ? List.copyOf(byId.values()) : List.copyOf(repos);
@@ -458,7 +485,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
             boolean derivedExternalOrigin = externalOrigin || isExternalOrigin(request);
-            return new ModelBuilderSessionState(
+            ModelBuilderSessionState derived = new ModelBuilderSessionState(
                     session,
                     request,
                     result,
@@ -471,6 +498,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     derivedRepos,
                     new LinkedHashSet<>(),
                     derivedExternalOrigin);
+            // Carried over so the reactor walk keeps its reporting mode whichever state runs it.
+            derived.reportReactorLoadFailures = reportReactorLoadFailures;
+            return derived;
         }
 
         @Override
@@ -634,9 +664,14 @@ public class DefaultModelBuilder implements ModelBuilder {
                 source = getSource();
             }
 
-            if (line <= 0 && column <= 0 && exception instanceof ModelParserException e) {
-                line = e.getLineNumber();
-                column = e.getColumnNumber();
+            if (line <= 0 && column <= 0) {
+                if (exception instanceof ModelParserException e) {
+                    line = e.getLineNumber();
+                    column = e.getColumnNumber();
+                } else if (exception instanceof XmlReaderException e && e.getLocation() != null) {
+                    line = e.getLocation().getLineNumber();
+                    column = e.getLocation().getColumnNumber();
+                }
             }
 
             ModelProblem problem =
@@ -680,17 +715,16 @@ public class DefaultModelBuilder implements ModelBuilder {
             // build request has a well-defined set of session/request repositories that
             // should take precedence; dependency and parent resolution do not.
             if (replace && isBuildRequest()) {
-                Set<String> ids = repos.stream().map(RemoteRepository::getId).collect(Collectors.toSet());
-                repositories = repositories.stream()
-                        .filter(r -> !ids.contains(r.getId()))
-                        .toList();
+                Set<String> ids = repos.stream().map(RemoteRepository::id).collect(Collectors.toSet());
+                repositories =
+                        repositories.stream().filter(r -> !ids.contains(r.id())).toList();
                 pomRepositories = pomRepositories.stream()
-                        .filter(r -> !ids.contains(r.getId()))
+                        .filter(r -> !ids.contains(r.id()))
                         .toList();
             } else {
                 Set<String> ids =
-                        pomRepositories.stream().map(RemoteRepository::getId).collect(Collectors.toSet());
-                repos = repos.stream().filter(r -> !ids.contains(r.getId())).toList();
+                        pomRepositories.stream().map(RemoteRepository::id).collect(Collectors.toSet());
+                repos = repos.stream().filter(r -> !ids.contains(r.id())).toList();
             }
 
             RepositoryFactory repositoryFactory = session.getService(RepositoryFactory.class);
@@ -958,7 +992,17 @@ public class DefaultModelBuilder implements ModelBuilder {
             return getPropertiesWithProfiles(model, new HashMap<>());
         }
 
-        private void buildBuildPom() throws ModelBuilderException {
+        /**
+         * Loads the file models of the whole reactor from the project root, so that every model
+         * that may be needed to read another one is mapped. With {@code mandatoryRoot} false, a
+         * source outside any project is read on its own instead of failing.
+         * <p>
+         * With {@code reportLoadFailures} false, a module that cannot be loaded is logged instead
+         * of reported, so that a caller reading a single POM is not told its file is broken when
+         * a sibling is. Reading the POM it did ask about reports that one's own failure anyway.
+         */
+        private void loadReactor(boolean mandatoryRoot, boolean reportLoadFailures) {
+            this.reportReactorLoadFailures = reportLoadFailures;
             // Retrieve and normalize the source path, ensuring it's non-null and in absolute form
             Path top = request.getSource().getPath();
             if (top == null) {
@@ -971,11 +1015,12 @@ public class DefaultModelBuilder implements ModelBuilder {
             try {
                 rootDirectory = session.getRootDirectory();
             } catch (IllegalStateException e) {
-                rootDirectory = session.getService(RootLocator.class).findMandatoryRoot(top);
+                RootLocator rootLocator = session.getService(RootLocator.class);
+                rootDirectory = mandatoryRoot ? rootLocator.findMandatoryRoot(top) : rootLocator.findRoot(top);
             }
 
             // Locate and normalize the root POM if it exists, fallback to top otherwise
-            Path root = modelProcessor.locateExistingPom(rootDirectory);
+            Path root = rootDirectory != null ? modelProcessor.locateExistingPom(rootDirectory) : null;
             if (root != null) {
                 root = root.toAbsolutePath().normalize();
             } else {
@@ -984,6 +1029,10 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // Load all models starting from the root
             loadFromRoot(root, top);
+        }
+
+        private void buildBuildPom() throws ModelBuilderException {
+            loadReactor(true, true);
 
             // Check for errors after loading models
             if (hasErrors()) {
@@ -1053,14 +1102,17 @@ public class DefaultModelBuilder implements ModelBuilder {
                 loadFilePom(executor, top, root, Set.of(), r);
             }
             if (result.getFileModel() == null && !Objects.equals(top, root)) {
-                logger.warn(
-                        "The top project ({}) cannot be found in the reactor from root project ({}). "
-                                + "Make sure the root directory is correct (a missing '.mvn' directory in the root "
-                                + "project is the most common cause) and the project is correctly included "
-                                + "in the reactor (missing activated profiles, command line options, etc.). For this "
-                                + "build, the top project will be used as the root project.",
-                        top,
-                        root);
+                // Only a warning when a build is what was asked for. A caller reading one POM has
+                // no reactor to get wrong, and the retry below is routine there, not a misconfiguration.
+                (reportReactorLoadFailures ? logger.atWarn() : logger.atDebug())
+                        .log(
+                                "The top project ({}) cannot be found in the reactor from root project ({}). "
+                                        + "Make sure the root directory is correct (a missing '.mvn' directory in the root "
+                                        + "project is the most common cause) and the project is correctly included "
+                                        + "in the reactor (missing activated profiles, command line options, etc.). For this "
+                                        + "build, the top project will be used as the root project.",
+                                top,
+                                root);
                 mappedSources.clear();
                 reportedImportWarnings.clear();
                 reactorProblemCollectors.clear();
@@ -1155,7 +1207,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             } catch (ModelBuilderException e) {
                 // gathered with problem collector
-                add(Severity.ERROR, Version.V40, "Failed to load project " + pom, e);
+                if (reportReactorLoadFailures) {
+                    add(Severity.ERROR, Version.V40, "Failed to load project " + pom, e);
+                } else {
+                    // The caller asked about one POM. If that POM is the one that failed, reading
+                    // it reports the failure again in a moment, with the real reason attached.
+                    logger.debug("Failed to load project {} while mapping the reactor", pom, e);
+                }
             }
         }
 
@@ -1655,24 +1713,22 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // A model resolved to satisfy dependency resolution -- a dependency POM
                     // itself, or one of its parents, reached transitively -- evaluates profiles
                     // against a sandboxed activation context.  The sandbox:
-                    //  - merges model properties into system property lookups (so POM-declared
-                    //    <properties> drive activation via the existing property lookup chain),
+                    //  - preserves system properties (JDK/OS activation must work),
                     //  - suppresses user properties (consumer -D flags must not activate
                     //    dependency profiles — they were not set for that artifact),
+                    //  - does not expose model properties through system property lookups
+                    //    (a dependency POM's own <properties> must not activate its own
+                    //    property-based profiles — see #13390),
                     //  - disables file existence checks (publisher paths don't exist here).
-                    // Model properties are merged into system properties rather than adding
-                    // a separate lookup step in PropertyProfileActivator, because changing the
-                    // activator would affect ALL profile evaluations (including the build's own
-                    // project) and cause unintended profile activation when a POM declares a
-                    // property that matches a profile's activation condition.
                     // File-activated profiles are pre-filtered (not just sandboxed) because
                     // returning false from exists() would incorrectly activate <missing> profiles.
                     // Repository stripping is intentionally omitted: only legitimately-active
-                    // profiles (JDK/OS/activeByDefault and POM-property-gated) reach injection,
-                    // and stripping their repositories would break the established
-                    // project → dep1 → dep2 pattern. See #13100.
-                    // TODO(#13146): repositories contributed by external-model profiles can shadow
-                    // central; a WARN/FAIL policy for URL mismatches should be added separately.
+                    // profiles (JDK/OS/activeByDefault/system-property/negated-property)
+                    // reach injection, and stripping their repositories would break the
+                    // established project → dep1 → dep2 pattern. See #13100.
+                    // #13146: same-id shadowing is already mitigated by REQUEST_DOMINANT
+                    // merging (the request's repositories take precedence), so no
+                    // additional WARN/FAIL policy is needed.
                     // Condition profiles using exists()/missing() are also pre-filtered for the
                     // same reason as file profiles: in the sandbox, context.exists() always returns
                     // false, so missing(path) evaluates to !false = true and fires unconditionally.
@@ -2465,7 +2521,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                             phase = ParentModelPhase.MERGE_MIXIN;
                             return new ParentResolutionFrame(model, mixins.next(), recording, chain, false, false);
                         }
-                        List<Profile> profiles = getActiveProfiles(model.getProfiles(), recording);
+                        // Evaluate with the parent's properties but the child's basedir (as Maven 3 does);
+                        // parent properties are kept out of the cache key since they derive from the source.
+                        DefaultProfileActivationContext activation = recording.start(model.getProperties());
+                        List<Profile> profiles = getActiveProfiles(model.getProfiles(), activation);
+                        replayRecordIntoContext(activation.stop(), recording, false);
                         model = profileInjector
                                 .injectProfiles(model, profiles, request, ModelBuilderSessionState.this)
                                 .withProfiles(List.of())
@@ -2786,7 +2846,13 @@ public class DefaultModelBuilder implements ModelBuilder {
                     add(
                             Severity.WARNING,
                             Version.BASE,
-                            "BOM imports from within reactor should be avoided",
+                            "BOM import '"
+                                    + ModelProblemUtils.toId(groupId, artifactId, version)
+                                    + "' references a module within the same reactor."
+                                    + " The BOM will be evaluated without conditional profile activation"
+                                    + " (file/property/condition), which may produce an incomplete"
+                                    + " dependencyManagement compared to the BOM's own build."
+                                    + " Prefer parent POM inheritance for intra-reactor version management and generated BOMs for downstream consumption.",
                             dependency.getLocation(""));
                 }
             }
@@ -2937,6 +3003,13 @@ public class DefaultModelBuilder implements ModelBuilder {
          */
         private void replayRecordIntoContext(
                 DefaultProfileActivationContext.Record cachedRecord, DefaultProfileActivationContext targetContext) {
+            replayRecordIntoContext(cachedRecord, targetContext, true);
+        }
+
+        private void replayRecordIntoContext(
+                DefaultProfileActivationContext.Record cachedRecord,
+                DefaultProfileActivationContext targetContext,
+                boolean includeModelProperties) {
             if (targetContext.record == null) {
                 return; // Target context is not recording
             }
@@ -2958,7 +3031,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             cachedRecord.usedUserProperties.forEach(targetRecord.usedUserProperties::putIfAbsent);
 
             // Replay model properties
-            cachedRecord.usedModelProperties.forEach(targetRecord.usedModelProperties::putIfAbsent);
+            if (includeModelProperties) {
+                cachedRecord.usedModelProperties.forEach(targetRecord.usedModelProperties::putIfAbsent);
+            }
 
             // Replay model infos
             cachedRecord.usedModelInfos.forEach(targetRecord.usedModelInfos::putIfAbsent);

@@ -26,11 +26,13 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -96,7 +98,10 @@ public class InjectorImpl implements Injector {
             while (enumeration.hasMoreElements()) {
                 URL url = enumeration.nextElement();
                 if (loadedUrls.add(url.toExternalForm())) {
-                    try (InputStream is = url.openStream();
+                    URLConnection connection = url.openConnection();
+                    // Uncached, so that closing the stream closes the jar (JDK-8239054)
+                    connection.setUseCaches(false);
+                    try (InputStream is = connection.getInputStream();
                             BufferedReader reader =
                                     new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
                         for (String line : reader.lines()
@@ -136,14 +141,14 @@ public class InjectorImpl implements Injector {
     @Override
     public <U> Injector bindInstance(@Nonnull Class<U> clazz, @Nonnull U instance) {
         Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
-        Binding<U> binding = Binding.toInstance(instance);
+        Binding<U> binding = Binding.toInstance(instance).withKey(key);
         return doBind(key, binding);
     }
 
     @Override
     public <U> Injector bindSupplier(@Nonnull Class<U> clazz, @Nonnull Supplier<U> supplier) {
         Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
-        Binding<U> binding = Binding.toSupplier(supplier);
+        Binding<U> binding = Binding.toSupplier(supplier).withKey(key);
         return doBind(key, binding);
     }
 
@@ -188,8 +193,33 @@ public class InjectorImpl implements Injector {
 
     protected <U> Injector bind(Key<U> key, Binding<U> b) {
         Set<Binding<?>> bindingSet = bindings.computeIfAbsent(key, $ -> new HashSet<>());
-        bindingSet.add(b);
+        if (bindingSet.stream().noneMatch(existing -> isSameBinding(existing, b))) {
+            bindingSet.add(b);
+        }
         return this;
+    }
+
+    private static boolean isSameBinding(Binding<?> first, Binding<?> second) {
+        if (!Objects.equals(first.getOriginalKey(), second.getOriginalKey())
+                || first.getPriority() != second.getPriority()
+                || !Objects.equals(first.getScope(), second.getScope())) {
+            return false;
+        }
+        Object firstIdentity = first.getRegistrationIdentity();
+        Object secondIdentity = second.getRegistrationIdentity();
+        // Both sides have explicit identities: use equals-based comparison (e.g. two initialized
+        // bindings wrapping the same source class). If only one side has an explicit identity,
+        // fall through to instanceof/reference checks — they represent distinct providers.
+        if (firstIdentity != first && secondIdentity != second) {
+            return firstIdentity.equals(secondIdentity);
+        }
+        if (first instanceof Binding.BindingToInstance<?> a && second instanceof Binding.BindingToInstance<?> b) {
+            return a.instance == b.instance;
+        }
+        if (first instanceof Binding.BindingToSupplier<?> a && second instanceof Binding.BindingToSupplier<?> b) {
+            return a.supplier == b.supplier;
+        }
+        return first == second;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -227,8 +257,20 @@ public class InjectorImpl implements Injector {
         Set<Binding<Q>> res = getBindings(key);
         if (res != null && !res.isEmpty()) {
             List<Binding<Q>> bindingList = new ArrayList<>(res);
-            bindingList.sort(getPriorityComparator());
+            Comparator<Binding<?>> comparator = key.getQualifier() == null
+                    ? getPriorityComparator().thenComparing(b -> !isDefaultBinding(b))
+                    : getPriorityComparator();
+            bindingList.sort(comparator);
             Binding<Q> binding = bindingList.get(0);
+            if (bindingList.size() > 1 && comparator.compare(binding, bindingList.get(1)) == 0) {
+                throw new DIException("Ambiguous bindings for key " + key.getDisplayString() + ":\n"
+                        + bindingList.stream()
+                                .filter(b -> comparator.compare(binding, b) == 0)
+                                .map(b -> b + " (priority=" + b.getPriority() + ")")
+                                .sorted()
+                                .collect(Collectors.joining("\n - ", " - ", ""))
+                        + "\nUse a qualifier or a distinct @Priority to select a single binding.");
+            }
             return compile(binding);
         }
         if (key.getRawType() == List.class) {
@@ -274,6 +316,12 @@ public class InjectorImpl implements Injector {
                         .sorted()
                         .distinct()
                         .collect(Collectors.joining("\n - ", " - ", "")));
+    }
+
+    private static boolean isDefaultBinding(Binding<?> binding) {
+        Key<?> key = binding.getOriginalKey();
+        Object qualifier = key != null ? key.getQualifier() : null;
+        return qualifier == null || "".equals(qualifier);
     }
 
     @SuppressWarnings("unchecked")

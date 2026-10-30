@@ -90,6 +90,23 @@ class SourcesTest {
         assertEquals(path.resolve("subdir").normalize(), resolved.getPath());
     }
 
+    /**
+     * A path source resolves against its own path, for a file as well as for a directory: the result is a path below
+     * it, not a sibling. Resolution against the parent directory is the job of the model source.
+     */
+    @Test
+    void testPathSourceResolvesAgainstItsOwnPath() {
+        Path pom = Paths.get("/tmp/x/pom.xml");
+        Source source = Sources.fromPath(pom);
+
+        assertEquals(
+                Paths.get("/tmp/x/pom.xml/child.xml"),
+                source.resolve("child.xml").getPath());
+        assertEquals(
+                Paths.get("/tmp/x/other/pom.xml"),
+                source.resolve("../other/pom.xml").getPath());
+    }
+
     @Test
     void testBuildPathSourceFunctionality() {
         // Test build source functionality

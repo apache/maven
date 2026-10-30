@@ -46,6 +46,7 @@ import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectDependenciesResolver;
 import org.apache.maven.project.artifact.InvalidDependencyVersionException;
 import org.apache.maven.project.artifact.ProjectArtifactsCache;
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
@@ -112,9 +113,12 @@ public class LifecycleDependencyResolver {
             throws LifecycleExecutionException {
         ClassLoader tccl = Thread.currentThread().getContextClassLoader();
         try {
-            ClassLoader projectRealm = project.getClassRealm();
-            if (projectRealm != null && projectRealm != tccl) {
-                Thread.currentThread().setContextClassLoader(projectRealm);
+            ClassRealm projectRealm = project.getClassRealm();
+            if (projectRealm != null) {
+                ClassLoader projectClassLoader = projectRealm;
+                if (projectClassLoader != tccl) {
+                    Thread.currentThread().setContextClassLoader(projectClassLoader);
+                }
             }
 
             if (project.getDependencyArtifacts() == null) {
@@ -128,12 +132,15 @@ public class LifecycleDependencyResolver {
             Set<Artifact> resolvedArtifacts = resolveProjectArtifacts(
                     project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts);
 
-            Map<Artifact, File> reactorProjects =
+            // MNG-6300: build a live-lookup map so that reactor files are always up-to-date.
+            // In the concurrent builder a sibling project may install its jar *after* this
+            // resolution starts, so we must read getFile() at lookup time rather than
+            // snapshotting it up-front (a null snapshot would prevent the file from ever
+            // being set, causing NPEs in plugins such as maven-dependency-plugin:properties).
+            Map<Artifact, MavenProject> reactorProjects =
                     new HashMap<>(session.getProjects().size());
             for (MavenProject reactorProject : session.getProjects()) {
-                reactorProjects.put(
-                        reactorProject.getArtifact(),
-                        reactorProject.getArtifact().getFile());
+                reactorProjects.put(reactorProject.getArtifact(), reactorProject);
             }
 
             Map<String, Artifact> map = new HashMap<>();
@@ -143,9 +150,12 @@ public class LifecycleDependencyResolver {
                  * During lifecycle the Artifact.getFile() can change from target/classes to the actual jar.
                  * This clearly shows that target/classes should not be abused as artifactFile just for the classpath
                  */
-                File reactorProjectFile = reactorProjects.get(artifact);
-                if (reactorProjectFile != null) {
-                    artifact.setFile(reactorProjectFile);
+                MavenProject reactorProject = reactorProjects.get(artifact);
+                if (reactorProject != null) {
+                    File reactorProjectFile = reactorProject.getArtifact().getFile();
+                    if (reactorProjectFile != null) {
+                        artifact.setFile(reactorProjectFile);
+                    }
                 }
 
                 map.put(artifact.getDependencyConflictId(), artifact);
@@ -258,8 +268,12 @@ public class LifecycleDependencyResolver {
             eventSpyDispatcher.onEvent(request);
 
             result = dependenciesResolver.resolve(request);
+            eventSpyDispatcher.onEvent(result);
         } catch (DependencyResolutionException e) {
             result = e.getResult();
+
+            // the listeners get the result when the resolution fails as well, not only when it succeeds
+            eventSpyDispatcher.onEvent(result);
 
             /*
              * MNG-2277, the check below compensates for our bad plugin support where we ended up with aggregator
@@ -279,8 +293,6 @@ public class LifecycleDependencyResolver {
                 throw new LifecycleExecutionException(messageBuilderFactory, null, project, e);
             }
         }
-
-        eventSpyDispatcher.onEvent(result);
 
         Set<Artifact> artifacts = new LinkedHashSet<>();
         if (result.getDependencyGraph() != null

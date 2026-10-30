@@ -74,7 +74,7 @@ public class DefaultModelProcessor implements ModelProcessor {
     @Inject
     public DefaultModelProcessor(ModelXmlFactory modelXmlFactory, @Nullable Map<String, ModelParser> modelParsers) {
         this.modelXmlFactory = modelXmlFactory;
-        this.modelParsers = modelParsers;
+        this.modelParsers = modelParsers != null ? modelParsers : Map.of();
     }
 
     @Override
@@ -99,7 +99,8 @@ public class DefaultModelProcessor implements ModelProcessor {
         Objects.requireNonNull(request, "source cannot be null");
         Path pomFile = request.getPath();
         if (pomFile != null) {
-            Path projectDirectory = pomFile.getParent();
+            // a parser may locate the project directory itself rather than a file within it
+            Path projectDirectory = Files.isDirectory(pomFile) ? pomFile : pomFile.getParent();
             Map<String, ModelParserException> exceptions = new LinkedHashMap<>();
             for (Map.Entry<String, ModelParser> parser : modelParsers.entrySet()) {
                 try {

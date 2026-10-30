@@ -116,8 +116,8 @@ under the License.
     <url>https://github.com/apache/maven/issues</url>
   </issueManagement>
   <ciManagement>
-    <system>Jenkins</system>
-    <url>https://ci-maven.apache.org/job/Maven/job/maven-box/job/maven/</url>
+    <system>GitHub</system>
+    <url>https://github.com/apache/maven/actions</url>
   </ciManagement>
   <distributionManagement>
     <site>
@@ -142,32 +142,31 @@ under the License.
     <maven.site.path>ref/4-LATEST</maven.site.path>
     <project.build.outputTimestamp>2025-06-24T20:18:00Z</project.build.outputTimestamp>
     <!-- various versions -->
-    <asmVersion>9.10.1</asmVersion>
-    <byteBuddyVersion>1.18.14</byteBuddyVersion>
-    <classWorldsVersion>2.12.1</classWorldsVersion>
+    <asmVersion>9.11.1</asmVersion>
+    <byteBuddyVersion>1.18.15</byteBuddyVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
     <domtripVersion>1.8.0</domtripVersion>
     <guiceVersion>5.1.0</guiceVersion>
-    <guavaVersion>33.7.1-jre</guavaVersion>
+    <guavaVersion>33.7.2-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
 
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
-    <javaxAnnotationApiVersion>1.3.2</javaxAnnotationApiVersion>
-    <jlineVersion>4.4.6</jlineVersion>
+    <jakartaAnnotationApiVersion>1.3.5</jakartaAnnotationApiVersion>
+    <jlineVersion>4.4.8</jlineVersion>
     <jmhVersion>1.37</jmhVersion>
     <junitVersion>6.1.3</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
-    <logbackClassicVersion>1.6.4</logbackClassicVersion>
+    <logbackClassicVersion>1.6.5</logbackClassicVersion>
     <mockitoVersion>5.24.0</mockitoVersion>
     <plexusInteractivityVersion>1.6.0</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.30.0</plexusInterpolationVersion>
     <plexusTestingVersion>2.2.0</plexusTestingVersion>
     <plexusXmlVersion>4.2.0</plexusXmlVersion>
-    <resolverVersion>2.0.23</resolverVersion>
+    <resolverVersion>2.0.24</resolverVersion>
     <securityDispatcherVersion>4.2.0</securityDispatcherVersion>
     <sisuVersion>1.1.0</sisuVersion>
     <slf4jVersion>2.0.20</slf4jVersion>
-    <stax2ApiVersion>4.3.1</stax2ApiVersion>
+    <stax2ApiVersion>4.3.2</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
     <woodstoxVersion>7.3.0</woodstoxVersion>
     <xmlunitVersion>2.14.0</xmlunitVersion>
@@ -400,12 +399,16 @@ under the License.
             <groupId>org.apache.maven</groupId>
             <artifactId>maven-xml-impl</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-classworlds</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
-        <groupId>javax.annotation</groupId>
-        <artifactId>javax.annotation-api</artifactId>
-        <version>${javaxAnnotationApiVersion}</version>
+        <groupId>jakarta.annotation</groupId>
+        <artifactId>jakarta.annotation-api</artifactId>
+        <version>${jakartaAnnotationApiVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.eclipse.sisu</groupId>
@@ -423,9 +426,9 @@ under the License.
         <version>1</version>
       </dependency>
       <dependency>
-        <groupId>org.codehaus.plexus</groupId>
-        <artifactId>plexus-classworlds</artifactId>
-        <version>${classWorldsVersion}</version>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-classworlds</artifactId>
+        <version>${project.version}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -648,6 +651,10 @@ under the License.
             <groupId>com.google.inject</groupId>
             <artifactId>guice</artifactId>
           </exclusion>
+          <exclusion>
+            <groupId>org.codehaus.plexus</groupId>
+            <artifactId>plexus-classworlds</artifactId>
+          </exclusion>
         </exclusions>
       </dependency>
       <dependency>
@@ -689,7 +696,7 @@ under the License.
       <dependency>
         <groupId>eu.maveniverse.maven.mimir</groupId>
         <artifactId>testing</artifactId>
-        <version>0.12.3</version>
+        <version>0.12.4</version>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
@@ -731,7 +738,7 @@ under the License.
         <plugin>
           <groupId>com.github.siom79.japicmp</groupId>
           <artifactId>japicmp-maven-plugin</artifactId>
-          <version>0.26.2</version>
+          <version>0.26.5</version>
           <executions>
             <execution>
               <goals>
@@ -819,6 +826,26 @@ under the License.
               <version>${asmVersion}</version>
             </dependency>
           </dependencies>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <configuration>
+            <archive>
+              <manifestEntries>
+                <Automatic-Module-Name>${javaModuleName}</Automatic-Module-Name>
+              </manifestEntries>
+            </archive>
+          </configuration>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-javadoc-plugin</artifactId>
+          <configuration>
+            <sourceFileExcludes>
+              <sourceFileExclude>module-info.java</sourceFileExclude>
+            </sourceFileExcludes>
+          </configuration>
         </plugin>
         <plugin>
           <groupId>org.apache.rat</groupId>
@@ -958,6 +985,22 @@ under the License.
   </build>
 
   <profiles>
+    <profile>
+      <!-- palantir-java-format crashes on JDK 27 (palantir/palantir-java-format#1786);
+           drop this profile once maven-parent ships a fixed release.
+           Activated by property, not <jdk>: the model builder tests build this POM in sessions
+           without java.version, where a <jdk> activation is an error. -->
+      <id>jdk27-skip-spotless</id>
+      <activation>
+        <property>
+          <name>java.specification.version</name>
+          <value>27</value>
+        </property>
+      </activation>
+      <properties>
+        <spotless.skip>true</spotless.skip>
+      </properties>
+    </profile>
     <profile>
       <id>mockito</id>
       <activation>
@@ -1157,6 +1200,10 @@ under the License.
             <groupId>org.apache.maven.plugins</groupId>
             <artifactId>maven-javadoc-plugin</artifactId>
             <configuration>
+              <legacyMode>true</legacyMode>
+              <sourceFileExcludes>
+                <sourceFileExclude>module-info.java</sourceFileExclude>
+              </sourceFileExcludes>
               <tags>
                 <tag>
                   <name>provisional</name>
@@ -1324,7 +1371,7 @@ under the License.
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>versions-maven-plugin</artifactId>
-            <version>2.22.0</version>
+            <version>2.23.0</version>
             <configuration>
               <generateBackupPoms>false</generateBackupPoms>
               <allowMajorUpdates>false</allowMajorUpdates>

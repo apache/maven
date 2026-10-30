@@ -131,8 +131,8 @@ case " $* " in
   *" -version "*) exit 0 ;;
 esac
 
-case "$1" in
-  *JvmConfigParser.java)
+case "$3" in
+  JvmConfigParser)
     # Mimics bin/JvmConfigParser: strip comments, expand the base directory
     # placeholders and print the arguments quoted.
     expand() {
@@ -149,7 +149,7 @@ case "$1" in
       printf '%s' "$out$text"
     }
 
-    basedir="$3"
+    basedir="$5"
     set -f
     while IFS= read -r line || [ -n "$line" ]; do
       line="${line%%#*}"
@@ -158,7 +158,7 @@ case "$1" in
       for token in $line; do
         printf '"%s" ' "$token"
       done
-    done < "$2"
+    done < "$4"
     printf '\n'
     exit 0 ;;
 esac
@@ -177,6 +177,53 @@ for stub in uname dirname java; do
   cp "$stub_dir/$stub" "$nocygpath_dir/$stub"
   chmod +x "$nocygpath_dir/$stub"
 done
+
+# A third stub set whose cygpath re-roots every POSIX path under its own
+# installation prefix, like the cygpath shipped inside an Anaconda installation
+# does (issue #13414). The launcher must detect that the Windows form does not
+# exist on disk, warn, and fall back to unconverted POSIX paths.
+lying_dir="$work_dir/stubs-lying-cygpath"
+mkdir -p "$lying_dir"
+for stub in uname dirname java; do
+  cp "$stub_dir/$stub" "$lying_dir/$stub"
+  chmod +x "$lying_dir/$stub"
+done
+
+cat > "$lying_dir/cygpath" <<'LYING'
+#!/bin/sh
+# cygpath(1) stub re-rooting every POSIX path under its own prefix, like the
+# Anaconda-shipped cygpath that caused issue #13414.
+for arg in "$@"; do
+  case "$arg" in
+    --*) ;;
+    *) path="$arg" ;;
+  esac
+done
+
+replace() {
+  text="$1"; needle="$2"; value="$3"; out=""
+  while :; do
+    case "$text" in
+      *"$needle"*)
+        out="$out${text%%"$needle"*}$value"
+        text="${text#*"$needle"}"
+        ;;
+      *) break ;;
+    esac
+  done
+  printf '%s' "$out$text"
+}
+
+case " $* " in
+  *" --windows "*)
+    printf 'C:\Anaconda\Library\%s\n' "`replace "$path" '/' '\'`"
+    ;;
+  *)
+    printf '%s\n' "$path"
+    ;;
+esac
+LYING
+chmod +x "$lying_dir/cygpath"
 
 # A jvm.config referencing the project base directory, to assert that the value
 # handed over to the JVM configuration is converted as well.
@@ -222,6 +269,16 @@ to_windows() {
   done
   printf 'C:%s' "$out$text"
 }
+
+# bin/mvn verifies that the Windows form of the current directory exists on
+# disk before trusting the cygpath output. The stubbed cygpath produces
+# C:-prefixed paths, which exist on Windows only. POSIX filesystems accept
+# them literally (backslashes and colons are ordinary characters), so create
+# the directory here to let the verification pass with the stub as well. On
+# Windows creating it fails because the real directory exists: fine.
+# mkdir -p: on Windows the argument is a real multi-component path whose
+# parents may not exist yet; on POSIX it is a single oddly-named directory.
+( cd "$project_dir/module" && mkdir -p "`to_windows "$project_dir/module"`" 2>/dev/null || true )
 
 # contains <haystack> <needle>
 # Plain substring check. A case/glob comparison cannot be used, the haystack
@@ -310,6 +367,27 @@ assert_contains "missing cygpath: maven.home falls back to a POSIX path" "$outpu
   "[-Dmaven.home=$maven_home]"
 assert_not_contains "missing cygpath: no empty maven.home is passed" "$output" \
   "[-Dmaven.home=]"
+
+# A cygpath from a foreign emulation layer must be detected: the conversion is
+# skipped, the paths stay in their POSIX form, and warnings explain why.
+output=`run_mvn MINGW64_NT-10.0 "$lying_dir"`
+assert_contains "foreign cygpath: multiModuleProjectDirectory falls back to a POSIX path" "$output" \
+  "[-Dmaven.multiModuleProjectDirectory=$project_dir]"
+assert_contains "foreign cygpath: maven.home falls back to a POSIX path" "$output" \
+  "[-Dmaven.home=$maven_home]"
+assert_not_contains "foreign cygpath: no empty maven.home is passed" "$output" \
+  "[-Dmaven.home=]"
+
+# ... and the warnings name the offending cygpath and the bogus conversion.
+warn_output=`( cd "$project_dir/module" &&
+  FAKE_UNAME="MINGW64_NT-10.0" PATH="$lying_dir" JAVA_HOME= MAVEN_SKIP_RC=1 \
+    "$sh_bin" "$maven_home/bin/mvn" verify 2>&1 )`
+assert_contains "foreign cygpath: warning names the offending cygpath" "$warn_output" \
+  "does not convert paths to"
+assert_contains "foreign cygpath: warning shows the bogus Windows form" "$warn_output" \
+  "which does not exist"
+assert_contains "foreign cygpath: warning names the discovered cygpath" "$warn_output" \
+  "stubs-lying-cygpath/cygpath"
 
 # The debug log must reproduce the Windows paths verbatim. echo expands
 # backslash escapes in dash and friends, turning C:\tmp into C:<tab>mp.

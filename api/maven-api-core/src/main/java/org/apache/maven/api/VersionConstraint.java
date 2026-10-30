@@ -40,18 +40,44 @@ public interface VersionConstraint {
     /**
      * Returns the range of this constraint, or {@code null} if none.
      * <p>
-     * Note: only one, this method or {@link #getRecommendedVersion()} method must return non-{@code null} value.
+     * Note: only one, this method or {@link #recommendedVersion()} method must return non-{@code null} value.
      */
     @Nullable
-    VersionRange getVersionRange();
+    VersionRange versionRange();
+
+    /**
+     * Returns the range of this constraint, or {@code null} if none.
+     * <p>
+     * Note: only one, this method or {@link #getRecommendedVersion()} method must return non-{@code null} value.
+     *
+     * @deprecated Use {@link #versionRange()} instead.
+     */
+    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Nullable
+    default VersionRange getVersionRange() {
+        return versionRange();
+    }
+
+    /**
+     * Returns the recommended version of this constraint, or {@code null} if none.
+     * <p>
+     * Note: only one, this method or {@link #versionRange()} method must return non-{@code null} value.
+     */
+    @Nullable
+    Version recommendedVersion();
 
     /**
      * Returns the recommended version of this constraint, or {@code null} if none.
      * <p>
      * Note: only one, this method or {@link #getVersionRange()} method must return non-{@code null} value.
+     *
+     * @deprecated Use {@link #recommendedVersion()} instead.
      */
+    @Deprecated(since = "4.1.0", forRemoval = true)
     @Nullable
-    Version getRecommendedVersion();
+    default Version getRecommendedVersion() {
+        return recommendedVersion();
+    }
 
     /**
      * Determines whether the specified version is contained within this constraint.

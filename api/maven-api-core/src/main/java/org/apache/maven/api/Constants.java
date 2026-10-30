@@ -198,6 +198,14 @@ public final class Constants {
 
     public static final String MAVEN_SETTINGS_SECURITY_FILE_NAME = "settings-security4.xml";
 
+    /**
+     * When set to {@code "true"}, settings parsing errors are fatal instead of warnings.
+     *
+     * @since 4.1.0
+     */
+    @Config(defaultValue = "false")
+    public static final String MAVEN_SETTINGS_STRICT_PARSING = "maven.settings.strictParsing";
+
     public static final String MAVEN_STYLE_PREFIX = "maven.style.";
 
     // Style Names
@@ -867,6 +875,35 @@ public final class Constants {
      */
     @Config(type = "java.lang.Boolean", defaultValue = "false")
     public static final String MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL = "maven.model.dependencyInterpolation.full";
+
+    /**
+     * System property to keep temp material for diagnostics.
+     * When set to {@code true} via {@code -Dmaven.tempfile.keep=true}, temporary files and directories
+     * created by {@link org.apache.maven.api.services.TempFileService} are not deleted at session end.
+     * This is a JVM system property only (read via {@link Boolean#getBoolean(String)});
+     * it is not resolved through Maven's property mechanism (pom.xml, profiles, settings.xml).
+     *
+     * @since 4.1.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false", source = Config.Source.SYSTEM_PROPERTIES)
+    public static final String MAVEN_TEMPFILE_KEEP = "maven.tempfile.keep";
+
+    /**
+     * System property to disable the {@code site} lifecycle.
+     * When set to {@code true} via {@code -Dmaven.site.lifecycle.disabled=true}, the {@code site}
+     * lifecycle is excluded from the default lifecycles, so Maven will not resolve or bind the
+     * {@code maven-site-plugin} unless it is explicitly configured in the POM.
+     * This is a JVM system property only (read via {@link Boolean#getBoolean(String)});
+     * it is not resolved through Maven's property mechanism (pom.xml, profiles, settings.xml).
+     *
+     * @since 4.0.0
+     */
+    @Config(
+            type = "java.lang.Boolean",
+            defaultValue = "false",
+            source = Config.Source.SYSTEM_PROPERTIES,
+            readOnly = true)
+    public static final String MAVEN_SITE_LIFECYCLE_DISABLED = "maven.site.lifecycle.disabled";
 
     private Constants() {}
 }

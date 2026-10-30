@@ -62,7 +62,10 @@ abstract class MavenSnapshotMetadata extends MavenMetadata {
     }
 
     protected String getKey(String classifier, String extension) {
-        return classifier + ':' + extension;
+        // A <snapshotVersion> without a <classifier> element reads as null, while an artifact
+        // without a classifier has "". Both mean "no classifier" and must share a key, or a
+        // merge keeps the previous build's entry next to the new one.
+        return (classifier == null ? "" : classifier) + ':' + extension;
     }
 
     @Override

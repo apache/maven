@@ -44,6 +44,7 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.impl.MappedCollection;
 import org.apache.maven.impl.MappedList;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.SourceQueries;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
 
@@ -75,72 +76,79 @@ public class DefaultProject implements Project {
 
     @Nonnull
     @Override
-    public String getGroupId() {
+    public String groupId() {
         return project.getGroupId();
     }
 
     @Nonnull
     @Override
-    public String getArtifactId() {
+    public String artifactId() {
         return project.getArtifactId();
     }
 
     @Nonnull
     @Override
-    public String getVersion() {
+    public String version() {
         return project.getVersion();
     }
 
     @Nonnull
     @Override
-    public List<ProducedArtifact> getArtifacts() {
+    public List<ProducedArtifact> artifacts() {
         org.eclipse.aether.artifact.Artifact pomArtifact = RepositoryUtils.toArtifact(new ProjectArtifact(project));
         org.eclipse.aether.artifact.Artifact projectArtifact = RepositoryUtils.toArtifact(project.getArtifact());
 
         ArrayList<ProducedArtifact> result = new ArrayList<>(2);
         result.add(session.getArtifact(ProducedArtifact.class, pomArtifact));
-        if (!ArtifactIdUtils.equalsVersionlessId(pomArtifact, projectArtifact)) {
+        if (producesMainArtifact() && !ArtifactIdUtils.equalsVersionlessId(pomArtifact, projectArtifact)) {
             result.add(session.getArtifact(ProducedArtifact.class, projectArtifact));
         }
         return Collections.unmodifiableList(result);
     }
 
+    @Override
+    public boolean producesMainArtifact() {
+        return packaging != null
+                && packaging.producesMainArtifact()
+                && !SourceQueries.usesModuleSourceHierarchy(project);
+    }
+
     @Nonnull
     @Override
-    public Packaging getPackaging() {
+    public Packaging packaging() {
         return packaging;
     }
 
     @Nonnull
     @Override
-    public Model getModel() {
+    public Model model() {
         return project.getModel().getDelegate();
     }
 
     @Nonnull
     @Override
-    public Path getPomPath() {
+    public Path pomPath() {
         return Objects.requireNonNull(project.getFile(), "pomPath cannot be null")
                 .toPath();
     }
 
     @Nonnull
     @Override
-    public Path getBasedir() {
+    public Path basedir() {
         return Objects.requireNonNull(project.getBasedir(), "basedir cannot be null")
                 .toPath();
     }
 
     @Nonnull
     @Override
-    public List<DependencyCoordinates> getDependencies() {
-        return new MappedList<>(getModel().getDependencies(), this::toDependency);
+    public List<DependencyCoordinates> dependencies() {
+        return new MappedList<>(model().getDependencies(), this::toDependency);
     }
 
     @Nonnull
     @Override
-    public List<DependencyCoordinates> getManagedDependencies() {
-        DependencyManagement dependencyManagement = getModel().getDependencyManagement();
+    public List<DependencyCoordinates> managedDependencies() {
+        DependencyManagement dependencyManagement = model().getDependencyManagement();
         if (dependencyManagement != null) {
             return new MappedList<>(dependencyManagement.getDependencies(), this::toDependency);
         }
@@ -149,34 +157,34 @@ public class DefaultProject implements Project {
 
     @Override
     public boolean isTopProject() {
-        return getBasedir().equals(getSession().getTopDirectory());
+        return basedir().equals(getSession().getTopDirectory());
     }
 
     @Override
     public boolean isRootProject() {
-        return getBasedir().equals(getRootDirectory());
+        return basedir().equals(rootDirectory());
     }
 
     @Override
-    public Path getRootDirectory() {
+    public Path rootDirectory() {
         return project.getRootDirectory();
     }
 
     @Override
-    public Optional<Project> getParent() {
+    public Optional<Project> parent() {
         MavenProject parent = project.getParent();
         return Optional.ofNullable(session.getProject(parent));
     }
 
     @Override
     @Nonnull
-    public List<Profile> getDeclaredProfiles() {
-        return getModel().getProfiles();
+    public List<Profile> declaredProfiles() {
+        return model().getProfiles();
     }
 
     @Override
     @Nonnull
-    public List<Profile> getEffectiveProfiles() {
+    public List<Profile> effectiveProfiles() {
         return Stream.iterate(this.project, Objects::nonNull, MavenProject::getParent)
                 .flatMap(project -> project.getModel().getDelegate().getProfiles().stream())
                 .toList();
@@ -184,7 +192,7 @@ public class DefaultProject implements Project {
 
     @Override
     @Nonnull
-    public List<Profile> getDeclaredActiveProfiles() {
+    public List<Profile> declaredActiveProfiles() {
         return project.getActiveProfiles().stream()
                 .map(org.apache.maven.model.Profile::getDelegate)
                 .toList();
@@ -192,7 +200,7 @@ public class DefaultProject implements Project {
 
     @Override
     @Nonnull
-    public List<Profile> getEffectiveActiveProfiles() {
+    public List<Profile> effectiveActiveProfiles() {
         return Stream.iterate(this.project, Objects::nonNull, MavenProject::getParent)
                 .flatMap(project -> project.getActiveProfiles().stream())
                 .map(org.apache.maven.model.Profile::getDelegate)
@@ -203,20 +211,20 @@ public class DefaultProject implements Project {
     private DependencyCoordinates toDependency(org.apache.maven.api.model.Dependency dependency) {
         return new DependencyCoordinates() {
             @Override
-            public String getGroupId() {
+            public String groupId() {
                 return dependency.getGroupId();
             }
 
             @Override
-            public String getArtifactId() {
+            public String artifactId() {
                 return dependency.getArtifactId();
             }
 
             @Override
-            public String getClassifier() {
+            public String classifier() {
                 String classifier = dependency.getClassifier();
                 if (classifier == null || classifier.isEmpty()) {
-                    classifier = getType().getClassifier();
+                    classifier = type().getClassifier();
                     if (classifier == null) {
                         classifier = "";
                     }
@@ -225,24 +233,24 @@ public class DefaultProject implements Project {
             }
 
             @Override
-            public VersionConstraint getVersionConstraint() {
+            public VersionConstraint versionConstraint() {
                 return session.parseVersionConstraint(dependency.getVersion());
             }
 
             @Override
-            public String getExtension() {
-                return getType().getExtension();
+            public String extension() {
+                return type().getExtension();
             }
 
             @Override
-            public Type getType() {
+            public Type type() {
                 String type = dependency.getType();
                 return session.requireType(type);
             }
 
             @Nonnull
             @Override
-            public DependencyScope getScope() {
+            public DependencyScope scope() {
                 String scope = dependency.getScope();
                 if (scope == null) {
                     scope = "";
@@ -251,13 +259,13 @@ public class DefaultProject implements Project {
             }
 
             @Override
-            public Boolean getOptional() {
+            public Boolean optional() {
                 return dependency.isOptional();
             }
 
             @Nonnull
             @Override
-            public Collection<Exclusion> getExclusions() {
+            public Collection<Exclusion> exclusions() {
                 return new MappedCollection<>(dependency.getExclusions(), this::toExclusion);
             }
 
@@ -265,13 +273,13 @@ public class DefaultProject implements Project {
                 return new Exclusion() {
                     @Nullable
                     @Override
-                    public String getGroupId() {
+                    public String groupId() {
                         return exclusion.getGroupId();
                     }
 
                     @Nullable
                     @Override
-                    public String getArtifactId() {
+                    public String artifactId() {
                         return exclusion.getArtifactId();
                     }
                 };

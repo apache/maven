@@ -517,7 +517,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                             mes.setDescriptor(md);
                         }
                     }
-                    requireNonNull(mes.getDescriptor());
+                    requireNonNull(mes.descriptor());
                 }
                 PluginStub plugin = new PluginStub();
                 plugin.setDescriptor(pluginDescriptor);
@@ -666,13 +666,9 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                     parameterConfiguration = config.child(parameter.getAlias());
                 }
                 XmlNode parameterDefaults = defaultConfiguration.child(parameter.getName());
-                parameterConfiguration = XmlNode.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
+                parameterConfiguration = XmlService.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
                 if (parameterConfiguration != null) {
                     Map<String, String> attributes = new HashMap<>(parameterConfiguration.attributes());
-                    // if (isEmpty(parameterConfiguration.getAttribute("implementation"))
-                    //         && !isEmpty(parameter.getImplementation())) {
-                    //     attributes.put("implementation", parameter.getImplementation());
-                    // }
                     parameterConfiguration = XmlNode.newInstance(
                             parameter.getName(),
                             parameterConfiguration.value(),

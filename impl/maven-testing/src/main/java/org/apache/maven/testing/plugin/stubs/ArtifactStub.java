@@ -61,7 +61,7 @@ public class ArtifactStub implements Artifact {
 
     @Nonnull
     @Override
-    public String getGroupId() {
+    public String groupId() {
         return groupId;
     }
 
@@ -71,7 +71,7 @@ public class ArtifactStub implements Artifact {
 
     @Nonnull
     @Override
-    public String getArtifactId() {
+    public String artifactId() {
         return artifactId;
     }
 
@@ -81,7 +81,7 @@ public class ArtifactStub implements Artifact {
 
     @Nonnull
     @Override
-    public String getClassifier() {
+    public String classifier() {
         return classifier;
     }
 
@@ -91,7 +91,7 @@ public class ArtifactStub implements Artifact {
 
     @Nonnull
     @Override
-    public Version getVersion() {
+    public Version version() {
         return getParser().parseVersion(version);
     }
 
@@ -100,7 +100,7 @@ public class ArtifactStub implements Artifact {
     }
 
     @Override
-    public Version getBaseVersion() {
+    public Version baseVersion() {
         return getParser().parseVersion(baseVersion != null ? baseVersion : version);
     }
 
@@ -110,7 +110,7 @@ public class ArtifactStub implements Artifact {
 
     @Nonnull
     @Override
-    public String getExtension() {
+    public String extension() {
         return extension;
     }
 
@@ -127,27 +127,27 @@ public class ArtifactStub implements Artifact {
     public ArtifactCoordinates toCoordinates() {
         return new ArtifactCoordinates() {
             @Override
-            public String getGroupId() {
+            public String groupId() {
                 return groupId;
             }
 
             @Override
-            public String getArtifactId() {
+            public String artifactId() {
                 return artifactId;
             }
 
             @Override
-            public String getClassifier() {
+            public String classifier() {
                 return classifier;
             }
 
             @Override
-            public VersionConstraint getVersionConstraint() {
+            public VersionConstraint versionConstraint() {
                 return getParser().parseVersionConstraint(version);
             }
 
             @Override
-            public String getExtension() {
+            public String extension() {
                 return extension;
             }
         };

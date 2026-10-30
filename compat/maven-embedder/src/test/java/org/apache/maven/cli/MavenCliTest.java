@@ -20,6 +20,8 @@ package org.apache.maven.cli;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
@@ -57,9 +59,13 @@ import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.eclipse.aether.transfer.TransferListener;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.impl.DumbTerminal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -71,8 +77,10 @@ import static org.apache.maven.cli.MavenCli.performProjectActivation;
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
@@ -220,6 +228,29 @@ class MavenCliTest {
     }
 
     /**
+     * MNG-11167: {@code multiModuleProjectDirectory} must keep the path as given, not the path that
+     * {@link File#getCanonicalFile()} resolves a symlinked (or, on Windows, a mapped network drive)
+     * segment to, or every module/parent path resolved relative to it inherits the wrong base.
+     */
+    @Test
+    void testMultiModuleProjectDirectoryIsNotResolvedThroughASymlink(@TempDir Path tempDir) throws Exception {
+        Path real = Files.createDirectories(tempDir.resolve("real"));
+        Path link = tempDir.resolve("link");
+        try {
+            Files.createSymbolicLink(link, real);
+        } catch (IOException | UnsupportedOperationException e) {
+            assumeTrue(false, "symbolic links are not supported on this machine");
+        }
+
+        System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, link.toString());
+        CliRequest request = new CliRequest(new String[0], null);
+
+        cli.initialize(request);
+
+        assertEquals(link.toString(), request.multiModuleProjectDirectory.getPath());
+    }
+
+    /**
      * Read .mvn/maven.config with the following definitions:
      * <pre>
      *   -T
@@ -343,6 +374,42 @@ class MavenCliTest {
         assertEquals("Apache Maven", request.getUserProperties().getProperty("label"));
 
         assertEquals("-Dpom.xml", request.getCommandLine().getOptionValue(CLIManager.ALTERNATE_POM_FILE));
+    }
+
+    /**
+     * Verifies the MNG-7131 contract: {@code .mvn/maven.config} uses a <em>one-argument-per-line</em> format,
+     * modelled after Java {@code @argfiles}. Each line is a single argv token — whitespace inside a line is
+     * preserved and is never re-split. This means a property value that contains spaces can be supplied as two
+     * consecutive lines:
+     * <pre>
+     *   --define
+     *   label=Apache Maven
+     * </pre>
+     * The two lines are passed as two separate tokens to Commons CLI, which consumes the second as the argument
+     * to {@code --define}. This is the contract introduced by commit {@code 331c5c3435} and broken by PR #13093
+     * (reverted in #13148); this test guards against that regression.
+     *
+     * @throws Exception in case of failure.
+     */
+    @Test
+    void testMavenConfigMultiLineDefineWithSpaces() throws Exception {
+        System.setProperty(
+                MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                new File("src/test/projects/mavenConfigSpacedValues").getCanonicalPath());
+        CliRequest request = new CliRequest(new String[0], null);
+
+        cli.initialize(request);
+        cli.cli(request);
+        cli.properties(request);
+
+        assertEquals(
+                "Apache Maven",
+                request.getUserProperties().getProperty("label"),
+                "MNG-7131: --define / value-with-spaces form must preserve the space");
+        assertEquals(
+                "1.0.0",
+                request.getUserProperties().getProperty("revision"),
+                "MNG-7131: --define / value-without-spaces form must work");
     }
 
     @Test
@@ -495,6 +562,74 @@ class MavenCliTest {
         assertEquals(
                 "." + File.separatorChar + "custom2",
                 executionRequest.getLocalRepositoryPath().toString());
+    }
+
+    /**
+     * The embedded entry point never goes through {@code main}, so no terminal is installed (#13357).
+     */
+    @Nested
+    class EmbeddedColor {
+
+        @BeforeEach
+        void setUp() {
+            // restored by the outer @AfterEach
+            System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, ".");
+            MessageUtils.setColorEnabled(true);
+        }
+
+        @AfterEach
+        void tearDown() {
+            MessageUtils.systemInstall((Terminal) null);
+            MessageUtils.setColorEnabled(true);
+        }
+
+        private String embeddedVersionOutput(String... extraArgs) {
+            ByteArrayOutputStream out = new ByteArrayOutputStream();
+            ByteArrayOutputStream err = new ByteArrayOutputStream();
+            String[] args = new String[extraArgs.length + 1];
+            args[0] = "--version";
+            System.arraycopy(extraArgs, 0, args, 1, extraArgs.length);
+            assertEquals(0, new MavenCli().doMain(args, ".", new PrintStream(out, true), new PrintStream(err, true)));
+            return new String(out.toByteArray(), StandardCharsets.UTF_8);
+        }
+
+        @Test
+        void colorYesEmitsAnsiAndLeavesNoTerminalBehind() {
+            assertNull(MessageUtils.getTerminal());
+
+            String output = embeddedVersionOutput("--color=yes");
+
+            assertTrue(output.contains("Apache Maven"));
+            assertNotEquals(stripAnsiCodes(output), output, "ANSI escapes expected: " + output);
+            assertNull(MessageUtils.getTerminal());
+        }
+
+        @Test
+        void colorNoAndAutoEmitNoAnsi() {
+            String no = embeddedVersionOutput("--color=no");
+            assertTrue(no.contains("Apache Maven"));
+            assertEquals(stripAnsiCodes(no), no);
+
+            MessageUtils.setColorEnabled(true);
+            String auto = embeddedVersionOutput();
+            assertTrue(auto.contains("Apache Maven"));
+            assertEquals(stripAnsiCodes(auto), auto);
+            assertNull(MessageUtils.getTerminal());
+        }
+
+        @Test
+        void installedTerminalIsLeftAlone() throws Exception {
+            Terminal mine = new DumbTerminal(
+                    "test", Terminal.TYPE_DUMB, InputStream.nullInputStream(), new ByteArrayOutputStream(), null);
+            MessageUtils.systemInstall(mine);
+            try {
+                embeddedVersionOutput("--color=yes");
+                assertSame(mine, MessageUtils.getTerminal());
+            } finally {
+                MessageUtils.systemInstall((Terminal) null);
+                mine.close();
+            }
+        }
     }
 
     /**

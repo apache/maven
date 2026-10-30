@@ -95,7 +95,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
         Node node = Mockito.mock(Node.class);
         Mockito.when(resolverResult.getRoot()).thenReturn(node);
         Node child = Mockito.mock(Node.class);
-        Mockito.when(node.getChildren()).thenReturn(List.of(child));
+        Mockito.when(node.children()).thenReturn(List.of(child));
 
         services.addAll(List.of(
                 new DefaultRequestCacheFactory(),

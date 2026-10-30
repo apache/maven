@@ -39,7 +39,7 @@ public class MessageUtils {
 
     public static void systemInstall(Terminal terminal) {
         MessageUtils.terminal = terminal;
-        MessageUtils.reader = createReader(terminal);
+        MessageUtils.reader = terminal != null ? createReader(terminal) : null;
     }
 
     public static void systemInstall() {
