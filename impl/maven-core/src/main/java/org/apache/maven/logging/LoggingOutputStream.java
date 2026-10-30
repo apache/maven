@@ -85,7 +85,13 @@ public class LoggingOutputStream extends FilterOutputStream {
         }
 
         public void forceFlush() {
-            ((LoggingOutputStream) out).forceFlush();
+            /*
+             * out is PrintStream's own field and is nulled out by PrintStream#close(), which can happen
+             * before this is called during shutdown (e.g. a build tool closing System.out/err itself).
+             */
+            if (out instanceof LoggingOutputStream los) {
+                los.forceFlush();
+            }
         }
     }
 
