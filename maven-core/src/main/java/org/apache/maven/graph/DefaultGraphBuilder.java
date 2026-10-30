@@ -23,11 +23,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
+import java.util.Set;
 
 import org.apache.maven.DefaultMaven;
 import org.apache.maven.MavenExecutionException;
@@ -74,7 +74,6 @@ public class DefaultGraphBuilder implements GraphBuilder {
 
             if (result == null) {
                 final List<MavenProject> projects = getProjectsForMavenReactor(session);
-                validateProjects(projects);
                 result = reactorDependencyGraph(session, projects);
             }
 
@@ -112,6 +111,8 @@ public class DefaultGraphBuilder implements GraphBuilder {
         activeProjects = trimSelectedProjects(activeProjects, projectDependencyGraph, session.getRequest());
         activeProjects = trimExcludedProjects(activeProjects, session.getRequest());
         activeProjects = trimResumedProjects(activeProjects, session.getRequest());
+
+        validateExtensionIsNotPartOfReactor(activeProjects);
 
         if (activeProjects.size() != projectDependencyGraph.getSortedProjects().size()) {
             projectDependencyGraph = new FilteredProjectDependencyGraph(projectDependencyGraph, activeProjects);
@@ -380,13 +381,11 @@ public class DefaultGraphBuilder implements GraphBuilder {
         }
     }
 
-    private void validateProjects(List<MavenProject> projects) {
-        Map<String, MavenProject> projectsMap = new HashMap<>();
+    private void validateExtensionIsNotPartOfReactor(List<MavenProject> projects) {
+        Set<String> projectKeys = new HashSet<>();
 
         for (MavenProject p : projects) {
-            String projectKey = ArtifactUtils.key(p.getGroupId(), p.getArtifactId(), p.getVersion());
-
-            projectsMap.put(projectKey, p);
+            projectKeys.add(ArtifactUtils.key(p.getGroupId(), p.getArtifactId(), p.getVersion()));
         }
 
         for (MavenProject project : projects) {
@@ -396,7 +395,7 @@ public class DefaultGraphBuilder implements GraphBuilder {
                     String pluginKey =
                             ArtifactUtils.key(plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion());
 
-                    if (projectsMap.containsKey(pluginKey)) {
+                    if (projectKeys.contains(pluginKey)) {
                         logger.warn(project.getName() + " uses " + plugin.getKey()
                                 + " as extensions, which is not possible within the same reactor build. "
                                 + "This plugin was pulled from the local repository!");
