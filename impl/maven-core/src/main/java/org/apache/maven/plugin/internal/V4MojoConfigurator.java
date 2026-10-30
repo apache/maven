@@ -75,6 +75,9 @@ public final class V4MojoConfigurator {
     }
 
     private void set(Object bean, String name, XmlNode node) throws Exception {
+        if (name.isEmpty()) {
+            throw new NoSuchFieldException("<empty element name>");
+        }
         String title = Character.toUpperCase(name.charAt(0)) + name.substring(1);
         for (Method method : bean.getClass().getMethods()) {
             if ((method.getName().equals("set" + title) || method.getName().equals("add" + title))
@@ -130,7 +133,10 @@ public final class V4MojoConfigurator {
             if (Properties.class.isAssignableFrom(type)) {
                 Properties properties = new Properties();
                 for (XmlNode child : node.children()) {
-                    properties.put(child.name(), convert(child, valueType));
+                    Object val = convert(child, valueType);
+                    if (val != null) {
+                        properties.put(child.name(), val);
+                    }
                 }
                 return properties;
             }
