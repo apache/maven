@@ -115,7 +115,7 @@ public final class CliUtils {
     public static int toMavenExecutionRequestLoggingLevel(Slf4jConfiguration.Level level) {
         requireNonNull(level, "level");
         return switch (level) {
-            case DEBUG -> MavenExecutionRequest.LOGGING_LEVEL_DEBUG;
+            case TRACE, DEBUG -> MavenExecutionRequest.LOGGING_LEVEL_DEBUG;
             case INFO -> MavenExecutionRequest.LOGGING_LEVEL_INFO;
             case ERROR -> MavenExecutionRequest.LOGGING_LEVEL_ERROR;
         };
@@ -124,7 +124,7 @@ public final class CliUtils {
     public static int toPlexusLoggingLevel(Slf4jConfiguration.Level level) {
         requireNonNull(level, "level");
         return switch (level) {
-            case DEBUG -> Logger.LEVEL_DEBUG;
+            case TRACE, DEBUG -> Logger.LEVEL_DEBUG;
             case INFO -> Logger.LEVEL_INFO;
             case ERROR -> Logger.LEVEL_ERROR;
         };

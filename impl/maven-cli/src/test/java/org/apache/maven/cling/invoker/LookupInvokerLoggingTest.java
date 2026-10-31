@@ -158,6 +158,7 @@ class LookupInvokerLoggingTest {
             // Simulate what MavenSimpleConfiguration does
             String value =
                     switch (level) {
+                        case TRACE -> "trace";
                         case DEBUG -> "debug";
                         case INFO -> "info";
                         case ERROR -> "error";
