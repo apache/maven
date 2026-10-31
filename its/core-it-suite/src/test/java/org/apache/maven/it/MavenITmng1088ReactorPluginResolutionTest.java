@@ -20,36 +20,36 @@ package org.apache.maven.it;
 
 import java.nio.file.Path;
 
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1088">MNG-1088</a>.
  *
- * @author Brett Porter
+ * <p>Verifies that the concurrent builder automatically builds a reactor plugin project up to
+ * the READY phase when another project in the reactor uses that plugin, even if the user
+ * requested a phase before "compile" (e.g. "initialize").
  *
+ * @author Brett Porter
  */
-@Disabled("Disabled for MNG-7977")
-public class MavenITmng1088ReactorPluginResolutionTest extends AbstractMavenIntegrationTestCase {
+class MavenITmng1088ReactorPluginResolutionTest extends AbstractMavenIntegrationTestCase {
 
     /**
-     * Test that the plugin manager falls back to resolution from the repository if a plugin is part of the reactor
-     * (i.e. an active project artifact) but the lifecycle has not been executed far enough to produce a file for
-     * the plugin (i.e. a phase before "compile").
+     * Test that a reactor plugin is automatically compiled and made available when the
+     * concurrent builder detects a cross-project plugin dependency, even when the user
+     * only requested a lifecycle phase before "compile" (here: "initialize").
      *
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG1088() throws Exception {
+    void testitMNG1088() throws Exception {
         Path testDir = extractResources("mng-1088");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("client/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng1088");
-        verifier.filterFile("settings-template.xml", "settings.xml");
-        verifier.addCliArgument("--settings");
-        verifier.addCliArgument("settings.xml");
+        verifier.addCliArgument("-b");
+        verifier.addCliArgument("concurrent");
         // NOTE: It's essential part of the test to invoke a phase before "compile"
         verifier.addCliArgument("initialize");
         verifier.execute();
