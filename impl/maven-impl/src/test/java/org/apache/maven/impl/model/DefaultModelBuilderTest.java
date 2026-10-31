@@ -1650,6 +1650,14 @@ class DefaultModelBuilderTest {
                         .orElse(null),
                 "The import itself must have happened: the ordinary managed entry from the "
                         + "imported BOM should be present");
+        assertNotNull(
+                rejectManagement.getDependencies().stream()
+                        .filter(d -> "system-scope-bom".equals(d.getArtifactId())
+                                && "import".equals(d.getScope())
+                                && "pom".equals(d.getType()))
+                        .findFirst()
+                        .orElse(null),
+                "The imported BOM itself must be retained in dependencyManagement");
         Dependency rejected = rejectManagement.getDependencies().stream()
                 .filter(d -> "system-scope-dep".equals(d.getArtifactId()))
                 .findFirst()
@@ -1887,6 +1895,39 @@ class DefaultModelBuilderTest {
             List<String> activeIds, List<String> inactiveIds) {
         return new DefaultProfileActivationContext(
                 null, null, activeIds, inactiveIds, Map.of(), Map.of(), Model.newInstance());
+    }
+
+    @Test
+    void testMng6402ImportedPomRetainedInDependencyManagement() {
+        Path pom = Paths.get("src/test/resources/poms/factory/mng-6402/pom.xml").toAbsolutePath();
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .recursive(true)
+                        .source(Sources.buildSource(pom))
+                        .build());
+
+        DependencyManagement depMgmt = result.getEffectiveModel().getDependencyManagement();
+        assertNotNull(depMgmt);
+
+        // Verify the managed dependency from the imported BOM is present
+        Dependency managedDep = depMgmt.getDependencies().stream()
+                .filter(d -> "managed-dep".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(managedDep, "Managed dependency from imported BOM must be present");
+        assertEquals("2.0.0", managedDep.getVersion());
+
+        // Verify the imported BOM dependency itself is retained in dependencyManagement (MNG-6402)
+        Dependency importedBom = depMgmt.getDependencies().stream()
+                .filter(d -> "imported-bom".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(importedBom, "Imported BOM imported-bom must be retained in dependencyManagement");
+        assertEquals("1.0.0", importedBom.getVersion());
+        assertEquals("import", importedBom.getScope());
+        assertEquals("pom", importedBom.getType());
     }
 
     @Provides
