@@ -107,7 +107,7 @@ under the License.
     <exportedPackage>javax.annotation.*</exportedPackage>
     <exportedPackage>javax.annotation.security.*</exportedPackage>
 
-    <!-- 
+    <!--
       | We may potentially want to export these, but right now I'm not sure that anything Guice specific needs
       | to be made available to plugin authors. If we find people are getting fancy and want to take advantage of
       | Guice specifics we can expose that later. Really some testing needs to be done to see full hiding
@@ -127,20 +127,20 @@ under the License.
     <exportedPackage>org.slf4j.helpers.*</exportedPackage>
     <exportedPackage>org.slf4j.event.*</exportedPackage>
 
-    <!-- JAnsi: maven-jline ships Ansi.java, forwarding ANSI calls to the already-initialized JLine terminal, for
-         backward compatibility with code (e.g. maven-shared-utils) still calling the JAnsi API. Named exactly,
-         not as org.fusesource.jansi.*, since Ansi is the only class maven-jline provides; any other class in
-         that package a plugin needs falls back to its own classpath (see ClassRealm#loadClassFromImport), so
-         this stays even though the jansi artifact itself is no longer exported below.
-         This is deliberately not extended to cover more of jansi (e.g. AnsiConsole): Maven itself has no use
-         for it, since colored output already goes through MessageBuilderFactory, and exporting it would
-         present AnsiConsole as a Maven-sanctioned way for a plugin to touch the shared console, which, via
-         AnsiConsole.systemInstall()/systemUninstall(), can swap out the process-wide stdout/stderr streams.
-         A plugin that brings its own jansi dependency can still do that today - removing jansi from
-         exportedArtifact above only stops Maven from blocking that dependency, it doesn't stop the plugin
-         from using it - so this export list is simply not the place to add official support for it.
-         See the discussion on #13727. -->
+    <!-- JAnsi: maven-jline ships Ansi, AnsiConsole, AnsiPrintStream and AnsiMode, forwarding to the
+         already-installed JLine terminal, for backward compatibility with code (e.g. maven-shared-utils)
+         still calling the JAnsi API. The jansi artifact itself stays excluded below, so a plugin that
+         declares org.fusesource.jansi:jansi gets these forwarding classes instead of its own copy: that
+         is what keeps AnsiConsole.systemInstall()/systemUninstall() calls routed through the single
+         console Maven owns, instead of a second, independent install racing it for ownership of
+         System.out/System.err. Each class is named exactly, not as org.fusesource.jansi.*, since these
+         four are the only ones maven-jline provides; any other class in that package a plugin needs
+         falls back to its own classpath (see ClassRealm#loadClassFromImport). See the discussion on
+         #13727. -->
     <exportedPackage>org.fusesource.jansi.Ansi</exportedPackage>
+    <exportedPackage>org.fusesource.jansi.AnsiConsole</exportedPackage>
+    <exportedPackage>org.fusesource.jansi.AnsiPrintStream</exportedPackage>
+    <exportedPackage>org.fusesource.jansi.AnsiMode</exportedPackage>
   </exportedPackages>
 
   <exportedArtifacts>
@@ -189,7 +189,16 @@ under the License.
     <exportedArtifact>org.slf4j:slf4j-api</exportedArtifact>
 
     <!--
-      | We must also filter out the old Aether or NoClassDefFoundErrors will surface  
+      | JAnsi is no longer a maven-core dependency (replaced by JLine, see #11874), but stays excluded here:
+      | maven-jline exports forwarding classes for the JAnsi API (see exportedPackages above), and excluding
+      | the real jansi artifact is what makes a plugin's own org.fusesource.jansi:jansi dependency resolve to
+      | those forwarding classes instead of shadowing them with the real AnsiConsole, which would install its
+      | own System.out/System.err independently of the terminal Maven already installed. See #13726, #13727.
+     -->
+    <exportedArtifact>org.fusesource.jansi:jansi</exportedArtifact>
+
+    <!--
+      | We must also filter out the old Aether or NoClassDefFoundErrors will surface
      -->
     <exportedArtifact>org.sonatype.aether:aether-api</exportedArtifact>
     <exportedArtifact>org.sonatype.aether:aether-spi</exportedArtifact>
@@ -204,7 +213,7 @@ under the License.
       | NOTE: Don't exclude the wagons or any of their dependencies (apart from the wagon API). This would otherwise
       | provoke linkage errors for wagons contributed by build extensions. We also don't need to exclude the wagons
       | from plugins. Plugins that use wagons directly and declare the corresponding dependency will simply use a
-      | wagon from their plugin realm. 
+      | wagon from their plugin realm.
      -->
   </exportedArtifacts>
 </extension>

@@ -22,6 +22,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
+import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -78,18 +79,19 @@ public class ExtensionDescriptorBuilderTest {
     }
 
     /**
-     * maven-core's own {@code META-INF/maven/extension.xml} must not export an artifact that maven-core no longer
-     * actually bundles: a stale {@code exportedArtifact} entry causes
-     * {@link org.apache.maven.ArtifactFilterManager} to strip that dependency out of a plugin's own resolved
-     * classpath even though Maven core does not provide it, breaking any plugin that declares it directly (see
-     * #13726, jansi left exported as an artifact after the JAnsi-to-JLine migration removed the real dependency).
+     * maven-core's own {@code META-INF/maven/extension.xml} must keep excluding {@code org.fusesource.jansi:jansi}
+     * as an {@code exportedArtifact} even though jansi is no longer a maven-core dependency (replaced by JLine, see
+     * #11874): maven-jline exports forwarding classes for the JAnsi API (see
+     * {@code org.apache.maven.jline}{@code .*} and {@code org.fusesource.jansi.*} in maven-jline), and it is the
+     * {@code exportedArtifact} exclusion that makes a plugin's own {@code org.fusesource.jansi:jansi} dependency
+     * resolve to those forwarding classes instead of shadowing them with the real {@code AnsiConsole}, which would
+     * install its own {@code System.out}/{@code System.err} independently of the terminal Maven already installed
+     * (see #13726, #13727).
      * <p>
-     * {@code exportedPackage} entries are a different, safer mechanism (a {@code ClassRealm} import with fallback
-     * to the plugin's own classpath for anything the import doesn't resolve, see
-     * {@code ClassRealm#loadClassFromImport}), so {@code org.fusesource.jansi.Ansi} staying there, named exactly
-     * rather than as the {@code org.fusesource.jansi.*} package, is intentional: maven-jline ships only that one
-     * compatibility class, forwarding to the already-initialized JLine terminal, and plugins that need other real
-     * jansi classes still get them from their own classpath.
+     * The four {@code exportedPackage} entries are named exactly, not as the {@code org.fusesource.jansi.*}
+     * wildcard, since {@code Ansi}, {@code AnsiConsole}, {@code AnsiPrintStream} and {@code AnsiMode} are the only
+     * classes maven-jline provides; any other class in that package a plugin needs falls back to its own classpath
+     * (see {@code ClassRealm#loadClassFromImport}).
      */
     @Test
     public void testCoreExtensionDescriptorHasNoStaleArtifactExports() throws Exception {
@@ -100,13 +102,21 @@ public class ExtensionDescriptorBuilderTest {
             ExtensionDescriptor ed = builder.build(in);
 
             assertTrue(
-                    ed.getExportedArtifacts().stream().noneMatch(a -> a.contains("jansi")),
-                    "jansi is no longer a maven-core dependency and must not be exported as an artifact: "
-                            + ed.getExportedArtifacts());
-            assertTrue(
-                    ed.getExportedPackages().contains("org.fusesource.jansi.Ansi"),
-                    "the JAnsi compatibility shim export must stay, named exactly (not as the org.fusesource.jansi.*"
-                            + " package, which maven-jline does not fully provide): " + ed.getExportedPackages());
+                    ed.getExportedArtifacts().contains("org.fusesource.jansi:jansi"),
+                    "jansi must stay excluded so a plugin's own jansi dependency resolves to maven-jline's"
+                            + " forwarding classes instead of shadowing them: " + ed.getExportedArtifacts());
+            assertEquals(
+                    Arrays.asList(
+                            "org.fusesource.jansi.Ansi",
+                            "org.fusesource.jansi.AnsiConsole",
+                            "org.fusesource.jansi.AnsiPrintStream",
+                            "org.fusesource.jansi.AnsiMode"),
+                    ed.getExportedPackages().stream()
+                            .filter(p -> p.startsWith("org.fusesource.jansi"))
+                            .collect(Collectors.toList()),
+                    "the JAnsi compatibility shim exports must stay, named exactly (not as the"
+                            + " org.fusesource.jansi.* package, which maven-jline does not fully provide): "
+                            + ed.getExportedPackages());
         }
     }
 }
