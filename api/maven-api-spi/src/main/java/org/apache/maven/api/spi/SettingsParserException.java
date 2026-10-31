@@ -74,10 +74,20 @@ public class SettingsParserException extends MavenException {
         return "Unknown settings parsing error";
     }
 
+    /**
+     * Returns the one-based line number where the error occurred, or {@code -1} if unknown.
+     *
+     * @return the line number
+     */
     public int getLineNumber() {
         return lineNumber;
     }
 
+    /**
+     * Returns the one-based column number where the error occurred, or {@code -1} if unknown.
+     *
+     * @return the column number
+     */
     public int getColumnNumber() {
         return columnNumber;
     }

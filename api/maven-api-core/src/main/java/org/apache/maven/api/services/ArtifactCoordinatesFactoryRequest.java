@@ -38,20 +38,37 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
 
+    /** @return the group identifier */
     String getGroupId();
 
+    /** @return the artifact identifier */
     String getArtifactId();
 
+    /** @return the version */
     String getVersion();
 
+    /** @return the classifier, may be {@code null} */
     String getClassifier();
 
+    /** @return the file extension, may be {@code null} */
     String getExtension();
 
+    /** @return the artifact type, may be {@code null} */
     String getType();
 
+    /** @return the coordinate string in the format {@code groupId:artifactId[:extension[:classifier]]:version}, may be {@code null} */
     String getCoordinatesString();
 
+    /**
+     * Builds a request from individual coordinate components.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param extension the file extension
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static ArtifactCoordinatesFactoryRequest build(
             @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
@@ -64,6 +81,18 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
                 .build();
     }
 
+    /**
+     * Builds a request from individual coordinate components including classifier and type.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param classifier the classifier
+     * @param extension the file extension
+     * @param type the artifact type
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static ArtifactCoordinatesFactoryRequest build(
             @Nonnull Session session,
@@ -84,6 +113,14 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
                 .build();
     }
 
+    /**
+     * Builds a request from a coordinate string formatted as
+     * {@code <groupId>:<artifactId>[:<extension>[:<classifier>]]:<version>}.
+     *
+     * @param session the session
+     * @param coordinateString the coordinate string
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static ArtifactCoordinatesFactoryRequest build(@Nonnull Session session, @Nonnull String coordinateString) {
         return ArtifactCoordinatesFactoryRequest.builder()
@@ -92,6 +129,13 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
                 .build();
     }
 
+    /**
+     * Builds a request from existing artifact coordinates.
+     *
+     * @param session the session
+     * @param coordinates the artifact coordinates
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static ArtifactCoordinatesFactoryRequest build(@Nonnull Session session, @Nonnull ArtifactCoordinates coordinates) {
         return ArtifactCoordinatesFactoryRequest.builder()
@@ -104,6 +148,7 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
                 .build();
     }
 
+    /** @return a new builder instance */
     static ArtifactFactoryRequestBuilder builder() {
         return new ArtifactFactoryRequestBuilder();
     }

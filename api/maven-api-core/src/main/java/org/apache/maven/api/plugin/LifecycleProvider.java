@@ -37,5 +37,10 @@ import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 @Consumer
 public interface LifecycleProvider {
 
+    /**
+     * Returns the custom lifecycle definitions provided by this plugin.
+     *
+     * @return the list of lifecycles, never {@code null}
+     */
     List<Lifecycle> getLifecycles();
 }

@@ -43,12 +43,34 @@ public interface ArtifactFactory extends Service {
     @Nonnull
     Artifact create(@Nonnull ArtifactFactoryRequest request);
 
+    /**
+     * Creates an artifact from individual components.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param extension the file extension
+     * @return an {@code Artifact}, never {@code null}
+     */
     @Nonnull
     default Artifact create(
             @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
         return create(ArtifactFactoryRequest.build(session, groupId, artifactId, version, extension));
     }
 
+    /**
+     * Creates an artifact from individual components including classifier and type.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param classifier the classifier, may be {@code null}
+     * @param extension the file extension, may be {@code null}
+     * @param type the artifact type, may be {@code null}
+     * @return an {@code Artifact}, never {@code null}
+     */
     @Nonnull
     default Artifact create(
             @Nonnull Session session,
@@ -71,12 +93,34 @@ public interface ArtifactFactory extends Service {
     @Nonnull
     ProducedArtifact createProduced(@Nonnull ArtifactFactoryRequest request);
 
+    /**
+     * Creates a produced artifact from individual components.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param extension the file extension
+     * @return a {@code ProducedArtifact}, never {@code null}
+     */
     @Nonnull
     default ProducedArtifact createProduced(
             @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
         return createProduced(ArtifactFactoryRequest.build(session, groupId, artifactId, version, extension));
     }
 
+    /**
+     * Creates a produced artifact from individual components including classifier and type.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param classifier the classifier, may be {@code null}
+     * @param extension the file extension, may be {@code null}
+     * @param type the artifact type, may be {@code null}
+     * @return a {@code ProducedArtifact}, never {@code null}
+     */
     @Nonnull
     default ProducedArtifact createProduced(
             @Nonnull Session session,

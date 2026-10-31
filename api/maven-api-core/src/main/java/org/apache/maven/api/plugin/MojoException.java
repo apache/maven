@@ -68,10 +68,20 @@ public class MojoException extends MavenException {
         super(cause);
     }
 
+    /**
+     * Returns the long message for this exception, providing additional detail beyond the short message.
+     *
+     * @return the long message, or {@code null} if not set
+     */
     public String getLongMessage() {
         return longMessage;
     }
 
+    /**
+     * Returns the source of this exception, typically the mojo or component that caused it.
+     *
+     * @return the source object, or {@code null} if not set
+     */
     public Object getSource() {
         return source;
     }

@@ -33,6 +33,7 @@ import static java.util.Objects.requireNonNull;
 public class AccumulatingLogger implements Logger {
     private final AtomicReference<List<Entry>> entries = new AtomicReference<>(new CopyOnWriteArrayList<>());
 
+    /** {@inheritDoc} */
     @Override
     public void log(Level level, String message, Throwable error) {
         requireNonNull(level, "level");
@@ -40,6 +41,7 @@ public class AccumulatingLogger implements Logger {
         entries.get().add(new Entry(level, message, error));
     }
 
+    /** {@inheritDoc} */
     @Override
     public List<Entry> drain() {
         return entries.getAndSet(new CopyOnWriteArrayList<>());
