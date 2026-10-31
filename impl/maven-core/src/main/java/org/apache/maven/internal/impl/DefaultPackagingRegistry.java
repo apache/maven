@@ -73,6 +73,10 @@ public class DefaultPackagingRegistry
 
     @Override
     public Optional<Packaging> lookup(String id) {
+        Optional<Packaging> provided = super.lookup(id);
+        if (provided.isPresent()) {
+            return provided;
+        }
         id = id.toLowerCase(Locale.ROOT);
         // TODO: we should be able to inject a Map<String, LifecycleMapping> directly,
         // however, SISU visibility filtering can only happen when an explicit
