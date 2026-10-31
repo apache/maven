@@ -1,19 +1,20 @@
-<!---
- Licensed to the Apache Software Foundation (ASF) under one or more
- contributor license agreements.  See the NOTICE file distributed with
- this work for additional information regarding copyright ownership.
- The ASF licenses this file to You under the Apache License, Version 2.0
- (the "License"); you may not use this file except in compliance with
- the License.  You may obtain a copy of the License at
+<!--
+Licensed to the Apache Software Foundation (ASF) under one or more
+contributor license agreements. See the NOTICE file distributed with
+this work for additional information regarding copyright ownership.
+The ASF licenses this file to You under the Apache License, Version 2.0
+(the "License"); you may not use this file except in compliance with
+the License. You may obtain a copy of the License at
 
-      http://www.apache.org/licenses/LICENSE-2.0
+     http://www.apache.org/licenses/LICENSE-2.0
 
- Unless required by applicable law or agreed to in writing, software
- distributed under the License is distributed on an "AS IS" BASIS,
- WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- See the License for the specific language governing permissions and
- limitations under the License.
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
 -->
+
 Contributing to Apache Maven
 ======================
 
@@ -43,16 +44,15 @@ Making and Submitting Changes
 --------------
 
 We accept Pull Requests via GitHub. The [developer mailing list][dev-ml-list] is the
-main channel of communication for contributors.  
-There are some guidelines which will make applying PRs easier for us:
+main channel of communication for contributors. There are some guidelines which
+will make applying PRs easier for us:
+
 + Create a topic branch from where you want to base your work (this is usually the master branch).
   Push your changes to a topic branch in your fork of the repository.
 + Make commits of logical units.
-+ Respect the original code style: by using the same [codestyle][code-style],
-  patches should only highlight the actual difference, not being disturbed by any formatting issues:
++ Respect the original code style by following the same [codestyle][code-style].
   + Only use spaces for indentation.
-  + Create minimal diffs - disable on save actions like reformat source code or organize imports.
-    If you feel the source code should be reformatted, create a separate PR for this change.
+  + Run `mvn spotless:apply` to apply the project's automatic formatting before submitting your changes.
   + Check for unnecessary whitespace with `git diff --check` before committing.
 + Make sure you have added the necessary tests (JUnit/[Core IT tests][core-it]) for your changes.
 + During development, run the relevant module tests first; before submitting, run all tests with `mvn -Prun-its verify` to check for regressions.
