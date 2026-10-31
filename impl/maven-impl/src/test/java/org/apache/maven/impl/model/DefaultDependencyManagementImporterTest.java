@@ -22,16 +22,24 @@ import java.util.List;
 
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
+import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
 
 class DefaultDependencyManagementImporterTest {
     @Test
@@ -183,5 +191,92 @@ class DefaultDependencyManagementImporterTest {
         assertEquals("junit-jupiter-api", merged.getArtifactId());
         assertEquals("5.10.0", merged.getVersion());
         assertEquals("provided", merged.getScope());
+    }
+
+    @Test
+    void testImportManagementDoesNotWarnOnIdenticalEntries() {
+        assertEquals(List.of(), importWarnings(managed().build(), managed().build()));
+    }
+
+    @Test
+    void testImportManagementDoesNotWarnOnExclusionsDeclaredInDifferentOrder() {
+        Dependency first = managed()
+                .exclusions(List.of(exclusion("x", "a"), exclusion("x", "b")))
+                .build();
+        Dependency second = managed()
+                .exclusions(List.of(exclusion("x", "b"), exclusion("x", "a")))
+                .build();
+
+        assertEquals(List.of(), importWarnings(first, second));
+    }
+
+    @Test
+    void testImportManagementWarningNamesDifferingExclusions() {
+        Dependency first = managed().exclusions(List.of(exclusion("x", "a"))).build();
+        Dependency second = managed().exclusions(List.of(exclusion("x", "b"))).build();
+
+        List<String> warnings = importWarnings(first, second);
+
+        assertEquals(1, warnings.size());
+        assertTrue(
+                warnings.get(0)
+                        .startsWith("Ignored POM import for: g:a:jar:1[exclusions: x:b] as already imported "
+                                + "g:a:jar:1[exclusions: x:a]."),
+                warnings.get(0));
+    }
+
+    @Test
+    void testImportManagementWarningDistinguishesUnsetFromExplicitCompileScope() {
+        // an unset scope is not managed, unlike an explicit compile scope, so both must not render as "@compile"
+        List<String> warnings =
+                importWarnings(managed().build(), managed().scope("compile").build());
+
+        assertEquals(1, warnings.size());
+        assertTrue(
+                warnings.get(0).startsWith("Ignored POM import for: g:a:jar:1@compile as already imported g:a:jar:1."),
+                warnings.get(0));
+    }
+
+    @Test
+    void testImportManagementWarningDistinguishesUnsetFromExplicitNonOptional() {
+        // an unset optional flag is not managed, unlike an explicit false
+        List<String> warnings =
+                importWarnings(managed().build(), managed().optional("false").build());
+
+        assertEquals(1, warnings.size());
+        assertTrue(
+                warnings.get(0)
+                        .startsWith("Ignored POM import for: g:a:jar:1[optional=false] as already imported g:a:jar:1."),
+                warnings.get(0));
+    }
+
+    private static Dependency.Builder managed() {
+        return Dependency.newBuilder().groupId("g").artifactId("a").type("jar").version("1");
+    }
+
+    private static Exclusion exclusion(String groupId, String artifactId) {
+        return Exclusion.newBuilder().groupId(groupId).artifactId(artifactId).build();
+    }
+
+    /**
+     * Imports two BOMs managing the given dependencies, in order, and returns the reported warnings.
+     */
+    private static List<String> importWarnings(Dependency first, Dependency second) {
+        ModelProblemCollector problems = mock(ModelProblemCollector.class);
+        new DefaultDependencyManagementImporter()
+                .importManagement(
+                        Model.newBuilder().build(),
+                        List.of(
+                                DependencyManagement.newBuilder()
+                                        .dependencies(List.of(first))
+                                        .build(),
+                                DependencyManagement.newBuilder()
+                                        .dependencies(List.of(second))
+                                        .build()),
+                        mock(ModelBuilderRequest.class),
+                        problems);
+        ArgumentCaptor<String> messages = ArgumentCaptor.forClass(String.class);
+        verify(problems, atLeast(0)).add(eq(Severity.WARNING), any(), messages.capture(), (InputLocation) any());
+        return messages.getAllValues();
     }
 }
