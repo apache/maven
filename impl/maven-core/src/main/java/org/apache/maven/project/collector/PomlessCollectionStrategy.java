@@ -24,15 +24,18 @@ import javax.inject.Singleton;
 
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.maven.DefaultMaven;
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.model.building.ModelSource;
 import org.apache.maven.model.building.UrlModelSource;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuilder;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingRequest;
+import org.apache.maven.project.ProjectBuildingResult;
 
 /**
  * Strategy to collect projects for building when the Maven invocation is not in a directory that contains a pom.xml.
@@ -49,10 +52,16 @@ public class PomlessCollectionStrategy implements ProjectCollectionStrategy {
 
     @Override
     public List<MavenProject> collectProjects(final MavenExecutionRequest request) throws ProjectBuildingException {
+        return collectProjects(request, problem -> {});
+    }
+
+    public List<MavenProject> collectProjects(MavenExecutionRequest request, Consumer<ModelProblem> problemConsumer)
+            throws ProjectBuildingException {
         ProjectBuildingRequest buildingRequest = request.getProjectBuildingRequest();
         ModelSource modelSource = new UrlModelSource(DefaultMaven.class.getResource("project/standalone.xml"));
-        MavenProject project =
-                projectBuilder.build(modelSource, buildingRequest).getProject();
+        ProjectBuildingResult result = projectBuilder.build(modelSource, buildingRequest);
+        result.getProblems().forEach(problemConsumer);
+        MavenProject project = result.getProject();
         project.setExecutionRoot(true);
         request.setProjectPresent(false);
 
