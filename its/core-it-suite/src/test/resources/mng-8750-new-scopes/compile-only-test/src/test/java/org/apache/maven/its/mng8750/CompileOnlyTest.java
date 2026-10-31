@@ -18,8 +18,8 @@
  */
 package org.apache.maven.its.mng8750;
 
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class to verify compile-only scope behavior.
@@ -33,7 +33,7 @@ public class CompileOnlyTest {
     public void testCompileDependencyAvailableAtRuntime() {
         CompileOnlyExample example = new CompileOnlyExample();
         String result = example.useCompileDep();
-        Assert.assertTrue("Compile dependency should be available", result.contains("Used compile dependency"));
+        Assertions.assertTrue(result.contains("Used compile dependency"), "Compile dependency should be available");
     }
 
     /**
@@ -43,7 +43,7 @@ public class CompileOnlyTest {
     public void testCompileOnlyDependencyCallableAtRuntime() {
         CompileOnlyExample example = new CompileOnlyExample();
         String result = example.useCompileOnlyDep();
-        Assert.assertTrue("Compile-only dependency should be callable", result.contains("Compile-only dependency"));
+        Assertions.assertTrue(result.contains("Compile-only dependency"), "Compile-only dependency should be callable");
     }
 
     /**
@@ -56,7 +56,7 @@ public class CompileOnlyTest {
         try {
             CompileOnlyExample.main(new String[0]);
         } catch (Exception e) {
-            Assert.fail("Main method should handle compile-only dependency gracefully: " + e.getMessage());
+            Assertions.fail("Main method should handle compile-only dependency gracefully: " + e.getMessage());
         }
     }
 }
