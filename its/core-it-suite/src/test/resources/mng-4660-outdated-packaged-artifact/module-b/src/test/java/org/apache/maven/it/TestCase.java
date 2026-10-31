@@ -37,7 +37,7 @@ package org.apache.maven.it;
  * under the License.
  */
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class TestCase {
     @Test
