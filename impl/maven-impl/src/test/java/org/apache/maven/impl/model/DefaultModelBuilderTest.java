@@ -374,6 +374,11 @@ class DefaultModelBuilderTest {
         assertEquals("activated", projectParentModel.getProperties().get("profile.property"));
         assertEquals("activated", projectParentModel.getProperties().get("profile.condition"));
         assertEquals("activated", projectParentModel.getProperties().get("profile.jdk"));
+        // POM-declared property via <condition>: since #13555, doReadAsParentModel() passes
+        // parent.getProperties() as interpolationProperties (not model properties), so
+        // getModelProperty() returns null and the condition does NOT fire — even for the
+        // non-sandboxed project parent path.
+        assertNull(projectParentModel.getProperties().get("profile.pom.condition"));
         assertTrue(projectParentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
         // After #13555, parent POM properties are NOT exposed through getModelProperty() in the
         // project-parent activation path — condition profiles relying on POM-declared properties
