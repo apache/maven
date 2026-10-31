@@ -23,7 +23,13 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.services.ProjectManager;
+import org.apache.maven.api.spi.LifecycleParticipant;
+import org.apache.maven.api.spi.ProjectExecutionEvent;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
@@ -100,6 +106,57 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
         }
     }
 
+    public static class InjectReactorDependencyV4 implements LifecycleParticipant {
+        @Override
+        public void afterProjectsRead(Session session) {
+            ProjectManager projectManager = session.getService(ProjectManager.class);
+            Project target = session.getProjects().stream()
+                    .filter(project -> "module-a".equals(project.artifactId()))
+                    .findFirst()
+                    .orElseThrow();
+            Project dependency = session.getProjects().stream()
+                    .filter(project -> "module-b".equals(project.artifactId()))
+                    .findFirst()
+                    .orElseThrow();
+
+            List<org.apache.maven.api.DependencyCoordinates> dependencies = new ArrayList<>(target.dependencies());
+            dependencies.add(session.createDependencyCoordinates(session.createArtifactCoordinates(
+                    dependency.groupId(), dependency.artifactId(), dependency.version(), "", "jar", "jar")));
+            projectManager.setDependencies(target, dependencies);
+        }
+    }
+
+    public static class RecordingLifecycleParticipant implements LifecycleParticipant {
+        private static final List<String> CALLBACKS = new CopyOnWriteArrayList<>();
+
+        @Override
+        public void afterProjectsRead(Session session) {
+            CALLBACKS.add("afterProjectsRead:" + session.getProjects().size());
+        }
+
+        @Override
+        public void beforeProjectExecution(ProjectExecutionEvent event) {
+            CALLBACKS.add("before:" + event.project().artifactId() + ':' + goal(event));
+        }
+
+        @Override
+        public void afterProjectExecution(ProjectExecutionEvent event) {
+            CALLBACKS.add("after:" + event.project().artifactId() + ':' + goal(event) + ':'
+                    + event.failure().isEmpty());
+        }
+
+        @Override
+        public void afterSessionEnd(Session session) {
+            CALLBACKS.add("afterSessionEnd");
+        }
+
+        private String goal(ProjectExecutionEvent event) {
+            return event.executionPlan().isEmpty()
+                    ? "(no plan)"
+                    : event.executionPlan().get(0).goal();
+        }
+    }
+
     @Override
     protected String getProjectsDirectory() {
         return "src/test/projects/lifecycle-listener";
@@ -145,6 +202,34 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
         assertEquals(List.of("root"), reactorOrder);
     }
 
+    @Test
+    void testV4ReactorDependencyInjection() throws Exception {
+        List<String> reactorOrder = getV4ReactorOrder(
+                "lifecycle-participant-reactor-dependency-injection", InjectReactorDependencyV4.class);
+        assertEquals(Arrays.asList("parent", "module-b", "module-a"), reactorOrder);
+    }
+
+    @Test
+    void testV4LifecycleCallbacks() throws Exception {
+        RecordingLifecycleParticipant.CALLBACKS.clear();
+        PlexusContainer container = getContainer();
+        ComponentDescriptor<RecordingLifecycleParticipant> cd =
+                new ComponentDescriptor<>(RecordingLifecycleParticipant.class, container.getContainerRealm());
+        cd.setRoleClass(LifecycleParticipant.class);
+        container.addComponentDescriptor(cd);
+
+        Maven maven = container.lookup(Maven.class);
+        MavenExecutionRequest request =
+                createMavenExecutionRequest(getProject("lifecycle-listener-dependency-injection"));
+        request.setGoals(List.of("validate"));
+        MavenExecutionResult result = maven.execute(request);
+
+        assertFalse(result.hasExceptions(), result.getExceptions().toString());
+        assertEquals(
+                List.of("afterProjectsRead:1", "before:simple:it", "after:simple:it:true", "afterSessionEnd"),
+                RecordingLifecycleParticipant.CALLBACKS);
+    }
+
     private <T> List<String> getReactorOrder(String testProject, Class<T> participant) throws Exception {
         PlexusContainer container = getContainer();
 
@@ -165,5 +250,25 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
             order.add(project.getArtifactId());
         }
         return order;
+    }
+
+    private <T extends LifecycleParticipant> List<String> getV4ReactorOrder(String testProject, Class<T> participant)
+            throws Exception {
+        PlexusContainer container = getContainer();
+
+        ComponentDescriptor<T> cd = new ComponentDescriptor<>(participant, container.getContainerRealm());
+        cd.setRoleClass(LifecycleParticipant.class);
+        container.addComponentDescriptor(cd);
+
+        Maven maven = container.lookup(Maven.class);
+        File pom = getProject(testProject);
+        MavenExecutionRequest request = createMavenExecutionRequest(pom);
+        request.setGoals(List.of("validate"));
+        MavenExecutionResult result = maven.execute(request);
+
+        assertFalse(result.hasExceptions(), result.getExceptions().toString());
+        return result.getTopologicallySortedProjects().stream()
+                .map(MavenProject::getArtifactId)
+                .toList();
     }
 }

@@ -33,7 +33,9 @@ import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.ProjectExecutionEvent;
 import org.apache.maven.execution.ProjectExecutionListener;
+import org.apache.maven.internal.impl.LifecycleParticipantDispatcher;
 import org.apache.maven.internal.transformation.TransformerManager;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MavenExecutionPlan;
 import org.apache.maven.lifecycle.internal.builder.BuilderCommon;
 import org.apache.maven.plugin.MojoExecution;
@@ -85,6 +87,8 @@ public class LifecycleModuleBuilder {
         session.setCurrentProject(currentProject);
 
         Instant buildStartTime = MonotonicClock.now();
+        List<MojoExecution> mojoExecutions = List.of();
+        boolean participantAfterCalled = false;
 
         try {
 
@@ -103,16 +107,19 @@ public class LifecycleModuleBuilder {
 
             MavenExecutionPlan executionPlan =
                     builderCommon.resolveBuildPlan(session, currentProject, taskSegment, new HashSet<>());
-            List<MojoExecution> mojoExecutions = executionPlan.getMojoExecutions();
+            mojoExecutions = executionPlan.getMojoExecutions();
 
             projectExecutionListener.beforeProjectLifecycleExecution(
                     new ProjectExecutionEvent(session, currentProject, mojoExecutions));
+            LifecycleParticipantDispatcher.beforeProjectExecution(session, currentProject, mojoExecutions);
             mojoExecutor.execute(session, mojoExecutions);
 
             Instant buildEndTime = MonotonicClock.now();
 
             projectExecutionListener.afterProjectExecutionSuccess(
                     new ProjectExecutionEvent(session, currentProject, mojoExecutions));
+            participantAfterCalled = true;
+            LifecycleParticipantDispatcher.afterProjectExecution(session, currentProject, mojoExecutions, null);
 
             reactorContext
                     .getResult()
@@ -120,10 +127,21 @@ public class LifecycleModuleBuilder {
 
             eventCatapult.fire(ExecutionEvent.Type.ProjectSucceeded, session, null);
         } catch (Throwable t) {
+            boolean projectSuccessReported = participantAfterCalled;
+            if (!participantAfterCalled) {
+                participantAfterCalled = true;
+                try {
+                    LifecycleParticipantDispatcher.afterProjectExecution(session, currentProject, mojoExecutions, t);
+                } catch (LifecycleExecutionException e) {
+                    t.addSuppressed(e);
+                }
+            }
             builderCommon.handleBuildError(reactorContext, rootSession, session, currentProject, t, buildStartTime);
 
-            projectExecutionListener.afterProjectExecutionFailure(
-                    new ProjectExecutionEvent(session, currentProject, t));
+            if (!projectSuccessReported) {
+                projectExecutionListener.afterProjectExecutionFailure(
+                        new ProjectExecutionEvent(session, currentProject, t));
+            }
 
             // rethrow original errors and runtime exceptions
             if (t instanceof RuntimeException runtimeException) {
