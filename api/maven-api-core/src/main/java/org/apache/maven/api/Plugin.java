@@ -45,8 +45,14 @@ public interface Plugin {
     @Nonnull
     List<Lifecycle> getLifecycles();
 
+    /**
+     * Returns the runtime realm for this plugin.
+     *
+     * @return the plugin realm
+     * @since 4.1.0
+     */
     @Nonnull
-    ClassLoader getClassLoader();
+    Realm getRealm();
 
     @Nullable
     Artifact getArtifact();
