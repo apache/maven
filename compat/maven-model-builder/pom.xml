@@ -39,6 +39,10 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-utils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-annotations</artifactId>
     </dependency>
     <dependency>
@@ -119,6 +123,19 @@ under the License.
               <version>${maven.baseline}</version>
             </dependency>
           </oldVersion>
+          <!-- Os retains its binary name in the new transitive dependency. -->
+          <newVersions>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>${project.artifactId}</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.apache.maven</groupId>
+              <artifactId>maven-utils</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+          </newVersions>
           <parameter>
             <excludes>
               <!--              <exclude>org.apache.maven.model.building.DefaultModelBuilder#DefaultModelBuilder():CONSTRUCTOR_REMOVED</exclude>-->

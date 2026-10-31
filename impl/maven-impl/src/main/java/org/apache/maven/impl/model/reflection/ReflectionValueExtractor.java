@@ -18,306 +18,31 @@
  */
 package org.apache.maven.impl.model.reflection;
 
-import java.lang.ref.Reference;
-import java.lang.ref.WeakReference;
-import java.lang.reflect.Array;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Collections;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.WeakHashMap;
-
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
- * Using simple dotted expressions to extract the values from an Object instance using JSP-like expressions
- * such as {@code project.build.sourceDirectory}.
- * <p>
- * In addition to usual getters using {@code getXxx} or {@code isXxx} suffixes, accessors
- * using {@code asXxx} or {@code toXxx} prefixes are also supported, as well as noun-based
- * accessors matching the property name exactly (e.g. {@code plugin()}, {@code descriptor()}).
+ * @deprecated Use {@link org.apache.maven.utils.ReflectionValueExtractor} instead.
  */
+@Deprecated
 public class ReflectionValueExtractor {
-    private static final Object[] OBJECT_ARGS = new Object[0];
-
-    private static final List<String> ACCESSOR_PREFIXES = List.of("get", "is", "to", "as");
-
-    /**
-     * Use a WeakHashMap here, so the keys (Class objects) can be garbage collected.
-     * This approach prevents permgen space overflows due to retention of discarded
-     * classloaders.
-     */
-    private static final Map<Class<?>, WeakReference<ClassMap>> CLASS_MAPS =
-            Collections.synchronizedMap(new WeakHashMap<>());
-
-    static final int EOF = -1;
-
-    static final char PROPERTY_START = '.';
-
-    static final char INDEXED_START = '[';
-
-    static final char INDEXED_END = ']';
-
-    static final char MAPPED_START = '(';
-
-    static final char MAPPED_END = ')';
-
-    static class Tokenizer {
-        final String expression;
-
-        int idx;
-
-        Tokenizer(String expression) {
-            this.expression = expression;
-        }
-
-        public int peekChar() {
-            return idx < expression.length() ? expression.charAt(idx) : EOF;
-        }
-
-        public int skipChar() {
-            return idx < expression.length() ? expression.charAt(idx++) : EOF;
-        }
-
-        public String nextToken(char delimiter) {
-            int start = idx;
-
-            while (idx < expression.length() && delimiter != expression.charAt(idx)) {
-                idx++;
-            }
-
-            // delimiter MUST be present
-            if (idx <= start || idx >= expression.length()) {
-                return null;
-            }
-
-            return expression.substring(start, idx++);
-        }
-
-        public String nextPropertyName() {
-            final int start = idx;
-
-            while (idx < expression.length() && Character.isJavaIdentifierPart(expression.charAt(idx))) {
-                idx++;
-            }
-
-            // property name does not require delimiter
-            if (idx <= start || idx > expression.length()) {
-                return null;
-            }
-
-            return expression.substring(start, idx);
-        }
-
-        public int getPosition() {
-            return idx < expression.length() ? idx : EOF;
-        }
-
-        // to make tokenizer look pretty in debugger
-        @Override
-        public String toString() {
-            return idx < expression.length() ? expression.substring(idx) : "<EOF>";
-        }
-    }
-
     private ReflectionValueExtractor() {}
 
-    /**
-     * <p>The implementation supports indexed, nested and mapped properties.</p>
-     * <ul>
-     * <li>nested properties should be defined by a dot, i.e. "user.address.street"</li>
-     * <li>indexed properties (java.util.List or array instance) should be contains <code>(\\w+)\\[(\\d+)\\]</code>
-     * pattern, i.e. "user.addresses[1].street"</li>
-     * <li>mapped properties should be contains <code>(\\w+)\\((.+)\\)</code> pattern,
-     *  i.e. "user.addresses(myAddress).street"</li>
-     * </ul>
-     *
-     * @param expression not null expression
-     * @param root       not null object
-     * @return the object defined by the expression
-     * @throws IntrospectionException if any
-     */
     public static Object evaluate(@Nonnull String expression, @Nullable Object root) throws IntrospectionException {
         return evaluate(expression, root, true);
     }
 
-    /**
-     * <p>
-     * The implementation supports indexed, nested and mapped properties.
-     * </p>
-     * <ul>
-     * <li>nested properties should be defined by a dot, i.e. "user.address.street"</li>
-     * <li>indexed properties (java.util.List or array instance) should be contains <code>(\\w+)\\[(\\d+)\\]</code>
-     * pattern, i.e. "user.addresses[1].street"</li>
-     * <li>mapped properties should be contains <code>(\\w+)\\((.+)\\)</code> pattern, i.e.
-     * "user.addresses(myAddress).street"</li>
-     * </ul>
-     *
-     * @param expression not null expression
-     * @param root not null object
-     * @param trimRootToken trim root token yes/no.
-     * @return the object defined by the expression
-     * @throws IntrospectionException if any
-     */
     public static Object evaluate(@Nonnull String expression, @Nullable Object root, boolean trimRootToken)
             throws IntrospectionException {
-        Object value = root;
-
-        // ----------------------------------------------------------------------
-        // Walk the dots and retrieve the ultimate value desired from the
-        // MavenProject instance.
-        // ----------------------------------------------------------------------
-
-        if (expression == null || expression.isEmpty() || !Character.isJavaIdentifierStart(expression.charAt(0))) {
-            return null;
-        }
-
-        boolean hasDots = expression.indexOf(PROPERTY_START) >= 0;
-
-        final Tokenizer tokenizer;
-        if (trimRootToken && hasDots) {
-            tokenizer = new Tokenizer(expression);
-            tokenizer.nextPropertyName();
-            if (tokenizer.getPosition() == EOF) {
-                return null;
-            }
-        } else {
-            tokenizer = new Tokenizer("." + expression);
-        }
-
-        int propertyPosition = tokenizer.getPosition();
-        while (value != null && tokenizer.peekChar() != EOF) {
-            switch (tokenizer.skipChar()) {
-                case INDEXED_START:
-                    value = getIndexedValue(
-                            expression,
-                            propertyPosition,
-                            tokenizer.getPosition(),
-                            value,
-                            tokenizer.nextToken(INDEXED_END));
-                    break;
-                case MAPPED_START:
-                    value = getMappedValue(
-                            expression,
-                            propertyPosition,
-                            tokenizer.getPosition(),
-                            value,
-                            tokenizer.nextToken(MAPPED_END));
-                    break;
-                case PROPERTY_START:
-                    propertyPosition = tokenizer.getPosition();
-                    value = getPropertyValue(value, tokenizer.nextPropertyName());
-                    break;
-                default:
-                    // could not parse expression
-                    return null;
-            }
-        }
-
-        if (value instanceof Optional<?> optional) {
-            value = optional.orElse(null);
-        }
-        return value;
-    }
-
-    private static Object getMappedValue(
-            final String expression, final int from, final int to, final Object value, final String key)
-            throws IntrospectionException {
-        if (value == null || key == null) {
-            return null;
-        }
-
-        if (value instanceof Map map) {
-            return map.get(key);
-        }
-
-        final String message = String.format(
-                "The token '%s' at position '%d' refers to a java.util.Map, but the value "
-                        + "seems is an instance of '%s'",
-                expression.subSequence(from, to), from, value.getClass());
-
-        throw new IntrospectionException(message);
-    }
-
-    private static Object getIndexedValue(
-            final String expression, final int from, final int to, final Object value, final String indexStr)
-            throws IntrospectionException {
         try {
-            int index = Integer.parseInt(indexStr);
-
-            if (value.getClass().isArray()) {
-                return Array.get(value, index);
-            }
-
-            if (value instanceof List list) {
-                return list.get(index);
-            }
-        } catch (NumberFormatException | IndexOutOfBoundsException e) {
-            return null;
+            return org.apache.maven.utils.ReflectionValueExtractor.evaluate(expression, root, trimRootToken, true);
+        } catch (org.apache.maven.utils.IntrospectionException e) {
+            IntrospectionException translated = e.getCause() != null
+                    ? new IntrospectionException(e.getCause())
+                    : new IntrospectionException(e.getMessage());
+            // Retain the shared helper's failure location without changing the legacy cause contract.
+            translated.setStackTrace(e.getStackTrace());
+            throw translated;
         }
-
-        final String message = String.format(
-                "The token '%s' at position '%d' refers to a java.util.List or an array, but the value "
-                        + "seems is an instance of '%s'",
-                expression.subSequence(from, to), from, value.getClass());
-
-        throw new IntrospectionException(message);
-    }
-
-    /**
-     * Resolves a single property segment against {@code value} by trying, in order:
-     * <ol>
-     *   <li>Prefixed accessors: {@code getX()}, {@code isX()}, {@code toX()}, {@code asX()}</li>
-     *   <li>Noun-based accessors: a zero-arg method whose name matches the property name exactly
-     *       (e.g. {@code plugin()}, {@code descriptor()}, {@code goal()}).</li>
-     * </ol>
-     * The noun-based fallback is intentional and applies globally to <em>any</em> object in the
-     * expression tree, not just {@code MojoExecution}. Classes that expose zero-arg methods whose
-     * names collide with common property names (e.g. {@code type()}, {@code name()}) will be
-     * resolved via this path. This is by design — it allows modern noun-style APIs to be used
-     * transparently in expressions like {@code ${mojo.plugin}} or {@code ${mojo.goal}}.
-     */
-    private static Object getPropertyValue(Object value, String property) throws IntrospectionException {
-        if (value == null || property == null || property.isEmpty()) {
-            return null;
-        }
-
-        ClassMap classMap = getClassMap(value.getClass());
-        String methodBase = Character.toTitleCase(property.charAt(0)) + property.substring(1);
-        try {
-            for (String prefix : ACCESSOR_PREFIXES) {
-                Method method = classMap.findMethod(prefix + methodBase);
-                if (method != null) {
-                    return method.invoke(value, OBJECT_ARGS);
-                }
-            }
-            // Also support noun-based accessor style (e.g. plugin(), descriptor(), goal())
-            // where the method name matches the property name exactly.
-            Method method = classMap.findMethod(property);
-            if (method != null) {
-                return method.invoke(value, OBJECT_ARGS);
-            }
-            return null;
-        } catch (InvocationTargetException e) {
-            throw new IntrospectionException(e.getTargetException());
-        } catch (MethodMap.AmbiguousException | IllegalAccessException e) {
-            throw new IntrospectionException(e);
-        }
-    }
-
-    private static ClassMap getClassMap(Class<?> clazz) {
-        Reference<ClassMap> ref = CLASS_MAPS.get(clazz);
-        ClassMap classMap = ref != null ? ref.get() : null;
-
-        if (classMap == null) {
-            classMap = new ClassMap(clazz);
-
-            CLASS_MAPS.put(clazz, new WeakReference<>(classMap));
-        }
-
-        return classMap;
     }
 }

@@ -24,10 +24,15 @@ import java.util.Map;
 import java.util.function.UnaryOperator;
 
 import org.apache.maven.api.services.InterpolatorException;
+import org.apache.maven.utils.StringInterpolator;
+import org.apache.maven.utils.StringInterpolatorException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DefaultInterpolatorTest {
 
@@ -75,10 +80,40 @@ class DefaultInterpolatorTest {
 
     @Test
     void testSubstLoop() {
-        assertThrows(
+        InterpolatorException error = assertThrows(
                 InterpolatorException.class,
                 () -> substVars("${a}", "a"),
                 "Expected substVars() to throw an InterpolatorException, but it didn't");
+        StringInterpolatorException cause = assertInstanceOf(StringInterpolatorException.class, error.getCause());
+        assertEquals("recursive variable reference: a", error.getMessage());
+        assertEquals(error.getMessage(), cause.getMessage());
+        assertTrue(java.util.Arrays.stream(cause.getStackTrace())
+                .anyMatch(frame -> StringInterpolator.class.getName().equals(frame.getClassName())));
+    }
+
+    @Test
+    void retainsTheOriginalUtilityExceptionAndItsCause() {
+        StringInterpolatorException failure = new StringInterpolatorException("utility callback failed");
+        failure.initCause(new IllegalStateException("original failure"));
+        InterpolatorException error = assertThrows(
+                InterpolatorException.class,
+                () -> new DefaultInterpolator().interpolate("${external}", key -> {
+                    throw failure;
+                }));
+        assertEquals(failure.getMessage(), error.getMessage());
+        assertSame(failure, error.getCause());
+    }
+
+    @Test
+    void preservesUnrelatedCallbackExceptions() {
+        IllegalArgumentException failure = new IllegalArgumentException("callback failed");
+        assertSame(
+                failure,
+                assertThrows(
+                        IllegalArgumentException.class,
+                        () -> new DefaultInterpolator().interpolate("${external}", key -> {
+                            throw failure;
+                        })));
     }
 
     @Test
@@ -115,11 +150,6 @@ class DefaultInterpolatorTest {
 
     @Test
     void testLoopEmpty() {
-        assertEquals("${a}", substVars("${a}", null, null, null, false));
-    }
-
-    @Test
-    void testLoopEmpty2() {
         assertEquals("${a}", substVars("${a}", null, null, null, false));
     }
 

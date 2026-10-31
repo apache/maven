@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.model.interpolation.reflection;
+package org.apache.maven.utils;
 
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -26,10 +26,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-/**
- * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
- */
-@Deprecated(since = "4.0.0")
 class MethodMap {
     private static final int MORE_SPECIFIC = 0;
 
@@ -120,10 +116,7 @@ class MethodMap {
      * simple distinguishable exception, used when
      * we run across ambiguous overloading
      */
-    static class AmbiguousException extends Exception {
-
-        private static final long serialVersionUID = 751688436639650618L;
-    }
+    static class AmbiguousException extends Exception {}
 
     private static Method getMostSpecific(List<Method> methods, Class<?>... classes) throws AmbiguousException {
         LinkedList<Method> applicables = getApplicables(methods, classes);
