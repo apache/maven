@@ -2156,8 +2156,7 @@ public class DefaultModelBuilder implements ModelBuilder {
          * @return the user properties to apply over the declared model properties
          */
         Map<String, String> overridingUserProperties() {
-            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER
-                    && request.getSession() != null) {
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER) {
                 return request.getSession().getUserProperties();
             }
             return request.getUserProperties();
