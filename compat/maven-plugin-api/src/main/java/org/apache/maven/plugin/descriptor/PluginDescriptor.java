@@ -67,6 +67,8 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
 
     private boolean inheritedByDefault = true;
 
+    private boolean modular;
+
     private List<Artifact> artifacts;
 
     private DependencyNode dependencyNode;
@@ -112,6 +114,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
         this.setComponents(clone(original.getMojos(), this));
         this.setId(original.getId());
         this.setIsolatedRealm(original.isIsolatedRealm());
+        this.setModular(original.isModular());
         this.setSource(original.getSource());
         this.setDependencies(original.getDependencies());
         this.setDependencyNode(original.getDependencyNode());
@@ -146,6 +149,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
                 .collect(Collectors.toList()));
         this.setId(original.getId());
         this.setIsolatedRealm(original.isIsolatedRealm());
+        this.setModular(original.isModular());
         this.setSource(null);
         this.setDependencies(Collections.emptyList()); // TODO: v4
         this.setDependencyNode(null); // TODO: v4
@@ -471,6 +475,14 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
         }
     }
 
+    public boolean isModular() {
+        return modular;
+    }
+
+    public void setModular(boolean modular) {
+        this.modular = modular;
+    }
+
     public void addMojos(List<MojoDescriptor> mojos) throws DuplicateMojoDescriptorException {
         for (MojoDescriptor mojoDescriptor : mojos) {
             addMojo(mojoDescriptor);
@@ -493,6 +505,7 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
                             .version(version)
                             .goalPrefix(goalPrefix)
                             .isolatedRealm(isIsolatedRealm())
+                            .modular(isModular())
                             .inheritedByDefault(inheritedByDefault)
                             .requiredJavaVersion(requiredJavaVersion)
                             .requiredMavenVersion(requiredMavenVersion)

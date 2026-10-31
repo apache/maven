@@ -34,6 +34,7 @@ package org.codehaus.plexus.classworlds.realm;
  * limitations under the License.
  */
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
@@ -44,9 +45,10 @@ import java.util.Collections;
 import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Objects;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.strategy.Strategy;
@@ -64,9 +66,9 @@ import org.codehaus.plexus.classworlds.strategy.StrategyFactory;
  */
 public class ClassRealm extends URLClassLoader {
 
-    private final ClassWorld world;
+    private ClassWorld world;
 
-    private final String id;
+    private String id;
 
     private SortedSet<Entry> foreignImports;
 
@@ -75,6 +77,14 @@ public class ClassRealm extends URLClassLoader {
     private Strategy strategy;
 
     private ClassLoader parentClassLoader;
+
+    private ModuleLayer moduleLayer;
+
+    private ModuleLayer.Controller moduleLayerController;
+
+    private static final boolean IS_PARALLEL_CAPABLE = Closeable.class.isAssignableFrom(URLClassLoader.class);
+
+    private final ConcurrentMap<String, Object> lockMap;
 
     /**
      * Creates a new class realm.
@@ -86,27 +96,22 @@ public class ClassRealm extends URLClassLoader {
      */
     public ClassRealm(ClassWorld world, String id, ClassLoader baseClassLoader) {
         super(new URL[0], baseClassLoader);
-        this.world = world;
-        this.id = id;
-        foreignImports = new TreeSet<>();
-        strategy = StrategyFactory.getStrategy(this);
-    }
 
-    /**
-     * Creates a new class realm with a specific class loading strategy.
-     *
-     * @param world           The class world this realm belongs to, must not be <code>null</code>.
-     * @param id              The identifier for this realm, must not be <code>null</code>.
-     * @param baseClassLoader The base class loader for this realm, may be <code>null</code> to use the bootstrap class
-     *                        loader.
-     * @param strategy        The class loading strategy, must not be <code>null</code>.
-     */
-    public ClassRealm(ClassWorld world, String id, ClassLoader baseClassLoader, Strategy strategy) {
-        super(new URL[0], baseClassLoader);
         this.world = world;
+
         this.id = id;
+
         foreignImports = new TreeSet<>();
-        this.strategy = Objects.requireNonNull(strategy, "strategy cannot be null");
+
+        strategy = StrategyFactory.getStrategy(this);
+
+        lockMap = IS_PARALLEL_CAPABLE ? new ConcurrentHashMap<>() : null;
+
+        if (IS_PARALLEL_CAPABLE) {
+            // We must call super.getClassLoadingLock at least once
+            // to avoid NPE in super.loadClass.
+            super.getClassLoadingLock(getClass().getName());
+        }
     }
 
     public String getId() {
@@ -117,10 +122,21 @@ public class ClassRealm extends URLClassLoader {
         return this.world;
     }
 
+    /**
+     * Returns the underlying ClassLoader for this realm.
+     * Since ClassRealm extends URLClassLoader, this method returns {@code this}.
+     *
+     * @return this
+     */
+    public ClassLoader getClassLoader() {
+        return this;
+    }
+
     public void importFromParent(String packageName) {
         if (parentImports == null) {
             parentImports = new TreeSet<>();
         }
+
         parentImports.add(new Entry(null, packageName));
     }
 
@@ -131,8 +147,10 @@ public class ClassRealm extends URLClassLoader {
                     return true;
                 }
             }
+
             return false;
         }
+
         return true;
     }
 
@@ -150,30 +168,24 @@ public class ClassRealm extends URLClassLoader {
                 return entry.getClassLoader();
             }
         }
+
         return null;
     }
 
     public Collection<ClassRealm> getImportRealms() {
         Collection<ClassRealm> importRealms = new HashSet<>();
+
         for (Entry entry : foreignImports) {
             if (entry.getClassLoader() instanceof ClassRealm) {
                 importRealms.add((ClassRealm) entry.getClassLoader());
             }
         }
+
         return importRealms;
     }
 
     public Strategy getStrategy() {
         return strategy;
-    }
-
-    /**
-     * Replaces the class loading strategy for this realm.
-     *
-     * @param strategy the new strategy, must not be {@code null}
-     */
-    public void setStrategy(Strategy strategy) {
-        this.strategy = Objects.requireNonNull(strategy, "strategy cannot be null");
     }
 
     public void setParentClassLoader(ClassLoader parentClassLoader) {
@@ -201,14 +213,17 @@ public class ClassRealm extends URLClassLoader {
 
     public void addURL(URL url) {
         String urlStr = url.toExternalForm();
+
         if (urlStr.startsWith("jar:") && urlStr.endsWith("!/")) {
             urlStr = urlStr.substring(4, urlStr.length() - 2);
+
             try {
                 url = new URL(urlStr);
             } catch (MalformedURLException e) {
                 e.printStackTrace();
             }
         }
+
         super.addURL(url);
     }
 
@@ -224,6 +239,27 @@ public class ClassRealm extends URLClassLoader {
         world.addReads(moduleName, getUnnamedModule());
     }
 
+    /**
+     * Sets the ModuleLayer and Controller for this realm.
+     * Called when the plugin is loaded as a JPMS module.
+     */
+    public void setModuleLayer(ModuleLayer moduleLayer, ModuleLayer.Controller controller) {
+        this.moduleLayer = moduleLayer;
+        this.moduleLayerController = controller;
+    }
+
+    public ModuleLayer getModuleLayer() {
+        return moduleLayer;
+    }
+
+    public ModuleLayer.Controller getModuleLayerController() {
+        return moduleLayerController;
+    }
+
+    public boolean isModular() {
+        return moduleLayer != null;
+    }
+
     // ----------------------------------------------------------------------
     // We delegate to the Strategy here so that we can change the behavior
     // of any existing ClassRealm.
@@ -234,7 +270,14 @@ public class ClassRealm extends URLClassLoader {
     }
 
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        return unsynchronizedLoadClass(name, resolve);
+        if (IS_PARALLEL_CAPABLE) {
+            return unsynchronizedLoadClass(name, resolve);
+
+        } else {
+            synchronized (this) {
+                return unsynchronizedLoadClass(name, resolve);
+            }
+        }
     }
 
     private Class<?> unsynchronizedLoadClass(String name, boolean resolve) throws ClassNotFoundException {
@@ -306,26 +349,35 @@ public class ClassRealm extends URLClassLoader {
 
     public void display(PrintStream out) {
         out.println("-----------------------------------------------------");
+
         for (ClassRealm cr = this; cr != null; cr = (ClassRealm) cr.getParentRealm()) {
             out.println("realm =    " + cr.getId());
             out.println("strategy = " + cr.getStrategy().getClass().getName());
+
             showUrls(cr, out);
+
             out.println();
         }
+
         out.println("-----------------------------------------------------");
     }
 
     private static void showUrls(ClassRealm classRealm, PrintStream out) {
         URL[] urls = classRealm.getURLs();
+
         for (int i = 0; i < urls.length; i++) {
             out.println("urls[" + i + "] = " + urls[i]);
         }
+
         out.println("Number of foreign imports: " + classRealm.foreignImports.size());
+
         for (Entry entry : classRealm.foreignImports) {
             out.println("import: " + entry);
         }
+
         if (classRealm.parentImports != null) {
             out.println("Number of parent imports: " + classRealm.parentImports.size());
+
             for (Entry entry : classRealm.parentImports) {
                 out.println("import: " + entry);
             }
@@ -342,6 +394,7 @@ public class ClassRealm extends URLClassLoader {
 
     public Class<?> loadClassFromImport(String name) {
         ClassLoader importClassLoader = getImportClassLoader(name);
+
         if (importClassLoader != null) {
             try {
                 return importClassLoader.loadClass(name);
@@ -349,16 +402,19 @@ public class ClassRealm extends URLClassLoader {
                 return null;
             }
         }
+
         return null;
     }
 
     public Class<?> loadClassFromSelf(String name) {
-        synchronized (getClassLoadingLock(name)) {
+        synchronized (getClassRealmLoadingLock(name)) {
             try {
                 Class<?> clazz = findLoadedClass(name);
+
                 if (clazz == null) {
                     clazz = findClassInternal(name);
                 }
+
                 return clazz;
             } catch (ClassNotFoundException e) {
                 return null;
@@ -366,8 +422,27 @@ public class ClassRealm extends URLClassLoader {
         }
     }
 
+    private Object getClassRealmLoadingLock(String name) {
+        if (IS_PARALLEL_CAPABLE) {
+            return getClassLoadingLock(name);
+        } else {
+            return this;
+        }
+    }
+
+    @Override
+    protected Object getClassLoadingLock(String name) {
+        if (IS_PARALLEL_CAPABLE) {
+            Object newLock = new Object();
+            Object lock = lockMap.putIfAbsent(name, newLock);
+            return (lock == null) ? newLock : lock;
+        }
+        return this;
+    }
+
     public Class<?> loadClassFromParent(String name) {
         ClassLoader parent = getParentClassLoader();
+
         if (parent != null && isImportedFromParent(name)) {
             try {
                 return parent.loadClass(name);
@@ -375,6 +450,7 @@ public class ClassRealm extends URLClassLoader {
                 return null;
             }
         }
+
         return null;
     }
 
@@ -384,9 +460,11 @@ public class ClassRealm extends URLClassLoader {
 
     public URL loadResourceFromImport(String name) {
         ClassLoader importClassLoader = getImportClassLoader(name);
+
         if (importClassLoader != null) {
             return importClassLoader.getResource(name);
         }
+
         return null;
     }
 
@@ -396,6 +474,7 @@ public class ClassRealm extends URLClassLoader {
 
     public URL loadResourceFromParent(String name) {
         ClassLoader parent = getParentClassLoader();
+
         if (parent != null && isImportedFromParent(name)) {
             return parent.getResource(name);
         } else {
@@ -409,6 +488,7 @@ public class ClassRealm extends URLClassLoader {
 
     public Enumeration<URL> loadResourcesFromImport(String name) {
         ClassLoader importClassLoader = getImportClassLoader(name);
+
         if (importClassLoader != null) {
             try {
                 return importClassLoader.getResources(name);
@@ -416,6 +496,7 @@ public class ClassRealm extends URLClassLoader {
                 return null;
             }
         }
+
         return null;
     }
 
@@ -429,6 +510,7 @@ public class ClassRealm extends URLClassLoader {
 
     public Enumeration<URL> loadResourcesFromParent(String name) {
         ClassLoader parent = getParentClassLoader();
+
         if (parent != null && isImportedFromParent(name)) {
             try {
                 return parent.getResources(name);
@@ -436,15 +518,33 @@ public class ClassRealm extends URLClassLoader {
                 // eat it
             }
         }
+
         return null;
     }
 
     @Override
     public void close() throws IOException {
+        if (moduleLayer != null) {
+            // defineModulesWithOneLoader uses a single shared ClassLoader for all modules in the layer.
+            // Close it once to release JAR file handles.
+            moduleLayer.modules().stream().findFirst().ifPresent(m -> {
+                ClassLoader loader = m.getClassLoader();
+                if (loader instanceof Closeable && loader != this) {
+                    try {
+                        ((Closeable) loader).close();
+                    } catch (IOException e) {
+                        // best effort
+                    }
+                }
+            });
+        }
         super.close();
     }
 
     static {
-        registerAsParallelCapable();
+        if (IS_PARALLEL_CAPABLE) // Avoid running this method on older jdks
+        {
+            registerAsParallelCapable();
+        }
     }
 }
