@@ -31,7 +31,8 @@ import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 /**
- * Tests for {@link DefaultLog}.
+ * Tests for {@link DefaultLog}, focused on verifying the bug fix for
+ * {@code warn(Supplier, Throwable)} and SLF4J delegation.
  */
 class DefaultLogTest {
 
@@ -43,6 +44,7 @@ class DefaultLogTest {
     void warnWithSupplierAndThrowableDelegatesToWarn() {
         Logger mockLogger = mock(Logger.class);
         when(mockLogger.isWarnEnabled()).thenReturn(true);
+        when(mockLogger.getName()).thenReturn("test.logger");
 
         DefaultLog log = new DefaultLog(mockLogger);
         RuntimeException ex = new RuntimeException("test");
@@ -58,6 +60,7 @@ class DefaultLogTest {
     void traceMethodsDelegateToSlf4jTrace() {
         Logger mockLogger = mock(Logger.class);
         when(mockLogger.isTraceEnabled()).thenReturn(true);
+        when(mockLogger.getName()).thenReturn("test.logger");
 
         DefaultLog log = new DefaultLog(mockLogger);
         log.trace("trace message");
