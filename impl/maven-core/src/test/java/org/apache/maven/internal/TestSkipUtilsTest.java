@@ -153,6 +153,36 @@ class TestSkipUtilsTest {
     }
 
     @Test
+    void repoSessionUserPropertiesOverridesConfigProperties() {
+        DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession();
+        repoSession.setUserProperties(Collections.singletonMap("maven.test.skip", "false"));
+        repoSession.setConfigProperty("maven.test.skip", "true");
+
+        // User property "false" must override config property "true"
+        assertFalse(TestSkipUtils.isTestSkip(repoSession, null));
+    }
+
+    @Test
+    void repoSessionUserPropertiesOverridesSystemProperties() {
+        DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession();
+        repoSession.setUserProperties(Collections.singletonMap("maven.test.skip", "false"));
+        repoSession.setSystemProperties(Collections.singletonMap("maven.test.skip", "true"));
+
+        // User property "false" must override system property "true"
+        assertFalse(TestSkipUtils.isTestSkip(repoSession, null));
+    }
+
+    @Test
+    void repoSessionSystemPropertiesOverridesConfigProperties() {
+        DefaultRepositorySystemSession repoSession = new DefaultRepositorySystemSession();
+        repoSession.setSystemProperties(Collections.singletonMap("maven.test.skip", "false"));
+        repoSession.setConfigProperty("maven.test.skip", "true");
+
+        // System property "false" must override config property "true"
+        assertFalse(TestSkipUtils.isTestSkip(repoSession, null));
+    }
+
+    @Test
     void projectPropertiesTrueReturnsTrue() {
         MavenProject project = new MavenProject();
         project.getProperties().setProperty("maven.test.skip", "true");

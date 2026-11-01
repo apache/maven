@@ -63,6 +63,8 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.scope.ResolutionScope;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.impl.ImplUtils.cast;
@@ -71,6 +73,8 @@ import static org.apache.maven.impl.ImplUtils.map;
 @Named
 @Singleton
 public class DefaultDependencyResolver implements DependencyResolver {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDependencyResolver.class);
 
     /**
      * Cache of information about the modules contained in a path element.
@@ -219,13 +223,35 @@ public class DefaultDependencyResolver implements DependencyResolver {
         return scopeFilter;
     }
 
+    /**
+     * Determines whether the specified artifact refers to test classes (e.g. test-jar).
+     * <p>
+     * Note: This method intentionally duplicates the logic in {@code RepositoryUtils.isTestArtifact}
+     * because {@code maven-impl} is part of the Maven 4 API implementation layer and does not depend
+     * on {@code maven-core} (which contains {@code RepositoryUtils}).
+     *
+     * @param artifact the artifact to check, may be {@code null}
+     * @return {@code true} if the artifact refers to test classes, {@code false} otherwise
+     */
     static boolean isTestArtifact(org.eclipse.aether.artifact.Artifact artifact) {
         return artifact != null
                 && ("test-jar".equals(artifact.getProperty(ArtifactProperties.TYPE, ""))
                         || ("jar".equals(artifact.getExtension()) && "tests".equals(artifact.getClassifier())));
     }
 
-    private static boolean isTestSkip(InternalSession session, Project project) {
+    /**
+     * Determines whether test execution and compilation are skipped (e.g. via {@code -Dmaven.test.skip}).
+     * <p>
+     * Note: This method exists separately from {@code TestSkipUtils.isTestSkip} because {@code maven-impl}
+     * operates on the Maven 4 API types ({@link InternalSession}, {@link Project}) and cannot depend on
+     * {@code maven-core} where {@code TestSkipUtils} resides. Property precedence order follows
+     * {@code userProperties > systemProperties > configProperties > projectProperties}.
+     *
+     * @param session the internal session, may be {@code null}
+     * @param project the Maven project, may be {@code null}
+     * @return {@code true} if tests are skipped, {@code false} otherwise
+     */
+    static boolean isTestSkip(InternalSession session, Project project) {
         if (session != null) {
             try {
                 if (session.getUserProperties() != null) {
@@ -240,18 +266,13 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         return Boolean.parseBoolean(val) || val.isEmpty();
                     }
                 }
-            } catch (Exception ignored) {
-                // Ignore if properties cannot be accessed
+            } catch (Exception e) {
+                LOGGER.debug("Failed to check test skip from session properties", e);
             }
             try {
                 RepositorySystemSession rSession = session.getSession();
                 if (rSession != null) {
-                    Object val = rSession.getConfigProperties().get("maven.test.skip");
-                    if (val != null) {
-                        String s = String.valueOf(val);
-                        return Boolean.parseBoolean(s) || s.isEmpty();
-                    }
-                    val = rSession.getUserProperties().get("maven.test.skip");
+                    Object val = rSession.getUserProperties().get("maven.test.skip");
                     if (val != null) {
                         String s = String.valueOf(val);
                         return Boolean.parseBoolean(s) || s.isEmpty();
@@ -261,9 +282,14 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         String s = String.valueOf(val);
                         return Boolean.parseBoolean(s) || s.isEmpty();
                     }
+                    val = rSession.getConfigProperties().get("maven.test.skip");
+                    if (val != null) {
+                        String s = String.valueOf(val);
+                        return Boolean.parseBoolean(s) || s.isEmpty();
+                    }
                 }
-            } catch (Exception ignored) {
-                // Ignore
+            } catch (Exception e) {
+                LOGGER.debug("Failed to check test skip from repository session properties", e);
             }
         }
         if (project != null) {
@@ -274,8 +300,8 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         return Boolean.parseBoolean(val) || val.isEmpty();
                     }
                 }
-            } catch (Exception ignored) {
-                // Ignore
+            } catch (Exception e) {
+                LOGGER.debug("Failed to check test skip from project properties", e);
             }
         }
         return false;

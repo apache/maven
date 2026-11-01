@@ -66,17 +66,17 @@ public final class TestSkipUtils {
      */
     public static boolean isTestSkip(RepositorySystemSession session, MavenProject project) {
         if (session != null) {
-            Object val = session.getConfigProperties().get("maven.test.skip");
-            if (val != null) {
-                String s = String.valueOf(val);
-                return Boolean.parseBoolean(s) || s.isEmpty();
-            }
-            val = session.getUserProperties().get("maven.test.skip");
+            Object val = session.getUserProperties().get("maven.test.skip");
             if (val != null) {
                 String s = String.valueOf(val);
                 return Boolean.parseBoolean(s) || s.isEmpty();
             }
             val = session.getSystemProperties().get("maven.test.skip");
+            if (val != null) {
+                String s = String.valueOf(val);
+                return Boolean.parseBoolean(s) || s.isEmpty();
+            }
+            val = session.getConfigProperties().get("maven.test.skip");
             if (val != null) {
                 String s = String.valueOf(val);
                 return Boolean.parseBoolean(s) || s.isEmpty();

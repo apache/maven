@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.Node;
+import org.apache.maven.api.Project;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.ArtifactProperties;
@@ -68,6 +69,43 @@ class DefaultDependencyResolverTest {
 
         DefaultArtifact classifierTestsNonJar = new DefaultArtifact("g", "a", "tests", "war", "1.0");
         assertFalse(DefaultDependencyResolver.isTestArtifact(classifierTestsNonJar));
+    }
+
+    @Test
+    void isTestSkipPrecedence() {
+        InternalSession session = mock(InternalSession.class);
+        RepositorySystemSession repoSession = mock(RepositorySystemSession.class);
+        when(session.getSession()).thenReturn(repoSession);
+
+        // Precedence: session userProperties > systemProperties
+        when(session.getUserProperties()).thenReturn(Map.of("maven.test.skip", "false"));
+        when(session.getSystemProperties()).thenReturn(Map.of("maven.test.skip", "true"));
+        assertFalse(DefaultDependencyResolver.isTestSkip(session, null));
+
+        // Precedence: repoSession userProperties > systemProperties > configProperties
+        when(session.getUserProperties()).thenReturn(Map.of());
+        when(session.getSystemProperties()).thenReturn(Map.of());
+        when(repoSession.getUserProperties()).thenReturn(Map.of("maven.test.skip", "false"));
+        when(repoSession.getSystemProperties()).thenReturn(Map.of("maven.test.skip", "true"));
+        when(repoSession.getConfigProperties()).thenReturn(Map.of("maven.test.skip", "true"));
+        assertFalse(DefaultDependencyResolver.isTestSkip(session, null));
+
+        when(repoSession.getUserProperties()).thenReturn(Map.of());
+        when(repoSession.getSystemProperties()).thenReturn(Map.of("maven.test.skip", "false"));
+        when(repoSession.getConfigProperties()).thenReturn(Map.of("maven.test.skip", "true"));
+        assertFalse(DefaultDependencyResolver.isTestSkip(session, null));
+    }
+
+    @Test
+    void isTestSkipHandlesExceptionsGracefully() {
+        InternalSession session = mock(InternalSession.class);
+        when(session.getUserProperties()).thenThrow(new RuntimeException("Simulated exception"));
+        when(session.getSession()).thenThrow(new RuntimeException("Simulated exception"));
+
+        Project project = mock(Project.class);
+        when(project.getModel()).thenThrow(new RuntimeException("Simulated exception"));
+
+        assertFalse(DefaultDependencyResolver.isTestSkip(session, project));
     }
 
     @Test
