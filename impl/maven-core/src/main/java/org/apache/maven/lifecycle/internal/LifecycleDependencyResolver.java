@@ -259,6 +259,17 @@ public class LifecycleDependencyResolver {
         resolutionFilter =
                 AndDependencyFilter.newInstance(resolutionFilter, new ReactorDependencyFilter(projectArtifacts));
 
+        if (RepositoryUtils.isTestSkip(session, project)) {
+            DependencyFilter testArtifactFilter = (node, parents) -> {
+                if (node.getDependency() != null) {
+                    return !RepositoryUtils.isTestArtifact(node.getDependency().getArtifact());
+                }
+                return true;
+            };
+            collectionFilter = AndDependencyFilter.newInstance(collectionFilter, testArtifactFilter);
+            resolutionFilter = AndDependencyFilter.newInstance(resolutionFilter, testArtifactFilter);
+        }
+
         DependencyResolutionResult result;
         try {
             DefaultDependencyResolutionRequest request =

@@ -30,11 +30,13 @@ import java.util.Set;
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentTestCase {
     @Inject
@@ -85,7 +87,7 @@ class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentTestCase
      * (lib) has a {@code null} artifact file — i.e. the sibling has not yet packaged its jar.
      *
      * <p>This guards the null-file code path introduced by the fix in
-     * <a href="https://github.com/apache/maven/pull/13728">#13728</a>. The concurrent-builder
+     * <a href=https://github.com/apache/maven/pull/13728>#13728</a>. The concurrent-builder
      * race (sibling file is {@code null} at map-build time but non-null at lookup time within the
      * same call) cannot be reproduced in a sequential unit test; this test covers the observable
      * contract: when the sibling file is {@code null}, resolution completes without error and the
@@ -128,5 +130,45 @@ class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentTestCase
                         .get("org.apache.maven.its.mng6300:mng6300-lib")
                         .getFile(),
                 "resolved lib artifact file should remain null when lib has not yet packaged its jar");
+    }
+
+    @Test
+    void testTestJarNotResolvedWhenTestSkipped() throws Exception {
+        File pom = new File("src/test/projects/lifecycle-dependency-resolver-test-jar/pom.xml");
+        Properties userProps = new Properties();
+        userProps.setProperty("maven.test.skip", "true");
+
+        MavenSession session = createMavenSession(pom, new Properties(), true);
+        session.getUserProperties().putAll(userProps);
+
+        MavenProject common = session.getProjects().get(1);
+        MavenProject core = session.getProjects().get(2);
+
+        common.getArtifact().setFile(new File("common.jar"));
+
+        Collection<String> scopesToResolve = Collections.singletonList("test");
+
+        resolver.resolveProjectDependencies(core, null, scopesToResolve, session, false, Collections.emptySet());
+
+        assertNull(core.getArtifactMap().get("org.apache.maven.its.mng8074:mng8074-common:test-jar:tests"));
+    }
+
+    @Test
+    void testTestJarResolutionFailsWhenTestNotSkipped() throws Exception {
+        File pom = new File("src/test/projects/lifecycle-dependency-resolver-test-jar/pom.xml");
+
+        MavenSession session = createMavenSession(pom, new Properties(), true);
+
+        MavenProject common = session.getProjects().get(1);
+        MavenProject core = session.getProjects().get(2);
+
+        common.getArtifact().setFile(new File("common.jar"));
+
+        Collection<String> scopesToResolve = Collections.singletonList("test");
+
+        assertThrows(
+                LifecycleExecutionException.class,
+                () -> resolver.resolveProjectDependencies(
+                        core, null, scopesToResolve, session, false, Collections.emptySet()));
     }
 }

@@ -34,7 +34,9 @@ import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.handler.manager.ArtifactHandlerManager;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
+import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.resolver.artifact.MavenArtifactProperties;
+import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -395,5 +397,82 @@ public class RepositoryUtils {
                 && Objects.equals(r1.getUrl(), r2.getUrl())
                 && policyEquals(r1.getPolicy(false), r2.getPolicy(false))
                 && policyEquals(r1.getPolicy(true), r2.getPolicy(true));
+    }
+
+    /**
+     * Determines whether the specified artifact refers to test classes (e.g. test-jar).
+     *
+     * @param artifact The artifact to check, may be {@code null}.
+     * @return {@code true} if the artifact refers to test classes, {@code false} otherwise.
+     */
+    public static boolean isTestArtifact(Artifact artifact) {
+        return artifact != null
+                && ("test-jar".equals(artifact.getProperty(ArtifactProperties.TYPE, ""))
+                        || ("jar".equals(artifact.getExtension()) && "tests".equals(artifact.getClassifier())));
+    }
+
+    /**
+     * Determines whether the specified artifact refers to test classes (e.g. test-jar).
+     *
+     * @param artifact The artifact to check, may be {@code null}.
+     * @return {@code true} if the artifact refers to test classes, {@code false} otherwise.
+     */
+    public static boolean isTestArtifact(org.apache.maven.artifact.Artifact artifact) {
+        return artifact != null
+                && ("test-jar".equals(artifact.getType())
+                        || ("jar".equals(artifact.getType()) && "tests".equals(artifact.getClassifier())));
+    }
+
+    /**
+     * Determines whether test execution and compilation are skipped (e.g. via {@code -Dmaven.test.skip}).
+     *
+     * @param session The Maven session, may be {@code null}.
+     * @param project The Maven project, may be {@code null}.
+     * @return {@code true} if tests are skipped, {@code false} otherwise.
+     */
+    public static boolean isTestSkip(MavenSession session, MavenProject project) {
+        if (session != null) {
+            if (session.getUserProperties() != null) {
+                String val = session.getUserProperties().getProperty("maven.test.skip");
+                if (val != null) {
+                    return Boolean.parseBoolean(val) || val.isEmpty();
+                }
+            }
+            if (session.getSystemProperties() != null) {
+                String val = session.getSystemProperties().getProperty("maven.test.skip");
+                if (val != null) {
+                    return Boolean.parseBoolean(val) || val.isEmpty();
+                }
+            }
+            return isTestSkip(session.getRepositorySession(), project);
+        }
+        return isTestSkip((RepositorySystemSession) null, project);
+    }
+
+    /**
+     * Determines whether test execution and compilation are skipped (e.g. via {@code -Dmaven.test.skip}).
+     *
+     * @param session The repository system session, may be {@code null}.
+     * @param project The Maven project, may be {@code null}.
+     * @return {@code true} if tests are skipped, {@code false} otherwise.
+     */
+    public static boolean isTestSkip(RepositorySystemSession session, MavenProject project) {
+        if (session != null) {
+            Object val = session.getUserProperties().get("maven.test.skip");
+            if (val instanceof String str) {
+                return Boolean.parseBoolean(str) || str.isEmpty();
+            }
+            val = session.getSystemProperties().get("maven.test.skip");
+            if (val instanceof String str) {
+                return Boolean.parseBoolean(str) || str.isEmpty();
+            }
+        }
+        if (project != null && project.getProperties() != null) {
+            String val = project.getProperties().getProperty("maven.test.skip");
+            if (val != null) {
+                return Boolean.parseBoolean(val) || val.isEmpty();
+            }
+        }
+        return false;
     }
 }
