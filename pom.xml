@@ -508,17 +508,6 @@ under the License.
         <version>${slf4jVersion}</version>
         <optional>true</optional>
       </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>jul-to-slf4j</artifactId>
-        <version>${slf4jVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>${logbackClassicVersion}</version>
-        <optional>true</optional>
-      </dependency>
       <!--  Wagon -->
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>

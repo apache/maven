@@ -232,6 +232,23 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
         }
     }
 
+    /**
+     * Context-aware write that includes the log level, logger name, and
+     * clean message alongside the formatted output. Subclasses can override
+     * to forward structured data to a log sink.
+     * <p>
+     * The default implementation delegates to {@link #write(StringBuilder, Throwable)}.
+     *
+     * @param level          the SLF4J log level constant
+     * @param loggerName     the name of the logger
+     * @param cleanMessage   the formatted message without level/timestamp prefix
+     * @param formattedBuf   the fully formatted log line
+     * @param t              the throwable, may be {@code null}
+     */
+    protected void write(int level, String loggerName, String cleanMessage, StringBuilder formattedBuf, Throwable t) {
+        write(formattedBuf, t);
+    }
+
     protected void writeThrowable(Throwable t, PrintStream targetStream) {
         if (t != null) {
             t.printStackTrace(targetStream);
@@ -312,15 +329,34 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
     private void innerHandleNormalizedLoggingCall(
             Level level, List<Marker> markers, String messagePattern, Object[] arguments, Throwable t) {
 
+        String formattedMessage = MessageFormatter.basicArrayFormat(messagePattern, arguments);
+        StringBuilder buf = formatLogPrefix(level.toInt());
+
+        if (markers != null) {
+            buf.append(SP);
+            for (Marker marker : markers) {
+                buf.append(marker.getName()).append(SP);
+            }
+        }
+
+        buf.append(formattedMessage);
+
+        write(level.toInt(), name, formattedMessage, buf, t);
+    }
+
+    /**
+     * Builds the log line prefix: date/time, thread info, level, and
+     * logger name.  Used by both the SLF4J call chain and the direct
+     * logging path ({@code logDirect}).
+     */
+    protected StringBuilder formatLogPrefix(int levelInt) {
         StringBuilder buf = new StringBuilder(32);
 
-        // Append date-time if so configured
         if (CONFIG_PARAMS.showDateTime) {
             DateTimeFormatter formatter = CONFIG_PARAMS.dateFormatter;
             if (formatter != null) {
                 ZonedDateTime zonedDateTime = MonotonicClock.now().atZone(ZoneId.systemDefault());
-                String dateText = formatter.format(zonedDateTime);
-                buf.append(dateText);
+                buf.append(formatter.format(zonedDateTime));
                 buf.append(SP);
             } else {
                 buf.append(MonotonicClock.elapsed().toMillis());
@@ -328,7 +364,6 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
             }
         }
 
-        // Append current thread name if so configured
         if (CONFIG_PARAMS.showThreadName) {
             buf.append('[');
             buf.append(Thread.currentThread().getName());
@@ -345,15 +380,12 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
             buf.append('[');
         }
 
-        // Append a readable representation of the log level
-        String levelStr = renderLevel(level.toInt());
-        buf.append(levelStr);
+        buf.append(renderLevel(levelInt));
         if (CONFIG_PARAMS.levelInBrackets) {
             buf.append(']');
         }
         buf.append(SP);
 
-        // Append the name of the log instance if so configured
         if (CONFIG_PARAMS.showShortLogName) {
             if (shortLogName == null) {
                 shortLogName = computeShortName();
@@ -363,19 +395,7 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
             buf.append(name).append(" - ");
         }
 
-        if (markers != null) {
-            buf.append(SP);
-            for (Marker marker : markers) {
-                buf.append(marker.getName()).append(SP);
-            }
-        }
-
-        String formattedMessage = MessageFormatter.basicArrayFormat(messagePattern, arguments);
-
-        // Append the message
-        buf.append(formattedMessage);
-
-        write(buf, t);
+        return buf;
     }
 
     protected String renderLevel(int levelInt) {

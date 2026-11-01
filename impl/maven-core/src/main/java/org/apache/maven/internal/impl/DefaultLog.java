@@ -18,19 +18,68 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.lang.StackWalker.StackFrame;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.plugin.Log;
+import org.apache.maven.slf4j.MavenSimpleLogger;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.slf4j.spi.LocationAwareLogger;
 
 import static java.util.Objects.requireNonNull;
 
 public class DefaultLog implements Log {
+
+    private static final StackWalker WALKER = StackWalker.getInstance();
+    private static final String THIS_CLASS = DefaultLog.class.getName();
+
     private final Logger logger;
 
     public DefaultLog(Logger logger) {
         this.logger = requireNonNull(logger);
+    }
+
+    @SuppressWarnings("deprecation") // Thread.getId() — threadId() requires Java 19+
+    private void doLog(int level, String message, Throwable throwable) {
+        if (logger instanceof MavenSimpleLogger msl) {
+            MavenSimpleLogger.SourceMetadata metadata = MavenSimpleLogger.isMetadataEnabled()
+                    ? new MavenSimpleLogger.SourceMetadata(
+                            logger.getName(),
+                            resolveCallerMethod(),
+                            Thread.currentThread().getId())
+                    : null;
+            msl.logDirect(level, message, throwable, metadata);
+        } else {
+            logToSlf4j(level, message, throwable);
+        }
+    }
+
+    private String resolveCallerMethod() {
+        return WALKER.walk(frames -> frames.dropWhile(f -> THIS_CLASS.equals(f.getClassName()))
+                .findFirst()
+                .map(StackFrame::getMethodName)
+                .orElse(null));
+    }
+
+    private void logToSlf4j(int level, String message, Throwable throwable) {
+        if (throwable != null) {
+            switch (level) {
+                case LocationAwareLogger.TRACE_INT -> logger.trace(message, throwable);
+                case LocationAwareLogger.DEBUG_INT -> logger.debug(message, throwable);
+                case LocationAwareLogger.INFO_INT -> logger.info(message, throwable);
+                case LocationAwareLogger.WARN_INT -> logger.warn(message, throwable);
+                default -> logger.error(message, throwable);
+            }
+        } else {
+            switch (level) {
+                case LocationAwareLogger.TRACE_INT -> logger.trace(message);
+                case LocationAwareLogger.DEBUG_INT -> logger.debug(message);
+                case LocationAwareLogger.INFO_INT -> logger.info(message);
+                case LocationAwareLogger.WARN_INT -> logger.warn(message);
+                default -> logger.error(message);
+            }
+        }
     }
 
     @Override
@@ -41,175 +90,175 @@ public class DefaultLog implements Log {
     @Override
     public void trace(CharSequence content) {
         if (isTraceEnabled()) {
-            logger.trace(toString(content));
+            doLog(LocationAwareLogger.TRACE_INT, toString(content), null);
         }
     }
 
     @Override
     public void trace(CharSequence content, Throwable error) {
         if (isTraceEnabled()) {
-            logger.trace(toString(content), error);
+            doLog(LocationAwareLogger.TRACE_INT, toString(content), error);
         }
     }
 
     @Override
     public void trace(Throwable error) {
         if (isTraceEnabled()) {
-            logger.trace("", error);
+            doLog(LocationAwareLogger.TRACE_INT, "", error);
         }
     }
 
     @Override
     public void trace(Supplier<String> content) {
         if (isTraceEnabled()) {
-            logger.trace(content.get());
+            doLog(LocationAwareLogger.TRACE_INT, content.get(), null);
         }
     }
 
     @Override
     public void trace(Supplier<String> content, Throwable error) {
         if (isTraceEnabled()) {
-            logger.trace(content.get(), error);
+            doLog(LocationAwareLogger.TRACE_INT, content.get(), error);
         }
     }
 
     @Override
     public void debug(CharSequence content) {
         if (isDebugEnabled()) {
-            logger.debug(toString(content));
+            doLog(LocationAwareLogger.DEBUG_INT, toString(content), null);
         }
     }
 
     @Override
     public void debug(CharSequence content, Throwable error) {
         if (isDebugEnabled()) {
-            logger.debug(toString(content), error);
+            doLog(LocationAwareLogger.DEBUG_INT, toString(content), error);
         }
     }
 
     @Override
     public void debug(Throwable error) {
         if (isDebugEnabled()) {
-            logger.debug("", error);
+            doLog(LocationAwareLogger.DEBUG_INT, "", error);
         }
     }
 
     @Override
     public void debug(Supplier<String> content) {
         if (isDebugEnabled()) {
-            logger.debug(content.get());
+            doLog(LocationAwareLogger.DEBUG_INT, content.get(), null);
         }
     }
 
     @Override
     public void debug(Supplier<String> content, Throwable error) {
         if (isDebugEnabled()) {
-            logger.debug(content.get(), error);
+            doLog(LocationAwareLogger.DEBUG_INT, content.get(), error);
         }
     }
 
     @Override
     public void info(CharSequence content) {
         if (isInfoEnabled()) {
-            logger.info(toString(content));
+            doLog(LocationAwareLogger.INFO_INT, toString(content), null);
         }
     }
 
     @Override
     public void info(CharSequence content, Throwable error) {
         if (isInfoEnabled()) {
-            logger.info(toString(content), error);
+            doLog(LocationAwareLogger.INFO_INT, toString(content), error);
         }
     }
 
     @Override
     public void info(Throwable error) {
         if (isInfoEnabled()) {
-            logger.info("", error);
+            doLog(LocationAwareLogger.INFO_INT, "", error);
         }
     }
 
     @Override
     public void info(Supplier<String> content) {
         if (isInfoEnabled()) {
-            logger.info(content.get());
+            doLog(LocationAwareLogger.INFO_INT, content.get(), null);
         }
     }
 
     @Override
     public void info(Supplier<String> content, Throwable error) {
         if (isInfoEnabled()) {
-            logger.info(content.get(), error);
+            doLog(LocationAwareLogger.INFO_INT, content.get(), error);
         }
     }
 
     @Override
     public void warn(CharSequence content) {
         if (isWarnEnabled()) {
-            logger.warn(toString(content));
+            doLog(LocationAwareLogger.WARN_INT, toString(content), null);
         }
     }
 
     @Override
     public void warn(CharSequence content, Throwable error) {
         if (isWarnEnabled()) {
-            logger.warn(toString(content), error);
+            doLog(LocationAwareLogger.WARN_INT, toString(content), error);
         }
     }
 
     @Override
     public void warn(Throwable error) {
         if (isWarnEnabled()) {
-            logger.warn("", error);
+            doLog(LocationAwareLogger.WARN_INT, "", error);
         }
     }
 
     @Override
     public void warn(Supplier<String> content) {
         if (isWarnEnabled()) {
-            logger.warn(content.get());
+            doLog(LocationAwareLogger.WARN_INT, content.get(), null);
         }
     }
 
     @Override
     public void warn(Supplier<String> content, Throwable error) {
         if (isWarnEnabled()) {
-            logger.warn(content.get(), error);
+            doLog(LocationAwareLogger.WARN_INT, content.get(), error);
         }
     }
 
     @Override
     public void error(CharSequence content) {
         if (isErrorEnabled()) {
-            logger.error(toString(content));
+            doLog(LocationAwareLogger.ERROR_INT, toString(content), null);
         }
     }
 
     @Override
     public void error(CharSequence content, Throwable error) {
         if (isErrorEnabled()) {
-            logger.error(toString(content), error);
+            doLog(LocationAwareLogger.ERROR_INT, toString(content), error);
         }
     }
 
     @Override
     public void error(Throwable error) {
         if (isErrorEnabled()) {
-            logger.error("", error);
+            doLog(LocationAwareLogger.ERROR_INT, "", error);
         }
     }
 
     @Override
     public void error(Supplier<String> content) {
         if (isErrorEnabled()) {
-            logger.error(content.get());
+            doLog(LocationAwareLogger.ERROR_INT, content.get(), null);
         }
     }
 
     @Override
     public void error(Supplier<String> content, Throwable error) {
         if (isErrorEnabled()) {
-            logger.error(content.get(), error);
+            doLog(LocationAwareLogger.ERROR_INT, content.get(), error);
         }
     }
 

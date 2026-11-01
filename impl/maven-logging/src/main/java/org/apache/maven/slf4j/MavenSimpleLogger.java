@@ -39,12 +39,88 @@ public class MavenSimpleLogger extends MavenBaseLogger {
     private String warnRenderedLevel;
     private String errorRenderedLevel;
 
-    static Consumer<String> logSink;
+    /**
+     * Source metadata captured from Log API or JUL events and passed
+     * inline to the {@link LogSink}.  {@code null} for standard SLF4J events.
+     *
+     * @param sourceClassName  source class name, or {@code null}
+     * @param sourceMethodName source method name, or {@code null}
+     * @param threadId         originating thread ID
+     * @since 4.1.0
+     */
+    public record SourceMetadata(String sourceClassName, String sourceMethodName, long threadId) {}
+
+    /**
+     * Structured log sink that receives log events with optional formatting
+     * and source metadata.
+     * <p>
+     * Implementations declare their needs via {@link #needsFormattedMessage()}
+     * and {@link #needsMetadata()} so the upstream pipeline can skip work
+     * the downstream consumer does not use.
+     *
+     * @since 4.1.0
+     */
+    public interface LogSink {
+        void accept(
+                int level,
+                String loggerName,
+                String cleanMessage,
+                String formattedMessage,
+                Throwable throwable,
+                SourceMetadata metadata);
+
+        /**
+         * Whether this sink uses the {@code formattedMessage} parameter.
+         * When {@code false}, the logging pipeline skips message formatting
+         * (timestamp, level prefix, logger name, ANSI styling).
+         */
+        default boolean needsFormattedMessage() {
+            return true;
+        }
+
+        /**
+         * Whether this sink uses source metadata ({@code sourceClassName},
+         * {@code sourceMethodName}, {@code threadId}).  When {@code false},
+         * callers skip the {@link StackWalker} cost and pass {@code null}.
+         */
+        default boolean needsMetadata() {
+            return true;
+        }
+    }
+
+    static volatile LogSink logSink;
 
     public static final String DEFAULT_LOG_LEVEL_KEY = "org.slf4j.simpleLogger.defaultLogLevel";
 
-    public static void setLogSink(Consumer<String> logSink) {
+    /**
+     * Sets the structured log sink.
+     *
+     * @param logSink the sink, or {@code null} to remove
+     * @since 4.1.0
+     */
+    public static void setLogSink(LogSink logSink) {
         MavenSimpleLogger.logSink = logSink;
+    }
+
+    /**
+     * Returns the current log sink, or {@code null} if none is set.
+     *
+     * @return the current log sink, or {@code null}
+     * @since 4.1.0
+     */
+    public static LogSink getLogSink() {
+        return logSink;
+    }
+
+    /**
+     * Whether the current sink needs source metadata.  Used by
+     * {@code DefaultLog} to skip the {@link StackWalker} cost and
+     * by {@code MavenJulHandler} to skip {@link SourceMetadata}
+     * allocation when no consumer reads those fields.
+     */
+    public static boolean isMetadataEnabled() {
+        LogSink sink = logSink;
+        return sink != null && sink.needsMetadata();
     }
 
     MavenSimpleLogger(String name) {
@@ -69,17 +145,58 @@ public class MavenSimpleLogger extends MavenBaseLogger {
         };
     }
 
-    @Override
-    protected void write(StringBuilder buf, Throwable t) {
-        Consumer<String> sink = logSink;
-        if (sink != null) {
-            sink.accept(buf.toString());
-            if (t != null) {
-                writeThrowable(t, sink);
-            }
-        } else {
-            super.write(buf, t);
+    /**
+     * Direct logging entry point that bypasses the SLF4J call chain.
+     * <p>
+     * Callers that already hold source metadata (Log API, JUL handler)
+     * can format + deliver in one step, eliminating the ThreadLocal
+     * round-trip that the standard SLF4J path requires.
+     *
+     * @param level    SLF4J level constant
+     * @param message  the log message (already formatted, no SLF4J placeholders)
+     * @param thrown   the throwable, may be {@code null}
+     * @param metadata source metadata, or {@code null}
+     */
+    public void logDirect(int level, String message, Throwable thrown, SourceMetadata metadata) {
+        if (!isLevelEnabled(level)) {
+            return;
         }
+        LogSink sink = logSink;
+        if (sink != null) {
+            String formatted = null;
+            if (sink.needsFormattedMessage()) {
+                StringBuilder buf = formatLogPrefix(level);
+                buf.append(message);
+                formatted = renderFormattedMessage(buf, thrown);
+            }
+            sink.accept(level, name, message, formatted, thrown, metadata);
+        } else {
+            StringBuilder buf = formatLogPrefix(level);
+            buf.append(message);
+            super.write(buf, thrown);
+        }
+    }
+
+    @Override
+    protected void write(int level, String loggerName, String cleanMessage, StringBuilder formattedBuf, Throwable t) {
+        LogSink sink = logSink;
+        if (sink != null) {
+            String formatted = sink.needsFormattedMessage() ? renderFormattedMessage(formattedBuf, t) : null;
+            sink.accept(level, loggerName, cleanMessage, formatted, t, null);
+        } else {
+            super.write(formattedBuf, t);
+        }
+    }
+
+    private String renderFormattedMessage(StringBuilder buf, Throwable t) {
+        String formatted = buf.toString();
+        if (t != null) {
+            StringBuilder full = new StringBuilder(formatted);
+            full.append(System.lineSeparator());
+            writeThrowable(t, line -> full.append(line).append(System.lineSeparator()));
+            formatted = full.toString();
+        }
+        return formatted;
     }
 
     @Override
