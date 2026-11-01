@@ -54,6 +54,7 @@ import org.apache.maven.api.services.DependencyResolverResult;
 import org.apache.maven.api.services.ProjectManager;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.collection.DependencyCollectionException;
@@ -62,6 +63,8 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.scope.ResolutionScope;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.transformer.ConflictResolver;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.impl.ImplUtils.cast;
@@ -70,6 +73,8 @@ import static org.apache.maven.impl.ImplUtils.map;
 @Named
 @Singleton
 public class DefaultDependencyResolver implements DependencyResolver {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultDependencyResolver.class);
 
     /**
      * Cache of information about the modules contained in a path element.
@@ -182,16 +187,159 @@ public class DefaultDependencyResolver implements DependencyResolver {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note: When invoking this method directly (rather than through {@link #resolve(DependencyResolverRequest)}),
+     * project-level properties (such as {@code <maven.test.skip>} in a POM's {@code <properties>}) are evaluated
+     * against the project matching {@code node} in {@link Session#getProjects()} if available. If no matching
+     * project is found, only session-level properties (user, system, configuration properties) will be checked.
+     * Callers with an explicit {@link DependencyResolverRequest} containing a {@link Project} should prefer
+     * {@link #resolve(DependencyResolverRequest)}.
+     */
     @Nonnull
     @Override
     public List<Node> flatten(@Nonnull Session s, @Nonnull Node node, @Nullable PathScope scope)
             throws DependencyResolverException {
+        return flatten(s, node, scope, findProject(s, node));
+    }
+
+    private static Project findProject(Session session, Node node) {
+        if (session != null && node != null) {
+            try {
+                List<Project> projects = session.getProjects();
+                if (projects != null && !projects.isEmpty()) {
+                    Artifact rootArtifact = node.artifact();
+                    if (rootArtifact != null) {
+                        for (Project p : projects) {
+                            if (Objects.equals(p.getGroupId(), rootArtifact.getGroupId())
+                                    && Objects.equals(p.getArtifactId(), rootArtifact.getArtifactId())) {
+                                return p;
+                            }
+                        }
+                    }
+                    if (projects.size() == 1) {
+                        return projects.get(0);
+                    }
+                }
+            } catch (RuntimeException e) {
+                LOGGER.debug("Failed to find project for node in session", e);
+            }
+        }
+        return null;
+    }
+
+    private List<Node> flatten(
+            @Nonnull Session s, @Nonnull Node node, @Nullable PathScope scope, @Nullable Project project)
+            throws DependencyResolverException {
         InternalSession session = InternalSession.from(s);
         DependencyNode root = cast(AbstractNode.class, node, "node").getDependencyNode();
         List<DependencyNode> dependencies = session.getRepositorySystem()
-                .flattenDependencyNodes(session.getSession(), root, getScopeDependencyFilter(scope));
+                .flattenDependencyNodes(session.getSession(), root, getDependencyFilter(session, scope, project));
         dependencies.remove(root);
         return map(dependencies, session::getNode);
+    }
+
+    private static DependencyFilter getDependencyFilter(InternalSession session, PathScope scope, Project project) {
+        DependencyFilter scopeFilter = getScopeDependencyFilter(scope);
+        if (isTestSkip(session, project)) {
+            DependencyFilter testFilter = (node, parents) -> {
+                org.eclipse.aether.graph.Dependency dep = node.getDependency();
+                if (dep != null) {
+                    return !(isTestArtifact(dep.getArtifact()) && "test".equals(dep.getScope()));
+                }
+                return true;
+            };
+            if (scopeFilter != null) {
+                return (node, parents) -> scopeFilter.accept(node, parents) && testFilter.accept(node, parents);
+            }
+            return testFilter;
+        }
+        return scopeFilter;
+    }
+
+    /**
+     * Determines whether the specified artifact refers to test classes (e.g. test-jar).
+     * <p>
+     * Note: This method intentionally duplicates the logic in {@code RepositoryUtils.isTestArtifact}
+     * because {@code maven-impl} is part of the Maven 4 API implementation layer and does not depend
+     * on {@code maven-core} (which contains {@code RepositoryUtils}).
+     *
+     * @param artifact the artifact to check, may be {@code null}
+     * @return {@code true} if the artifact refers to test classes, {@code false} otherwise
+     */
+    static boolean isTestArtifact(org.eclipse.aether.artifact.Artifact artifact) {
+        return artifact != null
+                && ("test-jar".equals(artifact.getProperty(ArtifactProperties.TYPE, ""))
+                        || ("jar".equals(artifact.getExtension()) && "tests".equals(artifact.getClassifier())));
+    }
+
+    /**
+     * Determines whether test execution and compilation are skipped (e.g. via {@code -Dmaven.test.skip}).
+     * <p>
+     * Note: This method exists separately from {@code TestSkipUtils.isTestSkip} because {@code maven-impl}
+     * operates on the Maven 4 API types ({@link InternalSession}, {@link Project}) and cannot depend on
+     * {@code maven-core} where {@code TestSkipUtils} resides. Property precedence order follows
+     * {@code userProperties > systemProperties > configProperties > projectProperties}.
+     *
+     * @param session the internal session, may be {@code null}
+     * @param project the Maven project, may be {@code null}
+     * @return {@code true} if tests are skipped, {@code false} otherwise
+     */
+    static boolean isTestSkip(InternalSession session, Project project) {
+        if (session != null) {
+            try {
+                if (session.getUserProperties() != null) {
+                    String val = session.getUserProperties().get("maven.test.skip");
+                    if (val != null) {
+                        return Boolean.parseBoolean(val) || val.isEmpty();
+                    }
+                }
+                if (session.getSystemProperties() != null) {
+                    String val = session.getSystemProperties().get("maven.test.skip");
+                    if (val != null) {
+                        return Boolean.parseBoolean(val) || val.isEmpty();
+                    }
+                }
+            } catch (RuntimeException e) {
+                LOGGER.debug("Failed to check test skip from session properties", e);
+            }
+            try {
+                RepositorySystemSession rSession = session.getSession();
+                if (rSession != null) {
+                    Object val = rSession.getUserProperties().get("maven.test.skip");
+                    if (val != null) {
+                        String s = String.valueOf(val);
+                        return Boolean.parseBoolean(s) || s.isEmpty();
+                    }
+                    val = rSession.getSystemProperties().get("maven.test.skip");
+                    if (val != null) {
+                        String s = String.valueOf(val);
+                        return Boolean.parseBoolean(s) || s.isEmpty();
+                    }
+                    val = rSession.getConfigProperties().get("maven.test.skip");
+                    if (val != null) {
+                        String s = String.valueOf(val);
+                        return Boolean.parseBoolean(s) || s.isEmpty();
+                    }
+                }
+            } catch (RuntimeException e) {
+                LOGGER.debug("Failed to check test skip from repository session properties", e);
+            }
+        }
+        if (project != null) {
+            try {
+                if (project.getModel() != null && project.getModel().getProperties() != null) {
+                    String val = project.getModel().getProperties().get("maven.test.skip");
+                    if (val != null) {
+                        return Boolean.parseBoolean(val) || val.isEmpty();
+                    }
+                }
+            } catch (RuntimeException e) {
+                LOGGER.debug("Failed to check test skip from project properties", e);
+            }
+        }
+        return false;
     }
 
     private static DependencyFilter getScopeDependencyFilter(PathScope scope) {
@@ -231,7 +379,11 @@ public class DefaultDependencyResolver implements DependencyResolver {
             if (request.getRequestType() == DependencyResolverRequest.RequestType.COLLECT) {
                 result = collectorResult;
             } else {
-                List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getPathScope());
+                List<Node> nodes = flatten(
+                        session,
+                        collectorResult.getRoot(),
+                        request.getPathScope(),
+                        request.getProject().orElse(null));
                 List<ArtifactCoordinates> coordinates = nodes.stream()
                         .map(Node::getDependency)
                         .filter(Objects::nonNull)

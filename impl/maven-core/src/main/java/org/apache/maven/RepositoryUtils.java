@@ -396,4 +396,16 @@ public class RepositoryUtils {
                 && policyEquals(r1.getPolicy(false), r2.getPolicy(false))
                 && policyEquals(r1.getPolicy(true), r2.getPolicy(true));
     }
+
+    /**
+     * Determines whether the specified artifact refers to test classes (e.g. test-jar).
+     *
+     * @param artifact The artifact to check, may be {@code null}.
+     * @return {@code true} if the artifact refers to test classes, {@code false} otherwise.
+     */
+    public static boolean isTestArtifact(Artifact artifact) {
+        return artifact != null
+                && ("test-jar".equals(artifact.getProperty(ArtifactProperties.TYPE, ""))
+                        || ("jar".equals(artifact.getExtension()) && "tests".equals(artifact.getClassifier())));
+    }
 }

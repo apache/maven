@@ -31,6 +31,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.impl.resolver.RelocatedArtifact;
+import org.apache.maven.internal.TestSkipUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
@@ -47,6 +48,7 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.util.artifact.ArtifactIdUtils;
+import org.eclipse.aether.util.filter.AndDependencyFilter;
 import org.eclipse.aether.util.graph.manager.DependencyManagerUtils;
 import org.eclipse.aether.util.graph.visitor.DependencyGraphDumper;
 import org.slf4j.Logger;
@@ -78,9 +80,13 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         final DefaultDependencyResolutionResult result = new DefaultDependencyResolutionResult();
 
         final MavenProject project = request.getMavenProject();
-        final DependencyFilter filter = request.getResolutionFilter();
+        DependencyFilter filter = request.getResolutionFilter();
         RepositorySystemSession session = request.getRepositorySession();
         ArtifactTypeRegistry stereotypes = session.getArtifactTypeRegistry();
+
+        if (TestSkipUtils.isTestSkip(session, project)) {
+            filter = AndDependencyFilter.newInstance(filter, TestSkipUtils.testArtifactFilter());
+        }
 
         if (logger.isDebugEnabled()
                 && session.getConfigProperties().get(DependencyManagerUtils.CONFIG_PROP_VERBOSE) == null) {

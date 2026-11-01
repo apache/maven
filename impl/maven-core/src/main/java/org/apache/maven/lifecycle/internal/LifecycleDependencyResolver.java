@@ -38,6 +38,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.TestSkipUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.project.DefaultDependencyResolutionRequest;
 import org.apache.maven.project.DependencyResolutionException;
@@ -258,6 +259,12 @@ public class LifecycleDependencyResolver {
         resolutionFilter = AndDependencyFilter.newInstance(collectionFilter, resolutionFilter);
         resolutionFilter =
                 AndDependencyFilter.newInstance(resolutionFilter, new ReactorDependencyFilter(projectArtifacts));
+
+        if (TestSkipUtils.isTestSkip(session, project)) {
+            DependencyFilter testArtifactFilter = TestSkipUtils.testArtifactFilter();
+            collectionFilter = AndDependencyFilter.newInstance(collectionFilter, testArtifactFilter);
+            resolutionFilter = AndDependencyFilter.newInstance(resolutionFilter, testArtifactFilter);
+        }
 
         DependencyResolutionResult result;
         try {

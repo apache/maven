@@ -23,7 +23,10 @@ import javax.inject.Inject;
 import java.io.File;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 
@@ -31,18 +34,49 @@ import org.apache.maven.AbstractCoreMavenComponentTestCase;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
+import org.eclipse.aether.repository.WorkspaceReader;
+import org.eclipse.aether.repository.WorkspaceRepository;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentTestCase {
     @Inject
     private LifecycleDependencyResolver resolver;
 
+    private final Map<String, File> workspaceArtifacts = new HashMap<>();
+
     @Override
     protected String getProjectsDirectory() {
         return null;
+    }
+
+    @Override
+    protected WorkspaceReader getWorkspaceReader() {
+        return new WorkspaceReader() {
+            private final WorkspaceRepository repository = new WorkspaceRepository("test");
+
+            @Override
+            public WorkspaceRepository getRepository() {
+                return repository;
+            }
+
+            @Override
+            public File findArtifact(org.eclipse.aether.artifact.Artifact artifact) {
+                String key = artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getExtension()
+                        + (artifact.getClassifier().isEmpty() ? "" : ":" + artifact.getClassifier());
+                return workspaceArtifacts.get(key);
+            }
+
+            @Override
+            public List<String> findVersions(org.eclipse.aether.artifact.Artifact artifact) {
+                return findArtifact(artifact) != null
+                        ? Collections.singletonList(artifact.getVersion())
+                        : Collections.emptyList();
+            }
+        };
     }
 
     @Test
@@ -128,5 +162,74 @@ class LifecycleDependencyResolverTest extends AbstractCoreMavenComponentTestCase
                         .get("org.apache.maven.its.mng6300:mng6300-lib")
                         .getFile(),
                 "resolved lib artifact file should remain null when lib has not yet packaged its jar");
+    }
+
+    @Test
+    void testTestJarNotResolvedWhenTestSkipped() throws Exception {
+        File pom = new File("src/test/projects/lifecycle-dependency-resolver-test-jar/pom.xml");
+        Properties userProps = new Properties();
+        userProps.setProperty("maven.test.skip", "true");
+
+        File commonJar = File.createTempFile("common", ".jar");
+        commonJar.deleteOnExit();
+        File testJar = File.createTempFile("common-tests", ".jar");
+        testJar.deleteOnExit();
+
+        workspaceArtifacts.put("org.apache.maven.its.mng8074:mng8074-common:jar", commonJar);
+        workspaceArtifacts.put("org.apache.maven.its.mng8074:mng8074-common:jar:tests", testJar);
+
+        try {
+            MavenSession session = createMavenSession(pom, new Properties(), true);
+            session.getUserProperties().putAll(userProps);
+
+            MavenProject common = session.getProjects().get(1);
+            MavenProject core = session.getProjects().get(2);
+
+            common.getArtifact().setFile(commonJar);
+            core.setArtifactFilter(artifact -> true);
+
+            Collection<String> scopesToResolve = Collections.singletonList("test");
+
+            resolver.resolveProjectDependencies(core, null, scopesToResolve, session, false, Collections.emptySet());
+
+            assertNull(core.getArtifactMap().get("org.apache.maven.its.mng8074:mng8074-common"));
+        } finally {
+            workspaceArtifacts.clear();
+        }
+    }
+
+    @Test
+    void testTestJarResolvedWhenTestNotSkipped() throws Exception {
+        File pom = new File("src/test/projects/lifecycle-dependency-resolver-test-jar/pom.xml");
+
+        File commonJar = File.createTempFile("common", ".jar");
+        commonJar.deleteOnExit();
+        File testJar = File.createTempFile("common-tests", ".jar");
+        testJar.deleteOnExit();
+
+        workspaceArtifacts.put("org.apache.maven.its.mng8074:mng8074-common:jar", commonJar);
+        workspaceArtifacts.put("org.apache.maven.its.mng8074:mng8074-common:jar:tests", testJar);
+
+        try {
+            MavenSession session = createMavenSession(pom, new Properties(), true);
+
+            MavenProject common = session.getProjects().get(1);
+            MavenProject core = session.getProjects().get(2);
+
+            common.getArtifact().setFile(commonJar);
+            core.setArtifactFilter(artifact -> true);
+
+            Collection<String> scopesToResolve = Collections.singletonList("test");
+
+            resolver.resolveProjectDependencies(core, null, scopesToResolve, session, false, Collections.emptySet());
+
+            Artifact resolved = core.getArtifactMap().get("org.apache.maven.its.mng8074:mng8074-common");
+            assertNotNull(resolved);
+            assertEquals(testJar, resolved.getFile());
+            assertEquals("test-jar", resolved.getType());
+            assertEquals("tests", resolved.getClassifier());
+        } finally {
+            workspaceArtifacts.clear();
+        }
     }
 }
