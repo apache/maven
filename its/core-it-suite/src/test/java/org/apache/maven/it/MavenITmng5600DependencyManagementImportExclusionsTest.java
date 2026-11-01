@@ -48,26 +48,29 @@ class MavenITmng5600DependencyManagementImportExclusionsTest extends AbstractMav
         verifier.verifyErrorFreeLog();
 
         final Properties properties = verifier.loadProperties("target/project.properties");
-        assertEquals("1", properties.getProperty("project.dependencyManagement.dependencies"));
+        assertEquals("2", properties.getProperty("project.dependencyManagement.dependencies"));
+        assertEquals(
+                "org.apache.maven.its.mng5600:bom:pom",
+                properties.getProperty("project.dependencyManagement.dependencies.0.managementKey"));
         assertEquals(
                 "commons-lang:commons-lang:jar",
-                properties.getProperty("project.dependencyManagement.dependencies.0.managementKey"));
+                properties.getProperty("project.dependencyManagement.dependencies.1.managementKey"));
 
-        assertEquals("2", properties.getProperty("project.dependencyManagement.dependencies.0.exclusions"));
+        assertEquals("2", properties.getProperty("project.dependencyManagement.dependencies.1.exclusions"));
         assertEquals(
                 "commons-io",
-                properties.getProperty("project.dependencyManagement.dependencies.0.exclusions.0.groupId"));
+                properties.getProperty("project.dependencyManagement.dependencies.1.exclusions.0.groupId"));
 
         assertEquals(
                 "commons-io",
-                properties.getProperty("project.dependencyManagement.dependencies.0.exclusions.0.artifactId"));
+                properties.getProperty("project.dependencyManagement.dependencies.1.exclusions.0.artifactId"));
 
         assertEquals(
                 "commons-logging",
-                properties.getProperty("project.dependencyManagement.dependencies.0.exclusions.1.groupId"));
+                properties.getProperty("project.dependencyManagement.dependencies.1.exclusions.1.groupId"));
 
         assertEquals(
                 "commons-logging",
-                properties.getProperty("project.dependencyManagement.dependencies.0.exclusions.1.artifactId"));
+                properties.getProperty("project.dependencyManagement.dependencies.1.exclusions.1.artifactId"));
     }
 }

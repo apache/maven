@@ -2595,16 +2595,11 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             List<DependencyManagement> importMgmts = null;
 
-            List<Dependency> deps = new ArrayList<>(depMgmt.getDependencies());
-            for (Iterator<Dependency> it = deps.iterator(); it.hasNext(); ) {
-                Dependency dependency = it.next();
-
+            for (Dependency dependency : depMgmt.getDependencies()) {
                 if (!(("pom".equals(dependency.getType()) && "import".equals(dependency.getScope()))
                         || "bom".equals(dependency.getType()))) {
                     continue;
                 }
-
-                it.remove();
 
                 DependencyManagement importMgmt = loadDependencyManagement(dependency, importIds);
 
@@ -2618,9 +2613,6 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             importIds.remove(importing);
-
-            model = model.withDependencyManagement(
-                    model.getDependencyManagement().withDependencies(deps));
 
             return dependencyManagementImporter.importManagement(
                     model, importMgmts, request, deduplicatingImportProblemCollector());
