@@ -18,9 +18,11 @@
  */
 package org.apache.maven.internal;
 
+import org.apache.maven.RepositoryUtils;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.graph.DependencyFilter;
 
 /**
  * Utility methods for checking test skip policy (e.g. {@code -Dmaven.test.skip}).
@@ -87,5 +89,20 @@ public final class TestSkipUtils {
             }
         }
         return false;
+    }
+
+    /**
+     * Creates a {@link DependencyFilter} that excludes test-scoped test artifacts (e.g. test-jars).
+     *
+     * @return the dependency filter
+     */
+    public static DependencyFilter testArtifactFilter() {
+        return (node, parents) -> {
+            if (node.getDependency() != null) {
+                org.eclipse.aether.graph.Dependency dep = node.getDependency();
+                return !(RepositoryUtils.isTestArtifact(dep.getArtifact()) && "test".equals(dep.getScope()));
+            }
+            return true;
+        };
     }
 }

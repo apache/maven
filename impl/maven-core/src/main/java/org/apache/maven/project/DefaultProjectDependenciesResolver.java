@@ -85,14 +85,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         ArtifactTypeRegistry stereotypes = session.getArtifactTypeRegistry();
 
         if (TestSkipUtils.isTestSkip(session, project)) {
-            DependencyFilter testArtifactFilter = (node, parents) -> {
-                if (node.getDependency() != null) {
-                    org.eclipse.aether.graph.Dependency dep = node.getDependency();
-                    return !(RepositoryUtils.isTestArtifact(dep.getArtifact()) && "test".equals(dep.getScope()));
-                }
-                return true;
-            };
-            filter = AndDependencyFilter.newInstance(filter, testArtifactFilter);
+            filter = AndDependencyFilter.newInstance(filter, TestSkipUtils.testArtifactFilter());
         }
 
         if (logger.isDebugEnabled()

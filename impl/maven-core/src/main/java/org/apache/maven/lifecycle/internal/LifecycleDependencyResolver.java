@@ -261,13 +261,7 @@ public class LifecycleDependencyResolver {
                 AndDependencyFilter.newInstance(resolutionFilter, new ReactorDependencyFilter(projectArtifacts));
 
         if (TestSkipUtils.isTestSkip(session, project)) {
-            DependencyFilter testArtifactFilter = (node, parents) -> {
-                if (node.getDependency() != null) {
-                    org.eclipse.aether.graph.Dependency dep = node.getDependency();
-                    return !(RepositoryUtils.isTestArtifact(dep.getArtifact()) && "test".equals(dep.getScope()));
-                }
-                return true;
-            };
+            DependencyFilter testArtifactFilter = TestSkipUtils.testArtifactFilter();
             collectionFilter = AndDependencyFilter.newInstance(collectionFilter, testArtifactFilter);
             resolutionFilter = AndDependencyFilter.newInstance(resolutionFilter, testArtifactFilter);
         }

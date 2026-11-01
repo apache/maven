@@ -54,6 +54,7 @@ import org.apache.maven.api.services.DependencyResolverResult;
 import org.apache.maven.api.services.ProjectManager;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
+import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.collection.DependencyCollectionException;
@@ -186,12 +187,98 @@ public class DefaultDependencyResolver implements DependencyResolver {
     @Override
     public List<Node> flatten(@Nonnull Session s, @Nonnull Node node, @Nullable PathScope scope)
             throws DependencyResolverException {
+        return flatten(s, node, scope, null);
+    }
+
+    private List<Node> flatten(
+            @Nonnull Session s, @Nonnull Node node, @Nullable PathScope scope, @Nullable Project project)
+            throws DependencyResolverException {
         InternalSession session = InternalSession.from(s);
         DependencyNode root = cast(AbstractNode.class, node, "node").getDependencyNode();
         List<DependencyNode> dependencies = session.getRepositorySystem()
-                .flattenDependencyNodes(session.getSession(), root, getScopeDependencyFilter(scope));
+                .flattenDependencyNodes(session.getSession(), root, getDependencyFilter(session, scope, project));
         dependencies.remove(root);
         return map(dependencies, session::getNode);
+    }
+
+    private static DependencyFilter getDependencyFilter(InternalSession session, PathScope scope, Project project) {
+        DependencyFilter scopeFilter = getScopeDependencyFilter(scope);
+        if (isTestSkip(session, project)) {
+            DependencyFilter testFilter = (node, parents) -> {
+                org.eclipse.aether.graph.Dependency dep = node.getDependency();
+                if (dep != null) {
+                    return !(isTestArtifact(dep.getArtifact()) && "test".equals(dep.getScope()));
+                }
+                return true;
+            };
+            if (scopeFilter != null) {
+                return (node, parents) -> scopeFilter.accept(node, parents) && testFilter.accept(node, parents);
+            }
+            return testFilter;
+        }
+        return scopeFilter;
+    }
+
+    static boolean isTestArtifact(org.eclipse.aether.artifact.Artifact artifact) {
+        return artifact != null
+                && ("test-jar".equals(artifact.getProperty(ArtifactProperties.TYPE, ""))
+                        || ("jar".equals(artifact.getExtension()) && "tests".equals(artifact.getClassifier())));
+    }
+
+    private static boolean isTestSkip(InternalSession session, Project project) {
+        if (session != null) {
+            try {
+                if (session.getUserProperties() != null) {
+                    String val = session.getUserProperties().get("maven.test.skip");
+                    if (val != null) {
+                        return Boolean.parseBoolean(val) || val.isEmpty();
+                    }
+                }
+                if (session.getSystemProperties() != null) {
+                    String val = session.getSystemProperties().get("maven.test.skip");
+                    if (val != null) {
+                        return Boolean.parseBoolean(val) || val.isEmpty();
+                    }
+                }
+            } catch (Exception ignored) {
+                // Ignore if properties cannot be accessed
+            }
+            try {
+                RepositorySystemSession rSession = session.getSession();
+                if (rSession != null) {
+                    Object val = rSession.getConfigProperties().get("maven.test.skip");
+                    if (val != null) {
+                        String s = String.valueOf(val);
+                        return Boolean.parseBoolean(s) || s.isEmpty();
+                    }
+                    val = rSession.getUserProperties().get("maven.test.skip");
+                    if (val != null) {
+                        String s = String.valueOf(val);
+                        return Boolean.parseBoolean(s) || s.isEmpty();
+                    }
+                    val = rSession.getSystemProperties().get("maven.test.skip");
+                    if (val != null) {
+                        String s = String.valueOf(val);
+                        return Boolean.parseBoolean(s) || s.isEmpty();
+                    }
+                }
+            } catch (Exception ignored) {
+                // Ignore
+            }
+        }
+        if (project != null) {
+            try {
+                if (project.getModel() != null && project.getModel().getProperties() != null) {
+                    String val = project.getModel().getProperties().get("maven.test.skip");
+                    if (val != null) {
+                        return Boolean.parseBoolean(val) || val.isEmpty();
+                    }
+                }
+            } catch (Exception ignored) {
+                // Ignore
+            }
+        }
+        return false;
     }
 
     private static DependencyFilter getScopeDependencyFilter(PathScope scope) {
@@ -231,7 +318,11 @@ public class DefaultDependencyResolver implements DependencyResolver {
             if (request.getRequestType() == DependencyResolverRequest.RequestType.COLLECT) {
                 result = collectorResult;
             } else {
-                List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getPathScope());
+                List<Node> nodes = flatten(
+                        session,
+                        collectorResult.getRoot(),
+                        request.getPathScope(),
+                        request.getProject().orElse(null));
                 List<ArtifactCoordinates> coordinates = nodes.stream()
                         .map(Node::getDependency)
                         .filter(Objects::nonNull)
