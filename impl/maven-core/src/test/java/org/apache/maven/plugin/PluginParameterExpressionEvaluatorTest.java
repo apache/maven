@@ -32,11 +32,11 @@ import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
-import org.apache.maven.configuration.internal.EnhancedComponentConfigurator;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -54,7 +54,6 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.util.Os;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -457,15 +456,19 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         PluginParameterExpressionEvaluator evaluator =
                 new PluginParameterExpressionEvaluator(mavenSession, new MojoExecution(null));
 
-        DefaultPlexusConfiguration configuration = new DefaultPlexusConfiguration("config");
-        configuration.addChild("uri", "${session.rootDirectory.uri}");
-        configuration.addChild("path", "${session.rootDirectory}");
-        configuration.addChild("uriString", "${session.rootDirectory.uri.string}");
-        configuration.addChild("uriAsciiString", "${session.rootDirectory.uri.ASCIIString}");
-        configuration.addChild("pathString", "${session.rootDirectory.string}");
+        XmlNode configuration = XmlNode.newInstance(
+                "configuration",
+                java.util.List.of(
+                        XmlNode.newInstance("uri", "${session.rootDirectory.uri}"),
+                        XmlNode.newInstance("path", "${session.rootDirectory}"),
+                        XmlNode.newInstance("uriString", "${session.rootDirectory.uri.string}"),
+                        XmlNode.newInstance("uriAsciiString", "${session.rootDirectory.uri.ASCIIString}"),
+                        XmlNode.newInstance("pathString", "${session.rootDirectory.string}")));
 
         Mojo mojo = new Mojo();
-        new EnhancedComponentConfigurator().configureComponent(mojo, configuration, evaluator, null);
+        new org.apache.maven.plugin.internal.V4MojoConfigurator(
+                        evaluator, getClass().getClassLoader(), null)
+                .configure(mojo, configuration);
 
         assertEquals(
                 Objects.equals(path.toUri().toString(), path.toUri().toASCIIString()), !Os.isFamily(Os.FAMILY_WINDOWS));
