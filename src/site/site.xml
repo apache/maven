@@ -39,6 +39,7 @@ under the License.
 
     <menu name="User Guide">
       <item name="Configuring Maven" href="configuring.html"/>
+      <item name="Aggregator Mojo Migration Guide" href="aggregator-migration.html"/>
     </menu>
 
     <menu inherit="bottom" name="Descriptors Reference">
