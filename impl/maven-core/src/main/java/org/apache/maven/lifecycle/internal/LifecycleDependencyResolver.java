@@ -38,6 +38,7 @@ import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.internal.TestSkipUtils;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.project.DefaultDependencyResolutionRequest;
 import org.apache.maven.project.DependencyResolutionException;
@@ -259,10 +260,11 @@ public class LifecycleDependencyResolver {
         resolutionFilter =
                 AndDependencyFilter.newInstance(resolutionFilter, new ReactorDependencyFilter(projectArtifacts));
 
-        if (RepositoryUtils.isTestSkip(session, project)) {
+        if (TestSkipUtils.isTestSkip(session, project)) {
             DependencyFilter testArtifactFilter = (node, parents) -> {
                 if (node.getDependency() != null) {
-                    return !RepositoryUtils.isTestArtifact(node.getDependency().getArtifact());
+                    org.eclipse.aether.graph.Dependency dep = node.getDependency();
+                    return !(RepositoryUtils.isTestArtifact(dep.getArtifact()) && "test".equals(dep.getScope()));
                 }
                 return true;
             };

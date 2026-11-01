@@ -31,6 +31,7 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.impl.resolver.RelocatedArtifact;
+import org.apache.maven.internal.TestSkipUtils;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
@@ -83,10 +84,11 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         RepositorySystemSession session = request.getRepositorySession();
         ArtifactTypeRegistry stereotypes = session.getArtifactTypeRegistry();
 
-        if (RepositoryUtils.isTestSkip(session, project)) {
+        if (TestSkipUtils.isTestSkip(session, project)) {
             DependencyFilter testArtifactFilter = (node, parents) -> {
                 if (node.getDependency() != null) {
-                    return !RepositoryUtils.isTestArtifact(node.getDependency().getArtifact());
+                    org.eclipse.aether.graph.Dependency dep = node.getDependency();
+                    return !(RepositoryUtils.isTestArtifact(dep.getArtifact()) && "test".equals(dep.getScope()));
                 }
                 return true;
             };
