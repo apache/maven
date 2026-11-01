@@ -188,4 +188,61 @@ class DefaultDependencyResolverTest {
         // When scope is null and maven.test.skip is not set, filter must be null
         assertNull(filterCaptor.getValue());
     }
+
+    @Test
+    void flattenPropagatesProjectPropertiesFromSession() {
+        DefaultDependencyResolver resolver = new DefaultDependencyResolver();
+
+        InternalSession session = mock(InternalSession.class);
+        RepositorySystem repoSystem = mock(RepositorySystem.class);
+        RepositorySystemSession repoSession = mock(RepositorySystemSession.class);
+
+        when(session.getSession()).thenReturn(repoSession);
+        when(session.getRepositorySystem()).thenReturn(repoSystem);
+        when(session.getUserProperties()).thenReturn(Map.of());
+        when(session.getSystemProperties()).thenReturn(Map.of());
+        when(repoSession.getConfigProperties()).thenReturn(Map.of());
+        when(repoSession.getUserProperties()).thenReturn(Map.of());
+        when(repoSession.getSystemProperties()).thenReturn(Map.of());
+
+        Project project = mock(Project.class);
+        org.apache.maven.api.model.Model model = mock(org.apache.maven.api.model.Model.class);
+        when(project.getModel()).thenReturn(model);
+        when(model.getProperties()).thenReturn(Map.of("maven.test.skip", "true"));
+        when(project.getGroupId()).thenReturn("g");
+        when(project.getArtifactId()).thenReturn("root");
+
+        when(session.getProjects()).thenReturn(List.of(project));
+
+        DependencyNode aetherRoot = new DefaultDependencyNode(new DefaultArtifact("g", "root", null, "pom", "1.0"));
+        Node rootNode = mock(AbstractNode.class);
+        org.apache.maven.api.Artifact apiRootArtifact = mock(org.apache.maven.api.Artifact.class);
+        when(apiRootArtifact.getGroupId()).thenReturn("g");
+        when(apiRootArtifact.getArtifactId()).thenReturn("root");
+        when(rootNode.artifact()).thenReturn(apiRootArtifact);
+        when(((AbstractNode) rootNode).getDependencyNode()).thenReturn(aetherRoot);
+
+        when(repoSystem.flattenDependencyNodes(eq(repoSession), eq(aetherRoot), any()))
+                .thenReturn(new java.util.ArrayList<>(List.of(aetherRoot)));
+
+        resolver.flatten(session, rootNode, null);
+
+        ArgumentCaptor<DependencyFilter> filterCaptor = ArgumentCaptor.forClass(DependencyFilter.class);
+        verify(repoSystem).flattenDependencyNodes(eq(repoSession), eq(aetherRoot), filterCaptor.capture());
+
+        DependencyFilter capturedFilter = filterCaptor.getValue();
+        assertNotNull(capturedFilter);
+
+        // Test-scoped test-jar must be excluded because project has maven.test.skip=true
+        DefaultArtifact testJar = new DefaultArtifact(
+                "g",
+                "a",
+                null,
+                "jar",
+                "1.0",
+                Collections.singletonMap(ArtifactProperties.TYPE, "test-jar"),
+                (java.nio.file.Path) null);
+        DependencyNode testNode = new DefaultDependencyNode(new Dependency(testJar, "test"));
+        assertFalse(capturedFilter.accept(testNode, Collections.emptyList()));
+    }
 }

@@ -187,11 +187,46 @@ public class DefaultDependencyResolver implements DependencyResolver {
         }
     }
 
+    /**
+     * {@inheritDoc}
+     * <p>
+     * Note: When invoking this method directly (rather than through {@link #resolve(DependencyResolverRequest)}),
+     * project-level properties (such as {@code <maven.test.skip>} in a POM's {@code <properties>}) are evaluated
+     * against the project matching {@code node} in {@link Session#getProjects()} if available. If no matching
+     * project is found, only session-level properties (user, system, configuration properties) will be checked.
+     * Callers with an explicit {@link DependencyResolverRequest} containing a {@link Project} should prefer
+     * {@link #resolve(DependencyResolverRequest)}.
+     */
     @Nonnull
     @Override
     public List<Node> flatten(@Nonnull Session s, @Nonnull Node node, @Nullable PathScope scope)
             throws DependencyResolverException {
-        return flatten(s, node, scope, null);
+        return flatten(s, node, scope, findProject(s, node));
+    }
+
+    private static Project findProject(Session session, Node node) {
+        if (session != null && node != null) {
+            try {
+                List<Project> projects = session.getProjects();
+                if (projects != null && !projects.isEmpty()) {
+                    Artifact rootArtifact = node.artifact();
+                    if (rootArtifact != null) {
+                        for (Project p : projects) {
+                            if (Objects.equals(p.getGroupId(), rootArtifact.getGroupId())
+                                    && Objects.equals(p.getArtifactId(), rootArtifact.getArtifactId())) {
+                                return p;
+                            }
+                        }
+                    }
+                    if (projects.size() == 1) {
+                        return projects.get(0);
+                    }
+                }
+            } catch (RuntimeException e) {
+                LOGGER.debug("Failed to find project for node in session", e);
+            }
+        }
+        return null;
     }
 
     private List<Node> flatten(
@@ -266,7 +301,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         return Boolean.parseBoolean(val) || val.isEmpty();
                     }
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 LOGGER.debug("Failed to check test skip from session properties", e);
             }
             try {
@@ -288,7 +323,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         return Boolean.parseBoolean(s) || s.isEmpty();
                     }
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 LOGGER.debug("Failed to check test skip from repository session properties", e);
             }
         }
@@ -300,7 +335,7 @@ public class DefaultDependencyResolver implements DependencyResolver {
                         return Boolean.parseBoolean(val) || val.isEmpty();
                     }
                 }
-            } catch (Exception e) {
+            } catch (RuntimeException e) {
                 LOGGER.debug("Failed to check test skip from project properties", e);
             }
         }
