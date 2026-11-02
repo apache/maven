@@ -32,6 +32,7 @@ import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.cling.invoker.ProtoLookup;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
@@ -41,6 +42,7 @@ import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -50,6 +52,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @Order(200)
 public class MavenInvokerTest extends MavenInvokerTestSupport {
+
+    /**
+     * Test invoker exposing the resume selector for unit testing.
+     */
+    private static class TestMavenInvoker extends MavenInvoker {
+
+        TestMavenInvoker() {
+            super(ProtoLookup.builder().build(), null);
+        }
+
+        String resumeSelector(List<MavenProject> projects, MavenProject failedProject) {
+            return getResumeFromSelector(projects, failedProject);
+        }
+    }
+
     @Override
     protected Invoker createInvoker(ClassWorld classWorld) {
         return new MavenInvoker(
@@ -262,5 +279,35 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         String log = logs.get("eu.maveniverse.maven.plugins:toolbox:" + Environment.TOOLBOX_VERSION + ":dump");
         assertTrue(log.contains("https://repo1.maven.org/maven2"), log);
         assertFalse(log.contains("https://repo.maven.apache.org/maven2"), log);
+    }
+
+    @Test
+    void getResumeFromSelectorWithUniqueArtifactId() {
+        TestMavenInvoker invoker = new TestMavenInvoker();
+
+        MavenProject first = new MavenProject();
+        first.setGroupId("org.apache.maven");
+        first.setArtifactId("maven-core");
+
+        MavenProject failed = new MavenProject();
+        failed.setGroupId("org.apache.maven");
+        failed.setArtifactId("maven-cli");
+
+        assertEquals(":maven-cli", invoker.resumeSelector(List.of(first, failed), failed));
+    }
+
+    @Test
+    void getResumeFromSelectorWithDuplicateArtifactId() {
+        TestMavenInvoker invoker = new TestMavenInvoker();
+
+        MavenProject first = new MavenProject();
+        first.setGroupId("org.apache.maven");
+        first.setArtifactId("maven-core");
+
+        MavenProject failed = new MavenProject();
+        failed.setGroupId("org.example");
+        failed.setArtifactId("maven-core");
+
+        assertEquals("org.example:maven-core", invoker.resumeSelector(List.of(first, failed), failed));
     }
 }
