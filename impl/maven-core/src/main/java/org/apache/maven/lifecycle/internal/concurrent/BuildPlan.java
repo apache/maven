@@ -69,6 +69,7 @@ public class BuildPlan {
 
     public void addStep(MavenProject project, String name, BuildStep step) {
         plan.get(project).put(name, step);
+        sortedNodes = null;
     }
 
     public Stream<BuildStep> allSteps() {

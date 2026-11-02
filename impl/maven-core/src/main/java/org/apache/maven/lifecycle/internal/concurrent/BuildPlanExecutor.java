@@ -642,14 +642,56 @@ public class BuildPlanExecutor {
                                 plan.step(project, resolvedPhase).ifPresent(n -> {
                                     MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());
                                     mojoExecution.setLifecyclePhase(phase);
-                                    n.addMojo(mojoExecution, execution.getPriority());
+                                    BuildStep target = n;
+                                    if (mojoDescriptor.isAggregator()
+                                            && !resolvedPhase.startsWith(BEFORE)
+                                            && !resolvedPhase.startsWith(AFTER)) {
+                                        // Only suppress inherited copies when their declaring ancestor is
+                                        // part of the reactor; partial builds still run the selected goal.
+                                        if (inheritedFromReactorAncestor(
+                                                project, plugin, execution, goal, resolvedPhase)) {
+                                            return;
+                                        }
+                                        // An aggregator needs a normal step: after:* steps also run for
+                                        // failure cleanup, even if a child failed.
+                                        if (!n.skip.get()) {
+                                            String name = "$aggregator:" + resolvedPhase;
+                                            target = plan.step(project, name).orElseGet(() -> {
+                                                BuildStep aggregator = new BuildStep(name, project, n.phase);
+                                                BuildStep phaseEnd = plan.requiredStep(project, AFTER + resolvedPhase);
+                                                List<BuildStep> successors = phaseEnd.successors.stream()
+                                                        .filter(s -> s.project == project)
+                                                        .toList();
+                                                aggregator.executeAfter(phaseEnd);
+                                                if (project.getCollectedProjects() != null) {
+                                                    for (MavenProject child : project.getCollectedProjects()) {
+                                                        plan.step(child, AFTER + resolvedPhase)
+                                                                .ifPresent(aggregator::executeAfter);
+                                                        plan.step(child, name).ifPresent(aggregator::executeAfter);
+                                                    }
+                                                }
+                                                for (MavenProject parent = project.getParent();
+                                                        parent != null;
+                                                        parent = parent.getParent()) {
+                                                    plan.step(parent, name)
+                                                            .ifPresent(parentAggregator -> parentAggregator.executeAfter(
+                                                                    aggregator));
+                                                }
+                                                successors.forEach(s -> s.executeAfter(aggregator));
+                                                plan.requiredStep(project, TEARDOWN).executeAfter(aggregator);
+                                                plan.addStep(project, name, aggregator);
+                                                return aggregator;
+                                            });
+                                        }
+                                    }
+                                    target.addMojo(mojoExecution, execution.getPriority());
+                                    BuildStep executionStep = target;
                                     if (mojoDescriptor.getDependencyCollectionRequired() != null
                                             || mojoDescriptor.getDependencyResolutionRequired() != null) {
                                         for (MavenProject p :
                                                 plan.getAllProjects().get(project)) {
                                             plan.step(p, AFTER + PACKAGE)
-                                                    .ifPresent(a -> plan.requiredStep(project, resolvedPhase)
-                                                            .executeAfter(a));
+                                                    .ifPresent(executionStep::executeAfter);
                                         }
                                     }
                                     // Apply @After annotation ordering constraints from the mojo descriptor
@@ -679,6 +721,50 @@ public class BuildPlanExecutor {
             } finally {
                 lock.writeLock().unlock();
             }
+        }
+
+        private boolean inheritedFromReactorAncestor(
+                MavenProject project, Plugin plugin, PluginExecution execution, String goal, String phase) {
+            if (declaredInProject(project, plugin, execution, goal)) {
+                return false;
+            }
+            for (MavenProject parent = project.getParent(); parent != null; parent = parent.getParent()) {
+                if (plan.getAllProjects().containsKey(parent)
+                        && plan.step(parent, phase).filter(step -> !step.skip.get()).isPresent()
+                        && parent.getBuild().getPlugins().stream()
+                                .filter(p -> p.getKey().equals(plugin.getKey()))
+                                .flatMap(p -> p.getExecutions().stream())
+                                .anyMatch(e -> e.getId().equals(execution.getId())
+                                        && e.getGoals().contains(goal)
+                                        && java.util.Objects.equals(e.getPhase(), execution.getPhase()))) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private boolean declaredInProject(MavenProject project, Plugin plugin, PluginExecution execution, String goal) {
+            var model = project.getOriginalModel();
+            if (model == null) {
+                return false;
+            }
+            Stream<Plugin> plugins = model.getBuild() == null
+                    ? Stream.empty()
+                    : model.getBuild().getPlugins().stream();
+            Set<String> activeProfiles = project.getActiveProfiles() == null
+                    ? Set.of()
+                    : project.getActiveProfiles().stream()
+                            .map(org.apache.maven.model.Profile::getId)
+                            .collect(Collectors.toSet());
+            plugins = Stream.concat(
+                    plugins,
+                    model.getProfiles().stream()
+                            .filter(profile -> activeProfiles.contains(profile.getId()))
+                            .filter(profile -> profile.getBuild() != null)
+                            .flatMap(profile -> profile.getBuild().getPlugins().stream()));
+            return plugins.filter(p -> p.getKey().equals(plugin.getKey()))
+                    .flatMap(p -> p.getExecutions().stream())
+                    .anyMatch(e -> e.getId().equals(execution.getId()) && e.getGoals().contains(goal));
         }
 
         /**
