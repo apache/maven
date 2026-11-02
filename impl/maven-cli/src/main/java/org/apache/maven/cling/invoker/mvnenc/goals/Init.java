@@ -141,6 +141,8 @@ public class Init extends InteractiveGoalSupport {
                                             .createInputPrompt()
                                             .name("edit")
                                             .message(template)
+                                            // without a default, JLine returns the text "null" for an empty line
+                                            .defaultValue("")
                                             .addPrompt()
                                             .build());
                             if (editMap.isEmpty()) {
