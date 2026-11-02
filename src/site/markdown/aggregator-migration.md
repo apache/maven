@@ -116,6 +116,7 @@ The `@After` annotation is repeatable. A Mojo can declare multiple
 ordering constraints when it must run after more than one phase:
 
 ```java
+@Mojo(name = "report")
 @After(phase = "compile")
 @After(phase = "test-compile")
 public class ReportMojo {
