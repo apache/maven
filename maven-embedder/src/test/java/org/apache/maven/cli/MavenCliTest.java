@@ -18,6 +18,7 @@
  */
 package org.apache.maven.cli;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
