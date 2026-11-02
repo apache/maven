@@ -39,6 +39,9 @@ under the License.
 
     <menu name="User Guide">
       <item name="Configuring Maven" href="configuring.html"/>
+    </menu>
+
+    <menu name="Plugin Development">
       <item name="Aggregator Mojo Migration Guide" href="aggregator-migration.html"/>
     </menu>
 
