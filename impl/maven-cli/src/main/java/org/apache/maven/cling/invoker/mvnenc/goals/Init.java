@@ -132,18 +132,22 @@ public class Init extends InteractiveGoalSupport {
                     Map<String, PromptResultItemIF> editMap;
                     for (Map.Entry<String, PromptResultItemIF> editable : editables) {
                         String template = editable.getValue().getResult();
-                        editMap = prompt.prompt(
-                                context.header,
-                                prompt.getPromptBuilder()
-                                        .createInputPrompt()
-                                        .name("edit")
-                                        .message(template)
-                                        .addPrompt()
-                                        .build());
-                        if (editMap.isEmpty()) {
-                            throw new InterruptedException();
-                        }
-                        String userInput = editMap.get("edit").getResult();
+                        String userInput;
+                        // the template is not a usable value, so ask again until one is given
+                        do {
+                            editMap = prompt.prompt(
+                                    context.header,
+                                    prompt.getPromptBuilder()
+                                            .createInputPrompt()
+                                            .name("edit")
+                                            .message(template)
+                                            .addPrompt()
+                                            .build());
+                            if (editMap.isEmpty()) {
+                                throw new InterruptedException();
+                            }
+                            userInput = editMap.get("edit").getResult();
+                        } while (userInput == null || userInput.isBlank());
                         String prefix = template.substring(0, template.indexOf('$'));
                         if (!prefix.isEmpty() && !userInput.startsWith(prefix)) {
                             userInput = prefix + userInput;
