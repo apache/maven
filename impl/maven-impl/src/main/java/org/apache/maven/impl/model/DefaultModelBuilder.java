@@ -1275,7 +1275,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             modelValidator.validateEffectiveModel(
                     session,
                     resultModel,
-                    isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
+                    isStrictRequest()
+                            ? ModelValidator.VALIDATION_LEVEL_STRICT
+                            : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     this);
 
             if (hasErrors()) {
@@ -1834,7 +1836,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             boolean trackRead = normalizedPath != null && activeModelReads.add(normalizedPath);
             try {
                 try {
-                    boolean strict = isBuildRequest();
+                    boolean strict = isStrictRequest();
                     try {
                         rootDirectory = request.getSession().getRootDirectory();
                         rootDirectoryFromSession = true;
@@ -2056,7 +2058,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 modelValidator.validateFileModel(
                         session,
                         model,
-                        isBuildRequest()
+                        isStrictRequest()
                                 ? ModelValidator.VALIDATION_LEVEL_STRICT
                                 : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                         this);
@@ -2187,7 +2189,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             modelValidator.validateRawModel(
                     session,
                     rawModel,
-                    isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
+                    isStrictRequest()
+                            ? ModelValidator.VALIDATION_LEVEL_STRICT
+                            : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     this);
 
             if (hasFatalErrors()) {
@@ -2986,7 +2990,26 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
+        /**
+         * Whether the request uses project-level semantics (local parent lookup, profile activation, etc.).
+         * This includes both strict build requests and the lenient {@link ModelBuilderRequest.RequestType#LOAD_PROJECT}
+         * type, which behaves like a build request for resolution purposes but does not enforce strict validation.
+         *
+         * @see #isStrictRequest() for requests that also require strict parsing and validation
+         */
         boolean isBuildRequest() {
+            return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.LOAD_PROJECT;
+        }
+
+        /**
+         * Whether the model has to be parsed and validated strictly. This is the case for the build requests, but not
+         * for {@link ModelBuilderRequest.RequestType#LOAD_PROJECT}, which is a project only in terms of semantics
+         * (local parents, profile activation) and keeps the lenient defaults of the consumer requests.
+         */
+        boolean isStrictRequest() {
             return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
                     || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
                     || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER;

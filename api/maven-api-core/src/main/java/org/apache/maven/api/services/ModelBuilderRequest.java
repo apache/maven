@@ -69,7 +69,14 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
         /**
          * The request is for building a model from a dependency POM file from a downloaded artifact.
          */
-        CONSUMER_DEPENDENCY
+        CONSUMER_DEPENDENCY,
+        /**
+         * The request is for loading a project from a POM file on the filesystem when build-time strictness is not
+         * wanted, for example by IDEs. The model gets the same project treatment as {@link #BUILD_EFFECTIVE}, such as
+         * local parent lookup and profile activation, but it is parsed leniently and validated at the minimal level,
+         * like for the consumer request types.
+         */
+        LOAD_PROJECT
     }
 
     /**
