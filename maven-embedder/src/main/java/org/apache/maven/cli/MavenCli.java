@@ -622,7 +622,8 @@ public class MavenCli {
             }
         }
 
-        // Logging caches System.out, so capture the stream installed by the terminal.
+        // Logging caches System.out, so wait for terminal installation on every path.
+        // With -l, the earlier wait protects redirection, so this second wait returns immediately.
         MessageUtils.awaitTerminalInitialization();
         slf4jConfiguration.activate();
 

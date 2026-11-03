@@ -29,6 +29,7 @@ import org.apache.maven.jline.MessageUtils;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.spi.TerminalExt;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.Isolated;
 import org.slf4j.LoggerFactory;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -37,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
+@Isolated("Changes JVM-wide streams, system properties, terminal state, and logging configuration")
 class MavenCliLoggingTest {
     @Test
     void cachesOutputAfterTerminalInstallationWithColorForced() throws Exception {
