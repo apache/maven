@@ -450,8 +450,10 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
                     mergedProps.get(Constants.MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY));
         }
 
+        // extenders get the origin-bound selector too, so credentials they inject (for example into the legacy
+        // ArtifactRepository objects of the request) are subject to the same credential scope as resolver's
         for (RepositorySystemSessionExtender extender : sessionExtenders.values()) {
-            extender.extend(request, configProps, mirrorSelector, proxySelector, authSelector);
+            extender.extend(request, configProps, mirrorSelector, proxySelector, effectiveAuthSelector);
         }
 
         // at this point we have "config" with pure MANDATORY resolver config, so resolver final config properties are
