@@ -150,6 +150,11 @@ public abstract class LayeredOptions<O extends Options> implements Options {
         options.get(0).displayHelp(request, printWriter);
     }
 
+    @Override
+    public Optional<Boolean> processes() {
+        return returnFirstPresentOrEmpty(Options::processes);
+    }
+
     protected <T> Optional<T> returnFirstPresentOrEmpty(Function<O, Optional<T>> getter) {
         for (O option : options) {
             Optional<T> o = getter.apply(option);

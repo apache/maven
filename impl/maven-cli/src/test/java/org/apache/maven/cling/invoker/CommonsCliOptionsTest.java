@@ -24,6 +24,7 @@ import org.apache.commons.cli.ParseException;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class CommonsCliOptionsTest {
@@ -52,5 +53,15 @@ class CommonsCliOptionsTest {
         Map<String, String> props = options.userProperties().get();
         assertEquals("bar", props.get("foo"));
         assertEquals("qux", props.get("baz"));
+    }
+
+    @Test
+    void processesOption() throws ParseException {
+        assertEquals(
+                true,
+                CommonsCliOptions.parse("test", new String[] {"--list-processes"})
+                        .processes()
+                        .orElse(false));
+        assertFalse(CommonsCliOptions.parse("test", new String[0]).processes().isPresent());
     }
 }
