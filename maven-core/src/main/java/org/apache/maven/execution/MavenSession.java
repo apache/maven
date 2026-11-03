@@ -27,6 +27,7 @@ import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -56,7 +57,13 @@ public class MavenSession implements Cloneable {
 
     private Properties executionProperties;
 
-    private ThreadLocal<MavenProject> currentProject = new ThreadLocal<>();
+    /**
+     * The current project set on a thread, {@link Optional#empty()} if it was set to {@code null}. Threads without a
+     * value use {@link #defaultProject}, so that reading the current project never stores a project in the thread.
+     */
+    private ThreadLocal<Optional<MavenProject>> currentProject = new ThreadLocal<>();
+
+    private MavenProject defaultProject;
 
     /**
      * These projects have already been topologically sorted in the {@link org.apache.maven.Maven} component before
@@ -85,13 +92,15 @@ public class MavenSession implements Cloneable {
     public void setProjects(List<MavenProject> projects) {
         if (!projects.isEmpty()) {
             MavenProject first = projects.get(0);
-            this.currentProject = ThreadLocal.withInitial(() -> first);
+            this.currentProject = new ThreadLocal<>();
+            this.defaultProject = first;
             this.topLevelProject = projects.stream()
                     .filter(project -> project.isExecutionRoot())
                     .findFirst()
                     .orElse(first);
         } else {
             this.currentProject = new ThreadLocal<>();
+            this.defaultProject = null;
             this.topLevelProject = null;
         }
         this.projects = projects;
@@ -143,11 +152,12 @@ public class MavenSession implements Cloneable {
     }
 
     public void setCurrentProject(MavenProject currentProject) {
-        this.currentProject.set(currentProject);
+        this.currentProject.set(Optional.ofNullable(currentProject));
     }
 
     public MavenProject getCurrentProject() {
-        return currentProject.get();
+        Optional<MavenProject> project = currentProject.get();
+        return project != null ? project.orElse(null) : defaultProject;
     }
 
     public ProjectBuildingRequest getProjectBuildingRequest() {
@@ -238,9 +248,9 @@ public class MavenSession implements Cloneable {
         try {
             MavenSession clone = (MavenSession) super.clone();
             // the default must become the current project of the thread that clones this
-            MavenProject current = getCurrentProject();
-            // we replace the thread local of the clone to prevent write through and enforce the new default value
-            clone.currentProject = ThreadLocal.withInitial(() -> current);
+            clone.defaultProject = getCurrentProject();
+            // we replace the thread local of the clone to prevent write through
+            clone.currentProject = new ThreadLocal<>();
             return clone;
         } catch (CloneNotSupportedException e) {
             throw new RuntimeException("Bug", e);
