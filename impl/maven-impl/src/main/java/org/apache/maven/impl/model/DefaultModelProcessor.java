@@ -192,6 +192,11 @@ public class DefaultModelProcessor implements ModelProcessor {
                 } else if (request.getPath() != null) {
                     return Files.newInputStream(request.getPath());
                 } else if (request.getReader() != null) {
+                    // Note: when the request carries a Reader (already decoded chars), we re-encode as UTF-8.
+                    // If the original XML declared a non-UTF-8 encoding (e.g. ISO-8859-1), the declaration
+                    // will no longer match the actual byte encoding. In practice Maven POMs are UTF-8 or
+                    // ASCII so this is safe, but callers providing a Reader for non-UTF-8 content should
+                    // use InputStream instead.
                     StringBuilder sb = new StringBuilder();
                     char[] buf = new char[4096];
                     int n;

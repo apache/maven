@@ -42,7 +42,7 @@ public interface ModelProcessor {
      * When present, the processor should use this transformer for XML parsing instead
      * of any default transformer it would otherwise apply.
      *
-     * @since 4.0.0
+     * @since 4.1.0
      */
     String TRANSFORMER = "transformer";
 
@@ -60,7 +60,7 @@ public interface ModelProcessor {
      * @param options Possible reading options, may be {@code null}.
      * @return The deserialized model, never {@code null}.
      * @throws ModelParserException If the model could not be deserialized.
-     * @since 4.0.0
+     * @since 4.1.0
      */
     @Nonnull
     Model read(@Nonnull Source source, @Nullable Map<String, ?> options) throws ModelParserException;
@@ -74,6 +74,6 @@ public interface ModelProcessor {
      * @throws XmlReaderException If the input format could not be parsed.
      * @deprecated Use {@link #read(Source, Map)} instead.
      */
-    @Deprecated(since = "4.0.0")
+    @Deprecated(since = "4.1.0")
     Model read(XmlReaderRequest request) throws IOException, XmlReaderException;
 }
