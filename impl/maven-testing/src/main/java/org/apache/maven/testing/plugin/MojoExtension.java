@@ -517,7 +517,13 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                             mes.setDescriptor(md);
                         }
                     }
-                    requireNonNull(mes.descriptor());
+                    if (mes.descriptor() == null) {
+                        throw new IllegalStateException("No mojo with goal '" + goal + "' in plugin "
+                                + pluginDescriptor.getId() + "; available goals: "
+                                + pluginDescriptor.getMojos().stream()
+                                        .map(MojoDescriptor::getGoal)
+                                        .collect(Collectors.toList()));
+                    }
                 }
                 PluginStub plugin = new PluginStub();
                 plugin.setDescriptor(pluginDescriptor);
