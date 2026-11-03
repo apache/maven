@@ -47,8 +47,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.SortedSet;
 import java.util.TreeSet;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.strategy.Strategy;
@@ -66,9 +64,9 @@ import org.codehaus.plexus.classworlds.strategy.StrategyFactory;
  */
 public class ClassRealm extends URLClassLoader {
 
-    private ClassWorld world;
+    private final ClassWorld world;
 
-    private String id;
+    private final String id;
 
     private SortedSet<Entry> foreignImports;
 
@@ -81,10 +79,6 @@ public class ClassRealm extends URLClassLoader {
     private ModuleLayer moduleLayer;
 
     private ModuleLayer.Controller moduleLayerController;
-
-    private static final boolean IS_PARALLEL_CAPABLE = Closeable.class.isAssignableFrom(URLClassLoader.class);
-
-    private final ConcurrentMap<String, Object> lockMap;
 
     /**
      * Creates a new class realm.
@@ -104,14 +98,6 @@ public class ClassRealm extends URLClassLoader {
         foreignImports = new TreeSet<>();
 
         strategy = StrategyFactory.getStrategy(this);
-
-        lockMap = IS_PARALLEL_CAPABLE ? new ConcurrentHashMap<>() : null;
-
-        if (IS_PARALLEL_CAPABLE) {
-            // We must call super.getClassLoadingLock at least once
-            // to avoid NPE in super.loadClass.
-            super.getClassLoadingLock(getClass().getName());
-        }
     }
 
     public String getId() {
@@ -181,7 +167,7 @@ public class ClassRealm extends URLClassLoader {
             }
         }
 
-        return importRealms;
+        return Collections.unmodifiableCollection(importRealms);
     }
 
     public Strategy getStrategy() {
@@ -270,14 +256,7 @@ public class ClassRealm extends URLClassLoader {
     }
 
     protected Class<?> loadClass(String name, boolean resolve) throws ClassNotFoundException {
-        if (IS_PARALLEL_CAPABLE) {
-            return unsynchronizedLoadClass(name, resolve);
-
-        } else {
-            synchronized (this) {
-                return unsynchronizedLoadClass(name, resolve);
-            }
-        }
+        return unsynchronizedLoadClass(name, resolve);
     }
 
     private Class<?> unsynchronizedLoadClass(String name, boolean resolve) throws ClassNotFoundException {
@@ -423,21 +402,7 @@ public class ClassRealm extends URLClassLoader {
     }
 
     private Object getClassRealmLoadingLock(String name) {
-        if (IS_PARALLEL_CAPABLE) {
-            return getClassLoadingLock(name);
-        } else {
-            return this;
-        }
-    }
-
-    @Override
-    protected Object getClassLoadingLock(String name) {
-        if (IS_PARALLEL_CAPABLE) {
-            Object newLock = new Object();
-            Object lock = lockMap.putIfAbsent(name, newLock);
-            return (lock == null) ? newLock : lock;
-        }
-        return this;
+        return getClassLoadingLock(name);
     }
 
     public Class<?> loadClassFromParent(String name) {
@@ -542,9 +507,6 @@ public class ClassRealm extends URLClassLoader {
     }
 
     static {
-        if (IS_PARALLEL_CAPABLE) // Avoid running this method on older jdks
-        {
-            registerAsParallelCapable();
-        }
+        registerAsParallelCapable();
     }
 }
