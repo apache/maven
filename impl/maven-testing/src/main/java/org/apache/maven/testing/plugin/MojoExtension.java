@@ -42,6 +42,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -170,6 +172,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             ExtensionContext.Namespace.create("mojo-extension");
 
     private static final String BASEDIR_KEY = "basedir";
+
+    private static final Pattern EXPRESSION = Pattern.compile("\\$\\{([^}]+)}");
 
     /**
      * Gets the identifier for the current test method.
@@ -654,10 +658,13 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             return goal.split(":");
         } else {
             Path pluginPom = Paths.get(getPluginBasedir(), "pom.xml");
-            Xpp3Dom pluginPomDom = Xpp3DomBuilder.build(Files.newBufferedReader(pluginPom));
+            Xpp3Dom pluginPomDom;
+            try (Reader reader = Files.newBufferedReader(pluginPom)) {
+                pluginPomDom = Xpp3DomBuilder.build(reader);
+            }
             String artifactId = pluginPomDom.getChild("artifactId").getValue();
-            String groupId = resolveFromRootThenParent(pluginPomDom, "groupId");
-            String version = resolveFromRootThenParent(pluginPomDom, "version");
+            String groupId = interpolate(pluginPom, pluginPomDom, resolveFromRootThenParent(pluginPomDom, "groupId"));
+            String version = interpolate(pluginPom, pluginPomDom, resolveFromRootThenParent(pluginPomDom, "version"));
             return new String[] {groupId, artifactId, version, goal};
         }
     }
@@ -722,6 +729,29 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                                 .orElse(null)))
                 .map(Xpp3Dom::getValue)
                 .orElseThrow(() -> new Exception("unable to determine " + element));
+    }
+
+    /**
+     * Resolves {@code ${...}} references in a plugin POM value, such as a CI-friendly
+     * {@code ${revision}} version, from the POM's {@code <properties>} and then from the
+     * system properties.
+     */
+    private static String interpolate(Path pluginPom, Xpp3Dom pluginPomDom, String value) throws Exception {
+        Matcher matcher = EXPRESSION.matcher(value);
+        StringBuilder sb = new StringBuilder();
+        while (matcher.find()) {
+            String key = matcher.group(1);
+            String resolved = child(pluginPomDom, "properties")
+                    .flatMap(p -> child(p, key))
+                    .map(Xpp3Dom::getValue)
+                    .orElseGet(() -> System.getProperty(key));
+            if (resolved == null) {
+                throw new Exception("unable to resolve " + matcher.group() + " in " + pluginPom);
+            }
+            matcher.appendReplacement(sb, Matcher.quoteReplacement(resolved));
+        }
+        matcher.appendTail(sb);
+        return sb.toString();
     }
 
     /**
