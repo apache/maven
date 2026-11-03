@@ -321,7 +321,7 @@ public class DefaultSettingsValidator {
 
     /**
      * Parses a {@code <server><repositoryOrigins>} value the way the credential scoping does; see
-     * {@code OriginBoundAuthenticationSelector#originOf(String)} in maven-core, which is the authority
+     * {@link org.apache.maven.impl.resolver.OriginBoundAuthenticationSelector#originOf(String)}, which is the authority
      * on what an origin is. Returns {@code null} when the value is not a URI at all.
      */
     private static URI parseRepositoryOrigin(String value) {

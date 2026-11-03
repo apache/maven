@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.aether;
+package org.apache.maven.impl.resolver;
 
 import java.util.HashMap;
 import java.util.Map;
