@@ -18,9 +18,11 @@
  */
 package org.apache.maven.execution;
 
+import java.lang.ref.WeakReference;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
 
@@ -154,6 +156,35 @@ class MavenSessionTest {
         }
         clone.setCurrentProject(null);
         assertSame(root, session.getCurrentProject());
+    }
+
+    @Test
+    void testReadingCurrentProjectOnOtherThreadDoesNotRetainProject() throws Exception {
+        ExecutorService executor = Executors.newSingleThreadExecutor();
+        try {
+            WeakReference<MavenProject> root = readCurrentProjectOnThread(executor);
+            for (int i = 0; i < 10 && root.get() != null; i++) {
+                System.gc();
+                Thread.sleep(10);
+            }
+            assertNull(root.get(), "the thread must not retain the project after the session is discarded");
+        } finally {
+            executor.shutdownNow();
+        }
+    }
+
+    private WeakReference<MavenProject> readCurrentProjectOnThread(ExecutorService executor) throws Exception {
+        MavenSession session = createSessionWithoutContainer();
+        MavenProject root = new MavenProject();
+        root.setExecutionRoot(true);
+        session.setProjects(List.of(root));
+        executor.submit(() -> {
+                    assertSame(root, session.getCurrentProject());
+                    MavenSession clone = session.clone();
+                    assertSame(root, clone.getCurrentProject());
+                })
+                .get(10, TimeUnit.SECONDS);
+        return new WeakReference<>(root);
     }
 
     /**
