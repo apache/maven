@@ -622,6 +622,8 @@ public class MavenCli {
             }
         }
 
+        // Logging caches System.out, so capture the stream installed by the terminal.
+        MessageUtils.awaitTerminalInitialization();
         slf4jConfiguration.activate();
 
         plexusLoggerManager = new Slf4jLoggerManager();
