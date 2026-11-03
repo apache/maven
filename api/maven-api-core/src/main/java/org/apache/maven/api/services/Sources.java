@@ -21,6 +21,8 @@ package org.apache.maven.api.services;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.InvalidPathException;
@@ -43,6 +45,7 @@ import static java.util.Objects.requireNonNull;
  *   <li>Path sources - simple access to file content</li>
  *   <li>Build sources - POM files being actively built by Maven</li>
  *   <li>Resolved sources - POMs resolved from repositories</li>
+ *   <li>URL sources - resources accessible via URL (classpath, file, http, etc.)</li>
  * </ul>
  *
  * @since 4.0.0
@@ -97,8 +100,11 @@ public final class Sources {
 
     /**
      * Creates a new source backed by a URL, with an optional model identifier.
-     * This is used for classpath-based sources such as the Maven super POM.
-     * The source does not support resolving related sources.
+     * <p>
+     * For hierarchical URLs (e.g. {@code file:}, {@code http:}, {@code https:}), sibling
+     * resolution via {@link Source#resolve(String)} is supported through URI resolution.
+     * For opaque URLs (e.g. {@code jar:} classpath entries), sibling resolution returns
+     * {@code null} since there is no meaningful "sibling" concept.
      *
      * @param url the URL to read from, must not be {@code null}
      * @param modelId the modelId (groupId:artifactId:version coordinates), may be {@code null}
@@ -112,8 +118,15 @@ public final class Sources {
     }
 
     /**
-     * Implementation of {@link ModelSource} backed by a URL (e.g. a classpath resource).
-     * Does not support resolving related sources.
+     * Implementation of {@link ModelSource} backed by a URL (e.g. a classpath resource or file URL).
+     * <p>
+     * Sibling resolution is supported for hierarchical URLs (e.g. {@code file:}, {@code http:},
+     * {@code https:}) via URI relative resolution. For opaque URLs (e.g. {@code jar:} entries),
+     * resolution always returns {@code null}.
+     * <p>
+     * For {@code file:} URLs, the {@link ModelSource#resolve(ModelLocator, String)} method
+     * additionally delegates to the locator to find sibling POM files on the filesystem,
+     * mirroring the behavior of {@link BuildPathSource}.
      */
     static class UrlModelSource implements ModelSource {
         private final URL url;
@@ -144,16 +157,79 @@ public final class Sources {
             return url.toExternalForm();
         }
 
+        /**
+         * Resolves a sibling source relative to this URL source.
+         * <p>
+         * For hierarchical URLs (non-opaque, e.g. {@code file:}, {@code http:}), resolves
+         * the relative path using URI resolution against the parent "directory" of the URL.
+         * For opaque URLs (e.g. {@code jar:} entries), returns {@code null}.
+         *
+         * @param relative the relative path to resolve
+         * @return a new {@link Source} for the resolved URL, or {@code null} if not resolvable
+         */
         @Override
         @Nullable
         public Source resolve(@Nonnull String relative) {
-            return null;
+            try {
+                URI uri = url.toURI();
+                if (uri.isOpaque()) {
+                    // Opaque URIs (jar:, etc.) cannot resolve siblings
+                    return null;
+                }
+                // Resolve against the parent "directory" — strip the last path segment first
+                URI base = uri.getPath().endsWith("/") ? uri : uri.resolve(".");
+                URI resolved = base.resolve(relative);
+                return new UrlModelSource(resolved.toURL(), null);
+            } catch (URISyntaxException | IllegalArgumentException | java.net.MalformedURLException e) {
+                return null;
+            }
         }
 
+        /**
+         * Resolves a sibling {@link ModelSource} relative to this URL source, using the locator
+         * to find the actual POM file.
+         * <p>
+         * For {@code file:} URLs, the resolved URI is converted to a filesystem path and passed
+         * to the locator (mirroring {@link BuildPathSource} behavior). For other hierarchical
+         * URLs, the resolved URL is wrapped directly. For opaque URLs, returns {@code null}.
+         *
+         * @param modelLocator the locator used to find the POM file
+         * @param relative the relative path to resolve
+         * @return a resolved {@link ModelSource}, or {@code null} if not resolvable
+         */
         @Override
         @Nullable
         public ModelSource resolve(@Nonnull ModelSource.ModelLocator modelLocator, @Nonnull String relative) {
-            return null;
+            try {
+                URI uri = url.toURI();
+                if (uri.isOpaque()) {
+                    return null;
+                }
+                URI base = uri.getPath().endsWith("/") ? uri : uri.resolve(".");
+                URI resolved = base.resolve(relative);
+                if ("file".equalsIgnoreCase(resolved.getScheme())) {
+                    // For file: URLs, use the locator to find the actual POM (honours pomFile discovery)
+                    String norm = relative.replace('\\', File.separatorChar).replace('/', File.separatorChar);
+                    Path siblingPath;
+                    try {
+                        Path parentPath = Path.of(uri).getParent();
+                        if (parentPath == null) {
+                            return null;
+                        }
+                        siblingPath = parentPath.resolve(norm);
+                    } catch (InvalidPathException e) {
+                        return null;
+                    }
+                    Path pomPath = modelLocator.locateExistingPom(siblingPath);
+                    if (pomPath != null) {
+                        return new UrlModelSource(pomPath.toUri().toURL(), null);
+                    }
+                    return null;
+                }
+                return new UrlModelSource(resolved.toURL(), null);
+            } catch (URISyntaxException | IllegalArgumentException | java.net.MalformedURLException e) {
+                return null;
+            }
         }
 
         @Override
