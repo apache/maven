@@ -242,13 +242,13 @@ public final class Sources {
         public boolean equals(Object o) {
             return o == this
                     || o instanceof UrlModelSource that
-                            && Objects.equals(url, that.url)
+                            && Objects.equals(url.toExternalForm(), that.url.toExternalForm())
                             && Objects.equals(modelId, that.modelId);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(url, modelId);
+            return Objects.hash(url.toExternalForm(), modelId);
         }
 
         @Override
