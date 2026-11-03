@@ -125,7 +125,6 @@ public class DefaultModelProcessor implements ModelProcessor {
                     ModelParserException mpe =
                             new ModelParserException(buildDetailedErrorMessage(pomFile, exceptions, e), e);
                     exceptions.values().forEach(mpe::addSuppressed);
-                    mpe.addSuppressed(e);
                     throw mpe;
                 }
                 throw e;

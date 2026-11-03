@@ -100,8 +100,9 @@ class DefaultModelProcessorTest {
         assertTrue(message.contains("default) XML reader also failed"), "Message should mention XML reader failure");
         assertTrue(message.contains("XML parsing failed"), "Message should contain XML error message");
 
-        // Verify suppressed exceptions are still attached
-        assertEquals(3, exception.getSuppressed().length, "Should have 3 suppressed exceptions");
+        // Verify suppressed exceptions are still attached (yaml + toml parsers;
+        // the XML fallback exception is the cause, not a suppressed exception)
+        assertEquals(2, exception.getSuppressed().length, "Should have 2 suppressed exceptions (one per SPI parser)");
     }
 
     @Test

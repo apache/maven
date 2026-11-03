@@ -38,9 +38,9 @@ import org.apache.maven.api.spi.ModelParserException;
 public interface ModelProcessor {
 
     /**
-     * Option key for passing an {@link XmlReaderRequest.Transformer} through the options map.
-     * When present, the processor should use this transformer for XML parsing instead
-     * of any default transformer it would otherwise apply.
+     * Option key for passing a source transformer through the options map.
+     * When present, the processor may use this transformer to pre-process
+     * the source input before parsing.
      *
      * @since 4.1.0
      */
