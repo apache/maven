@@ -229,8 +229,12 @@ public class LifecycleDependencyResolver {
             eventSpyDispatcher.onEvent(request);
 
             result = dependenciesResolver.resolve(request);
+            eventSpyDispatcher.onEvent(result);
         } catch (DependencyResolutionException e) {
             result = e.getResult();
+
+            // the listeners get the result when the resolution fails as well, not only when it succeeds
+            eventSpyDispatcher.onEvent(result);
 
             /*
              * MNG-2277, the check below compensates for our bad plugin support where we ended up with aggregator
@@ -250,8 +254,6 @@ public class LifecycleDependencyResolver {
                 throw new LifecycleExecutionException(messageBuilderFactory, null, project, e);
             }
         }
-
-        eventSpyDispatcher.onEvent(result);
 
         Set<Artifact> artifacts = new LinkedHashSet<>();
         if (result.getDependencyGraph() != null
