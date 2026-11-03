@@ -31,6 +31,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -78,6 +79,7 @@ import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.Profile;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
@@ -753,7 +755,7 @@ public class BuildPlanExecutor {
                             return false;
                         }
                         if (parentExecution.getGoals().contains(goal)
-                                && java.util.Objects.equals(parentExecution.getPhase(), execution.getPhase())
+                                && Objects.equals(parentExecution.getPhase(), execution.getPhase())
                                 && plan.getAllProjects().containsKey(parent)
                                 && plan.step(parent, phase)
                                         .filter(step -> !step.skip.get())
@@ -785,7 +787,7 @@ public class BuildPlanExecutor {
                     ? Set.of()
                     : project.getActiveProfiles().stream()
                             .filter(profile -> declaredInProject(project, profile.getLocation("")))
-                            .map(org.apache.maven.model.Profile::getId)
+                            .map(Profile::getId)
                             .collect(Collectors.toSet());
             plugins = Stream.concat(
                     plugins,

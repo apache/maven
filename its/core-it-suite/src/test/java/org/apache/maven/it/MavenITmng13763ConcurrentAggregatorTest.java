@@ -96,6 +96,28 @@ public class MavenITmng13763ConcurrentAggregatorTest extends AbstractMavenIntegr
     }
 
     @Test
+    public void testPartialBuildPreservesInheritedAggregator() throws Exception {
+        Path testDir = extractResources("mng-13763");
+        installPlugin(testDir);
+
+        Verifier verifier = newCleanVerifier(testDir.resolve("reactor"), true);
+        verifier.addCliArgument("-b");
+        verifier.addCliArgument("concurrent");
+        verifier.addCliArgument("-T2");
+        verifier.addCliArgument("-pl");
+        verifier.addCliArgument(":a");
+        verifier.addCliArgument("-DrequireOwnTouch=true");
+        verifier.addCliArgument("package");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+
+        assertTrue(Files.exists(testDir.resolve("reactor/a/target/aggregate-observed.txt")));
+        assertTrue(Files.exists(testDir.resolve("reactor/a/target/touched.txt")));
+        assertFalse(Files.exists(testDir.resolve("reactor/target/aggregate-observed.txt")));
+        assertFalse(Files.exists(testDir.resolve("reactor/b/target/aggregate-observed.txt")));
+    }
+
+    @Test
     public void testManagedAggregatorRunsInModules() throws Exception {
         verifyManagedAggregator(null);
     }
