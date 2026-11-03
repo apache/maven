@@ -75,6 +75,7 @@ import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
 import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.Task;
 import org.apache.maven.lifecycle.internal.TaskSegment;
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.MavenPluginManager;
@@ -659,26 +660,15 @@ public class BuildPlanExecutor {
                                             target = plan.step(project, name).orElseGet(() -> {
                                                 BuildStep aggregator = new BuildStep(name, project, n.phase);
                                                 BuildStep phaseEnd = plan.requiredStep(project, AFTER + resolvedPhase);
-                                                List<BuildStep> successors = phaseEnd.successors.stream()
-                                                        .filter(s -> s.project == project)
-                                                        .toList();
                                                 aggregator.executeAfter(phaseEnd);
                                                 if (project.getCollectedProjects() != null) {
                                                     for (MavenProject child : project.getCollectedProjects()) {
                                                         plan.step(child, AFTER + resolvedPhase)
                                                                 .ifPresent(aggregator::executeAfter);
-                                                        plan.step(child, name).ifPresent(aggregator::executeAfter);
                                                     }
                                                 }
-                                                for (MavenProject parent = project.getParent();
-                                                        parent != null;
-                                                        parent = parent.getParent()) {
-                                                    plan.step(parent, name)
-                                                            .ifPresent(parentAggregator -> parentAggregator.executeAfter(
-                                                                    aggregator));
-                                                }
-                                                successors.forEach(s -> s.executeAfter(aggregator));
-                                                plan.requiredStep(project, TEARDOWN).executeAfter(aggregator);
+                                                plan.requiredStep(project, TEARDOWN)
+                                                        .executeAfter(aggregator);
                                                 plan.addStep(project, name, aggregator);
                                                 return aggregator;
                                             });
@@ -690,8 +680,7 @@ public class BuildPlanExecutor {
                                             || mojoDescriptor.getDependencyResolutionRequired() != null) {
                                         for (MavenProject p :
                                                 plan.getAllProjects().get(project)) {
-                                            plan.step(p, AFTER + PACKAGE)
-                                                    .ifPresent(executionStep::executeAfter);
+                                            plan.step(p, AFTER + PACKAGE).ifPresent(executionStep::executeAfter);
                                         }
                                     }
                                     // Apply @After annotation ordering constraints from the mojo descriptor
@@ -701,6 +690,8 @@ public class BuildPlanExecutor {
                         }
                     }
                 }
+
+                linkAggregatorSteps();
 
                 BuildPlan buildPlan = plan;
                 for (BuildStep step :
@@ -723,48 +714,102 @@ public class BuildPlanExecutor {
             }
         }
 
+        void linkAggregatorSteps() {
+            // Planning can be deferred for reactor plugins. Revisit completion links after
+            // each planning pass so newly planned consumers and aggregators are included.
+            for (BuildStep aggregator : plan.allSteps()
+                    .filter(step -> step.name.startsWith("$aggregator:"))
+                    .toList()) {
+                BuildStep phaseEnd = plan.requiredStep(aggregator.project, AFTER + aggregator.phase.name());
+                List<MavenProject> children = aggregator.project.getCollectedProjects();
+                for (BuildStep successor : List.copyOf(phaseEnd.successors)) {
+                    // Collected projects may need the parent's ordinary phase outputs in
+                    // order to build the very outputs that its aggregator consumes.
+                    if (successor != aggregator && (children == null || !children.contains(successor.project))) {
+                        successor.executeAfter(aggregator);
+                    }
+                }
+            }
+        }
+
         private boolean inheritedFromReactorAncestor(
                 MavenProject project, Plugin plugin, PluginExecution execution, String goal, String phase) {
             if (declaredInProject(project, plugin, execution, goal)) {
                 return false;
             }
             for (MavenProject parent = project.getParent(); parent != null; parent = parent.getParent()) {
-                if (plan.getAllProjects().containsKey(parent)
-                        && plan.step(parent, phase).filter(step -> !step.skip.get()).isPresent()
-                        && parent.getBuild().getPlugins().stream()
-                                .filter(p -> p.getKey().equals(plugin.getKey()))
-                                .flatMap(p -> p.getExecutions().stream())
-                                .anyMatch(e -> e.getId().equals(execution.getId())
-                                        && e.getGoals().contains(goal)
-                                        && java.util.Objects.equals(e.getPhase(), execution.getPhase()))) {
-                    return true;
+                for (Plugin parentPlugin : parent.getBuild().getPlugins()) {
+                    if (!parentPlugin.getKey().equals(plugin.getKey())) {
+                        continue;
+                    }
+                    if (!parentPlugin.isInherited()) {
+                        return false;
+                    }
+                    for (PluginExecution parentExecution : parentPlugin.getExecutions()) {
+                        if (!parentExecution.getId().equals(execution.getId())) {
+                            continue;
+                        }
+                        if (!parentExecution.isInherited()) {
+                            return false;
+                        }
+                        if (parentExecution.getGoals().contains(goal)
+                                && java.util.Objects.equals(parentExecution.getPhase(), execution.getPhase())
+                                && plan.getAllProjects().containsKey(parent)
+                                && plan.step(parent, phase)
+                                        .filter(step -> !step.skip.get())
+                                        .isPresent()) {
+                            return true;
+                        }
+                    }
                 }
             }
             return false;
         }
 
         private boolean declaredInProject(MavenProject project, Plugin plugin, PluginExecution execution, String goal) {
+            // Goal locations survive model interpolation. Compare their POM paths rather
+            // than raw coordinates, which may contain expressions such as ${pluginGroup}.
+            InputLocation goals = execution.getLocation("goals");
+            InputLocation location = goals == null
+                    ? null
+                    : goals.getLocation(execution.getGoals().indexOf(goal));
+            if (declaredInProject(project, location)) {
+                return true;
+            }
             var model = project.getOriginalModel();
             if (model == null) {
                 return false;
             }
-            Stream<Plugin> plugins = model.getBuild() == null
-                    ? Stream.empty()
-                    : model.getBuild().getPlugins().stream();
+            Stream<Plugin> plugins = model.getBuild() == null ? Stream.empty() : model.getBuild().getPlugins().stream();
             Set<String> activeProfiles = project.getActiveProfiles() == null
                     ? Set.of()
                     : project.getActiveProfiles().stream()
+                            .filter(profile -> declaredInProject(project, profile.getLocation("")))
                             .map(org.apache.maven.model.Profile::getId)
                             .collect(Collectors.toSet());
             plugins = Stream.concat(
                     plugins,
-                    model.getProfiles().stream()
+                    // Merged goal lists do not retain every source location. Local profiles
+                    // in the effective model preserve their interpolated declarations.
+                    project.getModel().getProfiles().stream()
                             .filter(profile -> activeProfiles.contains(profile.getId()))
                             .filter(profile -> profile.getBuild() != null)
                             .flatMap(profile -> profile.getBuild().getPlugins().stream()));
             return plugins.filter(p -> p.getKey().equals(plugin.getKey()))
                     .flatMap(p -> p.getExecutions().stream())
-                    .anyMatch(e -> e.getId().equals(execution.getId()) && e.getGoals().contains(goal));
+                    .anyMatch(e ->
+                            e.getId().equals(execution.getId()) && e.getGoals().contains(goal));
+        }
+
+        private boolean declaredInProject(MavenProject project, InputLocation location) {
+            return location != null
+                    && location.getSource() != null
+                    && project.getFile() != null
+                    && project.getFile()
+                            .toPath()
+                            .toUri()
+                            .toString()
+                            .equals(location.getSource().getLocation());
         }
 
         /**

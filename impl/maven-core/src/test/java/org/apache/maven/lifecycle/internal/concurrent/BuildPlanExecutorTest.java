@@ -19,6 +19,7 @@
 package org.apache.maven.lifecycle.internal.concurrent;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -47,10 +48,101 @@ import org.eclipse.aether.installation.InstallRequest;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class BuildPlanExecutorTest {
+
+    @Test
+    void aggregateOutputsAreReadyBeforeExternalConsumers() {
+        MavenProject root = newProject();
+        MavenProject child = newProject();
+        child.setArtifactId("child");
+        MavenProject consumer = newProject();
+        consumer.setArtifactId("consumer");
+        root.setCollectedProjects(List.of(child));
+        BuildPlanExecutor.BuildContext context = newExecutor((BeforeProjectExecution) event -> {}).new BuildContext();
+        context.plan = new BuildPlan(Map.of(root, List.of(), child, List.of(root), consumer, List.of(root)));
+        for (MavenProject project : List.of(root, child, consumer)) {
+            context.plan.addProject(project, new HashMap<>());
+        }
+        BuildStep end = addStep(context.plan, root, "after:package");
+        BuildStep aggregate = addStep(context.plan, root, "$aggregator:package");
+        BuildStep childEnd = addStep(context.plan, child, "after:package");
+        BuildStep childCompile = addStep(context.plan, child, "compile");
+        BuildStep consumerCompile = addStep(context.plan, consumer, "compile");
+        aggregate.executeAfter(end);
+        aggregate.executeAfter(childEnd);
+        childEnd.executeAfter(childCompile);
+        childCompile.executeAfter(end);
+        consumerCompile.executeAfter(end);
+
+        context.linkAggregatorSteps();
+
+        assertTrue(consumerCompile.isSuccessorOf(aggregate));
+        assertFalse(childCompile.isSuccessorOf(aggregate), "do not introduce a parent/child dependency cycle");
+        assertTrue(aggregate.isSuccessorOf(childEnd));
+    }
+
+    @Test
+    void laterPlannedAggregatorUsesAggregationInsteadOfInheritance() {
+        MavenProject root = newProject();
+        MavenProject child = newProject();
+        child.setArtifactId("child");
+        root.setCollectedProjects(List.of(child));
+        BuildPlanExecutor.BuildContext context = newExecutor((BeforeProjectExecution) event -> {}).new BuildContext();
+        context.plan = new BuildPlan(Map.of(root, List.of(), child, List.of()));
+        context.plan.addProject(root, new HashMap<>());
+        context.plan.addProject(child, new HashMap<>());
+        BuildStep end = addStep(context.plan, root, "after:package");
+        BuildStep childEnd = addStep(context.plan, child, "after:package");
+        BuildStep aggregate = addStep(context.plan, root, "$aggregator:package");
+        aggregate.executeAfter(end);
+        aggregate.executeAfter(childEnd);
+        context.linkAggregatorSteps();
+
+        BuildStep childAggregate = addStep(context.plan, child, "$aggregator:package");
+        childAggregate.executeAfter(childEnd);
+        context.linkAggregatorSteps();
+
+        assertTrue(aggregate.isSuccessorOf(childAggregate));
+        assertFalse(childAggregate.isSuccessorOf(aggregate));
+    }
+
+    @Test
+    void laterPlannedConsumerWaitsForExistingAggregator() {
+        MavenProject root = newProject();
+        MavenProject consumer = newProject();
+        consumer.setArtifactId("consumer");
+        BuildPlanExecutor.BuildContext context = newExecutor((BeforeProjectExecution) event -> {}).new BuildContext();
+        context.plan = new BuildPlan(Map.of(root, List.of(), consumer, List.of(root)));
+        context.plan.addProject(root, new HashMap<>());
+        context.plan.addProject(consumer, new HashMap<>());
+        BuildStep end = addStep(context.plan, root, "after:package");
+        BuildStep aggregate = addStep(context.plan, root, "$aggregator:package");
+        aggregate.executeAfter(end);
+        context.linkAggregatorSteps();
+
+        BuildStep consumerCompile = addStep(context.plan, consumer, "compile");
+        consumerCompile.executeAfter(end);
+        context.linkAggregatorSteps();
+
+        assertTrue(consumerCompile.isSuccessorOf(aggregate));
+    }
+
+    private BuildStep addStep(BuildPlan plan, MavenProject project, String name) {
+        Lifecycle.Phase phase = new DefaultLifecycleRegistry(Collections.emptyList())
+                .lookup("default")
+                .orElseThrow()
+                .allPhases()
+                .filter(p -> p.name().equals("package"))
+                .findFirst()
+                .orElseThrow();
+        BuildStep step = new BuildStep(name, project, phase);
+        plan.addStep(project, name, step);
+        return step;
+    }
 
     /**
      * A build step that throws an {@link Error} must be reported as a build failure, the same way the

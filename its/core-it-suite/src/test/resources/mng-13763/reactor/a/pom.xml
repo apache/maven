@@ -43,8 +43,10 @@ under the License.
           </execution>
           <execution>
             <id>touch</id>
+            <goals>
+              <goal>touch</goal>
+            </goals>
             <phase>package</phase>
-            <goals><goal>touch</goal></goals>
           </execution>
         </executions>
       </plugin>
@@ -61,8 +63,34 @@ under the License.
             <executions>
               <execution>
                 <id>aggregate-child</id>
+                <goals>
+                  <goal>aggregate</goal>
+                </goals>
                 <phase>package</phase>
-                <goals><goal>aggregate</goal></goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+    <profile>
+      <id>settings-collision</id>
+      <activation>
+        <property>
+          <name>neverActivated</name>
+        </property>
+      </activation>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.its.mng13763</groupId>
+            <artifactId>aggregator-probe-maven-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>aggregate</id>
+                <goals>
+                  <goal>aggregate</goal>
+                </goals>
               </execution>
             </executions>
           </plugin>

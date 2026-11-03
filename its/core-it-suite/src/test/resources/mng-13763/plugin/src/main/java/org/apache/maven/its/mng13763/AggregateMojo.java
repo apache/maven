@@ -23,11 +23,15 @@ import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.jar.JarOutputStream;
 
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
+import org.apache.maven.plugins.annotations.Component;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
+import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.MavenProjectHelper;
 
 @Mojo(name = "aggregate", aggregator = true)
 public class AggregateMojo extends AbstractMojo {
@@ -40,24 +44,50 @@ public class AggregateMojo extends AbstractMojo {
     @Parameter(property = "requireOwnTouch", defaultValue = "false")
     private boolean requireOwnTouch;
 
+    @Parameter
+    private String[] expectedAggregates;
+
+    @Parameter(defaultValue = "false")
+    private boolean attachArtifact;
+
+    @Parameter(defaultValue = "${project}", readonly = true, required = true)
+    private MavenProject project;
+
+    @Component
+    private MavenProjectHelper projectHelper;
+
     public void execute() throws MojoExecutionException {
         Path root = basedir.toPath();
         Path output = root.resolve("target/aggregate-observed.txt");
         boolean a = Files.exists(root.resolve("a/target/touched.txt"));
         boolean b = Files.exists(root.resolve("b/target/touched.txt"));
-        boolean aa = Files.exists(root.resolve(root.getFileName().toString().equals("a")
-                ? "aa/target/touched.txt"
-                : "a/aa/target/touched.txt"));
+        boolean aa = Files.exists(root.resolve(
+                root.getFileName().toString().equals("a") ? "aa/target/touched.txt" : "a/aa/target/touched.txt"));
         if (requireOwnTouch && !Files.exists(root.resolve("target/touched.txt"))) {
             throw new MojoExecutionException("The module's package goal has not completed");
         }
-        if (expectChildAggregator && root.getFileName().toString().equals("reactor")
+        if (expectChildAggregator
+                && root.getFileName().toString().equals("reactor")
                 && !Files.exists(root.resolve("a/target/aggregate-observed.txt"))) {
             throw new MojoExecutionException("Child aggregator has not completed");
         }
         try {
+            if (expectedAggregates != null) {
+                for (String expected : expectedAggregates) {
+                    if (!Files.exists(root.resolve(expected))) {
+                        throw new MojoExecutionException("Missing subproject aggregate: " + expected);
+                    }
+                }
+            }
             Files.createDirectories(output.getParent());
             Files.write(output, ("a=" + a + " b=" + b + " aa=" + aa).getBytes(StandardCharsets.UTF_8));
+            if (attachArtifact) {
+                File artifact = root.resolve("target/aggregate.jar").toFile();
+                try (JarOutputStream jar = new JarOutputStream(Files.newOutputStream(artifact.toPath()))) {
+                    jar.finish();
+                }
+                projectHelper.attachArtifact(project, "jar", "aggregate", artifact);
+            }
         } catch (IOException e) {
             throw new MojoExecutionException("Could not write " + output, e);
         }
