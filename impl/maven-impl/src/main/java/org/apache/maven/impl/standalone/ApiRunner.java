@@ -68,6 +68,7 @@ import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.settings.Mirror;
 import org.apache.maven.api.settings.Proxy;
+import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.spi.TypeProvider;
@@ -82,6 +83,7 @@ import org.apache.maven.impl.MavenRepositoryListener;
 import org.apache.maven.impl.di.SessionScope;
 import org.apache.maven.impl.model.DefaultInterpolator;
 import org.apache.maven.impl.resolver.MavenSessionBuilderSupplier;
+import org.apache.maven.impl.resolver.OriginBoundAuthenticationSelector;
 import org.apache.maven.impl.resolver.scopes.Maven4ScopeManagerConfiguration;
 import org.codehaus.plexus.components.secdispatcher.Cipher;
 import org.codehaus.plexus.components.secdispatcher.Dispatcher;
@@ -97,12 +99,14 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.internal.impl.scope.ScopeManagerImpl;
+import org.eclipse.aether.repository.AuthenticationSelector;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.LocalRepositoryManager;
 import org.eclipse.aether.util.repository.AuthenticationBuilder;
 import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.eclipse.aether.util.repository.DefaultMirrorSelector;
 import org.eclipse.aether.util.repository.DefaultProxySelector;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides functionality for running Maven API in a standalone mode.
@@ -642,16 +646,6 @@ public class ApiRunner {
         }
         rsession.setMirrorSelector(mirrorSelector);
 
-        // Apply server authentication from settings
-        DefaultAuthenticationSelector authSelector = new DefaultAuthenticationSelector();
-        for (Server server : settings.getServers()) {
-            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
-            authBuilder.addUsername(server.getUsername()).addPassword(server.getPassword());
-            authBuilder.addPrivateKey(server.getPrivateKey(), server.getPassphrase());
-            authSelector.add(server.getId(), authBuilder.build());
-        }
-        rsession.setAuthenticationSelector(authSelector);
-
         // Build repositories from active profiles in settings
         SettingsBuilder settingsBuilder = session.getService(SettingsBuilder.class);
         Profile profile = settingsBuilder.convert(org.apache.maven.api.settings.Profile.newBuilder()
@@ -662,9 +656,50 @@ public class ApiRunner {
         List<RemoteRepository> repositories = profile.getRepositories().stream()
                 .map(repositoryFactory::createRemote)
                 .toList();
+
+        rsession.setAuthenticationSelector(authenticationSelector(settings, properties, userProperties));
         InternalSession s = (InternalSession) session.withRemoteRepositories(repositories);
         InternalSession.associate(rsession, s);
         return s;
+    }
+
+    /**
+     * Server credentials from settings, scoped to the origins the operator declared for each id (mirrors, settings
+     * repositories and {@code <server><repositoryOrigins>}), as the Maven CLI does; see
+     * {@link OriginBoundAuthenticationSelector#CREDENTIAL_SCOPE}.
+     */
+    private static AuthenticationSelector authenticationSelector(
+            Settings settings, Map<String, String> properties, Map<String, String> userProperties) {
+        Map<String, Set<String>> declaredRepositoryOrigins = new HashMap<>();
+        for (Mirror mirror : settings.getMirrors()) {
+            OriginBoundAuthenticationSelector.addOrigin(declaredRepositoryOrigins, mirror.getId(), mirror.getUrl());
+        }
+        for (Repository repository : settings.getRepositories()) {
+            OriginBoundAuthenticationSelector.addOrigin(
+                    declaredRepositoryOrigins, repository.getId(), repository.getUrl());
+        }
+        for (Repository repository : settings.getPluginRepositories()) {
+            OriginBoundAuthenticationSelector.addOrigin(
+                    declaredRepositoryOrigins, repository.getId(), repository.getUrl());
+        }
+        DefaultAuthenticationSelector authSelector = new DefaultAuthenticationSelector();
+        for (Server server : settings.getServers()) {
+            AuthenticationBuilder authBuilder = new AuthenticationBuilder();
+            authBuilder.addUsername(server.getUsername()).addPassword(server.getPassword());
+            authBuilder.addPrivateKey(server.getPrivateKey(), server.getPassphrase());
+            authSelector.add(server.getId(), authBuilder.build());
+            for (String repositoryOrigin : server.getRepositoryOrigins()) {
+                OriginBoundAuthenticationSelector.addOrigin(
+                        declaredRepositoryOrigins, server.getId(), repositoryOrigin);
+            }
+        }
+        String credentialScope = userProperties.getOrDefault(
+                OriginBoundAuthenticationSelector.CREDENTIAL_SCOPE,
+                properties.getOrDefault(
+                        OriginBoundAuthenticationSelector.CREDENTIAL_SCOPE,
+                        OriginBoundAuthenticationSelector.SCOPE_ORIGIN));
+        return OriginBoundAuthenticationSelector.wrap(
+                authSelector, credentialScope, declaredRepositoryOrigins, LoggerFactory.getLogger(ApiRunner.class));
     }
 
     /**

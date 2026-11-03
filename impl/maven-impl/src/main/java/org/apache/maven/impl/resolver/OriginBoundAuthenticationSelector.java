@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.aether;
+package org.apache.maven.impl.resolver;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -44,25 +44,34 @@ import static java.util.Objects.requireNonNull;
  * previous behaviour unless {@code strict} scope is requested, and a warning naming the target origin
  * is emitted once per id/origin pair.
  *
- * @see DefaultRepositorySystemSessionFactory#MAVEN_REPOSITORY_CREDENTIAL_SCOPE
+ * <p>
+ * Used by the Maven CLI session factory and by the standalone API runner, so both scope credentials the same way.
+ *
+ * @see #CREDENTIAL_SCOPE
  */
-class OriginBoundAuthenticationSelector implements AuthenticationSelector {
+public final class OriginBoundAuthenticationSelector implements AuthenticationSelector {
+    /**
+     * User or system property selecting the credential scope: {@value #SCOPE_ORIGIN} (default),
+     * {@value #SCOPE_STRICT} or {@value #SCOPE_ID}.
+     */
+    public static final String CREDENTIAL_SCOPE = "maven.repository.credentialScope";
+
     /**
      * Credentials are bound to operator-declared origins; ids without a declared origin keep legacy
      * behavior, with a warning.
      */
-    static final String SCOPE_ORIGIN = "origin";
+    public static final String SCOPE_ORIGIN = "origin";
 
     /**
      * Credentials are bound to operator-declared origins; ids without a declared origin get no
      * credentials.
      */
-    static final String SCOPE_STRICT = "strict";
+    public static final String SCOPE_STRICT = "strict";
 
     /**
      * Legacy behavior: credentials are matched by server id only.
      */
-    static final String SCOPE_ID = "id";
+    public static final String SCOPE_ID = "id";
 
     private final AuthenticationSelector delegate;
 
@@ -91,7 +100,7 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
      * @param logger logger used to report id/origin mismatches
      * @return the delegate itself for {@link #SCOPE_ID}, an origin-bound wrapper otherwise
      */
-    static AuthenticationSelector wrap(
+    public static AuthenticationSelector wrap(
             AuthenticationSelector delegate,
             String credentialScope,
             Map<String, Set<String>> declaredOrigins,
@@ -103,7 +112,7 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
                     delegate, declaredOrigins, SCOPE_STRICT.equals(credentialScope), logger);
         } else {
             throw new IllegalArgumentException("Unknown value '" + credentialScope + "' for "
-                    + DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE
+                    + CREDENTIAL_SCOPE
                     + ". Supported values are: " + SCOPE_ORIGIN + ", " + SCOPE_STRICT + ", " + SCOPE_ID);
         }
     }
@@ -112,7 +121,7 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
      * Records the origin of an operator-declared repository or mirror for the given id. URLs without a
      * parseable server authority (for example {@code file:} URLs) are ignored.
      */
-    static void addOrigin(Map<String, Set<String>> declaredOrigins, String id, String url) {
+    public static void addOrigin(Map<String, Set<String>> declaredOrigins, String id, String url) {
         String origin = originOf(url);
         if (id != null && origin != null) {
             declaredOrigins.computeIfAbsent(id, k -> new HashSet<>()).add(origin);
@@ -140,7 +149,7 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
                             + ". Add " + originHint(origin)
                             + " to <repositoryOrigins> of that server in settings if these credentials belong"
                             + " there, or set "
-                            + DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE + "="
+                            + CREDENTIAL_SCOPE + "="
                             + SCOPE_ID + " to restore legacy id-only credential matching.");
             return null;
         }
@@ -151,7 +160,7 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
                     "Not using credentials of server '" + id + "' for repository " + repository.getUrl()
                             + ": no repository or mirror with this id is declared in settings or on the command"
                             + " line and the server declares no <repositoryOrigins>, and "
-                            + DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE
+                            + CREDENTIAL_SCOPE
                             + "=" + SCOPE_STRICT + " is in effect. Declare " + originHint(origin)
                             + " in <repositoryOrigins> of that server in settings to allow it.");
             return null;
@@ -165,7 +174,7 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
                         + originHint(origin)
                         + " in <repositoryOrigins> of that server in settings to bind these credentials"
                         + " explicitly, or set "
-                        + DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE
+                        + CREDENTIAL_SCOPE
                         + "=" + SCOPE_STRICT + " to refuse such credential use.");
         return auth;
     }
@@ -184,7 +193,7 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
      * Returns the normalized origin ({@code protocol://host[:port]}, lower-cased, default http/https
      * ports elided) of the given URL, or {@code null} if the URL has no parseable server authority.
      */
-    static String originOf(String url) {
+    public static String originOf(String url) {
         if (url == null) {
             return null;
         }

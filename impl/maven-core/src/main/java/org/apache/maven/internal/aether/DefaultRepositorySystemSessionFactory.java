@@ -42,6 +42,7 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.MavenRepositoryListener;
 import org.apache.maven.impl.resolver.MavenSessionBuilderSupplier;
+import org.apache.maven.impl.resolver.OriginBoundAuthenticationSelector;
 import org.apache.maven.impl.resolver.type.TypeRegistryAdapter;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.ModelBase;
@@ -122,7 +123,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
      *
      * @since 4.0.0
      */
-    public static final String MAVEN_REPOSITORY_CREDENTIAL_SCOPE = "maven.repository.credentialScope";
+    public static final String MAVEN_REPOSITORY_CREDENTIAL_SCOPE = OriginBoundAuthenticationSelector.CREDENTIAL_SCOPE;
 
     private static final String WAGON_TRANSPORTER_PRIORITY_KEY = "aether.priority.WagonTransporterFactory";
 
