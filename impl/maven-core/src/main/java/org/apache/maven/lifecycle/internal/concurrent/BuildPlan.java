@@ -69,6 +69,10 @@ public class BuildPlan {
 
     public void addStep(MavenProject project, String name, BuildStep step) {
         plan.get(project).put(name, step);
+        invalidateOrdering();
+    }
+
+    void invalidateOrdering() {
         sortedNodes = null;
     }
 

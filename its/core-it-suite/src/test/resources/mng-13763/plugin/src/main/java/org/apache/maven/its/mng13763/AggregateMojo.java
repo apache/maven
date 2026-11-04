@@ -28,12 +28,13 @@ import java.util.jar.JarOutputStream;
 import org.apache.maven.plugin.AbstractMojo;
 import org.apache.maven.plugin.MojoExecutionException;
 import org.apache.maven.plugins.annotations.Component;
+import org.apache.maven.plugins.annotations.LifecyclePhase;
 import org.apache.maven.plugins.annotations.Mojo;
 import org.apache.maven.plugins.annotations.Parameter;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.MavenProjectHelper;
 
-@Mojo(name = "aggregate", aggregator = true)
+@Mojo(name = "aggregate", aggregator = true, defaultPhase = LifecyclePhase.PACKAGE)
 public class AggregateMojo extends AbstractMojo {
     @Parameter(defaultValue = "${project.basedir}", readonly = true, required = true)
     private File basedir;
@@ -50,6 +51,9 @@ public class AggregateMojo extends AbstractMojo {
     @Parameter(defaultValue = "false")
     private boolean attachArtifact;
 
+    @Parameter(defaultValue = "aggregate-observed.txt")
+    private String markerName;
+
     @Parameter(defaultValue = "${project}", readonly = true, required = true)
     private MavenProject project;
 
@@ -58,7 +62,7 @@ public class AggregateMojo extends AbstractMojo {
 
     public void execute() throws MojoExecutionException {
         Path root = basedir.toPath();
-        Path output = root.resolve("target/aggregate-observed.txt");
+        Path output = root.resolve("target").resolve(markerName);
         boolean a = Files.exists(root.resolve("a/target/touched.txt"));
         boolean b = Files.exists(root.resolve("b/target/touched.txt"));
         boolean aa = Files.exists(root.resolve(

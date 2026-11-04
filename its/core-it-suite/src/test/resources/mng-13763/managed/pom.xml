@@ -35,6 +35,12 @@ under the License.
           <artifactId>aggregator-probe-maven-plugin</artifactId>
           <version>1.0-SNAPSHOT</version>
           <executions>
+            <!-- Ordinary phase work must precede the aggregator in the configured order. -->
+            <execution>
+              <id>touch</id>
+              <phase>package</phase>
+              <goals><goal>touch</goal></goals>
+            </execution>
             <execution>
               <id>aggregate</id>
               <goals>

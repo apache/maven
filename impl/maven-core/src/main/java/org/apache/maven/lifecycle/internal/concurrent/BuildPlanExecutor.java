@@ -25,9 +25,11 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -205,6 +207,8 @@ public class BuildPlanExecutor {
         final ReadWriteLock lock = new ReentrantReadWriteLock();
         final int threads;
         BuildPlan plan;
+        final Map<BuildStep, BuildStep> aggregationEnds = new HashMap<>();
+        final Map<MavenProject, MavenProject> reactorProjects = new HashMap<>();
 
         BuildContext(MavenSession session, ReactorContext reactorContext, List<TaskSegment> taskSegments) {
             this.session = session;
@@ -423,7 +427,10 @@ public class BuildPlanExecutor {
             } else {
                 // For regular steps:
                 // Don't run for halted builds, blacklisted projects, or if predecessors failed
-                shouldExecute = !status.isHalted() && !status.isBlackListed(step.project) && allPredecessorsExecuted;
+                shouldExecute = !status.isHalted()
+                        && !status.isBlackListed(step.project)
+                        && allPredecessorsExecuted
+                        && (!step.name.startsWith("$aggregator:") || aggregationWorkSucceeded(step));
             }
 
             // 2. Either schedule the step or mark it as skipped based on the decision
@@ -473,6 +480,16 @@ public class BuildPlanExecutor {
                 // Recursively call executePlan to process steps that depend on this one
                 executePlan();
             }
+        }
+
+        private boolean aggregationWorkSucceeded(BuildStep step) {
+            // Cleanup steps may finish successfully after nested work failed or was skipped.
+            // They are not proof that the work required by an aggregator completed.
+            return step.allPredecessors()
+                    .filter(predecessor -> predecessor != step)
+                    .allMatch(predecessor -> predecessor.exception == null
+                            && predecessor.status.get() != FAILED
+                            && (!predecessor.hasExecutions() || predecessor.status.get() == EXECUTED));
         }
 
         private void executePlan() {
@@ -622,6 +639,9 @@ public class BuildPlanExecutor {
         private void plan() {
             lock.writeLock().lock();
             try {
+                if (reactorProjects.isEmpty()) {
+                    plan.getAllProjects().keySet().forEach(project -> reactorProjects.put(project, project));
+                }
                 Set<BuildStep> planSteps = plan.allSteps()
                         .filter(step -> PLAN.equals(step.name))
                         .filter(step -> step.predecessors.stream().allMatch(s -> s.status.get() == EXECUTED))
@@ -645,46 +665,12 @@ public class BuildPlanExecutor {
                                 plan.step(project, resolvedPhase).ifPresent(n -> {
                                     MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());
                                     mojoExecution.setLifecyclePhase(phase);
-                                    BuildStep target = n;
-                                    if (mojoDescriptor.isAggregator()
-                                            && !resolvedPhase.startsWith(BEFORE)
-                                            && !resolvedPhase.startsWith(AFTER)) {
-                                        // Only suppress inherited copies when their declaring ancestor is
-                                        // part of the reactor; partial builds still run the selected goal.
-                                        if (inheritedFromReactorAncestor(
-                                                project, plugin, execution, goal, resolvedPhase)) {
-                                            return;
-                                        }
-                                        // An aggregator needs a normal step: after:* steps also run for
-                                        // failure cleanup, even if a child failed.
-                                        if (!n.skip.get()) {
-                                            String name = "$aggregator:" + resolvedPhase;
-                                            target = plan.step(project, name).orElseGet(() -> {
-                                                BuildStep aggregator = new BuildStep(name, project, n.phase);
-                                                BuildStep phaseEnd = plan.requiredStep(project, AFTER + resolvedPhase);
-                                                aggregator.executeAfter(phaseEnd);
-                                                if (project.getCollectedProjects() != null) {
-                                                    for (MavenProject child : project.getCollectedProjects()) {
-                                                        plan.step(child, AFTER + resolvedPhase)
-                                                                .ifPresent(aggregator::executeAfter);
-                                                    }
-                                                }
-                                                plan.requiredStep(project, TEARDOWN)
-                                                        .executeAfter(aggregator);
-                                                plan.addStep(project, name, aggregator);
-                                                return aggregator;
-                                            });
-                                        }
+                                    if (requiresAggregation(n, mojoExecution)
+                                            && inheritedFromReactorAncestor(
+                                                    project, plugin, execution, goal, resolvedPhase)) {
+                                        return;
                                     }
-                                    target.addMojo(mojoExecution, execution.getPriority());
-                                    BuildStep executionStep = target;
-                                    if (mojoDescriptor.getDependencyCollectionRequired() != null
-                                            || mojoDescriptor.getDependencyResolutionRequired() != null) {
-                                        for (MavenProject p :
-                                                plan.getAllProjects().get(project)) {
-                                            plan.step(p, AFTER + PACKAGE).ifPresent(executionStep::executeAfter);
-                                        }
-                                    }
+                                    n.addMojo(mojoExecution, execution.getPriority());
                                     // Apply @After annotation ordering constraints from the mojo descriptor
                                     applyAfterLinks(mojoDescriptor, project, resolvedPhase);
                                 });
@@ -693,6 +679,21 @@ public class BuildPlanExecutor {
                     }
                 }
 
+                for (BuildStep step : planSteps) {
+                    splitAggregatorSteps(step.project);
+                    plan.steps(step.project)
+                            .filter(executionStep -> executionStep.phase != null)
+                            .forEach(executionStep -> executionStep.executions().forEach(execution -> {
+                                MojoDescriptor descriptor = execution.getMojoDescriptor();
+                                if (descriptor.getDependencyCollectionRequired() != null
+                                        || descriptor.getDependencyResolutionRequired() != null) {
+                                    for (MavenProject upstream :
+                                            plan.getAllProjects().get(step.project)) {
+                                        plan.step(upstream, AFTER + PACKAGE).ifPresent(executionStep::executeAfter);
+                                    }
+                                }
+                            }));
+                }
                 linkAggregatorSteps();
 
                 BuildPlan buildPlan = plan;
@@ -716,22 +717,102 @@ public class BuildPlanExecutor {
             }
         }
 
-        void linkAggregatorSteps() {
-            // Planning can be deferred for reactor plugins. Revisit completion links after
-            // each planning pass so newly planned consumers and aggregators are included.
-            for (BuildStep aggregator : plan.allSteps()
-                    .filter(step -> step.name.startsWith("$aggregator:"))
+        private boolean requiresAggregation(BuildStep step, MojoExecution execution) {
+            // Legacy phases such as prepare-package resolve to hooks, but retain ordinary
+            // lifecycle aggregation semantics. Explicit native hooks keep their own semantics.
+            return step.phase != null
+                    && execution.getLifecyclePhase() != null
+                    && execution.getMojoDescriptor().isAggregator()
+                    && (!(step.name.startsWith(BEFORE) || step.name.startsWith(AFTER))
+                            || !step.name.equals(execution.getLifecyclePhase()));
+        }
+
+        private void splitAggregatorSteps(MavenProject project) {
+            for (BuildStep step : plan.steps(project)
+                    .filter(s -> !s.name.startsWith("$aggregator:"))
+                    .filter(s -> !s.skip.get())
+                    .filter(s -> s.executions().anyMatch(execution -> requiresAggregation(s, execution)))
                     .toList()) {
-                BuildStep phaseEnd = plan.requiredStep(aggregator.project, AFTER + aggregator.phase.name());
-                List<MavenProject> children = aggregator.project.getCollectedProjects();
-                for (BuildStep successor : List.copyOf(phaseEnd.successors)) {
-                    // Collected projects may need the parent's ordinary phase outputs in
-                    // order to build the very outputs that its aggregator consumes.
-                    if (successor != aggregator && (children == null || !children.contains(successor.project))) {
-                        successor.executeAfter(aggregator);
+                var executions = step.mojos.entrySet().stream()
+                        .flatMap(entry -> entry.getValue().values().stream()
+                                .map(execution -> Map.entry(entry.getKey(), execution)))
+                        .toList();
+                step.mojos.clear();
+                String endName =
+                        step.name.startsWith(BEFORE) || step.name.startsWith(AFTER) ? step.name : AFTER + step.name;
+                BuildStep phaseEnd = plan.requiredStep(project, endName);
+                BuildStep target = step;
+                int segment = 0;
+                for (var entry : executions) {
+                    MojoExecution execution = entry.getValue();
+                    if (requiresAggregation(step, execution)) {
+                        String name = "$aggregator:" + step.name + ":" + segment++;
+                        BuildStep aggregate = new BuildStep(name, project, step.phase);
+                        aggregate.executeAfter(target);
+                        aggregate.executeAfter(phaseEnd);
+                        if (project.getCollectedProjects() != null) {
+                            for (MavenProject child : project.getCollectedProjects()) {
+                                plan.step(child, endName).ifPresent(aggregate::executeAfter);
+                            }
+                        }
+                        plan.requiredStep(project, TEARDOWN).executeAfter(aggregate);
+                        plan.addStep(project, name, aggregate);
+                        aggregationEnds.put(aggregate, phaseEnd);
+                        target = aggregate;
                     }
+                    target.addMojo(execution, entry.getKey());
                 }
             }
+        }
+
+        void linkAggregatorSteps() {
+            // Resolve nested aggregation before downstream barriers, independent of planning order.
+            Map<BuildStep, BuildStep> ends = new LinkedHashMap<>();
+            Map<MavenProject, List<BuildStep>> byProject = new HashMap<>();
+            plan.allSteps().filter(step -> step.name.startsWith("$aggregator:")).forEach(aggregate -> {
+                BuildStep end = aggregationEnds.getOrDefault(
+                        aggregate, plan.requiredStep(aggregate.project, AFTER + aggregate.phase.name()));
+                ends.put(aggregate, end);
+                byProject
+                        .computeIfAbsent(aggregate.project, p -> new ArrayList<>())
+                        .add(aggregate);
+            });
+            ends.forEach((aggregate, end) -> {
+                Set<BuildStep> prerequisites = aggregate.allPredecessors().collect(Collectors.toSet());
+                if (aggregate.project.getCollectedProjects() != null) {
+                    for (MavenProject child : aggregate.project.getCollectedProjects()) {
+                        for (BuildStep childAggregate : byProject.getOrDefault(child, List.of())) {
+                            if (!prerequisites.contains(ends.get(childAggregate))) {
+                                continue;
+                            }
+                            if (childAggregate.isSuccessorOf(aggregate)) {
+                                throw new IllegalStateException(
+                                        "Cyclic aggregation ordering between " + aggregate + " and " + childAggregate);
+                            }
+                            aggregate.executeAfter(childAggregate);
+                        }
+                    }
+                }
+            });
+            ends.forEach((aggregate, end) -> {
+                Set<BuildStep> prerequisites = aggregate.allPredecessors().collect(Collectors.toSet());
+                Set<BuildStep> visited = new HashSet<>();
+                var successors = new ArrayDeque<>(List.copyOf(end.successors));
+                while (!successors.isEmpty()) {
+                    BuildStep successor = successors.removeFirst();
+                    if (successor == aggregate || !visited.add(successor)) {
+                        continue;
+                    }
+                    if (prerequisites.contains(successor)) {
+                        // Ordinary parent outputs may be needed to build aggregate inputs.
+                        // Continue beyond that readiness point instead of losing the barrier.
+                        successors.addAll(List.copyOf(successor.successors));
+                    } else {
+                        successor.executeAfter(aggregate);
+                    }
+                }
+            });
+            plan.invalidateOrdering();
         }
 
         private boolean inheritedFromReactorAncestor(
@@ -740,28 +821,47 @@ public class BuildPlanExecutor {
                 return false;
             }
             for (MavenProject parent = project.getParent(); parent != null; parent = parent.getParent()) {
-                for (Plugin parentPlugin : parent.getBuild().getPlugins()) {
+                MavenProject reactorParent = reactorProjects.get(parent);
+                MavenProject ancestor = reactorParent != null ? reactorParent : parent;
+                for (Plugin parentPlugin : ancestor.getBuild().getPlugins()) {
                     if (!parentPlugin.getKey().equals(plugin.getKey())) {
                         continue;
                     }
-                    if (!parentPlugin.isInherited()) {
-                        return false;
-                    }
+                    boolean matchingExecution = false;
                     for (PluginExecution parentExecution : parentPlugin.getExecutions()) {
                         if (!parentExecution.getId().equals(execution.getId())) {
                             continue;
                         }
-                        if (!parentExecution.isInherited()) {
+                        matchingExecution = true;
+                        boolean inherited = parentExecution.getInherited() != null
+                                ? parentExecution.isInherited()
+                                : parentPlugin.isInherited();
+                        if (!inherited || !Objects.equals(parentPlugin.getVersion(), plugin.getVersion())) {
                             return false;
                         }
                         if (parentExecution.getGoals().contains(goal)
-                                && Objects.equals(parentExecution.getPhase(), execution.getPhase())
-                                && plan.getAllProjects().containsKey(parent)
-                                && plan.step(parent, phase)
-                                        .filter(step -> !step.skip.get())
-                                        .isPresent()) {
-                            return true;
+                                && reactorParent != null
+                                && reactorParent.getCollectedProjects() != null
+                                && reactorParent.getCollectedProjects().contains(project)) {
+                            MojoDescriptor descriptor = getMojoDescriptor(reactorParent, parentPlugin, goal);
+                            String parentPhase = parentExecution.getPhase() != null
+                                    ? parentExecution.getPhase()
+                                    : descriptor.getPhase();
+                            String resolved = plan.aliases().getOrDefault(parentPhase, parentPhase);
+                            if (resolved != null && resolved.startsWith(AT)) {
+                                resolved = resolved.substring(AT.length());
+                            }
+                            if (descriptor.isAggregator()
+                                    && Objects.equals(resolved, phase)
+                                    && plan.step(reactorParent, phase)
+                                            .filter(step -> !step.skip.get())
+                                            .isPresent()) {
+                                return true;
+                            }
                         }
+                    }
+                    if (!matchingExecution && !parentPlugin.isInherited()) {
+                        return false;
                     }
                 }
             }

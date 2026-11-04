@@ -131,6 +131,121 @@ class BuildPlanExecutorTest {
         assertTrue(consumerCompile.isSuccessorOf(aggregate));
     }
 
+    @Test
+    void transitiveConsumerWaitsForAggregate() {
+        MavenProject root = newProject();
+        MavenProject child = newProject();
+        child.setArtifactId("child");
+        MavenProject consumer = newProject();
+        consumer.setArtifactId("consumer");
+        root.setCollectedProjects(List.of(child));
+        BuildPlanExecutor.BuildContext context = newExecutor((BeforeProjectExecution) event -> {}).new BuildContext();
+        context.plan = new BuildPlan(Map.of(root, List.of(), child, List.of(root), consumer, List.of(root, child)));
+        for (MavenProject project : List.of(root, child, consumer)) {
+            context.plan.addProject(project, new HashMap<>());
+        }
+        BuildStep end = addStep(context.plan, root, "after:package");
+        BuildStep childEnd = addStep(context.plan, child, "after:package");
+        BuildStep aggregate = addStep(context.plan, root, "$aggregator:package");
+        BuildStep consume = addStep(context.plan, consumer, "compile");
+        childEnd.executeAfter(end);
+        aggregate.executeAfter(childEnd);
+        consume.executeAfter(childEnd);
+        consume.executeAfter(end); // Elided because it is already reachable through childEnd.
+
+        context.linkAggregatorSteps();
+
+        assertTrue(consume.isSuccessorOf(aggregate));
+        assertFalse(childEnd.isSuccessorOf(aggregate));
+    }
+
+    @Test
+    void laterPhaseWaitsForAggregateWhenReadinessCannot() {
+        MavenProject root = newProject();
+        MavenProject child = newProject();
+        child.setArtifactId("child");
+        root.setCollectedProjects(List.of(child));
+        BuildPlanExecutor.BuildContext context = newExecutor((BeforeProjectExecution) event -> {}).new BuildContext();
+        context.plan = new BuildPlan(Map.of(root, List.of(), child, List.of(root)));
+        context.plan.addProject(root, new HashMap<>());
+        context.plan.addProject(child, new HashMap<>());
+        BuildStep end = addStep(context.plan, root, "after:package");
+        BuildStep ready = addStep(context.plan, root, "ready");
+        BuildStep childEnd = addStep(context.plan, child, "after:package");
+        BuildStep aggregate = addStep(context.plan, root, "$aggregator:package");
+        BuildStep laterPhase = addStep(context.plan, root, "install");
+        ready.executeAfter(end);
+        childEnd.executeAfter(ready);
+        aggregate.executeAfter(childEnd);
+        laterPhase.executeAfter(ready);
+
+        context.linkAggregatorSteps();
+        context.linkAggregatorSteps();
+
+        assertFalse(ready.isSuccessorOf(aggregate));
+        assertTrue(laterPhase.isSuccessorOf(aggregate));
+        assertFalse(aggregate.isSuccessorOf(laterPhase));
+    }
+
+    @Test
+    void nestedAggregationPrecedesAncestorRegardlessOfPlanningOrder() {
+        for (boolean deferred : List.of(false, true)) {
+            MavenProject root = newProject();
+            MavenProject child = newProject();
+            child.setArtifactId("child");
+            root.setCollectedProjects(List.of(child));
+            BuildPlanExecutor.BuildContext context =
+                    newExecutor((BeforeProjectExecution) event -> {}).new BuildContext();
+            context.plan = new BuildPlan(Map.of(root, List.of(), child, List.of(root)));
+            context.plan.addProject(root, new HashMap<>());
+            context.plan.addProject(child, new HashMap<>());
+            BuildStep end = addStep(context.plan, root, "after:package");
+            BuildStep childEnd = addStep(context.plan, child, "after:package");
+            childEnd.executeAfter(end);
+            BuildStep aggregate = addStep(context.plan, root, "$aggregator:package");
+            aggregate.executeAfter(childEnd);
+            if (deferred) {
+                context.linkAggregatorSteps();
+            }
+            BuildStep childAggregate = addStep(context.plan, child, "$aggregator:package");
+            childAggregate.executeAfter(childEnd);
+
+            context.linkAggregatorSteps();
+            context.linkAggregatorSteps();
+
+            assertTrue(aggregate.isSuccessorOf(childAggregate));
+            assertFalse(childAggregate.isSuccessorOf(aggregate));
+        }
+    }
+
+    @Test
+    void earlierChildAggregationPrecedesAncestorBarrier() {
+        MavenProject root = newProject();
+        MavenProject child = newProject();
+        child.setArtifactId("child");
+        root.setCollectedProjects(List.of(child));
+        BuildPlanExecutor.BuildContext context = newExecutor((BeforeProjectExecution) event -> {}).new BuildContext();
+        context.plan = new BuildPlan(Map.of(root, List.of(), child, List.of(root)));
+        context.plan.addProject(root, new HashMap<>());
+        context.plan.addProject(child, new HashMap<>());
+        BuildStep end = addStep(context.plan, root, "after:package");
+        BuildStep childBefore = addStep(context.plan, child, "before:package");
+        BuildStep childEnd = addStep(context.plan, child, "after:package");
+        childBefore.executeAfter(end);
+        childEnd.executeAfter(childBefore);
+        BuildStep aggregate = addStep(context.plan, root, "$aggregator:package");
+        aggregate.executeAfter(childEnd);
+        BuildStep childAggregate = addStep(context.plan, child, "$aggregator:before:package:0");
+        childAggregate.executeAfter(childBefore);
+        context.aggregationEnds.put(childAggregate, childBefore);
+
+        context.linkAggregatorSteps();
+
+        assertTrue(aggregate.isSuccessorOf(childAggregate));
+        assertTrue(childEnd.isSuccessorOf(childAggregate));
+        assertFalse(childAggregate.isSuccessorOf(aggregate));
+    }
+
     private BuildStep addStep(BuildPlan plan, MavenProject project, String name) {
         Lifecycle.Phase phase = new DefaultLifecycleRegistry(Collections.emptyList())
                 .lookup("default")
