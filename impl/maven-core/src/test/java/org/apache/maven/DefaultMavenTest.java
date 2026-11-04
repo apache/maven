@@ -42,9 +42,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
+
     @Singleton
     @Named("WsrClassCatcher")
     private static final class WsrClassCatcher extends AbstractMavenLifecycleParticipant {
+
         private final AtomicReference<Class<?>> wsrClassRef = new AtomicReference<>(null);
 
         @Override
@@ -65,14 +67,18 @@ class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     void testEnsureResolverSessionHasMavenWorkspaceReader() throws Exception {
         WsrClassCatcher wsrClassCatcher =
                 (WsrClassCatcher) getContainer().lookup(AbstractMavenLifecycleParticipant.class, "WsrClassCatcher");
+
         Maven maven = getContainer().lookup(Maven.class);
+
         MavenExecutionRequest request =
                 createMavenExecutionRequest(getProject("simple")).setGoals(asList("validate"));
 
         MavenExecutionResult result = maven.execute(request);
+
         assertNotNull(result);
 
         Class<?> wsrClass = wsrClassCatcher.wsrClassRef.get();
+
         assertNotNull(wsrClass, "wsr cannot be null");
         assertTrue(MavenWorkspaceReader.class.isAssignableFrom(wsrClass), String.valueOf(wsrClass));
     }
@@ -100,13 +106,20 @@ class DefaultMavenTest extends AbstractCoreMavenComponentTestCase {
     @Test
     void testMavenProjectNoDuplicateArtifacts() throws Exception {
         MavenProjectHelper mavenProjectHelper = getContainer().lookup(MavenProjectHelper.class);
+
         MavenProject mavenProject = new MavenProject();
+
         mavenProject.setArtifact(new DefaultArtifact("g", "a", "1.0", Artifact.SCOPE_TEST, "jar", "", null));
+
         File artifactFile = Files.createTempFile("foo", "tmp").toFile();
+
         try {
             mavenProjectHelper.attachArtifact(mavenProject, "java-source", artifactFile);
+
             assertEquals(1, mavenProject.getAttachedArtifacts().size());
+
             mavenProjectHelper.attachArtifact(mavenProject, "java-source", artifactFile);
+
             assertEquals(1, mavenProject.getAttachedArtifacts().size());
         } finally {
             Files.deleteIfExists(artifactFile.toPath());
