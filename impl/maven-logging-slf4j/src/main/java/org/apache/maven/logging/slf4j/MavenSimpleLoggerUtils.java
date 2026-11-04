@@ -27,7 +27,7 @@ import org.slf4j.spi.LocationAwareLogger;
 /**
  * Static helpers for converting SLF4J events to the Maven logging API.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 public final class MavenSimpleLoggerUtils {
 

@@ -33,7 +33,7 @@ import org.apache.maven.api.logging.LogLevel;
  * Message formatting is deferred to the {@link DefaultLogEvent} — the raw template
  * and arguments are passed through so that sinks can access structured data.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 final class DefaultLogEventBuilder implements LogEventBuilder {
 

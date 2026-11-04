@@ -45,7 +45,7 @@ import org.apache.maven.logging.impl.DefaultLoggerManager;
  * This handler has no SLF4J dependency — events go directly through
  * {@link LoggerManager#get()} for level checking and sink dispatch.
  *
- * @since 4.1.0
+ * @since 4.2.0
  * @see #install()
  */
 public class MavenJulHandler extends Handler {

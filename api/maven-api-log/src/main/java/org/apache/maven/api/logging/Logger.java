@@ -50,7 +50,7 @@ import org.apache.maven.api.annotations.Provider;
  * log.warn("Deprecated configuration key: {}", key, e);
  * }</pre>
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Provider
@@ -350,7 +350,7 @@ public interface Logger {
      *
      * @param clazz the class whose name is used as the logger name, never {@code null}
      * @return a {@code Logger} instance, never {@code null}
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     static Logger of(@Nonnull Class<?> clazz) {
@@ -366,7 +366,7 @@ public interface Logger {
      *
      * @param name the logger name, never {@code null}
      * @return a {@code Logger} instance, never {@code null}
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     static Logger of(@Nonnull String name) {

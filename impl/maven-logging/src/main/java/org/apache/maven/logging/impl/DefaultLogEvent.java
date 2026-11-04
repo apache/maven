@@ -31,7 +31,7 @@ import org.apache.maven.api.logging.LogLevel;
  * the formatted {@link #message()} is computed lazily on first access.
  * When constructed with a pre-formatted message, it is returned as-is.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 public final class DefaultLogEvent implements LogEvent {
 

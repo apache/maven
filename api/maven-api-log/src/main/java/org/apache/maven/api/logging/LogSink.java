@@ -34,7 +34,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * lifetime of the build. The sink is not DI-managed; it is set via a static
  * setter in the logging infrastructure.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Consumer

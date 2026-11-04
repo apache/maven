@@ -44,7 +44,7 @@ import org.apache.maven.api.logging.LoggerManager;
  * This class has no SLF4J dependency. The SLF4J adapter layer creates
  * an instance and registers it via {@link LoggerManager#set(LoggerManager)}.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 public class DefaultLoggerManager implements LoggerManager {
 

@@ -27,7 +27,7 @@ import org.apache.maven.api.logging.LogEventBuilder;
  * target level is disabled. All methods are no-ops and no objects are allocated
  * beyond the singleton reference itself.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 final class NopLogEventBuilder implements LogEventBuilder {
 

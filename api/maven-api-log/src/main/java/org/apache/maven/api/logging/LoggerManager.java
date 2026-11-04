@@ -36,7 +36,7 @@ import org.apache.maven.api.annotations.Provider;
  * {@link ServiceLoader}. If no provider is found, a no-op fallback is
  * installed. Embedders and tests can override with {@link #set(LoggerManager)}.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Provider

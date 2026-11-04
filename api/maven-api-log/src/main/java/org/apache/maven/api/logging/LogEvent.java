@@ -47,7 +47,7 @@ import org.apache.maven.api.annotations.Provider;
  * unformatted message template ({@link #messageTemplate()},
  * {@link #messageArgs()}) alongside the formatted {@link #message()}.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Immutable

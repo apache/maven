@@ -44,7 +44,7 @@ import static java.util.Objects.requireNonNull;
  * Level checks and sink lookup both go through the {@code LoggerManager},
  * so the sink can be changed at runtime.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @SuppressWarnings("deprecation")
 public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
