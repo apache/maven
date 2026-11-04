@@ -48,6 +48,7 @@ import java.util.function.UnaryOperator;
 /**
  * Enhancement of the standard <code>Properties</code>
  * managing the maintain of comments, etc.
+ * @since 4.2.0
  */
 public class MavenProperties extends AbstractMap<String, String> {
 

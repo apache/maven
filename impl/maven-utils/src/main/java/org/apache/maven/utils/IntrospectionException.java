@@ -20,6 +20,7 @@ package org.apache.maven.utils;
 
 /**
  * Indicates that an expression could not access a property of an object.
+ * @since 4.2.0
  */
 public class IntrospectionException extends Exception {
     private static final long serialVersionUID = 1L;

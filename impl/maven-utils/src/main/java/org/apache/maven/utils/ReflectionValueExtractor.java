@@ -36,6 +36,7 @@ import java.util.WeakHashMap;
  * In addition to usual getters using {@code getXxx} or {@code isXxx} suffixes, accessors
  * using {@code asXxx} or {@code toXxx} prefixes are also supported, as well as noun-based
  * accessors matching the property name exactly (e.g. {@code plugin()}, {@code descriptor()}).
+ * @since 4.2.0
  */
 public class ReflectionValueExtractor {
     private static final Object[] OBJECT_ARGS = new Object[0];

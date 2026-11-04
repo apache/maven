@@ -20,6 +20,7 @@ package org.apache.maven.utils;
 
 /**
  * Indicates a recursive property reference during string interpolation.
+ * @since 4.2.0
  */
 public class StringInterpolatorException extends IllegalArgumentException {
     private static final long serialVersionUID = 1L;

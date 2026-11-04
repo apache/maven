@@ -27,6 +27,7 @@ import java.util.function.UnaryOperator;
 
 /**
  * Performs property substitution without depending on Maven services.
+ * @since 4.2.0
  */
 public class StringInterpolator {
 

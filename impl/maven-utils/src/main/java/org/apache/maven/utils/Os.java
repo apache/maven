@@ -24,6 +24,7 @@ import java.util.stream.Stream;
 
 /**
  * OS support.
+ * @since 4.2.0
  */
 public class Os {
 

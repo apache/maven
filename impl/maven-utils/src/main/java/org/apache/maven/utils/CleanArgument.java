@@ -23,6 +23,7 @@ import java.util.List;
 
 /**
  * Cleans surrounding quotes from command-line arguments.
+ * @since 4.2.0
  */
 public final class CleanArgument {
     private CleanArgument() {}

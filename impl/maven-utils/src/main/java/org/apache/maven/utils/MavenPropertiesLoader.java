@@ -28,6 +28,7 @@ import java.util.function.UnaryOperator;
 
 /**
  * Loads properties files, resolves included files, and substitutes property values.
+ * @since 4.2.0
  */
 public class MavenPropertiesLoader {
 
