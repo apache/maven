@@ -27,6 +27,8 @@ import org.apache.maven.impl.DefaultMessageBuilder;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
+import org.junit.jupiter.api.parallel.Resources;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -387,5 +389,20 @@ class FileSizeFormatTest {
         builder = new StringBuilder();
         format.formatRate(builder, Double.POSITIVE_INFINITY);
         assertEquals("? B/s", builder.toString());
+    }
+
+    @Test
+    @ResourceLock(Resources.LOCALE)
+    void testFormatRateIgnoresDefaultLocale() {
+        FileSizeFormat format = new FileSizeFormat();
+        Locale previous = Locale.getDefault();
+        Locale.setDefault(Locale.GERMANY);
+        try {
+            MessageBuilder builder = new DefaultMessageBuilder();
+            format.formatRate(builder, 5500.0);
+            assertEquals("5.5 kB/s", builder.build());
+        } finally {
+            Locale.setDefault(previous);
+        }
     }
 }

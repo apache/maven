@@ -18,6 +18,8 @@
  */
 package org.apache.maven.cling.transfer;
 
+import java.util.Locale;
+
 import org.apache.maven.api.services.MessageBuilder;
 
 /**
@@ -167,7 +169,7 @@ public class FileSizeFormat {
 
         ScaleUnit unit = ScaleUnit.getScaleUnit(Math.round(rate));
         double scaledRate = rate / unit.bytes();
-        return String.format("%.1f", scaledRate) + " " + unit.symbol() + "/s";
+        return String.format(Locale.ROOT, "%.1f", scaledRate) + " " + unit.symbol() + "/s";
     }
 
     private void format(MessageBuilder builder, long size, ScaleUnit unit, boolean omitSymbol) {
