@@ -348,6 +348,36 @@ public class InjectorImplTest {
     }
 
     @Test
+    void duplicateNamedBindingsInMapReportBothOrigins() {
+        Injector injector = Injector.create()
+                .bindImplicit(DuplicateNamedBindings.FirstDispatcher.class)
+                .bindImplicit(DuplicateNamedBindings.SecondDispatcher.class);
+
+        DIException exception = assertThrows(
+                DIException.class,
+                () -> injector.getInstance(new Key<Map<String, DuplicateNamedBindings.Dispatcher>>() {}));
+
+        String message = exception.getMessage();
+        assertThat(message)
+                .contains("@Named(\"legacy\")")
+                .contains("FirstDispatcher")
+                .contains("SecondDispatcher")
+                .contains("FirstDispatcher()")
+                .contains("SecondDispatcher()");
+    }
+
+    static class DuplicateNamedBindings {
+
+        interface Dispatcher {}
+
+        @Named("legacy")
+        static class FirstDispatcher implements Dispatcher {}
+
+        @Named("legacy")
+        static class SecondDispatcher implements Dispatcher {}
+    }
+
+    @Test
     void testSingleton() {
         Injector injector = Injector.create()
                 .bindImplicit(SingletonContainer.Bean1.class)
