@@ -39,7 +39,7 @@ import org.apache.maven.api.settings.Settings;
  * supplied by a core extension cannot read the bootstrap settings needed to resolve that
  * extension. This SPI does not change settings file discovery or extension loading.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Consumer

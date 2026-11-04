@@ -30,7 +30,7 @@ import org.apache.maven.api.services.RequestTrace;
 /**
  * Describes an artifact or metadata operation performed against a repository.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Immutable

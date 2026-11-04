@@ -51,7 +51,7 @@ public interface Session extends ProtoSession {
      * and platform settings that were active when the session started.
      *
      * @return the build invocation, never {@code null}
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     default BuildInvocation buildInvocation() {
