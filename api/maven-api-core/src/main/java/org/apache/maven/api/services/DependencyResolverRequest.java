@@ -199,12 +199,10 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
     }
 
     /**
-     * Builds a request for the given dependency using the default runtime scope.
+     * Builds a project-context request for one dependency using {@link PathScope#MAIN_RUNTIME}.
+     * Use the scope-taking overload to select another scope.
      *
-     * @param session the session
-     * @param requestType the request type
-     * @param dependency the root dependency coordinates
-     * @return a new request, never {@code null}
+     * @since 4.2.0
      */
     @Nonnull
     static DependencyResolverRequest build(
@@ -212,6 +210,11 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
         return build(session, requestType, project, dependency, PathScope.MAIN_RUNTIME);
     }
 
+    /**
+     * Builds a project-context request for one dependency and path scope.
+     *
+     * @since 4.2.0
+     */
     @Nonnull
     static DependencyResolverRequest build(
             Session session,
@@ -231,6 +234,8 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
     /**
      * Builds a project-context request for dependencies using {@link PathScope#MAIN_RUNTIME}.
      * Use the scope-taking overload to select another scope.
+     *
+     * @since 4.2.0
      */
     @Nonnull
     static DependencyResolverRequest build(
@@ -238,6 +243,11 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
         return build(session, requestType, project, dependencies, PathScope.MAIN_RUNTIME);
     }
 
+    /**
+     * Builds a project-context request for dependencies and path scope.
+     *
+     * @since 4.2.0
+     */
     @Nonnull
     static DependencyResolverRequest build(
             Session session,
