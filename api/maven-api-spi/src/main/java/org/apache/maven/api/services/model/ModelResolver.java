@@ -77,6 +77,13 @@ public interface ModelResolver extends Service {
             @Nonnull AtomicReference<Dependency> modified)
             throws ModelResolverException;
 
+    /**
+     * Resolves a POM for the specified coordinates.
+     *
+     * @param request the resolution request containing group, artifact, and version coordinates
+     * @return the resolution result containing the model source and resolved version
+     * @throws ModelResolverException if the POM could not be resolved
+     */
     @Nonnull
     ModelResolverResult resolveModel(@Nonnull ModelResolverRequest request) throws ModelResolverException;
 

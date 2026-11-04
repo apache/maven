@@ -29,6 +29,9 @@ import org.apache.maven.api.annotations.Nullable;
  */
 @Experimental
 public interface Exclusion {
+    /**
+     * {@return the group identifier of the excluded dependency, or {@code null} for a wildcard}.
+     */
     @Nullable
     String groupId();
 
@@ -41,6 +44,9 @@ public interface Exclusion {
         return groupId();
     }
 
+    /**
+     * {@return the artifact identifier of the excluded dependency, or {@code null} for a wildcard}.
+     */
     @Nullable
     String artifactId();
 

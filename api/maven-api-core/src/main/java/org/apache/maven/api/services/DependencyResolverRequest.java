@@ -63,26 +63,34 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
         RESOLVE
     }
 
+    /** @return the type of request (collect, flatten, or resolve) */
     @Nonnull
     RequestType getRequestType();
 
+    /** @return the project whose dependencies should be resolved, or empty if not project-based */
     @Nonnull
     Optional<Project> getProject();
 
+    /** @return the root artifact for the dependency graph, or empty */
     @Nonnull
     Optional<Artifact> getRootArtifact();
 
+    /** @return the root dependency coordinates, or empty */
     @Nonnull
     Optional<DependencyCoordinates> getRoot();
 
+    /** @return the direct dependencies, never {@code null} */
     @Nonnull
     Collection<DependencyCoordinates> getDependencies();
 
+    /** @return the managed dependencies for version and scope management, never {@code null} */
     @Nonnull
     Collection<DependencyCoordinates> getManagedDependencies();
 
+    /** @return whether to produce a verbose dependency graph */
     boolean getVerbose();
 
+    /** @return the path scope for dependency resolution */
     @Nonnull
     PathScope getPathScope();
 
@@ -119,16 +127,34 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
     @Nullable
     Version getTargetVersion();
 
+    /** @return a new builder instance */
     @Nonnull
     static DependencyResolverRequestBuilder builder() {
         return new DependencyResolverRequestBuilder();
     }
 
+    /**
+     * Builds a request for the given artifact using the default runtime scope.
+     *
+     * @param session the session
+     * @param requestType the request type
+     * @param rootArtifact the root artifact
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static DependencyResolverRequest build(Session session, RequestType requestType, Artifact rootArtifact) {
         return build(session, requestType, rootArtifact, PathScope.MAIN_RUNTIME);
     }
 
+    /**
+     * Builds a request for the given artifact and path scope.
+     *
+     * @param session the session
+     * @param requestType the request type
+     * @param rootArtifact the root artifact
+     * @param scope the path scope
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static DependencyResolverRequest build(
             Session session, RequestType requestType, Artifact rootArtifact, PathScope scope) {
@@ -140,11 +166,28 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
                 .build();
     }
 
+    /**
+     * Builds a request for the given project using the default runtime scope.
+     *
+     * @param session the session
+     * @param requestType the request type
+     * @param project the project
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static DependencyResolverRequest build(Session session, RequestType requestType, Project project) {
         return build(session, requestType, project, PathScope.MAIN_RUNTIME);
     }
 
+    /**
+     * Builds a request for the given project and path scope.
+     *
+     * @param session the session
+     * @param requestType the request type
+     * @param project the project
+     * @param scope the path scope
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static DependencyResolverRequest build(Session session, RequestType requestType, Project project, PathScope scope) {
         return new DependencyResolverRequestBuilder()
@@ -155,11 +198,28 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
                 .build();
     }
 
+    /**
+     * Builds a request for the given dependency using the default runtime scope.
+     *
+     * @param session the session
+     * @param requestType the request type
+     * @param dependency the root dependency coordinates
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static DependencyResolverRequest build(Session session, RequestType requestType, DependencyCoordinates dependency) {
         return build(session, requestType, dependency, PathScope.MAIN_RUNTIME);
     }
 
+    /**
+     * Builds a request for the given dependency and path scope.
+     *
+     * @param session the session
+     * @param requestType the request type
+     * @param dependency the root dependency coordinates
+     * @param scope the path scope
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static DependencyResolverRequest build(
             Session session, RequestType requestType, DependencyCoordinates dependency, PathScope scope) {
@@ -171,12 +231,29 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
                 .build();
     }
 
+    /**
+     * Builds a request for the given dependencies using the default runtime scope.
+     *
+     * @param session the session
+     * @param requestType the request type
+     * @param dependencies the dependency coordinates
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static DependencyResolverRequest build(
             Session session, RequestType requestType, List<DependencyCoordinates> dependencies) {
         return build(session, requestType, dependencies, PathScope.MAIN_RUNTIME);
     }
 
+    /**
+     * Builds a request for the given dependencies and path scope.
+     *
+     * @param session the session
+     * @param requestType the request type
+     * @param dependencies the dependency coordinates
+     * @param scope the path scope
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static DependencyResolverRequest build(
             Session session, RequestType requestType, List<DependencyCoordinates> dependencies, PathScope scope) {

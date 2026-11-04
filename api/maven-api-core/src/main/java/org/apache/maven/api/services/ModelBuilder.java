@@ -23,6 +23,14 @@ import java.util.List;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.model.Model;
 
+/**
+ * Service for building Maven project models from POM files or other sources.
+ * <p>
+ * The model builder processes raw POM files through the full Maven model building pipeline,
+ * including inheritance assembly, profile activation, interpolation, and validation.
+ *
+ * @since 4.0.0
+ */
 public interface ModelBuilder extends Service {
 
     String MODEL_VERSION_4_0_0 = "4.0.0";
@@ -33,10 +41,25 @@ public interface ModelBuilder extends Service {
 
     List<String> KNOWN_MODEL_VERSIONS = List.of(MODEL_VERSION_4_0_0, MODEL_VERSION_4_1_0, MODEL_VERSION_4_2_0);
 
+    /**
+     * Creates a new model builder session for building one or more models.
+     *
+     * @return a new model builder session
+     */
     ModelBuilderSession newSession();
 
+    /**
+     * A session for building models, allowing multiple builds to share state.
+     */
     interface ModelBuilderSession {
 
+        /**
+         * Builds the effective model from the given request.
+         *
+         * @param request the model builder request
+         * @return the model builder result
+         * @throws ModelBuilderException if the model cannot be built
+         */
         ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException;
 
         /**
@@ -67,5 +90,12 @@ public interface ModelBuilder extends Service {
         }
     }
 
+    /**
+     * Builds a raw model from the given request without applying inheritance or interpolation.
+     *
+     * @param request the model builder request
+     * @return the raw model
+     * @throws ModelBuilderException if the raw model cannot be built
+     */
     Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException;
 }
