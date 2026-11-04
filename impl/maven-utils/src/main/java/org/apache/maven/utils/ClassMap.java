@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.impl.model.reflection;
+package org.apache.maven.utils;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
