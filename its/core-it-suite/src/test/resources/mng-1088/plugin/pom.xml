@@ -17,8 +17,8 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.1.0">
+  <modelVersion>4.1.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng1088</groupId>
   <artifactId>p</artifactId>
@@ -26,17 +26,11 @@ under the License.
   <packaging>maven-plugin</packaging>
 
   <name>Maven Integration Test :: MNG-1088 :: Plugin</name>
-  <description>Test that the plugin manager falls back to resolution from the repository if a plugin is part of the reactor
-    (i.e. an active project artifact) but the lifecycle has not been executed far enough to produce a file for
-    the plugin (i.e. a phase before "compile").</description>
-
-  <distributionManagement>
-    <repository>
-      <uniqueVersion>false</uniqueVersion>
-      <id>maven-core-it</id>
-      <url>file:///${basedir}/repo</url>
-    </repository>
-  </distributionManagement>
+  <description>
+    A simple plugin built within the reactor, to be used by the sibling client module.
+    The concurrent builder must build this plugin first (up to the ready phase),
+    then allow the client to use it — without any pre-installed version.
+  </description>
 
   <properties>
     <maven.test.skip>true</maven.test.skip>
@@ -46,7 +40,8 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-plugin-api</artifactId>
-      <version>3.8.6</version>
+      <version>4.1.0-SNAPSHOT</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
@@ -57,17 +52,14 @@ under the License.
   </dependencies>
 
   <build>
-    <resources>
-      <resource>
-        <directory>.</directory>
-        <includes>
-          <include>pom.xml</include>
-          <include>src/**</include>
-        </includes>
-      </resource>
-      <resource>
-        <directory>src/main/resources</directory>
-      </resource>
-    </resources>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-plugin-plugin</artifactId>
+        <configuration>
+          <goalPrefix>mng1088</goalPrefix>
+        </configuration>
+      </plugin>
+    </plugins>
   </build>
 </project>
