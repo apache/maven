@@ -64,7 +64,7 @@ import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxWriter;
  * <p>Plugin coordinates are read from compiler {@code -A} options, typically provided by the
  * {@code maven-plugin-mixin}.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @SupportedAnnotationTypes("org.apache.maven.api.plugin.annotations.Mojo")
 @SupportedOptions({
