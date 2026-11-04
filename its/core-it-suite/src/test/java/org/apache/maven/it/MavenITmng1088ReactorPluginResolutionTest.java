@@ -47,7 +47,7 @@ public class MavenITmng1088ReactorPluginResolutionTest extends AbstractMavenInte
         verifier.setAutoclean(false);
         verifier.deleteDirectory("client/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng1088");
-        verifier.addCliArguments("-b", "concurrent", "package");
+        verifier.addCliArguments("-DmavenVersion=" + verifier.getMavenVersion(), "-b", "concurrent", "package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
