@@ -46,7 +46,7 @@ env:
 
 jobs:
   initial-build:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-26.04
     outputs:
       pom-hash: ${{ steps.pom-hash.outputs.hash }}
     steps:
@@ -155,7 +155,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-26.04, macos-latest, windows-latest]
         java: ['17', '25', '27']
     steps:
       - name: Set up JDK ${{ matrix.java }}
@@ -167,17 +167,10 @@ jobs:
           cache-jdk: true
           cache-read-only: ${{ github.event_name == 'pull_request' }}
 
-      - name: Install Graphviz (MacOS)
-        if: runner.os == 'macOS'
-        run: brew install graphviz
-
-      - name: Install Graphviz (Ubuntu)
+      - name: Install Graphviz
+        # the site, which needs it for diagrams, is built on Linux only
         if: runner.os == 'Linux'
-        run: sudo apt-get install graphviz
-
-      - name: Install Graphviz (Windows)
-        if: runner.os == 'Windows'
-        run: choco install graphviz
+        run: sudo apt-get install graphviz libgvplugin-neato-layout8
 
       - name: Checkout maven
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -235,6 +228,8 @@ jobs:
         run: mvn verify -Papache-release -Dgpg.skip=true -e -B -V
 
       - name: Build site with downloaded Maven
+        # one OS covers the site; every JDK still builds it, since Javadoc changes with the JDK
+        if: runner.os == 'Linux'
         shell: bash
         run: mvn site -e -B -V -Preporting
 
@@ -273,7 +268,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-26.04, macos-latest, windows-latest]
         java: ['17', '25', '27']
     steps:
       - name: Set up JDK ${{ matrix.java }}
@@ -384,7 +379,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ubuntu-latest, macos-latest, windows-latest]
+        os: [ubuntu-26.04, macos-latest, windows-latest]
     needs:
       - initial-build
       - full-build

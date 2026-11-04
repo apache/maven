@@ -3146,6 +3146,50 @@
             <li>Conditional logic: {@code if(contains(${java.version}, '-'), substring(${java.version}, 0, indexOf(${java.version}, '-')), ${java.version})}</li>
             </ul>
 
+            <h2>Cascading Profile Activation</h2>
+
+            <p>When a profile is activated and defines properties (via {@code &lt;properties&gt;}),
+            those properties are immediately available to trigger the activation of other
+            profiles in the same POM. Maven iterates through the remaining inactive profiles
+            until no new profiles are activated (a fixed-point is reached).</p>
+
+            <p>This allows building chains or groups of profiles where one profile acts as
+            a "trigger" that enables a set of related profiles. For example:</p>
+
+            <pre>
+&lt;profiles&gt;
+  &lt;!-- Activated by -Dstart.cascade=true --&gt;
+  &lt;profile&gt;
+    &lt;id&gt;trigger&lt;/id&gt;
+    &lt;activation&gt;
+      &lt;condition&gt;${start.cascade} == 'true'&lt;/condition&gt;
+    &lt;/activation&gt;
+    &lt;properties&gt;
+      &lt;enable.checks&gt;true&lt;/enable.checks&gt;
+    &lt;/properties&gt;
+  &lt;/profile&gt;
+  &lt;!-- Automatically activated when trigger sets enable.checks --&gt;
+  &lt;profile&gt;
+    &lt;id&gt;run-checkstyle&lt;/id&gt;
+    &lt;activation&gt;
+      &lt;condition&gt;${enable.checks} == 'true'&lt;/condition&gt;
+    &lt;/activation&gt;
+    &lt;!-- checkstyle plugin configuration --&gt;
+  &lt;/profile&gt;
+  &lt;profile&gt;
+    &lt;id&gt;run-spotbugs&lt;/id&gt;
+    &lt;activation&gt;
+      &lt;condition&gt;${enable.checks} == 'true'&lt;/condition&gt;
+    &lt;/activation&gt;
+    &lt;!-- spotbugs plugin configuration --&gt;
+  &lt;/profile&gt;
+&lt;/profiles&gt;
+            </pre>
+
+            <p><strong>Note:</strong> Cascading activation only applies to POM profiles
+            (not settings profiles). Properties contributed by cascading do not override
+            user or system properties.</p>
+
             <p>This flexible condition mechanism allows for more precise control over profile
             activation, enabling developers to create profiles that respond to a wide range of
             environmental factors and project states.</p>

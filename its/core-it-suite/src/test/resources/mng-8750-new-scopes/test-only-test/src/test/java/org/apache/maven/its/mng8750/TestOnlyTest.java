@@ -20,8 +20,8 @@ package org.apache.maven.its.mng8750;
 
 import org.apache.maven.its.mng8750.deps.TestDep;
 import org.apache.maven.its.mng8750.deps.TestOnlyDep;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Test class to verify test-only scope behavior.
@@ -37,9 +37,8 @@ public class TestOnlyTest {
     public void testTestDependencyAvailableAtTestRuntime() {
         TestDep dep = new TestDep();
         String result = dep.getMessage();
-        Assert.assertNotNull("Test dependency should be available", result);
-        Assert.assertTrue(
-                "Test dependency should be available", result.toLowerCase().contains("test dependency"));
+        Assertions.assertNotNull(result, "Test dependency should be available");
+        Assertions.assertTrue(result.toLowerCase().contains("test dependency"), "Test dependency should be available");
     }
 
     /**
@@ -52,7 +51,7 @@ public class TestOnlyTest {
         // With current behavior under test, test-only dependency is available at test runtime
         TestOnlyDep dep = new TestOnlyDep();
         String result = dep.getMessage();
-        Assert.assertNotNull("Test-only dependency should be available at test runtime", result);
+        Assertions.assertNotNull(result, "Test-only dependency should be available at test runtime");
     }
 
     /**
@@ -64,9 +63,9 @@ public class TestOnlyTest {
     public void testTestOnlyDependencyAvailableAtTestCompile() {
         // This test verifies that the test-only dependency was available during compilation
         // by checking that this test class itself compiled successfully
-        Assert.assertTrue(
-                "Test class compiled successfully, proving test-only dependency was available during test compilation",
-                true);
+        Assertions.assertTrue(
+                true,
+                "Test class compiled successfully, proving test-only dependency was available during test compilation");
 
         // We can't actually instantiate the TestOnlyDep here because it won't be available
         // at runtime, but the fact that this class compiled proves it was available during

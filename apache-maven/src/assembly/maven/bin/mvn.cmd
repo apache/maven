@@ -157,6 +157,7 @@ if not exist "%MAVEN_HOME%\bin\mvn.cmd" goto error
 @REM When only version info is requested, render the banner from a single
 @REM lightweight JVM (-XshowSettings) without starting Maven itself.
 set "FAST_VERSION=0"
+set "VERSION_SETTINGS_DIR="
 set "VERSION_SETTINGS_TEMP="
 if defined IS_VERSION_AND_EXIT goto tryFastVersion
 if defined IS_SHOW_VERSION goto tryFastVersion
@@ -165,10 +166,12 @@ goto javaGate
 :tryFastVersion
 if defined IS_VERBOSE goto javaGate
 if defined IS_MAIN_OVERRIDE goto javaGate
-set "VERSION_SETTINGS_TEMP=%TEMP%\mvn-version-%RANDOM%-%RANDOM%.txt"
+call :mkTempDir version VERSION_SETTINGS_DIR
+if ERRORLEVEL 1 goto javaGate
+set "VERSION_SETTINGS_TEMP=%VERSION_SETTINGS_DIR%\settings.txt"
 "%JAVACMD%" --enable-native-access=ALL-UNNAMED -XshowSettings:properties -version 2> "%VERSION_SETTINGS_TEMP%"
 if ERRORLEVEL 1 (
-  del "%VERSION_SETTINGS_TEMP%" 2>nul
+  rd /s /q "%VERSION_SETTINGS_DIR%" 2>nul
   set "VERSION_SETTINGS_TEMP="
   goto javaGate
 )
@@ -188,7 +191,7 @@ goto fastVersionDone
 
 :versionPrint
 call :printFastVersion "%VERSION_SETTINGS_TEMP%"
-if defined VERSION_SETTINGS_TEMP del "%VERSION_SETTINGS_TEMP%" 2>nul
+if defined VERSION_SETTINGS_DIR rd /s /q "%VERSION_SETTINGS_DIR%" 2>nul
 if defined IS_VERSION_AND_EXIT goto end
 set "MAVEN_VERSION_PRINTED=-Dmaven.version.printed=true"
 :fastVersionDone
@@ -279,29 +282,28 @@ cd /d "%EXEC_DIR%"
 
 :endDetectBaseDir
 
-rem Initialize JVM_CONFIG_MAVEN_OPTS to empty to avoid inheriting from environment
-set JVM_CONFIG_MAVEN_OPTS=
+rem Initialize to empty so values inherited from the environment are never used or deleted
+set "JVM_CONFIG_ARGFILE_ARG="
+set "JVM_CONFIG_DIR="
+set "JVM_CONFIG_TEMP="
 
 if not exist "%MAVEN_PROJECTBASEDIR%\.mvn\jvm.config" goto endReadJvmConfig
 
-rem Use the precompiled JvmConfigParser to parse jvm.config
-rem This avoids batch script parsing issues with special characters (pipes, quotes, @, etc.)
-rem Java writes parsed output to a temp file; we read it with 'set /p' + input redirect.
+rem Use the precompiled JvmConfigParser to parse jvm.config and write the result
+rem to a temp file in Java @argfile format. The JVM reads the file directly at
+rem launch time via @"%JVM_CONFIG_TEMP%", so cmd.exe never holds the raw content
+rem in a variable — no quoting, expansion, or metacharacter issues on any value.
 rem
-rem Why 'set /p <file' instead of 'for /f ... in (file)':
-rem   - 'for /f' silently produces no output when the file is briefly locked
-rem     (e.g. by Windows Defender real-time scanning), leaving JVM_CONFIG_MAVEN_OPTS empty
-rem     and causing hard-to-diagnose Maven startup failures.
-rem   - 'set /p <file' uses a transient input-redirect open with different sharing flags,
-rem     making it far less susceptible to lock contention. If the file IS locked, it
-rem     emits a visible error to stderr rather than failing silently.
-rem
-rem Why not capture stdout directly ('for /f ... in (`command`)')?
-rem   - cmd.exe's child shell interprets special characters (pipes |, ampersands &, etc.)
-rem     in the captured output, which breaks jvm.config values like
-rem     -Dhttp.nonProxyHosts=de|*.de  (the core use case for JvmConfigParser).
+rem Why write to a temp file instead of capturing stdout via 'for /f ... in (`cmd`)'?
+rem   cmd.exe's child shell interprets special characters (pipes |, ampersands &, etc.)
+rem   in the captured output — breaking values like -Dhttp.nonProxyHosts=de|*.de.
 
-set "JVM_CONFIG_TEMP=%TEMP%\mvn-jvm-config-%RANDOM%-%RANDOM%.txt"
+call :mkTempDir jvm-config JVM_CONFIG_DIR
+if ERRORLEVEL 1 (
+  echo ERROR: Could not create a temporary directory in %TEMP% for .mvn/jvm.config 1>&2
+  exit /b 1
+)
+set "JVM_CONFIG_TEMP=%JVM_CONFIG_DIR%\jvm.config.args"
 
 rem Debug logging (set MAVEN_DEBUG_SCRIPT=1 to enable)
 if defined MAVEN_DEBUG_SCRIPT (
@@ -324,9 +326,7 @@ if %JVM_CONFIG_EXIT% neq 0 (
   echo ERROR: Failed to parse .mvn/jvm.config file 1>&2
   echo   jvm.config path: %MAVEN_PROJECTBASEDIR%\.mvn\jvm.config 1>&2
   echo   Java command: %JAVACMD% 1>&2
-  if exist "%JVM_CONFIG_TEMP%" (
-    del "%JVM_CONFIG_TEMP%" 2>nul
-  )
+  rd /s /q "%JVM_CONFIG_DIR%" 2>nul
   exit /b 1
 )
 
@@ -336,22 +336,19 @@ if exist "%JVM_CONFIG_TEMP%" (
     echo [DEBUG] Temp file contents:
     type "%JVM_CONFIG_TEMP%"
   )
-  set /p JVM_CONFIG_MAVEN_OPTS=<"%JVM_CONFIG_TEMP%" 2>nul
-  rem Retry once after a brief delay if the read returned empty (Windows Defender file lock).
-  rem Note: use string comparison instead of 'if not defined' because 'set JVM_CONFIG_MAVEN_OPTS='
-  rem (empty assignment) counts as defined, so 'if not defined' would never trigger the retry.
-  if "%JVM_CONFIG_MAVEN_OPTS%"=="" (
-    if defined MAVEN_DEBUG_SCRIPT (
-      echo [DEBUG] First read returned empty, retrying after delay...
-    )
-    ping -n 2 127.0.0.1 >nul 2>nul
-    set /p JVM_CONFIG_MAVEN_OPTS=<"%JVM_CONFIG_TEMP%" 2>nul
+  rem Check whether the file is non-empty (JvmConfigParser found JVM opts to pass).
+  rem We use 'set /p' only to test emptiness — no quoting issues arise from this.
+  set "JVM_CONFIG_NONEMPTY="
+  set /p JVM_CONFIG_NONEMPTY=<"%JVM_CONFIG_TEMP%" 2>nul
+  if defined JVM_CONFIG_NONEMPTY (
+    set JVM_CONFIG_ARGFILE_ARG=@"%JVM_CONFIG_TEMP%"
   )
-  del "%JVM_CONFIG_TEMP%" 2>nul
+  rem Do NOT delete the temp file here — the JVM reads it at launch time.
+  rem It is deleted after the JVM exits (see below).
 )
 
 if defined MAVEN_DEBUG_SCRIPT (
-  echo [DEBUG] Final JVM_CONFIG_MAVEN_OPTS: %JVM_CONFIG_MAVEN_OPTS%
+  echo [DEBUG] JVM_CONFIG_ARGFILE_ARG: %JVM_CONFIG_ARGFILE_ARG%
 )
 
 :endReadJvmConfig
@@ -403,13 +400,13 @@ if not "%MAVEN_MAIN_CLASS%"=="org.apache.maven.cling.MavenCling" set "MAVEN_ARGS
 
 if defined MAVEN_DEBUG_SCRIPT (
   echo [DEBUG] Launching JVM with command:
-  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_MAVEN_OPTS% %MAVEN_DEBUG_OPTS% --enable-native-access=ALL-UNNAMED -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %MAVEN_VERSION_PRINTED% %LAUNCHER_CLASS% %MAVEN_ARGS% %*
+  echo [DEBUG]   "%JAVACMD%" %INTERNAL_MAVEN_OPTS% %MAVEN_OPTS% %JVM_CONFIG_ARGFILE_ARG% %MAVEN_DEBUG_OPTS% --enable-native-access=ALL-UNNAMED -classpath %LAUNCHER_JAR% "-Dclassworlds.conf=%CLASSWORLDS_CONF%" "-Dmaven.home=%MAVEN_HOME%" "-Dmaven.mainClass=%MAVEN_MAIN_CLASS%" "-Dlibrary.jline.path=%MAVEN_HOME%\lib\jline-native" "-Dmaven.multiModuleProjectDirectory=%MAVEN_PROJECTBASEDIR%" %MAVEN_VERSION_PRINTED% %LAUNCHER_CLASS% %MAVEN_ARGS% %*
 )
 
 "%JAVACMD%" ^
   %INTERNAL_MAVEN_OPTS% ^
   %MAVEN_OPTS% ^
-  %JVM_CONFIG_MAVEN_OPTS% ^
+  %JVM_CONFIG_ARGFILE_ARG% ^
   %MAVEN_DEBUG_OPTS% ^
   --enable-native-access=ALL-UNNAMED ^
   -classpath %LAUNCHER_JAR% ^
@@ -422,7 +419,10 @@ if defined MAVEN_DEBUG_SCRIPT (
   %LAUNCHER_CLASS% ^
   %MAVEN_ARGS% ^
   %*
-if ERRORLEVEL 1 goto error
+set JVM_CONFIG_EXIT_CODE=%ERRORLEVEL%
+rem Cleanup the jvm.config temp directory now that the JVM has exited (must be before @endlocal)
+if defined JVM_CONFIG_DIR rd /s /q "%JVM_CONFIG_DIR%" 2>nul
+if %JVM_CONFIG_EXIT_CODE% neq 0 goto error
 goto end
 
 :error
@@ -535,3 +535,16 @@ echo Java version: %_JAVA_VERSION%, vendor: %_JAVA_VENDOR%, runtime: %_JAVA_HOME
 echo Default locale: %_LOCALE%, platform encoding: %_ENCODING%, time zone: %_TIMEZONE%
 echo OS name: "%_OS_NAME%", version: "%_OS_VERSION%", arch: "%_OS_ARCH%", family: "%_OS_FAMILY%"
 exit /b 0
+
+:mkTempDir
+@REM Creates a new, empty directory under %TEMP% and stores its path in the variable named by %2.
+@REM %RANDOM% is seeded from the clock once per cmd.exe, so mvn.cmd processes started in the same
+@REM second draw the same numbers. mkdir fails when the name is taken and the retry moves on to the
+@REM next number, so concurrent builds never share a temp file.
+set "_MKTEMP_TRIES=0"
+:mkTempDirRetry
+set /a _MKTEMP_TRIES+=1
+set "_MKTEMP_DIR=%TEMP%\mvn-%~1-%RANDOM%-%RANDOM%"
+mkdir "%_MKTEMP_DIR%" 2>nul && (set "%~2=%_MKTEMP_DIR%" & exit /b 0)
+if %_MKTEMP_TRIES% lss 100 goto mkTempDirRetry
+exit /b 1

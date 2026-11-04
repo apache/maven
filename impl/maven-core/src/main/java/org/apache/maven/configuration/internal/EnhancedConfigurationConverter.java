@@ -94,7 +94,7 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
             if (null == value && implType.isInterface() && configuration.getChildCount() == 0) {
                 return null; // nothing to process
             }
-            final Object bean = instantiateObject(implType);
+            final Object bean = instantiate(implType, configuration);
             if (null == value) {
                 processConfiguration(lookup, bean, loader, configuration, evaluator, listener);
             } else {
@@ -108,6 +108,19 @@ class EnhancedConfigurationConverter extends ObjectWithFieldsConverter {
                 e.setFailedConfiguration(configuration);
             }
             throw e;
+        }
+    }
+
+    private static Object instantiate(Class<?> type, PlexusConfiguration configuration)
+            throws ComponentConfigurationException {
+        try {
+            var ctor = type.getDeclaredConstructor();
+            if (!ctor.canAccess(null)) {
+                ctor.setAccessible(true);
+            }
+            return ctor.newInstance();
+        } catch (ReflectiveOperationException e) {
+            throw new ComponentConfigurationException(configuration, "Cannot create instance of class " + type, e);
         }
     }
 
