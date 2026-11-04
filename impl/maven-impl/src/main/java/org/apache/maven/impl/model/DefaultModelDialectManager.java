@@ -48,7 +48,7 @@ import org.apache.maven.api.spi.ModelWriterException;
  * Registers the built-in XML dialect and any additional dialects provided via
  * the {@link ModelDialectProvider} SPI.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Named
 @Singleton

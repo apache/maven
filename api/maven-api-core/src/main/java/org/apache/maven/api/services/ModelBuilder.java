@@ -60,7 +60,7 @@ public interface ModelBuilder extends Service {
          * @return the result, carrying the model that was read and the problems collected
          * @throws ModelBuilderException if the model cannot be read at all
          * @throws UnsupportedOperationException if this implementation does not support it
-         * @since 4.1.0
+         * @since 4.2.0
          */
         default ModelBuilderResult validate(ModelBuilderRequest request) throws ModelBuilderException {
             throw new UnsupportedOperationException(getClass().getName() + " does not support validating a model");

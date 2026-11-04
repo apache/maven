@@ -27,7 +27,7 @@ import org.apache.maven.api.services.MavenException;
  * default message is used. Messages, including those from causes, should not contain
  * credentials from the input.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 public class SettingsParserException extends MavenException {

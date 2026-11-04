@@ -23,6 +23,6 @@ import org.apache.maven.api.Dialect;
 /**
  * Registry for {@link Dialect} extensible enum values.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 public interface DialectRegistry extends ExtensibleEnumRegistry<Dialect> {}

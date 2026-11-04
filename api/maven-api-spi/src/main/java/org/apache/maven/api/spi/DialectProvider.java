@@ -26,7 +26,7 @@ import org.apache.maven.api.di.Named;
 /**
  * SPI to extend the {@link org.apache.maven.api.Dialect} extensible enum with custom values.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Consumer

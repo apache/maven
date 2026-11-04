@@ -35,7 +35,7 @@ import org.apache.maven.api.model.Model;
  * translating between different dialects of Maven models.
  * It allows reading and writing models in various dialects supported by the system.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 public interface ModelDialectManager extends Service {
