@@ -7,7 +7,7 @@ to you under the Apache License, Version 2.0 (the
 "License"); you may not use this file except in compliance
 with the License.  You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+   http://www.apache.org/licenses/LICENSE-2.0
 
 Unless required by applicable law or agreed to in writing,
 software distributed under the License is distributed on an
@@ -16,6 +16,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
+
 # Configuring Apache Maven
 
 ## System properties and JVM
@@ -53,13 +54,13 @@ along with any other files loaded from it (see below) are called
 _Maven properties files_ and are Java properties files with a 
 few enhancements. Unlike standard properties files, these files are 
 UTF-8 encoded.
- 
+
 ### File Inclusion
 
 Additional files can be loaded using the special `${includes}` key. 
 The associated value is a comma-separated list of additional files to 
 include. Each item may be enclosed in quotes to gracefully include spaces. 
-Items are trimmed before being loaded.  If the first character of an item 
+Items are trimmed before being loaded. If the first character of an item 
 is a question mark, the load will silently fail if the file does not exist.
 ```
 ${includes} = ?"${maven.user.conf}/maven-system.properties", \
@@ -72,6 +73,7 @@ Properties undergo the _property substitution_ process, so that any
 value containing a `${xxx}` placeholder will be substituted with the value 
 of the `xxx` property. In addition to properties defined in the files
 being loaded, the following properties are defined:
+
 * `session.topDirectory`
 * `session.rootDirectory`
 * `maven.version`
@@ -87,6 +89,24 @@ and the _project_ specific system properties from `${session.rootDirectory}/.mvn
 The main user properties source `${maven.home}/conf/maven-user.properties` defines a few inclusions only, to
 load the _user wide_ user properties from `~/.m2/maven-user.properties` and the _project_ specific user properties 
 from `${session.rootDirectory}/.mvn/maven-user.properties`.
+
+User properties can be referenced when defining dependency versions in a project's POM. For example, a user-wide property can be defined in `~/.m2/maven-user.properties`:
+
+```properties
+junit.version=4.13.2
+```
+
+A dependency can then reference that property:
+
+```xml
+<dependency>
+    <groupId>junit</groupId>
+    <artifactId>junit</artifactId>
+    <version>${junit.version}</version>
+</dependency>
+```
+
+During model interpolation, user properties are checked before project model properties. Therefore, a user property with the same name as a property defined in the POM takes precedence.
 
 For the complete list of available Maven configuration properties and options, see [Maven Configuration Options](configuration.html).
 
@@ -105,10 +125,9 @@ configured in the `~/.m2/extensions.xml` file (user level),
 ## Maven Command Line Arguments
 
 Maven is a command line tool, and, as such, accepts various command
-line arguments.  The `MAVEN_ARGS` environment variable is used to
+line arguments. The `MAVEN_ARGS` environment variable is used to
 provide additional arguments to Maven. These arguments will be
 prepended to the actual list of command line arguments.
 
 For example, options and goals could be defined with the value
 `-B -V checkstyle:checkstyle`.
-
