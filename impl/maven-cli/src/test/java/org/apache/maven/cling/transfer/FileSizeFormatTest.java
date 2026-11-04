@@ -375,4 +375,17 @@ class FileSizeFormatTest {
         format.formatRate(builder, Double.NEGATIVE_INFINITY);
         assertEquals("? B/s", builder.build());
     }
+
+    @Test
+    void testFormatRateToStringBuilder() {
+        FileSizeFormat format = new FileSizeFormat();
+
+        StringBuilder builder = new StringBuilder();
+        format.formatRate(builder, 5500.0);
+        assertEquals("5.5 kB/s", builder.toString());
+
+        builder = new StringBuilder();
+        format.formatRate(builder, Double.POSITIVE_INFINITY);
+        assertEquals("? B/s", builder.toString());
+    }
 }
