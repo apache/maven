@@ -107,6 +107,7 @@
         <configuration>
           <systemPropertyVariables>
             <processor.worktree>${maven.multiModuleProjectDirectory}</processor.worktree>
+            <processor.version>${project.version}</processor.version>
           </systemPropertyVariables>
         </configuration>
       </plugin>

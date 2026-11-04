@@ -69,18 +69,20 @@ class MojoDescriptorProcessorTest {
 
     @BeforeAll
     static void resolveClasspath() {
+        String version = System.getProperty("processor.version", "4.2.0-SNAPSHOT");
+
         // Processor JAR — built from this module
         processorJar = resolveFile(
-                "impl/maven-plugin-mixin/target/maven-plugin-mixin-4.1.0-SNAPSHOT.jar",
-                "maven-plugin-mixin/4.1.0-SNAPSHOT/maven-plugin-mixin-4.1.0-SNAPSHOT.jar");
+                "impl/maven-plugin-mixin/target/maven-plugin-mixin-" + version + ".jar",
+                "maven-plugin-mixin/" + version + "/maven-plugin-mixin-" + version + ".jar");
 
         // Annotation JARs needed on the compilation classpath
         File apiCore = resolveFile(
-                "api/maven-api-core/target/maven-api-core-4.1.0-SNAPSHOT.jar",
-                "maven-api-core/4.1.0-SNAPSHOT/maven-api-core-4.1.0-SNAPSHOT.jar");
+                "api/maven-api-core/target/maven-api-core-" + version + ".jar",
+                "maven-api-core/" + version + "/maven-api-core-" + version + ".jar");
         File apiAnnotations = resolveFile(
-                "api/maven-api-annotations/target/maven-api-annotations-4.1.0-SNAPSHOT.jar",
-                "maven-api-annotations/4.1.0-SNAPSHOT/maven-api-annotations-4.1.0-SNAPSHOT.jar");
+                "api/maven-api-annotations/target/maven-api-annotations-" + version + ".jar",
+                "maven-api-annotations/" + version + "/maven-api-annotations-" + version + ".jar");
 
         classpathJars = List.of(apiCore, apiAnnotations);
     }
