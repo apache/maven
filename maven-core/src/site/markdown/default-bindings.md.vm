@@ -30,7 +30,7 @@ The [`default` lifecycle](./lifecycles.html) is defined without any plugin bindi
 
 <!-- MACRO{toc|fromDepth=2} -->
 
-Versions of the plugins are based on [ Project Plugin Management](.//plugin-management.html).
+Versions of the plugins are based on [ Project Plugin Management](./plugin-management.html).
 
 Plugin bindings for `pom` packaging
 -----------------------------------
