@@ -98,6 +98,56 @@ class DefaultDependencyResolverTest {
     }
 
     @Test
+    void collectWithProjectButNoCallerDepsSkipsManagementApplication() throws Exception {
+        // When a Project is present but request.getDependencies() is empty, the guard
+        // `request.getProject().isPresent() && !request.getDependencies().isEmpty()` is false,
+        // so applyDependencyManagement must NOT be called: the project's own deps go through
+        // as-is (no managed version/scope/exclusion merge).
+        InternalSession session = mock(InternalSession.class);
+        RepositorySystem repositorySystem = mock(RepositorySystem.class);
+        RepositorySystemSession repositorySession = mock(RepositorySystemSession.class);
+        DependencyResolverRequest request = mock(DependencyResolverRequest.class);
+        Project project = mock(Project.class);
+        DependencyCoordinates projectDependency = mock(DependencyCoordinates.class);
+        DependencyCoordinates managedDependency = mock(DependencyCoordinates.class);
+        List<DependencyCoordinates> projectDependencies = List.of(projectDependency);
+        List<DependencyCoordinates> managedDependencies = List.of(managedDependency);
+        // The resolver-level dependency has no version — management would set "1.2.3", but must NOT
+        Dependency resolverProjectDependency =
+                new Dependency(new DefaultArtifact("org.example", "processor", "", "jar", ""), "", false);
+        Dependency resolverManagedDependency =
+                new Dependency(new DefaultArtifact("org.example:processor:jar:1.2.3"), "runtime");
+
+        when(request.getSession()).thenReturn(session);
+        when(request.getProject()).thenReturn(Optional.of(project));
+        when(request.getDependencies()).thenReturn(List.of()); // no caller-supplied deps
+        when(request.getRepositories()).thenReturn(List.of());
+        when(project.getDependencies()).thenReturn(projectDependencies);
+        when(project.getManagedDependencies()).thenReturn(managedDependencies);
+        when(session.toDependencies(projectDependencies, false)).thenReturn(List.of(resolverProjectDependency));
+        when(session.toDependencies(managedDependencies, true)).thenReturn(List.of(resolverManagedDependency));
+        when(session.toResolvingRepositories(List.of())).thenReturn(List.of());
+        when(session.getRepositorySystem()).thenReturn(repositorySystem);
+        when(session.getSession()).thenReturn(repositorySession);
+        when(repositorySystem.collectDependencies(eq(repositorySession), any(CollectRequest.class)))
+                .thenAnswer(invocation -> new CollectResult(invocation.getArgument(1))
+                        .setRoot(new DefaultDependencyNode(resolverProjectDependency)));
+        when(session.getNode(any(), eq(false))).thenReturn(mock(Node.class));
+
+        new DefaultDependencyResolver().collect(request);
+
+        ArgumentCaptor<CollectRequest> requestCaptor = ArgumentCaptor.forClass(CollectRequest.class);
+        verify(repositorySystem).collectDependencies(eq(repositorySession), requestCaptor.capture());
+        Dependency collectedDependency =
+                requestCaptor.getValue().getDependencies().get(0);
+        // version must remain empty — management was NOT applied
+        assertEquals("", collectedDependency.getArtifact().getVersion());
+        assertEquals("", collectedDependency.getScope());
+        // project's own dependencies were used (not caller-supplied, since there were none)
+        verify(session).toDependencies(projectDependencies, false);
+    }
+
+    @Test
     void appliesProjectManagementToPluginDependency() {
         Dependency dependency =
                 new Dependency(new DefaultArtifact("org.example", "processor", "", "jar", ""), "", false);
