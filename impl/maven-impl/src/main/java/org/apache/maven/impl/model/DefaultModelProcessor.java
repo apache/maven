@@ -141,7 +141,7 @@ public class DefaultModelProcessor implements ModelProcessor {
      *
      * @deprecated Use {@link #read(Source, Map)} instead.
      */
-    @Deprecated(since = "4.1.0")
+    @Deprecated(since = "4.2.0")
     @Override
     public Model read(XmlReaderRequest request) throws IOException, XmlReaderException {
         Objects.requireNonNull(request, "request cannot be null");

@@ -110,7 +110,7 @@ public final class Sources {
      * @param modelId the modelId (groupId:artifactId:version coordinates), may be {@code null}
      * @return a new ModelSource instance backed by the URL
      * @throws NullPointerException if url is null
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     public static ModelSource urlSource(@Nonnull URL url, @Nullable String modelId) {
