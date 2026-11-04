@@ -52,7 +52,7 @@ public interface Event {
      * @return the current session, never {@code null}
      * @deprecated Use {@link #session()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Session getSession() {
         return session();
@@ -65,7 +65,7 @@ public interface Event {
      * @throws UnsupportedOperationException if this event is not an {@link ExecutionEvent}
      * @deprecated Use {@link ExecutionEvent#type()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default EventType getType() {
         if (this instanceof ExecutionEvent ee) {
@@ -80,7 +80,7 @@ public interface Event {
      * @return the current project or {@code empty()} if not applicable
      * @deprecated Use {@link ExecutionEvent#project()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Optional<Project> getProject() {
         if (this instanceof ExecutionEvent ee) {
@@ -95,7 +95,7 @@ public interface Event {
      * @return the current mojo execution or {@code empty()} if not applicable
      * @deprecated Use {@link ExecutionEvent#mojoExecution()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Optional<MojoExecution> getMojoExecution() {
         if (this instanceof ExecutionEvent ee) {
@@ -110,7 +110,7 @@ public interface Event {
      * @return the exception or {@code empty()} if none
      * @deprecated Use {@link ExecutionEvent#exception()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     default Optional<Exception> getException() {
         if (this instanceof ExecutionEvent ee) {
             return ee.exception();
