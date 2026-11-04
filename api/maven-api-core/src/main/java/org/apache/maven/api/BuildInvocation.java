@@ -67,7 +67,7 @@ import org.apache.maven.api.annotations.Nullable;
  *       these requires per-project activation and is not available at session level</li>
  * </ul>
  *
- * @since 4.1.0
+ * @since 4.2.0
  * @see Session#buildInvocation()
  */
 @Experimental

@@ -36,7 +36,7 @@ import org.apache.maven.api.model.Model;
  * Note: to provide a Maven model "dialect" that supports symmetric translation, implement
  * {@link ModelDialectProvider}, which composes a pair of parser and writer.
  *
- * @since 4.1.0
+ * @since 4.2.0
  * @see ModelDialectProvider
  * @see DialectProvider
  */

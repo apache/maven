@@ -165,7 +165,7 @@ public interface ProfileActivationContext {
      *
      * @param key the property name
      * @return the cascaded property value, or {@code null} if not set
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nullable
     default String getCascadedProfileProperty(@Nonnull String key) {
@@ -177,7 +177,7 @@ public interface ProfileActivationContext {
      * Called after profile activation is complete to prevent cascaded properties
      * from leaking into subsequent uses of the context.
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     default void clearCascadedProfileProperties() {}
 }

@@ -30,7 +30,7 @@ import org.apache.maven.api.di.Named;
  * Implement this interface to register support for reading and writing Maven models in an alternative dialect.
  * The implementation must be registered as a named DI component so that Maven can discover it.
  *
- * @since 4.1.0
+ * @since 4.2.0
  * @see ModelParser
  * @see ModelWriter
  * @see DialectProvider

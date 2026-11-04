@@ -39,7 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * which sets {@code -Dmaven.mainClass=MavenUpCling}, and {@code MavenCling}
  * (the default entry point since MNG-2520) delegates to it.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 class MavenITgh12922MvnupToolchainPluginStrategyTest extends AbstractMavenIntegrationTestCase {
 

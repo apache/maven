@@ -195,7 +195,7 @@ public interface XmlNode {
      * the {@code mvn → http://maven.apache.org/POM/4.0.0} binding.
      *
      * @return map of namespace prefix to URI, never {@code null}
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     default Map<String, String> namespaces() {
@@ -504,7 +504,7 @@ public interface XmlNode {
          *
          * @param namespaces the map of namespace prefix to URI
          * @return this builder instance
-         * @since 4.1.0
+         * @since 4.2.0
          */
         public Builder namespaces(Map<String, String> namespaces) {
             this.namespaces = namespaces;

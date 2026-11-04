@@ -209,7 +209,7 @@ public interface Project {
      *
      * @see Packaging#producesMainArtifact()
      * @see #mainArtifact()
-     * @since 4.1.0
+     * @since 4.2.0
      */
     default boolean producesMainArtifact() {
         return mainArtifact().isPresent();

@@ -25,6 +25,6 @@
  *
  * @see org.apache.maven.api.cli.Tools#MVNVAL_CMD
  * @see org.apache.maven.api.cli.Tools#MVNVAL_NAME
- * @since 4.1.0
+ * @since 4.2.0
  */
 package org.apache.maven.api.cli.mvnval;
