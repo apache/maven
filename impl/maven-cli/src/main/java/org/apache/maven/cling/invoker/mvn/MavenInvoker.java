@@ -72,6 +72,8 @@ import org.apache.maven.logging.MavenTransferListener;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.eclipse.aether.DefaultRepositoryCache;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.transfer.ArtifactFilteredOutException;
 import org.eclipse.aether.transfer.TransferListener;
 
 import static java.util.Comparator.comparing;
@@ -479,6 +481,8 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                 if (exception instanceof LifecycleExecutionException lifecycleExecutionException) {
                     failedProjects.add(lifecycleExecutionException.getProject());
                 }
+
+                logFilteredOutHint(context, exception, result);
             }
 
             context.logger.error("");
@@ -533,6 +537,69 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         context.logger.error("After correcting the problems, you can resume the build with the command");
         context.logger.error(
                 MessageUtils.builder().a("  ").strong(resumeBuildHint).toString());
+    }
+
+    /**
+     * When an {@link ArtifactFilteredOutException} is found in the exception chain, log a reactor-aware hint
+     * that precisely identifies whether the artifact is an unselected project, an already-selected project, or
+     * a pure repository-manager configuration issue.
+     */
+    protected void logFilteredOutHint(MavenContext context, Throwable exception, MavenExecutionResult result) {
+        ArtifactFilteredOutException filteredOut = findCause(exception, ArtifactFilteredOutException.class);
+        if (filteredOut == null) {
+            return;
+        }
+
+        Artifact artifact = filteredOut.getArtifact();
+        if (artifact == null) {
+            return;
+        }
+
+        String groupId = artifact.getGroupId();
+        String artifactId = artifact.getArtifactId();
+        String version = artifact.getVersion();
+        String coords = groupId + ":" + artifactId + ":" + version;
+
+        List<MavenProject> allProjects = result.getAllProjects();
+        List<MavenProject> selectedProjects = result.getTopologicallySortedProjects();
+
+        boolean inAll = allProjects.stream()
+                .anyMatch(p -> p.getGroupId().equals(groupId)
+                        && p.getArtifactId().equals(artifactId)
+                        && p.getVersion().equals(version));
+        boolean inSelected = selectedProjects.stream()
+                .anyMatch(p -> p.getGroupId().equals(groupId)
+                        && p.getArtifactId().equals(artifactId)
+                        && p.getVersion().equals(version));
+
+        context.logger.error("");
+        if (inAll && !inSelected) {
+            context.logger.error(coords
+                    + " is a project of this build but was not selected."
+                    + " Add -am to also build its dependencies, or run the full reactor.");
+        } else if (inAll) {
+            context.logger.error(coords
+                    + " is part of this build but has not been built yet."
+                    + " Build it first or reorder the reactor.");
+        } else {
+            context.logger.error("This error indicates that a remote repository filter has rejected " + coords + "."
+                    + " This commonly happens with repository managers using virtual/group repositories"
+                    + " that do not properly aggregate prefix files.");
+            context.logger.error("To disable remote repository filtering, add one or both of these to your command line"
+                    + " or to .mvn/maven.config:");
+            context.logger.error("  -Daether.remoteRepositoryFilter.prefixes=false");
+            context.logger.error("  -Daether.remoteRepositoryFilter.groupId=false");
+            context.logger.error("See https://maven.apache.org/resolver/remote-repository-filtering.html");
+        }
+    }
+
+    private static <T extends Throwable> T findCause(Throwable exception, Class<T> type) {
+        for (Throwable t = exception; t != null && t != t.getCause(); t = t.getCause()) {
+            if (type.isInstance(t)) {
+                return type.cast(t);
+            }
+        }
+        return null;
     }
 
     /**

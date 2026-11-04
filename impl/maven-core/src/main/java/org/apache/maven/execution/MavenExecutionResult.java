@@ -37,6 +37,16 @@ public interface MavenExecutionResult {
      */
     List<MavenProject> getTopologicallySortedProjects();
 
+    MavenExecutionResult setAllProjects(List<MavenProject> projects);
+
+    /**
+     * Returns all projects in the reactor graph, including those not selected by {@code -pl}.
+     * This is a superset of {@link #getTopologicallySortedProjects()}.
+     *
+     * @return all reactor projects, or an empty list if the graph has not been built.
+     */
+    List<MavenProject> getAllProjects();
+
     MavenExecutionResult setDependencyResolutionResult(DependencyResolutionResult result);
 
     DependencyResolutionResult getDependencyResolutionResult();
