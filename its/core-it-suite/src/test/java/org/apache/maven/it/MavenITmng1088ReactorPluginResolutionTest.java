@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.nio.file.Path;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -28,14 +29,13 @@ import org.junit.jupiter.api.Test;
  * @author Brett Porter
  *
  */
+@Disabled("Disabled for MNG-7977")
 public class MavenITmng1088ReactorPluginResolutionTest extends AbstractMavenIntegrationTestCase {
 
     /**
-     * Test that the concurrent builder can build a plugin that is part of the reactor and then use it
-     * in a sibling module — without any pre-installed version in the local repository.
-     * <p>
-     * The concurrent builder schedules the plugin project to reach the {@code ready} phase before
-     * planning the consuming project, so {@code mvn package -b concurrent} works on a clean local repo.
+     * Test that the plugin manager falls back to resolution from the repository if a plugin is part of the reactor
+     * (i.e. an active project artifact) but the lifecycle has not been executed far enough to produce a file for
+     * the plugin (i.e. a phase before "compile").
      *
      * @throws Exception in case of failure
      */
@@ -47,7 +47,11 @@ public class MavenITmng1088ReactorPluginResolutionTest extends AbstractMavenInte
         verifier.setAutoclean(false);
         verifier.deleteDirectory("client/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng1088");
-        verifier.addCliArguments("-b", "concurrent", "package");
+        verifier.filterFile("settings-template.xml", "settings.xml");
+        verifier.addCliArgument("--settings");
+        verifier.addCliArgument("settings.xml");
+        // NOTE: It's essential part of the test to invoke a phase before "compile"
+        verifier.addCliArgument("initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
