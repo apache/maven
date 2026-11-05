@@ -573,7 +573,9 @@ public class DefaultProfileSelectorTest {
 
         assertTrue(active.isEmpty());
         assertEquals(1, localProblems.getErrors().size());
-        assertEquals("Failed to determine activation for profile one: BOOM", localProblems.getErrors().get(0));
+        assertEquals(
+                "Failed to determine activation for profile one: BOOM",
+                localProblems.getErrors().get(0));
     }
 
     // ---- Helper methods ----
@@ -660,7 +662,8 @@ public class DefaultProfileSelectorTest {
     private Profile newPomProfile(String id, boolean activeByDefault) {
         return Profile.newBuilder()
                 .id(id)
-                .activation(Activation.newBuilder().activeByDefault(activeByDefault).build())
+                .activation(
+                        Activation.newBuilder().activeByDefault(activeByDefault).build())
                 .location("", newPomLocation())
                 .build();
     }
@@ -672,7 +675,8 @@ public class DefaultProfileSelectorTest {
     private Profile newSettingsProfile(String id, boolean activeByDefault) {
         return Profile.newBuilder()
                 .id(id)
-                .activation(Activation.newBuilder().activeByDefault(activeByDefault).build())
+                .activation(
+                        Activation.newBuilder().activeByDefault(activeByDefault).build())
                 .location("", newSettingsLocation())
                 .build();
     }
@@ -686,7 +690,8 @@ public class DefaultProfileSelectorTest {
         InputLocation location = InputLocation.of(1, 1, source);
         return Profile.newBuilder()
                 .id(id)
-                .activation(Activation.newBuilder().activeByDefault(activeByDefault).build())
+                .activation(
+                        Activation.newBuilder().activeByDefault(activeByDefault).build())
                 .location("", location)
                 .build();
     }
@@ -697,7 +702,8 @@ public class DefaultProfileSelectorTest {
     private Profile newProfileNoLocation(String id, boolean activeByDefault) {
         return Profile.newBuilder()
                 .id(id)
-                .activation(Activation.newBuilder().activeByDefault(activeByDefault).build())
+                .activation(
+                        Activation.newBuilder().activeByDefault(activeByDefault).build())
                 .build();
     }
 

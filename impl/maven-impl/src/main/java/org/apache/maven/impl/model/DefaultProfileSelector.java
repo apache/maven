@@ -26,8 +26,6 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Activation;
-import org.apache.maven.api.model.InputLocation;
-import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.BuilderProblem.Severity;
 import org.apache.maven.api.services.ModelProblem.Version;
@@ -35,6 +33,7 @@ import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileActivator;
 import org.apache.maven.api.services.model.ProfileSelector;
+import org.apache.maven.impl.model.profile.ProfileSourceDetector;
 
 /**
  * Calculates the active profiles among a given collection of profiles.
@@ -143,22 +142,7 @@ public class DefaultProfileSelector implements ProfileSelector {
         return activation != null && activation.isActiveByDefault();
     }
 
-    /**
-     * Determines whether the given profile originates from a POM file
-     * by checking if the profile's {@link InputSource} has a non-empty model id.
-     * Profiles from settings.xml or other external sources will have
-     * a {@code null} or empty model id.
-     * Defaults to {@code true} if no location information is available,
-     * matching the previous default behavior.
-     */
     private boolean isFromPom(Profile profile) {
-        InputLocation location = profile.getLocation("");
-        if (location != null) {
-            InputSource source = location.getSource();
-            if (source != null) {
-                return source.getModelId() != null && !source.getModelId().isEmpty();
-            }
-        }
-        return true;
+        return ProfileSourceDetector.isFromPom(profile);
     }
 }

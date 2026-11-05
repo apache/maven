@@ -190,12 +190,21 @@ public class ConditionProfileActivator implements ProfileActivator {
             // Check system properties
             v = context.getSystemProperty(name);
         }
-        if (v == null && profile != null && Profile.SOURCE_POM.equals(profile.getSource())) {
+        if (v == null && profile != null && isFromPom(profile)) {
             v = context.getCascadedProfileProperty(name);
             if (v == null) {
                 v = context.getModelProperty(name);
             }
         }
         return v;
+    }
+
+    /**
+     * Determines whether the given profile originates from a POM file.
+     *
+     * @see ProfileSourceDetector#isFromPom(Profile)
+     */
+    private static boolean isFromPom(Profile profile) {
+        return ProfileSourceDetector.isFromPom(profile);
     }
 }
