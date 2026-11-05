@@ -18,6 +18,7 @@
  */
 package org.apache.maven.execution;
 
+import java.util.Collections;
 import java.util.List;
 
 import org.apache.maven.project.DependencyResolutionResult;
@@ -36,6 +37,20 @@ public interface MavenExecutionResult {
      * @return the sorted list, or an empty list if there are no projects.
      */
     List<MavenProject> getTopologicallySortedProjects();
+
+    default MavenExecutionResult setAllProjects(List<MavenProject> projects) {
+        return this;
+    }
+
+    /**
+     * Returns all projects in the reactor graph, including those not selected by {@code -pl}.
+     * This is a superset of {@link #getTopologicallySortedProjects()}.
+     *
+     * @return all reactor projects, or an empty list if the graph has not been built.
+     */
+    default List<MavenProject> getAllProjects() {
+        return Collections.emptyList();
+    }
 
     MavenExecutionResult setDependencyResolutionResult(DependencyResolutionResult result);
 
