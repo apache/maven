@@ -175,7 +175,7 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
         if (sink.needsMetadata()) {
             sourceClass = name;
             sourceMethod = resolveCallerMethod();
-            threadId = Thread.currentThread().getId();
+            threadId = Thread.currentThread().getId(); // TODO: replace with threadId() when baseline ≥ JDK 19
             threadName = Thread.currentThread().getName();
         }
 

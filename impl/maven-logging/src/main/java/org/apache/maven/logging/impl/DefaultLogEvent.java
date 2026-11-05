@@ -19,6 +19,8 @@
 package org.apache.maven.logging.impl;
 
 import java.time.Instant;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.logging.LogEvent;
@@ -51,7 +53,7 @@ public final class DefaultLogEvent implements LogEvent {
     private final String mojoId;
     private final Map<String, Object> keyValues;
     private final String messageTemplate;
-    private final Object[] messageArgs;
+    private final List<Object> messageArgs;
 
     private volatile String formattedMessage;
 
@@ -72,6 +74,41 @@ public final class DefaultLogEvent implements LogEvent {
             Map<String, Object> keyValues,
             String messageTemplate,
             Object[] messageArgs) {
+        this(
+                timestamp,
+                level,
+                message,
+                loggerName,
+                throwable,
+                sourceClassName,
+                sourceMethodName,
+                threadId,
+                sequenceNumber,
+                threadName,
+                projectId,
+                mojoId,
+                keyValues,
+                messageTemplate,
+                messageArgs != null ? List.copyOf(Arrays.asList(messageArgs)) : null);
+    }
+
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public DefaultLogEvent(
+            Instant timestamp,
+            LogLevel level,
+            String message,
+            String loggerName,
+            Throwable throwable,
+            String sourceClassName,
+            String sourceMethodName,
+            long threadId,
+            long sequenceNumber,
+            String threadName,
+            String projectId,
+            String mojoId,
+            Map<String, Object> keyValues,
+            String messageTemplate,
+            List<Object> messageArgs) {
         this.timestamp = timestamp;
         this.level = level;
         this.message = message;
@@ -121,7 +158,7 @@ public final class DefaultLogEvent implements LogEvent {
                 mojoId,
                 Map.of(),
                 null,
-                null);
+                (List<Object>) null);
     }
 
     /**
@@ -210,24 +247,24 @@ public final class DefaultLogEvent implements LogEvent {
     }
 
     @Override
-    public Object[] messageArgs() {
-        return messageArgs != null ? messageArgs.clone() : null;
+    public List<Object> messageArgs() {
+        return messageArgs;
     }
 
-    static String formatMessage(String template, Object[] args) {
+    static String formatMessage(String template, List<Object> args) {
         if (template == null) {
             return "";
         }
-        if (args == null || args.length == 0) {
+        if (args == null || args.isEmpty()) {
             return template;
         }
         StringBuilder sb = new StringBuilder();
         int argIdx = 0;
         int start = 0;
         int pos;
-        while ((pos = template.indexOf(PLACEHOLDER, start)) != -1 && argIdx < args.length) {
+        while ((pos = template.indexOf(PLACEHOLDER, start)) != -1 && argIdx < args.size()) {
             sb.append(template, start, pos);
-            sb.append(args[argIdx++]);
+            sb.append(args.get(argIdx++));
             start = pos + 2;
         }
         sb.append(template, start, template.length());

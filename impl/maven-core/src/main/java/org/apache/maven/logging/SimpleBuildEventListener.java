@@ -47,7 +47,9 @@ public class SimpleBuildEventListener implements BuildEventListener {
         Throwable throwable = event.throwable();
         if (throwable != null) {
             StringWriter sw = new StringWriter();
-            throwable.printStackTrace(new PrintWriter(sw));
+            try (PrintWriter pw = new PrintWriter(sw)) {
+                throwable.printStackTrace(pw);
+            }
             log(sw.toString().stripTrailing());
         }
     }

@@ -163,9 +163,9 @@ class DefaultLoggerTest {
         assertEquals(1, sink.events.size());
         LogEvent e = sink.events.get(0);
         assertEquals("hello {} and {}", e.messageTemplate());
-        assertEquals(2, e.messageArgs().length);
-        assertEquals("world", e.messageArgs()[0]);
-        assertEquals(42, e.messageArgs()[1]);
+        assertEquals(2, e.messageArgs().size());
+        assertEquals("world", e.messageArgs().get(0));
+        assertEquals(42, e.messageArgs().get(1));
         assertEquals("hello world and 42", e.message());
     }
 

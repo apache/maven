@@ -38,6 +38,7 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 @Consumer
+@FunctionalInterface
 public interface LogSink {
 
     /**

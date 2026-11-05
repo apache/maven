@@ -19,6 +19,7 @@
 package org.apache.maven.api.logging;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
@@ -212,14 +213,16 @@ public interface LogEvent {
     }
 
     /**
-     * The raw argument array passed to
+     * The arguments passed to
      * {@link LogEventBuilder#log(String, Object...)}, or {@code null} when no
      * template args were supplied.
+     * <p>
+     * The returned list is immutable.
      *
-     * @return the raw args array, or {@code null}
+     * @return the immutable args list, or {@code null}
      */
     @Nullable
-    default Object[] messageArgs() {
+    default List<Object> messageArgs() {
         return null;
     }
 }
