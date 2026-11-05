@@ -620,12 +620,19 @@ public class MavenCli {
                 // Ignore
                 //
             }
-        }
 
-        // Logging caches System.out, so wait for terminal installation on every path.
-        // With -l, the earlier wait protects redirection, so this second wait returns immediately.
-        MessageUtils.awaitTerminalInitialization();
-        slf4jConfiguration.activate();
+            // Logging caches System.out; with -l the wait above already ran, so activate now.
+            slf4jConfiguration.activate();
+        } else {
+            // Logging caches System.out, so wait for terminal installation to complete before
+            // activating, except when color is explicitly forced. With forced color the user expects
+            // raw ANSI to flow through the original stdout; waiting causes AnsiConsole to wrap that
+            // stream before the logger caches it, which may strip the escape codes.
+            if (!"always".equals(styleColor) && !"yes".equals(styleColor) && !"force".equals(styleColor)) {
+                MessageUtils.awaitTerminalInitialization();
+            }
+            slf4jConfiguration.activate();
+        }
 
         plexusLoggerManager = new Slf4jLoggerManager();
         slf4jLogger = slf4jLoggerFactory.getLogger(this.getClass().getName());

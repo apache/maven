@@ -40,9 +40,94 @@ import static org.mockito.Mockito.mock;
 
 @Isolated("Changes JVM-wide streams, system properties, terminal state, and logging configuration")
 class MavenCliLoggingTest {
+    /**
+     * When color is explicitly forced ({@code -color=always}), logging must NOT wait for
+     * terminal installation before caching {@code System.out}.  Waiting causes
+     * {@code AnsiConsole.systemInstall()} to wrap the stream before the logger sees it; in a
+     * non-TTY environment (CI, pipes) that wrapper strips ANSI codes even for a dumb-color
+     * terminal, defeating the purpose of {@code -color=always}.
+     * <p>
+     * Therefore the logger caches the stream that was active when {@code logging()} was called
+     * (the "early" stream), and continues to write to it even after terminal installation
+     * replaces {@code System.out}.
+     */
     @Test
-    void cachesOutputAfterTerminalInstallationWithColorForced() throws Exception {
-        cachesOutputAfterTerminalInstallation("always");
+    void withColorForcedLoggerCachesEarlyStream() throws Exception {
+        PrintStream originalOut = System.out;
+        Terminal originalTerminal = MessageUtils.getTerminal();
+        boolean originalColor;
+        try {
+            MessageUtils.systemInstall(mock(Terminal.class));
+            originalColor = MessageUtils.isColorEnabled();
+        } finally {
+            MessageUtils.systemInstall(originalTerminal);
+        }
+        String cacheProperty = "org.slf4j.simpleLogger.cacheOutputStream";
+        String fileProperty = "org.slf4j.simpleLogger.logFile";
+        String originalCache = System.getProperty(cacheProperty);
+        String originalFile = System.getProperty(fileProperty);
+        CountDownLatch buildingTerminal = new CountDownLatch(1);
+        CountDownLatch releaseTerminal = new CountDownLatch(1);
+        ByteArrayOutputStream earlyOutput = new ByteArrayOutputStream();
+        ByteArrayOutputStream terminalOutput = new ByteArrayOutputStream();
+        Thread loggingThread = null;
+        try (PrintStream earlyStream = new PrintStream(earlyOutput, true, UTF_8.name());
+                PrintStream terminalStream = new PrintStream(terminalOutput, true, UTF_8.name())) {
+            System.setProperty(cacheProperty, "true");
+            System.setProperty(fileProperty, "System.out");
+            System.setOut(earlyStream);
+            new Slf4jSimpleConfiguration().activate();
+
+            FastTerminal terminal = new FastTerminal(
+                    () -> {
+                        buildingTerminal.countDown();
+                        if (!releaseTerminal.await(10, SECONDS)) {
+                            throw new IllegalStateException("Terminal installation was not released");
+                        }
+                        return mock(TerminalExt.class);
+                    },
+                    installed -> System.setOut(terminalStream));
+            MessageUtils.systemInstall(terminal);
+            assertTrue(buildingTerminal.await(10, SECONDS));
+
+            MavenCli cli = new MavenCli();
+            CliRequest request = new CliRequest(new String[] {"-Dstyle.color=always"}, null);
+            cli.cli(request);
+            cli.properties(request);
+            FutureTask<Void> logging = new FutureTask<>(() -> {
+                cli.logging(request);
+                return null;
+            });
+            loggingThread = new Thread(logging, "logging-initialization-test");
+            loggingThread.setDaemon(true);
+            loggingThread.start();
+            // With -color=always, logging() does NOT await terminal initialization, so it
+            // completes without blocking. Release the terminal after logging finishes.
+            logging.get(10, SECONDS);
+            releaseTerminal.countDown();
+            terminal.getTerminal();
+
+            // The logger must have cached earlyStream (active when logging() ran), not the
+            // terminalStream that the installed callback set afterwards.
+            LoggerFactory.getLogger(MavenCliLoggingTest.class).warn("terminal-output-marker");
+            assertTrue(
+                    earlyOutput.toString(UTF_8.name()).contains("terminal-output-marker"),
+                    "Logger must write to the stream that was active during logging() with -color=always");
+            assertFalse(
+                    terminalOutput.toString(UTF_8.name()).contains("terminal-output-marker"),
+                    "Logger must not switch to the terminal stream when color is forced");
+        } finally {
+            releaseTerminal.countDown();
+            if (loggingThread != null) {
+                loggingThread.join(10000);
+            }
+            System.setOut(originalOut);
+            MessageUtils.systemInstall(originalTerminal);
+            MessageUtils.setColorEnabled(originalColor);
+            restoreProperty(cacheProperty, originalCache);
+            restoreProperty(fileProperty, originalFile);
+            new Slf4jSimpleConfiguration().activate();
+        }
     }
 
     @Test
