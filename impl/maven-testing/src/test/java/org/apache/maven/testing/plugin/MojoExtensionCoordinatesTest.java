@@ -23,9 +23,12 @@ import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.Isolated;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 
+// swaps the global basedir system property that every @MojoTest reads
+@Isolated
 class MojoExtensionCoordinatesTest {
 
     @TempDir
