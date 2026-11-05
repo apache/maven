@@ -114,10 +114,15 @@ public final class V4MojoConfigurator {
             if (children.isEmpty()) {
                 // No child elements: treat the text value as a comma-separated list
                 String text = evaluateNodeAsString(node);
-                String[] parts = text != null ? text.split(",", -1) : new String[0];
+                String[] parts = text != null
+                        ? java.util.Arrays.stream(text.split(","))
+                                .map(String::trim)
+                                .filter(s -> !s.isEmpty())
+                                .toArray(String[]::new)
+                        : new String[0];
                 Object array = Array.newInstance(type.getComponentType(), parts.length);
                 for (int i = 0; i < parts.length; i++) {
-                    Array.set(array, i, convert(XmlNode.newInstance("item", parts[i].trim()), type.getComponentType()));
+                    Array.set(array, i, convert(XmlNode.newInstance("item", parts[i]), type.getComponentType()));
                 }
                 return array;
             }
@@ -136,8 +141,11 @@ public final class V4MojoConfigurator {
                 // No child elements: treat the text value as a comma-separated list
                 String text = evaluateNodeAsString(node);
                 if (text != null) {
-                    for (String part : text.split(",", -1)) {
-                        values.add(convert(XmlNode.newInstance("item", part.trim()), itemType));
+                    for (String part : text.split(",")) {
+                        String trimmed = part.trim();
+                        if (!trimmed.isEmpty()) {
+                            values.add(convert(XmlNode.newInstance("item", trimmed), itemType));
+                        }
                     }
                 }
             } else {
@@ -161,13 +169,14 @@ public final class V4MojoConfigurator {
                         if (key != null && val != null) {
                             properties.put(key, val);
                         }
-                    } else {
-                        // Support key=element-name, value=text: <key>value</key>
+                    } else if (nameNode == null) {
+                        // Simple <key>value</key> style
                         Object val = convert(child, valueType);
                         if (val != null) {
                             properties.put(child.name(), val);
                         }
                     }
+                    // nameNode != null && valueNode == null: malformed Plexus entry — skip it
                 }
                 return properties;
             }
@@ -202,8 +211,17 @@ public final class V4MojoConfigurator {
     }
 
     private Object convertScalar(XmlNode node, Class<?> type) throws Exception {
-        if (type == String.class || type == Object.class) {
+        if (type == String.class) {
             return evaluateNode(node, type);
+        }
+        if (type == Object.class) {
+            // For Object-typed parameters: if the node is a leaf (no children), evaluate as String.
+            // If it has children, fall through to bean/map/collection conversion so that
+            // structured XML children are not silently dropped.
+            if (node.children().isEmpty()) {
+                return evaluateNode(node, String.class);
+            }
+            return NOT_SCALAR;
         }
         if (type == Path.class || type == File.class) {
             Object evaluated = evaluateNode(node, type);

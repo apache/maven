@@ -427,4 +427,96 @@ class V4MojoConfiguratorTest {
         assertNotNull(mojo.item);
         assertEquals("single-value", mojo.item.getInternal());
     }
+
+    @Test
+    void testCommaSeparatedArray() throws Exception {
+        CollectionsMojo mojo = new CollectionsMojo();
+        XmlNode config =
+                new XmlNodeImpl("configuration", null, Map.of(), List.of(new XmlNodeImpl("array", "a, b, c")), null);
+
+        configurator.configure(mojo, config);
+
+        assertArrayEquals(new String[] {"a", "b", "c"}, mojo.array);
+    }
+
+    @Test
+    void testCommaSeparatedArraySkipsEmptyTokens() throws Exception {
+        CollectionsMojo mojo = new CollectionsMojo();
+        XmlNode config =
+                new XmlNodeImpl("configuration", null, Map.of(), List.of(new XmlNodeImpl("array", "a,,b, ,c")), null);
+
+        configurator.configure(mojo, config);
+
+        // consecutive/trailing commas and whitespace-only tokens are dropped
+        assertArrayEquals(new String[] {"a", "b", "c"}, mojo.array);
+    }
+
+    @Test
+    void testCommaSeparatedList() throws Exception {
+        CollectionsMojo mojo = new CollectionsMojo();
+        XmlNode config =
+                new XmlNodeImpl("configuration", null, Map.of(), List.of(new XmlNodeImpl("list", "x, y, z")), null);
+
+        configurator.configure(mojo, config);
+
+        assertEquals(List.of("x", "y", "z"), mojo.list);
+    }
+
+    @Test
+    void testPlexusStyleProperties() throws Exception {
+        CollectionsMojo mojo = new CollectionsMojo();
+        XmlNode config = new XmlNodeImpl(
+                "configuration",
+                null,
+                Map.of(),
+                List.of(new XmlNodeImpl(
+                        "properties",
+                        null,
+                        Map.of(),
+                        List.of(
+                                new XmlNodeImpl(
+                                        "property",
+                                        null,
+                                        Map.of(),
+                                        List.of(new XmlNodeImpl("name", "k1"), new XmlNodeImpl("value", "v1")),
+                                        null),
+                                new XmlNodeImpl(
+                                        "property",
+                                        null,
+                                        Map.of(),
+                                        List.of(new XmlNodeImpl("name", "k2"), new XmlNodeImpl("value", "v2")),
+                                        null)),
+                        null)),
+                null);
+
+        configurator.configure(mojo, config);
+
+        assertEquals("v1", mojo.properties.getProperty("k1"));
+        assertEquals("v2", mojo.properties.getProperty("k2"));
+        assertEquals(2, mojo.properties.size());
+    }
+
+    @Test
+    void testPlexusStylePropertyWithNameButNoValueIsSkipped() throws Exception {
+        CollectionsMojo mojo = new CollectionsMojo();
+        XmlNode config = new XmlNodeImpl(
+                "configuration",
+                null,
+                Map.of(),
+                List.of(new XmlNodeImpl(
+                        "properties",
+                        null,
+                        Map.of(),
+                        List.of(new XmlNodeImpl(
+                                "property", null, Map.of(), List.of(new XmlNodeImpl("name", "orphan")), null)),
+                        null)),
+                null);
+
+        configurator.configure(mojo, config);
+
+        // malformed Plexus entry (<name> without <value>) must be silently skipped,
+        // not inserted with key "property" (the XML tag name)
+        assertNotNull(mojo.properties);
+        assertTrue(mojo.properties.isEmpty(), "Malformed Plexus property entry must be silently skipped");
+    }
 }

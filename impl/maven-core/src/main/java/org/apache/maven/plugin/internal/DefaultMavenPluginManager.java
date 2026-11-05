@@ -118,6 +118,7 @@ import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
+import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -832,7 +833,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                             + "' with Maven XML configurator -->");
                 }
                 new V4MojoConfigurator(
-                                new PlexusMojoExpressionEvaluatorAdapter(expressionEvaluator),
+                                new PlexusMojoExpressionEvaluatorAdapter(
+                                        (TypeAwareExpressionEvaluator) expressionEvaluator),
                                 pluginRealm,
                                 mojoDescriptor.getPluginDescriptor())
                         .configure(mojo, configurationDom);

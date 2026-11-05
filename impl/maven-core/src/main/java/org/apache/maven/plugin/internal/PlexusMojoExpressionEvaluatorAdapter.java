@@ -20,18 +20,17 @@ package org.apache.maven.plugin.internal;
 
 import java.io.File;
 
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
 
 /**
- * Adapts a Plexus {@link ExpressionEvaluator} to the internal {@link MojoExpressionEvaluator} interface,
+ * Adapts a Plexus {@link TypeAwareExpressionEvaluator} to the internal {@link MojoExpressionEvaluator} interface,
  * isolating {@link V4MojoConfigurator} from the Plexus API.
  */
 class PlexusMojoExpressionEvaluatorAdapter implements MojoExpressionEvaluator {
     private final TypeAwareExpressionEvaluator delegate;
 
-    PlexusMojoExpressionEvaluatorAdapter(ExpressionEvaluator evaluator) {
-        this.delegate = (TypeAwareExpressionEvaluator) evaluator;
+    PlexusMojoExpressionEvaluatorAdapter(TypeAwareExpressionEvaluator evaluator) {
+        this.delegate = evaluator;
     }
 
     @Override
