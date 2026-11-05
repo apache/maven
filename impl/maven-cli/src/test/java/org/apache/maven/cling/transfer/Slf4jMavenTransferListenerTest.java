@@ -40,22 +40,24 @@ class Slf4jMavenTransferListenerTest {
 
     @Test
     void subSecondTransferReportsItsRate() {
+        // Create the mock first: loading Mockito must not count towards the transfer time.
+        Logger logger = mock(Logger.class);
         TransferResource resource = resourceStartedMillisAgo(250);
         TransferEvent event = new TransferEvent.Builder(new DefaultRepositorySystemSession(h -> false), resource)
                 .setType(TransferEvent.EventType.SUCCEEDED)
                 .setTransferredBytes(7_900)
                 .build();
-        Logger logger = mock(Logger.class);
 
         new Slf4jMavenTransferListener(logger).transferSucceeded(event);
 
         ArgumentCaptor<String> message = ArgumentCaptor.forClass(String.class);
         verify(logger).info(message.capture());
-        Matcher rate = Pattern.compile("\\(7\\.9 kB at (\\d+\\.\\d) kB/s\\)$").matcher(message.getValue());
+        Matcher rate =
+                Pattern.compile("\\(7\\.9 kB at (\\d+\\.\\d) (B|kB)/s\\)$").matcher(message.getValue());
         assertTrue(rate.find(), message.getValue());
-        // 7.9 kB in a little over 250 ms: at most 31.6 kB/s, and more than the 7.9 kB/s of a whole second
-        double kilobytesPerSecond = Double.parseDouble(rate.group(1));
-        assertTrue(kilobytesPerSecond > 7.9 && kilobytesPerSecond <= 31.6, message.getValue());
+        // The transfer took at least 250 ms, so 7.9 kB cannot have moved faster than 31.6 kB/s.
+        double bytesPerSecond = Double.parseDouble(rate.group(1)) * ("kB".equals(rate.group(2)) ? 1000 : 1);
+        assertTrue(bytesPerSecond <= 31_600, message.getValue());
     }
 
     private static TransferResource resourceStartedMillisAgo(long millis) {

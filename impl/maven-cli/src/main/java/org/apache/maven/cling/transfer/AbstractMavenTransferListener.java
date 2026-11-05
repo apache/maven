@@ -47,15 +47,28 @@ public abstract class AbstractMavenTransferListener extends AbstractTransferList
     }
 
     /**
-     * Returns the average rate of a transfer, measured in fractional seconds so that transfers shorter than a second
-     * get a rate too.
+     * Returns the average rate of a transfer that started at {@code start} and is still running.
      *
      * @param start when the transfer started
      * @param transferredBytes the number of bytes transferred so far
      * @return the rate in bytes per second, or empty if no time has elapsed
+     * @see #bytesPerSecond(Instant, Instant, long)
      */
     static OptionalDouble bytesPerSecond(Instant start, long transferredBytes) {
-        long nanos = Duration.between(start, MonotonicClock.now()).toNanos();
+        return bytesPerSecond(start, MonotonicClock.now(), transferredBytes);
+    }
+
+    /**
+     * Returns the average rate of a transfer, measured in fractional seconds so that transfers shorter than a second
+     * get a rate too.
+     *
+     * @param start when the transfer started
+     * @param end when the rate is measured
+     * @param transferredBytes the number of bytes transferred by {@code end}
+     * @return the rate in bytes per second, or empty if no time has elapsed
+     */
+    static OptionalDouble bytesPerSecond(Instant start, Instant end, long transferredBytes) {
+        long nanos = Duration.between(start, end).toNanos();
         if (nanos <= 0) {
             return OptionalDouble.empty();
         }
