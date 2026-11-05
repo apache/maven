@@ -433,7 +433,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                 try (Reader r = openPomUrl(context.getRequiredTestClass(), pom, modelPath)) {
                     tmodel = new MavenStaxReader().read(r);
                 }
-            } else {
+            } else if (methodMojo != null) {
+                // only a method-level annotation falls back to the basedir POM; a parameter-only one keeps the default
                 Path pomPath = basedirPath.resolve("pom.xml");
                 if (Files.exists(pomPath)) {
                     try (Reader r = Files.newBufferedReader(pomPath)) {
