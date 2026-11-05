@@ -70,6 +70,16 @@ public interface Plugin {
     Realm getRealm();
 
     /**
+     * Returns the class loader used to load this plugin's classes.
+     *
+     * @return the class loader, never {@code null}
+     */
+    @Nonnull
+    default ClassLoader getClassLoader() {
+        return getRealm().classLoader();
+    }
+
+    /**
      * Returns the artifact for this plugin.
      *
      * @return the plugin artifact, or {@code null} if not available
