@@ -295,7 +295,8 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
                     .get());
             options.addOption(Option.builder(UPDATE_SNAPSHOTS)
                     .longOpt("update-snapshots")
-                    .desc("Forces a check for missing releases and updated snapshots on remote repositories")
+                    .desc("Forces a check for missing releases and updated snapshots on remote repositories; "
+                            + "does not re-download release artifacts already present in the local repository")
                     .get());
             options.addOption(Option.builder(ACTIVATE_PROFILES)
                     .longOpt("activate-profiles")
