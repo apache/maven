@@ -20,6 +20,11 @@ package org.apache.maven.api.services;
 
 import org.apache.maven.api.annotations.Experimental;
 
+/**
+ * Exception thrown when an error occurs in the checksum algorithm service.
+ *
+ * @since 4.0.0
+ */
 @Experimental
 public class ChecksumAlgorithmServiceException extends MavenException {
 

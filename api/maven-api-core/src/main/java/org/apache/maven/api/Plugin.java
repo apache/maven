@@ -36,32 +36,62 @@ import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
 @Experimental
 public interface Plugin {
 
+    /**
+     * Returns the POM model element for this plugin.
+     *
+     * @return the plugin model, or {@code null} if not available
+     */
     @Nullable
     org.apache.maven.api.model.Plugin getModel();
 
+    /**
+     * Returns the plugin descriptor containing metadata about goals and parameters.
+     *
+     * @return the plugin descriptor, never {@code null}
+     */
     @Nonnull
     PluginDescriptor getDescriptor();
 
+    /**
+     * Returns the custom lifecycles defined by this plugin.
+     *
+     * @return the list of lifecycles, never {@code null}
+     */
     @Nonnull
     List<Lifecycle> getLifecycles();
 
     /**
      * Returns the runtime realm for this plugin.
      *
-     * @return the plugin realm
+     * @return the plugin realm, never {@code null}
      * @since 4.1.0
      */
     @Nonnull
     Realm getRealm();
 
+    /**
+     * Returns the artifact for this plugin.
+     *
+     * @return the plugin artifact, or {@code null} if not available
+     */
     @Nullable
     Artifact getArtifact();
 
+    /**
+     * Returns the collection of dependencies for this plugin.
+     *
+     * @return the plugin dependencies, never {@code null}
+     */
     @Nonnull
     default Collection<Dependency> getDependencies() {
         return getDependenciesMap().values();
     }
 
+    /**
+     * Returns the dependencies for this plugin, keyed by their string identifier.
+     *
+     * @return the dependency map, never {@code null}
+     */
     @Nonnull
     Map<String, Dependency> getDependenciesMap();
 }

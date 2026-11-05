@@ -40,6 +40,7 @@ import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.jline.MessageUtils;
+import org.apache.maven.utils.CleanArgument;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.cling.invoker.CliUtils.createInterpolator;

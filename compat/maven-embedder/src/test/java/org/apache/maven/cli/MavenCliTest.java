@@ -18,8 +18,10 @@
  */
 package org.apache.maven.cli;
 
+import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -64,6 +66,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -114,6 +117,35 @@ class MavenCliTest {
         for (T item : expected) {
             assertTrue(actual.contains(item), "Collection should contain: " + item);
         }
+    }
+
+    /**
+     * With redirected streams there is no console, and the password is read from the standard input, as the
+     * encryption printed an empty result otherwise (MNG-8398).
+     */
+    @Test
+    public void testReadPasswordFromRedirectedInput() throws Exception {
+        ByteArrayInputStream in = new ByteArrayInputStream("secret\nignored\n".getBytes(StandardCharsets.UTF_8));
+
+        assertEquals("secret", MavenCli.readPassword(null, in, "Password: "));
+    }
+
+    @Test
+    public void testReadPasswordFromRedirectedInputIsDecodedAsUtf8() throws Exception {
+        ByteArrayInputStream in = new ByteArrayInputStream("p\u00e4ss\u20ac\n".getBytes(StandardCharsets.UTF_8));
+
+        assertEquals("p\u00e4ss\u20ac", MavenCli.readPassword(null, in, "Password: "));
+    }
+
+    @Test
+    public void testReadPasswordRejectsMissingPassword() {
+        assertThrows(
+                IllegalStateException.class,
+                () -> MavenCli.readPassword(null, new ByteArrayInputStream(new byte[0]), "Password: "));
+        assertThrows(
+                IllegalStateException.class,
+                () -> MavenCli.readPassword(
+                        null, new ByteArrayInputStream("\n".getBytes(StandardCharsets.UTF_8)), "Password: "));
     }
 
     @Test
@@ -223,6 +255,29 @@ class MavenCliTest {
 
         cli.initialize(request);
         assertThrows(ParseException.class, () -> cli.cli(request));
+    }
+
+    /**
+     * MNG-11167: {@code multiModuleProjectDirectory} must keep the path as given, not the path that
+     * {@link File#getCanonicalFile()} resolves a symlinked (or, on Windows, a mapped network drive)
+     * segment to, or every module/parent path resolved relative to it inherits the wrong base.
+     */
+    @Test
+    void testMultiModuleProjectDirectoryIsNotResolvedThroughASymlink(@TempDir Path tempDir) throws Exception {
+        Path real = Files.createDirectories(tempDir.resolve("real"));
+        Path link = tempDir.resolve("link");
+        try {
+            Files.createSymbolicLink(link, real);
+        } catch (IOException | UnsupportedOperationException e) {
+            assumeTrue(false, "symbolic links are not supported on this machine");
+        }
+
+        System.setProperty(MavenCli.MULTIMODULE_PROJECT_DIRECTORY, link.toString());
+        CliRequest request = new CliRequest(new String[0], null);
+
+        cli.initialize(request);
+
+        assertEquals(link.toString(), request.multiModuleProjectDirectory.getPath());
     }
 
     /**
@@ -349,6 +404,42 @@ class MavenCliTest {
         assertEquals("Apache Maven", request.getUserProperties().getProperty("label"));
 
         assertEquals("-Dpom.xml", request.getCommandLine().getOptionValue(CLIManager.ALTERNATE_POM_FILE));
+    }
+
+    /**
+     * Verifies the MNG-7131 contract: {@code .mvn/maven.config} uses a <em>one-argument-per-line</em> format,
+     * modelled after Java {@code @argfiles}. Each line is a single argv token — whitespace inside a line is
+     * preserved and is never re-split. This means a property value that contains spaces can be supplied as two
+     * consecutive lines:
+     * <pre>
+     *   --define
+     *   label=Apache Maven
+     * </pre>
+     * The two lines are passed as two separate tokens to Commons CLI, which consumes the second as the argument
+     * to {@code --define}. This is the contract introduced by commit {@code 331c5c3435} and broken by PR #13093
+     * (reverted in #13148); this test guards against that regression.
+     *
+     * @throws Exception in case of failure.
+     */
+    @Test
+    void testMavenConfigMultiLineDefineWithSpaces() throws Exception {
+        System.setProperty(
+                MavenCli.MULTIMODULE_PROJECT_DIRECTORY,
+                new File("src/test/projects/mavenConfigSpacedValues").getCanonicalPath());
+        CliRequest request = new CliRequest(new String[0], null);
+
+        cli.initialize(request);
+        cli.cli(request);
+        cli.properties(request);
+
+        assertEquals(
+                "Apache Maven",
+                request.getUserProperties().getProperty("label"),
+                "MNG-7131: --define / value-with-spaces form must preserve the space");
+        assertEquals(
+                "1.0.0",
+                request.getUserProperties().getProperty("revision"),
+                "MNG-7131: --define / value-without-spaces form must work");
     }
 
     @Test

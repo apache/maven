@@ -514,14 +514,10 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                 if (phaseConfiguration != null) {
                     for (MojoExecution forkedExecution : forkedExecutions) {
                         org.codehaus.plexus.util.xml.Xpp3Dom config = forkedExecution.getConfiguration();
-
-                        if (config != null) {
-                            XmlNode forkedConfiguration = config.getDom();
-
-                            forkedConfiguration = XmlService.merge(phaseConfiguration, forkedConfiguration);
-
-                            forkedExecution.setConfiguration(forkedConfiguration);
-                        }
+                        XmlNode forkedConfiguration = config != null
+                                ? XmlService.merge(phaseConfiguration, config.getDom())
+                                : phaseConfiguration;
+                        forkedExecution.setConfiguration(forkedConfiguration);
                     }
                 }
             }

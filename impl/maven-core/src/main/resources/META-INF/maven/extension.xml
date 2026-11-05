@@ -77,11 +77,8 @@ under the License.
     <exportedPackage>org.eclipse.aether.version</exportedPackage>
     <exportedPackage>org.eclipse.aether.util</exportedPackage>
 
-    <!-- plexus-classworlds -->
+    <!-- maven-classworlds -->
     <exportedPackage>org.codehaus.plexus.classworlds</exportedPackage>
-
-    <!-- classworlds (for legacy code) -->
-    <exportedPackage>org.codehaus.classworlds</exportedPackage>
 
     <!-- plexus-utils (for DOM-type fields in maven-model) -->
     <exportedPackage>org.codehaus.plexus.util.xml.Xpp3Dom</exportedPackage>
@@ -102,7 +99,20 @@ under the License.
 
     <!-- plexus-interactivity-api -->
     <exportedPackage>org.codehaus.plexus.components.interactivity</exportedPackage>
+    <!-- JAnsi: maven-embedder ships Ansi, AnsiConsole, AnsiPrintStream and AnsiMode, forwarding to the
+         already-installed JLine terminal, for backward compatibility with code (e.g. maven-shared-utils)
+         still calling the JAnsi API. The jansi artifact itself stays excluded below, so a plugin that
+         declares org.fusesource.jansi:jansi gets these forwarding classes instead of its own copy: that
+         is what keeps AnsiConsole.systemInstall()/systemUninstall() calls routed through the single
+         console Maven owns, instead of a second, independent install racing it for ownership of
+         System.out/System.err. Each class is named exactly, not as org.fusesource.jansi.*, since these
+         four are the only ones maven-embedder provides; any other class in that package a plugin needs
+         falls back to its own classpath (see ClassRealm#loadClassFromImport). See the discussion on
+         #13727. -->
     <exportedPackage>org.fusesource.jansi.Ansi</exportedPackage>
+    <exportedPackage>org.fusesource.jansi.AnsiConsole</exportedPackage>
+    <exportedPackage>org.fusesource.jansi.AnsiPrintStream</exportedPackage>
+    <exportedPackage>org.fusesource.jansi.AnsiMode</exportedPackage>
 
     <!-- javax.inject (JSR-330) -->
     <exportedPackage>javax.inject.*</exportedPackage>
@@ -154,7 +164,7 @@ under the License.
     <exportedArtifact>org.apache.maven:maven-api-xml</exportedArtifact>
 
     <exportedArtifact>classworlds:classworlds</exportedArtifact>
-    <exportedArtifact>org.codehaus.plexus:plexus-classworlds</exportedArtifact>
+    <exportedArtifact>org.apache.maven:maven-classworlds</exportedArtifact>
     <exportedArtifact>org.codehaus.plexus:plexus-component-api</exportedArtifact>
     <exportedArtifact>org.codehaus.plexus:plexus-container-default</exportedArtifact>
     <exportedArtifact>plexus:plexus-container-default</exportedArtifact>
@@ -198,7 +208,13 @@ under the License.
     <exportedArtifact>javax.annotation:javax.annotation-api</exportedArtifact>
     <exportedArtifact>org.slf4j:slf4j-api</exportedArtifact>
 
-    <!-- core provides these now -->
+    <!--
+      | JAnsi is no longer a maven-core dependency (replaced by JLine, see #11874), but stays excluded here:
+      | maven-embedder exports forwarding classes for the JAnsi API (see exportedPackages above), and excluding
+      | the real jansi artifact is what makes a plugin's own org.fusesource.jansi:jansi dependency resolve to
+      | those forwarding classes instead of shadowing them with the real AnsiConsole, which would install its
+      | own System.out/System.err independently of the terminal Maven already installed. See #13726, #13727.
+     -->
     <exportedArtifact>org.fusesource.jansi:jansi</exportedArtifact>
     <exportedArtifact>org.codehaus.plexus:plexus-interactivity-api</exportedArtifact>
 

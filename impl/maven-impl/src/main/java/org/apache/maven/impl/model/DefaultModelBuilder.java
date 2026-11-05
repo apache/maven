@@ -20,13 +20,11 @@ package org.apache.maven.impl.model;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -114,7 +112,7 @@ import org.apache.maven.api.services.model.ProfileInjector;
 import org.apache.maven.api.services.model.ProfileSelector;
 import org.apache.maven.api.services.model.RootLocator;
 import org.apache.maven.api.services.xml.XmlReaderException;
-import org.apache.maven.api.services.xml.XmlReaderRequest;
+import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.api.spi.ModelParserException;
 import org.apache.maven.api.spi.ModelTransformer;
 import org.apache.maven.impl.DefaultRemoteRepository;
@@ -1275,7 +1273,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             modelValidator.validateEffectiveModel(
                     session,
                     resultModel,
-                    isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
+                    isStrictRequest()
+                            ? ModelValidator.VALIDATION_LEVEL_STRICT
+                            : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     this);
 
             if (hasErrors()) {
@@ -1726,8 +1726,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                     // profiles (JDK/OS/activeByDefault/system-property/negated-property)
                     // reach injection, and stripping their repositories would break the
                     // established project → dep1 → dep2 pattern. See #13100.
-                    // TODO(#13146): repositories contributed by external-model profiles can shadow
-                    // central; a WARN/FAIL policy for URL mismatches should be added separately.
+                    // #13146: same-id shadowing is already mitigated by REQUEST_DOMINANT
+                    // merging (the request's repositories take precedence), so no
+                    // additional WARN/FAIL policy is needed.
                     // Condition profiles using exists()/missing() are also pre-filtered for the
                     // same reason as file profiles: in the sandbox, context.exists() always returns
                     // false, so missing(path) evaluates to !false = true and fires unconditionally.
@@ -1833,7 +1834,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             boolean trackRead = normalizedPath != null && activeModelReads.add(normalizedPath);
             try {
                 try {
-                    boolean strict = isBuildRequest();
+                    boolean strict = isStrictRequest();
                     try {
                         rootDirectory = request.getSession().getRootDirectory();
                         rootDirectoryFromSession = true;
@@ -1843,31 +1844,27 @@ public class DefaultModelBuilder implements ModelBuilder {
                             rootDirectory = rootDirectory.getParent();
                         }
                     }
-                    try (InputStream is = modelSource.openStream()) {
-                        model = modelProcessor.read(XmlReaderRequest.builder()
-                                .strict(strict)
-                                .location(modelSource.getLocation())
-                                .modelId(modelSource.getModelId())
-                                .path(modelSource.getPath())
-                                .rootDirectory(rootDirectory)
-                                .inputStream(is)
-                                .transformer(new InterningTransformer(session))
-                                .build());
-                    } catch (XmlReaderException e) {
+                    try {
+                        model = modelProcessor.read(
+                                modelSource,
+                                Map.of(
+                                        ModelParser.STRICT,
+                                        strict,
+                                        ModelProcessor.TRANSFORMER,
+                                        new ModelInterningTransformer(session)));
+                    } catch (ModelParserException e) {
                         if (!strict) {
                             throw e;
                         }
-                        try (InputStream is = modelSource.openStream()) {
-                            model = modelProcessor.read(XmlReaderRequest.builder()
-                                    .strict(false)
-                                    .location(modelSource.getLocation())
-                                    .modelId(modelSource.getModelId())
-                                    .path(modelSource.getPath())
-                                    .rootDirectory(rootDirectory)
-                                    .inputStream(is)
-                                    .transformer(new InterningTransformer(session))
-                                    .build());
-                        } catch (XmlReaderException ne) {
+                        try {
+                            model = modelProcessor.read(
+                                    modelSource,
+                                    Map.of(
+                                            ModelParser.STRICT,
+                                            false,
+                                            ModelProcessor.TRANSFORMER,
+                                            new ModelInterningTransformer(session)));
+                        } catch (ModelParserException ne) {
                             // still unreadable even in non-strict mode, rethrow original error
                             throw e;
                         }
@@ -1878,24 +1875,29 @@ public class DefaultModelBuilder implements ModelBuilder {
                                 "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(),
                                 e);
                     }
-                } catch (XmlReaderException e) {
-                    add(
-                            Severity.FATAL,
-                            Version.BASE,
-                            "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(),
-                            e);
-                    throw newModelBuilderException();
-                } catch (IOException e) {
-                    String msg = e.getMessage();
-                    if (msg == null || msg.isEmpty()) {
-                        // NOTE: There's java.nio.charset.MalformedInputException and sun.io.MalformedInputException
-                        if (e.getClass().getName().endsWith("MalformedInputException")) {
-                            msg = "Some input bytes do not match the file encoding.";
-                        } else {
-                            msg = e.getClass().getSimpleName();
+                } catch (ModelParserException e) {
+                    if (e.getCause() instanceof IOException ioe) {
+                        String msg = ioe.getMessage();
+                        if (msg == null || msg.isEmpty()) {
+                            // NOTE: There's java.nio.charset.MalformedInputException and sun.io.MalformedInputException
+                            if (ioe.getClass().getName().endsWith("MalformedInputException")) {
+                                msg = "Some input bytes do not match the file encoding.";
+                            } else {
+                                msg = ioe.getClass().getSimpleName();
+                            }
                         }
+                        add(
+                                Severity.FATAL,
+                                Version.BASE,
+                                "Non-readable POM " + modelSource.getLocation() + ": " + msg,
+                                ioe);
+                    } else {
+                        add(
+                                Severity.FATAL,
+                                Version.BASE,
+                                "Non-parseable POM " + modelSource.getLocation() + ": " + e.getMessage(),
+                                e);
                     }
-                    add(Severity.FATAL, Version.BASE, "Non-readable POM " + modelSource.getLocation() + ": " + msg, e);
                     throw newModelBuilderException();
                 }
 
@@ -2055,7 +2057,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 modelValidator.validateFileModel(
                         session,
                         model,
-                        isBuildRequest()
+                        isStrictRequest()
                                 ? ModelValidator.VALIDATION_LEVEL_STRICT
                                 : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                         this);
@@ -2186,7 +2188,9 @@ public class DefaultModelBuilder implements ModelBuilder {
             modelValidator.validateRawModel(
                     session,
                     rawModel,
-                    isBuildRequest() ? ModelValidator.VALIDATION_LEVEL_STRICT : ModelValidator.VALIDATION_LEVEL_MINIMAL,
+                    isStrictRequest()
+                            ? ModelValidator.VALIDATION_LEVEL_STRICT
+                            : ModelValidator.VALIDATION_LEVEL_MINIMAL,
                     this);
 
             if (hasFatalErrors()) {
@@ -2985,7 +2989,26 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
+        /**
+         * Whether the request uses project-level semantics (local parent lookup, profile activation, etc.).
+         * This includes both strict build requests and the lenient {@link ModelBuilderRequest.RequestType#LOAD_PROJECT}
+         * type, which behaves like a build request for resolution purposes but does not enforce strict validation.
+         *
+         * @see #isStrictRequest() for requests that also require strict parsing and validation
+         */
         boolean isBuildRequest() {
+            return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER
+                    || request.getRequestType() == ModelBuilderRequest.RequestType.LOAD_PROJECT;
+        }
+
+        /**
+         * Whether the model has to be parsed and validated strictly. This is the case for the build requests, but not
+         * for {@link ModelBuilderRequest.RequestType#LOAD_PROJECT}, which is a project only in terms of semantics
+         * (local parents, profile activation) and keeps the lenient defaults of the consumer requests.
+         */
+        boolean isStrictRequest() {
             return request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT
                     || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_EFFECTIVE
                     || request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER;
@@ -3338,97 +3361,6 @@ public class DefaultModelBuilder implements ModelBuilder {
         @Override
         public R getRequest() {
             return request;
-        }
-    }
-
-    static class InterningTransformer implements XmlReaderRequest.Transformer {
-        static final Set<String> DEFAULT_CONTEXTS = Set.of(
-                // Core Maven coordinates
-                "groupId",
-                "artifactId",
-                "version",
-                "namespaceUri",
-                "packaging",
-
-                // Dependency-related fields
-                "scope",
-                "type",
-                "classifier",
-
-                // Build and plugin-related fields
-                "phase",
-                "goal",
-                "execution",
-
-                // Repository-related fields
-                "layout",
-                "policy",
-                "checksumPolicy",
-                "updatePolicy",
-
-                // Common metadata fields
-                "modelVersion",
-                "name",
-                "url",
-                "system",
-                "distribution",
-                "status",
-
-                // SCM fields
-                "connection",
-                "developerConnection",
-                "tag",
-
-                // Common enum-like values that appear frequently
-                "id",
-                "inherited",
-                "optional");
-
-        private final Set<String> contexts;
-
-        /**
-         * Creates an InterningTransformer with default contexts.
-         */
-        InterningTransformer() {
-            this.contexts = DEFAULT_CONTEXTS;
-        }
-
-        /**
-         * Creates an InterningTransformer with contexts from session properties.
-         *
-         * @param session the Maven session to read properties from
-         */
-        InterningTransformer(Session session) {
-            this.contexts = parseContextsFromSession(session);
-        }
-
-        private Set<String> parseContextsFromSession(Session session) {
-            String contextsProperty = session.getUserProperties().get(Constants.MAVEN_MODEL_BUILDER_INTERNS);
-            if (contextsProperty == null) {
-                contextsProperty = session.getSystemProperties().get(Constants.MAVEN_MODEL_BUILDER_INTERNS);
-            }
-
-            if (contextsProperty == null || contextsProperty.trim().isEmpty()) {
-                return DEFAULT_CONTEXTS;
-            }
-
-            return Arrays.stream(contextsProperty.split(","))
-                    .map(String::trim)
-                    .filter(s -> !s.isEmpty())
-                    .collect(Collectors.toSet());
-        }
-
-        @Override
-        public String transform(String input, String context) {
-            return input != null && contexts.contains(context) ? input.intern() : input;
-        }
-
-        /**
-         * Get the contexts that will be interned by this transformer.
-         * Used for testing purposes.
-         */
-        Set<String> getContexts() {
-            return contexts;
         }
     }
 

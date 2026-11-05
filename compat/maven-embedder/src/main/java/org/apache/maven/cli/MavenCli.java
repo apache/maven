@@ -20,12 +20,14 @@ package org.apache.maven.cli;
 
 import javax.xml.stream.XMLStreamException;
 
+import java.io.BufferedReader;
 import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -125,6 +127,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.eclipse.aether.DefaultRepositoryCache;
+import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.transfer.TransferListener;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.impl.DumbTerminal;
@@ -389,11 +392,12 @@ public class MavenCli {
                 throw new ExitException(1);
             }
             File basedir = new File(basedirProperty);
-            try {
-                cliRequest.multiModuleProjectDirectory = basedir.getCanonicalFile();
-            } catch (IOException e) {
-                cliRequest.multiModuleProjectDirectory = basedir.getAbsoluteFile();
-            }
+            // Resolve lexically rather than through getCanonicalFile(), which asks the OS to resolve the path
+            // and can substitute it with a different one when a segment is a symlink, junction, or (on Windows)
+            // a mapped network drive, corrupting the reactor root that every relative module/parent path is
+            // later resolved against (MNG-11167).
+            cliRequest.multiModuleProjectDirectory =
+                    getCanonicalPath(basedir.toPath()).toFile();
         }
 
         // We need to locate the top level project which may be pointed at using
@@ -1019,6 +1023,40 @@ public class MavenCli {
         return jars;
     }
 
+    /**
+     * Reads a password from the console and, when there is none because the streams are redirected, from the first
+     * line of the given input.
+     *
+     * @param console the console, or {@code null} if the streams are redirected
+     * @param in the input to read the first line from when there is no console
+     * @param prompt the prompt shown by the console; it is not shown when the password is read from the input, as
+     *               the caller is then not interactive and the prompt would only pollute its output
+     * @return the password, never empty
+     * @throws IOException if the input cannot be read
+     * @throws IllegalStateException if no password could be read, so that an empty one is not encrypted
+     */
+    static String readPassword(Console console, InputStream in, String prompt) throws IOException {
+        String password;
+        if (console != null) {
+            char[] chars = console.readPassword(prompt);
+            password = (chars == null) ? null : String.copyValueOf(chars);
+
+            if (chars != null) {
+                // Sun/Oracle advises to empty the char array
+                java.util.Arrays.fill(chars, ' ');
+            }
+        } else {
+            // do not close the reader, that would close the standard input
+            password = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).readLine();
+        }
+
+        if (password == null || password.isEmpty()) {
+            throw new IllegalStateException("No password was provided");
+        }
+
+        return password;
+    }
+
     //
     // This should probably be a separate tool and not be baked into Maven.
     //
@@ -1030,15 +1068,7 @@ public class MavenCli {
             String passwd = cliRequest.commandLine.getOptionValue(CLIManager.ENCRYPT_PASSWORD);
 
             if (passwd == null) {
-                Console cons = System.console();
-                char[] password = (cons == null) ? null : cons.readPassword("Password: ");
-                if (password != null) {
-                    // Cipher uses Strings
-                    passwd = String.copyValueOf(password);
-
-                    // Sun/Oracle advises to empty the char array
-                    java.util.Arrays.fill(password, ' ');
-                }
+                passwd = readPassword(System.console(), System.in, "Password: ");
             }
             System.out.println(dispatcher.encrypt(passwd, null));
             throw new ExitException(0);
@@ -1394,6 +1424,25 @@ public class MavenCli {
         enableOnPresentOption(commandLine, CLIManager.OFFLINE, request::setOffline);
         enableOnPresentOption(commandLine, CLIManager.UPDATE_SNAPSHOTS, request::setUpdateSnapshots);
         request.setGlobalChecksumPolicy(determineGlobalCheckPolicy(commandLine));
+
+        // Update policy options
+        String artifactsUpdatePolicy = null;
+        String metadataUpdatePolicy = null;
+        if (commandLine.hasOption(CLIManager.UPDATE_ARTIFACTS)) {
+            artifactsUpdatePolicy = RepositoryPolicy.UPDATE_POLICY_ALWAYS;
+        }
+        if (artifactsUpdatePolicy == null && commandLine.hasOption(CLIManager.ARTIFACTS_UPDATE_POLICY)) {
+            artifactsUpdatePolicy = commandLine.getOptionValue(CLIManager.ARTIFACTS_UPDATE_POLICY);
+        }
+        if (commandLine.hasOption(CLIManager.UPDATE_METADATA)) {
+            metadataUpdatePolicy = RepositoryPolicy.UPDATE_POLICY_ALWAYS;
+        }
+        if (metadataUpdatePolicy == null && commandLine.hasOption(CLIManager.METADATA_UPDATE_POLICY)) {
+            metadataUpdatePolicy = commandLine.getOptionValue(CLIManager.METADATA_UPDATE_POLICY);
+        }
+        request.setArtifactsUpdatePolicy(artifactsUpdatePolicy);
+        request.setMetadataUpdatePolicy(metadataUpdatePolicy);
+
         request.setBaseDirectory(baseDirectory);
         request.setSystemProperties(cliRequest.systemProperties);
         request.setUserProperties(cliRequest.userProperties);
