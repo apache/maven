@@ -33,7 +33,7 @@ import org.apache.maven.api.annotations.Provider;
  *
  * @since 4.0.0
  */
-@Deprecated(since = "4.1.0", forRemoval = true)
+@Deprecated(since = "4.2.0", forRemoval = true)
 @Experimental
 @Provider
 public interface Log {
