@@ -435,7 +435,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
     @Override
     public void mojoSkipped(ExecutionEvent event) {
-        if (logger.isWarnEnabled() && event.getSession().isOffline()) {
+        if (logger.isWarnEnabled()) {
             init();
             logger.warn(
                     "Goal '{}' requires online mode for execution but Maven is currently offline, skipping",

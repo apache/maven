@@ -202,7 +202,6 @@ public class MojoExecutor {
         Optional<FilterPredicate> matchedFilter = MojoExecutionFilter.matches(mojoExecution, filterPredicates);
         if (matchedFilter.isPresent()) {
             LOGGER.info("Skipping {} (matched filter: {})", mojoExecution, matchedFilter.get());
-            eventCatapult.fire(ExecutionEvent.Type.MojoSkipped, session, mojoExecution);
             return;
         }
         execute(session, mojoExecution, dependencyContext);
