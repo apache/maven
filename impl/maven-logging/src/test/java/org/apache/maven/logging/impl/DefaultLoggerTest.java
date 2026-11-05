@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -167,6 +168,22 @@ class DefaultLoggerTest {
         assertEquals("world", e.messageArgs().get(0));
         assertEquals(42, e.messageArgs().get(1));
         assertEquals("hello world and 42", e.message());
+    }
+
+    @Test
+    void fluentBuilderAllowsNullMessageArgs() {
+        CapturingSink sink = new CapturingSink();
+        LoggerManager.get().setLogSink(sink);
+        DefaultLogger log = new DefaultLogger("test.logger");
+
+        // null arg is valid SLF4J usage — must not throw at log site
+        log.atInfo().log("value is {}", (Object) null);
+
+        assertEquals(1, sink.events.size());
+        LogEvent e = sink.events.get(0);
+        assertEquals(1, e.messageArgs().size());
+        assertNull(e.messageArgs().get(0));
+        assertEquals("value is null", e.message());
     }
 
     @Test

@@ -20,6 +20,7 @@ package org.apache.maven.logging.impl;
 
 import java.time.Instant;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
@@ -89,7 +90,7 @@ public final class DefaultLogEvent implements LogEvent {
                 mojoId,
                 keyValues,
                 messageTemplate,
-                messageArgs != null ? List.copyOf(Arrays.asList(messageArgs)) : null);
+                messageArgs != null ? Collections.unmodifiableList(Arrays.asList(messageArgs)) : null);
     }
 
     @SuppressWarnings("checkstyle:ParameterNumber")
