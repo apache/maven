@@ -508,6 +508,18 @@ class MojoDescriptorProcessorTest {
         // DiIndexProcessor will pick it up in the next round
         // (we just verify the source was produced here)
         assertFalse(helpMojo.isEmpty());
+
+        // plugin.xml must include the help goal so Maven can resolve it at runtime
+        String pluginXml = result.getResource("META-INF/maven/plugin.xml");
+        assertNotNull(pluginXml, "plugin.xml must be generated");
+        assertContains(pluginXml, "<goal>help</goal>");
+        assertContains(pluginXml, "<implementation>com.example.HelpMojo</implementation>");
+        // help mojo must have projectRequired=false
+        assertContains(pluginXml, "<projectRequired>false</projectRequired>");
+        // detail parameter must be in descriptor
+        assertContains(pluginXml, "<name>detail</name>");
+        // outputFile from the original mojo must still be present alongside help
+        assertContains(pluginXml, "<goal>greet</goal>");
     }
 
     // =========================================================================

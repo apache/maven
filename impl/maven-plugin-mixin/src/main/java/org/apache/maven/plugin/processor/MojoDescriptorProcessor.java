@@ -182,6 +182,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                 mojos.add(mojo);
             }
         }
+        mojos.add(buildHelpMojoDescriptor(coords));
         PluginDescriptor descriptor = PluginDescriptor.newBuilder(true)
                 .name(coords[4])
                 .groupId(coords[0])
@@ -201,6 +202,56 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
             throw new IOException("Failed to write plugin descriptor", e);
         }
         note("Generated META-INF/maven/plugin.xml with " + mojos.size() + " mojo(s)");
+    }
+
+    /**
+     * Builds a synthetic {@link MojoDescriptor} for the generated {@code HelpMojo}.
+     * Since {@code HelpMojo} is itself generated during the last annotation-processing round,
+     * it cannot be in {@code mojoElements} when {@code writePluginXml()} runs.
+     * We therefore add its descriptor synthetically so that {@code help} is registered
+     * in {@code plugin.xml} and Maven can find the goal at runtime.
+     */
+    private MojoDescriptor buildHelpMojoDescriptor(String[] coords) {
+        String pkg = mojoElements.values().stream()
+                .map(te -> {
+                    String fqn = te.getQualifiedName().toString();
+                    int dot = fqn.lastIndexOf('.');
+                    return dot > 0 ? fqn.substring(0, dot) : "";
+                })
+                .findFirst()
+                .orElse("");
+        String impl = pkg.isEmpty() ? "HelpMojo" : pkg + ".HelpMojo";
+
+        List<org.apache.maven.api.plugin.descriptor.Parameter> params = List.of(
+                org.apache.maven.api.plugin.descriptor.Parameter.newBuilder(true)
+                        .name("detail")
+                        .type("boolean")
+                        .expression("${detail}")
+                        .defaultValue("false")
+                        .description("If true, display all settable properties for each goal.")
+                        .build(),
+                org.apache.maven.api.plugin.descriptor.Parameter.newBuilder(true)
+                        .name("goal")
+                        .type("java.lang.String")
+                        .expression("${goal}")
+                        .description("The name of the goal for which to show help.")
+                        .build(),
+                org.apache.maven.api.plugin.descriptor.Parameter.newBuilder(true)
+                        .name("indentSize")
+                        .type("int")
+                        .expression("${indentSize}")
+                        .defaultValue("2")
+                        .description("The number of spaces per indentation level, should be positive.")
+                        .build());
+
+        return MojoDescriptor.newBuilder(true)
+                .goal("help")
+                .implementation(impl)
+                .projectRequired(false)
+                .description("Display help information on " + coords[1] + ". Call mvn " + coords[3]
+                        + ":help -Ddetail=true -Dgoal=<goal-name> to display parameter details.")
+                .parameters(params)
+                .build();
     }
 
     private MojoDescriptor buildMojoDescriptor(TypeElement mojoType) {
