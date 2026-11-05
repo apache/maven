@@ -2508,8 +2508,20 @@ public class DefaultModelBuilder implements ModelBuilder {
                             }
                             recording = context.start();
                             model = readRawModel();
+                            Model parentResolutionModel = model;
+                            if (model.getProfiles().stream()
+                                    .anyMatch(p -> !p.getRepositories().isEmpty())) {
+                                // Parent lookup needs profile repositories before assembling the ancestry.
+                                // Keep final profile injection after inheritance, using the child's context.
+                                DefaultProfileActivationContext activation = recording.start(model.getProperties());
+                                List<Profile> profiles = getActiveProfiles(model.getProfiles(), activation);
+                                replayRecordIntoContext(activation.stop(), recording, false);
+                                parentResolutionModel = profileInjector.injectProfiles(
+                                        model, profiles, request, ModelBuilderSessionState.this);
+                            }
                             phase = ParentModelPhase.PARENT;
-                            return new ParentResolutionFrame(model, model.getParent(), recording, chain, true, false);
+                            return new ParentResolutionFrame(
+                                    parentResolutionModel, model.getParent(), recording, chain, true, false);
                         }
                     }
                     case PARENT -> {
