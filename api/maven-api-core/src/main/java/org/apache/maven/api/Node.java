@@ -130,7 +130,7 @@ public interface Node {
      * @deprecated Use {@link #artifact()} instead.
      */
     @Nullable
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     default Artifact getArtifact() {
         return artifact();
     }
@@ -140,7 +140,7 @@ public interface Node {
      * @deprecated Use {@link #dependency()} instead.
      */
     @Nullable
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     default Dependency getDependency() {
         return dependency();
     }
@@ -152,7 +152,7 @@ public interface Node {
      * @deprecated Use {@link #children()} instead.
      */
     @Nonnull
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     default List<Node> getChildren() {
         return children();
     }
@@ -162,7 +162,7 @@ public interface Node {
      * @deprecated Use {@link #remoteRepositories()} instead.
      */
     @Nonnull
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     default List<RemoteRepository> getRemoteRepositories() {
         return remoteRepositories();
     }
@@ -173,7 +173,7 @@ public interface Node {
      * @deprecated Use {@link #repository()} instead.
      */
     @Nonnull
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     default Optional<RemoteRepository> getRepository() {
         return repository();
     }
