@@ -20,6 +20,7 @@ package org.apache.maven.it;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.util.Properties;
 
 import org.junit.jupiter.api.Disabled;
@@ -70,8 +71,18 @@ class MavenITmng6255FixConcatLines extends AbstractMavenIntegrationTestCase {
     }
 
     protected void runWithLineEndings(String lineEndings, String test) throws Exception {
-        Path baseDir = extractResources("mng-6255");
+        // Each line-ending variant gets its own copy of the test project so that
+        // concurrent or sequential test variants do not overwrite each other's jvm.config.
+        Path sharedDir = extractResources("mng-6255");
+        Path baseDir = sharedDir.resolveSibling("mng-6255-" + test);
+        Files.createDirectories(baseDir);
+
+        // Copy pom.xml from the shared resource directory populated during test-resources phase
+        Path pom = sharedDir.resolve("pom.xml");
+        Files.copy(pom, baseDir.resolve("pom.xml"), StandardCopyOption.REPLACE_EXISTING);
+
         Path mvnDir = baseDir.resolve(".mvn");
+        Files.createDirectories(mvnDir);
 
         Path jvmConfig = mvnDir.resolve("jvm.config");
         createJvmConfigFile(jvmConfig, lineEndings, "-Djvm.config=ok", "-Xms256m", "-Xmx512m");

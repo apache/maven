@@ -965,15 +965,11 @@ public class MavenProject implements Cloneable {
         return getModel().getModules();
     }
 
+    /** Returns plugin management for this project, never {@code null}. */
     public PluginManagement getPluginManagement() {
-        PluginManagement pluginMgmt = null;
-
         Build build = getModel().getBuild();
-        if (build != null) {
-            pluginMgmt = build.getPluginManagement();
-        }
-
-        return pluginMgmt;
+        PluginManagement mgmt = build != null ? build.getPluginManagement() : null;
+        return mgmt != null ? mgmt : new PluginManagement();
     }
 
     private Build getModelBuild() {

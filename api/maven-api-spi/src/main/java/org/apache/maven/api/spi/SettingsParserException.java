@@ -27,7 +27,7 @@ import org.apache.maven.api.services.MavenException;
  * default message is used. Messages, including those from causes, should not contain
  * credentials from the input.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 public class SettingsParserException extends MavenException {
@@ -74,10 +74,20 @@ public class SettingsParserException extends MavenException {
         return "Unknown settings parsing error";
     }
 
+    /**
+     * Returns the one-based line number where the error occurred, or {@code -1} if unknown.
+     *
+     * @return the line number
+     */
     public int getLineNumber() {
         return lineNumber;
     }
 
+    /**
+     * Returns the one-based column number where the error occurred, or {@code -1} if unknown.
+     *
+     * @return the column number
+     */
     public int getColumnNumber() {
         return columnNumber;
     }

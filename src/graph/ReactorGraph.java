@@ -42,15 +42,15 @@ public class ReactorGraph {
         CLUSTER_PATTERNS.put("JLine", Pattern.compile("^org\\.jline:.*"));
         CLUSTER_PATTERNS.put("Maven 4 API", Pattern.compile("^org\\.apache\\.maven:maven-api-(?!impl).*"));
         CLUSTER_PATTERNS.put("Maven Resolver 2", Pattern.compile("^org\\.apache\\.maven\\.resolver:.*"));
-        CLUSTER_PATTERNS.put("Maven 4 Implementation", Pattern.compile("^org\\.apache\\.maven:maven-(support|impl|di|core|cli|xml|jline|logging|executor|testing):.*"));
+        CLUSTER_PATTERNS.put("Maven 4 Implementation", Pattern.compile("^org\\.apache\\.maven:maven-(support|impl|di|core|cli|xml|jline|logging|executor|testing|utils|classworlds):.*"));
         CLUSTER_PATTERNS.put("Maven 3 Compatibility", Pattern.compile("^org\\.apache\\.maven:maven-(artifact|builder-support|compat|embedder|model|model-builder|plugin-api|repository-metadata|resolver-provider|settings|settings-builder|toolchain-builder|toolchain-model):.*"));
-        CLUSTER_PATTERNS.put("Sisu", Pattern.compile("(^org\\.eclipse\\.sisu:.*)|(.*:guice:.*)|(.*:javax.inject:.*)|(.*:javax.annotation-api:.*)|(.*:aopalliance:.*)"));
+        CLUSTER_PATTERNS.put("Sisu", Pattern.compile("(^org\\.eclipse\\.sisu:.*)|(.*:guice:.*)|(.*:javax.inject:.*)|(.*:jakarta.annotation-api:.*)|(.*:aopalliance:.*)"));
         CLUSTER_PATTERNS.put("Plexus", Pattern.compile("^org\\.codehaus\\.plexus:.*"));
         CLUSTER_PATTERNS.put("XML Parsing", Pattern.compile("(.*:woodstox-core:.*)|(.*:stax2-api:.*)"));
         CLUSTER_PATTERNS.put("Wagon", Pattern.compile("^org\\.apache\\.maven\\.wagon:.*"));
         CLUSTER_PATTERNS.put("SLF4j", Pattern.compile("^org\\.slf4j:.*"));
         CLUSTER_PATTERNS.put("Commons", Pattern.compile("^commons-cli:.*"));
-        CLUSTER_PATTERNS.put("Testing", Pattern.compile("^.*:(mockito-core|junit-jupiter-api):.*"));
+        CLUSTER_PATTERNS.put("Testing", Pattern.compile("^.*:(mockito-core|junit-jupiter-api|junit-platform-commons|opentest4j):.*"));
     }
     private static final Pattern HIDDEN_NODES = Pattern.compile(".*:(maven-docgen|roaster-api|roaster-jdt|velocity-engine-core|commons-lang3|asm|logback-classic|slf4j-simple|domtrip-core|domtrip-maven):.*");
 

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.test</groupId>
+  <artifactId>mng-8710-parent</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+  <properties>
+    <message.file>activate.marker</message.file>
+  </properties>
+  <modules>
+    <module>child</module>
+  </modules>
+  <profiles>
+    <profile>
+      <id>file-from-parent</id>
+      <activation>
+        <file>
+          <exists>${message.file}</exists>
+        </file>
+      </activation>
+      <properties>
+        <profile.from.parent>activated</profile.from.parent>
+      </properties>
+    </profile>
+  </profiles>
+</project>

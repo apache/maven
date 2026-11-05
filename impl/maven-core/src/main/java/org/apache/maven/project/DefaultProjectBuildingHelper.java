@@ -279,13 +279,16 @@ public class DefaultProjectBuildingHelper implements ProjectBuildingHelper {
 
     @Override
     public void selectProjectRealm(MavenProject project) {
-        ClassLoader projectRealm = project.getClassRealm();
+        ClassRealm projectRealm = project.getClassRealm();
 
+        ClassLoader classLoader;
         if (projectRealm == null) {
-            projectRealm = classRealmManager.getCoreRealm();
+            classLoader = classRealmManager.getCoreRealm();
+        } else {
+            classLoader = projectRealm;
         }
 
-        Thread.currentThread().setContextClassLoader(projectRealm);
+        Thread.currentThread().setContextClassLoader(classLoader);
     }
 
     private static boolean containsExpression(String value) {

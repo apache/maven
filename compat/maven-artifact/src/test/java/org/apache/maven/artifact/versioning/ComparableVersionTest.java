@@ -686,4 +686,39 @@ class ComparableVersionTest {
         assertTrue(f.compareTo(sp2) < 0, "expected " + f + " < " + sp2);
         assertTrue(f.compareTo(sp3) < 0, "expected " + f + " < " + sp3);
     }
+
+    /**
+     * Regression test for <a href="https://issues.apache.org/jira/browse/MNG-7594">MNG-7594</a>:
+     * ComparableVersion#getCanonical() and ordering for version strings with hyphenated zeros.
+     */
+    @Test
+    void testHyphenatedZeroCanonical() {
+        ComparableVersion c1 = newComparable("1-0-1");
+        ComparableVersion c2 = newComparable("1-1");
+        ComparableVersion c3 = newComparable("1--1");
+
+        // 1-0-1 and 1--1 must compare equal and have canonical "1-0-1" (not reduced to "1-1")
+        checkVersionsEqual("1-0-1", "1--1");
+        assertEquals("1-0-1", c1.getCanonical());
+        assertEquals("1-0-1", c3.getCanonical());
+        assertEquals("1-1", c2.getCanonical());
+
+        // 1-0-1 < 1-1
+        checkVersionsOrder("1-0-1", "1-1");
+
+        // Bug 2 of MNG-6420: 1-0-2 < 1-0.1 < 1-2
+        checkVersionsOrder("1-0-2", "1-0.1");
+        checkVersionsOrder("1-0.1", "1-2");
+        assertEquals("1-0-2", newComparable("1-0-2").getCanonical());
+
+        // Multiple zeros between hyphens
+        checkVersionsEqual("1-0-0-1", "1-0--1");
+        checkVersionsEqual("1-0-0-1", "1--0-1");
+        checkVersionsOrder("1-0-0-1", "1-0-1");
+        assertEquals("1-0-0-1", newComparable("1-0-0-1").getCanonical());
+
+        // Trailing zero after hyphen still normalizes
+        checkVersionsEqual("1-0-1-0", "1-0-1");
+        assertEquals("1-0-1", newComparable("1-0-1-0").getCanonical());
+    }
 }

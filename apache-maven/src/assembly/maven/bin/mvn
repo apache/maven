@@ -23,7 +23,8 @@
 # Environment Variable Prerequisites
 #
 #   JAVA_HOME           (Optional) Points to a Java installation.
-#   MAVEN_ARGS          (Optional) Arguments passed to Maven before CLI arguments.
+#   MAVEN_ARGS          (Optional) Arguments passed to Maven before CLI arguments, separated by white space.
+#                       Single or double quotes group a value containing white space.
 #   MAVEN_OPTS          (Optional) Java runtime options used when Maven is executed.
 #   MAVEN_SKIP_RC       (Optional) Flag to disable loading of mavenrc files.
 #   MAVEN_DEBUG_OPTS    (Optional) Specify the debug options to use. Default value is "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${MAVEN_DEBUG_ADDRESS}" when --debug is used
@@ -596,22 +597,74 @@ fi
 
 cmd="$cmd $LAUNCHER_CLASS"
 
+# MAVEN_ARGS is only passed for the default Maven build command (MavenCling),
+# not for sub-commands like --up, --enc, --shell or --val which have their own options.
+#
+# Its words are separated by white space, and single or double quotes group a word
+# containing white space, so that a path with a space can be passed.
+# Nothing else is interpreted: no backslash escape, no ${...} placeholder, no globbing
+# and no command substitution, so the values reach Maven as they were written.
+# A word is made of adjacent quoted and unquoted parts, and "" is an empty word.
+# The words go in front of the user arguments, "$@" is rotated to get them in order.
+if [ "$MAVEN_MAIN_CLASS" = "org.apache.maven.cling.MavenCling" ] && [ -n "$MAVEN_ARGS" ]; then
+  maven_args_user_count=$#
+  maven_args_rest=$MAVEN_ARGS
+  maven_args_word=
+  maven_args_in_word=false
+  maven_args_quote=
+  maven_args_tab=`printf '\t'`
+  maven_args_nl='
+'
+  while [ -n "$maven_args_rest" ]; do
+    maven_args_tail=${maven_args_rest#?}
+    maven_args_char=${maven_args_rest%"$maven_args_tail"}
+    maven_args_rest=$maven_args_tail
+    if [ -n "$maven_args_quote" ]; then
+      if [ "$maven_args_char" = "$maven_args_quote" ]; then
+        maven_args_quote=
+      else
+        maven_args_word=$maven_args_word$maven_args_char
+      fi
+    else
+      case $maven_args_char in
+        '"' | "'")
+          maven_args_quote=$maven_args_char
+          maven_args_in_word=true
+          ;;
+        ' ' | "$maven_args_tab" | "$maven_args_nl")
+          if [ "$maven_args_in_word" = true ]; then
+            set -- "$@" "$maven_args_word"
+            maven_args_word=
+            maven_args_in_word=false
+          fi
+          ;;
+        *)
+          maven_args_word=$maven_args_word$maven_args_char
+          maven_args_in_word=true
+          ;;
+      esac
+    fi
+  done
+  if [ -n "$maven_args_quote" ]; then
+    echo "Warning: MAVEN_ARGS has an unterminated $maven_args_quote quote, the rest of the value is treated as part of the last word" >&2
+  fi
+  if [ "$maven_args_in_word" = true ]; then
+    set -- "$@" "$maven_args_word"
+  fi
+  while [ "$maven_args_user_count" -gt 0 ]; do
+    set -- "$@" "$1"
+    shift
+    maven_args_user_count=$((maven_args_user_count - 1))
+  done
+fi
+
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
   echo "[DEBUG] Launching JVM with command:" >&2
   printf '[DEBUG]   %s' "$cmd" >&2
-  if [ "$MAVEN_MAIN_CLASS" = "org.apache.maven.cling.MavenCling" ]; then
-    printf ' %s' "$MAVEN_ARGS" >&2
-  fi
   printf ' "%s"' "$@" >&2; echo >&2
 fi
 
-# User arguments ("$@") and MAVEN_ARGS are passed outside the eval'd string
-# to preserve literal values (backslashes, ${...} placeholders) without
-# shell re-parsing. Only the base command uses eval for MAVEN_OPTS word splitting.
-# MAVEN_ARGS is only passed for the default Maven build command (MavenCling),
-# not for sub-commands like --up, --enc, --shell or --val which have their own options.
-if [ "$MAVEN_MAIN_CLASS" = "org.apache.maven.cling.MavenCling" ]; then
-  eval exec "$cmd" '$MAVEN_ARGS' '"$@"'
-else
-  eval exec "$cmd" '"$@"'
-fi
+# The arguments ("$@") are passed outside the eval'd string to preserve literal
+# values (backslashes, ${...} placeholders) without shell re-parsing.
+# Only the base command uses eval for MAVEN_OPTS word splitting.
+eval exec "$cmd" '"$@"'

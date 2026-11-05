@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>4.2.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>apache-maven</artifactId>
@@ -126,8 +126,8 @@ under the License.
       <artifactId>javax.inject</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
 
     <!-- DI Runtime -->
@@ -536,6 +536,20 @@ under the License.
                   <executable>sh</executable>
                   <arguments>
                     <argument>${project.basedir}/src/test/scripts/test-mvn-fast-version.sh</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>test-mvn-args</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <skip>${skipTests}</skip>
+                  <executable>sh</executable>
+                  <arguments>
+                    <argument>${project.basedir}/src/test/scripts/test-mvn-args.sh</argument>
                   </arguments>
                 </configuration>
               </execution>

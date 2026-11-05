@@ -567,8 +567,8 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
                 if (lastItem.isNull()) {
                     if (i == size() - 1 || get(i + 1).getType() == STRING_ITEM) {
                         remove(i);
-                    } else if (get(i + 1).getType() == LIST_ITEM) {
-                        Item item = ((ListItem) get(i + 1)).get(0);
+                    } else if (get(i + 1) instanceof ListItem list) {
+                        Item item = list.get(0);
                         if (item.getType() == COMBINATION_ITEM || item.getType() == STRING_ITEM) {
                             remove(i);
                         }

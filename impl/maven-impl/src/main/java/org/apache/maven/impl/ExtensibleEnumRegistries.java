@@ -18,13 +18,16 @@
  */
 package org.apache.maven.impl;
 
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.maven.api.Dialect;
 import org.apache.maven.api.ExtensibleEnum;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.PathScope;
@@ -33,12 +36,15 @@ import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.SessionScoped;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.services.DialectRegistry;
 import org.apache.maven.api.services.ExtensibleEnumRegistry;
 import org.apache.maven.api.services.LanguageRegistry;
 import org.apache.maven.api.services.PathScopeRegistry;
 import org.apache.maven.api.services.ProjectScopeRegistry;
+import org.apache.maven.api.spi.DialectProvider;
 import org.apache.maven.api.spi.ExtensibleEnumProvider;
 import org.apache.maven.api.spi.LanguageProvider;
+import org.apache.maven.api.spi.ModelDialectProvider;
 import org.apache.maven.api.spi.PathScopeProvider;
 import org.apache.maven.api.spi.ProjectScopeProvider;
 
@@ -84,12 +90,49 @@ public class ExtensibleEnumRegistries {
         }
     }
 
+    @Named
+    @SessionScoped
+    public static class DefaultDialectRegistry extends DefaultExtensibleEnumRegistry<Dialect, DialectProvider>
+            implements DialectRegistry {
+
+        @Inject
+        public DefaultDialectRegistry(
+                List<DialectProvider> providers, List<ModelDialectProvider> modelDialectProviders) {
+            // Collect all dialect ids already covered by DialectProvider(s) and the built-in XML.
+            // Only seed dialects from ModelDialectProvider that are not already registered,
+            // so that extensions which implement only ModelDialectProvider (without a separate
+            // DialectProvider) still have their dialect appear in the DialectRegistry.
+            super(providers, buildBuiltins(providers, modelDialectProviders));
+        }
+
+        private static Dialect[] buildBuiltins(
+                List<DialectProvider> providers, List<ModelDialectProvider> modelDialectProviders) {
+            // Ids already covered by built-in XML and DialectProvider contributions
+            Set<String> coveredIds = new HashSet<>();
+            coveredIds.add(Dialect.XML.id().toLowerCase(Locale.ROOT));
+            providers.stream()
+                    .flatMap(p -> p.provides().stream())
+                    .map(d -> d.id().toLowerCase(Locale.ROOT))
+                    .forEach(coveredIds::add);
+
+            // Collect ModelDialectProvider dialects that fill gaps not covered by DialectProvider
+            Dialect[] extra = modelDialectProviders.stream()
+                    .map(ModelDialectProvider::getDialect)
+                    .filter(d -> coveredIds.add(d.id().toLowerCase(Locale.ROOT))) // add returns true if new
+                    .toArray(Dialect[]::new);
+
+            // Prepend XML to the builtins; extra entries are new (not yet in coveredIds before the filter ran)
+            return Stream.concat(Stream.of(Dialect.XML), Stream.of(extra)).toArray(Dialect[]::new);
+        }
+    }
+
     public abstract static class DefaultExtensibleEnumRegistry<
                     T extends ExtensibleEnum, P extends ExtensibleEnumProvider<T>>
             implements ExtensibleEnumRegistry<T> {
 
         protected final Map<String, T> values;
 
+        @SafeVarargs
         public DefaultExtensibleEnumRegistry(List<P> providers, T... builtinValues) {
             values = Stream.concat(Stream.of(builtinValues), providers.stream().flatMap(p -> p.provides().stream()))
                     .collect(Collectors.toUnmodifiableMap(t -> t.id().toLowerCase(Locale.ROOT), t -> t));

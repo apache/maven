@@ -21,6 +21,8 @@ package org.apache.maven.api.services;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
+ * Exception thrown when installing artifacts into the local repository fails.
+ *
  * @since 4.0.0
  */
 @Experimental

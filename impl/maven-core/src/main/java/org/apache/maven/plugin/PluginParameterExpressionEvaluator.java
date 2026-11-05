@@ -81,6 +81,13 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
 
     private Properties properties;
 
+    /**
+     * Creates an evaluator that is not bound to a mojo execution: the expressions referring to the mojo, its execution
+     * or its plugin ({@code ${mojo}}, {@code ${mojoExecution}}, {@code ${plugin}} and their sub-expressions) evaluate
+     * to {@code null}, as unknown expressions do, while all the other expressions are evaluated normally.
+     *
+     * @param session the session to evaluate the expressions against
+     */
     public PluginParameterExpressionEvaluator(MavenSession session) {
         this(session, null);
     }

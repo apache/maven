@@ -174,6 +174,12 @@ class DefaultModelBuilderTest {
         // genuinely doesn't exist on the developer's machine — normal project-build behaviour.
         assertEquals("activated", model.getProperties().get("profile.missing.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // POM-declared properties do not drive profile activation in any context:
+        // the PropertyProfileActivator only checks user → system properties.
+        assertNull(model.getProperties().get("profile.pom.property"));
+        // POM-declared property via <condition>: in a project build the non-sandboxed context
+        // allows getModelProperty() to return the real POM property, so this condition fires.
+        assertEquals("activated", model.getProperties().get("profile.pom.condition"));
         assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
@@ -195,6 +201,12 @@ class DefaultModelBuilderTest {
         // to !false = true and fires unconditionally — same footgun as <file><missing>.
         assertNull(model.getProperties().get("profile.missing.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // POM-declared property must not self-activate a profile in external builds (#13390).
+        assertNull(model.getProperties().get("profile.pom.property"));
+        // POM-declared property via <condition> must also be suppressed (#13390):
+        // ConditionProfileActivator.doGetProperty() calls getModelProperty() directly,
+        // so the sandbox must return null from getModelProperty() to close the gap.
+        assertNull(model.getProperties().get("profile.pom.condition"));
         // Negated-property profile (!skip.defaults) fires because 'skip.defaults' is absent
         // from the sandboxed context (user properties are suppressed; system properties do not
         // contain it). This is the common opt-out flag pattern: the publisher's default-on
@@ -274,6 +286,11 @@ class DefaultModelBuilderTest {
         assertEquals("activated", model.getProperties().get("profile.property"));
         assertEquals("activated", model.getProperties().get("profile.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // POM-declared properties do not drive profile activation even in caller-supplied builds.
+        assertNull(model.getProperties().get("profile.pom.property"));
+        // POM-declared property via <condition>: caller-supplied model uses non-sandboxed context,
+        // so getModelProperty() returns real POM properties and the condition fires.
+        assertEquals("activated", model.getProperties().get("profile.pom.condition"));
         assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
@@ -358,6 +375,12 @@ class DefaultModelBuilderTest {
         assertEquals("activated", projectParentModel.getProperties().get("profile.condition"));
         assertEquals("activated", projectParentModel.getProperties().get("profile.jdk"));
         assertTrue(projectParentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+        // After #13555, parent POM properties are NOT exposed through getModelProperty() in the
+        // project-parent activation path — condition profiles relying on POM-declared properties
+        // must not self-activate (#13390).
+        assertNull(
+                projectParentModel.getProperties().get("profile.pom.condition"),
+                "profile.pom.condition must not self-activate in the project-parent path");
 
         DefaultModelBuilder.ModelBuilderSessionState dependencyState =
                 dependencyAncestorState.derive(sharedParentRequest);
@@ -1737,6 +1760,83 @@ class DefaultModelBuilderTest {
                     "org.apache.maven.test:standalone-parent:1.0.0",
                     warnings.get(0).getModelId());
         }
+    }
+
+    @Test
+    void testMng8710ParentFileProfileWithPropertyActivationAppliesToChild() {
+        Path pom = Paths.get("src/test/resources/poms/factory/mng-8710/pom.xml").toAbsolutePath();
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .recursive(true)
+                        .source(Sources.buildSource(pom))
+                        .build());
+
+        Model parentModel = result.getEffectiveModel();
+        assertEquals("activated", parentModel.getProperties().get("profile.from.parent"));
+
+        ModelBuilderResult childResult = result.getChildren().stream()
+                .filter(r -> "mng-8710-child".equals(r.getEffectiveModel().getArtifactId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("child result missing: " + result.getChildren()));
+        Model childModel = childResult.getEffectiveModel();
+        assertEquals(
+                "activated",
+                childModel.getProperties().get("profile.from.parent"),
+                "Parent file profile interpolating ${message.file} must inject into child (MNG-8710)");
+    }
+
+    /**
+     * Combined invariant test for MNG-8710 + #13390.
+     * <p>
+     * A parent property used to resolve a file-profile path (via {@code interpolationProperties})
+     * must NOT simultaneously self-activate a property-based profile on that same parent.
+     * The file profile fires because the path interpolates correctly (#10375).
+     * The property-based profile must not fire because {@code interpolationProperties} is
+     * intentionally hidden from {@code getModelProperty()} (#13390).
+     */
+    @Test
+    void testMng8710ParentFileProfileFiresButPropertyProfileDoesNot() {
+        Path pom = Paths.get("src/test/resources/poms/factory/mng-8710-combined/pom.xml")
+                .toAbsolutePath();
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .recursive(true)
+                        .source(Sources.buildSource(pom))
+                        .build());
+
+        Model parentModel = result.getEffectiveModel();
+
+        // The file profile MUST activate: ${message.file} resolves via interpolationProperties (#10375)
+        assertEquals(
+                "true",
+                parentModel.getProperties().get("profile.file.activated"),
+                "File profile interpolating ${message.file} must activate (MNG-8710)");
+
+        // The property-based profile MUST NOT activate: interpolationProperties must not be
+        // visible through getModelProperty(), preventing self-activation (#13390)
+        assertNull(
+                parentModel.getProperties().get("profile.property.activated"),
+                "Property-based profile on ${message.file} must NOT activate via interpolationProperties (#13390)");
+
+        // Verify the same invariant holds for child modules
+        ModelBuilderResult childResult = result.getChildren().stream()
+                .filter(r ->
+                        "mng-8710-combined-child".equals(r.getEffectiveModel().getArtifactId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("child result missing: " + result.getChildren()));
+        Model childModel = childResult.getEffectiveModel();
+
+        assertEquals(
+                "true",
+                childModel.getProperties().get("profile.file.activated"),
+                "File profile must also activate for child module (MNG-8710)");
+        assertNull(
+                childModel.getProperties().get("profile.property.activated"),
+                "Property-based profile must not activate for child module either (#13390)");
     }
 
     @Test

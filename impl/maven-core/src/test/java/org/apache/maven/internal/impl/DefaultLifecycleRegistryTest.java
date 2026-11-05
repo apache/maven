@@ -18,14 +18,31 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.util.List;
+
+import org.apache.maven.api.Constants;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DefaultLifecycleRegistryTest {
 
     @Test
     void returnsNullImplementationVersionWhenClassHasNoPackage() {
         assertNull(DefaultLifecycleRegistry.getImplementationVersion(int.class));
+    }
+
+    /**
+     * Verifies that when {@code maven.site.lifecycle.disabled} is not set,
+     * the site lifecycle is present in the default stream.
+     */
+    @Test
+    void siteLifecyclePresentWhenPropertyNotSet() {
+        assertNull(
+                System.getProperty(Constants.MAVEN_SITE_LIFECYCLE_DISABLED),
+                "System property must not be set in this test JVM");
+        DefaultLifecycleRegistry registry = new DefaultLifecycleRegistry(List.of());
+        assertTrue(registry.lookup("site").isPresent(), "site lifecycle present when property is not set");
     }
 }
