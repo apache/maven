@@ -234,7 +234,8 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                         .name("goal")
                         .type("java.lang.String")
                         .expression("${goal}")
-                        .description("The name of the goal for which to show help. If unspecified, all goals will be displayed.")
+                        .description(
+                                "The name of the goal for which to show help. If unspecified, all goals will be displayed.")
                         .build(),
                 org.apache.maven.api.plugin.descriptor.Parameter.newBuilder(true)
                         .name("indentSize")
@@ -457,7 +458,6 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
             import java.io.IOException;
             import java.io.InputStream;
             import java.util.List;
-            import java.util.stream.Collectors;
 
             /**
              * Display help information on %2$s.<br>
@@ -556,7 +556,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                         List<org.apache.maven.api.plugin.descriptor.Parameter> params = mojo.getParameters()
                                 .stream()
                                 .filter(org.apache.maven.api.plugin.descriptor.Parameter::isEditable)
-                                .collect(Collectors.toList());
+                                .toList();
                         if (!params.isEmpty()) {
                             mb.a(indent(1)).strong("Available parameters:").newline();
                             mb.newline();
@@ -591,12 +591,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                 }
 
                 private String indent(int level) {
-                    int count = level * indentSize;
-                    StringBuilder sb = new StringBuilder(count);
-                    for (int i = 0; i < count; i++) {
-                        sb.append(' ');
-                    }
-                    return sb.toString();
+                    return " ".repeat(level * indentSize);
                 }
 
                 private void appendWrapped(MessageBuilder mb, String text, int indent, int lineLength) {
