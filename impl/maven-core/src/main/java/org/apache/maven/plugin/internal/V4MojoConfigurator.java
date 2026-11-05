@@ -113,6 +113,16 @@ public final class V4MojoConfigurator {
         }
         if (type.isArray()) {
             List<XmlNode> children = node.children();
+            if (children.isEmpty()) {
+                // No child elements: treat the text value as a comma-separated list
+                String text = evaluateNodeAsString(node);
+                String[] parts = text != null ? text.split(",", -1) : new String[0];
+                Object array = Array.newInstance(type.getComponentType(), parts.length);
+                for (int i = 0; i < parts.length; i++) {
+                    Array.set(array, i, convert(XmlNode.newInstance("item", parts[i].trim()), type.getComponentType()));
+                }
+                return array;
+            }
             Object array = Array.newInstance(type.getComponentType(), children.size());
             for (int i = 0; i < children.size(); i++) {
                 Array.set(array, i, convert(children.get(i), type.getComponentType()));
@@ -123,8 +133,19 @@ public final class V4MojoConfigurator {
             Type itemType = target instanceof ParameterizedType p ? p.getActualTypeArguments()[0] : Object.class;
             Collection<Object> values =
                     Set.class.isAssignableFrom(type) ? new java.util.LinkedHashSet<>() : new ArrayList<>();
-            for (XmlNode child : node.children()) {
-                values.add(convert(child, itemType));
+            List<XmlNode> children = node.children();
+            if (children.isEmpty()) {
+                // No child elements: treat the text value as a comma-separated list
+                String text = evaluateNodeAsString(node);
+                if (text != null) {
+                    for (String part : text.split(",", -1)) {
+                        values.add(convert(XmlNode.newInstance("item", part.trim()), itemType));
+                    }
+                }
+            } else {
+                for (XmlNode child : children) {
+                    values.add(convert(child, itemType));
+                }
             }
             return values;
         }
@@ -133,9 +154,21 @@ public final class V4MojoConfigurator {
             if (Properties.class.isAssignableFrom(type)) {
                 Properties properties = new Properties();
                 for (XmlNode child : node.children()) {
-                    Object val = convert(child, valueType);
-                    if (val != null) {
-                        properties.put(child.name(), val);
+                    // Support Plexus-style: <property><name>k</name><value>v</value></property>
+                    XmlNode nameNode = child.child("name");
+                    XmlNode valueNode = child.child("value");
+                    if (nameNode != null && valueNode != null) {
+                        String key = evaluateNodeAsString(nameNode);
+                        Object val = convert(valueNode, valueType);
+                        if (key != null && val != null) {
+                            properties.put(key, val);
+                        }
+                    } else {
+                        // Support key=element-name, value=text: <key>value</key>
+                        Object val = convert(child, valueType);
+                        if (val != null) {
+                            properties.put(child.name(), val);
+                        }
                     }
                 }
                 return properties;
