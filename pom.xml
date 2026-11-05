@@ -105,7 +105,7 @@ under the License.
   <scm>
     <connection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</connection>
     <developerConnection>scm:git:https://gitbox.apache.org/repos/asf/maven.git</developerConnection>
-    <tag>maven-3.9.x</tag>
+    <tag>maven-3.10.x</tag>
     <url>https://github.com/apache/maven/tree/${project.scm.tag}</url>
   </scm>
   <issueManagement>
@@ -164,6 +164,12 @@ under the License.
     <!-- Note: Maven 3 can never become "pure modular" thing, we leave that to Maven 4+ -->
     <moduleNamePrefix>${project.groupId}.v3.</moduleNamePrefix>
     <moduleNameSuffix>invalid</moduleNameSuffix>
+
+    <!-- Override surefire version -->
+    <!-- TODO: Remove with next parent version -->
+    <version.maven-surefire-plugin>3.6.1</version.maven-surefire-plugin>
+    <version.maven-failsafe-plugin>3.6.1</version.maven-failsafe-plugin>
+
   </properties>
 
   <!--bootstrap-start-comment-->
