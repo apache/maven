@@ -45,7 +45,7 @@ class MavenITmng8379SettingsDecryptTest extends AbstractMavenIntegrationTestCase
         verifier.verifyErrorFreeLog();
 
         // there is a warning and all fields decrypted
-        verifier.verifyTextInLog(" encountered while building the effective settings (use -e to see details)");
+        verifier.verifyTextInLog(" encountered while building the effective settings");
         verifier.verifyTextInLog("<password>testtest</password>");
         verifier.verifyTextInLog("<value>testtest</value>");
     }
@@ -68,7 +68,7 @@ class MavenITmng8379SettingsDecryptTest extends AbstractMavenIntegrationTestCase
 
         // there is no warning and all fields decrypted
         verifier.verifyTextNotInLog("[WARNING]");
-        verifier.verifyTextNotInLog(" encountered while building the effective settings (use -e to see details)");
+        verifier.verifyTextNotInLog(" encountered while building the effective settings");
         verifier.verifyTextInLog("<password>testtest</password>");
         verifier.verifyTextInLog("<value>secretHeader</value>");
     }
