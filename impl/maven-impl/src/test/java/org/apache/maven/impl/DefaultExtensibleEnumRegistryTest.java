@@ -18,7 +18,11 @@
  */
 package org.apache.maven.impl;
 
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.ExtensibleEnum;
@@ -26,6 +30,7 @@ import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.spi.ExtensibleEnumProvider;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -99,6 +104,56 @@ class DefaultExtensibleEnumRegistryTest {
         assertSame(foo, registry.lookup("foo").orElseThrow());
     }
 
+    // --- isVisibleFrom tests ---
+
+    @Test
+    void visibleFromNullClassLoaderAlwaysReturnsTrue() {
+        TestProvider provider = () -> List.of(CUSTOM);
+        assertTrue(ExtensibleEnumRegistries.isVisibleFrom(provider, null));
+    }
+
+    @Test
+    void visibleFromSameClassLoaderReturnsTrue() {
+        TestProvider provider = () -> List.of(CUSTOM);
+        ClassLoader cl = provider.getClass().getClassLoader();
+        assertTrue(ExtensibleEnumRegistries.isVisibleFrom(provider, cl));
+    }
+
+    @Test
+    void visibleFromChildOfParentClassLoaderReturnsTrue() throws Exception {
+        TestProvider provider = () -> List.of(CUSTOM);
+        ClassLoader parent = provider.getClass().getClassLoader();
+        try (URLClassLoader child = new URLClassLoader(new URL[0], parent)) {
+            assertTrue(ExtensibleEnumRegistries.isVisibleFrom(provider, child));
+        }
+    }
+
+    @Test
+    void notVisibleFromUnrelatedClassLoader() throws Exception {
+        TestProvider provider = () -> List.of(CUSTOM);
+        try (URLClassLoader unrelated = new URLClassLoader(new URL[0], null)) {
+            assertFalse(ExtensibleEnumRegistries.isVisibleFrom(provider, unrelated));
+        }
+    }
+
+    @Test
+    void visibleFromClassRealmThatImportsProviderRealm() throws Exception {
+        TestProvider provider = () -> List.of(CUSTOM);
+        ClassLoader providerCl = provider.getClass().getClassLoader();
+        try (FakeClassRealm realm = new FakeClassRealm(Set.of(providerCl))) {
+            assertTrue(ExtensibleEnumRegistries.isVisibleFrom(provider, realm));
+        }
+    }
+
+    @Test
+    void notVisibleFromClassRealmWithoutMatchingImport() throws Exception {
+        TestProvider provider = () -> List.of(CUSTOM);
+        try (URLClassLoader otherCl = new URLClassLoader(new URL[0], null);
+                FakeClassRealm realm = new FakeClassRealm(Set.of(otherCl))) {
+            assertFalse(ExtensibleEnumRegistries.isVisibleFrom(provider, realm));
+        }
+    }
+
     record TestValue(String id) implements ExtensibleEnum {}
 
     interface TestProvider extends ExtensibleEnumProvider<TestValue> {}
@@ -113,6 +168,24 @@ class DefaultExtensibleEnumRegistryTest {
         @SafeVarargs
         TestRegistry(Lookup lookup, List<TestProvider> providers, TestValue... builtins) {
             super(lookup, TestProvider.class, providers, builtins);
+        }
+    }
+
+    /**
+     * Simulates a ClassRealm with {@code getImportRealms()} so the reflection-based
+     * import check can be exercised without depending on plexus-classworlds.
+     */
+    static class FakeClassRealm extends URLClassLoader {
+        private final Collection<ClassLoader> importedRealms;
+
+        FakeClassRealm(Collection<ClassLoader> importedRealms) {
+            super(new URL[0], null);
+            this.importedRealms = importedRealms;
+        }
+
+        @SuppressWarnings("unused") // called via reflection by isImportedRealm
+        public Collection<ClassLoader> getImportRealms() {
+            return importedRealms;
         }
     }
 }

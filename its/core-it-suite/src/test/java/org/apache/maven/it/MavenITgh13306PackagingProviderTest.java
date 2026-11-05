@@ -49,6 +49,8 @@ class MavenITgh13306PackagingProviderTest extends AbstractMavenIntegrationTestCa
 
         verifier = newVerifier(new File(testDir, "reactor").getPath());
         verifier.setAutoclean(false);
+        verifier.addCliArgument("-T");
+        verifier.addCliArgument("2");
         verifier.addCliArgument("validate");
         try {
             verifier.execute();
