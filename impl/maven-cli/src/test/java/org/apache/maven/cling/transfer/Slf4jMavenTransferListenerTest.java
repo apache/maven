@@ -29,6 +29,7 @@ import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.transfer.TransferEvent;
 import org.eclipse.aether.transfer.TransferResource;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.mockito.ArgumentCaptor;
 import org.slf4j.Logger;
 
@@ -38,6 +39,7 @@ import static org.mockito.Mockito.verify;
 
 class Slf4jMavenTransferListenerTest {
 
+    @ResourceLock("TransferResource.clock")
     @Test
     void subSecondTransferReportsItsRate() {
         // Create the mock first: loading Mockito must not count towards the transfer time.
