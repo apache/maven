@@ -86,6 +86,10 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
     private final Set<String> generatedFactoryNames = new LinkedHashSet<>();
     private String[] resolvedCoordinates;
     private boolean coordinateErrorEmitted = false;
+    /** Guards against re-generating {@code HelpMojo.java} in the final processing round. */
+    private boolean helpMojoGenerated = false;
+    /** Guards against re-generating {@code plugin.xml} after HelpMojo triggers a new round. */
+    private boolean pluginXmlGenerated = false;
 
     @Override
     public SourceVersion getSupportedSourceVersion() {
@@ -175,6 +179,9 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
     }
 
     private void writePluginXml(String[] coords) throws IOException {
+        if (pluginXmlGenerated) {
+            return;
+        }
         List<MojoDescriptor> mojos = new ArrayList<>();
         for (TypeElement mojoType : mojoElements.values()) {
             MojoDescriptor mojo = buildMojoDescriptor(mojoType);
@@ -202,6 +209,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
             throw new IOException("Failed to write plugin descriptor", e);
         }
         note("Generated META-INF/maven/plugin.xml with " + mojos.size() + " mojo(s)");
+        pluginXmlGenerated = true;
     }
 
     /**
@@ -640,7 +648,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         // Idempotency guard: JSR 269 fires a final round with processingOver()==true
         // even when no new files were generated; without this guard, createSourceFile()
         // would throw FilerException on the second call.
-        if (generatedFactoryNames.contains(helpFqn)) {
+        if (helpMojoGenerated) {
             return;
         }
 
@@ -650,7 +658,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         try (Writer w = processingEnv.getFiler().createSourceFile(helpFqn).openWriter()) {
             w.write(source);
         }
-        generatedFactoryNames.add(helpFqn);
+        helpMojoGenerated = true;
         note("Generated " + helpFqn);
     }
 
