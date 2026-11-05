@@ -55,6 +55,18 @@ public final class V4MojoConfigurator {
         this.pluginDescriptor = pluginDescriptor;
     }
 
+    /**
+     * Creates a configurator backed by a Plexus {@link TypeAwareExpressionEvaluator}.
+     * For use by callers outside the {@code internal} package that cannot access
+     * {@link PlexusMojoExpressionEvaluatorAdapter} directly (e.g. {@code maven-testing}).
+     */
+    public V4MojoConfigurator(
+            org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator evaluator,
+            ClassLoader classLoader,
+            PluginDescriptor pluginDescriptor) {
+        this(new PlexusMojoExpressionEvaluatorAdapter(evaluator), classLoader, pluginDescriptor);
+    }
+
     public void configure(Object mojo, XmlNode configuration) throws PluginConfigurationException {
         if (configuration == null) {
             return;

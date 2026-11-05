@@ -832,9 +832,15 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                     logger.debug("Configuring mojo execution '" + mojoDescriptor.getId() + ':' + executionId
                             + "' with Maven XML configurator -->");
                 }
+                if (!(expressionEvaluator instanceof TypeAwareExpressionEvaluator tae)) {
+                    throw new PluginConfigurationException(
+                            mojoDescriptor.getPluginDescriptor(),
+                            "Expression evaluator for mojo '"
+                                    + mojoDescriptor.getId()
+                                    + "' does not implement TypeAwareExpressionEvaluator");
+                }
                 new V4MojoConfigurator(
-                                new PlexusMojoExpressionEvaluatorAdapter(
-                                        (TypeAwareExpressionEvaluator) expressionEvaluator),
+                                new PlexusMojoExpressionEvaluatorAdapter(tae),
                                 pluginRealm,
                                 mojoDescriptor.getPluginDescriptor())
                         .configure(mojo, configurationDom);

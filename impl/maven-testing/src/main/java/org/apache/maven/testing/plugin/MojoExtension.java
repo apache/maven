@@ -310,7 +310,10 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             ExpressionEvaluator evaluator = new WrapEvaluator(
                     getInjector(), new PluginParameterExpressionEvaluatorV4(session, project, mojoExecution));
 
-            new V4MojoConfigurator(evaluator, mojo.getClass().getClassLoader(), null)
+            new V4MojoConfigurator(
+                            (TypeAwareExpressionEvaluator) evaluator,
+                            mojo.getClass().getClassLoader(),
+                            null)
                     .configure(mojo, pluginConfiguration);
             return mojo;
         } catch (Exception e) {
