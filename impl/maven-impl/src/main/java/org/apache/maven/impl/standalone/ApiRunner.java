@@ -649,7 +649,9 @@ public class ApiRunner {
     /**
      * Server credentials from settings, scoped to the origins the operator declared for each id (mirrors, settings
      * repositories and {@code <server><repositoryOrigins>}), as the Maven CLI does; see
-     * {@link OriginBoundAuthenticationSelector#CREDENTIAL_SCOPE}.
+     * {@link OriginBoundAuthenticationSelector#CREDENTIAL_SCOPE}. Like the repositories {@code ApiRunner} builds, the
+     * origins come from the top-level settings repositories only: a repository declared in a settings profile is not
+     * counted, which the CLI does.
      */
     private static AuthenticationSelector authenticationSelector(
             Settings settings, Map<String, String> properties, Map<String, String> userProperties) {
