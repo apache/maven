@@ -831,7 +831,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                     logger.debug("Configuring mojo execution '" + mojoDescriptor.getId() + ':' + executionId
                             + "' with Maven XML configurator -->");
                 }
-                new V4MojoConfigurator(expressionEvaluator, pluginRealm, mojoDescriptor.getPluginDescriptor())
+                new V4MojoConfigurator(
+                                new PlexusMojoExpressionEvaluatorAdapter(expressionEvaluator),
+                                pluginRealm,
+                                mojoDescriptor.getPluginDescriptor())
                         .configure(mojo, configurationDom);
                 validateParameters(mojoDescriptor, configuration, expressionEvaluator);
                 logger.debug("-- end configuration --");

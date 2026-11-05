@@ -39,19 +39,17 @@ import java.util.Set;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
 
 /** Configures a Maven 4 mojo directly from the public Maven XML model. */
 public final class V4MojoConfigurator {
     private static final Object NOT_SCALAR = new Object();
 
-    private final ExpressionEvaluator evaluator;
+    private final MojoExpressionEvaluator evaluator;
     private final ClassLoader classLoader;
     private final PluginDescriptor pluginDescriptor;
 
     public V4MojoConfigurator(
-            ExpressionEvaluator evaluator, ClassLoader classLoader, PluginDescriptor pluginDescriptor) {
+            MojoExpressionEvaluator evaluator, ClassLoader classLoader, PluginDescriptor pluginDescriptor) {
         this.evaluator = evaluator;
         this.classLoader = classLoader;
         this.pluginDescriptor = pluginDescriptor;
@@ -220,9 +218,7 @@ public final class V4MojoConfigurator {
                 return null;
             }
             Path path = Paths.get(value.replace('/', File.separatorChar));
-            if (evaluator instanceof TypeAwareExpressionEvaluator typed) {
-                path = typed.alignToBaseDirectory(path.toFile()).toPath();
-            }
+            path = evaluator.alignToBaseDirectory(path.toFile()).toPath();
             return type == File.class ? path.toFile() : path;
         }
         if (type == URI.class) {
@@ -399,9 +395,7 @@ public final class V4MojoConfigurator {
         if (value == null) {
             return null;
         }
-        return evaluator instanceof TypeAwareExpressionEvaluator typed
-                ? typed.evaluate(value, type)
-                : evaluator.evaluate(value);
+        return evaluator.evaluate(value, type);
     }
 
     private static Method findDefaultSetter(Class<?> type) {

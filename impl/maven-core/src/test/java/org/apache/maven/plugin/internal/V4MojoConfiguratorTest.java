@@ -30,8 +30,6 @@ import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.internal.xml.XmlNodeImpl;
 import org.apache.maven.plugin.PluginConfigurationException;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -50,17 +48,16 @@ import static org.mockito.Mockito.when;
 
 class V4MojoConfiguratorTest {
 
-    private TypeAwareExpressionEvaluator evaluator;
+    private MojoExpressionEvaluator evaluator;
     private PluginDescriptor pluginDescriptor;
     private V4MojoConfigurator configurator;
 
     @BeforeEach
     void setUp() throws Exception {
-        evaluator = mock(TypeAwareExpressionEvaluator.class);
+        evaluator = mock(MojoExpressionEvaluator.class);
         pluginDescriptor = new PluginDescriptor();
         configurator = new V4MojoConfigurator(evaluator, getClass().getClassLoader(), pluginDescriptor);
 
-        when(evaluator.evaluate(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
         when(evaluator.evaluate(anyString(), any())).thenAnswer(invocation -> invocation.getArgument(0));
         when(evaluator.alignToBaseDirectory(any(File.class))).thenAnswer(invocation -> {
             File f = invocation.getArgument(0);
@@ -152,8 +149,8 @@ class V4MojoConfiguratorTest {
 
     @Test
     void testUnresolvedExpressionsDoNotThrowAndUseDefaults() throws Exception {
-        ExpressionEvaluator nullEvaluator = mock(ExpressionEvaluator.class);
-        when(nullEvaluator.evaluate(anyString())).thenReturn(null);
+        MojoExpressionEvaluator nullEvaluator = mock(MojoExpressionEvaluator.class);
+        when(nullEvaluator.evaluate(anyString(), any())).thenReturn(null);
         V4MojoConfigurator nullConfigurator =
                 new V4MojoConfigurator(nullEvaluator, getClass().getClassLoader(), pluginDescriptor);
 
@@ -185,8 +182,8 @@ class V4MojoConfiguratorTest {
 
     @Test
     void testDefaultValueAttributeFallback() throws Exception {
-        ExpressionEvaluator nullEvaluator = mock(ExpressionEvaluator.class);
-        when(nullEvaluator.evaluate(anyString())).thenAnswer(inv -> {
+        MojoExpressionEvaluator nullEvaluator = mock(MojoExpressionEvaluator.class);
+        when(nullEvaluator.evaluate(anyString(), any())).thenAnswer(inv -> {
             String val = inv.getArgument(0);
             return val.startsWith("${unresolved") ? null : val;
         });
@@ -268,8 +265,8 @@ class V4MojoConfiguratorTest {
 
     @Test
     void testPropertiesNullSafetyOnUnresolvedExpression() throws Exception {
-        ExpressionEvaluator nullEvaluator = mock(ExpressionEvaluator.class);
-        when(nullEvaluator.evaluate(anyString())).thenReturn(null);
+        MojoExpressionEvaluator nullEvaluator = mock(MojoExpressionEvaluator.class);
+        when(nullEvaluator.evaluate(anyString(), any())).thenReturn(null);
         V4MojoConfigurator nullConfigurator =
                 new V4MojoConfigurator(nullEvaluator, getClass().getClassLoader(), pluginDescriptor);
 

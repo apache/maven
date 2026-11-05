@@ -54,6 +54,7 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.internal.V4MojoConfiguratorTestHelper;
 import org.apache.maven.project.CycleDetectedException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
@@ -464,19 +465,20 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         PluginParameterExpressionEvaluatorV4 evaluator =
                 new PluginParameterExpressionEvaluatorV4(mavenSession.getSession(), null);
 
-        XmlNode configuration = XmlNode.newInstance(
-                "configuration",
-                java.util.List.of(
-                        XmlNode.newInstance("uri", "${session.rootDirectory.uri}"),
-                        XmlNode.newInstance("path", "${session.rootDirectory}"),
-                        XmlNode.newInstance("uriString", "${session.rootDirectory.uri.string}"),
-                        XmlNode.newInstance("uriAsciiString", "${session.rootDirectory.uri.ASCIIString}"),
-                        XmlNode.newInstance("pathString", "${session.rootDirectory.string}")));
-
         Mojo mojo = new Mojo();
-        new org.apache.maven.plugin.internal.V4MojoConfigurator(
-                        evaluator, getClass().getClassLoader(), null)
-                .configure(mojo, configuration);
+        V4MojoConfiguratorTestHelper.configure(
+                evaluator,
+                getClass().getClassLoader(),
+                null,
+                mojo,
+                XmlNode.newInstance(
+                        "configuration",
+                        java.util.List.of(
+                                XmlNode.newInstance("uri", "${session.rootDirectory.uri}"),
+                                XmlNode.newInstance("path", "${session.rootDirectory}"),
+                                XmlNode.newInstance("uriString", "${session.rootDirectory.uri.string}"),
+                                XmlNode.newInstance("uriAsciiString", "${session.rootDirectory.uri.ASCIIString}"),
+                                XmlNode.newInstance("pathString", "${session.rootDirectory.string}"))));
 
         assertEquals(
                 Objects.equals(path.toUri().toString(), path.toUri().toASCIIString()), !Os.isFamily(Os.FAMILY_WINDOWS));
