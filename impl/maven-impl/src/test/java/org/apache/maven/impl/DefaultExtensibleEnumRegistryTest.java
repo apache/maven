@@ -120,34 +120,38 @@ class DefaultExtensibleEnumRegistryTest {
     }
 
     @Test
-    void visibleFromChildOfParentClassLoaderReturnsTrue() {
+    void visibleFromChildOfParentClassLoaderReturnsTrue() throws Exception {
         TestProvider provider = () -> List.of(CUSTOM);
         ClassLoader parent = provider.getClass().getClassLoader();
-        ClassLoader child = new URLClassLoader(new URL[0], parent);
-        assertTrue(ExtensibleEnumRegistries.isVisibleFrom(provider, child));
+        try (URLClassLoader child = new URLClassLoader(new URL[0], parent)) {
+            assertTrue(ExtensibleEnumRegistries.isVisibleFrom(provider, child));
+        }
     }
 
     @Test
-    void notVisibleFromUnrelatedClassLoader() {
+    void notVisibleFromUnrelatedClassLoader() throws Exception {
         TestProvider provider = () -> List.of(CUSTOM);
-        ClassLoader unrelated = new URLClassLoader(new URL[0], null);
-        assertFalse(ExtensibleEnumRegistries.isVisibleFrom(provider, unrelated));
+        try (URLClassLoader unrelated = new URLClassLoader(new URL[0], null)) {
+            assertFalse(ExtensibleEnumRegistries.isVisibleFrom(provider, unrelated));
+        }
     }
 
     @Test
-    void visibleFromClassRealmThatImportsProviderRealm() {
+    void visibleFromClassRealmThatImportsProviderRealm() throws Exception {
         TestProvider provider = () -> List.of(CUSTOM);
         ClassLoader providerCl = provider.getClass().getClassLoader();
-        FakeClassRealm realm = new FakeClassRealm(Set.of(providerCl));
-        assertTrue(ExtensibleEnumRegistries.isVisibleFrom(provider, realm));
+        try (FakeClassRealm realm = new FakeClassRealm(Set.of(providerCl))) {
+            assertTrue(ExtensibleEnumRegistries.isVisibleFrom(provider, realm));
+        }
     }
 
     @Test
-    void notVisibleFromClassRealmWithoutMatchingImport() {
+    void notVisibleFromClassRealmWithoutMatchingImport() throws Exception {
         TestProvider provider = () -> List.of(CUSTOM);
-        ClassLoader otherCl = new URLClassLoader(new URL[0], null);
-        FakeClassRealm realm = new FakeClassRealm(Set.of(otherCl));
-        assertFalse(ExtensibleEnumRegistries.isVisibleFrom(provider, realm));
+        try (URLClassLoader otherCl = new URLClassLoader(new URL[0], null);
+                FakeClassRealm realm = new FakeClassRealm(Set.of(otherCl))) {
+            assertFalse(ExtensibleEnumRegistries.isVisibleFrom(provider, realm));
+        }
     }
 
     record TestValue(String id) implements ExtensibleEnum {}
