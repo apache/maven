@@ -58,6 +58,7 @@ under the License.
       <item name="CLI options" href="./compat/maven-embedder/cli.html"/>
       <item name="Super POM" href="./compat/maven-model-builder/super-pom.html"/>
       <item name="Maven Configuration" href="./configuration.html"/>
+      <item name="Aggregator Mojos &amp; Lifecycles" href="./aggregator-goals.html"/>
     </menu>
 
     <menu inherit="bottom" name="Development">
