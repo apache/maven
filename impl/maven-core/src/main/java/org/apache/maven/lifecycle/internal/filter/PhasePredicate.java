@@ -27,7 +27,7 @@ import org.apache.maven.api.MojoExecution;
  *
  * <p>Example: {@code -Dmaven.lifecycle.filter=phase(test)} removes all mojos bound to the {@code test} phase.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 public class PhasePredicate implements FilterPredicate {
 

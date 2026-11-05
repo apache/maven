@@ -52,7 +52,7 @@ import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
  *
  * <p>When any field is {@code null} or not specified, it is treated as a wildcard (matches any value).
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 public class CoordinatePredicate implements FilterPredicate {
 

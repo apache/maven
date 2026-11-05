@@ -27,7 +27,7 @@ import org.apache.maven.api.MojoExecution;
  * New predicate types can be added without breaking existing filter expressions.
  *
  * @see MojoExecutionFilter
- * @since 4.1.0
+ * @since 4.2.0
  */
 public interface FilterPredicate {
 

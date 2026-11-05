@@ -52,7 +52,7 @@ import org.apache.maven.api.xml.XmlNode;
  *   <li>{@code phase(name)} — skip all mojos bound to the named phase</li>
  * </ul>
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 public class MojoExecutionFilter {
 
@@ -103,8 +103,8 @@ public class MojoExecutionFilter {
     }
 
     /**
-     * Returns {@code true} if the given legacy mojo execution matches any predicate in the list
-     * and should be skipped.
+     * Returns the first matching predicate if the given legacy mojo execution matches any predicate in the list
+     * and should be skipped, or an empty Optional if the execution should proceed.
      *
      * <p>Adapts the legacy {@link org.apache.maven.plugin.MojoExecution} into a lightweight
      * {@link MojoExecution} view — only the fields accessed by the predicates
@@ -113,19 +113,20 @@ public class MojoExecutionFilter {
      *
      * @param execution  the legacy mojo execution to test
      * @param predicates the predicates to apply (OR-ed)
-     * @return {@code true} if the execution should be skipped
+     * @return the first matching predicate, or empty if no match
      */
-    public static boolean matches(org.apache.maven.plugin.MojoExecution execution, List<FilterPredicate> predicates) {
+    public static Optional<FilterPredicate> matches(
+            org.apache.maven.plugin.MojoExecution execution, List<FilterPredicate> predicates) {
         if (predicates.isEmpty()) {
-            return false;
+            return Optional.empty();
         }
         MojoExecution apiExecution = adapt(execution);
         for (FilterPredicate predicate : predicates) {
             if (predicate.matches(apiExecution)) {
-                return true;
+                return Optional.of(predicate);
             }
         }
-        return false;
+        return Optional.empty();
     }
 
     /**

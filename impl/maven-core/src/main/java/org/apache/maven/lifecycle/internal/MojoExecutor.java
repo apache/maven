@@ -29,7 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Properties;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -183,8 +183,7 @@ public class MojoExecutor {
      * Uses {@code -Dmaven.lifecycle.filter} user property; returns an empty list if absent.
      */
     private List<FilterPredicate> resolveFilterPredicates(MavenSession session) throws LifecycleExecutionException {
-        Properties userProps = session.getUserProperties();
-        String filterExpression = userProps != null ? userProps.getProperty(MojoExecutionFilter.PROPERTY_NAME) : null;
+        String filterExpression = session.getUserProperties().getProperty(MojoExecutionFilter.PROPERTY_NAME);
         try {
             return MojoExecutionFilter.parse(filterExpression);
         } catch (IllegalArgumentException e) {
@@ -200,8 +199,9 @@ public class MojoExecutor {
             PhaseRecorder phaseRecorder,
             List<FilterPredicate> filterPredicates)
             throws LifecycleExecutionException {
-        if (MojoExecutionFilter.matches(mojoExecution, filterPredicates)) {
-            LOGGER.info("Skipping {} (filtered by {})", mojoExecution, MojoExecutionFilter.PROPERTY_NAME);
+        Optional<FilterPredicate> matchedFilter = MojoExecutionFilter.matches(mojoExecution, filterPredicates);
+        if (matchedFilter.isPresent()) {
+            LOGGER.info("Skipping {} (matched filter: {})", mojoExecution, matchedFilter.get());
             eventCatapult.fire(ExecutionEvent.Type.MojoSkipped, session, mojoExecution);
             return;
         }
