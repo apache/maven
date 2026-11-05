@@ -483,13 +483,25 @@ class MojoDescriptorProcessorTest {
         // Goal prefix from artifactId "greet-maven-plugin" → "greet"
         assertContains(helpMojo, "greet:help");
 
-        // XXE hardening
-        assertContains(helpMojo, "external-general-entities");
-        assertContains(helpMojo, "setExpandEntityReferences(false)");
+        // Uses PluginXmlFactory service (no raw DOM parsing)
+        assertContains(helpMojo, "PluginXmlFactory");
+        assertContains(helpMojo, "session.getService(PluginXmlFactory.class)");
 
-        // Readonly parameter filter
-        assertContains(helpMojo, "editable");
-        assertContains(helpMojo, "\"false\".equals(getTextContent(p, \"editable\"))");
+        // Session injected to access services
+        assertContains(helpMojo, "Session session");
+
+        // Uses MessageBuilderFactory for colored output
+        assertContains(helpMojo, "MessageBuilderFactory");
+        assertContains(helpMojo, "session.getService(MessageBuilderFactory.class)");
+        assertContains(helpMojo, "mbf.getTerminalWidth()");
+
+        // Styled output: goal in mojo style, deprecated in warning style
+        assertContains(helpMojo, "mb.mojo(");
+        assertContains(helpMojo, ".warning(");
+        assertContains(helpMojo, ".strong(");
+
+        // Readonly parameter filter uses typed isEditable()
+        assertContains(helpMojo, "isEditable");
 
         // HelpMojo should also get a factory generated for it (it has @Mojo)
         // since the HelpMojo source is emitted before processingOver returns,

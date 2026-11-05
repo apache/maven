@@ -390,8 +390,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
     }
 
     private void generateHelpMojo(String[] coords) throws IOException {
-        // Determine the package: use the first mojo's package as the HelpMojo package.
-        // For plugins with mojos in multiple packages, the first registered mojo's package is used.
+        // Use the first discovered mojo's package for the generated HelpMojo.
         String pkg = mojoElements.values().stream()
                 .map(te -> {
                     String fqn = te.getQualifiedName().toString();
@@ -408,286 +407,200 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         if (generatedFactoryNames.contains(helpFqn)) {
             return;
         }
-        String pluginXmlPath = "/META-INF/maven/plugin.xml";
+
+        String packageDecl = pkg.isEmpty() ? "" : "package " + pkg + ";\n\n";
         String goalPrefix = coords[3];
         String artifactId = coords[1];
         String version = coords[2];
-        try (PrintWriter pw = new PrintWriter(
-                processingEnv.getFiler().createSourceFile(helpFqn).openWriter())) {
-            writeHelpMojoHeader(pw, pkg, artifactId, version, goalPrefix, pluginXmlPath);
-            writeHelpMojoMethods(pw, pluginXmlPath);
+
+        String source = """
+                %simport org.apache.maven.api.Session;
+                import org.apache.maven.api.di.Inject;
+                import org.apache.maven.api.plugin.Log;
+                import org.apache.maven.api.plugin.MojoException;
+                import org.apache.maven.api.plugin.annotations.Mojo;
+                import org.apache.maven.api.plugin.annotations.Parameter;
+                import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
+                import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
+                import org.apache.maven.api.services.MessageBuilder;
+                import org.apache.maven.api.services.MessageBuilderFactory;
+                import org.apache.maven.api.services.xml.PluginXmlFactory;
+                import org.apache.maven.api.services.xml.XmlReaderException;
+                import java.io.IOException;
+                import java.io.InputStream;
+                import java.util.List;
+
+                /**
+                 * Display help information on %s.<br>
+                 * Call <code>mvn %s:help -Ddetail=true -Dgoal=&lt;goal-name&gt;</code>
+                 * to display parameter details.
+                 *
+                 * @since %s
+                 */
+                @Mojo(name = "help", projectRequired = false)
+                public class HelpMojo implements org.apache.maven.api.plugin.Mojo {
+
+                    @Inject
+                    private Session session;
+
+                    @Inject
+                    private Log logger;
+
+                    /** If {@code true}, display all settable properties for each goal. */
+                    @Parameter(property = "detail", defaultValue = "false")
+                    private boolean detail;
+
+                    /** The name of the goal for which to show help. If unspecified, all goals will be displayed. */
+                    @Parameter(property = "goal")
+                    private String goal;
+
+                    /** The number of spaces per indentation level, should be positive. */
+                    @Parameter(property = "indentSize", defaultValue = "2")
+                    private int indentSize;
+
+                    private static final String PLUGIN_XML_PATH = "/META-INF/maven/plugin.xml";
+
+                    @Override
+                    public void execute() throws MojoException {
+                        if (indentSize <= 0) {
+                            logger.warn("The parameter 'indentSize' should be positive, using '2' as default.");
+                            indentSize = 2;
+                        }
+                        MessageBuilderFactory mbf = session.getService(MessageBuilderFactory.class);
+                        int lineLength = mbf.getTerminalWidth();
+                        if (lineLength <= 0) {
+                            lineLength = 80;
+                        }
+                        PluginDescriptor descriptor = loadDescriptor();
+                        MessageBuilder mb = mbf.builder();
+                        String name = descriptor.getName();
+                        String ver = descriptor.getVersion();
+                        String id = descriptor.getGroupId() + ":" + descriptor.getArtifactId() + ":" + ver;
+                        String title = (name != null && !name.isEmpty() && !name.contains(id))
+                                ? name + " " + ver : (name != null && !name.isEmpty() ? name : id);
+                        mb.strong(title).newline();
+                        if (descriptor.getDescription() != null) {
+                            appendWrapped(mb, descriptor.getDescription(), 1, lineLength);
+                        }
+                        mb.newline();
+                        List<MojoDescriptor> mojos = descriptor.getMojos();
+                        if (goal == null || goal.isEmpty()) {
+                            mb.a("This plugin has ").strong(String.valueOf(mojos.size()))
+                                    .a(mojos.size() > 1 ? " goals:" : " goal:").newline();
+                            mb.newline();
+                        }
+                        for (MojoDescriptor mojo : mojos) {
+                            writeGoal(mb, descriptor.getGoalPrefix(), mojo, lineLength);
+                        }
+                        if (logger.isInfoEnabled()) {
+                            logger.info(mb.build());
+                        }
+                    }
+
+                    private PluginDescriptor loadDescriptor() throws MojoException {
+                        try (InputStream is = getClass().getResourceAsStream(PLUGIN_XML_PATH)) {
+                            if (is == null) {
+                                throw new MojoException("Could not find plugin descriptor at " + PLUGIN_XML_PATH);
+                            }
+                            return session.getService(PluginXmlFactory.class).read(is);
+                        } catch (IOException | XmlReaderException e) {
+                            throw new MojoException("Failed to parse " + PLUGIN_XML_PATH + ": " + e.getMessage(), e);
+                        }
+                    }
+
+                    private void writeGoal(MessageBuilder mb, String gp, MojoDescriptor mojo, int lineLength) {
+                        if (goal != null && !goal.isEmpty() && !goal.equals(mojo.getGoal())) {
+                            return;
+                        }
+                        mb.mojo(gp + ":" + mojo.getGoal()).newline();
+                        if (mojo.getDeprecated() != null && !mojo.getDeprecated().isEmpty()) {
+                            mb.a(indent(1)).warning("Deprecated.").a(" ").a(mojo.getDeprecated()).newline();
+                            if (detail && mojo.getDescription() != null) {
+                                mb.newline();
+                                appendWrapped(mb, mojo.getDescription(), 1, lineLength);
+                            }
+                        } else if (mojo.getDescription() != null) {
+                            appendWrapped(mb, mojo.getDescription(), 1, lineLength);
+                        }
+                        mb.newline();
+                        if (detail) {
+                            List<org.apache.maven.api.plugin.descriptor.Parameter> params = mojo.getParameters()
+                                    .stream()
+                                    .filter(org.apache.maven.api.plugin.descriptor.Parameter::isEditable)
+                                    .toList();
+                            if (!params.isEmpty()) {
+                                mb.a(indent(1)).strong("Available parameters:").newline();
+                                mb.newline();
+                                params.forEach(p -> writeParameter(mb, p, lineLength));
+                            }
+                        }
+                    }
+
+                    private void writeParameter(
+                            MessageBuilder mb, org.apache.maven.api.plugin.descriptor.Parameter p, int lineLength) {
+                        String suffix = (p.getDefaultValue() != null && !p.getDefaultValue().isEmpty())
+                                ? " (Default: " + p.getDefaultValue() + ")" : "";
+                        mb.a(indent(2)).strong(p.getName()).a(suffix).newline();
+                        if (p.getDeprecated() != null && !p.getDeprecated().isEmpty()) {
+                            mb.a(indent(3)).warning("Deprecated.").a(" ").a(p.getDeprecated()).newline();
+                            mb.newline();
+                        }
+                        if (p.getDescription() != null && !p.getDescription().isEmpty()) {
+                            appendWrapped(mb, p.getDescription(), 3, lineLength);
+                        }
+                        if (p.isRequired()) {
+                            mb.a(indent(3)).a("Required: ").strong("Yes").newline();
+                        }
+                        String expression = p.getExpression();
+                        if (expression != null && !expression.isEmpty()
+                                && expression.startsWith("${") && expression.endsWith("}")
+                                && !expression.substring(2).contains("${")) {
+                            mb.a(indent(3)).a("User property: ")
+                                    .info(expression.substring(2, expression.length() - 1)).newline();
+                        }
+                        mb.newline();
+                    }
+
+                    private String indent(int level) {
+                        return " ".repeat(level * indentSize);
+                    }
+
+                    private void appendWrapped(MessageBuilder mb, String text, int indent, int lineLength) {
+                        String pad = indent(indent);
+                        int maxWidth = lineLength - pad.length();
+                        for (String rawLine : text.split("(\r\n)|(\r)|(\n)")) {
+                            // strip basic HTML tags and entities from javadoc descriptions
+                            String plain = rawLine
+                                    .replaceAll("<[^>]+>", "")
+                                    .replace("&lt;", "<").replace("&gt;", ">").replace("&amp;", "&")
+                                    .replace("&nbsp;", " ").replace('\u00A0', ' ').trim();
+                            if (plain.isEmpty()) {
+                                mb.newline();
+                                continue;
+                            }
+                            StringBuilder line = new StringBuilder(pad);
+                            for (String token : plain.split(" +")) {
+                                if (line.length() > pad.length() && line.length() + token.length() + 1 > lineLength) {
+                                    mb.a(line).newline();
+                                    line = new StringBuilder(pad);
+                                } else if (line.length() > pad.length()) {
+                                    line.append(' ');
+                                }
+                                line.append(token);
+                            }
+                            if (line.length() > pad.length()) {
+                                mb.a(line).newline();
+                            }
+                        }
+                    }
+                }
+                """.formatted(packageDecl, artifactId, goalPrefix, version);
+
+        try (Writer w = processingEnv.getFiler().createSourceFile(helpFqn).openWriter()) {
+            w.write(source);
         }
         generatedFactoryNames.add(helpFqn);
         note("Generated " + helpFqn);
-    }
-
-    private static void writeHelpMojoHeader(
-            PrintWriter pw,
-            String pkg,
-            String artifactId,
-            String version,
-            String goalPrefix,
-            String pluginXmlPath) {
-        if (!pkg.isEmpty()) {
-            pw.println("package " + pkg + ";");
-            pw.println();
-        }
-        pw.println("import org.apache.maven.api.di.Inject;");
-        pw.println("import org.apache.maven.api.plugin.Log;");
-        pw.println("import org.apache.maven.api.plugin.MojoException;");
-        pw.println("import org.apache.maven.api.plugin.annotations.Mojo;");
-        pw.println("import org.apache.maven.api.plugin.annotations.Parameter;");
-        pw.println("import org.w3c.dom.Document;");
-        pw.println("import org.w3c.dom.Element;");
-        pw.println("import org.w3c.dom.Node;");
-        pw.println("import org.w3c.dom.NodeList;");
-        pw.println("import org.xml.sax.SAXException;");
-        pw.println("import javax.xml.parsers.DocumentBuilder;");
-        pw.println("import javax.xml.parsers.DocumentBuilderFactory;");
-        pw.println("import javax.xml.parsers.ParserConfigurationException;");
-        pw.println("import java.io.IOException;");
-        pw.println("import java.io.InputStream;");
-        pw.println("import java.util.ArrayList;");
-        pw.println("import java.util.List;");
-        pw.println();
-        pw.println("/**");
-        pw.println(" * Display help information on " + artifactId + ".<br>");
-        pw.println(" * Call <code>mvn " + goalPrefix + ":help -Ddetail=true -Dgoal=&lt;goal-name&gt;</code>"
-                + " to display parameter details.");
-        pw.println(" *");
-        pw.println(" * @since " + version);
-        pw.println(" */");
-        pw.println("@Mojo(name = \"help\", projectRequired = false)");
-        pw.println("public class HelpMojo implements org.apache.maven.api.plugin.Mojo {");
-        pw.println();
-        pw.println("    @Inject");
-        pw.println("    private Log logger;");
-        pw.println();
-        pw.println("    /** If {@code true}, display all settable properties for each goal. */");
-        pw.println("    @Parameter(property = \"detail\", defaultValue = \"false\")");
-        pw.println("    private boolean detail;");
-        pw.println();
-        pw.println("    /** The name of the goal for which to show help."
-                + " If unspecified, all goals will be displayed. */");
-        pw.println("    @Parameter(property = \"goal\")");
-        pw.println("    private String goal;");
-        pw.println();
-        pw.println("    /** The maximum length of a display line, should be positive. */");
-        pw.println("    @Parameter(property = \"lineLength\", defaultValue = \"80\")");
-        pw.println("    private int lineLength;");
-        pw.println();
-        pw.println("    /** The number of spaces per indentation level, should be positive. */");
-        pw.println("    @Parameter(property = \"indentSize\", defaultValue = \"2\")");
-        pw.println("    private int indentSize;");
-        pw.println();
-        pw.println("    private static final String PLUGIN_XML_PATH = \"" + pluginXmlPath + "\";");
-        pw.println("    private static final int DEFAULT_LINE_LENGTH = 80;");
-    }
-
-    @SuppressWarnings("checkstyle:MethodLength")
-    private static void writeHelpMojoMethods(PrintWriter pw, String pluginXmlPath) {
-        pw.println();
-        pw.println("    @Override");
-        pw.println("    public void execute() throws MojoException {");
-        pw.println("        if (lineLength <= 0) {");
-        pw.println(
-                "            logger.warn(\"The parameter 'lineLength' should be positive, using '80' as default.\");");
-        pw.println("            lineLength = DEFAULT_LINE_LENGTH;");
-        pw.println("        }");
-        pw.println("        if (indentSize <= 0) {");
-        pw.println(
-                "            logger.warn(\"The parameter 'indentSize' should be positive, using '2' as default.\");");
-        pw.println("            indentSize = 2;");
-        pw.println("        }");
-        pw.println("        Document doc = loadPluginXml();");
-        pw.println("        StringBuilder sb = new StringBuilder();");
-        pw.println("        Node plugin = getSingleChild(doc, \"plugin\");");
-        pw.println("        String name = getTextContent(plugin, \"name\");");
-        pw.println("        String version = getTextContent(plugin, \"version\");");
-        pw.println("        String id = getTextContent(plugin, \"groupId\") + \":\"");
-        pw.println("                + getTextContent(plugin, \"artifactId\") + \":\" + version;");
-        pw.println("        if (name != null && !name.isEmpty() && !name.contains(id)) {");
-        pw.println("            append(sb, name + \" \" + version, 0);");
-        pw.println("        } else {");
-        pw.println("            append(sb, name != null && !name.isEmpty() ? name : id, 0);");
-        pw.println("        }");
-        pw.println("        String pluginDescription = getTextContent(plugin, \"description\");");
-        pw.println("        if (pluginDescription != null) {");
-        pw.println("            append(sb, pluginDescription, 1);");
-        pw.println("        }");
-        pw.println("        append(sb, \"\", 0);");
-        pw.println("        String goalPrefix = getTextContent(plugin, \"goalPrefix\");");
-        pw.println("        List<Node> mojos = findChildren(getSingleChild(plugin, \"mojos\"), \"mojo\");");
-        pw.println("        if (goal == null || goal.isEmpty()) {");
-        pw.println("            append(sb, \"This plugin has \" + mojos.size()");
-        pw.println("                    + (mojos.size() > 1 ? \" goals:\" : \" goal:\"), 0);");
-        pw.println("            append(sb, \"\", 0);");
-        pw.println("        }");
-        pw.println("        for (Node mojo : mojos) {");
-        pw.println("            writeGoal(sb, goalPrefix, (Element) mojo);");
-        pw.println("        }");
-        pw.println("        if (logger.isInfoEnabled()) {");
-        pw.println("            logger.info(sb.toString());");
-        pw.println("        }");
-        pw.println("    }");
-        pw.println();
-        pw.println("    private Document loadPluginXml() throws MojoException {");
-        pw.println("        try (InputStream is = getClass().getResourceAsStream(PLUGIN_XML_PATH)) {");
-        pw.println("            if (is == null) {");
-        pw.println(
-                "                throw new MojoException(\"Could not find plugin descriptor at \" + PLUGIN_XML_PATH);");
-        pw.println("            }");
-        pw.println("            DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();");
-        pw.println("            dbf.setFeature(\"http://xml.org/sax/features/external-general-entities\", false);");
-        pw.println(
-                "            dbf.setFeature(\"http://xml.org/sax/features/external-parameter-entities\", false);");
-        pw.println("            dbf.setExpandEntityReferences(false);");
-        pw.println("            DocumentBuilder db = dbf.newDocumentBuilder();");
-        pw.println("            return db.parse(is);");
-        pw.println("        } catch (IOException | SAXException | ParserConfigurationException e) {");
-        pw.println(
-                "            throw new MojoException(\"Failed to parse \" + PLUGIN_XML_PATH + \": \" + e.getMessage(), e);");
-        pw.println("        }");
-        pw.println("    }");
-        pw.println();
-        pw.println("    private void writeGoal(StringBuilder sb, String goalPrefix, Element mojo) {");
-        pw.println("        String mojoGoal = getTextContent(mojo, \"goal\");");
-        pw.println("        if (goal != null && !goal.isEmpty() && !goal.equals(mojoGoal)) {");
-        pw.println("            return;");
-        pw.println("        }");
-        pw.println("        append(sb, goalPrefix + \":\" + mojoGoal, 0);");
-        pw.println("        String deprecated = getTextContent(mojo, \"deprecated\");");
-        pw.println("        String description = getTextContent(mojo, \"description\");");
-        pw.println("        if (deprecated != null && !deprecated.isEmpty()) {");
-        pw.println("            append(sb, \"Deprecated. \" + deprecated, 1);");
-        pw.println("            if (detail && description != null) {");
-        pw.println("                append(sb, \"\", 0);");
-        pw.println("                append(sb, description, 1);");
-        pw.println("            }");
-        pw.println("        } else if (description != null) {");
-        pw.println("            append(sb, description, 1);");
-        pw.println("        }");
-        pw.println("        append(sb, \"\", 0);");
-        pw.println("        if (detail) {");
-        pw.println("            Node parametersNode = findChild(mojo, \"parameters\");");
-        pw.println("            if (parametersNode != null) {");
-        pw.println("                List<Node> params = findChildren(parametersNode, \"parameter\");");
-        pw.println("                // filter out read-only parameters (editable=false)");
-        pw.println("                params = params.stream()");
-        pw.println("                        .filter(p -> !\"false\".equals(getTextContent(p, \"editable\")))");
-        pw.println("                        .toList();");
-        pw.println("                if (!params.isEmpty()) {");
-        pw.println("                    append(sb, \"Available parameters:\", 1);");
-        pw.println("                    append(sb, \"\", 0);");
-        pw.println("                    for (Node param : params) {");
-        pw.println("                        writeParameter(sb, param);");
-        pw.println("                    }");
-        pw.println("                }");
-        pw.println("            }");
-        pw.println("        }");
-        pw.println("    }");
-        pw.println();
-        pw.println("    private void writeParameter(StringBuilder sb, Node parameter) {");
-        pw.println("        String paramName = getTextContent(parameter, \"name\");");
-        pw.println("        String paramDescription = getTextContent(parameter, \"description\");");
-        pw.println("        String defaultValue = getTextContent(parameter, \"defaultValue\");");
-        pw.println("        String suffix = (defaultValue != null && !defaultValue.isEmpty())");
-        pw.println("                ? \" (Default: \" + defaultValue + \")\" : \"\";");
-        pw.println("        append(sb, paramName + suffix, 2);");
-        pw.println("        String deprecated = getTextContent(parameter, \"deprecated\");");
-        pw.println("        if (deprecated != null && !deprecated.isEmpty()) {");
-        pw.println("            append(sb, \"Deprecated. \" + deprecated, 3);");
-        pw.println("            append(sb, \"\", 0);");
-        pw.println("        }");
-        pw.println("        if (paramDescription != null && !paramDescription.isEmpty()) {");
-        pw.println("            append(sb, paramDescription, 3);");
-        pw.println("        }");
-        pw.println("        String required = getTextContent(parameter, \"required\");");
-        pw.println("        if (\"true\".equals(required)) {");
-        pw.println("            append(sb, \"Required: Yes\", 3);");
-        pw.println("        }");
-        pw.println("        String expression = getTextContent(parameter, \"expression\");");
-        pw.println("        if (expression != null && !expression.isEmpty()) {");
-        pw.println("            String property = expression.startsWith(\"${\") && expression.endsWith(\"}\")"
-                + " && !expression.substring(2).contains(\"${\")");
-        pw.println("                    ? expression.substring(2, expression.length() - 1) : null;");
-        pw.println("            if (property != null) {");
-        pw.println("                append(sb, \"User property: \" + property, 3);");
-        pw.println("            }");
-        pw.println("        }");
-        pw.println("        append(sb, \"\", 0);");
-        pw.println("    }");
-        pw.println();
-        pw.println("    private void append(StringBuilder sb, String description, int indent) {");
-        pw.println("        for (String line : toLines(description, indent)) {");
-        pw.println("            sb.append(line).append('\\n');");
-        pw.println("        }");
-        pw.println("    }");
-        pw.println();
-        pw.println("    private List<String> toLines(String text, int indent) {");
-        pw.println("        List<String> lines = new ArrayList<>();");
-        pw.println("        String ind = \"\\t\".repeat(indent);");
-        pw.println("        for (String plainLine : text.split(\"(\\r\\n)|(\\r)|(\\n)\")) {");
-        pw.println("            toLines(lines, ind + plainLine);");
-        pw.println("        }");
-        pw.println("        return lines;");
-        pw.println("    }");
-        pw.println();
-        pw.println("    private void toLines(List<String> lines, String line) {");
-        pw.println("        int lineIndent = 0;");
-        pw.println("        for (int i = 0; i < line.length() && line.charAt(i) == '\\t'; i++) {");
-        pw.println("            lineIndent++;");
-        pw.println("        }");
-        pw.println("        StringBuilder buf = new StringBuilder(256);");
-        pw.println("        for (String token : line.split(\" +\")) {");
-        pw.println("            if (buf.length() > 0) {");
-        pw.println("                if (buf.length() + token.length() >= lineLength) {");
-        pw.println("                    lines.add(buf.toString());");
-        pw.println("                    buf.setLength(0);");
-        pw.println("                    buf.append(\" \".repeat(lineIndent * indentSize));");
-        pw.println("                } else {");
-        pw.println("                    buf.append(' ');");
-        pw.println("                }");
-        pw.println("            }");
-        pw.println("            for (char c : token.toCharArray()) {");
-        pw.println("                buf.append(c == '\\t' ? \" \".repeat(indentSize - buf.length() % indentSize)");
-        pw.println("                        : c == '\\u00A0' ? ' ' : c);");
-        pw.println("            }");
-        pw.println("        }");
-        pw.println("        lines.add(buf.toString());");
-        pw.println("    }");
-        pw.println();
-        pw.println("    private static String getTextContent(Node parent, String elementName) {");
-        pw.println("        Node child = findChild(parent, elementName);");
-        pw.println("        return child != null ? child.getTextContent() : null;");
-        pw.println("    }");
-        pw.println();
-        pw.println("    private static Node findChild(Node parent, String name) {");
-        pw.println("        NodeList children = parent.getChildNodes();");
-        pw.println("        for (int i = 0; i < children.getLength(); i++) {");
-        pw.println("            Node n = children.item(i);");
-        pw.println("            if (name.equals(n.getNodeName())) return n;");
-        pw.println("        }");
-        pw.println("        return null;");
-        pw.println("    }");
-        pw.println();
-        pw.println("    private static Node getSingleChild(Node parent, String name) throws MojoException {");
-        pw.println("        Node n = findChild(parent, name);");
-        pw.println(
-                "        if (n == null) throw new MojoException(\"Missing element <\" + name + \"> in plugin.xml\");");
-        pw.println("        return n;");
-        pw.println("    }");
-        pw.println();
-        pw.println("    private static List<Node> findChildren(Node parent, String name) {");
-        pw.println("        List<Node> result = new ArrayList<>();");
-        pw.println("        NodeList children = parent.getChildNodes();");
-        pw.println("        for (int i = 0; i < children.getLength(); i++) {");
-        pw.println("            Node n = children.item(i);");
-        pw.println("            if (name.equals(n.getNodeName())) result.add(n);");
-        pw.println("        }");
-        pw.println("        return result;");
-        pw.println("    }");
-        pw.println("}");
     }
 
     static JavadocInfo parseJavadoc(String raw) {

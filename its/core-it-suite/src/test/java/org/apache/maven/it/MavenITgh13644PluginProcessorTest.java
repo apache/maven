@@ -32,7 +32,8 @@ import org.junit.jupiter.api.Test;
  * {@code maven-plugin-plugin} or {@code maven-plugin-tools}.
  * <p>
  * The test builds a minimal V4 plugin that uses the annotation processor,
- * installs it, then runs a consumer project that invokes the generated mojo.
+ * installs it, then runs a consumer project that invokes the generated mojo
+ * and also exercises the generated {@code help} mojo.
  */
 class MavenITgh13644PluginProcessorTest extends AbstractMavenIntegrationTestCase {
 
@@ -43,6 +44,7 @@ class MavenITgh13644PluginProcessorTest extends AbstractMavenIntegrationTestCase
      *   <li>generates a {@code MojoFactory} class picked up by {@code DiIndexProcessor}</li>
      *   <li>produces a plugin JAR that Maven can load and execute at runtime</li>
      *   <li>correctly wires {@code @Parameter} injection (goal prefix, default value, property)</li>
+     *   <li>generates a working {@code help} mojo that lists goals and parameters</li>
      * </ul>
      */
     @Test
@@ -59,15 +61,31 @@ class MavenITgh13644PluginProcessorTest extends AbstractMavenIntegrationTestCase
         pluginVerifier.verifyFilePresent("target/classes/META-INF/maven/plugin.xml");
         // Verify DI index was populated (DiIndexProcessor picked up the factory)
         pluginVerifier.verifyFilePresent("target/classes/META-INF/maven/org.apache.maven.api.di.Inject");
+        // Verify HelpMojo was generated and compiled
+        pluginVerifier.verifyFilePresent("target/classes/org/apache/maven/its/gh13644/HelpMojo.class");
 
-        // Step 2: run the consumer project
+        // Step 2: run the consumer project — exercises the touch mojo
         Verifier consumerVerifier = newVerifier(testDir.resolve("consumer"));
         consumerVerifier.addCliArgument("compile");
         consumerVerifier.execute();
         consumerVerifier.verifyErrorFreeLog();
 
         // Mojo must have executed and created the touch file
-        consumerVerifier.verifyTextInLog("[GH-13644] touch goal executed via annotation-processor-generated descriptor");
+        consumerVerifier.verifyTextInLog(
+                "[GH-13644] touch goal executed via annotation-processor-generated descriptor");
         consumerVerifier.verifyFilePresent("target/touch.txt");
+
+        // Step 3: invoke the generated help mojo — verifies it was compiled and can run
+        Verifier helpVerifier = newVerifier(testDir.resolve("consumer"));
+        helpVerifier.addCliArgument("gh13644:help");
+        helpVerifier.addCliArgument("-Ddetail=true");
+        helpVerifier.execute();
+        helpVerifier.verifyErrorFreeLog();
+
+        // help output must list the touch goal and its parameter
+        helpVerifier.verifyTextInLog("gh13644:touch");
+        helpVerifier.verifyTextInLog("outputFile");
+        // detail mode must show the user property
+        helpVerifier.verifyTextInLog("gh13644.outputFile");
     }
 }
