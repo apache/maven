@@ -298,8 +298,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                         bind(ILoggerFactory.class).toProvider(() -> context.loggerFactory);
                         bind(MessageBuilderFactory.class).toInstance(context.invokerRequest.messageBuilderFactory());
                     }
-                },
-                new SisuDiBridgeModule(true, context.invokerRequest.messageBuilderFactory()));
+                });
 
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         Runnable settingsCleaner = null;
