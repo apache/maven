@@ -110,6 +110,20 @@ public class MessageUtils {
         }
     }
 
+    /**
+     * Blocks until the asynchronous terminal installation completes.
+     * Call this before redirecting {@code System.out}/{@code System.err} to avoid the terminal
+     * thread overwriting your redirection, and before activating logging configuration to ensure
+     * it caches the correct output stream.
+     *
+     * @see <a href="https://github.com/apache/maven/issues/12188">#12188</a>
+     */
+    public static void awaitTerminalInitialization() {
+        if (terminal instanceof FastTerminal fastTerminal) {
+            fastTerminal.getTerminal();
+        }
+    }
+
     public static void setColorEnabled(boolean enabled) {
         colorEnabled = enabled;
     }
