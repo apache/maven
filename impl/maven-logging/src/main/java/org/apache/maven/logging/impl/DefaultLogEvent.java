@@ -124,7 +124,7 @@ public final class DefaultLogEvent implements LogEvent {
         this.mojoId = mojoId;
         this.keyValues = keyValues != null ? Map.copyOf(keyValues) : Map.of();
         this.messageTemplate = messageTemplate;
-        this.messageArgs = messageArgs;
+        this.messageArgs = messageArgs != null ? Collections.unmodifiableList(messageArgs) : null;
     }
 
     /**
