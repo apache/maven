@@ -217,6 +217,7 @@ class V4MojoConfiguratorTest {
         Set<String> set;
         Map<String, String> map;
         Properties properties;
+        Object objectParam;
     }
 
     @Test
@@ -518,5 +519,30 @@ class V4MojoConfiguratorTest {
         // not inserted with key "property" (the XML tag name)
         assertNotNull(mojo.properties);
         assertTrue(mojo.properties.isEmpty(), "Malformed Plexus property entry must be silently skipped");
+    }
+
+    @Test
+    @SuppressWarnings("unchecked")
+    void testObjectTypedParameterWithChildrenConvertsToMap() throws Exception {
+        CollectionsMojo mojo = new CollectionsMojo();
+        XmlNode config = new XmlNodeImpl(
+                "configuration",
+                null,
+                Map.of(),
+                List.of(new XmlNodeImpl(
+                        "objectParam",
+                        null,
+                        Map.of(),
+                        List.of(new XmlNodeImpl("key1", "val1"), new XmlNodeImpl("key2", "val2")),
+                        null)),
+                null);
+
+        // Must not throw NoSuchFieldException from the bean path
+        configurator.configure(mojo, config);
+
+        assertInstanceOf(Map.class, mojo.objectParam);
+        Map<String, Object> result = (Map<String, Object>) mojo.objectParam;
+        assertEquals("val1", result.get("key1"));
+        assertEquals("val2", result.get("key2"));
     }
 }

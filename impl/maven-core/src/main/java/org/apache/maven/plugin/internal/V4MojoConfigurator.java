@@ -56,7 +56,7 @@ public final class V4MojoConfigurator {
     }
 
     /**
-     * Creates a configurator backed by a Plexus {@link TypeAwareExpressionEvaluator}.
+     * Creates a configurator backed by a Plexus {@code TypeAwareExpressionEvaluator}.
      * For use by callers outside the {@code internal} package that cannot access
      * {@link PlexusMojoExpressionEvaluatorAdapter} directly (e.g. {@code maven-testing}).
      */
@@ -228,12 +228,16 @@ public final class V4MojoConfigurator {
         }
         if (type == Object.class) {
             // For Object-typed parameters: if the node is a leaf (no children), evaluate as String.
-            // If it has children, fall through to bean/map/collection conversion so that
-            // structured XML children are not silently dropped.
+            // If it has children, convert to Map<String, Object> so that structured XML is
+            // preserved rather than crashing the bean path (Object has no fields to set).
             if (node.children().isEmpty()) {
                 return evaluateNode(node, String.class);
             }
-            return NOT_SCALAR;
+            Map<String, Object> map = new LinkedHashMap<>();
+            for (XmlNode child : node.children()) {
+                map.put(child.name(), convert(child, Object.class));
+            }
+            return map;
         }
         if (type == Path.class || type == File.class) {
             Object evaluated = evaluateNode(node, type);

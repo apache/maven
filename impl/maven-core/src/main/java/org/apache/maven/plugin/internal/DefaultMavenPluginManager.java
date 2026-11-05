@@ -827,7 +827,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         }
 
         try {
-            if ("enhanced".equals(configuratorId)) {
+            if ("enhanced".equals(configuratorId) && mojoDescriptor.isV4Api()) {
                 if (logger.isDebugEnabled()) {
                     logger.debug("Configuring mojo execution '" + mojoDescriptor.getId() + ':' + executionId
                             + "' with Maven XML configurator -->");
