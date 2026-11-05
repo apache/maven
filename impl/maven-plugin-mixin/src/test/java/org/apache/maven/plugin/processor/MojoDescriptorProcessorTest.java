@@ -504,10 +504,15 @@ class MojoDescriptorProcessorTest {
         assertContains(helpMojo, "isEditable");
 
         // HelpMojo should also get a factory generated for it (it has @Mojo)
-        // since the HelpMojo source is emitted before processingOver returns,
-        // DiIndexProcessor will pick it up in the next round
-        // (we just verify the source was produced here)
+        // HelpMojoMojoFactory is now generated in the same round as HelpMojo by
+        // generateHelpMojoFactory(), so DiIndexProcessor picks it up correctly.
         assertFalse(helpMojo.isEmpty());
+
+        // HelpMojoMojoFactory must also be generated in the same processing round
+        String helpFactory = result.getGeneratedSource("com.example.HelpMojoMojoFactory");
+        assertNotNull(helpFactory, "HelpMojoMojoFactory source must be generated");
+        assertContains(helpFactory, "@org.apache.maven.api.di.Named(\"com.example:greet-maven-plugin:1.0.0:help\")");
+        assertContains(helpFactory, "public class HelpMojoMojoFactory extends HelpMojo {");
 
         // plugin.xml must include the help goal so Maven can resolve it at runtime
         String pluginXml = result.getResource("META-INF/maven/plugin.xml");

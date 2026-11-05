@@ -68,6 +68,9 @@ class MavenITgh13644PluginProcessorTest extends AbstractMavenIntegrationTestCase
         pluginVerifier.verifyFilePresent("target/classes/META-INF/maven/org.apache.maven.api.di.Inject");
         // Verify HelpMojo was generated and compiled
         pluginVerifier.verifyFilePresent("target/classes/org/apache/maven/its/gh13644/HelpMojo.class");
+        // Verify HelpMojoMojoFactory was generated (needed by DI to resolve the help goal)
+        pluginVerifier.verifyFilePresent(
+                "target/classes/org/apache/maven/its/gh13644/HelpMojoMojoFactory.class");
 
         // Step 2: run the consumer project — exercises the touch mojo
         Verifier consumerVerifier = newVerifier(testDir.resolve("consumer"));

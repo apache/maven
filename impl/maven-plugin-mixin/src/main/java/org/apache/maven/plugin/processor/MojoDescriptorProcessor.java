@@ -660,6 +660,33 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         }
         helpMojoGenerated = true;
         note("Generated " + helpFqn);
+
+        // Also generate HelpMojoMojoFactory explicitly here, in the same round as HelpMojo.
+        // We cannot rely on a subsequent annotation-processing round to pick up @Mojo on
+        // the generated HelpMojo and call generateFactory() for it, because DiIndexProcessor
+        // writes the DI index file during processingOver() and FilerException prevents a
+        // second write in the follow-up round — meaning HelpMojoMojoFactory would never make
+        // it into META-INF/maven/org.apache.maven.api.di.Inject.
+        generateHelpMojoFactory(pkg, coords);
+    }
+
+    private void generateHelpMojoFactory(String pkg, String[] coords) throws IOException {
+        String roleHint = coords[0] + ":" + coords[1] + ":" + coords[2] + ":help";
+        String factoryName = "HelpMojoMojoFactory";
+        String factoryFqn = pkg.isEmpty() ? factoryName : pkg + "." + factoryName;
+
+        try (PrintWriter pw = new PrintWriter(
+                processingEnv.getFiler().createSourceFile(factoryFqn).openWriter())) {
+            if (!pkg.isEmpty()) {
+                pw.println("package " + pkg + ";");
+                pw.println();
+            }
+            pw.println("@org.apache.maven.api.di.Named(\"" + roleHint + "\")");
+            pw.println("public class " + factoryName + " extends HelpMojo {");
+            pw.println("}");
+        }
+        generatedFactoryNames.add(factoryFqn);
+        note("Generated factory " + factoryFqn);
     }
 
     static JavadocInfo parseJavadoc(String raw) {
