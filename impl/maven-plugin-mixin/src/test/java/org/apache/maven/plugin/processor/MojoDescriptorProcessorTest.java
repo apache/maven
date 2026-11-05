@@ -434,6 +434,70 @@ class MojoDescriptorProcessorTest {
         assertFalse(pluginXml.contains("<goalPrefix>compiler</goalPrefix>"));
     }
 
+    // -------------------------------------------------------------------------
+    // Test: HelpMojo generation
+    // -------------------------------------------------------------------------
+
+    @Test
+    void helpMojoIsGeneratedWithCorrectContent() {
+        String source = """
+                package com.example;
+                import org.apache.maven.api.plugin.annotations.Mojo;
+                import org.apache.maven.api.plugin.annotations.Parameter;
+                /** Greets the user. */
+                @Mojo(name = "greet")
+                public class GreetMojo {
+                    /** The greeting message. */
+                    @Parameter(property = "greet.message", defaultValue = "Hello")
+                    private String message;
+
+                    /** Internal project basedir — not user-settable. */
+                    @Parameter(readonly = true, property = "project.basedir")
+                    private java.io.File basedir;
+
+                    public void execute() {}
+                }
+                """;
+
+        CompilationResult result = compile(
+                List.of(inMemorySource("com.example.GreetMojo", source)),
+                Map.of(
+                        "maven.plugin.groupId", "com.example",
+                        "maven.plugin.artifactId", "greet-maven-plugin",
+                        "maven.plugin.version", "1.0.0"));
+
+        assertTrue(result.success, () -> "Compilation failed:\n" + result.diagnosticsToString());
+
+        // HelpMojo source assertions
+        String helpMojo = result.getGeneratedSource("com.example.HelpMojo");
+        assertNotNull(helpMojo, "HelpMojo source must be generated");
+
+        // Package and annotation
+        assertContains(helpMojo, "package com.example;");
+        assertContains(helpMojo, "@Mojo(name = \"help\", projectRequired = false)");
+        assertContains(helpMojo, "public class HelpMojo implements org.apache.maven.api.plugin.Mojo");
+
+        // Reads plugin.xml (not plugin-help.xml)
+        assertContains(helpMojo, "PLUGIN_XML_PATH = \"/META-INF/maven/plugin.xml\"");
+
+        // Goal prefix from artifactId "greet-maven-plugin" → "greet"
+        assertContains(helpMojo, "greet:help");
+
+        // XXE hardening
+        assertContains(helpMojo, "external-general-entities");
+        assertContains(helpMojo, "setExpandEntityReferences(false)");
+
+        // Readonly parameter filter
+        assertContains(helpMojo, "editable");
+        assertContains(helpMojo, "\"false\".equals(getTextContent(p, \"editable\"))");
+
+        // HelpMojo should also get a factory generated for it (it has @Mojo)
+        // since the HelpMojo source is emitted before processingOver returns,
+        // DiIndexProcessor will pick it up in the next round
+        // (we just verify the source was produced here)
+        assertFalse(helpMojo.isEmpty());
+    }
+
     // =========================================================================
     //  Compilation harness
     // =========================================================================
