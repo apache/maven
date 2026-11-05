@@ -518,7 +518,7 @@ class MojoDescriptorProcessorTest {
         assertContains(pluginXml, "<projectRequired>false</projectRequired>");
         // detail parameter must be in descriptor
         assertContains(pluginXml, "<name>detail</name>");
-        // outputFile from the original mojo must still be present alongside help
+        // greet goal from GreetMojo must still be present alongside help
         assertContains(pluginXml, "<goal>greet</goal>");
     }
 

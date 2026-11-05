@@ -234,7 +234,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                         .name("goal")
                         .type("java.lang.String")
                         .expression("${goal}")
-                        .description("The name of the goal for which to show help.")
+                        .description("The name of the goal for which to show help. If unspecified, all goals will be displayed.")
                         .build(),
                 org.apache.maven.api.plugin.descriptor.Parameter.newBuilder(true)
                         .name("indentSize")
