@@ -55,6 +55,6 @@ class MojoExtensionParameterPomTest {
     @Test
     void parameterWithoutPomKeepsTheDefaultProject(@InjectMojo(goal = COORDINATES) ExpressionEvaluatorMojo mojo) {
         // not the plugin's own basedir POM, which only a method-level @InjectMojo reads
-        assertEquals("myGroupId", project.getModel().getGroupId());
+        assertEquals("myArtifactId", project.getModel().getArtifactId());
     }
 }
