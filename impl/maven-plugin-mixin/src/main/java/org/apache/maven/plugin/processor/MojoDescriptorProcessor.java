@@ -406,6 +406,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
             import java.io.IOException;
             import java.io.InputStream;
             import java.util.List;
+            import java.util.stream.Collectors;
 
             /**
              * Display help information on %2$s.<br>
@@ -504,7 +505,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                         List<org.apache.maven.api.plugin.descriptor.Parameter> params = mojo.getParameters()
                                 .stream()
                                 .filter(org.apache.maven.api.plugin.descriptor.Parameter::isEditable)
-                                .toList();
+                                .collect(Collectors.toList());
                         if (!params.isEmpty()) {
                             mb.a(indent(1)).strong("Available parameters:").newline();
                             mb.newline();
@@ -539,7 +540,12 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                 }
 
                 private String indent(int level) {
-                    return " ".repeat(level * indentSize);
+                    int count = level * indentSize;
+                    StringBuilder sb = new StringBuilder(count);
+                    for (int i = 0; i < count; i++) {
+                        sb.append(' ');
+                    }
+                    return sb.toString();
                 }
 
                 private void appendWrapped(MessageBuilder mb, String text, int indent, int lineLength) {
