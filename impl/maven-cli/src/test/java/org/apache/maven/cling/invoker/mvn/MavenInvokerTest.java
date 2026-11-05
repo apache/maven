@@ -87,8 +87,9 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
     }
 
     /**
-     * The invocation replaces the handlers of the {@code java.util.logging} root logger with {@code SLF4JBridgeHandler};
-     * they must be back afterwards, as the root logger belongs to the JVM Maven runs in (GH-13362).
+     * The invocation replaces the handlers of the {@code java.util.logging} root logger with
+     * {@code SLF4JBridgeHandler}; they must be back afterwards, as the root logger belongs to
+     * the JVM Maven runs in (GH-13362).
      */
     @Test
     void restoresJavaUtilLoggingRootHandlers(
@@ -220,45 +221,45 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
         String settingsXml = """
-<?xml version="1.0"?>
-<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
-  <interactiveMode>false</interactiveMode>
-  <profiles>
-    <profile>
-      <id>oss-development</id>
-      <repositories>
-        <repository>
-          <id>central</id>
-          <url>https://repo1.maven.org/maven2/</url>
-          <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-        </repository>
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <id>central</id>
-          <url>https://repo1.maven.org/maven2/</url>
-          <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-        </pluginRepository>
-      </pluginRepositories>
-    </profile>
-  </profiles>
-  <activeProfiles>
-    <activeProfile>oss-development</activeProfile>
-  </activeProfiles>
-</settings>""";
+                <?xml version="1.0"?>
+                <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+                  <interactiveMode>false</interactiveMode>
+                  <profiles>
+                    <profile>
+                      <id>oss-development</id>
+                      <repositories>
+                        <repository>
+                          <id>central</id>
+                          <url>https://repo1.maven.org/maven2/</url>
+                          <releases>
+                            <enabled>true</enabled>
+                            <updatePolicy>never</updatePolicy>
+                          </releases>
+                          <snapshots>
+                            <enabled>false</enabled>
+                          </snapshots>
+                        </repository>
+                      </repositories>
+                      <pluginRepositories>
+                        <pluginRepository>
+                          <id>central</id>
+                          <url>https://repo1.maven.org/maven2/</url>
+                          <releases>
+                            <enabled>true</enabled>
+                            <updatePolicy>never</updatePolicy>
+                          </releases>
+                          <snapshots>
+                            <enabled>false</enabled>
+                          </snapshots>
+                        </pluginRepository>
+                      </pluginRepositories>
+                    </profile>
+                  </profiles>
+                  <activeProfiles>
+                    <activeProfile>oss-development</activeProfile>
+                  </activeProfiles>
+                </settings>""";
         Path dotMvn = cwd.resolve(".mvn");
         Files.createDirectories(dotMvn);
         Path projectExtensions = dotMvn.resolve("settings.xml");
@@ -309,5 +310,16 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         failed.setArtifactId("maven-core");
 
         assertEquals("org.example:maven-core", invoker.resumeSelector(List.of(first, failed), failed));
+    }
+
+    @Test
+    void getResumeFromSelectorWithSingleProject() {
+        TestMavenInvoker invoker = new TestMavenInvoker();
+
+        MavenProject failed = new MavenProject();
+        failed.setGroupId("org.apache.maven");
+        failed.setArtifactId("maven-cli");
+
+        assertEquals(":maven-cli", invoker.resumeSelector(List.of(failed), failed));
     }
 }
