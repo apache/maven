@@ -645,15 +645,15 @@ public abstract class BaseParser implements Parser {
                         "Extension id '" + id + "' must not be combined with groupId/artifactId/version");
             }
             String[] parts = id.split(":", -1);
-            if (parts.length != 3 || parts[0].isEmpty() || parts[1].isEmpty() || parts[2].isEmpty()) {
+            if (parts.length != 3 || parts[0].isBlank() || parts[1].isBlank() || parts[2].isBlank()) {
                 throw new IllegalArgumentException(
                         "Invalid extension id '" + id + "': expected groupId:artifactId:version");
             }
-            groupId = parts[0];
-            artifactId = parts[1];
-            version = parts[2];
+            groupId = parts[0].strip();
+            artifactId = parts[1].strip();
+            version = parts[2].strip();
         }
-        if (groupId == null || artifactId == null || version == null) {
+        if (isNullOrEmpty(groupId) || isNullOrEmpty(artifactId) || isNullOrEmpty(version)) {
             throw new IllegalArgumentException(
                     "Extension must specify either id or all of groupId, artifactId, and version");
         }
@@ -664,6 +664,10 @@ public abstract class BaseParser implements Parser {
                 .classLoadingStrategy(re.getClassLoadingStrategy())
                 .configuration(re.getConfiguration())
                 .build();
+    }
+
+    private static boolean isNullOrEmpty(String s) {
+        return s == null || s.isEmpty();
     }
 
     @Nullable
