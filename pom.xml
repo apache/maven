@@ -144,7 +144,7 @@ under the License.
     <commonsCliVersion>1.11.0</commonsCliVersion>
     <domtripVersion>1.8.0</domtripVersion>
     <guiceVersion>5.1.0</guiceVersion>
-    <guavaVersion>33.7.2-jre</guavaVersion>
+    <guavaVersion>33.8.0-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
 
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
@@ -875,7 +875,7 @@ under the License.
       <plugin>
         <groupId>io.github.olamy.maven.plugins</groupId>
         <artifactId>jacoco-aggregator-maven-plugin</artifactId>
-        <version>1.0.4</version>
+        <version>1.0.5</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
