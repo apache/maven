@@ -30,7 +30,7 @@ import org.apache.maven.metadata.v4.MetadataStaxWriter;
 /**
  * Provide public methods from {@link MetadataStaxWriter}
  *
- * @deprecated Maven 3 compatability - please use {@link MetadataStaxWriter}
+ * @deprecated Maven 3 compatibility - please use {@link MetadataStaxWriter}
  */
 @Deprecated
 public class MetadataXpp3Writer {
