@@ -639,7 +639,7 @@ public abstract class BaseParser implements Parser {
         String artifactId = re.getArtifactId();
         String version = re.getVersion();
         String id = re.getId();
-        if (id != null && !id.isEmpty()) {
+        if (!isNullOrEmpty(id)) {
             if (groupId != null || artifactId != null || version != null) {
                 throw new IllegalArgumentException(
                         "Extension id '" + id + "' must not be combined with groupId/artifactId/version");
