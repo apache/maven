@@ -77,17 +77,6 @@ public class SisuDiBridgeModule extends AbstractModule {
         this.messageBuilderFactory = messageBuilderFactory;
     }
 
-    // Plexus installs explicit modules before scanning; Guice deduplicates Sisu's automatic instance.
-    @Override
-    public boolean equals(Object other) {
-        return other != null && getClass() == other.getClass();
-    }
-
-    @Override
-    public int hashCode() {
-        return getClass().hashCode();
-    }
-
     @Override
     protected void configure() {
         Provider<PlexusContainer> containerProvider = getProvider(PlexusContainer.class);
