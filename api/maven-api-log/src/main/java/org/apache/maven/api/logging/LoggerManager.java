@@ -187,18 +187,27 @@ public interface LoggerManager {
 
         private static final ThreadLocal<Boolean> DISCOVERING = new ThreadLocal<>();
 
+        /**
+         * Bootstrap buffering manager — shared across all callers that arrive before
+         * the real {@link ServiceLoader} provider is installed (re-entrant calls during
+         * loading, and the no-provider fallback). Events buffered here are drained into
+         * the real sink by {@link LoggerManager#set(LoggerManager)}.
+         */
+        static final BufferingLoggerManager BOOTSTRAP = new BufferingLoggerManager();
+
         static synchronized LoggerManager discover() {
             LoggerManager mgr = instance;
             if (mgr != null) {
                 return mgr;
             }
 
-            // Re-entrancy guard: if ServiceLoader loading triggers logging,
-            // return a no-op manager to avoid infinite recursion.
-            // Do NOT write to `instance` here — the outer discover() call
-            // will install the real implementation once ServiceLoader finishes.
+            // Re-entrancy guard: a log call emitted while ServiceLoader is loading a
+            // provider would recurse back into discover(). Return the shared bootstrap
+            // buffer so those events are captured rather than silently dropped.
+            // Do NOT write to `instance` here — the outer discover() call will install
+            // the real implementation once ServiceLoader finishes.
             if (DISCOVERING.get() == Boolean.TRUE) {
-                return new NopLoggerManager();
+                return BOOTSTRAP;
             }
 
             DISCOVERING.set(Boolean.TRUE);
@@ -214,9 +223,10 @@ public interface LoggerManager {
                 DISCOVERING.remove();
             }
 
-            mgr = new BufferingLoggerManager();
-            instance = mgr;
-            return mgr;
+            // No provider found — reuse the shared bootstrap buffer so any events
+            // already buffered by re-entrant callers are not lost.
+            instance = BOOTSTRAP;
+            return BOOTSTRAP;
         }
     }
 }

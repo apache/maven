@@ -72,7 +72,7 @@ final class BufferingLoggerManager implements LoggerManager {
         return false;
     }
 
-    void drainTo(LogSink sink) {
+    public void drainTo(LogSink sink) {
         LogEvent event;
         while ((event = buffer.poll()) != null) {
             sink.accept(event);
