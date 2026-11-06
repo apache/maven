@@ -31,7 +31,10 @@ import org.apache.maven.api.annotations.Provider;
  * convenience, to enable developers to pass things like <code>java.lang.StringBuffer</code> directly into the logger,
  * rather than formatting first by calling <code>toString()</code>.
  *
+ * @deprecated Use {@link org.apache.maven.api.logging.Logger} instead.
+ *     Obtain an instance via dependency injection or {@link org.apache.maven.api.logging.Logger#of(Class)}.
  * @since 4.0.0
+ * @see org.apache.maven.api.logging.Logger
  */
 @Deprecated(since = "4.2.0", forRemoval = true)
 @Experimental
