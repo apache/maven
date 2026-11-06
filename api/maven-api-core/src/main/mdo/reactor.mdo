@@ -107,31 +107,42 @@
 
     <class xml.tagName="extension">
       <name>ReactorExtension</name>
-      <description>Describes a core extension to load.</description>
+      <description>Describes a core extension to load. Fields may be provided either as XML attributes
+      (compact form) or via the {@code id} attribute using the {@code groupId:artifactId:version} coordinate
+      format. When {@code id} is specified, the individual coordinate attributes must not be set.</description>
       <version>1.0.0+</version>
       <fields>
-        <field>
+        <field xml.attribute="true">
+          <name>id</name>
+          <description>Compact coordinate in the form {@code groupId:artifactId:version}.
+          Mutually exclusive with the individual {@code groupId}, {@code artifactId}, and {@code version} attributes.
+          Example: {@code io.takari.maven:takari-smart-builder:0.6.1}</description>
+          <version>1.0.0+</version>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
           <name>groupId</name>
-          <description>The group ID of the extension's artifact.</description>
+          <description>The group ID of the extension's artifact. Must not be set when {@code id} is used.</description>
           <version>1.0.0+</version>
-          <required>true</required>
+          <required>false</required>
           <type>String</type>
         </field>
-        <field>
+        <field xml.attribute="true">
           <name>artifactId</name>
-          <description>The artifact ID of the extension.</description>
+          <description>The artifact ID of the extension. Must not be set when {@code id} is used.</description>
           <version>1.0.0+</version>
-          <required>true</required>
+          <required>false</required>
           <type>String</type>
         </field>
-        <field>
+        <field xml.attribute="true">
           <name>version</name>
-          <description>The version of the extension.</description>
+          <description>The version of the extension. Must not be set when {@code id} is used.</description>
           <version>1.0.0+</version>
-          <required>true</required>
+          <required>false</required>
           <type>String</type>
         </field>
-        <field>
+        <field xml.attribute="true">
           <name>classLoadingStrategy</name>
           <description>The class loading strategy: 'self-first' (the default), 'parent-first' (loads classes from the
           parent, then from the extension) or 'plugin' (follows the rules from extensions defined as plugins).</description>
@@ -149,25 +160,6 @@
           <type>DOM</type>
         </field>
       </fields>
-      <codeSegments>
-        <codeSegment>
-          <version>1.0.0+</version>
-          <code>
-            <![CDATA[
-    /**
-     * Gets the identifier of the extension.
-     *
-     * @return The extension id in the form {@code <groupId>:<artifactId>:<version>}, never {@code null}.
-     */
-    public String getId() {
-        return (getGroupId() == null ? "[unknown-group-id]" : getGroupId())
-            + ":" + (getArtifactId() == null ? "[unknown-artifact-id]" : getArtifactId())
-            + ":" + (getVersion() == null ? "[unknown-version]" : getVersion());
-    }
-            ]]>
-          </code>
-        </codeSegment>
-      </codeSegments>
     </class>
 
     <class xml.tagName="alias">
