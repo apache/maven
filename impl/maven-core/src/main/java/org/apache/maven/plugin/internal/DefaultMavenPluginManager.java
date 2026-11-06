@@ -579,9 +579,8 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
      * for classic plugins, returns the realm's own classloader.
      */
     private static ClassLoader getEffectiveClassLoader(ClassRealm pluginRealm) {
-        var implRealm = (org.codehaus.plexus.classworlds.realm.ClassRealm) pluginRealm;
-        if (implRealm.isModular()) {
-            ModuleLayer layer = implRealm.getModuleLayer();
+        if (pluginRealm.isModular()) {
+            ModuleLayer layer = pluginRealm.getModuleLayer();
             // defineModulesWithOneLoader guarantees a single shared ClassLoader for all
             // modules in the layer; any module's getClassLoader() returns the same instance.
             String anyModuleName =
@@ -622,8 +621,11 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             Map<Class<? extends Service>, Supplier<? extends Service>> services = sessionV4.getAllServices();
             services.forEach((itf, svc) -> injector.bindSupplier((Class<Service>) itf, (Supplier<Service>) svc));
 
-            mojo = mojoInterface.cast(injector.getInstance(
-                    Key.of(pluginRealm.loadClass(mojoDescriptor.getImplementation()), mojoDescriptor.getRoleHint())));
+            // Use discoveryLoader to load the mojo class — it must be the same classloader used for
+            // injector.discover(), otherwise class identity (name, loader) won't match the bindings
+            // registered by discover() and mojo instantiation fails with "no binding found".
+            Class<?> mojoImplClass = discoveryLoader.loadClass(mojoDescriptor.getImplementation());
+            mojo = mojoInterface.cast(injector.getInstance(Key.of(mojoImplClass, mojoDescriptor.getRoleHint())));
 
         } catch (Exception e) {
             throw new PluginContainerException(mojoDescriptor, pluginRealm, "Unable to lookup Mojo", e);
