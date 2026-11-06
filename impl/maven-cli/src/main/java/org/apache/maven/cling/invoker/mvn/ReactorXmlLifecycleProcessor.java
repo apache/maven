@@ -132,7 +132,7 @@ public class ReactorXmlLifecycleProcessor implements LifecycleProcessor {
      *
      * @throws IllegalStateException if any rule is violated
      */
-    private static void validate(PhaseInjection p) {
+    static void validate(PhaseInjection p) {
         if (p.getName() == null || p.getName().isBlank()) {
             throw new IllegalStateException("reactor.xml: <phase> element must have a non-blank 'name' attribute");
         }
