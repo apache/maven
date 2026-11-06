@@ -185,7 +185,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         warnIfPhasesDefinedOutsideProject(context, settingsResult.getInstallationSettings(), "installation");
     }
 
-    private static void addAliases(Map<String, List<String>> target, org.apache.maven.api.settings.Settings settings) {
+    static void addAliases(Map<String, List<String>> target, org.apache.maven.api.settings.Settings settings) {
         if (settings == null) {
             return;
         }
