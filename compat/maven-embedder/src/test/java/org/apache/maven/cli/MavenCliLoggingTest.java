@@ -31,6 +31,7 @@ import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
 import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.slf4j.MavenBaseLogger;
+import org.apache.maven.slf4j.MavenLoggerFactory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.impl.DumbTerminal;
 import org.jline.terminal.spi.TerminalExt;
@@ -44,6 +45,7 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assumptions.assumeTrue;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.mock;
 
@@ -58,6 +60,14 @@ class MavenCliLoggingTest {
 
     @BeforeEach
     void setUp() throws Exception {
+        // These tests require MavenLoggerFactory as the active SLF4J provider because they
+        // rely on stream caching behaviour specific to MavenSimpleConfiguration.activate().
+        // When another binding (e.g. Logback) is on the classpath and wins the ServiceLoader
+        // race (platform-dependent), the assertions cannot hold and the test must be skipped
+        // rather than fail.
+        assumeTrue(
+                LoggerFactory.getILoggerFactory() instanceof MavenLoggerFactory,
+                "MavenLoggerFactory must be the active SLF4J provider");
         savedOut = System.out;
         savedTerminal = getTerminalField();
         savedColor = getColorEnabled();
