@@ -37,6 +37,7 @@ public class MavenSimpleConfiguration extends BaseSlf4jConfiguration {
     public void setRootLoggerLevel(Level level) {
         String value =
                 switch (level) {
+                    case TRACE -> "trace";
                     case DEBUG -> "debug";
                     case INFO -> "info";
                     case ERROR -> "error";
