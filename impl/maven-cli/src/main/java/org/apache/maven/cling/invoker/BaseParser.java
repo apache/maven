@@ -47,8 +47,10 @@ import org.apache.maven.api.cli.cisupport.CIInfo;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.extensions.InputLocation;
 import org.apache.maven.api.cli.extensions.InputSource;
+import org.apache.maven.api.reactor.ReactorConfig;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
+import org.apache.maven.cling.internal.reactor.io.ReactorConfigStaxReader;
 import org.apache.maven.cling.invoker.cisupport.CIDetectorHelper;
 import org.apache.maven.cling.props.MavenPropertiesLoader;
 import org.apache.maven.cling.utils.CLIReportingUtils;
@@ -94,6 +96,9 @@ public abstract class BaseParser implements Parser {
 
         @Nullable
         public Options options;
+
+        @Nullable
+        public ReactorConfig reactorConfig;
 
         public Map<String, String> extraInterpolationSource() {
             Map<String, String> extra = new HashMap<>();
@@ -160,6 +165,14 @@ public abstract class BaseParser implements Parser {
             parserRequest.logger().error("Error determining root directory", e);
         }
 
+        // reactor.xml — read before option parsing so MavenParser can do alias expansion
+        try {
+            context.reactorConfig = readReactorConfig(context);
+        } catch (Exception e) {
+            context.parsingFailed = true;
+            parserRequest.logger().error("Error reading reactor configuration", e);
+        }
+
         // options
         try {
             context.options = parseCliOptions(context);
@@ -168,7 +181,6 @@ public abstract class BaseParser implements Parser {
             context.options = null;
             parserRequest.logger().error("Error parsing program arguments", e);
         }
-
         // system and user properties
         try {
             context.systemProperties = populateSystemProperties(context);
@@ -275,7 +287,8 @@ public abstract class BaseParser implements Parser {
                 context.rootDirectory,
                 context.extensions,
                 context.ciInfo,
-                context.options);
+                context.options,
+                context.reactorConfig);
     }
 
     protected Path getCwd(LocalContext context) {
@@ -489,6 +502,32 @@ public abstract class BaseParser implements Parser {
     protected abstract Options parseCliOptions(LocalContext context);
 
     /**
+     * Reads {@code .mvn/reactor.xml} from the project root directory, if present.
+     *
+     * <p>The result is stored on {@link LocalContext#reactorConfig} before {@link #parseCliOptions(LocalContext)}
+     * is called, so that {@code MavenParser} can perform alias expansion using the parsed config.
+     *
+     * @param context the current local context
+     * @return the parsed {@link ReactorConfig}, or {@code null} if {@code .mvn/reactor.xml} was not found
+     */
+    @Nullable
+    protected ReactorConfig readReactorConfig(LocalContext context) {
+        Path dir = context.rootDirectory != null ? context.rootDirectory : context.topDirectory;
+        if (dir == null) {
+            return null;
+        }
+        Path reactorXml = dir.resolve(".mvn/reactor.xml");
+        if (!Files.isRegularFile(reactorXml)) {
+            return null;
+        }
+        try (InputStream is = Files.newInputStream(reactorXml)) {
+            return new ReactorConfigStaxReader().read(is, true, null);
+        } catch (XMLStreamException | IOException e) {
+            throw new IllegalArgumentException("Failed to parse reactor configuration file: " + reactorXml, e);
+        }
+    }
+
+    /**
      * Important: This method must return list of {@link CoreExtensions} in precedence order.
      */
     protected List<CoreExtensions> readCoreExtensionsDescriptor(LocalContext context) {
@@ -499,11 +538,26 @@ public abstract class BaseParser implements Parser {
         Map<String, String> eff = new HashMap<>(context.systemProperties);
         eff.putAll(context.userProperties);
 
-        // project
-        file = context.cwd.resolve(eff.get(Constants.MAVEN_PROJECT_EXTENSIONS));
-        loaded = readCoreExtensionsDescriptorFromFile(file, false);
-        if (!loaded.isEmpty()) {
-            result.add(new CoreExtensions(file, loaded));
+        // project extensions: use reactor.xml <extensions> when present, otherwise extensions.xml
+        if (context.reactorConfig != null
+                && context.reactorConfig.getExtensions() != null
+                && !context.reactorConfig.getExtensions().isEmpty()) {
+            // reactor.xml is authoritative for project extensions
+            Path dir = context.rootDirectory != null ? context.rootDirectory : context.topDirectory;
+            Path reactorXml = dir != null ? dir.resolve(".mvn/reactor.xml") : null;
+            loaded = context.reactorConfig.getExtensions().stream()
+                    .map(BaseParser::toCoreExtension)
+                    .collect(Collectors.toList());
+            if (reactorXml != null && !loaded.isEmpty()) {
+                result.add(new CoreExtensions(reactorXml, loaded));
+            }
+        } else {
+            // project extensions.xml (legacy)
+            file = context.cwd.resolve(eff.get(Constants.MAVEN_PROJECT_EXTENSIONS));
+            loaded = readCoreExtensionsDescriptorFromFile(file, false);
+            if (!loaded.isEmpty()) {
+                result.add(new CoreExtensions(file, loaded));
+            }
         }
 
         // user
@@ -573,6 +627,56 @@ public abstract class BaseParser implements Parser {
                             .collect(Collectors.joining("; ")));
         }
         return coreExtensions;
+    }
+
+    /**
+     * Converts a {@link org.apache.maven.api.reactor.ReactorExtension} from {@code reactor.xml} to a
+     * {@link CoreExtension}, resolving the {@code id} shorthand (groupId:artifactId:version) if present and
+     * validating that coordinates are complete and unambiguous.
+     */
+    static CoreExtension toCoreExtension(org.apache.maven.api.reactor.ReactorExtension re) {
+        String groupId = re.getGroupId();
+        String artifactId = re.getArtifactId();
+        String version = re.getVersion();
+        String id = re.getId();
+        if (!isNullOrEmpty(id)) {
+            if (groupId != null || artifactId != null || version != null) {
+                throw new IllegalArgumentException(
+                        "Extension id '" + id + "' must not be combined with groupId/artifactId/version");
+            }
+            String[] parts = id.split(":", -1);
+            if (parts.length != 3 || parts[0].isBlank() || parts[1].isBlank() || parts[2].isBlank()) {
+                throw new IllegalArgumentException(
+                        "Invalid extension id '" + id + "': expected groupId:artifactId:version");
+            }
+            groupId = parts[0].strip();
+            artifactId = parts[1].strip();
+            version = parts[2].strip();
+        }
+        if (isNullOrEmpty(groupId) || isNullOrEmpty(artifactId) || isNullOrEmpty(version)) {
+            throw new IllegalArgumentException(
+                    "Extension must specify either id or all of groupId, artifactId, and version");
+        }
+        CoreExtension.Builder builder = CoreExtension.newBuilder()
+                .groupId(groupId)
+                .artifactId(artifactId)
+                .version(version)
+                .classLoadingStrategy(re.getClassLoadingStrategy())
+                .configuration(re.getConfiguration());
+        // Propagate the InputLocation from the ReactorExtension so that
+        // PrecedenceCoreExtensionSelector.formatLocation() (and similar callers)
+        // can report where the extension was declared without a NullPointerException.
+        org.apache.maven.api.reactor.InputLocation reactorLoc = re.getLocation("");
+        if (reactorLoc != null) {
+            org.apache.maven.api.reactor.InputSource reactorSrc = reactorLoc.getSource();
+            InputSource extSrc = reactorSrc != null ? InputSource.of(reactorSrc.getLocation()) : null;
+            builder.location("", InputLocation.of(reactorLoc.getLineNumber(), reactorLoc.getColumnNumber(), extSrc));
+        }
+        return builder.build();
+    }
+
+    private static boolean isNullOrEmpty(String s) {
+        return s == null || s.isEmpty();
     }
 
     @Nullable

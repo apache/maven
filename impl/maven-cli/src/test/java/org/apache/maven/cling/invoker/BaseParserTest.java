@@ -25,6 +25,8 @@ import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserRequest;
+import org.apache.maven.api.cli.extensions.CoreExtension;
+import org.apache.maven.api.reactor.ReactorExtension;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -94,5 +96,98 @@ public class BaseParserTest {
         Assertions.assertNotEquals(
                 "${session.rootDirectory}", invokerRequest.userProperties().get("foo"));
         Assertions.assertFalse(invokerRequest.userProperties().get("foo").trim().isEmpty());
+    }
+
+    // ----- toCoreExtension (id shorthand) -----
+
+    @Test
+    void extensionIdShorthandHappyPath() {
+        ReactorExtension re = ReactorExtension.newBuilder()
+                .id("io.takari.maven:takari-smart-builder:0.6.1")
+                .build();
+        CoreExtension ce = BaseParser.toCoreExtension(re);
+        Assertions.assertEquals("io.takari.maven", ce.getGroupId());
+        Assertions.assertEquals("takari-smart-builder", ce.getArtifactId());
+        Assertions.assertEquals("0.6.1", ce.getVersion());
+    }
+
+    @Test
+    void extensionIdShorthandEmptyComponentThrows() {
+        ReactorExtension re = ReactorExtension.newBuilder().id("::").build();
+        IllegalArgumentException ex =
+                Assertions.assertThrows(IllegalArgumentException.class, () -> BaseParser.toCoreExtension(re));
+        Assertions.assertTrue(ex.getMessage().contains("Invalid extension id"), ex.getMessage());
+    }
+
+    @Test
+    void extensionIdShorthandWrongPartCountThrows() {
+        ReactorExtension re = ReactorExtension.newBuilder().id("g:a").build();
+        IllegalArgumentException ex =
+                Assertions.assertThrows(IllegalArgumentException.class, () -> BaseParser.toCoreExtension(re));
+        Assertions.assertTrue(ex.getMessage().contains("Invalid extension id"), ex.getMessage());
+    }
+
+    @Test
+    void extensionIdCombinedWithGroupIdThrows() {
+        ReactorExtension re =
+                ReactorExtension.newBuilder().id("g:a:v").groupId("other").build();
+        IllegalArgumentException ex =
+                Assertions.assertThrows(IllegalArgumentException.class, () -> BaseParser.toCoreExtension(re));
+        Assertions.assertTrue(ex.getMessage().contains("must not be combined"), ex.getMessage());
+    }
+
+    @Test
+    void extensionNoCoordinatesThrows() {
+        ReactorExtension re =
+                ReactorExtension.newBuilder().classLoadingStrategy("self-first").build();
+        IllegalArgumentException ex =
+                Assertions.assertThrows(IllegalArgumentException.class, () -> BaseParser.toCoreExtension(re));
+        Assertions.assertTrue(ex.getMessage().contains("must specify either id"), ex.getMessage());
+    }
+
+    @Test
+    void extensionExplicitCoordinatesHappyPath() {
+        ReactorExtension re = ReactorExtension.newBuilder()
+                .groupId("com.example")
+                .artifactId("my-ext")
+                .version("1.0")
+                .build();
+        CoreExtension ce = BaseParser.toCoreExtension(re);
+        Assertions.assertEquals("com.example", ce.getGroupId());
+        Assertions.assertEquals("my-ext", ce.getArtifactId());
+        Assertions.assertEquals("1.0", ce.getVersion());
+        Assertions.assertNull(ce.getConfiguration());
+    }
+
+    @Test
+    void extensionIdShorthandTrimsInnerWhitespace() {
+        ReactorExtension re = ReactorExtension.newBuilder()
+                .id("io.takari.maven : takari-smart-builder : 0.6.1")
+                .build();
+        CoreExtension ce = BaseParser.toCoreExtension(re);
+        Assertions.assertEquals("io.takari.maven", ce.getGroupId());
+        Assertions.assertEquals("takari-smart-builder", ce.getArtifactId());
+        Assertions.assertEquals("0.6.1", ce.getVersion());
+    }
+
+    @Test
+    void extensionIdShorthandBlankComponentThrows() {
+        ReactorExtension re =
+                ReactorExtension.newBuilder().id("  :artifact:1.0").build();
+        IllegalArgumentException ex =
+                Assertions.assertThrows(IllegalArgumentException.class, () -> BaseParser.toCoreExtension(re));
+        Assertions.assertTrue(ex.getMessage().contains("Invalid extension id"), ex.getMessage());
+    }
+
+    @Test
+    void extensionEmptyCoordinatesThrows() {
+        ReactorExtension re = ReactorExtension.newBuilder()
+                .groupId("")
+                .artifactId("")
+                .version("")
+                .build();
+        IllegalArgumentException ex =
+                Assertions.assertThrows(IllegalArgumentException.class, () -> BaseParser.toCoreExtension(re));
+        Assertions.assertTrue(ex.getMessage().contains("must specify either id"), ex.getMessage());
     }
 }

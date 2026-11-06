@@ -158,6 +158,11 @@ public class MojoExecutionFilter {
             }
 
             @Override
+            public org.apache.maven.api.Realm getRealm() {
+                throw new UnsupportedOperationException("getRealm() is not available in the filter adapter");
+            }
+
+            @Override
             public ClassLoader getClassLoader() {
                 throw new UnsupportedOperationException("getClassLoader() is not available in the filter adapter");
             }
