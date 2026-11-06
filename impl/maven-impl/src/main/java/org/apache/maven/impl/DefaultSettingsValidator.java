@@ -111,7 +111,9 @@ public class DefaultSettingsValidator {
                             "must denote a valid group id and match the pattern " + ID);
                 }
             }
-        } else {
+        }
+
+        if (!isProjectSettings) {
             // User / installation settings: warn on elements that are only meaningful in project settings.
             if (settings.getExtensions() != null && !settings.getExtensions().isEmpty()) {
                 addViolation(

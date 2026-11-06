@@ -24,6 +24,8 @@ import java.util.Map;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.SettingsBuilder;
+import org.apache.maven.api.settings.Extension;
+import org.apache.maven.api.settings.PhaseInjection;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.Server;
@@ -222,5 +224,87 @@ class DefaultSettingsValidatorTest {
         Settings settings = Settings.newBuilder().servers(List.of(server)).build();
 
         return validator.validate(settings);
+    }
+
+    // -----------------------------------------------------------------------
+    // New elements: extensions, phases, aliases
+    // -----------------------------------------------------------------------
+
+    @Test
+    void testExtensionsAllowedInProjectSettings() {
+        Extension ext = Extension.newBuilder()
+                .groupId("com.example")
+                .artifactId("my-extension")
+                .version("1.0")
+                .build();
+        Settings settings = Settings.newBuilder().extensions(List.of(ext)).build();
+
+        // isProjectSettings=true → no warning
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings, true);
+        assertEquals(0, problems.totalProblemsReported());
+    }
+
+    @Test
+    void testExtensionsWarnedInUserSettings() {
+        Extension ext = Extension.newBuilder()
+                .groupId("com.example")
+                .artifactId("my-extension")
+                .version("1.0")
+                .build();
+        Settings settings = Settings.newBuilder().extensions(List.of(ext)).build();
+
+        // isProjectSettings=false → warning
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings, false);
+        assertEquals(1, problems.totalProblemsReported());
+        BuilderProblem problem = problems.problems().findFirst().orElseThrow();
+        assertEquals(BuilderProblem.Severity.WARNING, problem.getSeverity());
+        assertEquals(
+                "'extensions' is not supported on user or installation settings. "
+                        + "Move <extensions> to your project's .mvn/settings.xml.",
+                problem.getMessage());
+    }
+
+    @Test
+    void testPhasesAllowedInProjectSettings() {
+        PhaseInjection phase =
+                PhaseInjection.newBuilder().name("my-phase").after("compile").build();
+        Settings settings = Settings.newBuilder().phases(List.of(phase)).build();
+
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings, true);
+        assertEquals(0, problems.totalProblemsReported());
+    }
+
+    @Test
+    void testPhasesWarnedInUserSettings() {
+        PhaseInjection phase =
+                PhaseInjection.newBuilder().name("my-phase").after("compile").build();
+        Settings settings = Settings.newBuilder().phases(List.of(phase)).build();
+
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings, false);
+        assertEquals(1, problems.totalProblemsReported());
+        BuilderProblem problem = problems.problems().findFirst().orElseThrow();
+        assertEquals(BuilderProblem.Severity.WARNING, problem.getSeverity());
+        assertEquals(
+                "'phases' is not supported on user or installation settings. "
+                        + "Move <phases> to your project's .mvn/settings.xml.",
+                problem.getMessage());
+    }
+
+    @Test
+    void testExtensionsAndPhasesInUserSettingsGenerateTwoWarnings() {
+        Extension ext = Extension.newBuilder()
+                .groupId("com.example")
+                .artifactId("my-extension")
+                .version("1.0")
+                .build();
+        PhaseInjection phase =
+                PhaseInjection.newBuilder().name("my-phase").after("compile").build();
+        Settings settings = Settings.newBuilder()
+                .extensions(List.of(ext))
+                .phases(List.of(phase))
+                .build();
+
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings, false);
+        assertEquals(2, problems.totalProblemsReported());
     }
 }
