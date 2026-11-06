@@ -573,14 +573,14 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             String module = line.substring("add-reads ".length()).trim();
             realm.addReads(module);
         } else {
-            logger.debug("Unknown module-access directive: {}", line);
+            logger.warn("Unknown module-access directive: {}", line);
         }
     }
 
     private void applyExportOrOpen(org.codehaus.plexus.classworlds.realm.ClassRealm realm, String spec, boolean open) {
         int slash = spec.indexOf('/');
         if (slash <= 0) {
-            logger.debug("Invalid module-access directive (missing '/'): {}", spec);
+            logger.warn("Invalid module-access directive (missing '/'): {}", spec);
             return;
         }
         String module = spec.substring(0, slash);
