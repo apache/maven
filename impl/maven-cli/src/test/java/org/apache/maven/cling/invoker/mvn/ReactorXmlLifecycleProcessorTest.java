@@ -114,30 +114,12 @@ class ReactorXmlLifecycleProcessorTest {
     // -------------------------------------------------------------------------
 
     /**
-     * Exercises the private validate() method indirectly by calling the same logic
-     * extracted here. In practice validate() is called inside resolveInjections() which
-     * requires a live MavenSession; this helper duplicates the validation rules so they
-     * can be tested without DI.
+     * Calls {@link ReactorXmlLifecycleProcessor#validate(PhaseInjection)} directly
+     * (package-private) for each phase. No duplication of validation logic needed.
      */
     private static void validateVia(List<PhaseInjection> phases) {
         for (PhaseInjection p : phases) {
-            validatePhase(p);
-        }
-    }
-
-    /** Mirror of ReactorXmlLifecycleProcessor.validate() kept in sync by hand. */
-    private static void validatePhase(PhaseInjection p) {
-        if (p.getName() == null || p.getName().isBlank()) {
-            throw new IllegalStateException("reactor.xml: <phase> element must have a non-blank 'name' attribute");
-        }
-        boolean hasParent = p.getParent() != null && !p.getParent().isBlank();
-        boolean hasAfter = p.getAfter() != null && !p.getAfter().isBlank();
-        boolean hasBefore = p.getBefore() != null && !p.getBefore().isBlank();
-        if (!hasParent && !hasAfter && !hasBefore) {
-            throw new IllegalStateException("reactor.xml: custom phase '"
-                    + p.getName()
-                    + "' must specify 'parent' and/or at least one of 'after' or 'before'"
-                    + " to anchor it in the lifecycle DAG");
+            ReactorXmlLifecycleProcessor.validate(p);
         }
     }
 }
