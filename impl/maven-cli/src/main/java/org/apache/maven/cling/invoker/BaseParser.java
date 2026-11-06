@@ -546,13 +546,7 @@ public abstract class BaseParser implements Parser {
             Path dir = context.rootDirectory != null ? context.rootDirectory : context.topDirectory;
             Path reactorXml = dir != null ? dir.resolve(".mvn/reactor.xml") : null;
             loaded = context.reactorConfig.getExtensions().stream()
-                    .map(re -> org.apache.maven.api.cli.extensions.CoreExtension.newBuilder()
-                            .groupId(re.getGroupId())
-                            .artifactId(re.getArtifactId())
-                            .version(re.getVersion())
-                            .classLoadingStrategy(re.getClassLoadingStrategy())
-                            .configuration(re.getConfiguration())
-                            .build())
+                    .map(BaseParser::toCoreExtension)
                     .collect(Collectors.toList());
             if (reactorXml != null && !loaded.isEmpty()) {
                 result.add(new CoreExtensions(reactorXml, loaded));
@@ -633,6 +627,43 @@ public abstract class BaseParser implements Parser {
                             .collect(Collectors.joining("; ")));
         }
         return coreExtensions;
+    }
+
+    /**
+     * Converts a {@link org.apache.maven.api.reactor.ReactorExtension} from {@code reactor.xml} to a
+     * {@link CoreExtension}, resolving the {@code id} shorthand (groupId:artifactId:version) if present and
+     * validating that coordinates are complete and unambiguous.
+     */
+    static CoreExtension toCoreExtension(org.apache.maven.api.reactor.ReactorExtension re) {
+        String groupId = re.getGroupId();
+        String artifactId = re.getArtifactId();
+        String version = re.getVersion();
+        String id = re.getId();
+        if (id != null && !id.isEmpty()) {
+            if (groupId != null || artifactId != null || version != null) {
+                throw new IllegalArgumentException(
+                        "Extension id '" + id + "' must not be combined with groupId/artifactId/version");
+            }
+            String[] parts = id.split(":", -1);
+            if (parts.length != 3 || parts[0].isEmpty() || parts[1].isEmpty() || parts[2].isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Invalid extension id '" + id + "': expected groupId:artifactId:version");
+            }
+            groupId = parts[0];
+            artifactId = parts[1];
+            version = parts[2];
+        }
+        if (groupId == null || artifactId == null || version == null) {
+            throw new IllegalArgumentException(
+                    "Extension must specify either id or all of groupId, artifactId, and version");
+        }
+        return CoreExtension.newBuilder()
+                .groupId(groupId)
+                .artifactId(artifactId)
+                .version(version)
+                .classLoadingStrategy(re.getClassLoadingStrategy())
+                .configuration(re.getConfiguration())
+                .build();
     }
 
     @Nullable
