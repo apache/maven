@@ -19,8 +19,6 @@
 package org.apache.maven.cli;
 
 import java.io.ByteArrayOutputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
@@ -35,7 +33,6 @@ import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.slf4j.MavenBaseLogger;
 import org.jline.terminal.Terminal;
-import org.jline.terminal.impl.DumbTerminal;
 import org.jline.terminal.spi.TerminalExt;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
@@ -57,8 +54,6 @@ class MavenCliLoggingTest {
     private PrintStream savedOut;
     private Terminal savedTerminal;
     private boolean savedColor;
-    private String savedLogFile;
-    private String savedCacheOutputStream;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -68,8 +63,6 @@ class MavenCliLoggingTest {
         // Null out the terminal so leftover FastTerminal threads from other tests cannot
         // race with this test's stream setup via their consumer callbacks.
         injectTerminal(null);
-        savedLogFile = System.getProperty(MavenBaseLogger.LEGACY_PREFIX + "logFile");
-        savedCacheOutputStream = System.getProperty(MavenBaseLogger.LEGACY_PREFIX + "cacheOutputStream");
     }
 
     @AfterEach
@@ -77,58 +70,85 @@ class MavenCliLoggingTest {
         System.setOut(savedOut);
         injectTerminal(savedTerminal);
         setColorEnabled(savedColor);
-        restoreProperty(MavenBaseLogger.LEGACY_PREFIX + "logFile", savedLogFile);
-        restoreProperty(MavenBaseLogger.LEGACY_PREFIX + "cacheOutputStream", savedCacheOutputStream);
-        // Restore the logger to write to the original System.err (default).
+        // Clear both properties and reactivate the logger so it writes to the restored
+        // System.err (the default).  Always clear rather than restore: activateSlf4j()
+        // must run against a clean slate to reset the logger state correctly.
         System.clearProperty(MavenBaseLogger.LEGACY_PREFIX + "logFile");
         System.clearProperty(MavenBaseLogger.LEGACY_PREFIX + "cacheOutputStream");
         activateSlf4j();
     }
 
     /**
-     * When color is explicitly forced ({@code -color=always}), {@code logging()} must NOT call
-     * {@code awaitTerminalInitialization()} before activating the logging configuration.  The
-     * logger must therefore cache the stream that was active at activation time (the "early"
+     * When color is explicitly forced ({@code -Dstyle.color=always}), {@code logging()} must NOT
+     * call {@code awaitTerminalInitialization()} before activating the logging configuration.
+     * The logger must therefore cache the stream that was active at activation time (the "early"
      * stream), not the stream installed by the terminal consumer afterwards.
      * <p>
-     * Note: on master the logger reconfiguration ({@code MavenSimpleLogger.configure()}) renders
-     * ANSI-coloured level labels via {@code JLineMessageBuilderFactory}, which calls
-     * {@code terminal.getType()} and therefore always awaits terminal initialisation.  The test
-     * accounts for this by completing the terminal build before running {@code logging()} and
-     * then swapping {@code System.out} afterwards, verifying that the logger sticks to the
-     * stream it cached at activation time.
+     * On master, {@code MavenSimpleLogger.configure()} renders ANSI-coloured level labels via
+     * {@code JLineMessageBuilderFactory}, which calls {@code terminal.getType()} and therefore
+     * always awaits terminal initialisation inside {@code activate()}.  The key behavioral
+     * difference being tested is that with {@code color=always}, {@code config.init()} captures
+     * {@code System.out} <em>before</em> the terminal consumer runs (because
+     * {@code awaitTerminalInitialization()} is skipped before {@code activate()}).
+     * <p>
+     * This test uses a held-back {@link FastTerminal} instead of a {@code DumbTerminal}.  The
+     * terminal build blocks until the test releases it.  Since {@code logging()} with
+     * {@code color=always} does not call {@code awaitTerminalInitialization()} before
+     * {@code activate()}, the logger caches {@code earlyStream} in {@code config.init()}, then
+     * blocks inside {@code configure()} waiting for the terminal.  When the test releases the
+     * terminal, the consumer swaps {@code System.out} to {@code terminalStream}, but the logger
+     * has already cached {@code earlyStream}.
      */
     @Test
     void withColorForcedLoggerCachesEarlyStream() throws Exception {
+        CountDownLatch buildingTerminal = new CountDownLatch(1);
+        CountDownLatch releaseTerminal = new CountDownLatch(1);
         ByteArrayOutputStream earlyOutput = new ByteArrayOutputStream();
-        ByteArrayOutputStream lateOutput = new ByteArrayOutputStream();
+        ByteArrayOutputStream terminalOutput = new ByteArrayOutputStream();
+        Thread loggingThread = null;
         try (PrintStream earlyStream = new PrintStream(earlyOutput, true, UTF_8.name());
-                PrintStream lateStream = new PrintStream(lateOutput, true, UTF_8.name());
-                Terminal dumb = new DumbTerminal(
-                        "Maven",
-                        Terminal.TYPE_DUMB_COLOR,
-                        InputStream.nullInputStream(),
-                        OutputStream.nullOutputStream(),
-                        null)) {
-            // Install a completed terminal so configure() can call getType() without blocking.
-            injectTerminal(dumb);
-
-            // Set up logger to cache System.out at activate() time.
+                PrintStream terminalStream = new PrintStream(terminalOutput, true, UTF_8.name())) {
             System.setProperty(MavenBaseLogger.LEGACY_PREFIX + "cacheOutputStream", "true");
             System.setProperty(MavenBaseLogger.LEGACY_PREFIX + "logFile", "System.out");
             System.setOut(earlyStream);
             activateSlf4j();
 
-            // Run logging() with -color=always. It must NOT call awaitTerminalInitialization()
-            // before activate(), so it completes immediately (no blocking terminal).
+            FastTerminal terminal = new FastTerminal(
+                    () -> {
+                        buildingTerminal.countDown();
+                        if (!releaseTerminal.await(10, SECONDS)) {
+                            throw new IllegalStateException("Terminal installation was not released");
+                        }
+                        return mock(TerminalExt.class, RETURNS_DEEP_STUBS);
+                    },
+                    installed -> System.setOut(terminalStream));
+            injectTerminal(terminal);
+            terminal.start();
+            assertTrue(buildingTerminal.await(10, SECONDS), "FastTerminal build thread must start");
+
+            // Run logging() on a separate thread — it will block inside configure() when
+            // toAnsi() calls FastTerminal.getType() → getTerminal() → terminal.get().
             MavenCli cli = new MavenCli();
             CliRequest request = new CliRequest(new String[] {"-Dstyle.color=always"}, null);
             cli.cli(request);
             cli.properties(request);
-            cli.logging(request);
+            FutureTask<Void> logging = new FutureTask<>(() -> {
+                cli.logging(request);
+                return null;
+            });
+            loggingThread = new Thread(logging, "logging-initialization-test");
+            loggingThread.setDaemon(true);
+            loggingThread.start();
 
-            // Swap System.out AFTER logging() has cached earlyStream.
-            System.setOut(lateStream);
+            // Wait until the logging thread is blocked on the terminal's CompletableFuture.
+            // At that point, config.init() has already captured earlyStream (it runs before
+            // configure() which is where the block occurs).
+            awaitThreadState(loggingThread, Thread.State.WAITING, 10_000);
+
+            // Release the terminal — the consumer sets System.out=terminalStream, but the
+            // logger has already cached earlyStream in config.init().
+            releaseTerminal.countDown();
+            logging.get(10, SECONDS);
 
             // The logger must still write to earlyStream.
             LoggerFactory.getLogger(MavenCliLoggingTest.class).warn("terminal-output-marker");
@@ -136,8 +156,13 @@ class MavenCliLoggingTest {
                     earlyOutput.toString(UTF_8.name()).contains("terminal-output-marker"),
                     "Logger must write to the stream that was active when logging() ran with -color=always");
             assertFalse(
-                    lateOutput.toString(UTF_8.name()).contains("terminal-output-marker"),
+                    terminalOutput.toString(UTF_8.name()).contains("terminal-output-marker"),
                     "Logger must not switch to the stream installed after logging() completed");
+        } finally {
+            releaseTerminal.countDown();
+            if (loggingThread != null) {
+                loggingThread.join(10_000);
+            }
         }
     }
 
@@ -228,6 +253,12 @@ class MavenCliLoggingTest {
      * {@code awaitTerminalInitialization()} before activating the logging configuration, so that
      * the terminal consumer has already swapped {@code System.out} before the logger caches it.
      * This prevents logs from going to a stale stream instead of the terminal-wrapped one.
+     * <p>
+     * Unlike the {@code color=always} test, this test verifies that the logger caches the
+     * <em>terminal</em> stream, not the early stream.  The held-back {@link FastTerminal}
+     * approach works cleanly here: {@code logging()} calls {@code awaitTerminalInitialization()}
+     * which blocks until the terminal is released.  When released, the consumer swaps
+     * {@code System.out}, then {@code config.init()} captures the new stream.
      */
     @Test
     void cachesOutputAfterTerminalInstallationWithColorDisabled() throws Exception {
@@ -242,7 +273,6 @@ class MavenCliLoggingTest {
     private void cachesOutputAfterTerminalInstallation(String color) throws Exception {
         CountDownLatch buildingTerminal = new CountDownLatch(1);
         CountDownLatch releaseTerminal = new CountDownLatch(1);
-        CountDownLatch awaitingTerminalOrLoggingFinished = new CountDownLatch(1);
         ByteArrayOutputStream earlyOutput = new ByteArrayOutputStream();
         ByteArrayOutputStream terminalOutput = new ByteArrayOutputStream();
         Thread loggingThread = null;
@@ -253,22 +283,15 @@ class MavenCliLoggingTest {
             System.setOut(earlyStream);
             activateSlf4j();
 
-            FastTerminal terminal =
-                    new FastTerminal(
-                            () -> {
-                                buildingTerminal.countDown();
-                                if (!releaseTerminal.await(10, SECONDS)) {
-                                    throw new IllegalStateException("Terminal installation was not released");
-                                }
-                                return mock(TerminalExt.class, RETURNS_DEEP_STUBS);
-                            },
-                            installed -> System.setOut(terminalStream)) {
-                        @Override
-                        public TerminalExt getTerminal() {
-                            awaitingTerminalOrLoggingFinished.countDown();
-                            return super.getTerminal();
+            FastTerminal terminal = new FastTerminal(
+                    () -> {
+                        buildingTerminal.countDown();
+                        if (!releaseTerminal.await(10, SECONDS)) {
+                            throw new IllegalStateException("Terminal installation was not released");
                         }
-                    };
+                        return mock(TerminalExt.class, RETURNS_DEEP_STUBS);
+                    },
+                    installed -> System.setOut(terminalStream));
             // Inject the FastTerminal directly into MessageUtils.terminal before starting the
             // build thread, to avoid calling systemInstall(Terminal) which also creates a LineReader
             // from the terminal — that would call FastTerminal.getTerminal() and block.
@@ -282,29 +305,57 @@ class MavenCliLoggingTest {
             cli.cli(request);
             cli.properties(request);
             FutureTask<Void> logging = new FutureTask<>(() -> {
-                try {
-                    cli.logging(request);
-                    return null;
-                } finally {
-                    awaitingTerminalOrLoggingFinished.countDown();
-                }
+                cli.logging(request);
+                return null;
             });
             loggingThread = new Thread(logging, "logging-initialization-test");
             loggingThread.setDaemon(true);
             loggingThread.start();
-            assertTrue(awaitingTerminalOrLoggingFinished.await(10, SECONDS));
+
+            // Wait until the logging thread is blocked on awaitTerminalInitialization() →
+            // FastTerminal.getTerminal() → CompletableFuture.get().  At this point,
+            // config.init() has NOT yet run (it comes after awaitTerminalInitialization()).
+            awaitThreadState(loggingThread, Thread.State.WAITING, 10_000);
+
+            // Release the terminal — the consumer sets System.out=terminalStream.
+            // awaitTerminalInitialization() returns, then config.init() captures terminalStream.
             releaseTerminal.countDown();
             logging.get(10, SECONDS);
-            terminal.getTerminal();
 
             LoggerFactory.getLogger(MavenCliLoggingTest.class).warn("terminal-output-marker");
-            assertTrue(terminalOutput.toString(UTF_8.name()).contains("terminal-output-marker"));
-            assertFalse(earlyOutput.toString(UTF_8.name()).contains("terminal-output-marker"));
+            assertTrue(
+                    terminalOutput.toString(UTF_8.name()).contains("terminal-output-marker"),
+                    "Logger must write to the stream installed by the terminal consumer");
+            assertFalse(
+                    earlyOutput.toString(UTF_8.name()).contains("terminal-output-marker"),
+                    "Logger must not write to the early stream that was active before terminal installation");
         } finally {
             releaseTerminal.countDown();
             if (loggingThread != null) {
-                loggingThread.join(10000);
+                loggingThread.join(10_000);
             }
+        }
+    }
+
+    /**
+     * Waits until the given thread enters the expected state or the timeout expires.
+     * Used to detect when a thread is blocked on {@code CompletableFuture.get()} inside
+     * {@code FastTerminal.getTerminal()}.  This is more reliable than a fixed sleep and
+     * avoids depending on platform-specific scheduling behavior.
+     *
+     * @param thread   the thread to monitor
+     * @param expected the expected thread state (typically {@link Thread.State#WAITING})
+     * @param timeoutMs maximum time to wait in milliseconds
+     */
+    private static void awaitThreadState(Thread thread, Thread.State expected, long timeoutMs)
+            throws InterruptedException {
+        long deadline = System.nanoTime() + timeoutMs * 1_000_000L;
+        while (thread.getState() != expected) {
+            if (System.nanoTime() > deadline) {
+                throw new AssertionError("Thread " + thread.getName() + " did not reach state " + expected + " within "
+                        + timeoutMs + "ms; actual state: " + thread.getState());
+            }
+            Thread.sleep(10);
         }
     }
 
@@ -346,13 +397,5 @@ class MavenCliLoggingTest {
     private static void activateSlf4j() {
         Slf4jConfiguration config = Slf4jConfigurationFactory.getConfiguration(LoggerFactory.getILoggerFactory());
         config.activate();
-    }
-
-    private static void restoreProperty(String name, String value) {
-        if (value == null) {
-            System.clearProperty(name);
-        } else {
-            System.setProperty(name, value);
-        }
     }
 }
