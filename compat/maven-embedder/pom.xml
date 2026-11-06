@@ -167,6 +167,10 @@ under the License.
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
       <optional>true</optional>
+      <!-- provided: compile-only for LogbackConfiguration; excluded from test classpath
+           so MavenLoggerFactory is the sole SLF4J provider in tests (macOS aarch64 CI
+           picks Logback when both providers are present, breaking stream assertions) -->
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>org.jline</groupId>
