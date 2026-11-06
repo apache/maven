@@ -81,8 +81,6 @@ import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.model.DefaultModelPathTranslator;
-import org.apache.maven.internal.impl.DefaultLog;
-import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.model.v4.MavenMerger;
 import org.apache.maven.model.v4.MavenStaxReader;
