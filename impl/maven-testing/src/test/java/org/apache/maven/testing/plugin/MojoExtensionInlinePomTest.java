@@ -29,18 +29,22 @@ class MojoExtensionInlinePomTest {
 
     private static final String COORDINATES = "test:test-plugin:0.0.1-SNAPSHOT:goal";
 
-    private static final String NAMESPACED_POM = "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">"
-            + "<groupId>customGroupId</groupId>"
-            + "<artifactId>customArtifactId</artifactId>"
-            + "<version>2.0</version>"
-            + "</project>";
+    private static final String NAMESPACED_POM = """
+            <project xmlns="http://maven.apache.org/POM/4.0.0">
+              <groupId>customGroupId</groupId>
+              <artifactId>customArtifactId</artifactId>
+              <version>2.0</version>
+            </project>
+            """;
 
-    private static final String POM_WITH_PROLOG = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
-            + "<project xmlns=\"http://maven.apache.org/POM/4.0.0\">"
-            + "<groupId>prologGroupId</groupId>"
-            + "<artifactId>customArtifactId</artifactId>"
-            + "<version>2.0</version>"
-            + "</project>";
+    private static final String POM_WITH_PROLOG = """
+            <?xml version="1.0" encoding="UTF-8"?>
+            <project xmlns="http://maven.apache.org/POM/4.0.0">
+              <groupId>prologGroupId</groupId>
+              <artifactId>customArtifactId</artifactId>
+              <version>2.0</version>
+            </project>
+            """;
 
     @Inject
     Project project;
