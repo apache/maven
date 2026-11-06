@@ -244,8 +244,8 @@ class MavenCliLoggingTest {
             if (loggingThread != null) {
                 loggingThread.join(10_000);
             }
-            // Close the PrintStream wrapping maven.log before System.out is restored.
-            // On Windows, an open FileOutputStream prevents @TempDir from deleting the file.
+            // Close the PrintStream wrapping maven.log so @TempDir can delete the temp directory on Windows.
+            // An open FileOutputStream prevents directory deletion on Windows.
             PrintStream logStream = System.out;
             System.setOut(originalOut);
             if (logStream != originalOut) {
