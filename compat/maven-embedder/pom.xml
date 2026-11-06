@@ -228,6 +228,19 @@ under the License.
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>sisu-maven-plugin</artifactId>
       </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- Exclude logback-classic from the test classpath so MavenLoggerFactory is
+               the sole SLF4J provider. Without this, ServiceLoader may pick Logback on
+               some platforms (macOS aarch64), causing MavenCliLoggingTest to fail because
+               LogbackConfiguration.activate() is a no-op and stream assertions break. -->
+          <classpathDependencyExcludes>
+            <classpathDependencyExclude>ch.qos.logback:logback-classic</classpathDependencyExclude>
+          </classpathDependencyExcludes>
+        </configuration>
+      </plugin>
     </plugins>
   </build>
 </project>
