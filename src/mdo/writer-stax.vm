@@ -246,9 +246,23 @@ public class ${className} {
       #end
     #end
   #end
+  ##
+  ## If the class has a field annotated with xml.content="true", write its value
+  ## as element body text rather than a child element.
+  ##
+  #foreach ( $field in $allFields )
+    #if ( $Helper.xmlFieldMetadata( $field ).content )
+      #set ( $contentFieldCapName = $Helper.capitalise( $field.name ) )
+      #if ( $field.type == "String" )
+            if (${classLcapName}.get${contentFieldCapName}() != null) {
+                serializer.writeCharacters(${classLcapName}.get${contentFieldCapName}());
+            }
+      #end
+    #end
+  #end
   #foreach ( $field in $allFields )
     #if ( ! $Helper.xmlFieldMetadata( $field ).attribute && ! $Helper.xmlFieldMetadata( $field ).transient
-                 && ! $Helper.xmlFieldMetadata( $field ).format )
+                 && ! $Helper.xmlFieldMetadata( $field ).format && ! $Helper.xmlFieldMetadata( $field ).content )
       #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
       #if ( ! $fieldTagName )
         #set ( $fieldTagName = $field.name )

@@ -1237,7 +1237,7 @@
           <required>true</required>
           <type>String</type>
         </field>
-        <field>
+        <field xml.content="true">
           <name>content</name>
           <description>Inline text form: whitespace-separated arguments, quote-aware.
           Mutually exclusive with {@code args}.</description>

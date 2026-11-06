@@ -366,6 +366,20 @@ public class ${className} {
   #if ( $needXmlContext )
         context.addLast( ${classLcapName} );
   #end
+  ##
+  ## If the class has a field annotated with xml.content="true", that field is read
+  ## from the element body text rather than from a child element.
+  ##
+  #set ( $contentField = false )
+  #foreach ( $field in $allFields )
+    #if ( $Helper.xmlFieldMetadata( $field ).content )
+      #set ( $contentField = $field )
+    #end
+  #end
+  #if ( $contentField )
+    #set ( $contentFieldCapName = $Helper.capitalise( $contentField.name ) )
+        ${classLcapName}.${contentField.name}(interpolatedTrimmed(parser.getElementText(), "${contentField.name}"));
+  #else
         while ((strict ? parser.nextTag() : nextTag(parser)) == XMLStreamReader.START_ELEMENT) {
             checkNamespace(parser, strict, namespace);
             String childName = checkDuplicate(parser.getLocalName(), parser, parsed);
@@ -377,7 +391,7 @@ public class ${className} {
             switch (childName) {
   #set( $ift = "if" )
   #foreach ( $field in $allFields )
-    #if ( ! $Helper.xmlFieldMetadata( $field ).attribute && ! $Helper.xmlFieldMetadata( $field ).transient && ! $Helper.xmlFieldMetadata( $field ).format )
+    #if ( ! $Helper.xmlFieldMetadata( $field ).attribute && ! $Helper.xmlFieldMetadata( $field ).transient && ! $Helper.xmlFieldMetadata( $field ).format && ! $Helper.xmlFieldMetadata( $field ).content )
       #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
       #if ( ! $fieldTagName )
         #set ( $fieldTagName = $field.name )
@@ -508,6 +522,7 @@ public class ${className} {
         ${classLcapName}.${field.name}(${field.name});
     #end
   #end
+  #end## end #if ($contentField) / #else
   #foreach ( $field in $allFields )
     #if ( $Helper.xmlFieldMetadata( $field ).format )
         ${classLcapName}.${field.name}($Helper.xmlFieldMetadata( $field ).format);
