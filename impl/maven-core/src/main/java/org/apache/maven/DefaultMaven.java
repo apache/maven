@@ -295,6 +295,7 @@ public class DefaultMaven implements Maven {
             }
 
             result.setTopologicallySortedProjects(session.getProjects());
+            result.setAllProjects(session.getAllProjects());
 
             result.setProject(session.getTopLevelProject());
 

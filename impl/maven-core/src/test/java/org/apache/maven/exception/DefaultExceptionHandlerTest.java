@@ -166,6 +166,8 @@ class DefaultExceptionHandlerTest {
         assertTrue(
                 summary.getMessage().contains("remote repository filter"),
                 "Message should explain the filtering cause");
+        assertTrue(
+                summary.getMessage().contains("com.example:my-lib:1.0"), "Message should name the rejected artifact");
         assertEquals(
                 "https://maven.apache.org/resolver/remote-repository-filtering.html",
                 summary.getReference(),
