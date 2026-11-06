@@ -290,15 +290,13 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 .setStrictClassPathScanning(false)
                 .setName("maven");
 
-        DefaultPlexusContainer container = new DefaultPlexusContainer(
-                cc,
-                new AbstractModule() {
-                    @Override
-                    protected void configure() {
-                        bind(ILoggerFactory.class).toProvider(() -> context.loggerFactory);
-                        bind(MessageBuilderFactory.class).toInstance(context.invokerRequest.messageBuilderFactory());
-                    }
-                });
+        DefaultPlexusContainer container = new DefaultPlexusContainer(cc, new AbstractModule() {
+            @Override
+            protected void configure() {
+                bind(ILoggerFactory.class).toProvider(() -> context.loggerFactory);
+                bind(MessageBuilderFactory.class).toInstance(context.invokerRequest.messageBuilderFactory());
+            }
+        });
 
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
         Runnable settingsCleaner = null;
