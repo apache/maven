@@ -28,6 +28,7 @@ import org.apache.maven.api.cli.CoreExtensions;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.extensions.InputLocation;
+import org.apache.maven.api.cli.extensions.InputSource;
 
 public class PrecedenceCoreExtensionSelector<C extends LookupContext> implements CoreExtensionSelector<C> {
     @Override
@@ -92,6 +93,10 @@ public class PrecedenceCoreExtensionSelector<C extends LookupContext> implements
     }
 
     protected String formatLocation(InputLocation location) {
-        return location.getSource().getLocation() + ":" + location.getLineNumber();
+        if (location == null) {
+            return "<unknown>";
+        }
+        InputSource source = location.getSource();
+        return (source != null ? source.getLocation() : "<unknown>") + ":" + location.getLineNumber();
     }
 }

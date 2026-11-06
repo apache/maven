@@ -657,13 +657,22 @@ public abstract class BaseParser implements Parser {
             throw new IllegalArgumentException(
                     "Extension must specify either id or all of groupId, artifactId, and version");
         }
-        return CoreExtension.newBuilder()
+        CoreExtension.Builder builder = CoreExtension.newBuilder()
                 .groupId(groupId)
                 .artifactId(artifactId)
                 .version(version)
                 .classLoadingStrategy(re.getClassLoadingStrategy())
-                .configuration(re.getConfiguration())
-                .build();
+                .configuration(re.getConfiguration());
+        // Propagate the InputLocation from the ReactorExtension so that
+        // PrecedenceCoreExtensionSelector.formatLocation() (and similar callers)
+        // can report where the extension was declared without a NullPointerException.
+        org.apache.maven.api.reactor.InputLocation reactorLoc = re.getLocation("");
+        if (reactorLoc != null) {
+            org.apache.maven.api.reactor.InputSource reactorSrc = reactorLoc.getSource();
+            InputSource extSrc = reactorSrc != null ? InputSource.of(reactorSrc.getLocation()) : null;
+            builder.location("", InputLocation.of(reactorLoc.getLineNumber(), reactorLoc.getColumnNumber(), extSrc));
+        }
+        return builder.build();
     }
 
     private static boolean isNullOrEmpty(String s) {
