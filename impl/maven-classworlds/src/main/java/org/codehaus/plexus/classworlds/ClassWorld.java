@@ -43,6 +43,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
@@ -55,6 +56,8 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
  * @author <a href="mailto:bob@eng.werken.com">bob mcwhirter</a>
  */
 public class ClassWorld implements Closeable {
+    private static final Logger LOGGER = Logger.getLogger(ClassWorld.class.getName());
+
     private Map<String, ClassRealm> realms;
 
     private final List<ClassWorldListener> listeners = new ArrayList<>();
@@ -125,7 +128,7 @@ public class ClassWorld implements Closeable {
      */
     @Override
     public synchronized void close() throws IOException {
-        realms.values().stream().forEach(this::disposeRealm);
+        realms.values().forEach(this::disposeRealm);
         realms.clear();
     }
 
@@ -211,7 +214,19 @@ public class ClassWorld implements Closeable {
      */
     public synchronized void addReads(String sourceModuleName, Module target) {
         Module source = findModule(sourceModuleName);
-        if (source == null || moduleLayerController == null || isBootLayerModule(source)) {
+        if (source == null) {
+            LOGGER.warning("module-access: module '" + sourceModuleName + "' not found, ignoring add-reads directive");
+            return;
+        }
+        if (moduleLayerController == null) {
+            LOGGER.warning("module-access: no ModuleLayer controller available, cannot add-reads for '"
+                    + sourceModuleName + "'");
+            return;
+        }
+        if (isBootLayerModule(source)) {
+            LOGGER.warning("module-access: module '" + sourceModuleName
+                    + "' is in the boot layer and cannot be modified at runtime;"
+                    + " use --add-reads on the JVM command line instead");
             return;
         }
         moduleLayerController.addReads(source, target);
@@ -219,7 +234,20 @@ public class ClassWorld implements Closeable {
 
     private void applyModuleAccess(String moduleName, String packageName, Module target, boolean open) {
         Module source = findModule(moduleName);
-        if (source == null || moduleLayerController == null || isBootLayerModule(source)) {
+        if (source == null) {
+            LOGGER.warning("module-access: module '" + moduleName + "' not found, ignoring "
+                    + (open ? "add-opens" : "add-exports") + " directive for package '" + packageName + "'");
+            return;
+        }
+        if (moduleLayerController == null) {
+            LOGGER.warning("module-access: no ModuleLayer controller available, cannot "
+                    + (open ? "add-opens" : "add-exports") + " for '" + moduleName + "/" + packageName + "'");
+            return;
+        }
+        if (isBootLayerModule(source)) {
+            LOGGER.warning("module-access: module '" + moduleName
+                    + "' is in the boot layer and cannot be modified at runtime;"
+                    + " use --" + (open ? "add-opens" : "add-exports") + " on the JVM command line instead");
             return;
         }
         if (open) {

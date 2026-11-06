@@ -475,10 +475,16 @@ public class PluginDescriptor extends ComponentSetDescriptor implements Cloneabl
         }
     }
 
+    /**
+     * @since 4.1.0
+     */
     public boolean isModular() {
         return modular;
     }
 
+    /**
+     * @since 4.1.0
+     */
     public void setModular(boolean modular) {
         this.modular = modular;
     }

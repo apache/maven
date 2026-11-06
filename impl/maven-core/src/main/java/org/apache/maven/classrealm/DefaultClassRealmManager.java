@@ -218,7 +218,10 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
         populateRealm(classRealm, constituents);
 
-        applyModuleAccessDescriptors(classRealm);
+        // module-access descriptors only make sense for plugin and extension realms
+        if (type == RealmType.Plugin || type == RealmType.Extension) {
+            applyModuleAccessDescriptors(classRealm);
+        }
 
         return classRealm;
     }
@@ -318,6 +321,12 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             // Parent layer: use the runtime layer from ClassWorld if available (has Maven API
             // modules + JLine), otherwise fall back to the boot layer.
             // Flat hierarchy — all plugin layers are siblings under this parent.
+            if (!(world instanceof org.codehaus.plexus.classworlds.ClassWorld)) {
+                throw new ModuleLayerCreationException("Cannot create modular plugin realm for " + plugin.getId()
+                        + ": the ClassWorld implementation does not support ModuleLayer"
+                        + " (expected org.codehaus.plexus.classworlds.ClassWorld, got "
+                        + world.getClass().getName() + ")");
+            }
             org.codehaus.plexus.classworlds.ClassWorld implWorld = (org.codehaus.plexus.classworlds.ClassWorld) world;
             ModuleLayer parentLayer =
                     implWorld.getModuleLayer() != null ? implWorld.getModuleLayer() : ModuleLayer.boot();
@@ -333,7 +342,14 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             ModuleLayer pluginLayer = controller.layer();
 
             // Store per-realm, not per-world
-            var implRealm = (org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm;
+            if (!(classRealm instanceof org.codehaus.plexus.classworlds.realm.ClassRealm)) {
+                throw new ModuleLayerCreationException("Cannot attach ModuleLayer to plugin realm for " + plugin.getId()
+                        + ": the ClassRealm implementation does not support ModuleLayer"
+                        + " (expected org.codehaus.plexus.classworlds.realm.ClassRealm, got "
+                        + classRealm.getClass().getName() + ")");
+            }
+            org.codehaus.plexus.classworlds.realm.ClassRealm implRealm =
+                    (org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm;
             implRealm.setModuleLayer(pluginLayer, controller);
 
             // Also populate the realm's classpath with the same artifacts
@@ -357,7 +373,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
             return classRealm;
 
-        } catch (FindException | ResolutionException e) {
+        } catch (FindException | ResolutionException | LayerInstantiationException e) {
             throw new ModuleLayerCreationException(
                     "Failed to create module layer for plugin " + plugin.getId()
                             + " which declares <modular>true</modular>."
@@ -527,9 +543,8 @@ public class DefaultClassRealmManager implements ClassRealmManager {
      * @param classRealm the plugin class realm whose JAR(s) are scanned for descriptors
      */
     private void applyModuleAccessDescriptors(ClassRealm classRealm) {
-        var implRealm = (org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm;
         try {
-            Enumeration<URL> resources = implRealm.getResources(MODULE_ACCESS_DESCRIPTOR);
+            Enumeration<URL> resources = classRealm.getResources(MODULE_ACCESS_DESCRIPTOR);
             while (resources.hasMoreElements()) {
                 URL resource = resources.nextElement();
                 try (BufferedReader reader =
@@ -540,12 +555,12 @@ public class DefaultClassRealmManager implements ClassRealmManager {
                         if (line.isEmpty() || line.startsWith("#")) {
                             continue;
                         }
-                        applyModuleAccessDirective(implRealm, line);
+                        applyModuleAccessDirective(classRealm, line);
                     }
                 }
             }
         } catch (IOException e) {
-            logger.debug("Failed to read module-access descriptors for realm {}", classRealm.getId(), e);
+            logger.warn("Failed to read module-access descriptors for realm {}", classRealm.getId(), e);
         }
     }
 
