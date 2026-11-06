@@ -97,7 +97,9 @@ class MavenSystemLoggerTest {
         logger.log(System.Logger.Level.INFO, (ResourceBundle) null, "Hello {0}, count={1}", "world", 42);
 
         assertEquals(1, events.size());
-        assertEquals("Hello world, count=42", events.get(0).message());
+        LogEvent event = events.get(0);
+        // Template args are always lazily formatted; the formatted result must be correct
+        assertEquals("Hello world, count=42", event.message());
     }
 
     @Test

@@ -18,6 +18,7 @@
  */
 package org.apache.maven.logging.impl;
 
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -37,8 +38,6 @@ import org.apache.maven.api.logging.LogLevel;
  * @since 4.2.0
  */
 public final class DefaultLogEvent implements LogEvent {
-
-    private static final String PLACEHOLDER = "{}";
 
     private final Instant timestamp;
     private final LogLevel level;
@@ -341,16 +340,11 @@ public final class DefaultLogEvent implements LogEvent {
         if (args == null || args.isEmpty()) {
             return template;
         }
-        StringBuilder sb = new StringBuilder();
-        int argIdx = 0;
-        int start = 0;
-        int pos;
-        while ((pos = template.indexOf(PLACEHOLDER, start)) != -1 && argIdx < args.size()) {
-            sb.append(template, start, pos);
-            sb.append(args.get(argIdx++));
-            start = pos + 2;
+        try {
+            return MessageFormat.format(template, args.toArray());
+        } catch (IllegalArgumentException e) {
+            // Malformed MessageFormat pattern — return template as-is rather than losing the message
+            return template;
         }
-        sb.append(template, start, template.length());
-        return sb.toString();
     }
 }

@@ -18,7 +18,6 @@
  */
 package org.apache.maven.logging.slf4j;
 
-import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.MonotonicClock;
@@ -51,15 +50,22 @@ public final class MavenSimpleLoggerUtils {
 
     /**
      * Creates a {@link LogEvent} from SLF4J-sourced parameters.
+     * The {@code messageTemplate} uses MessageFormat {@code {0}}-style placeholders
+     * (already converted from SLF4J's {@code {}} style by {@link Slf4jTemplateConverter}).
      * SLF4J events have no source metadata (class/method).
      */
     @SuppressWarnings("deprecation") // Thread.getId()
     public static LogEvent toLogEvent(
-            int level, String loggerName, String cleanMessage, Throwable throwable, String pluginId) {
+            int level,
+            String loggerName,
+            String messageTemplate,
+            Object[] messageArgs,
+            Throwable throwable,
+            String pluginId) {
         return new DefaultLogEvent(
                 MonotonicClock.now(),
                 toLogLevel(level),
-                cleanMessage != null ? cleanMessage : "",
+                null,
                 loggerName,
                 throwable,
                 null,
@@ -71,7 +77,7 @@ public final class MavenSimpleLoggerUtils {
                 null,
                 pluginId,
                 Map.of(),
-                null,
-                (List<Object>) null);
+                messageTemplate,
+                messageArgs);
     }
 }

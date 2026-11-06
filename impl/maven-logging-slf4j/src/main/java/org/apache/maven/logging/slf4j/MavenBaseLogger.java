@@ -230,18 +230,25 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
 
     /**
      * Context-aware write that includes the log level, logger name, and
-     * clean message alongside the formatted output. Subclasses can override
+     * message template+args alongside the formatted output. Subclasses can override
      * to forward structured data to a log sink.
      * <p>
      * The default implementation delegates to {@link #write(StringBuilder, Throwable)}.
      *
      * @param level          the SLF4J log level constant
      * @param loggerName     the name of the logger
-     * @param cleanMessage   the formatted message without level/timestamp prefix
+     * @param messageTemplate the MessageFormat {0}-style template (converted from SLF4J {})
+     * @param messageArgs    the template arguments (trailing Throwable already stripped)
      * @param formattedBuf   the fully formatted log line
      * @param t              the throwable, may be {@code null}
      */
-    protected void write(int level, String loggerName, String cleanMessage, StringBuilder formattedBuf, Throwable t) {
+    protected void write(
+            int level,
+            String loggerName,
+            String messageTemplate,
+            Object[] messageArgs,
+            StringBuilder formattedBuf,
+            Throwable t) {
         write(formattedBuf, t);
     }
 
@@ -325,7 +332,14 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
     private void innerHandleNormalizedLoggingCall(
             Level level, List<Marker> markers, String messagePattern, Object[] arguments, Throwable t) {
 
-        String formattedMessage = MessageFormatter.basicArrayFormat(messagePattern, arguments);
+        // Convert SLF4J {}-style template to MessageFormat {0}-style and strip
+        // any trailing Throwable argument (SLF4J convention) so args match the template.
+        String mavenTemplate = Slf4jTemplateConverter.convert(messagePattern);
+        Object[] cleanArgs =
+                t != null && arguments != null && arguments.length > 0 && arguments[arguments.length - 1] == t
+                        ? java.util.Arrays.copyOf(arguments, arguments.length - 1)
+                        : arguments;
+
         StringBuilder buf = formatLogPrefix(level.toInt());
 
         if (markers != null) {
@@ -335,9 +349,11 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
             }
         }
 
+        // Formatted message for the console fallback buffer only
+        String formattedMessage = MessageFormatter.basicArrayFormat(messagePattern, arguments);
         buf.append(formattedMessage);
 
-        write(level.toInt(), name, formattedMessage, buf, t);
+        write(level.toInt(), name, mavenTemplate, cleanArgs, buf, t);
     }
 
     /**

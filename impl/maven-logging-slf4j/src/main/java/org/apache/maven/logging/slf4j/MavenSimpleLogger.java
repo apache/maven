@@ -71,10 +71,17 @@ public class MavenSimpleLogger extends MavenBaseLogger {
     }
 
     @Override
-    protected void write(int level, String loggerName, String cleanMessage, StringBuilder formattedBuf, Throwable t) {
+    protected void write(
+            int level,
+            String loggerName,
+            String messageTemplate,
+            Object[] messageArgs,
+            StringBuilder formattedBuf,
+            Throwable t) {
         LogSink sink = LoggerManager.get().getLogSink();
         if (sink != null) {
-            sink.accept(MavenSimpleLoggerUtils.toLogEvent(level, loggerName, cleanMessage, t, pluginId));
+            sink.accept(
+                    MavenSimpleLoggerUtils.toLogEvent(level, loggerName, messageTemplate, messageArgs, t, pluginId));
         } else {
             super.write(formattedBuf, t);
         }

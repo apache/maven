@@ -18,7 +18,6 @@
  */
 package org.apache.maven.logging.system;
 
-import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 
@@ -74,8 +73,14 @@ final class MavenSystemLogger implements System.Logger {
         if (mapped == null || !LoggerManager.get().isLevelEnabled(name, mapped)) {
             return;
         }
-        String message = formatMessage(bundle, format, params);
-        LoggerManager.get().getLogger(name).at(mapped).log(message);
+        // Resolve bundle key to template (if bundle present), then pass template+args
+        // through unformatted so the LogEvent retains structured data.
+        String template = resolveBundle(bundle, format);
+        if (params != null && params.length > 0) {
+            LoggerManager.get().getLogger(name).at(mapped).log(template, params);
+        } else {
+            LoggerManager.get().getLogger(name).at(mapped).log(template);
+        }
     }
 
     private static LogLevel mapLevel(Level level) {
@@ -94,17 +99,6 @@ final class MavenSystemLogger implements System.Logger {
             try {
                 return bundle.getString(msg);
             } catch (MissingResourceException ignored) {
-            }
-        }
-        return msg;
-    }
-
-    private static String formatMessage(ResourceBundle bundle, String format, Object... params) {
-        String msg = resolveBundle(bundle, format);
-        if (params != null && params.length > 0 && msg != null) {
-            try {
-                return MessageFormat.format(msg, params);
-            } catch (IllegalArgumentException ignored) {
             }
         }
         return msg;

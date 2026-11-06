@@ -159,11 +159,11 @@ class DefaultLoggerTest {
         LoggerManager.get().setLogSink(sink);
         DefaultLogger log = new DefaultLogger("test.logger");
 
-        log.atInfo().log("hello {} and {}", "world", 42);
+        log.atInfo().log("hello {0} and {1}", "world", 42);
 
         assertEquals(1, sink.events.size());
         LogEvent e = sink.events.get(0);
-        assertEquals("hello {} and {}", e.messageTemplate());
+        assertEquals("hello {0} and {1}", e.messageTemplate());
         assertEquals(2, e.messageArgs().size());
         assertEquals("world", e.messageArgs().get(0));
         assertEquals(42, e.messageArgs().get(1));
@@ -176,8 +176,8 @@ class DefaultLoggerTest {
         LoggerManager.get().setLogSink(sink);
         DefaultLogger log = new DefaultLogger("test.logger");
 
-        // null arg is valid SLF4J usage — must not throw at log site
-        log.atInfo().log("value is {}", (Object) null);
+        // null arg is valid — must not throw at log site
+        log.atInfo().log("value is {0}", (Object) null);
 
         assertEquals(1, sink.events.size());
         LogEvent e = sink.events.get(0);

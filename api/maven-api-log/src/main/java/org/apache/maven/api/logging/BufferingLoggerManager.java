@@ -18,6 +18,7 @@
  */
 package org.apache.maven.api.logging;
 
+import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -249,29 +250,34 @@ final class BufferingLoggerManager implements LoggerManager {
 
         @Override
         public void log(String format, Object arg) {
-            dispatch(formatMessage(format, arg));
+            dispatch(format, new Object[] {arg});
         }
 
         @Override
         public void log(String format, Object arg1, Object arg2) {
-            dispatch(formatMessage(format, arg1, arg2));
+            dispatch(format, new Object[] {arg1, arg2});
         }
 
         @Override
         public void log(String format, Object... args) {
-            dispatch(formatMessage(format, args));
+            dispatch(format, args);
         }
 
         @Override
         public void log(Supplier<String> messageSupplier) {
-            dispatch(messageSupplier.get());
+            dispatch(messageSupplier.get(), null);
         }
 
         private void dispatch(String message) {
+            dispatch(message, null);
+        }
+
+        private void dispatch(String template, Object[] args) {
             LoggerManager mgr = LoggerManager.get();
             LogSink sink = mgr.getLogSink();
             if (sink != null) {
                 long seq = mgr instanceof BufferingLoggerManager b ? b.nextSequence() : -1;
+                String message = formatMessage(template, args);
                 sink.accept(new SimpleLogEvent(
                         Instant.now(),
                         level,
@@ -284,21 +290,19 @@ final class BufferingLoggerManager implements LoggerManager {
             }
         }
 
-        static String formatMessage(String template, Object... args) {
+        static String formatMessage(String template, Object[] args) {
+            if (template == null) {
+                return "";
+            }
             if (args == null || args.length == 0) {
                 return template;
             }
-            StringBuilder sb = new StringBuilder(template.length() + 32);
-            int argIdx = 0;
-            int start = 0;
-            int idx;
-            while ((idx = template.indexOf("{}", start)) >= 0 && argIdx < args.length) {
-                sb.append(template, start, idx);
-                sb.append(args[argIdx++]);
-                start = idx + 2;
+            try {
+                return MessageFormat.format(template, args);
+            } catch (IllegalArgumentException e) {
+                // Malformed MessageFormat pattern — return template as-is
+                return template;
             }
-            sb.append(template, start, template.length());
-            return sb.toString();
         }
     }
 
