@@ -25,6 +25,7 @@ import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
@@ -166,7 +167,6 @@ class MavenCliLoggingTest {
     private void cachesOutputAfterTerminalInstallation(String color) throws Exception {
         CountDownLatch buildingTerminal = new CountDownLatch(1);
         CountDownLatch releaseTerminal = new CountDownLatch(1);
-        CountDownLatch awaitingTerminalOrLoggingFinished = new CountDownLatch(1);
         ByteArrayOutputStream earlyOutput = new ByteArrayOutputStream();
         ByteArrayOutputStream terminalOutput = new ByteArrayOutputStream();
         Thread loggingThread = null;
@@ -177,22 +177,15 @@ class MavenCliLoggingTest {
             System.setOut(earlyStream);
             activateSlf4j();
 
-            FastTerminal terminal =
-                    new FastTerminal(
-                            () -> {
-                                buildingTerminal.countDown();
-                                if (!releaseTerminal.await(10, SECONDS)) {
-                                    throw new IllegalStateException("Terminal installation was not released");
-                                }
-                                return mock(TerminalExt.class, RETURNS_DEEP_STUBS);
-                            },
-                            installed -> System.setOut(terminalStream)) {
-                        @Override
-                        public TerminalExt getTerminal() {
-                            awaitingTerminalOrLoggingFinished.countDown();
-                            return super.getTerminal();
+            FastTerminal terminal = new FastTerminal(
+                    () -> {
+                        buildingTerminal.countDown();
+                        if (!releaseTerminal.await(10, SECONDS)) {
+                            throw new IllegalStateException("Terminal installation was not released");
                         }
-                    };
+                        return mock(TerminalExt.class, RETURNS_DEEP_STUBS);
+                    },
+                    installed -> System.setOut(terminalStream));
             // Inject the FastTerminal directly into MessageUtils.terminal before starting the
             // build thread, to avoid calling systemInstall(Terminal) which also creates a LineReader
             // from the terminal — that would call FastTerminal.getTerminal() and block.
@@ -206,20 +199,22 @@ class MavenCliLoggingTest {
             cli.cli(request);
             cli.properties(request);
             FutureTask<Void> logging = new FutureTask<>(() -> {
-                try {
-                    cli.logging(request);
-                    return null;
-                } finally {
-                    awaitingTerminalOrLoggingFinished.countDown();
-                }
+                cli.logging(request);
+                return null;
             });
             loggingThread = new Thread(logging, "logging-initialization-test");
             loggingThread.setDaemon(true);
             loggingThread.start();
-            assertTrue(awaitingTerminalOrLoggingFinished.await(10, SECONDS));
+
+            // Wait until the logging thread is blocked on awaitTerminalInitialization() →
+            // FastTerminal.getTerminal() → CompletableFuture.get(). At this point,
+            // config.init() has NOT yet run (it comes after awaitTerminalInitialization()).
+            awaitThreadState(loggingThread, Thread.State.WAITING, 10_000);
+
+            // Release the terminal — the consumer sets System.out=terminalStream.
+            // awaitTerminalInitialization() returns, then config.init() captures terminalStream.
             releaseTerminal.countDown();
             logging.get(10, SECONDS);
-            terminal.getTerminal();
 
             LoggerFactory.getLogger(MavenCliLoggingTest.class).warn("terminal-output-marker");
             assertTrue(terminalOutput.toString(UTF_8.name()).contains("terminal-output-marker"));
@@ -229,6 +224,28 @@ class MavenCliLoggingTest {
             if (loggingThread != null) {
                 loggingThread.join(10000);
             }
+        }
+    }
+
+    /**
+     * Waits until the given thread enters the expected state or the timeout expires.
+     * Used to detect when a thread is blocked on {@code CompletableFuture.get()} inside
+     * {@code FastTerminal.getTerminal()}.  This is more reliable than a fixed sleep and
+     * avoids depending on platform-specific scheduling behaviour.
+     *
+     * @param thread    the thread to monitor
+     * @param expected  the expected thread state (typically {@link Thread.State#WAITING})
+     * @param timeoutMs maximum time to wait in milliseconds
+     */
+    private static void awaitThreadState(Thread thread, Thread.State expected, long timeoutMs)
+            throws InterruptedException {
+        long deadline = System.nanoTime() + TimeUnit.MILLISECONDS.toNanos(timeoutMs);
+        while (thread.getState() != expected) {
+            if (System.nanoTime() > deadline) {
+                throw new AssertionError("Thread " + thread.getName() + " did not reach state " + expected + " within "
+                        + timeoutMs + "ms; actual state: " + thread.getState());
+            }
+            Thread.sleep(10);
         }
     }
 
