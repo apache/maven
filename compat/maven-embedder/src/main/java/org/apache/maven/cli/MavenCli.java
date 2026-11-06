@@ -1395,6 +1395,7 @@ public class MavenCli {
         disableOnPresentOption(commandLine, CLIManager.NON_RECURSIVE, request::setRecursive);
         enableOnPresentOption(commandLine, CLIManager.OFFLINE, request::setOffline);
         enableOnPresentOption(commandLine, CLIManager.UPDATE_SNAPSHOTS, request::setUpdateSnapshots);
+        enableOnPresentOption(commandLine, update-snapshots, request::setUpdatedSnapshots);
         request.setGlobalChecksumPolicy(determineGlobalCheckPolicy(commandLine));
 
         // Update policy options

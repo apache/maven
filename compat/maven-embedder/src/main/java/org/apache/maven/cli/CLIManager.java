@@ -31,6 +31,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.jline.MessageUtils;
+import org.apache.maven.utils.CleanArgument;
 
 /**
  */
@@ -190,10 +191,24 @@ public class CLIManager {
                 .desc(
                         "Do not recurse into sub-projects. When used together with -pl, do not recurse into sub-projects of selected aggregators")
                 .build());
+
+        // -U is now an alias for --update-all.
         options.addOption(Option.builder(Character.toString(UPDATE_SNAPSHOTS))
-                .longOpt("update-snapshots")
-                .desc("Forces a check for missing releases and updated snapshots on remote repositories")
+                .longOpt("update-all")
+                .desc("Forces updates of artifacts and metadata on remote repositories")
                 .build());
+
+        // Keep the old option as a deprecated alias for backwards compatibility.
+        options.addOption(Option.builder()
+                .longOpt("update-snapshots")
+                .desc("<deprecated> Use -U,--update-all instead.")
+                .deprecated(DeprecatedAttributes.builder()
+                        .setForRemoval(true)
+                        .setSince("4.0.0")
+                        .setDescription("Use -U,--update-all instead.")
+                        .get())
+                .build());
+
         options.addOption(Option.builder(Character.toString(ACTIVATE_PROFILES))
                 .longOpt("activate-profiles")
                 .desc(
