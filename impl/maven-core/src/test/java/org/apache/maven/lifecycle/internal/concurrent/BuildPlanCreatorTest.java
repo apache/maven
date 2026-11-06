@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle.internal.concurrent;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -465,5 +466,160 @@ class BuildPlanCreatorTest {
             phase.predecessors.forEach(
                     pred -> assertTrue(plan.step(pred.project, pred.name).isPresent(), "Phase not present: " + pred));
         });
+    }
+
+    /**
+     * Verifies that when the requested phase is before "compile" (e.g. "initialize"),
+     * the new skip-clearing logic forces the reactor plugin project and all its
+     * predecessors to reach READY so that the plugin is available when needed.
+     */
+    @Test
+    void testReactorPluginPreCompilePhase() {
+        MavenProject p1 = new MavenProject();
+        p1.setGroupId("g");
+        p1.setArtifactId("p1");
+        p1.setVersion("1.0");
+        p1.setCollectedProjects(List.of());
+        Plugin plugin = new Plugin();
+        plugin.setGroupId("g");
+        plugin.setArtifactId("p2");
+        plugin.setVersion("1.0");
+        p1.getBuild().addPlugin(plugin);
+
+        MavenProject p2 = new MavenProject();
+        p2.setGroupId("g");
+        p2.setArtifactId("p2");
+        p2.setVersion("1.0");
+        p2.setCollectedProjects(List.of());
+
+        Map<MavenProject, List<MavenProject>> projects = new HashMap<>();
+        projects.put(p2, Collections.emptyList());
+        projects.put(p1, Collections.singletonList(p2));
+
+        // Use a phase before "compile" — this is the path that triggers the skip-clearing logic.
+        // Without the fix, "ready" (and compile/package/…) would be skipped for p2 because
+        // "initialize" ends well before "ready" in the lifecycle.
+        DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
+        BuildPlanExecutor.BuildContext context =
+                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles).new BuildContext();
+
+        BuildPlan plan = context.calculateLifecycleMappings(projects, "initialize");
+
+        // Baseline: without the fix, "ready" on the plugin project IS skipped (initialize < ready).
+        assertTrue(
+                plan.requiredStep(p2, "ready").skip.get(),
+                "Baseline: ready step of plugin project should be skipped before applyReactorPluginConstraints");
+
+        // Simulate what buildInitialPlan does: add PLAN steps for each project so that
+        // applyReactorPluginConstraints can wire the PLAN→READY ordering constraint.
+        for (MavenProject project : projects.keySet()) {
+            BuildStep planStep = new BuildStep(BuildStep.PLAN, project, null);
+            planStep.status.set(BuildStep.PLANNING);
+            plan.addStep(project, BuildStep.PLAN, planStep);
+        }
+
+        // Apply the reactor-plugin constraints (the fix under test).
+        context.applyReactorPluginConstraints(plan);
+
+        // After the fix: the READY step of the plugin project (p2) must NOT be skipped.
+        assertFalse(
+                plan.requiredStep(p2, "ready").skip.get(),
+                "READY step of the reactor plugin project must not be skipped after applyReactorPluginConstraints");
+
+        // All predecessors of "ready" within p2 must also not be skipped — they are needed
+        // to reach READY (resources, compile, package, …).
+        plan.requiredStep(p2, "ready")
+                .allPredecessors()
+                .filter(s -> s.project == p2)
+                .forEach(s -> assertFalse(
+                        s.skip.get(), "Predecessor step " + s.name + " of plugin project must not be skipped"));
+    }
+
+    /**
+     * Verifies that when the requested phase is before "compile" (e.g. "initialize") and the
+     * reactor plugin project itself has a reactor library dependency, the skip-clearing logic
+     * also un-skips the library project's steps that are needed to compile the plugin.
+     * <p>
+     * Scenario: library (p3) → plugin (p2) → consumer (p1). Without the fix the library's
+     * compile steps remain skipped, causing the plugin's compilation to fail at READY.
+     */
+    @Test
+    void testReactorPluginWithLibraryDependencyPreCompilePhase() {
+        // p3: reactor library (no special plugins)
+        MavenProject p3 = new MavenProject();
+        p3.setGroupId("g");
+        p3.setArtifactId("p3");
+        p3.setVersion("1.0");
+        p3.setCollectedProjects(List.of());
+
+        // p2: reactor plugin that depends on the library p3
+        MavenProject p2 = new MavenProject();
+        p2.setGroupId("g");
+        p2.setArtifactId("p2");
+        p2.setVersion("1.0");
+        p2.setCollectedProjects(List.of());
+        // p2 declares a compile-scope dependency on p3 (the library) — this is what
+        // filterByScope checks when creating cross-project DEPENDENCIES ordering edges.
+        p2.getDependencies().add(createDependency("g", "p3", "compile"));
+
+        // p1: consumer that uses the reactor plugin p2
+        MavenProject p1 = new MavenProject();
+        p1.setGroupId("g");
+        p1.setArtifactId("p1");
+        p1.setVersion("1.0");
+        p1.setCollectedProjects(List.of());
+        Plugin plugin = new Plugin();
+        plugin.setGroupId("g");
+        plugin.setArtifactId("p2");
+        plugin.setVersion("1.0");
+        p1.getBuild().addPlugin(plugin);
+
+        // Dependency order: p3 (library) must be built before p2 (plugin), p2 before p1 (consumer)
+        Map<MavenProject, List<MavenProject>> projects = new LinkedHashMap<>();
+        projects.put(p3, Collections.emptyList());
+        projects.put(p2, Collections.singletonList(p3));
+        projects.put(p1, Collections.singletonList(p2));
+
+        DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
+        BuildPlanExecutor.BuildContext context =
+                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles).new BuildContext();
+
+        BuildPlan plan = context.calculateLifecycleMappings(projects, "initialize");
+
+        // Baseline: "ready" on both the plugin and the library must be skipped before the fix.
+        assertTrue(
+                plan.requiredStep(p2, "ready").skip.get(),
+                "Baseline: ready step of plugin project (p2) should be skipped before applyReactorPluginConstraints");
+        assertTrue(
+                plan.requiredStep(p3, "ready").skip.get(),
+                "Baseline: ready step of library project (p3) should be skipped before applyReactorPluginConstraints");
+
+        // Add PLAN steps as buildInitialPlan would.
+        for (MavenProject project : projects.keySet()) {
+            BuildStep planStep = new BuildStep(BuildStep.PLAN, project, null);
+            planStep.status.set(BuildStep.PLANNING);
+            plan.addStep(project, BuildStep.PLAN, planStep);
+        }
+
+        context.applyReactorPluginConstraints(plan);
+
+        // After the fix: the plugin project (p2) must be un-skipped all the way to READY.
+        assertFalse(
+                plan.requiredStep(p2, "ready").skip.get(),
+                "READY step of the reactor plugin project (p2) must not be skipped");
+
+        // Also: the library project (p3) that p2 depends on must be un-skipped so that p2
+        // can compile against it. This was the gap addressed by removing the project filter.
+        assertFalse(
+                plan.requiredStep(p3, "ready").skip.get(),
+                "READY step of the reactor library project (p3) must not be skipped — "
+                        + "the plugin (p2) compiles against it and cannot reach READY otherwise");
+
+        // All predecessors of p2's "ready" must also be un-skipped.
+        plan.requiredStep(p2, "ready")
+                .allPredecessors()
+                .filter(s -> s.project == p2)
+                .forEach(s -> assertFalse(
+                        s.skip.get(), "Predecessor step " + s.name + " of plugin project (p2) must not be skipped"));
     }
 }
