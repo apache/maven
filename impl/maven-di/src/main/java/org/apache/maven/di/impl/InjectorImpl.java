@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -97,7 +98,10 @@ public class InjectorImpl implements Injector {
             while (enumeration.hasMoreElements()) {
                 URL url = enumeration.nextElement();
                 if (loadedUrls.add(url.toExternalForm())) {
-                    try (InputStream is = url.openStream();
+                    URLConnection connection = url.openConnection();
+                    // Uncached, so that closing the stream closes the jar (JDK-8239054)
+                    connection.setUseCaches(false);
+                    try (InputStream is = connection.getInputStream();
                             BufferedReader reader =
                                     new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
                         for (String line : reader.lines()
@@ -287,16 +291,15 @@ public class InjectorImpl implements Injector {
             Key<Object> v = key.getTypeParameter(1);
             Set<Binding<Object>> res2 = getBindings(v);
             if (k.getRawType() == String.class && res2 != null) {
-                Map<String, Supplier<Object>> map = res2.stream()
+                Map<String, Binding<Object>> namedBindings = res2.stream()
                         .filter(b -> b.getOriginalKey() == null
                                 || b.getOriginalKey().getQualifier() == null
                                 || b.getOriginalKey().getQualifier() instanceof String)
-                        .collect(Collectors.toMap(
-                                b -> (String)
-                                        (b.getOriginalKey() != null
-                                                ? b.getOriginalKey().getQualifier()
-                                                : null),
-                                this::compile));
+                        .collect(Collectors.toMap(InjectorImpl::bindingName, b -> b, (first, second) -> {
+                            throw duplicateBindings(v, first, second);
+                        }));
+                Map<String, Supplier<Object>> map = namedBindings.entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> compile(e.getValue())));
                 //noinspection unchecked
                 return () -> (Q) map(map, Supplier::get);
             }
@@ -318,6 +321,22 @@ public class InjectorImpl implements Injector {
         Key<?> key = binding.getOriginalKey();
         Object qualifier = key != null ? key.getQualifier() : null;
         return qualifier == null || "".equals(qualifier);
+    }
+
+    private static String bindingName(Binding<?> binding) {
+        return binding.getOriginalKey() != null
+                ? (String) binding.getOriginalKey().getQualifier()
+                : null;
+    }
+
+    private static DIException duplicateBindings(Key<?> valueKey, Binding<?> first, Binding<?> second) {
+        Object qualifier =
+                first.getOriginalKey() != null ? first.getOriginalKey().getQualifier() : null;
+        Key<?> duplicateKey = qualifier != null ? Key.ofType(valueKey.getType(), qualifier) : valueKey;
+        return new DIException("Duplicate bindings for key " + duplicateKey.getDisplayString() + ":\n"
+                + " - " + first
+                + "\n - " + second
+                + "\nRemove one of the conflicting bindings or use distinct @Named qualifiers.");
     }
 
     @SuppressWarnings("unchecked")

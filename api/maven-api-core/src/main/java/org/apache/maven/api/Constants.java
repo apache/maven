@@ -201,7 +201,7 @@ public final class Constants {
     /**
      * When set to {@code "true"}, settings parsing errors are fatal instead of warnings.
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Config(defaultValue = "false")
     public static final String MAVEN_SETTINGS_STRICT_PARSING = "maven.settings.strictParsing";
@@ -505,7 +505,7 @@ public final class Constants {
      * When set to {@code false}, automatic discovery is disabled regardless of whether
      * {@code <subprojects>} or {@code <modules>} is declared.
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Config(type = "java.lang.Boolean", defaultValue = "true")
     public static final String MAVEN_PROJECT_DISCOVER_SUBPROJECTS = "maven.project.discoverSubprojects";
@@ -535,7 +535,7 @@ public final class Constants {
      * like parent POMs, allowing dependency management to be inherited by consumers.</li>
      * </ul>
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Config(type = "java.lang.Boolean", defaultValue = "false")
     public static final String MAVEN_CONSUMER_POM_FLATTEN = "maven.consumer.pom.flatten";
@@ -551,7 +551,7 @@ public final class Constants {
      * versions and rely on the original managed dependencies for alignment.</li>
      * </ul>
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Config(type = "java.lang.Boolean", defaultValue = "true")
     public static final String MAVEN_CONSUMER_POM_REMOVE_UNUSED_MANAGED_DEPENDENCIES =
@@ -569,7 +569,7 @@ public final class Constants {
      * published in the consumer POM, restoring the previous behavior.</li>
      * </ul>
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Config(type = "java.lang.Boolean", defaultValue = "true")
     public static final String MAVEN_CONSUMER_POM_SANITIZE_REPOSITORIES = "maven.consumer.pom.sanitizeRepositories";
@@ -614,7 +614,7 @@ public final class Constants {
      * <br/>
      * Default: <code>"true"</code>.
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Config(type = "java.lang.Boolean", defaultValue = "true")
     public static final String MAVEN_DEPLOY_BUILD_POM = "maven.deploy.buildPom";
@@ -779,7 +779,7 @@ public final class Constants {
     /**
      * User property key for cache configuration.
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     public static final String MAVEN_CACHE_CONFIG_PROPERTY = "maven.cache.config";
 
@@ -789,7 +789,7 @@ public final class Constants {
      * request type breakdowns, and retention policy effectiveness will be displayed
      * when the build completes.
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Config(type = "java.lang.Boolean", defaultValue = "false")
     public static final String MAVEN_CACHE_STATS = "maven.cache.stats";
@@ -799,7 +799,7 @@ public final class Constants {
      * This enables fine-grained analysis of cache misses caused by key vs value evictions.
      * Supported values are {@code HARD}, {@code SOFT} and {@code WEAK}.
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     public static final String MAVEN_CACHE_KEY_REFS = "maven.cache.keyValueRefs";
 
@@ -808,7 +808,7 @@ public final class Constants {
      * This enables fine-grained analysis of cache misses caused by key vs value evictions.
      * Supported values are {@code HARD}, {@code SOFT} and {@code WEAK}.
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     public static final String MAVEN_CACHE_VALUE_REFS = "maven.cache.keyValueRefs";
 
@@ -817,7 +817,7 @@ public final class Constants {
      * Value should be a comma-separated list of simple class names (e.g., "Dependency,Plugin,Build").
      * Default is "Dependency" for backward compatibility.
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Config(defaultValue = "Dependency")
     public static final String MAVEN_MODEL_PROCESSOR_POOLED_TYPES = "maven.model.processor.pooledTypes";
@@ -827,7 +827,7 @@ public final class Constants {
      * Valid values are: "SOFT", "HARD", "WEAK", "NONE".
      * Default is "HARD" for optimal performance.
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Config(defaultValue = "HARD")
     public static final String MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE = "maven.model.processor.referenceType";
@@ -837,7 +837,7 @@ public final class Constants {
      * Format: maven.model.processor.referenceType.{ClassName} = {ReferenceType}
      * Example: maven.model.processor.referenceType.Dependency = SOFT
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     public static final String MAVEN_MODEL_PROCESSOR_REFERENCE_TYPE_PREFIX = "maven.model.processor.referenceType.";
 
@@ -853,7 +853,7 @@ public final class Constants {
      * </ul>
      * Dependency management imported from the local reactor is not affected by this property.
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Config(type = "java.lang.Boolean", defaultValue = "false")
     public static final String MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE =
@@ -871,7 +871,7 @@ public final class Constants {
      * previous Maven versions.</li>
      * </ul>
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Config(type = "java.lang.Boolean", defaultValue = "false")
     public static final String MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL = "maven.model.dependencyInterpolation.full";
@@ -883,10 +883,20 @@ public final class Constants {
      * This is a JVM system property only (read via {@link Boolean#getBoolean(String)});
      * it is not resolved through Maven's property mechanism (pom.xml, profiles, settings.xml).
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Config(type = "java.lang.Boolean", defaultValue = "false", source = Config.Source.SYSTEM_PROPERTIES)
     public static final String MAVEN_TEMPFILE_KEEP = "maven.tempfile.keep";
+
+    /**
+     * Comma-separated list of mojo execution filter predicates. Matching executions are skipped at runtime.
+     * Supported forms: {@code *}, {@code :A}, {@code G:A}, {@code G:A:v:g[@e]}, {@code P}, {@code P:v:g},
+     * {@code P:v:g@e}, {@code phase(name)}.
+     *
+     * @since 4.2.0
+     */
+    @Config
+    public static final String MAVEN_LIFECYCLE_FILTER = "maven.lifecycle.filter";
 
     /**
      * System property to disable the {@code site} lifecycle.

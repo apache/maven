@@ -94,7 +94,7 @@ public interface Packaging extends ExtensibleEnum {
      * {@return whether this packaging produces a main artifact}.
      * Packaging types such as {@code pom} or {@code bom} do not produce a main artifact.
      *
-     * @since 4.1.0
+     * @since 4.2.0
      */
     default boolean producesMainArtifact() {
         return true;

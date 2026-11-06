@@ -33,7 +33,7 @@ import org.apache.maven.api.annotations.Nonnull;
  *
  * @see RepositoryEvent
  * @see RepositoryEventType
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Consumer

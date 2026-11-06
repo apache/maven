@@ -23,6 +23,6 @@
  * <p>This package contains the implementation classes for the POM validation tool,
  * which reads and validates POM files without building them.</p>
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 package org.apache.maven.cling.invoker.mvnval;

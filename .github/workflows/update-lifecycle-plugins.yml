@@ -46,6 +46,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
           cache: maven
+          cache-jdk: false
 
       - name: Update lifecycle plugin versions
         run: |

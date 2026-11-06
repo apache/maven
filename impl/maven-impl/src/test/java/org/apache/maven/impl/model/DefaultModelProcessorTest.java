@@ -35,9 +35,11 @@ import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.api.spi.ModelParserException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -79,12 +81,10 @@ class DefaultModelProcessorTest {
         DefaultModelProcessor processor =
                 new DefaultModelProcessor(xmlFactory, Map.of("yaml", yamlParser, "toml", tomlParser));
 
-        // Create request
-        XmlReaderRequest request =
-                XmlReaderRequest.builder().path(pomFile).strict(true).build();
-
         // Execute and verify
-        IOException exception = assertThrows(IOException.class, () -> processor.read(request));
+        ModelParserException exception = assertThrows(
+                ModelParserException.class,
+                () -> processor.read(Sources.fromPath(pomFile), Map.of(ModelParser.STRICT, true)));
 
         String message = exception.getMessage();
 
@@ -100,8 +100,9 @@ class DefaultModelProcessorTest {
         assertTrue(message.contains("default) XML reader also failed"), "Message should mention XML reader failure");
         assertTrue(message.contains("XML parsing failed"), "Message should contain XML error message");
 
-        // Verify suppressed exceptions are still attached
-        assertEquals(3, exception.getSuppressed().length, "Should have 3 suppressed exceptions");
+        // Verify suppressed exceptions are still attached (yaml + toml parsers;
+        // the XML fallback exception is the cause, not a suppressed exception)
+        assertEquals(2, exception.getSuppressed().length, "Should have 2 suppressed exceptions (one per SPI parser)");
     }
 
     @Test
@@ -118,10 +119,9 @@ class DefaultModelProcessorTest {
 
         DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, Map.of("json", jsonParser));
 
-        XmlReaderRequest request =
-                XmlReaderRequest.builder().path(pomFile).strict(true).build();
-
-        IOException exception = assertThrows(IOException.class, () -> processor.read(request));
+        ModelParserException exception = assertThrows(
+                ModelParserException.class,
+                () -> processor.read(Sources.fromPath(pomFile), Map.of(ModelParser.STRICT, true)));
 
         String message = exception.getMessage();
         assertTrue(message.contains("Tried 1 parser:"), "Message should mention 1 parser (singular)");
@@ -144,10 +144,7 @@ class DefaultModelProcessorTest {
 
         DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, Map.of("yaml", yamlParser));
 
-        XmlReaderRequest request =
-                XmlReaderRequest.builder().path(pomFile).strict(true).build();
-
-        Model result = processor.read(request);
+        Model result = processor.read(Sources.fromPath(pomFile), Map.of(ModelParser.STRICT, true));
         assertNotNull(result);
         verify(xmlFactory, never()).read(any(XmlReaderRequest.class));
     }
@@ -189,12 +186,68 @@ class DefaultModelProcessorTest {
         Path located = processor.locateExistingPom(projectDir);
         assertEquals(projectDir, located);
 
-        Model result = processor.read(
-                XmlReaderRequest.builder().path(located).strict(true).build());
+        Model result = processor.read(Sources.fromPath(located), Map.of(ModelParser.STRICT, true));
 
         assertEquals(1, parseCalls.get(), "ModelParser#parse should be called for the located source");
         assertEquals("a", result.getArtifactId());
         assertEquals(located, result.getPomFile());
         verify(xmlFactory, never()).read(any(XmlReaderRequest.class));
+    }
+
+    @Test
+    void testDeprecatedReadDelegatesToNewRead() throws Exception {
+        Path pomFile = tempDir.resolve("pom.xml");
+        Files.writeString(
+                pomFile,
+                "<project><modelVersion>4.0.0</modelVersion><groupId>g</groupId><artifactId>a</artifactId><version>1</version></project>");
+
+        Model mockModel = Model.newBuilder()
+                .modelVersion("4.0.0")
+                .groupId("g")
+                .artifactId("a")
+                .version("1")
+                .build();
+        ModelXmlFactory xmlFactory = mock(ModelXmlFactory.class);
+        when(xmlFactory.read(any(XmlReaderRequest.class))).thenReturn(mockModel);
+
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, Map.of());
+        XmlReaderRequest request =
+                XmlReaderRequest.builder().path(pomFile).strict(true).build();
+
+        Model result = processor.read(request);
+        assertNotNull(result);
+        assertEquals("a", result.getArtifactId());
+    }
+
+    @Test
+    void testDeprecatedReadPassesTransformer() throws Exception {
+        Path pomFile = tempDir.resolve("pom.xml");
+        Files.writeString(
+                pomFile,
+                "<project><modelVersion>4.0.0</modelVersion><groupId>g</groupId><artifactId>a</artifactId><version>1</version></project>");
+
+        Model mockModel = Model.newBuilder()
+                .modelVersion("4.0.0")
+                .groupId("g")
+                .artifactId("a")
+                .version("1")
+                .build();
+        ModelXmlFactory xmlFactory = mock(ModelXmlFactory.class);
+        when(xmlFactory.read(any(XmlReaderRequest.class))).thenReturn(mockModel);
+
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, Map.of());
+        XmlReaderRequest.Transformer transformer = mock(XmlReaderRequest.Transformer.class);
+        XmlReaderRequest request = XmlReaderRequest.builder()
+                .path(pomFile)
+                .strict(true)
+                .transformer(transformer)
+                .build();
+
+        Model result = processor.read(request);
+        assertNotNull(result);
+
+        ArgumentCaptor<XmlReaderRequest> captor = ArgumentCaptor.forClass(XmlReaderRequest.class);
+        verify(xmlFactory).read(captor.capture());
+        assertSame(transformer, captor.getValue().getTransformer());
     }
 }
