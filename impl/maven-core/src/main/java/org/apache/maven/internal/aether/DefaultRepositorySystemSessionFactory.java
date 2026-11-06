@@ -41,6 +41,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.resolver.MavenSessionBuilderSupplier;
+import org.apache.maven.impl.resolver.OriginBoundAuthenticationSelector;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.model.ModelBase;
 import org.apache.maven.resolver.RepositorySystemSessionFactory;
@@ -120,7 +121,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
      *
      * @since 4.0.0
      */
-    public static final String MAVEN_REPOSITORY_CREDENTIAL_SCOPE = "maven.repository.credentialScope";
+    public static final String MAVEN_REPOSITORY_CREDENTIAL_SCOPE = OriginBoundAuthenticationSelector.CREDENTIAL_SCOPE;
 
     private static final String WAGON_TRANSPORTER_PRIORITY_KEY = "aether.priority.WagonTransporterFactory";
 
@@ -447,8 +448,10 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
                     mergedProps.get(Constants.MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY));
         }
 
+        // extenders get the origin-bound selector too, so credentials they inject (for example into the legacy
+        // ArtifactRepository objects of the request) are subject to the same credential scope as resolver's
         for (RepositorySystemSessionExtender extender : sessionExtenders.values()) {
-            extender.extend(request, configProps, mirrorSelector, proxySelector, authSelector);
+            extender.extend(request, configProps, mirrorSelector, proxySelector, effectiveAuthSelector);
         }
 
         // at this point we have "config" with pure MANDATORY resolver config, so resolver final config properties are

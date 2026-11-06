@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.artifact.InvalidRepositoryException;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -464,6 +465,31 @@ public class DefaultRepositorySystemSessionFactoryTest {
         AuthenticationSelector selector = authenticationSelector(request);
 
         assertNull(selector.getAuthentication(repository("internal", "https://repo.example.org/releases/")));
+    }
+
+    @Test
+    void sessionExtendersReceiveOriginBoundAuthenticationSelector() throws InvalidRepositoryException {
+        MavenExecutionRequest request =
+                requestWithServer(serverWithRepositoryOrigins("internal", "https://repo.example.org"));
+        AtomicReference<AuthenticationSelector> captured = new AtomicReference<>();
+        RepositorySystemSessionExtender extender =
+                (mavenExecutionRequest, configProperties, mirrorSelector, proxySelector, authenticationSelector) ->
+                        captured.set(authenticationSelector);
+        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Map.of("capture", extender),
+                versionFilterBuilder);
+
+        systemSessionFactory.newRepositorySession(request);
+
+        AuthenticationSelector selector = captured.get();
+        assertNotNull(selector);
+        assertNotNull(selector.getAuthentication(repository("internal", "https://repo.example.org/releases/")));
+        assertNull(selector.getAuthentication(repository("internal", "https://evil.example.org/releases/")));
     }
 
     private static Server serverWithRepositoryOrigins(String id, String... repositoryOrigins) {
