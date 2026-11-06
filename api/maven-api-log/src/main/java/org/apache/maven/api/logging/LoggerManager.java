@@ -63,28 +63,38 @@ public interface LoggerManager {
 
     /**
      * Returns the active log sink, or {@code null} if none is installed.
+     *
+     * @since 4.2.0
      */
     @Nullable
     LogSink getLogSink();
 
     /**
      * Installs or removes the active log sink.
+     *
+     * @since 4.2.0
      */
     void setLogSink(@Nullable LogSink sink);
 
     /**
      * Returns whether logging at {@code level} is enabled for the named logger.
+     *
+     * @since 4.2.0
      */
     boolean isLevelEnabled(@Nonnull String loggerName, @Nonnull LogLevel level);
 
     /**
      * Sets the root logger level (typically from {@code -X}, {@code -q} CLI flags).
      * The new level takes effect immediately.
+     *
+     * @since 4.2.0
      */
     void setRootLoggerLevel(@Nonnull LogLevel level);
 
     /**
      * Reloads level configuration and resets severity tracking state.
+     *
+     * @since 4.2.0
      */
     void reconfigure();
 
@@ -94,6 +104,8 @@ public interface LoggerManager {
      * <p>
      * Used by {@code --fail-on-severity}: the CLI stores the threshold
      * and checks at build end.
+     *
+     * @since 4.2.0
      */
     boolean hasReached(@Nonnull LogLevel level);
 
@@ -130,6 +142,7 @@ public interface LoggerManager {
      * set via {@link #set(LoggerManager)}.
      *
      * @return the global manager, never {@code null}
+     * @since 4.2.0
      */
     @Nonnull
     static LoggerManager get() {
@@ -151,6 +164,7 @@ public interface LoggerManager {
      * {@link LogSink}.
      *
      * @param manager the manager to install, or {@code null} to clear
+     * @since 4.2.0
      */
     static void set(LoggerManager manager) {
         LoggerManager old = Holder.instance;
