@@ -151,7 +151,9 @@ public final class Constants {
      * Maven installation extensions.
      *
      * @since 4.0.0
+     * @deprecated Use the {@code <extensions>} section in the installation {@code settings.xml} instead.
      */
+    @Deprecated
     @Config(defaultValue = "${maven.installation.conf}/extensions.xml")
     public static final String MAVEN_INSTALLATION_EXTENSIONS = "maven.installation.extensions";
 
@@ -159,7 +161,9 @@ public final class Constants {
      * Maven user extensions.
      *
      * @since 4.0.0
+     * @deprecated Use the {@code <extensions>} section in the user {@code settings.xml} instead.
      */
+    @Deprecated
     @Config(defaultValue = "${maven.user.conf}/extensions.xml")
     public static final String MAVEN_USER_EXTENSIONS = "maven.user.extensions";
 
@@ -167,7 +171,9 @@ public final class Constants {
      * Maven project extensions.
      *
      * @since 4.0.0
+     * @deprecated Use the {@code <extensions>} section in the project {@code .mvn/settings.xml} instead.
      */
+    @Deprecated
     @Config(defaultValue = "${maven.project.conf}/extensions.xml")
     public static final String MAVEN_PROJECT_EXTENSIONS = "maven.project.extensions";
 

@@ -30,6 +30,7 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.cisupport.CIInfo;
+import org.apache.maven.api.settings.PhaseInjection;
 
 import static java.util.Objects.requireNonNull;
 
@@ -44,6 +45,8 @@ public class BaseInvokerRequest implements InvokerRequest {
     private final Path topDirectory;
     private final Path rootDirectory;
     private final List<CoreExtensions> coreExtensions;
+    private final Map<String, List<String>> aliases;
+    private final List<PhaseInjection> phases;
     private final CIInfo ciInfo;
     private final Options options;
 
@@ -59,6 +62,8 @@ public class BaseInvokerRequest implements InvokerRequest {
             @Nonnull Path topDirectory,
             @Nullable Path rootDirectory,
             @Nullable List<CoreExtensions> coreExtensions,
+            @Nullable Map<String, List<String>> aliases,
+            @Nullable List<PhaseInjection> phases,
             @Nullable CIInfo ciInfo,
             @Nullable Options options) {
         this.parserRequest = requireNonNull(parserRequest);
@@ -72,6 +77,8 @@ public class BaseInvokerRequest implements InvokerRequest {
         this.topDirectory = requireNonNull(topDirectory);
         this.rootDirectory = rootDirectory;
         this.coreExtensions = coreExtensions;
+        this.aliases = aliases;
+        this.phases = phases;
         this.ciInfo = ciInfo;
         this.options = options;
     }
@@ -124,6 +131,16 @@ public class BaseInvokerRequest implements InvokerRequest {
     @Override
     public Optional<List<CoreExtensions>> coreExtensions() {
         return Optional.ofNullable(coreExtensions);
+    }
+
+    @Override
+    public Optional<Map<String, List<String>>> aliases() {
+        return Optional.ofNullable(aliases);
+    }
+
+    @Override
+    public Optional<List<PhaseInjection>> phases() {
+        return Optional.ofNullable(phases);
     }
 
     @Override

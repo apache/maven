@@ -49,6 +49,7 @@ import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.plugin.descriptor.AfterLink;
 import org.apache.maven.api.services.LifecycleRegistry;
 import org.apache.maven.api.services.MavenException;
+import org.apache.maven.api.spi.LifecycleProcessor;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.api.xml.XmlService;
 import org.apache.maven.execution.BuildFailure;
@@ -169,6 +170,8 @@ public class BuildPlanExecutor {
     private final MojoDescriptorCreator mojoDescriptorCreator;
     private final LifecycleRegistry lifecycles;
 
+    private final List<LifecycleProcessor> lifecycleProcessors;
+
     @Inject
     @SuppressWarnings("checkstyle:ParameterNumber")
     public BuildPlanExecutor(
@@ -180,7 +183,8 @@ public class BuildPlanExecutor {
             Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators,
             MavenPluginManager mavenPluginManager,
             MojoDescriptorCreator mojoDescriptorCreator,
-            LifecycleRegistry lifecycles) {
+            LifecycleRegistry lifecycles,
+            List<LifecycleProcessor> lifecycleProcessors) {
         this.mojoExecutor = mojoExecutor;
         this.eventCatapult = eventCatapult;
         this.projectExecutionListener = new CompoundProjectExecutionListener(listeners);
@@ -190,6 +194,22 @@ public class BuildPlanExecutor {
         this.mavenPluginManager = mavenPluginManager;
         this.mojoDescriptorCreator = mojoDescriptorCreator;
         this.lifecycles = lifecycles;
+        this.lifecycleProcessors = lifecycleProcessors != null ? lifecycleProcessors : Collections.emptyList();
+    }
+
+    private Lifecycle applyProcessors(Lifecycle lifecycle) {
+        if (lifecycleProcessors.isEmpty()) {
+            return lifecycle;
+        }
+        Lifecycle processed = lifecycle;
+        for (LifecycleProcessor processor : lifecycleProcessors) {
+            processed = processor.process(processed);
+        }
+        return processed;
+    }
+
+    private Stream<Lifecycle> processedLifecycles() {
+        return lifecycles.stream().map(this::applyProcessors);
     }
 
     public void execute(MavenSession session, ReactorContext reactorContext, List<TaskSegment> taskSegments)
@@ -1059,7 +1079,8 @@ public class BuildPlanExecutor {
                                 pluginDescriptor.getPlugin(), pluginDescriptor.getSource(), e));
                     }
                     if (lifecycleOverlay == null) {
-                        Optional<Lifecycle> lf = lifecycles.lookup(forkedLifecycle);
+                        Optional<Lifecycle> lf =
+                                lifecycles.lookup(forkedLifecycle).map(BuildPlanExecutor.this::applyProcessors);
                         if (lf.isPresent()) {
                             lifecycle = lf.get();
                         } else {
@@ -1074,7 +1095,8 @@ public class BuildPlanExecutor {
                         String phaseName = n.startsWith(BEFORE)
                                 ? n.substring(BEFORE.length())
                                 : n.startsWith(AFTER) ? n.substring(AFTER.length()) : n;
-                        lifecycle = lifecycles.stream()
+                        lifecycle = BuildPlanExecutor.this
+                                .processedLifecycles()
                                 .filter(l -> l.allPhases().anyMatch(p -> phaseName.equals(p.name())))
                                 .findFirst()
                                 .orElse(null);
@@ -1082,7 +1104,7 @@ public class BuildPlanExecutor {
                             throw new IllegalStateException();
                         }
                     } else {
-                        lifecycle = lifecycles.require(Lifecycle.DEFAULT);
+                        lifecycle = BuildPlanExecutor.this.applyProcessors(lifecycles.require(Lifecycle.DEFAULT));
                     }
                 }
 
@@ -1107,7 +1129,8 @@ public class BuildPlanExecutor {
         }
 
         private String getResolvedPhase(String phase) {
-            return lifecycles.stream()
+            return BuildPlanExecutor.this
+                    .processedLifecycles()
                     .flatMap(l -> l.aliases().stream())
                     .filter(a -> phase.equals(a.v3Phase()))
                     .findFirst()
@@ -1245,7 +1268,8 @@ public class BuildPlanExecutor {
             /*
              * Determine the lifecycle that corresponds to the given phase.
              */
-            Lifecycle lifecycle = lifecycles.stream()
+            Lifecycle lifecycle = BuildPlanExecutor.this
+                    .processedLifecycles()
                     .filter(l -> l.allPhases().anyMatch(p -> mainPhase.equals(p.name())))
                     .findFirst()
                     .orElse(null);
@@ -1256,7 +1280,8 @@ public class BuildPlanExecutor {
                                 + "\". You must specify a valid lifecycle phase"
                                 + " or a goal in the format <plugin-prefix>:<goal> or"
                                 + " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: "
-                                + lifecycles.stream()
+                                + BuildPlanExecutor.this
+                                        .processedLifecycles()
                                         .flatMap(l -> l.allPhases().map(Lifecycle.Phase::name))
                                         .collect(Collectors.joining(", "))
                                 + ".",

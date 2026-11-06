@@ -184,6 +184,29 @@ public interface InvokerRequest {
     Optional<List<CoreExtensions>> coreExtensions();
 
     /**
+     * Returns the named build aliases collected from all settings tiers (installation, user, project).
+     * Last-wins across tiers: an alias defined in project settings overrides one with the same name from user
+     * or installation settings.
+     *
+     * @return an {@link Optional} containing the merged alias map (name → expansion tokens), or empty if no
+     *         aliases are defined in any settings tier
+     * @since 4.1.0
+     */
+    @Nonnull
+    Optional<Map<String, List<String>>> aliases();
+
+    /**
+     * Returns the lifecycle phase injections collected from project-scoped settings.
+     * Phase injections from user and installation settings are silently ignored.
+     *
+     * @return an {@link Optional} containing the list of {@link org.apache.maven.api.settings.PhaseInjection},
+     *         or empty if no phases are defined in project settings
+     * @since 4.1.0
+     */
+    @Nonnull
+    Optional<List<org.apache.maven.api.settings.PhaseInjection>> phases();
+
+    /**
      * Returns detected CI system, if any.
      *
      * @return an {@link Optional} containing the {@link CIInfo} collected from CI system. or empty if CI not

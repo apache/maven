@@ -247,6 +247,11 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     }
 
     @Override
+    public Optional<Boolean> listAliases() {
+        return commandLine.hasOption(CLIManager.LIST_ALIASES) ? Optional.of(true) : Optional.empty();
+    }
+
+    @Override
     protected CommonsCliMavenOptions copy(
             String source, CommonsCliOptions.CLIManager cliManager, CommandLine commandLine) {
         return new CommonsCliMavenOptions(source, (CLIManager) cliManager, commandLine);
@@ -279,6 +284,7 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
         public static final String ARTIFACTS_UPDATE_POLICY = "artifacts-update-policy";
         public static final String METADATA_UPDATE_POLICY = "metadata-update-policy";
         public static final String AT_FILE = "af";
+        public static final String LIST_ALIASES = "list-aliases";
 
         @Override
         protected void prepareOptions(org.apache.commons.cli.Options options) {
@@ -408,6 +414,11 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
                     .hasArg()
                     .desc(
                             "If set, Maven will load command line options from the specified file and merge with CLI specified ones.")
+                    .get());
+            options.addOption(Option.builder()
+                    .longOpt(LIST_ALIASES)
+                    .desc(
+                            "List effective build aliases defined in settings files and exit. Use --list-aliases to show available build aliases defined in settings files.")
                     .get());
         }
     }

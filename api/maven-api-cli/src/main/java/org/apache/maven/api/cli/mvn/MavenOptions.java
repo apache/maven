@@ -242,4 +242,14 @@ public interface MavenOptions extends Options {
      */
     @Nonnull
     Optional<List<String>> goals();
+
+    /**
+     * Indicates whether Maven should list effective build aliases and exit.
+     * Aliases are collected from installation, user, and project-scoped settings files.
+     *
+     * @return an {@link Optional} containing true if aliases should be listed, or empty if not specified
+     * @since 4.1.0
+     */
+    @Nonnull
+    Optional<Boolean> listAliases();
 }

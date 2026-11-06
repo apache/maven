@@ -48,12 +48,15 @@ import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.extensions.InputLocation;
 import org.apache.maven.api.cli.extensions.InputSource;
 import org.apache.maven.api.services.Interpolator;
+import org.apache.maven.api.settings.Extension;
+import org.apache.maven.api.settings.Settings;
 import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cling.invoker.cisupport.CIDetectorHelper;
 import org.apache.maven.cling.props.MavenPropertiesLoader;
 import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.apache.maven.properties.internal.EnvironmentUtils;
 import org.apache.maven.properties.internal.SystemProperties;
+import org.apache.maven.settings.v4.SettingsStaxReader;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.cling.invoker.CliUtils.createInterpolator;
@@ -88,6 +91,12 @@ public abstract class BaseParser implements Parser {
 
         @Nullable
         public List<CoreExtensions> extensions;
+
+        @Nullable
+        public Map<String, List<String>> aliases;
+
+        @Nullable
+        public List<org.apache.maven.api.settings.PhaseInjection> phases;
 
         @Nullable
         public CIInfo ciInfo;
@@ -274,6 +283,8 @@ public abstract class BaseParser implements Parser {
                 context.topDirectory,
                 context.rootDirectory,
                 context.extensions,
+                context.aliases,
+                context.phases,
                 context.ciInfo,
                 context.options);
     }
@@ -499,21 +510,34 @@ public abstract class BaseParser implements Parser {
         Map<String, String> eff = new HashMap<>(context.systemProperties);
         eff.putAll(context.userProperties);
 
-        // project
-        file = context.cwd.resolve(eff.get(Constants.MAVEN_PROJECT_EXTENSIONS));
-        loaded = readCoreExtensionsDescriptorFromFile(file, false);
-        if (!loaded.isEmpty()) {
-            result.add(new CoreExtensions(file, loaded));
+        // project: check settings.xml <extensions> first; fall back to extensions.xml
+        Path projectSettingsFile = resolveProjectSettingsFile(context, eff);
+        Settings projectSettings = readSettingsEarly(projectSettingsFile, context);
+        if (projectSettings != null
+                && projectSettings.getExtensions() != null
+                && !projectSettings.getExtensions().isEmpty()) {
+            // settings.xml is authoritative for project extensions
+            List<CoreExtension> fromSettings = projectSettings.getExtensions().stream()
+                    .map(e -> toCorExtension(e, projectSettingsFile))
+                    .collect(Collectors.toList());
+            result.add(new CoreExtensions(projectSettingsFile, fromSettings));
+        } else {
+            // legacy fallback: .mvn/extensions.xml
+            file = context.cwd.resolve(eff.get(Constants.MAVEN_PROJECT_EXTENSIONS));
+            loaded = readCoreExtensionsDescriptorFromFile(file, false);
+            if (!loaded.isEmpty()) {
+                result.add(new CoreExtensions(file, loaded));
+            }
         }
 
-        // user
+        // user: extensions.xml only (settings.xml user extensions are not for pre-DI loading)
         file = context.userHomeDirectory.resolve(eff.get(Constants.MAVEN_USER_EXTENSIONS));
         loaded = readCoreExtensionsDescriptorFromFile(file, true);
         if (!loaded.isEmpty()) {
             result.add(new CoreExtensions(file, loaded));
         }
 
-        // installation
+        // installation: extensions.xml only
         file = context.installationDirectory.resolve(eff.get(Constants.MAVEN_INSTALLATION_EXTENSIONS));
         loaded = readCoreExtensionsDescriptorFromFile(file, true);
         if (!loaded.isEmpty()) {
@@ -521,6 +545,89 @@ public abstract class BaseParser implements Parser {
         }
 
         return result.isEmpty() ? null : List.copyOf(result);
+    }
+
+    /**
+     * Resolves the project settings file path without DI, for the early pre-DI pass.
+     */
+    protected Path resolveProjectSettingsFile(LocalContext context, Map<String, String> eff) {
+        // honour --project-settings override if already parsed
+        if (context.options instanceof org.apache.maven.api.cli.mvn.MavenOptions mavenOpts) {
+            if (mavenOpts.altProjectSettings().isPresent()) {
+                return context.cwd.resolve(mavenOpts.altProjectSettings().get());
+            }
+        }
+        String projectSettingsStr = eff.get(Constants.MAVEN_PROJECT_SETTINGS);
+        if (projectSettingsStr != null && context.rootDirectory != null) {
+            Path resolved = context.rootDirectory.resolve(projectSettingsStr);
+            if (Files.isRegularFile(resolved)) {
+                return resolved;
+            }
+        }
+        // default: .mvn/settings.xml relative to rootDirectory
+        if (context.rootDirectory != null) {
+            Path defaultPath = context.rootDirectory.resolve(".mvn/settings.xml");
+            if (Files.isRegularFile(defaultPath)) {
+                return defaultPath;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Lightweight early parse of a settings.xml file for pre-DI data (extensions, args/options).
+     * Returns {@code null} if the file is absent or cannot be parsed.
+     */
+    @Nullable
+    protected Settings readSettingsEarly(@Nullable Path settingsFile, LocalContext context) {
+        if (settingsFile == null || !Files.isRegularFile(settingsFile)) {
+            return null;
+        }
+        try (InputStream is = Files.newInputStream(settingsFile)) {
+            return new SettingsStaxReader().read(is, false, null);
+        } catch (Exception e) {
+            context.parserRequest
+                    .logger()
+                    .warn("Could not read settings file for early parsing: " + settingsFile + ": " + e.getMessage());
+            return null;
+        }
+    }
+
+    /**
+     * Converts a settings {@link Extension} to a {@link CoreExtension}, expanding the compact {@code id} shorthand.
+     */
+    protected CoreExtension toCorExtension(Extension ext, Path sourceFile) {
+        String groupId = ext.getGroupId();
+        String artifactId = ext.getArtifactId();
+        String version = ext.getVersion();
+        String id = ext.getId();
+        if (id != null && !id.isEmpty()) {
+            if (groupId != null || artifactId != null || version != null) {
+                throw new IllegalArgumentException("Extension id '" + id
+                        + "' must not be combined with groupId/artifactId/version in " + sourceFile);
+            }
+            String[] parts = id.split(":", -1);
+            if (parts.length != 3 || parts[0].isEmpty() || parts[1].isEmpty() || parts[2].isEmpty()) {
+                throw new IllegalArgumentException(
+                        "Invalid extension id '" + id + "': expected groupId:artifactId:version in " + sourceFile);
+            }
+            groupId = parts[0];
+            artifactId = parts[1];
+            version = parts[2];
+        }
+        if (groupId == null || artifactId == null || version == null) {
+            throw new IllegalArgumentException(
+                    "Extension must specify either id or all of groupId, artifactId, and version in " + sourceFile);
+        }
+        org.apache.maven.api.cli.extensions.CoreExtension.Builder builder =
+                org.apache.maven.api.cli.extensions.CoreExtension.newBuilder(true);
+        builder.groupId(groupId);
+        builder.artifactId(artifactId);
+        builder.version(version);
+        if (ext.getClassLoadingStrategy() != null) {
+            builder.classLoadingStrategy(ext.getClassLoadingStrategy());
+        }
+        return builder.build();
     }
 
     protected List<CoreExtension> readCoreExtensionsDescriptorFromFile(Path extensionsFile, boolean allowMetaVersions) {

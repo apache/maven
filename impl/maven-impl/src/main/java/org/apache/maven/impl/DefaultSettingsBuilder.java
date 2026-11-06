@@ -161,7 +161,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             throw new SettingsBuilderException("Error building settings", problems);
         }
 
-        return new DefaultSettingsBuilderResult(request, effective, problems);
+        return new DefaultSettingsBuilderResult(request, installation, project, user, effective, problems);
     }
 
     private Settings readSettings(
@@ -602,13 +602,27 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         private final SettingsBuilderRequest request;
 
+        private final Settings installationSettings;
+
+        private final Settings projectSettings;
+
+        private final Settings userSettings;
+
         private final Settings effectiveSettings;
 
         private final ProblemCollector<BuilderProblem> problems;
 
         DefaultSettingsBuilderResult(
-                SettingsBuilderRequest request, Settings effectiveSettings, ProblemCollector<BuilderProblem> problems) {
+                SettingsBuilderRequest request,
+                Settings installationSettings,
+                Settings projectSettings,
+                Settings userSettings,
+                Settings effectiveSettings,
+                ProblemCollector<BuilderProblem> problems) {
             this.request = request;
+            this.installationSettings = installationSettings != null ? installationSettings : Settings.newInstance();
+            this.projectSettings = projectSettings != null ? projectSettings : Settings.newInstance();
+            this.userSettings = userSettings != null ? userSettings : Settings.newInstance();
             this.effectiveSettings = effectiveSettings;
             this.problems = (problems != null) ? problems : ProblemCollector.empty();
         }
@@ -616,6 +630,21 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         @Override
         public SettingsBuilderRequest getRequest() {
             return request;
+        }
+
+        @Override
+        public Settings getInstallationSettings() {
+            return installationSettings;
+        }
+
+        @Override
+        public Settings getProjectSettings() {
+            return projectSettings;
+        }
+
+        @Override
+        public Settings getUserSettings() {
+            return userSettings;
         }
 
         @Override

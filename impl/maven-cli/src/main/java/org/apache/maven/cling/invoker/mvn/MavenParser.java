@@ -29,6 +29,7 @@ import java.util.stream.Stream;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.mvn.MavenOptions;
+import org.apache.maven.api.settings.Settings;
 import org.apache.maven.cling.invoker.BaseParser;
 
 public class MavenParser extends BaseParser {
@@ -47,12 +48,55 @@ public class MavenParser extends BaseParser {
                 throw new IllegalArgumentException("Specified file does not exists (" + file + ")");
             }
         }
-        // maven.config; if exists
-        Path mavenConfig = context.rootDirectory != null ? context.rootDirectory.resolve(".mvn/maven.config") : null;
-        if (mavenConfig != null && Files.isRegularFile(mavenConfig)) {
-            result.add(parseMavenConfigOptions(mavenConfig));
+
+        // Project settings.xml <args>/<options> supersede maven.config when present
+        java.util.Map<String, String> eff = new java.util.HashMap<>(context.systemProperties);
+        if (context.userProperties != null) {
+            eff.putAll(context.userProperties);
+        }
+        Path projectSettingsFile = resolveProjectSettingsFile(context, eff);
+        Settings projectSettings = readSettingsEarly(projectSettingsFile, context);
+        boolean settingsHasArgs = projectSettings != null
+                && (!isNullOrEmpty(projectSettings.getOptions())
+                        || (projectSettings.getArgs() != null
+                                && !projectSettings.getArgs().isEmpty()));
+        if (settingsHasArgs) {
+            result.add(parseMavenSettingsOptions(projectSettings, projectSettingsFile));
+        } else {
+            // legacy fallback: .mvn/maven.config
+            Path mavenConfig =
+                    context.rootDirectory != null ? context.rootDirectory.resolve(".mvn/maven.config") : null;
+            if (mavenConfig != null && Files.isRegularFile(mavenConfig)) {
+                result.add(parseMavenConfigOptions(mavenConfig));
+            }
         }
         return LayeredMavenOptions.layerMavenOptions(result);
+    }
+
+    private static boolean isNullOrEmpty(String s) {
+        return s == null || s.isBlank();
+    }
+
+    protected MavenOptions parseMavenSettingsOptions(Settings settings, Path settingsFile) {
+        List<String> args;
+        if (settings.getArgs() != null && !settings.getArgs().isEmpty()) {
+            args = settings.getArgs();
+        } else {
+            // tokenize inline options text (shell-style, quote-aware)
+            args = ArgumentTokenizer.tokenize(settings.getOptions());
+        }
+        try {
+            MavenOptions options = parseArgs("settings.xml", args);
+            if (options.goals().isPresent()) {
+                throw new IllegalArgumentException("Unrecognized entries in settings.xml (" + settingsFile
+                        + ") <args>/<options>: " + options.goals().get());
+            }
+            return options;
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(
+                    "Failed to parse arguments from settings.xml (" + settingsFile + "): " + e.getMessage(),
+                    e.getCause());
+        }
     }
 
     protected MavenOptions parseMavenCliOptions(List<String> args) {
