@@ -193,7 +193,13 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             if (alias.getName() != null && !alias.getName().isBlank()) {
                 List<String> args = alias.getArgs();
                 if (args == null || args.isEmpty()) {
-                    target.remove(alias.getName()); // explicit removal: empty alias clears inherited one
+                    // Check inline text content (e.g. <alias name="ci">-T 4 -Dsurefire.skip</alias>)
+                    String content = alias.getContent();
+                    if (content != null && !content.isBlank()) {
+                        target.put(alias.getName(), ArgumentTokenizer.tokenize(content));
+                    } else {
+                        target.remove(alias.getName()); // explicit removal: empty alias clears inherited one
+                    }
                 } else {
                     target.put(alias.getName(), java.util.Collections.unmodifiableList(args));
                 }

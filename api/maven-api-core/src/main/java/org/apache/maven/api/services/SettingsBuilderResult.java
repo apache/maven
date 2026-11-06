@@ -43,7 +43,7 @@ public interface SettingsBuilderResult extends Result<SettingsBuilderRequest> {
      * Gets the installation-scoped settings (before merging).
      *
      * @return the installation settings, never {@code null} (empty if not configured)
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     default Settings getInstallationSettings() {
@@ -55,7 +55,7 @@ public interface SettingsBuilderResult extends Result<SettingsBuilderRequest> {
      * This is the tier where {@code <phases>} and project-specific {@code <extensions>} are authoritative.
      *
      * @return the project settings, never {@code null} (empty if not configured)
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     default Settings getProjectSettings() {
@@ -66,7 +66,7 @@ public interface SettingsBuilderResult extends Result<SettingsBuilderRequest> {
      * Gets the user-scoped settings (before merging).
      *
      * @return the user settings, never {@code null} (empty if not configured)
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     default Settings getUserSettings() {

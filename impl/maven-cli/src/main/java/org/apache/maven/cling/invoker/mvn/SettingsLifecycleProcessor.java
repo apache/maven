@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  * <p>Phase injections are only respected from project-scoped settings. User and installation
  * settings {@code <phases>} are silently ignored (and emit a warning during settings loading).
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Named
 public class SettingsLifecycleProcessor implements LifecycleProcessor {

@@ -23,7 +23,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.commons.cli.ParseException;
@@ -50,12 +52,12 @@ public class MavenParser extends BaseParser {
         }
 
         // Project settings.xml <args>/<options> supersede maven.config when present
-        java.util.Map<String, String> eff = new java.util.HashMap<>(context.systemProperties);
-        if (context.userProperties != null) {
-            eff.putAll(context.userProperties);
-        }
-        Path projectSettingsFile = resolveProjectSettingsFile(context, eff);
-        Settings projectSettings = readSettingsEarly(projectSettingsFile, context);
+        Map<String, String> systemProperties = context.systemProperties != null ? context.systemProperties : Map.of();
+        Map<String, String> userProperties = context.userProperties != null ? context.userProperties : Map.of();
+        Map<String, String> effectiveProperties = new HashMap<>(systemProperties);
+        effectiveProperties.putAll(userProperties);
+        Path projectSettingsFile = resolveProjectSettingsFile(context, effectiveProperties);
+        Settings projectSettings = readSettingsEarlyCached(projectSettingsFile, context);
         boolean settingsHasArgs = projectSettings != null
                 && (!isNullOrEmpty(projectSettings.getOptions())
                         || (projectSettings.getArgs() != null

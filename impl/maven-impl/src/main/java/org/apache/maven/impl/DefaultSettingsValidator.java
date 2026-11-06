@@ -114,16 +114,7 @@ public class DefaultSettingsValidator {
         }
 
         if (!isProjectSettings) {
-            // User / installation settings: warn on elements that are only meaningful in project settings.
-            if (settings.getExtensions() != null && !settings.getExtensions().isEmpty()) {
-                addViolation(
-                        problems,
-                        BuilderProblem.Severity.WARNING,
-                        "extensions",
-                        null,
-                        "is not supported on user or installation settings. "
-                                + "Move <extensions> to your project's .mvn/settings.xml.");
-            }
+            // User / installation settings: <phases> are only meaningful in project settings.
             if (settings.getPhases() != null && !settings.getPhases().isEmpty()) {
                 addViolation(
                         problems,

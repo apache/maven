@@ -40,7 +40,7 @@ import java.util.List;
  * invoked directly by shell scripts; it must not share classpath code with Maven. This class is an
  * independent re-implementation of the same algorithm for use within Maven's Java classpath.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 public final class ArgumentTokenizer {
 

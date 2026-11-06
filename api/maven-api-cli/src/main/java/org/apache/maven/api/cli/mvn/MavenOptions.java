@@ -248,7 +248,7 @@ public interface MavenOptions extends Options {
      * Aliases are collected from installation, user, and project-scoped settings files.
      *
      * @return an {@link Optional} containing true if aliases should be listed, or empty if not specified
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     Optional<Boolean> listAliases();

@@ -47,8 +47,10 @@ import org.apache.maven.api.cli.cisupport.CIInfo;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.extensions.InputLocation;
 import org.apache.maven.api.cli.extensions.InputSource;
+import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.settings.Extension;
+import org.apache.maven.api.settings.PhaseInjection;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cling.invoker.cisupport.CIDetectorHelper;
@@ -96,13 +98,21 @@ public abstract class BaseParser implements Parser {
         public Map<String, List<String>> aliases;
 
         @Nullable
-        public List<org.apache.maven.api.settings.PhaseInjection> phases;
+        public List<PhaseInjection> phases;
 
         @Nullable
         public CIInfo ciInfo;
 
         @Nullable
         public Options options;
+
+        // Cached early-parsed settings files — avoids reading the same file twice
+        // (once for extensions in readCoreExtensionsDescriptor, once for CLI args in MavenParser).
+        @Nullable
+        public Path cachedProjectSettingsPath;
+
+        @Nullable
+        public Settings cachedProjectSettings;
 
         public Map<String, String> extraInterpolationSource() {
             Map<String, String> extra = new HashMap<>();
@@ -512,13 +522,13 @@ public abstract class BaseParser implements Parser {
 
         // project: check settings.xml <extensions> first; fall back to extensions.xml
         Path projectSettingsFile = resolveProjectSettingsFile(context, eff);
-        Settings projectSettings = readSettingsEarly(projectSettingsFile, context);
+        Settings projectSettings = readSettingsEarlyCached(projectSettingsFile, context);
         if (projectSettings != null
                 && projectSettings.getExtensions() != null
                 && !projectSettings.getExtensions().isEmpty()) {
             // settings.xml is authoritative for project extensions
             List<CoreExtension> fromSettings = projectSettings.getExtensions().stream()
-                    .map(e -> toCorExtension(e, projectSettingsFile))
+                    .map(e -> toCoreExtension(e, projectSettingsFile))
                     .collect(Collectors.toList());
             result.add(new CoreExtensions(projectSettingsFile, fromSettings));
         } else {
@@ -530,18 +540,40 @@ public abstract class BaseParser implements Parser {
             }
         }
 
-        // user: extensions.xml only (settings.xml user extensions are not for pre-DI loading)
-        file = context.userHomeDirectory.resolve(eff.get(Constants.MAVEN_USER_EXTENSIONS));
-        loaded = readCoreExtensionsDescriptorFromFile(file, true);
-        if (!loaded.isEmpty()) {
-            result.add(new CoreExtensions(file, loaded));
+        // user: check settings.xml <extensions> first, then extensions.xml
+        Path userSettingsFile = resolveUserSettingsFile(context, eff);
+        Settings userSettings = readSettingsEarly(userSettingsFile, context);
+        if (userSettings != null
+                && userSettings.getExtensions() != null
+                && !userSettings.getExtensions().isEmpty()) {
+            List<CoreExtension> fromSettings = userSettings.getExtensions().stream()
+                    .map(e -> toCoreExtension(e, userSettingsFile))
+                    .collect(Collectors.toList());
+            result.add(new CoreExtensions(userSettingsFile, fromSettings));
+        } else {
+            file = context.userHomeDirectory.resolve(eff.get(Constants.MAVEN_USER_EXTENSIONS));
+            loaded = readCoreExtensionsDescriptorFromFile(file, true);
+            if (!loaded.isEmpty()) {
+                result.add(new CoreExtensions(file, loaded));
+            }
         }
 
-        // installation: extensions.xml only
-        file = context.installationDirectory.resolve(eff.get(Constants.MAVEN_INSTALLATION_EXTENSIONS));
-        loaded = readCoreExtensionsDescriptorFromFile(file, true);
-        if (!loaded.isEmpty()) {
-            result.add(new CoreExtensions(file, loaded));
+        // installation: check settings.xml <extensions> first, then extensions.xml
+        Path installationSettingsFile = resolveInstallationSettingsFile(context, eff);
+        Settings installationSettings = readSettingsEarly(installationSettingsFile, context);
+        if (installationSettings != null
+                && installationSettings.getExtensions() != null
+                && !installationSettings.getExtensions().isEmpty()) {
+            List<CoreExtension> fromSettings = installationSettings.getExtensions().stream()
+                    .map(e -> toCoreExtension(e, installationSettingsFile))
+                    .collect(Collectors.toList());
+            result.add(new CoreExtensions(installationSettingsFile, fromSettings));
+        } else {
+            file = context.installationDirectory.resolve(eff.get(Constants.MAVEN_INSTALLATION_EXTENSIONS));
+            loaded = readCoreExtensionsDescriptorFromFile(file, true);
+            if (!loaded.isEmpty()) {
+                result.add(new CoreExtensions(file, loaded));
+            }
         }
 
         return result.isEmpty() ? null : List.copyOf(result);
@@ -552,7 +584,7 @@ public abstract class BaseParser implements Parser {
      */
     protected Path resolveProjectSettingsFile(LocalContext context, Map<String, String> eff) {
         // honour --project-settings override if already parsed
-        if (context.options instanceof org.apache.maven.api.cli.mvn.MavenOptions mavenOpts) {
+        if (context.options instanceof MavenOptions mavenOpts) {
             if (mavenOpts.altProjectSettings().isPresent()) {
                 return context.cwd.resolve(mavenOpts.altProjectSettings().get());
             }
@@ -575,8 +607,51 @@ public abstract class BaseParser implements Parser {
     }
 
     /**
+     * Resolves the user settings file path without DI, for the early pre-DI pass.
+     */
+    protected Path resolveUserSettingsFile(LocalContext context, Map<String, String> eff) {
+        if (context.options instanceof MavenOptions mavenOpts) {
+            if (mavenOpts.altUserSettings().isPresent()) {
+                return context.cwd.resolve(mavenOpts.altUserSettings().get());
+            }
+        }
+        String userSettingsStr = eff.get(Constants.MAVEN_USER_SETTINGS);
+        if (userSettingsStr != null) {
+            Path resolved = context.userHomeDirectory.resolve(userSettingsStr);
+            if (Files.isRegularFile(resolved)) {
+                return resolved;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Resolves the installation settings file path without DI, for the early pre-DI pass.
+     */
+    protected Path resolveInstallationSettingsFile(LocalContext context, Map<String, String> eff) {
+        if (context.options instanceof MavenOptions mavenOpts) {
+            if (mavenOpts.altInstallationSettings().isPresent()) {
+                return context.cwd.resolve(mavenOpts.altInstallationSettings().get());
+            }
+        }
+        String installationSettingsStr = eff.get(Constants.MAVEN_INSTALLATION_SETTINGS);
+        if (installationSettingsStr != null) {
+            Path resolved = context.installationDirectory.resolve(installationSettingsStr);
+            if (Files.isRegularFile(resolved)) {
+                return resolved;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Lightweight early parse of a settings.xml file for pre-DI data (extensions, args/options).
      * Returns {@code null} if the file is absent or cannot be parsed.
+     *
+     * <p><b>Known limitation:</b> property interpolation is intentionally skipped ({@code false, null}
+     * arguments to the reader) because the full session is not yet set up. Extension coordinates
+     * containing {@code ${...}} property references (e.g. {@code <version>${my.ext.version}</version>})
+     * will be used literally and are therefore not supported in early-parsed blocks.
      */
     @Nullable
     protected Settings readSettingsEarly(@Nullable Path settingsFile, LocalContext context) {
@@ -594,9 +669,34 @@ public abstract class BaseParser implements Parser {
     }
 
     /**
+     * Caching wrapper around {@link #readSettingsEarly}: on the first call for a given path the result
+     * is stored in {@code context.cachedProjectSettings}; subsequent calls for the same path return the
+     * cached instance without re-reading the file. This avoids the double-parse that would otherwise
+     * occur when both {@code readCoreExtensionsDescriptor} and {@code MavenParser.parseCliOptions}
+     * independently resolve and read the project settings file on startup.
+     *
+     * <p>Only the <em>project</em> settings file is cached here (user/installation settings are only
+     * read in one place and do not need caching). Pass {@code null} to skip caching and fall through to
+     * the regular parse.
+     */
+    @Nullable
+    protected Settings readSettingsEarlyCached(@Nullable Path settingsFile, LocalContext context) {
+        if (settingsFile == null) {
+            return null;
+        }
+        if (settingsFile.equals(context.cachedProjectSettingsPath)) {
+            return context.cachedProjectSettings;
+        }
+        Settings result = readSettingsEarly(settingsFile, context);
+        context.cachedProjectSettingsPath = settingsFile;
+        context.cachedProjectSettings = result;
+        return result;
+    }
+
+    /**
      * Converts a settings {@link Extension} to a {@link CoreExtension}, expanding the compact {@code id} shorthand.
      */
-    protected CoreExtension toCorExtension(Extension ext, Path sourceFile) {
+    protected CoreExtension toCoreExtension(Extension ext, Path sourceFile) {
         String groupId = ext.getGroupId();
         String artifactId = ext.getArtifactId();
         String version = ext.getVersion();

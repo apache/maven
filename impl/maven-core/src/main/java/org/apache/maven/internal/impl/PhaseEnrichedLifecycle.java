@@ -58,13 +58,13 @@ import org.apache.maven.api.model.Plugin;
  * <p>{@code after} and {@code before} accept comma-separated lists when multiple anchors are
  * needed, and both can be specified together to constrain the insertion from both sides.
  *
- * <p>Example {@code reactor.xml} declarations:
+ * <p>Example {@code settings.xml} declarations:
  * <pre>{@code
  * <phase name="pre-integration" parent="verify" after="unit-test" before="integration-test"/>
  * <phase name="post-all" parent="verify" after="unit-test,integration-test"/>
  * }</pre>
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 public class PhaseEnrichedLifecycle implements Lifecycle {
 
@@ -333,7 +333,7 @@ public class PhaseEnrichedLifecycle implements Lifecycle {
         }
 
         if (lowerBound >= 0 && upperBound < siblings.size() && lowerBound >= upperBound) {
-            throw new IllegalStateException("reactor.xml: custom phase '" + inj.name()
+            throw new IllegalStateException("settings.xml: custom phase '" + inj.name()
                     + "' has conflicting constraints — 'after' anchor '"
                     + siblings.get(lowerBound).name() + "' is not before 'before' anchor '"
                     + siblings.get(upperBound).name() + "'");

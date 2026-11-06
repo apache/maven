@@ -158,6 +158,12 @@ public class DefaultLifecycles {
     /**
      * Applies all registered {@link LifecycleProcessor}s to the given lifecycle in order.
      * If the lifecycle has no API delegate (legacy lifecycle), it is returned as-is.
+     *
+     * <p><b>Dual-call design note:</b> processors are also applied per-plan in
+     * {@code BuildPlanExecutor.applyProcessors()} to allow per-invocation customisation (e.g.
+     * phase injection from project settings that is only known after DI). All registered
+     * {@link org.apache.maven.api.spi.LifecycleProcessor} implementations <em>must</em> therefore
+     * be idempotent, as the SPI contract requires.
      */
     private Lifecycle applyProcessors(Lifecycle lifecycle) {
         if (lifecycleProcessors.isEmpty() || lifecycle.getDelegate() == null) {

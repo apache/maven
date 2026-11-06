@@ -418,7 +418,7 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
             options.addOption(Option.builder()
                     .longOpt(LIST_ALIASES)
                     .desc(
-                            "List effective build aliases defined in settings files and exit. Use --list-aliases to show available build aliases defined in settings files.")
+                            "List effective build aliases defined in settings files and exit.")
                     .get());
         }
     }

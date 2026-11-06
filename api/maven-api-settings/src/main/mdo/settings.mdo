@@ -251,7 +251,8 @@
             CLI options to prepend to every invocation (inline text, whitespace-separated, quote-aware).
             For options with spaces in their values, use the structured {@link #getArgs()} form instead.
             Mutually exclusive with {@code args}. Replaces {@code .mvn/maven.config} when present in
-            project-scoped settings; also honoured in user and installation settings.
+            project-scoped settings. Only honoured in project-scoped settings ({@code .mvn/settings.xml});
+            this field is ignored in user and installation settings.
             ]]>
           </description>
           <type>String</type>
@@ -265,7 +266,8 @@
             CLI options as structured {@literal <arg>} elements — one token per element.
             Use instead of {@link #getOptions()} when option values contain spaces.
             Mutually exclusive with {@code options}. Replaces {@code .mvn/maven.config} when present in
-            project-scoped settings; also honoured in user and installation settings.
+            project-scoped settings. Only honoured in project-scoped settings ({@code .mvn/settings.xml});
+            this field is ignored in user and installation settings.
             ]]>
           </description>
           <association xml.itemsStyle="flat" xml.tagName="arg">

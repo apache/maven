@@ -35,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DefaultSettingsValidatorTest {
 
@@ -239,13 +240,12 @@ class DefaultSettingsValidatorTest {
                 .build();
         Settings settings = Settings.newBuilder().extensions(List.of(ext)).build();
 
-        // isProjectSettings=true → no warning
         ProblemCollector<BuilderProblem> problems = validator.validate(settings, true);
         assertEquals(0, problems.totalProblemsReported());
     }
 
     @Test
-    void testExtensionsWarnedInUserSettings() {
+    void testExtensionsAlsoAllowedInUserSettings() {
         Extension ext = Extension.newBuilder()
                 .groupId("com.example")
                 .artifactId("my-extension")
@@ -253,15 +253,9 @@ class DefaultSettingsValidatorTest {
                 .build();
         Settings settings = Settings.newBuilder().extensions(List.of(ext)).build();
 
-        // isProjectSettings=false → warning
+        // Extensions are now supported in user/installation settings too — no warning
         ProblemCollector<BuilderProblem> problems = validator.validate(settings, false);
-        assertEquals(1, problems.totalProblemsReported());
-        BuilderProblem problem = problems.problems().findFirst().orElseThrow();
-        assertEquals(BuilderProblem.Severity.WARNING, problem.getSeverity());
-        assertEquals(
-                "'extensions' is not supported on user or installation settings. "
-                        + "Move <extensions> to your project's .mvn/settings.xml.",
-                problem.getMessage());
+        assertEquals(0, problems.totalProblemsReported());
     }
 
     @Test
@@ -291,7 +285,7 @@ class DefaultSettingsValidatorTest {
     }
 
     @Test
-    void testExtensionsAndPhasesInUserSettingsGenerateTwoWarnings() {
+    void testExtensionsAndPhasesInUserSettingsOnlyPhasesWarn() {
         Extension ext = Extension.newBuilder()
                 .groupId("com.example")
                 .artifactId("my-extension")
@@ -304,7 +298,11 @@ class DefaultSettingsValidatorTest {
                 .phases(List.of(phase))
                 .build();
 
+        // Extensions no longer warn; only phases generate a warning
         ProblemCollector<BuilderProblem> problems = validator.validate(settings, false);
-        assertEquals(2, problems.totalProblemsReported());
+        assertEquals(1, problems.totalProblemsReported());
+        BuilderProblem problem = problems.problems().findFirst().orElseThrow();
+        assertEquals(BuilderProblem.Severity.WARNING, problem.getSeverity());
+        assertTrue(problem.getMessage().contains("phases"));
     }
 }
