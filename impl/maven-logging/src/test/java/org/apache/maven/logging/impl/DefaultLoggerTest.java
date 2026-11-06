@@ -187,6 +187,20 @@ class DefaultLoggerTest {
     }
 
     @Test
+    void apostropheInTemplateIsNotCorrupted() {
+        CapturingSink sink = new CapturingSink();
+        LoggerManager.get().setLogSink(sink);
+        DefaultLogger log = new DefaultLogger("test.logger");
+
+        // MessageFormat would corrupt "Can't find {0}" into "Cant find {0}".
+        // The direct positional substitution must preserve apostrophes.
+        log.atInfo().log("Can't find {0}", "file.txt");
+
+        assertEquals(1, sink.events.size());
+        assertEquals("Can't find file.txt", sink.events.get(0).message());
+    }
+
+    @Test
     void fluentBuilderPassesKeyValuesAsStructuredData() {
         CapturingSink sink = new CapturingSink();
         LoggerManager.get().setLogSink(sink);

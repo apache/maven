@@ -45,12 +45,16 @@ public interface LoggerManager {
 
     /**
      * Returns a {@link Logger} instance for the given name.
+     *
+     * @since 4.2.0
      */
     @Nonnull
     Logger getLogger(@Nonnull String name);
 
     /**
      * Returns a {@link Logger} instance for the given class.
+     *
+     * @since 4.2.0
      */
     @Nonnull
     default Logger getLogger(@Nonnull Class<?> clazz) {
@@ -100,6 +104,7 @@ public interface LoggerManager {
      *
      * @param classLoader the plugin's classloader
      * @param pluginId the plugin identifier (e.g. {@code "groupId:artifactId:version"})
+     * @since 4.2.0
      */
     default void registerPluginClassLoader(@Nonnull ClassLoader classLoader, @Nonnull String pluginId) {}
 
@@ -109,6 +114,7 @@ public interface LoggerManager {
      *
      * @param classLoader the classloader to look up
      * @return the plugin identifier, or {@code null}
+     * @since 4.2.0
      */
     @Nullable
     default String getPluginId(@Nullable ClassLoader classLoader) {

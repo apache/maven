@@ -18,7 +18,6 @@
  */
 package org.apache.maven.api.logging;
 
-import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -297,12 +296,36 @@ final class BufferingLoggerManager implements LoggerManager {
             if (args == null || args.length == 0) {
                 return template;
             }
-            try {
-                return MessageFormat.format(template, args);
-            } catch (IllegalArgumentException e) {
-                // Malformed MessageFormat pattern — return template as-is
-                return template;
+            // Direct positional substitution of {0}, {1}, ... — deliberately avoids
+            // MessageFormat.format() which treats apostrophes as escape characters.
+            StringBuilder sb = new StringBuilder(template.length() + 32);
+            int len = template.length();
+            int i = 0;
+            while (i < len) {
+                char c = template.charAt(i);
+                if (c == '{' && i + 1 < len) {
+                    int j = i + 1;
+                    int idx = 0;
+                    boolean hasDigits = false;
+                    while (j < len && template.charAt(j) >= '0' && template.charAt(j) <= '9') {
+                        idx = idx * 10 + (template.charAt(j) - '0');
+                        j++;
+                        hasDigits = true;
+                    }
+                    if (hasDigits && j < len && template.charAt(j) == '}') {
+                        if (idx < args.length) {
+                            sb.append(args[idx]);
+                        } else {
+                            sb.append(template, i, j + 1);
+                        }
+                        i = j + 1;
+                        continue;
+                    }
+                }
+                sb.append(c);
+                i++;
             }
+            return sb.toString();
         }
     }
 

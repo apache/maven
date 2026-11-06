@@ -18,7 +18,6 @@
  */
 package org.apache.maven.logging.impl;
 
-import java.text.MessageFormat;
 import java.time.Instant;
 import java.util.Arrays;
 import java.util.Collections;
@@ -340,11 +339,38 @@ public final class DefaultLogEvent implements LogEvent {
         if (args == null || args.isEmpty()) {
             return template;
         }
-        try {
-            return MessageFormat.format(template, args.toArray());
-        } catch (IllegalArgumentException e) {
-            // Malformed MessageFormat pattern — return template as-is rather than losing the message
-            return template;
+        // Direct positional substitution of {0}, {1}, ... — deliberately avoids
+        // MessageFormat.format() which treats apostrophes as escape characters,
+        // corrupting messages like "Can't find {0}" into "Cant find {0}".
+        StringBuilder sb = new StringBuilder(template.length() + 32);
+        int len = template.length();
+        int i = 0;
+        while (i < len) {
+            char c = template.charAt(i);
+            if (c == '{' && i + 1 < len) {
+                // Parse index digits
+                int j = i + 1;
+                int idx = 0;
+                boolean hasDigits = false;
+                while (j < len && template.charAt(j) >= '0' && template.charAt(j) <= '9') {
+                    idx = idx * 10 + (template.charAt(j) - '0');
+                    j++;
+                    hasDigits = true;
+                }
+                if (hasDigits && j < len && template.charAt(j) == '}') {
+                    if (idx < args.size()) {
+                        sb.append(args.get(idx));
+                    } else {
+                        // Index out of range — emit placeholder as-is
+                        sb.append(template, i, j + 1);
+                    }
+                    i = j + 1;
+                    continue;
+                }
+            }
+            sb.append(c);
+            i++;
         }
+        return sb.toString();
     }
 }

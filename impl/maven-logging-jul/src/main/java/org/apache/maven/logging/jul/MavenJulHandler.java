@@ -174,9 +174,17 @@ public class MavenJulHandler extends Handler {
     @Override
     public void close() throws SecurityException {}
 
+    private static final StackWalker STACK_WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+
     private static String resolvePluginId(LoggerManager mgr) {
-        ClassLoader cl = Thread.currentThread().getContextClassLoader();
-        return cl != null ? mgr.getPluginId(cl) : null;
+        // Walk the call stack to find the first frame whose classloader is a registered
+        // plugin classloader — matching the attribution strategy used by MavenLoggerFactory
+        // for SLF4J loggers so both JUL and SLF4J events are attributed consistently.
+        return STACK_WALKER.walk(
+                frames -> frames.map(f -> mgr.getPluginId(f.getDeclaringClass().getClassLoader()))
+                        .filter(java.util.Objects::nonNull)
+                        .findFirst()
+                        .orElse(null));
     }
 
     static LogLevel julLevelToLogLevel(Level julLevel) {

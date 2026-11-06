@@ -21,11 +21,14 @@ package org.apache.maven.logging.slf4j;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
- * Converts SLF4J {@code {}}-style message templates to MessageFormat {@code {0}}-style,
+ * Converts SLF4J {@code {}}-style message templates to positional {@code {0}}-style,
  * which is the template format used by Maven's {@link org.apache.maven.api.logging.Logger} API.
  * <p>
- * Results are cached permanently: in practice, templates are compile-time string constants,
- * so the cache stays bounded regardless of call volume.
+ * Results are cached in a {@link java.util.concurrent.ConcurrentHashMap}. The cache has no
+ * eviction policy: it relies on the convention that log templates are compile-time string
+ * constants, keeping the entry count bounded in practice. Plugin code that constructs
+ * templates dynamically (e.g. by string concatenation) would cause unbounded growth —
+ * such usage is a misuse of the logging API.
  * <p>
  * Example: {@code "Resolved {} files in {}"} → {@code "Resolved {0} files in {1}"}
  *

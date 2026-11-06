@@ -81,4 +81,12 @@ class Slf4jTemplateConverterTest {
     void adjacentPlaceholders() {
         assertEquals("{0}{1}", Slf4jTemplateConverter.convert("{}{}"));
     }
+
+    @Test
+    void apostropheInTemplateIsPreservedAfterConversion() {
+        // Verifies that apostrophes are not treated as escape characters during
+        // the {} → {N} conversion (would be an issue with MessageFormat.format()).
+        assertEquals("Can't find {0}", Slf4jTemplateConverter.convert("Can't find {}"));
+        assertEquals("It's {0} and {1}", Slf4jTemplateConverter.convert("It's {} and {}"));
+    }
 }
