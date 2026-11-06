@@ -283,11 +283,16 @@ class ParentTraversalTest {
         var state = externalState(directory, "mixin-0", opaque);
         Set<String> chain = new LinkedHashSet<>(Set.of("caller"));
         for (int attempt = 0; attempt < 2; attempt++) {
+            // Parent failures remain in the owning model's collector. Retry with a fresh collector,
+            // retaining the request caches and caller ancestry to exercise failed-traversal cleanup.
+            var attemptState = state.derive(state.request);
             resolutions.set(0);
             ModelBuilderException error = assertThrows(
-                    ModelBuilderException.class, () -> state.readAsParentModel(context(List.of(), List.of()), chain));
+                    ModelBuilderException.class,
+                    () -> attemptState.readAsParentModel(context(List.of(), List.of()), chain));
             assertTrue(error.getMessage().contains("cycle"), error.getMessage());
-            assertEquals(length + (opaque ? 1 : 0), resolutions.get());
+            assertTrue(attemptState.getProblemCollector().hasFatalProblems());
+            assertEquals(length + (opaque ? 1 : 0), resolutions.get(), "Resolution count on attempt " + attempt);
             assertEquals(Set.of("caller"), chain);
         }
     }

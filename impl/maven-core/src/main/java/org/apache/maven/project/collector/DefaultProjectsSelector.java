@@ -25,6 +25,7 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.model.building.ModelProblem;
@@ -54,6 +55,13 @@ public class DefaultProjectsSelector implements ProjectsSelector {
     @Override
     public List<MavenProject> selectProjects(List<File> files, MavenExecutionRequest request)
             throws ProjectBuildingException {
+        return selectProjects(files, request, problem -> {});
+    }
+
+    @Override
+    public List<MavenProject> selectProjects(
+            List<File> files, MavenExecutionRequest request, Consumer<ModelProblem> problemConsumer)
+            throws ProjectBuildingException {
         ProjectBuildingRequest projectBuildingRequest = request.getProjectBuildingRequest();
 
         boolean hasProjectSelection = !request.getProjectActivation().isEmpty();
@@ -66,6 +74,7 @@ public class DefaultProjectsSelector implements ProjectsSelector {
 
         for (ProjectBuildingResult result : results) {
             projects.add(result.getProject());
+            result.getProblems().forEach(problemConsumer);
 
             int problemsCount = result.getProblems().size();
             totalProblemsCount += problemsCount;
