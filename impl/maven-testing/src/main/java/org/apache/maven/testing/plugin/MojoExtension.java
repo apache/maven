@@ -94,6 +94,7 @@ import org.apache.maven.testing.plugin.stubs.ProjectStub;
 import org.apache.maven.testing.plugin.stubs.RepositorySystemSupplier;
 import org.apache.maven.testing.plugin.stubs.SessionMock;
 import org.apache.maven.utils.StringInterpolator;
+import org.apache.maven.utils.StringInterpolatorException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
@@ -736,12 +737,17 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
      * system properties.
      */
     private static String interpolate(Path pluginPom, Xpp3Dom pluginPomDom, String value) throws Exception {
-        String interpolated = INTERPOLATOR.interpolate(
-                value,
-                key -> child(pluginPomDom, "properties")
-                        .flatMap(p -> child(p, key))
-                        .map(Xpp3Dom::getValue)
-                        .orElseGet(() -> System.getProperty(key)));
+        String interpolated;
+        try {
+            interpolated = INTERPOLATOR.interpolate(
+                    value,
+                    key -> child(pluginPomDom, "properties")
+                            .flatMap(p -> child(p, key))
+                            .map(Xpp3Dom::getValue)
+                            .orElseGet(() -> System.getProperty(key)));
+        } catch (StringInterpolatorException e) {
+            throw new Exception("unable to resolve " + value + " in " + pluginPom + ": " + e.getMessage(), e);
+        }
         if (interpolated.contains("${")) {
             throw new Exception("unable to resolve " + value + " in " + pluginPom);
         }
