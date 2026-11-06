@@ -50,7 +50,6 @@ import org.apache.maven.api.cli.extensions.InputSource;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.settings.Extension;
-import org.apache.maven.api.settings.PhaseInjection;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cling.invoker.cisupport.CIDetectorHelper;
@@ -93,12 +92,6 @@ public abstract class BaseParser implements Parser {
 
         @Nullable
         public List<CoreExtensions> extensions;
-
-        @Nullable
-        public Map<String, List<String>> aliases;
-
-        @Nullable
-        public List<PhaseInjection> phases;
 
         @Nullable
         public CIInfo ciInfo;
@@ -293,8 +286,6 @@ public abstract class BaseParser implements Parser {
                 context.topDirectory,
                 context.rootDirectory,
                 context.extensions,
-                context.aliases,
-                context.phases,
                 context.ciInfo,
                 context.options);
     }
@@ -726,6 +717,9 @@ public abstract class BaseParser implements Parser {
         builder.version(version);
         if (ext.getClassLoadingStrategy() != null) {
             builder.classLoadingStrategy(ext.getClassLoadingStrategy());
+        }
+        if (ext.getConfiguration() != null) {
+            builder.configuration(ext.getConfiguration());
         }
         return builder.build();
     }

@@ -193,7 +193,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             if (alias.getName() != null && !alias.getName().isBlank()) {
                 List<String> args = alias.getArgs();
                 if (args == null || args.isEmpty()) {
-                    // Check inline text content (e.g. <alias name="ci">-T 4 -Dsurefire.skip</alias>)
+                    // Check structured content form (e.g. <alias name="ci"><content>-T 4 -Dsurefire.skip</content></alias>)
                     String content = alias.getContent();
                     if (content != null && !content.isBlank()) {
                         target.put(alias.getName(), ArgumentTokenizer.tokenize(content));

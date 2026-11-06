@@ -31,7 +31,6 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.cli.cisupport.CIInfo;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.MessageBuilderFactory;
-import org.apache.maven.api.settings.PhaseInjection;
 
 /**
  * Represents a Maven invocation request, encapsulating all necessary information
@@ -183,35 +182,6 @@ public interface InvokerRequest {
      */
     @Nonnull
     Optional<List<CoreExtensions>> coreExtensions();
-
-    /**
-     * Returns the named build aliases collected from all settings tiers (installation, user, project).
-     * Last-wins across tiers: an alias defined in project settings overrides one with the same name from user
-     * or installation settings.
-     *
-     * <p><b>Lifecycle note:</b> this field is populated post-DI by the invoker (not at parse time).
-     * Callers outside the invoker lifecycle will always observe an empty {@link Optional}.
-     *
-     * @return an {@link Optional} containing the merged alias map (name → expansion tokens), or empty if no
-     *         aliases are defined in any settings tier
-     * @since 4.2.0
-     */
-    @Nonnull
-    Optional<Map<String, List<String>>> aliases();
-
-    /**
-     * Returns the lifecycle phase injections collected from project-scoped settings.
-     * Phase injections from user and installation settings are silently ignored.
-     *
-     * <p><b>Lifecycle note:</b> this field is populated post-DI by the invoker (not at parse time).
-     * Callers outside the invoker lifecycle will always observe an empty {@link Optional}.
-     *
-     * @return an {@link Optional} containing the list of {@link PhaseInjection},
-     *         or empty if no phases are defined in project settings
-     * @since 4.2.0
-     */
-    @Nonnull
-    Optional<List<PhaseInjection>> phases();
 
     /**
      * Returns detected CI system, if any.

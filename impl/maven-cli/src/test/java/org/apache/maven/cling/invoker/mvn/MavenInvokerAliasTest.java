@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  * <p>Covered syntax:
  * <pre>{@code
  * <!-- inline text -->
- * <alias name="ci">verify -Dmaven.test.skip=true</alias>
+ * <alias name="ci"><content>verify -Dmaven.test.skip=true</content></alias>
  *
  * <!-- structured args -->
  * <alias name="ci">
@@ -51,7 +51,7 @@ class MavenInvokerAliasTest {
 
     @Test
     void inlineAliasSingleToken() {
-        // <alias name="ci">verify</alias>
+        // <alias name="ci"><content>verify</content></alias>
         Alias alias = Alias.newBuilder().name("ci").content("verify").build();
         Settings settings = Settings.newBuilder().aliases(List.of(alias)).build();
 
@@ -63,9 +63,7 @@ class MavenInvokerAliasTest {
 
     @Test
     void inlineAliasMultipleTokens() {
-        // <alias name="ci">
-        //     verify -Dmaven.test.skip=true
-        // </alias>
+        // <alias name="ci"><content>verify -Dmaven.test.skip=true</content></alias>
         Alias alias = Alias.newBuilder()
                 .name("ci")
                 .content("    verify -Dmaven.test.skip=true\n")
@@ -80,7 +78,7 @@ class MavenInvokerAliasTest {
 
     @Test
     void inlineAliasQuotedSpaces() {
-        // <alias name="msg">-Dmessage="hello world"</alias>
+        // <alias name="msg"><content>-Dmessage="hello world"</content></alias>
         Alias alias = Alias.newBuilder()
                 .name("msg")
                 .content("-Dmessage=\"hello world\"")
