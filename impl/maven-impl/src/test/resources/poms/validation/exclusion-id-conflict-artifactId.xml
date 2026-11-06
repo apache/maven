@@ -1,0 +1,17 @@
+<project>
+  <modelVersion>4.2.0</modelVersion>
+  <artifactId>aid</artifactId>
+  <groupId>gid</groupId>
+  <version>0.1</version>
+
+  <dependencies>
+    <dependency id="org.postgresql:postgresql:42.7.3">
+      <exclusions>
+        <!-- EXPECT: 1 error — <artifactId> must not be specified when 'id' attribute is used -->
+        <exclusion id="*:*">
+            <artifactId>*</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+  </dependencies>
+</project>
