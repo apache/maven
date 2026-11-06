@@ -171,6 +171,15 @@ public class BaseParserTest {
     }
 
     @Test
+    void extensionIdShorthandBlankComponentThrows() {
+        ReactorExtension re =
+                ReactorExtension.newBuilder().id("  :artifact:1.0").build();
+        IllegalArgumentException ex =
+                Assertions.assertThrows(IllegalArgumentException.class, () -> BaseParser.toCoreExtension(re));
+        Assertions.assertTrue(ex.getMessage().contains("Invalid extension id"), ex.getMessage());
+    }
+
+    @Test
     void extensionEmptyCoordinatesThrows() {
         ReactorExtension re = ReactorExtension.newBuilder()
                 .groupId("")
