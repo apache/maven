@@ -30,16 +30,24 @@ class MojoExtensionParameterPomTest {
 
     private static final String COORDINATES = "test:test-plugin:0.0.1-SNAPSHOT:goal";
 
-    private static final String CUSTOM_POM = "<project>"
-            + "<groupId>customGroupId</groupId>"
-            + "<artifactId>customArtifactId</artifactId>"
-            + "<version>2.0</version>"
-            + "<build><plugins><plugin>"
-            + "<groupId>test</groupId>"
-            + "<artifactId>test-plugin</artifactId>"
-            + "<configuration><param>fromParameterPom</param></configuration>"
-            + "</plugin></plugins></build>"
-            + "</project>";
+    private static final String CUSTOM_POM = """
+            <project>
+              <groupId>customGroupId</groupId>
+              <artifactId>customArtifactId</artifactId>
+              <version>2.0</version>
+              <build>
+                <plugins>
+                  <plugin>
+                    <groupId>test</groupId>
+                    <artifactId>test-plugin</artifactId>
+                    <configuration>
+                      <param>fromParameterPom</param>
+                    </configuration>
+                  </plugin>
+                </plugins>
+              </build>
+            </project>
+            """;
 
     @Inject
     Project project;
