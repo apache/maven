@@ -96,8 +96,7 @@ public class MavenParser extends BaseParser {
             return options;
         } catch (ParseException e) {
             throw new IllegalArgumentException(
-                    "Failed to parse arguments from settings.xml (" + settingsFile + "): " + e.getMessage(),
-                    e.getCause());
+                    "Failed to parse arguments from settings.xml (" + settingsFile + "): " + e.getMessage(), e);
         }
     }
 
@@ -105,7 +104,7 @@ public class MavenParser extends BaseParser {
         try {
             return parseArgs(Options.SOURCE_CLI, args);
         } catch (ParseException e) {
-            throw new IllegalArgumentException("Failed to parse CLI arguments: " + e.getMessage(), e.getCause());
+            throw new IllegalArgumentException("Failed to parse CLI arguments: " + e.getMessage(), e);
         }
     }
 
@@ -116,7 +115,7 @@ public class MavenParser extends BaseParser {
             return parseArgs("atFile", args);
         } catch (ParseException e) {
             throw new IllegalArgumentException(
-                    "Failed to parse arguments from file (" + atFile + "): " + e.getMessage(), e.getCause());
+                    "Failed to parse arguments from file (" + atFile + "): " + e.getMessage(), e);
         } catch (IOException e) {
             throw new IllegalStateException("Error reading config file: " + atFile, e);
         }
@@ -135,8 +134,7 @@ public class MavenParser extends BaseParser {
             return options;
         } catch (ParseException e) {
             throw new IllegalArgumentException(
-                    "Failed to parse arguments from maven.config file (" + configFile + "): " + e.getMessage(),
-                    e.getCause());
+                    "Failed to parse arguments from maven.config file (" + configFile + "): " + e.getMessage(), e);
         } catch (IOException e) {
             throw new IllegalStateException("Error reading config file: " + configFile, e);
         }

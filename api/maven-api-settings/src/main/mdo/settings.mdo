@@ -281,9 +281,9 @@
           <required>false</required>
           <description>
             <![CDATA[
-            Core extensions to load. Replaces {@code .mvn/extensions.xml} when present in project-scoped
-            settings. <strong>Valid only in project-scoped settings</strong> — rejected in user and
-            installation settings.
+            Core extensions to load. Replaces {@code .mvn/extensions.xml} (project), the user
+            {@code extensions.xml}, or the installation {@code extensions.xml} when present at the
+            corresponding tier. Valid at all tiers (project, user, and installation).
             ]]>
           </description>
           <association xml.itemsStyle="flat" xml.tagName="extension">
@@ -1169,7 +1169,7 @@
       <description>Describes a core extension to load. Fields may be provided either as XML attributes
       (compact form) or via the {@code id} attribute using the {@code groupId:artifactId:version} coordinate
       format. When {@code id} is specified, the individual coordinate attributes must not be set.
-      Valid only in project-scoped settings.</description>
+      Valid at all tiers (project, user, and installation).</description>
       <version>2.1.0+</version>
       <fields>
         <field xml.attribute="true">
