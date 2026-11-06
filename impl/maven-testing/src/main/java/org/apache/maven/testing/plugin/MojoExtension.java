@@ -42,8 +42,6 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -95,6 +93,7 @@ import org.apache.maven.testing.plugin.stubs.ProducedArtifactStub;
 import org.apache.maven.testing.plugin.stubs.ProjectStub;
 import org.apache.maven.testing.plugin.stubs.RepositorySystemSupplier;
 import org.apache.maven.testing.plugin.stubs.SessionMock;
+import org.apache.maven.utils.StringInterpolator;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
@@ -173,7 +172,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
 
     private static final String BASEDIR_KEY = "basedir";
 
-    private static final Pattern EXPRESSION = Pattern.compile("\\$\\{([^}]+)}");
+    private static final StringInterpolator INTERPOLATOR = new StringInterpolator();
 
     /**
      * Gets the identifier for the current test method.
@@ -737,21 +736,16 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
      * system properties.
      */
     private static String interpolate(Path pluginPom, Xpp3Dom pluginPomDom, String value) throws Exception {
-        Matcher matcher = EXPRESSION.matcher(value);
-        StringBuilder sb = new StringBuilder();
-        while (matcher.find()) {
-            String key = matcher.group(1);
-            String resolved = child(pluginPomDom, "properties")
-                    .flatMap(p -> child(p, key))
-                    .map(Xpp3Dom::getValue)
-                    .orElseGet(() -> System.getProperty(key));
-            if (resolved == null) {
-                throw new Exception("unable to resolve " + matcher.group() + " in " + pluginPom);
-            }
-            matcher.appendReplacement(sb, Matcher.quoteReplacement(resolved));
+        String interpolated = INTERPOLATOR.interpolate(
+                value,
+                key -> child(pluginPomDom, "properties")
+                        .flatMap(p -> child(p, key))
+                        .map(Xpp3Dom::getValue)
+                        .orElseGet(() -> System.getProperty(key)));
+        if (interpolated.contains("${")) {
+            throw new Exception("unable to resolve " + value + " in " + pluginPom);
         }
-        matcher.appendTail(sb);
-        return sb.toString();
+        return interpolated;
     }
 
     /**
