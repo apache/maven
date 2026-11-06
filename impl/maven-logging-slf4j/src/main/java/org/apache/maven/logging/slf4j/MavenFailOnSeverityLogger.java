@@ -32,6 +32,10 @@ public class MavenFailOnSeverityLogger extends MavenSimpleLogger {
         super(name);
     }
 
+    MavenFailOnSeverityLogger(String name, String pluginId) {
+        super(name, pluginId);
+    }
+
     @Override
     public void warn(String msg) {
         super.warn(msg);

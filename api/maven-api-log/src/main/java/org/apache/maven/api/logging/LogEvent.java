@@ -184,6 +184,19 @@ public interface LogEvent {
         return null;
     }
 
+    /**
+     * The plugin that produced this event
+     * (e.g. {@code "org.apache.maven.plugins:maven-compiler-plugin:3.13.0"}), or {@code null}
+     * if the event was logged by Maven core or outside a plugin context.
+     *
+     * @return the plugin identifier, or {@code null}
+     * @since 4.2.0
+     */
+    @Nullable
+    default String pluginId() {
+        return null;
+    }
+
     // ---- Structured data (populated for fluent LogBuilder events) ----
 
     /**

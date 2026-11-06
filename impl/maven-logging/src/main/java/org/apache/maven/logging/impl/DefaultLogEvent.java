@@ -52,6 +52,7 @@ public final class DefaultLogEvent implements LogEvent {
     private final String threadName;
     private final String projectId;
     private final String mojoId;
+    private final String pluginId;
     private final Map<String, Object> keyValues;
     private final String messageTemplate;
     private final List<Object> messageArgs;
@@ -88,6 +89,44 @@ public final class DefaultLogEvent implements LogEvent {
                 threadName,
                 projectId,
                 mojoId,
+                null,
+                keyValues,
+                messageTemplate,
+                messageArgs != null ? Collections.unmodifiableList(Arrays.asList(messageArgs)) : null);
+    }
+
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public DefaultLogEvent(
+            Instant timestamp,
+            LogLevel level,
+            String message,
+            String loggerName,
+            Throwable throwable,
+            String sourceClassName,
+            String sourceMethodName,
+            long threadId,
+            long sequenceNumber,
+            String threadName,
+            String projectId,
+            String mojoId,
+            String pluginId,
+            Map<String, Object> keyValues,
+            String messageTemplate,
+            Object[] messageArgs) {
+        this(
+                timestamp,
+                level,
+                message,
+                loggerName,
+                throwable,
+                sourceClassName,
+                sourceMethodName,
+                threadId,
+                sequenceNumber,
+                threadName,
+                projectId,
+                mojoId,
+                pluginId,
                 keyValues,
                 messageTemplate,
                 messageArgs != null ? Collections.unmodifiableList(Arrays.asList(messageArgs)) : null);
@@ -110,6 +149,43 @@ public final class DefaultLogEvent implements LogEvent {
             Map<String, Object> keyValues,
             String messageTemplate,
             List<Object> messageArgs) {
+        this(
+                timestamp,
+                level,
+                message,
+                loggerName,
+                throwable,
+                sourceClassName,
+                sourceMethodName,
+                threadId,
+                sequenceNumber,
+                threadName,
+                projectId,
+                mojoId,
+                null,
+                keyValues,
+                messageTemplate,
+                messageArgs);
+    }
+
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public DefaultLogEvent(
+            Instant timestamp,
+            LogLevel level,
+            String message,
+            String loggerName,
+            Throwable throwable,
+            String sourceClassName,
+            String sourceMethodName,
+            long threadId,
+            long sequenceNumber,
+            String threadName,
+            String projectId,
+            String mojoId,
+            String pluginId,
+            Map<String, Object> keyValues,
+            String messageTemplate,
+            List<Object> messageArgs) {
         this.timestamp = timestamp;
         this.level = level;
         this.message = message;
@@ -122,6 +198,7 @@ public final class DefaultLogEvent implements LogEvent {
         this.threadName = threadName;
         this.projectId = projectId;
         this.mojoId = mojoId;
+        this.pluginId = pluginId;
         this.keyValues = keyValues != null ? Map.copyOf(keyValues) : Map.of();
         this.messageTemplate = messageTemplate;
         this.messageArgs = messageArgs != null ? Collections.unmodifiableList(messageArgs) : null;
@@ -235,6 +312,11 @@ public final class DefaultLogEvent implements LogEvent {
     @Override
     public String mojoId() {
         return mojoId;
+    }
+
+    @Override
+    public String pluginId() {
+        return pluginId;
     }
 
     @Override

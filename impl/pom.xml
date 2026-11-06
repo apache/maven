@@ -41,6 +41,7 @@ under the License.
     <module>maven-logging</module>
     <module>maven-logging-slf4j</module>
     <module>maven-logging-jul</module>
+    <module>maven-logging-system</module>
     <module>maven-core</module>
     <module>maven-cli</module>
     <module>maven-testing</module>

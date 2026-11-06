@@ -55,6 +55,7 @@ import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.api.plugin.descriptor.Resolution;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
@@ -370,6 +371,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
             pluginDescriptor.setClassRealm(pluginRealm);
             pluginDescriptor.setArtifacts(pluginArtifacts);
+            registerPluginClassLoader(pluginDescriptor, pluginRealm);
         } else {
             boolean v4api = pluginDescriptor.getMojos().stream().anyMatch(MojoDescriptor::isV4Api);
             Map<String, ClassLoader> foreignImports = calcImports(project, parent, imports, v4api);
@@ -397,9 +399,16 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             for (ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents()) {
                 componentDescriptor.setRealm(cacheRecord.getRealm());
             }
+            registerPluginClassLoader(pluginDescriptor, cacheRecord.getRealm());
 
             pluginRealmCache.register(project, cacheKey, cacheRecord);
         }
+    }
+
+    private static void registerPluginClassLoader(PluginDescriptor pluginDescriptor, ClassRealm realm) {
+        Plugin plugin = pluginDescriptor.getPlugin();
+        String pluginKey = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion();
+        LoggerManager.get().registerPluginClassLoader(realm, pluginKey);
     }
 
     private void createPluginRealm(

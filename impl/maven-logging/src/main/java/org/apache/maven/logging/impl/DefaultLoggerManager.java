@@ -19,8 +19,11 @@
 package org.apache.maven.logging.impl;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
@@ -69,6 +72,7 @@ public class DefaultLoggerManager implements LoggerManager {
     private final ConcurrentHashMap<String, Integer> levelCache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Logger> loggers = new ConcurrentHashMap<>();
     private final List<Runnable> reconfigurationListeners = new CopyOnWriteArrayList<>();
+    private final Map<ClassLoader, String> pluginClassLoaders = Collections.synchronizedMap(new WeakHashMap<>());
 
     public DefaultLoggerManager() {
         this.logSink = new AccumulatingLogSink();
@@ -80,6 +84,16 @@ public class DefaultLoggerManager implements LoggerManager {
     @Override
     public Logger getLogger(String name) {
         return loggers.computeIfAbsent(name, DefaultLogger::new);
+    }
+
+    @Override
+    public Logger getLogger(Class<?> clazz) {
+        String pluginId = getPluginId(clazz.getClassLoader());
+        if (pluginId != null) {
+            String key = clazz.getName() + "@" + pluginId;
+            return loggers.computeIfAbsent(key, k -> new DefaultLogger(clazz.getName(), null, null, pluginId));
+        }
+        return getLogger(clazz.getName());
     }
 
     // -- LogManager: sink --
@@ -188,6 +202,21 @@ public class DefaultLoggerManager implements LoggerManager {
             }
             break;
         }
+    }
+
+    // -- Plugin classloader registry --
+
+    @Override
+    public void registerPluginClassLoader(ClassLoader classLoader, String pluginId) {
+        pluginClassLoaders.put(classLoader, pluginId);
+    }
+
+    @Override
+    public String getPluginId(ClassLoader classLoader) {
+        if (classLoader == null) {
+            return null;
+        }
+        return pluginClassLoaders.get(classLoader);
     }
 
     // -- Level resolution --

@@ -18,6 +18,7 @@
  */
 package org.apache.maven.logging.slf4j;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -32,6 +33,8 @@ import org.slf4j.Logger;
  */
 public class MavenLoggerFactory implements ILoggerFactory {
     static volatile MavenLoggerFactory instance;
+
+    private static final StackWalker STACK_WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
 
     final DefaultLoggerManager logManager;
     final ConcurrentMap<String, Logger> loggerMap = new ConcurrentHashMap<>();
@@ -51,14 +54,25 @@ public class MavenLoggerFactory implements ILoggerFactory {
 
     /**
      * Return an appropriate {@link Logger} instance by name.
+     * <p>
+     * Uses {@link StackWalker} to identify whether the caller belongs to a
+     * plugin classloader. When it does, the logger is keyed by
+     * {@code name + "@" + pluginId} so that each plugin gets its own logger
+     * instance with the correct plugin attribution.
      */
     @Override
     public Logger getLogger(String name) {
-        return loggerMap.computeIfAbsent(name, this::getNewLoggingInstance);
+        String pluginId = resolvePluginId();
+        String cacheKey = pluginId != null ? name + "@" + pluginId : name;
+        return loggerMap.computeIfAbsent(cacheKey, k -> new MavenFailOnSeverityLogger(name, pluginId));
     }
 
-    protected Logger getNewLoggingInstance(String name) {
-        return new MavenFailOnSeverityLogger(name);
+    private String resolvePluginId() {
+        return STACK_WALKER.walk(frames -> frames.map(f ->
+                        LoggerManager.get().getPluginId(f.getDeclaringClass().getClassLoader()))
+                .filter(Objects::nonNull)
+                .findFirst()
+                .orElse(null));
     }
 
     public void reconfigure() {

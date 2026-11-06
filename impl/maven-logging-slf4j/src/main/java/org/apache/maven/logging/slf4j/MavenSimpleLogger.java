@@ -48,6 +48,10 @@ public class MavenSimpleLogger extends MavenBaseLogger {
         super(name);
     }
 
+    MavenSimpleLogger(String name, String pluginId) {
+        super(name, pluginId);
+    }
+
     @Override
     protected String renderLevel(int level) {
         if (traceRenderedLevel == null) {
@@ -70,7 +74,7 @@ public class MavenSimpleLogger extends MavenBaseLogger {
     protected void write(int level, String loggerName, String cleanMessage, StringBuilder formattedBuf, Throwable t) {
         LogSink sink = LoggerManager.get().getLogSink();
         if (sink != null) {
-            sink.accept(MavenSimpleLoggerUtils.toLogEvent(level, loggerName, cleanMessage, t));
+            sink.accept(MavenSimpleLoggerUtils.toLogEvent(level, loggerName, cleanMessage, t, pluginId));
         } else {
             super.write(formattedBuf, t);
         }

@@ -184,6 +184,8 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
     protected int currentLogLevel = LOG_LEVEL_INFO;
     /** The short name of this simple log instance */
     private transient String shortLogName = null;
+    /** The plugin identifier captured at logger creation time, or {@code null} for core loggers. */
+    protected final String pluginId;
 
     /**
      * Legacy SLF4J prefix maintained for backwards compatibility
@@ -195,7 +197,12 @@ public class MavenBaseLogger extends LegacyAbstractLogger {
      * MavenLoggerFactory instances.
      */
     protected MavenBaseLogger(String name) {
+        this(name, null);
+    }
+
+    protected MavenBaseLogger(String name, String pluginId) {
         this.name = name;
+        this.pluginId = pluginId;
 
         LoggerManager mgr = LoggerManager.get();
         if (mgr instanceof DefaultLoggerManager dlm) {

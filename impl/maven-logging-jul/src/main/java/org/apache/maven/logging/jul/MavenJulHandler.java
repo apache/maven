@@ -138,6 +138,8 @@ public class MavenJulHandler extends Handler {
                 threadName = Thread.currentThread().getName();
             }
 
+            String pluginId = resolvePluginId(mgr);
+
             LogEvent event = new DefaultLogEvent(
                     MonotonicClock.now(),
                     level,
@@ -150,7 +152,11 @@ public class MavenJulHandler extends Handler {
                     SEQUENCE.getAndIncrement(),
                     threadName,
                     null,
-                    null);
+                    null,
+                    pluginId,
+                    null,
+                    null,
+                    (java.util.List<Object>) null);
 
             sink.accept(event);
 
@@ -167,6 +173,11 @@ public class MavenJulHandler extends Handler {
 
     @Override
     public void close() throws SecurityException {}
+
+    private static String resolvePluginId(LoggerManager mgr) {
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        return cl != null ? mgr.getPluginId(cl) : null;
+    }
 
     static LogLevel julLevelToLogLevel(Level julLevel) {
         int value = julLevel.intValue();

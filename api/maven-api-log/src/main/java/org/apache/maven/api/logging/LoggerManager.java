@@ -33,8 +33,9 @@ import org.apache.maven.api.annotations.Provider;
  * and severity tracking for {@code --fail-on-severity}.
  * <p>
  * The singleton is resolved lazily on the first {@link #get()} call using
- * {@link ServiceLoader}. If no provider is found, a no-op fallback is
- * installed. Embedders and tests can override with {@link #set(LoggerManager)}.
+ * {@link ServiceLoader}. If no provider is found, a buffering fallback is
+ * installed that accumulates events until a real implementation is set via
+ * {@link #set(LoggerManager)}.
  *
  * @since 4.2.0
  */
@@ -93,11 +94,34 @@ public interface LoggerManager {
     boolean hasReached(@Nonnull LogLevel level);
 
     /**
+     * Registers a classloader as belonging to a specific plugin.
+     * Used by the plugin manager to enable attribution of log events
+     * to the plugin that produced them.
+     *
+     * @param classLoader the plugin's classloader
+     * @param pluginId the plugin identifier (e.g. {@code "groupId:artifactId:version"})
+     */
+    default void registerPluginClassLoader(@Nonnull ClassLoader classLoader, @Nonnull String pluginId) {}
+
+    /**
+     * Returns the plugin identifier for the given classloader, or {@code null}
+     * if the classloader is not a registered plugin classloader.
+     *
+     * @param classLoader the classloader to look up
+     * @return the plugin identifier, or {@code null}
+     */
+    @Nullable
+    default String getPluginId(@Nullable ClassLoader classLoader) {
+        return null;
+    }
+
+    /**
      * Returns the global {@code LoggerManager} instance.
      * <p>
      * On the first call, synchronously discovers an implementation via
-     * {@link ServiceLoader}. If none is found, a no-op fallback is installed.
-     * The result is cached — subsequent calls return immediately.
+     * {@link ServiceLoader}. If none is found, a buffering fallback is
+     * installed that accumulates events until a real implementation is
+     * set via {@link #set(LoggerManager)}.
      *
      * @return the global manager, never {@code null}
      */
@@ -115,11 +139,22 @@ public interface LoggerManager {
      * <p>
      * Typically used by embedders or tests to override the
      * {@link ServiceLoader}-discovered implementation.
+     * <p>
+     * If the previous manager was the bootstrap buffering manager,
+     * any accumulated events are drained to the new manager's
+     * {@link LogSink}.
      *
      * @param manager the manager to install, or {@code null} to clear
      */
     static void set(LoggerManager manager) {
+        LoggerManager old = Holder.instance;
         Holder.instance = manager;
+        if (old instanceof BufferingLoggerManager buffering && manager != null && old != manager) {
+            LogSink sink = manager.getLogSink();
+            if (sink != null) {
+                buffering.drainTo(sink);
+            }
+        }
     }
 
     /**
@@ -154,12 +189,12 @@ public interface LoggerManager {
                     return discovered;
                 }
             } catch (Exception | ServiceConfigurationError ignored) {
-                // ServiceLoader failure — fall through to no-op
+                // ServiceLoader failure — fall through to buffering fallback
             } finally {
                 DISCOVERING.remove();
             }
 
-            mgr = new NopLoggerManager();
+            mgr = new BufferingLoggerManager();
             instance = mgr;
             return mgr;
         }

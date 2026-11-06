@@ -58,15 +58,21 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
     private final String name;
     private final String projectId;
     private final String mojoId;
+    private final String pluginId;
 
     public DefaultLogger(String name) {
-        this(name, null, null);
+        this(name, null, null, null);
     }
 
     public DefaultLogger(String name, String projectId, String mojoId) {
+        this(name, projectId, mojoId, null);
+    }
+
+    public DefaultLogger(String name, String projectId, String mojoId, String pluginId) {
         this.name = requireNonNull(name, "name");
         this.projectId = projectId;
         this.mojoId = mojoId;
+        this.pluginId = pluginId;
     }
 
     // ---- org.apache.maven.api.logging.Logger ----
@@ -128,7 +134,7 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
     @Override
     public DefaultLogger child(String childName) {
         requireNonNull(childName, "childName");
-        return new DefaultLogger(name + "." + childName, projectId, mojoId);
+        return new DefaultLogger(name + "." + childName, projectId, mojoId, pluginId);
     }
 
     // ---- Internal dispatch ----
@@ -192,6 +198,7 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
                 threadName,
                 projectIdOverride != null ? projectIdOverride : projectId,
                 mojoIdOverride != null ? mojoIdOverride : mojoId,
+                pluginId,
                 keyValues,
                 messageTemplate,
                 messageArgs);
