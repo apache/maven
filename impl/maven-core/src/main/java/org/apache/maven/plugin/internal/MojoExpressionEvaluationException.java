@@ -16,19 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.configuration;
+package org.apache.maven.plugin.internal;
 
-/**
- * Thrown when a bean couldn't be configured.
- *
- */
-public class BeanConfigurationException extends Exception {
-
-    public BeanConfigurationException(String message) {
+/** Thrown when a mojo parameter expression cannot be evaluated. */
+class MojoExpressionEvaluationException extends Exception {
+    MojoExpressionEvaluationException(String message) {
         super(message);
     }
 
-    public BeanConfigurationException(String message, Throwable cause) {
+    MojoExpressionEvaluationException(String message, Throwable cause) {
         super(message, cause);
     }
 }
