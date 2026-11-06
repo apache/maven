@@ -60,8 +60,7 @@ class MavenITgh12640BomInheritedDepMgmtTest extends AbstractMavenIntegrationTest
         verifier.verifyErrorFreeLog();
 
         // Read the consumer POM that was installed to the local repo
-        Path consumerPomPath =
-                verifier.getArtifactPath("org.apache.maven.its.gh12640", "bom", "1.0.0-SNAPSHOT", "pom");
+        Path consumerPomPath = verifier.getArtifactPath("org.apache.maven.its.gh12640", "bom", "1.0.0-SNAPSHOT", "pom");
 
         assertTrue(Files.exists(consumerPomPath), "Consumer POM not found at " + consumerPomPath);
 
@@ -110,8 +109,7 @@ class MavenITgh12640BomInheritedDepMgmtTest extends AbstractMavenIntegrationTest
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Path consumerPomPath =
-                verifier.getArtifactPath("org.apache.maven.its.gh12640", "bom", "1.0.0-SNAPSHOT", "pom");
+        Path consumerPomPath = verifier.getArtifactPath("org.apache.maven.its.gh12640", "bom", "1.0.0-SNAPSHOT", "pom");
 
         assertTrue(Files.exists(consumerPomPath), "Consumer POM not found at " + consumerPomPath);
 

@@ -43,7 +43,6 @@ class MavenITmdep0590ClassifiedPomArtifactFromReactorTest extends AbstractMavenI
         Properties properties = verifier.loadProperties("consumer/target/artifact.properties");
         ItUtils.assertCanonicalFileEquals(
                 testDir.resolve("producer/custom.pom"),
-                Path.of(properties.getProperty(
-                        "org.apache.maven.its.mdep590:producer:pom:custom:1.0-SNAPSHOT")));
+                Path.of(properties.getProperty("org.apache.maven.its.mdep590:producer:pom:custom:1.0-SNAPSHOT")));
     }
 }

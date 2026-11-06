@@ -26,11 +26,9 @@ under the License.
   <packaging>maven-plugin</packaging>
 
   <name>Maven Integration Test :: MNG-1088 :: Plugin</name>
-  <description>
-    A simple plugin built within the reactor, to be used by the sibling client module.
+  <description>A simple plugin built within the reactor, to be used by the sibling client module.
     The concurrent builder must build this plugin first (up to the ready phase),
-    then allow the client to use it — without any pre-installed version.
-  </description>
+    then allow the client to use it — without any pre-installed version.</description>
 
   <properties>
     <maven.test.skip>true</maven.test.skip>

@@ -26,10 +26,8 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-1088</name>
-  <description>
-    Test that the concurrent builder can build a plugin that is part of the reactor,
-    then use it in a sibling module — without any pre-installed version in the local repo.
-  </description>
+  <description>Test that the concurrent builder can build a plugin that is part of the reactor,
+    then use it in a sibling module — without any pre-installed version in the local repo.</description>
 
   <modules>
     <module>plugin</module>
