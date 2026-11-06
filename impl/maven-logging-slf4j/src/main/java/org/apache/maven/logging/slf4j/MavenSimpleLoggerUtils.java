@@ -53,6 +53,10 @@ public final class MavenSimpleLoggerUtils {
      * The {@code messageTemplate} uses MessageFormat {@code {0}}-style placeholders
      * (already converted from SLF4J's {@code {}} style by {@link Slf4jTemplateConverter}).
      * SLF4J events have no source metadata (class/method).
+     * <p>
+     * {@code renderedLine} is the already-formatted output line (including colored level prefix)
+     * produced by the logger; it is stored as the pre-rendered message so that console sinks
+     * can emit it verbatim without re-formatting.
      */
     @SuppressWarnings("deprecation") // Thread.getId()
     public static LogEvent toLogEvent(
@@ -61,11 +65,12 @@ public final class MavenSimpleLoggerUtils {
             String messageTemplate,
             Object[] messageArgs,
             Throwable throwable,
-            String pluginId) {
+            String pluginId,
+            String renderedLine) {
         return new DefaultLogEvent(
                 MonotonicClock.now(),
                 toLogLevel(level),
-                null,
+                renderedLine,
                 loggerName,
                 throwable,
                 null,

@@ -80,8 +80,8 @@ public class MavenSimpleLogger extends MavenBaseLogger {
             Throwable t) {
         LogSink sink = LoggerManager.get().getLogSink();
         if (sink != null) {
-            sink.accept(
-                    MavenSimpleLoggerUtils.toLogEvent(level, loggerName, messageTemplate, messageArgs, t, pluginId));
+            sink.accept(MavenSimpleLoggerUtils.toLogEvent(
+                    level, loggerName, messageTemplate, messageArgs, t, pluginId, formattedBuf.toString()));
         } else {
             super.write(formattedBuf, t);
         }
