@@ -889,6 +889,16 @@ public final class Constants {
     public static final String MAVEN_TEMPFILE_KEEP = "maven.tempfile.keep";
 
     /**
+     * Comma-separated list of mojo execution filter predicates. Matching executions are skipped at runtime.
+     * Supported forms: {@code *}, {@code :A}, {@code G:A}, {@code G:A:v:g[@e]}, {@code P}, {@code P:v:g},
+     * {@code P:v:g@e}, {@code phase(name)}.
+     *
+     * @since 4.2.0
+     */
+    @Config
+    public static final String MAVEN_LIFECYCLE_FILTER = "maven.lifecycle.filter";
+
+    /**
      * System property to disable the {@code site} lifecycle.
      * When set to {@code true} via {@code -Dmaven.site.lifecycle.disabled=true}, the {@code site}
      * lifecycle is excluded from the default lifecycles, so Maven will not resolve or bind the
