@@ -32,7 +32,7 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 /**
  * Provide public methods from {@link MetadataStaxReader}
  *
- * @deprecated Maven 3 compatability - please use {@link MetadataStaxReader}
+ * @deprecated Maven 3 compatibility - please use {@link MetadataStaxReader}
  */
 @Deprecated
 public class MetadataXpp3Reader {
