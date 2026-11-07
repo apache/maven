@@ -26,6 +26,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -102,9 +103,20 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             Map<String, Dispatcher> dispatchers,
             @Nullable List<SettingsParser> settingsParsers) {
         this.xmlSettingsParser = new XmlSettingsParser(settingsXmlFactory);
-        this.settingsParsers = settingsParsers != null ? settingsParsers : List.of();
+        this.settingsParsers = deduplicate(settingsParsers);
         this.interpolator = interpolator;
         this.dispatchers = dispatchers;
+    }
+
+    private static List<SettingsParser> deduplicate(@Nullable List<SettingsParser> parsers) {
+        if (parsers == null || parsers.isEmpty()) {
+            return List.of();
+        }
+        Map<String, SettingsParser> seen = new LinkedHashMap<>();
+        for (SettingsParser parser : parsers) {
+            seen.putIfAbsent(parser.id(), parser);
+        }
+        return List.copyOf(seen.values());
     }
 
     @Override
@@ -372,16 +384,14 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     matches.add(parser);
                 }
             } catch (RuntimeException e) {
-                String msg = "Settings parser '" + parser.id()
-                        + "' failed to determine support for this source";
+                String msg = "Settings parser '" + parser.id() + "' failed to determine support for this source";
                 problems.reportProblem(
                         new DefaultBuilderProblem(source.getLocation(), -1, -1, e, msg, BuilderProblem.Severity.FATAL));
                 return null;
             }
         }
         if (matches.size() > 1) {
-            String parsers =
-                    matches.stream().map(SettingsParser::id).sorted().collect(Collectors.joining(", "));
+            String parsers = matches.stream().map(SettingsParser::id).sorted().collect(Collectors.joining(", "));
             String msg = "Multiple settings parsers support this source: " + parsers;
             problems.reportProblem(
                     new DefaultBuilderProblem(source.getLocation(), -1, -1, null, msg, BuilderProblem.Severity.FATAL));

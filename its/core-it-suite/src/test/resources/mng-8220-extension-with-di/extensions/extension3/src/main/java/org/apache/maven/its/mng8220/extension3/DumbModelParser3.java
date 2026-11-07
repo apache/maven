@@ -40,8 +40,6 @@ final class DumbModelParser3 implements ModelParser {
     @Inject
     public DumbModelParser3() {}
 
-
-    @Override
     public String id() {
         return "dumb3";
     }

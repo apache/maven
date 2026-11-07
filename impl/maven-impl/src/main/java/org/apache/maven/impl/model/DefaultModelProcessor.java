@@ -81,7 +81,18 @@ public class DefaultModelProcessor implements ModelProcessor {
     @Inject
     public DefaultModelProcessor(ModelXmlFactory modelXmlFactory, @Nullable List<ModelParser> modelParsers) {
         this.modelXmlFactory = modelXmlFactory;
-        this.modelParsers = modelParsers != null ? modelParsers : List.of();
+        this.modelParsers = deduplicate(modelParsers);
+    }
+
+    private static List<ModelParser> deduplicate(@Nullable List<ModelParser> parsers) {
+        if (parsers == null || parsers.isEmpty()) {
+            return List.of();
+        }
+        Map<String, ModelParser> seen = new LinkedHashMap<>();
+        for (ModelParser parser : parsers) {
+            seen.putIfAbsent(parser.id(), parser);
+        }
+        return List.copyOf(seen.values());
     }
 
     @Override
