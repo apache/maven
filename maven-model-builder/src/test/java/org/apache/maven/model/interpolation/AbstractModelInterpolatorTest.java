@@ -19,11 +19,13 @@
 package org.apache.maven.model.interpolation;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Optional;
 import java.util.Properties;
 import java.util.TimeZone;
 
@@ -39,6 +41,7 @@ import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
+import org.apache.maven.model.root.DefaultRootLocator;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.Test;
 
@@ -338,6 +341,91 @@ public abstract class AbstractModelInterpolatorTest {
     }
 
     @Test
+    public void testRootDirectory() throws Exception {
+        File rootDirectory = new File("/test/root");
+        File projectDirectory = new File(rootDirectory, "module");
+
+        Model model = new Model();
+        model.setVersion("3.8.1");
+        model.setArtifactId("foo");
+
+        Repository repository = new Repository();
+        repository.setUrl("${project.rootDirectory}/temp-repo");
+        model.addRepository(repository);
+
+        ModelInterpolator interpolator = createInterpolator(rootDirectory);
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out =
+                interpolator.interpolateModel(model, projectDirectory, createModelBuildingRequest(context), collector);
+        assertProblemFree(collector);
+
+        assertEquals(
+                rootDirectory.getAbsolutePath() + "/temp-repo",
+                out.getRepositories().get(0).getUrl());
+    }
+
+    @Test
+    public void testCustomRootDirectoryPropertyIsNotShadowed() throws Exception {
+        // GH-13883: a custom ${rootDirectory} property must not be shadowed by ${project.rootDirectory}
+        File rootDirectory = new File("/test/root");
+        File projectDirectory = new File(rootDirectory, "module");
+
+        Model model = new Model();
+        model.setVersion("3.8.1");
+        model.setArtifactId("foo");
+        model.addProperty("rootDirectory", "${project.basedir}");
+
+        Repository custom = new Repository();
+        custom.setId("custom");
+        custom.setUrl("${rootDirectory}/temp-repo");
+        model.addRepository(custom);
+
+        Repository project = new Repository();
+        project.setId("project");
+        project.setUrl("${project.rootDirectory}/temp-repo");
+        model.addRepository(project);
+
+        ModelInterpolator interpolator = createInterpolator(rootDirectory);
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out =
+                interpolator.interpolateModel(model, projectDirectory, createModelBuildingRequest(context), collector);
+        assertProblemFree(collector);
+
+        assertEquals(
+                projectDirectory.getAbsolutePath() + "/temp-repo",
+                out.getRepositories().get(0).getUrl());
+        assertEquals(
+                rootDirectory.getAbsolutePath() + "/temp-repo",
+                out.getRepositories().get(1).getUrl());
+    }
+
+    @Test
+    public void testUnprefixedRootDirectoryIsNotInterpolated() throws Exception {
+        // GH-13883: only ${project.rootDirectory} is supported, ${rootDirectory} is not an alias
+        File rootDirectory = new File("/test/root");
+        File projectDirectory = new File(rootDirectory, "module");
+
+        Model model = new Model();
+        model.setVersion("3.8.1");
+        model.setArtifactId("foo");
+
+        Repository repository = new Repository();
+        repository.setUrl("${rootDirectory}/temp-repo");
+        model.addRepository(repository);
+
+        ModelInterpolator interpolator = createInterpolator(rootDirectory);
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out =
+                interpolator.interpolateModel(model, projectDirectory, createModelBuildingRequest(context), collector);
+        assertProblemFree(collector);
+
+        assertEquals("${rootDirectory}/temp-repo", out.getRepositories().get(0).getUrl());
+    }
+
+    @Test
     public void testEnvars() throws Exception {
         Properties context = new Properties();
 
@@ -580,4 +668,18 @@ public abstract class AbstractModelInterpolatorTest {
     protected abstract ModelInterpolator createInterpolator(PathTranslator translator) throws Exception;
 
     protected abstract ModelInterpolator createInterpolator() throws Exception;
+
+    private ModelInterpolator createInterpolator(File rootDirectory) throws Exception {
+        return ((AbstractStringBasedModelInterpolator) createInterpolator()).setRootLocator(new DefaultRootLocator() {
+            @Override
+            public Path findRoot(Path basedir) {
+                return rootDirectory.toPath();
+            }
+
+            @Override
+            protected Optional<Path> getRootDirectoryFallback() {
+                return Optional.empty();
+            }
+        });
+    }
 }

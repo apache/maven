@@ -33,7 +33,7 @@ The main component is `ModelBuilder` ([javadoc](./apidocs/org/apache/maven/model
 The sequence is divided into 2 phases:
 
 - phase 1
-    - profile activation: see [available activators](./apidocs/org/apache/maven/model/profile/activation/package-summary.html). Notice that model interpolation hasn't happened yet, then interpolation for file-based activation is limited to `${basedir}` (since Maven 3), system properties and user properties
+    - profile activation: see [available activators](./apidocs/org/apache/maven/model/profile/activation/package-summary.html). Notice that model interpolation hasn't happened yet, then interpolation for file-based activation is limited to `${basedir}` (since Maven 3), `${project.rootDirectory}` (since Maven 3.10.0), system properties and user properties
     - raw model validation: `ModelValidator` ([javadoc](./apidocs/org/apache/maven/model/validation/ModelValidator.html)), with its `DefaultModelValidator` implementation ([source](./xref/org/apache/maven/model/validation/DefaultModelValidator.html))
     - model normalization - merge duplicates: `ModelNormalizer` ([javadoc](./apidocs/org/apache/maven/model/normalization/ModelNormalizer.html)), with its `DefaultModelNormalizer` implementation ([source](./xref/org/apache/maven/model/normalization/DefaultModelNormalizer.html))
     - profile injection: `ProfileInjector` ([javadoc](./apidocs/org/apache/maven/model/profile/ProfileInjector.html)), with its `DefaultProfileInjector` implementation ([source](./xref/org/apache/maven/model/profile/DefaultProfileInjector.html))
@@ -69,7 +69,7 @@ Notice that the 5 URLs from the model (`project.url`, `project.scm.connection`, 
 
 Model Interpolation consists in replacing `${...}` with calculated value. It is done in `StringSearchModelInterpolator` ([javadoc](./apidocs/org/apache/maven/model/interpolation/StringSearchModelInterpolator.html), [source](./xref/org/apache/maven/model/interpolation/StringSearchModelInterpolator.html)).
 
-Notice that model interpolation happens _after_ profile activation, then profile activation doesn't benefit from every values: interpolation for file-based activation is limited to `${basedir}` (which was introduced in Maven 3 and is not deprecated in this context), system properties and user properties.
+Notice that model interpolation happens _after_ profile activation, then profile activation doesn't benefit from every values: interpolation for file-based activation is limited to `${basedir}` (which was introduced in Maven 3 and is not deprecated in this context) and `${project.rootDirectory}` (introduced in Maven 3.10.0), system properties and user properties.
 
 Values are evaluated in sequence from different syntaxes:
 
@@ -77,7 +77,7 @@ Values are evaluated in sequence from different syntaxes:
 |:---|:---|:---|
 |`project.*` <br />`pom.*` (_deprecated_) <br />`*` (_deprecated_)|POM content (see [POM reference](../maven-model/maven.html))|`${project.version}` <br />`${project.build.finalName}` <br />`${project.artifactId}` <br />`${project.build.directory}`|
 |`project.basedir` <br />`pom.basedir` (_deprecated_) <br />`basedir` (_deprecated_)|the directory containing the `pom.xml` file|`${project.basedir}`|
-|`project.rootDirectory`|the project's root directory (containing a `.mvn` directory)|`${project.rootDirectory}`|
+|`project.rootDirectory`|the project's root directory (containing a `.mvn` directory) _(since Maven 3.10.0)_|`${project.rootDirectory}`|
 |`project.baseUri` <br />`pom.baseUri` (_deprecated_)|the directory containing the `pom.xml` file as URI|`${project.baseUri}`|
 |`build.timestamp` <br />`maven.build.timestamp`|the UTC timestamp of build start, in `yyyy-MM-dd'T'HH:mm:ss'Z'` default format, which can be overridden with `maven.build.timestamp.format` POM property|`${maven.build.timestamp}`|
 |`*`|user properties, set from CLI with `-Dproperty=value`|`${skipTests}`|
