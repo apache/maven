@@ -173,6 +173,11 @@ public interface LoggerManager {
             LogSink sink = manager.getLogSink();
             if (sink != null) {
                 buffering.drainTo(sink);
+            } else {
+                // The new manager has no sink yet — bootstrap events cannot be forwarded.
+                // Emit a warning to stderr so the loss is not silent.
+                System.err.println("[WARNING] LoggerManager installed without an active LogSink;"
+                        + " bootstrap log events accumulated before LogSink installation are discarded.");
             }
         }
     }
@@ -215,6 +220,12 @@ public interface LoggerManager {
                 for (LoggerManager discovered :
                         ServiceLoader.load(LoggerManager.class, LoggerManager.class.getClassLoader())) {
                     instance = discovered;
+                    // Drain any events buffered during re-entrant calls while ServiceLoader
+                    // was initialising the provider.  mirror the same logic as set().
+                    LogSink sink = discovered.getLogSink();
+                    if (sink != null) {
+                        BOOTSTRAP.drainTo(sink);
+                    }
                     return discovered;
                 }
             } catch (Exception | ServiceConfigurationError ignored) {

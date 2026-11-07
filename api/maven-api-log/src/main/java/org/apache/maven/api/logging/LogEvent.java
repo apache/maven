@@ -214,6 +214,22 @@ public interface LogEvent {
     }
 
     /**
+     * The pre-rendered console line produced by the SLF4J logger, including level prefix
+     * and ANSI color codes, or {@code null} when the event was not produced via SLF4J.
+     * <p>
+     * Console sinks that want to emit the exact string the logger formatted (preserving
+     * colors) should use this value when non-null; structured sinks (JSON, XML) should
+     * use {@link #message()} instead.
+     *
+     * @return the pre-rendered console line, or {@code null}
+     * @since 4.2.0
+     */
+    @Nullable
+    default String renderedLine() {
+        return null;
+    }
+
+    /**
      * The unformatted message template as passed to
      * {@link LogEventBuilder#log(String, Object...)}, or {@code null} when the
      * event was produced with a pre-formatted message (no template args).

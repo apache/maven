@@ -54,6 +54,7 @@ public final class DefaultLogEvent implements LogEvent {
     private final Map<String, Object> keyValues;
     private final String messageTemplate;
     private final List<Object> messageArgs;
+    private final String renderedLine;
 
     private volatile String formattedMessage;
 
@@ -200,6 +201,48 @@ public final class DefaultLogEvent implements LogEvent {
         this.keyValues = keyValues != null ? Map.copyOf(keyValues) : Map.of();
         this.messageTemplate = messageTemplate;
         this.messageArgs = messageArgs != null ? Collections.unmodifiableList(messageArgs) : null;
+        this.renderedLine = null;
+    }
+
+    /**
+     * Full constructor for SLF4J-sourced events that carry a pre-rendered console line.
+     */
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public DefaultLogEvent(
+            Instant timestamp,
+            LogLevel level,
+            String message,
+            String loggerName,
+            Throwable throwable,
+            String sourceClassName,
+            String sourceMethodName,
+            long threadId,
+            long sequenceNumber,
+            String threadName,
+            String projectId,
+            String mojoId,
+            String pluginId,
+            Map<String, Object> keyValues,
+            String messageTemplate,
+            List<Object> messageArgs,
+            String renderedLine) {
+        this.timestamp = timestamp;
+        this.level = level;
+        this.message = message;
+        this.loggerName = loggerName;
+        this.throwable = throwable;
+        this.sourceClassName = sourceClassName;
+        this.sourceMethodName = sourceMethodName;
+        this.threadId = threadId;
+        this.sequenceNumber = sequenceNumber;
+        this.threadName = threadName;
+        this.projectId = projectId;
+        this.mojoId = mojoId;
+        this.pluginId = pluginId;
+        this.keyValues = keyValues != null ? Map.copyOf(keyValues) : Map.of();
+        this.messageTemplate = messageTemplate;
+        this.messageArgs = messageArgs != null ? Collections.unmodifiableList(messageArgs) : null;
+        this.renderedLine = renderedLine;
     }
 
     /**
@@ -330,6 +373,11 @@ public final class DefaultLogEvent implements LogEvent {
     @Override
     public List<Object> messageArgs() {
         return messageArgs;
+    }
+
+    @Override
+    public String renderedLine() {
+        return renderedLine;
     }
 
     static String formatMessage(String template, List<Object> args) {

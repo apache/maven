@@ -55,8 +55,10 @@ public final class MavenSimpleLoggerUtils {
      * SLF4J events have no source metadata (class/method).
      * <p>
      * {@code renderedLine} is the already-formatted output line (including colored level prefix)
-     * produced by the logger; it is stored as the pre-rendered message so that console sinks
-     * can emit it verbatim without re-formatting.
+     * produced by the logger; it is stored in {@link org.apache.maven.api.logging.LogEvent#renderedLine()}
+     * so that console sinks can emit it verbatim. The {@link org.apache.maven.api.logging.LogEvent#message()}
+     * field contains only the log message text, without any level prefix or timestamp — conforming to
+     * the {@link org.apache.maven.api.logging.LogEvent#message()} contract.
      */
     @SuppressWarnings("deprecation") // Thread.getId()
     public static LogEvent toLogEvent(
@@ -70,7 +72,7 @@ public final class MavenSimpleLoggerUtils {
         return new DefaultLogEvent(
                 MonotonicClock.now(),
                 toLogLevel(level),
-                renderedLine,
+                null, // message is null: computed lazily from messageTemplate + messageArgs
                 loggerName,
                 throwable,
                 null,
@@ -83,6 +85,7 @@ public final class MavenSimpleLoggerUtils {
                 pluginId,
                 Map.of(),
                 messageTemplate,
-                messageArgs);
+                messageArgs != null ? java.util.Arrays.asList(messageArgs) : null,
+                renderedLine);
     }
 }

@@ -43,7 +43,8 @@ public class SimpleBuildEventListener implements BuildEventListener {
 
     @Override
     public void projectLogMessage(String projectId, LogEvent event) {
-        log(event.message());
+        String line = event.renderedLine();
+        log(line != null ? line : event.message());
         Throwable throwable = event.throwable();
         if (throwable != null) {
             StringWriter sw = new StringWriter();
