@@ -31,6 +31,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.jline.MessageUtils;
+import org.apache.maven.utils.CleanArgument;
 
 /**
  */

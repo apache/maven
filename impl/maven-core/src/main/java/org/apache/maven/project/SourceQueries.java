@@ -44,7 +44,7 @@ public final class SourceQueries {
      *
      * @param project the project to check
      * @return {@code true} if the project uses a modular source hierarchy
-     * @since 4.1.0
+     * @since 4.2.0
      */
     public static boolean usesModuleSourceHierarchy(MavenProject project) {
         if (project.getBuild() != null && project.getBuild().getDelegate() != null) {

@@ -52,7 +52,7 @@ public interface VersionConstraint {
      *
      * @deprecated Use {@link #versionRange()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nullable
     default VersionRange getVersionRange() {
         return versionRange();
@@ -73,7 +73,7 @@ public interface VersionConstraint {
      *
      * @deprecated Use {@link #recommendedVersion()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nullable
     default Version getRecommendedVersion() {
         return recommendedVersion();

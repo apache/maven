@@ -22,7 +22,6 @@ import org.apache.maven.api.Dialect;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.di.Named;
 
 /**
  * SPI to provide a symmetric pair of {@link ModelParser} and {@link ModelWriter} for a given {@link Dialect}.
@@ -30,14 +29,13 @@ import org.apache.maven.api.di.Named;
  * Implement this interface to register support for reading and writing Maven models in an alternative dialect.
  * The implementation must be registered as a named DI component so that Maven can discover it.
  *
- * @since 4.1.0
+ * @since 4.2.0
  * @see ModelParser
  * @see ModelWriter
  * @see DialectProvider
  */
 @Experimental
 @Consumer
-@Named
 public interface ModelDialectProvider extends SpiService {
 
     /**

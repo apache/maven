@@ -33,7 +33,7 @@ import static org.apache.maven.api.ExtensibleEnums.dialect;
  * Implementation must have {@code equals()} and {@code hashCode()} implemented, so implementations of this interface
  * can be used as keys.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Immutable
@@ -60,7 +60,7 @@ public interface Dialect extends ExtensibleEnum {
      * @param id the unique identifier for the dialect, never {@code null}
      * @return a new {@code Dialect} instance with the given id
      * @throws NullPointerException if {@code id} is {@code null}
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     static Dialect of(@Nonnull String id) {

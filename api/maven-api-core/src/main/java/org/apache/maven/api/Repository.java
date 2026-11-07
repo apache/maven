@@ -81,7 +81,7 @@ public interface Repository {
      * @deprecated Use {@link #id()} instead.
      */
     @Nonnull
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     default String getId() {
         return id();
     }
@@ -93,7 +93,7 @@ public interface Repository {
      * @deprecated Use {@link #type()} instead.
      */
     @Nonnull
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     default String getType() {
         return type();
     }

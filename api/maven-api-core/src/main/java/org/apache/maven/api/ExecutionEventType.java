@@ -23,7 +23,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * The possible types of build execution events.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 public enum ExecutionEventType {

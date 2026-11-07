@@ -72,6 +72,14 @@ public interface SettingsBuilderRequest extends Request<ProtoSession> {
     @Nonnull
     Optional<UnaryOperator<String>> getInterpolationSource();
 
+    /**
+     * Creates a request from installation and user settings sources.
+     *
+     * @param session the session
+     * @param installationSettingsSource the installation settings source
+     * @param userSettingsSource the user settings source
+     * @return the new request
+     */
     @Nonnull
     static SettingsBuilderRequest build(
             @Nonnull ProtoSession session,
@@ -80,12 +88,29 @@ public interface SettingsBuilderRequest extends Request<ProtoSession> {
         return build(session, installationSettingsSource, null, userSettingsSource);
     }
 
+    /**
+     * Creates a request from installation and user settings paths.
+     *
+     * @param session the session
+     * @param installationSettingsPath the installation settings path
+     * @param userSettingsPath the user settings path
+     * @return the new request
+     */
     @Nonnull
     static SettingsBuilderRequest build(
             @Nonnull ProtoSession session, @Nonnull Path installationSettingsPath, @Nonnull Path userSettingsPath) {
         return build(session, Sources.fromPath(installationSettingsPath), null, Sources.fromPath(userSettingsPath));
     }
 
+    /**
+     * Creates a request from installation, project, and user settings sources.
+     *
+     * @param session the session
+     * @param installationSettingsSource the installation settings source, or {@code null}
+     * @param projectSettingsSource the project settings source, or {@code null}
+     * @param userSettingsSource the user settings source, or {@code null}
+     * @return the new request
+     */
     @Nonnull
     static SettingsBuilderRequest build(
             @Nonnull ProtoSession session,
@@ -100,6 +125,16 @@ public interface SettingsBuilderRequest extends Request<ProtoSession> {
                 .build();
     }
 
+    /**
+     * Creates a request from installation, project, and user settings paths.
+     * Paths that do not exist are treated as absent.
+     *
+     * @param session the session
+     * @param installationSettingsPath the installation settings path, or {@code null}
+     * @param projectSettingsPath the project settings path, or {@code null}
+     * @param userSettingsPath the user settings path, or {@code null}
+     * @return the new request
+     */
     @Nonnull
     static SettingsBuilderRequest build(
             @Nonnull ProtoSession session,
@@ -123,6 +158,11 @@ public interface SettingsBuilderRequest extends Request<ProtoSession> {
                 .build();
     }
 
+    /**
+     * Creates a new builder for constructing a {@code SettingsBuilderRequest}.
+     *
+     * @return a new builder
+     */
     @Nonnull
     static SettingsBuilderRequestBuilder builder() {
         return new SettingsBuilderRequestBuilder();

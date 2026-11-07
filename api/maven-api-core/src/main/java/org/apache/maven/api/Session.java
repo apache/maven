@@ -51,7 +51,7 @@ public interface Session extends ProtoSession {
      * and platform settings that were active when the session started.
      *
      * @return the build invocation, never {@code null}
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     default BuildInvocation buildInvocation() {
@@ -564,7 +564,7 @@ public interface Session extends ProtoSession {
      * Gets the relative path for a locally installed artifact. Note that the artifact need not actually exist yet at
      * the returned location, the path merely indicates where the artifact would eventually be stored.
      * <p>
-     * Shortcut for {@code getService(LocalArtifactManager.class).getPathForLocalArtitact(...)}.
+     * Shortcut for {@code getService(LocalRepositoryManager.class).getPathForLocalArtifact(...)}.
      *
      * @param artifact the artifact for which to get a local path
      * @return local path associated to the given artifact, or {@code null} if none

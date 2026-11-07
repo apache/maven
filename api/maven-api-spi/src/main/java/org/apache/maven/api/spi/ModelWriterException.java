@@ -24,7 +24,7 @@ import org.apache.maven.api.services.MavenException;
 /**
  * Exception thrown when a {@link ModelWriter} fails to write a model.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 public class ModelWriterException extends MavenException {

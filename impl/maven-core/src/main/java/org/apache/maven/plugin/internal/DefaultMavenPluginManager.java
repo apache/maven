@@ -118,6 +118,7 @@ import org.codehaus.plexus.component.configurator.ComponentConfigurator;
 import org.codehaus.plexus.component.configurator.ConfigurationListener;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
+import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
 import org.codehaus.plexus.component.repository.ComponentDescriptor;
 import org.codehaus.plexus.component.repository.exception.ComponentLifecycleException;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
@@ -615,6 +616,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 mojoExecution.getExecutionId(),
                 mojoDescriptor,
                 pluginRealm,
+                dom,
                 pomConfiguration,
                 expressionEvaluator);
 
@@ -800,6 +802,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 mojoExecution.getExecutionId(),
                 mojoDescriptor,
                 pluginRealm,
+                dom,
                 pomConfiguration,
                 expressionEvaluator);
 
@@ -811,6 +814,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             String executionId,
             MojoDescriptor mojoDescriptor,
             ClassRealm pluginRealm,
+            XmlNode configurationDom,
             PlexusConfiguration configuration,
             ExpressionEvaluator expressionEvaluator)
             throws PluginConfigurationException {
@@ -823,6 +827,28 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         }
 
         try {
+            if ("enhanced".equals(configuratorId) && mojoDescriptor.isV4Api()) {
+                if (logger.isDebugEnabled()) {
+                    logger.debug("Configuring mojo execution '" + mojoDescriptor.getId() + ':' + executionId
+                            + "' with Maven XML configurator -->");
+                }
+                if (!(expressionEvaluator instanceof TypeAwareExpressionEvaluator tae)) {
+                    throw new PluginConfigurationException(
+                            mojoDescriptor.getPluginDescriptor(),
+                            "Expression evaluator for mojo '"
+                                    + mojoDescriptor.getId()
+                                    + "' does not implement TypeAwareExpressionEvaluator");
+                }
+                new V4MojoConfigurator(
+                                new PlexusMojoExpressionEvaluatorAdapter(tae),
+                                pluginRealm,
+                                mojoDescriptor.getPluginDescriptor())
+                        .configure(mojo, configurationDom);
+                validateParameters(mojoDescriptor, configuration, expressionEvaluator);
+                logger.debug("-- end configuration --");
+                return;
+            }
+
             // TODO could the configuration be passed to lookup and the configurator known to plexus via the descriptor
             // so that this method could entirely be handled by a plexus lookup?
             configurator = container.lookup(ComponentConfigurator.class, configuratorId);

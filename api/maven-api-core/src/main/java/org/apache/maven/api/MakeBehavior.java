@@ -24,7 +24,7 @@ import org.apache.maven.api.annotations.Experimental;
  * The reactor make behavior, controlling whether upstream and/or downstream
  * dependencies of selected projects are also built.
  *
- * @since 4.1.0
+ * @since 4.2.0
  * @see BuildInvocation#makeBehavior()
  */
 @Experimental

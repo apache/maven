@@ -57,12 +57,34 @@ public interface ArtifactCoordinatesFactory extends Service {
         return create(ArtifactCoordinatesFactoryRequest.build(session, coordinatesString));
     }
 
+    /**
+     * Creates artifact coordinates from individual components.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param extension the file extension
+     * @return an {@code ArtifactCoordinates}, never {@code null}
+     */
     @Nonnull
     default ArtifactCoordinates create(
             @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
         return create(ArtifactCoordinatesFactoryRequest.build(session, groupId, artifactId, version, extension));
     }
 
+    /**
+     * Creates artifact coordinates from individual components including classifier and type.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param classifier the classifier, may be {@code null}
+     * @param extension the file extension, may be {@code null}
+     * @param type the artifact type, may be {@code null}
+     * @return an {@code ArtifactCoordinates}, never {@code null}
+     */
     @Nonnull
     default ArtifactCoordinates create(
             @Nonnull Session session,
@@ -76,6 +98,13 @@ public interface ArtifactCoordinatesFactory extends Service {
                 session, groupId, artifactId, version, classifier, extension, type));
     }
 
+    /**
+     * Creates artifact coordinates from an existing artifact.
+     *
+     * @param session the session
+     * @param artifact the artifact to derive coordinates from
+     * @return an {@code ArtifactCoordinates}, never {@code null}
+     */
     @Nonnull
     default ArtifactCoordinates create(@Nonnull Session session, Artifact artifact) {
         return create(ArtifactCoordinatesFactoryRequest.build(

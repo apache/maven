@@ -28,7 +28,7 @@ under the License.
   </parent>
 
   <artifactId>maven</artifactId>
-  <version>4.1.0-SNAPSHOT</version>
+  <version>4.2.0-SNAPSHOT</version>
   <packaging>pom</packaging>
 
   <name>Apache Maven</name>
@@ -129,8 +129,6 @@ under the License.
 
   <properties>
     <javaVersion>17</javaVersion>
-    <maven.compiler.source>${javaVersion}</maven.compiler.source>
-    <maven.compiler.target>${javaVersion}</maven.compiler.target>
     <maven.compiler.proc>full</maven.compiler.proc>
     <maven.test.redirectTestOutputToFile>true</maven.test.redirectTestOutputToFile>
     <maven.baseline>3.9.8</maven.baseline>
@@ -139,14 +137,14 @@ under the License.
     <distributionShortName>Maven</distributionShortName>
     <distributionName>Apache Maven</distributionName>
     <maven.site.path>ref/4-LATEST</maven.site.path>
-    <project.build.outputTimestamp>2025-06-24T20:18:00Z</project.build.outputTimestamp>
+    <project.build.outputTimestamp>2026-10-20T15:36:21Z</project.build.outputTimestamp>
     <!-- various versions -->
     <asmVersion>9.11.1</asmVersion>
-    <byteBuddyVersion>1.18.15</byteBuddyVersion>
+    <byteBuddyVersion>1.18.17</byteBuddyVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
     <domtripVersion>1.8.0</domtripVersion>
     <guiceVersion>5.1.0</guiceVersion>
-    <guavaVersion>33.7.2-jre</guavaVersion>
+    <guavaVersion>33.8.0-jre</guavaVersion>
     <guavafailureaccessVersion>1.0.1</guavafailureaccessVersion>
 
     <jakartaInjectApiVersion>2.0.1</jakartaInjectApiVersion>
@@ -155,7 +153,7 @@ under the License.
     <jmhVersion>1.37</jmhVersion>
     <junitVersion>6.1.3</junitVersion>
     <jxpathVersion>1.4.0</jxpathVersion>
-    <logbackClassicVersion>1.6.5</logbackClassicVersion>
+    <logbackClassicVersion>1.6.6</logbackClassicVersion>
     <mockitoVersion>5.24.0</mockitoVersion>
     <plexusInteractivityVersion>1.6.0</plexusInteractivityVersion>
     <plexusInterpolationVersion>1.30.0</plexusInterpolationVersion>
@@ -291,6 +289,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-support</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-utils</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -680,6 +683,11 @@ under the License.
         <artifactId>jimfs</artifactId>
         <version>1.3.2</version>
       </dependency>
+      <dependency>
+        <groupId>org.opentest4j</groupId>
+        <artifactId>opentest4j</artifactId>
+        <version>1.3.0</version>
+      </dependency>
 
       <dependency>
         <groupId>org.openjdk.jmh</groupId>
@@ -695,7 +703,7 @@ under the License.
       <dependency>
         <groupId>eu.maveniverse.maven.mimir</groupId>
         <artifactId>testing</artifactId>
-        <version>0.12.4</version>
+        <version>0.13.0</version>
       </dependency>
     </dependencies>
     <!--bootstrap-start-comment-->
@@ -780,7 +788,7 @@ under the License.
         <plugin>
           <groupId>org.jacoco</groupId>
           <artifactId>jacoco-maven-plugin</artifactId>
-          <version>0.8.15</version>
+          <version>0.8.16</version>
           <configuration>
             <excludes>
               <exclude>**/org/apache/maven/it/**</exclude>
@@ -799,7 +807,7 @@ under the License.
             <dependency>
               <groupId>net.sourceforge.pmd</groupId>
               <artifactId>pmd-core</artifactId>
-              <version>7.28.0</version>
+              <version>7.29.0</version>
             </dependency>
           </dependencies>
         </plugin>
@@ -867,7 +875,7 @@ under the License.
       <plugin>
         <groupId>io.github.olamy.maven.plugins</groupId>
         <artifactId>jacoco-aggregator-maven-plugin</artifactId>
-        <version>1.0.4</version>
+        <version>1.0.5</version>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>

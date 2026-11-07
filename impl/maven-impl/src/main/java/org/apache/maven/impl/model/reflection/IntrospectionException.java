@@ -18,6 +18,10 @@
  */
 package org.apache.maven.impl.model.reflection;
 
+/**
+ * @deprecated Use {@link org.apache.maven.utils.IntrospectionException} instead.
+ */
+@Deprecated
 public class IntrospectionException extends Exception {
 
     IntrospectionException(String message) {

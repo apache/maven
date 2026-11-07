@@ -21,14 +21,12 @@ package org.apache.maven.api.spi;
 import org.apache.maven.api.Dialect;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.di.Named;
 
 /**
  * SPI to extend the {@link org.apache.maven.api.Dialect} extensible enum with custom values.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Consumer
-@Named
 public interface DialectProvider extends ExtensibleEnumProvider<Dialect> {}

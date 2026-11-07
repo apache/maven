@@ -26,7 +26,7 @@ import org.apache.maven.api.annotations.Experimental;
  * The reactor failure behavior, controlling how Maven reacts when a module
  * in a multi-module build fails.
  *
- * @since 4.1.0
+ * @since 4.2.0
  * @see BuildInvocation#reactorFailureBehavior()
  */
 @Experimental

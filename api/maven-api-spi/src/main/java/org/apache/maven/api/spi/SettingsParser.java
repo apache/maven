@@ -25,7 +25,6 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.di.Named;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.settings.Settings;
 
@@ -39,11 +38,10 @@ import org.apache.maven.api.settings.Settings;
  * supplied by a core extension cannot read the bootstrap settings needed to resolve that
  * extension. This SPI does not change settings file discovery or extension loading.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Consumer
-@Named
 public interface SettingsParser extends SpiService {
     /**
      * Option that can be specified in the options map. The value should be a {@code Boolean};
