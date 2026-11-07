@@ -155,4 +155,77 @@ class SettingsUtilsTest {
                 p.getPluginRepositories().size(), clone.getPluginRepositories().size());
         // TODO deep compare the lists
     }
+
+    @Test
+    void testDominantMirrorsPrecedeRecessiveMirrors() {
+        org.apache.maven.api.settings.Mirror dominantMirror = org.apache.maven.api.settings.Mirror.newBuilder()
+                .id("user-mirror")
+                .mirrorOf("insecure-repo")
+                .url("http://insecure.example.com/")
+                .build();
+        org.apache.maven.api.settings.Mirror recessiveMirror = org.apache.maven.api.settings.Mirror.newBuilder()
+                .id("maven-default-http-blocker")
+                .mirrorOf("external:http:*")
+                .url("http://0.0.0.0/")
+                .blocked(true)
+                .build();
+
+        Settings dominant = Settings.newBuilder().mirrors(List.of(dominantMirror)).build();
+        Settings recessive = Settings.newBuilder().mirrors(List.of(recessiveMirror)).build();
+
+        Settings merged = SettingsUtilsV4.merge(dominant, recessive);
+
+        List<org.apache.maven.api.settings.Mirror> mirrors = merged.getMirrors();
+        assertNotNull(mirrors);
+        assertEquals(2, mirrors.size());
+        assertEquals("user-mirror", mirrors.get(0).getId());
+        assertEquals("maven-default-http-blocker", mirrors.get(1).getId());
+    }
+
+    @Test
+    void testDominantMirrorWinsOnConflict() {
+        org.apache.maven.api.settings.Mirror dominantMirror = org.apache.maven.api.settings.Mirror.newBuilder()
+                .id("shared-mirror")
+                .url("http://dominant.example.com/")
+                .build();
+        org.apache.maven.api.settings.Mirror recessiveMirror = org.apache.maven.api.settings.Mirror.newBuilder()
+                .id("shared-mirror")
+                .url("http://recessive.example.com/")
+                .build();
+
+        Settings dominant = Settings.newBuilder().mirrors(List.of(dominantMirror)).build();
+        Settings recessive = Settings.newBuilder().mirrors(List.of(recessiveMirror)).build();
+
+        Settings merged = SettingsUtilsV4.merge(dominant, recessive);
+
+        List<org.apache.maven.api.settings.Mirror> mirrors = merged.getMirrors();
+        assertNotNull(mirrors);
+        assertEquals(1, mirrors.size());
+        assertEquals("shared-mirror", mirrors.get(0).getId());
+        assertEquals("http://dominant.example.com/", mirrors.get(0).getUrl());
+    }
+
+    @Test
+    void testDominantSettingsValuesPrecedeRecessive() {
+        Settings dominant = Settings.newBuilder()
+                .localRepository("/dominant/path")
+                .build();
+        Settings recessive = Settings.newBuilder()
+                .localRepository("/recessive/path")
+                .build();
+
+        Settings merged = SettingsUtilsV4.merge(dominant, recessive);
+        assertEquals("/dominant/path", merged.getLocalRepository());
+    }
+
+    @Test
+    void testRecessiveSettingsValuesFillGaps() {
+        Settings dominant = Settings.newBuilder().build();
+        Settings recessive = Settings.newBuilder()
+                .localRepository("/recessive/path")
+                .build();
+
+        Settings merged = SettingsUtilsV4.merge(dominant, recessive);
+        assertEquals("/recessive/path", merged.getLocalRepository());
+    }
 }
