@@ -18,7 +18,6 @@
  */
 package org.apache.maven.cling.invoker.mvn;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -55,43 +54,6 @@ public final class ArgumentTokenizer {
      * @return an unmodifiable list of token strings; empty if the input contains only whitespace
      */
     public static List<String> tokenize(String input) {
-        List<String> args = new ArrayList<>();
-        StringBuilder current = new StringBuilder();
-        boolean inDoubleQuotes = false;
-        boolean inSingleQuotes = false;
-
-        for (int i = 0; i < input.length(); i++) {
-            char c = input.charAt(i);
-
-            if (c == '\\' && !inSingleQuotes && i + 1 < input.length()) {
-                // Backslash escape: outside single-quotes, \X is always a literal X.
-                // This matches POSIX behaviour in both unquoted and double-quoted contexts.
-                current.append(input.charAt(++i));
-            } else if (c == '"' && !inSingleQuotes) {
-                inDoubleQuotes = !inDoubleQuotes;
-            } else if (c == '\'' && !inDoubleQuotes) {
-                inSingleQuotes = !inSingleQuotes;
-            } else if (Character.isWhitespace(c) && !inDoubleQuotes && !inSingleQuotes) {
-                // Whitespace outside quotes — end of current token
-                if (current.length() > 0) {
-                    args.add(current.toString());
-                    current.setLength(0);
-                }
-            } else {
-                current.append(c);
-            }
-        }
-
-        // Add last token if any
-        if (current.length() > 0) {
-            args.add(current.toString());
-        }
-
-        if (inDoubleQuotes || inSingleQuotes) {
-            throw new IllegalArgumentException(
-                    "Unclosed " + (inDoubleQuotes ? "double" : "single") + " quote in: " + input);
-        }
-
-        return List.copyOf(args);
+        return org.apache.maven.settings.v4.ArgumentTokenizer.tokenize(input);
     }
 }

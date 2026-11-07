@@ -20,6 +20,7 @@ package org.apache.maven.cling.invoker.mvn;
 
 import java.util.List;
 
+import org.apache.maven.settings.v4.ArgumentTokenizer;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

@@ -247,8 +247,11 @@ public class ${className} {
     #end
   #end
   ##
-  ## If the class has a field annotated with xml.content="true", write its value
-  ## as element body text rather than a child element.
+  ## Content/mixed-content fields:
+  ##   - xml.content="true" on a String field → writeCharacters() directly.
+  ##   - xml.insertParentFieldsUpTo="mixed" on a flat List<String> field → write <arg> children.
+  ##     (The reader accepts both inline text and structured children; the writer always produces
+  ##      the structured form for unambiguous round-trip fidelity.)
   ##
   #foreach ( $field in $allFields )
     #if ( $Helper.xmlFieldMetadata( $field ).content )
@@ -256,6 +259,20 @@ public class ${className} {
       #if ( $field.type == "String" )
             if (${classLcapName}.get${contentFieldCapName}() != null) {
                 serializer.writeCharacters(${classLcapName}.get${contentFieldCapName}());
+            }
+      #end
+    #end
+    #if ( $Helper.xmlFieldMetadata( $field ).format == "mixed" )
+      #if ( $Helper.isFlatItems( $field ) && $field.to == "String" )
+        #set ( $mixedFieldCapName = $Helper.capitalise( $field.name ) )
+        #set ( $mixedSingularTag = $Helper.xmlFieldMetadata( $field ).tagName )
+        #if ( ! $mixedSingularTag )
+          #set ( $mixedSingularTag = $Helper.singular( $field.name ) )
+        #end
+            if (${classLcapName}.get${mixedFieldCapName}() != null) {
+                for (String _arg : ${classLcapName}.get${mixedFieldCapName}()) {
+                    writeTag("${mixedSingularTag}", null, _arg, serializer${loctracnull});
+                }
             }
       #end
     #end

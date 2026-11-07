@@ -30,15 +30,17 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 
 /**
- * Tests for {@link MavenInvoker#addAliases}: verifies that alias inline text
- * and structured {@code <arg>} forms both expand correctly.
+ * Tests for {@link MavenInvoker#addAliases}: verifies that alias expansion works
+ * correctly. Tokenization of the inline text form happens in the StAX reader
+ * (via {@link ArgumentTokenizer}); by the time {@code addAliases} is called the
+ * model always holds a pre-tokenized {@code List<String>}.
  *
- * <p>Covered syntax:
+ * <p>Covered XML syntax (both produce identical model state after parsing):
  * <pre>{@code
- * <!-- inline text -->
+ * <!-- inline text — tokenized by the reader -->
  * <alias name="ci">verify -Dmaven.test.skip=true</alias>
  *
- * <!-- structured args -->
+ * <!-- structured args — collected verbatim by the reader -->
  * <alias name="ci">
  *   <arg>verify</arg>
  *   <arg>-Dmaven.test.skip=true</arg>
@@ -47,55 +49,11 @@ import static org.junit.jupiter.api.Assertions.assertNull;
  */
 class MavenInvokerAliasTest {
 
-    // ------------------------------------------------------------------ inline text form
+    // ------------------------------------------------------------------ single token
 
     @Test
-    void inlineAliasSingleToken() {
-        // <alias name="ci">verify</alias>
-        Alias alias = Alias.newBuilder().name("ci").content("verify").build();
-        Settings settings = Settings.newBuilder().aliases(List.of(alias)).build();
-
-        Map<String, List<String>> result = new HashMap<>();
-        MavenInvoker.addAliases(result, settings);
-
-        assertEquals(List.of("verify"), result.get("ci"));
-    }
-
-    @Test
-    void inlineAliasMultipleTokens() {
-        // <alias name="ci">verify -Dmaven.test.skip=true</alias>
-        Alias alias = Alias.newBuilder()
-                .name("ci")
-                .content("    verify -Dmaven.test.skip=true\n")
-                .build();
-        Settings settings = Settings.newBuilder().aliases(List.of(alias)).build();
-
-        Map<String, List<String>> result = new HashMap<>();
-        MavenInvoker.addAliases(result, settings);
-
-        assertEquals(List.of("verify", "-Dmaven.test.skip=true"), result.get("ci"));
-    }
-
-    @Test
-    void inlineAliasQuotedSpaces() {
-        // <alias name="msg">-Dmessage="hello world"</alias>
-        Alias alias = Alias.newBuilder()
-                .name("msg")
-                .content("-Dmessage=\"hello world\"")
-                .build();
-        Settings settings = Settings.newBuilder().aliases(List.of(alias)).build();
-
-        Map<String, List<String>> result = new HashMap<>();
-        MavenInvoker.addAliases(result, settings);
-
-        assertEquals(List.of("-Dmessage=hello world"), result.get("msg"));
-    }
-
-    // ------------------------------------------------------------------ structured <arg> form
-
-    @Test
-    void structuredAliasSingleArg() {
-        // <alias name="ci"><arg>verify</arg></alias>
+    void aliasSingleToken() {
+        // <alias name="ci">verify</alias>  — reader produces args=["verify"]
         Alias alias = Alias.newBuilder().name("ci").args(List.of("verify")).build();
         Settings settings = Settings.newBuilder().aliases(List.of(alias)).build();
 
@@ -105,12 +63,12 @@ class MavenInvokerAliasTest {
         assertEquals(List.of("verify"), result.get("ci"));
     }
 
+    // ------------------------------------------------------------------ multiple tokens
+
     @Test
-    void structuredAliasMultipleArgs() {
-        // <alias name="ci">
-        //   <arg>verify</arg>
-        //   <arg>-Dmaven.test.skip=true</arg>
-        // </alias>
+    void aliasMultipleTokens() {
+        // <alias name="ci">verify -Dmaven.test.skip=true</alias>
+        // reader tokenizes → args=["verify", "-Dmaven.test.skip=true"]
         Alias alias = Alias.newBuilder()
                 .name("ci")
                 .args(List.of("verify", "-Dmaven.test.skip=true"))
@@ -123,8 +81,10 @@ class MavenInvokerAliasTest {
         assertEquals(List.of("verify", "-Dmaven.test.skip=true"), result.get("ci"));
     }
 
+    // ------------------------------------------------------------------ value with spaces (structured form)
+
     @Test
-    void structuredAliasArgValueWithSpaces() {
+    void aliasArgValueWithSpaces() {
         // <alias name="msg"><arg>-Dmessage=hello world</arg></alias>
         // The structured form preserves spaces literally — no tokenization needed.
         Alias alias = Alias.newBuilder()
@@ -139,11 +99,28 @@ class MavenInvokerAliasTest {
         assertEquals(List.of("-Dmessage=hello world"), result.get("msg"));
     }
 
+    // ------------------------------------------------------------------ multiple structured args
+
+    @Test
+    void aliasMultipleStructuredArgs() {
+        // <alias name="ci"><arg>verify</arg><arg>-Dmaven.test.skip=true</arg></alias>
+        Alias alias = Alias.newBuilder()
+                .name("ci")
+                .args(List.of("verify", "-Dmaven.test.skip=true"))
+                .build();
+        Settings settings = Settings.newBuilder().aliases(List.of(alias)).build();
+
+        Map<String, List<String>> result = new HashMap<>();
+        MavenInvoker.addAliases(result, settings);
+
+        assertEquals(List.of("verify", "-Dmaven.test.skip=true"), result.get("ci"));
+    }
+
     // ------------------------------------------------------------------ last-wins / removal
 
     @Test
     void emptyAliasRemovesInherited() {
-        // An alias with no content and no args removes an inherited alias (last-wins across tiers).
+        // An alias with no args removes an inherited alias (last-wins across tiers).
         Alias alias = Alias.newBuilder().name("ci").build();
         Settings settings = Settings.newBuilder().aliases(List.of(alias)).build();
 
@@ -157,7 +134,7 @@ class MavenInvokerAliasTest {
     @Test
     void laterTierAliasOverridesEarlier() {
         // Project settings override user settings for the same alias name.
-        Alias userAlias = Alias.newBuilder().name("ci").content("install").build();
+        Alias userAlias = Alias.newBuilder().name("ci").args(List.of("install")).build();
         Alias projectAlias = Alias.newBuilder()
                 .name("ci")
                 .args(List.of("verify", "-Dmaven.test.skip=true"))
@@ -177,7 +154,7 @@ class MavenInvokerAliasTest {
 
     @Test
     void nullNameAliasIgnored() {
-        Alias alias = Alias.newBuilder().content("verify").build(); // name is null
+        Alias alias = Alias.newBuilder().args(List.of("verify")).build(); // name is null
         Settings settings = Settings.newBuilder().aliases(List.of(alias)).build();
 
         Map<String, List<String>> result = new HashMap<>();

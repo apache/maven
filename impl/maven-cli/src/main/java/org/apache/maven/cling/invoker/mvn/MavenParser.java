@@ -59,9 +59,8 @@ public class MavenParser extends BaseParser {
         Path projectSettingsFile = resolveProjectSettingsFile(context, effectiveProperties);
         Settings projectSettings = readSettingsEarlyCached(projectSettingsFile, context);
         boolean settingsHasArgs = projectSettings != null
-                && (!isNullOrEmpty(projectSettings.getOptions())
-                        || (projectSettings.getArgs() != null
-                                && !projectSettings.getArgs().isEmpty()));
+                && (projectSettings.getArgs() != null
+                        && !projectSettings.getArgs().isEmpty());
         if (settingsHasArgs) {
             result.add(parseMavenSettingsOptions(projectSettings, projectSettingsFile));
         } else {
@@ -75,18 +74,8 @@ public class MavenParser extends BaseParser {
         return LayeredMavenOptions.layerMavenOptions(result);
     }
 
-    private static boolean isNullOrEmpty(String s) {
-        return s == null || s.isBlank();
-    }
-
     protected MavenOptions parseMavenSettingsOptions(Settings settings, Path settingsFile) {
-        List<String> args;
-        if (settings.getArgs() != null && !settings.getArgs().isEmpty()) {
-            args = settings.getArgs();
-        } else {
-            // tokenize inline options text (shell-style, quote-aware)
-            args = ArgumentTokenizer.tokenize(settings.getOptions());
-        }
+        List<String> args = settings.getArgs() != null ? settings.getArgs() : List.of();
         try {
             MavenOptions options = parseArgs("settings.xml", args);
             if (options.goals().isPresent()) {

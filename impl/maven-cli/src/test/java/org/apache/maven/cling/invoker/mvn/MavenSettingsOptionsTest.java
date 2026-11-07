@@ -41,17 +41,18 @@ class MavenSettingsOptionsTest {
 
     @Test
     void inlineOptionsThreads() {
-        // <options>-T4</options>
-        Settings settings = Settings.newBuilder().options("-T4").build();
+        // Simulates <options>-T4</options> after tokenization by the reader
+        Settings settings = Settings.newBuilder().args(List.of("-T4")).build();
         MavenOptions options = parser.parseMavenSettingsOptions(settings, Path.of("settings.xml"));
         assertEquals("4", options.threads().orElseThrow());
     }
 
     @Test
     void inlineOptionsMultipleFlags() {
-        // <options>-T4 --no-transfer-progress</options>
-        Settings settings =
-                Settings.newBuilder().options("-T4 --no-transfer-progress").build();
+        // Simulates <options>-T4 --no-transfer-progress</options> after tokenization
+        Settings settings = Settings.newBuilder()
+                .args(List.of("-T4", "--no-transfer-progress"))
+                .build();
         MavenOptions options = parser.parseMavenSettingsOptions(settings, Path.of("settings.xml"));
         assertEquals("4", options.threads().orElseThrow());
         assertTrue(options.noTransferProgress().orElse(false));
@@ -82,17 +83,13 @@ class MavenSettingsOptionsTest {
     }
 
     @Test
-    void structuredArgTakesPrecedenceOverInlineOptions() {
-        // When both args (structured) and options (inline) are set, args wins.
-        // Here the structured form only sets --no-transfer-progress;
-        // the inline text -q should be ignored.
+    void multipleStructuredArgs() {
+        // <options><arg>--no-transfer-progress</arg><arg>-q</arg></options>
         Settings settings = Settings.newBuilder()
-                .args(List.of("--no-transfer-progress"))
-                .options("-q")
+                .args(List.of("--no-transfer-progress", "-q"))
                 .build();
         MavenOptions options = parser.parseMavenSettingsOptions(settings, Path.of("settings.xml"));
-        // structured form is preferred — only --no-transfer-progress should be active
         assertTrue(options.noTransferProgress().orElse(false));
-        assertTrue(options.quiet().isEmpty() || !options.quiet().orElse(false));
+        assertTrue(options.quiet().orElse(false));
     }
 }

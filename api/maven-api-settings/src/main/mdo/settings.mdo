@@ -242,31 +242,23 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
-        <field xdoc.separator="blank">
-          <name>options</name>
-          <version>2.1.0+</version>
-          <required>false</required>
-          <description>
-            <![CDATA[
-            CLI options to prepend to every invocation (inline text, whitespace-separated, quote-aware).
-            For options with spaces in their values, use the structured {@link #getArgs()} form instead.
-            Mutually exclusive with {@code args}. Replaces {@code .mvn/maven.config} when present in
-            project-scoped settings. Only honoured in project-scoped settings ({@code .mvn/settings.xml});
-            this field is ignored in user and installation settings.
-            ]]>
-          </description>
-          <type>String</type>
-        </field>
-        <field>
+        <field xdoc.separator="blank" xml.tagName="options" xml.format="mixed">
           <name>args</name>
           <version>2.1.0+</version>
           <required>false</required>
           <description>
             <![CDATA[
-            CLI options as structured {@literal <arg>} elements — one token per element.
-            Use instead of {@link #getOptions()} when option values contain spaces.
-            Mutually exclusive with {@code options}. Replaces {@code .mvn/maven.config} when present in
-            project-scoped settings. Only honoured in project-scoped settings ({@code .mvn/settings.xml});
+            CLI options to prepend to every invocation. Two syntaxes are supported inside
+            the {@code <options>} element:
+            <ul>
+              <li><b>Inline text</b> — whitespace-separated tokens, shell quote-aware:
+                  {@code <options>-T4 --no-transfer-progress</options>}</li>
+              <li><b>Structured</b> — one {@literal <arg>} element per token, preserving spaces
+                  inside values:
+                  {@code <options><arg>-T4</arg><arg>-Dmessage=hello world</arg></options>}</li>
+            </ul>
+            Replaces {@code .mvn/maven.config} when present in project-scoped settings.
+            Only honoured in project-scoped settings ({@code .mvn/settings.xml});
             this field is ignored in user and installation settings.
             ]]>
           </description>
@@ -1237,18 +1229,20 @@
           <required>true</required>
           <type>String</type>
         </field>
-        <field xml.content="true">
-          <name>content</name>
-          <description>Inline text form: whitespace-separated arguments, quote-aware.
-          Mutually exclusive with {@code args}.</description>
-          <version>2.1.0+</version>
-          <required>false</required>
-          <type>String</type>
-        </field>
-        <field>
+        <field xml.format="mixed">
           <name>args</name>
-          <description>Structured form: each {@literal &lt;arg&gt;} element is one argument token.
-          Use when argument values contain spaces. Mutually exclusive with {@code content}.</description>
+          <description>
+            <![CDATA[
+            The expansion for this alias. Two syntaxes are supported:
+            <ul>
+              <li><b>Inline text</b> — whitespace-separated tokens, shell quote-aware:
+                  {@code <alias name="ci">verify -Dmaven.test.skip=true</alias>}</li>
+              <li><b>Structured</b> — one {@literal <arg>} element per token, preserving spaces
+                  inside values:
+                  {@code <alias name="release"><arg>deploy</arg><arg>-Prelease</arg></alias>}</li>
+            </ul>
+            ]]>
+          </description>
           <version>2.1.0+</version>
           <required>false</required>
           <association xml.itemsStyle="flat" xml.tagName="arg">
