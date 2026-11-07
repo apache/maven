@@ -20,14 +20,20 @@ package org.apache.maven.impl.model.profile;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.RootLocator;
+import org.apache.maven.impl.model.DefaultInterpolator;
+import org.apache.maven.impl.model.DefaultPathTranslator;
 import org.apache.maven.impl.model.DefaultProfileActivationContext;
+import org.apache.maven.impl.model.rootlocator.DefaultRootLocator;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
@@ -77,6 +83,43 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
         assertActivation(true, newExistsProfile("${project.rootDirectory}/" + "file.txt"), context);
         assertActivation(false, newMissingProfile("${project.rootDirectory}"), context);
         assertActivation(false, newMissingProfile("${project.rootDirectory}/" + "file.txt"), context);
+    }
+
+    @Test
+    void testCustomRootDirectoryPropertyIsNotShadowed() throws Exception {
+        // GH-13883: a custom ${rootDirectory} property must not be shadowed by ${project.rootDirectory}
+        ProfileActivationContext moduleContext = newModuleContext(Map.of("rootDirectory", "${project.basedir}"));
+
+        assertActivation(true, newExistsProfile("${rootDirectory}/module-file.txt"), moduleContext);
+        assertActivation(false, newExistsProfile("${rootDirectory}/file.txt"), moduleContext);
+        assertActivation(true, newExistsProfile("${project.rootDirectory}/file.txt"), moduleContext);
+        assertActivation(false, newExistsProfile("${project.rootDirectory}/module-file.txt"), moduleContext);
+    }
+
+    @Test
+    void testUnprefixedRootDirectoryIsNotInterpolated() throws Exception {
+        // GH-13883: only ${project.rootDirectory} is supported, ${rootDirectory} is not an alias
+        ProfileActivationContext moduleContext = newModuleContext(Map.of());
+
+        assertActivation(false, newExistsProfile("${rootDirectory}/file.txt"), moduleContext);
+        assertActivation(true, newMissingProfile("${rootDirectory}/file.txt"), moduleContext);
+    }
+
+    private ProfileActivationContext newModuleContext(Map<String, String> modelProperties) throws IOException {
+        Path moduleDir = Files.createDirectories(tempDir.resolve("module"));
+        Files.createFile(moduleDir.resolve("module-file.txt"));
+
+        RootLocator rootLocator = new DefaultRootLocator() {
+            @Override
+            protected boolean isRootDirectory(Path dir) {
+                return tempDir.equals(dir);
+            }
+        };
+        return new DefaultProfileActivationContext(new DefaultPathTranslator(), rootLocator, new DefaultInterpolator())
+                .setModel(Model.newBuilder()
+                        .pomFile(moduleDir.resolve("pom.xml"))
+                        .properties(modelProperties)
+                        .build());
     }
 
     @Test
