@@ -2255,8 +2255,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 throws ModelBuilderException {
             Model raw = readRawModel();
             Model parentResolutionModel = raw;
-            if (raw.getProfiles().stream()
-                    .anyMatch(p -> !p.getRepositories().isEmpty())) {
+            if (raw.getProfiles().stream().anyMatch(p -> !p.getRepositories().isEmpty())) {
                 // Parent lookup needs profile repositories before assembling the ancestry.
                 // Keep final profile injection after inheritance, using the child's context.
                 DefaultProfileActivationContext activation =
