@@ -43,6 +43,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
+import java.util.logging.Logger;
 
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
@@ -55,8 +56,7 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
  * @author <a href="mailto:bob@eng.werken.com">bob mcwhirter</a>
  */
 public class ClassWorld implements Closeable {
-
-    private static final System.Logger LOGGER = System.getLogger(ClassWorld.class.getName());
+    private static final Logger LOGGER = Logger.getLogger(ClassWorld.class.getName());
 
     private Map<String, ClassRealm> realms;
 
@@ -68,6 +68,7 @@ public class ClassWorld implements Closeable {
 
     public ClassWorld(String realmId, ClassLoader classLoader) {
         this();
+
         try {
             newRealm(realmId, classLoader);
         } catch (DuplicateRealmException e) {
@@ -104,16 +105,20 @@ public class ClassWorld implements Closeable {
         if (realms.containsKey(id)) {
             throw new DuplicateRealmException(this, id);
         }
+
         ClassRealm realm;
+
         if (filter == null) {
             realm = new ClassRealm(this, id, classLoader);
         } else {
             realm = new FilteredClassRealm(filter, this, id, classLoader);
         }
         realms.put(id, realm);
+
         for (ClassWorldListener listener : listeners) {
             listener.realmCreated(realm);
         }
+
         return realm;
     }
 
@@ -129,6 +134,7 @@ public class ClassWorld implements Closeable {
 
     public synchronized void disposeRealm(String id) throws NoSuchRealmException {
         ClassRealm realm = realms.remove(id);
+
         if (realm != null) {
             disposeRealm(realm);
         } else {
@@ -150,6 +156,7 @@ public class ClassWorld implements Closeable {
         if (realms.containsKey(id)) {
             return realms.get(id);
         }
+
         throw new NoSuchRealmException(this, id);
     }
 
@@ -208,59 +215,39 @@ public class ClassWorld implements Closeable {
     public synchronized void addReads(String sourceModuleName, Module target) {
         Module source = findModule(sourceModuleName);
         if (source == null) {
-            LOGGER.log(
-                    System.Logger.Level.WARNING,
-                    "module-access: module ''{0}'' not found, ignoring add-reads",
-                    sourceModuleName);
+            LOGGER.warning("module-access: module '" + sourceModuleName + "' not found, ignoring add-reads directive");
             return;
         }
         if (moduleLayerController == null) {
-            LOGGER.log(
-                    System.Logger.Level.WARNING,
-                    "module-access: no ModuleLayer controller available, cannot add-reads {0}",
-                    sourceModuleName);
+            LOGGER.warning("module-access: no ModuleLayer controller available, cannot add-reads for '"
+                    + sourceModuleName + "'");
             return;
         }
         if (isBootLayerModule(source)) {
-            LOGGER.log(
-                    System.Logger.Level.WARNING,
-                    "module-access: module ''{0}'' is in the boot layer and cannot be modified at runtime;"
-                            + " use --add-reads {0}=ALL-UNNAMED on the JVM command line instead",
-                    sourceModuleName);
+            LOGGER.warning("module-access: module '" + sourceModuleName
+                    + "' is in the boot layer and cannot be modified at runtime;"
+                    + " use --add-reads on the JVM command line instead");
             return;
         }
         moduleLayerController.addReads(source, target);
     }
 
     private void applyModuleAccess(String moduleName, String packageName, Module target, boolean open) {
-        String directive = open ? "add-opens" : "add-exports";
         Module source = findModule(moduleName);
         if (source == null) {
-            LOGGER.log(
-                    System.Logger.Level.WARNING,
-                    "module-access: module ''{0}'' not found, ignoring {1} {0}/{2}",
-                    moduleName,
-                    directive,
-                    packageName);
+            LOGGER.warning("module-access: module '" + moduleName + "' not found, ignoring "
+                    + (open ? "add-opens" : "add-exports") + " directive for package '" + packageName + "'");
             return;
         }
         if (moduleLayerController == null) {
-            LOGGER.log(
-                    System.Logger.Level.WARNING,
-                    "module-access: no ModuleLayer controller available, cannot {0} {1}/{2}",
-                    directive,
-                    moduleName,
-                    packageName);
+            LOGGER.warning("module-access: no ModuleLayer controller available, cannot "
+                    + (open ? "add-opens" : "add-exports") + " for '" + moduleName + "/" + packageName + "'");
             return;
         }
         if (isBootLayerModule(source)) {
-            LOGGER.log(
-                    System.Logger.Level.WARNING,
-                    "module-access: module ''{0}'' is in the boot layer and cannot be modified at runtime;"
-                            + " use --{1} {0}/{2}=ALL-UNNAMED on the JVM command line instead",
-                    moduleName,
-                    directive,
-                    packageName);
+            LOGGER.warning("module-access: module '" + moduleName
+                    + "' is in the boot layer and cannot be modified at runtime;"
+                    + " use --" + (open ? "add-opens" : "add-exports") + " on the JVM command line instead");
             return;
         }
         if (open) {
@@ -289,6 +276,7 @@ public class ClassWorld implements Closeable {
         if (realms.containsKey(id)) {
             return realms.get(id);
         }
+
         return null;
     }
 
