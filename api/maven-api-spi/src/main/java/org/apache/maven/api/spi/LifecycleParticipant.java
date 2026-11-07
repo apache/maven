@@ -23,7 +23,6 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.ThreadSafe;
-import org.apache.maven.api.di.Named;
 
 /**
  * Allows build extensions to participate in the Maven build lifecycle.
@@ -37,7 +36,6 @@ import org.apache.maven.api.di.Named;
 @Experimental
 @Consumer
 @ThreadSafe
-@Named
 public interface LifecycleParticipant extends SpiService {
 
     /**
