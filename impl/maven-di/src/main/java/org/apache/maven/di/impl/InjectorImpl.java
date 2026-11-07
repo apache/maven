@@ -285,6 +285,11 @@ public class InjectorImpl implements Injector {
                 //noinspection unchecked
                 return () -> (Q) list(list, Supplier::get);
             }
+            // No bindings registered for this type — an empty list is the correct result,
+            // not an error. Callers such as Lookup.lookupList() document "may be empty if
+            // no components found" and must not receive a DIException for absent bindings.
+            //noinspection unchecked
+            return () -> (Q) List.of();
         }
         if (key.getRawType() == Map.class) {
             Key<?> k = key.getTypeParameter(0);
@@ -302,6 +307,11 @@ public class InjectorImpl implements Injector {
                         .collect(Collectors.toMap(Map.Entry::getKey, e -> compile(e.getValue())));
                 //noinspection unchecked
                 return () -> (Q) map(map, Supplier::get);
+            }
+            // No bindings registered for this type — an empty map is the correct result.
+            if (k.getRawType() == String.class) {
+                //noinspection unchecked
+                return () -> (Q) Map.of();
             }
         }
         if (dep.optional()) {
