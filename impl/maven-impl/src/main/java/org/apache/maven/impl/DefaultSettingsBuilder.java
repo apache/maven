@@ -81,7 +81,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private final SettingsParser xmlSettingsParser;
 
-    private final Map<String, SettingsParser> settingsParsers;
+    private final List<SettingsParser> settingsParsers;
 
     private final Interpolator interpolator;
 
@@ -92,7 +92,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
      */
     public DefaultSettingsBuilder(
             SettingsXmlFactory settingsXmlFactory, Interpolator interpolator, Map<String, Dispatcher> dispatchers) {
-        this(settingsXmlFactory, interpolator, dispatchers, Map.of());
+        this(settingsXmlFactory, interpolator, dispatchers, List.of());
     }
 
     @Inject
@@ -100,9 +100,9 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             SettingsXmlFactory settingsXmlFactory,
             Interpolator interpolator,
             Map<String, Dispatcher> dispatchers,
-            @Nullable Map<String, SettingsParser> settingsParsers) {
+            @Nullable List<SettingsParser> settingsParsers) {
         this.xmlSettingsParser = new XmlSettingsParser(settingsXmlFactory);
-        this.settingsParsers = settingsParsers != null ? settingsParsers : Map.of();
+        this.settingsParsers = settingsParsers != null ? settingsParsers : List.of();
         this.interpolator = interpolator;
         this.dispatchers = dispatchers;
     }
@@ -365,14 +365,14 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     @Nullable
     private SettingsParser selectParser(Source source, ProblemCollector<BuilderProblem> problems) {
-        List<Map.Entry<String, SettingsParser>> matches = new ArrayList<>();
-        for (Map.Entry<String, SettingsParser> entry : settingsParsers.entrySet()) {
+        List<SettingsParser> matches = new ArrayList<>();
+        for (SettingsParser parser : settingsParsers) {
             try {
-                if (entry.getValue().supports(source)) {
-                    matches.add(entry);
+                if (parser.supports(source)) {
+                    matches.add(parser);
                 }
             } catch (RuntimeException e) {
-                String msg = "Settings parser '" + parserName(entry.getKey())
+                String msg = "Settings parser '" + parser.id()
                         + "' failed to determine support for this source";
                 problems.reportProblem(
                         new DefaultBuilderProblem(source.getLocation(), -1, -1, e, msg, BuilderProblem.Severity.FATAL));
@@ -381,17 +381,13 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
         if (matches.size() > 1) {
             String parsers =
-                    matches.stream().map(e -> parserName(e.getKey())).sorted().collect(Collectors.joining(", "));
+                    matches.stream().map(SettingsParser::id).sorted().collect(Collectors.joining(", "));
             String msg = "Multiple settings parsers support this source: " + parsers;
             problems.reportProblem(
                     new DefaultBuilderProblem(source.getLocation(), -1, -1, null, msg, BuilderProblem.Severity.FATAL));
             return null;
         }
-        return matches.isEmpty() ? xmlSettingsParser : matches.get(0).getValue();
-    }
-
-    private static String parserName(@Nullable String key) {
-        return key != null ? key : "<unnamed>";
+        return matches.isEmpty() ? xmlSettingsParser : matches.get(0);
     }
 
     private Settings interpolate(

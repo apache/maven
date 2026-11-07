@@ -41,6 +41,12 @@ final class DumbModelParser1 implements ModelParser {
     @Inject
     public DumbModelParser1() {}
 
+
+    @Override
+    public String id() {
+        return "dumb1";
+    }
+
     @Override
     public Optional<Source> locate(Path dir) {
         logger.warn("[MNG-8220] DumbModelParser1 Called from extension");

@@ -26,8 +26,6 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -75,7 +73,7 @@ class DefaultSettingsParserTest {
     void customSettings() throws Exception {
         Path source = directory.resolve("settings.properties");
         Files.writeString(source, propertiesSettings() + "\n");
-        var result = build(Sources.fromPath(source), Map.of("properties", new PropertiesSettingsParser()));
+        var result = build(Sources.fromPath(source), List.of(new PropertiesSettingsParser()));
         assertEquals(
                 directory.resolve("repository").toString(),
                 result.getEffectiveSettings().getLocalRepository());
@@ -85,7 +83,7 @@ class DefaultSettingsParserTest {
     void sourceWithoutBackingFile() throws Exception {
         var result = build(
                 source("memory.properties", propertiesSettings()),
-                Map.of("properties", new PropertiesSettingsParser()));
+                List.of(new PropertiesSettingsParser()));
         assertEquals(
                 directory.resolve("repository").toString(),
                 result.getEffectiveSettings().getLocalRepository());
@@ -95,7 +93,7 @@ class DefaultSettingsParserTest {
     void xmlFallbackDoesNotRequireXmlExtension() throws Exception {
         var result = build(
                 source("settings.conf", "<settings><offline>true</offline></settings>"),
-                Map.of("properties", new PropertiesSettingsParser()));
+                List.of(new PropertiesSettingsParser()));
         assertTrue(result.getEffectiveSettings().isOffline());
     }
 
@@ -266,8 +264,8 @@ class DefaultSettingsParserTest {
     }
 
     @Test
-    void unnamedSupportsFailurePreventsXmlFallback() throws Exception {
-        assertSupportsFailureStopsSelectionAndParsing(null, false);
+    void supportsFailurePreventsXmlFallback() throws Exception {
+        assertSupportsFailureStopsSelectionAndParsing("broken", false);
     }
 
     @Test
@@ -276,24 +274,27 @@ class DefaultSettingsParserTest {
     }
 
     @Test
-    void unnamedSupportsFailurePreventsPreviouslyMatchedParser() throws Exception {
-        assertSupportsFailureStopsSelectionAndParsing(null, true);
+    void supportsFailurePreventsPreviouslyMatchedParser() throws Exception {
+        assertSupportsFailureStopsSelectionAndParsing("broken", true);
     }
 
-    private void assertSupportsFailureStopsSelectionAndParsing(String providerName, boolean matchingFirst)
+    private void assertSupportsFailureStopsSelectionAndParsing(String parserId, boolean matchingFirst)
             throws Exception {
         SettingsParser matching = mock(SettingsParser.class);
         SettingsParser broken = mock(SettingsParser.class);
         SettingsParser unvisited = mock(SettingsParser.class);
+        when(matching.id()).thenReturn("matching");
         when(matching.supports(any())).thenReturn(true);
+        when(broken.id()).thenReturn(parserId);
         var failure = new IllegalStateException();
         when(broken.supports(any())).thenThrow(failure);
-        var parsers = new LinkedHashMap<String, SettingsParser>();
+        when(unvisited.id()).thenReturn("unvisited");
+        var parsers = new ArrayList<SettingsParser>();
         if (matchingFirst) {
-            parsers.put("matching", matching);
+            parsers.add(matching);
         }
-        parsers.put(providerName, broken);
-        parsers.put("unvisited", unvisited);
+        parsers.add(broken);
+        parsers.add(unvisited);
         var xmlFactory = mock(SettingsXmlFactory.class);
         var builder = new DefaultSettingsBuilder(xmlFactory, new DefaultInterpolator(), Map.of(), parsers);
         var source = source("settings.xml", "<settings/>");
@@ -309,8 +310,7 @@ class DefaultSettingsParserTest {
         assertEquals(1, fatals.size());
         var fatal = fatals.get(0);
         assertEquals(
-                "Settings parser '" + (providerName != null ? providerName : "<unnamed>")
-                        + "' failed to determine support for this source",
+                "Settings parser '" + parserId + "' failed to determine support for this source",
                 fatal.getMessage());
         assertEquals("settings.xml", fatal.getSource());
         assertEquals(-1, fatal.getLineNumber());
@@ -379,7 +379,7 @@ class DefaultSettingsParserTest {
                                 .username("${account}")
                                 .build()))
                         .build());
-        var result = builder(Map.of("custom", parser))
+        var result = builder(List.of(parser))
                 .build(SettingsBuilderRequest.builder()
                         .session(mock(Session.class))
                         .installationSettingsSource(source(
@@ -402,7 +402,7 @@ class DefaultSettingsParserTest {
         SettingsParser parser = mock(SettingsParser.class);
         when(parser.supports(any())).thenReturn(true);
         when(parser.parse(any(), any())).thenReturn(Settings.newInstance().withOffline(true));
-        var result = builder(Map.of("custom", parser))
+        var result = builder(List.of(parser))
                 .build(SettingsBuilderRequest.builder()
                         .session(mock(Session.class))
                         .projectSettingsSource(source("project.custom", ""))
@@ -413,7 +413,7 @@ class DefaultSettingsParserTest {
 
     @Test
     void projectSettingsCannotWidenServerCredentialOrigins() throws Exception {
-        var result = builder(Map.of())
+        var result = builder(List.of())
                 .build(SettingsBuilderRequest.builder()
                         .session(mock(Session.class))
                         .userSettingsSource(source(
@@ -462,7 +462,7 @@ class DefaultSettingsParserTest {
                 new DefaultSettingsXmlFactory(),
                 new DefaultInterpolator(),
                 Map.of("test", mock(Dispatcher.class)),
-                Map.of("custom", parser));
+                List.of(parser));
         var request = SettingsBuilderRequest.builder()
                 .session(session)
                 .userSettingsSource(source("settings.custom", ""))
@@ -509,17 +509,20 @@ class DefaultSettingsParserTest {
     }
 
     @Test
-    void unnamedParserConflictIsReported() throws Exception {
-        var parsers = new HashMap<String, SettingsParser>();
-        parsers.put(null, new PropertiesSettingsParser());
-        parsers.put("properties", new PropertiesSettingsParser());
+    void parserConflictIsReported() throws Exception {
+        var parser1 = mock(SettingsParser.class);
+        var parser2 = mock(SettingsParser.class);
+        when(parser1.id()).thenReturn("parser-a");
+        when(parser1.supports(any())).thenReturn(true);
+        when(parser2.id()).thenReturn("parser-b");
+        when(parser2.supports(any())).thenReturn(true);
         var error =
-                assertThrows(SettingsBuilderException.class, () -> build(source("settings.properties", ""), parsers));
+                assertThrows(SettingsBuilderException.class, () -> build(source("settings.properties", ""), List.of(parser1, parser2)));
         var fatal = error.getProblemCollector()
                 .problems(BuilderProblem.Severity.FATAL)
                 .findFirst()
                 .orElseThrow();
-        assertEquals("Multiple settings parsers support this source: <unnamed>, properties", fatal.getMessage());
+        assertEquals("Multiple settings parsers support this source: parser-a, parser-b", fatal.getMessage());
     }
 
     private String propertiesSettings() throws IOException {
@@ -531,12 +534,12 @@ class DefaultSettingsParserTest {
         return output.toString(StandardCharsets.ISO_8859_1);
     }
 
-    private DefaultSettingsBuilder builder(Map<String, SettingsParser> parsers) {
+    private DefaultSettingsBuilder builder(List<SettingsParser> parsers) {
         return new DefaultSettingsBuilder(
                 new DefaultSettingsXmlFactory(), new DefaultInterpolator(), Map.of(), parsers);
     }
 
-    private SettingsBuilderResult build(Source source, Map<String, SettingsParser> parsers) {
+    private SettingsBuilderResult build(Source source, List<SettingsParser> parsers) {
         return builder(parsers)
                 .build(SettingsBuilderRequest.builder()
                         .session(mock(Session.class))
@@ -553,6 +556,11 @@ class DefaultSettingsParserTest {
     }
 
     private static class PropertiesSettingsParser implements SettingsParser {
+        @Override
+        public String id() {
+            return "properties";
+        }
+
         @Override
         public boolean supports(Source source) {
             return source.getLocation().endsWith(".properties");
