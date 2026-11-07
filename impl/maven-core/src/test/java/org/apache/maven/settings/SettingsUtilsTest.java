@@ -170,8 +170,10 @@ class SettingsUtilsTest {
                 .blocked(true)
                 .build();
 
-        Settings dominant = Settings.newBuilder().mirrors(List.of(dominantMirror)).build();
-        Settings recessive = Settings.newBuilder().mirrors(List.of(recessiveMirror)).build();
+        Settings dominant =
+                Settings.newBuilder().mirrors(List.of(dominantMirror)).build();
+        Settings recessive =
+                Settings.newBuilder().mirrors(List.of(recessiveMirror)).build();
 
         Settings merged = SettingsUtilsV4.merge(dominant, recessive);
 
@@ -193,8 +195,10 @@ class SettingsUtilsTest {
                 .url("http://recessive.example.com/")
                 .build();
 
-        Settings dominant = Settings.newBuilder().mirrors(List.of(dominantMirror)).build();
-        Settings recessive = Settings.newBuilder().mirrors(List.of(recessiveMirror)).build();
+        Settings dominant =
+                Settings.newBuilder().mirrors(List.of(dominantMirror)).build();
+        Settings recessive =
+                Settings.newBuilder().mirrors(List.of(recessiveMirror)).build();
 
         Settings merged = SettingsUtilsV4.merge(dominant, recessive);
 
@@ -207,12 +211,10 @@ class SettingsUtilsTest {
 
     @Test
     void testDominantSettingsValuesPrecedeRecessive() {
-        Settings dominant = Settings.newBuilder()
-                .localRepository("/dominant/path")
-                .build();
-        Settings recessive = Settings.newBuilder()
-                .localRepository("/recessive/path")
-                .build();
+        Settings dominant =
+                Settings.newBuilder().localRepository("/dominant/path").build();
+        Settings recessive =
+                Settings.newBuilder().localRepository("/recessive/path").build();
 
         Settings merged = SettingsUtilsV4.merge(dominant, recessive);
         assertEquals("/dominant/path", merged.getLocalRepository());
@@ -221,9 +223,8 @@ class SettingsUtilsTest {
     @Test
     void testRecessiveSettingsValuesFillGaps() {
         Settings dominant = Settings.newBuilder().build();
-        Settings recessive = Settings.newBuilder()
-                .localRepository("/recessive/path")
-                .build();
+        Settings recessive =
+                Settings.newBuilder().localRepository("/recessive/path").build();
 
         Settings merged = SettingsUtilsV4.merge(dominant, recessive);
         assertEquals("/recessive/path", merged.getLocalRepository());

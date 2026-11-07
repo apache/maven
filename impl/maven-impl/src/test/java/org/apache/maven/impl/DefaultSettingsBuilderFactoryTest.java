@@ -33,6 +33,7 @@ import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.SettingsBuilderException;
 import org.apache.maven.api.services.SettingsBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilderResult;
+import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
 import org.apache.maven.api.settings.Mirror;
