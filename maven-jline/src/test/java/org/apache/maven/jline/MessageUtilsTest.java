@@ -32,6 +32,15 @@ class MessageUtilsTest {
     }
 
     @Test
+    void parsesWidth() {
+        assertEquals(137, MessageUtils.parseWidth("137"));
+        assertEquals(137, MessageUtils.parseWidth(" 137\n"));
+        assertEquals(-1, MessageUtils.parseWidth("0"));
+        assertEquals(-1, MessageUtils.parseWidth("wide"));
+        assertEquals(-1, MessageUtils.parseWidth(null));
+    }
+
+    @Test
     void resolvesStyleSpecs() {
         assertEquals("\u001B[1;31m", JLineMessageBuilderFactory.resolve("bold,f:red"));
         assertEquals("\u001B[90m", JLineMessageBuilderFactory.resolve("f:bright-black"));

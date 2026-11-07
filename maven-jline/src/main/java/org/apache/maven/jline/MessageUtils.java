@@ -18,7 +18,11 @@
  */
 package org.apache.maven.jline;
 
+import java.io.BufferedReader;
 import java.io.Console;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 
 import org.apache.maven.message.MessageBuilder;
@@ -41,6 +45,7 @@ public class MessageUtils {
     public static void systemInstall() {
         tty = detectAnsiTerminal();
         colorEnabled = tty;
+        width = 0;
     }
 
     /**
@@ -59,10 +64,54 @@ public class MessageUtils {
     }
 
     /**
-     * Terminal width is not detected (that needs native code), so this is always {@code -1}, meaning "unknown".
+     * Returns the terminal width in columns, or {@code -1} if unknown. Taken from the {@code COLUMNS} environment
+     * variable if set, otherwise (on a detected non-Windows terminal) from {@code stty size}. Computed once.
      */
     public static int getTerminalWidth() {
-        return -1;
+        int w = width;
+        if (w == 0) {
+            w = detectWidth();
+            width = w;
+        }
+        return w;
+    }
+
+    static volatile int width; // 0 = not yet detected
+
+    private static int detectWidth() {
+        int columns = parseWidth(System.getenv("COLUMNS"));
+        if (columns > 0) {
+            return columns;
+        }
+        if (!tty || System.getProperty("os.name", "").startsWith("Windows")) {
+            return -1;
+        }
+        // ponytail: read once, window resizes are not tracked; re-query periodically if a consumer ever needs it
+        try {
+            Process p = new ProcessBuilder("stty", "size")
+                    .redirectInput(new File("/dev/tty"))
+                    .redirectError(new File("/dev/null"))
+                    .start();
+            try (BufferedReader r = new BufferedReader(new InputStreamReader(p.getInputStream()))) {
+                String size = r.readLine(); // "rows cols"
+                p.waitFor();
+                return size == null ? -1 : parseWidth(size.substring(size.indexOf(' ') + 1));
+            }
+        } catch (IOException e) {
+            return -1;
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return -1;
+        }
+    }
+
+    static int parseWidth(String s) {
+        try {
+            int w = s == null ? -1 : Integer.parseInt(s.trim());
+            return w > 0 ? w : -1;
+        } catch (NumberFormatException e) {
+            return -1;
+        }
     }
 
     public static MessageBuilder builder() {
