@@ -25,7 +25,6 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.di.Named;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.settings.Settings;
 
@@ -38,12 +37,15 @@ import org.apache.maven.api.settings.Settings;
  * Parsers must be available in the container building the settings. In particular, a parser
  * supplied by a core extension cannot read the bootstrap settings needed to resolve that
  * extension. This SPI does not change settings file discovery or extension loading.
+ * <p>
+ * Implementations must be annotated with {@code @Named("my-unique-id")} on the
+ * implementation class. The name serves as the key when multiple parsers are
+ * collected, and must be unique across all extensions to avoid conflicts.
  *
  * @since 4.2.0
  */
 @Experimental
 @Consumer
-@Named
 public interface SettingsParser extends SpiService {
     /**
      * Option that can be specified in the options map. The value should be a {@code Boolean};

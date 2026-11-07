@@ -24,17 +24,20 @@ import java.util.Map;
 import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.di.Named;
 
 /**
  * Component able to contribute to Maven session user properties. This SPI component is invoked
  * very early, while there is no session created yet.
  *
+ * <p>
+ * Implementations must be annotated with {@code @Named("my-unique-id")} on the
+ * implementation class. The name serves as the key when multiple contributors are
+ * collected, and must be unique across all extensions to avoid conflicts.
+ *
  * @since 4.0.0
  */
 @Experimental
 @Consumer
-@Named
 public interface PropertyContributor extends SpiService {
     /**
      * Invoked just before session is created with a mutable map that carries collected user properties so far.

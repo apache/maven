@@ -26,7 +26,6 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.di.Named;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Source;
 
@@ -37,13 +36,17 @@ import org.apache.maven.api.services.Source;
  * Note: to provide a Maven model "dialect" that supports symmetric translation, implement
  * {@link ModelDialectProvider}, which composes a pair of parser and writer.
  *
+ * <p>
+ * Implementations must be annotated with {@code @Named("my-unique-id")} on the
+ * implementation class. The name serves as the key when multiple parsers are
+ * collected, and must be unique across all extensions to avoid conflicts.
+ *
  * @since 4.0.0
  * @see ModelDialectProvider
  * @see DialectProvider
  */
 @Experimental
 @Consumer
-@Named
 public interface ModelParser extends SpiService {
 
     /**
