@@ -252,6 +252,26 @@ public class InjectorImpl implements Injector {
         };
     }
 
+    /**
+     * Resolves a compiled binding supplier for the given dependency.
+     *
+     * <p>The resolution rules differ by key type:
+     * <ul>
+     *   <li><b>Scalar types</b>: a single binding must exist; ambiguous bindings throw
+     *       {@link DIException}. If no binding exists and the dependency is optional,
+     *       returns a supplier of {@code null}; otherwise throws {@link DIException}.</li>
+     *   <li><b>{@code List<T>}</b>: returns all bindings for {@code T}, sorted by priority.
+     *       If no bindings are registered for {@code T}, returns an empty list —
+     *       this is not an error condition.</li>
+     *   <li><b>{@code Map<String, T>}</b>: returns all named bindings for {@code T} keyed
+     *       by their qualifier. If no bindings are registered for {@code T}, returns an
+     *       empty map — this is not an error condition.</li>
+     * </ul>
+     *
+     * @param dep the dependency to resolve
+     * @return a supplier that produces the bound instance(s)
+     * @throws DIException if a required scalar binding is absent or ambiguous
+     */
     public <Q> Supplier<Q> doGetCompiledBinding(Dependency<Q> dep) {
         Key<Q> key = dep.key();
         Set<Binding<Q>> res = getBindings(key);
