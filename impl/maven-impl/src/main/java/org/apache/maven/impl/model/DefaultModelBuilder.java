@@ -2254,7 +2254,17 @@ public class DefaultModelBuilder implements ModelBuilder {
                 DefaultProfileActivationContext childProfileActivationContext, Set<String> parentChain)
                 throws ModelBuilderException {
             Model raw = readRawModel();
-            Model parentData = readParent(raw, raw.getParent(), childProfileActivationContext, parentChain);
+            Model parentResolutionModel = raw;
+            if (raw.getProfiles().stream().anyMatch(p -> !p.getRepositories().isEmpty())) {
+                // Parent lookup needs profile repositories before assembling the ancestry.
+                // Keep final profile injection after inheritance, using the child's context.
+                DefaultProfileActivationContext activation = childProfileActivationContext.start(raw.getProperties());
+                List<Profile> profiles = getActiveProfiles(raw.getProfiles(), activation);
+                replayRecordIntoContext(activation.stop(), childProfileActivationContext, false);
+                parentResolutionModel = profileInjector.injectProfiles(raw, profiles, request, this);
+            }
+            Model parentData =
+                    readParent(parentResolutionModel, raw.getParent(), childProfileActivationContext, parentChain);
             Model parent = new DefaultInheritanceAssembler(new DefaultInheritanceAssembler.InheritanceModelMerger() {
                         @Override
                         protected void mergeModel_Modules(
