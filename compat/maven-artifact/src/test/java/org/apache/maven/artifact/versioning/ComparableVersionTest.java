@@ -723,7 +723,8 @@ class ComparableVersionTest {
     }
 
     /**
-     * Regression test for <a href="https://issues.apache.org/jira/browse/MNG-7714">MNG-7714</a>:
+     * Regression test for <a href="https://github.com/apache/maven/issues/13889">#13889</a> /
+     * <a href="https://issues.apache.org/jira/browse/MNG-7714">MNG-7714</a>:
      * a qualifier followed by a number must keep the separator in the canonical form, as Maven 3 does.
      */
     @Test
