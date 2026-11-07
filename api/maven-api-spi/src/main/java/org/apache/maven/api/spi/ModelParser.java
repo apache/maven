@@ -53,6 +53,7 @@ public interface ModelParser extends SpiService {
      * parsers fail or conflict. Must be globally unique across all extensions.
      *
      * @return the parser identifier, never {@code null}
+     * @since 4.2.0
      */
     @Nonnull
     default String id() {
