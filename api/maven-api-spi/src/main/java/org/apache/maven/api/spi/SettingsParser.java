@@ -53,7 +53,9 @@ public interface SettingsParser extends SpiService {
      * @return the parser identifier, never {@code null}
      */
     @Nonnull
-    String id();
+    default String id() {
+        return getClass().getName();
+    }
 
     /**
      * Option that can be specified in the options map. The value should be a {@code Boolean};
