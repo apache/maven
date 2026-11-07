@@ -171,7 +171,7 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
                         }
                     },
                     PROJECT_PREFIXES,
-                    true);
+                    false);
             valueSources.add(rootDirectoryValueSource);
 
             ValueSource baseUriValueSource = new PrefixedValueSourceWrapper(
