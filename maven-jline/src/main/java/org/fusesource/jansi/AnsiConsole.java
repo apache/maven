@@ -19,31 +19,34 @@
 package org.fusesource.jansi;
 
 /**
- * Forwards to {@link org.jline.jansi.AnsiConsole} instead of performing its own install, so that code
- * calling the JAnsi API, such as maven-shared-utils, shares the single console Maven itself installs
- * through {@code org.apache.maven.jline.MessageUtils} rather than racing it for ownership of
- * {@code System.out}/{@code System.err}.
+ * Does not install anything: Maven never replaces {@code System.out}/{@code System.err}, it only decides whether
+ * to emit colors (see {@code org.apache.maven.jline.MessageUtils}). Install calls are just counted, so code calling
+ * the JAnsi API, such as maven-shared-utils, keeps working without racing Maven for the console.
  *
- * This class comes from Jansi and is provided for backward compatibility with maven-shared-utils,
- * while Maven has migrated to JLine (into which Jansi has been merged since JLine 3.25.0).
+ * This class comes from Jansi and is provided for backward compatibility with maven-shared-utils;
+ * Maven itself no longer ships Jansi.
  */
 @Deprecated
 public class AnsiConsole {
 
     private static final AnsiPrintStream OUT = new AnsiPrintStream();
 
+    private static int installed;
+
     private AnsiConsole() {}
 
     public static synchronized void systemInstall() {
-        org.jline.jansi.AnsiConsole.systemInstall();
+        installed++;
     }
 
     public static synchronized boolean isInstalled() {
-        return org.jline.jansi.AnsiConsole.isInstalled();
+        return installed > 0;
     }
 
     public static synchronized void systemUninstall() {
-        org.jline.jansi.AnsiConsole.systemUninstall();
+        if (installed > 0) {
+            installed--;
+        }
     }
 
     public static AnsiPrintStream out() {
@@ -51,6 +54,6 @@ public class AnsiConsole {
     }
 
     public static int getTerminalWidth() {
-        return org.jline.jansi.AnsiConsole.getTerminalWidth();
+        return org.apache.maven.jline.MessageUtils.getTerminalWidth();
     }
 }

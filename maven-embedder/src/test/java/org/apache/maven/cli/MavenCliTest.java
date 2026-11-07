@@ -41,8 +41,6 @@ import org.apache.maven.model.building.ModelProcessor;
 import org.apache.maven.toolchain.building.ToolchainsBuildingRequest;
 import org.apache.maven.toolchain.building.ToolchainsBuildingResult;
 import org.codehaus.plexus.PlexusContainer;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.impl.DumbTerminal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -56,7 +54,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -363,12 +360,6 @@ public class MavenCliTest {
         @BeforeEach
         public void setUp() {
             MessageUtils.systemInstall();
-            MessageUtils.getTerminalWidth(); // wait for fast terminal initialize
-        }
-
-        @AfterEach
-        public void tearDown() {
-            MessageUtils.systemUninstall();
         }
 
         @Test
@@ -486,7 +477,6 @@ public class MavenCliTest {
 
         @AfterEach
         void tearDown() {
-            MessageUtils.systemInstall((Terminal) null);
             MessageUtils.setColorEnabled(true);
         }
 
@@ -501,14 +491,11 @@ public class MavenCliTest {
         }
 
         @Test
-        void colorYesEmitsAnsiAndLeavesNoTerminalBehind() {
-            assertNull(MessageUtils.getTerminal());
-
+        void colorYesEmitsAnsi() {
             String output = embeddedVersionOutput("--color=yes");
 
             assertTrue(output.contains("Apache Maven"));
             assertNotEquals(MessageUtils.stripAnsiCodes(output), output, "ANSI escapes expected: " + output);
-            assertNull(MessageUtils.getTerminal());
         }
 
         @Test
@@ -521,25 +508,6 @@ public class MavenCliTest {
             String auto = embeddedVersionOutput();
             assertTrue(auto.contains("Apache Maven"));
             assertEquals(MessageUtils.stripAnsiCodes(auto), auto);
-            assertNull(MessageUtils.getTerminal());
-        }
-
-        @Test
-        void installedTerminalIsLeftAlone() throws Exception {
-            Terminal mine = new DumbTerminal(
-                    "test",
-                    Terminal.TYPE_DUMB,
-                    new ByteArrayInputStream(new byte[0]),
-                    new ByteArrayOutputStream(),
-                    null);
-            MessageUtils.systemInstall(mine);
-            try {
-                embeddedVersionOutput("--color=yes");
-                assertSame(mine, MessageUtils.getTerminal());
-            } finally {
-                MessageUtils.systemInstall((Terminal) null);
-                mine.close();
-            }
         }
     }
 

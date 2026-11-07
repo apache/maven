@@ -21,25 +21,30 @@ package org.apache.maven.jline;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.message.MessageBuilder;
 import org.apache.maven.message.MessageBuilderFactory;
 import org.eclipse.sisu.Priority;
-import org.jline.utils.AttributedStringBuilder;
-import org.jline.utils.AttributedStyle;
-import org.jline.utils.StyleResolver;
 
+/**
+ * Message builder factory emitting ANSI colors. The class name is kept for compatibility, JLine is not used anymore.
+ */
 @Named
 @Singleton
 @Priority(10)
 public class JLineMessageBuilderFactory implements MessageBuilderFactory {
-    private final StyleResolver resolver;
 
-    public JLineMessageBuilderFactory() {
-        this.resolver = new MavenStyleResolver();
-    }
+    static final String RESET = "\u001B[0m";
+
+    private static final List<String> COLORS =
+            Arrays.asList("black", "red", "green", "yellow", "blue", "magenta", "cyan", "white");
+
+    private static final Map<String, String> STYLES = new ConcurrentHashMap<>();
 
     @Override
     public boolean isColorEnabled() {
@@ -58,29 +63,124 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory {
 
     @Override
     public MessageBuilder builder(int size) {
-        return new JlineMessageBuilder(resolver, size);
+        return new AnsiMessageBuilder(size);
     }
 
-    private static class JlineMessageBuilder implements MessageBuilder {
-        private final StyleResolver styleResolver;
-        private final AttributedStringBuilder builder;
+    /**
+     * Resolves a style to its ANSI escape sequence (empty if it has no effect). A style is either a spec like
+     * {@code bold,f:red}, or a reference {@code .name:-default} looked up from the {@code maven.style.name} or
+     * {@code style.name} system property, falling back to {@code default}.
+     */
+    static String resolve(String style) {
+        return STYLES.computeIfAbsent(style, JLineMessageBuilderFactory::doResolve);
+    }
 
-        private JlineMessageBuilder(StyleResolver styleResolver, int size) {
-            this.styleResolver = styleResolver;
-            this.builder = new AttributedStringBuilder(size);
+    private static String doResolve(String style) {
+        String spec = style;
+        if (spec.startsWith(".")) {
+            int i = spec.indexOf(":-");
+            String name = i < 0 ? spec.substring(1) : spec.substring(1, i);
+            String def = i < 0 ? "" : spec.substring(i + 2);
+            spec = System.getProperty("maven.style." + name, System.getProperty("style." + name, def));
+        }
+        StringBuilder codes = new StringBuilder();
+        for (String item : spec.split(",")) {
+            String code = code(item.trim().toLowerCase(Locale.ROOT));
+            if (code != null) {
+                codes.append(codes.length() > 0 ? ";" : "").append(code);
+            }
+        }
+        return codes.length() > 0 ? "\u001B[" + codes + "m" : "";
+    }
+
+    // ponytail: the subset of JLine's style syntax Maven styles use; unknown items are ignored
+    private static String code(String item) {
+        switch (item) {
+            case "bold":
+                return "1";
+            case "faint":
+                return "2";
+            case "italic":
+                return "3";
+            case "underline":
+                return "4";
+            case "blink":
+                return "5";
+            case "inverse":
+                return "7";
+            case "conceal":
+            case "hidden":
+                return "8";
+            case "crossed-out":
+                return "9";
+            default:
+        }
+        int colon = item.indexOf(':');
+        if (colon < 0) {
+            return null;
+        }
+        String target = item.substring(0, colon);
+        boolean fg = target.equals("f") || target.equals("fg") || target.equals("foreground");
+        boolean bg = target.equals("b") || target.equals("bg") || target.equals("background");
+        return fg || bg ? color(item.substring(colon + 1), fg) : null;
+    }
+
+    private static String color(String color, boolean fg) {
+        if (color.equals("default")) {
+            return fg ? "39" : "49";
+        }
+        boolean bright = false;
+        if (color.startsWith("bright-")) {
+            bright = true;
+            color = color.substring("bright-".length());
+        } else if (color.startsWith("!")) {
+            bright = true;
+            color = color.substring(1);
+        }
+        int index = COLORS.indexOf(color);
+        if (index >= 0) {
+            return String.valueOf((fg ? 30 : 40) + (bright ? 60 : 0) + index);
+        }
+        try {
+            if (color.startsWith("#") || color.startsWith("x")) {
+                int rgb = Integer.parseInt(color.substring(1), 16);
+                return (fg ? "38" : "48") + ";2;" + (rgb >> 16 & 0xff) + ";" + (rgb >> 8 & 0xff) + ";" + (rgb & 0xff);
+            }
+            return (fg ? "38" : "48") + ";5;" + (Integer.parseInt(color) & 0xff);
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    private static class AnsiMessageBuilder implements MessageBuilder {
+        private final StringBuilder builder;
+        private boolean styled;
+
+        private AnsiMessageBuilder(int size) {
+            this.builder = new StringBuilder(size);
         }
 
         @Override
         public MessageBuilder style(String style) {
             if (MessageUtils.isColorEnabled()) {
-                builder.style(styleResolver.resolve(style));
+                String ansi = resolve(style);
+                if (!ansi.isEmpty()) {
+                    if (styled) {
+                        builder.append(RESET);
+                    }
+                    builder.append(ansi);
+                    styled = true;
+                }
             }
             return this;
         }
 
         @Override
         public MessageBuilder resetStyle() {
-            builder.style(AttributedStyle.DEFAULT);
+            if (styled) {
+                builder.append(RESET);
+                styled = false;
+            }
             return this;
         }
 
@@ -105,52 +205,20 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory {
         @Override
         public MessageBuilder setLength(int length) {
             builder.setLength(length);
+            if (length == 0) {
+                styled = false;
+            }
             return this;
         }
 
         @Override
         public String build() {
-            return builder.toAnsi(MessageUtils.terminal);
+            return styled ? builder + RESET : builder.toString();
         }
 
         @Override
         public String toString() {
             return build();
-        }
-    }
-
-    private static class MavenStyleResolver extends StyleResolver {
-        private final Map<String, AttributedStyle> styles = new ConcurrentHashMap<>();
-
-        private MavenStyleResolver() {
-            super(key -> {
-                String v = System.getProperty("maven.style." + key);
-                if (v == null) {
-                    v = System.getProperty("style." + key);
-                }
-                return v;
-            });
-        }
-
-        @Override
-        public AttributedStyle resolve(String spec) {
-            return styles.computeIfAbsent(spec, this::doResolve);
-        }
-
-        @Override
-        public AttributedStyle resolve(String spec, String defaultSpec) {
-            return resolve(defaultSpec != null ? spec + ":-" + defaultSpec : spec);
-        }
-
-        private AttributedStyle doResolve(String spec) {
-            String def = null;
-            int i = spec.indexOf(":-");
-            if (i != -1) {
-                String[] parts = spec.split(":-");
-                spec = parts[0].trim();
-                def = parts[1].trim();
-            }
-            return super.resolve(spec, def);
         }
     }
 }

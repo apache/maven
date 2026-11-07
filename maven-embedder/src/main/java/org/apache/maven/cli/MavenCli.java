@@ -19,7 +19,6 @@
 package org.apache.maven.cli;
 
 import java.io.BufferedReader;
-import java.io.ByteArrayInputStream;
 import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -27,7 +26,6 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -120,8 +118,6 @@ import org.codehaus.plexus.util.xml.pull.XmlPullParserException;
 import org.eclipse.aether.DefaultRepositoryCache;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.transfer.TransferListener;
-import org.jline.terminal.Terminal;
-import org.jline.terminal.impl.DumbTerminal;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -221,45 +217,13 @@ public class MavenCli {
         MavenCli cli = new MavenCli();
 
         MessageUtils.systemInstall();
-        MessageUtils.registerShutdownHook();
-        int result = cli.doMain(new CliRequest(args, classWorld));
-        MessageUtils.systemUninstall();
-
-        return result;
+        return cli.doMain(new CliRequest(args, classWorld));
     }
 
     // TODO need to externalize CliRequest
     public static int doMain(String[] args, ClassWorld classWorld) {
         MavenCli cli = new MavenCli();
         return cli.doMain(new CliRequest(args, classWorld));
-    }
-
-    /**
-     * Installs a threadless, colour-capable "dumb" terminal that is not attached to the process console, so that
-     * an explicit {@code --color=yes} works; automatic detection still yields plain output for it. Colour is
-     * optional, so failure to create the terminal is not an error.
-     *
-     * @return the installed terminal, or {@code null} if it could not be created
-     */
-    private static Terminal installEmbeddedTerminal() {
-        try {
-            Terminal dumb = new DumbTerminal(
-                    "Maven",
-                    Terminal.TYPE_DUMB_COLOR,
-                    new ByteArrayInputStream(new byte[0]),
-                    new OutputStream() {
-                        @Override
-                        public void write(int b) {
-                            // discard
-                        }
-                    },
-                    null);
-            MessageUtils.systemInstall(dumb);
-            return dumb;
-        } catch (IOException e) {
-            LoggerFactory.getLogger(MavenCli.class).debug("Could not create terminal, continuing without colour", e);
-            return null;
-        }
     }
 
     /**
@@ -281,22 +245,12 @@ public class MavenCli {
             realms = Collections.emptySet();
         }
 
-        // Embedders call this method instead of main(), so nobody installed a terminal; without one
-        // MessageUtils.isColorEnabled() is always false, even for an explicit --color=yes (#13357).
-        // The dumb terminal keeps "auto" plain, and an already installed terminal is left alone.
-        Terminal embeddedTerminal = null;
         try {
             if (stdout != null) {
-                MessageUtils.awaitTerminalInitialization();
                 System.setOut(stdout);
             }
             if (stderr != null) {
-                MessageUtils.awaitTerminalInitialization();
                 System.setErr(stderr);
-            }
-
-            if (MessageUtils.getTerminal() == null) {
-                embeddedTerminal = installEmbeddedTerminal();
             }
 
             CliRequest cliRequest = new CliRequest(args, classWorld);
@@ -304,16 +258,6 @@ public class MavenCli {
 
             return doMain(cliRequest);
         } finally {
-            if (embeddedTerminal != null) {
-                if (MessageUtils.getTerminal() == embeddedTerminal) {
-                    MessageUtils.systemInstall((Terminal) null);
-                }
-                try {
-                    embeddedTerminal.close();
-                } catch (IOException e) {
-                    // ignore
-                }
-            }
             if (classWorld != null) {
                 for (ClassRealm realm : new ArrayList<>(classWorld.getRealms())) {
                     String realmId = realm.getId();
@@ -593,22 +537,14 @@ public class MavenCli {
                 || cliRequest.commandLine.hasOption(CLIManager.LOG_FILE)) {
             MessageUtils.setColorEnabled(false);
         } else {
-            // if the terminal is detected as dumb terminal, disable colors
-            if (MessageUtils.getTerminal() != null
-                    && MessageUtils.getTerminal().getType().startsWith("dumb")) {
-                MessageUtils.setColorEnabled(false);
-            }
+            // auto: color only on a detected ANSI terminal; embedded use (#13357) never detects one
+            MessageUtils.setColorEnabled(MessageUtils.isTty());
         }
 
         // LOG STREAMS
         if (cliRequest.commandLine.hasOption(CLIManager.LOG_FILE)) {
             File logFile = new File(cliRequest.commandLine.getOptionValue(CLIManager.LOG_FILE));
             logFile = resolveFile(logFile, cliRequest.workingDirectory);
-
-            // make sure the terminal has finished installing before we grab the streams, otherwise it
-            // could later overwrite our redirection and logs would leak back to the console
-            // (see https://github.com/apache/maven/issues/12188)
-            MessageUtils.awaitTerminalInitialization();
 
             // redirect stdout and stderr to file
             try {
@@ -620,19 +556,8 @@ public class MavenCli {
                 // Ignore
                 //
             }
-
-            // Logging caches System.out; with -l the wait above already ran, so activate now.
-            slf4jConfiguration.activate();
-        } else {
-            // Logging caches System.out, so wait for terminal installation to complete before
-            // activating, except when color is explicitly forced. With forced color the user expects
-            // raw ANSI to flow through the original stdout; waiting causes AnsiConsole to wrap that
-            // stream before the logger caches it, which may strip the escape codes.
-            if (!"always".equals(styleColor) && !"yes".equals(styleColor) && !"force".equals(styleColor)) {
-                MessageUtils.awaitTerminalInitialization();
-            }
-            slf4jConfiguration.activate();
         }
+        slf4jConfiguration.activate();
 
         plexusLoggerManager = new Slf4jLoggerManager();
         slf4jLogger = slf4jLoggerFactory.getLogger(this.getClass().getName());
@@ -678,7 +603,7 @@ public class MavenCli {
 
         if (slf4jLogger.isDebugEnabled()) {
             slf4jLogger.debug("Message scheme: {}", (MessageUtils.isColorEnabled() ? "color" : "plain"));
-            slf4jLogger.debug("Message terminal: {}", MessageUtils.getTerminal());
+            slf4jLogger.debug("Message terminal: {}", MessageUtils.isTty() ? "ansi" : "none");
             if (MessageUtils.isColorEnabled()) {
                 MessageBuilder buff = builder();
                 buff.a("Message styles: ");

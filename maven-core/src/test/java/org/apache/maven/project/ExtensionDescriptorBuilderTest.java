@@ -80,7 +80,7 @@ public class ExtensionDescriptorBuilderTest {
 
     /**
      * maven-core's own {@code META-INF/maven/extension.xml} must keep excluding {@code org.fusesource.jansi:jansi}
-     * as an {@code exportedArtifact} even though jansi is no longer a maven-core dependency (replaced by JLine, see
+     * as an {@code exportedArtifact} even though jansi is no longer a maven-core dependency (see
      * #11874): maven-jline exports forwarding classes for the JAnsi API (see
      * {@code org.apache.maven.jline}{@code .*} and {@code org.fusesource.jansi.*} in maven-jline), and it is the
      * {@code exportedArtifact} exclusion that makes a plugin's own {@code org.fusesource.jansi:jansi} dependency
