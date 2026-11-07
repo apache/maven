@@ -36,6 +36,11 @@ import org.apache.maven.api.services.Source;
  * Note: to provide a Maven model "dialect" that supports symmetric translation, implement
  * {@link ModelDialectProvider}, which composes a pair of parser and writer.
  *
+ * <p>
+ * Implementations must be annotated with {@code @Named("my-unique-id")} on the
+ * implementation class. The name serves as the key when multiple parsers are
+ * collected, and must be unique across all extensions to avoid conflicts.
+ *
  * @since 4.0.0
  * @see ModelDialectProvider
  * @see DialectProvider

@@ -29,6 +29,11 @@ import org.apache.maven.api.annotations.Experimental;
  * Component able to contribute to Maven session user properties. This SPI component is invoked
  * very early, while there is no session created yet.
  *
+ * <p>
+ * Implementations must be annotated with {@code @Named("my-unique-id")} on the
+ * implementation class. The name serves as the key when multiple contributors are
+ * collected, and must be unique across all extensions to avoid conflicts.
+ *
  * @since 4.0.0
  */
 @Experimental
