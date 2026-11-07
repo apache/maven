@@ -31,6 +31,8 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyScope;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.impl.resolver.RelocatedArtifact;
+import org.apache.maven.impl.resolver.TrackingExclusionDependencySelector;
+import org.apache.maven.impl.resolver.TrackingExclusionDependencySelector.ExclusionTrackingRecord;
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Exclusion;
@@ -184,6 +186,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
                             + (message != null ? ": " + message : ""));
                 }
             }
+            warnObsoleteExclusions(session, project);
         }
 
         if (logger.isDebugEnabled()) {
@@ -200,6 +203,30 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
         }
 
         return result;
+    }
+
+    private void warnObsoleteExclusions(RepositorySystemSession session, MavenProject project) {
+        String projectKey = project.getGroupId() + ":" + project.getArtifactId();
+        List<ExclusionTrackingRecord> records =
+                TrackingExclusionDependencySelector.getTrackingRecords(session, projectKey);
+        for (ExclusionTrackingRecord record : records) {
+            org.eclipse.aether.graph.Dependency directDep = record.getDirectDependency();
+            String depCoord = directDep.getArtifact().getGroupId() + ":"
+                    + directDep.getArtifact().getArtifactId();
+            for (org.eclipse.aether.graph.Exclusion exclusion : record.getDeclaredExclusions()) {
+                if ("*".equals(exclusion.getGroupId()) && "*".equals(exclusion.getArtifactId())) {
+                    continue;
+                }
+                if (!record.getMatchedExclusions().contains(exclusion)) {
+                    logger.warn(
+                            "The exclusion of {}:{} for {} in {} is obsolete - there is no dependency on this exclusion",
+                            exclusion.getGroupId(),
+                            exclusion.getArtifactId(),
+                            depCoord,
+                            project.getId());
+                }
+            }
+        }
     }
 
     private static boolean containsPlaceholder(String value) {
