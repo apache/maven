@@ -225,6 +225,11 @@ public interface LoggerManager {
                     LogSink sink = discovered.getLogSink();
                     if (sink != null) {
                         BOOTSTRAP.drainTo(sink);
+                    } else {
+                        // The discovered manager has no sink yet — bootstrap events cannot be forwarded.
+                        // Emit a warning to stderr so the loss is not silent.
+                        System.err.println("[WARNING] ServiceLoader-discovered LoggerManager has no active LogSink;"
+                                + " bootstrap log events accumulated before LogSink installation are discarded.");
                     }
                     return discovered;
                 }

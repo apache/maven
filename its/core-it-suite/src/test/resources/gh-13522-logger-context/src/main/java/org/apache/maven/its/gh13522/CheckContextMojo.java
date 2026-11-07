@@ -43,7 +43,7 @@ import org.apache.maven.api.plugin.annotations.Parameter;
  * them to {@code target/log-context.properties} so the IT verifier
  * can assert their values.</p>
  */
-@Mojo(name = "check-context", defaultPhase = org.apache.maven.api.Lifecycle.Phase.VALIDATE, projectRequired = false)
+@Mojo(name = "check-context", defaultPhase = org.apache.maven.api.Lifecycle.Phase.VALIDATE)
 public class CheckContextMojo implements org.apache.maven.api.plugin.Mojo {
 
     @Inject

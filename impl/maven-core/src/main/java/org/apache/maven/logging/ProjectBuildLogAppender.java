@@ -164,7 +164,8 @@ public class ProjectBuildLogAppender implements AutoCloseable {
                         event.pluginId(),
                         event.keyValues(),
                         event.messageTemplate(),
-                        event.messageArgs());
+                        event.messageArgs(),
+                        event.renderedLine());
             }
 
             queue.add(full);
