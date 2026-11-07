@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.message.MessageBuilder;
@@ -83,11 +84,31 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory {
             String def = i < 0 ? "" : spec.substring(i + 2);
             spec = System.getProperty("maven.style." + name, System.getProperty("style." + name, def));
         }
-        StringBuilder codes = new StringBuilder();
+        // same order as JLine emitted (ITs match exact bytes): attributes 3-9, foreground, background, bold, faint
+        String[] slots = new String[5];
+        TreeSet<String> attributes = new TreeSet<>();
         for (String item : spec.split(",")) {
             String code = code(item.trim().toLowerCase(Locale.ROOT));
-            if (code != null) {
-                codes.append(codes.length() > 0 ? ";" : "").append(code);
+            if (code == null) {
+                continue;
+            }
+            int colon = item.indexOf(':');
+            if (colon > 0) {
+                String target = item.trim().substring(0, colon).toLowerCase(Locale.ROOT);
+                slots[target.startsWith("f") ? 1 : 2] = code;
+            } else if (code.equals("1")) {
+                slots[3] = code;
+            } else if (code.equals("2")) {
+                slots[4] = code;
+            } else {
+                attributes.add(code);
+            }
+        }
+        slots[0] = attributes.isEmpty() ? null : String.join(";", attributes);
+        StringBuilder codes = new StringBuilder();
+        for (String slot : slots) {
+            if (slot != null) {
+                codes.append(codes.length() > 0 ? ";" : "").append(slot);
             }
         }
         return codes.length() > 0 ? "\u001B[" + codes + "m" : "";

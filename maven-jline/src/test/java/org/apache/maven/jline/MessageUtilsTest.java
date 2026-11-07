@@ -42,16 +42,24 @@ class MessageUtilsTest {
 
     @Test
     void resolvesStyleSpecs() {
-        assertEquals("\u001B[1;31m", JLineMessageBuilderFactory.resolve("bold,f:red"));
+        // byte-for-byte what JLine 3.30 emitted for the same specs
+        assertEquals("\u001B[31;1m", JLineMessageBuilderFactory.resolve("bold,f:red"));
+        assertEquals("\u001B[36;1m", JLineMessageBuilderFactory.resolve("f:cyan,bold"));
+        assertEquals("\u001B[4;31;44;1m", JLineMessageBuilderFactory.resolve("bold,underline,f:red,bg:blue"));
+        assertEquals(
+                "\u001B[3;4;5;7;8;9;31;44;1;2m",
+                JLineMessageBuilderFactory.resolve(
+                        "bold,faint,italic,underline,blink,inverse,conceal,crossed-out,f:red,bg:blue"));
+        assertEquals("\u001B[3;5;8m", JLineMessageBuilderFactory.resolve("conceal,hidden,blink,italic"));
         assertEquals("\u001B[90m", JLineMessageBuilderFactory.resolve("f:bright-black"));
-        assertEquals("\u001B[44;38;5;208m", JLineMessageBuilderFactory.resolve("bg:blue,fg:208"));
+        assertEquals("\u001B[38;5;208;44m", JLineMessageBuilderFactory.resolve("bg:blue,fg:208"));
         assertEquals("\u001B[38;2;255;0;16m", JLineMessageBuilderFactory.resolve("f:#ff0010"));
         assertEquals("", JLineMessageBuilderFactory.resolve("nonsense,f:nocolor"));
     }
 
     @Test
     void resolvesNamedStyleFromSystemPropertyOrDefault() {
-        assertEquals("\u001B[1;34m", JLineMessageBuilderFactory.resolve(".test-unset:-bold,f:blue"));
+        assertEquals("\u001B[34;1m", JLineMessageBuilderFactory.resolve(".test-unset:-bold,f:blue"));
         System.setProperty("maven.style.test-set", "f:green");
         try {
             assertEquals("\u001B[32m", JLineMessageBuilderFactory.resolve(".test-set:-bold,f:blue"));
@@ -67,7 +75,7 @@ class MessageUtilsTest {
 
         MessageUtils.setColorEnabled(true);
         MessageBuilder mb = MessageUtils.builder().a("a ").error("b").a(" c");
-        assertEquals("a \u001B[1;31mb\u001B[0m c", mb.build());
+        assertEquals("a \u001B[31;1mb\u001B[0m c", mb.build());
         assertEquals("a b c", MessageUtils.stripAnsiCodes(mb.build()));
         // an unterminated style is reset at the end
         assertEquals(
