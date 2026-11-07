@@ -45,6 +45,8 @@ import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.api.spi.ModelParserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -75,6 +77,8 @@ import org.apache.maven.api.spi.ModelParserException;
 @Singleton
 public class DefaultModelProcessor implements ModelProcessor {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultModelProcessor.class);
+
     private final ModelXmlFactory modelXmlFactory;
     private final List<ModelParser> modelParsers;
 
@@ -90,7 +94,14 @@ public class DefaultModelProcessor implements ModelProcessor {
         }
         Map<String, ModelParser> seen = new LinkedHashMap<>();
         for (ModelParser parser : parsers) {
-            seen.putIfAbsent(parser.id(), parser);
+            ModelParser previous = seen.putIfAbsent(parser.id(), parser);
+            if (previous != null) {
+                LOGGER.warn(
+                        "Duplicate model parser id '{}': {} already registered, ignoring {}",
+                        parser.id(),
+                        previous.getClass().getName(),
+                        parser.getClass().getName());
+            }
         }
         return List.copyOf(seen.values());
     }

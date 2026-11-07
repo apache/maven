@@ -118,12 +118,13 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
         Map<String, SettingsParser> seen = new LinkedHashMap<>();
         for (SettingsParser parser : parsers) {
-            if (seen.putIfAbsent(parser.id(), parser) != null) {
+            SettingsParser previous = seen.putIfAbsent(parser.id(), parser);
+            if (previous != null) {
                 LOGGER.warn(
-                        "Duplicate settings parser id '{}': {} ignored in favour of {}",
+                        "Duplicate settings parser id '{}': {} already registered, ignoring {}",
                         parser.id(),
-                        parser.getClass().getName(),
-                        seen.get(parser.id()).getClass().getName());
+                        previous.getClass().getName(),
+                        parser.getClass().getName());
             }
         }
         return List.copyOf(seen.values());
