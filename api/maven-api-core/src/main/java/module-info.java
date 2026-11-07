@@ -20,6 +20,7 @@
 module org.apache.maven.api {
     requires transitive org.apache.maven.api.annotations;
     requires transitive org.apache.maven.api.di;
+    requires transitive org.apache.maven.api.logging;
     requires transitive org.apache.maven.api.model;
     requires transitive org.apache.maven.api.settings;
     requires transitive org.apache.maven.api.toolchain;

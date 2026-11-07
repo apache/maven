@@ -18,6 +18,8 @@
  */
 package org.apache.maven.its.mng3652;
 
+import javax.inject.Inject;
+
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -41,8 +43,6 @@ import org.apache.maven.plugins.annotations.Parameter;
 import org.codehaus.plexus.util.FileUtils;
 import org.codehaus.plexus.util.IOUtil;
 
-import javax.inject.Inject;
-
 /**
  * Goal which attempts to download a dummy artifact from a repository on localhost
  * at the specified port. This is used to allow the unit test class to record the
@@ -56,6 +56,7 @@ public class MyMojo extends AbstractMojo {
 
     @Parameter(defaultValue = "${project.build.directory}/touch.txt")
     private File touchFile;
+
     private ArtifactResolver resolver;
     private ArtifactFactory artifactFactory;
     private ArtifactRepositoryFactory repositoryFactory;

@@ -47,6 +47,7 @@ import org.apache.maven.api.cli.cisupport.CIInfo;
 import org.apache.maven.api.cli.extensions.CoreExtension;
 import org.apache.maven.api.cli.extensions.InputLocation;
 import org.apache.maven.api.cli.extensions.InputSource;
+import org.apache.maven.api.logging.Logger;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.cling.internal.extension.io.CoreExtensionsStaxReader;
 import org.apache.maven.cling.invoker.cisupport.CIDetectorHelper;
@@ -64,6 +65,10 @@ import static org.apache.maven.cling.invoker.CliUtils.stripLeadingAndTrailingQuo
 import static org.apache.maven.cling.invoker.CliUtils.toMap;
 
 public abstract class BaseParser implements Parser {
+
+    private static Logger logger() {
+        return Logger.of(BaseParser.class);
+    }
 
     @SuppressWarnings("VisibilityModifier")
     public static class LocalContext {
@@ -117,21 +122,21 @@ public abstract class BaseParser implements Parser {
         } catch (Exception e) {
             context.parsingFailed = true;
             context.cwd = getCanonicalPath(Paths.get("."));
-            parserRequest.logger().error("Error determining working directory", e);
+            logger().error("Error determining working directory", e);
         }
         try {
             context.installationDirectory = getInstallationDirectory(context);
         } catch (Exception e) {
             context.parsingFailed = true;
             context.installationDirectory = context.cwd;
-            parserRequest.logger().error("Error determining installation directory", e);
+            logger().error("Error determining installation directory", e);
         }
         try {
             context.userHomeDirectory = getUserHomeDirectory(context);
         } catch (Exception e) {
             context.parsingFailed = true;
             context.userHomeDirectory = context.cwd;
-            parserRequest.logger().error("Error determining user home directory", e);
+            logger().error("Error determining user home directory", e);
         }
 
         // top/root
@@ -142,22 +147,22 @@ public abstract class BaseParser implements Parser {
             // without wrapping it in an internal "Error determining top directory" prefix.
             context.parsingFailed = true;
             context.topDirectory = context.cwd;
-            parserRequest.logger().error(e.getMessage());
+            logger().error(e.getMessage());
         } catch (Exception e) {
             context.parsingFailed = true;
             context.topDirectory = context.cwd;
-            parserRequest.logger().error("Error determining top directory", e);
+            logger().error("Error determining top directory", e);
         }
         try {
             context.rootDirectory = getRootDirectory(context);
         } catch (IllegalArgumentException e) {
             context.parsingFailed = true;
             context.rootDirectory = context.cwd;
-            parserRequest.logger().error(e.getMessage());
+            logger().error(e.getMessage());
         } catch (Exception e) {
             context.parsingFailed = true;
             context.rootDirectory = context.cwd;
-            parserRequest.logger().error("Error determining root directory", e);
+            logger().error("Error determining root directory", e);
         }
 
         // options
@@ -166,7 +171,7 @@ public abstract class BaseParser implements Parser {
         } catch (Exception e) {
             context.parsingFailed = true;
             context.options = null;
-            parserRequest.logger().error("Error parsing program arguments", e);
+            logger().error("Error parsing program arguments", e);
         }
 
         // system and user properties
@@ -175,14 +180,14 @@ public abstract class BaseParser implements Parser {
         } catch (Exception e) {
             context.parsingFailed = true;
             context.systemProperties = new HashMap<>();
-            parserRequest.logger().error("Error populating system properties", e);
+            logger().error("Error populating system properties", e);
         }
         try {
             context.userProperties = populateUserProperties(context);
         } catch (Exception e) {
             context.parsingFailed = true;
             context.userProperties = new HashMap<>();
-            parserRequest.logger().error("Error populating user properties", e);
+            logger().error("Error populating user properties", e);
         }
 
         // options: interpolate
@@ -199,7 +204,7 @@ public abstract class BaseParser implements Parser {
             context.extensions = readCoreExtensionsDescriptor(context);
         } catch (Exception e) {
             context.parsingFailed = true;
-            parserRequest.logger().error("Error reading core extensions descriptor", e);
+            logger().error("Error reading core extensions descriptor", e);
         }
 
         // CI detection
@@ -220,10 +225,9 @@ public abstract class BaseParser implements Parser {
             String c = severity.toLowerCase(Locale.ENGLISH);
             if (!Arrays.asList("warn", "warning", "error").contains(c)) {
                 context.parsingFailed = true;
-                context.parserRequest
-                        .logger()
-                        .error("Invalid fail on severity threshold '" + c
-                                + "'. Supported values are 'WARN', 'WARNING' and 'ERROR'.");
+                logger().error(
+                                "Invalid fail on severity threshold '{}'. Supported values are 'WARN', 'WARNING' and 'ERROR'.",
+                                c);
             }
         });
         options.altUserSettings()
@@ -246,10 +250,9 @@ public abstract class BaseParser implements Parser {
             if (!Arrays.asList("always", "yes", "force", "never", "no", "none", "auto", "tty", "if-tty")
                     .contains(c)) {
                 context.parsingFailed = true;
-                context.parserRequest
-                        .logger()
-                        .error("Invalid color configuration value '" + c
-                                + "'. Supported values are 'auto', 'always', 'never'.");
+                logger().error(
+                                "Invalid color configuration value '{}'. Supported values are 'auto', 'always', 'never'.",
+                                c);
             }
         });
     }
@@ -258,7 +261,7 @@ public abstract class BaseParser implements Parser {
         Path path = context.cwd.resolve(fileName);
         if (!Files.isRegularFile(path)) {
             context.parsingFailed = true;
-            context.parserRequest.logger().error(message + ": " + path);
+            logger().error("{}: {}", message, path);
         }
     }
 
@@ -581,11 +584,9 @@ public abstract class BaseParser implements Parser {
         if (detected.isEmpty()) {
             return null;
         } else if (detected.size() > 1) {
-            // warn
-            context.parserRequest
-                    .logger()
-                    .warn("Multiple CI systems detected: "
-                            + detected.stream().map(CIInfo::name).collect(Collectors.joining(", ")));
+            logger().warn(
+                            "Multiple CI systems detected: {}",
+                            detected.stream().map(CIInfo::name).collect(Collectors.joining(", ")));
         }
         return detected.get(0);
     }

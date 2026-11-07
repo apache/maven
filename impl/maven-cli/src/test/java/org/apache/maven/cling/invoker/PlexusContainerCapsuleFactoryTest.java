@@ -30,11 +30,11 @@ import java.util.jar.JarOutputStream;
 
 import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
+import org.apache.maven.api.logging.LogLevel;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.cling.invoker.mvn.MavenContext;
 import org.apache.maven.cling.invoker.mvn.MavenInvoker;
 import org.apache.maven.cling.invoker.mvn.MavenParser;
-import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.apache.maven.model.Plugin;
@@ -215,7 +215,7 @@ class PlexusContainerCapsuleFactoryTest {
         var context =
                 new MavenContext(request, true, (MavenOptions) request.options().orElseThrow());
         context.loggerFactory = LoggerFactory.getILoggerFactory();
-        context.loggerLevel = Slf4jConfiguration.Level.INFO;
+        context.loggerLevel = LogLevel.INFO;
         var invoker = new MavenInvoker(
                 ProtoLookup.builder().addMapping(ClassWorld.class, world).build(), null);
         container = new PlexusContainerCapsuleFactory<MavenContext>().container(invoker, context, (i, c) -> List.of());

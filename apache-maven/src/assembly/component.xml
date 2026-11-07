@@ -37,10 +37,20 @@ under the License.
 
     <dependencySet>
       <useProjectArtifact>false</useProjectArtifact>
+      <outputDirectory>boot</outputDirectory>
+      <includes>
+        <include>org.apache.maven:maven-api-log</include>
+        <include>org.apache.maven:maven-logging-system</include>
+      </includes>
+    </dependencySet>
+    <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>lib</outputDirectory>
       <excludes>
         <exclude>org.apache.maven:maven-classworlds</exclude>
         <exclude>org.jline:*</exclude>
+        <exclude>org.apache.maven:maven-api-log</exclude>
+        <exclude>org.apache.maven:maven-logging-system</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
