@@ -44,7 +44,12 @@ public class SimpleBuildEventListener implements BuildEventListener {
     @Override
     public void projectLogMessage(String projectId, LogEvent event) {
         String line = event.renderedLine();
-        log(line != null ? line : event.message());
+        if (line == null) {
+            // Maven API Logger events (not SLF4J) carry no pre-rendered line;
+            // reconstruct the console format: "[LEVEL] message"
+            line = "[" + renderLevel(event.level()) + "] " + event.message();
+        }
+        log(line);
         Throwable throwable = event.throwable();
         if (throwable != null) {
             StringWriter sw = new StringWriter();

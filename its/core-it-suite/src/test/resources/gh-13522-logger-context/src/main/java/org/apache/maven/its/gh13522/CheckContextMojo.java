@@ -26,7 +26,6 @@ import java.nio.file.Paths;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicReference;
 
-import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.logging.LogEvent;
 import org.apache.maven.api.logging.Logger;
 import org.apache.maven.api.logging.LoggerManager;
@@ -46,14 +45,15 @@ import org.apache.maven.api.plugin.annotations.Parameter;
 @Mojo(name = "check-context", defaultPhase = org.apache.maven.api.Lifecycle.Phase.VALIDATE)
 public class CheckContextMojo implements org.apache.maven.api.plugin.Mojo {
 
-    @Inject
-    private Logger logger;
-
     @Parameter(defaultValue = "${project.build.directory}", readonly = true)
     private String buildDirectory;
 
     @Override
     public void execute() {
+        // Obtain the logger for this class via LoggerManager — Logger is not injectable
+        // from plugin child injectors; use LoggerManager.get() directly.
+        Logger logger = LoggerManager.get().getLogger(getClass().getName());
+
         AtomicReference<LogEvent> captured = new AtomicReference<>();
 
         // Wrap the existing sink to intercept the next event from this logger
