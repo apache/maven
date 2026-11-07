@@ -316,7 +316,9 @@ class DefaultSettingsParserTest {
             verify(matching, never()).parse(any(), any());
         }
         verify(broken, never()).parse(any(), any());
-        verifyNoInteractions(unvisited, xmlFactory);
+        verify(unvisited, never()).supports(any());
+        verify(unvisited, never()).parse(any(), any());
+        verifyNoInteractions(xmlFactory);
         verify(source, never()).openStream();
     }
 
