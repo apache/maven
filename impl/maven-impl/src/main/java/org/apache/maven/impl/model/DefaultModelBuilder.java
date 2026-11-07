@@ -2258,12 +2258,10 @@ public class DefaultModelBuilder implements ModelBuilder {
             if (raw.getProfiles().stream().anyMatch(p -> !p.getRepositories().isEmpty())) {
                 // Parent lookup needs profile repositories before assembling the ancestry.
                 // Keep final profile injection after inheritance, using the child's context.
-                DefaultProfileActivationContext activation =
-                        childProfileActivationContext.start(raw.getProperties());
+                DefaultProfileActivationContext activation = childProfileActivationContext.start(raw.getProperties());
                 List<Profile> profiles = getActiveProfiles(raw.getProfiles(), activation);
                 replayRecordIntoContext(activation.stop(), childProfileActivationContext, false);
-                parentResolutionModel = profileInjector.injectProfiles(
-                        raw, profiles, request, this);
+                parentResolutionModel = profileInjector.injectProfiles(raw, profiles, request, this);
             }
             Model parentData =
                     readParent(parentResolutionModel, raw.getParent(), childProfileActivationContext, parentChain);
