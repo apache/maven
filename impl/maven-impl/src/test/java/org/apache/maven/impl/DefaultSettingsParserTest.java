@@ -81,9 +81,7 @@ class DefaultSettingsParserTest {
 
     @Test
     void sourceWithoutBackingFile() throws Exception {
-        var result = build(
-                source("memory.properties", propertiesSettings()),
-                List.of(new PropertiesSettingsParser()));
+        var result = build(source("memory.properties", propertiesSettings()), List.of(new PropertiesSettingsParser()));
         assertEquals(
                 directory.resolve("repository").toString(),
                 result.getEffectiveSettings().getLocalRepository());
@@ -99,7 +97,7 @@ class DefaultSettingsParserTest {
 
     @Test
     void xmlStrictFailureBecomesWarningAfterLenientParsing() throws Exception {
-        var result = build(source("settings.xml", "<settings>\n<unknown/>\n</settings>"), Map.of());
+        var result = build(source("settings.xml", "<settings>\n<unknown/>\n</settings>"), List.of());
         var problems =
                 result.getProblems().problems(BuilderProblem.Severity.WARNING).toList();
         assertEquals(1, problems.size());
@@ -110,7 +108,8 @@ class DefaultSettingsParserTest {
     @Test
     void malformedXmlIsFatal() throws Exception {
         var error = assertThrows(
-                SettingsBuilderException.class, () -> build(source("settings.xml", "<settings>\n<offline>"), Map.of()));
+                SettingsBuilderException.class,
+                () -> build(source("settings.xml", "<settings>\n<offline>"), List.of()));
         assertTrue(error.getMessage().contains("Non-parseable settings settings.xml"));
         assertTrue(error.getProblemCollector()
                 .problems(BuilderProblem.Severity.FATAL)
@@ -130,7 +129,7 @@ class DefaultSettingsParserTest {
                 return Settings.newInstance().withOffline(true);
             }
         };
-        var result = build(source("settings.properties", "unknown=value"), Map.of("properties", parser));
+        var result = build(source("settings.properties", "unknown=value"), List.of(parser));
         assertEquals(List.of(true, false), calls);
         assertTrue(result.getEffectiveSettings().isOffline());
         var problem = result.getProblems()
@@ -145,11 +144,12 @@ class DefaultSettingsParserTest {
     @Test
     void selectedParserFailureDoesNotFallBackToXml() throws Exception {
         SettingsParser parser = mock(SettingsParser.class);
+        when(parser.id()).thenReturn("parser");
         when(parser.supports(any())).thenReturn(true);
         when(parser.parse(any(), any())).thenThrow(new SettingsParserException("Invalid custom settings", 4, 2, null));
         var error = assertThrows(
                 SettingsBuilderException.class,
-                () -> build(source("settings.properties", "<settings/>"), Map.of("properties", parser)));
+                () -> build(source("settings.properties", "<settings/>"), List.of(parser)));
         assertTrue(error.getMessage().contains("Invalid custom settings"));
         var problem = error.getProblemCollector()
                 .problems(BuilderProblem.Severity.FATAL)
@@ -163,13 +163,13 @@ class DefaultSettingsParserTest {
     @Test
     void strictWarningSurvivesFailedLenientParsing() throws Exception {
         SettingsParser parser = mock(SettingsParser.class);
+        when(parser.id()).thenReturn("parser");
         when(parser.supports(any())).thenReturn(true);
         var strict = new SettingsParserException("Unknown setting", 3, 7, null);
         var lenient = new SettingsParserException("Invalid value", 5, 2, null);
         when(parser.parse(any(), any())).thenThrow(strict).thenThrow(lenient);
         var error = assertThrows(
-                SettingsBuilderException.class,
-                () -> build(source("settings.properties", ""), Map.of("properties", parser)));
+                SettingsBuilderException.class, () -> build(source("settings.properties", ""), List.of(parser)));
         var warnings = error.getProblemCollector()
                 .problems(BuilderProblem.Severity.WARNING)
                 .toList();
@@ -196,13 +196,13 @@ class DefaultSettingsParserTest {
     @Test
     void strictWarningSurvivesUnreadableLenientInput() throws Exception {
         SettingsParser parser = mock(SettingsParser.class);
+        when(parser.id()).thenReturn("parser");
         when(parser.supports(any())).thenReturn(true);
         var strict = new SettingsParserException("Unknown setting", 3, 7, null);
         var unreadable = new IOException("Read failed");
         when(parser.parse(any(), any())).thenThrow(strict).thenThrow(unreadable);
         var error = assertThrows(
-                SettingsBuilderException.class,
-                () -> build(source("settings.properties", ""), Map.of("properties", parser)));
+                SettingsBuilderException.class, () -> build(source("settings.properties", ""), List.of(parser)));
         var warnings = error.getProblemCollector()
                 .problems(BuilderProblem.Severity.WARNING)
                 .toList();
@@ -222,12 +222,12 @@ class DefaultSettingsParserTest {
     @Test
     void causeOnlyParserFailureHasUsefulDiagnostic() throws Exception {
         SettingsParser parser = mock(SettingsParser.class);
+        when(parser.id()).thenReturn("parser");
         when(parser.supports(any())).thenReturn(true);
         when(parser.parse(any(), any()))
                 .thenThrow(new SettingsParserException(new IllegalArgumentException("Invalid value")));
         var error = assertThrows(
-                SettingsBuilderException.class,
-                () -> build(source("settings.properties", ""), Map.of("properties", parser)));
+                SettingsBuilderException.class, () -> build(source("settings.properties", ""), List.of(parser)));
         var fatal = error.getProblemCollector()
                 .problems(BuilderProblem.Severity.FATAL)
                 .findFirst()
@@ -238,12 +238,14 @@ class DefaultSettingsParserTest {
     @Test
     void conflictingParsersAreReportedBeforeParsing() throws Exception {
         SettingsParser first = mock(SettingsParser.class);
+        when(first.id()).thenReturn("first");
         SettingsParser second = mock(SettingsParser.class);
+        when(second.id()).thenReturn("second");
         when(first.supports(any())).thenReturn(true);
         when(second.supports(any())).thenReturn(true);
         var error = assertThrows(
                 SettingsBuilderException.class,
-                () -> build(source("settings.properties", "<settings/>"), Map.of("second", second, "first", first)));
+                () -> build(source("settings.properties", "<settings/>"), List.of(second, first)));
         var fatals = error.getProblemCollector()
                 .problems(BuilderProblem.Severity.FATAL)
                 .toList();
@@ -264,16 +266,6 @@ class DefaultSettingsParserTest {
     }
 
     @Test
-    void supportsFailurePreventsXmlFallback() throws Exception {
-        assertSupportsFailureStopsSelectionAndParsing("broken", false);
-    }
-
-    @Test
-    void supportsFailurePreventsPreviouslyMatchedParser() throws Exception {
-        assertSupportsFailureStopsSelectionAndParsing("broken", true);
-    }
-
-    @Test
     void supportsFailurePreventsPreviouslyMatchedParser() throws Exception {
         assertSupportsFailureStopsSelectionAndParsing("broken", true);
     }
@@ -281,8 +273,11 @@ class DefaultSettingsParserTest {
     private void assertSupportsFailureStopsSelectionAndParsing(String parserId, boolean matchingFirst)
             throws Exception {
         SettingsParser matching = mock(SettingsParser.class);
+        when(matching.id()).thenReturn("matching");
         SettingsParser broken = mock(SettingsParser.class);
+        when(broken.id()).thenReturn("broken");
         SettingsParser unvisited = mock(SettingsParser.class);
+        when(unvisited.id()).thenReturn("unvisited");
         when(matching.id()).thenReturn("matching");
         when(matching.supports(any())).thenReturn(true);
         when(broken.id()).thenReturn(parserId);
@@ -310,8 +305,7 @@ class DefaultSettingsParserTest {
         assertEquals(1, fatals.size());
         var fatal = fatals.get(0);
         assertEquals(
-                "Settings parser '" + parserId + "' failed to determine support for this source",
-                fatal.getMessage());
+                "Settings parser '" + parserId + "' failed to determine support for this source", fatal.getMessage());
         assertEquals("settings.xml", fatal.getSource());
         assertEquals(-1, fatal.getLineNumber());
         assertEquals(-1, fatal.getColumnNumber());
@@ -331,7 +325,7 @@ class DefaultSettingsParserTest {
         Source source = mock(Source.class);
         when(source.getLocation()).thenReturn("unreadable.xml");
         when(source.openStream()).thenThrow(new IOException("Read failed"));
-        var error = assertThrows(SettingsBuilderException.class, () -> build(source, Map.of()));
+        var error = assertThrows(SettingsBuilderException.class, () -> build(source, List.of()));
         assertTrue(error.getMessage().contains("Non-readable settings unreadable.xml"));
         verify(source).openStream();
     }
@@ -339,11 +333,11 @@ class DefaultSettingsParserTest {
     @Test
     void customIoFailureIsNotRetried() throws Exception {
         SettingsParser parser = mock(SettingsParser.class);
+        when(parser.id()).thenReturn("parser");
         when(parser.supports(any())).thenReturn(true);
         when(parser.parse(any(), any())).thenThrow(new IOException("Read failed"));
         var error = assertThrows(
-                SettingsBuilderException.class,
-                () -> build(source("settings.properties", ""), Map.of("properties", parser)));
+                SettingsBuilderException.class, () -> build(source("settings.properties", ""), List.of(parser)));
         assertTrue(error.getMessage().contains("Non-readable settings settings.properties"));
         verify(parser).parse(any(), any());
     }
@@ -360,7 +354,7 @@ class DefaultSettingsParserTest {
             streams.add(stream);
             return stream;
         });
-        assertThrows(SettingsBuilderException.class, () -> build(source, Map.of()));
+        assertThrows(SettingsBuilderException.class, () -> build(source, List.of()));
         assertFalse(streams.isEmpty());
         for (InputStream stream : streams) {
             verify(stream).close();
@@ -370,6 +364,7 @@ class DefaultSettingsParserTest {
     @Test
     void formatsShareInterpolationAndMergePrecedence() throws Exception {
         SettingsParser parser = mock(SettingsParser.class);
+        when(parser.id()).thenReturn("parser");
         when(parser.supports(any()))
                 .thenAnswer(call -> ((Source) call.getArgument(0)).getLocation().endsWith(".custom"));
         when(parser.parse(any(), any()))
@@ -400,6 +395,7 @@ class DefaultSettingsParserTest {
     @Test
     void projectSettingsRestrictionsApplyToCustomParser() throws Exception {
         SettingsParser parser = mock(SettingsParser.class);
+        when(parser.id()).thenReturn("parser");
         when(parser.supports(any())).thenReturn(true);
         when(parser.parse(any(), any())).thenReturn(Settings.newInstance().withOffline(true));
         var result = builder(List.of(parser))
@@ -443,6 +439,7 @@ class DefaultSettingsParserTest {
     void customSettingsDecryptionFailureDoesNotExposeCredentials() throws Exception {
         String encrypted = "{L6L/HbmrY+cH+sNkphn-corrupted-q3fguYepTpM04WlIXb8nB1pk=}";
         SettingsParser parser = mock(SettingsParser.class);
+        when(parser.id()).thenReturn("parser");
         when(parser.supports(any())).thenReturn(true);
         when(parser.parse(any(), any()))
                 .thenReturn(Settings.newBuilder()
@@ -491,7 +488,7 @@ class DefaultSettingsParserTest {
     }
 
     @Test
-    void unnamedParserWorksInNativeContainer() throws Exception {
+    void parserWorksInNativeContainer() throws Exception {
         Injector injector = Injector.create()
                 .bindInstance(SettingsXmlFactory.class, new DefaultSettingsXmlFactory())
                 .bindInstance(Interpolator.class, new DefaultInterpolator())
@@ -511,13 +508,16 @@ class DefaultSettingsParserTest {
     @Test
     void parserConflictIsReported() throws Exception {
         var parser1 = mock(SettingsParser.class);
+        when(parser1.id()).thenReturn("parser1");
         var parser2 = mock(SettingsParser.class);
+        when(parser2.id()).thenReturn("parser2");
         when(parser1.id()).thenReturn("parser-a");
         when(parser1.supports(any())).thenReturn(true);
         when(parser2.id()).thenReturn("parser-b");
         when(parser2.supports(any())).thenReturn(true);
-        var error =
-                assertThrows(SettingsBuilderException.class, () -> build(source("settings.properties", ""), List.of(parser1, parser2)));
+        var error = assertThrows(
+                SettingsBuilderException.class,
+                () -> build(source("settings.properties", ""), List.of(parser1, parser2)));
         var fatal = error.getProblemCollector()
                 .problems(BuilderProblem.Severity.FATAL)
                 .findFirst()

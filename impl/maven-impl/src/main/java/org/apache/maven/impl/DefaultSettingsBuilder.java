@@ -372,16 +372,14 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     matches.add(parser);
                 }
             } catch (RuntimeException e) {
-                String msg = "Settings parser '" + parser.id()
-                        + "' failed to determine support for this source";
+                String msg = "Settings parser '" + parser.id() + "' failed to determine support for this source";
                 problems.reportProblem(
                         new DefaultBuilderProblem(source.getLocation(), -1, -1, e, msg, BuilderProblem.Severity.FATAL));
                 return null;
             }
         }
         if (matches.size() > 1) {
-            String parsers =
-                    matches.stream().map(SettingsParser::id).sorted().collect(Collectors.joining(", "));
+            String parsers = matches.stream().map(SettingsParser::id).sorted().collect(Collectors.joining(", "));
             String msg = "Multiple settings parsers support this source: " + parsers;
             problems.reportProblem(
                     new DefaultBuilderProblem(source.getLocation(), -1, -1, null, msg, BuilderProblem.Severity.FATAL));

@@ -41,7 +41,6 @@ import org.apache.maven.api.spi.ModelParserException;
 @Priority(1)
 public class HoconModelReader implements ModelParser {
 
-
     @Override
     public String id() {
         return "hocon";
