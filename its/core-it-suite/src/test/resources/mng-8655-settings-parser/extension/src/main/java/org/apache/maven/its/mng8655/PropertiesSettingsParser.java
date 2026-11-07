@@ -38,6 +38,7 @@ public class PropertiesSettingsParser implements SettingsParser {
     @Inject
     public PropertiesSettingsParser() {}
 
+    @Override
     public String id() {
         return "properties";
     }

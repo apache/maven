@@ -64,12 +64,16 @@ import org.apache.maven.settings.v4.SettingsTransformer;
 import org.codehaus.plexus.components.secdispatcher.Dispatcher;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import org.codehaus.plexus.components.secdispatcher.internal.DefaultSecDispatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
  */
 @Named
 public class DefaultSettingsBuilder implements SettingsBuilder {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultSettingsBuilder.class);
 
     private final DefaultSettingsValidator settingsValidator = new DefaultSettingsValidator();
 
@@ -114,7 +118,13 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
         Map<String, SettingsParser> seen = new LinkedHashMap<>();
         for (SettingsParser parser : parsers) {
-            seen.putIfAbsent(parser.id(), parser);
+            if (seen.putIfAbsent(parser.id(), parser) != null) {
+                LOGGER.warn(
+                        "Duplicate settings parser id '{}': {} ignored in favour of {}",
+                        parser.id(),
+                        parser.getClass().getName(),
+                        seen.get(parser.id()).getClass().getName());
+            }
         }
         return List.copyOf(seen.values());
     }

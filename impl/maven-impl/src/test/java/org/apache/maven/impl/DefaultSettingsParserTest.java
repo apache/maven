@@ -273,11 +273,8 @@ class DefaultSettingsParserTest {
     private void assertSupportsFailureStopsSelectionAndParsing(String parserId, boolean matchingFirst)
             throws Exception {
         SettingsParser matching = mock(SettingsParser.class);
-        when(matching.id()).thenReturn("matching");
         SettingsParser broken = mock(SettingsParser.class);
-        when(broken.id()).thenReturn("broken");
         SettingsParser unvisited = mock(SettingsParser.class);
-        when(unvisited.id()).thenReturn("unvisited");
         when(matching.id()).thenReturn("matching");
         when(matching.supports(any())).thenReturn(true);
         when(broken.id()).thenReturn(parserId);
@@ -510,9 +507,7 @@ class DefaultSettingsParserTest {
     @Test
     void parserConflictIsReported() throws Exception {
         var parser1 = mock(SettingsParser.class);
-        when(parser1.id()).thenReturn("parser1");
         var parser2 = mock(SettingsParser.class);
-        when(parser2.id()).thenReturn("parser2");
         when(parser1.id()).thenReturn("parser-a");
         when(parser1.supports(any())).thenReturn(true);
         when(parser2.id()).thenReturn("parser-b");
