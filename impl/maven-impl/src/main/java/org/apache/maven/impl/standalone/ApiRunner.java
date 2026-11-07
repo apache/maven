@@ -76,6 +76,7 @@ import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.di.impl.InjectorImpl;
+import org.apache.maven.di.impl.Types;
 import org.apache.maven.impl.AbstractSession;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.di.SessionScope;
@@ -439,12 +440,12 @@ public class ApiRunner {
 
             @Override
             public <T> List<T> lookupList(Class<T> type) {
-                return injector.getInstance(new Key<List<T>>() {});
+                return injector.getInstance(Key.ofType(Types.parameterizedType(List.class, type)));
             }
 
             @Override
             public <T> Map<String, T> lookupMap(Class<T> type) {
-                return injector.getInstance(new Key<Map<String, T>>() {});
+                return injector.getInstance(Key.ofType(Types.parameterizedType(Map.class, String.class, type)));
             }
         };
     }
