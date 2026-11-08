@@ -42,6 +42,7 @@ import org.codehaus.plexus.interpolation.PrefixAwareRecursionInterceptor;
 import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
 import org.codehaus.plexus.interpolation.PrefixedValueSourceWrapper;
 import org.codehaus.plexus.interpolation.RecursionInterceptor;
+import org.codehaus.plexus.interpolation.SimpleRecursionInterceptor;
 import org.codehaus.plexus.interpolation.SingleResponseValueSource;
 import org.codehaus.plexus.interpolation.ValueSource;
 
@@ -292,6 +293,47 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
     }
 
     protected RecursionInterceptor createRecursionInterceptor() {
-        return new PrefixAwareRecursionInterceptor(PROJECT_PREFIXES);
+        return new PrefixAwareRecursionInterceptor(PROJECT_PREFIXES) {
+            // The custom property is distinct from project.rootDirectory and pom.rootDirectory.
+            private final RecursionInterceptor rootDirectory = new SimpleRecursionInterceptor();
+
+            @Override
+            public boolean hasRecursiveExpression(String expression) {
+                return "rootDirectory".equals(expression)
+                        ? rootDirectory.hasRecursiveExpression(expression)
+                        : super.hasRecursiveExpression(expression);
+            }
+
+            @Override
+            public void expressionResolutionStarted(String expression) {
+                if ("rootDirectory".equals(expression)) {
+                    rootDirectory.expressionResolutionStarted(expression);
+                } else {
+                    super.expressionResolutionStarted(expression);
+                }
+            }
+
+            @Override
+            public void expressionResolutionFinished(String expression) {
+                if ("rootDirectory".equals(expression)) {
+                    rootDirectory.expressionResolutionFinished(expression);
+                } else {
+                    super.expressionResolutionFinished(expression);
+                }
+            }
+
+            @Override
+            public List<?> getExpressionCycle(String expression) {
+                return "rootDirectory".equals(expression)
+                        ? rootDirectory.getExpressionCycle(expression)
+                        : super.getExpressionCycle(expression);
+            }
+
+            @Override
+            public void clear() {
+                rootDirectory.clear();
+                super.clear();
+            }
+        };
     }
 }

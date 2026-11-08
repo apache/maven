@@ -19,6 +19,7 @@
 package org.apache.maven.model.interpolation;
 
 import java.io.File;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -31,22 +32,28 @@ import java.util.TimeZone;
 
 import org.apache.maven.model.Build;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DistributionManagement;
 import org.apache.maven.model.Model;
 import org.apache.maven.model.Organization;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.Resource;
 import org.apache.maven.model.Scm;
+import org.apache.maven.model.Site;
 import org.apache.maven.model.building.DefaultModelBuildingRequest;
 import org.apache.maven.model.building.ModelBuildingRequest;
 import org.apache.maven.model.building.SimpleProblemCollector;
 import org.apache.maven.model.path.PathTranslator;
 import org.apache.maven.model.root.DefaultRootLocator;
+import org.codehaus.plexus.interpolation.RecursionInterceptor;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author jdcasey
@@ -423,6 +430,84 @@ public abstract class AbstractModelInterpolatorTest {
         assertProblemFree(collector);
 
         assertEquals("${rootDirectory}/temp-repo", out.getRepositories().get(0).getUrl());
+    }
+
+    @Test
+    public void testRootDirectoryAliases(@TempDir Path directory) throws Exception {
+        for (String prefix : new String[] {"project.", "pom."}) {
+            for (String source : new String[] {"model", "user", "system"}) {
+                Path root = Files.createDirectory(directory.resolve(prefix + source));
+                Model model = new Model();
+                ModelBuildingRequest request = new DefaultModelBuildingRequest();
+                Properties properties = "model".equals(source)
+                        ? model.getProperties()
+                        : "user".equals(source) ? request.getUserProperties() : request.getSystemProperties();
+                properties.setProperty("rootDirectory", "${" + prefix + "rootDirectory}");
+
+                assertRootDirectoryInterpolation(root, model, request, root.toString());
+            }
+        }
+    }
+
+    @Test
+    public void testRootDirectoryCycleIsDetected() throws Exception {
+        Model model = new Model();
+        model.setName("${rootDirectory}");
+        model.getProperties().setProperty("rootDirectory", "${other}");
+        model.getProperties().setProperty("other", "${rootDirectory}");
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+
+        createInterpolator().interpolateModel(model, null, new DefaultModelBuildingRequest(), collector);
+
+        assertFalse(collector.getErrors().isEmpty());
+    }
+
+    @Test
+    public void testRootDirectoryRecursionNamespaces() throws Exception {
+        RecursionInterceptor interceptor =
+                ((AbstractStringBasedModelInterpolator) createInterpolator()).createRecursionInterceptor();
+        interceptor.expressionResolutionStarted("rootDirectory");
+        assertFalse(interceptor.hasRecursiveExpression("project.rootDirectory"));
+        interceptor.expressionResolutionStarted("project.rootDirectory");
+        assertTrue(interceptor.hasRecursiveExpression("pom.rootDirectory"));
+        interceptor.expressionResolutionFinished("project.rootDirectory");
+        assertTrue(interceptor.hasRecursiveExpression("rootDirectory"));
+        interceptor.expressionResolutionFinished("rootDirectory");
+        assertFalse(interceptor.hasRecursiveExpression("rootDirectory"));
+
+        interceptor.expressionResolutionStarted("rootDirectory");
+        interceptor.expressionResolutionStarted("project.rootDirectory");
+        interceptor.clear();
+        assertFalse(interceptor.hasRecursiveExpression("rootDirectory"));
+        assertFalse(interceptor.hasRecursiveExpression("project.rootDirectory"));
+    }
+
+    private void assertRootDirectoryInterpolation(
+            Path root, Model model, ModelBuildingRequest request, String expectedCustomRoot) throws Exception {
+        Files.createDirectory(root.resolve(".mvn"));
+        Path child = Files.createDirectory(root.resolve("child"));
+        model.getProperties().setProperty("customRoot", "${rootDirectory}");
+        model.getProperties().setProperty("projectRoot", "${project.rootDirectory}");
+        model.getProperties().setProperty("pomRoot", "${pom.rootDirectory}");
+        model.setName("${rootDirectory}");
+        Site site = new Site();
+        site.setName("${rootDirectory}");
+        DistributionManagement distributionManagement = new DistributionManagement();
+        distributionManagement.setSite(site);
+        model.setDistributionManagement(distributionManagement);
+
+        AbstractStringBasedModelInterpolator interpolator = (AbstractStringBasedModelInterpolator) createInterpolator();
+        interpolator.setRootLocator(new DefaultRootLocator());
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out = interpolator.interpolateModel(model, child.toFile(), request, collector);
+
+        assertProblemFree(collector);
+        assertEquals(expectedCustomRoot, out.getProperties().getProperty("customRoot"));
+        assertEquals(expectedCustomRoot, out.getName());
+        assertEquals(
+                expectedCustomRoot, out.getDistributionManagement().getSite().getName());
+        assertEquals(root.toString(), out.getProperties().getProperty("projectRoot"));
+        assertEquals(root.toString(), out.getProperties().getProperty("pomRoot"));
     }
 
     @Test
