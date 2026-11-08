@@ -32,6 +32,7 @@ import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
+import org.apache.maven.api.model.Inclusion;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
@@ -129,6 +130,9 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
         if (!dependency.getExclusions().isEmpty()) {
             stringBuilder.append("[").append(dependency.getExclusions().size()).append(" exclusions]");
         }
+        if (!dependency.getIncludes().isEmpty()) {
+            stringBuilder.append("[").append(dependency.getIncludes().size()).append(" includes]");
+        }
         return stringBuilder.toString();
     }
 
@@ -141,7 +145,8 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
                 && Objects.equals(d1.getScope(), d2.getScope())
                 && Objects.equals(d1.getSystemPath(), d2.getSystemPath())
                 && Objects.equals(d1.getOptional(), d2.getOptional())
-                && equals(d1.getExclusions(), d2.getExclusions());
+                && equals(d1.getExclusions(), d2.getExclusions())
+                && equalsInclusions(d1.getIncludes(), d2.getIncludes());
     }
 
     private boolean equals(Collection<Exclusion> ce1, Collection<Exclusion> ce2) {
@@ -161,6 +166,25 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
     private boolean equals(Exclusion e1, Exclusion e2) {
         return Objects.equals(e1.getGroupId(), e2.getGroupId())
                 && Objects.equals(e1.getArtifactId(), e2.getArtifactId());
+    }
+
+    private boolean equalsInclusions(Collection<Inclusion> ci1, Collection<Inclusion> ci2) {
+        if (ci1.size() == ci2.size()) {
+            Iterator<Inclusion> i1 = ci1.iterator();
+            Iterator<Inclusion> i2 = ci2.iterator();
+            while (i1.hasNext() && i2.hasNext()) {
+                if (!equals(i1.next(), i2.next())) {
+                    return false;
+                }
+            }
+            return !i1.hasNext() && !i2.hasNext();
+        }
+        return false;
+    }
+
+    private boolean equals(Inclusion i1, Inclusion i2) {
+        return Objects.equals(i1.getGroupId(), i2.getGroupId())
+                && Objects.equals(i1.getArtifactId(), i2.getArtifactId());
     }
 
     static Dependency updateWithImportedFrom(Dependency dependency, DependencyManagement bom) {

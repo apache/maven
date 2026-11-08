@@ -1313,6 +1313,16 @@
           </association>
         </field>
         <field>
+          <name>includes</name>
+          <version>4.1.0+</version>
+          <description>Lists a set of artifacts that should be included from this dependency's
+            artifact list when importing a bill of materials.</description>
+          <association>
+            <type>Inclusion</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
           <name>optional</name>
           <version>4.0.0+</version>
           <description>
@@ -1447,6 +1457,34 @@
           <description>The artifact ID of the project to exclude.</description>
           <type>String</type>
           <required>true</required>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Inclusion</name>
+      <version>4.1.0+</version>
+      <description>
+        <![CDATA[
+        The {@code <inclusion>} element contains information required to include
+        an artifact in the project when importing a bill of materials.
+        <p>
+        The {@code groupId} and {@code artifactId} fields are interpreted as glob patterns.
+
+        @see java.nio.file.FileSystem#getPathMatcher
+        ]]>
+      </description>
+      <fields>
+        <field>
+          <name>groupId</name>
+          <version>4.1.0+</version>
+          <description>The group ID of the project to include.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>4.1.0+</version>
+          <description>The artifact ID of the project to include.</description>
+          <type>String</type>
         </field>
       </fields>
     </class>
