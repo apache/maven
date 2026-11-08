@@ -381,10 +381,24 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                                                 .toString())
                                         .build(),
                                 Source.newBuilder()
+                                        .scope("main")
+                                        .lang("resources")
+                                        .directory(basedirPath
+                                                .resolve("src/main/resources")
+                                                .toString())
+                                        .build(),
+                                Source.newBuilder()
                                         .scope("test")
                                         .lang("java")
                                         .directory(basedirPath
                                                 .resolve("src/test/java")
+                                                .toString())
+                                        .build(),
+                                Source.newBuilder()
+                                        .scope("test")
+                                        .lang("resources")
+                                        .directory(basedirPath
+                                                .resolve("src/test/resources")
                                                 .toString())
                                         .build()))
                         .testOutputDirectory(
