@@ -686,4 +686,17 @@ class ComparableVersionTest {
         assertTrue(f.compareTo(sp2) < 0, "expected " + f + " < " + sp2);
         assertTrue(f.compareTo(sp3) < 0, "expected " + f + " < " + sp3);
     }
+
+    /**
+     * Regression test for <a href="https://github.com/apache/maven/issues/13889">#13889</a> /
+     * <a href="https://issues.apache.org/jira/browse/MNG-7714">MNG-7714</a>:
+     * a qualifier followed by a number must keep the separator in the canonical form, as Maven 3 does.
+     */
+    @Test
+    void testQualifierWithNumberCanonicalSpelling() {
+        assertEquals("3-milestone-2", new ComparableVersion("3.0.0-M2").getCanonical());
+        assertEquals("4-beta-1", new ComparableVersion("4.0.0-beta-1").getCanonical());
+        assertEquals("3.34-rc-1", new ComparableVersion("3.34.0.CR1").getCanonical());
+        assertEquals("1-sp-1", new ComparableVersion("1.0-sp1").getCanonical());
+    }
 }
