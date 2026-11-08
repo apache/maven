@@ -92,7 +92,7 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory {
             if (code == null) {
                 continue;
             }
-            int colon = item.indexOf(':');
+            int colon = item.trim().indexOf(':');
             if (colon > 0) {
                 String target = item.trim().substring(0, colon).toLowerCase(Locale.ROOT);
                 slots[target.startsWith("f") ? 1 : 2] = code;
