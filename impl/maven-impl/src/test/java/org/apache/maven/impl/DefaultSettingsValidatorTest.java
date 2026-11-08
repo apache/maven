@@ -305,4 +305,32 @@ class DefaultSettingsValidatorTest {
         assertEquals(BuilderProblem.Severity.WARNING, problem.getSeverity());
         assertTrue(problem.getMessage().contains("phases"));
     }
+
+    @Test
+    void testPhaseMissingNameIsErrorInProjectSettings() {
+        // A <phase> without a name must be reported as ERROR at settings-load time,
+        // not as IllegalStateException at session-init time.
+        PhaseInjection phase = PhaseInjection.newBuilder().after("compile").build();
+        Settings settings = Settings.newBuilder().phases(List.of(phase)).build();
+
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings, true);
+        assertEquals(1, problems.totalProblemsReported());
+        BuilderProblem problem = problems.problems().findFirst().orElseThrow();
+        assertEquals(BuilderProblem.Severity.ERROR, problem.getSeverity());
+        assertTrue(problem.getMessage().contains("non-blank 'name'"));
+    }
+
+    @Test
+    void testPhaseMissingAnchorIsErrorInProjectSettings() {
+        // A <phase> with a name but no parent/after/before must be reported as ERROR.
+        PhaseInjection phase = PhaseInjection.newBuilder().name("orphan").build();
+        Settings settings = Settings.newBuilder().phases(List.of(phase)).build();
+
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings, true);
+        assertEquals(1, problems.totalProblemsReported());
+        BuilderProblem problem = problems.problems().findFirst().orElseThrow();
+        assertEquals(BuilderProblem.Severity.ERROR, problem.getSeverity());
+        assertTrue(problem.getMessage().contains("orphan"));
+        assertTrue(problem.getMessage().contains("after"));
+    }
 }

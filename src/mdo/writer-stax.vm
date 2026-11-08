@@ -265,15 +265,32 @@ public class ${className} {
     #if ( $Helper.xmlFieldMetadata( $field ).format == "mixed" )
       #if ( $Helper.isFlatItems( $field ) && $field.to == "String" )
         #set ( $mixedFieldCapName = $Helper.capitalise( $field.name ) )
-        #set ( $mixedSingularTag = $Helper.xmlFieldMetadata( $field ).tagName )
-        #if ( ! $mixedSingularTag )
-          #set ( $mixedSingularTag = $Helper.singular( $field.name ) )
-        #end
+        #set ( $mixedWrapperTag = $Helper.xmlFieldMetadata( $field ).tagName )
+        #set ( $mixedItemTag = $Helper.singular( $field.name ) )
+        #if ( $mixedWrapperTag )
+          ##
+          ## Wrapper mixed-content (e.g. Settings.args → <options><arg>…</arg></options>):
+          ## The field has xml.tagName="options" (wrapper) and singular name "arg" (item).
+          ## Write the wrapper element only when the list is non-empty.
+          ##
+            if (${classLcapName}.get${mixedFieldCapName}() != null && !${classLcapName}.get${mixedFieldCapName}().isEmpty()) {
+                serializer.writeStartElement(namespace, "${mixedWrapperTag}");
+                for (String _arg : ${classLcapName}.get${mixedFieldCapName}()) {
+                    writeTag("${mixedItemTag}", null, _arg, serializer${loctracnull});
+                }
+                serializer.writeEndElement();
+            }
+        #else
+          ##
+          ## Body-level mixed-content (e.g. Alias.args → <alias>…<arg>…</alias>):
+          ## No wrapper element; items go directly in the containing element body.
+          ##
             if (${classLcapName}.get${mixedFieldCapName}() != null) {
                 for (String _arg : ${classLcapName}.get${mixedFieldCapName}()) {
-                    writeTag("${mixedSingularTag}", null, _arg, serializer${loctracnull});
+                    writeTag("${mixedItemTag}", null, _arg, serializer${loctracnull});
                 }
             }
+        #end
       #end
     #end
   #end

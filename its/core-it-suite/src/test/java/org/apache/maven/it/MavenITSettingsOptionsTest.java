@@ -18,8 +18,6 @@
  */
 package org.apache.maven.it;
 
-import java.io.IOException;
-import java.nio.file.Files;
 import java.nio.file.Path;
 
 import org.junit.jupiter.api.Test;
@@ -52,7 +50,7 @@ class MavenITSettingsOptionsTest extends AbstractMavenIntegrationTestCase {
 
         // -q suppresses [INFO] lines
         assertFalse(
-                verifier.loadFile(verifier.getBasedir(), "inline.txt", false).stream()
+                verifier.loadFile(verifier.getLogFile()).stream()
                         .anyMatch(l -> l.contains("[INFO] Building")),
                 "Quiet mode from <options> must suppress [INFO] Building line");
     }
@@ -71,7 +69,7 @@ class MavenITSettingsOptionsTest extends AbstractMavenIntegrationTestCase {
         verifier.verifyErrorFreeLog();
 
         assertFalse(
-                verifier.loadFile(verifier.getBasedir(), "structured.txt", false).stream()
+                verifier.loadFile(verifier.getLogFile()).stream()
                         .anyMatch(l -> l.contains("[INFO] Building")),
                 "Quiet mode from <options><arg> must suppress [INFO] Building line");
     }
@@ -94,11 +92,11 @@ class MavenITSettingsOptionsTest extends AbstractMavenIntegrationTestCase {
         // settings.xml has -q (quiet); maven.config has --debug
         // If maven.config were honoured, [DEBUG] lines would appear
         assertFalse(
-                verifier.loadFile(verifier.getBasedir(), "precedence.txt", false).stream()
+                verifier.loadFile(verifier.getLogFile()).stream()
                         .anyMatch(l -> l.startsWith("[DEBUG]")),
                 "maven.config must be ignored when <options> is present in settings");
         assertFalse(
-                verifier.loadFile(verifier.getBasedir(), "precedence.txt", false).stream()
+                verifier.loadFile(verifier.getLogFile()).stream()
                         .anyMatch(l -> l.contains("[INFO] Building")),
                 "Quiet mode from settings <options> must suppress [INFO] Building");
     }

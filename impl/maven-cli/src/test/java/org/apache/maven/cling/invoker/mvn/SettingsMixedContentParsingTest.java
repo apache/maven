@@ -19,11 +19,13 @@
 package org.apache.maven.cling.invoker.mvn;
 
 import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.List;
 
 import org.apache.maven.api.settings.Alias;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.settings.v4.SettingsStaxReader;
+import org.apache.maven.settings.v4.SettingsStaxWriter;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -173,5 +175,74 @@ class SettingsMixedContentParsingTest {
                 List.of("verify", "-Dmaven.test.skip=true"),
                 s.getAliases().get(0).getArgs());
         assertEquals(List.of("deploy", "-Prelease"), s.getAliases().get(1).getArgs());
+    }
+
+    // ------------------------------------------------------------------ round-trip
+
+    private String write(Settings s) throws Exception {
+        StringWriter sw = new StringWriter();
+        new SettingsStaxWriter().write(sw, s);
+        return sw.toString();
+    }
+
+    @Test
+    void optionsRoundTrip() throws Exception {
+        // Parse structured form → writer produces <options><arg>…</arg></options> → re-parse → same list
+        String xml = "<settings xmlns=\"" + NS + "\">"
+                + "<options><arg>-T4</arg><arg>--no-transfer-progress</arg></options>"
+                + "</settings>";
+        Settings original = parse(xml);
+        String serialized = write(original);
+        Settings roundTripped = parse(serialized);
+        assertEquals(
+                original.getArgs(),
+                roundTripped.getArgs(),
+                "options round-trip must preserve args; serialized: " + serialized);
+    }
+
+    @Test
+    void optionsInlineRoundTrip() throws Exception {
+        // Parse inline form → writer produces structured form → re-parse → same list
+        String xml =
+                "<settings xmlns=\"" + NS + "\">" + "<options>-T4 --no-transfer-progress</options>" + "</settings>";
+        Settings original = parse(xml);
+        String serialized = write(original);
+        // The serialized form must contain the <options> wrapper (not bare <options>value</options>)
+        // and re-parsing it must produce the same arg list
+        Settings roundTripped = parse(serialized);
+        assertEquals(
+                original.getArgs(),
+                roundTripped.getArgs(),
+                "options inline→structured round-trip must preserve args; serialized: " + serialized);
+    }
+
+    @Test
+    void aliasRoundTrip() throws Exception {
+        // Parse structured alias → writer → re-parse
+        String xml = "<settings xmlns=\"" + NS + "\">"
+                + "<alias name=\"ci\"><arg>verify</arg><arg>-Dmaven.test.skip=true</arg></alias>"
+                + "</settings>";
+        Settings original = parse(xml);
+        String serialized = write(original);
+        Settings roundTripped = parse(serialized);
+        assertEquals(
+                original.getAliases().get(0).getArgs(),
+                roundTripped.getAliases().get(0).getArgs(),
+                "alias round-trip must preserve args; serialized: " + serialized);
+    }
+
+    @Test
+    void aliasInlineRoundTrip() throws Exception {
+        // Parse inline alias → writer → re-parse
+        String xml = "<settings xmlns=\"" + NS + "\">"
+                + "<alias name=\"ci\">verify -Dmaven.test.skip=true</alias>"
+                + "</settings>";
+        Settings original = parse(xml);
+        String serialized = write(original);
+        Settings roundTripped = parse(serialized);
+        assertEquals(
+                original.getAliases().get(0).getArgs(),
+                roundTripped.getAliases().get(0).getArgs(),
+                "alias inline→structured round-trip must preserve args; serialized: " + serialized);
     }
 }

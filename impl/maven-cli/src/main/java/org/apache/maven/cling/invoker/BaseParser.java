@@ -706,7 +706,12 @@ public abstract class BaseParser implements Parser {
             artifactId = parts[1];
             version = parts[2];
         }
-        if (groupId == null || artifactId == null || version == null) {
+        if (groupId == null
+                || groupId.isEmpty()
+                || artifactId == null
+                || artifactId.isEmpty()
+                || version == null
+                || version.isEmpty()) {
             throw new IllegalArgumentException(
                     "Extension must specify either id or all of groupId, artifactId, and version in " + sourceFile);
         }
