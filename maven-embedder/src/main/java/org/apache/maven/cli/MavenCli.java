@@ -66,6 +66,7 @@ import org.apache.maven.cli.event.ExecutionEventLogger;
 import org.apache.maven.cli.internal.BootstrapCoreExtensionManager;
 import org.apache.maven.cli.internal.extension.model.CoreExtension;
 import org.apache.maven.cli.internal.extension.model.io.xpp3.CoreExtensionsXpp3Reader;
+import org.apache.maven.cli.logging.AnsiTerminal;
 import org.apache.maven.cli.logging.Slf4jConfiguration;
 import org.apache.maven.cli.logging.Slf4jConfigurationFactory;
 import org.apache.maven.cli.logging.Slf4jLoggerManager;
@@ -204,12 +205,8 @@ public class MavenCli {
     public static int main(String[] args, ClassWorld classWorld) {
         MavenCli cli = new MavenCli();
 
-        MessageUtils.systemInstall();
-        MessageUtils.registerShutdownHook();
-        int result = cli.doMain(new CliRequest(args, classWorld));
-        MessageUtils.systemUninstall();
-
-        return result;
+        AnsiTerminal.detect();
+        return cli.doMain(new CliRequest(args, classWorld));
     }
 
     // TODO need to externalize CliRequest
@@ -525,6 +522,9 @@ public class MavenCli {
         } else if (cliRequest.commandLine.hasOption(CLIManager.BATCH_MODE)
                 || cliRequest.commandLine.hasOption(CLIManager.LOG_FILE)) {
             MessageUtils.setColorEnabled(false);
+        } else {
+            // auto: color only on a detected ANSI terminal; embedded use never detects one
+            MessageUtils.setColorEnabled(AnsiTerminal.isTty());
         }
 
         // LOG STREAMS
