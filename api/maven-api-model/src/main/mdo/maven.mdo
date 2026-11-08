@@ -1315,8 +1315,16 @@
         <field>
           <name>includes</name>
           <version>4.1.0+</version>
-          <description>Lists a set of artifacts that should be included from this dependency's
-            artifact list when importing a bill of materials.</description>
+          <description>
+            <![CDATA[
+            Lists a set of artifacts to include when importing a bill of materials.
+            A dependency from the imported BOM is included if it matches at least one
+            {@code <include>} entry (OR semantics). Omitting {@code groupId} or
+            {@code artifactId} in an {@code <include>} acts as a wildcard matching any value.
+            When both {@code <includes>} and {@code <exclusions>} are present, inclusions
+            are applied first, then exclusions are applied to the remaining set.
+            ]]>
+          </description>
           <association>
             <type>Inclusion</type>
             <multiplicity>*</multiplicity>
@@ -1468,9 +1476,11 @@
         The {@code <inclusion>} element contains information required to include
         an artifact in the project when importing a bill of materials.
         <p>
-        The {@code groupId} and {@code artifactId} fields are interpreted as glob patterns.
-
-        @see java.nio.file.FileSystem#getPathMatcher
+        The {@code groupId} and {@code artifactId} fields support simple glob patterns.
+        Supported wildcards: {@code *} matches any sequence of characters, and
+        {@code ?} matches exactly one character. Character classes and alternation
+        groups (e.g., {@code [a-z]}, {@code {x,y}}) are not supported - use separate
+        {@code <include>} elements for multiple patterns.
         ]]>
       </description>
       <fields>

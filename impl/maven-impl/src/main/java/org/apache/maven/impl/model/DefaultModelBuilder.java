@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -3262,7 +3263,19 @@ public class DefaultModelBuilder implements ModelBuilder {
                 .toList());
     }
 
-    private final Map<String, Pattern> patternCache = new ConcurrentHashMap<>();
+    static final int MAX_PATTERN_CACHE_SIZE = 1000;
+
+    /**
+     * Bounded LRU cache for compiled regex patterns from glob expressions used in BOM inclusion/exclusion matching.
+     * Prevents unbounded memory growth in long-running Maven daemon sessions while maintaining thread safety.
+     */
+    final Map<String, Pattern> patternCache =
+            Collections.synchronizedMap(new LinkedHashMap<String, Pattern>(16, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, Pattern> eldest) {
+                    return size() > MAX_PATTERN_CACHE_SIZE;
+                }
+            });
 
     private boolean match(Inclusion inclusion, Dependency candidate) {
         return match(inclusion.getGroupId(), candidate.getGroupId())
@@ -3274,7 +3287,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                 && match(exclusion.getArtifactId(), candidate.getArtifactId());
     }
 
-    private boolean match(String pattern, String text) {
+    boolean match(String pattern, String text) {
         if (pattern == null || pattern.isEmpty() || "*".equals(pattern)) {
             return true;
         }
