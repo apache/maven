@@ -57,6 +57,10 @@ under the License.
       <plugin>
         <groupId>org.codehaus.modello</groupId>
         <artifactId>modello-maven-plugin</artifactId>
+        <!-- TODO: bump to 2.8.2 once https://github.com/codehaus-plexus/modello/pull/628 is released;
+             that PR adds mixed="true" to XSD complexTypes for xml.format="mixed" fields,
+             making the XSD accept both inline text and <arg> child forms. -->
+        <version>2.8.2-SNAPSHOT</version>
         <configuration>
           <pluralExceptions>
             <aliases>alias</aliases>
