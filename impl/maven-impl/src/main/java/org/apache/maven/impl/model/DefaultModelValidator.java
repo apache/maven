@@ -1649,9 +1649,13 @@ public class DefaultModelValidator implements ModelValidator {
 
     private void validateDependencyInclusions(ModelProblemCollector problems, Dependency dependency, String prefix) {
         for (Inclusion inclusion : dependency.getIncludes()) {
-            if ((inclusion.getGroupId() == null || inclusion.getGroupId().isEmpty())
-                    && (inclusion.getArtifactId() == null
-                            || inclusion.getArtifactId().isEmpty())) {
+            boolean emptyOrWildcardGroupId = inclusion.getGroupId() == null
+                    || inclusion.getGroupId().isEmpty()
+                    || "*".equals(inclusion.getGroupId());
+            boolean emptyOrWildcardArtifactId = inclusion.getArtifactId() == null
+                    || inclusion.getArtifactId().isEmpty()
+                    || "*".equals(inclusion.getArtifactId());
+            if (emptyOrWildcardGroupId && emptyOrWildcardArtifactId) {
                 addViolation(
                         problems,
                         Severity.WARNING,

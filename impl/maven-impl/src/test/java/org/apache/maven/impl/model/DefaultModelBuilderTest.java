@@ -2024,6 +2024,61 @@ class DefaultModelBuilderTest {
     }
 
     @Test
+    public void testDependencyManagementImportWithExclusionWildcardPattern() throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Session testSession = setupTestBomSession(basedir, "exclusion-wildcard");
+        ModelBuilder testBuilder = testSession.getService(ModelBuilder.class);
+
+        Path projectPom = basedir.resolve("target/project-import-exclusion-wildcard.xml");
+        String pomContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.1.0">
+                  <modelVersion>4.1.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>consumer-project-exclusion-wildcard</artifactId>
+                  <version>1.0</version>
+                  <packaging>pom</packaging>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>test-bom</artifactId>
+                        <version>1.0</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                        <exclusions>
+                          <exclusion>
+                            <groupId>org.springframework*</groupId>
+                            <artifactId>*-web</artifactId>
+                          </exclusion>
+                        </exclusions>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                </project>
+                """;
+        Files.writeString(projectPom, pomContent);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(testSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(projectPom))
+                .build();
+        ModelBuilderResult result = testBuilder.newSession().build(request);
+        assertNotNull(result);
+        List<Dependency> deps =
+                result.getEffectiveModel().getDependencyManagement().getDependencies();
+        Set<String> keys =
+                deps.stream().map(d -> d.getGroupId() + ":" + d.getArtifactId()).collect(Collectors.toSet());
+        assertEquals(4, keys.size());
+        assertFalse(keys.contains("org.springframework:spring-web"));
+        assertTrue(keys.contains("org.springframework:spring-core"));
+        assertTrue(keys.contains("org.springframework.boot:spring-boot"));
+        assertTrue(keys.contains("com.fasterxml.jackson.core:jackson-databind"));
+        assertTrue(keys.contains("ch.qos.logback:logback-classic"));
+    }
+
+    @Test
     public void testDependencyManagementImportWithIncludesArtifactPattern() throws Exception {
         Path basedir = Paths.get(System.getProperty("basedir", ""));
         Session testSession = setupTestBomSession(basedir, "includes-3");

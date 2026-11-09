@@ -1444,11 +1444,12 @@
       <description>
         <![CDATA[
         The {@code <exclusion>} element contains information required to exclude
-        an artifact to the project.
+        an artifact from the project.
         <p>
-        The {@code groupId} and {@code artifactId} fields are interpreted as glob patterns.
-
-        @see java.nio.file.FileSystem#getPathMatcher
+        The {@code groupId} and {@code artifactId} fields support simple glob patterns.
+        Supported wildcards: {@code *} matches any sequence of characters, and
+        {@code ?} matches exactly one character. Character classes and alternation
+        groups (e.g., {@code [a-z]}, {@code {x,y}}) are not supported.
         ]]>
       </description>
       <fields>

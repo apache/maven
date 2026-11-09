@@ -874,6 +874,53 @@ class DefaultModelValidatorTest {
     }
 
     @Test
+    void testDependencyIncludesBareWildcardWarns() throws Exception {
+        String xml = "<project>\n"
+                + "  <modelVersion>4.1.0</modelVersion>\n"
+                + "  <groupId>gid</groupId>\n"
+                + "  <artifactId>aid</artifactId>\n"
+                + "  <version>1.0</version>\n"
+                + "  <dependencyManagement>\n"
+                + "    <dependencies>\n"
+                + "      <dependency>\n"
+                + "        <groupId>test</groupId>\n"
+                + "        <artifactId>bom</artifactId>\n"
+                + "        <version>1.0</version>\n"
+                + "        <type>pom</type>\n"
+                + "        <scope>import</scope>\n"
+                + "        <includes>\n"
+                + "          <include>\n"
+                + "            <groupId>*</groupId>\n"
+                + "          </include>\n"
+                + "          <include>\n"
+                + "            <artifactId>*</artifactId>\n"
+                + "          </include>\n"
+                + "          <include>\n"
+                + "            <groupId>*</groupId>\n"
+                + "            <artifactId>*</artifactId>\n"
+                + "          </include>\n"
+                + "        </includes>\n"
+                + "      </dependency>\n"
+                + "    </dependencies>\n"
+                + "  </dependencyManagement>\n"
+                + "</project>";
+        Model model = new MavenStaxReader().read(new StringReader(xml));
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validateEffectiveModel(session, model, ModelValidator.VALIDATION_LEVEL_STRICT, problems);
+
+        assertViolations(problems, 0, 0, 3);
+        assertContains(
+                problems.getWarnings().get(0),
+                "'dependencyManagement.dependencies.dependency.includes.include' for groupId='test', artifactId='bom', type='pom' must specify at least groupId or artifactId");
+        assertContains(
+                problems.getWarnings().get(1),
+                "'dependencyManagement.dependencies.dependency.includes.include' for groupId='test', artifactId='bom', type='pom' must specify at least groupId or artifactId");
+        assertContains(
+                problems.getWarnings().get(2),
+                "'dependencyManagement.dependencies.dependency.includes.include' for groupId='test', artifactId='bom', type='pom' must specify at least groupId or artifactId");
+    }
+
+    @Test
     void testDependencyIncludesValidWithWildcards() throws Exception {
         String xml = "<project>\n"
                 + "  <modelVersion>4.1.0</modelVersion>\n"

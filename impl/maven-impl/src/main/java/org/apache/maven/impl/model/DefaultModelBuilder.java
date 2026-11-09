@@ -3277,16 +3277,40 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             });
 
+    /**
+     * Matches a candidate dependency against an {@link Inclusion} specification.
+     * Both groupId and artifactId support simple glob patterns ('*' and '?').
+     */
     private boolean match(Inclusion inclusion, Dependency candidate) {
         return match(inclusion.getGroupId(), candidate.getGroupId())
                 && match(inclusion.getArtifactId(), candidate.getArtifactId());
     }
 
+    /**
+     * Matches a candidate dependency against an {@link Exclusion} specification.
+     * Both groupId and artifactId support simple glob patterns ('*' and '?').
+     * Note: In earlier Maven versions, exclusions only supported literal '*' or exact equality.
+     * In Maven 4, glob patterns are supported on exclusions as documented in the model specification.
+     */
     private boolean match(Exclusion exclusion, Dependency candidate) {
         return match(exclusion.getGroupId(), candidate.getGroupId())
                 && match(exclusion.getArtifactId(), candidate.getArtifactId());
     }
 
+    /**
+     * Matches a candidate text against a glob pattern.
+     * Supported wildcards:
+     * <ul>
+     *   <li>{@code *} matches any sequence of characters (including empty).</li>
+     *   <li>{@code ?} matches exactly one character.</li>
+     * </ul>
+     * Character classes (e.g. {@code [a-z]}) and alternation groups (e.g. {@code {x,y}})
+     * are treated as literal characters.
+     *
+     * @param pattern the glob pattern, or {@code null}/empty/{@code "*"} to match any text
+     * @param text the candidate text to test
+     * @return {@code true} if the text matches the pattern, {@code false} otherwise
+     */
     boolean match(String pattern, String text) {
         if (pattern == null || pattern.isEmpty() || "*".equals(pattern)) {
             return true;
