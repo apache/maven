@@ -38,12 +38,12 @@ import org.codehaus.plexus.interpolation.AbstractValueSource;
 import org.codehaus.plexus.interpolation.InterpolationPostProcessor;
 import org.codehaus.plexus.interpolation.MapBasedValueSource;
 import org.codehaus.plexus.interpolation.ObjectBasedValueSource;
-import org.codehaus.plexus.interpolation.PrefixAwareRecursionInterceptor;
 import org.codehaus.plexus.interpolation.PrefixedObjectValueSource;
 import org.codehaus.plexus.interpolation.PrefixedValueSourceWrapper;
 import org.codehaus.plexus.interpolation.RecursionInterceptor;
 import org.codehaus.plexus.interpolation.SingleResponseValueSource;
 import org.codehaus.plexus.interpolation.ValueSource;
+import org.codehaus.plexus.interpolation.util.ValueSourceUtils;
 
 /**
  * Use a regular expression search to find and resolve expressions within the POM.
@@ -291,7 +291,71 @@ public abstract class AbstractStringBasedModelInterpolator implements ModelInter
         return processors;
     }
 
+    private enum PrefixOnlyExpression {
+        ROOT_DIRECTORY("rootDirectory"),
+        BASE_URI("baseUri");
+
+        private final String expression;
+
+        PrefixOnlyExpression(String expression) {
+            this.expression = expression;
+        }
+
+        @Override
+        public String toString() {
+            return "project." + expression;
+        }
+    }
+
     protected RecursionInterceptor createRecursionInterceptor() {
-        return new PrefixAwareRecursionInterceptor(PROJECT_PREFIXES);
+        return new RecursionInterceptor() {
+            private final List<Object> expressions = new ArrayList<>();
+
+            private Object key(String expression) {
+                String naked = ValueSourceUtils.trimPrefix(expression, PROJECT_PREFIXES, true);
+                // Built-in keys must also be distinct from custom names with repeated project prefixes.
+                if (!naked.equals(expression)) {
+                    if ("rootDirectory".equals(naked)) {
+                        return PrefixOnlyExpression.ROOT_DIRECTORY;
+                    }
+                    if ("baseUri".equals(naked)) {
+                        return PrefixOnlyExpression.BASE_URI;
+                    }
+                }
+                return naked;
+            }
+
+            @Override
+            public void expressionResolutionStarted(String expression) {
+                expressions.add(key(expression));
+            }
+
+            @Override
+            public void expressionResolutionFinished(String expression) {
+                expressions.remove(expressions.size() - 1);
+            }
+
+            @Override
+            public boolean hasRecursiveExpression(String expression) {
+                return expressions.contains(key(expression));
+            }
+
+            @Override
+            public List<?> getExpressionCycle(String expression) {
+                int idx = expressions.indexOf(key(expression));
+                List<String> cycle = new ArrayList<>();
+                if (idx >= 0) {
+                    for (Object key : expressions.subList(idx, expressions.size())) {
+                        cycle.add(key.toString());
+                    }
+                }
+                return cycle;
+            }
+
+            @Override
+            public void clear() {
+                expressions.clear();
+            }
+        };
     }
 }
