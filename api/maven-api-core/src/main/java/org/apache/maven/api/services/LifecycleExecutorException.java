@@ -23,7 +23,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * Signals that lifecycle planning or execution failed.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 public class LifecycleExecutorException extends MavenException {

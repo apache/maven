@@ -27,7 +27,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * An immutable execution plan for one project.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Immutable

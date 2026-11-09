@@ -35,7 +35,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * <p>This is the Maven API v4 lifecycle executor service. The legacy
  * {@code org.apache.maven.lifecycle.LifecycleExecutor} interface serves a different role in the compatibility layer.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 public interface LifecycleExecutor extends Service {
@@ -70,7 +70,6 @@ public interface LifecycleExecutor extends Service {
      * @return the lifecycle planning result
      * @throws LifecycleExecutorException if the lifecycle plan cannot be calculated
      * @see #plan(LifecyclePlanRequest)
-     * @since 4.1.0
      */
     @Nonnull
     default LifecyclePlanResult plan(@Nonnull Session session, @Nonnull Project project, @Nonnull List<String> tasks) {
@@ -86,7 +85,6 @@ public interface LifecycleExecutor extends Service {
      * @throws LifecycleExecutorException if lifecycle execution fails
      * @throws IllegalArgumentException if the plan was not produced by this service
      * @see #execute(LifecycleExecutionRequest)
-     * @since 4.1.0
      */
     @Nonnull
     default LifecycleExecutionResult execute(@Nonnull Session session, @Nonnull LifecyclePlan plan) {
@@ -103,7 +101,6 @@ public interface LifecycleExecutor extends Service {
      * @throws LifecycleExecutorException if lifecycle execution fails
      * @throws IllegalArgumentException if the plan was not produced by this service
      * @see #execute(LifecycleExecutionRequest)
-     * @since 4.1.0
      */
     @Nonnull
     default LifecycleExecutionResult execute(
@@ -122,7 +119,6 @@ public interface LifecycleExecutor extends Service {
      * @throws IllegalArgumentException if the calculated plan cannot be executed by this service
      * @see #plan(LifecyclePlanRequest)
      * @see #execute(LifecycleExecutionRequest)
-     * @since 4.1.0
      */
     @Nonnull
     default LifecycleExecutionResult planAndExecute(
@@ -142,7 +138,6 @@ public interface LifecycleExecutor extends Service {
      * @throws IllegalArgumentException if the calculated plan cannot be executed by this service
      * @see #plan(LifecyclePlanRequest)
      * @see #execute(LifecycleExecutionRequest)
-     * @since 4.1.0
      */
     @Nonnull
     default LifecycleExecutionResult planAndExecute(

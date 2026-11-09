@@ -20,6 +20,7 @@ package org.apache.maven.api.services;
 
 import java.util.List;
 
+import org.apache.maven.api.LifecyclePlan;
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -27,10 +28,14 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * The result of executing a lifecycle plan.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 public interface LifecycleExecutionResult extends Result<LifecycleExecutionRequest> {
+
+    /** {@return the lifecycle plan that was executed} */
+    @Nonnull
+    LifecyclePlan plan();
 
     /** {@return the executions retained by the request and submitted for execution} */
     @Nonnull

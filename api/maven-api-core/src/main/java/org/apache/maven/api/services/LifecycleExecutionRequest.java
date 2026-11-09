@@ -35,7 +35,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * A request to execute all or part of a previously calculated lifecycle plan.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Immutable

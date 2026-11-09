@@ -228,7 +228,7 @@ public interface Session extends ProtoSession {
      * @param tasks lifecycle phases or plugin goals used to calculate the plan
      * @return the lifecycle planning result
      * @throws org.apache.maven.api.services.LifecycleExecutorException if the lifecycle plan cannot be calculated
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     default LifecyclePlanResult planLifecycle(@Nonnull Project project, @Nonnull List<String> tasks) {
@@ -242,7 +242,7 @@ public interface Session extends ProtoSession {
      * @return the lifecycle execution result
      * @throws org.apache.maven.api.services.LifecycleExecutorException if lifecycle execution fails
      * @throws IllegalArgumentException if the plan was not produced by the lifecycle executor service
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     default LifecycleExecutionResult executeLifecycle(@Nonnull LifecyclePlan plan) {
@@ -257,7 +257,7 @@ public interface Session extends ProtoSession {
      * @return the lifecycle execution result
      * @throws org.apache.maven.api.services.LifecycleExecutorException if lifecycle execution fails
      * @throws IllegalArgumentException if the plan was not produced by the lifecycle executor service
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     default LifecycleExecutionResult executeLifecycle(
@@ -274,7 +274,7 @@ public interface Session extends ProtoSession {
      * @throws org.apache.maven.api.services.LifecycleExecutorException if the lifecycle plan cannot be calculated or
      *      executed
      * @throws IllegalArgumentException if the calculated plan cannot be executed by the lifecycle executor service
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     default LifecycleExecutionResult executeLifecycle(@Nonnull Project project, @Nonnull List<String> tasks) {
@@ -291,7 +291,7 @@ public interface Session extends ProtoSession {
      * @throws org.apache.maven.api.services.LifecycleExecutorException if the lifecycle plan cannot be calculated or
      *      executed
      * @throws IllegalArgumentException if the calculated plan cannot be executed by the lifecycle executor service
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     default LifecycleExecutionResult executeLifecycle(

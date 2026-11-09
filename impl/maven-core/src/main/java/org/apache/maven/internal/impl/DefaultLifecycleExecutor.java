@@ -124,7 +124,7 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
             } catch (org.apache.maven.lifecycle.LifecycleExecutionException e) {
                 throw new LifecycleExecutorException("Unable to execute lifecycle plan", e);
             }
-            return new DefaultLifecycleExecutionResult(request, executions);
+            return new DefaultLifecycleExecutionResult(request, plan, executions);
         } finally {
             mavenSession.setCurrentProject(previousProject);
         }
@@ -150,7 +150,8 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
         }
     }
 
-    private record DefaultLifecycleExecutionResult(LifecycleExecutionRequest request, List<MojoExecution> executions)
+    private record DefaultLifecycleExecutionResult(
+            LifecycleExecutionRequest request, org.apache.maven.api.LifecyclePlan plan, List<MojoExecution> executions)
             implements LifecycleExecutionResult {
         private DefaultLifecycleExecutionResult {
             executions = List.copyOf(executions);

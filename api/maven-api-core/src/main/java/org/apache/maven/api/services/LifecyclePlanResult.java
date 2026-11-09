@@ -25,7 +25,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * The result of calculating a lifecycle plan.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 public interface LifecyclePlanResult extends Result<LifecyclePlanRequest> {

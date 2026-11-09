@@ -34,7 +34,7 @@ import static java.util.Objects.requireNonNull;
 /**
  * A request to calculate a lifecycle plan for one project.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Immutable
