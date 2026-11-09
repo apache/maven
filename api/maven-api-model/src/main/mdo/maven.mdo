@@ -1278,6 +1278,12 @@
             this project. For more information, see
             <a href="https://maven.apache.org/guides/introduction/introduction-to-dependency-mechanism.html">the
             dependency mechanism</a>. The default scope is {@code compile}.
+            <p>
+            Since {@code modelVersion} 4.2.0, two additional scopes are available:
+            {@code api} (equivalent to {@code compile}, but explicitly marks the dependency
+            as part of the project's public API) and {@code implementation} (the dependency
+            is available to the project at compile and runtime, but is not transitively
+            visible to consumers at compile time; it remains transitively available at runtime).
             ]]>
           </description>
           <type>String</type>
