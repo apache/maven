@@ -171,6 +171,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
 
     private static final String BASEDIR_KEY = "basedir";
 
+    private static final String POM_KEY = "pom";
+
     /**
      * Gets the identifier for the current test method.
      * The format is "TestClassName-testMethodName".
@@ -237,7 +239,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             String goal;
             if (parameterInjectMojo != null) {
                 String pom = parameterInjectMojo.pom();
-                if (pom != null && !pom.isEmpty()) {
+                String appliedPom = extensionContext.getStore(MOJO_EXTENSION).get(POM_KEY, String.class);
+                if (pom != null && !pom.isEmpty() && !Objects.equals(pom, appliedPom)) {
                     try (Reader r = openPomUrl(holder, pom, new Path[1])) {
                         Model localModel = new MavenStaxReader().read(r);
                         model = new MavenMerger().merge(localModel, model, false, null);
@@ -384,8 +387,18 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
 
         Path basedirPath = Paths.get(getBasedir());
 
-        InjectMojo mojo = AnnotationSupport.findAnnotation(context.getElement().get(), InjectMojo.class)
+        InjectMojo methodMojo = AnnotationSupport.findAnnotation(
+                        context.getElement().get(), InjectMojo.class)
                 .orElse(null);
+        InjectMojo parameterMojo = findParameterInjectMojo(context);
+        InjectMojo mojo = methodMojo != null ? methodMojo : parameterMojo;
+        // A POM given on a test method parameter configures the project too, so it is read
+        // here, where the Project singleton is created, and not only in resolveParameter().
+        String pom = mojo != null ? mojo.pom() : "";
+        if (pom.isEmpty() && parameterMojo != null) {
+            pom = parameterMojo.pom();
+        }
+        context.getStore(MOJO_EXTENSION).put(POM_KEY, pom);
         Model defaultModel = Model.newBuilder()
                 .groupId("myGroupId")
                 .artifactId("myArtifactId")
@@ -430,12 +443,12 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         Path[] modelPath = new Path[] {null};
         Model tmodel = null;
         if (mojo != null) {
-            String pom = mojo.pom();
-            if (pom != null && !pom.isEmpty()) {
+            if (!pom.isEmpty()) {
                 try (Reader r = openPomUrl(context.getRequiredTestClass(), pom, modelPath)) {
                     tmodel = new MavenStaxReader().read(r);
                 }
-            } else {
+            } else if (methodMojo != null) {
+                // only a method-level annotation falls back to the basedir POM; a parameter-only one keeps the default
                 Path pomPath = basedirPath.resolve("pom.xml");
                 if (Files.exists(pomPath)) {
                     try (Reader r = Files.newBufferedReader(pomPath)) {
@@ -637,6 +650,18 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         //        mojoExecutionScope.enter();
         //        mojoExecutionScope.seed(Project.class, p);
         //        mojoExecutionScope.seed(MojoExecution.class, me);
+    }
+
+    /**
+     * Returns the {@link InjectMojo} declared on a parameter of the current test method, if any.
+     */
+    private static InjectMojo findParameterInjectMojo(ExtensionContext context) {
+        return context.getTestMethod()
+                .flatMap(m -> Arrays.stream(m.getParameters())
+                        .map(p -> p.getAnnotation(InjectMojo.class))
+                        .filter(Objects::nonNull)
+                        .findFirst())
+                .orElse(null);
     }
 
     private Reader openPomUrl(Class<?> holder, String pom, Path[] modelPath) throws IOException {
