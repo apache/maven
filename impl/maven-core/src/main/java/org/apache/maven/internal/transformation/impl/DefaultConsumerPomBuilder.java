@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -582,15 +583,16 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                 }
                 return dependency;
             });
-            // Only keep transitive scopes (null/empty => COMPILE)
-            directDependencies.values().removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
+            // Only keep consumer-visible scopes (null/empty => COMPILE), then map api/implementation
+            directDependencies.values().removeIf(DefaultConsumerPomBuilder::isNonConsumerScope);
             managedDependencies.keySet().removeAll(directDependencies.keySet());
 
             model = model.withDependencyManagement(
                             managedDependencies.isEmpty()
                                     ? null
                                     : model.getDependencyManagement().withDependencies(managedDependencies.values()))
-                    .withDependencies(directDependencies.isEmpty() ? null : directDependencies.values());
+                    .withDependencies(
+                            directDependencies.isEmpty() ? null : mapScopesForConsumerPom(directDependencies.values()));
         } else {
             // Even without dependencyManagement, filter direct dependencies to compile/runtime only
             Map<String, Dependency> directDependencies = model.getDependencies().stream()
@@ -600,15 +602,19 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                             Function.identity(),
                             this::merge,
                             LinkedHashMap::new));
-            // Only keep transitive scopes
-            directDependencies.values().removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
-            model = model.withDependencies(directDependencies.isEmpty() ? null : directDependencies.values());
+            // Only keep consumer-visible scopes, then map api/implementation
+            directDependencies.values().removeIf(DefaultConsumerPomBuilder::isNonConsumerScope);
+            model = model.withDependencies(
+                    directDependencies.isEmpty() ? null : mapScopesForConsumerPom(directDependencies.values()));
         }
 
         return model;
     }
 
-    private static boolean hasDependencyScope(Dependency dependency) {
+    private static final Set<DependencyScope> CONSUMER_POM_SCOPES = Set.of(
+            DependencyScope.COMPILE, DependencyScope.RUNTIME, DependencyScope.API, DependencyScope.IMPLEMENTATION);
+
+    private static boolean isNonConsumerScope(Dependency dependency) {
         String scopeId = dependency.getScope();
         DependencyScope scope;
         if (scopeId == null || scopeId.isEmpty()) {
@@ -616,7 +622,23 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         } else {
             scope = DependencyScope.forId(scopeId);
         }
-        return scope == null || !scope.isTransitive();
+        return scope == null || !CONSUMER_POM_SCOPES.contains(scope);
+    }
+
+    private static Dependency mapScopeForConsumerPom(Dependency dependency) {
+        String scopeId = dependency.getScope();
+        if (DependencyScope.API.id().equals(scopeId)) {
+            return dependency.withScope(DependencyScope.COMPILE.id());
+        } else if (DependencyScope.IMPLEMENTATION.id().equals(scopeId)) {
+            return dependency.withScope(DependencyScope.RUNTIME.id());
+        }
+        return dependency;
+    }
+
+    private static List<Dependency> mapScopesForConsumerPom(Collection<Dependency> dependencies) {
+        return dependencies.stream()
+                .map(DefaultConsumerPomBuilder::mapScopeForConsumerPom)
+                .collect(Collectors.toList());
     }
 
     private Dependency merge(Dependency dep1, Dependency dep2) {
@@ -860,12 +882,12 @@ class DefaultConsumerPomBuilder implements PomBuilder {
 
         // Merge additional dependencies into the model, deduplicating by key
         if (!additionalDeps.isEmpty()) {
-            additionalDeps.removeIf(DefaultConsumerPomBuilder::hasDependencyScope);
+            additionalDeps.removeIf(DefaultConsumerPomBuilder::isNonConsumerScope);
             Map<String, Dependency> mergedDeps = new LinkedHashMap<>();
             for (Dependency dep : model.getDependencies()) {
                 mergedDeps.put(getDependencyKey(dep), dep);
             }
-            for (Dependency dep : additionalDeps) {
+            for (Dependency dep : mapScopesForConsumerPom(additionalDeps)) {
                 mergedDeps.putIfAbsent(getDependencyKey(dep), dep);
             }
             model = model.withDependencies(mergedDeps.values());

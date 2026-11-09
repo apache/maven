@@ -46,7 +46,7 @@ public enum DependencyScope {
      * None. Allows you to declare dependencies (for example to alter reactor build order) but in reality dependencies
      * in this scope are not part of any path scope.
      */
-    NONE("none", false),
+    NONE("none"),
 
     /**
      * Undefined. When no scope is explicitly given, UNDEFINED will be used, but its meaning will depend on
@@ -54,47 +54,67 @@ public enum DependencyScope {
      * explicitly managed by this managed dependency, or as a real dependency, in which case, the scope
      * will default to {@link #COMPILE}.
      */
-    UNDEFINED("", false),
+    UNDEFINED(""),
 
     /**
      * Compile only.
      */
-    COMPILE_ONLY("compile-only", false),
+    COMPILE_ONLY("compile-only"),
 
     /**
      * Compile, runtime and test.
      */
-    COMPILE("compile", true),
+    COMPILE("compile"),
 
     /**
      * Runtime and test.
      */
-    RUNTIME("runtime", true),
+    RUNTIME("runtime"),
 
     /**
      * Provided.
      */
-    PROVIDED("provided", false),
+    PROVIDED("provided"),
 
     /**
      * Test compile only.
      */
-    TEST_ONLY("test-only", false),
+    TEST_ONLY("test-only"),
 
     /**
      * Test compile and test runtime.
      */
-    TEST("test", false),
+    TEST("test"),
 
     /**
      * Test runtime.
      */
-    TEST_RUNTIME("test-runtime", false),
+    TEST_RUNTIME("test-runtime"),
 
     /**
      * System scope.
      */
-    SYSTEM("system", false);
+    SYSTEM("system"),
+
+    /**
+     * API scope. Dependencies in this scope are part of the project's public API and are
+     * transitively visible to consumers at both compile time and runtime.
+     * Only available with {@code modelVersion} 4.2.0 or later.
+     *
+     * @since 4.2.0
+     */
+    API("api"),
+
+    /**
+     * Implementation scope. Dependencies in this scope are internal implementation details:
+     * they are available to the project itself at compile time and runtime, but are not
+     * transitively visible to consumers at compile time. They remain transitively available
+     * at runtime.
+     * Only available with {@code modelVersion} 4.2.0 or later.
+     *
+     * @since 4.2.0
+     */
+    IMPLEMENTATION("implementation");
 
     private static final Map<String, DependencyScope> IDS = Collections.unmodifiableMap(
             Stream.of(DependencyScope.values()).collect(Collectors.toMap(s -> s.id, s -> s)));
@@ -111,11 +131,9 @@ public enum DependencyScope {
     }
 
     private final String id;
-    private final boolean transitive;
 
-    DependencyScope(String id, boolean transitive) {
+    DependencyScope(String id) {
         this.id = id;
-        this.transitive = transitive;
     }
 
     /**
@@ -127,13 +145,6 @@ public enum DependencyScope {
     @Nonnull
     public String id() {
         return id;
-    }
-
-    /**
-     * {@return whether dependencies in this scope are included transitively}.
-     */
-    public boolean isTransitive() {
-        return transitive;
     }
 
     /**
