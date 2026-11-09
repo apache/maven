@@ -26,6 +26,7 @@ import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Isolated;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 // swaps the global basedir system property that every @MojoTest reads
 @Isolated
@@ -49,6 +50,26 @@ class MojoExtensionCoordinatesTest {
         try {
             String[] coord = new MojoExtension().mojoCoordinates("goal");
             assertArrayEquals(new String[] {"org.example", "my-plugin", "1.2.3", "goal"}, coord);
+        } finally {
+            if (previous != null) {
+                System.setProperty("basedir", previous);
+            } else {
+                System.clearProperty("basedir");
+            }
+        }
+    }
+
+    @Test
+    void coordinatesThrowsOnUnresolvableExpression() throws Exception {
+        Files.writeString(
+                pluginBasedir.resolve("pom.xml"),
+                "<project><parent><groupId>org.example</groupId><artifactId>parent</artifactId>"
+                        + "<version>${unresolved}</version></parent>"
+                        + "<artifactId>my-plugin</artifactId></project>");
+        String previous = System.getProperty("basedir");
+        System.setProperty("basedir", pluginBasedir.toString());
+        try {
+            assertThrows(Exception.class, () -> new MojoExtension().mojoCoordinates("goal"));
         } finally {
             if (previous != null) {
                 System.setProperty("basedir", previous);
