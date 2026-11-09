@@ -98,6 +98,7 @@ import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionRangeResolver;
 import org.apache.maven.api.services.VersionResolver;
 import org.apache.maven.api.services.VersionResolverException;
+import org.apache.maven.api.spi.SpiService;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.Binding;
@@ -159,14 +160,24 @@ public abstract class AbstractSession implements InternalSession {
         this.repositories = getRepositories(repositories, resolverRepositories);
         this.lookup = lookup;
         this.injector = lookup != null ? lookup.lookupOptional(Injector.class).orElse(null) : null;
-        this.listeners = getListeners(session);
+        this.listeners = getListeners(session, lookup);
         this.context = context;
     }
 
     @SuppressWarnings("unchecked")
-    private static List<Listener> getListeners(RepositorySystemSession session) {
+    private static List<Listener> getListeners(RepositorySystemSession session, Lookup lookup) {
         // Both event families share the registration scope of the underlying repository system session.
-        return (List<Listener>) session.getData().computeIfAbsent(Listener.class, CopyOnWriteArrayList::new);
+        return (List<Listener>) session.getData().computeIfAbsent(Listener.class, () -> {
+            List<Listener> list = new CopyOnWriteArrayList<>();
+            if (lookup != null) {
+                for (SpiService spi : lookup.lookupList(SpiService.class)) {
+                    if (spi instanceof Listener listener && !list.contains(listener)) {
+                        list.add(listener);
+                    }
+                }
+            }
+            return list;
+        });
     }
 
     @SuppressWarnings("unchecked")
