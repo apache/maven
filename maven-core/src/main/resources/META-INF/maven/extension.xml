@@ -23,6 +23,7 @@ under the License.
   <exportedPackages>
     <!-- maven-* -->
     <exportedPackage>org.apache.maven.*</exportedPackage>
+    <exportedPackage>org.apache.maven.message.*</exportedPackage>
     <exportedPackage>org.apache.maven.artifact</exportedPackage>
     <exportedPackage>org.apache.maven.classrealm</exportedPackage>
     <exportedPackage>org.apache.maven.cli</exportedPackage>
