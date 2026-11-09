@@ -169,10 +169,10 @@ public abstract class AbstractMavenIntegrationTestCase {
             }
         }
 
-        // auto set source+target to lowest reasonable java version
-        verifier.getSystemProperties().put("maven.compiler.source", "8");
-        verifier.getSystemProperties().put("maven.compiler.target", "8");
-        verifier.getSystemProperties().put("maven.compiler.release", "8");
+        // Maven 4 requires JDK 17; use 17 as the baseline for IT-compiled projects.
+        verifier.getSystemProperties().put("maven.compiler.release", "17");
+        verifier.getSystemProperties().remove("maven.compiler.source");
+        verifier.getSystemProperties().remove("maven.compiler.target");
 
         return verifier;
     }
