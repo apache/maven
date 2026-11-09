@@ -27,6 +27,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
 import org.apache.maven.jline.FastTerminal;
@@ -53,11 +54,19 @@ import static org.mockito.Mockito.mock;
 @Isolated("Changes JVM-wide streams, system properties, terminal state, and logging configuration")
 class MavenCliLoggingTest {
 
+    private static final String[] SAVED_PROPERTIES = {
+        MavenBaseLogger.LEGACY_PREFIX + "logFile",
+        MavenBaseLogger.LEGACY_PREFIX + "cacheOutputStream",
+        MavenBaseLogger.LEGACY_PREFIX + "defaultLogLevel",
+        Constants.MAVEN_LOGGER_LOG_FILE,
+        Constants.MAVEN_LOGGER_CACHE_OUTPUT_STREAM,
+        Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL,
+    };
+
     private PrintStream savedOut;
     private Terminal savedTerminal;
     private boolean savedColor;
-    private String savedLogFile;
-    private String savedCacheOutputStream;
+    private final String[] savedPropertyValues = new String[SAVED_PROPERTIES.length];
 
     @BeforeEach
     void setUp() throws Exception {
@@ -75,8 +84,18 @@ class MavenCliLoggingTest {
         // Null out the terminal so leftover FastTerminal threads from other tests cannot
         // race with this test's stream setup via their consumer callbacks.
         injectTerminal(null);
-        savedLogFile = System.getProperty(MavenBaseLogger.LEGACY_PREFIX + "logFile");
-        savedCacheOutputStream = System.getProperty(MavenBaseLogger.LEGACY_PREFIX + "cacheOutputStream");
+        for (int i = 0; i < SAVED_PROPERTIES.length; i++) {
+            savedPropertyValues[i] = System.getProperty(SAVED_PROPERTIES[i]);
+        }
+        // Clear all logger properties and re-initialize the config so previous tests
+        // (e.g. MavenCliTest#calculateTransferListener setting maven.logger.defaultLogLevel=error
+        // via --quiet) cannot poison this test's config. The re-init is needed because
+        // SimpleLoggerConfiguration.init() only updates defaultLogLevel when the property IS set;
+        // clearing the property alone leaves the stale value in the config object.
+        for (String prop : SAVED_PROPERTIES) {
+            System.clearProperty(prop);
+        }
+        activateSlf4j();
     }
 
     @AfterEach
@@ -84,11 +103,9 @@ class MavenCliLoggingTest {
         System.setOut(savedOut);
         injectTerminal(savedTerminal);
         setColorEnabled(savedColor);
-        restoreProperty(MavenBaseLogger.LEGACY_PREFIX + "logFile", savedLogFile);
-        restoreProperty(MavenBaseLogger.LEGACY_PREFIX + "cacheOutputStream", savedCacheOutputStream);
-        // Restore the logger to write to the original System.err (default).
-        System.clearProperty(MavenBaseLogger.LEGACY_PREFIX + "logFile");
-        System.clearProperty(MavenBaseLogger.LEGACY_PREFIX + "cacheOutputStream");
+        for (int i = 0; i < SAVED_PROPERTIES.length; i++) {
+            restoreProperty(SAVED_PROPERTIES[i], savedPropertyValues[i]);
+        }
         activateSlf4j();
     }
 
