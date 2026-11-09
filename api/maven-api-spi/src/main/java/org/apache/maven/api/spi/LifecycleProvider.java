@@ -21,7 +21,6 @@ package org.apache.maven.api.spi;
 import org.apache.maven.api.Lifecycle;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.di.Named;
 
 /**
  * Service provider interface for registering custom {@link Lifecycle} implementations.
@@ -54,5 +53,4 @@ import org.apache.maven.api.di.Named;
  */
 @Experimental
 @Consumer
-@Named
 public interface LifecycleProvider extends ExtensibleEnumProvider<Lifecycle> {}
