@@ -16,12 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.message;
+package org.apache.maven.api.services;
+
+import org.apache.maven.api.Constants;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Message builder that supports configurable styling.
  *
- * @since 3.10.0
+ * @since 4.0.0
  * @see MessageBuilderFactory
  */
 public interface MessageBuilder extends Appendable {
@@ -33,6 +36,7 @@ public interface MessageBuilder extends Appendable {
      * @param message the message to append
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder trace(Object message) {
         return style("." + Constants.MAVEN_STYLE_TRACE_NAME + ":-" + Constants.MAVEN_STYLE_TRACE_DEFAULT, message);
     }
@@ -44,6 +48,7 @@ public interface MessageBuilder extends Appendable {
      * @param message the message to append
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder debug(Object message) {
         return style("." + Constants.MAVEN_STYLE_DEBUG_NAME + ":-" + Constants.MAVEN_STYLE_DEBUG_DEFAULT, message);
     }
@@ -55,6 +60,7 @@ public interface MessageBuilder extends Appendable {
      * @param message the message to append
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder info(Object message) {
         return style("." + Constants.MAVEN_STYLE_INFO_NAME + ":-" + Constants.MAVEN_STYLE_INFO_DEFAULT, message);
     }
@@ -66,6 +72,7 @@ public interface MessageBuilder extends Appendable {
      * @param message the message to append
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder warning(Object message) {
         return style("." + Constants.MAVEN_STYLE_WARNING_NAME + ":-" + Constants.MAVEN_STYLE_WARNING_DEFAULT, message);
     }
@@ -77,6 +84,7 @@ public interface MessageBuilder extends Appendable {
      * @param message the message to append
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder error(Object message) {
         return style("." + Constants.MAVEN_STYLE_ERROR_NAME + ":-" + Constants.MAVEN_STYLE_ERROR_DEFAULT, message);
     }
@@ -88,6 +96,7 @@ public interface MessageBuilder extends Appendable {
      * @param message the message to append
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder success(Object message) {
         return style("." + Constants.MAVEN_STYLE_SUCCESS_NAME + ":-" + Constants.MAVEN_STYLE_SUCCESS_DEFAULT, message);
     }
@@ -99,6 +108,7 @@ public interface MessageBuilder extends Appendable {
      * @param message the message to append
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder failure(Object message) {
         return style("." + Constants.MAVEN_STYLE_FAILURE_NAME + ":-" + Constants.MAVEN_STYLE_FAILURE_DEFAULT, message);
     }
@@ -110,6 +120,7 @@ public interface MessageBuilder extends Appendable {
      * @param message the message to append
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder strong(Object message) {
         return style("." + Constants.MAVEN_STYLE_STRONG_NAME + ":-" + Constants.MAVEN_STYLE_STRONG_DEFAULT, message);
     }
@@ -121,6 +132,7 @@ public interface MessageBuilder extends Appendable {
      * @param message the message to append
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder mojo(Object message) {
         return style("." + Constants.MAVEN_STYLE_MOJO_NAME + ":-" + Constants.MAVEN_STYLE_MOJO_DEFAULT, message);
     }
@@ -132,10 +144,12 @@ public interface MessageBuilder extends Appendable {
      * @param message the message to append
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder project(Object message) {
         return style("." + Constants.MAVEN_STYLE_PROJECT_NAME + ":-" + Constants.MAVEN_STYLE_PROJECT_DEFAULT, message);
     }
 
+    @Nonnull
     default MessageBuilder style(String style, Object message) {
         return style(style).a(message).resetStyle();
     }
@@ -148,12 +162,15 @@ public interface MessageBuilder extends Appendable {
     // message building methods modelled after Ansi methods
     //
 
+    @Nonnull
     @Override
     MessageBuilder append(CharSequence cs);
 
+    @Nonnull
     @Override
     MessageBuilder append(CharSequence cs, int start, int end);
 
+    @Nonnull
     @Override
     MessageBuilder append(char c);
 
@@ -165,6 +182,7 @@ public interface MessageBuilder extends Appendable {
      * @param len the number of {@code char}s to append
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder a(char[] value, int offset, int len) {
         return append(String.valueOf(value, offset, len));
     }
@@ -175,6 +193,7 @@ public interface MessageBuilder extends Appendable {
      * @param value the content to append
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder a(char[] value) {
         return append(String.valueOf(value));
     }
@@ -187,6 +206,7 @@ public interface MessageBuilder extends Appendable {
      * @param end the end index of the subsequence to be appended
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder a(CharSequence value, int start, int end) {
         return append(value, start, end);
     }
@@ -197,6 +217,7 @@ public interface MessageBuilder extends Appendable {
      * @param value the content to append
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder a(CharSequence value) {
         return append(value);
     }
@@ -207,6 +228,7 @@ public interface MessageBuilder extends Appendable {
      * @param value the content to append
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder a(Object value) {
         return append(String.valueOf(value));
     }
@@ -216,6 +238,7 @@ public interface MessageBuilder extends Appendable {
      *
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder newline() {
         return append(System.lineSeparator());
     }
@@ -228,6 +251,7 @@ public interface MessageBuilder extends Appendable {
      * @param args arguments referenced by the format specifiers in the format string
      * @return the current builder
      */
+    @Nonnull
     default MessageBuilder format(String pattern, Object... args) {
         return append(String.format(pattern, args));
     }
@@ -245,33 +269,6 @@ public interface MessageBuilder extends Appendable {
      *
      * @return the message
      */
+    @Nonnull
     String build();
-
-    class Constants {
-        // Style Names
-        public static final String MAVEN_STYLE_TRANSFER_NAME = "transfer";
-        public static final String MAVEN_STYLE_TRACE_NAME = "trace";
-        public static final String MAVEN_STYLE_DEBUG_NAME = "debug";
-        public static final String MAVEN_STYLE_INFO_NAME = "info";
-        public static final String MAVEN_STYLE_WARNING_NAME = "warning";
-        public static final String MAVEN_STYLE_ERROR_NAME = "error";
-        public static final String MAVEN_STYLE_SUCCESS_NAME = "success";
-        public static final String MAVEN_STYLE_FAILURE_NAME = "failure";
-        public static final String MAVEN_STYLE_STRONG_NAME = "strong";
-        public static final String MAVEN_STYLE_MOJO_NAME = "mojo";
-        public static final String MAVEN_STYLE_PROJECT_NAME = "project";
-
-        // Default Values
-        public static final String MAVEN_STYLE_TRANSFER_DEFAULT = "f:bright-black";
-        public static final String MAVEN_STYLE_TRACE_DEFAULT = "bold,f:magenta";
-        public static final String MAVEN_STYLE_DEBUG_DEFAULT = "bold,f:cyan";
-        public static final String MAVEN_STYLE_INFO_DEFAULT = "bold,f:blue";
-        public static final String MAVEN_STYLE_WARNING_DEFAULT = "bold,f:yellow";
-        public static final String MAVEN_STYLE_ERROR_DEFAULT = "bold,f:red";
-        public static final String MAVEN_STYLE_SUCCESS_DEFAULT = "bold,f:green";
-        public static final String MAVEN_STYLE_FAILURE_DEFAULT = "bold,f:red";
-        public static final String MAVEN_STYLE_STRONG_DEFAULT = "bold";
-        public static final String MAVEN_STYLE_MOJO_DEFAULT = "f:green";
-        public static final String MAVEN_STYLE_PROJECT_DEFAULT = "f:cyan";
-    }
 }

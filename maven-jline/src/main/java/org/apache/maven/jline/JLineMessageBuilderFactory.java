@@ -28,8 +28,8 @@ import java.util.Map;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.apache.maven.message.MessageBuilder;
-import org.apache.maven.message.MessageBuilderFactory;
+import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.eclipse.sisu.Priority;
 
 /**

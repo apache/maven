@@ -16,36 +16,25 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.message;
+package org.apache.maven.api.annotations;
+
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
- * A factory for {@link MessageBuilder}.
+ * The annotated element must not be null.
+ * <p>
+ * Annotated fields must not be null after construction has completed.
+ * <p>
+ * When this annotation is applied to a method it applies to the method return value.
  *
- * @since 3.10.0
+ * @since 4.0.0
  */
-public interface MessageBuilderFactory {
-    /**
-     * Checks if the underlying output does support styling or not.
-     * @return whether color styling is supported or not
-     */
-    boolean isColorEnabled();
-
-    /**
-     * Returns the terminal width or <code>-1</code> if not supported.
-     * @return the terminal width
-     */
-    int getTerminalWidth();
-
-    /**
-     * Creates a new message builder.
-     * @return a new message builder
-     */
-    MessageBuilder builder();
-
-    /**
-     * Creates a new message builder of the specified size.
-     * @param size the initial size of the message builder buffer
-     * @return a new message builder
-     */
-    MessageBuilder builder(int size);
-}
+@Experimental
+@Documented
+@Retention(RetentionPolicy.CLASS)
+@Target({ElementType.FIELD, ElementType.PARAMETER, ElementType.METHOD})
+public @interface Nonnull {}

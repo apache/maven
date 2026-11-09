@@ -18,7 +18,7 @@
  */
 package org.apache.maven.jline;
 
-import org.apache.maven.message.MessageBuilder;
+import org.apache.maven.api.services.MessageBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
