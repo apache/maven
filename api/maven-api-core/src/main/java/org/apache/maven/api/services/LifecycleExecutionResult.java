@@ -19,6 +19,7 @@
 package org.apache.maven.api.services;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.apache.maven.api.LifecyclePlan;
 import org.apache.maven.api.MojoExecution;
@@ -40,4 +41,16 @@ public interface LifecycleExecutionResult extends Result<LifecycleExecutionReque
     /** {@return the executions retained by the request and submitted for execution} */
     @Nonnull
     List<MojoExecution> executions();
+
+    /** {@return the executions that completed successfully} */
+    @Nonnull
+    List<MojoExecution> executedSuccessfully();
+
+    /** {@return the execution that failed, if any} */
+    @Nonnull
+    Optional<MojoExecution> failedExecution();
+
+    /** {@return the cause of the failure, if any} */
+    @Nonnull
+    Optional<Throwable> failureCause();
 }

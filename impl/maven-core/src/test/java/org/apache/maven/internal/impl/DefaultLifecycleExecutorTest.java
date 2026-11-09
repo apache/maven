@@ -18,7 +18,9 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.maven.api.LifecyclePlan;
 import org.apache.maven.api.services.LifecycleExecutionRequest;
@@ -27,30 +29,33 @@ import org.apache.maven.api.services.LifecycleExecutorException;
 import org.apache.maven.api.services.LifecyclePlanRequest;
 import org.apache.maven.api.services.LifecyclePlanResult;
 import org.apache.maven.execution.MavenSession;
-import org.apache.maven.lifecycle.MavenExecutionPlan;
-import org.apache.maven.lifecycle.internal.LifecycleExecutionPlanCalculator;
+import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
-import org.apache.maven.lifecycle.internal.MojoExecutor;
 import org.apache.maven.lifecycle.internal.TaskSegment;
+import org.apache.maven.lifecycle.internal.concurrent.BuildPlan;
+import org.apache.maven.lifecycle.internal.concurrent.BuildPlanExecutor;
+import org.apache.maven.lifecycle.internal.concurrent.BuildStep;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doThrow;
-import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
-import static org.mockito.Mockito.same;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -60,40 +65,50 @@ class DefaultLifecycleExecutorTest {
     private InternalMavenSession session;
     private MavenSession mavenSession;
     private LifecycleTaskSegmentCalculator taskSegmentCalculator;
-    private LifecycleExecutionPlanCalculator executionPlanCalculator;
-    private MojoExecutor mojoExecutor;
+    private BuildPlanExecutor buildPlanExecutor;
     private MavenProject project;
     private MavenProject previousProject;
     private DefaultProject apiProject;
     private MojoExecution compile;
     private MojoExecution test;
     private DefaultLifecycleExecutor executor;
+    private BuildPlan buildPlan;
 
     @BeforeEach
     void setUp() throws Exception {
         session = mock(InternalMavenSession.class);
         mavenSession = mock(MavenSession.class);
         taskSegmentCalculator = mock(LifecycleTaskSegmentCalculator.class);
-        executionPlanCalculator = mock(LifecycleExecutionPlanCalculator.class);
-        mojoExecutor = mock(MojoExecutor.class);
+        buildPlanExecutor = mock(BuildPlanExecutor.class);
         project = new MavenProject();
         previousProject = new MavenProject();
         apiProject = mock(DefaultProject.class);
         compile = execution("compile", "compile");
         test = execution("test", "test");
         TaskSegment segment = new TaskSegment(false, new LifecycleTask("verify"));
-        MavenExecutionPlan plan = mock(MavenExecutionPlan.class);
 
         when(session.getMavenSession()).thenReturn(mavenSession);
         when(mavenSession.getCurrentProject()).thenReturn(previousProject);
         when(apiProject.getProject()).thenReturn(project);
         when(taskSegmentCalculator.calculateTaskSegments(mavenSession, List.of("verify")))
                 .thenReturn(List.of(segment));
-        when(executionPlanCalculator.calculateExecutionPlan(mavenSession, project, segment.getTasks()))
-                .thenReturn(plan);
-        when(plan.getMojoExecutions()).thenReturn(List.of(compile, test));
 
-        executor = new DefaultLifecycleExecutor(taskSegmentCalculator, executionPlanCalculator, mojoExecutor);
+        // Create a BuildPlan with steps containing the mojos
+        buildPlan = new BuildPlan(Collections.singletonMap(project, Collections.emptyList()));
+        Map<String, BuildStep> steps = new java.util.LinkedHashMap<>();
+        BuildStep compileStep = new BuildStep("compile", project, null);
+        compileStep.addMojo(compile, 0);
+        steps.put("compile", compileStep);
+        BuildStep testStep = new BuildStep("test", project, null);
+        testStep.addMojo(test, 0);
+        compileStep.executeBefore(testStep);
+        steps.put("test", testStep);
+        buildPlan.addProject(project, steps);
+
+        when(buildPlanExecutor.calculateProjectPlan(same(mavenSession), same(project), anyList()))
+                .thenReturn(buildPlan);
+
+        executor = new DefaultLifecycleExecutor(taskSegmentCalculator, buildPlanExecutor);
     }
 
     @Test
@@ -118,10 +133,6 @@ class DefaultLifecycleExecutorTest {
                 result.executions().stream()
                         .map(org.apache.maven.api.MojoExecution::goal)
                         .toList());
-        @SuppressWarnings("unchecked")
-        ArgumentCaptor<List<MojoExecution>> executions = ArgumentCaptor.forClass(List.class);
-        verify(mojoExecutor).execute(eq(mavenSession), executions.capture());
-        assertEquals(List.of(test), executions.getValue());
         verify(mavenSession, times(2)).setCurrentProject(same(project));
         verify(mavenSession, times(2)).setCurrentProject(same(previousProject));
     }
@@ -134,16 +145,18 @@ class DefaultLifecycleExecutorTest {
         LifecycleExecutionResult result = executor.execute(LifecycleExecutionRequest.build(session, plan));
 
         assertEquals(2, result.executions().size());
-        verify(mojoExecutor).execute(mavenSession, List.of(compile, test));
+        assertEquals(2, result.executedSuccessfully().size());
+        assertTrue(result.failedExecution().isEmpty());
+        assertTrue(result.failureCause().isEmpty());
     }
 
     @Test
     void restoresCurrentProjectOnExecutionFailure() throws Exception {
         LifecyclePlan plan = executor.plan(LifecyclePlanRequest.build(session, apiProject, List.of("verify")))
                 .plan();
-        doThrow(new org.apache.maven.lifecycle.LifecycleExecutionException("boom"))
-                .when(mojoExecutor)
-                .execute(eq(mavenSession), anyList());
+        doThrow(new LifecycleExecutionException("boom"))
+                .when(buildPlanExecutor)
+                .configureAndExecute(eq(mavenSession), eq(project), anyList());
 
         assertThrows(
                 LifecycleExecutorException.class,
@@ -165,7 +178,7 @@ class DefaultLifecycleExecutorTest {
                 })));
 
         assertSame(filterFailure, thrown);
-        verify(mojoExecutor, never()).execute(eq(mavenSession), anyList());
+        verify(buildPlanExecutor, never()).configureAndExecute(any(), any(), anyList());
         verify(mavenSession, times(2)).setCurrentProject(same(previousProject));
     }
 
@@ -180,6 +193,40 @@ class DefaultLifecycleExecutorTest {
         assertEquals("plan was not produced by this lifecycle executor", thrown.getMessage());
         assertFalse(thrown.getMessage().contains(DefaultLifecyclePlan.class.getName()));
         verify(mavenSession, never()).setCurrentProject(project);
+    }
+
+    @Test
+    void reportsPerExecutionStatus() throws Exception {
+        LifecyclePlan plan = executor.plan(LifecyclePlanRequest.build(session, apiProject, List.of("verify")))
+                .plan();
+
+        // Make the second step (test) fail
+        doAnswer(inv -> {
+                    List<MojoExecution> execs = inv.getArgument(2);
+                    if (execs.stream().anyMatch(e -> "test".equals(e.getGoal()))) {
+                        throw new LifecycleExecutionException("test failed");
+                    }
+                    return null;
+                })
+                .when(buildPlanExecutor)
+                .configureAndExecute(eq(mavenSession), eq(project), anyList());
+
+        LifecycleExecutorException ex = assertThrows(
+                LifecycleExecutorException.class,
+                () -> executor.execute(LifecycleExecutionRequest.build(session, plan)));
+
+        assertTrue(ex.getMessage().contains("Unable to execute lifecycle plan"));
+    }
+
+    @Test
+    void phaseGrouping() throws Exception {
+        LifecyclePlan plan = executor.plan(LifecyclePlanRequest.build(session, apiProject, List.of("verify")))
+                .plan();
+
+        var byPhase = plan.executionsByPhase();
+        assertEquals(2, byPhase.size());
+        assertTrue(byPhase.containsKey("compile"));
+        assertTrue(byPhase.containsKey("test"));
     }
 
     private static MojoExecution execution(String goal, String phase) {

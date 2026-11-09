@@ -194,6 +194,51 @@ public class BuildPlanExecutor {
         }
     }
 
+    /**
+     * Calculates a lifecycle plan for a single project without executing it.
+     * The returned {@link BuildPlan} contains the phase DAG with mojos bound to their steps.
+     *
+     * @param session the current Maven session
+     * @param project the project for which to calculate the plan
+     * @param taskSegments the parsed task segments
+     * @return the calculated build plan
+     */
+    public BuildPlan calculateProjectPlan(MavenSession session, MavenProject project, List<TaskSegment> taskSegments) {
+        BuildContext ctx = new BuildContext(session);
+
+        Map<MavenProject, List<MavenProject>> projects = Collections.singletonMap(project, Collections.emptyList());
+
+        BuildPlan plan = new BuildPlan(projects);
+        for (TaskSegment taskSegment : taskSegments) {
+            BuildPlan segment = ctx.calculateMojoExecutions(projects, taskSegment.getTasks());
+            plan.then(segment);
+        }
+
+        ctx.plan = plan;
+        ctx.bindProjectMojos(project);
+
+        return ctx.plan;
+    }
+
+    /**
+     * Configures and executes a list of mojo executions for a single project.
+     * This applies mojo configuration, finalizes parameters, and delegates to the concurrent MojoExecutor.
+     *
+     * @param session the current Maven session
+     * @param project the project whose mojos are being executed
+     * @param executions the mojo executions to run
+     * @throws LifecycleExecutionException if execution fails
+     */
+    public void configureAndExecute(MavenSession session, MavenProject project, List<MojoExecution> executions)
+            throws LifecycleExecutionException {
+        attachToThread(project);
+        executions.forEach(mojoExecution -> {
+            mojoExecutionConfigurator(mojoExecution).configure(project, mojoExecution, true);
+            finalizeMojoConfiguration(mojoExecution);
+        });
+        mojoExecutor.execute(session, executions);
+    }
+
     class BuildContext implements AutoCloseable {
         final MavenSession session;
         final ReactorContext reactorContext;
@@ -219,6 +264,14 @@ public class BuildPlanExecutor {
 
         BuildContext() {
             this.session = null;
+            this.reactorContext = null;
+            this.threads = 1;
+            this.executor = null;
+            this.plan = null;
+        }
+
+        BuildContext(MavenSession session) {
+            this.session = session;
             this.reactorContext = null;
             this.threads = 1;
             this.executor = null;
@@ -625,39 +678,7 @@ public class BuildPlanExecutor {
                         .filter(step -> step.status.compareAndSet(PLANNING, SCHEDULED))
                         .collect(Collectors.toSet());
                 for (BuildStep step : planSteps) {
-                    MavenProject project = step.project;
-                    for (Plugin plugin : project.getBuild().getPlugins()) {
-                        for (PluginExecution execution : plugin.getExecutions()) {
-                            for (String goal : execution.getGoals()) {
-                                MojoDescriptor mojoDescriptor = getMojoDescriptor(project, plugin, goal);
-                                String phase =
-                                        execution.getPhase() != null ? execution.getPhase() : mojoDescriptor.getPhase();
-                                if (phase == null) {
-                                    continue;
-                                }
-                                String tmpResolvedPhase = plan.aliases().getOrDefault(phase, phase);
-                                String resolvedPhase = tmpResolvedPhase.startsWith(AT)
-                                        ? tmpResolvedPhase.substring(AT.length())
-                                        : tmpResolvedPhase;
-                                plan.step(project, resolvedPhase).ifPresent(n -> {
-                                    MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());
-                                    mojoExecution.setLifecyclePhase(phase);
-                                    n.addMojo(mojoExecution, execution.getPriority());
-                                    if (mojoDescriptor.getDependencyCollectionRequired() != null
-                                            || mojoDescriptor.getDependencyResolutionRequired() != null) {
-                                        for (MavenProject p :
-                                                plan.getAllProjects().get(project)) {
-                                            plan.step(p, AFTER + PACKAGE)
-                                                    .ifPresent(a -> plan.requiredStep(project, resolvedPhase)
-                                                            .executeAfter(a));
-                                        }
-                                    }
-                                    // Apply @After annotation ordering constraints from the mojo descriptor
-                                    applyAfterLinks(mojoDescriptor, project, resolvedPhase);
-                                });
-                            }
-                        }
-                    }
+                    bindProjectMojos(step.project);
                 }
 
                 BuildPlan buildPlan = plan;
@@ -679,6 +700,47 @@ public class BuildPlanExecutor {
             } finally {
                 lock.writeLock().unlock();
             }
+        }
+
+        void bindProjectMojos(MavenProject project) {
+            for (Plugin plugin : project.getBuild().getPlugins()) {
+                for (PluginExecution execution : plugin.getExecutions()) {
+                    for (String goal : execution.getGoals()) {
+                        MojoDescriptor mojoDescriptor = getMojoDescriptor(project, plugin, goal);
+                        String phase = execution.getPhase() != null ? execution.getPhase() : mojoDescriptor.getPhase();
+                        if (phase == null) {
+                            continue;
+                        }
+                        String tmpResolvedPhase = plan.aliases().getOrDefault(phase, phase);
+                        String resolvedPhase = tmpResolvedPhase.startsWith(AT)
+                                ? tmpResolvedPhase.substring(AT.length())
+                                : tmpResolvedPhase;
+                        plan.step(project, resolvedPhase).ifPresent(n -> {
+                            MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());
+                            mojoExecution.setLifecyclePhase(phase);
+                            n.addMojo(mojoExecution, execution.getPriority());
+                            if (mojoDescriptor.getDependencyCollectionRequired() != null
+                                    || mojoDescriptor.getDependencyResolutionRequired() != null) {
+                                for (MavenProject p : plan.getAllProjects().get(project)) {
+                                    plan.step(p, AFTER + PACKAGE)
+                                            .ifPresent(a -> plan.requiredStep(project, resolvedPhase)
+                                                    .executeAfter(a));
+                                }
+                            }
+                            applyAfterLinks(mojoDescriptor, project, resolvedPhase);
+                        });
+                    }
+                }
+            }
+
+            // Compute fork plans
+            BuildPlan buildPlan = plan;
+            for (BuildStep step : plan.steps(project).toList()) {
+                for (MojoExecution execution : step.executions().toList()) {
+                    buildPlan = computeForkPlan(step, execution, buildPlan);
+                }
+            }
+            plan = buildPlan;
         }
 
         /**

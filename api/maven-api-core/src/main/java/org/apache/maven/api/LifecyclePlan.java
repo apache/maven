@@ -18,7 +18,10 @@
  */
 package org.apache.maven.api;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
@@ -44,4 +47,12 @@ public interface LifecyclePlan {
     /** {@return the configured mojo executions in lifecycle order} */
     @Nonnull
     List<MojoExecution> executions();
+
+    /** {@return the executions grouped by lifecycle phase, preserving phase order} */
+    @Nonnull
+    default Map<String, List<MojoExecution>> executionsByPhase() {
+        return executions().stream()
+                .collect(Collectors.groupingBy(
+                        e -> e.lifecyclePhase().orElse(""), LinkedHashMap::new, Collectors.toUnmodifiableList()));
+    }
 }
