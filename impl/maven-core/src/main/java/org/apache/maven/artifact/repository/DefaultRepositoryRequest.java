@@ -65,7 +65,7 @@ public class DefaultRepositoryRequest implements RepositoryRequest {
             request.setRemoteRepositories(project.getPluginArtifactRepositories());
         }
         request.setOffline(session.isOffline());
-        request.setForceUpdate(session.getRequest().isUpdateSnapshots());
+        request.setForceUpdate(session.getRequest().isUpdateAll());
 
         return request;
     }

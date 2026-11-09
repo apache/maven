@@ -254,7 +254,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         request.setReactorFailureBehavior(determineReactorFailureBehaviour(context));
         request.setRecursive(!context.options().nonRecursive().orElse(!request.isRecursive()));
         request.setOffline(context.options().offline().orElse(request.isOffline()));
-        request.setUpdateSnapshots(context.options().updateSnapshots().orElse(false));
+        request.setUpdateAll(context.options().updateAll().orElse(false));
         request.setGlobalChecksumPolicy(determineGlobalChecksumPolicy(context));
         context.options().artifactsUpdatePolicy().ifPresent(request::setArtifactsUpdatePolicy);
         context.options().metadataUpdatePolicy().ifPresent(request::setMetadataUpdatePolicy);

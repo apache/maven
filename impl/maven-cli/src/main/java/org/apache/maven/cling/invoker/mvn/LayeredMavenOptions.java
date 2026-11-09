@@ -60,8 +60,8 @@ public class LayeredMavenOptions<O extends MavenOptions> extends LayeredOptions<
     }
 
     @Override
-    public Optional<Boolean> updateSnapshots() {
-        return returnFirstPresentOrEmpty(MavenOptions::updateSnapshots);
+    public Optional<Boolean> updateAll() {
+        return returnFirstPresentOrEmpty(MavenOptions::updateAll);
     }
 
     @Override

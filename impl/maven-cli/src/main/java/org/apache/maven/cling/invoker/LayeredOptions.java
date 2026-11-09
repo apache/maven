@@ -143,7 +143,9 @@ public abstract class LayeredOptions<O extends Options> implements Options {
     }
 
     @Override
-    public void warnAboutDeprecatedOptions(ParserRequest request, Consumer<String> printWriter) {}
+    public void warnAboutDeprecatedOptions(ParserRequest request, Consumer<String> printWriter) {
+        options.forEach(option -> option.warnAboutDeprecatedOptions(request, printWriter));
+    }
 
     @Override
     public void displayHelp(ParserRequest request, Consumer<String> printWriter) {

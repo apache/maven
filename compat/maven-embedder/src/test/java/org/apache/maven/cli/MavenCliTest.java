@@ -24,6 +24,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
 import java.nio.file.Files;
@@ -563,6 +565,58 @@ class MavenCliTest {
         String selector = cli.getResumeFromSelector(allProjects, failedProject);
 
         assertEquals("group-a:module", selector);
+    }
+
+    static Stream<List<String>> updateOptions() {
+        return Stream.of(
+                List.of("-U"),
+                List.of("--update-all"),
+                List.of("--update-snapshots"),
+                List.of("-U", "--update-all", "--update-snapshots"),
+                List.of("--update-snapshots", "--update-all", "-U"));
+    }
+
+    @ParameterizedTest
+    @MethodSource("updateOptions")
+    void updateOptionsPopulateRequestAndDeprecateOnlyOldAlias(List<String> args) throws Exception {
+        CLIManager manager = new CLIManager();
+        CommandLine commandLine = manager.parse(args.toArray(new String[0]));
+        CliRequest request = new CliRequest(args.toArray(new String[0]), null);
+        request.commandLine = commandLine;
+        request.workingDirectory = System.getProperty("user.dir");
+        assertTrue(cli.populateRequest(request).isUpdateAll());
+
+        if (args.contains("--update-snapshots")) {
+            assertEquals(1, manager.getUsedDeprecatedOptions().size());
+            Option alias = manager.getUsedDeprecatedOptions().iterator().next();
+            assertEquals("update-snapshots", alias.getLongOpt());
+            assertNull(alias.getOpt());
+            assertFalse(alias.getDeprecated().isForRemoval());
+            assertEquals("Use -U,--update-all instead.", alias.getDeprecated().getDescription());
+        } else {
+            assertTrue(commandLine.hasOption(CLIManager.UPDATE_ALL));
+            assertTrue(manager.getUsedDeprecatedOptions().isEmpty());
+        }
+    }
+
+    @Test
+    void updatesAreNotForcedByDefault() throws Exception {
+        CliRequest request = new CliRequest(new String[0], null);
+        request.commandLine = new CLIManager().parse(new String[0]);
+        request.workingDirectory = System.getProperty("user.dir");
+        assertFalse(cli.populateRequest(request).isUpdateAll());
+    }
+
+    @Test
+    void helpDocumentsPreferredOptionAndDeprecatedAlias() {
+        StringWriter output = new StringWriter();
+        new CLIManager().displayHelp(new PrintWriter(output));
+        String help = output.toString().replaceAll("\\s+", " ");
+        assertTrue(help.contains("-U,--update-all"));
+        assertTrue(help.contains("equivalent to -UA -UM"));
+        assertTrue(help.contains("--update-snapshots"));
+        assertTrue(help.contains("<deprecated> Alias for --update-all."));
+        assertFalse(help.contains("-U,--update-snapshots"));
     }
 
     @Test

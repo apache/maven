@@ -147,7 +147,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
 
     private String globalChecksumPolicy;
 
-    private boolean updateSnapshots = false;
+    private boolean updateAll = false;
 
     private String artifactsUpdatePolicy = null;
 
@@ -211,7 +211,7 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
         copy.setTransferListener(original.getTransferListener());
         copy.setLoggingLevel(original.getLoggingLevel());
         copy.setGlobalChecksumPolicy(original.getGlobalChecksumPolicy());
-        copy.setUpdateSnapshots(original.isUpdateSnapshots());
+        copy.setUpdateAll(original.isUpdateAll());
         copy.setNoSnapshotUpdates(original.isNoSnapshotUpdates());
         copy.setArtifactsUpdatePolicy(original.getArtifactsUpdatePolicy());
         copy.setMetadataUpdatePolicy(original.getMetadataUpdatePolicy());
@@ -413,8 +413,14 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     }
 
     @Override
+    public boolean isUpdateAll() {
+        return updateAll;
+    }
+
+    @Deprecated(since = "4.2.0")
+    @Override
     public boolean isUpdateSnapshots() {
-        return updateSnapshots;
+        return isUpdateAll();
     }
 
     @Override
@@ -655,10 +661,16 @@ public class DefaultMavenExecutionRequest implements MavenExecutionRequest {
     }
 
     @Override
-    public MavenExecutionRequest setUpdateSnapshots(boolean updateSnapshots) {
-        this.updateSnapshots = updateSnapshots;
+    public MavenExecutionRequest setUpdateAll(boolean updateAll) {
+        this.updateAll = updateAll;
 
         return this;
+    }
+
+    @Deprecated(since = "4.2.0")
+    @Override
+    public MavenExecutionRequest setUpdateSnapshots(boolean updateSnapshots) {
+        return setUpdateAll(updateSnapshots);
     }
 
     @Override

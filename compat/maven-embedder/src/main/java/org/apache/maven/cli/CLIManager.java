@@ -69,7 +69,9 @@ public class CLIManager {
 
     public static final char NON_RECURSIVE = 'N';
 
-    public static final char UPDATE_SNAPSHOTS = 'U';
+    public static final char UPDATE_ALL = 'U';
+
+    public static final String UPDATE_SNAPSHOTS_ALIAS = "update-snapshots";
 
     public static final char ACTIVATE_PROFILES = 'P';
 
@@ -191,9 +193,18 @@ public class CLIManager {
                 .desc(
                         "Do not recurse into sub-projects. When used together with -pl, do not recurse into sub-projects of selected aggregators")
                 .build());
-        options.addOption(Option.builder(Character.toString(UPDATE_SNAPSHOTS))
-                .longOpt("update-snapshots")
-                .desc("Forces a check for missing releases and updated snapshots on remote repositories")
+        options.addOption(Option.builder(Character.toString(UPDATE_ALL))
+                .longOpt("update-all")
+                .desc("Forces a check for missing releases and updated snapshots on remote repositories "
+                        + "(equivalent to -UA -UM; sets artifact and metadata update policies to 'always')")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(UPDATE_SNAPSHOTS_ALIAS)
+                .desc("<deprecated> Alias for --update-all.")
+                .deprecated(DeprecatedAttributes.builder()
+                        .setSince("4.2.0")
+                        .setDescription("Use -U,--update-all instead.")
+                        .get())
                 .build());
         options.addOption(Option.builder(Character.toString(ACTIVATE_PROFILES))
                 .longOpt("activate-profiles")

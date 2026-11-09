@@ -249,9 +249,48 @@ public interface MavenExecutionRequest {
 
     int getLoggingLevel();
 
-    // Update snapshots
+    // Update checks
+
+    /**
+     * Sets whether to force checks for missing releases and updated snapshots, corresponding to
+     * {@code -U} / {@code --update-all}. When enabled, both artifact and metadata update policies are
+     * set to {@code always} unless per-type update policies are specified.
+     *
+     * @param updateAll whether to force update checks
+     * @return this request
+     * @since 4.2.0
+     */
+    default MavenExecutionRequest setUpdateAll(boolean updateAll) {
+        return setUpdateSnapshots(updateAll);
+    }
+
+    /**
+     * Returns whether checks for missing releases and updated snapshots should be forced.
+     *
+     * @return whether update checks should be forced
+     * @since 4.2.0
+     */
+    default boolean isUpdateAll() {
+        return isUpdateSnapshots();
+    }
+
+    /**
+     * Sets whether to force update checks.
+     *
+     * @param updateSnapshots whether to force update checks
+     * @return this request
+     * @deprecated Use {@link #setUpdateAll(boolean)} instead.
+     */
+    @Deprecated(since = "4.2.0")
     MavenExecutionRequest setUpdateSnapshots(boolean updateSnapshots);
 
+    /**
+     * Returns whether update checks should be forced.
+     *
+     * @return whether update checks should be forced
+     * @deprecated Use {@link #isUpdateAll()} instead.
+     */
+    @Deprecated(since = "4.2.0")
     boolean isUpdateSnapshots();
 
     MavenExecutionRequest setNoSnapshotUpdates(boolean noSnapshotUpdates);
@@ -264,7 +303,7 @@ public interface MavenExecutionRequest {
      * Sets the update policy to apply to artifact resolution.
      * Valid values: {@code always}, {@code daily}, {@code interval:N} (minutes), {@code never}.
      *
-     * @param policy the update policy string, or {@code null} to defer to the legacy snapshot flags
+     * @param policy the update policy string, or {@code null} to defer to the combined update flags
      *               (only when the metadata update policy is also {@code null})
      * @return this request
      * @since 4.0.0
@@ -283,7 +322,7 @@ public interface MavenExecutionRequest {
      * Sets the update policy to apply to metadata resolution.
      * Valid values: {@code always}, {@code daily}, {@code interval:N} (minutes), {@code never}.
      *
-     * @param policy the update policy string, or {@code null} to defer to the legacy snapshot flags
+     * @param policy the update policy string, or {@code null} to defer to the combined update flags
      *               (only when the artifacts update policy is also {@code null})
      * @return this request
      * @since 4.0.0

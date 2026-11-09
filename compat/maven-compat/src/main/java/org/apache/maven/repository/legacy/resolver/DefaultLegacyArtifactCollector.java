@@ -78,7 +78,7 @@ public class DefaultLegacyArtifactCollector implements LegacyArtifactCollector {
 
         if (session != null) {
             request.setOffline(session.isOffline());
-            request.setForceUpdate(session.getRequest().isUpdateSnapshots());
+            request.setForceUpdate(session.getRequest().isUpdateAll());
             request.setServers(session.getRequest().getServers());
             request.setMirrors(session.getRequest().getMirrors());
             request.setProxies(session.getRequest().getProxies());

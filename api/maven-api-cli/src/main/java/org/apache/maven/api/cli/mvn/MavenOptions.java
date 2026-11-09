@@ -55,12 +55,15 @@ public interface MavenOptions extends Options {
     Optional<Boolean> nonRecursive();
 
     /**
-     * Indicates whether Maven should force a check for updated snapshots on remote repositories.
+     * Indicates whether Maven should force a check for missing releases and updated snapshots on remote repositories.
+     * The {@code -U} / {@code --update-all} option is equivalent to {@code -UA -UM}, setting both artifact and
+     * metadata update policies to {@code always}. The {@code --update-snapshots} option is a deprecated alias.
      *
-     * @return an {@link Optional} containing true if snapshot updates should be forced, false if not, or empty if not specified
+     * @return an {@link Optional} containing true if update checks should be forced, false if not, or empty if not specified
+     * @since 4.2.0
      */
     @Nonnull
-    Optional<Boolean> updateSnapshots();
+    Optional<Boolean> updateAll();
 
     /**
      * Returns the list of profiles to activate.
@@ -80,7 +83,7 @@ public interface MavenOptions extends Options {
 
     /**
      * The update policy to apply to artifacts ('always', 'daily', 'interval:N', 'never').
-     * The --UA flag overrides this with 'always'.
+     * The -UA flag overrides this with 'always'.
      *
      * @return an {@link Optional} containing the artifacts update policy, or empty if not specified
      * @since 4.0.0
@@ -90,7 +93,7 @@ public interface MavenOptions extends Options {
 
     /**
      * The update policy to apply to metadata ('always', 'daily', 'interval:N', 'never').
-     * The --UM flag overrides this with 'always'.
+     * The -UM flag overrides this with 'always'.
      *
      * @return an {@link Optional} containing the metadata update policy, or empty if not specified
      * @since 4.0.0

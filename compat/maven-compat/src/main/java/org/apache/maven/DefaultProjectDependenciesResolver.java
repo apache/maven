@@ -167,7 +167,7 @@ public class DefaultProjectDependenciesResolver implements ProjectDependenciesRe
                 .setResolutionFilter(resolutionScopeFilter)
                 .setLocalRepository(session.getLocalRepository())
                 .setOffline(session.isOffline())
-                .setForceUpdate(session.getRequest().isUpdateSnapshots());
+                .setForceUpdate(session.getRequest().isUpdateAll());
         request.setServers(session.getRequest().getServers());
         request.setMirrors(session.getRequest().getMirrors());
         request.setProxies(session.getRequest().getProxies());

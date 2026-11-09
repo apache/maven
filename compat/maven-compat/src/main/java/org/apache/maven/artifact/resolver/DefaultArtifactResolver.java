@@ -114,7 +114,7 @@ public class DefaultArtifactResolver implements ArtifactResolver, Disposable {
     private void injectSession1(RepositoryRequest request, MavenSession session) {
         if (session != null) {
             request.setOffline(session.isOffline());
-            request.setForceUpdate(session.getRequest().isUpdateSnapshots());
+            request.setForceUpdate(session.getRequest().isUpdateAll());
         }
     }
 

@@ -52,6 +52,8 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.version.VersionScheme;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -145,7 +147,7 @@ public class DefaultRepositorySystemSessionFactoryTest {
     }
 
     @Test
-    void isSnapshotUpdatesTest() throws InvalidRepositoryException {
+    void updateAllSetsBothUpdatePoliciesToAlways() throws InvalidRepositoryException {
         DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
                 aetherRepositorySystem,
                 eventSpyDispatcher,
@@ -157,10 +159,40 @@ public class DefaultRepositorySystemSessionFactoryTest {
 
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepository(getLocalRepository());
-        request.setUpdateSnapshots(true);
-        assertEquals(
-                RepositoryPolicy.UPDATE_POLICY_ALWAYS,
-                systemSessionFactory.newRepositorySession(request).getUpdatePolicy());
+        request.setUpdateAll(true);
+        org.eclipse.aether.RepositorySystemSession session = systemSessionFactory.newRepositorySession(request);
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_ALWAYS, session.getArtifactUpdatePolicy());
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_ALWAYS, session.getMetadataUpdatePolicy());
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void perTypeUpdatePoliciesTakePrecedenceOverUpdateAll(boolean artifacts) throws InvalidRepositoryException {
+        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Collections.emptyMap(),
+                versionFilterBuilder);
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setUpdateAll(true);
+        if (artifacts) {
+            request.setArtifactsUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_NEVER);
+        } else {
+            request.setMetadataUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_DAILY);
+        }
+
+        org.eclipse.aether.RepositorySystemSession session = systemSessionFactory.newRepositorySession(request);
+        if (artifacts) {
+            assertEquals(RepositoryPolicy.UPDATE_POLICY_NEVER, session.getArtifactUpdatePolicy());
+            assertNull(session.getMetadataUpdatePolicy());
+        } else {
+            assertNull(session.getArtifactUpdatePolicy());
+            assertEquals(RepositoryPolicy.UPDATE_POLICY_DAILY, session.getMetadataUpdatePolicy());
+        }
     }
 
     @Test

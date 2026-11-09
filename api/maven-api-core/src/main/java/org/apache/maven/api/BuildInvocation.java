@@ -49,8 +49,8 @@ import org.apache.maven.api.annotations.Nullable;
  *   <li>Resume-from ({@link #resumeFrom()}) and resume mode ({@link #resume()})</li>
  *   <li>Recursive mode ({@link #recursive()})</li>
  *   <li>Reactor failure behavior ({@link #reactorFailureBehavior()})</li>
- *   <li>Offline mode ({@link #offline()}) and snapshot update policy
- *       ({@link #updateSnapshots()})</li>
+ *   <li>Offline mode ({@link #offline()}) and forced update checks
+ *       ({@link #updateAll()})</li>
  *   <li>Degree of concurrency ({@link #threads()})</li>
  *   <li>Batch mode ({@link #batchMode()})</li>
  * </ul>
@@ -185,11 +185,14 @@ public interface BuildInvocation {
     boolean offline();
 
     /**
-     * Whether snapshot updates were forced ({@code -U} / {@code --update-snapshots}).
+     * Whether checks for missing releases and updated snapshots were forced ({@code -U} / {@code --update-all}).
+     * This option is equivalent to {@code -UA -UM}, setting both artifact and metadata update policies to
+     * {@code always}. The {@code --update-snapshots} option is a deprecated alias.
      *
-     * @return {@code true} if snapshot updates were forced
+     * @return {@code true} if update checks were forced
+     * @since 4.2.0
      */
-    boolean updateSnapshots();
+    boolean updateAll();
 
     /**
      * Whether the build was invoked in non-interactive (batch) mode ({@code --batch-mode} / {@code -B}).

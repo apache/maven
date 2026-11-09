@@ -257,6 +257,9 @@ public class CommonsCliOptions implements Options {
                         .append(" ")
                         .append(option.getDeprecated().getSince());
             }
+            if (option.getDeprecated().getDescription() != null) {
+                sb.append(": ").append(option.getDeprecated().getDescription());
+            }
             printWriter.accept(sb.toString());
         }
     }

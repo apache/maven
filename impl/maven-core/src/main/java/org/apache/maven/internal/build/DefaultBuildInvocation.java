@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
  * @param resumeFrom             resume-from selector, or {@code null}
  * @param reactorFailureBehavior reactor failure behavior
  * @param offline                whether offline mode was active
- * @param updateSnapshots        whether snapshot updates were forced
+ * @param updateAll              whether checks for missing releases and updated snapshots were forced
  * @param batchMode              whether batch mode was active
  * @param recursive              whether recursive processing is enabled
  * @param resume                 whether resume mode was active
@@ -62,7 +62,7 @@ public record DefaultBuildInvocation(
         String resumeFrom,
         ReactorFailureBehavior reactorFailureBehavior,
         boolean offline,
-        boolean updateSnapshots,
+        boolean updateAll,
         boolean batchMode,
         boolean recursive,
         boolean resume,
@@ -157,7 +157,7 @@ public record DefaultBuildInvocation(
                 resumeFrom,
                 failureBehavior,
                 request.isOffline(),
-                request.isUpdateSnapshots(),
+                request.isUpdateAll(),
                 !request.isInteractiveMode(),
                 request.isRecursive(),
                 request.isResume(),

@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DeprecatedAttributes;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.mvn.MavenOptions;
@@ -56,8 +57,8 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     }
 
     @Override
-    public Optional<Boolean> updateSnapshots() {
-        if (commandLine.hasOption(CLIManager.UPDATE_SNAPSHOTS)) {
+    public Optional<Boolean> updateAll() {
+        if (commandLine.hasOption(CLIManager.UPDATE_ALL) || commandLine.hasOption(CLIManager.UPDATE_SNAPSHOTS_ALIAS)) {
             return Optional.of(Boolean.TRUE);
         }
         return Optional.empty();
@@ -255,7 +256,8 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     protected static class CLIManager extends CommonsCliOptions.CLIManager {
         public static final String ALTERNATE_POM_FILE = "f";
         public static final String NON_RECURSIVE = "N";
-        public static final String UPDATE_SNAPSHOTS = "U";
+        public static final String UPDATE_ALL = "U";
+        public static final String UPDATE_SNAPSHOTS_ALIAS = "update-snapshots";
         public static final String ACTIVATE_PROFILES = "P";
         public static final String SUPPRESS_SNAPSHOT_UPDATES = "nsu";
         public static final String CHECKSUM_FAILURE_POLICY = "C";
@@ -293,9 +295,18 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
                     .desc(
                             "Do not recurse into sub-projects. When used together with -pl, do not recurse into sub-projects of selected aggregators")
                     .get());
-            options.addOption(Option.builder(UPDATE_SNAPSHOTS)
-                    .longOpt("update-snapshots")
-                    .desc("Forces a check for missing releases and updated snapshots on remote repositories")
+            options.addOption(Option.builder(UPDATE_ALL)
+                    .longOpt("update-all")
+                    .desc("Forces a check for missing releases and updated snapshots on remote repositories "
+                            + "(equivalent to -UA -UM; sets artifact and metadata update policies to 'always')")
+                    .get());
+            options.addOption(Option.builder()
+                    .longOpt(UPDATE_SNAPSHOTS_ALIAS)
+                    .desc("<deprecated> Alias for --update-all.")
+                    .deprecated(DeprecatedAttributes.builder()
+                            .setSince("4.2.0")
+                            .setDescription("Use -U,--update-all instead.")
+                            .get())
                     .get());
             options.addOption(Option.builder(ACTIVATE_PROFILES)
                     .longOpt("activate-profiles")

@@ -22,10 +22,18 @@ import java.util.List;
 
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  */
@@ -36,6 +44,52 @@ class DefaultMavenExecutionTest {
         MavenExecutionRequest copy = DefaultMavenExecutionRequest.copy(original);
         assertNotNull(copy);
         assertNotSame(copy, original);
+    }
+
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void updateAllIsPreservedWhenCopyingRequest(boolean updateAll) {
+        MavenExecutionRequest original = new DefaultMavenExecutionRequest();
+        assertFalse(original.isUpdateAll());
+        assertSame(original, original.setUpdateAll(updateAll));
+        assertEquals(updateAll, original.isUpdateAll());
+
+        MavenExecutionRequest copy = DefaultMavenExecutionRequest.copy(original);
+        assertEquals(updateAll, copy.isUpdateAll());
+        copy.setUpdateAll(!updateAll);
+        assertEquals(updateAll, original.isUpdateAll());
+        assertEquals(!updateAll, copy.isUpdateAll());
+    }
+
+    @SuppressWarnings("deprecation")
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void deprecatedUpdateMethodsShareTheUpdateAllFlag(boolean updateAll) {
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        assertFalse(request.isUpdateSnapshots());
+        assertSame(request, request.setUpdateSnapshots(updateAll));
+        assertEquals(updateAll, request.isUpdateAll());
+        assertEquals(updateAll, request.isUpdateSnapshots());
+
+        MavenExecutionRequest copy = DefaultMavenExecutionRequest.copy(request);
+        assertEquals(updateAll, copy.isUpdateAll());
+        assertEquals(updateAll, copy.isUpdateSnapshots());
+
+        assertSame(request, request.setUpdateAll(!updateAll));
+        assertEquals(!updateAll, request.isUpdateSnapshots());
+        assertEquals(updateAll, copy.isUpdateSnapshots());
+    }
+
+    @SuppressWarnings("deprecation")
+    @ParameterizedTest
+    @ValueSource(booleans = {true, false})
+    void updateAllSupportsExistingRequestImplementations(boolean updateAll) {
+        MavenExecutionRequest request = mock(MavenExecutionRequest.class, CALLS_REAL_METHODS);
+        when(request.setUpdateSnapshots(updateAll)).thenReturn(request);
+        when(request.isUpdateSnapshots()).thenReturn(updateAll);
+
+        assertSame(request, request.setUpdateAll(updateAll));
+        assertEquals(updateAll, request.isUpdateAll());
     }
 
     @Test

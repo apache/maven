@@ -666,9 +666,15 @@ public class MavenCli {
         for (Option option : cliRequest.commandLine.getOptions()) {
             if (option.isDeprecated()) {
                 StringBuilder sb = new StringBuilder();
-                sb.append("The option -").append(option.getOpt());
+                sb.append("The option ");
+                if (option.getOpt() != null) {
+                    sb.append("-").append(option.getOpt());
+                }
                 if (option.getLongOpt() != null) {
-                    sb.append(",--").append(option.getLongOpt());
+                    if (option.getOpt() != null) {
+                        sb.append(",");
+                    }
+                    sb.append("--").append(option.getLongOpt());
                 }
                 sb.append(" is deprecated ");
                 if (option.getDeprecated().isForRemoval()) {
@@ -1437,7 +1443,8 @@ public class MavenCli {
         request.setReactorFailureBehavior(determineReactorFailureBehaviour(commandLine));
         disableOnPresentOption(commandLine, CLIManager.NON_RECURSIVE, request::setRecursive);
         enableOnPresentOption(commandLine, CLIManager.OFFLINE, request::setOffline);
-        enableOnPresentOption(commandLine, CLIManager.UPDATE_SNAPSHOTS, request::setUpdateSnapshots);
+        enableOnPresentOption(commandLine, CLIManager.UPDATE_ALL, request::setUpdateAll);
+        enableOnPresentOption(commandLine, CLIManager.UPDATE_SNAPSHOTS_ALIAS, request::setUpdateAll);
         request.setGlobalChecksumPolicy(determineGlobalCheckPolicy(commandLine));
 
         // Update policy options

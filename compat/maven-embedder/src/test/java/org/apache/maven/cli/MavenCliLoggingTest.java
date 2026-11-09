@@ -40,6 +40,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Isolated;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.slf4j.LoggerFactory;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -95,6 +97,32 @@ class MavenCliLoggingTest {
             restoreProperty(SAVED_PROPERTIES[i], savedPropertyValues[i]);
         }
         activateSlf4j();
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"-U", "--update-all", "--update-snapshots"})
+    void onlyOldUpdateAliasProducesDeprecationWarning(String option) throws Exception {
+        ByteArrayOutputStream output = new ByteArrayOutputStream();
+        try (PrintStream stream = new PrintStream(output, true, UTF_8)) {
+            System.setProperty(MavenBaseLogger.LEGACY_PREFIX + "logFile", "System.out");
+            System.setOut(stream);
+            activateSlf4j();
+
+            MavenCli cli = new MavenCli();
+            CliRequest request = new CliRequest(new String[] {option, "-Dstyle.color=never"}, null);
+            cli.cli(request);
+            cli.properties(request);
+            cli.logging(request);
+
+            String logs = output.toString(UTF_8);
+            if ("--update-snapshots".equals(option)) {
+                assertTrue(logs.contains("The option --update-snapshots is deprecated"), logs);
+                assertTrue(logs.contains("Use -U,--update-all instead."), logs);
+                assertFalse(logs.contains("-null"), logs);
+            } else {
+                assertFalse(logs.contains("deprecated"), logs);
+            }
+        }
     }
 
     /**

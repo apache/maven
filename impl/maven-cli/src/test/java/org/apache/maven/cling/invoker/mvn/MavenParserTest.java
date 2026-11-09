@@ -21,11 +21,17 @@ package org.apache.maven.cling.invoker.mvn;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
+import org.apache.maven.jline.JLineMessageBuilderFactory;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -49,6 +55,31 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 class MavenParserTest {
 
     private final MavenParser parser = new MavenParser();
+
+    @ParameterizedTest
+    @ValueSource(strings = {"-U", "--update-all", "--update-snapshots"})
+    void updateOptionsFromMavenConfig(String option, @TempDir Path tempDir) throws Exception {
+        Files.createDirectories(tempDir.resolve(".mvn"));
+        Files.writeString(tempDir.resolve(".mvn/maven.config"), option + System.lineSeparator());
+        Path userHome = Files.createDirectories(tempDir.resolve("home"));
+        ParserRequest request = ParserRequest.mvn(List.of("validate"), new JLineMessageBuilderFactory())
+                .cwd(tempDir)
+                .userHome(userHome)
+                .build();
+        MavenOptions options =
+                (MavenOptions) parser.parseInvocation(request).options().orElseThrow();
+
+        assertTrue(options.updateAll().orElseThrow());
+        assertEquals(List.of("validate"), options.goals().orElseThrow());
+        List<String> warnings = new ArrayList<>();
+        options.warnAboutDeprecatedOptions(request, warnings::add);
+        if ("--update-snapshots".equals(option)) {
+            assertEquals("Detected deprecated option use in maven.config", warnings.get(0));
+            assertTrue(warnings.get(1).contains("Use -U,--update-all instead."));
+        } else {
+            assertTrue(warnings.isEmpty());
+        }
+    }
 
     /**
      * Core MNG-7131 regression test: a property value containing a space must survive the

@@ -200,16 +200,17 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
         sessionBuilder.setChecksumPolicy(request.getGlobalChecksumPolicy());
 
         if (request.getArtifactsUpdatePolicy() == null && request.getMetadataUpdatePolicy() == null) {
-            // we go "old" way
+            // Apply the combined policy when no per-type policy was specified.
             sessionBuilder.setUpdatePolicy(
                     request.isNoSnapshotUpdates()
                             ? RepositoryPolicy.UPDATE_POLICY_NEVER
-                            : request.isUpdateSnapshots() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null);
+                            : request.isUpdateAll() ? RepositoryPolicy.UPDATE_POLICY_ALWAYS : null);
         } else {
-            // New-style per-type policies take precedence; warn if old-style flags were also set
-            if (request.isNoSnapshotUpdates() || request.isUpdateSnapshots()) {
-                logger.warn("Both new-style update policy options and legacy snapshot flags (-U/-nsu) were specified. "
-                        + "The new-style policies take precedence; the legacy flags are ignored.");
+            // Per-type policies take precedence over combined update flags.
+            if (request.isNoSnapshotUpdates() || request.isUpdateAll()) {
+                logger.warn(
+                        "Both per-type update policy options and combined update flags (-U/--update-all/-nsu) were specified. "
+                                + "The per-type policies take precedence; the combined flags are ignored.");
             }
             if (request.getArtifactsUpdatePolicy() != null) {
                 sessionBuilder.setArtifactUpdatePolicy(request.getArtifactsUpdatePolicy());

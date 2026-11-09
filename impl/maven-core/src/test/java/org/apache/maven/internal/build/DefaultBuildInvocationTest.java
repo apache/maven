@@ -55,7 +55,7 @@ class DefaultBuildInvocationTest {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setGoals(List.of("clean", "install"));
         request.setOffline(true);
-        request.setUpdateSnapshots(true);
+        request.setUpdateAll(true);
         request.setInteractiveMode(false);
         request.setReactorFailureBehavior(MavenExecutionRequest.REACTOR_FAIL_AT_END);
 
@@ -66,7 +66,7 @@ class DefaultBuildInvocationTest {
 
         assertEquals(List.of("clean", "install"), inv.goals());
         assertTrue(inv.offline());
-        assertTrue(inv.updateSnapshots());
+        assertTrue(inv.updateAll());
         assertTrue(inv.batchMode());
         assertEquals(ReactorFailureBehavior.FAIL_AT_END, inv.reactorFailureBehavior());
         assertTrue(inv.recursive());
