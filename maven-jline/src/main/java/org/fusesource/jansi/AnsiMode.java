@@ -22,8 +22,8 @@ package org.fusesource.jansi;
  * Mirrors the real JAnsi {@code AnsiMode} enum so code compiled against JAnsi, such as
  * maven-shared-utils, keeps resolving against this type at runtime.
  *
- * This class comes from Jansi and is provided for backward compatibility with maven-shared-utils,
- * while Maven has migrated to JLine (into which Jansi has been merged since JLine 3.25.0).
+ * This class comes from Jansi and is provided for backward compatibility with maven-shared-utils;
+ * Maven itself no longer ships Jansi.
  */
 @Deprecated
 public enum AnsiMode {

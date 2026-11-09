@@ -158,7 +158,6 @@ under the License.
     <checkstyle.violation.ignore>None</checkstyle.violation.ignore>
     <checkstyle.excludes>**/package-info.java</checkstyle.excludes>
     <project.build.outputTimestamp>2026-09-27T20:38:58Z</project.build.outputTimestamp>
-    <jlineVersion>3.30.17</jlineVersion>
 
     <!-- The JPMS module name elements used in the Automatic-Module-Name -->
     <!-- Note: Maven 3 can never become "pure modular" thing, we leave that to Maven 4+ -->
@@ -356,26 +355,6 @@ under the License.
         <groupId>org.codehaus.plexus</groupId>
         <artifactId>plexus-interpolation</artifactId>
         <version>${plexusInterpolationVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jline</groupId>
-        <artifactId>jansi-core</artifactId>
-        <version>${jlineVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jline</groupId>
-        <artifactId>jline-terminal</artifactId>
-        <version>${jlineVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jline</groupId>
-        <artifactId>jline-terminal-jni</artifactId>
-        <version>${jlineVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.jline</groupId>
-        <artifactId>jline-terminal-ffm</artifactId>
-        <version>${jlineVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
@@ -742,11 +721,7 @@ under the License.
             </goals>
             <configuration>
               <rules>
-                <enforceBytecodeVersion>
-                  <excludes>
-                    <exclude>org.jline:jline-terminal-ffm</exclude>
-                  </excludes>
-                </enforceBytecodeVersion>
+                <enforceBytecodeVersion />
               </rules>
               <fail>true</fail>
             </configuration>

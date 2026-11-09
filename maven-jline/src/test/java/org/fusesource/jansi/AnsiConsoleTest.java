@@ -28,10 +28,10 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Verifies that this JAnsi compatibility shim shares its lifecycle with {@link org.jline.jansi.AnsiConsole}
- * instead of running an install of its own (see #13726, #13727).
+ * Verifies that this JAnsi compatibility shim never installs anything of its own (see #13726, #13727).
  */
 class AnsiConsoleTest {
 
@@ -43,15 +43,17 @@ class AnsiConsoleTest {
     }
 
     @Test
-    void systemInstallAndUninstallDelegateToJLinesAnsiConsole() {
+    void systemInstallLeavesSystemOutAlone() {
+        PrintStream original = System.out;
         assertFalse(AnsiConsole.isInstalled());
 
         AnsiConsole.systemInstall();
-        assertEquals(org.jline.jansi.AnsiConsole.isInstalled(), AnsiConsole.isInstalled());
+        assertTrue(AnsiConsole.isInstalled());
+        assertSame(original, System.out);
 
         AnsiConsole.systemUninstall();
         assertFalse(AnsiConsole.isInstalled());
-        assertEquals(org.jline.jansi.AnsiConsole.isInstalled(), AnsiConsole.isInstalled());
+        assertSame(original, System.out);
     }
 
     @Test
@@ -75,8 +77,21 @@ class AnsiConsoleTest {
     }
 
     @Test
-    void getTerminalWidthDelegatesToJLinesAnsiConsole() {
-        assertEquals(org.jline.jansi.AnsiConsole.getTerminalWidth(), AnsiConsole.getTerminalWidth());
+    void getTerminalWidthDelegatesToMessageUtils() {
+        assertEquals(org.apache.maven.jline.MessageUtils.getTerminalWidth(), AnsiConsole.getTerminalWidth());
+    }
+
+    @Test
+    void renderHonoursColorSetting() {
+        org.apache.maven.jline.MessageUtils.setColorEnabled(true);
+        try {
+            assertEquals(
+                    "a \u001B[1;31mb\u001B[m c",
+                    Ansi.ansi().render("a @|bold,red b|@ c").toString());
+        } finally {
+            org.apache.maven.jline.MessageUtils.setColorEnabled(false);
+        }
+        assertEquals("a b c", Ansi.ansi().render("a @|bold,red b|@ c").toString());
     }
 
     @Test

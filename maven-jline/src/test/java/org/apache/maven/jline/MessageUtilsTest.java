@@ -18,32 +18,68 @@
  */
 package org.apache.maven.jline;
 
-import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
+import org.apache.maven.message.MessageBuilder;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
-import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 class MessageUtilsTest {
 
     @AfterEach
     void reset() {
-        MessageUtils.terminal = null;
+        MessageUtils.setColorEnabled(false);
     }
 
     @Test
-    void awaitTerminalInitializationIsNoOpWhenNoTerminalInstalled() {
-        MessageUtils.terminal = null;
-        assertDoesNotThrow(MessageUtils::awaitTerminalInitialization);
+    void parsesWidth() {
+        assertEquals(137, MessageUtils.parseWidth("137"));
+        assertEquals(137, MessageUtils.parseWidth(" 137\n"));
+        assertEquals(-1, MessageUtils.parseWidth("0"));
+        assertEquals(-1, MessageUtils.parseWidth("wide"));
+        assertEquals(-1, MessageUtils.parseWidth(null));
     }
 
     @Test
-    void awaitTerminalInitializationIsNoOpForPlainTerminal() throws Exception {
-        // a plain terminal (e.g. embedded use) has nothing to wait for and must return at once
-        try (Terminal terminal = TerminalBuilder.builder().dumb(true).build()) {
-            MessageUtils.terminal = terminal;
-            assertDoesNotThrow(MessageUtils::awaitTerminalInitialization);
+    void resolvesStyleSpecs() {
+        // byte-for-byte what JLine 3.30 emitted for the same specs
+        assertEquals("\u001B[31;1m", JLineMessageBuilderFactory.resolve("bold,f:red"));
+        assertEquals("\u001B[36;1m", JLineMessageBuilderFactory.resolve("f:cyan,bold"));
+        assertEquals("\u001B[4;31;44;1m", JLineMessageBuilderFactory.resolve("bold,underline,f:red,bg:blue"));
+        assertEquals(
+                "\u001B[3;4;5;7;8;9;31;44;1;2m",
+                JLineMessageBuilderFactory.resolve(
+                        "bold,faint,italic,underline,blink,inverse,conceal,crossed-out,f:red,bg:blue"));
+        assertEquals("\u001B[3;5;8m", JLineMessageBuilderFactory.resolve("conceal,hidden,blink,italic"));
+        assertEquals("\u001B[90m", JLineMessageBuilderFactory.resolve("f:bright-black"));
+        assertEquals("\u001B[38;5;208;44m", JLineMessageBuilderFactory.resolve("bg:blue,fg:208"));
+        assertEquals("\u001B[38;2;255;0;16m", JLineMessageBuilderFactory.resolve("f:#ff0010"));
+        assertEquals("", JLineMessageBuilderFactory.resolve("nonsense,f:nocolor"));
+    }
+
+    @Test
+    void resolvesNamedStyleFromSystemPropertyOrDefault() {
+        assertEquals("\u001B[34;1m", JLineMessageBuilderFactory.resolve(".test-unset:-bold,f:blue"));
+        System.setProperty("maven.style.test-set", "f:green");
+        try {
+            assertEquals("\u001B[32m", JLineMessageBuilderFactory.resolve(".test-set:-bold,f:blue"));
+        } finally {
+            System.clearProperty("maven.style.test-set");
         }
+    }
+
+    @Test
+    void builderEmitsAnsiOnlyWhenColorEnabled() {
+        MessageUtils.setColorEnabled(false);
+        assertEquals("a b c", MessageUtils.builder().a("a ").error("b").a(" c").build());
+
+        MessageUtils.setColorEnabled(true);
+        MessageBuilder mb = MessageUtils.builder().a("a ").error("b").a(" c");
+        assertEquals("a \u001B[31;1mb\u001B[0m c", mb.build());
+        assertEquals("a b c", MessageUtils.stripAnsiCodes(mb.build()));
+        // an unterminated style is reset at the end
+        assertEquals(
+                "\u001B[1mx\u001B[0m",
+                MessageUtils.builder().style("bold").a("x").build());
     }
 }

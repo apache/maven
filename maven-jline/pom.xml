@@ -27,31 +27,14 @@ under the License.
   </parent>
 
   <artifactId>maven-jline</artifactId>
-  <name>Maven 3 JLine integration</name>
-  <description>Provides the JLine integration in Maven</description>
+  <name>Maven 3 Message Colors</name>
+  <description>Provides colorized (ANSI) message output in Maven</description>
 
   <properties>
     <moduleNameSuffix>jline</moduleNameSuffix>
   </properties>
 
   <dependencies>
-    <dependency>
-      <groupId>org.jline</groupId>
-      <artifactId>jansi-core</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jline</groupId>
-      <artifactId>jline-terminal</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jline</groupId>
-      <artifactId>jline-terminal-jni</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.jline</groupId>
-      <artifactId>jline-terminal-ffm</artifactId>
-      <optional>true</optional>
-    </dependency>
     <dependency>
       <groupId>javax.inject</groupId>
       <artifactId>javax.inject</artifactId>

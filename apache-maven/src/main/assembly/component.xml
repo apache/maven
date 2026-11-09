@@ -63,15 +63,6 @@ under the License.
       </includes>
     </fileSet>
     <fileSet>
-      <directory>target/dependency/org/jline/nativ</directory>
-      <outputDirectory>lib/jline-native</outputDirectory>
-      <includes>
-        <include>**/*.so</include>
-        <include>**/*.jnilib</include>
-        <include>**/*.dll</include>
-      </includes>
-    </fileSet>
-    <fileSet>
       <directory>src/bin</directory>
       <outputDirectory>bin</outputDirectory>
       <includes>

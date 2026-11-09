@@ -154,7 +154,6 @@ CLASSWORLDS_JAR=`echo "${MAVEN_HOME}"/boot/plexus-classworlds-*.jar`
 CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
 
 # For Cygwin and MinGW, switch paths to Windows format before running java(1)
-JLINE_NATIVE_PATH="$MAVEN_HOME/lib/jline-native"
 if $cygwin || $mingw ; then
   [ -n "$MAVEN_HOME" ] &&
     MAVEN_HOME=`cygpath --windows "$MAVEN_HOME"`
@@ -164,9 +163,6 @@ if $cygwin || $mingw ; then
     CLASSPATH=`cygpath --path --windows "$CLASSPATH"`
   [ -n "$CLASSWORLDS_JAR" ] &&
     CLASSWORLDS_JAR=`cygpath --windows "$CLASSWORLDS_JAR"`
-  # converted separately, appending to the already converted MAVEN_HOME would
-  # produce a path mixing both separators, e.g. C:\maven/lib/jline-native
-  JLINE_NATIVE_PATH=`cygpath --windows "$JLINE_NATIVE_PATH"`
 fi
 
 # traverses directory structure from process work directory to filesystem root
@@ -356,7 +352,5 @@ exec "$JAVACMD" \
   -classpath "${CLASSWORLDS_JAR}" \
   "-Dclassworlds.conf=${MAVEN_HOME}/bin/m2.conf" \
   "-Dmaven.home=${MAVEN_HOME}" \
-  "-Dlibrary.jline.path=$JLINE_NATIVE_PATH" \
-  "-Dorg.jline.terminal.exec.redirectPipeCreationMode=native,reflection" \
   "-Dmaven.multiModuleProjectDirectory=${MAVEN_PROJECTBASEDIR}" \
   ${CLASSWORLDS_LAUNCHER} "$@"

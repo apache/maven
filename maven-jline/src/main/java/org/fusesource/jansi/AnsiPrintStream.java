@@ -22,13 +22,13 @@ import java.io.OutputStream;
 import java.io.PrintStream;
 
 /**
- * Forwards everything written to it to whatever {@code System.out} currently is, which is the stream
- * JLine installed. Unlike real JAnsi, this stream does not decide for itself whether to strip, force or
- * pass through ANSI escapes - that decision belongs to the terminal Maven already set up - so
+ * Forwards everything written to it to whatever {@code System.out} currently is, untouched by Maven.
+ * Unlike real JAnsi, this stream does not decide for itself whether to strip, force or
+ * pass through ANSI escapes - that decision belongs to Maven's color setting - so
  * {@link #setMode} is a no-op.
  *
- * This class comes from Jansi and is provided for backward compatibility with maven-shared-utils,
- * while Maven has migrated to JLine (into which Jansi has been merged since JLine 3.25.0).
+ * This class comes from Jansi and is provided for backward compatibility with maven-shared-utils;
+ * Maven itself no longer ships Jansi.
  */
 @Deprecated
 public class AnsiPrintStream extends PrintStream {
@@ -59,7 +59,7 @@ public class AnsiPrintStream extends PrintStream {
     }
 
     public void setMode(AnsiMode mode) {
-        // no-op: the terminal Maven installed already decides whether ANSI is forced, stripped or kept
+        // no-op: Maven's color setting decides whether ANSI is emitted at all
     }
 
     public int getTerminalWidth() {

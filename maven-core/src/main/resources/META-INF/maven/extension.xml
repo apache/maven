@@ -127,8 +127,8 @@ under the License.
     <exportedPackage>org.slf4j.helpers.*</exportedPackage>
     <exportedPackage>org.slf4j.event.*</exportedPackage>
 
-    <!-- JAnsi: maven-jline ships Ansi, AnsiConsole, AnsiPrintStream and AnsiMode, forwarding to the
-         already-installed JLine terminal, for backward compatibility with code (e.g. maven-shared-utils)
+    <!-- JAnsi: maven-jline ships Ansi, AnsiConsole, AnsiPrintStream and AnsiMode, honouring
+         Maven's own color setting, for backward compatibility with code (e.g. maven-shared-utils)
          still calling the JAnsi API. The jansi artifact itself stays excluded below, so a plugin that
          declares org.fusesource.jansi:jansi gets these forwarding classes instead of its own copy: that
          is what keeps AnsiConsole.systemInstall()/systemUninstall() calls routed through the single
@@ -189,11 +189,11 @@ under the License.
     <exportedArtifact>org.slf4j:slf4j-api</exportedArtifact>
 
     <!--
-      | JAnsi is no longer a maven-core dependency (replaced by JLine, see #11874), but stays excluded here:
+      | JAnsi is no longer a maven-core dependency (see #11874), but stays excluded here:
       | maven-jline exports forwarding classes for the JAnsi API (see exportedPackages above), and excluding
       | the real jansi artifact is what makes a plugin's own org.fusesource.jansi:jansi dependency resolve to
       | those forwarding classes instead of shadowing them with the real AnsiConsole, which would install its
-      | own System.out/System.err independently of the terminal Maven already installed. See #13726, #13727.
+      | own System.out/System.err behind Maven's back. See #13726, #13727.
      -->
     <exportedArtifact>org.fusesource.jansi:jansi</exportedArtifact>
 

@@ -62,7 +62,7 @@ stub_dir="$work_dir/stubs"
 maven_home="$work_dir/maven-home"
 project_dir="$work_dir/project"
 
-mkdir -p "$stub_dir" "$maven_home/bin" "$maven_home/boot" "$maven_home/lib/jline-native" \
+mkdir -p "$stub_dir" "$maven_home/bin" "$maven_home/boot" \
   "$project_dir/.mvn" "$project_dir/module"
 
 cp "$mvn_script" "$maven_home/bin/mvn"
@@ -306,8 +306,6 @@ for os in CYGWIN_NT-10.0 MINGW32_NT-6.2 MINGW64_NT-10.0 MSYS_NT-10.0; do
     "[-Dmaven.multiModuleProjectDirectory=`to_windows "$project_dir"`]"
   assert_contains "$os: maven.home is a native Windows path" "$output" \
     "[-Dmaven.home=`to_windows "$maven_home"`]"
-  assert_contains "$os: library.jline.path is a native Windows path" "$output" \
-    "[-Dlibrary.jline.path=`to_windows "$maven_home/lib/jline-native"`]"
   assert_not_contains "$os: no path mixes both separators" "$output" "\\/"
 done
 

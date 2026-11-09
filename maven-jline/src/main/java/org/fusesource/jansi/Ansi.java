@@ -25,8 +25,7 @@ import java.util.ArrayList;
  * <a href="https://en.wikipedia.org/wiki/ANSI_escape_code#CSI_sequences">ANSI escape sequences</a>.
  *
  * This class comes from Jansi and is provided for backward compatibility
- * with maven-shared-utils, while Maven has migrated to JLine (into which Jansi has been merged
- * since JLine 3.25.0).
+ * with maven-shared-utils; Maven itself no longer ships Jansi.
  *
  * @see AnsiConsole
  */
@@ -162,12 +161,14 @@ public class Ansi implements Appendable {
         void apply(Ansi ansi);
     }
 
+    private static volatile boolean enabled = true;
+
     public static boolean isEnabled() {
-        return org.apache.maven.jline.MessageUtils.isColorEnabled() && org.jline.jansi.Ansi.isEnabled();
+        return org.apache.maven.jline.MessageUtils.isColorEnabled() && enabled;
     }
 
     public static void setEnabled(final boolean flag) {
-        org.jline.jansi.Ansi.setEnabled(flag);
+        enabled = flag;
     }
 
     public static Ansi ansi() {
@@ -851,21 +852,59 @@ public class Ansi implements Appendable {
     }
 
     /**
-     * Uses the {@link org.jline.jansi.AnsiRenderer}
-     * to generate the ANSI escape sequences for the supplied text.
+     * Renders Jansi markup, e.g. {@code @|bold,red text|@}, into ANSI escape sequences.
      *
      * @param text text
      * @return this
      * @since 2.2
      */
     public Ansi render(final String text) {
-        a(new org.jline.jansi.Ansi().render(text).toString());
-        return this;
+        int i = 0;
+        int begin;
+        while ((begin = text.indexOf("@|", i)) >= 0) {
+            int space = text.indexOf(' ', begin);
+            int end = text.indexOf("|@", begin);
+            if (space < 0 || end < 0 || space > end) {
+                break;
+            }
+            a(text.substring(i, begin));
+            for (String code : text.substring(begin + 2, space).split(",")) {
+                renderCode(code.trim().toUpperCase(java.util.Locale.ROOT));
+            }
+            a(text.substring(space + 1, end)).reset();
+            i = end + 2;
+        }
+        return a(text.substring(i));
+    }
+
+    private void renderCode(String code) {
+        boolean bg = code.startsWith("BG_");
+        String name = bg || code.startsWith("FG_") ? code.substring(3) : code;
+        for (Color color : Color.values()) {
+            if (color.name().equals(name)) {
+                if (bg) {
+                    bg(color);
+                } else {
+                    fg(color);
+                }
+                return;
+            }
+        }
+        for (Attribute attribute : Attribute.values()) {
+            if (attribute.name().equals(code) || attribute.name().equals(code + "_ON")) {
+                a(attribute);
+                return;
+            }
+        }
+        if (code.equals("BOLD")) {
+            bold();
+        } else if (code.equals("FAINT")) {
+            a(Attribute.INTENSITY_FAINT);
+        }
     }
 
     /**
-     * String formats and renders the supplied arguments.  Uses the {@link org.jline.jansi.AnsiRenderer}
-     * to generate the ANSI escape sequences.
+     * String formats and renders the supplied arguments.
      *
      * @param text format
      * @param args arguments
@@ -873,8 +912,7 @@ public class Ansi implements Appendable {
      * @since 2.2
      */
     public Ansi render(final String text, Object... args) {
-        a(String.format(new org.jline.jansi.Ansi().render(text).toString(), args));
-        return this;
+        return render(String.format(text, args));
     }
 
     @Override
