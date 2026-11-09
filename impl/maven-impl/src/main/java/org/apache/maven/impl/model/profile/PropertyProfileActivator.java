@@ -99,6 +99,13 @@ public class PropertyProfileActivator implements ProfileActivator {
         if (sysValue == null) {
             sysValue = context.getSystemProperty(name);
         }
+        // Check cascaded profile properties last (for cascading profile activation).
+        // Only cascaded properties (from previously-activated profiles) are checked — the
+        // POM's own <properties> must NOT self-activate profiles via PropertyProfileActivator.
+        // ONLY for POM profiles - settings profiles should not use cascaded properties.
+        if (sysValue == null && Profile.SOURCE_POM.equals(profile.getSource())) {
+            sysValue = context.getCascadedProfileProperty(name);
+        }
 
         String propValue = property.getValue();
         if (propValue != null && !propValue.isEmpty()) {

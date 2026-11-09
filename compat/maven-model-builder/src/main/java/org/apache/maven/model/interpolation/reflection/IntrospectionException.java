@@ -19,7 +19,7 @@
 package org.apache.maven.model.interpolation.reflection;
 
 /**
- * @deprecated use {@code org.apache.maven.api.services.ModelBuilder} instead
+ * @deprecated Use {@link org.apache.maven.utils.IntrospectionException} instead.
  */
 @Deprecated(since = "4.0.0")
 public class IntrospectionException extends Exception {

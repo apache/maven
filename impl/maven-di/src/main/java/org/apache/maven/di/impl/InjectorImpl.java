@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -97,7 +98,10 @@ public class InjectorImpl implements Injector {
             while (enumeration.hasMoreElements()) {
                 URL url = enumeration.nextElement();
                 if (loadedUrls.add(url.toExternalForm())) {
-                    try (InputStream is = url.openStream();
+                    URLConnection connection = url.openConnection();
+                    // Uncached, so that closing the stream closes the jar (JDK-8239054)
+                    connection.setUseCaches(false);
+                    try (InputStream is = connection.getInputStream();
                             BufferedReader reader =
                                     new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
                         for (String line : reader.lines()
@@ -248,6 +252,26 @@ public class InjectorImpl implements Injector {
         };
     }
 
+    /**
+     * Resolves a compiled binding supplier for the given dependency.
+     *
+     * <p>The resolution rules differ by key type:
+     * <ul>
+     *   <li><b>Scalar types</b>: a single binding must exist; ambiguous bindings throw
+     *       {@link DIException}. If no binding exists and the dependency is optional,
+     *       returns a supplier of {@code null}; otherwise throws {@link DIException}.</li>
+     *   <li><b>{@code List<T>}</b>: returns all bindings for {@code T}, sorted by priority.
+     *       If no bindings are registered for {@code T}, returns an empty list —
+     *       this is not an error condition.</li>
+     *   <li><b>{@code Map<String, T>}</b>: returns all named bindings for {@code T} keyed
+     *       by their qualifier. If no bindings are registered for {@code T}, returns an
+     *       empty map — this is not an error condition.</li>
+     * </ul>
+     *
+     * @param dep the dependency to resolve
+     * @return a supplier that produces the bound instance(s)
+     * @throws DIException if a required scalar binding is absent or ambiguous
+     */
     public <Q> Supplier<Q> doGetCompiledBinding(Dependency<Q> dep) {
         Key<Q> key = dep.key();
         Set<Binding<Q>> res = getBindings(key);
@@ -281,24 +305,33 @@ public class InjectorImpl implements Injector {
                 //noinspection unchecked
                 return () -> (Q) list(list, Supplier::get);
             }
+            // No bindings registered for this type — an empty list is the correct result,
+            // not an error. Callers such as Lookup.lookupList() document "may be empty if
+            // no components found" and must not receive a DIException for absent bindings.
+            //noinspection unchecked
+            return () -> (Q) List.of();
         }
         if (key.getRawType() == Map.class) {
             Key<?> k = key.getTypeParameter(0);
             Key<Object> v = key.getTypeParameter(1);
             Set<Binding<Object>> res2 = getBindings(v);
             if (k.getRawType() == String.class && res2 != null) {
-                Map<String, Supplier<Object>> map = res2.stream()
+                Map<String, Binding<Object>> namedBindings = res2.stream()
                         .filter(b -> b.getOriginalKey() == null
                                 || b.getOriginalKey().getQualifier() == null
                                 || b.getOriginalKey().getQualifier() instanceof String)
-                        .collect(Collectors.toMap(
-                                b -> (String)
-                                        (b.getOriginalKey() != null
-                                                ? b.getOriginalKey().getQualifier()
-                                                : null),
-                                this::compile));
+                        .collect(Collectors.toMap(InjectorImpl::bindingName, b -> b, (first, second) -> {
+                            throw duplicateBindings(v, first, second);
+                        }));
+                Map<String, Supplier<Object>> map = namedBindings.entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> compile(e.getValue())));
                 //noinspection unchecked
                 return () -> (Q) map(map, Supplier::get);
+            }
+            // No bindings registered for this type — an empty map is the correct result.
+            if (k.getRawType() == String.class) {
+                //noinspection unchecked
+                return () -> (Q) Map.of();
             }
         }
         if (dep.optional()) {
@@ -318,6 +351,22 @@ public class InjectorImpl implements Injector {
         Key<?> key = binding.getOriginalKey();
         Object qualifier = key != null ? key.getQualifier() : null;
         return qualifier == null || "".equals(qualifier);
+    }
+
+    private static String bindingName(Binding<?> binding) {
+        return binding.getOriginalKey() != null
+                ? (String) binding.getOriginalKey().getQualifier()
+                : null;
+    }
+
+    private static DIException duplicateBindings(Key<?> valueKey, Binding<?> first, Binding<?> second) {
+        Object qualifier =
+                first.getOriginalKey() != null ? first.getOriginalKey().getQualifier() : null;
+        Key<?> duplicateKey = qualifier != null ? Key.ofType(valueKey.getType(), qualifier) : valueKey;
+        return new DIException("Duplicate bindings for key " + duplicateKey.getDisplayString() + ":\n"
+                + " - " + first
+                + "\n - " + second
+                + "\nRemove one of the conflicting bindings or use distinct @Named qualifiers.");
     }
 
     @SuppressWarnings("unchecked")

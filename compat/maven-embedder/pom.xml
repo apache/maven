@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-compat-modules</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>4.2.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-embedder</artifactId>
@@ -57,6 +57,10 @@ under the License.
     <!-- Maven4 impl -->
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-utils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
     </dependency>
     <dependency>
@@ -69,11 +73,19 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-impl</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-jline</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-logging</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-support</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -138,16 +150,12 @@ under the License.
 
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-utils</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-xml</artifactId>
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-classworlds</artifactId>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-classworlds</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -166,6 +174,10 @@ under the License.
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
+      <!-- compile-only (optional) for LogbackConfiguration; excluded from the surefire
+           test classpath via classpathDependencyExcludes so MavenLoggerFactory is the
+           sole SLF4J provider in tests (macOS aarch64 CI picks Logback when both
+           providers are present, breaking stream assertions) -->
       <optional>true</optional>
     </dependency>
     <dependency>
@@ -223,6 +235,19 @@ under the License.
       <plugin>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>sisu-maven-plugin</artifactId>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-surefire-plugin</artifactId>
+        <configuration>
+          <!-- Exclude logback-classic from the test classpath so MavenLoggerFactory is
+               the sole SLF4J provider. Without this, ServiceLoader may pick Logback on
+               some platforms (macOS aarch64), causing MavenCliLoggingTest to fail because
+               LogbackConfiguration.activate() is a no-op and stream assertions break. -->
+          <classpathDependencyExcludes>
+            <classpathDependencyExclude>ch.qos.logback:logback-classic</classpathDependencyExclude>
+          </classpathDependencyExcludes>
+        </configuration>
       </plugin>
     </plugins>
   </build>

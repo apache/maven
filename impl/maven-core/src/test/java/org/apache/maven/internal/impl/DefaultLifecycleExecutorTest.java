@@ -28,6 +28,7 @@ import org.apache.maven.api.services.LifecycleExecutionResult;
 import org.apache.maven.api.services.LifecycleExecutorException;
 import org.apache.maven.api.services.LifecyclePlanRequest;
 import org.apache.maven.api.services.LifecyclePlanResult;
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
@@ -88,6 +89,7 @@ class DefaultLifecycleExecutorTest {
         TaskSegment segment = new TaskSegment(false, new LifecycleTask("verify"));
 
         when(session.getMavenSession()).thenReturn(mavenSession);
+        when(session.getService(Lookup.class)).thenReturn(mock(Lookup.class));
         when(mavenSession.getCurrentProject()).thenReturn(previousProject);
         when(apiProject.getProject()).thenReturn(project);
         when(taskSegmentCalculator.calculateTaskSegments(mavenSession, List.of("verify")))

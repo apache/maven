@@ -39,6 +39,15 @@ import org.apache.maven.api.annotations.Nonnull;
  *     }
  * }
  * }</pre>
+ * <p>
+ * Listeners can be registered in two ways:
+ * <ul>
+ *   <li>Programmatically, via {@link Session#registerListener(Listener)}.</li>
+ *   <li>Automatically via dependency injection: implement both this interface and
+ *       {@code org.apache.maven.api.spi.SpiService}, then register your class in
+ *       {@code META-INF/services/org.apache.maven.api.spi.SpiService}. Maven will
+ *       discover and register such listeners automatically at session initialization.</li>
+ * </ul>
  *
  * @since 4.0.0
  */

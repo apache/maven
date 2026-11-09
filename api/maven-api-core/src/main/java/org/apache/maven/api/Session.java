@@ -51,6 +51,18 @@ import org.apache.maven.api.toolchain.ToolchainModel;
 public interface Session extends ProtoSession {
 
     /**
+     * Returns the invocation context of this build: the goals, flags, properties,
+     * and platform settings that were active when the session started.
+     *
+     * @return the build invocation, never {@code null}
+     * @since 4.2.0
+     */
+    @Nonnull
+    default BuildInvocation buildInvocation() {
+        throw new UnsupportedOperationException("buildInvocation() is not supported by this Session implementation");
+    }
+
+    /**
      * Returns the current maven version.
      *
      * @return the maven version, never {@code null}
@@ -132,9 +144,13 @@ public interface Session extends ProtoSession {
     /**
      * Returns the degree of concurrency for the build.
      *
-     * @return  the degree of concurrency
+     * @return the degree of concurrency
+     * @deprecated Use {@link #buildInvocation()}{@code .threads()} instead.
      */
-    int getDegreeOfConcurrency();
+    @Deprecated
+    default int getDegreeOfConcurrency() {
+        return buildInvocation().threads();
+    }
 
     /**
      * Retrieves a list of projects associated with the session.
@@ -630,7 +646,7 @@ public interface Session extends ProtoSession {
      * Gets the relative path for a locally installed artifact. Note that the artifact need not actually exist yet at
      * the returned location, the path merely indicates where the artifact would eventually be stored.
      * <p>
-     * Shortcut for {@code getService(LocalArtifactManager.class).getPathForLocalArtitact(...)}.
+     * Shortcut for {@code getService(LocalRepositoryManager.class).getPathForLocalArtifact(...)}.
      *
      * @param artifact the artifact for which to get a local path
      * @return local path associated to the given artifact, or {@code null} if none

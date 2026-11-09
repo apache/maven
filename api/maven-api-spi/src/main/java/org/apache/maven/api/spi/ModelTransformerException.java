@@ -21,6 +21,11 @@ package org.apache.maven.api.spi;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.services.MavenException;
 
+/**
+ * Exception thrown when a model transformation fails.
+ *
+ * @since 4.0.0
+ */
 @Experimental
 public class ModelTransformerException extends MavenException {
 

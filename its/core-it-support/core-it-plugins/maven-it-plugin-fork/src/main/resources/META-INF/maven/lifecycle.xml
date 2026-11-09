@@ -25,4 +25,15 @@
       </phase>
     </phases>
   </lifecycle>
+  <lifecycle>
+    <id>phase-config</id>
+    <phases>
+      <phase>
+        <id>generate-resources</id>
+        <configuration>
+          <outputDirectory>${project.build.directory}/phase-config</outputDirectory>
+        </configuration>
+      </phase>
+    </phases>
+  </lifecycle>
 </lifecycles>

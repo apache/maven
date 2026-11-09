@@ -74,19 +74,18 @@ import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.api.xml.XmlService;
-import org.apache.maven.configuration.internal.EnhancedComponentConfigurator;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.model.DefaultModelPathTranslator;
 import org.apache.maven.internal.impl.DefaultLog;
-import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.model.v4.MavenMerger;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluatorV4;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxReader;
+import org.apache.maven.plugin.internal.V4MojoConfigurator;
 import org.apache.maven.testing.di.MavenDIExtension;
 import org.apache.maven.testing.plugin.stubs.MojoExecutionStub;
 import org.apache.maven.testing.plugin.stubs.PluginStub;
@@ -94,6 +93,8 @@ import org.apache.maven.testing.plugin.stubs.ProducedArtifactStub;
 import org.apache.maven.testing.plugin.stubs.ProjectStub;
 import org.apache.maven.testing.plugin.stubs.RepositorySystemSupplier;
 import org.apache.maven.testing.plugin.stubs.SessionMock;
+import org.apache.maven.utils.StringInterpolator;
+import org.apache.maven.utils.StringInterpolatorException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
@@ -172,6 +173,10 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
 
     private static final String BASEDIR_KEY = "basedir";
 
+    private static final StringInterpolator INTERPOLATOR = new StringInterpolator();
+
+    private static final String POM_KEY = "pom";
+
     /**
      * Gets the identifier for the current test method.
      * The format is "TestClassName-testMethodName".
@@ -238,7 +243,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             String goal;
             if (parameterInjectMojo != null) {
                 String pom = parameterInjectMojo.pom();
-                if (pom != null && !pom.isEmpty()) {
+                String appliedPom = extensionContext.getStore(MOJO_EXTENSION).get(POM_KEY, String.class);
+                if (pom != null && !pom.isEmpty() && !Objects.equals(pom, appliedPom)) {
                     try (Reader r = openPomUrl(holder, pom, new Path[1])) {
                         Model localModel = new MavenStaxReader().read(r);
                         model = new MavenMerger().merge(localModel, model, false, null);
@@ -311,9 +317,11 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             ExpressionEvaluator evaluator = new WrapEvaluator(
                     getInjector(), new PluginParameterExpressionEvaluatorV4(session, project, mojoExecution));
 
-            EnhancedComponentConfigurator configurator = new EnhancedComponentConfigurator();
-            configurator.configureComponent(
-                    mojo, new XmlPlexusConfiguration(pluginConfiguration), evaluator, null, null);
+            new V4MojoConfigurator(
+                            (TypeAwareExpressionEvaluator) evaluator,
+                            mojo.getClass().getClassLoader(),
+                            null)
+                    .configure(mojo, pluginConfiguration);
             return mojo;
         } catch (Exception e) {
             throw new ParameterResolutionException("Unable to resolve mojo", e);
@@ -383,8 +391,18 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
 
         Path basedirPath = Paths.get(getBasedir());
 
-        InjectMojo mojo = AnnotationSupport.findAnnotation(context.getElement().get(), InjectMojo.class)
+        InjectMojo methodMojo = AnnotationSupport.findAnnotation(
+                        context.getElement().get(), InjectMojo.class)
                 .orElse(null);
+        InjectMojo parameterMojo = findParameterInjectMojo(context);
+        InjectMojo mojo = methodMojo != null ? methodMojo : parameterMojo;
+        // A POM given on a test method parameter configures the project too, so it is read
+        // here, where the Project singleton is created, and not only in resolveParameter().
+        String pom = mojo != null ? mojo.pom() : "";
+        if (pom.isEmpty() && parameterMojo != null) {
+            pom = parameterMojo.pom();
+        }
+        context.getStore(MOJO_EXTENSION).put(POM_KEY, pom);
         Model defaultModel = Model.newBuilder()
                 .groupId("myGroupId")
                 .artifactId("myArtifactId")
@@ -402,10 +420,24 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                                                 .toString())
                                         .build(),
                                 Source.newBuilder()
+                                        .scope("main")
+                                        .lang("resources")
+                                        .directory(basedirPath
+                                                .resolve("src/main/resources")
+                                                .toString())
+                                        .build(),
+                                Source.newBuilder()
                                         .scope("test")
                                         .lang("java")
                                         .directory(basedirPath
                                                 .resolve("src/test/java")
+                                                .toString())
+                                        .build(),
+                                Source.newBuilder()
+                                        .scope("test")
+                                        .lang("resources")
+                                        .directory(basedirPath
+                                                .resolve("src/test/resources")
                                                 .toString())
                                         .build()))
                         .testOutputDirectory(
@@ -415,12 +447,12 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         Path[] modelPath = new Path[] {null};
         Model tmodel = null;
         if (mojo != null) {
-            String pom = mojo.pom();
-            if (pom != null && !pom.isEmpty()) {
+            if (!pom.isEmpty()) {
                 try (Reader r = openPomUrl(context.getRequiredTestClass(), pom, modelPath)) {
                     tmodel = new MavenStaxReader().read(r);
                 }
-            } else {
+            } else if (methodMojo != null) {
+                // only a method-level annotation falls back to the basedir POM; a parameter-only one keeps the default
                 Path pomPath = basedirPath.resolve("pom.xml");
                 if (Files.exists(pomPath)) {
                     try (Reader r = Files.newBufferedReader(pomPath)) {
@@ -517,7 +549,13 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                             mes.setDescriptor(md);
                         }
                     }
-                    requireNonNull(mes.descriptor());
+                    if (mes.descriptor() == null) {
+                        throw new IllegalStateException("No mojo with goal '" + goal + "' in plugin "
+                                + pluginDescriptor.getId() + "; available goals: "
+                                + pluginDescriptor.getMojos().stream()
+                                        .map(MojoDescriptor::getGoal)
+                                        .collect(Collectors.toList()));
+                    }
                 }
                 PluginStub plugin = new PluginStub();
                 plugin.setDescriptor(pluginDescriptor);
@@ -618,6 +656,18 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         //        mojoExecutionScope.seed(MojoExecution.class, me);
     }
 
+    /**
+     * Returns the {@link InjectMojo} declared on a parameter of the current test method, if any.
+     */
+    private static InjectMojo findParameterInjectMojo(ExtensionContext context) {
+        return context.getTestMethod()
+                .flatMap(m -> Arrays.stream(m.getParameters())
+                        .map(p -> p.getAnnotation(InjectMojo.class))
+                        .filter(Objects::nonNull)
+                        .findFirst())
+                .orElse(null);
+    }
+
     private Reader openPomUrl(Class<?> holder, String pom, Path[] modelPath) throws IOException {
         if (pom.startsWith("file:")) {
             Path path = Paths.get(getBasedir()).resolve(pom.substring("file:".length()));
@@ -629,7 +679,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                 throw new IllegalStateException("Unable to find pom on classpath: " + pom);
             }
             return new XmlStreamReader(url.openStream());
-        } else if (pom.contains("<project>")) {
+        } else if (pom.stripLeading().startsWith("<")) {
+            // inline XML, with or without a prolog or a namespace on the root element
             return new StringReader(pom);
         } else {
             Path path = Paths.get(getBasedir()).resolve(pom);
@@ -647,10 +698,13 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             return goal.split(":");
         } else {
             Path pluginPom = Paths.get(getPluginBasedir(), "pom.xml");
-            Xpp3Dom pluginPomDom = Xpp3DomBuilder.build(Files.newBufferedReader(pluginPom));
+            Xpp3Dom pluginPomDom;
+            try (Reader reader = Files.newBufferedReader(pluginPom)) {
+                pluginPomDom = Xpp3DomBuilder.build(reader);
+            }
             String artifactId = pluginPomDom.getChild("artifactId").getValue();
-            String groupId = resolveFromRootThenParent(pluginPomDom, "groupId");
-            String version = resolveFromRootThenParent(pluginPomDom, "version");
+            String groupId = interpolate(pluginPom, pluginPomDom, resolveFromRootThenParent(pluginPomDom, "groupId"));
+            String version = interpolate(pluginPom, pluginPomDom, resolveFromRootThenParent(pluginPomDom, "version"));
             return new String[] {groupId, artifactId, version, goal};
         }
     }
@@ -666,7 +720,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                     parameterConfiguration = config.child(parameter.getAlias());
                 }
                 XmlNode parameterDefaults = defaultConfiguration.child(parameter.getName());
-                parameterConfiguration = XmlNode.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
+                parameterConfiguration = XmlService.merge(parameterConfiguration, parameterDefaults, Boolean.TRUE);
                 if (parameterConfiguration != null) {
                     Map<String, String> attributes = new HashMap<>(parameterConfiguration.attributes());
                     parameterConfiguration = XmlNode.newInstance(
@@ -715,6 +769,29 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                                 .orElse(null)))
                 .map(Xpp3Dom::getValue)
                 .orElseThrow(() -> new Exception("unable to determine " + element));
+    }
+
+    /**
+     * Resolves {@code ${...}} references in a plugin POM value, such as a CI-friendly
+     * {@code ${revision}} version, from the POM's {@code <properties>} and then from the
+     * system properties.
+     */
+    private static String interpolate(Path pluginPom, Xpp3Dom pluginPomDom, String value) throws Exception {
+        String interpolated;
+        try {
+            interpolated = INTERPOLATOR.interpolate(
+                    value,
+                    key -> child(pluginPomDom, "properties")
+                            .flatMap(p -> child(p, key))
+                            .map(Xpp3Dom::getValue)
+                            .orElseGet(() -> System.getProperty(key)));
+        } catch (StringInterpolatorException e) {
+            throw new Exception("unable to resolve " + value + " in " + pluginPom + ": " + e.getMessage(), e);
+        }
+        if (interpolated.contains("${")) {
+            throw new Exception("unable to resolve " + value + " in " + pluginPom);
+        }
+        return interpolated;
     }
 
     /**

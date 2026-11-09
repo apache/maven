@@ -18,10 +18,8 @@
  */
 package org.apache.maven.cling.transfer;
 
-import java.time.Duration;
-import java.time.Instant;
+import java.util.OptionalDouble;
 
-import org.apache.maven.api.MonotonicClock;
 import org.eclipse.aether.transfer.AbstractTransferListener;
 import org.eclipse.aether.transfer.TransferCancelledException;
 import org.eclipse.aether.transfer.TransferEvent;
@@ -96,13 +94,11 @@ public class Slf4jMavenTransferListener extends AbstractTransferListener {
                 .append(" (");
         format.format(message, contentLength);
 
-        Duration duration =
-                Duration.between(Instant.ofEpochMilli(resource.getTransferStartTime()), MonotonicClock.now());
-        if ((duration.getSeconds() | duration.getNano()) > 0) { // duration.isPositive()
-            long bytesPerSecond = Math.round(contentLength / (double) duration.toSeconds());
+        OptionalDouble bytesPerSecond =
+                AbstractMavenTransferListener.bytesPerSecond(resource.getStartTime(), contentLength);
+        if (bytesPerSecond.isPresent()) {
             message.append(" at ");
-            format.format(message, bytesPerSecond);
-            message.append("/s");
+            format.formatRate(message, bytesPerSecond.getAsDouble());
         }
 
         message.append(')');

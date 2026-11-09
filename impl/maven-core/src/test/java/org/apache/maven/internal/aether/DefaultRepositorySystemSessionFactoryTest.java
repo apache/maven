@@ -164,6 +164,50 @@ public class DefaultRepositorySystemSessionFactoryTest {
     }
 
     @Test
+    void artifactsUpdatePolicyTest() throws InvalidRepositoryException {
+        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Collections.emptyMap(),
+                versionFilterBuilder);
+
+        // No policy set: legacy path, no per-type policy
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        org.eclipse.aether.RepositorySystemSession session = systemSessionFactory.newRepositorySession(request);
+        assertNull(session.getArtifactUpdatePolicy());
+        assertNull(session.getMetadataUpdatePolicy());
+
+        // Artifacts policy only
+        request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setArtifactsUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
+        session = systemSessionFactory.newRepositorySession(request);
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_ALWAYS, session.getArtifactUpdatePolicy());
+        assertNull(session.getMetadataUpdatePolicy());
+
+        // Metadata policy only
+        request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setMetadataUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_NEVER);
+        session = systemSessionFactory.newRepositorySession(request);
+        assertNull(session.getArtifactUpdatePolicy());
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_NEVER, session.getMetadataUpdatePolicy());
+
+        // Both per-type policies set (interval:N)
+        request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setArtifactsUpdatePolicy("interval:30");
+        request.setMetadataUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_DAILY);
+        session = systemSessionFactory.newRepositorySession(request);
+        assertEquals("interval:30", session.getArtifactUpdatePolicy());
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_DAILY, session.getMetadataUpdatePolicy());
+    }
+
+    @Test
     void wagonProviderConfigurationTest() throws InvalidRepositoryException {
         Server server = new Server();
         server.setId("repository");
@@ -505,6 +549,31 @@ public class DefaultRepositorySystemSessionFactoryTest {
         AuthenticationSelector selector = authenticationSelector(request);
 
         assertNull(selector.getAuthentication(repository("internal", "https://repo.example.org/releases/")));
+    }
+
+    @Test
+    void sessionExtendersReceiveOriginBoundAuthenticationSelector() throws InvalidRepositoryException {
+        MavenExecutionRequest request =
+                requestWithServer(serverWithRepositoryOrigins("internal", "https://repo.example.org"));
+        AtomicReference<AuthenticationSelector> captured = new AtomicReference<>();
+        RepositorySystemSessionExtender extender =
+                (mavenExecutionRequest, configProperties, mirrorSelector, proxySelector, authenticationSelector) ->
+                        captured.set(authenticationSelector);
+        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Map.of("capture", extender),
+                versionFilterBuilder);
+
+        systemSessionFactory.newRepositorySession(request);
+
+        AuthenticationSelector selector = captured.get();
+        assertNotNull(selector);
+        assertNotNull(selector.getAuthentication(repository("internal", "https://repo.example.org/releases/")));
+        assertNull(selector.getAuthentication(repository("internal", "https://evil.example.org/releases/")));
     }
 
     private static Server serverWithRepositoryOrigins(String id, String... repositoryOrigins) {

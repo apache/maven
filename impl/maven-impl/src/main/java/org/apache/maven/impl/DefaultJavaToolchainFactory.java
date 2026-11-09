@@ -40,7 +40,7 @@ import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionParserException;
 import org.apache.maven.api.toolchain.ToolchainModel;
 import org.apache.maven.api.xml.XmlNode;
-import org.apache.maven.impl.util.Os;
+import org.apache.maven.utils.Os;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
