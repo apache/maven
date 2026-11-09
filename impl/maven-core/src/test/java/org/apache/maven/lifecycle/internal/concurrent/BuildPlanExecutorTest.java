@@ -35,11 +35,18 @@ import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.internal.transformation.TransformerManager;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.lifecycle.internal.GoalTask;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
+import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
 import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.lifecycle.internal.stub.ExecutionEventCatapultStub;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
@@ -50,7 +57,11 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 class BuildPlanExecutorTest {
 
@@ -404,6 +415,11 @@ class BuildPlanExecutorTest {
     }
 
     private BuildPlanExecutor newExecutor(ProjectExecutionListener listener) {
+        return newExecutor(listener, null);
+    }
+
+    private BuildPlanExecutor newExecutor(
+            ProjectExecutionListener listener, MojoDescriptorCreator mojoDescriptorCreator) {
         return new BuildPlanExecutor(
                 null,
                 new ExecutionEventCatapultStub(),
@@ -412,8 +428,60 @@ class BuildPlanExecutorTest {
                 new BuildPlanLogger(),
                 Map.of(),
                 null,
-                null,
+                mojoDescriptorCreator,
                 new DefaultLifecycleRegistry(Collections.emptyList()));
+    }
+
+    @Test
+    void rejectsUndeclaredExecutionIdFromCommandLine() throws Exception {
+        MavenProject project = newProject();
+
+        MojoDescriptorCreator mojoDescriptorCreator = mock(MojoDescriptorCreator.class);
+        when(mojoDescriptorCreator.getMojoDescriptor(any(), any(), any())).thenReturn(dependencyPurgeMojoDescriptor());
+
+        BuildPlanExecutor.BuildContext context =
+                newExecutor((BeforeProjectExecution) event -> {}, mojoDescriptorCreator).new BuildContext();
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> context.calculateMojoExecutions(
+                        Map.of(project, List.of()),
+                        List.of(new GoalTask("dependency:purge-local-repository@nonexistent"))));
+    }
+
+    @Test
+    void acceptsDeclaredExecutionIdFromCommandLine() throws Exception {
+        MavenProject project = newProject();
+        Build build = new Build();
+        project.getModel().setBuild(build);
+        Plugin plugin = new Plugin();
+        plugin.setGroupId("org.apache.maven.plugins");
+        plugin.setArtifactId("maven-dependency-plugin");
+        PluginExecution execution = new PluginExecution();
+        execution.setId("purge-before-release");
+        plugin.addExecution(execution);
+        build.addPlugin(plugin);
+
+        MojoDescriptorCreator mojoDescriptorCreator = mock(MojoDescriptorCreator.class);
+        when(mojoDescriptorCreator.getMojoDescriptor(any(), any(), any())).thenReturn(dependencyPurgeMojoDescriptor());
+
+        BuildPlanExecutor.BuildContext context =
+                newExecutor((BeforeProjectExecution) event -> {}, mojoDescriptorCreator).new BuildContext();
+
+        context.calculateMojoExecutions(
+                Map.of(project, List.of()),
+                List.of(new GoalTask("dependency:purge-local-repository@purge-before-release")));
+    }
+
+    private static MojoDescriptor dependencyPurgeMojoDescriptor() {
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        pluginDescriptor.setGroupId("org.apache.maven.plugins");
+        pluginDescriptor.setArtifactId("maven-dependency-plugin");
+        pluginDescriptor.setVersion("1.0");
+        MojoDescriptor mojoDescriptor = new MojoDescriptor();
+        mojoDescriptor.setPluginDescriptor(pluginDescriptor);
+        mojoDescriptor.setGoal("purge-local-repository");
+        return mojoDescriptor;
     }
 
     private MavenProject newProject() {

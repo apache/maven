@@ -25,12 +25,17 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.DefaultLifecycles;
 import org.apache.maven.lifecycle.Lifecycle;
 import org.apache.maven.lifecycle.LifecycleMappingDelegate;
+import org.apache.maven.model.Build;
+import org.apache.maven.model.Model;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.model.PluginExecution;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -90,5 +95,80 @@ class DefaultLifecycleExecutionPlanCalculatorTest {
         calculator.calculateExecutionPlan(session, project, List.of(new LifecycleTask("validate")), false);
 
         verify(lifecyclePluginResolver).resolveMissingPluginVersions(project, session);
+    }
+
+    @Test
+    void rejectsUndeclaredExecutionIdFromCommandLine() throws Exception {
+        MojoDescriptorCreator mojoDescriptorCreator = mock(MojoDescriptorCreator.class);
+        MavenSession session = mock(MavenSession.class);
+        MavenProject project = new MavenProject();
+
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        pluginDescriptor.setGroupId("org.apache.maven.plugins");
+        pluginDescriptor.setArtifactId("maven-dependency-plugin");
+        pluginDescriptor.setVersion("1.0");
+        MojoDescriptor mojoDescriptor = new MojoDescriptor();
+        mojoDescriptor.setPluginDescriptor(pluginDescriptor);
+        mojoDescriptor.setGoal("purge-local-repository");
+        when(mojoDescriptorCreator.getMojoDescriptor("dependency:purge-local-repository@nonexistent", session, project))
+                .thenReturn(mojoDescriptor);
+
+        DefaultLifecycleExecutionPlanCalculator calculator = new DefaultLifecycleExecutionPlanCalculator(
+                mock(BuildPluginManager.class),
+                mock(DefaultLifecycles.class),
+                mojoDescriptorCreator,
+                mock(LifecyclePluginResolver.class));
+
+        assertThrows(
+                IllegalArgumentException.class,
+                () -> calculator.calculateExecutionPlan(
+                        session,
+                        project,
+                        List.of(new GoalTask("dependency:purge-local-repository@nonexistent")),
+                        false));
+    }
+
+    @Test
+    void acceptsDeclaredExecutionIdFromCommandLine() throws Exception {
+        MojoDescriptorCreator mojoDescriptorCreator = mock(MojoDescriptorCreator.class);
+        MavenSession session = mock(MavenSession.class);
+
+        Model model = new Model();
+        model.setGroupId("test.group");
+        model.setArtifactId("test-artifact");
+        model.setVersion("1.0.0");
+        Build build = new Build();
+        model.setBuild(build);
+        Plugin plugin = new Plugin();
+        plugin.setGroupId("org.apache.maven.plugins");
+        plugin.setArtifactId("maven-dependency-plugin");
+        PluginExecution execution = new PluginExecution();
+        execution.setId("purge-before-release");
+        plugin.addExecution(execution);
+        build.addPlugin(plugin);
+        MavenProject project = new MavenProject(model);
+
+        PluginDescriptor pluginDescriptor = new PluginDescriptor();
+        pluginDescriptor.setGroupId("org.apache.maven.plugins");
+        pluginDescriptor.setArtifactId("maven-dependency-plugin");
+        pluginDescriptor.setVersion("1.0");
+        MojoDescriptor mojoDescriptor = new MojoDescriptor();
+        mojoDescriptor.setPluginDescriptor(pluginDescriptor);
+        mojoDescriptor.setGoal("purge-local-repository");
+        when(mojoDescriptorCreator.getMojoDescriptor(
+                        "dependency:purge-local-repository@purge-before-release", session, project))
+                .thenReturn(mojoDescriptor);
+
+        DefaultLifecycleExecutionPlanCalculator calculator = new DefaultLifecycleExecutionPlanCalculator(
+                mock(BuildPluginManager.class),
+                mock(DefaultLifecycles.class),
+                mojoDescriptorCreator,
+                mock(LifecyclePluginResolver.class));
+
+        calculator.calculateExecutionPlan(
+                session,
+                project,
+                List.of(new GoalTask("dependency:purge-local-repository@purge-before-release")),
+                false);
     }
 }

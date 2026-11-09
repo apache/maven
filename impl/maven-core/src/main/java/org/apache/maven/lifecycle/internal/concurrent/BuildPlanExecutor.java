@@ -1189,6 +1189,14 @@ public class BuildPlanExecutor {
                     for (MavenProject project : projects.keySet()) {
                         BuildStep st = new BuildStep(pluginGoal, project, null);
                         MojoDescriptor mojoDescriptor = getMojoDescriptor(project, pluginGoal);
+                        if (executionIdx > 0
+                                && !hasDeclaredExecution(project, mojoDescriptor.getPluginDescriptor(), executionId)) {
+                            throw new IllegalArgumentException("Execution '" + executionId + "' of goal "
+                                    + mojoDescriptor.getId() + " is not declared in the POM of project "
+                                    + project.getId() + ". Add an <execution> with that id to the plugin's"
+                                    + " configuration, or omit '@" + executionId
+                                    + "' to run the goal with its default configuration.");
+                        }
                         MojoExecution mojoExecution =
                                 new MojoExecution(mojoDescriptor, executionId, MojoExecution.Source.CLI);
                         st.addMojo(mojoExecution, 0);
@@ -1209,6 +1217,45 @@ public class BuildPlanExecutor {
             }
 
             return buildPlan;
+        }
+
+        /**
+         * Whether {@code executionId} matches one of the {@code <execution>} ids the project declares for the
+         * given plugin, directly or through plugin management. Used to reject an execution id supplied on the
+         * command line (for example {@code mvn plugin:goal@executionId}) that does not correspond to any
+         * declared execution, instead of silently falling back to the goal's default configuration.
+         *
+         * @param project the project the execution was requested against
+         * @param pluginDescriptor the descriptor of the plugin the goal belongs to
+         * @param executionId the execution id to look for
+         * @return {@code true} if the project declares an execution with that id for the plugin
+         */
+        private boolean hasDeclaredExecution(
+                MavenProject project, PluginDescriptor pluginDescriptor, String executionId) {
+            Plugin plugin = findPlugin(pluginDescriptor, project.getBuildPlugins());
+            if (plugin == null && project.getPluginManagement() != null) {
+                plugin = findPlugin(
+                        pluginDescriptor, project.getPluginManagement().getPlugins());
+            }
+            if (plugin == null) {
+                return false;
+            }
+            for (PluginExecution execution : plugin.getExecutions()) {
+                if (executionId.equals(execution.getId())) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        private Plugin findPlugin(PluginDescriptor pluginDescriptor, List<Plugin> plugins) {
+            for (Plugin plugin : plugins) {
+                if (pluginDescriptor.getArtifactId().equals(plugin.getArtifactId())
+                        && pluginDescriptor.getGroupId().equals(plugin.getGroupId())) {
+                    return plugin;
+                }
+            }
+            return null;
         }
 
         private MojoDescriptor getMojoDescriptor(MavenProject project, Plugin plugin, String goal) {
