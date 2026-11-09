@@ -22,6 +22,8 @@ package org.apache.maven.api;
  * Configuration constants.
  * <p>
  * Maven 3 carries only the style names of the Maven 4 class, for {@link org.apache.maven.api.services.MessageBuilder}.
+ *
+ * @since 3.10.1
  */
 public final class Constants {
 
@@ -57,73 +59,73 @@ public final class Constants {
      * Maven output color mode.
      * Allowed values are <code>auto</code>, <code>always</code>, <code>never</code>.
      *
-     * @since 4.0.0
+     * @since 3.10.1
      */
     public static final String MAVEN_STYLE_COLOR_PROPERTY = MAVEN_STYLE_PREFIX + "color";
 
     /**
      * Color style for transfer messages.
-     * @since 4.0.0
+     * @since 3.10.1
      */
     public static final String MAVEN_STYLE_TRANSFER = MAVEN_STYLE_PREFIX + MAVEN_STYLE_TRANSFER_NAME;
 
     /**
      * Color style for trace messages.
-     * @since 4.0.0
+     * @since 3.10.1
      */
     public static final String MAVEN_STYLE_TRACE = MAVEN_STYLE_PREFIX + MAVEN_STYLE_TRACE_NAME;
 
     /**
      * Color style for debug messages.
-     * @since 4.0.0
+     * @since 3.10.1
      */
     public static final String MAVEN_STYLE_DEBUG = MAVEN_STYLE_PREFIX + MAVEN_STYLE_DEBUG_NAME;
 
     /**
      * Color style for info messages.
-     * @since 4.0.0
+     * @since 3.10.1
      */
     public static final String MAVEN_STYLE_INFO = MAVEN_STYLE_PREFIX + MAVEN_STYLE_INFO_NAME;
 
     /**
      * Color style for warning messages.
-     * @since 4.0.0
+     * @since 3.10.1
      */
     public static final String MAVEN_STYLE_WARNING = MAVEN_STYLE_PREFIX + MAVEN_STYLE_WARNING_NAME;
 
     /**
      * Color style for error messages.
-     * @since 4.0.0
+     * @since 3.10.1
      */
     public static final String MAVEN_STYLE_ERROR = MAVEN_STYLE_PREFIX + MAVEN_STYLE_ERROR_NAME;
 
     /**
      * Color style for success messages.
-     * @since 4.0.0
+     * @since 3.10.1
      */
     public static final String MAVEN_STYLE_SUCCESS = MAVEN_STYLE_PREFIX + MAVEN_STYLE_SUCCESS_NAME;
 
     /**
      * Color style for failure messages.
-     * @since 4.0.0
+     * @since 3.10.1
      */
     public static final String MAVEN_STYLE_FAILURE = MAVEN_STYLE_PREFIX + MAVEN_STYLE_FAILURE_NAME;
 
     /**
      * Color style for strong messages.
-     * @since 4.0.0
+     * @since 3.10.1
      */
     public static final String MAVEN_STYLE_STRONG = MAVEN_STYLE_PREFIX + MAVEN_STYLE_STRONG_NAME;
 
     /**
      * Color style for mojo messages.
-     * @since 4.0.0
+     * @since 3.10.1
      */
     public static final String MAVEN_STYLE_MOJO = MAVEN_STYLE_PREFIX + MAVEN_STYLE_MOJO_NAME;
 
     /**
      * Color style for project messages.
-     * @since 4.0.0
+     * @since 3.10.1
      */
     public static final String MAVEN_STYLE_PROJECT = MAVEN_STYLE_PREFIX + MAVEN_STYLE_PROJECT_NAME;
 
