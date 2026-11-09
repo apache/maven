@@ -22,7 +22,6 @@ import org.apache.maven.api.Dialect;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.di.Named;
 
 /**
  * SPI to provide a symmetric pair of {@link ModelParser} and {@link ModelWriter} for a given {@link Dialect}.
@@ -37,7 +36,6 @@ import org.apache.maven.api.di.Named;
  */
 @Experimental
 @Consumer
-@Named
 public interface ModelDialectProvider extends SpiService {
 
     /**
