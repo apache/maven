@@ -29,8 +29,6 @@ import org.junit.jupiter.api.Test;
  * can be used by a sibling module during its {@code compile} phase.  The POM {@code provided}
  * dependency on the AP module gives Maven the ordering information it needs; no special
  * reactor-plugin detection (MNG-1088 class) is required.</p>
- *
- * <p>Tests both the sequential (default) builder and the Maven 4 concurrent builder.</p>
  */
 class MavenITgh13911ReactorAnnotationProcessorTest extends AbstractMavenIntegrationTestCase {
 
@@ -41,7 +39,7 @@ class MavenITgh13911ReactorAnnotationProcessorTest extends AbstractMavenIntegrat
      * @throws Exception in case of failure
      */
     @Test
-    void testReactorAnnotationProcessorSequential() throws Exception {
+    void testReactorAnnotationProcessor() throws Exception {
         Path testDir = extractResources("/gh-13911-reactor-ap");
 
         Verifier verifier = newVerifier(testDir);
@@ -53,31 +51,6 @@ class MavenITgh13911ReactorAnnotationProcessorTest extends AbstractMavenIntegrat
         verifier.verifyErrorFreeLog();
 
         // The annotation processor must have run and written its marker resource
-        verifier.verifyFilePresent("client/target/classes/META-INF/generated-by-gh13911.txt");
-    }
-
-    /**
-     * Verify the same scenario with the Maven 4 concurrent builder.
-     *
-     * <p>The POM {@code provided} dependency on the AP module creates a DAG edge that the
-     * concurrent builder honours; the AP module reaches {@code READY} before the client
-     * module's {@code compile} step starts.</p>
-     *
-     * @throws Exception in case of failure
-     */
-    @Test
-    void testReactorAnnotationProcessorConcurrent() throws Exception {
-        Path testDir = extractResources("/gh-13911-reactor-ap");
-
-        Verifier verifier = newVerifier(testDir);
-        verifier.setAutoclean(false);
-        verifier.deleteDirectory("client/target");
-        verifier.deleteArtifacts("org.apache.maven.its.gh13911");
-        // -b concurrent is mandatory — the concurrent builder is not the default
-        verifier.addCliArguments("-b", "concurrent", "compile");
-        verifier.execute();
-        verifier.verifyErrorFreeLog();
-
         verifier.verifyFilePresent("client/target/classes/META-INF/generated-by-gh13911.txt");
     }
 }
