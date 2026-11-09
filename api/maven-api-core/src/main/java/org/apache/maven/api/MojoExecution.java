@@ -83,7 +83,11 @@ public interface MojoExecution {
     @Nonnull
     Optional<XmlNode> configuration();
 
-    /** {@return true if this mojo triggers a forked lifecycle execution} */
+    /**
+     * {@return true if this mojo triggers a forked lifecycle execution}
+     *
+     * @since 4.2.0
+     */
     default boolean isForkingExecution() {
         MojoDescriptor d = descriptor();
         return (d.getExecutePhase() != null && !d.getExecutePhase().isEmpty())

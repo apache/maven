@@ -18,7 +18,10 @@
  */
 package org.apache.maven.api.services;
 
+import java.util.Optional;
+
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * Signals that lifecycle planning or execution failed.
@@ -28,22 +31,26 @@ import org.apache.maven.api.annotations.Experimental;
 @Experimental
 public class LifecycleExecutorException extends MavenException {
 
-    /**
-     * Creates an exception for a lifecycle planning or execution failure.
-     *
-     * @param message the detail message
-     */
+    private final LifecycleExecutionResult result;
+
     public LifecycleExecutorException(String message) {
         super(message);
+        this.result = null;
     }
 
-    /**
-     * Creates an exception for a lifecycle planning or execution failure.
-     *
-     * @param message the detail message
-     * @param cause the underlying failure
-     */
     public LifecycleExecutorException(String message, Throwable cause) {
         super(message, cause);
+        this.result = null;
+    }
+
+    public LifecycleExecutorException(String message, Throwable cause, LifecycleExecutionResult result) {
+        super(message, cause);
+        this.result = result;
+    }
+
+    /** {@return the partial execution result available at the time of failure, or empty} */
+    @Nonnull
+    public Optional<LifecycleExecutionResult> result() {
+        return Optional.ofNullable(result);
     }
 }

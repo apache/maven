@@ -40,7 +40,6 @@ import org.apache.maven.api.services.LifecycleExecutor;
 import org.apache.maven.api.services.LifecycleExecutorException;
 import org.apache.maven.api.services.LifecyclePlanRequest;
 import org.apache.maven.api.services.LifecyclePlanResult;
-import org.apache.maven.api.services.MavenException;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
@@ -96,8 +95,6 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
             DefaultLifecyclePlan plan =
                     new DefaultLifecyclePlan(request.project(), request.tasks(), executions, buildPlan, mapping);
             return new DefaultLifecyclePlanResult(request, plan);
-        } catch (MavenException e) {
-            throw new LifecycleExecutorException("Unable to calculate lifecycle plan", e);
         } catch (Exception e) {
             throw new LifecycleExecutorException("Unable to calculate lifecycle plan", e);
         } finally {
@@ -149,10 +146,11 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
                             succeeded.add(mapping.get(internal));
                         }
                     } catch (LifecycleExecutionException e) {
-                        // Determine which mojo failed (last in the batch that was executing)
                         failed = mapping.get(stepExecutions.get(stepExecutions.size() - 1));
                         failureCause = e;
-                        throw new LifecycleExecutorException("Unable to execute lifecycle plan", e);
+                        DefaultLifecycleExecutionResult partialResult = new DefaultLifecycleExecutionResult(
+                                request, plan, submittedExecutions, succeeded, failed, failureCause);
+                        throw new LifecycleExecutorException("Unable to execute lifecycle plan", e, partialResult);
                     }
                 }
             }

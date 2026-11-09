@@ -218,6 +218,15 @@ class DefaultLifecycleExecutorTest {
                 () -> executor.execute(LifecycleExecutionRequest.build(session, plan)));
 
         assertTrue(ex.getMessage().contains("Unable to execute lifecycle plan"));
+        LifecycleExecutionResult partialResult = ex.result().orElseThrow();
+        assertEquals(
+                List.of("compile"),
+                partialResult.executedSuccessfully().stream()
+                        .map(org.apache.maven.api.MojoExecution::goal)
+                        .toList());
+        assertTrue(partialResult.failedExecution().isPresent());
+        assertEquals("test", partialResult.failedExecution().get().goal());
+        assertTrue(partialResult.failureCause().isPresent());
     }
 
     @Test
