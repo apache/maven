@@ -535,16 +535,6 @@ under the License.
         <artifactId>wagon-provider-api</artifactId>
         <version>${wagonVersion}</version>
       </dependency>
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-file</artifactId>
-        <version>${wagonVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-http</artifactId>
-        <version>${wagonVersion}</version>
-      </dependency>
       <!--  Repository -->
       <dependency>
         <groupId>org.apache.maven.resolver</groupId>
