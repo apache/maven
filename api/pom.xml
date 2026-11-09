@@ -47,9 +47,36 @@
 
   <properties>
     <project.directory>api</project.directory>
+    <maven4api.baseline>4.0.0-rc-5</maven4api.baseline>
   </properties>
 
   <profiles>
+    <profile>
+      <id>maven4-api-check</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>com.github.siom79.japicmp</groupId>
+            <artifactId>japicmp-maven-plugin</artifactId>
+            <configuration>
+              <oldVersion>
+                <dependency>
+                  <groupId>${project.groupId}</groupId>
+                  <artifactId>${project.artifactId}</artifactId>
+                  <type>${project.packaging}</type>
+                  <version>${maven4api.baseline}</version>
+                </dependency>
+              </oldVersion>
+              <parameter>
+                <packagingSupporteds>
+                  <packagingSupported>jar</packagingSupported>
+                </packagingSupporteds>
+              </parameter>
+            </configuration>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
     <profile>
       <id>reporting</id>
       <reporting>
