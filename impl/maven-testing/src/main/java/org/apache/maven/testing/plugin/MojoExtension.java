@@ -650,7 +650,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                 throw new IllegalStateException("Unable to find pom on classpath: " + pom);
             }
             return new XmlStreamReader(url.openStream());
-        } else if (pom.contains("<project>")) {
+        } else if (pom.stripLeading().startsWith("<")) {
+            // inline XML, with or without a prolog or a namespace on the root element
             return new StringReader(pom);
         } else {
             Path path = Paths.get(getBasedir()).resolve(pom);
