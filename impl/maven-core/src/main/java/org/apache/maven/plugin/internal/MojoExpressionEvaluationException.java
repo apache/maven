@@ -18,8 +18,12 @@
  */
 package org.apache.maven.plugin.internal;
 
-/** Thrown when a mojo parameter expression cannot be evaluated. */
-class MojoExpressionEvaluationException extends Exception {
+/**
+ * Thrown when a mojo parameter expression cannot be evaluated.
+ *
+ * @since 4.2.0
+ */
+public class MojoExpressionEvaluationException extends Exception {
     MojoExpressionEvaluationException(String message) {
         super(message);
     }
