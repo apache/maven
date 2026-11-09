@@ -501,6 +501,8 @@ public class DefaultModelValidator implements ModelValidator {
             }
 
             boolean isModelVersion41OrMore = !Objects.equals(ModelBuilder.MODEL_VERSION_4_0_0, model.getModelVersion());
+            boolean isModelVersion42OrMore =
+                    model.getModelVersion() != null && compareModelVersions("4.2.0", model.getModelVersion()) <= 0;
             if (isModelVersion41OrMore) {
                 validateStringNoExpression("groupId", problems, Severity.FATAL, Version.V41, model.getGroupId(), model);
 
@@ -548,6 +550,7 @@ public class DefaultModelValidator implements ModelValidator {
                     "dependencies.dependency.",
                     EMPTY,
                     isModelVersion41OrMore,
+                    isModelVersion42OrMore,
                     validationLevel);
 
             validate20RawDependenciesSelfReferencing(
@@ -560,6 +563,7 @@ public class DefaultModelValidator implements ModelValidator {
                         "dependencyManagement.dependencies.dependency.",
                         EMPTY,
                         isModelVersion41OrMore,
+                        isModelVersion42OrMore,
                         validationLevel);
             }
 
@@ -604,6 +608,7 @@ public class DefaultModelValidator implements ModelValidator {
                         prefix,
                         "dependencies.dependency.",
                         isModelVersion41OrMore,
+                        isModelVersion42OrMore,
                         validationLevel);
 
                 if (profile.getDependencyManagement() != null) {
@@ -613,6 +618,7 @@ public class DefaultModelValidator implements ModelValidator {
                             prefix,
                             "dependencyManagement.dependencies.dependency.",
                             isModelVersion41OrMore,
+                            isModelVersion42OrMore,
                             validationLevel);
                 }
 
@@ -1184,6 +1190,7 @@ public class DefaultModelValidator implements ModelValidator {
             String prefix,
             String prefix2,
             boolean is41OrBeyond,
+            boolean is42OrBeyond,
             int validationLevel) {
         Severity errOn30 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_0);
         Severity errOn31 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_1);
@@ -1272,15 +1279,15 @@ public class DefaultModelValidator implements ModelValidator {
                 }
             }
 
-            if (!is41OrBeyond && !dependency.getIncludes().isEmpty()) {
+            if (!is42OrBeyond && !dependency.getIncludes().isEmpty()) {
                 addViolation(
                         problems,
                         Severity.ERROR,
-                        Version.V41,
+                        Version.V42,
                         prefix + prefix2 + "includes",
                         SourceHint.dependencyManagementKey(dependency),
-                        "'includes' is only supported with modelVersion 4.1.0 or higher; "
-                                + "use modelVersion 4.1.0 or remove 'includes'.",
+                        "'includes' is only supported with modelVersion 4.2.0 or higher; "
+                                + "use modelVersion 4.2.0 or remove 'includes'.",
                         dependency);
             }
 
@@ -1288,7 +1295,7 @@ public class DefaultModelValidator implements ModelValidator {
                 addViolation(
                         problems,
                         Severity.WARNING,
-                        Version.V41,
+                        Version.V42,
                         prefix + prefix2 + "includes",
                         SourceHint.dependencyManagementKey(dependency),
                         "'includes' is only supported for dependency management imports (scope 'import').",
@@ -1649,41 +1656,82 @@ public class DefaultModelValidator implements ModelValidator {
 
     private void validateDependencyInclusions(ModelProblemCollector problems, Dependency dependency, String prefix) {
         for (Inclusion inclusion : dependency.getIncludes()) {
-            boolean emptyOrWildcardGroupId = inclusion.getGroupId() == null
-                    || inclusion.getGroupId().isEmpty()
-                    || "*".equals(inclusion.getGroupId());
-            boolean emptyOrWildcardArtifactId = inclusion.getArtifactId() == null
-                    || inclusion.getArtifactId().isEmpty()
-                    || "*".equals(inclusion.getArtifactId());
+            String groupId = inclusion.getGroupId();
+            String artifactId = inclusion.getArtifactId();
+            String id = inclusion.getId();
+
+            boolean validId = true;
+            if (id != null && !id.isEmpty()) {
+                int colonIdx = id.indexOf(':');
+                if (colonIdx < 0) {
+                    validId = false;
+                    addViolation(
+                            problems,
+                            Severity.ERROR,
+                            Version.V42,
+                            prefix + "includes.include.id",
+                            SourceHint.dependencyManagementKey(dependency),
+                            "with value '" + id + "' does not match the expected 'groupId:artifactId' format.",
+                            inclusion);
+                } else if (id.indexOf(':', colonIdx + 1) >= 0) {
+                    validId = false;
+                    addViolation(
+                            problems,
+                            Severity.ERROR,
+                            Version.V42,
+                            prefix + "includes.include.id",
+                            SourceHint.dependencyManagementKey(dependency),
+                            "with value '" + id
+                                    + "' contains more than one colon; expected 'groupId:artifactId' format.",
+                            inclusion);
+                } else {
+                    String parsedGroupId = id.substring(0, colonIdx);
+                    String parsedArtifactId = id.substring(colonIdx + 1);
+
+                    if (groupId == null || groupId.isEmpty()) {
+                        groupId = parsedGroupId;
+                    }
+                    if (artifactId == null || artifactId.isEmpty()) {
+                        artifactId = parsedArtifactId;
+                    }
+                }
+            }
+
+            if (!validId) {
+                continue;
+            }
+
+            boolean emptyOrWildcardGroupId = groupId == null || groupId.isEmpty() || "*".equals(groupId);
+            boolean emptyOrWildcardArtifactId = artifactId == null || artifactId.isEmpty() || "*".equals(artifactId);
             if (emptyOrWildcardGroupId && emptyOrWildcardArtifactId) {
                 addViolation(
                         problems,
                         Severity.WARNING,
-                        Version.V41,
+                        Version.V42,
                         prefix + "includes.include",
                         SourceHint.dependencyManagementKey(dependency),
                         "must specify at least groupId or artifactId.",
                         inclusion);
             }
-            if (inclusion.getGroupId() != null && !inclusion.getGroupId().isEmpty()) {
+            if (groupId != null && !groupId.isEmpty()) {
                 validateCoordinatesIdWithWildcards(
                         prefix,
                         "includes.include.groupId",
                         problems,
                         Severity.WARNING,
-                        Version.V41,
-                        inclusion.getGroupId(),
+                        Version.V42,
+                        groupId,
                         SourceHint.dependencyManagementKey(dependency),
                         inclusion);
             }
-            if (inclusion.getArtifactId() != null && !inclusion.getArtifactId().isEmpty()) {
+            if (artifactId != null && !artifactId.isEmpty()) {
                 validateCoordinatesIdWithWildcards(
                         prefix,
                         "includes.include.artifactId",
                         problems,
                         Severity.WARNING,
-                        Version.V41,
-                        inclusion.getArtifactId(),
+                        Version.V42,
+                        artifactId,
                         SourceHint.dependencyManagementKey(dependency),
                         inclusion);
             }

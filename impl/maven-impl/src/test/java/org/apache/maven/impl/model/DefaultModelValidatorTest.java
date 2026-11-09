@@ -807,13 +807,45 @@ class DefaultModelValidatorTest {
         validator.validateFileModel(session, model, ModelValidator.VALIDATION_LEVEL_STRICT, problems);
 
         assertViolations(problems, 0, 1, 0);
-        assertContains(problems.getErrors().get(0), "'includes' is only supported with modelVersion 4.1.0 or higher");
+        assertContains(problems.getErrors().get(0), "'includes' is only supported with modelVersion 4.2.0 or higher");
+    }
+
+    @Test
+    void testDependencyIncludesInModelVersion410() throws Exception {
+        String xml = "<project>\n"
+                + "  <modelVersion>4.1.0</modelVersion>\n"
+                + "  <groupId>gid</groupId>\n"
+                + "  <artifactId>aid</artifactId>\n"
+                + "  <version>1.0</version>\n"
+                + "  <dependencyManagement>\n"
+                + "    <dependencies>\n"
+                + "      <dependency>\n"
+                + "        <groupId>test</groupId>\n"
+                + "        <artifactId>bom</artifactId>\n"
+                + "        <version>1.0</version>\n"
+                + "        <type>pom</type>\n"
+                + "        <scope>import</scope>\n"
+                + "        <includes>\n"
+                + "          <include>\n"
+                + "            <groupId>org.springframework*</groupId>\n"
+                + "          </include>\n"
+                + "        </includes>\n"
+                + "      </dependency>\n"
+                + "    </dependencies>\n"
+                + "  </dependencyManagement>\n"
+                + "</project>";
+        Model model = new MavenStaxReader().read(new StringReader(xml));
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validateFileModel(session, model, ModelValidator.VALIDATION_LEVEL_STRICT, problems);
+
+        assertViolations(problems, 0, 1, 0);
+        assertContains(problems.getErrors().get(0), "'includes' is only supported with modelVersion 4.2.0 or higher");
     }
 
     @Test
     void testDependencyIncludesNonImportScope() throws Exception {
         String xml = "<project>\n"
-                + "  <modelVersion>4.1.0</modelVersion>\n"
+                + "  <modelVersion>4.2.0</modelVersion>\n"
                 + "  <groupId>gid</groupId>\n"
                 + "  <artifactId>aid</artifactId>\n"
                 + "  <version>1.0</version>\n"
@@ -844,7 +876,7 @@ class DefaultModelValidatorTest {
     @Test
     void testDependencyIncludeMissingBothIds() throws Exception {
         String xml = "<project>\n"
-                + "  <modelVersion>4.1.0</modelVersion>\n"
+                + "  <modelVersion>4.2.0</modelVersion>\n"
                 + "  <groupId>gid</groupId>\n"
                 + "  <artifactId>aid</artifactId>\n"
                 + "  <version>1.0</version>\n"
@@ -876,7 +908,7 @@ class DefaultModelValidatorTest {
     @Test
     void testDependencyIncludesBareWildcardWarns() throws Exception {
         String xml = "<project>\n"
-                + "  <modelVersion>4.1.0</modelVersion>\n"
+                + "  <modelVersion>4.2.0</modelVersion>\n"
                 + "  <groupId>gid</groupId>\n"
                 + "  <artifactId>aid</artifactId>\n"
                 + "  <version>1.0</version>\n"
@@ -923,7 +955,7 @@ class DefaultModelValidatorTest {
     @Test
     void testDependencyIncludesValidWithWildcards() throws Exception {
         String xml = "<project>\n"
-                + "  <modelVersion>4.1.0</modelVersion>\n"
+                + "  <modelVersion>4.2.0</modelVersion>\n"
                 + "  <groupId>gid</groupId>\n"
                 + "  <artifactId>aid</artifactId>\n"
                 + "  <version>1.0</version>\n"
@@ -953,6 +985,73 @@ class DefaultModelValidatorTest {
         validator.validateEffectiveModel(session, model, ModelValidator.VALIDATION_LEVEL_STRICT, problems);
 
         assertViolations(problems, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyIncludesWithIdAttribute() throws Exception {
+        String xml = "<project>\n"
+                + "  <modelVersion>4.2.0</modelVersion>\n"
+                + "  <groupId>gid</groupId>\n"
+                + "  <artifactId>aid</artifactId>\n"
+                + "  <version>1.0</version>\n"
+                + "  <dependencyManagement>\n"
+                + "    <dependencies>\n"
+                + "      <dependency>\n"
+                + "        <groupId>test</groupId>\n"
+                + "        <artifactId>bom</artifactId>\n"
+                + "        <version>1.0</version>\n"
+                + "        <type>pom</type>\n"
+                + "        <scope>import</scope>\n"
+                + "        <includes>\n"
+                + "          <include id=\"org.apache.maven:*\"/>\n"
+                + "          <include id=\"com.google.guava:guava\"/>\n"
+                + "        </includes>\n"
+                + "      </dependency>\n"
+                + "    </dependencies>\n"
+                + "  </dependencyManagement>\n"
+                + "</project>";
+        Model model = new MavenStaxReader().read(new StringReader(xml));
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validateRawModel(session, model, ModelValidator.VALIDATION_LEVEL_STRICT, problems);
+        validator.validateEffectiveModel(session, model, ModelValidator.VALIDATION_LEVEL_STRICT, problems);
+
+        assertViolations(problems, 0, 0, 0);
+    }
+
+    @Test
+    void testDependencyIncludesWithInvalidIdFormat() throws Exception {
+        String xml = "<project>\n"
+                + "  <modelVersion>4.2.0</modelVersion>\n"
+                + "  <groupId>gid</groupId>\n"
+                + "  <artifactId>aid</artifactId>\n"
+                + "  <version>1.0</version>\n"
+                + "  <dependencyManagement>\n"
+                + "    <dependencies>\n"
+                + "      <dependency>\n"
+                + "        <groupId>test</groupId>\n"
+                + "        <artifactId>bom</artifactId>\n"
+                + "        <version>1.0</version>\n"
+                + "        <type>pom</type>\n"
+                + "        <scope>import</scope>\n"
+                + "        <includes>\n"
+                + "          <include id=\"no-colon\"/>\n"
+                + "          <include id=\"too:many:colons\"/>\n"
+                + "        </includes>\n"
+                + "      </dependency>\n"
+                + "    </dependencies>\n"
+                + "  </dependencyManagement>\n"
+                + "</project>";
+        Model model = new MavenStaxReader().read(new StringReader(xml));
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validateEffectiveModel(session, model, ModelValidator.VALIDATION_LEVEL_STRICT, problems);
+
+        assertViolations(problems, 0, 2, 0);
+        assertContains(
+                problems.getErrors().get(0),
+                "with value 'no-colon' does not match the expected 'groupId:artifactId' format.");
+        assertContains(
+                problems.getErrors().get(1),
+                "with value 'too:many:colons' contains more than one colon; expected 'groupId:artifactId' format.");
     }
 
     @Test
