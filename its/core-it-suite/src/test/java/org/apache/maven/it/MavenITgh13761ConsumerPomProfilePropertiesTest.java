@@ -18,9 +18,9 @@
  */
 package org.apache.maven.it;
 
+import java.io.File;
 import java.io.Reader;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Map;
 
 import org.apache.maven.api.model.Model;
@@ -40,16 +40,20 @@ class MavenITgh13761ConsumerPomProfilePropertiesTest extends AbstractMavenIntegr
 
     private static final String GROUP_ID = "org.apache.maven.its.gh13761";
 
+    MavenITgh13761ConsumerPomProfilePropertiesTest() {
+        super("[4.0.0,)");
+    }
+
     @Test
     void testActiveProfilePropertiesAreNotPersistedInConsumerPom() throws Exception {
-        Path basedir = extractResources("gh-13761-consumer-pom-profile-properties");
+        File basedir = extractResources("gh-13761-consumer-pom-profile-properties");
 
-        Verifier verifier = newVerifier(basedir);
+        Verifier verifier = newVerifier(basedir.getAbsolutePath());
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Model consumerPom = read(verifier.getArtifactPath(GROUP_ID, "profile-properties", "1.0", "pom"));
+        Model consumerPom = read(new File(verifier.getArtifactPath(GROUP_ID, "profile-properties", "1.0", "pom")));
 
         assertEquals(Map.of("flag", "false", "classifier", "none"), consumerPom.getProperties());
         assertEquals(Map.of("flag", "true", "classifier", "here"), profile(consumerPom, "active-here").getProperties());
@@ -62,22 +66,22 @@ class MavenITgh13761ConsumerPomProfilePropertiesTest extends AbstractMavenIntegr
      */
     @Test
     void testUserPropertyStillOverridesDeclaredValueInConsumerPom() throws Exception {
-        Path basedir = extractResources("gh-13761-consumer-pom-profile-properties");
+        File basedir = extractResources("gh-13761-consumer-pom-profile-properties");
 
-        Verifier verifier = newVerifier(basedir);
+        Verifier verifier = newVerifier(basedir.getAbsolutePath());
         verifier.addCliArgument("-Dclassifier=cli");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
-        Model consumerPom = read(verifier.getArtifactPath(GROUP_ID, "profile-properties", "1.0", "pom"));
+        Model consumerPom = read(new File(verifier.getArtifactPath(GROUP_ID, "profile-properties", "1.0", "pom")));
 
         assertEquals(Map.of("flag", "false", "classifier", "cli"), consumerPom.getProperties());
         assertEquals(Map.of("flag", "false"), profile(consumerPom, "opt-in").getProperties());
     }
 
-    private static Model read(Path pomFile) throws Exception {
-        try (Reader reader = Files.newBufferedReader(pomFile)) {
+    private static Model read(File pomFile) throws Exception {
+        try (Reader reader = Files.newBufferedReader(pomFile.toPath())) {
             return new MavenStaxReader().read(reader);
         }
     }
