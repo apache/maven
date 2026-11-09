@@ -719,6 +719,12 @@ under the License.
     <pluginManagement>
       <plugins>
         <plugin>
+          <groupId>org.codehaus.modello</groupId>
+          <artifactId>modello-maven-plugin</artifactId>
+          <!-- Override parent; requires codehaus-plexus/modello#634 to be released -->
+          <version>2.8.2-SNAPSHOT</version>
+        </plugin>
+        <plugin>
           <groupId>org.apache.maven.plugins</groupId>
           <artifactId>maven-surefire-plugin</artifactId>
           <configuration>
