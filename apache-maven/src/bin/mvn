@@ -241,15 +241,6 @@ export MAVEN_PROJECTBASEDIR
 MAVEN_CMD_LINE_ARGS="$MAVEN_CONFIG $@"
 export MAVEN_CMD_LINE_ARGS
 
-# MNG-8248
-if "$JAVACMD" --enable-native-access=ALL-UNNAMED -version >/dev/null 2>&1; then
-  MAVEN_OPTS="--enable-native-access=ALL-UNNAMED $MAVEN_OPTS"
-  # MNG-8169
-  if $mingw ; then
-    MAVEN_OPTS="--add-opens java.base/java.lang=ALL-UNNAMED $MAVEN_OPTS"
-  fi
-fi
-
 # Parse MAVEN_ARGS: words are separated by white space, single or double quotes group a
 # word containing white space. Nothing else is interpreted (no backslash, no ${...},
 # no globbing, no command substitution). The words go in front of the user arguments.
