@@ -60,6 +60,8 @@ import org.apache.maven.api.services.ArtifactDeployer;
 import org.apache.maven.api.services.ArtifactFactory;
 import org.apache.maven.api.services.ArtifactInstaller;
 import org.apache.maven.api.services.ArtifactManager;
+import org.apache.maven.api.services.Interpolator;
+import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.LocalRepositoryManager;
 import org.apache.maven.api.services.ProjectBuilder;
 import org.apache.maven.api.services.ProjectManager;
@@ -73,6 +75,7 @@ import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.DIException;
 import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.model.DefaultInterpolator;
 import org.apache.maven.impl.model.DefaultModelPathTranslator;
 import org.apache.maven.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.DefaultLog;
@@ -166,6 +169,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             ExtensionContext.Namespace.create("mojo-extension");
 
     private static final String BASEDIR_KEY = "basedir";
+
+    private static final Interpolator INTERPOLATOR = new DefaultInterpolator();
 
     /**
      * Gets the identifier for the current test method.
@@ -635,10 +640,13 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             return goal.split(":");
         } else {
             Path pluginPom = Paths.get(getPluginBasedir(), "pom.xml");
-            Xpp3Dom pluginPomDom = Xpp3DomBuilder.build(Files.newBufferedReader(pluginPom));
+            Xpp3Dom pluginPomDom;
+            try (Reader reader = Files.newBufferedReader(pluginPom)) {
+                pluginPomDom = Xpp3DomBuilder.build(reader);
+            }
             String artifactId = pluginPomDom.getChild("artifactId").getValue();
-            String groupId = resolveFromRootThenParent(pluginPomDom, "groupId");
-            String version = resolveFromRootThenParent(pluginPomDom, "version");
+            String groupId = interpolate(pluginPom, pluginPomDom, resolveFromRootThenParent(pluginPomDom, "groupId"));
+            String version = interpolate(pluginPom, pluginPomDom, resolveFromRootThenParent(pluginPomDom, "version"));
             return new String[] {groupId, artifactId, version, goal};
         }
     }
@@ -702,6 +710,27 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                         .orElse(null)))
                 .map(Xpp3Dom::getValue)
                 .orElseThrow(() -> new Exception("unable to determine " + element));
+    }
+
+    /**
+     * Resolves {@code ${...}} references in a plugin POM value, such as a CI-friendly
+     * {@code ${revision}} version, from the POM's {@code <properties>} and then from the
+     * system properties.
+     */
+    private static String interpolate(Path pluginPom, Xpp3Dom pluginPomDom, String value) throws Exception {
+        String interpolated;
+        try {
+            interpolated = INTERPOLATOR.interpolate(value, key -> child(pluginPomDom, "properties")
+                    .flatMap(p -> child(p, key))
+                    .map(Xpp3Dom::getValue)
+                    .orElseGet(() -> System.getProperty(key)));
+        } catch (InterpolatorException e) {
+            throw new Exception("unable to resolve " + value + " in " + pluginPom + ": " + e.getMessage(), e);
+        }
+        if (interpolated != null && interpolated.contains("${")) {
+            throw new Exception("unable to resolve " + value + " in " + pluginPom);
+        }
+        return interpolated;
     }
 
     /**
