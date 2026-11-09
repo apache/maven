@@ -27,7 +27,7 @@ import org.apache.maven.api.annotations.ThreadSafe;
  * Services can be retrieved from the session using the
  * {@code Session#getService(Class)} method.
  *
- * @since 4.0.0
+ * @since 3.10.1
  */
 @Experimental
 @ThreadSafe
