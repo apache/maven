@@ -443,7 +443,11 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
 
     @Override
     public Map<PathType, List<Path>> getDispatchedPaths() {
-        return Collections.unmodifiableMap(dispatchedPaths);
+        Map<PathType, List<Path>> copy = new LinkedHashMap<>(dispatchedPaths.size());
+        for (Map.Entry<PathType, List<Path>> entry : dispatchedPaths.entrySet()) {
+            copy.put(entry.getKey(), Collections.unmodifiableList(entry.getValue()));
+        }
+        return Collections.unmodifiableMap(copy);
     }
 
     @Override

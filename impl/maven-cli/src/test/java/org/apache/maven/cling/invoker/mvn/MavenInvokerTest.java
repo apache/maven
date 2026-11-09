@@ -23,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
 
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
@@ -37,6 +39,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -64,6 +67,37 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
         invoke(cwd, userHome, List.of("verify"), List.of());
+    }
+
+    /**
+     * The invocation replaces the handlers of the {@code java.util.logging} root logger with {@code SLF4JBridgeHandler};
+     * they must be back afterwards, as the root logger belongs to the JVM Maven runs in (GH-13362).
+     */
+    @Test
+    void restoresJavaUtilLoggingRootHandlers(
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+            throws Exception {
+        java.util.logging.Logger root = java.util.logging.Logger.getLogger("");
+        Handler[] original = root.getHandlers();
+        Handler marker = new ConsoleHandler();
+        for (Handler handler : original) {
+            root.removeHandler(handler);
+        }
+        root.addHandler(marker);
+        try {
+            invoke(cwd, userHome, List.of("validate"), List.of());
+
+            assertArrayEquals(new Handler[] {marker}, root.getHandlers());
+        } finally {
+            root.removeHandler(marker);
+            for (Handler handler : root.getHandlers()) {
+                root.removeHandler(handler);
+            }
+            for (Handler handler : original) {
+                root.addHandler(handler);
+            }
+        }
     }
 
     @Disabled("Enable it when fully moved to NIO2 with Path/Filesystem (ie MavenExecutionRequest)")

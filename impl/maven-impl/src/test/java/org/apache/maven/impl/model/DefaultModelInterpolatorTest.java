@@ -429,6 +429,65 @@ class DefaultModelInterpolatorTest {
     }
 
     @Test
+    void testCustomRootDirectoryPropertyIsNotShadowed() throws Exception {
+        // GH-13883: a custom ${rootDirectory} property must not be shadowed by ${project.rootDirectory}
+        Path rootDirectory = Paths.get("myRootDirectory");
+        Path projectDirectory = rootDirectory.resolve("module");
+        this.rootDirectory = new AtomicReference<>(rootDirectory);
+
+        Map<String, String> modelProperties = new HashMap<>();
+        modelProperties.put("rootDirectory", "${project.basedir}");
+
+        Model model = Model.newBuilder()
+                .version("3.8.1")
+                .artifactId("foo")
+                .properties(modelProperties)
+                .repositories(List.of(
+                        Repository.newBuilder()
+                                .id("custom")
+                                .url("${rootDirectory}/temp-repo")
+                                .build(),
+                        Repository.newBuilder()
+                                .id("project")
+                                .url("${project.rootDirectory}/temp-repo")
+                                .build()))
+                .build();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out = interpolator.interpolateModel(
+                model, projectDirectory, createModelBuildingRequest(context).build(), collector);
+        assertProblemFree(collector);
+
+        assertEquals(
+                projectDirectory.toAbsolutePath() + "/temp-repo",
+                out.getRepositories().get(0).getUrl());
+        assertEquals(rootDirectory + "/temp-repo", out.getRepositories().get(1).getUrl());
+    }
+
+    @Test
+    void testUnprefixedRootDirectoryIsNotInterpolated() throws Exception {
+        // GH-13883: only ${project.rootDirectory} is supported, ${rootDirectory} is not an alias
+        Path rootDirectory = Paths.get("myRootDirectory");
+        Path projectDirectory = rootDirectory.resolve("module");
+        this.rootDirectory = new AtomicReference<>(rootDirectory);
+
+        Model model = Model.newBuilder()
+                .version("3.8.1")
+                .artifactId("foo")
+                .repositories(List.of(Repository.newBuilder()
+                        .url("${rootDirectory}/temp-repo")
+                        .build()))
+                .build();
+
+        final SimpleProblemCollector collector = new SimpleProblemCollector();
+        Model out = interpolator.interpolateModel(
+                model, projectDirectory, createModelBuildingRequest(context).build(), collector);
+        assertProblemFree(collector);
+
+        assertEquals("${rootDirectory}/temp-repo", out.getRepositories().get(0).getUrl());
+    }
+
+    @Test
     public void testEnvars() throws Exception {
         context.put("env.HOME", "/path/to/home");
 
@@ -629,6 +688,26 @@ class DefaultModelInterpolatorTest {
         interpolator.interpolateModel(model, null, request, collector);
 
         assertCollectorState(0, 2, 0, collector);
+        assertTrue(collector.getErrors().get(0).contains("recursive variable reference"));
+    }
+
+    @Test
+    public void testRecursiveExpressionCycleInListField() throws Exception {
+        Map<String, String> props = new HashMap<>();
+        props.put("aa", "${bb}");
+        props.put("bb", "${aa}");
+
+        Model model = Model.newBuilder()
+                .properties(props)
+                .build(Build.newBuilder().filters(List.of("${aa}")).build())
+                .build();
+
+        SimpleProblemCollector collector = new SimpleProblemCollector();
+
+        ModelBuilderRequest request = createModelBuildingRequest(Map.of()).build();
+        Model out = interpolator.interpolateModel(model, null, request, collector);
+
+        assertEquals(List.of("${aa}"), out.getBuild().getFilters());
         assertTrue(collector.getErrors().get(0).contains("recursive variable reference"));
     }
 

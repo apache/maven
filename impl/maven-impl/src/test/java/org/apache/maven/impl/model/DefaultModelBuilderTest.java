@@ -133,10 +133,12 @@ class DefaultModelBuilderTest {
     /**
      * Models built at {@link ModelBuilderRequest.RequestType#CONSUMER_DEPENDENCY} come from a
      * dependency POM resolved from a repository. Their file, property, and condition activators
-     * are not evaluated, and their profiles contribute no repositories. A project build, at
+     * are not evaluated. Platform-derived activation (JDK version, operating system,
+     * activeByDefault) is unaffected at either level. Repositories from legitimately-active
+     * profiles (JDK/OS/activeByDefault) are honored — stripping them would break the established
+     * {@code project → dep1 → dep2} pattern where dep1 declares dep2's non-Central repository
+     * inside a JDK- or activeByDefault-activated profile. A project build, at
      * {@link ModelBuilderRequest.RequestType#BUILD_PROJECT}, still evaluates every activator.
-     * Platform-derived activation (JDK version, operating system, activeByDefault) is unaffected
-     * at either level.
      */
     private ModelBuilderRequest.ModelBuilderRequestBuilder resolvedProfilesRequest(
             ModelBuilderRequest.RequestType requestType) {
@@ -145,12 +147,17 @@ class DefaultModelBuilderTest {
             systemProperties.put(name, System.getProperty(name));
         }
         systemProperties.put("some.dir", System.getProperty("java.io.tmpdir"));
-        systemProperties.put("some.gating.property", "true");
-        systemProperties.put("some.condition.property", "true");
+        // Use user properties for gating values: they simulate -D flags and must be suppressed
+        // when building external (repository-resolved) models. System properties are reserved for
+        // platform facts (java.version, os.name, …) that survive the external-model sandbox.
+        Map<String, String> userProperties = Map.of(
+                "some.gating.property", "true",
+                "some.condition.property", "true");
         return ModelBuilderRequest.builder()
                 .session(session)
                 .requestType(requestType)
                 .systemProperties(systemProperties)
+                .userProperties(userProperties)
                 .source(Sources.buildSource(getPom("resolved-model-with-profiles")));
     }
 
@@ -163,7 +170,17 @@ class DefaultModelBuilderTest {
         assertEquals("activated", model.getProperties().get("profile.file"));
         assertEquals("activated", model.getProperties().get("profile.property"));
         assertEquals("activated", model.getProperties().get("profile.condition"));
+        // missing('/publisher/private/file') fires in a project build because that path
+        // genuinely doesn't exist on the developer's machine — normal project-build behaviour.
+        assertEquals("activated", model.getProperties().get("profile.missing.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // POM-declared properties do not drive profile activation in any context:
+        // the PropertyProfileActivator only checks user → system properties.
+        assertNull(model.getProperties().get("profile.pom.property"));
+        // POM-declared property via <condition>: in a project build the non-sandboxed context
+        // allows getModelProperty() to return the real POM property, so this condition fires.
+        assertEquals("activated", model.getProperties().get("profile.pom.condition"));
+        assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
 
@@ -179,8 +196,78 @@ class DefaultModelBuilderTest {
         assertNull(model.getProperties().get("profile.file"));
         assertNull(model.getProperties().get("profile.property"));
         assertNull(model.getProperties().get("profile.condition"));
+        // missing()-condition profiles must be pre-filtered in CONSUMER_DEPENDENCY builds:
+        // in the sandbox context.exists() always returns false, so missing(path) evaluates
+        // to !false = true and fires unconditionally — same footgun as <file><missing>.
+        assertNull(model.getProperties().get("profile.missing.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
-        assertTrue(model.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+        // POM-declared property must not self-activate a profile in external builds (#13390).
+        assertNull(model.getProperties().get("profile.pom.property"));
+        // POM-declared property via <condition> must also be suppressed (#13390):
+        // ConditionProfileActivator.doGetProperty() calls getModelProperty() directly,
+        // so the sandbox must return null from getModelProperty() to close the gap.
+        assertNull(model.getProperties().get("profile.pom.condition"));
+        // Negated-property profile (!skip.defaults) fires because 'skip.defaults' is absent
+        // from the sandboxed context (user properties are suppressed; system properties do not
+        // contain it). This is the common opt-out flag pattern: the publisher's default-on
+        // profile must remain active for external builds unless a system-level override is set.
+        assertEquals("activated", model.getProperties().get("profile.negated.property"));
+        // Repositories from legitimately-active profiles (JDK-activated) must be honored:
+        // stripping them would break the project → dep1 → dep2 pattern. See #13100, #13116.
+        assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+    }
+
+    /**
+     * An {@code activeByDefault=true} profile in an external dependency model must contribute
+     * its repositories — the same guarantee as for JDK/OS-activated profiles (see #13100).
+     * Uses a dedicated fixture with only an activeByDefault profile so the standard Maven rule
+     * ("activeByDefault is suppressed when any other profile activates") does not interfere.
+     */
+    @Test
+    public void testActiveByDefaultProfileRepositoryHonored() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.resolvedSource(
+                        getPom("active-by-default-profile"), "org.apache.maven.test:active-by-default-profile:1.0.0"))
+                .build();
+        Model model = builder.newSession().build(request).getEffectiveModel();
+
+        // The always-active profile activates by default: its repository must survive external
+        // model resolution unchanged. See #13100, #13141.
+        assertTrue(
+                model.getRepositories().stream().anyMatch(r -> "always-active-repo".equals(r.getId())),
+                "Repository from activeByDefault profile must be retained in external dependency model");
+    }
+
+    /**
+     * A system property named {@code skip.defaults} suppresses the default-on negated-property
+     * profile ({@code !skip.defaults}) even in external (repository-resolved) model builds.
+     * System properties are platform facts that pass through the sandbox unchanged, so the
+     * publisher's opt-out mechanism still works when the consumer sets it at the JVM level.
+     */
+    @Test
+    public void testExternalModelSystemPropertySuppressesDefaultOnProfile() {
+        Map<String, String> systemProperties = new HashMap<>();
+        for (String name : System.getProperties().stringPropertyNames()) {
+            systemProperties.put(name, System.getProperty(name));
+        }
+        systemProperties.put("some.dir", System.getProperty("java.io.tmpdir"));
+        systemProperties.put("skip.defaults", "true"); // system-level opt-out
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .systemProperties(systemProperties)
+                .userProperties(Map.of("some.gating.property", "true", "some.condition.property", "true"))
+                .source(Sources.resolvedSource(
+                        getPom("resolved-model-with-profiles"),
+                        "org.apache.maven.test:resolved-model-with-profiles:1.0.0"))
+                .build();
+        Model model = builder.newSession().build(request).getEffectiveModel();
+
+        assertNull(
+                model.getProperties().get("profile.negated.property"),
+                "negated-property (default-on) profile must be suppressed when system property 'skip.defaults' is set");
     }
 
     /**
@@ -199,6 +286,12 @@ class DefaultModelBuilderTest {
         assertEquals("activated", model.getProperties().get("profile.property"));
         assertEquals("activated", model.getProperties().get("profile.condition"));
         assertEquals("activated", model.getProperties().get("profile.jdk"));
+        // POM-declared properties do not drive profile activation even in caller-supplied builds.
+        assertNull(model.getProperties().get("profile.pom.property"));
+        // POM-declared property via <condition>: caller-supplied model uses non-sandboxed context,
+        // so getModelProperty() returns real POM properties and the condition fires.
+        assertEquals("activated", model.getProperties().get("profile.pom.condition"));
+        assertEquals("activated", model.getProperties().get("profile.negated.property"));
         assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
 
@@ -208,8 +301,9 @@ class DefaultModelBuilderTest {
             systemProperties.put(name, System.getProperty(name));
         }
         systemProperties.put("some.dir", System.getProperty("java.io.tmpdir"));
-        systemProperties.put("some.gating.property", "true");
-        systemProperties.put("some.condition.property", "true");
+        // Note: some.gating.property and some.condition.property are simulated -D flags;
+        // they belong in userProperties, not systemProperties, so that the external-model
+        // sandbox correctly suppresses them when building repository-resolved models.
         return systemProperties;
     }
 
@@ -221,7 +315,9 @@ class DefaultModelBuilderTest {
                 List.of(),
                 List.of(),
                 systemProperties,
-                Map.of(),
+                // Gating props simulate -D flags: pass as user properties so the external-model
+                // sandbox suppresses them for dependency parents but allows them for project parents.
+                Map.of("some.gating.property", "true", "some.condition.property", "true"),
                 Model.newInstance());
     }
 
@@ -279,6 +375,12 @@ class DefaultModelBuilderTest {
         assertEquals("activated", projectParentModel.getProperties().get("profile.condition"));
         assertEquals("activated", projectParentModel.getProperties().get("profile.jdk"));
         assertTrue(projectParentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+        // After #13555, parent POM properties are NOT exposed through getModelProperty() in the
+        // project-parent activation path — condition profiles relying on POM-declared properties
+        // must not self-activate (#13390).
+        assertNull(
+                projectParentModel.getProperties().get("profile.pom.condition"),
+                "profile.pom.condition must not self-activate in the project-parent path");
 
         DefaultModelBuilder.ModelBuilderSessionState dependencyState =
                 dependencyAncestorState.derive(sharedParentRequest);
@@ -290,7 +392,8 @@ class DefaultModelBuilderTest {
         assertNull(dependencyParentModel.getProperties().get("profile.property"));
         assertNull(dependencyParentModel.getProperties().get("profile.condition"));
         assertEquals("activated", dependencyParentModel.getProperties().get("profile.jdk"));
-        assertTrue(dependencyParentModel.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+        // Repositories from legitimately-active profiles (JDK-activated) must be honored. See #13100, #13116.
+        assertTrue(dependencyParentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
 
         // The first (fully activated) result must not have been altered by the second read.
         assertEquals("activated", projectParentModel.getProperties().get("profile.file"));
@@ -309,7 +412,8 @@ class DefaultModelBuilderTest {
         Model dependencyParentModel2 =
                 dependencyState2.readAsParentModel(parentActivationContext(systemProperties), new HashSet<>());
         assertNull(dependencyParentModel2.getProperties().get("profile.file"));
-        assertTrue(dependencyParentModel2.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+        // Repositories from legitimately-active profiles (JDK-activated) must be honored. See #13100, #13116.
+        assertTrue(dependencyParentModel2.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
 
         DefaultModelBuilder.ModelBuilderSessionState projectState2 = mainState.derive(sharedParentRequest2);
         Model projectParentModel2 =
@@ -370,7 +474,8 @@ class DefaultModelBuilderTest {
         assertNull(grandparentModel.getProperties().get("profile.property"));
         assertNull(grandparentModel.getProperties().get("profile.condition"));
         assertEquals("activated", grandparentModel.getProperties().get("profile.jdk"));
-        assertTrue(grandparentModel.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+        // Repositories from legitimately-active profiles (JDK-activated) must be honored. See #13100, #13116.
+        assertTrue(grandparentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
     }
 
     /**
@@ -1658,6 +1763,83 @@ class DefaultModelBuilderTest {
     }
 
     @Test
+    void testMng8710ParentFileProfileWithPropertyActivationAppliesToChild() {
+        Path pom = Paths.get("src/test/resources/poms/factory/mng-8710/pom.xml").toAbsolutePath();
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .recursive(true)
+                        .source(Sources.buildSource(pom))
+                        .build());
+
+        Model parentModel = result.getEffectiveModel();
+        assertEquals("activated", parentModel.getProperties().get("profile.from.parent"));
+
+        ModelBuilderResult childResult = result.getChildren().stream()
+                .filter(r -> "mng-8710-child".equals(r.getEffectiveModel().getArtifactId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("child result missing: " + result.getChildren()));
+        Model childModel = childResult.getEffectiveModel();
+        assertEquals(
+                "activated",
+                childModel.getProperties().get("profile.from.parent"),
+                "Parent file profile interpolating ${message.file} must inject into child (MNG-8710)");
+    }
+
+    /**
+     * Combined invariant test for MNG-8710 + #13390.
+     * <p>
+     * A parent property used to resolve a file-profile path (via {@code interpolationProperties})
+     * must NOT simultaneously self-activate a property-based profile on that same parent.
+     * The file profile fires because the path interpolates correctly (#10375).
+     * The property-based profile must not fire because {@code interpolationProperties} is
+     * intentionally hidden from {@code getModelProperty()} (#13390).
+     */
+    @Test
+    void testMng8710ParentFileProfileFiresButPropertyProfileDoesNot() {
+        Path pom = Paths.get("src/test/resources/poms/factory/mng-8710-combined/pom.xml")
+                .toAbsolutePath();
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .recursive(true)
+                        .source(Sources.buildSource(pom))
+                        .build());
+
+        Model parentModel = result.getEffectiveModel();
+
+        // The file profile MUST activate: ${message.file} resolves via interpolationProperties (#10375)
+        assertEquals(
+                "true",
+                parentModel.getProperties().get("profile.file.activated"),
+                "File profile interpolating ${message.file} must activate (MNG-8710)");
+
+        // The property-based profile MUST NOT activate: interpolationProperties must not be
+        // visible through getModelProperty(), preventing self-activation (#13390)
+        assertNull(
+                parentModel.getProperties().get("profile.property.activated"),
+                "Property-based profile on ${message.file} must NOT activate via interpolationProperties (#13390)");
+
+        // Verify the same invariant holds for child modules
+        ModelBuilderResult childResult = result.getChildren().stream()
+                .filter(r ->
+                        "mng-8710-combined-child".equals(r.getEffectiveModel().getArtifactId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("child result missing: " + result.getChildren()));
+        Model childModel = childResult.getEffectiveModel();
+
+        assertEquals(
+                "true",
+                childModel.getProperties().get("profile.file.activated"),
+                "File profile must also activate for child module (MNG-8710)");
+        assertNull(
+                childModel.getProperties().get("profile.property.activated"),
+                "Property-based profile must not activate for child module either (#13390)");
+    }
+
+    @Test
     void testBomImportWarningFromParentProfileActivatedForChild() {
         Path pom = Paths.get("src/test/resources/poms/factory/mng-8450-profile-context/pom.xml")
                 .toAbsolutePath();
@@ -1718,6 +1900,173 @@ class DefaultModelBuilderTest {
     static ApacheTransporterFactory newApacheTransporterFactory(
             ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
         return new ApacheTransporterFactory(checksumExtractor, pathProcessor);
+    }
+
+    @Test
+    public void testOmitVersionInDependencyManagementWithExclusion(@TempDir Path tempDir) throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Path localRepoPath = tempDir.resolve("local-repo");
+        Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
+        Session session = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this), localRepoPath);
+        RemoteRepository remoteRepository = session.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
+        session = session.withRemoteRepositories(List.of(remoteRepository));
+        ModelBuilder builder = session.getService(ModelBuilder.class);
+
+        Files.createDirectory(tempDir.resolve(".mvn"));
+        Path projectPom = tempDir.resolve("pom.xml");
+        String pomContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>test-project</artifactId>
+                  <version>1.0</version>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>bom</artifactId>
+                        <version>0.1</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                      </dependency>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>a</artifactId>
+                        <exclusions>
+                          <exclusion>
+                            <groupId>org.apache.maven.its</groupId>
+                            <artifactId>b</artifactId>
+                          </exclusion>
+                        </exclusions>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                  <dependencies>
+                    <dependency>
+                      <groupId>org.apache.maven.its</groupId>
+                      <artifactId>a</artifactId>
+                    </dependency>
+                  </dependencies>
+                </project>
+                """;
+        Files.writeString(projectPom, pomContent);
+
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .source(Sources.buildSource(projectPom))
+                        .build());
+
+        assertNotNull(result);
+        Model model = result.getEffectiveModel();
+        assertNotNull(model);
+        Dependency dep = model.getDependencies().stream()
+                .filter(d -> "a".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(dep);
+        assertEquals("0.1", dep.getVersion());
+        assertEquals(1, dep.getExclusions().size());
+        assertEquals("b", dep.getExclusions().get(0).getArtifactId());
+    }
+
+    @Test
+    public void testOmitVersionInDependencyManagementWithExclusionInChild(@TempDir Path tempDir) throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Path localRepoPath = tempDir.resolve("local-repo");
+        Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
+        Session session = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this), localRepoPath);
+        RemoteRepository remoteRepository = session.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
+        session = session.withRemoteRepositories(List.of(remoteRepository));
+        ModelBuilder builder = session.getService(ModelBuilder.class);
+
+        Files.createDirectory(tempDir.resolve(".mvn"));
+        Path parentPom = tempDir.resolve("pom.xml");
+        String parentContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>parent-project</artifactId>
+                  <version>1.0</version>
+                  <packaging>pom</packaging>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>bom</artifactId>
+                        <version>0.1</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                </project>
+                """;
+        Files.writeString(parentPom, parentContent);
+
+        Path childDir = tempDir.resolve("child");
+        Files.createDirectory(childDir);
+        Path childPom = childDir.resolve("pom.xml");
+        String childContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <parent>
+                    <groupId>org.apache.maven.its</groupId>
+                    <artifactId>parent-project</artifactId>
+                    <version>1.0</version>
+                    <relativePath>../pom.xml</relativePath>
+                  </parent>
+                  <artifactId>child-project</artifactId>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>a</artifactId>
+                        <exclusions>
+                          <exclusion>
+                            <groupId>org.apache.maven.its</groupId>
+                            <artifactId>b</artifactId>
+                          </exclusion>
+                        </exclusions>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                  <dependencies>
+                    <dependency>
+                      <groupId>org.apache.maven.its</groupId>
+                      <artifactId>a</artifactId>
+                    </dependency>
+                  </dependencies>
+                </project>
+                """;
+        Files.writeString(childPom, childContent);
+
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .source(Sources.buildSource(childPom))
+                        .build());
+
+        assertNotNull(result);
+        Model model = result.getEffectiveModel();
+        assertNotNull(model);
+        Dependency dep = model.getDependencies().stream()
+                .filter(d -> "a".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(dep);
+        assertEquals("0.1", dep.getVersion());
+        assertEquals(1, dep.getExclusions().size());
+        assertEquals("b", dep.getExclusions().get(0).getArtifactId());
     }
 
     private Path getPom(String name) {

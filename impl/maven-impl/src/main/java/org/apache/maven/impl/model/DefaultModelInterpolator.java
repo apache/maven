@@ -134,7 +134,11 @@ public class DefaultModelInterpolator implements ModelInterpolator {
                 return di.interpolate(value, null, cycleMap, cb, postprocessor, false);
             } catch (InterpolatorException e) {
                 problems.add(BuilderProblem.Severity.ERROR, ModelProblem.Version.BASE, e.getMessage(), e);
-                return null;
+                // Keep the original text rather than handing null back to the transformer. A null
+                // ends up as an element of a List<String> model field such as build/filters, and
+                // the immutable model constructor copies that list with List.copyOf, which fails
+                // with a bare NullPointerException that hides the problem just collected above.
+                return value;
             }
         };
     }

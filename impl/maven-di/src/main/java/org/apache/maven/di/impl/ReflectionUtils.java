@@ -144,7 +144,8 @@ public final class ReflectionUtils {
             if (scope != null) {
                 binding = binding.scope(scope);
             }
-            binding = binding.initializeWith(generateInjectingInitializer(key));
+            binding = binding.initializeWith(
+                    generateInjectingInitializer(key), List.of(binding.getRegistrationIdentity(), key));
         }
         return binding;
     }
@@ -180,7 +181,9 @@ public final class ReflectionUtils {
             if (injectFactoryMethods.size() > 1) {
                 throw failedImplicitBinding(key, "more than one inject factory method");
             }
-            return bindingFromMethod(injectFactoryMethods.iterator().next());
+            return ReflectionUtils.<T>bindingFromMethod(
+                            injectFactoryMethods.iterator().next())
+                    .withKey(key);
         }
 
         if (constructors.isEmpty()) {
@@ -323,7 +326,9 @@ public final class ReflectionUtils {
                         throw new DIException("Failed to call method " + method, e.getCause());
                     }
                 },
-                toDependencies(method.getDeclaringClass(), method));
+                toDependencies(method.getDeclaringClass(), method),
+                0,
+                method);
 
         Priority priority = method.getAnnotation(Priority.class);
         if (priority != null) {
@@ -358,7 +363,9 @@ public final class ReflectionUtils {
                                 e.getCause());
                     }
                 },
-                dependencies);
+                dependencies,
+                0,
+                constructor);
 
         Priority priority = constructor.getDeclaringClass().getAnnotation(Priority.class);
         if (priority != null) {

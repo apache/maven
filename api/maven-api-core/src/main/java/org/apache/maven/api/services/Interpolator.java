@@ -34,7 +34,26 @@ import org.apache.maven.api.annotations.Nullable;
 
 /**
  * The Interpolator service provides methods for variable substitution in strings and maps.
- * It allows for the replacement of placeholders (e.g., ${variable}) with their corresponding values.
+ * It allows for the replacement of placeholders (e.g., {@code ${variable}}) with their
+ * corresponding values.
+ *
+ * <h2>Syntax</h2>
+ * <p>Placeholders use the {@code ${…}} syntax. The variable name is resolved via the supplied
+ * map and/or callback. When a variable cannot be resolved the behaviour depends on the
+ * {@code defaultsToEmpty} flag: {@code true} replaces the placeholder with an empty string,
+ * {@code false} leaves the original {@code ${…}} text in place.</p>
+ *
+ * <h2>Default / alternate operators</h2>
+ * <p>Two shell-style conditional operators are supported inside a placeholder:</p>
+ * <ul>
+ *   <li>{@code ${var:-default}} — expands to {@code default} when {@code var} is unset or empty,
+ *       otherwise expands to the value of {@code var}.</li>
+ *   <li>{@code ${var:+alternate}} — expands to {@code alternate} when {@code var} is set and
+ *       non-empty, otherwise expands to an empty string.</li>
+ * </ul>
+ * <p>The operator values may themselves contain nested {@code ${…}} placeholders, and operators
+ * can be chained to form ternary-style expressions, e.g.
+ * {@code ${release:+${foo}:-${bar}}}.</p>
  *
  * @since 4.0.0
  */
@@ -140,6 +159,13 @@ public interface Interpolator extends Service {
         };
     }
 
+    /**
+     * Creates a composite function from a varargs array of functions.
+     *
+     * @param functions the functions to chain
+     * @return a function that applies each function in order until a non-null result is found
+     * @see #chain(Collection)
+     */
     @SafeVarargs
     static UnaryOperator<String> chain(UnaryOperator<String>... functions) {
         return chain(List.of(functions));

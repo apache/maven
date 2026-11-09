@@ -168,6 +168,7 @@ public class MavenProject implements Cloneable {
 
     // calculated.
     private Map<String, Artifact> artifactMap;
+    private Map<String, Artifact> artifactMapByDependencyConflictId;
 
     private Model originalModel;
 
@@ -881,9 +882,8 @@ public class MavenProject implements Cloneable {
 
     public void setArtifacts(Set<Artifact> artifacts) {
         this.artifacts = artifacts;
-
-        // flush the calculated artifactMap
         artifactMap = null;
+        artifactMapByDependencyConflictId = null;
     }
 
     /**
@@ -899,12 +899,13 @@ public class MavenProject implements Cloneable {
             if (artifactFilter == null || resolvedArtifacts == null) {
                 artifacts = new LinkedHashSet<>();
             } else {
-                artifacts = new LinkedHashSet<>(resolvedArtifacts.size() * 2);
+                Set<Artifact> result = new LinkedHashSet<>(resolvedArtifacts.size() * 2);
                 for (Artifact artifact : resolvedArtifacts) {
                     if (artifactFilter.include(artifact)) {
-                        artifacts.add(artifact);
+                        result.add(artifact);
                     }
                 }
+                artifacts = result;
             }
         }
         return artifacts;
@@ -917,9 +918,22 @@ public class MavenProject implements Cloneable {
         return artifactMap;
     }
 
+    /**
+     * Like {@link #getArtifactMap()}, but keyed by {@link org.apache.maven.artifact.Artifact#getDependencyConflictId()}
+     * (groupId:artifactId:type[:classifier]), which disambiguates artifacts that share the same groupId:artifactId
+     * but differ by classifier (MNG-5552).
+     * @return a mutable map keyed by dependency conflict id; if two artifacts share the same key the last one wins
+     * @since 4.1.0
+     */
+    public Map<String, Artifact> getArtifactMapByDependencyConflictId() {
+        if (artifactMapByDependencyConflictId == null) {
+            artifactMapByDependencyConflictId = ArtifactMaps.byDependencyConflictId(getArtifacts());
+        }
+        return artifactMapByDependencyConflictId;
+    }
+
     public void setPluginArtifacts(Set<Artifact> pluginArtifacts) {
         this.pluginArtifacts = pluginArtifacts;
-
         this.pluginArtifactMap = null;
     }
 
@@ -931,7 +945,6 @@ public class MavenProject implements Cloneable {
         if (pluginArtifactMap == null) {
             pluginArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getPluginArtifacts());
         }
-
         return pluginArtifactMap;
     }
 
@@ -965,15 +978,11 @@ public class MavenProject implements Cloneable {
         return getModel().getModules();
     }
 
+    /** Returns plugin management for this project, never {@code null}. */
     public PluginManagement getPluginManagement() {
-        PluginManagement pluginMgmt = null;
-
         Build build = getModel().getBuild();
-        if (build != null) {
-            pluginMgmt = build.getPluginManagement();
-        }
-
-        return pluginMgmt;
+        PluginManagement mgmt = build != null ? build.getPluginManagement() : null;
+        return mgmt != null ? mgmt : new PluginManagement();
     }
 
     private Build getModelBuild() {
@@ -1517,6 +1526,7 @@ public class MavenProject implements Cloneable {
         this.resolvedArtifacts = (artifacts != null) ? artifacts : Collections.emptySet();
         this.artifacts = null;
         this.artifactMap = null;
+        this.artifactMapByDependencyConflictId = null;
     }
 
     /**
@@ -1531,6 +1541,7 @@ public class MavenProject implements Cloneable {
         this.artifactFilter = artifactFilter;
         this.artifacts = null;
         this.artifactMap = null;
+        this.artifactMapByDependencyConflictId = null;
     }
 
     /**
@@ -1557,15 +1568,7 @@ public class MavenProject implements Cloneable {
     }
 
     // ----------------------------------------------------------------------------------------------------------------
-    //
-    //
-    // D E P R E C A T E D
-    //
-    //
-    // ----------------------------------------------------------------------------------------------------------------
-    //
-    // Everything below will be removed for Maven 4.0.0
-    //
+    // D E P R E C A T E D  -  Everything below will be removed for Maven 4.0.0
     // ----------------------------------------------------------------------------------------------------------------
 
     private ProjectBuildingRequest projectBuilderConfiguration;
@@ -1844,7 +1847,6 @@ public class MavenProject implements Cloneable {
     @Deprecated
     public void setReportArtifacts(Set<Artifact> reportArtifacts) {
         this.reportArtifacts = reportArtifacts;
-
         reportArtifactMap = null;
     }
 
@@ -1858,7 +1860,6 @@ public class MavenProject implements Cloneable {
         if (reportArtifactMap == null) {
             reportArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getReportArtifacts());
         }
-
         return reportArtifactMap;
     }
 
@@ -1878,7 +1879,6 @@ public class MavenProject implements Cloneable {
         if (extensionArtifactMap == null) {
             extensionArtifactMap = ArtifactUtils.artifactMapByVersionlessId(getExtensionArtifacts());
         }
-
         return extensionArtifactMap;
     }
 

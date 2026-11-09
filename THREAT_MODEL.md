@@ -154,8 +154,10 @@ Maven's inputs split cleanly into **operator-supplied (trusted)** and **reposito
 | Input | Line | Origin | Attacker-controllable? | Caller/operator must enforce |
 | --- | --- | --- | --- | --- |
 | `pom.xml` (source/build POM) | both | operator's project | **no** — trusted local config | don't build untrusted projects unsandboxed (§10) *(inferred, Q5)* |
+| Maven command-line arguments and system properties | both | operator / CI invocation | **no** — trusted invocation input | validate values supplied by users, scripts, or CI *(inferred, Q5)* |
 | `settings.xml` (+ `settings-security`) | both | operator `~/.m2` | **no** — trusted; holds credentials | protect the file / key material *(inferred, Q5, Q9)* |
 | `.mvn/extensions.xml`, `.mvn/maven.config` | both | operator project | **no** — trusted; loads extensions as code | same as `pom.xml` *(inferred, Q5)* |
+| Test source code (unit and integration tests) | both | operator's project | **no** — trusted code executed during the build | trust the test code or run the build in isolation (§10) *(inferred, Q5)* |
 | Existing `~/.m2/repository` contents | both | prior builds | **no** — trusted-on-arrival | don't share a poisoned local repo *(inferred, Q11)* |
 | **Resolved dependency/plugin/extension bytes** | both | remote repo/mirror | **yes** | checksum policy; add signature verification; pin versions *(inferred, Q4, Q6)* |
 | **Repository metadata** (`maven-metadata.xml`, checksums, index) | both | remote repo/mirror | **yes** | resolver parses these before trust is established *(inferred, Q4, Q18)* |
@@ -164,6 +166,7 @@ Maven's inputs split cleanly into **operator-supplied (trusted)** and **reposito
 | **Consumer-POM transform input** (`mvn deploy`) | **4.x only** | operator project → published | source **no**; the *published* result is a new surface for downstream | verify what you publish matches intent *(inferred, Q7)* |
 | **`mvnup` rewrite input** | **4.x only** | operator `pom.xml` | **no** — trusted, but written back in place | review the diff `mvnup` produces *(inferred, Q8)* |
 | **`mvnenc` secrets / vault** | **4.x only** | operator | **no** — trusted | manage the master key/vault (§10) *(inferred, Q9)* |
+| **`mvnval` validation input** | **4.x only** | operator `pom.xml` | **no** — trusted | never writes to a POM. By default (`--mode effective`) it builds the effective model, so it resolves parents and imported boms and caches them in the local repository, from the repositories the POM itself declares as well as Central, through whatever the user's settings mirror it to. Point it at a POM you do not trust and it fetches from URLs that POM chose; `--mode raw` reaches no repository at all, and `--temp-local-repository` resolves into a directory made for the run and deleted when it ends, on every exit and on a signal, though not on `SIGKILL`. It stands up no DI container, so nothing beside the POM (`.mvn/extensions.xml`, `maven.ext.class.path`, `.mvn/settings.xml`) can make it load code. JVM options in `.mvn/jvm.config` still reach the launcher, as for every Maven tool |
 
 **Size/shape.** Maven imposes no general bound on POM size, dependency-graph depth, or artifact size; resolution of a hostile dependency graph (deep transitive fan-out, decompression of hostile archives) is a resource surface. *(inferred, Q17)*
 
@@ -219,6 +222,7 @@ This is the load-bearing section for triage. State each plainly.
 
 For Maven, "downstream" is the **build author / operator / CI owner.**
 
+- **Take responsibility for supplied inputs.** Validate and trust only the POMs, configuration, repositories, credentials, local repository contents, and other build inputs you provide to Maven.
 - **Only build code and POMs you trust** — or provide OS/container isolation yourself. *(documented — security.html.)*
 - **Curate your repositories and mirrors.** Prefer HTTPS; keep the shipped `external:http:*` block; use a controlled proxy/mirror rather than arbitrary third-party repos. *(documented — security.html.)*
 - **Choose your checksum/signature posture deliberately.** Enable `--strict-checksums` and add signature-verification tooling if your threat model needs publisher authenticity. *(inferred, Q4, Q6)*

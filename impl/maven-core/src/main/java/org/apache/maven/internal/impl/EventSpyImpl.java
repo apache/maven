@@ -23,18 +23,24 @@ import javax.inject.Singleton;
 
 import java.util.Collection;
 
-import org.apache.maven.api.Event;
 import org.apache.maven.api.EventType;
 import org.apache.maven.api.Listener;
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Bridges between Maven3 events and Maven4 events.
+ * Each listener's {@link Listener#onEvent(org.apache.maven.api.Event)} method handles its own dispatch:
+ * legacy listeners receive the event directly, while typed listeners (such as
+ * {@link org.apache.maven.api.ExecutionListener}) route it to their specific callbacks.
  */
 @Named
 @Singleton
 public class EventSpyImpl implements EventSpy {
+    private static final Logger LOGGER = LoggerFactory.getLogger(EventSpyImpl.class);
+
     @Override
     public void init(Context context) throws Exception {}
 
@@ -46,16 +52,24 @@ public class EventSpyImpl implements EventSpy {
             EventType eventType = convert(ee.getType());
             Collection<Listener> listeners = session.getListeners();
             if (!listeners.isEmpty()) {
-                Event event = new DefaultEvent(session, ee, eventType);
+                org.apache.maven.api.ExecutionEvent event = new DefaultEvent(session, ee, eventType);
                 for (Listener listener : listeners) {
-                    listener.onEvent(event);
+                    try {
+                        listener.onEvent(event);
+                    } catch (RuntimeException e) {
+                        LOGGER.warn(
+                                "Failed to notify listener {} about {}",
+                                listener.getClass().getName(),
+                                eventType,
+                                e);
+                    }
                 }
             }
         }
     }
 
     /**
-     * Simple "conversion" from Maven3 event type enum to Maven4 enum.
+     * Converts the Maven 3 execution event type to its Maven API counterpart.
      */
     protected EventType convert(ExecutionEvent.Type type) {
         return EventType.values()[type.ordinal()];

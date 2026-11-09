@@ -20,12 +20,15 @@ package org.apache.maven.cli;
 
 import javax.xml.stream.XMLStreamException;
 
+import java.io.BufferedReader;
 import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.FileSystem;
@@ -124,7 +127,10 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.eclipse.aether.DefaultRepositoryCache;
+import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.transfer.TransferListener;
+import org.jline.terminal.Terminal;
+import org.jline.terminal.impl.DumbTerminal;
 import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -242,6 +248,29 @@ public class MavenCli {
     }
 
     /**
+     * Installs a threadless, colour-capable "dumb" terminal that is not attached to the process console, so that
+     * an explicit {@code --color=yes} works; automatic detection still yields plain output for it. Colour is
+     * optional, so failure to create the terminal is not an error.
+     *
+     * @return the installed terminal, or {@code null} if it could not be created
+     */
+    private static Terminal installEmbeddedTerminal() {
+        try {
+            Terminal dumb = new DumbTerminal(
+                    "Maven",
+                    Terminal.TYPE_DUMB_COLOR,
+                    InputStream.nullInputStream(),
+                    OutputStream.nullOutputStream(),
+                    null);
+            MessageUtils.systemInstall(dumb);
+            return dumb;
+        } catch (IOException e) {
+            LoggerFactory.getLogger(MavenCli.class).debug("Could not create terminal, continuing without colour", e);
+            return null;
+        }
+    }
+
+    /**
      * This supports painless invocation by the Verifier during embedded execution of the core ITs.
      * See <a href="http://maven.apache.org/shared/maven-verifier/xref/org/apache/maven/it/Embedded3xLauncher.html">
      * <code>Embedded3xLauncher</code> in <code>maven-verifier</code></a>
@@ -266,6 +295,10 @@ public class MavenCli {
             realms = Collections.emptySet();
         }
 
+        // Embedders call this method instead of main(), so nobody installed a terminal; without one
+        // MessageUtils.isColorEnabled() is always false, even for an explicit --color=yes (#13357).
+        // The dumb terminal keeps "auto" plain, and an already installed terminal is left alone.
+        Terminal embeddedTerminal = null;
         try {
             if (stdout != null) {
                 System.setOut(stdout);
@@ -274,11 +307,25 @@ public class MavenCli {
                 System.setErr(stderr);
             }
 
+            if (MessageUtils.getTerminal() == null) {
+                embeddedTerminal = installEmbeddedTerminal();
+            }
+
             CliRequest cliRequest = new CliRequest(args, classWorld);
             cliRequest.workingDirectory = workingDirectory;
 
             return doMain(cliRequest);
         } finally {
+            if (embeddedTerminal != null) {
+                if (MessageUtils.getTerminal() == embeddedTerminal) {
+                    MessageUtils.systemInstall((Terminal) null);
+                }
+                try {
+                    embeddedTerminal.close();
+                } catch (IOException e) {
+                    // ignore
+                }
+            }
             if (classWorld != null) {
                 for (ClassRealm realm : new ArrayList<>(classWorld.getRealms())) {
                     String realmId = realm.getId();
@@ -345,11 +392,12 @@ public class MavenCli {
                 throw new ExitException(1);
             }
             File basedir = new File(basedirProperty);
-            try {
-                cliRequest.multiModuleProjectDirectory = basedir.getCanonicalFile();
-            } catch (IOException e) {
-                cliRequest.multiModuleProjectDirectory = basedir.getAbsoluteFile();
-            }
+            // Resolve lexically rather than through getCanonicalFile(), which asks the OS to resolve the path
+            // and can substitute it with a different one when a segment is a symlink, junction, or (on Windows)
+            // a mapped network drive, corrupting the reactor root that every relative module/parent path is
+            // later resolved against (MNG-11167).
+            cliRequest.multiModuleProjectDirectory =
+                    getCanonicalPath(basedir.toPath()).toFile();
         }
 
         // We need to locate the top level project which may be pointed at using
@@ -532,6 +580,10 @@ public class MavenCli {
                             || commandLine.hasOption(CLIManager.NON_INTERACTIVE));
             if (isBatchMode || commandLine.hasOption(CLIManager.LOG_FILE)) {
                 MessageUtils.setColorEnabled(false);
+            } else if (MessageUtils.getTerminal() != null
+                    && MessageUtils.getTerminal().getType().startsWith("dumb")) {
+                // if the terminal is detected as dumb terminal, disable colors
+                MessageUtils.setColorEnabled(false);
             }
         }
 
@@ -553,6 +605,11 @@ public class MavenCli {
             File logFile = new File(commandLine.getOptionValue(CLIManager.LOG_FILE));
             logFile = ResolveFile.resolveFile(logFile, cliRequest.workingDirectory);
 
+            // make sure the terminal has finished installing before we grab the streams, otherwise it
+            // could later overwrite our redirection and logs would leak back to the console
+            // (see https://github.com/apache/maven/issues/12188)
+            MessageUtils.awaitTerminalInitialization();
+
             // redirect stdout and stderr to file
             try {
                 PrintStream ps = new PrintStream(new FileOutputStream(logFile));
@@ -563,9 +620,19 @@ public class MavenCli {
                 // Ignore
                 //
             }
-        }
 
-        slf4jConfiguration.activate();
+            // Logging caches System.out; with -l the wait above already ran, so activate now.
+            slf4jConfiguration.activate();
+        } else {
+            // Logging caches System.out, so wait for terminal installation to complete before
+            // activating, except when color is explicitly forced. With forced color the user expects
+            // raw ANSI to flow through the original stdout; waiting causes AnsiConsole to wrap that
+            // stream before the logger caches it, which may strip the escape codes.
+            if (!"always".equals(styleColor) && !"yes".equals(styleColor) && !"force".equals(styleColor)) {
+                MessageUtils.awaitTerminalInitialization();
+            }
+            slf4jConfiguration.activate();
+        }
 
         plexusLoggerManager = new Slf4jLoggerManager();
         slf4jLogger = slf4jLoggerFactory.getLogger(this.getClass().getName());
@@ -921,7 +988,7 @@ public class MavenCli {
 
             for (CoreExtensionEntry entry : reverse(extensions)) {
                 Set<String> exportedPackages = entry.getExportedPackages();
-                ClassRealm realm = entry.getClassRealm();
+                ClassRealm realm = (ClassRealm) entry.getClassRealm();
                 for (String exportedPackage : exportedPackages) {
                     extRealm.importFrom(realm, exportedPackage);
                 }
@@ -971,6 +1038,40 @@ public class MavenCli {
         return jars;
     }
 
+    /**
+     * Reads a password from the console and, when there is none because the streams are redirected, from the first
+     * line of the given input.
+     *
+     * @param console the console, or {@code null} if the streams are redirected
+     * @param in the input to read the first line from when there is no console
+     * @param prompt the prompt shown by the console; it is not shown when the password is read from the input, as
+     *               the caller is then not interactive and the prompt would only pollute its output
+     * @return the password, never empty
+     * @throws IOException if the input cannot be read
+     * @throws IllegalStateException if no password could be read, so that an empty one is not encrypted
+     */
+    static String readPassword(Console console, InputStream in, String prompt) throws IOException {
+        String password;
+        if (console != null) {
+            char[] chars = console.readPassword(prompt);
+            password = (chars == null) ? null : String.copyValueOf(chars);
+
+            if (chars != null) {
+                // Sun/Oracle advises to empty the char array
+                java.util.Arrays.fill(chars, ' ');
+            }
+        } else {
+            // do not close the reader, that would close the standard input
+            password = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).readLine();
+        }
+
+        if (password == null || password.isEmpty()) {
+            throw new IllegalStateException("No password was provided");
+        }
+
+        return password;
+    }
+
     //
     // This should probably be a separate tool and not be baked into Maven.
     //
@@ -982,15 +1083,7 @@ public class MavenCli {
             String passwd = cliRequest.commandLine.getOptionValue(CLIManager.ENCRYPT_PASSWORD);
 
             if (passwd == null) {
-                Console cons = System.console();
-                char[] password = (cons == null) ? null : cons.readPassword("Password: ");
-                if (password != null) {
-                    // Cipher uses Strings
-                    passwd = String.copyValueOf(password);
-
-                    // Sun/Oracle advises to empty the char array
-                    java.util.Arrays.fill(password, ' ');
-                }
+                passwd = readPassword(System.console(), System.in, "Password: ");
             }
             System.out.println(dispatcher.encrypt(passwd, null));
             throw new ExitException(0);
@@ -1344,8 +1437,28 @@ public class MavenCli {
         request.setReactorFailureBehavior(determineReactorFailureBehaviour(commandLine));
         disableOnPresentOption(commandLine, CLIManager.NON_RECURSIVE, request::setRecursive);
         enableOnPresentOption(commandLine, CLIManager.OFFLINE, request::setOffline);
-        enableOnPresentOption(commandLine, CLIManager.UPDATE_SNAPSHOTS, request::setUpdateSnapshots);
+        enableOnPresentOption(commandLine, CLIManager.UPDATE_ALL, request::setUpdateSnapshots);
+        enableOnPresentOption(commandLine, "update-snapshots", request::setUpdateSnapshots);
         request.setGlobalChecksumPolicy(determineGlobalCheckPolicy(commandLine));
+
+        // Update policy options
+        String artifactsUpdatePolicy = null;
+        String metadataUpdatePolicy = null;
+        if (commandLine.hasOption(CLIManager.UPDATE_ARTIFACTS)) {
+            artifactsUpdatePolicy = RepositoryPolicy.UPDATE_POLICY_ALWAYS;
+        }
+        if (artifactsUpdatePolicy == null && commandLine.hasOption(CLIManager.ARTIFACTS_UPDATE_POLICY)) {
+            artifactsUpdatePolicy = commandLine.getOptionValue(CLIManager.ARTIFACTS_UPDATE_POLICY);
+        }
+        if (commandLine.hasOption(CLIManager.UPDATE_METADATA)) {
+            metadataUpdatePolicy = RepositoryPolicy.UPDATE_POLICY_ALWAYS;
+        }
+        if (metadataUpdatePolicy == null && commandLine.hasOption(CLIManager.METADATA_UPDATE_POLICY)) {
+            metadataUpdatePolicy = commandLine.getOptionValue(CLIManager.METADATA_UPDATE_POLICY);
+        }
+        request.setArtifactsUpdatePolicy(artifactsUpdatePolicy);
+        request.setMetadataUpdatePolicy(metadataUpdatePolicy);
+
         request.setBaseDirectory(baseDirectory);
         request.setSystemProperties(cliRequest.systemProperties);
         request.setUserProperties(cliRequest.userProperties);
@@ -1624,6 +1737,9 @@ public class MavenCli {
     }
 
     int calculateDegreeOfConcurrency(String threadConfiguration) {
+        if ("max".equalsIgnoreCase(threadConfiguration)) {
+            return Math.max(1, Runtime.getRuntime().availableProcessors() - 1);
+        }
         try {
             if (threadConfiguration.endsWith("C")) {
                 String str = threadConfiguration.substring(0, threadConfiguration.length() - 1);
@@ -1647,7 +1763,7 @@ public class MavenCli {
             }
         } catch (NumberFormatException e) {
             throw new IllegalArgumentException("Invalid threads value: '" + threadConfiguration
-                    + "'. Supported are int and float values ending with C.");
+                    + "'. Supported are 'max', int and float values ending with C.");
         }
     }
 

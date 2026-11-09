@@ -79,6 +79,26 @@ public interface MavenOptions extends Options {
     Optional<Boolean> suppressSnapshotUpdates();
 
     /**
+     * The update policy to apply to artifacts ('always', 'daily', 'interval:N', 'never').
+     * The --UA flag overrides this with 'always'.
+     *
+     * @return an {@link Optional} containing the artifacts update policy, or empty if not specified
+     * @since 4.0.0
+     */
+    @Nonnull
+    Optional<String> artifactsUpdatePolicy();
+
+    /**
+     * The update policy to apply to metadata ('always', 'daily', 'interval:N', 'never').
+     * The --UM flag overrides this with 'always'.
+     *
+     * @return an {@link Optional} containing the metadata update policy, or empty if not specified
+     * @since 4.0.0
+     */
+    @Nonnull
+    Optional<String> metadataUpdatePolicy();
+
+    /**
      * Indicates whether Maven should use strict checksum verification.
      *
      * @return an {@link Optional} containing true if strict checksum verification is enabled, false if not, or empty if not specified
@@ -161,7 +181,9 @@ public interface MavenOptions extends Options {
     /**
      * Returns the number of threads used for parallel builds.
      *
-     * @return an {@link Optional} containing the number of threads (or "1C" for one thread per CPU core), or empty if not specified
+     * @return an {@link Optional} containing the number of threads (e.g. {@code 4} for an integer,
+     *         {@code 2C} or {@code 2.5C} for a CPU multiplier, or {@code max} for available processors minus 1,
+     *         minimum 1), or empty if not specified
      */
     @Nonnull
     Optional<String> threads();

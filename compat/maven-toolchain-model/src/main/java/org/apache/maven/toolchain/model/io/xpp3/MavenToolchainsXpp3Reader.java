@@ -95,6 +95,11 @@ public class MavenToolchainsXpp3Reader {
             return new PersistedToolchains(delegate.read(reader, strict, null));
         } catch (XMLStreamException e) {
             throw new XmlPullParserException(e.getMessage(), null, e);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof XMLStreamException cause) {
+                throw new XmlPullParserException(cause.getMessage(), null, cause);
+            }
+            throw e;
         }
     }
 

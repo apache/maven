@@ -194,6 +194,41 @@ class DefaultArtifactVersionTest {
     }
 
     @Test
+    void testZeroPrefixedQualifierEqualsAndHashCode() {
+        for (String prefix : new String[] {"", "1-", "1.2-"}) {
+            for (String qualifier : new String[] {"alpha", "a1", "rc", "snapshot", "ga", "ga0", "ga1", "sp", "x"}) {
+                for (String zero : new String[] {"0-", "0.", "0-0-", "0-0.0-"}) {
+                    assertEqualsAndHash(prefix + qualifier, prefix + zero + qualifier);
+                }
+            }
+            assertEqualsAndHash(prefix + "ga", prefix + "0-final");
+            assertEqualsAndHash(prefix + "ga1", prefix + "0-0-release1");
+        }
+    }
+
+    @Test
+    void testReleaseQualifierWithZeroDigitEqualsAndHashCode() {
+        for (String release : new String[] {"ga", "final", "release"}) {
+            for (int length : new int[] {1, 9, 10, 18, 19}) {
+                String version = "1-" + release + "0".repeat(length);
+                assertEqualsAndHash("1", version);
+                assertEqualsAndHash("1-ga", version);
+                assertEqualsAndHash("1-ga.1", version + ".1");
+                assertEqualsAndHash("1-ga-alpha", version + "-alpha");
+            }
+        }
+    }
+
+    @Test
+    void testNestedQualifierListEqualsAndHashCode() {
+        assertEqualsAndHash("b.m", "b.m.final");
+        assertEqualsAndHash("b.y", "b.y.0");
+        assertEqualsAndHash("beta.milestone", "0000000000-beta.milestone-");
+        assertEqualsAndHash("beta.beta-release.0000000000000000000", "0000000000000000000.00.beta.beta");
+        assertEqualsAndHash("9.a--release0", "9a.release");
+    }
+
+    @Test
     void testEqualsNullSafe() {
         assertFalse(newArtifactVersion("1").equals(null));
     }

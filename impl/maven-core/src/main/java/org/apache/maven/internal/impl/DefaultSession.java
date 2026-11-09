@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.BuildInvocation;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
@@ -37,6 +38,7 @@ import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 import org.apache.maven.api.services.MavenException;
+import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.toolchain.ToolchainModel;
 import org.apache.maven.artifact.repository.ArtifactRepository;
@@ -45,6 +47,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.AbstractSession;
 import org.apache.maven.impl.DefaultRemoteRepository;
 import org.apache.maven.impl.PropertiesAsMap;
+import org.apache.maven.internal.build.DefaultBuildInvocation;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -62,6 +65,8 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     private final MavenRepositorySystem mavenRepositorySystem;
     private final RuntimeInformation runtimeInformation;
     private final Map<String, Project> allProjects = new ConcurrentHashMap<>();
+    private final Object buildInvocationLock = new Object();
+    private volatile BuildInvocation buildInvocation;
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultSession(
@@ -71,6 +76,18 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
             @Nonnull MavenRepositorySystem mavenRepositorySystem,
             @Nonnull Lookup lookup,
             @Nonnull RuntimeInformation runtimeInformation) {
+        this(session, repositorySystem, remoteRepositories, mavenRepositorySystem, lookup, runtimeInformation, null);
+    }
+
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    protected DefaultSession(
+            @Nonnull MavenSession session,
+            @Nonnull RepositorySystem repositorySystem,
+            @Nullable List<RemoteRepository> remoteRepositories,
+            @Nonnull MavenRepositorySystem mavenRepositorySystem,
+            @Nonnull Lookup lookup,
+            @Nonnull RuntimeInformation runtimeInformation,
+            @Nullable RequestTrace context) {
         super(
                 requireNonNull(session).getRepositorySession(),
                 repositorySystem,
@@ -78,7 +95,8 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
                 remoteRepositories == null
                         ? map(session.getRequest().getRemoteRepositories(), RepositoryUtils::toRepo)
                         : null,
-                lookup);
+                lookup,
+                context);
         this.mavenSession = session;
         this.mavenRepositorySystem = mavenRepositorySystem;
         this.runtimeInformation = runtimeInformation;
@@ -153,9 +171,17 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
         return parseVersion(runtimeInformation.getMavenVersion());
     }
 
+    @Nonnull
     @Override
-    public int getDegreeOfConcurrency() {
-        return getMavenSession().getRequest().getDegreeOfConcurrency();
+    public BuildInvocation buildInvocation() {
+        if (buildInvocation == null) {
+            synchronized (buildInvocationLock) {
+                if (buildInvocation == null) {
+                    buildInvocation = DefaultBuildInvocation.from(getMavenSession());
+                }
+            }
+        }
+        return buildInvocation;
     }
 
     @Nonnull
@@ -195,7 +221,8 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
     }
 
     @Override
-    protected Session newSession(RepositorySystemSession repoSession, List<RemoteRepository> repositories) {
+    protected Session newSession(
+            RepositorySystemSession repoSession, List<RemoteRepository> repositories, RequestTrace context) {
         MavenSession t = getMavenSession();
         final MavenSession ms = requireNonNull(t);
         final MavenSession mss;
@@ -204,17 +231,18 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
         } else {
             mss = ms;
         }
-        return newSession(mss, repositories);
+        return newSession(mss, repositories, context);
     }
 
-    protected Session newSession(MavenSession mavenSession, List<RemoteRepository> repositories) {
+    protected Session newSession(MavenSession mavenSession, List<RemoteRepository> repositories, RequestTrace context) {
         return new DefaultSession(
                 requireNonNull(mavenSession),
                 getRepositorySystem(),
                 repositories,
                 mavenRepositorySystem,
                 lookup,
-                runtimeInformation);
+                runtimeInformation,
+                context);
     }
 
     @Override

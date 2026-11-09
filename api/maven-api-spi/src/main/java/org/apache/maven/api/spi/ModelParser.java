@@ -26,19 +26,22 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.di.Named;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Source;
 
 /**
  * The {@code ModelParser} interface is used to locate and read {@link Model}s from the file system.
  * This allows plugging in additional syntaxes for the main model read by Maven when building a project.
+ * <p>
+ * Note: to provide a Maven model "dialect" that supports symmetric translation, implement
+ * {@link ModelDialectProvider}, which composes a pair of parser and writer.
  *
  * @since 4.0.0
+ * @see ModelDialectProvider
+ * @see DialectProvider
  */
 @Experimental
 @Consumer
-@Named
 public interface ModelParser extends SpiService {
 
     /**

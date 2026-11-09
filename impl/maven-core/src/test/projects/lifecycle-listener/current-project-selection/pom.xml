@@ -1,0 +1,19 @@
+<project>
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>current-project-selection</groupId>
+  <artifactId>root</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <modules>
+    <module>dependency</module>
+  </modules>
+
+  <dependencies>
+    <dependency>
+      <groupId>current-project-selection</groupId>
+      <artifactId>dependency</artifactId>
+      <version>1.0</version>
+    </dependency>
+  </dependencies>
+</project>

@@ -37,6 +37,7 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.codehaus.plexus.personality.plexus.lifecycle.phase.Disposable;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.WorkspaceRepository;
@@ -173,6 +174,12 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
 
     @Override
     public CacheRecord put(Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts) {
+        return put(key, pluginRealm, pluginArtifacts, null);
+    }
+
+    @Override
+    public CacheRecord put(
+            Key key, ClassRealm pluginRealm, List<Artifact> pluginArtifacts, DependencyNode dependencyNode) {
         Objects.requireNonNull(pluginRealm, "pluginRealm cannot be null");
         Objects.requireNonNull(pluginArtifacts, "pluginArtifacts cannot be null");
 
@@ -180,7 +187,7 @@ public class DefaultPluginRealmCache implements PluginRealmCache, Disposable {
             throw new IllegalStateException("Duplicate plugin realm for plugin " + key);
         }
 
-        CacheRecord record = new CacheRecord(pluginRealm, pluginArtifacts);
+        CacheRecord record = new CacheRecord(pluginRealm, pluginArtifacts, dependencyNode);
 
         cache.put(key, record);
 

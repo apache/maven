@@ -612,8 +612,8 @@ public class RepositorySystemSupplier {
     @Provides
     @Named(SimpleLocalRepositoryManagerFactory.NAME)
     static SimpleLocalRepositoryManagerFactory newSimpleLocalRepositoryManagerFactory(
-            LocalPathComposer localPathComposer, RepositoryKeyFunctionFactory repositoryKeyFunctionFactory) {
-        return new SimpleLocalRepositoryManagerFactory(localPathComposer, repositoryKeyFunctionFactory);
+            LocalPathComposer localPathComposer) {
+        return new SimpleLocalRepositoryManagerFactory(localPathComposer);
     }
 
     @Singleton

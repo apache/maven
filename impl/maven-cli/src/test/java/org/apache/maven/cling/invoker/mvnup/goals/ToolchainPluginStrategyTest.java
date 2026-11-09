@@ -38,6 +38,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.verify;
 
 /**
  * Unit tests for the {@link ToolchainPluginStrategy} class.
@@ -480,17 +482,18 @@ class ToolchainPluginStrategyTest {
     @DisplayName("Full apply")
     class ApplyTests {
 
-        @Test
-        @DisplayName("should add plugin when source level is incompatible with running JDK")
-        void addsPluginWhenIncompatible() {
-            // Simulate running JDK 21, project targets source 6
-            ToolchainPluginStrategy strategy = new ToolchainPluginStrategy() {
-                @Override
-                int getRunningJdkMajor() {
-                    return 21;
-                }
-            };
+        private ToolchainPluginStrategy strategy;
 
+        @BeforeEach
+        void setUp() {
+            strategy = new ToolchainPluginStrategy();
+        }
+
+        @Test
+        @DisplayName("should add plugin when project declares a retired source level and emit JDK availability warning")
+        void addsPluginForRetiredSourceLevel() {
+            // source 6 is retired (last supported by JDK 11) — toolchain must be added
+            // regardless of the JDK running mvnup, and a warning about JDK availability must be emitted
             String pomXml = """
                     <?xml version="1.0" encoding="UTF-8"?>
                     <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -510,19 +513,16 @@ class ToolchainPluginStrategyTest {
 
             assertEquals(1, result.modifiedPoms().size());
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
+            assertTrue(doc.toXml().contains("select-jdk-toolchain"), "POM should contain select-jdk-toolchain goal");
+            verify(context.logger).warn(contains("must be installed"));
         }
 
         @Test
-        @DisplayName("should not modify POM when source level is compatible")
-        void noModificationWhenCompatible() {
-            // Simulate running JDK 17, project targets source 11
-            ToolchainPluginStrategy strategy = new ToolchainPluginStrategy() {
-                @Override
-                int getRunningJdkMajor() {
-                    return 17;
-                }
-            };
-
+        @DisplayName(
+                "should not modify POM and must not generate invalid range when source level is current (not retired)")
+        void noModificationForCurrentSourceLevel() {
+            // source 21 is not retired — must not generate the invalid '(,-1]' version range (regression: #13189)
+            // latestJdkForSourceLevel(21) returns -1; this must NOT propagate into the POM as a version constraint
             String pomXml = """
                     <?xml version="1.0" encoding="UTF-8"?>
                     <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -531,7 +531,7 @@ class ToolchainPluginStrategyTest {
                         <artifactId>test</artifactId>
                         <version>1.0</version>
                         <properties>
-                            <maven.compiler.release>11</maven.compiler.release>
+                            <maven.compiler.release>21</maven.compiler.release>
                         </properties>
                     </project>
                     """;
@@ -541,18 +541,12 @@ class ToolchainPluginStrategyTest {
             UpgradeResult result = strategy.doApply(context, Map.of(POM_PATH, doc));
 
             assertEquals(0, result.modifiedPoms().size());
+            assertFalse(doc.toXml().contains(",-1]"), "POM must not contain invalid version range (,-1]");
         }
 
         @Test
         @DisplayName("should not modify POM when no source level configured")
         void noModificationWithoutSourceLevel() {
-            ToolchainPluginStrategy strategy = new ToolchainPluginStrategy() {
-                @Override
-                int getRunningJdkMajor() {
-                    return 21;
-                }
-            };
-
             String pomXml = """
                     <?xml version="1.0" encoding="UTF-8"?>
                     <project xmlns="http://maven.apache.org/POM/4.0.0">
@@ -573,13 +567,6 @@ class ToolchainPluginStrategyTest {
         @Test
         @DisplayName("should not add duplicate plugin when already present")
         void noDuplicatePlugin() {
-            ToolchainPluginStrategy strategy = new ToolchainPluginStrategy() {
-                @Override
-                int getRunningJdkMajor() {
-                    return 21;
-                }
-            };
-
             String pomXml = """
                     <?xml version="1.0" encoding="UTF-8"?>
                     <project xmlns="http://maven.apache.org/POM/4.0.0">

@@ -57,6 +57,7 @@ import org.codehaus.plexus.util.FileUtils;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.LocalRepository;
+import org.eclipse.aether.repository.WorkspaceReader;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 
@@ -172,6 +173,7 @@ public abstract class AbstractCoreMavenComponentTestCase {
         RepositorySystemSession session = new MavenSessionBuilderSupplier(repositorySystem, true)
                 .get()
                 .withLocalRepositories(localRepo)
+                .setWorkspaceReader(getWorkspaceReader())
                 .build();
         projectBuildingRequest.setRepositorySession(session);
 
@@ -192,6 +194,13 @@ public abstract class AbstractCoreMavenComponentTestCase {
         sessionScope.seed(MavenSession.class, mSession);
         sessionScope.seed(Session.class, iSession);
         sessionScope.seed(InternalMavenSession.class, InternalMavenSession.from(iSession));
+    }
+
+    /**
+     * The workspace reader of the repository session, none by default.
+     */
+    protected WorkspaceReader getWorkspaceReader() {
+        return null;
     }
 
     protected MavenProject createStubMavenProject() {

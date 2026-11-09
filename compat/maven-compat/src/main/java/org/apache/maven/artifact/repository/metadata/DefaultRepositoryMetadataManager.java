@@ -39,6 +39,7 @@ import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.DefaultRepositoryRequest;
 import org.apache.maven.artifact.repository.RepositoryRequest;
+import org.apache.maven.impl.resolver.MetadataInputValidator;
 import org.apache.maven.metadata.v4.MetadataStaxReader;
 import org.apache.maven.metadata.v4.MetadataStaxWriter;
 import org.apache.maven.repository.legacy.ChecksumFailedException;
@@ -287,7 +288,7 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
         try (InputStream in = Files.newInputStream(mappingFile.toPath())) {
             Metadata result = new Metadata(new MetadataStaxReader().read(in, false));
 
-            validateVersioning(result);
+            validateMetadata(result);
 
             return result;
         } catch (FileNotFoundException e) {
@@ -299,47 +300,29 @@ public class DefaultRepositoryMetadataManager extends AbstractLogEnabled impleme
     }
 
     /**
-     * Version tokens adopted from repository metadata must be valid coordinate components; metadata carrying
-     * anything else is treated as invalid.
+     * Version tokens and plugin coordinates adopted from repository metadata must be valid coordinate components;
+     * metadata carrying anything else is treated as invalid.
      */
-    private static void validateVersioning(Metadata metadata) throws RepositoryMetadataReadException {
-        if (metadata == null) {
-            return;
+    private static void validateMetadata(Metadata metadata) throws IOException {
+        for (Plugin plugin : metadata.getPlugins()) {
+            MetadataInputValidator.validateVersionToken(plugin.getArtifactId(), "plugin/artifactId");
+            MetadataInputValidator.validateVersionToken(plugin.getPrefix(), "plugin/prefix");
         }
         Versioning versioning = metadata.getVersioning();
         if (versioning == null) {
             return;
         }
-        validateVersionToken(versioning.getLatest());
-        validateVersionToken(versioning.getRelease());
+        MetadataInputValidator.validateVersionToken(versioning.getLatest(), "latest version");
+        MetadataInputValidator.validateVersionToken(versioning.getRelease(), "release version");
         for (String version : versioning.getVersions()) {
-            validateVersionToken(version);
+            MetadataInputValidator.validateVersionToken(version, "version");
         }
         for (SnapshotVersion snapshotVersion : versioning.getSnapshotVersions()) {
-            validateVersionToken(snapshotVersion.getVersion());
+            MetadataInputValidator.validateVersionToken(snapshotVersion.getVersion(), "snapshot version");
         }
         Snapshot snapshot = versioning.getSnapshot();
         if (snapshot != null) {
-            validateVersionToken(snapshot.getTimestamp());
-        }
-    }
-
-    private static void validateVersionToken(String value) throws RepositoryMetadataReadException {
-        if (value == null || value.isEmpty()) {
-            return;
-        }
-        boolean valid = !"..".equals(value);
-        if (valid) {
-            for (int i = 0; i < value.length(); i++) {
-                char c = value.charAt(i);
-                if (c == '/' || c == '\\' || c == ':' || Character.isISOControl(c)) {
-                    valid = false;
-                    break;
-                }
-            }
-        }
-        if (!valid) {
-            throw new RepositoryMetadataReadException("Metadata contains an invalid version token: '" + value + "'");
+            MetadataInputValidator.validateVersionToken(snapshot.getTimestamp(), "snapshot timestamp");
         }
     }
 

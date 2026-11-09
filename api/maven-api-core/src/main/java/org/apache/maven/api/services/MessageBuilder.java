@@ -149,27 +149,48 @@ public interface MessageBuilder extends Appendable {
         return style("." + Constants.MAVEN_STYLE_PROJECT_NAME + ":-" + Constants.MAVEN_STYLE_PROJECT_DEFAULT, message);
     }
 
+    /**
+     * Append message content with the given style applied, then reset the style.
+     *
+     * @param style the style definition to apply
+     * @param message the message to append
+     * @return the current builder
+     */
     @Nonnull
     default MessageBuilder style(String style, Object message) {
         return style(style).a(message).resetStyle();
     }
 
+    /**
+     * Apply the given style to subsequent appended content.
+     *
+     * @param style the style definition to apply
+     * @return the current builder
+     */
     MessageBuilder style(String style);
 
+    /**
+     * Reset the current style back to the default.
+     *
+     * @return the current builder
+     */
     MessageBuilder resetStyle();
 
     //
     // message building methods modelled after Ansi methods
     //
 
+    /** {@inheritDoc} */
     @Nonnull
     @Override
     MessageBuilder append(CharSequence cs);
 
+    /** {@inheritDoc} */
     @Nonnull
     @Override
     MessageBuilder append(CharSequence cs, int start, int end);
 
+    /** {@inheritDoc} */
     @Nonnull
     @Override
     MessageBuilder append(char c);

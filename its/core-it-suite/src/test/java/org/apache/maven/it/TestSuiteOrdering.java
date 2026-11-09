@@ -21,7 +21,10 @@ package org.apache.maven.it;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,15 +33,29 @@ import org.junit.jupiter.api.ClassOrderer;
 import org.junit.jupiter.api.ClassOrdererContext;
 
 /**
- * Test suite ordering that orders tests by prefix (gh-xxx, mng-xxx, it-xxx) in descending order.
+ * Test suite ordering that orders tests by prefix (gh-xxx, mng-xxx, it-xxx, mdep-xxx) in descending order.
  * This ensures newer tests (higher numbers) are run first, which is useful for fail-fast behavior
  * since newer tests are more likely to fail.
+ * <p>
+ * Execution order (first to last):
+ * <ol>
+ *   <li>{@code MavenITBootstrapTest} — always runs first to set up the local repository</li>
+ *   <li>gh-prefixed tests (descending number)</li>
+ *   <li>mng-prefixed tests (descending number)</li>
+ *   <li>it-prefixed and mdep-prefixed tests (descending number)</li>
+ *   <li>Unrecognized class name patterns — fall back to alphabetical ordering (logged once as warning)</li>
+ * </ol>
  */
 public class TestSuiteOrdering implements ClassOrderer {
 
     private static final Pattern GH_PATTERN = Pattern.compile(".*MavenITgh(\\d+).*");
     private static final Pattern MNG_PATTERN = Pattern.compile(".*MavenITmng(\\d+).*");
     private static final Pattern IT_PATTERN = Pattern.compile(".*MavenIT(\\d+).*");
+    private static final Pattern MDEP_PATTERN = Pattern.compile(".*MavenITmdep(\\d+).*");
+
+    private static final PrintStream out = System.out;
+    private static final Set<String> WARNED_CLASSES =
+            Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     private static void infoProperty(PrintStream info, String property) {
         info.println(property + ": " + System.getProperty(property));
@@ -78,35 +95,50 @@ public class TestSuiteOrdering implements ClassOrderer {
 
     @Override
     public void orderClasses(ClassOrdererContext context) {
-        context.getClassDescriptors()
-                .sort(Comparator.comparing(this::getOrderKey).reversed());
+        context.getClassDescriptors().sort(Comparator.comparing(this::getOrderKey).reversed());
     }
 
     private String getOrderKey(ClassDescriptor classDescriptor) {
         String className = classDescriptor.getTestClass().getSimpleName();
 
-        // Check for gh- pattern first (highest priority)
+        // Bootstrap test must always run first — give it the highest possible key.
+        if (className.equals("MavenITBootstrapTest")) {
+            return "9-MavenITBootstrapTest";
+        }
+
+        // Check for gh- pattern (highest priority among numbered tests)
         Matcher ghMatcher = GH_PATTERN.matcher(className);
         if (ghMatcher.matches()) {
             int number = Integer.parseInt(ghMatcher.group(1));
-            return String.format("3-%08d", number); // Prefix with 3 for highest priority
+            return String.format("3-%08d", number);
         }
 
         // Check for mng- pattern (medium priority)
         Matcher mngMatcher = MNG_PATTERN.matcher(className);
         if (mngMatcher.matches()) {
             int number = Integer.parseInt(mngMatcher.group(1));
-            return String.format("2-%08d", number); // Prefix with 2 for medium priority
+            return String.format("2-%08d", number);
         }
 
-        // Check for it- pattern (lowest priority)
+        // Check for it- pattern (lower priority)
         Matcher itMatcher = IT_PATTERN.matcher(className);
         if (itMatcher.matches()) {
             int number = Integer.parseInt(itMatcher.group(1));
-            return String.format("1-%08d", number); // Prefix with 3 for lowest priority
+            return String.format("1-%08d", number);
         }
 
-        // For any other tests, use the class name as-is (will be sorted alphabetically)
-        return "4-" + className;
+        // Check for mdep- pattern (same bucket as it-)
+        Matcher mdepMatcher = MDEP_PATTERN.matcher(className);
+        if (mdepMatcher.matches()) {
+            int number = Integer.parseInt(mdepMatcher.group(1));
+            return String.format("1-%08d", number);
+        }
+
+        // Unknown prefix — log once per class so contributors notice non-standard names.
+        // Use "0-" so these sort last (after all known categories) in the descending order.
+        if (WARNED_CLASSES.add(className)) {
+            out.println("[TestSuiteOrdering] Unrecognized test class pattern, ordering as fallback: " + className);
+        }
+        return "0-" + className;
     }
 }

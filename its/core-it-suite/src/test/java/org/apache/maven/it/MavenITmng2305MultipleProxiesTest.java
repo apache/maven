@@ -63,8 +63,9 @@ public class MavenITmng2305MultipleProxiesTest extends AbstractMavenIntegrationT
         // NOTE: trust store cannot be reliably configured for the current JVM
         verifier.setForkJvm(true);
 
-        // keytool -genkey -alias https.mngit -keypass key-passwd -keystore keystore -storepass store-passwd \
-        //   -validity 4096 -dname "cn=https.mngit, ou=None, L=Seattle, ST=Washington, o=ExampleOrg, c=US" -keyalg RSA
+        // keytool -genkeypair -alias https.mngit -keyalg RSA -keysize 2048 -sigalg SHA256withRSA \
+        //   -storetype JKS -keystore keystore -storepass store-passwd -keypass key-passwd \
+        //   -validity 4096 -dname "cn=https.mngit, ou=None, L=Seattle, ST=Washington, o=ExampleOrg, c=US" -noprompt
         Path storePath = testDir.resolve("keystore");
         String storePwd = "store-passwd";
         String keyPwd = "key-passwd";

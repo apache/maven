@@ -545,6 +545,25 @@
             <multiplicity>*</multiplicity>
           </association>
         </field>
+        <field>
+          <name>repositoryOrigins</name>
+          <version>1.3.0+</version>
+          <description>List of repository origins these credentials may be used with, each written as
+            {@code scheme://host} or {@code scheme://host:port}, for example {@code https://repo.example.org}
+            or {@code https://mirror.example.org:8443} - an origin, not a full repository URL.
+            Maven binds the credentials of a server to the origins of the repositories and mirrors declared
+            with the same id, see the {@code maven.repository.credentialScope} user property. The origins
+            listed here are added to those; nothing is replaced. Declaring them is needed when the repository
+            using these credentials is not known when the session is created, for example a repository
+            declared in a {@code settings.xml} profile that is not listed in {@code &lt;activeProfiles&gt;}
+            but activated through {@code &lt;activation&gt;} or {@code -P}.
+            Comparison is case insensitive and the default ports 80 (http) and 443 (https) are equivalent to
+            no port. This element is not supported in project settings and is dropped there.</description>
+          <association>
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
       </fields>
     </class>
     <class>

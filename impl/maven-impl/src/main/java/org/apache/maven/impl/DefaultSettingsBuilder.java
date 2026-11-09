@@ -18,23 +18,25 @@
  */
 package org.apache.maven.impl;
 
-import javax.xml.stream.Location;
-import javax.xml.stream.XMLStreamException;
-
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.services.BuilderProblem;
@@ -46,8 +48,6 @@ import org.apache.maven.api.services.SettingsBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilderResult;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
-import org.apache.maven.api.services.xml.XmlReaderException;
-import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.settings.Activation;
 import org.apache.maven.api.settings.IdentifiableBase;
 import org.apache.maven.api.settings.Profile;
@@ -56,6 +56,8 @@ import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.RepositoryPolicy;
 import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.api.spi.SettingsParser;
+import org.apache.maven.api.spi.SettingsParserException;
 import org.apache.maven.settings.v4.SettingsMerger;
 import org.apache.maven.settings.v4.SettingsTransformer;
 import org.codehaus.plexus.components.secdispatcher.Dispatcher;
@@ -77,7 +79,9 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
     };
 
-    private final SettingsXmlFactory settingsXmlFactory;
+    private final SettingsParser xmlSettingsParser;
+
+    private final Map<String, SettingsParser> settingsParsers;
 
     private final Interpolator interpolator;
 
@@ -86,10 +90,19 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
     /**
      * In Maven4 the {@link SecDispatcher} is injected and build settings are fully decrypted as well.
      */
-    @Inject
     public DefaultSettingsBuilder(
             SettingsXmlFactory settingsXmlFactory, Interpolator interpolator, Map<String, Dispatcher> dispatchers) {
-        this.settingsXmlFactory = settingsXmlFactory;
+        this(settingsXmlFactory, interpolator, dispatchers, Map.of());
+    }
+
+    @Inject
+    public DefaultSettingsBuilder(
+            SettingsXmlFactory settingsXmlFactory,
+            Interpolator interpolator,
+            Map<String, Dispatcher> dispatchers,
+            @Nullable Map<String, SettingsParser> settingsParsers) {
+        this.xmlSettingsParser = new XmlSettingsParser(settingsXmlFactory);
+        this.settingsParsers = settingsParsers != null ? settingsParsers : Map.of();
         this.interpolator = interpolator;
         this.dispatchers = dispatchers;
     }
@@ -110,11 +123,11 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         Settings effective =
                 settingsMerger.merge(user, settingsMerger.merge(project, installation, false, null), false, null);
 
-        // If no repository is defined in the user/global settings,
-        // it means that we have "old" settings (as those are new in 4.0)
-        // so add central to the computed settings for backward compatibility.
+        // Each list is checked independently: a user may define <repositories>
+        // (e.g. an internal mirror) without defining <pluginRepositories>, and
+        // plugin resolution still needs central.
         if (effective.getRepositories().isEmpty()
-                && effective.getPluginRepositories().isEmpty()) {
+                || effective.getPluginRepositories().isEmpty()) {
             Repository central = Repository.newBuilder()
                     .id("central")
                     .name("Central Repository")
@@ -123,10 +136,14 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     .build();
             Repository centralWithNoUpdate = central.withReleases(
                     RepositoryPolicy.newBuilder().updatePolicy("never").build());
-            effective = Settings.newBuilder(effective)
-                    .repositories(List.of(central))
-                    .pluginRepositories(List.of(centralWithNoUpdate))
-                    .build();
+            Settings.Builder builder = Settings.newBuilder(effective);
+            if (effective.getRepositories().isEmpty()) {
+                builder.repositories(List.of(central));
+            }
+            if (effective.getPluginRepositories().isEmpty()) {
+                builder.pluginRepositories(List.of(centralWithNoUpdate));
+            }
+            effective = builder.build();
         }
 
         // resolve relative local repository paths to absolute to save plugins from trouble.
@@ -156,38 +173,45 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             return Settings.newInstance();
         }
 
+        // Determine if strict parsing mode is requested
+        boolean strictParsing = Boolean.parseBoolean(
+                request.getSession().getEffectiveProperties().get(Constants.MAVEN_SETTINGS_STRICT_PARSING));
+
         Settings settings;
 
         try {
-            try (InputStream is = settingsSource.openStream()) {
-                settings = settingsXmlFactory.read(XmlReaderRequest.builder()
-                        .inputStream(is)
-                        .location(settingsSource.getLocation())
-                        .strict(true)
-                        .build());
-            } catch (XmlReaderException e) {
-                try (InputStream is = settingsSource.openStream()) {
-                    settings = settingsXmlFactory.read(XmlReaderRequest.builder()
-                            .inputStream(is)
-                            .location(settingsSource.getLocation())
-                            .strict(false)
-                            .build());
-                    Location loc = e.getCause() instanceof XMLStreamException xe ? xe.getLocation() : null;
-                    problems.reportProblem(new DefaultBuilderProblem(
-                            settingsSource.getLocation(),
-                            loc != null ? loc.getLineNumber() : -1,
-                            loc != null ? loc.getColumnNumber() : -1,
-                            e,
-                            e.getMessage(),
-                            BuilderProblem.Severity.WARNING));
-                }
+            SettingsParser parser = selectParser(settingsSource, problems);
+            if (parser == null) {
+                return Settings.newInstance();
             }
-        } catch (XmlReaderException e) {
-            Location loc = e.getCause() instanceof XMLStreamException xe ? xe.getLocation() : null;
+
+            // Interpolate the raw XML before parsing so that non-String fields
+            // (e.g. proxy.port, proxy.active) are resolved at the text level
+            // before Modello converts them to int/boolean.
+            Source interpolatedSource = interpolateSource(settingsSource, request);
+
+            try {
+                settings = parser.parse(interpolatedSource, Map.of(SettingsParser.STRICT, true));
+            } catch (SettingsParserException e) {
+                BuilderProblem.Severity severity =
+                        strictParsing ? BuilderProblem.Severity.FATAL : BuilderProblem.Severity.WARNING;
+                problems.reportProblem(new DefaultBuilderProblem(
+                        settingsSource.getLocation(),
+                        e.getLineNumber(),
+                        e.getColumnNumber(),
+                        e,
+                        e.getMessage(),
+                        severity));
+                if (strictParsing) {
+                    return Settings.newInstance();
+                }
+                settings = parser.parse(interpolatedSource, Map.of(SettingsParser.STRICT, false));
+            }
+        } catch (SettingsParserException e) {
             problems.reportProblem(new DefaultBuilderProblem(
                     settingsSource.getLocation(),
-                    loc != null ? loc.getLineNumber() : -1,
-                    loc != null ? loc.getColumnNumber() : -1,
+                    e.getLineNumber(),
+                    e.getColumnNumber(),
                     e,
                     "Non-parseable settings " + settingsSource.getLocation() + ": " + e.getMessage(),
                     BuilderProblem.Severity.FATAL));
@@ -226,6 +250,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                                     .filePermissions(null)
                                     .directoryPermissions(null)
                                     .aliases(List.of())
+                                    .repositoryOrigins(List.of())
                                     .build())
                             .toList())
                     .build();
@@ -243,6 +268,130 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private Server serverAlias(Server server, String id) {
         return Server.newBuilder(server, true).id(id).aliases(List.of()).build();
+    }
+
+    /**
+     * XML-escapes a value so that it can be safely embedded in XML text content.
+     * Replaces the five predefined XML entities: {@code &}, {@code <}, {@code >},
+     * {@code "}, and {@code '}.
+     */
+    private static String xmlEscape(String value) {
+        if (value == null) {
+            return null;
+        }
+        // Quick check: if none of the special chars are present, return as-is
+        if (value.indexOf('&') < 0
+                && value.indexOf('<') < 0
+                && value.indexOf('>') < 0
+                && value.indexOf('"') < 0
+                && value.indexOf('\'') < 0) {
+            return value;
+        }
+        StringBuilder sb = new StringBuilder(value.length() + 16);
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            switch (c) {
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                case '\'':
+                    sb.append("&apos;");
+                    break;
+                default:
+                    sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Wraps the source so that when {@code openStream()} is called, the raw XML is read,
+     * interpolated as a string (resolving non-String fields like {@code <port>${test.port}</port>}
+     * before Modello converts them to int/boolean), and returned as a new stream.
+     *
+     * <p>Resolved property values are XML-escaped before substitution so that values containing
+     * XML special characters (e.g. {@code &x=y<>}) do not corrupt the XML structure.</p>
+     */
+    private Source interpolateSource(Source settingsSource, SettingsBuilderRequest request) {
+        UnaryOperator<String> src;
+        if (request.getInterpolationSource().isPresent()) {
+            src = request.getInterpolationSource().get();
+        } else {
+            Map<String, String> userProperties = request.getSession().getUserProperties();
+            Map<String, String> systemProperties = request.getSession().getSystemProperties();
+            src = Interpolator.chain(userProperties::get, systemProperties::get);
+        }
+
+        return new Source() {
+            @Override
+            public Path getPath() {
+                return settingsSource.getPath();
+            }
+
+            @Override
+            public InputStream openStream() throws IOException {
+                String rawXml;
+                try (InputStream in = settingsSource.openStream()) {
+                    byte[] bytes = in.readAllBytes();
+                    rawXml = new String(bytes, StandardCharsets.UTF_8);
+                }
+                // XML-escape resolved values so that property values containing XML special
+                // characters (e.g. &, <, >) do not produce malformed XML after substitution.
+                String interpolatedXml =
+                        interpolator.interpolate(rawXml, src, (name, value) -> xmlEscape(value), false);
+                return new ByteArrayInputStream(interpolatedXml.getBytes(StandardCharsets.UTF_8));
+            }
+
+            @Override
+            public String getLocation() {
+                return settingsSource.getLocation();
+            }
+
+            @Override
+            public Source resolve(String relative) {
+                return settingsSource.resolve(relative);
+            }
+        };
+    }
+
+    @Nullable
+    private SettingsParser selectParser(Source source, ProblemCollector<BuilderProblem> problems) {
+        List<Map.Entry<String, SettingsParser>> matches = new ArrayList<>();
+        for (Map.Entry<String, SettingsParser> entry : settingsParsers.entrySet()) {
+            try {
+                if (entry.getValue().supports(source)) {
+                    matches.add(entry);
+                }
+            } catch (RuntimeException e) {
+                String msg = "Settings parser '" + parserName(entry.getKey())
+                        + "' failed to determine support for this source";
+                problems.reportProblem(
+                        new DefaultBuilderProblem(source.getLocation(), -1, -1, e, msg, BuilderProblem.Severity.FATAL));
+                return null;
+            }
+        }
+        if (matches.size() > 1) {
+            String parsers =
+                    matches.stream().map(e -> parserName(e.getKey())).sorted().collect(Collectors.joining(", "));
+            String msg = "Multiple settings parsers support this source: " + parsers;
+            problems.reportProblem(
+                    new DefaultBuilderProblem(source.getLocation(), -1, -1, null, msg, BuilderProblem.Severity.FATAL));
+            return null;
+        }
+        return matches.isEmpty() ? xmlSettingsParser : matches.get(0).getValue();
+    }
+
+    private static String parserName(@Nullable String key) {
+        return key != null ? key : "<unnamed>";
     }
 
     private Settings interpolate(

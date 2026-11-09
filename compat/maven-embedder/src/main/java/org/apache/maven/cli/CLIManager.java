@@ -31,6 +31,7 @@ import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.jline.MessageUtils;
+import org.apache.maven.utils.CleanArgument;
 
 /**
  */
@@ -68,7 +69,11 @@ public class CLIManager {
 
     public static final char NON_RECURSIVE = 'N';
 
-    public static final char UPDATE_SNAPSHOTS = 'U';
+    public static final char UPDATE_ALL = 'U';
+
+    /** @deprecated Use {@link #UPDATE_ALL} instead. */
+    @Deprecated
+    public static final char UPDATE_SNAPSHOTS = UPDATE_ALL;
 
     public static final char ACTIVATE_PROFILES = 'P';
 
@@ -132,6 +137,14 @@ public class CLIManager {
 
     public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
 
+    public static final String UPDATE_METADATA = "UM";
+
+    public static final String UPDATE_ARTIFACTS = "UA";
+
+    public static final String ARTIFACTS_UPDATE_POLICY = "artifacts-update-policy";
+
+    public static final String METADATA_UPDATE_POLICY = "metadata-update-policy";
+
     public static final String DEBUG = "debug";
     public static final String ENC = "enc";
     public static final String YJP = "yjp";
@@ -182,10 +195,25 @@ public class CLIManager {
                 .desc(
                         "Do not recurse into sub-projects. When used together with -pl, do not recurse into sub-projects of selected aggregators")
                 .build());
-        options.addOption(Option.builder(Character.toString(UPDATE_SNAPSHOTS))
-                .longOpt("update-snapshots")
-                .desc("Forces a check for missing releases and updated snapshots on remote repositories")
+
+        // -U is the short form of --update-all.
+        options.addOption(Option.builder(Character.toString(UPDATE_ALL))
+                .longOpt("update-all")
+                .desc(
+                        "Shortcut for --update-metadata --update-artifacts: forces updates of metadata and artifacts on remote repositories")
                 .build());
+
+        // Keep the old option as a deprecated alias for backwards compatibility.
+        options.addOption(Option.builder()
+                .longOpt("update-snapshots")
+                .desc("<deprecated> Use -U,--update-all instead.")
+                .deprecated(DeprecatedAttributes.builder()
+                        .setForRemoval(true)
+                        .setSince("4.2.0")
+                        .setDescription("Use -U,--update-all instead.")
+                        .get())
+                .build());
+
         options.addOption(Option.builder(Character.toString(ACTIVATE_PROFILES))
                 .longOpt("activate-profiles")
                 .desc(
@@ -307,7 +335,8 @@ public class CLIManager {
         options.addOption(Option.builder(THREADS)
                 .longOpt("threads")
                 .hasArg()
-                .desc("Thread count, for instance 4 (int) or 2C/2.5C (int/float) where C is core multiplied")
+                .desc(
+                        "Thread count, for instance 4 (int) or 2C/2.5C (int/float) where C is core multiplied, or 'max' (available processors minus 1, minimum 1)")
                 .build());
         options.addOption(Option.builder(BUILDER)
                 .longOpt("builder")
@@ -338,6 +367,27 @@ public class CLIManager {
         options.addOption(Option.builder(IGNORE_TRANSITIVE_REPOSITORIES)
                 .longOpt("ignore-transitive-repositories")
                 .desc("If set, Maven will ignore remote repositories introduced by transitive dependencies.")
+                .build());
+        options.addOption(Option.builder(UPDATE_METADATA)
+                .longOpt("update-metadata")
+                .desc(
+                        "Forces updates of remote repository metadata (updates plugin prefixes, version ranges and snapshots)")
+                .build());
+        options.addOption(Option.builder(UPDATE_ARTIFACTS)
+                .longOpt("update-artifacts")
+                .desc("Forces checks for missing artifacts (retries cached retrieval errors)")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(ARTIFACTS_UPDATE_POLICY)
+                .hasArg(true)
+                .desc(
+                        "The update policy to apply onto artifacts ('always', 'daily', 'interval:N', 'never'); The -UA option overrides this option with 'always'")
+                .build());
+        options.addOption(Option.builder()
+                .longOpt(METADATA_UPDATE_POLICY)
+                .hasArg(true)
+                .desc(
+                        "The update policy to apply onto metadata ('always', 'daily', 'interval:N', 'never'); The -UM option overrides this option with 'always'")
                 .build());
 
         // Parameters handled by script

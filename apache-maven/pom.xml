@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>4.2.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>apache-maven</artifactId>
@@ -126,8 +126,8 @@ under the License.
       <artifactId>javax.inject</artifactId>
     </dependency>
     <dependency>
-      <groupId>javax.annotation</groupId>
-      <artifactId>javax.annotation-api</artifactId>
+      <groupId>jakarta.annotation</groupId>
+      <artifactId>jakarta.annotation-api</artifactId>
     </dependency>
 
     <!-- DI Runtime -->
@@ -164,7 +164,30 @@ under the License.
   </pluginRepositories>
 
   <build>
+    <resources>
+      <resource>
+        <filtering>true</filtering>
+        <directory>src/main/resources</directory>
+      </resource>
+    </resources>
     <plugins>
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>buildnumber-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <id>create-buildnumber</id>
+            <goals>
+              <goal>create</goal>
+            </goals>
+            <configuration>
+              <doCheck>false</doCheck>
+              <doUpdate>false</doUpdate>
+              <revisionOnScmFailure>NON_CANONICAL</revisionOnScmFailure>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-dependency-plugin</artifactId>
@@ -185,6 +208,21 @@ under the License.
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <executions>
+          <execution>
+            <!-- compiled here so that the launchers do not pay for source-launch compilation on every run -->
+            <id>compile-jvm-config-parser</id>
+            <goals>
+              <goal>compile</goal>
+            </goals>
+            <configuration>
+              <compileSourceRoots>
+                <compileSourceRoot>${project.basedir}/src/assembly/maven/bin</compileSourceRoot>
+              </compileSourceRoots>
+              <includes>
+                <include>JvmConfigParser.java</include>
+              </includes>
+            </configuration>
+          </execution>
           <execution>
             <id>test-compile</id>
             <goals>
@@ -377,17 +415,21 @@ under the License.
           </plugin>
           <!-- calculate checksums of source release for Apache dist area -->
           <plugin>
-            <groupId>net.nicoulaj.maven.plugins</groupId>
-            <artifactId>checksum-maven-plugin</artifactId>
-            <version>1.11</version>
+            <groupId>eu.maveniverse.maven.plugins</groupId>
+            <artifactId>checksum-plugin3</artifactId>
             <executions>
               <execution>
                 <id>source-release-checksum</id>
                 <goals>
-                  <goal>artifacts</goal>
+                  <goal>project</goal>
                 </goals>
+                <phase>post-integration-test</phase>
                 <configuration>
-                  <includeClassifiers>bin,src</includeClassifiers>
+                  <alg>SHA-512</alg>
+                  <includedClassifiers>
+                    <includedClassifier>src</includedClassifier>
+                    <includedClassifier>bin</includedClassifier>
+                  </includedClassifiers>
                 </configuration>
               </execution>
             </executions>
@@ -467,7 +509,7 @@ under the License.
           <plugin>
             <groupId>org.codehaus.mojo</groupId>
             <artifactId>exec-maven-plugin</artifactId>
-            <version>3.6.3</version>
+            <version>3.6.4</version>
             <executions>
               <execution>
                 <id>test-mvn-path-conversion</id>
@@ -480,6 +522,48 @@ under the License.
                   <executable>sh</executable>
                   <arguments>
                     <argument>${project.basedir}/src/test/scripts/test-mvn-path-conversion.sh</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>test-mvn-fast-version</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <skip>${skipTests}</skip>
+                  <executable>sh</executable>
+                  <arguments>
+                    <argument>${project.basedir}/src/test/scripts/test-mvn-fast-version.sh</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>test-mvn-args</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <skip>${skipTests}</skip>
+                  <executable>sh</executable>
+                  <arguments>
+                    <argument>${project.basedir}/src/test/scripts/test-mvn-args.sh</argument>
+                  </arguments>
+                </configuration>
+              </execution>
+              <execution>
+                <id>test-mvn-jvm-config</id>
+                <goals>
+                  <goal>exec</goal>
+                </goals>
+                <phase>test</phase>
+                <configuration>
+                  <skip>${skipTests}</skip>
+                  <executable>sh</executable>
+                  <arguments>
+                    <argument>${project.basedir}/src/test/scripts/test-mvn-jvm-config.sh</argument>
                   </arguments>
                 </configuration>
               </execution>

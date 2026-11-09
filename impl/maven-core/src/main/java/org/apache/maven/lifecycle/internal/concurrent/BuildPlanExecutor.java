@@ -25,12 +25,15 @@ import javax.xml.stream.XMLStreamException;
 import java.io.IOException;
 import java.time.Duration;
 import java.time.Instant;
+import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
@@ -75,8 +78,10 @@ import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
 import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.Task;
 import org.apache.maven.lifecycle.internal.TaskSegment;
+import org.apache.maven.model.InputLocation;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.PluginExecution;
+import org.apache.maven.model.Profile;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.MojoNotFoundException;
@@ -202,6 +207,8 @@ public class BuildPlanExecutor {
         final ReadWriteLock lock = new ReentrantReadWriteLock();
         final int threads;
         BuildPlan plan;
+        final Map<BuildStep, BuildStep> aggregationEnds = new HashMap<>();
+        final Map<MavenProject, MavenProject> reactorProjects = new HashMap<>();
 
         BuildContext(MavenSession session, ReactorContext reactorContext, List<TaskSegment> taskSegments) {
             this.session = session;
@@ -401,9 +408,9 @@ public class BuildPlanExecutor {
                             try {
                                 executeStep(step);
                                 executePlan();
-                            } catch (Exception e) {
+                            } catch (Throwable e) {
                                 step.status.compareAndSet(SKIPPED, FAILED);
-                                // Store the exception in the step for handling in the TEARDOWN phase
+                                // Store the failure in the step for handling in the TEARDOWN phase
                                 step.exception = e;
                                 logger.debug("Stored exception for step {} to be handled in TEARDOWN phase", step, e);
                                 // Let the scheduler handle after:* phases and TEARDOWN in the next cycle
@@ -420,7 +427,10 @@ public class BuildPlanExecutor {
             } else {
                 // For regular steps:
                 // Don't run for halted builds, blacklisted projects, or if predecessors failed
-                shouldExecute = !status.isHalted() && !status.isBlackListed(step.project) && allPredecessorsExecuted;
+                shouldExecute = !status.isHalted()
+                        && !status.isBlackListed(step.project)
+                        && allPredecessorsExecuted
+                        && (!step.name.startsWith("$aggregator:") || aggregationWorkSucceeded(step));
             }
 
             // 2. Either schedule the step or mark it as skipped based on the decision
@@ -438,10 +448,10 @@ public class BuildPlanExecutor {
                             }
                         }
                         executePlan();
-                    } catch (Exception e) {
+                    } catch (Throwable e) {
                         step.status.compareAndSet(SCHEDULED, FAILED);
 
-                        // Store the exception in the step for handling in the TEARDOWN phase
+                        // Store the failure in the step for handling in the TEARDOWN phase
                         step.exception = e;
                         logger.debug("Stored exception for step {} to be handled in TEARDOWN phase", step, e);
 
@@ -470,6 +480,16 @@ public class BuildPlanExecutor {
                 // Recursively call executePlan to process steps that depend on this one
                 executePlan();
             }
+        }
+
+        private boolean aggregationWorkSucceeded(BuildStep step) {
+            // Cleanup steps may finish successfully after nested work failed or was skipped.
+            // They are not proof that the work required by an aggregator completed.
+            return step.allPredecessors()
+                    .filter(predecessor -> predecessor != step)
+                    .allMatch(predecessor -> predecessor.exception == null
+                            && predecessor.status.get() != FAILED
+                            && (!predecessor.hasExecutions() || predecessor.status.get() == EXECUTED));
         }
 
         private void executePlan() {
@@ -525,7 +545,7 @@ public class BuildPlanExecutor {
                     List<Throwable> failures = null;
                     boolean allWorkExecuted = true;
                     for (BuildStep projectStep : plan.steps(step.project).toList()) {
-                        Exception exception = projectStep.exception;
+                        Throwable exception = projectStep.exception;
                         if (exception != null) {
                             if (failures == null) {
                                 failures = new ArrayList<>();
@@ -560,7 +580,7 @@ public class BuildPlanExecutor {
                             failure = new LifecycleExecutionException("Error building project");
                             failures.forEach(failure::addSuppressed);
                         }
-                        handleBuildError(reactorContext, session, step.project, failure);
+                        handleBuildError(reactorContext, session, step.project, failure, isFatal(failures));
                     } else if (projectStarted && allWorkExecuted) {
                         // If there were no failures, report success
                         projectExecutionListener.afterProjectExecutionSuccess(
@@ -593,6 +613,20 @@ public class BuildPlanExecutor {
             step.status.compareAndSet(SCHEDULED, EXECUTED);
         }
 
+        /**
+         * Tells whether any of the failures collected for a project must halt the build. Several failures are
+         * reported through a wrapper, and a wrapper is always a checked exception, so an {@link Error} among
+         * them can only be seen by looking at the failures themselves.
+         *
+         * @param failures The failures collected for a single project
+         * @return {@code true} if the build must be halted; checked exceptions (ordinary plugin failures) are
+         *         soft and allow the reactor to continue with other projects, while {@link RuntimeException}s
+         *         and {@link Error}s indicate an unexpected JVM or framework state and halt the build
+         */
+        private static boolean isFatal(List<Throwable> failures) {
+            return failures.stream().anyMatch(t -> t instanceof RuntimeException || !(t instanceof Exception));
+        }
+
         private void attachToThread(BuildStep step) {
             BuildPlanExecutor.attachToThread(step.project);
             session.setCurrentProject(step.project);
@@ -605,6 +639,9 @@ public class BuildPlanExecutor {
         private void plan() {
             lock.writeLock().lock();
             try {
+                if (reactorProjects.isEmpty()) {
+                    plan.getAllProjects().keySet().forEach(project -> reactorProjects.put(project, project));
+                }
                 Set<BuildStep> planSteps = plan.allSteps()
                         .filter(step -> PLAN.equals(step.name))
                         .filter(step -> step.predecessors.stream().allMatch(s -> s.status.get() == EXECUTED))
@@ -628,16 +665,12 @@ public class BuildPlanExecutor {
                                 plan.step(project, resolvedPhase).ifPresent(n -> {
                                     MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());
                                     mojoExecution.setLifecyclePhase(phase);
-                                    n.addMojo(mojoExecution, execution.getPriority());
-                                    if (mojoDescriptor.getDependencyCollectionRequired() != null
-                                            || mojoDescriptor.getDependencyResolutionRequired() != null) {
-                                        for (MavenProject p :
-                                                plan.getAllProjects().get(project)) {
-                                            plan.step(p, AFTER + PACKAGE)
-                                                    .ifPresent(a -> plan.requiredStep(project, resolvedPhase)
-                                                            .executeAfter(a));
-                                        }
+                                    if (requiresAggregation(n, mojoExecution)
+                                            && inheritedFromReactorAncestor(
+                                                    project, plugin, execution, goal, resolvedPhase)) {
+                                        return;
                                     }
+                                    n.addMojo(mojoExecution, execution.getPriority());
                                     // Apply @After annotation ordering constraints from the mojo descriptor
                                     applyAfterLinks(mojoDescriptor, project, resolvedPhase);
                                 });
@@ -645,6 +678,23 @@ public class BuildPlanExecutor {
                         }
                     }
                 }
+
+                for (BuildStep step : planSteps) {
+                    splitAggregatorSteps(step.project);
+                    plan.steps(step.project)
+                            .filter(executionStep -> executionStep.phase != null)
+                            .forEach(executionStep -> executionStep.executions().forEach(execution -> {
+                                MojoDescriptor descriptor = execution.getMojoDescriptor();
+                                if (descriptor.getDependencyCollectionRequired() != null
+                                        || descriptor.getDependencyResolutionRequired() != null) {
+                                    for (MavenProject upstream :
+                                            plan.getAllProjects().get(step.project)) {
+                                        plan.step(upstream, AFTER + PACKAGE).ifPresent(executionStep::executeAfter);
+                                    }
+                                }
+                            }));
+                }
+                linkAggregatorSteps();
 
                 BuildPlan buildPlan = plan;
                 for (BuildStep step :
@@ -665,6 +715,203 @@ public class BuildPlanExecutor {
             } finally {
                 lock.writeLock().unlock();
             }
+        }
+
+        private boolean requiresAggregation(BuildStep step, MojoExecution execution) {
+            // Legacy phases such as prepare-package resolve to hooks, but retain ordinary
+            // lifecycle aggregation semantics. Explicit native hooks keep their own semantics.
+            return step.phase != null
+                    && execution.getLifecyclePhase() != null
+                    && execution.getMojoDescriptor().isAggregator()
+                    && (!(step.name.startsWith(BEFORE) || step.name.startsWith(AFTER))
+                            || !step.name.equals(execution.getLifecyclePhase()));
+        }
+
+        private void splitAggregatorSteps(MavenProject project) {
+            for (BuildStep step : plan.steps(project)
+                    .filter(s -> !s.name.startsWith("$aggregator:"))
+                    .filter(s -> !s.skip.get())
+                    .filter(s -> s.executions().anyMatch(execution -> requiresAggregation(s, execution)))
+                    .toList()) {
+                var executions = step.mojos.entrySet().stream()
+                        .flatMap(entry -> entry.getValue().values().stream()
+                                .map(execution -> Map.entry(entry.getKey(), execution)))
+                        .toList();
+                step.mojos.clear();
+                String endName =
+                        step.name.startsWith(BEFORE) || step.name.startsWith(AFTER) ? step.name : AFTER + step.name;
+                BuildStep phaseEnd = plan.requiredStep(project, endName);
+                BuildStep target = step;
+                int segment = 0;
+                for (var entry : executions) {
+                    MojoExecution execution = entry.getValue();
+                    if (requiresAggregation(step, execution)) {
+                        String name = "$aggregator:" + step.name + ":" + segment++;
+                        BuildStep aggregate = new BuildStep(name, project, step.phase);
+                        aggregate.executeAfter(target);
+                        aggregate.executeAfter(phaseEnd);
+                        if (project.getCollectedProjects() != null) {
+                            for (MavenProject child : project.getCollectedProjects()) {
+                                plan.step(child, endName).ifPresent(aggregate::executeAfter);
+                            }
+                        }
+                        plan.requiredStep(project, TEARDOWN).executeAfter(aggregate);
+                        plan.addStep(project, name, aggregate);
+                        aggregationEnds.put(aggregate, phaseEnd);
+                        target = aggregate;
+                    }
+                    target.addMojo(execution, entry.getKey());
+                }
+            }
+        }
+
+        void linkAggregatorSteps() {
+            // Resolve nested aggregation before downstream barriers, independent of planning order.
+            Map<BuildStep, BuildStep> ends = new LinkedHashMap<>();
+            Map<MavenProject, List<BuildStep>> byProject = new HashMap<>();
+            plan.allSteps().filter(step -> step.name.startsWith("$aggregator:")).forEach(aggregate -> {
+                BuildStep end = aggregationEnds.getOrDefault(
+                        aggregate, plan.requiredStep(aggregate.project, AFTER + aggregate.phase.name()));
+                ends.put(aggregate, end);
+                byProject
+                        .computeIfAbsent(aggregate.project, p -> new ArrayList<>())
+                        .add(aggregate);
+            });
+            ends.forEach((aggregate, end) -> {
+                Set<BuildStep> prerequisites = aggregate.allPredecessors().collect(Collectors.toSet());
+                if (aggregate.project.getCollectedProjects() != null) {
+                    for (MavenProject child : aggregate.project.getCollectedProjects()) {
+                        for (BuildStep childAggregate : byProject.getOrDefault(child, List.of())) {
+                            if (!prerequisites.contains(ends.get(childAggregate))) {
+                                continue;
+                            }
+                            if (childAggregate.isSuccessorOf(aggregate)) {
+                                throw new IllegalStateException(
+                                        "Cyclic aggregation ordering between " + aggregate + " and " + childAggregate);
+                            }
+                            aggregate.executeAfter(childAggregate);
+                        }
+                    }
+                }
+            });
+            ends.forEach((aggregate, end) -> {
+                Set<BuildStep> prerequisites = aggregate.allPredecessors().collect(Collectors.toSet());
+                Set<BuildStep> visited = new HashSet<>();
+                var successors = new ArrayDeque<>(List.copyOf(end.successors));
+                while (!successors.isEmpty()) {
+                    BuildStep successor = successors.removeFirst();
+                    if (successor == aggregate || !visited.add(successor)) {
+                        continue;
+                    }
+                    if (prerequisites.contains(successor)) {
+                        // Ordinary parent outputs may be needed to build aggregate inputs.
+                        // Continue beyond that readiness point instead of losing the barrier.
+                        successors.addAll(List.copyOf(successor.successors));
+                    } else {
+                        successor.executeAfter(aggregate);
+                    }
+                }
+            });
+            plan.invalidateOrdering();
+        }
+
+        private boolean inheritedFromReactorAncestor(
+                MavenProject project, Plugin plugin, PluginExecution execution, String goal, String phase) {
+            if (declaredInProject(project, plugin, execution, goal)) {
+                return false;
+            }
+            for (MavenProject parent = project.getParent(); parent != null; parent = parent.getParent()) {
+                MavenProject reactorParent = reactorProjects.get(parent);
+                MavenProject ancestor = reactorParent != null ? reactorParent : parent;
+                for (Plugin parentPlugin : ancestor.getBuild().getPlugins()) {
+                    if (!parentPlugin.getKey().equals(plugin.getKey())) {
+                        continue;
+                    }
+                    boolean matchingExecution = false;
+                    for (PluginExecution parentExecution : parentPlugin.getExecutions()) {
+                        if (!parentExecution.getId().equals(execution.getId())) {
+                            continue;
+                        }
+                        matchingExecution = true;
+                        boolean inherited = parentExecution.getInherited() != null
+                                ? parentExecution.isInherited()
+                                : parentPlugin.isInherited();
+                        if (!inherited || !Objects.equals(parentPlugin.getVersion(), plugin.getVersion())) {
+                            return false;
+                        }
+                        if (parentExecution.getGoals().contains(goal)
+                                && reactorParent != null
+                                && reactorParent.getCollectedProjects() != null
+                                && reactorParent.getCollectedProjects().contains(project)) {
+                            MojoDescriptor descriptor = getMojoDescriptor(reactorParent, parentPlugin, goal);
+                            String parentPhase = parentExecution.getPhase() != null
+                                    ? parentExecution.getPhase()
+                                    : descriptor.getPhase();
+                            String resolved = plan.aliases().getOrDefault(parentPhase, parentPhase);
+                            if (resolved != null && resolved.startsWith(AT)) {
+                                resolved = resolved.substring(AT.length());
+                            }
+                            if (descriptor.isAggregator()
+                                    && Objects.equals(resolved, phase)
+                                    && plan.step(reactorParent, phase)
+                                            .filter(step -> !step.skip.get())
+                                            .isPresent()) {
+                                return true;
+                            }
+                        }
+                    }
+                    if (!matchingExecution && !parentPlugin.isInherited()) {
+                        return false;
+                    }
+                }
+            }
+            return false;
+        }
+
+        private boolean declaredInProject(MavenProject project, Plugin plugin, PluginExecution execution, String goal) {
+            // Goal locations survive model interpolation. Compare their POM paths rather
+            // than raw coordinates, which may contain expressions such as ${pluginGroup}.
+            InputLocation goals = execution.getLocation("goals");
+            InputLocation location = goals == null
+                    ? null
+                    : goals.getLocation(execution.getGoals().indexOf(goal));
+            if (declaredInProject(project, location)) {
+                return true;
+            }
+            var model = project.getOriginalModel();
+            if (model == null) {
+                return false;
+            }
+            Stream<Plugin> plugins = model.getBuild() == null ? Stream.empty() : model.getBuild().getPlugins().stream();
+            Set<String> activeProfiles = project.getActiveProfiles() == null
+                    ? Set.of()
+                    : project.getActiveProfiles().stream()
+                            .filter(profile -> declaredInProject(project, profile.getLocation("")))
+                            .map(Profile::getId)
+                            .collect(Collectors.toSet());
+            plugins = Stream.concat(
+                    plugins,
+                    // Merged goal lists do not retain every source location. Local profiles
+                    // in the effective model preserve their interpolated declarations.
+                    project.getModel().getProfiles().stream()
+                            .filter(profile -> activeProfiles.contains(profile.getId()))
+                            .filter(profile -> profile.getBuild() != null)
+                            .flatMap(profile -> profile.getBuild().getPlugins().stream()));
+            return plugins.filter(p -> p.getKey().equals(plugin.getKey()))
+                    .flatMap(p -> p.getExecutions().stream())
+                    .anyMatch(e ->
+                            e.getId().equals(execution.getId()) && e.getGoals().contains(goal));
+        }
+
+        private boolean declaredInProject(MavenProject project, InputLocation location) {
+            return location != null
+                    && location.getSource() != null
+                    && project.getFile() != null
+                    && project.getFile()
+                            .toPath()
+                            .toUri()
+                            .toString()
+                            .equals(location.getSource().getLocation());
         }
 
         /**
@@ -717,18 +964,23 @@ public class BuildPlanExecutor {
          * all upstream projects are returned. Otherwise, only projects that the given
          * project depends on with a matching scope are included.
          * <p>
-         * Matching is exact on the dependency's declared scope string (e.g. "compile",
-         * "provided", "test"). Maven's default dependency scope is "compile" (when no
-         * scope is declared), so a null scope in the model is treated as "compile" for
-         * matching purposes. Note that this does <em>not</em> perform path-scope
-         * resolution — for example, filtering by "compile" will not include
-         * "provided"-scoped dependencies even though they contribute to
-         * {@code PathScope.MAIN_COMPILE}. This keeps the filter simple and predictable;
-         * broader scope-aware filtering can be added in a follow-up if needed.
+         * The scope parameter is a lifecycle dependency scope (as declared in
+         * {@link org.apache.maven.api.DependencyScope}). It is expanded to match all
+         * artifact scopes that contribute to that dependency scope for build ordering:
+         * <ul>
+         *   <li>{@code "compile"} matches compile, provided, system, and null-scoped
+         *       (Maven default) dependencies</li>
+         *   <li>{@code "runtime"} matches compile, runtime, and null-scoped dependencies</li>
+         *   <li>{@code "test"} matches all scopes</li>
+         *   <li>{@code "test-only"} matches only test-scoped dependencies</li>
+         * </ul>
+         * This ensures that reactor dependencies contributing to a given classpath are
+         * properly ordered in the build plan (e.g. a provided-scope reactor dependency
+         * is built before the consumer's compile phase).
          *
          * @param project the project whose dependencies to check
          * @param upstreamProjects the list of upstream reactor projects
-         * @param scope the dependency scope to filter by, or null/empty for all
+         * @param scope the lifecycle dependency scope to filter by, or null/empty for all
          * @return the filtered list of upstream projects
          */
         static List<MavenProject> filterByScope(
@@ -736,12 +988,27 @@ public class BuildPlanExecutor {
             if (scope == null || scope.isEmpty()) {
                 return upstreamProjects;
             }
+            Set<String> matchingScopes = expandScope(scope);
             return upstreamProjects.stream()
                     .filter(dep -> project.getDependencies().stream()
                             .anyMatch(d -> dep.getGroupId().equals(d.getGroupId())
                                     && dep.getArtifactId().equals(d.getArtifactId())
-                                    && scope.equals(d.getScope() != null ? d.getScope() : "compile")))
+                                    && matchingScopes.contains(d.getScope() != null ? d.getScope() : "compile")))
                     .collect(Collectors.toList());
+        }
+
+        /**
+         * Expands a lifecycle dependency scope to the set of artifact scopes that
+         * contribute to it for build ordering purposes.
+         */
+        private static Set<String> expandScope(String scope) {
+            return switch (scope) {
+                case "compile" -> Set.of("compile", "provided", "system");
+                case "runtime" -> Set.of("compile", "runtime");
+                case "test" -> Set.of("compile", "provided", "system", "runtime", "test");
+                case "test-only" -> Set.of("test");
+                default -> Set.of(scope);
+            };
         }
 
         protected BuildPlan computeForkPlan(BuildStep step, MojoExecution execution, BuildPlan buildPlan) {
@@ -863,13 +1130,16 @@ public class BuildPlanExecutor {
          * @param buildContext The reactor context
          * @param session The Maven session
          * @param mavenProject The project that failed
-         * @param t The exception that caused the failure
+         * @param t The exception that caused the failure, possibly a wrapper around several failures
+         * @param fatal Whether the failure must halt the build. This cannot be read off {@code t}, because a
+         *              wrapper around several failures hides what is inside it. See {@link #isFatal(List)}.
          */
         protected void handleBuildError(
                 final ReactorContext buildContext,
                 final MavenSession session,
                 final MavenProject mavenProject,
-                Throwable t) {
+                Throwable t,
+                boolean fatal) {
             // record the error and mark the project as failed
             Clock clock = getClock(mavenProject);
             buildContext.getResult().addException(t);
@@ -878,12 +1148,12 @@ public class BuildPlanExecutor {
                     .addBuildSummary(new BuildFailure(mavenProject, clock.execTime(), clock.wallTime(), t));
 
             // notify listeners about "soft" project build failures only
-            if (t instanceof Exception exception && !(t instanceof RuntimeException)) {
+            if (!fatal && t instanceof Exception exception) {
                 eventCatapult.fire(ExecutionEvent.Type.ProjectFailed, session, null, exception);
             }
 
             // reactor failure modes
-            if (t instanceof RuntimeException || !(t instanceof Exception)) {
+            if (fatal) {
                 // fail fast on RuntimeExceptions, Errors and "other" Throwables
                 // assume these are system errors and further build is meaningless
                 buildContext.getReactorBuildStatus().halt();

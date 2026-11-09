@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-impl-modules</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>4.2.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-core</artifactId>
@@ -31,7 +31,32 @@ under the License.
   <name>Maven 4 Core</name>
   <description>Maven Core classes.</description>
 
+  <properties>
+    <javaModuleName>org.apache.maven.core</javaModuleName>
+    <!-- Default lifecycle plugin versions.
+         Maintained here so that dependency-update bots (Dependabot, Renovate)
+         can propose version bumps automatically.  Values are filtered into
+         plugin-versions.properties at build time and loaded at runtime. -->
+    <lifecycle.maven-clean-plugin>3.5.0</lifecycle.maven-clean-plugin>
+    <lifecycle.maven-compiler-plugin>3.16.0</lifecycle.maven-compiler-plugin>
+    <lifecycle.maven-deploy-plugin>3.2.0</lifecycle.maven-deploy-plugin>
+    <lifecycle.maven-ear-plugin>3.4.0</lifecycle.maven-ear-plugin>
+    <lifecycle.maven-ejb-plugin>3.3.0</lifecycle.maven-ejb-plugin>
+    <lifecycle.maven-install-plugin>3.2.0</lifecycle.maven-install-plugin>
+    <lifecycle.maven-jar-plugin>3.5.1</lifecycle.maven-jar-plugin>
+    <lifecycle.maven-plugin-plugin>3.16.0</lifecycle.maven-plugin-plugin>
+    <lifecycle.maven-rar-plugin>3.1.0</lifecycle.maven-rar-plugin>
+    <lifecycle.maven-resources-plugin>3.5.0</lifecycle.maven-resources-plugin>
+    <lifecycle.maven-site-plugin>3.22.0</lifecycle.maven-site-plugin>
+    <lifecycle.maven-surefire-plugin>3.6.1</lifecycle.maven-surefire-plugin>
+    <lifecycle.maven-war-plugin>3.5.1</lifecycle.maven-war-plugin>
+  </properties>
+
   <dependencies>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-utils</artifactId>
+    </dependency>
     <!--  Maven4 API -->
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -85,15 +110,15 @@ under the License.
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-jline</artifactId>
-    </dependency>
-    <dependency>
-      <groupId>org.apache.maven</groupId>
       <artifactId>maven-logging</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-support</artifactId>
     </dependency>
 
     <!-- compat -->
@@ -152,8 +177,8 @@ under the License.
 
     <!-- Sisu/Eclipse DI -->
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-classworlds</artifactId>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-classworlds</artifactId>
     </dependency>
     <dependency>
       <groupId>javax.inject</groupId>
@@ -260,16 +285,84 @@ under the License.
     </resources>
     <pluginManagement>
       <plugins>
+        <!-- Default lifecycle plugins declared here so that dependency-update bots
+             (Dependabot, Renovate) see the version.maven-*-plugin properties as
+             actual plugin version references and can propose automated bumps. -->
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-clean-plugin</artifactId>
+          <version>${lifecycle.maven-clean-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-compiler-plugin</artifactId>
+          <version>${lifecycle.maven-compiler-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-deploy-plugin</artifactId>
+          <version>${lifecycle.maven-deploy-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-ear-plugin</artifactId>
+          <version>${lifecycle.maven-ear-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-ejb-plugin</artifactId>
+          <version>${lifecycle.maven-ejb-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-install-plugin</artifactId>
+          <version>${lifecycle.maven-install-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-jar-plugin</artifactId>
+          <version>${lifecycle.maven-jar-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-plugin-plugin</artifactId>
+          <version>${lifecycle.maven-plugin-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-rar-plugin</artifactId>
+          <version>${lifecycle.maven-rar-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>${lifecycle.maven-resources-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-site-plugin</artifactId>
+          <version>${lifecycle.maven-site-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-surefire-plugin</artifactId>
+          <version>${lifecycle.maven-surefire-plugin}</version>
+        </plugin>
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-war-plugin</artifactId>
+          <version>${lifecycle.maven-war-plugin}</version>
+        </plugin>
         <plugin>
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
-            <excludes combine.children="append">
+            <inputExcludes>
               <exclude>lifecycle-executor.txt</exclude>
               <exclude>plugin-manager.txt</exclude>
               <exclude>project-builder.txt</exclude>
               <exclude>src/site/resources/design/**</exclude>
-            </excludes>
+            </inputExcludes>
           </configuration>
         </plugin>
       </plugins>
@@ -318,7 +411,6 @@ under the License.
               <include>org.apache.maven.artifact</include>
               <include>org.apache.maven.classrealm</include>
               <include>org.apache.maven.cli</include>
-              <include>org.apache.maven.configuration</include>
               <include>org.apache.maven.exception</include>
               <include>org.apache.maven.execution</include>
               <include>org.apache.maven.execution.scope</include>
@@ -396,6 +488,40 @@ under the License.
               <exclude>org.apache.maven.toolchain.ToolchainManagerPrivate</exclude>
               <exclude>org.apache.maven.toolchain.ToolchainPrivate</exclude>
               <exclude>org.apache.maven.toolchain.ToolchainsBuilder</exclude>
+              <!-- ClassRealm API changes for Maven 4 - return type changes from Plexus ClassRealm to Maven ClassRealm -->
+              <exclude>org.apache.maven.classrealm.ClassRealmManager#createExtensionRealm(org.apache.maven.model.Plugin,java.util.List):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.ClassRealmManager#createPluginRealm(org.apache.maven.model.Plugin,java.lang.ClassLoader,java.util.List,java.util.Map,java.util.List):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.ClassRealmManager#createProjectRealm(org.apache.maven.model.Model,java.util.List):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.ClassRealmManager#getCoreRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.ClassRealmManager#getMavenApiRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.ClassRealmManagerDelegate#setupRealm(org.codehaus.plexus.classworlds.realm.ClassRealm,org.apache.maven.classrealm.ClassRealmRequest):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.classrealm.DefaultClassRealmManager#createExtensionRealm(org.apache.maven.model.Plugin,java.util.List):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.DefaultClassRealmManager#createPluginRealm(org.apache.maven.model.Plugin,java.lang.ClassLoader,java.util.List,java.util.Map,java.util.List):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.DefaultClassRealmManager#createProjectRealm(org.apache.maven.model.Model,java.util.List):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.DefaultClassRealmManager#getCoreRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.classrealm.DefaultClassRealmManager#getMavenApiRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.plugin.BuildPluginManager#getPluginRealm(org.apache.maven.execution.MavenSession,org.apache.maven.plugin.descriptor.PluginDescriptor):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.plugin.DefaultBuildPluginManager#getPluginRealm(org.apache.maven.execution.MavenSession,org.apache.maven.plugin.descriptor.PluginDescriptor):METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.plugin.ExtensionRealmCache#put(org.apache.maven.plugin.ExtensionRealmCache$Key,org.codehaus.plexus.classworlds.realm.ClassRealm,org.apache.maven.project.ExtensionDescriptor,java.util.List):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.ExtensionRealmCache$CacheRecord#getRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.plugin.PluginContainerException#getPluginRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.plugin.PluginContainerException#PluginContainerException(org.apache.maven.model.Plugin,org.codehaus.plexus.classworlds.realm.ClassRealm,java.lang.String,org.codehaus.plexus.configuration.PlexusConfigurationException):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.PluginContainerException#PluginContainerException(org.apache.maven.plugin.descriptor.MojoDescriptor,org.codehaus.plexus.classworlds.realm.ClassRealm,java.lang.String,java.lang.Throwable):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.PluginContainerException#PluginContainerException(org.apache.maven.model.Plugin,org.codehaus.plexus.classworlds.realm.ClassRealm,java.lang.String,org.codehaus.plexus.component.repository.exception.ComponentRepositoryException):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.PluginContainerException#PluginContainerException(org.apache.maven.model.Plugin,org.codehaus.plexus.classworlds.realm.ClassRealm,java.lang.String,java.lang.Throwable):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.PluginContainerException#PluginContainerException(org.apache.maven.plugin.descriptor.MojoDescriptor,org.codehaus.plexus.classworlds.realm.ClassRealm,java.lang.String,org.codehaus.plexus.component.repository.exception.ComponentLookupException):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.PluginManagerException#PluginManagerException(org.apache.maven.plugin.descriptor.MojoDescriptor,org.apache.maven.project.MavenProject,java.lang.String,org.codehaus.plexus.classworlds.realm.NoSuchRealmException):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.PluginRealmCache#put(org.apache.maven.plugin.PluginRealmCache$Key,org.codehaus.plexus.classworlds.realm.ClassRealm,java.util.List):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.PluginRealmCache$CacheRecord#getRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.plugin.PluginRealmCache$CacheRecord#PluginRealmCache$CacheRecord(org.codehaus.plexus.classworlds.realm.ClassRealm,java.util.List):CONSTRUCTOR_REMOVED</exclude>
+              <exclude>org.apache.maven.project.MavenProject#getClassRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <exclude>org.apache.maven.project.MavenProject#setClassRealm(org.codehaus.plexus.classworlds.realm.ClassRealm):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.project.ProjectRealmCache#put(org.apache.maven.project.ProjectRealmCache$Key,org.codehaus.plexus.classworlds.realm.ClassRealm,org.eclipse.aether.graph.DependencyFilter):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.project.ProjectRealmCache$CacheRecord#getRealm():METHOD_RETURN_TYPE_CHANGED</exclude>
+              <!-- Additional cache-related method removals -->
+              <exclude>org.apache.maven.plugin.DefaultExtensionRealmCache#put(org.apache.maven.plugin.ExtensionRealmCache$Key,org.codehaus.plexus.classworlds.realm.ClassRealm,org.apache.maven.project.ExtensionDescriptor,java.util.List):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.plugin.DefaultPluginRealmCache#put(org.apache.maven.plugin.PluginRealmCache$Key,org.codehaus.plexus.classworlds.realm.ClassRealm,java.util.List):METHOD_REMOVED</exclude>
+              <exclude>org.apache.maven.project.DefaultProjectRealmCache#put(org.apache.maven.project.ProjectRealmCache$Key,org.codehaus.plexus.classworlds.realm.ClassRealm,org.eclipse.aether.graph.DependencyFilter):METHOD_REMOVED</exclude>
             </excludes>
           </parameter>
         </configuration>

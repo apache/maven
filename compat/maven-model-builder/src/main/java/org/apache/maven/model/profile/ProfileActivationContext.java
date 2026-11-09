@@ -62,6 +62,11 @@ public interface ProfileActivationContext {
      * Gets the user properties to use for interpolation and profile activation. The user properties have been
      * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command
      * line.
+     * <p>
+     * <b>In repository-resolved (external) model builds</b> (dependency POMs, parent POMs, imported BOMs), this
+     * map is intentionally empty. Consumer {@code -D} flags are not propagated to dependency profile activation:
+     * the consumer did not set those flags for the dependency, and doing so would make dependency resolution
+     * non-deterministic and open to accidental (or malicious) profile injection.
      *
      * @return The user properties, never {@code null}.
      */
@@ -75,7 +80,12 @@ public interface ProfileActivationContext {
     File getProjectDirectory();
 
     /**
-     * Gets current calculated project properties
+     * Gets current calculated project properties.
+     * <p>
+     * These are the properties declared in the model's own {@code <properties>} section.
+     * They are available for interpolation but are <b>not</b> used for profile activation
+     * in repository-resolved (external) model builds — a dependency POM's own properties
+     * must not activate its own property-based profiles (see #13390).
      *
      * @return The project properties, never {@code null}.
      */

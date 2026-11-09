@@ -18,9 +18,12 @@
  */
 package org.apache.maven.api.services.model;
 
+import java.util.Collection;
+
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.ModelBuilderException;
 
@@ -63,6 +66,11 @@ public interface ProfileActivationContext {
     /**
      * Gets the user property to use for interpolation and profile activation. The user properties have been
      * configured directly by the user on his discretion, e.g. via the {@code -Dkey=value} parameter on the command line.
+     * <p>
+     * <b>In repository-resolved (external) model builds</b> (dependency POMs, parent POMs, imported BOMs),
+     * this always returns {@code null}. Consumer {@code -D} flags are not propagated to dependency profile
+     * activation: the consumer did not set those flags for the dependency, and doing so would make dependency
+     * resolution non-deterministic and open to accidental (or malicious) profile injection.
      *
      * @param key the name of the user property
      * @return The user property for the specified key, or {@code null}.
@@ -71,7 +79,12 @@ public interface ProfileActivationContext {
     String getUserProperty(@Nonnull String key);
 
     /**
-     * Gets the model property to use for interpolation and profile activation.
+     * Gets the model property to use for interpolation.
+     * <p>
+     * These are the properties declared in the model's own {@code <properties>} section.
+     * They are available for interpolation but are <b>not</b> used for profile activation
+     * in repository-resolved (external) model builds — a dependency POM's own properties
+     * must not activate its own property-based profiles (see #13390).
      *
      * @param key the name of the model property
      * @return The model property for the specified key, or {@code null};
@@ -113,6 +126,11 @@ public interface ProfileActivationContext {
 
     /**
      * Interpolates the given path string using the current context's properties.
+     * <p>
+     * Implementations that support cascading profile activation (via {@link #addProfileProperties})
+     * may resolve placeholders against properties contributed by previously-activated profiles.
+     * This means file-existence conditions ({@code <exists>}, {@code <missing>}) can depend on
+     * properties set by earlier profiles in the activation cascade.
      *
      * @param path The path string to interpolate
      * @return The interpolated path string
@@ -131,4 +149,35 @@ public interface ProfileActivationContext {
      * @throws InterpolatorException if an error occurs during interpolation
      */
     boolean exists(@Nullable String path, boolean glob);
+
+    /**
+     * Inject properties from newly activated profiles in order to trigger the cascading mechanism.
+     * This method allows profiles to contribute properties that can trigger the activation of other profiles.
+     *
+     * @param activatedProfiles The collection of profiles that have been activated that may trigger the cascading effect.
+     */
+    default void addProfileProperties(Collection<Profile> activatedProfiles) {}
+
+    /**
+     * Gets a property from cascaded profile properties only — properties contributed by
+     * previously-activated profiles during cascading activation. Unlike {@link #getModelProperty},
+     * this does not return the model's own static properties.
+     *
+     * @param key the property name
+     * @return the cascaded property value, or {@code null} if not set
+     * @since 4.2.0
+     */
+    @Nullable
+    default String getCascadedProfileProperty(@Nonnull String key) {
+        return null;
+    }
+
+    /**
+     * Clears cascaded profile properties accumulated during activation.
+     * Called after profile activation is complete to prevent cascaded properties
+     * from leaking into subsequent uses of the context.
+     *
+     * @since 4.2.0
+     */
+    default void clearCascadedProfileProperties() {}
 }

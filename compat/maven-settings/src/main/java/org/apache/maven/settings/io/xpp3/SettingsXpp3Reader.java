@@ -69,6 +69,11 @@ public class SettingsXpp3Reader {
             return new Settings(delegate.read(reader, strict, null));
         } catch (XMLStreamException e) {
             throw new XmlPullParserException(e.getMessage(), null, e);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof XMLStreamException cause) {
+                throw new XmlPullParserException(cause.getMessage(), null, cause);
+            }
+            throw e;
         }
     }
 
@@ -77,6 +82,11 @@ public class SettingsXpp3Reader {
             return new Settings(delegate.read(reader));
         } catch (XMLStreamException e) {
             throw new XmlPullParserException(e.getMessage(), null, e);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof XMLStreamException cause) {
+                throw new XmlPullParserException(cause.getMessage(), null, cause);
+            }
+            throw e;
         }
     }
 
@@ -85,6 +95,11 @@ public class SettingsXpp3Reader {
             return new Settings(delegate.read(in, strict, null));
         } catch (XMLStreamException e) {
             throw new XmlPullParserException(e.getMessage(), null, e);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof XMLStreamException cause) {
+                throw new XmlPullParserException(cause.getMessage(), null, cause);
+            }
+            throw e;
         }
     }
 
@@ -93,6 +108,11 @@ public class SettingsXpp3Reader {
             return new Settings(delegate.read(in));
         } catch (XMLStreamException e) {
             throw new XmlPullParserException(e.getMessage(), null, e);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof XMLStreamException cause) {
+                throw new XmlPullParserException(cause.getMessage(), null, cause);
+            }
+            throw e;
         }
     }
 
@@ -101,6 +121,11 @@ public class SettingsXpp3Reader {
             return new Settings(delegate.read(parser, strict, null));
         } catch (XMLStreamException e) {
             throw new XmlPullParserException(e.getMessage(), null, e);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof XMLStreamException cause) {
+                throw new XmlPullParserException(cause.getMessage(), null, cause);
+            }
+            throw e;
         }
     }
 

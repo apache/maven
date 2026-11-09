@@ -130,7 +130,15 @@ public class InfoReport extends AbstractMojo implements MavenReport {
         }
     }
 
+    /**
+     * @deprecated use {@link #getOutputPath()} instead
+     */
+    @Deprecated
     public String getOutputName() {
+        return getOutputPath();
+    }
+
+    public String getOutputPath() {
         return "info";
     }
 

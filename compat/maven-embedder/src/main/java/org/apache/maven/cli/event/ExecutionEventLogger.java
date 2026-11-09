@@ -20,7 +20,10 @@ package org.apache.maven.cli.event;
 
 import java.io.File;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.api.services.MessageBuilder;
@@ -62,6 +65,8 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     private int maxProjectNameLength;
     private int totalProjects;
     private volatile int currentVisitedProjectCount;
+    // a project built again, for instance by an aggregator goal on the command line, keeps its number
+    private final Map<MavenProject, Integer> projectNumbers = new HashMap<>();
 
     public ExecutionEventLogger(MessageBuilderFactory messageBuilderFactory) {
         this(messageBuilderFactory, LoggerFactory.getLogger(ExecutionEventLogger.class));
@@ -129,10 +134,8 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                 logger.info("{}{}[{}]", project.getName(), chars(' ', (len > 0) ? len : 1), project.getPackaging());
             }
 
-            final List<MavenProject> allProjects = event.getSession().getAllProjects();
-
-            currentVisitedProjectCount = allProjects.size() - projects.size();
-            totalProjects = allProjects.size();
+            currentVisitedProjectCount = 0;
+            totalProjects = projects.size();
         }
     }
 
@@ -199,44 +202,53 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
         List<MavenProject> projects = session.getProjects();
 
-        StringBuilder buffer = new StringBuilder(128);
-
         String skippedMessage = builder().warning("SKIPPED").build();
         String successMessage = builder().success("SUCCESS").build();
         String failureMessage = builder().failure("FAILURE").build();
         String unknownMessage = builder().warning("UNKNOWN").build();
 
-        boolean lastWasSkipped = false;
+        List<ReactorSummaryEntry> entries = new ArrayList<>(projects.size());
         for (MavenProject project : projects) {
             BuildSummary buildSummary = result.getBuildSummary(project);
 
             String statusMessage;
-            boolean shouldSkip = result.hasExceptions();
-            if (buildSummary == null) {
-                statusMessage = skippedMessage;
-            } else if (buildSummary instanceof BuildSuccess) {
+            int group;
+            if (buildSummary instanceof BuildSuccess) {
                 statusMessage = successMessage;
+                group = 1;
             } else if (buildSummary instanceof BuildFailure) {
                 statusMessage = failureMessage;
-                shouldSkip = false;
+                group = 2;
+            } else if (buildSummary == null) {
+                statusMessage = skippedMessage;
+                group = 0;
             } else {
                 statusMessage = unknownMessage;
+                group = 2;
             }
+            entries.add(new ReactorSummaryEntry(project, buildSummary, group, statusMessage));
+        }
 
-            if (shouldSkip) {
-                lastWasSkipped = true;
+        ReactorSummaryRequest request = new ReactorSummaryRequest(entries, isSingleVersion);
+
+        logReactorSummaryGroup(request, 0);
+        logReactorSummaryGroup(request, 1);
+        logReactorSummaryGroup(request, 2);
+    }
+
+    private void logReactorSummaryGroup(ReactorSummaryRequest request, int group) {
+        StringBuilder buffer = new StringBuilder(128);
+
+        for (ReactorSummaryEntry entry : request.entries()) {
+            if (entry.group() != group) {
                 continue;
             }
-            if (lastWasSkipped) {
-                logger.info("...");
-                lastWasSkipped = false;
-            }
 
-            buffer.append(project.getName());
+            buffer.append(entry.project().getName());
             buffer.append(' ');
 
-            if (!isSingleVersion) {
-                buffer.append(project.getVersion());
+            if (!request.isSingleVersion()) {
+                buffer.append(entry.project().getVersion());
                 buffer.append(' ');
             }
 
@@ -247,19 +259,24 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                 buffer.append(' ');
             }
 
-            buffer.append(statusMessage);
-            if (buildSummary != null) {
-                formatBuildTime(buffer, buildSummary);
+            buffer.append(entry.statusMessage());
+            if (entry.buildSummary() != null) {
+                formatBuildTime(buffer, entry.buildSummary());
             }
 
-            logger.info(buffer.toString());
+            if (entry.buildSummary() instanceof BuildFailure) {
+                logger.error(buffer.toString());
+            } else {
+                logger.info(buffer.toString());
+            }
             buffer.setLength(0);
         }
-
-        if (lastWasSkipped) {
-            logger.info("...");
-        }
     }
+
+    private record ReactorSummaryRequest(List<ReactorSummaryEntry> entries, boolean isSingleVersion) {}
+
+    private record ReactorSummaryEntry(
+            MavenProject project, BuildSummary buildSummary, int group, String statusMessage) {}
 
     private void formatBuildTime(StringBuilder buffer, BuildSummary buildSummary) {
         buffer.append(" [");
@@ -276,12 +293,17 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
         infoLine('-');
         MessageBuilder buffer = builder();
 
-        if (session.getResult().hasExceptions()) {
+        boolean failure = session.getResult().hasExceptions();
+        if (failure) {
             buffer.failure("BUILD FAILURE");
         } else {
             buffer.success("BUILD SUCCESS");
         }
-        logger.info(buffer.toString());
+        if (failure) {
+            logger.error(buffer.toString());
+        } else {
+            logger.info(buffer.toString());
+        }
     }
 
     private MessageBuilder builder() {
@@ -350,7 +372,12 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                 // display progress [i/n]
                 int number;
                 synchronized (this) {
-                    number = ++currentVisitedProjectCount;
+                    Integer known = projectNumbers.get(event.getProject());
+                    if (known == null) {
+                        known = ++currentVisitedProjectCount;
+                        projectNumbers.put(event.getProject(), known);
+                    }
+                    number = known;
                 }
                 String progress = " [" + number + '/' + totalProjects + ']';
 

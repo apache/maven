@@ -31,6 +31,15 @@ import org.apache.maven.di.impl.InjectorImpl;
  * It provides both a builder API for configuring the injection behavior and methods for
  * accessing and injecting beans.
  * <p>
+ * The default injector returned by {@link #create()} selects the matching binding
+ * with the highest priority for a single-instance lookup.
+ * For an unqualified lookup, bindings with no qualifier or an empty
+ * {@link org.apache.maven.api.di.Named} qualifier are preferred when priorities are equal.
+ * If no binding matches or equally preferred bindings remain, the lookup fails.
+ * Automatic {@code List<T>} injection retains all matching bindings.
+ * Automatic {@code Map<String, T>} injection includes bindings without a qualifier
+ * or with a {@link org.apache.maven.api.di.Named} qualifier and requires distinct keys.
+ * <p>
  * Example usage:
  * <pre>
  * Injector injector = Injector.create()
@@ -157,7 +166,7 @@ public interface Injector {
      * @param key the class representing the type to retrieve
      * @return an instance of the requested type
      * @throws NullPointerException if key is null
-     * @throws IllegalStateException if the type cannot be provided
+     * @throws RuntimeException if no binding can be provided or bindings are ambiguous
      */
     @Nonnull
     <T> T getInstance(@Nonnull Class<T> key);
@@ -172,7 +181,7 @@ public interface Injector {
      * @param key the key identifying the instance to retrieve
      * @return an instance matching the requested key
      * @throws NullPointerException if key is null
-     * @throws IllegalStateException if the type cannot be provided
+     * @throws RuntimeException if no binding can be provided or bindings are ambiguous
      */
     @Nonnull
     <T> T getInstance(@Nonnull Key<T> key);

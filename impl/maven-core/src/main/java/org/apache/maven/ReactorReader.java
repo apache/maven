@@ -44,13 +44,18 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.Packaging;
+import org.apache.maven.api.Project;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.LookupException;
 import org.apache.maven.eventspy.EventSpy;
 import org.apache.maven.execution.ExecutionEvent;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.resolver.MavenWorkspaceReader;
+import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.SourceQueries;
 import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.repository.WorkspaceRepository;
@@ -402,7 +407,7 @@ class ReactorReader implements MavenWorkspaceReader {
      * @param project the project to copy artifacts from
      */
     private void installIntoProjectLocalRepository(MavenProject project) {
-        if ("pom".equals(project.getPackaging())
+        if (!producesMainArtifact(project)
                         && !"clean".equals(getLifecycles(project).peekLast())
                 || hasBeenPackagedDuringThisSession(project)) {
             getProjectArtifacts(project).filter(this::isRegularFile).forEach(this::installIntoProjectLocalRepository);
@@ -425,19 +430,32 @@ class ReactorReader implements MavenWorkspaceReader {
             if (Files.isDirectory(artifactPath)) {
                 try (Stream<Path> paths = Files.list(artifactPath)) {
                     for (Path path : (Iterable<Path>) paths::iterator) {
-                        Files.delete(path);
+                        Files.deleteIfExists(path);
                     }
                 }
-                try {
-                    Files.delete(artifactPath);
-                    Files.delete(artifactPath.getParent());
-                    Files.delete(artifactPath.getParent().getParent());
-                } catch (DirectoryNotEmptyException e) {
-                    // ignore
-                }
+                deleteIfEmpty(artifactPath);
+                deleteIfEmpty(artifactPath.getParent());
+                deleteIfEmpty(artifactPath.getParent().getParent());
+                deleteIfEmpty(getProjectLocalRepo());
+                deleteIfEmpty(getProjectLocalRepo().getParent());
             }
         } catch (IOException e) {
             LOGGER.error("Error while cleaning project local repository", e);
+        }
+    }
+
+    /**
+     * Deletes {@code dir} if it exists and is empty, silently ignoring non-empty directories.
+     * Used to prune the per-GAV, groupId, {@code project-local-repo}, and {@code .mvn/target}
+     * directory hierarchy after a project's clean phase so that no empty remnants are left.
+     */
+    private void deleteIfEmpty(Path dir) {
+        try {
+            Files.deleteIfExists(dir);
+        } catch (DirectoryNotEmptyException e) {
+            // Directory still has content (other modules' artifacts) — leave it alone.
+        } catch (IOException e) {
+            LOGGER.warn("Failed to delete directory {}", dir, e);
         }
     }
 
@@ -450,10 +468,41 @@ class ReactorReader implements MavenWorkspaceReader {
                         // pom artifact
                         Stream.of(new ProjectArtifact(project)),
                         // main project artifact if not a pom
-                        "pom".equals(project.getPackaging()) ? Stream.empty() : Stream.of(project.getArtifact())),
+                        !producesMainArtifact(project) ? Stream.empty() : Stream.of(project.getArtifact())),
                 // attached artifacts
                 project.getAttachedArtifacts().stream());
         return artifacts.map(RepositoryUtils::toArtifact);
+    }
+
+    /**
+     * Determines whether the project produces a main artifact.
+     * Package-private for testing.
+     */
+    boolean producesMainArtifact(MavenProject project) {
+        if ("pom".equals(project.getPackaging())) {
+            return false;
+        }
+        try {
+            if (session != null && session.getSession() != null) {
+                if (session.getSession() instanceof InternalMavenSession ims) {
+                    Project p = ims.getProject(project);
+                    if (p != null) {
+                        return p.producesMainArtifact();
+                    }
+                }
+                Packaging pkg = session.getSession().requirePackaging(project.getPackaging());
+                if (!pkg.producesMainArtifact()) {
+                    return false;
+                }
+            }
+        } catch (IllegalArgumentException | LookupException e) {
+            LOGGER.debug(
+                    "Cannot determine packaging '{}' for project '{}', assuming default",
+                    project.getPackaging(),
+                    project.getId(),
+                    e);
+        }
+        return !SourceQueries.usesModuleSourceHierarchy(project);
     }
 
     private boolean isRegularFile(Artifact artifact) {

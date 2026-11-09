@@ -35,6 +35,7 @@ import org.junit.jupiter.api.Test;
 import static org.apache.maven.api.Lifecycle.AFTER;
 import static org.apache.maven.api.Lifecycle.BEFORE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -85,6 +86,102 @@ class BuildPlanCreatorTest {
             phase.predecessors.forEach(
                     pred -> assertTrue(plan.step(pred.project, pred.name).isPresent(), "Phase not present: " + pred));
         });
+    }
+
+    /**
+     * Regression test for <a href="https://github.com/apache/maven/issues/13529">#13529</a>:
+     * merging overlapping lifecycle plans (e.g., {@code package} then {@code install})
+     * must un-skip the non-overlapping phases so that mojos can be bound during planning.
+     */
+    @Test
+    void testMergeUnskipsNonOverlappingPhases() {
+        MavenProject project = new MavenProject();
+        project.setCollectedProjects(List.of());
+        project.setArtifactId("test");
+        Map<MavenProject, List<MavenProject>> projects = Collections.singletonMap(project, Collections.emptyList());
+
+        BuildPlan plan = calculateLifecycleMappings(projects, "package");
+
+        // Verify install is skipped in the package plan
+        assertTrue(plan.requiredStep(project, "install").skip.get());
+
+        plan.then(calculateLifecycleMappings(projects, "install"));
+
+        // Verify install-related steps are NOT skipped after merge
+        for (String stepName : List.of("before:install", "install", "after:install")) {
+            assertFalse(
+                    plan.requiredStep(project, stepName).skip.get(),
+                    "Step " + stepName + " should not be skipped after merging package+install plans");
+        }
+
+        // Verify install is reachable from package
+        assertTrue(
+                plan.requiredStep(project, "install").isSuccessorOf(plan.requiredStep(project, "after:package")),
+                "install must be a successor of package");
+
+        // Verify all predecessor references point to steps actually in the plan
+        plan.allSteps()
+                .forEach(step -> step.predecessors.forEach(pred -> assertTrue(
+                        plan.step(pred.project, pred.name).isPresent(), "Predecessor not in plan: " + pred)));
+    }
+
+    /**
+     * Simulates {@code package javadoc:aggregate-jar install} with three task segments.
+     * The aggregator goal must run after package but before install, without creating
+     * cycles in the build plan.
+     */
+    @Test
+    void testMergeThreeSegmentsWithAggregatorGoal() {
+        MavenProject root = new MavenProject();
+        root.setCollectedProjects(List.of());
+        root.setArtifactId("root");
+        MavenProject child = new MavenProject();
+        child.setCollectedProjects(List.of());
+        child.setArtifactId("child");
+        Map<MavenProject, List<MavenProject>> allProjects = new HashMap<>();
+        allProjects.put(root, Collections.emptyList());
+        allProjects.put(child, Collections.singletonList(root));
+
+        // Segment 1: package (all projects)
+        BuildPlan plan = new BuildPlan(allProjects);
+        plan.then(calculateLifecycleMappings(allProjects, "package"));
+
+        // Segment 2: aggregator goal (root only)
+        BuildPlan goalPlan = new BuildPlan();
+        BuildStep goalStep = new BuildStep("javadoc:aggregate-jar", root, null);
+        Map<String, BuildStep> goalSteps = new HashMap<>();
+        goalSteps.put("javadoc:aggregate-jar", goalStep);
+        goalPlan.addProject(root, goalSteps);
+        plan.then(goalPlan);
+
+        // Segment 3: install (all projects)
+        plan.then(calculateLifecycleMappings(allProjects, "install"));
+
+        // Verify: all predecessor references point to plan objects (no dangling)
+        plan.allSteps()
+                .forEach(step -> step.predecessors.forEach(pred -> assertTrue(
+                        plan.step(pred.project, pred.name).isPresent(), "Predecessor not in plan: " + pred)));
+
+        // Verify: install is not skipped for both projects
+        for (MavenProject p : List.of(root, child)) {
+            assertFalse(
+                    plan.requiredStep(p, "install").skip.get(),
+                    "install should not be skipped for " + p.getArtifactId());
+        }
+
+        // Verify: no cycle — javadoc must NOT be a successor of install
+        BuildStep jdocStep = plan.requiredStep(root, "javadoc:aggregate-jar");
+        BuildStep installStep = plan.requiredStep(root, "install");
+        assertFalse(
+                jdocStep.isSuccessorOf(installStep), "javadoc must not be a successor of install (would create cycle)");
+
+        // Verify: javadoc runs after package
+        assertTrue(
+                jdocStep.isSuccessorOf(plan.requiredStep(root, "after:package")),
+                "javadoc must be a successor of package");
+
+        // Verify: install runs after javadoc
+        assertTrue(installStep.isSuccessorOf(jdocStep), "install must be a successor of javadoc:aggregate-jar");
     }
 
     @Test
@@ -240,40 +337,54 @@ class BuildPlanCreatorTest {
     }
 
     /**
-     * Tests that {@code filterByScope} filters upstream projects by exact scope match,
-     * treating null-scoped dependencies as "compile" (Maven default).
+     * Tests that {@code filterByScope} expands scopes for build ordering.
+     * "compile" includes compile, provided, system, and null-scoped (Maven default) dependencies
+     * so that provided/system-scope reactor dependencies are properly ordered.
      */
     @Test
     void testFilterByScopeMatchesExact() {
         MavenProject compileDep = createProjectWithId("g", "compile-dep");
         MavenProject providedDep = createProjectWithId("g", "provided-dep");
+        MavenProject systemDep = createProjectWithId("g", "system-dep");
+        MavenProject runtimeDep = createProjectWithId("g", "runtime-dep");
         MavenProject testDep = createProjectWithId("g", "test-dep");
         MavenProject nullScopeDep = createProjectWithId("g", "null-scope-dep");
-        List<MavenProject> upstream = List.of(compileDep, providedDep, testDep, nullScopeDep);
+        List<MavenProject> upstream = List.of(compileDep, providedDep, systemDep, runtimeDep, testDep, nullScopeDep);
 
         MavenProject consumer = new MavenProject();
         consumer.getDependencies().add(createDependency("g", "compile-dep", "compile"));
         consumer.getDependencies().add(createDependency("g", "provided-dep", "provided"));
+        consumer.getDependencies().add(createDependency("g", "system-dep", "system"));
+        consumer.getDependencies().add(createDependency("g", "runtime-dep", "runtime"));
         consumer.getDependencies().add(createDependency("g", "test-dep", "test"));
         consumer.getDependencies().add(createDependency("g", "null-scope-dep", null));
 
-        // "compile" matches explicit compile + null-scoped (Maven default is compile)
+        // "compile" scope expands to compile + provided + system + null-scoped (Maven default)
         List<MavenProject> compileFiltered =
                 BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "compile");
-        assertEquals(2, compileFiltered.size());
+        assertEquals(4, compileFiltered.size());
         assertTrue(compileFiltered.contains(compileDep));
+        assertTrue(compileFiltered.contains(providedDep));
+        assertTrue(compileFiltered.contains(systemDep));
         assertTrue(compileFiltered.contains(nullScopeDep));
 
-        // "provided" matches only provided-scoped
-        List<MavenProject> providedFiltered =
-                BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "provided");
-        assertEquals(1, providedFiltered.size());
-        assertTrue(providedFiltered.contains(providedDep));
+        // "runtime" scope expands to compile + runtime + null-scoped
+        List<MavenProject> runtimeFiltered =
+                BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "runtime");
+        assertEquals(3, runtimeFiltered.size());
+        assertTrue(runtimeFiltered.contains(compileDep));
+        assertTrue(runtimeFiltered.contains(runtimeDep));
+        assertTrue(runtimeFiltered.contains(nullScopeDep));
 
-        // "test" matches only test-scoped
+        // "test" scope expands to all scopes
         List<MavenProject> testFiltered = BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "test");
-        assertEquals(1, testFiltered.size());
-        assertTrue(testFiltered.contains(testDep));
+        assertEquals(6, testFiltered.size());
+
+        // "test-only" scope matches only test-scoped dependencies
+        List<MavenProject> testOnlyFiltered =
+                BuildPlanExecutor.BuildContext.filterByScope(consumer, upstream, "test-only");
+        assertEquals(1, testOnlyFiltered.size());
+        assertTrue(testOnlyFiltered.contains(testDep));
     }
 
     /**

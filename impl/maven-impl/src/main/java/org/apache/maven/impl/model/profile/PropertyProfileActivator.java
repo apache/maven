@@ -35,6 +35,13 @@ import org.apache.maven.api.services.model.ProfileActivator;
 
 /**
  * Determines profile activation based on the existence or value of some execution property.
+ * <p>
+ * The property lookup order is: user properties ({@code -D} flags) → system properties
+ * ({@code java.version}, {@code os.name}, …).  In external model builds (dependency POMs,
+ * parent POMs, imported BOMs), the caller provides a sandboxed {@link ProfileActivationContext}
+ * that suppresses user properties, so consumer {@code -D} flags cannot activate dependency
+ * profiles.  Model properties are not exposed through the system-property lookup, so a
+ * dependency POM's own {@code <properties>} cannot self-activate profiles (see #13390).
  *
  * @see ActivationProperty
  */
@@ -80,12 +87,24 @@ public class PropertyProfileActivator implements ProfileActivator {
             return false;
         }
 
+        // Lookup order: user (-D) → system (java.version, os.name, …).
+        // In external model builds the caller provides a sandboxed context that suppresses
+        // user properties, so consumer -D flags cannot activate dependency profiles.
+        // Model properties are not exposed through the system-property lookup,
+        // so a dependency POM's own <properties> cannot self-activate profiles.
         String sysValue = context.getUserProperty(name);
         if (sysValue == null && "packaging".equals(name)) {
             sysValue = context.getModelPackaging();
         }
         if (sysValue == null) {
             sysValue = context.getSystemProperty(name);
+        }
+        // Check cascaded profile properties last (for cascading profile activation).
+        // Only cascaded properties (from previously-activated profiles) are checked — the
+        // POM's own <properties> must NOT self-activate profiles via PropertyProfileActivator.
+        // ONLY for POM profiles - settings profiles should not use cascaded properties.
+        if (sysValue == null && Profile.SOURCE_POM.equals(profile.getSource())) {
+            sysValue = context.getCascadedProfileProperty(name);
         }
 
         String propValue = property.getValue();

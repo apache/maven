@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-compat-modules</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>4.2.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-settings</artifactId>
@@ -47,6 +47,10 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-xml</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-support</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
@@ -85,25 +89,6 @@ under the License.
           </params>
         </configuration>
         <executions>
-          <execution>
-            <id>velocity</id>
-            <goals>
-              <goal>velocity</goal>
-            </goals>
-            <phase>generate-sources</phase>
-            <configuration>
-              <templates>
-                <template>merger.vm</template>
-                <template>transformer.vm</template>
-                <template>reader-stax.vm</template>
-                <template>writer-stax.vm</template>
-              </templates>
-              <params combine.children="append">
-                <param>locationTracking=true</param>
-                <param>generateLocationClasses=true</param>
-              </params>
-            </configuration>
-          </execution>
           <execution>
             <id>v3</id>
             <goals>

@@ -40,6 +40,7 @@ import org.apache.maven.api.cli.ParserRequest;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.jline.MessageUtils;
+import org.apache.maven.utils.CleanArgument;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.cling.invoker.CliUtils.createInterpolator;
@@ -325,6 +326,7 @@ public class CommonsCliOptions implements Options {
         public static final String DEBUG = "debug";
         public static final String ENC = "enc";
         public static final String UPGRADE = "up";
+        public static final String VALIDATE = "val";
         public static final String SHELL = "shell";
         public static final String YJP = "yjp";
 
@@ -450,6 +452,10 @@ public class CommonsCliOptions implements Options {
             options.addOption(Option.builder()
                     .longOpt(UPGRADE)
                     .desc("Launch the Maven Upgrade tool (script option).")
+                    .get());
+            options.addOption(Option.builder()
+                    .longOpt(VALIDATE)
+                    .desc("Launch the Maven POM Validation tool (script option).")
                     .get());
             options.addOption(Option.builder()
                     .longOpt(SHELL)

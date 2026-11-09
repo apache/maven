@@ -23,10 +23,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DeprecatedAttributes;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.cling.invoker.CommonsCliOptions;
+import org.eclipse.aether.repository.RepositoryPolicy;
 
 public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOptions {
     public static CommonsCliMavenOptions parse(String source, String[] args) throws ParseException {
@@ -56,7 +58,7 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
 
     @Override
     public Optional<Boolean> updateSnapshots() {
-        if (commandLine.hasOption(CLIManager.UPDATE_SNAPSHOTS)) {
+        if (commandLine.hasOption(CLIManager.UPDATE_ALL) || commandLine.hasOption("update-snapshots")) {
             return Optional.of(Boolean.TRUE);
         }
         return Optional.empty();
@@ -74,6 +76,28 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     public Optional<Boolean> suppressSnapshotUpdates() {
         if (commandLine.hasOption(CLIManager.SUPPRESS_SNAPSHOT_UPDATES)) {
             return Optional.of(Boolean.TRUE);
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<String> artifactsUpdatePolicy() {
+        if (commandLine.hasOption(CLIManager.UPDATE_ARTIFACTS)) {
+            return Optional.of(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
+        }
+        if (commandLine.hasOption(CLIManager.ARTIFACTS_UPDATE_POLICY)) {
+            return Optional.of(commandLine.getOptionValue(CLIManager.ARTIFACTS_UPDATE_POLICY));
+        }
+        return Optional.empty();
+    }
+
+    @Override
+    public Optional<String> metadataUpdatePolicy() {
+        if (commandLine.hasOption(CLIManager.UPDATE_METADATA)) {
+            return Optional.of(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
+        }
+        if (commandLine.hasOption(CLIManager.METADATA_UPDATE_POLICY)) {
+            return Optional.of(commandLine.getOptionValue(CLIManager.METADATA_UPDATE_POLICY));
         }
         return Optional.empty();
     }
@@ -232,7 +256,7 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     protected static class CLIManager extends CommonsCliOptions.CLIManager {
         public static final String ALTERNATE_POM_FILE = "f";
         public static final String NON_RECURSIVE = "N";
-        public static final String UPDATE_SNAPSHOTS = "U";
+        public static final String UPDATE_ALL = "U";
         public static final String ACTIVATE_PROFILES = "P";
         public static final String SUPPRESS_SNAPSHOT_UPDATES = "nsu";
         public static final String CHECKSUM_FAILURE_POLICY = "C";
@@ -251,6 +275,10 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
         public static final String CACHE_ARTIFACT_NOT_FOUND = "canf";
         public static final String STRICT_ARTIFACT_DESCRIPTOR_POLICY = "sadp";
         public static final String IGNORE_TRANSITIVE_REPOSITORIES = "itr";
+        public static final String UPDATE_METADATA = "UM";
+        public static final String UPDATE_ARTIFACTS = "UA";
+        public static final String ARTIFACTS_UPDATE_POLICY = "artifacts-update-policy";
+        public static final String METADATA_UPDATE_POLICY = "metadata-update-policy";
         public static final String AT_FILE = "af";
 
         @Override
@@ -266,9 +294,21 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
                     .desc(
                             "Do not recurse into sub-projects. When used together with -pl, do not recurse into sub-projects of selected aggregators")
                     .get());
-            options.addOption(Option.builder(UPDATE_SNAPSHOTS)
+            options.addOption(Option.builder(UPDATE_ALL)
+                    .longOpt("update-all")
+                    .desc(
+                            "Shortcut for --update-metadata --update-artifacts: forces updates of metadata and artifacts on remote repositories")
+                    .get());
+
+            // Keep the old option as a deprecated alias for backwards compatibility.
+            options.addOption(Option.builder()
                     .longOpt("update-snapshots")
-                    .desc("Forces a check for missing releases and updated snapshots on remote repositories")
+                    .desc("<deprecated> Use -U,--update-all instead.")
+                    .deprecated(DeprecatedAttributes.builder()
+                            .setForRemoval(true)
+                            .setSince("4.2.0")
+                            .setDescription("Use -U,--update-all instead.")
+                            .get())
                     .get());
             options.addOption(Option.builder(ACTIVATE_PROFILES)
                     .longOpt("activate-profiles")
@@ -327,7 +367,8 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
             options.addOption(Option.builder(THREADS)
                     .longOpt("threads")
                     .hasArg()
-                    .desc("Thread count, for instance 4 (int) or 2C/2.5C (int/float) where C is core multiplied")
+                    .desc(
+                            "Thread count, for instance 4 (int) or 2C/2.5C (int/float) where C is core multiplied, or 'max' (available processors minus 1, minimum 1)")
                     .get());
             options.addOption(Option.builder(BUILDER)
                     .longOpt("builder")
@@ -353,6 +394,27 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
             options.addOption(Option.builder(IGNORE_TRANSITIVE_REPOSITORIES)
                     .longOpt("ignore-transitive-repositories")
                     .desc("If set, Maven will ignore remote repositories introduced by transitive dependencies.")
+                    .get());
+            options.addOption(Option.builder(UPDATE_METADATA)
+                    .longOpt("update-metadata")
+                    .desc(
+                            "Forces updates of remote repository metadata (updates plugin prefixes, version ranges and snapshots)")
+                    .get());
+            options.addOption(Option.builder(UPDATE_ARTIFACTS)
+                    .longOpt("update-artifacts")
+                    .desc("Forces checks for missing artifacts (retries cached retrieval errors)")
+                    .get());
+            options.addOption(Option.builder()
+                    .longOpt(ARTIFACTS_UPDATE_POLICY)
+                    .hasArg(true)
+                    .desc(
+                            "The update policy to apply onto artifacts ('always', 'daily', 'interval:N', 'never'); The -UA option overrides this option with 'always'")
+                    .get());
+            options.addOption(Option.builder()
+                    .longOpt(METADATA_UPDATE_POLICY)
+                    .hasArg(true)
+                    .desc(
+                            "The update policy to apply onto metadata ('always', 'daily', 'interval:N', 'never'); The -UM option overrides this option with 'always'")
                     .get());
             options.addOption(Option.builder(AT_FILE)
                     .longOpt("at-file")

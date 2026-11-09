@@ -75,6 +75,11 @@ public class MavenXpp3Reader {
             return new Model(model);
         } catch (XMLStreamException e) {
             throw new XmlPullParserException(e.getMessage(), null, e);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof XMLStreamException cause) {
+                throw new XmlPullParserException(cause.getMessage(), null, cause);
+            }
+            throw e;
         }
     }
 
@@ -111,6 +116,11 @@ public class MavenXpp3Reader {
             return new Model(model);
         } catch (XMLStreamException e) {
             throw new XmlPullParserException(e.getMessage(), null, e);
+        } catch (RuntimeException e) {
+            if (e.getCause() instanceof XMLStreamException cause) {
+                throw new XmlPullParserException(cause.getMessage(), null, cause);
+            }
+            throw e;
         }
     }
 

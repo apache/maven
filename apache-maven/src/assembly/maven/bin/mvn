@@ -23,7 +23,8 @@
 # Environment Variable Prerequisites
 #
 #   JAVA_HOME           (Optional) Points to a Java installation.
-#   MAVEN_ARGS          (Optional) Arguments passed to Maven before CLI arguments.
+#   MAVEN_ARGS          (Optional) Arguments passed to Maven before CLI arguments, separated by white space.
+#                       Single or double quotes group a value containing white space.
 #   MAVEN_OPTS          (Optional) Java runtime options used when Maven is executed.
 #   MAVEN_SKIP_RC       (Optional) Flag to disable loading of mavenrc files.
 #   MAVEN_DEBUG_OPTS    (Optional) Specify the debug options to use. Default value is "-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=y,address=${MAVEN_DEBUG_ADDRESS}" when --debug is used
@@ -72,6 +73,26 @@ if $cygwin || $mingw ; then
   if ! ( \unset -f command; \command -v cygpath ) > /dev/null 2>&1 ; then
     echo "Warning: cygpath was not found on the PATH, Apache Maven cannot convert paths to the Windows format." >&2
     echo "Some plugins may misbehave when they receive POSIX paths." >&2
+    cygwin=false
+    mingw=false
+  fi
+fi
+
+# A cygpath(1) from an unrelated POSIX emulation layer (e.g. the one shipped in
+# an Anaconda installation) can be found on the PATH first. It re-roots every
+# POSIX path under its own installation prefix, so all converted values point to
+# non-existing directories and the JVM dies with a bare ClassNotFoundException.
+# cygpath can convert relative paths too, but the current directory is the only
+# path that is known to exist at this point: verify that its Windows form can be
+# found on disk before trusting any of the later conversions.
+if $cygwin || $mingw ; then
+  _cygpath_bin=`( \unset -f command; \command -v cygpath )` || _cygpath_bin=
+  _probe_win=`cygpath --windows "$PWD"` || _probe_win=
+  if [ -z "$_probe_win" ] || [ ! -d "$_probe_win" ] ; then
+    printf '%s\n' "Warning: the cygpath found on the PATH (\"$_cygpath_bin\") does not convert paths to" >&2
+    printf '%s\n' "usable Windows paths (\"$PWD\" converts to \"$_probe_win\", which does not exist)," >&2
+    printf '%s\n' "so Apache Maven cannot convert paths to the Windows format." >&2
+    printf '%s\n' "Some plugins may misbehave when they receive POSIX paths." >&2
     cygwin=false
     mingw=false
   fi
@@ -130,11 +151,196 @@ else
   fi
 fi
 
-if ! "$JAVACMD" --enable-native-access=ALL-UNNAMED -version >/dev/null 2>&1; then
-  echo "Error: Apache Maven 4.x requires Java 17 or newer to run." >&2
-  "$JAVACMD" -version >&2
-  echo "Please upgrade your Java installation or set JAVA_HOME to point to a compatible JDK." >&2
-  exit 1
+# Early scan of the CLI arguments so that version-only invocations can be
+# answered straight from this script, without booting the full Maven JVM. The
+# banner is assembled to match org.apache.maven.cling.utils.CLIReportingUtils
+# #showVersion (see print_fast_version below). Compact single-dash tokens
+# (e.g. -qv, -qV) are honoured, but only when composed exclusively of the safe
+# chars q/v/V/X/e, mirroring the relevant Commons CLI short options.
+VERSION_AND_EXIT=false
+SHOW_VERSION=false
+QUIET=false
+VERBOSE=false
+MAIN_CLASS_OVERRIDE=false
+FAST_VERSION_PRINTED=false
+for arg in "$@"; do
+  if [ "$arg" = "--" ] ; then
+    break
+  fi
+  case $arg in
+    -v|--version) VERSION_AND_EXIT=true ;;
+    -V|--show-version) SHOW_VERSION=true ;;
+    -q|--quiet) QUIET=true ;;
+    -X|--debug) VERBOSE=true ;;
+    --enc|--shell|--up|--val) MAIN_CLASS_OVERRIDE=true ;;
+    -[qvVXe]*)
+      case $arg in
+        *v*) VERSION_AND_EXIT=true ;;
+        *V*) SHOW_VERSION=true ;;
+      esac
+      case $arg in
+        *q*) QUIET=true ;;
+        *X*) VERBOSE=true ;;
+      esac
+      ;;
+    *) ;;
+  esac
+done
+
+# Read a single `key=value` from a properties file. Unresolved `${...}`
+# placeholders are treated as absent, mirroring the reduce() logic used by the
+# JVM version reporting.
+read_property() {
+  _file=$1
+  _key=$2
+  if [ -f "$_file" ] ; then
+    _value=`sed -n "s/^$_key=//p" "$_file"`
+    case $_value in
+      \$\{*|"") ;;
+      *) printf '%s\n' "$_value" ;;
+    esac
+  fi
+}
+
+# Extract a JVM system property value from a `java -XshowSettings:properties`
+# dump (the properties are emitted on stderr as `    java.version = 17.0.10`).
+show_settings_property() {
+  _settings=$1
+  _key=$2
+  if [ -n "$_settings" ] ; then
+    printf '%s\n' "$_settings" | sed -n "s/^ *$_key *= *//p" | head -n 1
+  fi
+}
+
+# Render the version banner. When quiet, only the bare version is printed,
+# matching CLIReportingUtils#showVersionMinimal.
+print_fast_version() {
+  _settings=$1
+  _quiet=$2
+
+  _version_file="$MAVEN_HOME/bin/maven.version.properties"
+
+  _mvn_name=`read_property "$_version_file" distributionName`
+  _mvn_short=`read_property "$_version_file" distributionShortName`
+  _mvn_version=`read_property "$_version_file" version`
+  _mvn_build=`read_property "$_version_file" buildNumber`
+
+  if [ -z "$_mvn_version" ] ; then
+    # Fallback to the (versioned) core jar filename when the version file is
+    # not present, e.g. when running straight from a source checkout.
+    for _jar in "$MAVEN_HOME"/lib/maven-core-*.jar ; do
+      if [ -f "$_jar" ] ; then
+        _mvn_version=`printf '%s' "$_jar" | sed -e 's#.*maven-core-##' -e 's#\.jar$##'`
+        break
+      fi
+    done
+  fi
+
+  if [ -z "$_mvn_name" ] ; then
+    _mvn_name="Apache Maven"
+  fi
+  if [ -z "$_mvn_short" ] ; then
+    _mvn_short="Maven"
+  fi
+  if [ -z "$_mvn_version" ] ; then
+    _mvn_version="<version unknown>"
+  fi
+
+  if $_quiet ; then
+    printf '%s\n' "$_mvn_version"
+    return 0
+  fi
+
+  printf '%s %s' "$_mvn_name" "$_mvn_version"
+  if [ -n "$_mvn_build" ] ; then
+    printf ' (%s)' "$_mvn_build"
+  fi
+  printf '\n'
+
+  printf '%s home: %s\n' "$_mvn_short" "$MAVEN_HOME"
+
+  _java_version=`show_settings_property "$_settings" java.version`
+  _java_vendor=`show_settings_property "$_settings" java.vendor`
+  _java_home=`show_settings_property "$_settings" java.home`
+  printf 'Java version: %s, vendor: %s, runtime: %s\n' \
+    "${_java_version:-<unknown Java version>}" "${_java_vendor:-<unknown vendor>}" "${_java_home:-<unknown runtime>}"
+
+  _lang=`show_settings_property "$_settings" user.language`
+  _country=`show_settings_property "$_settings" user.country`
+  _encoding=`show_settings_property "$_settings" file.encoding`
+  _timezone=`show_settings_property "$_settings" user.timezone`
+  if [ -z "$_timezone" ] ; then
+    # The settings dump does not carry the time zone; derive it the same way
+    # the JVM does (TZ wins, then /etc/localtime) when possible.
+    if [ -n "$TZ" ] && [ -r "/usr/share/zoneinfo/$TZ" ] ; then
+      _timezone="$TZ"
+    elif [ -h /etc/localtime ] ; then
+      _timezone=`readlink /etc/localtime`
+      _timezone=`printf '%s' "$_timezone" | sed 's#^.*zoneinfo/##'`
+    elif [ -r /etc/timezone ] ; then
+      _timezone=`cat /etc/timezone`
+    fi
+  fi
+  _locale="$_lang"
+  if [ -n "$_country" ] ; then
+    _locale="$_lang"_"$_country"
+  fi
+  printf 'Default locale: %s, platform encoding: %s, time zone: %s\n' \
+    "$_locale" "${_encoding:-<unknown encoding>}" "${_timezone:-<unknown>}"
+
+  _os_name=`show_settings_property "$_settings" os.name`
+  _os_version=`show_settings_property "$_settings" os.version`
+  _os_arch=`show_settings_property "$_settings" os.arch`
+  _os_name=`printf '%s' "$_os_name" | tr '[:upper:]' '[:lower:]'`
+  _os_version=`printf '%s' "$_os_version" | tr '[:upper:]' '[:lower:]'`
+  _os_arch=`printf '%s' "$_os_arch" | tr '[:upper:]' '[:lower:]'`
+
+  _os_family="unknown"
+  case "$_os_name" in
+    *windows*) _os_family="windows" ;;
+    *mac*|darwin) _os_family="mac" ;;
+    *os/2*) _os_family="os/2" ;;
+    *dos*) _os_family="dos" ;;
+    *)
+      if [ -n "$_os_name" ] ; then
+        _os_family="unix"
+      fi
+      ;;
+  esac
+  printf 'OS name: "%s", version: "%s", arch: "%s", family: "%s"\n' \
+    "$_os_name" "$_os_version" "$_os_arch" "$_os_family"
+}
+
+# Combined Java 17 gate and JVM settings probe. Version invocations reuse the
+# settings dump to render the banner without starting Maven itself; every other
+# invocation only relies on the exit status, exactly like the former probe.
+HAS_SETTINGS=false
+VERSION_SETTINGS=
+if $VERSION_AND_EXIT || $SHOW_VERSION ; then
+  if ! $VERBOSE && ! $MAIN_CLASS_OVERRIDE ; then
+    if VERSION_SETTINGS=`"$JAVACMD" --enable-native-access=ALL-UNNAMED -XshowSettings:properties -version 2>&1` ; then
+      HAS_SETTINGS=true
+    fi
+  fi
+fi
+if ! $HAS_SETTINGS ; then
+  if ! "$JAVACMD" --enable-native-access=ALL-UNNAMED -version >/dev/null 2>&1; then
+    echo "Error: Apache Maven 4.x requires Java 17 or newer to run." >&2
+    "$JAVACMD" -version >&2
+    echo "Please upgrade your Java installation or set JAVA_HOME to point to a compatible JDK." >&2
+    exit 1
+  fi
+fi
+
+if $HAS_SETTINGS ; then
+  if $VERSION_AND_EXIT ; then
+    print_fast_version "$VERSION_SETTINGS" $QUIET
+    exit 0
+  fi
+  # -V/--show-version: print the banner now and let the JVM run the build
+  # without printing it a second time.
+  print_fast_version "$VERSION_SETTINGS" $QUIET
+  FAST_VERSION_PRINTED=true
 fi
 
 # traverses directory structure from process work directory to filesystem root
@@ -170,14 +376,11 @@ find_file_argument_basedir() {
       elif [ -f "${arg}" ]; then
         basedir=`dirname "${arg}"`
         basedir=`cd "$basedir" && pwd -P`
-        if [ ! -d "$basedir" ]; then
-          echo "Directory $basedir extracted from the -f/--file command-line argument ${arg} does not exist" >&2
-          exit 1
-        fi
-      else
-        echo "POM file ${arg} specified with the -f/--file command line argument does not exist" >&2
-        exit 1
       fi
+      # If the argument does not exist (e.g. a Cygwin/MSYS path that will be
+      # converted later, or a genuinely missing file), fall back to the current
+      # directory.  The Java layer validates the path and produces the proper
+      # error message when the file is truly absent.
       break
     fi
     if [ "$arg" = "-f" -o "$arg" = "--file" ]; then
@@ -195,15 +398,15 @@ find_file_argument_basedir() {
 # Set MAVEN_DEBUG_SCRIPT=1 to enable debug logging
 concat_lines() {
   if [ -f "$1" ]; then
-    # Use Java source-launch mode (JDK 11+) to run JvmConfigParser directly
-    # This avoids the need for compilation and temporary directories
+    # JvmConfigParser is shipped precompiled: source-launch mode would compile it
+    # on every invocation, which costs several times the actual parsing
 
     # Debug logging
     if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
       printf '[DEBUG] Found jvm.config file at: %s\n' "$1" >&2
       printf '[DEBUG] Running JvmConfigParser with Java: %s\n' "$JAVACMD" >&2
       printf '[DEBUG] Parser arguments: %s %s %s\n' \
-        "$MAVEN_HOME/bin/JvmConfigParser.java" "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" >&2
+        "-cp $MAVEN_HOME/bin JvmConfigParser" "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" >&2
     fi
 
     # Verify Java is available
@@ -212,14 +415,22 @@ concat_lines() {
       return 1
     }
 
-    # Run the parser using source-launch mode
-    # Capture both stdout and stderr for comprehensive error reporting
-    parser_output=$("$JAVACMD" "$MAVEN_HOME/bin/JvmConfigParser.java" "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" 2>&1)
+    # Run the parser
+    # Capture stdout for JVM options; capture stderr separately so JVM notices
+    # (e.g. JAVA_TOOL_OPTIONS) do not pollute MAVEN_OPTS.
+    parser_stderr_file=$(mktemp "${TMPDIR:-/tmp}/mvn-jvm-config-stderr.XXXXXX" 2>/dev/null || echo "${TMPDIR:-/tmp}/mvn-jvm-config-stderr.$$")
+    trap 'rm -f "$parser_stderr_file"' EXIT INT TERM
+    parser_output=$("$JAVACMD" -cp "$MAVEN_HOME/bin" JvmConfigParser "$1" "$MAVEN_PROJECTBASEDIR_NATIVE" 2>"$parser_stderr_file")
     parser_exit=$?
 
     if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
       echo "[DEBUG] JvmConfigParser exit code: $parser_exit" >&2
       printf '[DEBUG] JvmConfigParser output: %s\n' "$parser_output" >&2
+      if [ -s "$parser_stderr_file" ]; then
+        while IFS= read -r parser_err_line || [ -n "$parser_err_line" ]; do
+          printf '[DEBUG] JvmConfigParser stderr: %s\n' "$parser_err_line" >&2
+        done < "$parser_stderr_file"
+      fi
     fi
 
     if [ $parser_exit -ne 0 ]; then
@@ -229,10 +440,24 @@ concat_lines() {
       printf '  Maven basedir: %s\n' "$MAVEN_PROJECTBASEDIR" >&2
       printf '  Java command: %s\n' "$JAVACMD" >&2
       echo "  Parser output:" >&2
-      printf '%s\n' "$parser_output" | sed 's/^/    /' >&2
+      # Print captured stderr (parser exceptions/diagnostics) and stdout so no diagnostic info is dropped
+      if [ -s "$parser_stderr_file" ]; then
+        while IFS= read -r parser_err_line || [ -n "$parser_err_line" ]; do
+          printf '    %s\n' "$parser_err_line" >&2
+        done < "$parser_stderr_file"
+      fi
+      if [ -n "$parser_output" ]; then
+        printf '%s\n' "$parser_output" | while IFS= read -r parser_out_line || [ -n "$parser_out_line" ]; do
+          printf '    %s\n' "$parser_out_line" >&2
+        done
+      fi
+      rm -f "$parser_stderr_file" 2>/dev/null || :
+      trap - EXIT INT TERM
       exit 1
     fi
 
+    rm -f "$parser_stderr_file" 2>/dev/null || :
+    trap - EXIT INT TERM
     printf '%s\n' "$parser_output"
   fi
 }
@@ -260,22 +485,72 @@ fi
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
   printf '[DEBUG] Final MAVEN_OPTS: %s\n' "$MAVEN_OPTS" >&2
 fi
-LAUNCHER_JAR=`echo "$MAVEN_HOME"/boot/plexus-classworlds-*.jar`
+LAUNCHER_JAR=""
+for _jar in "$MAVEN_HOME"/boot/*.jar; do
+  [ -f "$_jar" ] && LAUNCHER_JAR="${LAUNCHER_JAR:+$LAUNCHER_JAR:}$_jar"
+done
 LAUNCHER_CLASS=org.codehaus.plexus.classworlds.launcher.Launcher
 JLINE_NATIVE_PATH="$MAVEN_HOME/lib/jline-native"
+MODULES_DIR="$MAVEN_HOME/lib/modules"
 
 # For Cygwin and MinGW, switch paths to Windows format before running java(1) command
 if $cygwin || $mingw ; then
   [ -n "$JAVA_HOME" ] &&
     JAVA_HOME=`cygpath --windows "$JAVA_HOME"`
-  LAUNCHER_JAR=`cygpath --windows "$LAUNCHER_JAR"`
+  LAUNCHER_JAR=`cygpath --windows --path "$LAUNCHER_JAR"`
   CLASSWORLDS_CONF=`cygpath --windows "$CLASSWORLDS_CONF"`
   MAVEN_HOME=`cygpath --windows "$MAVEN_HOME"`
   # converted separately, appending to the already converted MAVEN_HOME would
   # produce a path mixing both separators, e.g. C:\maven/lib/jline-native
   JLINE_NATIVE_PATH=`cygpath --windows "$JLINE_NATIVE_PATH"`
+  MODULES_DIR=`cygpath --windows "$MODULES_DIR"`
+fi
+
+# Module-path and native access flags require a JDK that can read the module jars.
+# The probe includes --module-path so it fails on JDKs that cannot read the module descriptors.
+# Fall back to ALL-UNNAMED so that --enable-native-access is always granted on JDK 22+,
+# even when the module-path probe fails (older JDK, missing lib/modules/, locked-down env).
+MAVEN_MODULE_OPTS="--enable-native-access=ALL-UNNAMED"
+if "$JAVACMD" --module-path "$MODULES_DIR" --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm -version >/dev/null 2>&1; then
+  MAVEN_MODULE_OPTS="--module-path \"$MODULES_DIR\" --add-modules ALL-MODULE-PATH --enable-native-access=org.jline.terminal.ffm,org.jline.nativ"
 fi
 MAVEN_PROJECTBASEDIR="$MAVEN_PROJECTBASEDIR_NATIVE"
+
+# MNG-8056: Under Cygwin, the JVM is a native Windows process and cannot resolve
+# Cygwin-style POSIX paths (e.g. /cygdrive/c/...) directly.  The internal paths
+# (MAVEN_HOME, CLASSWORLDS_CONF, JAVA_HOME, …) are already converted above, but
+# user-supplied paths passed via -f/--file, -s/--settings, -gs/--global-settings, -t/--toolchains, -gt/--global-toolchains,
+# -ps/--project-settings, -is/--install-settings, -it/--install-toolchains,
+# -l/--log-file, and -af/--at-file reach the JVM unconverted.
+# The loop below rewrites only those argument values that begin with '/' (absolute
+# POSIX paths); relative paths and already-Windows paths are left unchanged.
+# MinGW/MSYS2 perform automatic path mangling, so the fix is Cygwin-only.
+if $cygwin ; then
+  _np=false
+  _count=$#
+  while [ $_count -gt 0 ]; do
+    _a="$1"
+    shift
+    if $_np; then
+      case "$_a" in
+        /*) _a=$(cygpath --windows "$_a") ;;
+      esac
+      _np=false
+    else
+      case "$_a" in
+        -f|--file|-s|--settings|-gs|--global-settings|-t|--toolchains|-gt|--global-toolchains|-ps|--project-settings|-is|--install-settings|-it|--install-toolchains|-l|--log-file|-af|--at-file)
+          _np=true ;;
+        --file=/*|--settings=/*|--global-settings=/*|--toolchains=/*|--global-toolchains=/*|--project-settings=/*|--install-settings=/*|--install-toolchains=/*|--log-file=/*|--at-file=/*)
+          _flag="${_a%%=*}"
+          _path="${_a#*=}"
+          _a="${_flag}=$(cygpath --windows "${_path}")"
+          ;;
+      esac
+    fi
+    set -- "$@" "$_a"
+    _count=$(( _count - 1 ))
+  done
+fi
 
 handle_args() {
   while [ $# -gt 0 ]; do
@@ -303,6 +578,9 @@ handle_args() {
       --up)
         MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenUpCling"
         ;;
+      --val)
+        MAVEN_MAIN_CLASS="org.apache.maven.cling.MavenValCling"
+        ;;
       *)
         ;;
     esac
@@ -317,31 +595,90 @@ MAVEN_MAIN_CLASS=${MAVEN_MAIN_CLASS:=org.apache.maven.cling.MavenCling}
 cmd="\"$JAVACMD\" \
   $MAVEN_OPTS \
   $MAVEN_DEBUG_OPTS \
-  --enable-native-access=ALL-UNNAMED \
+  $MAVEN_MODULE_OPTS \
   -classpath \"$LAUNCHER_JAR\" \
   \"-Dclassworlds.conf=$CLASSWORLDS_CONF\" \
   \"-Dmaven.home=$MAVEN_HOME\" \
   \"-Dmaven.mainClass=$MAVEN_MAIN_CLASS\" \
   \"-Dlibrary.jline.path=$JLINE_NATIVE_PATH\" \
-  \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\" \
-  $LAUNCHER_CLASS"
+  \"-Dmaven.multiModuleProjectDirectory=$MAVEN_PROJECTBASEDIR\""
+
+# The JVM option must precede the main class on the command line, otherwise it
+# would be treated as a plain Maven argument rather than a system property.
+if [ "$FAST_VERSION_PRINTED" = "true" ] ; then
+  cmd="$cmd \"-Dmaven.version.printed=true\""
+fi
+
+cmd="$cmd $LAUNCHER_CLASS"
+
+# MAVEN_ARGS is only passed for the default Maven build command (MavenCling),
+# not for sub-commands like --up, --enc, --shell or --val which have their own options.
+#
+# Its words are separated by white space, and single or double quotes group a word
+# containing white space, so that a path with a space can be passed.
+# Nothing else is interpreted: no backslash escape, no ${...} placeholder, no globbing
+# and no command substitution, so the values reach Maven as they were written.
+# A word is made of adjacent quoted and unquoted parts, and "" is an empty word.
+# The words go in front of the user arguments, "$@" is rotated to get them in order.
+if [ "$MAVEN_MAIN_CLASS" = "org.apache.maven.cling.MavenCling" ] && [ -n "$MAVEN_ARGS" ]; then
+  maven_args_user_count=$#
+  maven_args_rest=$MAVEN_ARGS
+  maven_args_word=
+  maven_args_in_word=false
+  maven_args_quote=
+  maven_args_tab=`printf '\t'`
+  maven_args_nl='
+'
+  while [ -n "$maven_args_rest" ]; do
+    maven_args_tail=${maven_args_rest#?}
+    maven_args_char=${maven_args_rest%"$maven_args_tail"}
+    maven_args_rest=$maven_args_tail
+    if [ -n "$maven_args_quote" ]; then
+      if [ "$maven_args_char" = "$maven_args_quote" ]; then
+        maven_args_quote=
+      else
+        maven_args_word=$maven_args_word$maven_args_char
+      fi
+    else
+      case $maven_args_char in
+        '"' | "'")
+          maven_args_quote=$maven_args_char
+          maven_args_in_word=true
+          ;;
+        ' ' | "$maven_args_tab" | "$maven_args_nl")
+          if [ "$maven_args_in_word" = true ]; then
+            set -- "$@" "$maven_args_word"
+            maven_args_word=
+            maven_args_in_word=false
+          fi
+          ;;
+        *)
+          maven_args_word=$maven_args_word$maven_args_char
+          maven_args_in_word=true
+          ;;
+      esac
+    fi
+  done
+  if [ -n "$maven_args_quote" ]; then
+    echo "Warning: MAVEN_ARGS has an unterminated $maven_args_quote quote, the rest of the value is treated as part of the last word" >&2
+  fi
+  if [ "$maven_args_in_word" = true ]; then
+    set -- "$@" "$maven_args_word"
+  fi
+  while [ "$maven_args_user_count" -gt 0 ]; do
+    set -- "$@" "$1"
+    shift
+    maven_args_user_count=$((maven_args_user_count - 1))
+  done
+fi
 
 if [ -n "$MAVEN_DEBUG_SCRIPT" ]; then
   echo "[DEBUG] Launching JVM with command:" >&2
   printf '[DEBUG]   %s' "$cmd" >&2
-  if [ "$MAVEN_MAIN_CLASS" = "org.apache.maven.cling.MavenCling" ]; then
-    printf ' %s' "$MAVEN_ARGS" >&2
-  fi
   printf ' "%s"' "$@" >&2; echo >&2
 fi
 
-# User arguments ("$@") and MAVEN_ARGS are passed outside the eval'd string
-# to preserve literal values (backslashes, ${...} placeholders) without
-# shell re-parsing. Only the base command uses eval for MAVEN_OPTS word splitting.
-# MAVEN_ARGS is only passed for the default Maven build command (MavenCling),
-# not for sub-commands like --up, --enc, or --shell which have their own options.
-if [ "$MAVEN_MAIN_CLASS" = "org.apache.maven.cling.MavenCling" ]; then
-  eval exec "$cmd" '$MAVEN_ARGS' '"$@"'
-else
-  eval exec "$cmd" '"$@"'
-fi
+# The arguments ("$@") are passed outside the eval'd string to preserve literal
+# values (backslashes, ${...} placeholders) without shell re-parsing.
+# Only the base command uses eval for MAVEN_OPTS word splitting.
+eval exec "$cmd" '"$@"'

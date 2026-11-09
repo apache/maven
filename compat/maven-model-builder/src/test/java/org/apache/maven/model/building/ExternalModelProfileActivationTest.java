@@ -28,23 +28,54 @@ import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Models built at {@link ModelBuildingRequest#VALIDATION_LEVEL_MINIMAL} come from POMs resolved
- * from a repository during dependency resolution (a dependency POM, one of its parents, or an
- * imported BOM), see for instance {@code DefaultArtifactDescriptorReader#loadPom}. Their file and
- * property activators are not evaluated, and their profiles contribute no repositories. A project
- * build, at {@link ModelBuildingRequest#VALIDATION_LEVEL_STRICT}, still evaluates every activator.
- * Platform-derived activation (JDK version, operating system, activeByDefault) is unaffected at
- * either level.
+ * Tests for profile activation in external (repository-resolved) model builds, i.e. those at
+ * {@link ModelBuildingRequest#VALIDATION_LEVEL_MINIMAL} (dependency POMs, parent POMs, imported BOMs).
+ *
+ * <h2>Activation rules for external models</h2>
+ * <ul>
+ *   <li><b>JDK / OS / activeByDefault</b> — always re-activated: they are platform facts.</li>
+ *   <li><b>File</b> — suppressed: publisher-local paths don't exist on the consumer's machine.</li>
+ *   <li><b>Property (user / -D)</b> — suppressed: consumer flags were not set for that dependency
+ *       and must not accidentally activate its profiles.</li>
+ *   <li><b>Property (system)</b> — re-activated: system properties are platform facts
+ *       ({@code java.version}, {@code os.name}, …).</li>
+ *   <li><b>Property (POM-declared, from &lt;properties&gt;)</b> — suppressed: a dependency POM's
+ *       own properties must not activate its own property-based profiles (see #13390).
+ *       This restores 3.9.x behavior where the {@code PropertyProfileActivator} only
+ *       consulted user and system properties, never model properties.</li>
+ *   <li><b>Negated property (-D absent)</b> — re-activated (default-on): the property is absent from
+ *       the sandboxed context, so {@code !foo} evaluates to true, preserving the publisher's intent.</li>
+ *   <li><b>Profile repositories</b> — honored from legitimately-active profiles
+ *       (JDK/OS/activeByDefault/system-property/negated-property); stripping them would break
+ *       the established {@code project → dep1 → dep2} pattern. See #13100.</li>
+ * </ul>
  */
 class ExternalModelProfileActivationTest {
 
+    /**
+     * POM with profiles covering all activation types.
+     * <p>
+     * For the file test, {@code some.dir} is set as a system property pointing to a directory that
+     * exists (tmpdir); in a STRICT project build this profile fires, but in external builds file
+     * activation is suppressed entirely.
+     * <p>
+     * For the user-property test, {@code user.gating.prop} must be set via user properties (-D),
+     * not system properties, to test the suppression of -D flags in external builds.
+     * <p>
+     * For the system-property test, {@code sys.gating.prop} is set as a system property and
+     * must remain effective in external builds (system properties are platform facts).
+     */
     private static final String POM = "<project>\n"
             + "  <modelVersion>4.0.0</modelVersion>\n"
             + "  <groupId>thegroup</groupId>\n"
             + "  <artifactId>withprofiles</artifactId>\n"
             + "  <version>1</version>\n"
             + "  <packaging>pom</packaging>\n"
+            + "  <properties>\n"
+            + "    <pom.declared.prop>hello</pom.declared.prop>\n"
+            + "  </properties>\n"
             + "  <profiles>\n"
+            // profile 1: file activation — suppressed in external builds
             + "    <profile>\n"
             + "      <id>file-condition</id>\n"
             + "      <activation>\n"
@@ -56,17 +87,55 @@ class ExternalModelProfileActivationTest {
             + "        <profile.file>activated</profile.file>\n"
             + "      </properties>\n"
             + "    </profile>\n"
+            // profile 2: user-property activation — suppressed in external builds
             + "    <profile>\n"
-            + "      <id>property-condition</id>\n"
+            + "      <id>user-property-condition</id>\n"
             + "      <activation>\n"
             + "        <property>\n"
-            + "          <name>some.gating.property</name>\n"
+            + "          <name>user.gating.prop</name>\n"
             + "        </property>\n"
             + "      </activation>\n"
             + "      <properties>\n"
-            + "        <profile.property>activated</profile.property>\n"
+            + "        <profile.user.property>activated</profile.user.property>\n"
             + "      </properties>\n"
             + "    </profile>\n"
+            // profile 3: system-property activation — must fire in external builds
+            + "    <profile>\n"
+            + "      <id>system-property-condition</id>\n"
+            + "      <activation>\n"
+            + "        <property>\n"
+            + "          <name>sys.gating.prop</name>\n"
+            + "        </property>\n"
+            + "      </activation>\n"
+            + "      <properties>\n"
+            + "        <profile.sys.property>activated</profile.sys.property>\n"
+            + "      </properties>\n"
+            + "    </profile>\n"
+            // profile 4: POM-declared property activation (positive) — suppressed in external builds
+            + "    <profile>\n"
+            + "      <id>pom-declared-property-condition</id>\n"
+            + "      <activation>\n"
+            + "        <property>\n"
+            + "          <name>pom.declared.prop</name>\n"
+            + "        </property>\n"
+            + "      </activation>\n"
+            + "      <properties>\n"
+            + "        <profile.pom.property>activated</profile.pom.property>\n"
+            + "      </properties>\n"
+            + "    </profile>\n"
+            // profile 5: negated-property (default-on, opt-out via -D) — must fire in external builds
+            + "    <profile>\n"
+            + "      <id>negated-property-default-on</id>\n"
+            + "      <activation>\n"
+            + "        <property>\n"
+            + "          <name>!skip.defaults</name>\n"
+            + "        </property>\n"
+            + "      </activation>\n"
+            + "      <properties>\n"
+            + "        <profile.negated.property>activated</profile.negated.property>\n"
+            + "      </properties>\n"
+            + "    </profile>\n"
+            // profile 6: JDK activation — always fires
             + "    <profile>\n"
             + "      <id>jdk-condition</id>\n"
             + "      <activation>\n"
@@ -85,39 +154,310 @@ class ExternalModelProfileActivationTest {
             + "  </profiles>\n"
             + "</project>\n";
 
-    private Model build(int validationLevel) throws Exception {
+    private Model build(int validationLevel, Properties systemProperties, Properties userProperties) throws Exception {
         ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
-
-        Properties systemProperties = new Properties();
-        systemProperties.putAll(System.getProperties());
-        systemProperties.setProperty("some.dir", System.getProperty("java.io.tmpdir"));
-        systemProperties.setProperty("some.gating.property", "true");
 
         DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
         request.setModelSource(new StringModelSource(POM));
         request.setValidationLevel(validationLevel);
         request.setSystemProperties(systemProperties);
+        request.setUserProperties(userProperties);
+        request.setModelResolver(new DefaultModelBuilderTest.BaseModelResolver());
 
         return builder.build(request).getEffectiveModel();
     }
 
-    @Test
-    void testProjectBuildEvaluatesAllActivators() throws Exception {
-        Model model = build(ModelBuildingRequest.VALIDATION_LEVEL_STRICT);
+    private Properties systemPropertiesWithTestValues() {
+        Properties sp = new Properties();
+        sp.putAll(System.getProperties());
+        sp.setProperty("some.dir", System.getProperty("java.io.tmpdir"));
+        sp.setProperty("sys.gating.prop", "true");
+        return sp;
+    }
 
-        assertEquals("activated", model.getProperties().get("profile.file"));
-        assertEquals("activated", model.getProperties().get("profile.property"));
-        assertEquals("activated", model.getProperties().get("profile.jdk"));
-        assertTrue(model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+    private Properties userPropertiesWithTestValues() {
+        Properties up = new Properties();
+        up.setProperty("user.gating.prop", "true");
+        return up;
     }
 
     @Test
-    void testDependencyPomActivatesOnlyEnvironmentIndependentProfiles() throws Exception {
-        Model model = build(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+    void testProjectBuildEvaluatesAllActivators() throws Exception {
+        Model model = build(
+                ModelBuildingRequest.VALIDATION_LEVEL_STRICT,
+                systemPropertiesWithTestValues(),
+                userPropertiesWithTestValues());
 
-        assertNull(model.getProperties().get("profile.file"));
-        assertNull(model.getProperties().get("profile.property"));
-        assertEquals("activated", model.getProperties().get("profile.jdk"));
-        assertTrue(model.getRepositories().stream().noneMatch(r -> "profile-repo".equals(r.getId())));
+        assertEquals("activated", model.getProperties().get("profile.file"), "file profile must fire in project build");
+        assertEquals(
+                "activated",
+                model.getProperties().get("profile.user.property"),
+                "user-property profile must fire in project build");
+        assertEquals(
+                "activated",
+                model.getProperties().get("profile.sys.property"),
+                "system-property profile must fire in project build");
+        // POM-declared properties do not drive profile activation in any context:
+        // the PropertyProfileActivator only checks user → system properties.
+        assertNull(
+                model.getProperties().get("profile.pom.property"),
+                "POM-declared-property profile must NOT fire in project build");
+        assertEquals(
+                "activated",
+                model.getProperties().get("profile.negated.property"),
+                "negated-property profile must fire in project build");
+        assertEquals("activated", model.getProperties().get("profile.jdk"), "JDK profile must fire in project build");
+        assertTrue(
+                model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())),
+                "profile repository must be present in project build");
+    }
+
+    @Test
+    void testExternalModelFileActivationIsSuppressed() throws Exception {
+        // File activation must be suppressed in external model builds regardless of whether the
+        // path exists: publisher-local paths don't exist on the consumer's machine.
+        Model model = build(
+                ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL,
+                systemPropertiesWithTestValues(),
+                userPropertiesWithTestValues());
+
+        assertNull(model.getProperties().get("profile.file"), "file profile must NOT fire in external model build");
+    }
+
+    @Test
+    void testExternalModelUserPropertyActivationIsSuppressed() throws Exception {
+        // Consumer -D flags must not activate dependency profiles.
+        Model model = build(
+                ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL,
+                systemPropertiesWithTestValues(),
+                userPropertiesWithTestValues());
+
+        assertNull(
+                model.getProperties().get("profile.user.property"),
+                "user-property profile must NOT fire in external model build (consumer -D suppressed)");
+    }
+
+    @Test
+    void testExternalModelSystemPropertyActivationIsPreserved() throws Exception {
+        // System properties are platform facts and must drive activation even in external builds.
+        Model model = build(
+                ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, systemPropertiesWithTestValues(), new Properties());
+
+        assertEquals(
+                "activated",
+                model.getProperties().get("profile.sys.property"),
+                "system-property profile must fire in external model build");
+    }
+
+    @Test
+    void testExternalModelPomDeclaredPropertyActivationIsSuppressed() throws Exception {
+        // A dependency POM's own <properties> must not activate its own property-based profiles.
+        // This restores 3.9.x behavior: PropertyProfileActivator only checks user → system
+        // properties, never model properties. See #13390 (jruby-base self-activation bug).
+        Model model = build(
+                ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, systemPropertiesWithTestValues(), new Properties());
+
+        assertNull(
+                model.getProperties().get("profile.pom.property"),
+                "POM-declared-property profile must NOT fire in external model build");
+    }
+
+    @Test
+    void testExternalModelNegatedPropertyDefaultOnIsPreserved() throws Exception {
+        // A negated-property profile (!foo) fires when the property is absent.
+        // In the sandbox, user properties are suppressed so 'skip.defaults' is absent → fires.
+        // This is the common "opt-out flag" pattern (e.g. resteasy-default in JBoss projects).
+        Model model = build(
+                ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, systemPropertiesWithTestValues(), new Properties());
+
+        assertEquals(
+                "activated",
+                model.getProperties().get("profile.negated.property"),
+                "negated-property (default-on) profile must fire in external model build");
+    }
+
+    @Test
+    void testExternalModelSystemPropertySuppressesDefaultOnProfile() throws Exception {
+        // A system property named skip.defaults suppresses the default-on negated-property
+        // profile (!skip.defaults) even in external model builds. System properties are platform
+        // facts that pass through the sandbox unchanged, so the publisher's opt-out mechanism
+        // still works when the consumer sets it at the JVM level.
+        Properties sp = systemPropertiesWithTestValues();
+        sp.setProperty("skip.defaults", "true"); // system-level opt-out
+        Model model = build(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, sp, new Properties());
+
+        assertNull(
+                model.getProperties().get("profile.negated.property"),
+                "negated-property (default-on) profile must be suppressed when system property 'skip.defaults' is set");
+    }
+
+    @Test
+    void testExternalModelJdkActivationIsPreserved() throws Exception {
+        // JDK activation is a platform fact and must fire in external builds.
+        Model model = build(
+                ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, systemPropertiesWithTestValues(), new Properties());
+
+        assertEquals("activated", model.getProperties().get("profile.jdk"), "JDK profile must fire in external build");
+    }
+
+    @Test
+    void testExternalModelJdkProfileRepositoriesAreHonored() throws Exception {
+        // Repositories from legitimately-active profiles (JDK-activated) must be honored:
+        // stripping them would break the project → dep1 → dep2 pattern. See #13100, #13116.
+        Model model = build(
+                ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL, systemPropertiesWithTestValues(), new Properties());
+
+        assertTrue(
+                model.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())),
+                "profile repository must be present in external model build (JDK-activated profile)");
+    }
+
+    /**
+     * Reproduces #13390: a dependency POM declares a property (like jruby-base's {@code tzdata.version})
+     * and has a profile activated by the same property name. The profile is intended to be activated
+     * by the consumer via {@code -D}, not by the POM's own {@code <properties>} section.
+     * The sandbox must not let the POM's properties self-activate its profiles.
+     */
+    @Test
+    void testExternalModelPomPropertyDoesNotSelfActivateProfile() throws Exception {
+        String jrubyStylePom = "<project>\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>example</groupId>\n"
+                + "  <artifactId>jruby-style</artifactId>\n"
+                + "  <version>1.0</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "  <properties>\n"
+                + "    <tzdata.version>2024a</tzdata.version>\n"
+                + "  </properties>\n"
+                + "  <profiles>\n"
+                + "    <profile>\n"
+                + "      <id>tzdata-bundle</id>\n"
+                + "      <activation>\n"
+                + "        <property>\n"
+                + "          <name>tzdata.version</name>\n"
+                + "        </property>\n"
+                + "      </activation>\n"
+                + "      <properties>\n"
+                + "        <tzdata.activated>true</tzdata.activated>\n"
+                + "      </properties>\n"
+                + "    </profile>\n"
+                + "  </profiles>\n"
+                + "</project>\n";
+
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+
+        Properties systemProperties = new Properties();
+        systemProperties.putAll(System.getProperties());
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new StringModelSource(jrubyStylePom));
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        request.setSystemProperties(systemProperties);
+
+        Model model = builder.build(request).getEffectiveModel();
+
+        assertNull(
+                model.getProperties().get("tzdata.activated"),
+                "POM-declared property must not self-activate a profile in external model build (#13390)");
+    }
+
+    /**
+     * Verifies that a negated-property profile ({@code !resteasy.dependencies.eap}) in an external
+     * model fires correctly. This is the pattern used by RESTEasy's parent POM (#13084):
+     * the profile is active by default and can be opted out via {@code -D}. Since user
+     * properties are suppressed in the sandbox, the opt-out flag is absent and the profile
+     * must remain active.
+     */
+    @Test
+    void testExternalModelNegatedPropertyProfileFires() throws Exception {
+        String resteasyStylePom = "<project>\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>example</groupId>\n"
+                + "  <artifactId>resteasy-style</artifactId>\n"
+                + "  <version>1.0</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "  <profiles>\n"
+                + "    <profile>\n"
+                + "      <id>resteasy-default</id>\n"
+                + "      <activation>\n"
+                + "        <property>\n"
+                + "          <name>!resteasy.dependencies.eap</name>\n"
+                + "        </property>\n"
+                + "      </activation>\n"
+                + "      <properties>\n"
+                + "        <resteasy.defaults.active>true</resteasy.defaults.active>\n"
+                + "      </properties>\n"
+                + "    </profile>\n"
+                + "  </profiles>\n"
+                + "</project>\n";
+
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+
+        Properties systemProperties = new Properties();
+        systemProperties.putAll(System.getProperties());
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new StringModelSource(resteasyStylePom));
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        request.setSystemProperties(systemProperties);
+
+        Model model = builder.build(request).getEffectiveModel();
+
+        assertEquals(
+                "true",
+                model.getProperties().get("resteasy.defaults.active"),
+                "negated-property profile must fire in external model build (#13084)");
+    }
+
+    /**
+     * An {@code activeByDefault=true} profile in an external dependency model must contribute
+     * its repositories — the same guarantee as for JDK/OS-activated profiles (see #13100).
+     * Uses an isolated POM with only an activeByDefault profile so the standard Maven rule
+     * ("activeByDefault is suppressed when any other profile activates") does not interfere.
+     */
+    @Test
+    void testActiveByDefaultProfileRepositoryHonored() throws Exception {
+        // Isolated POM: only one profile (activeByDefault=true), no other profiles that could
+        // suppress it.  Without isolation the JDK-activated sibling in POM would cause Maven
+        // to skip the activeByDefault profile entirely, making the test vacuous.
+        String activeByDefaultPom = "<project>\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>thegroup</groupId>\n"
+                + "  <artifactId>active-by-default-profile</artifactId>\n"
+                + "  <version>1</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "  <profiles>\n"
+                + "    <profile>\n"
+                + "      <id>always-active</id>\n"
+                + "      <activation>\n"
+                + "        <activeByDefault>true</activeByDefault>\n"
+                + "      </activation>\n"
+                + "      <repositories>\n"
+                + "        <repository>\n"
+                + "          <id>always-active-repo</id>\n"
+                + "          <url>https://repo.example.test/always-active</url>\n"
+                + "        </repository>\n"
+                + "      </repositories>\n"
+                + "    </profile>\n"
+                + "  </profiles>\n"
+                + "</project>\n";
+
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+
+        Properties systemProperties = new Properties();
+        systemProperties.putAll(System.getProperties());
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new StringModelSource(activeByDefaultPom));
+        request.setValidationLevel(ModelBuildingRequest.VALIDATION_LEVEL_MINIMAL);
+        request.setSystemProperties(systemProperties);
+
+        Model model = builder.build(request).getEffectiveModel();
+
+        // The always-active profile activates by default: its repository must survive external
+        // model resolution unchanged. See #13100, #13141.
+        assertTrue(
+                model.getRepositories().stream().anyMatch(r -> "always-active-repo".equals(r.getId())),
+                "Repository from activeByDefault profile must be retained in external dependency model");
     }
 }

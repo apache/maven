@@ -314,9 +314,11 @@ public class DefaultModelBuilder implements ModelBuilder {
             List<Profile> interpolatedProfiles = getInterpolatedProfiles(rawModel, profileActivationContext, problems);
             tmpModel.setProfiles(interpolatedProfiles);
 
+            List<Profile> profilesToEvaluate =
+                    externalModel ? withoutFileActivation(tmpModel.getProfiles()) : tmpModel.getProfiles();
             List<Profile> activePomProfiles = profileSelector.getActiveProfiles(
-                    externalModel ? withoutFileAndPropertyActivation(interpolatedProfiles) : tmpModel.getProfiles(),
-                    profileActivationContext,
+                    profilesToEvaluate,
+                    externalModel ? externalActivationContext(profileActivationContext) : profileActivationContext,
                     problems);
 
             List<Profile> rawProfiles = new ArrayList<>();
@@ -327,11 +329,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
             // profile injection
             for (Profile activeProfile : activePomProfiles) {
-                profileInjector.injectProfile(
-                        tmpModel,
-                        externalModel ? withoutRepositories(activeProfile) : activeProfile,
-                        request,
-                        problems);
+                profileInjector.injectProfile(tmpModel, activeProfile, request, problems);
             }
 
             if (currentData == resultData) {
@@ -518,30 +516,74 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     /**
-     * Returns the profiles from the given list whose activation does not depend on a file or a
-     * property. Profiles activated by JDK version, operating system, or marked
-     * {@code activeByDefault} are unaffected, since those conditions are a function of the build
-     * platform rather than of the model content.
+     * Returns a sandboxed {@link ProfileActivationContext} for evaluating profiles in
+     * repository-resolved (external) models — dependency POMs, parent POMs, and imported BOMs.
+     * <p>
+     * The sandboxed context preserves system properties (so JDK/OS activation works).
+     * User properties (consumer {@code -D} flags) are suppressed because they were not
+     * set for the dependency and must not accidentally activate its profiles.
+     * Model properties are <b>not</b> exposed through the system-property lookup — a
+     * dependency POM's own {@code <properties>} must not activate its own property-based
+     * profiles (see #13390).
+     * File-based profiles are pre-filtered via {@link #withoutFileActivation(List)} before
+     * reaching this context, so {@code getProjectDirectory()} is not relied on for file checks.
+     *
+     * @param delegate the original full context for this model build
+     * @return a sandboxed context suitable for external model profile activation
      */
-    private static List<Profile> withoutFileAndPropertyActivation(List<Profile> profiles) {
+    private static ProfileActivationContext externalActivationContext(ProfileActivationContext delegate) {
+        return new ProfileActivationContext() {
+            @Override
+            public List<String> getActiveProfileIds() {
+                return delegate.getActiveProfileIds();
+            }
+
+            @Override
+            public List<String> getInactiveProfileIds() {
+                return delegate.getInactiveProfileIds();
+            }
+
+            @Override
+            public Map<String, String> getSystemProperties() {
+                return delegate.getSystemProperties();
+            }
+
+            /** User properties are suppressed: consumer -D flags do not activate dependency profiles. */
+            @Override
+            public Map<String, String> getUserProperties() {
+                return Collections.emptyMap();
+            }
+
+            @Override
+            public Map<String, String> getProjectProperties() {
+                return delegate.getProjectProperties();
+            }
+
+            @Override
+            public File getProjectDirectory() {
+                return delegate.getProjectDirectory();
+            }
+        };
+    }
+
+    /**
+     * Returns the profiles from the given list whose activation does not depend on a file.
+     * File-activated profiles are suppressed in external model builds because publisher-local
+     * paths do not exist in the consumer's environment and resolving them against the consumer's
+     * filesystem would produce non-deterministic or incorrect results.
+     *
+     * @param profiles the full profile list
+     * @return profiles with file-activated ones removed
+     */
+    private static List<Profile> withoutFileActivation(List<Profile> profiles) {
         List<Profile> eligible = new ArrayList<>(profiles.size());
         for (Profile profile : profiles) {
             Activation activation = profile.getActivation();
-            if (activation == null || (activation.getFile() == null && activation.getProperty() == null)) {
+            if (activation == null || activation.getFile() == null) {
                 eligible.add(profile);
             }
         }
         return eligible;
-    }
-
-    /**
-     * Returns a copy of the given profile with its repositories and plugin repositories cleared.
-     */
-    private static Profile withoutRepositories(Profile profile) {
-        Profile stripped = profile.clone();
-        stripped.setRepositories(Collections.emptyList());
-        stripped.setPluginRepositories(Collections.emptyList());
-        return stripped;
     }
 
     @Override
@@ -974,18 +1016,33 @@ public class DefaultModelBuilder implements ModelBuilder {
                 || !groupId.equals(parent.getGroupId())
                 || artifactId == null
                 || !artifactId.equals(parent.getArtifactId())) {
-            StringBuilder buffer = new StringBuilder(256);
-            buffer.append("'parent.relativePath'");
-            if (childModel != problems.getRootModel()) {
-                buffer.append(" of POM ").append(ModelProblemUtils.toSourceHint(childModel));
+            String actual = groupId + ':' + artifactId;
+            String declared = parent.getGroupId() + ':' + parent.getArtifactId();
+            String sourceHint =
+                    (childModel != problems.getRootModel()) ? ModelProblemUtils.toSourceHint(childModel) : null;
+
+            String message;
+            if (parent.getRelativePath() == null) {
+                // <relativePath> was omitted — Maven probed ../pom.xml on its own
+                message = "Maven probed the default location '../pom.xml'"
+                        + (sourceHint != null ? " for POM " + sourceHint : "")
+                        + " and found " + actual
+                        + " instead of the declared parent " + declared
+                        + ". Maven will fall back to repository resolution."
+                        + " To suppress this warning, add <relativePath/> to your <parent> declaration.";
+            } else {
+                // <relativePath> was set explicitly
+                message = "'parent.relativePath'"
+                        + (sourceHint != null ? " of POM " + sourceHint : "")
+                        + " points at '" + parent.getRelativePath() + "'"
+                        + " which resolves to " + actual
+                        + " instead of the declared parent " + declared
+                        + ". Please verify your project structure or correct the <relativePath> value.";
             }
-            buffer.append(" points at ").append(groupId).append(':').append(artifactId);
-            buffer.append(" instead of ").append(parent.getGroupId()).append(':');
-            buffer.append(parent.getArtifactId()).append(", please verify your project structure");
 
             problems.setSource(childModel);
             problems.add(new ModelProblemCollectorRequest(Severity.WARNING, Version.BASE)
-                    .setMessage(buffer.toString())
+                    .setMessage(message)
                     .setLocation(parent.getLocation("")));
             return null;
         }

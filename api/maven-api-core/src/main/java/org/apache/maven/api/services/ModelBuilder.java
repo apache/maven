@@ -23,6 +23,14 @@ import java.util.List;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.model.Model;
 
+/**
+ * Service for building Maven project models from POM files or other sources.
+ * <p>
+ * The model builder processes raw POM files through the full Maven model building pipeline,
+ * including inheritance assembly, profile activation, interpolation, and validation.
+ *
+ * @since 4.0.0
+ */
 public interface ModelBuilder extends Service {
 
     String MODEL_VERSION_4_0_0 = "4.0.0";
@@ -33,12 +41,61 @@ public interface ModelBuilder extends Service {
 
     List<String> KNOWN_MODEL_VERSIONS = List.of(MODEL_VERSION_4_0_0, MODEL_VERSION_4_1_0, MODEL_VERSION_4_2_0);
 
+    /**
+     * Creates a new model builder session for building one or more models.
+     *
+     * @return a new model builder session
+     */
     ModelBuilderSession newSession();
 
+    /**
+     * A session for building models, allowing multiple builds to share state.
+     */
     interface ModelBuilderSession {
 
+        /**
+         * Builds the effective model from the given request.
+         *
+         * @param request the model builder request
+         * @return the model builder result
+         * @throws ModelBuilderException if the model cannot be built
+         */
         ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException;
+
+        /**
+         * Validates the model described by the request, collecting every problem instead of
+         * throwing on the first one.
+         * <p>
+         * Unlike {@link #build(ModelBuilderRequest)} this does not throw when validation reports
+         * errors: the result carries errors and warnings alike, so a caller that only wants to
+         * report on a POM can see warnings that come with no error. A problem severe enough that
+         * the model cannot be read at all is still thrown.
+         * <p>
+         * An implementation must not resolve from a remote repository and must not download. How
+         * much of the pipeline it runs beyond that is its own, so a caller takes the verdict from
+         * the problems on the result rather than from the model accessors, whose {@code @Nonnull}
+         * contracts describe a fully built model and do not hold here.
+         * <p>
+         * Reading one model can need others: a subproject may leave out its parent version, which
+         * is then taken from the parent's own file model. An implementation may therefore read
+         * files besides the one the request names, up to the project root.
+         *
+         * @return the result, carrying the model that was read and the problems collected
+         * @throws ModelBuilderException if the model cannot be read at all
+         * @throws UnsupportedOperationException if this implementation does not support it
+         * @since 4.2.0
+         */
+        default ModelBuilderResult validate(ModelBuilderRequest request) throws ModelBuilderException {
+            throw new UnsupportedOperationException(getClass().getName() + " does not support validating a model");
+        }
     }
 
+    /**
+     * Builds a raw model from the given request without applying inheritance or interpolation.
+     *
+     * @param request the model builder request
+     * @return the raw model
+     * @throws ModelBuilderException if the raw model cannot be built
+     */
     Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException;
 }

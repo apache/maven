@@ -28,8 +28,9 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests that {@link DefaultRepositoryMetadataManager} rejects repository metadata carrying version tokens that
- * are not valid coordinate components, on the legacy read path used when metadata is loaded for merging.
+ * Tests that {@link DefaultRepositoryMetadataManager} rejects repository metadata carrying version or plugin
+ * tokens that are not valid coordinate components, on the legacy read path used when metadata is loaded for
+ * merging.
  */
 class DefaultRepositoryMetadataManagerValidationTest {
 
@@ -42,7 +43,7 @@ class DefaultRepositoryMetadataManagerValidationTest {
         RepositoryMetadataReadException exception =
                 assertThrows(RepositoryMetadataReadException.class, () -> manager.readMetadata(metadataFile));
 
-        assertTrue(exception.getMessage().contains("invalid version token"), exception.getMessage());
+        assertTrue(exception.getMessage().contains("invalid release version"), exception.getMessage());
     }
 
     @Test
@@ -52,7 +53,27 @@ class DefaultRepositoryMetadataManagerValidationTest {
         RepositoryMetadataReadException exception =
                 assertThrows(RepositoryMetadataReadException.class, () -> manager.readMetadata(metadataFile));
 
-        assertTrue(exception.getMessage().contains("invalid version token"), exception.getMessage());
+        assertTrue(exception.getMessage().contains("invalid snapshot timestamp"), exception.getMessage());
+    }
+
+    @Test
+    void testMetadataWithInvalidPluginArtifactIdIsRejected() {
+        File metadataFile = testFile("metadata-invalid-plugin-artifactid/maven-metadata.xml");
+
+        RepositoryMetadataReadException exception =
+                assertThrows(RepositoryMetadataReadException.class, () -> manager.readMetadata(metadataFile));
+
+        assertTrue(exception.getMessage().contains("invalid plugin/artifactId"), exception.getMessage());
+    }
+
+    @Test
+    void testMetadataWithInvalidPluginPrefixIsRejected() {
+        File metadataFile = testFile("metadata-invalid-plugin-prefix/maven-metadata.xml");
+
+        RepositoryMetadataReadException exception =
+                assertThrows(RepositoryMetadataReadException.class, () -> manager.readMetadata(metadataFile));
+
+        assertTrue(exception.getMessage().contains("invalid plugin/prefix"), exception.getMessage());
     }
 
     private static File testFile(String resource) {

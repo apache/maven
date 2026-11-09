@@ -49,29 +49,45 @@ notifications:
   issues: issues@maven.apache.org
   pullrequests: issues@maven.apache.org
 
-# https://release-test.apache.org/projects/maven
+# https://releases.apache.org/projects/maven
 project:
   metadata:
     key: maven
     committee: maven
     name: Apache Maven
-    description: "Maven is a project development management and comprehension tool.
+    description: 'Maven is a project development management and comprehension tool.
       Based on the concept of a project object model: builds, dependency management,
-      documentation creation, site publication, and distribution publication are all controlled from the declarative file.
-      Maven can be extended by plugins to utilise a number of other development tools for reporting or the build process."
-    short_description: Maven is a project development management and comprehension tool.
+      documentation creation, site publication, and distribution publication are all
+      controlled from the declarative file. Maven can be extended by plugins to utilise
+      a number of other development tools for reporting or the build process.'
+    short_description: Maven is a project development management and comprehension
+      tool.
     homepage: https://maven.apache.org/
     download_page: https://maven.apache.org/download.html
     bug_database: https://github.com/apache/maven/issues
     mailing_lists: https://maven.apache.org/mailing-lists.html
     repositories:
-      - https://github.com/apache/maven.git
+      - https://github.com/apache/maven
     categories:
       - build-management
     programming_languages:
       - Java
+    version_method: semver
+    cycle_match: (\d+\.\d+)(?:[.\-].*)?
   policy:
-    github_repository_name: maven
+    announce_release_template_url: https://maven.apache.org/atr/templates/announce_release_template.txt
+    start_vote_template_url: https://maven.apache.org/atr/templates/start_vote_template_maven.txt
+    finish_vote_template_url: https://maven.apache.org/atr/templates/finish_vote_template.txt
     download_path_suffix: maven-{{MAJOR_VERSION}}/{{VERSION}}
+    auto_archive_prior_release: true
+    vote_recipients:
+      to: dev@maven.apache.org
+    announce_recipients:
+      to: announce@apache.org
+      cc:
+        - announce@maven.apache.org
+        - dev@maven.apache.org
+        - users@maven.apache.org
   features:
     atr_sync: true
+    atr_sync_mode: full

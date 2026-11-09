@@ -23,14 +23,24 @@ under the License.
       <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>boot</outputDirectory>
       <includes>
-        <include>org.codehaus.plexus:plexus-classworlds</include>
+        <include>org.apache.maven:maven-classworlds</include>
       </includes>
     </dependencySet>
+
+    <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
+      <outputDirectory>lib/modules</outputDirectory>
+      <includes>
+        <include>org.jline:*</include>
+      </includes>
+    </dependencySet>
+
     <dependencySet>
       <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>lib</outputDirectory>
       <excludes>
-        <exclude>org.codehaus.plexus:plexus-classworlds</exclude>
+        <exclude>org.apache.maven:maven-classworlds</exclude>
+        <exclude>org.jline:*</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>
@@ -74,6 +84,13 @@ under the License.
       <lineEnding>dos</lineEnding>
     </fileSet>
     <fileSet>
+      <directory>target/classes</directory>
+      <outputDirectory>bin</outputDirectory>
+      <includes>
+        <include>JvmConfigParser.class</include>
+      </includes>
+    </fileSet>
+    <fileSet>
       <directory>target/dependency/org/jline/nativ</directory>
       <outputDirectory>lib/jline-native</outputDirectory>
       <includes>
@@ -90,6 +107,7 @@ under the License.
         <include>mvnenc</include>
         <include>mvnsh</include>
         <include>mvnup</include>
+        <include>mvnval</include>
         <include>mvnDebug</include>
         <include>mvnencDebug</include>
         <!-- This is so that CI systems can periodically run the profiler -->
@@ -105,6 +123,14 @@ under the License.
     <fileSet>
       <directory>src/assembly/maven/lib</directory>
       <outputDirectory>lib</outputDirectory>
+    </fileSet>
+    <fileSet>
+      <directory>target/classes/org/apache/maven/messages</directory>
+      <outputDirectory>bin</outputDirectory>
+      <includes>
+        <include>maven.version.properties</include>
+      </includes>
+      <fileMode>0444</fileMode>
     </fileSet>
   </fileSets>
 </component>

@@ -42,6 +42,7 @@ import org.apache.maven.api.services.ArtifactResolver;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.RepositoryFactory;
+import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionRangeResolver;
 import org.apache.maven.cling.invoker.ProtoLookup;
@@ -254,6 +255,14 @@ public class BootstrapCoreExtensionManager {
                 MavenSession session,
                 RepositorySystem repositorySystem,
                 List<org.apache.maven.api.RemoteRepository> repositories) {
+            this(session, repositorySystem, repositories, null);
+        }
+
+        private SimpleSession(
+                MavenSession session,
+                RepositorySystem repositorySystem,
+                List<org.apache.maven.api.RemoteRepository> repositories,
+                RequestTrace context) {
             super(
                     session,
                     repositorySystem,
@@ -262,13 +271,16 @@ public class BootstrapCoreExtensionManager {
                     ProtoLookup.builder()
                             .addMapping(RequestCacheFactory.class, new DefaultRequestCacheFactory())
                             .build(),
-                    null);
+                    null,
+                    context);
         }
 
         @Override
         protected Session newSession(
-                MavenSession mavenSession, List<org.apache.maven.api.RemoteRepository> repositories) {
-            return new SimpleSession(mavenSession, getRepositorySystem(), repositories);
+                MavenSession mavenSession,
+                List<org.apache.maven.api.RemoteRepository> repositories,
+                RequestTrace context) {
+            return new SimpleSession(mavenSession, getRepositorySystem(), repositories, context);
         }
 
         @SuppressWarnings("unchecked")

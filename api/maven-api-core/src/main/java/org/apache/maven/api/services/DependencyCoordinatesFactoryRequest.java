@@ -36,6 +36,8 @@ import org.apache.maven.api.annotations.Nullable;
 import static java.util.Objects.requireNonNull;
 
 /**
+ * Request for creating {@link org.apache.maven.api.DependencyCoordinates}, extending
+ * {@link ArtifactCoordinatesFactoryRequest} with scope, optionality, and exclusion information.
  *
  * @since 4.0.0
  */
@@ -43,13 +45,28 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinatesFactoryRequest {
 
+    /** @return the dependency scope, may be {@code null} */
     String getScope();
 
+    /** @return whether this dependency is optional */
     boolean isOptional();
 
+    /** @return the dependency exclusions, never {@code null} */
     @Nonnull
     Collection<Exclusion> getExclusions();
 
+    /**
+     * Builds a request from individual components.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param classifier the classifier
+     * @param extension the file extension
+     * @param type the artifact type
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static DependencyCoordinatesFactoryRequest build(
             @Nonnull Session session,
@@ -70,35 +87,50 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
                 .build();
     }
 
+    /**
+     * Builds a request from existing artifact coordinates.
+     *
+     * @param session the session
+     * @param coordinates the artifact coordinates
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static DependencyCoordinatesFactoryRequest build(
             @Nonnull Session session, @Nonnull ArtifactCoordinates coordinates) {
         return builder()
                 .session(requireNonNull(session, "session cannot be null"))
                 .groupId(requireNonNull(coordinates, "coordinates cannot be null")
-                        .getGroupId())
-                .artifactId(coordinates.getArtifactId())
-                .version(coordinates.getVersionConstraint().toString())
-                .classifier(coordinates.getClassifier())
-                .extension(coordinates.getExtension())
+                        .groupId())
+                .artifactId(coordinates.artifactId())
+                .version(coordinates.versionConstraint().toString())
+                .classifier(coordinates.classifier())
+                .extension(coordinates.extension())
                 .build();
     }
 
+    /**
+     * Builds a request from an existing dependency.
+     *
+     * @param session the session
+     * @param dependency the dependency to derive coordinates from
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static DependencyCoordinatesFactoryRequest build(@Nonnull Session session, @Nonnull Dependency dependency) {
         return builder()
                 .session(requireNonNull(session, "session cannot be null"))
-                .groupId(requireNonNull(dependency, "dependency").getGroupId())
-                .artifactId(dependency.getArtifactId())
-                .version(dependency.getVersion().toString())
-                .classifier(dependency.getClassifier())
-                .extension(dependency.getExtension())
-                .type(dependency.getType().id())
-                .scope(dependency.getScope().id())
+                .groupId(requireNonNull(dependency, "dependency").groupId())
+                .artifactId(dependency.artifactId())
+                .version(dependency.version().toString())
+                .classifier(dependency.classifier())
+                .extension(dependency.extension())
+                .type(dependency.type().id())
+                .scope(dependency.scope().id())
                 .optional(dependency.isOptional())
                 .build();
     }
 
+    /** @return a new builder instance */
     @Nonnull
     static DependencyCoordinatesFactoryRequestBuilder builder() {
         return new DependencyCoordinatesFactoryRequestBuilder();

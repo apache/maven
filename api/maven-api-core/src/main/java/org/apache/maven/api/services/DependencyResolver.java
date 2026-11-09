@@ -133,6 +133,15 @@ public interface DependencyResolver extends Service {
     List<Node> flatten(@Nonnull Session session, @Nonnull Node node, @Nullable PathScope scope)
             throws DependencyResolverException;
 
+    /**
+     * Flattens the dependency tree of a project for the given path scope.
+     *
+     * @param session the session
+     * @param project the project
+     * @param scope the path scope
+     * @return the flattened result, never {@code null}
+     * @throws DependencyResolverException if the dependency tree could not be flattened
+     */
     @Nonnull
     default DependencyResolverResult flatten(
             @Nonnull Session session, @Nonnull Project project, @Nonnull PathScope scope) {
@@ -140,6 +149,14 @@ public interface DependencyResolver extends Service {
                 session, DependencyResolverRequest.RequestType.FLATTEN, project, scope));
     }
 
+    /**
+     * Flattens the dependency tree described by the request.
+     *
+     * @param request the dependency resolver request with type {@link DependencyResolverRequest.RequestType#FLATTEN}
+     * @return the flattened result, never {@code null}
+     * @throws IllegalArgumentException if the request type is not {@code FLATTEN}
+     * @throws DependencyResolverException if the dependency tree could not be flattened
+     */
     @Nonnull
     default DependencyResolverResult flatten(@Nonnull DependencyResolverRequest request) {
         if (request.getRequestType() != DependencyResolverRequest.RequestType.FLATTEN) {
@@ -148,12 +165,29 @@ public interface DependencyResolver extends Service {
         return resolve(request);
     }
 
+    /**
+     * Resolves the dependencies of a project for the default runtime scope.
+     *
+     * @param session the session
+     * @param project the project
+     * @return the resolution result, never {@code null}
+     * @throws DependencyResolverException if dependency resolution fails
+     */
     @Nonnull
     default DependencyResolverResult resolve(@Nonnull Session session, @Nonnull Project project) {
         return resolve(
                 DependencyResolverRequest.build(session, DependencyResolverRequest.RequestType.RESOLVE, project));
     }
 
+    /**
+     * Resolves the dependencies of a project for the given path scope.
+     *
+     * @param session the session
+     * @param project the project
+     * @param scope the path scope
+     * @return the resolution result, never {@code null}
+     * @throws DependencyResolverException if dependency resolution fails
+     */
     @Nonnull
     default DependencyResolverResult resolve(
             @Nonnull Session session, @Nonnull Project project, @Nonnull PathScope scope) {
@@ -161,12 +195,89 @@ public interface DependencyResolver extends Service {
                 session, DependencyResolverRequest.RequestType.RESOLVE, project, scope));
     }
 
+    /**
+     * Resolves a dependency in the context of a project. The project's dependency management and repositories are
+     * applied to the dependency and its transitive dependencies. The path scope defaults to
+     * {@link PathScope#MAIN_RUNTIME}; use the scope-taking overload to select another scope.
+     *
+     * @since 4.2.0
+     */
+    @Nonnull
+    default DependencyResolverResult resolve(
+            @Nonnull Session session, @Nonnull Project project, @Nonnull DependencyCoordinates dependency) {
+        return resolve(DependencyResolverRequest.build(
+                session, DependencyResolverRequest.RequestType.RESOLVE, project, dependency));
+    }
+
+    /**
+     * Resolves a dependency in the context of a project for the given path scope. The project's dependency management
+     * and repositories are applied to the dependency and its transitive dependencies.
+     *
+     * @since 4.2.0
+     */
+    @Nonnull
+    default DependencyResolverResult resolve(
+            @Nonnull Session session,
+            @Nonnull Project project,
+            @Nonnull DependencyCoordinates dependency,
+            @Nonnull PathScope scope) {
+        return resolve(DependencyResolverRequest.build(
+                session, DependencyResolverRequest.RequestType.RESOLVE, project, dependency, scope));
+    }
+
+    /**
+     * Resolves dependencies in the context of a project. The project's dependency management and repositories are
+     * applied to the dependencies and their transitive dependencies. The path scope defaults to
+     * {@link PathScope#MAIN_RUNTIME}; use the scope-taking overload to select another scope.
+     *
+     * @since 4.2.0
+     */
+    @Nonnull
+    default DependencyResolverResult resolve(
+            @Nonnull Session session, @Nonnull Project project, @Nonnull List<DependencyCoordinates> dependencies) {
+        return resolve(DependencyResolverRequest.build(
+                session, DependencyResolverRequest.RequestType.RESOLVE, project, dependencies));
+    }
+
+    /**
+     * Resolves dependencies in the context of a project for the given path scope. The project's dependency management
+     * and repositories are applied to the dependencies and their transitive dependencies.
+     *
+     * @since 4.2.0
+     */
+    @Nonnull
+    default DependencyResolverResult resolve(
+            @Nonnull Session session,
+            @Nonnull Project project,
+            @Nonnull List<DependencyCoordinates> dependencies,
+            @Nonnull PathScope scope) {
+        return resolve(DependencyResolverRequest.build(
+                session, DependencyResolverRequest.RequestType.RESOLVE, project, dependencies, scope));
+    }
+
+    /**
+     * Resolves a single dependency for the default runtime scope.
+     *
+     * @param session the session
+     * @param dependency the dependency coordinates
+     * @return the resolution result, never {@code null}
+     * @throws DependencyResolverException if dependency resolution fails
+     */
     @Nonnull
     default DependencyResolverResult resolve(@Nonnull Session session, @Nonnull DependencyCoordinates dependency) {
         return resolve(
                 DependencyResolverRequest.build(session, DependencyResolverRequest.RequestType.RESOLVE, dependency));
     }
 
+    /**
+     * Resolves a single dependency for the given path scope.
+     *
+     * @param session the session
+     * @param dependency the dependency coordinates
+     * @param scope the path scope
+     * @return the resolution result, never {@code null}
+     * @throws DependencyResolverException if dependency resolution fails
+     */
     @Nonnull
     default DependencyResolverResult resolve(
             @Nonnull Session session, @Nonnull DependencyCoordinates dependency, @Nonnull PathScope scope) {
@@ -174,6 +285,14 @@ public interface DependencyResolver extends Service {
                 session, DependencyResolverRequest.RequestType.RESOLVE, dependency, scope));
     }
 
+    /**
+     * Resolves a list of dependencies for the default runtime scope.
+     *
+     * @param session the session
+     * @param dependencies the dependency coordinates
+     * @return the resolution result, never {@code null}
+     * @throws DependencyResolverException if dependency resolution fails
+     */
     @Nonnull
     default DependencyResolverResult resolve(
             @Nonnull Session session, @Nonnull List<DependencyCoordinates> dependencies) {
@@ -181,6 +300,15 @@ public interface DependencyResolver extends Service {
                 DependencyResolverRequest.build(session, DependencyResolverRequest.RequestType.RESOLVE, dependencies));
     }
 
+    /**
+     * Resolves a list of dependencies for the given path scope.
+     *
+     * @param session the session
+     * @param dependencies the dependency coordinates
+     * @param scope the path scope
+     * @return the resolution result, never {@code null}
+     * @throws DependencyResolverException if dependency resolution fails
+     */
     @Nonnull
     default DependencyResolverResult resolve(
             @Nonnull Session session, @Nonnull List<DependencyCoordinates> dependencies, @Nonnull PathScope scope) {

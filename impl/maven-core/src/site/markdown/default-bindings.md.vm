@@ -32,7 +32,7 @@ The [`default` lifecycle](./lifecycles.html) is defined without any plugin bindi
 
 Versions of the plugins are shared in a few constants:
 
-<!-- MACRO{snippet|id=versions|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/providers/packaging/AbstractLifecycleMappingProvider.java} -->
+<!-- MACRO{snippet|id=versions|file=${project.basedir}/src/main/java/org/apache/maven/lifecycle/PluginVersions.java} -->
 
 Plugin bindings for `pom` packaging
 -----------------------------------
