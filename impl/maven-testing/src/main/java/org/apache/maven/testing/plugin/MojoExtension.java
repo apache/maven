@@ -366,7 +366,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
 
         Path basedirPath = Paths.get(getBasedir());
 
-        String[] methodInjectMojoAttrs = findInjectMojoAttrs(context.getElement().get());
+        String[] methodInjectMojoAttrs =
+                findInjectMojoAttrs(context.getElement().get());
         String[] parameterInjectMojoAttrs = findParameterInjectMojoAttrs(context);
         String[] injectMojoAttrs = methodInjectMojoAttrs != null ? methodInjectMojoAttrs : parameterInjectMojoAttrs;
         // A POM given on a test method parameter configures the project too, so it is read
