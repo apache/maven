@@ -23,6 +23,10 @@ under the License.
   <exportedPackages>
     <!-- maven-* -->
     <exportedPackage>org.apache.maven.*</exportedPackage>
+    <!-- the Maven 4 API types Maven 3 provides, copied from maven-api-core -->
+    <exportedPackage>org.apache.maven.api.*</exportedPackage>
+    <exportedPackage>org.apache.maven.api.annotations.*</exportedPackage>
+    <exportedPackage>org.apache.maven.api.services.*</exportedPackage>
     <exportedPackage>org.apache.maven.artifact</exportedPackage>
     <exportedPackage>org.apache.maven.classrealm</exportedPackage>
     <exportedPackage>org.apache.maven.cli</exportedPackage>

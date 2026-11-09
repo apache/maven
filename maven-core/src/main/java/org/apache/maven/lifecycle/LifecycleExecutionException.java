@@ -18,8 +18,8 @@
  */
 package org.apache.maven.lifecycle;
 
-import org.apache.maven.message.MessageBuilder;
-import org.apache.maven.message.MessageBuilderFactory;
+import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.message.internal.DefaultMessageBuilderFactory;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;

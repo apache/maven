@@ -25,8 +25,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.lang.reflect.Method;
 
-import org.apache.maven.message.MessageBuilder;
-import org.apache.maven.message.MessageBuilderFactory;
+import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.api.services.MessageBuilderFactory;
 
 /**
  * Colorized message support. Maven only needs ANSI colors in its log output, so there is no terminal library here:

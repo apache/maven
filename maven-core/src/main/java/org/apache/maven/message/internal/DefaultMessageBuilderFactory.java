@@ -21,8 +21,8 @@ package org.apache.maven.message.internal;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import org.apache.maven.message.MessageBuilder;
-import org.apache.maven.message.MessageBuilderFactory;
+import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.eclipse.sisu.Priority;
 
 @Named

@@ -18,7 +18,7 @@
  */
 package org.apache.maven.message.internal;
 
-import org.apache.maven.message.MessageBuilder;
+import org.apache.maven.api.services.MessageBuilder;
 
 class DefaultMessageBuilder implements MessageBuilder {
 
