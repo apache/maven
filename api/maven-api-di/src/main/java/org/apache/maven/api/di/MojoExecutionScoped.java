@@ -38,7 +38,23 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *     </ul>
  *
  * @since 4.0.0
+ * @deprecated This annotation is an unfinished counterpart of the Maven 3
+ *             {@code org.apache.maven.execution.scope.MojoExecutionScoped}
+ *             annotation and should not be used. Its scope is not registered
+ *             in the Maven 4 dependency injection container, and it does not
+ *             support proxying when injected into components with a wider scope.
+ *             The implementation relies on a {@code ThreadLocal} execution
+ *             context, which requires an active mojo execution.
+ *             <p>
+ *             For Maven 4 plugins, use direct {@code @Inject} injection for
+ *             execution context objects such as {@code MojoExecution},
+ *             {@code Project}, and {@code Log}. Use {@code @SessionScoped}
+ *             for session-scoped components. For legacy extensions running
+ *             in the shared Plexus/Sisu container, use the Maven 3
+ *             {@code org.apache.maven.execution.scope.MojoExecutionScoped}
+ *             annotation.
  */
+@Deprecated
 @Scope
 @Documented
 @Retention(RUNTIME)
