@@ -170,7 +170,9 @@ public interface Injector {
      * @throws NullPointerException if {@code cls} or {@code supplier} is null
      */
     @Nonnull
-    <T> Injector bindSupplier(@Nonnull Class<T> cls, @Nonnull Supplier<T> supplier, int priority);
+    default <T> Injector bindSupplier(@Nonnull Class<T> cls, @Nonnull Supplier<T> supplier, int priority) {
+        return bindSupplier(cls, supplier);
+    }
 
     /**
      * Performs field and method injection on an existing instance.

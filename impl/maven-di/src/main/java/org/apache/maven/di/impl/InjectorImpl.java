@@ -147,9 +147,7 @@ public class InjectorImpl implements Injector {
 
     @Override
     public <U> Injector bindSupplier(@Nonnull Class<U> clazz, @Nonnull Supplier<U> supplier) {
-        Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
-        Binding<U> binding = Binding.toSupplier(supplier).withKey(key);
-        return doBind(key, binding);
+        return bindSupplier(clazz, supplier, 0);
     }
 
     @Override
