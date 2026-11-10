@@ -183,8 +183,31 @@ public class DefaultDependencyManagementImporter implements DependencyManagement
     }
 
     private boolean equals(Inclusion i1, Inclusion i2) {
-        return Objects.equals(i1.getGroupId(), i2.getGroupId())
-                && Objects.equals(i1.getArtifactId(), i2.getArtifactId());
+        return Objects.equals(getGroupId(i1), getGroupId(i2)) && Objects.equals(getArtifactId(i1), getArtifactId(i2));
+    }
+
+    private static String getGroupId(Inclusion inclusion) {
+        if (inclusion.getGroupId() != null && !inclusion.getGroupId().isEmpty()) {
+            return inclusion.getGroupId();
+        }
+        if (inclusion.getId() != null) {
+            int idx = inclusion.getId().indexOf(':');
+            return idx >= 0 ? inclusion.getId().substring(0, idx) : inclusion.getId();
+        }
+        return null;
+    }
+
+    private static String getArtifactId(Inclusion inclusion) {
+        if (inclusion.getArtifactId() != null && !inclusion.getArtifactId().isEmpty()) {
+            return inclusion.getArtifactId();
+        }
+        if (inclusion.getId() != null) {
+            int idx = inclusion.getId().indexOf(':');
+            if (idx >= 0) {
+                return inclusion.getId().substring(idx + 1);
+            }
+        }
+        return null;
     }
 
     static Dependency updateWithImportedFrom(Dependency dependency, DependencyManagement bom) {
