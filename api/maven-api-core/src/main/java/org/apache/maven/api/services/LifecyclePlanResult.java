@@ -25,7 +25,12 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * The result of calculating a lifecycle plan.
  *
+ * <p>The {@link #plan()} accessor returns the immutable {@link LifecyclePlan} that can be
+ * inspected and then passed to
+ * {@link LifecycleExecutor#execute(LifecycleExecutionRequest)}.
+ *
  * @since 4.2.0
+ * @see LifecycleExecutor#plan(LifecyclePlanRequest)
  */
 @Experimental
 public interface LifecyclePlanResult extends Result<LifecyclePlanRequest> {

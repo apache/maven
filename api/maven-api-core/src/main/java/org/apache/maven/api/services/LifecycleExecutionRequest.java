@@ -35,7 +35,13 @@ import static java.util.Objects.requireNonNull;
 /**
  * A request to execute all or part of a previously calculated lifecycle plan.
  *
+ * <p>The optional {@link #filter()} predicate selects which mojo executions from the
+ * plan are actually run. When {@code null}, all executions in the plan are executed.
+ * The filter is intentionally excluded from {@link #equals(Object)} / {@link #hashCode()}
+ * because lambda predicates have no meaningful equality.
+ *
  * @since 4.2.0
+ * @see LifecycleExecutor#execute(LifecycleExecutionRequest)
  */
 @Experimental
 @Immutable

@@ -34,7 +34,12 @@ import static java.util.Objects.requireNonNull;
 /**
  * A request to calculate a lifecycle plan for one project.
  *
+ * <p>Tasks can be lifecycle phase names (e.g. {@code "compile"}, {@code "verify"})
+ * or fully qualified plugin goals (e.g.
+ * {@code "org.apache.maven.plugins:maven-compiler-plugin:compile"}).
+ *
  * @since 4.2.0
+ * @see LifecycleExecutor#plan(LifecyclePlanRequest)
  */
 @Experimental
 @Immutable

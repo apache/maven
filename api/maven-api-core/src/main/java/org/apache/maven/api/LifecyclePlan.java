@@ -28,9 +28,39 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * An immutable execution plan for one project.
+ * An immutable snapshot of the lifecycle execution plan for a single project.
+ *
+ * <p>A {@code LifecyclePlan} is produced by {@link org.apache.maven.api.services.LifecycleExecutor#plan(
+ * org.apache.maven.api.services.LifecyclePlanRequest) LifecycleExecutor.plan()} and captures the
+ * configured {@link MojoExecution mojo executions} that Maven would run for the requested
+ * lifecycle phases or plugin goals. The plan is composable: it can be inspected, filtered,
+ * and then passed to {@link org.apache.maven.api.services.LifecycleExecutor#execute(
+ * org.apache.maven.api.services.LifecycleExecutionRequest) LifecycleExecutor.execute()}.
+ *
+ * <h2>Typical usage</h2>
+ * <pre>{@code
+ * LifecyclePlanResult result = session.planLifecycle(project, List.of("verify"));
+ * LifecyclePlan plan = result.plan();
+ *
+ * // Inspect: display the plan to the user
+ * plan.executionsByPhase().forEach((phase, mojos) ->
+ *     System.out.println(phase + ": " + mojos));
+ *
+ * // Filter and execute: run only the compile-phase mojos
+ * session.executeLifecycle(plan,
+ *     mojo -> mojo.lifecyclePhase().orElse("").equals("compile"));
+ * }</pre>
+ *
+ * <p>The {@link #executions()} list is topologically sorted: mojos appear in an order
+ * consistent with the lifecycle phase graph, but the internal execution engine may
+ * run independent steps concurrently.
+ *
+ * <p>Instances are scoped to a single project. Reactor-level (multi-project) orchestration
+ * is handled separately.
  *
  * @since 4.2.0
+ * @see org.apache.maven.api.services.LifecycleExecutor
+ * @see Session#planLifecycle(Project, java.util.List)
  */
 @Experimental
 @Immutable

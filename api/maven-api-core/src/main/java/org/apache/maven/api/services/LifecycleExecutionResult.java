@@ -29,7 +29,15 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * The result of executing a lifecycle plan.
  *
+ * <p>On the success path this object is returned from
+ * {@link LifecycleExecutor#execute(LifecycleExecutionRequest)}. On the failure path
+ * it is attached to the thrown {@link LifecycleExecutorException} and accessible via
+ * {@link LifecycleExecutorException#result()}, so callers can always determine which
+ * mojos succeeded before the failure.
+ *
  * @since 4.2.0
+ * @see LifecycleExecutor#execute(LifecycleExecutionRequest)
+ * @see LifecycleExecutorException#result()
  */
 @Experimental
 public interface LifecycleExecutionResult extends Result<LifecycleExecutionRequest> {

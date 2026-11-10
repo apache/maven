@@ -30,12 +30,47 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
- * Calculates, inspects, and executes Maven lifecycle plans for a single project.
+ * Service for calculating and executing Maven lifecycle plans for a single project.
  *
- * <p>This is the Maven API v4 lifecycle executor service. The legacy
- * {@code org.apache.maven.lifecycle.LifecycleExecutor} interface serves a different role in the compatibility layer.
+ * <p>This service separates lifecycle <em>planning</em> from <em>execution</em>, enabling
+ * callers to inspect and filter the plan before deciding what to execute. This is the
+ * primary entry point for IDE embedders and tools that need programmatic lifecycle control.
+ *
+ * <h2>Core workflow</h2>
+ * The service exposes two abstract operations:
+ * <ol>
+ *   <li>{@link #plan(LifecyclePlanRequest)} — calculates an immutable {@link LifecyclePlan}
+ *       containing the configured mojo executions for the requested phases/goals</li>
+ *   <li>{@link #execute(LifecycleExecutionRequest)} — runs all or a filtered subset of a
+ *       previously calculated plan</li>
+ * </ol>
+ *
+ * <p>Convenience defaults ({@link #plan(Session, Project, java.util.List)},
+ * {@link #execute(Session, LifecyclePlan)}, {@link #planAndExecute(Session, Project, java.util.List)})
+ * and {@link Session} shortcuts ({@link Session#planLifecycle(Project, java.util.List)},
+ * {@link Session#executeLifecycle(LifecyclePlan)}) cover the common cases without
+ * constructing request objects directly.
+ *
+ * <h2>Scope and limitations</h2>
+ * <ul>
+ *   <li>This service operates on a <strong>single project</strong>. Reactor-level
+ *       (multi-project) orchestration is handled by a separate mechanism.</li>
+ *   <li>The plan uses the same graph-based calculation as the concurrent build
+ *       infrastructure, but plugin resolution happens eagerly during {@code plan()},
+ *       which requires that all plugin artifacts are already resolvable.</li>
+ *   <li>On execution failure, the thrown {@link LifecycleExecutorException} carries
+ *       a {@linkplain LifecycleExecutorException#result() partial result} with per-mojo
+ *       success/failure status.</li>
+ * </ul>
+ *
+ * <p>This is the Maven 4 API lifecycle executor. The legacy
+ * {@code org.apache.maven.lifecycle.LifecycleExecutor} in the compatibility layer
+ * serves a different role (full reactor execution).
  *
  * @since 4.2.0
+ * @see LifecyclePlan
+ * @see Session#planLifecycle(Project, java.util.List)
+ * @see Session#executeLifecycle(LifecyclePlan)
  */
 @Experimental
 public interface LifecycleExecutor extends Service {
