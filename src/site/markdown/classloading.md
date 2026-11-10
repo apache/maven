@@ -42,7 +42,7 @@ JVM launcher, an integration testing harness, or an IDE embedder.
 During a normal command-line invocation this is the JVM System
 ClassLoader and contains:
 
-- `${maven.home}/boot/maven-classworlds-*.jar` — the classworlds
+- `${maven.home}/boot/*.jar` — the classworlds
   library that bootstraps all other realms
 - Any `-javaagent` classes specified on the JVM command line
 
