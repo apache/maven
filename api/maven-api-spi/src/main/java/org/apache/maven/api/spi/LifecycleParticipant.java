@@ -32,7 +32,7 @@ import org.apache.maven.api.annotations.ThreadSafe;
  * Extensions may update project state through services such as
  * {@link org.apache.maven.api.services.ProjectManager}.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Consumer
