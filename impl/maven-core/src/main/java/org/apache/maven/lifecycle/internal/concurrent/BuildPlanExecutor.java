@@ -290,11 +290,14 @@ public class BuildPlanExecutor {
          * For each project that uses a plugin which is itself a reactor module, this method:
          * <ol>
          *   <li>Makes the consumer project's PLAN step wait for the plugin project's READY step.</li>
-         *   <li>Clears the {@code skip} flag on the plugin project's READY step and <em>all</em>
-         *       of its transitive predecessors — including cross-project predecessors such as
-         *       reactor libraries that the plugin project depends on — so that the entire
-         *       dependency chain is built to the point where the plugin is READY, even when
-         *       the requested phase would otherwise stop before READY (e.g. {@code initialize}).</li>
+         *   <li>Clears the {@code skip} flag on the plugin project's READY step and its
+         *       transitive predecessors that were actually skipped (i.e. beyond the requested
+         *       phase) — including cross-project predecessors such as reactor libraries that the
+         *       plugin project depends on — so that the entire dependency chain is built to the
+         *       point where the plugin is READY, even when the requested phase would otherwise
+         *       stop before READY (e.g. {@code initialize}).  Steps that are already not skipped
+         *       (structural steps like SETUP/PLAN and phases within the requested phase) are left
+         *       untouched, avoiding unnecessary empty-shell executions.</li>
          * </ol>
          * <p>
          * This method is package-private so that unit tests can exercise the logic independently
@@ -319,7 +322,18 @@ public class BuildPlanExecutor {
                                 // requested phase is earlier (e.g. initialize). Without this,
                                 // a reactor library that the plugin compiles against would
                                 // remain skipped, causing the plugin's compilation to fail.
-                                readyStep.allPredecessors().forEach(s -> s.skip.set(false));
+                                //
+                                // Only un-skip steps that were actually skipped (i.e. beyond
+                                // the requested phase).  Steps within the requested phase
+                                // already have skip=false and don't need to be touched.
+                                // Leaving already-unskipped structural steps (SETUP, PLAN,
+                                // before:/after: nodes within the requested phase) untouched
+                                // avoids empty-shell executions that would otherwise trigger
+                                // misleading SETUP/TEARDOWN lifecycle events.
+                                readyStep
+                                        .allPredecessors()
+                                        .filter(s -> s.skip.get())
+                                        .forEach(s -> s.skip.set(false));
                             });
                         });
                     }
