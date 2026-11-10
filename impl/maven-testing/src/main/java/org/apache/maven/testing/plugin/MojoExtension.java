@@ -822,7 +822,9 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
     public static void setVariableValueToObject(Object object, String variable, Object value)
             throws IllegalAccessException {
         Field field = getFieldByNameIncludingSuperclasses(variable, object.getClass());
-        requireNonNull(field, "Field " + variable + " not found in " + object.getClass().getName());
+        requireNonNull(
+                field,
+                "Field " + variable + " not found in " + object.getClass().getName());
         field.setAccessible(true);
         field.set(object, value);
     }
