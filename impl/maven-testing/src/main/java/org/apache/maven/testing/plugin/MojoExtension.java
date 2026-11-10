@@ -695,7 +695,8 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
                 pomModel = new MavenStaxReader().read(reader);
             }
             String artifactId = pomModel.getArtifactId();
-            String groupId = resolveGroupId(pomModel);
+            String rawGroupId = resolveGroupId(pomModel);
+            String groupId = interpolateModel(pluginPom, pomModel, rawGroupId);
             String rawVersion = resolveVersion(pomModel);
             String version = interpolateModel(pluginPom, pomModel, rawVersion);
             return new String[] {groupId, artifactId, version, goal};

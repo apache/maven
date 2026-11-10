@@ -23,6 +23,8 @@ import java.io.File;
 /**
  * Evaluates mojo parameter expressions and aligns paths to the project base directory.
  * Used by {@link V4MojoConfigurator} to resolve plugin parameter values.
+ *
+ * @since 4.2.0
  */
 public interface MojoExpressionEvaluator {
 
