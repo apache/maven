@@ -50,8 +50,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * </ul>
  * <p>
  * Implementations should handle their own errors. Any {@link RuntimeException} thrown by {@link #onEvent(Event)}
- * is caught and logged at {@code WARN} level by event dispatchers (such as {@code EventSpyImpl} for execution events
- * and {@code MavenRepositoryListener} for repository events) to protect build stability and ensure that other
+ * is caught and logged at {@code WARN} level by event dispatchers to protect build stability and ensure that other
  * listeners are still notified. A listener cannot abort or fail the build by throwing an exception.
  *
  * @since 4.0.0

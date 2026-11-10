@@ -111,11 +111,15 @@ import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.transfer.TransferResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.impl.ImplUtils.map;
 
 public abstract class AbstractSession implements InternalSession {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSession.class);
 
     protected final RepositorySystemSession session;
     protected final RepositorySystem repositorySystem;
@@ -177,7 +181,7 @@ public abstract class AbstractSession implements InternalSession {
                         }
                     }
                 } catch (LookupException e) {
-                    // ignore if lookup is unavailable in test environments
+                    LOGGER.warn("Failed to discover Listener implementations via SPI", e);
                 }
             }
             return list;
