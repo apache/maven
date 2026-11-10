@@ -124,8 +124,10 @@ class BindingSelectionTest {
     void supplierWithLowerPriorityIsOverriddenByProvidesMethod() {
         // A binding registered with SESSION_SERVICE_PRIORITY (negative) must lose
         // to a @Provides method at the default priority (0).
+        // Use NamedService::new for the low-priority supplier so the assertion is not tautological:
+        // if priority selection fails and the supplier wins, the result is NamedService, not DefaultService.
         Injector injector = Injector.create()
-                .bindSupplier(Service.class, DefaultService::new, Injector.SESSION_SERVICE_PRIORITY)
+                .bindSupplier(Service.class, NamedService::new, Injector.SESSION_SERVICE_PRIORITY)
                 .bindImplicit(DefaultAndNamed.class);
 
         // The @Provides method in DefaultAndNamed wins over the low-priority supplier — no ambiguity.
