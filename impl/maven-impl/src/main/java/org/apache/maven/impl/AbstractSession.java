@@ -98,6 +98,7 @@ import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionRangeResolver;
 import org.apache.maven.api.services.VersionResolver;
 import org.apache.maven.api.services.VersionResolverException;
+import org.apache.maven.api.spi.SpiService;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.Binding;
@@ -110,11 +111,15 @@ import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.transfer.TransferResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.impl.ImplUtils.map;
 
 public abstract class AbstractSession implements InternalSession {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSession.class);
 
     protected final RepositorySystemSession session;
     protected final RepositorySystem repositorySystem;
@@ -159,14 +164,28 @@ public abstract class AbstractSession implements InternalSession {
         this.repositories = getRepositories(repositories, resolverRepositories);
         this.lookup = lookup;
         this.injector = lookup != null ? lookup.lookupOptional(Injector.class).orElse(null) : null;
-        this.listeners = getListeners(session);
+        this.listeners = getListeners(session, lookup);
         this.context = context;
     }
 
     @SuppressWarnings("unchecked")
-    private static List<Listener> getListeners(RepositorySystemSession session) {
+    private static List<Listener> getListeners(RepositorySystemSession session, Lookup lookup) {
         // Both event families share the registration scope of the underlying repository system session.
-        return (List<Listener>) session.getData().computeIfAbsent(Listener.class, CopyOnWriteArrayList::new);
+        return (List<Listener>) session.getData().computeIfAbsent(Listener.class, () -> {
+            List<Listener> list = new CopyOnWriteArrayList<>();
+            if (lookup != null) {
+                try {
+                    for (SpiService spi : lookup.lookupList(SpiService.class)) {
+                        if (spi instanceof Listener listener && !list.contains(listener)) {
+                            list.add(listener);
+                        }
+                    }
+                } catch (LookupException e) {
+                    LOGGER.warn("Failed to discover Listener implementations via SPI", e);
+                }
+            }
+            return list;
+        });
     }
 
     @SuppressWarnings("unchecked")

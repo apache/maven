@@ -115,6 +115,18 @@ be defined in the project POM, a parent POM, or dependency management.
 
 For the complete list of available Maven configuration properties and options, see [Maven Configuration Options](configuration.html).
 
+## Parallel build safety
+
+In a parallel build, Maven serializes concurrent executions of the same legacy mojo class when it is not marked `@threadSafe`. The lock is shared across all projects in the reactor, so an execution in one project blocks the same mojo class in another project even when those projects are otherwise independent. Maven emits a warning only when an execution actually has to wait, but this serialization can noticeably reduce effective parallelism in a large multi-module build.
+
+Some legacy plugins are safe for concurrent use but predate the `@threadSafe` declaration. As a temporary workaround while such a plugin is updated, the build owner can disable serialization globally with:
+
+```
+-Dmaven.plugin.nonThreadSafeSerializer=false
+```
+
+Disable this safeguard only when the affected mojos are known to be safe for concurrent execution. The long-term solution is for the plugin to declare its safe mojos `@threadSafe` or migrate to the Maven 4 plugin API. Maven 4 mojos are always considered thread-safe and are not subject to this serialization.
+
 ## Settings
 
 Settings are configured in the `~/.m2/settings.xml` file (user level),
@@ -136,3 +148,91 @@ prepended to the actual list of command line arguments.
 
 For example, options and goals could be defined with the value
 `-B -V checkstyle:checkstyle`.
+
+## Dependency injection diagnostics
+
+Set the `maven.di.debug` Java system property before startup to print Maven DI
+bindings, including those discovered during container creation. For example, to
+run the `validate` phase with diagnostics:
+
+```sh
+MAVEN_OPTS="-Dmaven.di.debug=true" mvn validate
+```
+
+Use `true` (case insensitive) or an empty value to show all bindings. Use
+`ambiguous` to show only keys with zero or multiple candidates:
+
+```sh
+MAVEN_OPTS="-Dmaven.di.debug=ambiguous" mvn validate
+```
+
+The filter counts registered candidates without checking whether priority
+selection or dependency resolution will succeed. It omits scope registrations
+and marks keys leaving the filter as removals.
+
+An unset property or any other value, including `false`, disables native dumps.
+Sisu diagnostics use the separate `sisu.debug` property. Set both to inspect
+both containers:
+
+```sh
+MAVEN_OPTS="-Dmaven.di.debug=true -Dsisu.debug=true" mvn validate
+```
+
+Each block starts with `Maven DI native registry` and identifies the injector
+and registry revision. Full snapshots list keys in sorted order, including
+aliases and keys without candidates. Candidates within each key appear in
+descending priority order. Deltas use the same order for new or changed
+candidates, followed by removals. Output goes to standard output; Maven may
+prefix lines with `[stdout]`.
+
+Candidate details list priority, scope, source, declared dependencies,
+constructor and factory method parameters, declared exceptions and initializers
+on separate lines. Initializers identify injected fields and methods. Optional
+dependencies start with `?`; this does not mean they are missing.
+
+Class loader references such as `L1` distinguish types from different realms.
+They remain stable across a full snapshot and its deltas; each block ends with a
+legend of their full identities. `bootstrap` identifies the bootstrap class
+loader.
+
+Snapshots print after discovery and when lookup or injection observes changed
+registrations, including context bindings added before a Maven 4 Mojo runs. The
+first block is a full snapshot. Later blocks show changed keys, individual
+candidates and scopes: `+` for additions, `-` for removals and `~` for changes.
+Delta headers give the previous and current registry revisions. Repeated lookups
+of an unchanged registry and changes hidden by the filter produce no output.
+Discovery or registration failures produce a block marked `partial`.
+
+Snapshots print in capture order. Parallel callers wait until their snapshot is
+processed. Checkpoints from callbacks on the writer thread queue until the
+callback returns. Changing the stream or diagnostic mode resets the history.
+Output failures and checkpoints that observe diagnostics disabled also reset it.
+The next output starts with a full snapshot.
+
+Maven uses its configured console styles when colors are enabled. Force colors
+on or off with `--color`:
+
+```sh
+MAVEN_OPTS="-Dmaven.di.debug=true" mvn --color always validate
+MAVEN_OPTS="-Dmaven.di.debug=true" mvn --color never validate
+```
+
+The default styles are:
+
+| Element | Style |
+| --- | --- |
+| Types in keys, candidates and dependencies | Cyan |
+| Qualifiers such as `@Named` | Yellow |
+| Scope annotations | Green |
+| Scope `<none>` | Gray |
+| Nonzero priorities | Yellow (warning style) |
+| Optional dependency marker `?` | Red |
+| Section headers such as `key:` and `candidate:` | Bold |
+
+Standalone Maven DI uses plain text. Color does not affect snapshot comparison.
+
+Snapshots do not create components, call providers or initializers, or obtain
+scope instances. Bound instances, suppliers and annotation qualifiers appear by
+type and identity, without exposing values or calling their `toString()`
+methods. Only the native registry is included; components supplied on demand by
+Sisu or Guice may be absent.

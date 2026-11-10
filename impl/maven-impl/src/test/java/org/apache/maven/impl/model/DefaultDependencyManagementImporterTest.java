@@ -22,6 +22,7 @@ import java.util.List;
 
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
+import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
@@ -152,6 +153,10 @@ class DefaultDependencyManagementImporterTest {
                 .groupId("org.junit.jupiter")
                 .artifactId("junit-jupiter-api")
                 .scope("provided")
+                .exclusions(List.of(Exclusion.newBuilder()
+                        .groupId("org.junit.vintage")
+                        .artifactId("junit-vintage-engine")
+                        .build()))
                 .build();
 
         Model target = Model.newBuilder()
@@ -183,5 +188,8 @@ class DefaultDependencyManagementImporterTest {
         assertEquals("junit-jupiter-api", merged.getArtifactId());
         assertEquals("5.10.0", merged.getVersion());
         assertEquals("provided", merged.getScope());
+        assertEquals(1, merged.getExclusions().size());
+        assertEquals("org.junit.vintage", merged.getExclusions().get(0).getGroupId());
+        assertEquals("junit-vintage-engine", merged.getExclusions().get(0).getArtifactId());
     }
 }

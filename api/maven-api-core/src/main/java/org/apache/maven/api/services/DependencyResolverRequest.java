@@ -199,13 +199,71 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
     }
 
     /**
-     * Builds a request for the given dependency using the default runtime scope.
+     * Builds a project-context request for one dependency using {@link PathScope#MAIN_RUNTIME}.
+     * Use the scope-taking overload to select another scope.
      *
-     * @param session the session
-     * @param requestType the request type
-     * @param dependency the root dependency coordinates
-     * @return a new request, never {@code null}
+     * @since 4.2.0
      */
+    @Nonnull
+    static DependencyResolverRequest build(
+            Session session, RequestType requestType, Project project, DependencyCoordinates dependency) {
+        return build(session, requestType, project, dependency, PathScope.MAIN_RUNTIME);
+    }
+
+    /**
+     * Builds a project-context request for one dependency and path scope.
+     *
+     * @since 4.2.0
+     */
+    @Nonnull
+    static DependencyResolverRequest build(
+            Session session,
+            RequestType requestType,
+            Project project,
+            DependencyCoordinates dependency,
+            PathScope scope) {
+        return new DependencyResolverRequestBuilder()
+                .session(session)
+                .requestType(requestType)
+                .project(project)
+                .dependency(dependency)
+                .pathScope(scope)
+                .build();
+    }
+
+    /**
+     * Builds a project-context request for dependencies using {@link PathScope#MAIN_RUNTIME}.
+     * Use the scope-taking overload to select another scope.
+     *
+     * @since 4.2.0
+     */
+    @Nonnull
+    static DependencyResolverRequest build(
+            Session session, RequestType requestType, Project project, List<DependencyCoordinates> dependencies) {
+        return build(session, requestType, project, dependencies, PathScope.MAIN_RUNTIME);
+    }
+
+    /**
+     * Builds a project-context request for dependencies and path scope.
+     *
+     * @since 4.2.0
+     */
+    @Nonnull
+    static DependencyResolverRequest build(
+            Session session,
+            RequestType requestType,
+            Project project,
+            List<DependencyCoordinates> dependencies,
+            PathScope scope) {
+        return new DependencyResolverRequestBuilder()
+                .session(session)
+                .requestType(requestType)
+                .project(project)
+                .dependencies(dependencies)
+                .pathScope(scope)
+                .build();
+    }
+
     @Nonnull
     static DependencyResolverRequest build(Session session, RequestType requestType, DependencyCoordinates dependency) {
         return build(session, requestType, dependency, PathScope.MAIN_RUNTIME);

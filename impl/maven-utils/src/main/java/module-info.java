@@ -22,6 +22,7 @@ module org.apache.maven.utils {
             org.apache.maven.impl,
             org.apache.maven.cling,
             org.apache.maven.core,
+            org.apache.maven.testing,
             maven.compat,
             maven.embedder,
             maven.model.builder;

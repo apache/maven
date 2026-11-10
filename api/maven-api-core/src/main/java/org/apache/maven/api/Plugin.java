@@ -61,12 +61,23 @@ public interface Plugin {
     List<Lifecycle> getLifecycles();
 
     /**
+     * Returns the runtime realm for this plugin.
+     *
+     * @return the plugin realm, never {@code null}
+     * @since 4.1.0
+     */
+    @Nonnull
+    Realm getRealm();
+
+    /**
      * Returns the class loader used to load this plugin's classes.
      *
      * @return the class loader, never {@code null}
      */
     @Nonnull
-    ClassLoader getClassLoader();
+    default ClassLoader getClassLoader() {
+        return getRealm().classLoader();
+    }
 
     /**
      * Returns the artifact for this plugin.

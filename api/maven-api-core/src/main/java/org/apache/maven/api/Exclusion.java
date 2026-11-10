@@ -38,7 +38,7 @@ public interface Exclusion {
     /**
      * @deprecated Use {@link #groupId()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nullable
     default String getGroupId() {
         return groupId();
@@ -53,7 +53,7 @@ public interface Exclusion {
     /**
      * @deprecated Use {@link #artifactId()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nullable
     default String getArtifactId() {
         return artifactId();
