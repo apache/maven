@@ -148,6 +148,23 @@ public interface Injector {
     <T> Injector bindSupplier(@Nonnull Class<T> cls, @Nonnull Supplier<T> supplier);
 
     /**
+     * Binds a supplier to a class with an explicit priority.
+     * <p>
+     * A lower priority value means the binding will be overridden by any binding with a higher priority.
+     * Use a negative priority (e.g. {@code -10}) to register a fallback binding that yields to
+     * plugin-provided {@code @Provides} methods (which default to priority {@code 0}).
+     *
+     * @param <T> the type of the instance
+     * @param cls the class to bind to
+     * @param supplier the supplier to use for injection
+     * @param priority the binding priority
+     * @return this injector instance for method chaining
+     * @throws NullPointerException if either parameter is null
+     */
+    @Nonnull
+    <T> Injector bindSupplier(@Nonnull Class<T> cls, @Nonnull Supplier<T> supplier, int priority);
+
+    /**
      * Performs field and method injection on an existing instance.
      * <p>
      * This method will inject dependencies into annotated fields and methods of
