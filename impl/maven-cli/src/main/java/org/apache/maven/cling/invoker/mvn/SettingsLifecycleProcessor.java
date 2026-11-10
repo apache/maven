@@ -21,6 +21,7 @@ package org.apache.maven.cling.invoker.mvn;
 import java.util.List;
 
 import org.apache.maven.api.Lifecycle;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.settings.PhaseInjection;
@@ -71,7 +72,7 @@ public class SettingsLifecycleProcessor implements LifecycleProcessor {
     private final LegacySupport legacySupport;
 
     @Inject
-    public SettingsLifecycleProcessor(LegacySupport legacySupport) {
+    public SettingsLifecycleProcessor(@Nullable LegacySupport legacySupport) {
         this.legacySupport = legacySupport;
     }
 
@@ -100,6 +101,9 @@ public class SettingsLifecycleProcessor implements LifecycleProcessor {
 
     @SuppressWarnings("unchecked")
     private List<PhaseEnrichedLifecycle.InjectedPhase> resolveInjections() {
+        if (legacySupport == null) {
+            return List.of();
+        }
         MavenSession session = legacySupport.getSession();
         if (session == null) {
             return List.of();
