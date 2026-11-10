@@ -63,11 +63,13 @@ public final class LifecycleParticipantDispatcher {
                 thread.setContextClassLoader(participant.getClass().getClassLoader());
                 try {
                     call.run(participant);
-                } catch (LifecycleParticipantException e) {
+                } catch (LifecycleParticipantException | RuntimeException e) {
+                    LifecycleParticipantException lpe =
+                            e instanceof LifecycleParticipantException ex ? ex : new LifecycleParticipantException(e);
                     if (failure == null) {
-                        failure = e;
+                        failure = lpe;
                     } else {
-                        failure.addSuppressed(e);
+                        failure.addSuppressed(lpe);
                     }
                 }
             }

@@ -44,6 +44,8 @@ public interface LifecycleParticipant extends SpiService {
      * Extensions may update project state through services such as
      * {@link org.apache.maven.api.services.ProjectManager}.
      *
+     * <p>The default implementation does nothing.
+     *
      * @param session the build session
      * @throws LifecycleParticipantException if the build cannot continue
      */
