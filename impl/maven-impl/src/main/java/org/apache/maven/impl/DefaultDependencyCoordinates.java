@@ -18,10 +18,7 @@
  */
 package org.apache.maven.impl;
 
-import java.util.Collection;
-
 import org.apache.maven.api.DependencyCoordinates;
-import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.VersionConstraint;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
@@ -41,27 +38,5 @@ public class DefaultDependencyCoordinates extends AetherDependencyWrapper implem
     @Override
     public Boolean optional() {
         return dependency.getOptional();
-    }
-
-    @Nonnull
-    @Override
-    public Collection<Exclusion> exclusions() {
-        return new MappedCollection<>(dependency.getExclusions(), this::toExclusion);
-    }
-
-    private Exclusion toExclusion(org.eclipse.aether.graph.Exclusion exclusion) {
-        return new Exclusion() {
-            @Nullable
-            @Override
-            public String groupId() {
-                return exclusion.getGroupId();
-            }
-
-            @Nullable
-            @Override
-            public String artifactId() {
-                return exclusion.getArtifactId();
-            }
-        };
     }
 }

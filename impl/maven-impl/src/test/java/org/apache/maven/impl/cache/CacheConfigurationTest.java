@@ -181,8 +181,13 @@ class CacheConfigurationTest {
         assertTrue(requestSelector.matches(testRequest)); // Should match Request interface
     }
 
-    // Test implementation class that implements ModelBuilderRequest
+    // Cacheable model request used to exercise selectors independently of model-building policy.
     private static class TestRequestImpl implements ModelBuilderRequest {
+        @Override
+        public CacheRetention getCacheRetention() {
+            return CacheRetention.REQUEST_SCOPED;
+        }
+
         @Override
         public Session getSession() {
             return null;

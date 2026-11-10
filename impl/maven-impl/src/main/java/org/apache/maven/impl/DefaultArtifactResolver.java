@@ -96,6 +96,11 @@ public class DefaultArtifactResolver implements ArtifactResolver {
     protected ArtifactResolverResult doResolve(ArtifactResolverRequest request) {
         InternalSession session = InternalSession.from(request.getSession());
         org.apache.maven.api.services.RequestTrace trace = RequestTraceHelper.getCurrentTrace(session);
+        RequestTraceHelper.ResolverTrace fallbackTrace = null;
+        if (trace == null) {
+            fallbackTrace = RequestTraceHelper.enter(session, request);
+            trace = fallbackTrace.mvnTrace();
+        }
         try {
             List<RemoteRepository> repositories = session.toResolvingRepositories(
                     request.getRepositories() != null ? request.getRepositories() : session.getRemoteRepositories());
@@ -134,6 +139,10 @@ public class DefaultArtifactResolver implements ArtifactResolver {
                 message = "Unable to resolve artifacts: " + e.getMessage();
             }
             throw new ArtifactResolverException(message, e, toResult(request, e));
+        } finally {
+            if (fallbackTrace != null) {
+                RequestTraceHelper.exit(fallbackTrace);
+            }
         }
     }
 

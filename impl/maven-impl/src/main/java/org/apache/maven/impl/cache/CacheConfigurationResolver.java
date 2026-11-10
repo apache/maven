@@ -37,7 +37,7 @@ public class CacheConfigurationResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheConfigurationResolver.class);
 
     /**
-     * Cache for parsed selectors per session to avoid re-parsing.
+     * Parsed selectors shared by sessions with the same configuration string.
      */
     private static final ConcurrentMap<String, List<CacheSelector>> SELECTOR_CACHE = new ConcurrentHashMap<>();
 
@@ -49,12 +49,13 @@ public class CacheConfigurationResolver {
      * @return the resolved cache configuration
      */
     public static CacheConfig resolveConfig(Request<?> req, ProtoSession session) {
-        // First check if request implements CacheMetadata for backward compatibility
+        // Read the request's declared retention before applying user-defined selectors.
         CacheRetention legacyRetention = null;
         if (req instanceof CacheMetadata metadata) {
             legacyRetention = metadata.getCacheRetention();
         }
 
+        // Disabled requests must execute even when a selector would enable caching.
         if (legacyRetention == CacheRetention.DISABLED) {
             return new CacheConfig(CacheRetention.DISABLED, Cache.ReferenceType.NONE);
         }

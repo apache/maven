@@ -29,9 +29,10 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Submits operations to the session pipeline, including requests made during bootstrap.
- * Normal sessions and bootstrap requests converge in {@link #execute(Request, Function, RequestCache)}.
- * This is the shared execution point for operation lifecycle handling. Services enter and exit
- * their trace scope around the request call.
+ * Requests handled by {@link AbstractSession} and the bootstrap fallback share
+ * {@link #execute(Request, Function, RequestCache)} for cache handling. Services enter and restore
+ * their trace scope around the request call. Future lifecycle events can be dispatched
+ * at that shared execution point.
  */
 public final class RequestExecutor {
     private RequestExecutor() {}

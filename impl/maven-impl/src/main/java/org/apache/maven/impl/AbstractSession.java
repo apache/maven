@@ -610,7 +610,7 @@ public abstract class AbstractSession implements InternalSession {
     /**
      * Shortcut for <code>getService(ArtifactCoordinatesFactory.class).create(...)</code>
      *
-     * @see ArtifactFactory#create(Session, String, String, String, String)
+     * @see ArtifactCoordinatesFactory#create(Session, String, String, String, String)
      */
     @Override
     public ArtifactCoordinates createArtifactCoordinates(
@@ -872,7 +872,7 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     /**
-     * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
+     * Shortcut for <code>getService(DependencyCoordinatesFactory.class).create(...)</code>
      *
      * @see DependencyCoordinatesFactory#create(Session, ArtifactCoordinates)
      */
@@ -883,9 +883,9 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     /**
-     * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
+     * Shortcut for <code>getService(DependencyCoordinatesFactory.class).create(...)</code>
      *
-     * @see DependencyCoordinatesFactory#create(Session, ArtifactCoordinates)
+     * @see DependencyCoordinatesFactory#create(Session, Dependency)
      */
     @Nonnull
     @Override

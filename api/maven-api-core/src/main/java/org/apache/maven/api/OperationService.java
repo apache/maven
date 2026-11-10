@@ -28,6 +28,8 @@ import org.apache.maven.api.services.Result;
 
 /**
  * Marker interface for services whose operations participate in the shared request pipeline.
+ * Implementations must be thread-safe: their service methods may be called concurrently
+ * from multiple threads.
  * Implementations submit their requests to the session's request pipeline, which provides
  * caching and the context needed to observe operation lifecycles. Requests and results
  * describe the work, while request traces identify the operations that initiated it.

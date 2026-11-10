@@ -46,8 +46,8 @@ public class DefaultRequestCache extends AbstractRequestCache {
     // Comprehensive cache statistics
     private final CacheStatistics statistics = new CacheStatistics();
 
-    // Weak session keys and soft cache values avoid strong global retention while keeping
-    // a live session's cache available across ordinary garbage collections.
+    // Weak session keys and soft cache values avoid strong global retention.
+    // Soft values can survive routine GC but remain reclaimable under memory pressure.
     private final Cache<ProtoSession, Cache<CacheConfig, Cache<Object, CachingSupplier<?, ?>>>> bootstrapCaches =
             Cache.newCache(Cache.ReferenceType.WEAK, Cache.ReferenceType.SOFT, "RequestCache-Bootstrap");
 

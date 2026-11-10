@@ -117,6 +117,7 @@ public interface DependencyCoordinatesFactory extends Service {
 
     /**
      * Creates dependency coordinates from an existing dependency.
+     * The dependency's scope, optional flag and exclusions are preserved.
      *
      * @param session the session
      * @param dependency the dependency
@@ -136,7 +137,7 @@ public interface DependencyCoordinatesFactory extends Service {
                 dependency.type().id(),
                 dependency.scope().id(),
                 dependency.isOptional(),
-                List.of());
+                dependency.exclusions());
     }
 
     /**

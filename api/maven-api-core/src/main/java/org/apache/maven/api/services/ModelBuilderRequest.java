@@ -38,8 +38,7 @@ import org.apache.maven.api.model.Profile;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Request used to build a {@link org.apache.maven.api.Project} using
- * the {@link ProjectBuilder} service.
+ * Request used to build a Maven model using the {@link ModelBuilder} service.
  *
  * @since 4.0.0
  */
@@ -49,9 +48,9 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest, CacheMetada
 
     /**
      * Returns the cache retention for the complete model-building operation.
-     * Project builds update mutable model-builder session state and must execute each time.
-     * Consumer models can be reused within the enclosing operation. Internal model caches
-     * remain independently available to all request types.
+     * Model builds depend on mutable model-builder session state, including inherited
+     * repositories and profile activation context, and must execute each time. Internal
+     * model caches remain independently available to all request types.
      *
      * @return the retention policy for the model-building operation
      * @since 4.2.0
@@ -59,10 +58,7 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest, CacheMetada
     @Nonnull
     @Override
     default CacheRetention getCacheRetention() {
-        return switch (getRequestType()) {
-            case CONSUMER_PARENT, CONSUMER_DEPENDENCY -> CacheRetention.REQUEST_SCOPED;
-            default -> CacheRetention.DISABLED;
-        };
+        return CacheRetention.DISABLED;
     }
 
     /**

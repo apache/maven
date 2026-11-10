@@ -70,6 +70,11 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
             throws VersionRangeResolverException {
         InternalSession session = InternalSession.from(request.getSession());
         org.apache.maven.api.services.RequestTrace trace = RequestTraceHelper.getCurrentTrace(session);
+        RequestTraceHelper.ResolverTrace fallbackTrace = null;
+        if (trace == null) {
+            fallbackTrace = RequestTraceHelper.enter(session, request);
+            trace = fallbackTrace.mvnTrace();
+        }
         try {
             VersionRangeResult res = repositorySystem.resolveVersionRange(
                     session.getSession(),
@@ -117,6 +122,10 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
             };
         } catch (VersionRangeResolutionException e) {
             throw new VersionRangeResolverException("Unable to resolve version range", e);
+        } finally {
+            if (fallbackTrace != null) {
+                RequestTraceHelper.exit(fallbackTrace);
+            }
         }
     }
 

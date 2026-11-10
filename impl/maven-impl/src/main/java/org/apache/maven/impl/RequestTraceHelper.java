@@ -32,9 +32,9 @@ import org.eclipse.aether.resolution.ArtifactRequest;
 import org.eclipse.aether.resolution.DependencyRequest;
 
 /**
- * Helper class to manage request tracing for improved error logging in Maven's dependency resolution.
+ * Helper for tracking Maven operation requests and their Resolver trace representations.
  * This class provides utilities to:
- * - Track request traces through Maven's dependency resolution process
+ * - Track nested Maven operations, including bootstrap requests
  * - Convert between Maven and Resolver trace formats
  * - Generate human-readable interpretations of trace data
  */
@@ -86,8 +86,9 @@ public final class RequestTraceHelper {
             org.apache.maven.api.services.RequestTrace previousMvnTrace) {}
 
     /**
-     * Creates a new trace entry and updates the session's current trace
-     * @param session The current Maven session
+     * Enters a trace scope, using the request's explicit trace when present.
+     * Otherwise, creates a trace from the session's current trace and the supplied data.
+     * @param session The current full or bootstrap session
      * @param data The data object to associate with the trace
      * @return A new ResolverTrace containing both Maven and Resolver trace information
      */

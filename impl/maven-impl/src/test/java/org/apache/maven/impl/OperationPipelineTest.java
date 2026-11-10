@@ -27,7 +27,10 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import org.apache.maven.api.Artifact;
+import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.ProtoSession;
@@ -39,14 +42,20 @@ import org.apache.maven.api.cache.RequestCacheFactory;
 import org.apache.maven.api.services.ArtifactDeployerRequest;
 import org.apache.maven.api.services.ArtifactInstallerException;
 import org.apache.maven.api.services.ArtifactInstallerRequest;
+import org.apache.maven.api.services.ArtifactResolverException;
+import org.apache.maven.api.services.ArtifactResolverRequest;
 import org.apache.maven.api.services.DependencyResolverRequest;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
+import org.apache.maven.api.services.Result;
 import org.apache.maven.api.services.SettingsBuilderRequest;
 import org.apache.maven.api.services.SettingsBuilderResult;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.ToolchainsBuilderRequest;
 import org.apache.maven.api.services.ToolchainsBuilderResult;
+import org.apache.maven.api.services.VersionRangeResolverRequest;
+import org.apache.maven.api.services.VersionResolverRequest;
 import org.apache.maven.impl.cache.DefaultRequestCache;
 import org.apache.maven.impl.cache.DefaultRequestCacheFactory;
 import org.apache.maven.impl.model.DefaultInterpolator;
@@ -60,14 +69,25 @@ import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.installation.InstallResult;
 import org.eclipse.aether.installation.InstallationException;
+import org.eclipse.aether.resolution.ArtifactRequest;
+import org.eclipse.aether.resolution.ArtifactResolutionException;
+import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.resolution.VersionRangeRequest;
+import org.eclipse.aether.resolution.VersionRangeResult;
+import org.eclipse.aether.resolution.VersionRequest;
+import org.eclipse.aether.resolution.VersionResult;
 import org.eclipse.aether.scope.ResolutionScope;
 import org.eclipse.aether.scope.ScopeManager;
 import org.eclipse.aether.spi.connector.transport.Transporter;
 import org.eclipse.aether.spi.connector.transport.TransporterProvider;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
+import org.mockito.stubbing.Answer;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
@@ -104,6 +124,117 @@ class OperationPipelineTest {
         doReturn(Map.of()).when(session).getSystemProperties();
         doReturn(Map.of()).when(session).getEffectiveProperties();
         return session;
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+        "version, false, false",
+        "version, true, false",
+        "range, false, false",
+        "range, true, false",
+        "artifact, false, false",
+        "artifact, true, false",
+        "version, false, true",
+        "version, true, true",
+        "range, false, true",
+        "range, true, true",
+        "artifact, false, true",
+        "artifact, true, true"
+    })
+    void visibleResolverHooksHandleMissingTrace(String operation, boolean fail, boolean explicitTrace)
+            throws Exception {
+        RepositorySystem repositorySystem = mock(RepositorySystem.class);
+        AbstractSession session = newSession(repositorySystem);
+        ArtifactCoordinates coordinates = mock(ArtifactCoordinates.class);
+        org.eclipse.aether.artifact.Artifact resolverArtifact = new org.eclipse.aether.artifact.DefaultArtifact(
+                        "org.example:library:1.0")
+                .setPath(Path.of("library.jar"));
+        doReturn(resolverArtifact).when(session).toArtifact(coordinates);
+        Artifact artifact = mock(Artifact.class);
+        when(artifact.toCoordinates()).thenReturn(coordinates);
+        doReturn(artifact).when(session).getArtifact(resolverArtifact);
+        doReturn(mock(DownloadedArtifact.class)).when(session).getArtifact(DownloadedArtifact.class, resolverArtifact);
+        RequestTrace suppliedTrace = explicitTrace ? new RequestTrace("supplied") : null;
+        Request<?> request =
+                switch (operation) {
+                    case "version" ->
+                        VersionResolverRequest.builder()
+                                .session(session)
+                                .artifactCoordinates(coordinates)
+                                .trace(suppliedTrace)
+                                .build();
+                    case "range" ->
+                        VersionRangeResolverRequest.builder()
+                                .session(session)
+                                .artifactCoordinates(coordinates)
+                                .trace(suppliedTrace)
+                                .build();
+                    default ->
+                        ArtifactResolverRequest.builder()
+                                .session(session)
+                                .coordinates(List.of(coordinates))
+                                .trace(suppliedTrace)
+                                .build();
+                };
+        AtomicInteger calls = new AtomicInteger();
+        IllegalStateException failure = new IllegalStateException("resolution failed");
+        Answer<Object> resolve = call -> {
+            calls.incrementAndGet();
+            RequestTrace activeTrace = session.getCurrentTrace();
+            assertNotNull(activeTrace);
+            if (suppliedTrace != null) {
+                assertSame(suppliedTrace, activeTrace);
+            } else {
+                assertSame(request, activeTrace.data());
+                assertNull(activeTrace.parent());
+            }
+            if (fail) {
+                if (operation.equals("artifact")) {
+                    List<ArtifactResult> results = call.<List<ArtifactRequest>>getArgument(1).stream()
+                            .map(ArtifactResult::new)
+                            .toList();
+                    throw new ArtifactResolutionException(results, "resolution failed", failure);
+                }
+                throw failure;
+            }
+            return switch (operation) {
+                case "version" -> new VersionResult(call.getArgument(1, VersionRequest.class)).setVersion("1.0");
+                case "range" -> new VersionRangeResult(call.getArgument(1, VersionRangeRequest.class));
+                default ->
+                    call.<List<ArtifactRequest>>getArgument(1).stream()
+                            .map(r -> new ArtifactResult(r).setArtifact(r.getArtifact()))
+                            .toList();
+            };
+        };
+        switch (operation) {
+            case "version" ->
+                when(repositorySystem.resolveVersion(eq(session.getSession()), any(VersionRequest.class)))
+                        .thenAnswer(resolve);
+            case "range" ->
+                when(repositorySystem.resolveVersionRange(eq(session.getSession()), any(VersionRangeRequest.class)))
+                        .thenAnswer(resolve);
+            default ->
+                when(repositorySystem.resolveArtifacts(eq(session.getSession()), any()))
+                        .thenAnswer(resolve);
+        }
+        java.util.function.Supplier<Result<?>> invoke = () -> switch (operation) {
+            case "version" -> new DefaultVersionResolver(repositorySystem).doResolve((VersionResolverRequest) request);
+            case "range" ->
+                new DefaultVersionRangeResolver(repositorySystem).doResolve((VersionRangeResolverRequest) request);
+            default -> new DefaultArtifactResolver().doResolve((ArtifactResolverRequest) request);
+        };
+        assertNull(session.getCurrentTrace());
+        if (fail) {
+            if (operation.equals("artifact")) {
+                assertThrows(ArtifactResolverException.class, invoke::get);
+            } else {
+                assertSame(failure, assertThrows(IllegalStateException.class, invoke::get));
+            }
+        } else {
+            assertSame(request, invoke.get().getRequest());
+        }
+        assertEquals(1, calls.get());
+        assertNull(session.getCurrentTrace());
     }
 
     @Test

@@ -21,8 +21,11 @@ package org.apache.maven.impl;
 import java.util.List;
 
 import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.Dependency;
 import org.apache.maven.api.DependencyCoordinates;
+import org.apache.maven.api.DependencyScope;
 import org.apache.maven.api.Exclusion;
+import org.apache.maven.api.Type;
 import org.apache.maven.api.services.ArtifactFactory;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.ArtifactTypeRegistry;
@@ -32,6 +35,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -94,6 +98,36 @@ class FactoryServicesTest {
         assertEquals("[1,2)", dependency.versionConstraint().toString());
         assertEquals("tests", dependency.classifier());
         assertEquals("jar", dependency.extension());
+    }
+
+    @Test
+    void dependencyConversionPreservesExclusionsWithoutRecursion() {
+        InternalSession session = newSession();
+        Type type = mock(Type.class);
+        when(type.id()).thenReturn("jar");
+        when(session.requireType("jar")).thenReturn(type);
+        when(session.requireDependencyScope("runtime")).thenReturn(DependencyScope.RUNTIME);
+        org.eclipse.aether.graph.Dependency resolverDependency = new org.eclipse.aether.graph.Dependency(
+                new org.eclipse.aether.artifact.DefaultArtifact("org.example:library:jar:tests:1.0"),
+                "runtime",
+                true,
+                List.of(new org.eclipse.aether.graph.Exclusion("org.excluded", "unwanted", "*", "*")));
+        Dependency dependency = new DefaultDependency(session, resolverDependency);
+        DefaultDependencyCoordinatesFactory factory = new DefaultDependencyCoordinatesFactory();
+        when(session.createDependencyCoordinates(any(Dependency.class)))
+                .thenAnswer(call -> factory.create(session, (Dependency) call.getArgument(0)));
+        assertEquals("org.excluded", dependency.exclusions().iterator().next().groupId());
+        for (DependencyCoordinates coordinates :
+                List.of(factory.create(session, dependency), dependency.toCoordinates())) {
+            assertEquals("tests", coordinates.classifier());
+            assertEquals("1.0", coordinates.versionConstraint().toString());
+            assertEquals(DependencyScope.RUNTIME, coordinates.scope());
+            assertTrue(coordinates.optional());
+            assertEquals(1, coordinates.exclusions().size());
+            Exclusion exclusion = coordinates.exclusions().iterator().next();
+            assertEquals("org.excluded", exclusion.groupId());
+            assertEquals("unwanted", exclusion.artifactId());
+        }
     }
 
     @Test
