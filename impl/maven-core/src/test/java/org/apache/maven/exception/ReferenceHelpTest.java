@@ -23,6 +23,7 @@ import java.util.List;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -92,6 +93,34 @@ class ReferenceHelpTest {
         assertNull(ReferenceHelp.getHelpText("com.example.SomeError"));
         assertNull(ReferenceHelp.getHelpText(""));
         assertNull(ReferenceHelp.getHelpText(null));
+    }
+
+    @Test
+    void hasHelpTextReturnsTrueForBuiltInReferences() {
+        for (String key : BUILT_IN_KEYS) {
+            assertTrue(ReferenceHelp.hasHelpText(key), "Expected help text resource for " + key);
+            assertTrue(
+                    ReferenceHelp.hasHelpText("http://cwiki.apache.org/confluence/display/MAVEN/" + key),
+                    "Expected help text resource for cwiki URL of " + key);
+        }
+        assertTrue(ReferenceHelp.hasHelpText(
+                "https://maven.apache.org/resolver/remote-repository-filtering.html"));
+    }
+
+    @Test
+    void hasHelpTextReturnsFalseForUnknownOrInvalidReferences() {
+        assertFalse(ReferenceHelp.hasHelpText("NoSuchException"));
+        assertFalse(ReferenceHelp.hasHelpText("com.example.SomeError"));
+        assertFalse(ReferenceHelp.hasHelpText("a b"));
+        assertFalse(ReferenceHelp.hasHelpText(""));
+        assertFalse(ReferenceHelp.hasHelpText(null));
+    }
+
+    @Test
+    void hasHelpTextAgreesWithGetHelpTextForBuiltIns() {
+        for (String key : BUILT_IN_KEYS) {
+            assertEquals(ReferenceHelp.getHelpText(key) != null, ReferenceHelp.hasHelpText(key), key);
+        }
     }
 
     @Test

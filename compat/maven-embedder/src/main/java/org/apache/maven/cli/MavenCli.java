@@ -1116,7 +1116,7 @@ public class MavenCli {
             for (Throwable exception : result.getExceptions()) {
                 ExceptionSummary summary = handler.handleException(exception);
 
-                hasDetailedHelp |= ReferenceHelp.getHelpText(summary.getReference()) != null;
+                hasDetailedHelp |= ReferenceHelp.hasHelpText(summary.getReference());
 
                 logSummary(summary, "", cliRequest.showErrors);
 
@@ -1241,11 +1241,11 @@ public class MavenCli {
         }
 
         String reference = summary.getReference();
-        if (reference != null && !reference.isEmpty()) {
-            String help = ReferenceHelp.getHelpText(reference);
-            if (help != null) {
-                slf4jLogger.debug(help);
-            }
+        if (reference != null
+                && !reference.isEmpty()
+                && slf4jLogger.isDebugEnabled()
+                && ReferenceHelp.hasHelpText(reference)) {
+            slf4jLogger.debug(ReferenceHelp.getHelpText(reference));
         }
 
         indent += "  ";

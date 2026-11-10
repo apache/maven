@@ -73,6 +73,20 @@ public final class ReferenceHelp {
     }
 
     /**
+     * Returns whether a help text resource exists for the given exception reference. This is a cheap
+     * existence-only check that does not read the resource content; use it when only knowing whether a
+     * reference is backed by help text matters (for example to decide whether to hint at the verbose
+     * {@code -X} switch), and call {@link #getHelpText(String)} only when the text is actually needed.
+     *
+     * @param reference the exception reference, may be {@code null} or empty
+     * @return {@code true} when a help text resource exists for the reference, {@code false} otherwise
+     */
+    public static boolean hasHelpText(String reference) {
+        String key = normalizeKey(reference);
+        return key != null && ReferenceHelp.class.getResource(RESOURCE_PREFIX + key + ".txt") != null;
+    }
+
+    /**
      * Extracts the resource key from a reference (plain key or wiki URL) and validates it is safe to use
      * as a file name. Returns {@code null} when the reference cannot be mapped to a resource.
      */

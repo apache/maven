@@ -572,7 +572,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             Set<String> hintedArtifacts = new HashSet<>();
             for (Throwable exception : result.getExceptions()) {
                 ExceptionSummary summary = handler.handleException(exception);
-                hasDetailedHelp |= ReferenceHelp.getHelpText(summary.getReference()) != null;
+                hasDetailedHelp |= ReferenceHelp.hasHelpText(summary.getReference());
                 logSummary(context, summary, "");
 
                 if (exception instanceof LifecycleExecutionException lifecycleExecutionException) {
@@ -730,6 +730,20 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
     protected static final String ANSI_RESET = "\u001B\u005Bm";
 
+    /**
+     * Logs the summary of a failed build, including any embedded detailed help text associated with
+     * {@link ExceptionSummary#getReference()} when verbose output is enabled.
+     * <p>
+     * Migration note: the former {@code logSummary(MavenContext, ExceptionSummary, Map<String, String>,
+     * String)} overload (which collected the reference URLs into a {@code references} map) was replaced by
+     * this three-argument form. The collector map has been dropped: detailed help is now read on demand from
+     * the {@link ReferenceHelp} resources instead. Subclasses overriding the old overload must update to this
+     * signature.
+     *
+     * @param context the Maven context used for logging
+     * @param summary the exception summary to log
+     * @param indent the indentation prefix for nested summary lines
+     */
     protected void logSummary(MavenContext context, ExceptionSummary summary, String indent) {
         String msg = summary.getMessage();
 
@@ -766,11 +780,11 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         }
 
         String reference = summary.getReference();
-        if (reference != null && !reference.isEmpty()) {
-            String help = ReferenceHelp.getHelpText(reference);
-            if (help != null) {
-                context.logger.debug(help);
-            }
+        if (reference != null
+                && !reference.isEmpty()
+                && context.invokerRequest.effectiveVerbose()
+                && ReferenceHelp.hasHelpText(reference)) {
+            context.logger.debug(ReferenceHelp.getHelpText(reference));
         }
 
         indent += "  ";
