@@ -43,6 +43,12 @@ final class Slf4jTemplateConverter {
     /**
      * Converts an SLF4J {@code {}}-style template to MessageFormat {@code {N}}-style.
      * Returns the input unchanged if it contains no {@code {}} placeholders.
+     * <p>
+     * Handles the SLF4J escape convention:
+     * <ul>
+     *   <li>{@code \{}} is an escaped placeholder that prints literal {@code {}}</li>
+     *   <li>{@code \\{}} is an escaped backslash followed by a real placeholder</li>
+     * </ul>
      *
      * @param slf4jTemplate the SLF4J template, may be {@code null}
      * @return the converted template, or the original if no conversion was needed
@@ -60,8 +66,22 @@ final class Slf4jTemplateConverter {
         int start = 0;
         int idx;
         while ((idx = template.indexOf("{}", start)) >= 0) {
-            sb.append(template, start, idx);
-            sb.append('{').append(argIdx++).append('}');
+            if (idx > 0 && template.charAt(idx - 1) == '\\') {
+                if (idx > 1 && template.charAt(idx - 2) == '\\') {
+                    // \\{} — escaped backslash followed by a real placeholder
+                    sb.append(template, start, idx - 2);
+                    sb.append('\\');
+                    sb.append('{').append(argIdx++).append('}');
+                } else {
+                    // \{} — escaped placeholder, emit literal {}
+                    sb.append(template, start, idx - 1);
+                    sb.append("{}");
+                }
+            } else {
+                // bare {} — real placeholder
+                sb.append(template, start, idx);
+                sb.append('{').append(argIdx++).append('}');
+            }
             start = idx + 2;
         }
         sb.append(template, start, template.length());

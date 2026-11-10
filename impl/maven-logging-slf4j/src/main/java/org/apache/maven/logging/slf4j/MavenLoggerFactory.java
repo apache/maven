@@ -53,17 +53,44 @@ public class MavenLoggerFactory implements ILoggerFactory {
 
     @Override
     public Logger getLogger(String name) {
+        // Fast path: if a logger is already cached by name alone (non-plugin case),
+        // return it without performing an expensive stack walk.
+        Logger cached = loggerMap.get(name);
+        if (cached != null) {
+            return cached;
+        }
+
         String pluginId = resolvePluginId();
         String cacheKey = pluginId != null ? name + "@" + pluginId : name;
         return loggerMap.computeIfAbsent(cacheKey, k -> new MavenSimpleLogger(name, pluginId));
     }
 
+    /** Sentinel value for classloaders that are not associated with any plugin. */
+    private static final String NO_PLUGIN = "\0";
+
+    private final ConcurrentMap<ClassLoader, String> classLoaderPluginIds = new ConcurrentHashMap<>();
+
     private String resolvePluginId() {
-        return STACK_WALKER.walk(frames -> frames.map(f ->
-                        LoggerManager.get().getPluginId(f.getDeclaringClass().getClassLoader()))
+        return STACK_WALKER.walk(frames -> frames.map(f -> {
+                    ClassLoader cl = f.getDeclaringClass().getClassLoader();
+                    return resolveClassLoaderPluginId(cl);
+                })
                 .filter(Objects::nonNull)
                 .findFirst()
                 .orElse(null));
+    }
+
+    private String resolveClassLoaderPluginId(ClassLoader cl) {
+        if (cl == null) {
+            return null;
+        }
+        String id = classLoaderPluginIds.get(cl);
+        if (id != null) {
+            return id == NO_PLUGIN ? null : id;
+        }
+        String resolved = LoggerManager.get().getPluginId(cl);
+        classLoaderPluginIds.put(cl, resolved != null ? resolved : NO_PLUGIN);
+        return resolved;
     }
 
     public void reconfigure() {

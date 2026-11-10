@@ -62,9 +62,13 @@ class MavenSystemLoggerTest {
     @Test
     void levelMapping() {
         MavenSystemLogger logger = new MavenSystemLogger("test");
-        // ALL and TRACE should be loggable (BufferingLoggerManager enables all levels)
-        assertTrue(logger.isLoggable(System.Logger.Level.ALL));
-        assertTrue(logger.isLoggable(System.Logger.Level.TRACE));
+        // Bootstrap manager defaults to WARN level, so TRACE/DEBUG/INFO are disabled
+        assertFalse(logger.isLoggable(System.Logger.Level.ALL));
+        assertFalse(logger.isLoggable(System.Logger.Level.TRACE));
+        assertFalse(logger.isLoggable(System.Logger.Level.DEBUG));
+        assertFalse(logger.isLoggable(System.Logger.Level.INFO));
+        // WARN and ERROR should be loggable
+        assertTrue(logger.isLoggable(System.Logger.Level.WARNING));
         assertTrue(logger.isLoggable(System.Logger.Level.ERROR));
         // OFF should never be loggable
         assertFalse(logger.isLoggable(System.Logger.Level.OFF));
@@ -94,7 +98,8 @@ class MavenSystemLoggerTest {
         LoggerManager.get().setLogSink(captureSink);
 
         MavenSystemLogger logger = new MavenSystemLogger("test.format");
-        logger.log(System.Logger.Level.INFO, (ResourceBundle) null, "Hello {0}, count={1}", "world", 42);
+        // Use WARN level since bootstrap manager defaults to WARN minimum
+        logger.log(System.Logger.Level.WARNING, (ResourceBundle) null, "Hello {0}, count={1}", "world", 42);
 
         assertEquals(1, events.size());
         LogEvent event = events.get(0);

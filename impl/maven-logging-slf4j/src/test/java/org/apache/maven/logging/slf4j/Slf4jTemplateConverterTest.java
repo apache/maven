@@ -89,4 +89,33 @@ class Slf4jTemplateConverterTest {
         assertEquals("Can't find {0}", Slf4jTemplateConverter.convert("Can't find {}"));
         assertEquals("It's {0} and {1}", Slf4jTemplateConverter.convert("It's {} and {}"));
     }
+
+    @Test
+    void escapedPlaceholderBecomesLiteralBraces() {
+        // SLF4J convention: \{} means literal {} (not a placeholder)
+        assertEquals(
+                "Value is {} not a placeholder", Slf4jTemplateConverter.convert("Value is \\{} not a placeholder"));
+    }
+
+    @Test
+    void escapedPlaceholderDoesNotConsumeArgIndex() {
+        // \{} should not advance the argument index
+        assertEquals("Literal {} then {0} param", Slf4jTemplateConverter.convert("Literal \\{} then {} param"));
+    }
+
+    @Test
+    void doubleBackslashBeforePlaceholder() {
+        // \\{} means literal backslash + real placeholder
+        assertEquals("path\\{0}", Slf4jTemplateConverter.convert("path\\\\{}"));
+    }
+
+    @Test
+    void mixedEscapedAndRegularPlaceholders() {
+        assertEquals("{0} literal {} and {1}", Slf4jTemplateConverter.convert("{} literal \\{} and {}"));
+    }
+
+    @Test
+    void escapedPlaceholderOnly() {
+        assertEquals("{}", Slf4jTemplateConverter.convert("\\{}"));
+    }
 }

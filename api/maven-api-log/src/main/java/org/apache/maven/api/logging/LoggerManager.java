@@ -173,11 +173,16 @@ public interface LoggerManager {
             LogSink sink = manager.getLogSink();
             if (sink != null) {
                 buffering.drainTo(sink);
-            } else {
+            } else if (!buffering.isEmpty()) {
                 // The new manager has no sink yet — bootstrap events cannot be forwarded.
                 // Emit a warning to stderr so the loss is not silent.
+                long dropped = buffering.droppedCount();
+                String dropMsg = dropped > 0
+                        ? " (" + dropped + " earlier events were already dropped due to buffer overflow)"
+                        : "";
                 System.err.println("[WARNING] LoggerManager installed without an active LogSink;"
-                        + " bootstrap log events accumulated before LogSink installation are discarded.");
+                        + " bootstrap log events accumulated before LogSink installation are discarded."
+                        + dropMsg);
             }
         }
     }
@@ -225,11 +230,16 @@ public interface LoggerManager {
                     LogSink sink = discovered.getLogSink();
                     if (sink != null) {
                         BOOTSTRAP.drainTo(sink);
-                    } else {
+                    } else if (!BOOTSTRAP.isEmpty()) {
                         // The discovered manager has no sink yet — bootstrap events cannot be forwarded.
                         // Emit a warning to stderr so the loss is not silent.
+                        long dropped = BOOTSTRAP.droppedCount();
+                        String dropMsg = dropped > 0
+                                ? " (" + dropped + " earlier events were already dropped due to buffer overflow)"
+                                : "";
                         System.err.println("[WARNING] ServiceLoader-discovered LoggerManager has no active LogSink;"
-                                + " bootstrap log events accumulated before LogSink installation are discarded.");
+                                + " bootstrap log events accumulated before LogSink installation are discarded."
+                                + dropMsg);
                     }
                     return discovered;
                 }

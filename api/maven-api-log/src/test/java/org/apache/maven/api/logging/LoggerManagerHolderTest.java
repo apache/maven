@@ -26,7 +26,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Tests for the {@link LoggerManager.Holder} bootstrap behaviour:
@@ -63,9 +65,10 @@ class LoggerManagerHolderTest {
 
     @Test
     void bootstrapBuffersEventsAndDrainsOnSet() {
-        // Enqueue an event into BOOTSTRAP before any real manager is installed
+        // Enqueue an event into BOOTSTRAP before any real manager is installed.
+        // Use warn() because the bootstrap manager defaults to WARN level.
         LoggerManager.Holder.instance = LoggerManager.Holder.BOOTSTRAP;
-        LoggerManager.Holder.BOOTSTRAP.getLogger("test").info("pre-install event");
+        LoggerManager.Holder.BOOTSTRAP.getLogger("test").warn("pre-install event");
 
         // Install a real manager with a sink — set() must drain the buffer
         List<LogEvent> received = new ArrayList<>();
@@ -87,5 +90,57 @@ class LoggerManagerHolderTest {
 
         assertEquals(1, captured.size());
         assertEquals("after discovery", captured.get(0).message());
+    }
+
+    @Test
+    void bootstrapDefaultLevelIsWarn() {
+        // BOOTSTRAP should only enable WARN and ERROR, not TRACE/DEBUG/INFO
+        LoggerManager.Holder.instance = LoggerManager.Holder.BOOTSTRAP;
+        BufferingLoggerManager bootstrap = LoggerManager.Holder.BOOTSTRAP;
+
+        assertFalse(bootstrap.isLevelEnabled("test", LogLevel.TRACE));
+        assertFalse(bootstrap.isLevelEnabled("test", LogLevel.DEBUG));
+        assertFalse(bootstrap.isLevelEnabled("test", LogLevel.INFO));
+        assertTrue(bootstrap.isLevelEnabled("test", LogLevel.WARN));
+        assertTrue(bootstrap.isLevelEnabled("test", LogLevel.ERROR));
+    }
+
+    @Test
+    void bootstrapInfoEventsAreFilteredOut() {
+        // Events below WARN should not be buffered
+        LoggerManager.Holder.instance = LoggerManager.Holder.BOOTSTRAP;
+
+        LoggerManager.Holder.BOOTSTRAP.getLogger("test").info("should be filtered");
+        LoggerManager.Holder.BOOTSTRAP.getLogger("test").debug("also filtered");
+        LoggerManager.Holder.BOOTSTRAP.getLogger("test").warn("should pass");
+
+        List<LogEvent> received = new ArrayList<>();
+        BufferingLoggerManager real = new BufferingLoggerManager();
+        real.setLogSink(received::add);
+        LoggerManager.set(real);
+
+        assertEquals(1, received.size(), "only WARN+ events should be buffered");
+        assertEquals("should pass", received.get(0).message());
+    }
+
+    @Test
+    void bootstrapBufferCapacityIsLimited() {
+        // Use a fresh instance to avoid droppedCount bleeding from other tests
+        BufferingLoggerManager mgr = new BufferingLoggerManager();
+        LoggerManager.Holder.instance = mgr;
+
+        // Fill buffer beyond capacity
+        for (int i = 0; i < BufferingLoggerManager.MAX_BUFFER_SIZE + 100; i++) {
+            mgr.getLogger("test").warn("event " + i);
+        }
+
+        // Drain and verify we got at most MAX_BUFFER_SIZE events
+        List<LogEvent> received = new ArrayList<>();
+        mgr.drainTo(received::add);
+        assertTrue(
+                received.size() <= BufferingLoggerManager.MAX_BUFFER_SIZE,
+                "buffer should not exceed max size, got " + received.size());
+        assertTrue(mgr.droppedCount() > 0, "some events should have been dropped");
+        assertEquals(100, mgr.droppedCount(), "expected 100 dropped events");
     }
 }

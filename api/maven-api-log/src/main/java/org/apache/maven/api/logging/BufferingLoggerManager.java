@@ -21,6 +21,7 @@ package org.apache.maven.api.logging;
 import java.time.Instant;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
@@ -28,16 +29,28 @@ import java.util.function.Supplier;
  * Bootstrap {@link LoggerManager} that buffers log events until the real
  * implementation is installed via {@link LoggerManager#set(LoggerManager)}.
  * <p>
- * All levels are enabled so that early log messages are never lost.
+ * Only {@link LogLevel#WARN WARN} and above are enabled by default to
+ * avoid buffering noisy debug/info output during bootstrap. The buffer
+ * is capped at {@value #MAX_BUFFER_SIZE} events; when exceeded, the oldest
+ * events are dropped and the count of dropped events is tracked.
+ * <p>
  * After the real manager is installed, any cached {@link BufferingLogger}
  * instances dynamically resolve the current manager for level checks
  * and sink dispatch, so they continue to work correctly.
  */
 final class BufferingLoggerManager implements LoggerManager {
 
+    /** Maximum number of events kept in the bootstrap buffer. */
+    static final int MAX_BUFFER_SIZE = 1000;
+
+    /** Default minimum level during the bootstrap phase. */
+    private static final LogLevel DEFAULT_LEVEL = LogLevel.WARN;
+
     private final ConcurrentLinkedQueue<LogEvent> buffer = new ConcurrentLinkedQueue<>();
     private final ConcurrentHashMap<String, Logger> loggers = new ConcurrentHashMap<>();
     private final AtomicLong sequence = new AtomicLong();
+    private final AtomicInteger bufferSize = new AtomicInteger();
+    private final AtomicLong droppedCount = new AtomicLong();
     private volatile LogSink customSink;
 
     @Override
@@ -48,7 +61,17 @@ final class BufferingLoggerManager implements LoggerManager {
     @Override
     public LogSink getLogSink() {
         LogSink s = customSink;
-        return s != null ? s : buffer::add;
+        return s != null ? s : this::bufferEvent;
+    }
+
+    private void bufferEvent(LogEvent event) {
+        buffer.add(event);
+        if (bufferSize.incrementAndGet() > MAX_BUFFER_SIZE) {
+            if (buffer.poll() != null) {
+                bufferSize.decrementAndGet();
+                droppedCount.incrementAndGet();
+            }
+        }
     }
 
     @Override
@@ -58,7 +81,7 @@ final class BufferingLoggerManager implements LoggerManager {
 
     @Override
     public boolean isLevelEnabled(String loggerName, LogLevel level) {
-        return true;
+        return level.ordinal() >= DEFAULT_LEVEL.ordinal();
     }
 
     @Override
@@ -75,8 +98,17 @@ final class BufferingLoggerManager implements LoggerManager {
     public void drainTo(LogSink sink) {
         LogEvent event;
         while ((event = buffer.poll()) != null) {
+            bufferSize.decrementAndGet();
             sink.accept(event);
         }
+    }
+
+    boolean isEmpty() {
+        return buffer.isEmpty();
+    }
+
+    long droppedCount() {
+        return droppedCount.get();
     }
 
     long nextSequence() {
