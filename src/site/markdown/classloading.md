@@ -159,16 +159,13 @@ This realm is created only when core extensions are configured or when
 `-Dmaven.ext.class.path` is specified. It aggregates:
 
 - Exported packages from all core extension realms
-- JARs from `-Dmaven.ext.class.path` (added directly to the realm)
+- JARs from `-Dmaven.ext.class.path` — their `META-INF/maven/extension.xml`
+  descriptors are read and declared exports honored
+  ([MNG-8112](https://issues.apache.org/jira/browse/MNG-8112))
 
 If created, this realm becomes the container realm in the Plexus/Sisu
 container. If no core extensions or ext classpath entries exist,
 `plexus.core` remains the container realm.
-
-> **Note:** As of Maven 4.2, JARs loaded via `-Dmaven.ext.class.path`
-> have their `META-INF/maven/extension.xml` descriptors read and their
-> declared exports honored. See
-> [MNG-8112](https://issues.apache.org/jira/browse/MNG-8112).
 
 ## Maven API Realm (`maven.api`)
 
