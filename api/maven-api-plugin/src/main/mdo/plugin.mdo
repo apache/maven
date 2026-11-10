@@ -218,7 +218,7 @@ under the License.
             {@code compile+runtime} (since Maven 3.0) or {@code runtime+system} (since Maven 3.0)
           </description>
         </field>
-        <field xsd.enumerations="compile,runtime,test,compile+runtime,runtime+system">
+        <field xsd.suggestions="compile,runtime,test,compile+runtime,runtime+system,main-compile,main-runtime,test-compile,test-runtime,true">
           <name>dependencyResolution</name>
           <version>2.0.0+</version>
           <type>String</type>
@@ -241,7 +241,7 @@ under the License.
             full dependency resolution might fail due to projects which haven't been built yet.
           </description>
         </field>
-        <field xsd.enumerations="compile,runtime,test,compile+runtime,runtime+system">
+        <field xsd.suggestions="compile,runtime,test,compile+runtime,runtime+system,main-compile,main-runtime,test-compile,test-runtime,true">
           <name>dependencyCollection</name>
           <version>2.0.0+</version>
           <type>String</type>

@@ -1266,7 +1266,7 @@
           <type>String</type>
           <required>false</required>
         </field>
-        <field xsd.enumerations="none,compile-only,compile,runtime,provided,test-only,test,test-runtime,system,import">
+        <field xsd.suggestions="none,compile-only,compile,runtime,provided,test-only,test,test-runtime,system,import">
           <name>scope</name>
           <version>4.0.0+</version>
           <description>
