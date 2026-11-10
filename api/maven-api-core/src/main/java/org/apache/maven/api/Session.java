@@ -210,6 +210,8 @@ public interface Session extends ProtoSession {
     /**
      * Registers a listener for execution events, repository events, or both.
      * Typed listeners receive only their event-specific callbacks. Legacy listeners receive execution events.
+     * Listeners implementing {@code org.apache.maven.api.spi.SpiService} are also auto-discovered during
+     * session initialization.
      * Registration is shared by Maven sessions using the same underlying repository system session.
      *
      * @param listener the listener to register
