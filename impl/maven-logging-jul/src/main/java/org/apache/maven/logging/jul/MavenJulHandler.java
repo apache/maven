@@ -18,7 +18,6 @@
  */
 package org.apache.maven.logging.jul;
 
-import java.text.MessageFormat;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
 import java.util.concurrent.atomic.AtomicLong;
@@ -123,7 +122,8 @@ public class MavenJulHandler extends Handler {
                 return;
             }
 
-            String message = formatMessage(record);
+            String messageTemplate = resolveTemplate(record);
+            Object[] messageArgs = record.getParameters();
             Throwable throwable = record.getThrown();
 
             String sourceClass = null;
@@ -143,7 +143,7 @@ public class MavenJulHandler extends Handler {
             LogEvent event = new DefaultLogEvent(
                     MonotonicClock.now(),
                     level,
-                    message,
+                    null,
                     loggerName,
                     throwable,
                     sourceClass,
@@ -155,8 +155,8 @@ public class MavenJulHandler extends Handler {
                     null,
                     pluginId,
                     null,
-                    null,
-                    (java.util.List<Object>) null);
+                    messageTemplate,
+                    messageArgs);
 
             sink.accept(event);
 
@@ -202,12 +202,11 @@ public class MavenJulHandler extends Handler {
         }
     }
 
-    private static String formatMessage(LogRecord record) {
+    private static String resolveTemplate(LogRecord record) {
         String message = record.getMessage();
         if (message == null) {
             return "";
         }
-
         ResourceBundle bundle = record.getResourceBundle();
         if (bundle != null) {
             try {
@@ -216,16 +215,6 @@ public class MavenJulHandler extends Handler {
                 // use raw message
             }
         }
-
-        Object[] params = record.getParameters();
-        if (params != null && params.length > 0) {
-            try {
-                message = MessageFormat.format(message, params);
-            } catch (IllegalArgumentException e) {
-                // use message as-is if formatting fails
-            }
-        }
-
         return message;
     }
 }
