@@ -18,140 +18,102 @@
  */
 package org.apache.maven.logging.slf4j;
 
-import java.io.PrintStream;
-import java.util.function.Consumer;
+import java.util.Arrays;
+import java.util.Map;
 
+import org.apache.maven.api.MonotonicClock;
+import org.apache.maven.api.logging.LogLevel;
 import org.apache.maven.api.logging.LogSink;
 import org.apache.maven.api.logging.LoggerManager;
-import org.apache.maven.api.services.MessageBuilder;
+import org.apache.maven.logging.impl.DefaultLogEvent;
 import org.apache.maven.logging.impl.DefaultLoggerManager;
-
-import static org.apache.maven.jline.MessageUtils.builder;
+import org.slf4j.Marker;
+import org.slf4j.event.Level;
+import org.slf4j.helpers.LegacyAbstractLogger;
+import org.slf4j.spi.LocationAwareLogger;
 
 /**
- * Logger for Maven, that support colorization of levels and stacktraces. This class implements 2 methods introduced in
- * slf4j-simple provider local copy.
+ * Thin SLF4J logger that dispatches events to the Maven unified logging API
+ * via {@link LoggerManager}. Level checks are delegated to
+ * {@link DefaultLoggerManager}; formatting is deferred to the {@link LogSink}.
  *
  * @since 3.5.0
  */
-public class MavenSimpleLogger extends MavenBaseLogger {
+public class MavenSimpleLogger extends LegacyAbstractLogger {
 
-    private String traceRenderedLevel;
-    private String debugRenderedLevel;
-    private String infoRenderedLevel;
-    private String warnRenderedLevel;
-    private String errorRenderedLevel;
-
-    public static final String DEFAULT_LOG_LEVEL_KEY = "org.slf4j.simpleLogger.defaultLogLevel";
+    private static final StackWalker STACK_WALKER = StackWalker.getInstance();
+    final String pluginId;
+    int currentLogLevel = LocationAwareLogger.INFO_INT;
 
     MavenSimpleLogger(String name) {
-        super(name);
+        this(name, null);
     }
 
     MavenSimpleLogger(String name, String pluginId) {
-        super(name, pluginId);
-    }
-
-    @Override
-    protected String renderLevel(int level) {
-        if (traceRenderedLevel == null) {
-            traceRenderedLevel = builder().trace("TRACE").build();
-            debugRenderedLevel = builder().debug("DEBUG").build();
-            infoRenderedLevel = builder().info("INFO").build();
-            warnRenderedLevel = builder().warning("WARNING").build();
-            errorRenderedLevel = builder().error("ERROR").build();
-        }
-        return switch (level) {
-            case LOG_LEVEL_TRACE -> traceRenderedLevel;
-            case LOG_LEVEL_DEBUG -> debugRenderedLevel;
-            case LOG_LEVEL_INFO -> infoRenderedLevel;
-            case LOG_LEVEL_WARN -> warnRenderedLevel;
-            default -> errorRenderedLevel;
-        };
-    }
-
-    @Override
-    protected void write(
-            int level,
-            String loggerName,
-            String messageTemplate,
-            Object[] messageArgs,
-            StringBuilder formattedBuf,
-            Throwable t) {
-        LogSink sink = LoggerManager.get().getLogSink();
-        if (sink != null) {
-            sink.accept(MavenSimpleLoggerUtils.toLogEvent(
-                    level, loggerName, messageTemplate, messageArgs, t, pluginId, formattedBuf.toString()));
-        } else {
-            super.write(formattedBuf, t);
+        this.name = name;
+        this.pluginId = pluginId;
+        LoggerManager mgr = LoggerManager.get();
+        if (mgr instanceof DefaultLoggerManager dlm) {
+            this.currentLogLevel = dlm.getLoggerLevel(name);
         }
     }
 
     @Override
-    protected void writeThrowable(Throwable t, PrintStream stream) {
-        writeThrowable(t, stream::println);
-    }
-
-    protected void writeThrowable(Throwable t, Consumer<String> stream) {
-        if (t == null) {
+    protected void handleNormalizedLoggingCall(
+            Level level, Marker marker, String messagePattern, Object[] arguments, Throwable throwable) {
+        int intLevel = level.toInt();
+        if (!isLevelEnabled(intLevel)) {
             return;
         }
-        MessageBuilder builder = builder().failure(t.getClass().getName());
-        if (t.getMessage() != null) {
-            builder.a(": ").failure(t.getMessage());
-        }
-        stream.accept(builder.toString());
 
-        printStackTrace(t, stream, "");
-    }
+        String mavenTemplate = Slf4jTemplateConverter.convert(messagePattern);
+        Object[] cleanArgs = throwable != null
+                        && arguments != null
+                        && arguments.length > 0
+                        && arguments[arguments.length - 1] == throwable
+                ? Arrays.copyOf(arguments, arguments.length - 1)
+                : arguments;
 
-    protected void printStackTrace(Throwable t, Consumer<String> stream, String prefix) {
-        MessageBuilder builder = builder();
-        for (StackTraceElement e : t.getStackTrace()) {
-            builder.a(prefix);
-            builder.a("    ");
-            builder.strong("at");
-            builder.a(" ");
-            builder.a(e.getClassName());
-            builder.a(".");
-            builder.a(e.getMethodName());
-            builder.a("(");
-            builder.strong(getLocation(e));
-            builder.a(")");
-            stream.accept(builder.toString());
-            builder.setLength(0);
-        }
-        for (Throwable se : t.getSuppressed()) {
-            writeThrowable(se, stream, "Suppressed", prefix + "    ");
-        }
-        Throwable cause = t.getCause();
-        if (cause != null && t != cause) {
-            writeThrowable(cause, stream, "Caused by", prefix);
-        }
-    }
+        LoggerManager mgr = LoggerManager.get();
+        LogSink sink = mgr.getLogSink();
+        if (sink != null) {
+            LogLevel logLevel = toLogLevel(intLevel);
+            DefaultLoggerManager dlm = mgr instanceof DefaultLoggerManager d ? d : null;
 
-    protected void writeThrowable(Throwable t, Consumer<String> stream, String caption, String prefix) {
-        MessageBuilder builder =
-                builder().a(prefix).strong(caption).a(": ").a(t.getClass().getName());
-        if (t.getMessage() != null) {
-            builder.a(": ").failure(t.getMessage());
-        }
-        stream.accept(builder.toString());
+            String sourceClass = null;
+            String sourceMethod = null;
+            if (sink.needsMetadata()) {
+                StackWalker.StackFrame caller = STACK_WALKER.walk(
+                        frames -> frames.dropWhile(f -> f.getClassName().startsWith("org.slf4j.")
+                                        || f.getClassName().startsWith("org.apache.maven.logging.slf4j."))
+                                .findFirst()
+                                .orElse(null));
+                if (caller != null) {
+                    sourceClass = caller.getClassName();
+                    sourceMethod = caller.getMethodName();
+                }
+            }
 
-        printStackTrace(t, stream, prefix);
-    }
-
-    protected String getLocation(final StackTraceElement e) {
-        assert e != null;
-
-        if (e.isNativeMethod()) {
-            return "Native Method";
-        } else if (e.getFileName() == null) {
-            return "Unknown Source";
-        } else if (e.getLineNumber() >= 0) {
-            return e.getFileName() + ":" + e.getLineNumber();
-        } else {
-            return e.getFileName();
+            sink.accept(new DefaultLogEvent(
+                    MonotonicClock.now(),
+                    logLevel,
+                    null,
+                    name,
+                    throwable,
+                    sourceClass,
+                    sourceMethod,
+                    Thread.currentThread().getId(),
+                    dlm != null ? dlm.nextSequenceNumber() : -1,
+                    Thread.currentThread().getName(),
+                    null,
+                    null,
+                    pluginId,
+                    Map.of(),
+                    mavenTemplate,
+                    cleanArgs != null ? Arrays.asList(cleanArgs) : null));
+            if (dlm != null) {
+                dlm.record(logLevel);
+            }
         }
     }
 
@@ -162,14 +124,53 @@ public class MavenSimpleLogger extends MavenBaseLogger {
         } else {
             this.currentLogLevel = defaultLogLevel;
         }
-        traceRenderedLevel = builder().trace("TRACE").build();
-        debugRenderedLevel = builder().debug("DEBUG").build();
-        infoRenderedLevel = builder().info("INFO").build();
-        warnRenderedLevel = builder().warning("WARNING").build();
-        errorRenderedLevel = builder().error("ERROR").build();
     }
 
     public void setLogLevel(int logLevel) {
         this.currentLogLevel = logLevel;
+    }
+
+    boolean isLevelEnabled(int logLevel) {
+        return logLevel >= currentLogLevel;
+    }
+
+    @Override
+    public boolean isTraceEnabled() {
+        return isLevelEnabled(LocationAwareLogger.TRACE_INT);
+    }
+
+    @Override
+    public boolean isDebugEnabled() {
+        return isLevelEnabled(LocationAwareLogger.DEBUG_INT);
+    }
+
+    @Override
+    public boolean isInfoEnabled() {
+        return isLevelEnabled(LocationAwareLogger.INFO_INT);
+    }
+
+    @Override
+    public boolean isWarnEnabled() {
+        return isLevelEnabled(LocationAwareLogger.WARN_INT);
+    }
+
+    @Override
+    public boolean isErrorEnabled() {
+        return isLevelEnabled(LocationAwareLogger.ERROR_INT);
+    }
+
+    @Override
+    protected String getFullyQualifiedCallerName() {
+        return null;
+    }
+
+    static LogLevel toLogLevel(int level) {
+        return switch (level) {
+            case LocationAwareLogger.TRACE_INT -> LogLevel.TRACE;
+            case LocationAwareLogger.DEBUG_INT -> LogLevel.DEBUG;
+            case LocationAwareLogger.INFO_INT -> LogLevel.INFO;
+            case LocationAwareLogger.WARN_INT -> LogLevel.WARN;
+            default -> LogLevel.ERROR;
+        };
     }
 }

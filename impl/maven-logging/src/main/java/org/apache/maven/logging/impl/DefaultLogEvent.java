@@ -19,7 +19,6 @@
 package org.apache.maven.logging.impl;
 
 import java.time.Instant;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -57,79 +56,6 @@ public final class DefaultLogEvent implements LogEvent {
     private final String renderedLine;
 
     private volatile String formattedMessage;
-
-    @SuppressWarnings("checkstyle:ParameterNumber")
-    public DefaultLogEvent(
-            Instant timestamp,
-            LogLevel level,
-            String message,
-            String loggerName,
-            Throwable throwable,
-            String sourceClassName,
-            String sourceMethodName,
-            long threadId,
-            long sequenceNumber,
-            String threadName,
-            String projectId,
-            String mojoId,
-            Map<String, Object> keyValues,
-            String messageTemplate,
-            Object[] messageArgs) {
-        this(
-                timestamp,
-                level,
-                message,
-                loggerName,
-                throwable,
-                sourceClassName,
-                sourceMethodName,
-                threadId,
-                sequenceNumber,
-                threadName,
-                projectId,
-                mojoId,
-                null,
-                keyValues,
-                messageTemplate,
-                messageArgs != null ? Collections.unmodifiableList(Arrays.asList(messageArgs)) : null);
-    }
-
-    @SuppressWarnings("checkstyle:ParameterNumber")
-    public DefaultLogEvent(
-            Instant timestamp,
-            LogLevel level,
-            String message,
-            String loggerName,
-            Throwable throwable,
-            String sourceClassName,
-            String sourceMethodName,
-            long threadId,
-            long sequenceNumber,
-            String threadName,
-            String projectId,
-            String mojoId,
-            String pluginId,
-            Map<String, Object> keyValues,
-            String messageTemplate,
-            Object[] messageArgs) {
-        this(
-                timestamp,
-                level,
-                message,
-                loggerName,
-                throwable,
-                sourceClassName,
-                sourceMethodName,
-                threadId,
-                sequenceNumber,
-                threadName,
-                projectId,
-                mojoId,
-                pluginId,
-                keyValues,
-                messageTemplate,
-                messageArgs != null ? Collections.unmodifiableList(Arrays.asList(messageArgs)) : null);
-    }
 
     @SuppressWarnings("checkstyle:ParameterNumber")
     public DefaultLogEvent(

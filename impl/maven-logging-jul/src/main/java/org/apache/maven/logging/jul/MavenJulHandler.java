@@ -18,9 +18,9 @@
  */
 package org.apache.maven.logging.jul;
 
+import java.util.Arrays;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -48,8 +48,6 @@ import org.apache.maven.logging.impl.DefaultLoggerManager;
  * @see #install()
  */
 public class MavenJulHandler extends Handler {
-
-    private static final AtomicLong SEQUENCE = new AtomicLong();
 
     /**
      * Re-entrancy guard: set to {@code true} while {@link #publish} is routing
@@ -149,14 +147,14 @@ public class MavenJulHandler extends Handler {
                     sourceClass,
                     sourceMethod,
                     threadId,
-                    SEQUENCE.getAndIncrement(),
+                    mgr instanceof DefaultLoggerManager dlm ? dlm.nextSequenceNumber() : -1,
                     threadName,
                     null,
                     null,
                     pluginId,
                     null,
                     messageTemplate,
-                    messageArgs);
+                    messageArgs != null ? Arrays.asList(messageArgs) : null);
 
             sink.accept(event);
 

@@ -21,14 +21,7 @@ module org.apache.maven.logging.slf4j {
     requires org.apache.maven.logging;
     requires org.apache.maven.api;
     requires org.apache.maven.api.logging;
-    requires org.apache.maven.jline;
     requires org.slf4j;
-
-    exports org.apache.maven.logging.slf4j to
-            org.apache.maven.logging.jul,
-            org.apache.maven.core,
-            org.apache.maven.cling,
-            org.apache.maven.embedder;
 
     provides org.slf4j.spi.SLF4JServiceProvider with
             org.apache.maven.logging.slf4j.MavenServiceProvider;

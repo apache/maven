@@ -49,22 +49,13 @@ public class MavenLoggerFactory implements ILoggerFactory {
             LoggerManager.set(logManager);
         }
         logManager.addReconfigurationListener(this::updateExistingLoggers);
-        MavenSimpleLogger.lazyInit();
     }
 
-    /**
-     * Return an appropriate {@link Logger} instance by name.
-     * <p>
-     * Uses {@link StackWalker} to identify whether the caller belongs to a
-     * plugin classloader. When it does, the logger is keyed by
-     * {@code name + "@" + pluginId} so that each plugin gets its own logger
-     * instance with the correct plugin attribution.
-     */
     @Override
     public Logger getLogger(String name) {
         String pluginId = resolvePluginId();
         String cacheKey = pluginId != null ? name + "@" + pluginId : name;
-        return loggerMap.computeIfAbsent(cacheKey, k -> new MavenFailOnSeverityLogger(name, pluginId));
+        return loggerMap.computeIfAbsent(cacheKey, k -> new MavenSimpleLogger(name, pluginId));
     }
 
     private String resolvePluginId() {
@@ -76,13 +67,10 @@ public class MavenLoggerFactory implements ILoggerFactory {
     }
 
     public void reconfigure() {
-        // Calling LoggerManager.reconfigure() will fire the reconfigurationListener,
-        // which calls updateExistingLoggers() — no need to call it here explicitly.
         LoggerManager.get().reconfigure();
     }
 
     private void updateExistingLoggers() {
-        MavenBaseLogger.init();
         loggerMap.values().forEach(l -> {
             if (l instanceof MavenSimpleLogger msl) {
                 msl.configure(logManager.getDefaultLogLevel());

@@ -114,7 +114,7 @@ class ProjectBuildLogAppenderTest {
                 "mojo-a", // matches ThreadLocal
                 null,
                 null,
-                (Object[]) null);
+                null);
 
         try (ProjectBuildLogAppender appender = new ProjectBuildLogAppender(listener)) {
             LoggerManager.get().getLogSink().accept(original);

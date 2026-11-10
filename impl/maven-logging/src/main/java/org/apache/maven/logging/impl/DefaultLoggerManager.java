@@ -27,6 +27,7 @@ import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.Constants;
@@ -64,6 +65,8 @@ public class DefaultLoggerManager implements LoggerManager {
     public static final int LOG_LEVEL_WARN = 30;
     public static final int LOG_LEVEL_ERROR = 40;
     public static final int LOG_LEVEL_OFF = 50;
+
+    private static final AtomicLong SEQUENCE = new AtomicLong();
 
     private volatile LogSink logSink;
     private volatile int defaultLogLevel = LOG_LEVEL_INFO;
@@ -190,6 +193,10 @@ public class DefaultLoggerManager implements LoggerManager {
     public boolean hasReached(LogLevel level) {
         LogLevel reached = maxReached.get();
         return reached != null && reached.ordinal() >= level.ordinal();
+    }
+
+    public long nextSequenceNumber() {
+        return SEQUENCE.getAndIncrement();
     }
 
     public void record(LogLevel level) {

@@ -617,14 +617,6 @@ public class MavenCli {
                 // Ignore
                 //
             }
-        } else {
-            // Logging caches System.out, so wait for terminal installation to complete before
-            // activating, except when color is explicitly forced. With forced color the user expects
-            // raw ANSI to flow through the original stdout; waiting causes AnsiConsole to wrap that
-            // stream before the logger caches it, which may strip the escape codes.
-            if (!"always".equals(styleColor) && !"yes".equals(styleColor) && !"force".equals(styleColor)) {
-                MessageUtils.awaitTerminalInitialization();
-            }
         }
 
         LoggerManager.get().reconfigure();

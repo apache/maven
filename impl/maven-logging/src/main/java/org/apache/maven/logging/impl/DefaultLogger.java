@@ -20,8 +20,8 @@ package org.apache.maven.logging.impl;
 
 import java.lang.StackWalker.StackFrame;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.MonotonicClock;
@@ -52,8 +52,6 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
     private static final StackWalker WALKER = StackWalker.getInstance();
     private static final String THIS_CLASS = DefaultLogger.class.getName();
     private static final String BUILDER_CLASS = DefaultLogEventBuilder.class.getName();
-
-    private static final AtomicLong SEQUENCE = new AtomicLong();
 
     private final String name;
     private final String projectId;
@@ -171,7 +169,7 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
         }
 
         Instant timestamp = MonotonicClock.now();
-        long seq = SEQUENCE.getAndIncrement();
+        long seq = mgr instanceof DefaultLoggerManager dlm2 ? dlm2.nextSequenceNumber() : -1;
 
         String sourceClass = null;
         String sourceMethod = null;
@@ -201,7 +199,7 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
                 pluginId,
                 keyValues,
                 messageTemplate,
-                messageArgs);
+                messageArgs != null ? Arrays.asList(messageArgs) : null);
 
         sink.accept(event);
 
