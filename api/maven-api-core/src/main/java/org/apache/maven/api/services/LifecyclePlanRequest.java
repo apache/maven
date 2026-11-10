@@ -34,12 +34,29 @@ import static java.util.Objects.requireNonNull;
 /**
  * A request to calculate a lifecycle plan for one project.
  *
- * <p>Tasks can be lifecycle phase names (e.g. {@code "compile"}, {@code "verify"})
- * or fully qualified plugin goals (e.g.
- * {@code "org.apache.maven.plugins:maven-compiler-plugin:compile"}).
+ * <p>Each task in the {@link #tasks()} list is either a <strong>lifecycle phase</strong> or a
+ * <strong>plugin goal</strong>. Any task containing {@code ':'} is parsed as a goal;
+ * everything else is treated as a lifecycle phase name.
+ *
+ * <h2>Lifecycle phases</h2>
+ * Phase names correspond to the phases defined in a {@link org.apache.maven.api.Lifecycle},
+ * such as those declared in {@link org.apache.maven.api.Lifecycle.Phase}:
+ * {@code "compile"}, {@code "test"}, {@code "verify"}, {@code "install"}, etc.
+ * Requesting a phase causes all preceding phases in the lifecycle to execute as well.
+ *
+ * <h2>Plugin goals</h2>
+ * Goals can be specified in several formats:
+ * <ul>
+ *   <li>{@code groupId:artifactId:version:goal} — fully qualified with version</li>
+ *   <li>{@code groupId:artifactId:goal} — version resolved from the project or plugin management</li>
+ *   <li>{@code prefix:goal} — resolved via plugin prefix mapping (e.g. {@code "compiler:compile"})</li>
+ * </ul>
+ * An optional {@code @executionId} suffix (e.g. {@code "prefix:goal@myExecution"}) selects
+ * a specific plugin execution configuration from the POM.
  *
  * @since 4.2.0
  * @see LifecycleExecutor#plan(LifecyclePlanRequest)
+ * @see org.apache.maven.api.Lifecycle.Phase
  */
 @Experimental
 @Immutable
