@@ -29,7 +29,6 @@ import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.ProjectManager;
 import org.apache.maven.api.spi.LifecycleParticipant;
-import org.apache.maven.api.spi.ProjectExecutionEvent;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
@@ -133,28 +132,6 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
         public void afterProjectsRead(Session session) {
             CALLBACKS.add("afterProjectsRead:" + session.getProjects().size());
         }
-
-        @Override
-        public void beforeProjectExecution(ProjectExecutionEvent event) {
-            CALLBACKS.add("before:" + event.project().artifactId() + ':' + goal(event));
-        }
-
-        @Override
-        public void afterProjectExecution(ProjectExecutionEvent event) {
-            CALLBACKS.add("after:" + event.project().artifactId() + ':' + goal(event) + ':'
-                    + event.failure().isEmpty());
-        }
-
-        @Override
-        public void afterSessionEnd(Session session) {
-            CALLBACKS.add("afterSessionEnd");
-        }
-
-        private String goal(ProjectExecutionEvent event) {
-            return event.executionPlan().isEmpty()
-                    ? "(no plan)"
-                    : event.executionPlan().get(0).goal();
-        }
     }
 
     @Override
@@ -225,9 +202,7 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
         MavenExecutionResult result = maven.execute(request);
 
         assertFalse(result.hasExceptions(), result.getExceptions().toString());
-        assertEquals(
-                List.of("afterProjectsRead:1", "before:simple:it", "after:simple:it:true", "afterSessionEnd"),
-                RecordingLifecycleParticipant.CALLBACKS);
+        assertEquals(List.of("afterProjectsRead:1"), RecordingLifecycleParticipant.CALLBACKS);
     }
 
     private <T> List<String> getReactorOrder(String testProject, Class<T> participant) throws Exception {

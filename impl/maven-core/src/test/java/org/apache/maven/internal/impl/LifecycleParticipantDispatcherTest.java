@@ -55,7 +55,7 @@ class LifecycleParticipantDispatcherTest {
                         participant("third", callbacks, null)));
 
         MavenExecutionException exception = assertThrows(
-                MavenExecutionException.class, () -> LifecycleParticipantDispatcher.afterSessionEnd(mavenSession));
+                MavenExecutionException.class, () -> LifecycleParticipantDispatcher.afterProjectsRead(mavenSession));
 
         assertEquals(List.of("first", "second", "third"), callbacks);
         assertSame(firstFailure, exception.getCause());
@@ -66,7 +66,7 @@ class LifecycleParticipantDispatcherTest {
             String name, List<String> callbacks, LifecycleParticipantException failure) {
         return new LifecycleParticipant() {
             @Override
-            public void afterSessionEnd(Session session) throws LifecycleParticipantException {
+            public void afterProjectsRead(Session session) throws LifecycleParticipantException {
                 callbacks.add(name);
                 if (failure != null) {
                     throw failure;

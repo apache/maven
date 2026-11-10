@@ -369,24 +369,7 @@ public class DefaultMaven implements Maven {
     }
 
     private void afterSessionEnd(MavenSession session) throws MavenExecutionException {
-        MavenExecutionException failure = null;
-        try {
-            callListeners(session, AbstractMavenLifecycleParticipant::afterSessionEnd);
-        } catch (MavenExecutionException e) {
-            failure = e;
-        }
-        try {
-            LifecycleParticipantDispatcher.afterSessionEnd(session);
-        } catch (MavenExecutionException e) {
-            if (failure == null) {
-                failure = e;
-            } else {
-                failure.addSuppressed(e);
-            }
-        }
-        if (failure != null) {
-            throw failure;
-        }
+        callListeners(session, AbstractMavenLifecycleParticipant::afterSessionEnd);
     }
 
     @FunctionalInterface

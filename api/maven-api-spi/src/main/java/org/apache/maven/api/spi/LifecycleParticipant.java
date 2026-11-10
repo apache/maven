@@ -25,11 +25,12 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.ThreadSafe;
 
 /**
- * Allows build extensions to participate in the Maven build lifecycle.
+ * Allows build extensions to participate in the Maven build lifecycle after all reactor
+ * projects have been read. This is the v4 API equivalent of
+ * {@code AbstractMavenLifecycleParticipant.afterProjectsRead()}.
  * <p>
- * The same participant instance may be called concurrently for different projects during a parallel build.
- * Implementations must therefore be thread-safe and must use the project supplied by the callback instead of
- * relying on mutable session-scoped current-project state.
+ * Extensions may update project state through services such as
+ * {@link org.apache.maven.api.services.ProjectManager}.
  *
  * @since 4.1.0
  */
@@ -47,28 +48,4 @@ public interface LifecycleParticipant extends SpiService {
      * @throws LifecycleParticipantException if the build cannot continue
      */
     default void afterProjectsRead(@Nonnull Session session) throws LifecycleParticipantException {}
-
-    /**
-     * Invoked immediately before execution starts for a project, after its execution plan has been calculated.
-     *
-     * @param event the project, session, and immutable execution plan
-     * @throws LifecycleParticipantException if the project build cannot continue
-     */
-    default void beforeProjectExecution(@Nonnull ProjectExecutionEvent event) throws LifecycleParticipantException {}
-
-    /**
-     * Invoked after project execution finishes, successfully or with a failure.
-     *
-     * @param event the project, session, execution plan, and optional failure
-     * @throws LifecycleParticipantException if the build cannot continue
-     */
-    default void afterProjectExecution(@Nonnull ProjectExecutionEvent event) throws LifecycleParticipantException {}
-
-    /**
-     * Invoked when the build session ends. This callback is intended for cleanup of resources owned by the extension.
-     *
-     * @param session the build session
-     * @throws LifecycleParticipantException if cleanup fails
-     */
-    default void afterSessionEnd(@Nonnull Session session) throws LifecycleParticipantException {}
 }
