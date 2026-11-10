@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.impl;
 
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -25,8 +26,10 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link DefaultMojoExecution} immutable snapshot semantics.
@@ -76,6 +79,7 @@ class DefaultMojoExecutionTest {
     @Test
     void cliInvocationPathExecutionIdAndLifecyclePhaseAreEmpty() {
         InternalMavenSession session = mock(InternalMavenSession.class);
+        when(session.getService(Lookup.class)).thenReturn(mock(Lookup.class));
         MojoExecution delegate = cliExecution("help");
 
         org.apache.maven.api.MojoExecution snapshot = new DefaultMojoExecution(session, delegate);
@@ -85,11 +89,13 @@ class DefaultMojoExecutionTest {
         assertFalse(snapshot.lifecyclePhase().isPresent(), "lifecyclePhase should be empty for CLI invocation");
         assertFalse(snapshot.model().isPresent(), "model should be empty when no plugin in model");
         assertFalse(snapshot.configuration().isPresent(), "configuration should be empty when not set");
+        assertNotNull(snapshot.plugin().getRealm().classLoader());
     }
 
     @Test
     void lifecycleBoundExecutionExecutionIdAndLifecyclePhasePresentAndImmutable() {
         InternalMavenSession session = mock(InternalMavenSession.class);
+        when(session.getService(Lookup.class)).thenReturn(mock(Lookup.class));
         MojoExecution delegate = lifecycleExecution("compile", "default-compile", "compile");
 
         org.apache.maven.api.MojoExecution snapshot = new DefaultMojoExecution(session, delegate);
@@ -108,6 +114,7 @@ class DefaultMojoExecutionTest {
     @Test
     void snapshotDescriptorMatchesLegacyDescriptor() {
         InternalMavenSession session = mock(InternalMavenSession.class);
+        when(session.getService(Lookup.class)).thenReturn(mock(Lookup.class));
         MojoExecution delegate = cliExecution("clean");
 
         org.apache.maven.api.MojoExecution snapshot = new DefaultMojoExecution(session, delegate);

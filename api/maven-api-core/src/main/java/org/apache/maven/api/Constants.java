@@ -636,6 +636,20 @@ public final class Constants {
     public static final String MAVEN_BUILDER_MAX_PROBLEMS = "maven.builder.maxProblems";
 
     /**
+     * Enables diagnostic output for Maven's native dependency injection registry.
+     * When set, Maven prints a sorted snapshot of all DI bindings to stdout at discovery and
+     * lookup checkpoints, without creating components or invoking providers.
+     * Accepted values: {@code true} or empty string (dump every binding),
+     * {@code ambiguous} (dump only keys with more than one candidate),
+     * any other value or unset (diagnostics disabled, the default).
+     * Example: {@code mvn validate -Dmaven.di.debug=ambiguous}
+     *
+     * @since 4.2.0
+     */
+    @Config(source = Config.Source.SYSTEM_PROPERTIES)
+    public static final String MAVEN_DI_DEBUG = "maven.di.debug";
+
+    /**
      * Configuration property for version range resolution used metadata "nature".
      * It may contain following string values:
      * <ul>
@@ -887,6 +901,16 @@ public final class Constants {
      */
     @Config(type = "java.lang.Boolean", defaultValue = "false", source = Config.Source.SYSTEM_PROPERTIES)
     public static final String MAVEN_TEMPFILE_KEEP = "maven.tempfile.keep";
+
+    /**
+     * Comma-separated list of mojo execution filter predicates. Matching executions are skipped at runtime.
+     * Supported forms: {@code *}, {@code :A}, {@code G:A}, {@code G:A:v:g[@e]}, {@code P}, {@code P:v:g},
+     * {@code P:v:g@e}, {@code phase(name)}.
+     *
+     * @since 4.2.0
+     */
+    @Config
+    public static final String MAVEN_LIFECYCLE_FILTER = "maven.lifecycle.filter";
 
     /**
      * System property to disable the {@code site} lifecycle.

@@ -2016,8 +2016,9 @@ public class DefaultModelBuilder implements ModelBuilder {
                             .distributionManagement(interpolateRepository(model.getDistributionManagement(), callback))
                             .build();
                     // Override model properties with user properties (use request properties
-                    // to ensure consistency with model interpolation)
-                    Map<String, String> userProps = request.getUserProperties();
+                    // to ensure consistency with model interpolation, except for a consumer
+                    // build, see overridingUserProperties())
+                    Map<String, String> userProps = overridingUserProperties();
                     Map<String, String> newProps = merge(model.getProperties(), userProps);
                     if (newProps != null) {
                         model = model.withProperties(newProps);
@@ -2138,6 +2139,28 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
             }
             return result != null ? result : profiles;
+        }
+
+        /**
+         * Returns the user properties that override the properties declared in the model, in the
+         * main block and in every profile.
+         * <p>
+         * A {@link ModelBuilderRequest.RequestType#BUILD_CONSUMER} request carries, besides the
+         * session's user properties, the properties of the profiles that were active when the
+         * project was built (see {@code DefaultConsumerPomBuilder}). They let the coordinates those
+         * profiles supply interpolate and validate (MNG-8709), but they describe the producer's
+         * environment: the consumer re-evaluates the profile activation itself, so only the
+         * properties the user actually passed may be written into the consumer POM (GH-13761).
+         * Every other build request overrides with the request's user properties, which the
+         * caller may have tailored on purpose.
+         *
+         * @return the user properties to apply over the declared model properties
+         */
+        Map<String, String> overridingUserProperties() {
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_CONSUMER) {
+                return request.getSession().getUserProperties();
+            }
+            return request.getUserProperties();
         }
 
         /**
@@ -2508,8 +2531,20 @@ public class DefaultModelBuilder implements ModelBuilder {
                             }
                             recording = context.start();
                             model = readRawModel();
+                            Model parentResolutionModel = model;
+                            if (model.getProfiles().stream()
+                                    .anyMatch(p -> !p.getRepositories().isEmpty())) {
+                                // Parent lookup needs profile repositories before assembling the ancestry.
+                                // Keep final profile injection after inheritance, using the child's context.
+                                DefaultProfileActivationContext activation = recording.start(model.getProperties());
+                                List<Profile> profiles = getActiveProfiles(model.getProfiles(), activation);
+                                replayRecordIntoContext(activation.stop(), recording, false);
+                                parentResolutionModel = profileInjector.injectProfiles(
+                                        model, profiles, request, ModelBuilderSessionState.this);
+                            }
                             phase = ParentModelPhase.PARENT;
-                            return new ParentResolutionFrame(model, model.getParent(), recording, chain, true, false);
+                            return new ParentResolutionFrame(
+                                    parentResolutionModel, model.getParent(), recording, chain, true, false);
                         }
                     }
                     case PARENT -> {

@@ -64,7 +64,7 @@ public interface Artifact {
      * @see ArtifactCoordinates#getGroupId()
      * @deprecated Use {@link #groupId()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default String getGroupId() {
         return groupId();
@@ -84,7 +84,7 @@ public interface Artifact {
      * @see ArtifactCoordinates#getArtifactId()
      * @deprecated Use {@link #artifactId()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default String getArtifactId() {
         return artifactId();
@@ -112,7 +112,7 @@ public interface Artifact {
      * @see ArtifactCoordinates#getVersionConstraint()
      * @deprecated Use {@link #version()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Version getVersion() {
         return version();
@@ -135,7 +135,7 @@ public interface Artifact {
      *
      * @deprecated Use {@link #baseVersion()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Version getBaseVersion() {
         return baseVersion();
@@ -157,7 +157,7 @@ public interface Artifact {
      * @see ArtifactCoordinates#getClassifier()
      * @deprecated Use {@link #classifier()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default String getClassifier() {
         return classifier();
@@ -181,7 +181,7 @@ public interface Artifact {
      * @see ArtifactCoordinates#getExtension()
      * @deprecated Use {@link #extension()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default String getExtension() {
         return extension();

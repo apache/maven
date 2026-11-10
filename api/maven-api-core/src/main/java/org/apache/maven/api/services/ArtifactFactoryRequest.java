@@ -30,7 +30,7 @@ import org.apache.maven.api.annotations.Nullable;
 import static java.util.Objects.requireNonNull;
 
 /**
- *
+ * Request for creating an {@link org.apache.maven.api.Artifact} from individual coordinate components.
  *
  * @since 4.0.0
  */
@@ -38,18 +38,34 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface ArtifactFactoryRequest extends Request<Session> {
 
+    /** @return the group identifier */
     String getGroupId();
 
+    /** @return the artifact identifier */
     String getArtifactId();
 
+    /** @return the version */
     String getVersion();
 
+    /** @return the classifier, may be {@code null} */
     String getClassifier();
 
+    /** @return the file extension, may be {@code null} */
     String getExtension();
 
+    /** @return the artifact type, may be {@code null} */
     String getType();
 
+    /**
+     * Builds a request from individual components.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param extension the file extension
+     * @return a new request
+     */
     static ArtifactFactoryRequest build(
             Session session, String groupId, String artifactId, String version, String extension) {
         return ArtifactFactoryRequest.builder()
@@ -61,6 +77,18 @@ public interface ArtifactFactoryRequest extends Request<Session> {
                 .build();
     }
 
+    /**
+     * Builds a request from individual components including classifier and type.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param classifier the classifier
+     * @param extension the file extension
+     * @param type the artifact type
+     * @return a new request
+     */
     static ArtifactFactoryRequest build(
             Session session,
             String groupId,
@@ -80,6 +108,7 @@ public interface ArtifactFactoryRequest extends Request<Session> {
                 .build();
     }
 
+    /** @return a new builder instance */
     static ArtifactFactoryRequestBuilder builder() {
         return new ArtifactFactoryRequestBuilder();
     }

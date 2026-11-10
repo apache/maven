@@ -69,7 +69,11 @@ public class CLIManager {
 
     public static final char NON_RECURSIVE = 'N';
 
-    public static final char UPDATE_SNAPSHOTS = 'U';
+    public static final char UPDATE_ALL = 'U';
+
+    /** @deprecated Use {@link #UPDATE_ALL} instead. */
+    @Deprecated
+    public static final char UPDATE_SNAPSHOTS = UPDATE_ALL;
 
     public static final char ACTIVATE_PROFILES = 'P';
 
@@ -191,10 +195,25 @@ public class CLIManager {
                 .desc(
                         "Do not recurse into sub-projects. When used together with -pl, do not recurse into sub-projects of selected aggregators")
                 .build());
-        options.addOption(Option.builder(Character.toString(UPDATE_SNAPSHOTS))
-                .longOpt("update-snapshots")
-                .desc("Forces a check for missing releases and updated snapshots on remote repositories")
+
+        // -U is the short form of --update-all.
+        options.addOption(Option.builder(Character.toString(UPDATE_ALL))
+                .longOpt("update-all")
+                .desc(
+                        "Shortcut for --update-metadata --update-artifacts: forces updates of metadata and artifacts on remote repositories")
                 .build());
+
+        // Keep the old option as a deprecated alias for backwards compatibility.
+        options.addOption(Option.builder()
+                .longOpt("update-snapshots")
+                .desc("<deprecated> Use -U,--update-all instead.")
+                .deprecated(DeprecatedAttributes.builder()
+                        .setForRemoval(true)
+                        .setSince("4.2.0")
+                        .setDescription("Use -U,--update-all instead.")
+                        .get())
+                .build());
+
         options.addOption(Option.builder(Character.toString(ACTIVATE_PROFILES))
                 .longOpt("activate-profiles")
                 .desc(

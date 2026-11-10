@@ -29,7 +29,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Provides;
@@ -92,6 +94,108 @@ class ParentTraversalTest {
         assertEquals("root", inactive.getProperties().get("inherited"));
         assertEquals("active", model.getProperties().get("profile-property"));
         assertEquals(Set.of("caller"), chain);
+    }
+
+    @Test
+    void testParentProfileRepositoryIsAvailableBeforeAncestorResolution(@TempDir Path directory) throws Exception {
+        Path pom = parentWithRepositoryProfiles(
+                directory,
+                repositoryProfile(
+                        "test-profile",
+                        "",
+                        "<properties><repo.url>file:///profile-repository</repo.url></properties>"));
+        AtomicInteger resolutions = repositoryResolver(directory, Map.of("test-profile", "file:///profile-repository"));
+        var state = builder.new ModelBuilderSessionState(ModelBuilderRequest.builder()
+                .session(session)
+                .source(Sources.buildSource(pom))
+                .requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)
+                .activeProfileIds(List.of("test-profile"))
+                .build());
+        var activation = context(List.of("test-profile"), List.of()).start();
+        Model model = state.readAsParentModel(activation, new LinkedHashSet<>());
+        assertEquals("file:///profile-repository", model.getProperties().get("repo.url"));
+        assertEquals(Boolean.TRUE, activation.stop().usedActiveProfiles.get("test-profile"));
+        assertEquals(1, resolutions.get());
+        assertSame(model, state.readAsParentModel(context(List.of("test-profile"), List.of()), new LinkedHashSet<>()));
+        assertEquals(1, resolutions.get(), "A matching activation context should reuse the assembled parent");
+    }
+
+    @Test
+    void testExternalParentRepositoryProfilesRemainSandboxed(@TempDir Path directory) throws Exception {
+        String profiles = repositoryProfile("test-jdk", "<jdk>[1,)</jdk>", "")
+                + repositoryProfile("test-user", "<property><name>enable.repo</name></property>", "")
+                + repositoryProfile("test-file", "<file><exists>${some.dir}</exists></file>", "")
+                + repositoryProfile("test-missing", "<file><missing>missing-file</missing></file>", "")
+                + repositoryProfile("test-condition", "<condition>missing('missing-file')</condition>", "");
+        Path pom = parentWithRepositoryProfiles(directory, profiles);
+        AtomicInteger resolutions = repositoryResolver(directory, Map.of("test-jdk", "file:///default-repository"));
+        Map<String, String> systemProperties =
+                Map.of("java.version", System.getProperty("java.version"), "some.dir", directory.toString());
+        Map<String, String> userProperties = Map.of("enable.repo", "true");
+        var state = builder.new ModelBuilderSessionState(ModelBuilderRequest.builder()
+                .session(session)
+                .source(Sources.resolvedSource(pom, "test:parent:1"))
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .systemProperties(systemProperties)
+                .userProperties(userProperties)
+                .build());
+        var activation = new DefaultProfileActivationContext(
+                session.getService(RootLocator.class),
+                session.getService(Interpolator.class),
+                List.of(),
+                List.of(),
+                systemProperties,
+                userProperties,
+                Model.newBuilder().pomFile(pom).build());
+        state.readAsParentModel(activation, new LinkedHashSet<>());
+        assertEquals(1, resolutions.get());
+    }
+
+    private AtomicInteger repositoryResolver(Path directory, Map<String, String> expectedRepositories) {
+        AtomicInteger resolutions = new AtomicInteger();
+        ModelResolver resolver = mock(ModelResolver.class);
+        when(resolver.resolveModel(any(ModelResolver.ModelResolverRequest.class)))
+                .thenAnswer(invocation -> {
+                    resolutions.incrementAndGet();
+                    ModelResolver.ModelResolverRequest request = invocation.getArgument(0);
+                    assertEquals(
+                            expectedRepositories,
+                            request.repositories().stream()
+                                    .filter(repository -> repository.id().startsWith("test-"))
+                                    .collect(Collectors.toMap(RemoteRepository::id, RemoteRepository::url)));
+                    return new ModelResolver.ModelResolverResult(
+                            request,
+                            Sources.resolvedSource(directory.resolve("ancestor.xml"), "test:ancestor:1"),
+                            null);
+                });
+        bindExternalResolver(resolver);
+        return resolutions;
+    }
+
+    private Path parentWithRepositoryProfiles(Path directory, String profiles) throws IOException {
+        Files.writeString(directory.resolve("ancestor.xml"), """
+                <project><modelVersion>4.0.0</modelVersion>
+                  <groupId>test</groupId><artifactId>ancestor</artifactId><version>1</version><packaging>pom</packaging>
+                </project>
+                """);
+        Path pom = directory.resolve("pom.xml");
+        Files.writeString(pom, """
+                <project xmlns="http://maven.apache.org/POM/4.1.0"><modelVersion>4.1.0</modelVersion>
+                  <parent><groupId>test</groupId><artifactId>ancestor</artifactId><version>1</version><relativePath/></parent>
+                  <groupId>test</groupId><artifactId>parent</artifactId><version>1</version><packaging>pom</packaging>
+                  <properties><repo.url>file:///default-repository</repo.url></properties>
+                  <profiles>%s</profiles>
+                </project>
+                """.formatted(profiles));
+        return pom;
+    }
+
+    private String repositoryProfile(String id, String activation, String properties) {
+        return """
+                <profile><id>%s</id><activation>%s</activation>%s
+                  <repositories><repository><id>%s</id><url>${repo.url}</url></repository></repositories>
+                </profile>
+                """.formatted(id, activation, properties, id);
     }
 
     @Test

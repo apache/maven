@@ -55,9 +55,10 @@ public interface MavenOptions extends Options {
     Optional<Boolean> nonRecursive();
 
     /**
-     * Indicates whether Maven should force a check for updated snapshots on remote repositories.
+     * Indicates whether Maven should force a check for missing releases and updated snapshots on remote
+     * repositories. Release artifacts already present in the local repository are not re-downloaded.
      *
-     * @return an {@link Optional} containing true if snapshot updates should be forced, false if not, or empty if not specified
+     * @return an {@link Optional} containing true if update checks should be forced, false if not, or empty if not specified
      */
     @Nonnull
     Optional<Boolean> updateSnapshots();

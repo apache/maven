@@ -23,6 +23,8 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.settings.Settings;
 
 /**
+ * Result of building the effective Maven settings, providing access to the assembled
+ * {@link org.apache.maven.api.settings.Settings} and any problems encountered during the build.
  *
  * @since 4.0.0
  */
