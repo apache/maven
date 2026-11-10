@@ -724,8 +724,7 @@ public class BuildPlanExecutor {
                             .filter(executionStep -> executionStep.phase != null)
                             .forEach(executionStep -> executionStep.executions().forEach(execution -> {
                                 MojoDescriptor descriptor = execution.getMojoDescriptor();
-                                if (descriptor.getDependencyCollectionRequired() != null
-                                        || descriptor.getDependencyResolutionRequired() != null) {
+                                if (requiresDependencyOrdering(descriptor)) {
                                     for (MavenProject upstream :
                                             plan.getAllProjects().get(step.project)) {
                                         plan.step(upstream, AFTER + PACKAGE).ifPresent(executionStep::executeAfter);
