@@ -42,6 +42,8 @@ class MavenITmng7836AlternativePomSyntaxTest extends AbstractMavenIntegrationTes
         pluginVerifier.addCliArgument("clean");
         pluginVerifier.addCliArgument("install");
         pluginVerifier.addCliArgument("-V");
+        // The extension POM targets Java 8; sisu-maven-plugin:0.3.5 cannot process Java 17 class files
+        pluginVerifier.getSystemProperties().put("maven.compiler.release", "8");
         pluginVerifier.execute();
         pluginVerifier.verifyErrorFreeLog();
 

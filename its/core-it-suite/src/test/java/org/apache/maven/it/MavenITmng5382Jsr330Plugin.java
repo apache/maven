@@ -46,6 +46,8 @@ class MavenITmng5382Jsr330Plugin extends AbstractMavenIntegrationTestCase {
         v0.setAutoclean(false);
         v0.deleteDirectory("target");
         v0.deleteArtifacts("org.apache.maven.its.mng5382");
+        // maven-plugin-plugin:3.2 cannot process Java 17 class files; keep the fixture at Java 8
+        v0.getSystemProperties().put("maven.compiler.release", "8");
         v0.addCliArgument("install");
         v0.execute();
         v0.verifyErrorFreeLog();

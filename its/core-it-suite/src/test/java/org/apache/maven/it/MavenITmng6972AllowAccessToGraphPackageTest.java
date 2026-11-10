@@ -48,6 +48,8 @@ public class MavenITmng6972AllowAccessToGraphPackageTest extends AbstractMavenIn
 
         verifier = newVerifier(testDir.resolve("build-plugin"));
         verifier.getSystemProperties().put("maven.multiModuleProjectDirectory", testDir.toString());
+        // plexus-component-metadata:1.5.5 cannot process Java 17 class files; keep the fixture at Java 8
+        verifier.getSystemProperties().put("maven.compiler.release", "8");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
