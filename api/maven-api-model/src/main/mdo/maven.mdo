@@ -156,7 +156,7 @@
           <description>The current version of the artifact produced by this project.</description>
           <type>String</type>
         </field>
-        <field xsd.suggestions="jar,pom,war,ear,ejb,rar,par,maven-plugin">
+        <field xsd.suggestions="jar,pom,bom,war,ear,ejb,rar,par,maven-plugin">
           <name>packaging</name>
           <version>4.0.0+</version>
           <description>
@@ -1233,7 +1233,7 @@
           </description>
           <type>String</type>
         </field>
-        <field xsd.suggestions="jar,pom,war,ear,ejb,rar,par,ejb-client,test-jar,maven-plugin">
+        <field xsd.suggestions="pom,bom,jar,fatjar,classpath-jar,modular-jar,processor,classpath-processor,modular-processor,java-source,javadoc,maven-plugin,test-jar,test-java-source,war,ear,ejb,rar,par,ejb-client">
           <name>type</name>
           <version>4.0.0+</version>
           <description>
@@ -1266,7 +1266,7 @@
           <type>String</type>
           <required>false</required>
         </field>
-        <field xsd.enumerations="compile,provided,runtime,test,system,import">
+        <field xsd.enumerations="none,compile-only,compile,runtime,provided,test-only,test,test-runtime,system,import">
           <name>scope</name>
           <version>4.0.0+</version>
           <description>
@@ -2833,7 +2833,7 @@
           <description>The identifier of this execution for labelling the goals during the build,
             and for matching executions to merge during inheritance and profile injection.</description>
         </field>
-        <field xsd.suggestions="validate,initialize,generate-sources,process-sources,generate-resources,process-resources,compile,process-classes,generate-test-sources,process-test-sources,generate-test-resources,process-test-resources,test-compile,process-test-classes,test,prepare-package,package,pre-integration-test,integration-test,post-integration-test,verify,install,deploy,pre-clean,clean,post-clean,pre-site,site,post-site,site-deploy">
+        <field xsd.suggestions="all,each,build,initialize,validate,sources,resources,compile,ready,package,verify,unit-test,test-sources,test-resources,test-compile,test,integration-test,install,deploy,clean,before:,after:">
           <name>phase</name>
           <version>4.0.0+</version>
           <type>String</type>

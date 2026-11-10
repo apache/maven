@@ -179,7 +179,7 @@ under the License.
           <defaultValue>java</defaultValue>
           <description>The implementation language for this Mojo (java, beanshell, etc.).</description>
         </field>
-        <field xsd.suggestions="validate,initialize,generate-sources,process-sources,generate-resources,process-resources,compile,process-classes,generate-test-sources,process-test-sources,generate-test-resources,process-test-resources,test-compile,process-test-classes,test,prepare-package,package,pre-integration-test,integration-test,post-integration-test,verify,install,deploy,pre-clean,clean,post-clean,pre-site,site,post-site,site-deploy">
+        <field xsd.suggestions="all,each,build,initialize,validate,sources,resources,compile,ready,package,verify,unit-test,test-sources,test-resources,test-compile,test,integration-test,install,deploy,clean,before:,after:">
           <name>phase</name>
           <version>1.0.0+</version>
           <type>String</type>
