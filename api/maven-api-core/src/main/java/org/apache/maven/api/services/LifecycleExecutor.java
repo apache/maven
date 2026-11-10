@@ -51,6 +51,26 @@ import org.apache.maven.api.annotations.Nonnull;
  * {@link Session#executeLifecycle(LifecyclePlan)}) cover the common cases without
  * constructing request objects directly.
  *
+ * <h2>Example</h2>
+ * <pre>{@code
+ * // Plan the "resources" phase for a project
+ * LifecyclePlanResult planResult = session.planLifecycle(
+ *     project, List.of(Lifecycle.Phase.RESOURCES));
+ * LifecyclePlan plan = planResult.plan();
+ *
+ * // Inspect what would run
+ * for (MojoExecution mojo : plan.executions()) {
+ *     System.out.println(mojo.lifecyclePhase().orElse("") + " : " + mojo.goal());
+ * }
+ *
+ * // Execute the full plan
+ * LifecycleExecutionResult result = session.executeLifecycle(plan);
+ *
+ * // Or execute only specific mojos (e.g. skip resource copying)
+ * result = session.executeLifecycle(plan,
+ *     mojo -> !mojo.goal().equals("resources"));
+ * }</pre>
+ *
  * <h2>Scope and limitations</h2>
  * <ul>
  *   <li>This service operates on a <strong>single project</strong>. Reactor-level
