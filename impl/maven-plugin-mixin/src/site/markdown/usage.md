@@ -108,9 +108,9 @@ public class ListDepsMojo implements Mojo {
 }
 ```
 
-The processor emits a `<resolution>` element and infers
-`<dependencyResolution>main</dependencyResolution>` from the `@Resolution`
-fields (unless overridden by `@Mojo.dependencyResolutionPathScopes()`).
+The processor emits a `<resolution>` element in the plugin descriptor.
+The build planner uses these `<resolution>` entries directly to determine
+dependency ordering — no `<dependencyResolution>` inference is needed.
 
 ## Packaging note
 

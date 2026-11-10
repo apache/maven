@@ -187,6 +187,14 @@ public class BuildPlanExecutor {
         this.lifecycles = lifecycles;
     }
 
+    private static boolean requiresDependencyOrdering(MojoDescriptor descriptor) {
+        if (descriptor.isV4Api()) {
+            return !descriptor.getMojoDescriptorV4().getResolutions().isEmpty();
+        }
+        return descriptor.getDependencyCollectionRequired() != null
+                || descriptor.getDependencyResolutionRequired() != null;
+    }
+
     public void execute(MavenSession session, ReactorContext reactorContext, List<TaskSegment> taskSegments)
             throws ExecutionException, InterruptedException {
         try (BuildContext ctx = new BuildContext(session, reactorContext, taskSegments)) {
@@ -643,8 +651,7 @@ public class BuildPlanExecutor {
                                     MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());
                                     mojoExecution.setLifecyclePhase(phase);
                                     n.addMojo(mojoExecution, execution.getPriority());
-                                    if (mojoDescriptor.getDependencyCollectionRequired() != null
-                                            || mojoDescriptor.getDependencyResolutionRequired() != null) {
+                                    if (requiresDependencyOrdering(mojoDescriptor)) {
                                         for (MavenProject p :
                                                 plan.getAllProjects().get(project)) {
                                             plan.step(p, AFTER + PACKAGE)

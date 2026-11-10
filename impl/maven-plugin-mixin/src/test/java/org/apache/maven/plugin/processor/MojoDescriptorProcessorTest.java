@@ -571,11 +571,11 @@ class MojoDescriptorProcessorTest {
     }
 
     // -------------------------------------------------------------------------
-    // Test 12: @Resolution fields infer dependencyResolution
+    // Test 12: @Resolution fields appear in resolutions list (not dependencyResolution)
     // -------------------------------------------------------------------------
 
     @Test
-    void resolutionFieldInfersDependencyResolution() {
+    void resolutionFieldAppearsInResolutionsList() {
         String source = """
                 package com.example;
                 import org.apache.maven.api.plugin.annotations.Mojo;
@@ -600,8 +600,12 @@ class MojoDescriptorProcessorTest {
 
         String pluginXml = result.getResource("META-INF/maven/plugin.xml");
         assertNotNull(pluginXml, "plugin.xml must be generated");
-        // dependencyResolution should be inferred from @Resolution(pathScope = "main")
-        assertContains(pluginXml, "<dependencyResolution>main</dependencyResolution>");
+        // @Resolution fields should appear in the resolutions list, not as dependencyResolution
+        assertContains(pluginXml, "<pathScope>main</pathScope>");
+        assertContains(pluginXml, "<requestType>resolve</requestType>");
+        assertFalse(
+                pluginXml.contains("<dependencyResolution>main</dependencyResolution>"),
+                "dependencyResolution should not be inferred from @Resolution; the build planner uses resolutions directly");
     }
 
     // -------------------------------------------------------------------------

@@ -313,11 +313,6 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         set(b::phase, mojoAnn.defaultPhase());
         set(b::configurator, mojoAnn.configurator());
         set(b::dependencyResolution, mojoAnn.dependencyResolutionPathScopes());
-        // Infer dependencyResolution from @Resolution fields if not explicitly set on @Mojo
-        if (isBlank(mojoAnn.dependencyResolutionPathScopes())) {
-            String inferred = inferDependencyResolution(mojoType);
-            set(b::dependencyResolution, inferred);
-        }
         if (mojoAnn.dependencyCollection()) {
             b.dependencyCollection("true");
         }
@@ -807,25 +802,6 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                 .getPackageOf(typeElement)
                 .getQualifiedName()
                 .toString();
-    }
-
-    /**
-     * Infers the {@code dependencyResolution} value from {@code @Resolution} fields.
-     * Returns the first non-empty {@code pathScope} found, or {@code null} if none.
-     */
-    private String inferDependencyResolution(TypeElement mojoType) {
-        for (TypeElement cur = mojoType; cur != null && !isObject(cur); cur = superType(cur)) {
-            for (Element enclosed : cur.getEnclosedElements()) {
-                if (enclosed.getKind() != ElementKind.FIELD) {
-                    continue;
-                }
-                Resolution ann = enclosed.getAnnotation(Resolution.class);
-                if (ann != null && !ann.pathScope().isEmpty()) {
-                    return ann.pathScope();
-                }
-            }
-        }
-        return null;
     }
 
     /**
