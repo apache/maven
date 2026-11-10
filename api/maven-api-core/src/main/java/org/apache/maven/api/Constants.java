@@ -636,6 +636,20 @@ public final class Constants {
     public static final String MAVEN_BUILDER_MAX_PROBLEMS = "maven.builder.maxProblems";
 
     /**
+     * Enables diagnostic output for Maven's native dependency injection registry.
+     * When set, Maven prints a sorted snapshot of all DI bindings to stdout at discovery and
+     * lookup checkpoints, without creating components or invoking providers.
+     * Accepted values: {@code true} or empty string (dump every binding),
+     * {@code ambiguous} (dump only keys with more than one candidate),
+     * any other value or unset (diagnostics disabled, the default).
+     * Example: {@code mvn validate -Dmaven.di.debug=ambiguous}
+     *
+     * @since 4.2.0
+     */
+    @Config(source = Config.Source.SYSTEM_PROPERTIES)
+    public static final String MAVEN_DI_DEBUG = "maven.di.debug";
+
+    /**
      * Configuration property for version range resolution used metadata "nature".
      * It may contain following string values:
      * <ul>
