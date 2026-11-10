@@ -42,8 +42,8 @@ JVM launcher, an integration testing harness, or an IDE embedder.
 During a normal command-line invocation this is the JVM System
 ClassLoader and contains:
 
-- `${maven.home}/boot/*.jar` — the classworlds
-  library that bootstraps all other realms
+- `${maven.home}/boot/*.jar` — the classworlds library that bootstraps
+  all other realms
 - Any `-javaagent` classes specified on the JVM command line
 
 ## Maven Core Realm (`plexus.core`)
@@ -56,10 +56,27 @@ typically include:
 
 - `${maven.home}/lib/ext/*.jar`
 - `${maven.home}/lib/*.jar`
+- `${maven.home}/lib/modules/*.jar` — loaded as a classpath fallback
+  when JPMS module layer creation is not available (see below)
 
 This realm is the **container realm** in the Plexus/Sisu container
 unless core extensions are present, in which case the `maven.ext` realm
 takes over as the container realm (see below).
+
+### JPMS Module Layer (`lib/modules/`)
+
+The `m2.conf` `module` directive instructs maven-classworlds to load
+`${maven.home}/lib/modules/*.jar` as a dedicated JPMS `ModuleLayer`
+(a child layer of the boot layer) rather than adding them to the
+`plexus.core` classpath. This enables module-system features such as
+`--enable-native-access` for JLine's terminal support.
+
+Currently `lib/modules/` contains the JLine JARs. When a module layer
+is successfully created, the `load ${maven.home}/lib/modules/*.jar`
+entry inside `[plexus.core]` acts as a no-op (the classes are already
+visible via the parent module layer). On older JDKs or in embedder
+environments where `createModuleLayer()` is not invoked, the same JARs
+are picked up from the classpath entry as a transparent fallback.
 
 ## Core Extension Realms (`coreExtension>G:A:V`)
 
