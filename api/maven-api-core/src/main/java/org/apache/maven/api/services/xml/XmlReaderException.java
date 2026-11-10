@@ -40,6 +40,11 @@ public class XmlReaderException extends MavenException {
         this.location = location;
     }
 
+    /**
+     * Returns the location in the XML document where the error occurred.
+     *
+     * @return the error location, or {@code null} if not available
+     */
     public Location getLocation() {
         return location;
     }

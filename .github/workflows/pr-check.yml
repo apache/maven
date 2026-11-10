@@ -15,11 +15,12 @@
 # specific language governing permissions and limitations
 # under the License.
 
-name: PR check
+name: PR Check
 
 on:
-  pull_request_target:
-    types: [opened, edited, reopened, synchronize]
+  workflow_run:
+    workflows: [PR Signal]
+    types: [completed]
 
 jobs:
   pr-check:

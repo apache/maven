@@ -55,7 +55,7 @@ public interface Dependency extends Artifact {
      * @see DependencyCoordinates#getType()
      * @deprecated Use {@link #type()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Type getType() {
         return type();
@@ -77,7 +77,7 @@ public interface Dependency extends Artifact {
      * @see DependencyCoordinates#getScope()
      * @deprecated Use {@link #scope()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default DependencyScope getScope() {
         return scope();

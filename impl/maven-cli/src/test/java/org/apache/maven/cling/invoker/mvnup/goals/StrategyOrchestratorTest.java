@@ -234,7 +234,7 @@ class StrategyOrchestratorTest {
 
             orchestrator.executeStrategies(context, pomMap);
 
-            verify(context).action("1 POM(s) would be modified");
+            verify(context).action("1 POMs would be modified");
             verify(context).action("Total POMs would be modified: 1");
             verify(context, Mockito.never()).success("Modified: 1 POMs");
         }

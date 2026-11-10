@@ -28,6 +28,7 @@ import java.util.Optional;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ToolchainFactory;
+import org.apache.maven.api.services.ToolchainManagerException;
 import org.apache.maven.api.toolchain.ToolchainModel;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -40,6 +41,9 @@ import org.mockito.MockitoAnnotations;
 import org.slf4j.Logger;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyMap;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -260,5 +264,37 @@ class DefaultToolchainManagerTest {
 
         // verify
         assertEquals(0, basics.length);
+    }
+
+    @Test
+    void testMisconfiguredToolchainThrowsOnGetToolchains() throws Exception {
+        // When a v3 ToolchainFactory throws MisconfiguredToolchainException,
+        // getToolchains() must propagate it as ToolchainManagerException, not swallow it.
+        // This is the port of the 3.10.x fix (commit 2ba1bbcd7c).
+        org.apache.maven.toolchain.ToolchainFactory throwingFactory =
+                mock(org.apache.maven.toolchain.ToolchainFactory.class);
+        when(throwingFactory.createToolchain(any(org.apache.maven.toolchain.model.ToolchainModel.class)))
+                .thenThrow(new MisconfiguredToolchainException("Non-existing JDK home configuration at /bogus/path"));
+
+        Map<String, org.apache.maven.toolchain.ToolchainFactory> v3Factories = new HashMap<>();
+        v3Factories.put("jdk", throwingFactory);
+        when(lookup.lookupMap(org.apache.maven.toolchain.ToolchainFactory.class))
+                .thenReturn(v3Factories);
+        when(lookup.lookupMap(ToolchainFactory.class)).thenReturn(Map.of());
+
+        ToolchainManagerFactory.DefaultToolchainManagerV3 mgr = new ToolchainManagerFactory(lookup, logger).v3Manager();
+
+        MavenSession session = mock(MavenSession.class);
+        Session sessionv4 = mock(Session.class);
+        when(session.getSession()).thenReturn(sessionv4);
+
+        ToolchainModel jdkModel = ToolchainModel.newBuilder().type("jdk").build();
+        when(sessionv4.getToolchains()).thenReturn(List.of(jdkModel));
+
+        ToolchainManagerException ex = assertThrows(
+                ToolchainManagerException.class, () -> mgr.getToolchains(session, "jdk", Map.of("version", "17")));
+
+        assertTrue(ex.getMessage().contains("jdk"), "message should contain toolchain type");
+        assertInstanceOf(MisconfiguredToolchainException.class, ex.getCause().getCause());
     }
 }

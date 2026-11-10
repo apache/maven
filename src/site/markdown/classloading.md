@@ -20,9 +20,10 @@ under the License.
 # Maven Classloading
 
 This document describes the classloading mechanism used by Maven 4.x.
-Maven uses [Plexus Classworlds][classworlds] to build a hierarchy of isolated
-classloaders (called **realms**) so that plugins, extensions and the
-Maven core can each see only the classes they are supposed to see.
+Maven uses [maven-classworlds][classworlds] — an internalized fork of
+Plexus Classworlds — to build a hierarchy of isolated classloaders
+(called **realms**) so that plugins, extensions and the Maven core can
+each see only the classes they are supposed to see.
 
 The following diagram gives an overview of the realm hierarchy during a
 typical Maven build. Solid arrows indicate the parent classloader
@@ -41,8 +42,8 @@ JVM launcher, an integration testing harness, or an IDE embedder.
 During a normal command-line invocation this is the JVM System
 ClassLoader and contains:
 
-- `${maven.home}/boot/plexus-classworlds-*.jar` — the Plexus
-  Classworlds library that bootstraps all other realms
+- `${maven.home}/boot/maven-classworlds-*.jar` — the classworlds
+  library that bootstraps all other realms
 - Any `-javaagent` classes specified on the JVM command line
 
 ## Maven Core Realm (`plexus.core`)
@@ -135,10 +136,9 @@ If created, this realm becomes the container realm in the Plexus/Sisu
 container. If no core extensions or ext classpath entries exist,
 `plexus.core` remains the container realm.
 
-> **Known limitation:** JARs loaded via `-Dmaven.ext.class.path` are
-> added directly to the `maven.ext` realm, but their
-> `META-INF/maven/extension.xml` descriptors are never read. Declared
-> exports from these JARs are silently ignored. See
+> **Note:** As of Maven 4.2, JARs loaded via `-Dmaven.ext.class.path`
+> have their `META-INF/maven/extension.xml` descriptors read and their
+> declared exports honored. See
 > [MNG-8112](https://issues.apache.org/jira/browse/MNG-8112).
 
 ## Maven API Realm (`maven.api`)
@@ -224,6 +224,12 @@ Each plugin gets its own isolated classloader:
 
 Maven creates one classloader per unique plugin + dependencies +
 build-extensions combination. The `PluginRealmCache` manages this.
+
+Maven 4 exposes the plugin realm through the `PluginManager` API
+service. The `PluginManager.loadPlugin()` method returns a `Realm`
+object that bundles the plugin's classloader, its optional JPMS module
+layer, and a realm-scoped `Lookup` — allowing build extensions to
+perform scoped component discovery without accessing internal APIs.
 
 **Provided artifact filtering:** artifacts that are already in
 `CoreExports` are filtered from the plugin's classpath to avoid
@@ -368,5 +374,5 @@ Sisu's visibility filtering has known limitations:
   realm, which means extension components are visible to all projects
   in that group, not individually scoped.
 
-[classworlds]: https://codehaus-plexus.github.io/plexus-classworlds/
+[classworlds]: https://github.com/apache/maven/tree/master/impl/maven-classworlds
 [sisu]: https://eclipse.dev/sisu/

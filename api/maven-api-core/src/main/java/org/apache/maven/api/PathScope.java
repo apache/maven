@@ -47,9 +47,19 @@ import static org.apache.maven.api.ExtensibleEnums.pathScope;
 public interface PathScope extends ExtensibleEnum {
 
     // TODO: what if I simply want all dependencies ?
+    /**
+     * Returns the project scope associated with this path scope.
+     *
+     * @return the project scope, never {@code null}
+     */
     @Nonnull
     ProjectScope projectScope();
 
+    /**
+     * Returns the set of dependency scopes included in this path scope.
+     *
+     * @return the dependency scopes, never {@code null}
+     */
     @Nonnull
     Set<DependencyScope> dependencyScopes();
 

@@ -81,6 +81,13 @@ public interface VersionRangeResolver extends Service {
         return resolve(VersionRangeResolverRequest.build(session, artifactCoordinates, repositories));
     }
 
+    /**
+     * Expands a version range to a list of matching versions using the given request.
+     *
+     * @param request the version range resolver request
+     * @return the version range resolution result
+     * @throws VersionRangeResolverException if the version range could not be resolved
+     */
     @Nonnull
     VersionRangeResolverResult resolve(@Nonnull VersionRangeResolverRequest request)
             throws VersionRangeResolverException;

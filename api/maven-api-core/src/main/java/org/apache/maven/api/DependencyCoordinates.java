@@ -55,7 +55,7 @@ public interface DependencyCoordinates extends ArtifactCoordinates {
      *
      * @deprecated Use {@link #type()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Type getType() {
         return type();
@@ -74,7 +74,7 @@ public interface DependencyCoordinates extends ArtifactCoordinates {
      *
      * @deprecated Use {@link #scope()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default DependencyScope getScope() {
         return scope();
@@ -94,7 +94,7 @@ public interface DependencyCoordinates extends ArtifactCoordinates {
      * @return {@code Boolean.TRUE} and {@code Boolean.FALSE} if optional, or {@code null} if unspecified
      * @deprecated Use {@link #optional()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nullable
     default Boolean getOptional() {
         return optional();
@@ -111,7 +111,7 @@ public interface DependencyCoordinates extends ArtifactCoordinates {
      *
      * @deprecated Use {@link #exclusions()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Collection<Exclusion> getExclusions() {
         return exclusions();

@@ -23,6 +23,8 @@ import java.util.Map;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-5771">MNG-5771</a>:
  * check that Maven loads core extensions and components contributed by <code>.mvn/extensions.xml</code>
@@ -64,6 +66,49 @@ public class MavenITmng5771CoreExtensionsTest extends AbstractMavenIntegrationTe
         verifier.addCliArgument("validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
+    }
+
+    @Test
+    public void testCoreExtensionFromClassPath() throws Exception {
+        Path testDir = extractResources(RESOURCE_PATH);
+
+        Verifier verifier = newVerifier(testDir);
+        verifier.filterFile("settings-template.xml", "settings.xml");
+
+        verifier = newVerifier(testDir.resolve("client-classpath"));
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument(testDir.resolve("settings.xml").toString());
+        verifier.addCliArgument("-Dmaven.ext.class.path="
+                + testDir.resolve("repo/org/apache/maven/its/it-core-extensions/maven-it-core-extensions/0.1/"
+                        + "maven-it-core-extensions-0.1.jar"));
+        verifier.addCliArgument("validate");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+    }
+
+    @Test
+    public void testCoreExtensionsWithClassPath() throws Exception {
+        Path testDir = extractResources(RESOURCE_PATH);
+
+        Verifier verifier = newVerifier(testDir);
+        verifier.filterFile("settings-template.xml", "settings.xml");
+
+        verifier = newVerifier(testDir.resolve("client"));
+        verifier.deleteDirectory("target");
+        verifier.deleteArtifacts("org.apache.maven.its.it-core-extensions");
+        verifier.addCliArgument("-s");
+        verifier.addCliArgument(testDir.resolve("settings.xml").toString());
+        verifier.addCliArgument("-Dmaven.ext.class.path=" + testDir.resolve("classpath-extension"));
+        verifier.addCliArgument("-Dclsldr.resourcePaths=org/apache/maven/its/classpath_extension/marker.properties");
+        verifier.addCliArgument("-Dclsldr.pluginClassLoaderOutput=target/classpath.properties");
+        verifier.addCliArgument("validate");
+        verifier.addCliArgument("org.apache.maven.its.plugins:maven-it-plugin-class-loader:2.1-SNAPSHOT:load");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+        assertNotNull(verifier.loadProperties("target/classpath.properties")
+                .getProperty("org/apache/maven/its/classpath_extension/marker.properties"));
     }
 
     //

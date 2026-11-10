@@ -26,17 +26,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.Properties;
 import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
+import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.mvnval.ValidateOptions;
 import org.apache.maven.api.services.ModelBuilder;
 import org.apache.maven.cling.invoker.ProtoLookup;
+import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.jline.terminal.Terminal;
 import org.junit.jupiter.api.BeforeEach;
@@ -44,6 +48,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.api.parallel.ResourceLock;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 
@@ -55,6 +60,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.parallel.Resources.SYSTEM_PROPERTIES;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
@@ -115,9 +121,6 @@ class ValidateInvokerTest {
         invoker = new ValidateInvoker(ProtoLookup.builder().build(), null) {
             @Override
             protected Session createSession(Path localRepository) {
-                // withLocalRepository is the line production uses, so an aimed repository is
-                // exercised rather than stubbed. The transports and the settings-derived
-                // repository list production adds are not: this session has neither.
                 aimed.add(localRepository);
                 return localRepository == null
                         ? shared
@@ -155,6 +158,55 @@ class ValidateInvokerTest {
     @Nested
     @DisplayName("Wiring")
     class WiringTests {
+
+        @ParameterizedTest
+        @ValueSource(booleans = {false, true})
+        @ResourceLock(SYSTEM_PROPERTIES)
+        @DisplayName("should use settings repositories or Central and override the local repository")
+        void shouldUseSettingsRepositoriesOrCentralWithRequestedLocalRepository(boolean configuredRepository)
+                throws Exception {
+            Path settings = Files.createDirectories(tempDir.resolve(".m2")).resolve("settings.xml");
+            String repositories = configuredRepository ? """
+                      <repositories>
+                        <repository>
+                          <id>configured</id><url>https://repository.example.invalid/maven2</url>
+                          <snapshots><enabled>false</enabled></snapshots>
+                        </repository>
+                      </repositories>
+                      """ : "";
+            Files.writeString(settings, """
+                    <settings xmlns="http://maven.apache.org/SETTINGS/2.0.0">
+                      <localRepository>${user.home}/settings-local</localRepository>
+                      %s
+                    </settings>
+                    """.formatted(repositories));
+            Path requested = Files.createDirectories(tempDir.resolve("requested-%20-repository"));
+            Files.createDirectories(tempDir.resolve("settings-local"));
+            Properties previous = System.getProperties();
+            Properties isolated = (Properties) previous.clone();
+            isolated.setProperty("user.home", tempDir.toString());
+            isolated.setProperty(Constants.MAVEN_HOME, tempDir.toString());
+            isolated.setProperty(
+                    Constants.MAVEN_INSTALLATION_CONF, tempDir.resolve("conf").toString());
+            try {
+                System.setProperties(isolated);
+                Session session = new ValidateInvoker(ProtoLookup.builder().build(), null).createSession(requested);
+
+                assertTrue(
+                        Files.isSameFile(requested, session.getLocalRepository().path()));
+                assertEquals(
+                        List.of(configuredRepository ? "configured" : RemoteRepository.CENTRAL_ID),
+                        session.getRemoteRepositories().stream()
+                                .map(RemoteRepository::id)
+                                .toList());
+                assertFalse(InternalSession.from(session)
+                        .toRepository(session.getRemoteRepositories().get(0))
+                        .getPolicy(true)
+                        .isEnabled());
+            } finally {
+                System.setProperties(previous);
+            }
+        }
 
         @Test
         @DisplayName("should register the transports resolution needs")
