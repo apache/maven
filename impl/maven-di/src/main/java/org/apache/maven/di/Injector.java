@@ -54,6 +54,14 @@ import org.apache.maven.di.impl.InjectorImpl;
 public interface Injector {
 
     /**
+     * Priority assigned to session services injected by Maven core into V4 mojos.
+     * <p>
+     * A negative value ensures that these fallback bindings are overridden by any
+     * plugin-provided {@code @Provides} method (which defaults to priority {@code 0}).
+     */
+    int SESSION_SERVICE_PRIORITY = -10;
+
+    /**
      * Creates a new Injector instance with default settings.
      *
      * @return a new Injector instance
@@ -159,7 +167,7 @@ public interface Injector {
      * @param supplier the supplier to use for injection
      * @param priority the binding priority
      * @return this injector instance for method chaining
-     * @throws NullPointerException if either parameter is null
+     * @throws NullPointerException if {@code cls} or {@code supplier} is null
      */
     @Nonnull
     <T> Injector bindSupplier(@Nonnull Class<T> cls, @Nonnull Supplier<T> supplier, int priority);
