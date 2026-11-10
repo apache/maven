@@ -44,7 +44,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.internal.LifecycleTaskSegmentCalculator;
 import org.apache.maven.lifecycle.internal.TaskSegment;
-import org.apache.maven.lifecycle.internal.concurrent.BuildPlan;
 import org.apache.maven.lifecycle.internal.concurrent.BuildPlanExecutor;
 import org.apache.maven.lifecycle.internal.concurrent.BuildStep;
 import org.apache.maven.project.MavenProject;
@@ -81,11 +80,13 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
         mavenSession.setCurrentProject(mavenProject);
         try {
             List<TaskSegment> taskSegments = taskSegmentCalculator.calculateTaskSegments(mavenSession, request.tasks());
-            BuildPlan buildPlan = buildPlanExecutor.calculateProjectPlan(mavenSession, mavenProject, taskSegments);
+            BuildPlanExecutor.BuildContext buildContext =
+                    buildPlanExecutor.createProjectContext(mavenSession, mavenProject, taskSegments);
 
-            List<org.apache.maven.plugin.MojoExecution> internalExecutions = buildPlan.sortedNodes().stream()
-                    .flatMap(BuildStep::executions)
-                    .toList();
+            List<org.apache.maven.plugin.MojoExecution> internalExecutions =
+                    buildContext.getPlan().sortedNodes().stream()
+                            .flatMap(BuildStep::executions)
+                            .toList();
             List<MojoExecution> executions = internalExecutions.stream()
                     .map(execution -> (MojoExecution) new DefaultMojoExecution(internalSession, execution))
                     .toList();
@@ -93,7 +94,7 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
                     DefaultLifecyclePlan.buildMapping(internalExecutions, executions);
 
             DefaultLifecyclePlan plan =
-                    new DefaultLifecyclePlan(request.project(), request.tasks(), executions, buildPlan, mapping);
+                    new DefaultLifecyclePlan(request.project(), request.tasks(), executions, buildContext, mapping);
             return new DefaultLifecyclePlanResult(request, plan);
         } catch (Exception e) {
             throw new LifecycleExecutorException("Unable to calculate lifecycle plan", e);
@@ -106,14 +107,16 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
     @Override
     public LifecycleExecutionResult execute(@Nonnull LifecycleExecutionRequest request) {
         requireNonNull(request, "request");
-        InternalMavenSession internalSession = InternalMavenSession.from(request.getSession());
-        MavenSession mavenSession = internalSession.getMavenSession();
+        InternalMavenSession.from(request.getSession());
+        MavenSession mavenSession =
+                InternalMavenSession.from(request.getSession()).getMavenSession();
         if (!(request.plan() instanceof DefaultLifecyclePlan plan)) {
             throw new IllegalArgumentException("plan was not produced by this lifecycle executor");
         }
         MavenProject mavenProject =
                 cast(DefaultProject.class, plan.project(), "project").getProject();
         MavenProject previousProject = mavenSession.getCurrentProject();
+        BuildPlanExecutor.BuildContext buildContext = plan.buildContext();
 
         mavenSession.setCurrentProject(mavenProject);
         try {
@@ -135,13 +138,13 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
             MojoExecution failed = null;
             Throwable failureCause = null;
 
-            for (BuildStep step : plan.buildPlan().sortedNodes()) {
+            for (BuildStep step : buildContext.getPlan().sortedNodes()) {
                 List<org.apache.maven.plugin.MojoExecution> stepExecutions = step.executions()
                         .filter(internal -> accepted.contains(mapping.get(internal)))
                         .toList();
                 if (!stepExecutions.isEmpty()) {
                     try {
-                        buildPlanExecutor.configureAndExecute(mavenSession, mavenProject, stepExecutions);
+                        buildContext.configureAndExecuteStep(mavenProject, stepExecutions);
                         for (org.apache.maven.plugin.MojoExecution internal : stepExecutions) {
                             succeeded.add(mapping.get(internal));
                         }

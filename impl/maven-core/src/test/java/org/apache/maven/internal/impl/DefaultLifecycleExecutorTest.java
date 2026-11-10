@@ -74,6 +74,7 @@ class DefaultLifecycleExecutorTest {
     private MojoExecution test;
     private DefaultLifecycleExecutor executor;
     private BuildPlan buildPlan;
+    private BuildPlanExecutor.BuildContext buildContext;
 
     @BeforeEach
     void setUp() throws Exception {
@@ -107,8 +108,10 @@ class DefaultLifecycleExecutorTest {
         steps.put("test", testStep);
         buildPlan.addProject(project, steps);
 
-        when(buildPlanExecutor.calculateProjectPlan(same(mavenSession), same(project), anyList()))
-                .thenReturn(buildPlan);
+        buildContext = mock(BuildPlanExecutor.BuildContext.class);
+        when(buildContext.getPlan()).thenReturn(buildPlan);
+        when(buildPlanExecutor.createProjectContext(same(mavenSession), same(project), anyList()))
+                .thenReturn(buildContext);
 
         executor = new DefaultLifecycleExecutor(taskSegmentCalculator, buildPlanExecutor);
     }
@@ -157,8 +160,8 @@ class DefaultLifecycleExecutorTest {
         LifecyclePlan plan = executor.plan(LifecyclePlanRequest.build(session, apiProject, List.of("verify")))
                 .plan();
         doThrow(new LifecycleExecutionException("boom"))
-                .when(buildPlanExecutor)
-                .configureAndExecute(eq(mavenSession), eq(project), anyList());
+                .when(buildContext)
+                .configureAndExecuteStep(eq(project), anyList());
 
         assertThrows(
                 LifecycleExecutorException.class,
@@ -180,7 +183,7 @@ class DefaultLifecycleExecutorTest {
                 })));
 
         assertSame(filterFailure, thrown);
-        verify(buildPlanExecutor, never()).configureAndExecute(any(), any(), anyList());
+        verify(buildContext, never()).configureAndExecuteStep(any(), anyList());
         verify(mavenSession, times(2)).setCurrentProject(same(previousProject));
     }
 
@@ -204,14 +207,14 @@ class DefaultLifecycleExecutorTest {
 
         // Make the second step (test) fail
         doAnswer(inv -> {
-                    List<MojoExecution> execs = inv.getArgument(2);
+                    List<MojoExecution> execs = inv.getArgument(1);
                     if (execs.stream().anyMatch(e -> "test".equals(e.getGoal()))) {
                         throw new LifecycleExecutionException("test failed");
                     }
                     return null;
                 })
-                .when(buildPlanExecutor)
-                .configureAndExecute(eq(mavenSession), eq(project), anyList());
+                .when(buildContext)
+                .configureAndExecuteStep(eq(project), anyList());
 
         LifecycleExecutorException ex = assertThrows(
                 LifecycleExecutorException.class,

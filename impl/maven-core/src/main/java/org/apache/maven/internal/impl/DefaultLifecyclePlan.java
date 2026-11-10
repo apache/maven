@@ -25,25 +25,25 @@ import java.util.Map;
 import org.apache.maven.api.LifecyclePlan;
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Project;
-import org.apache.maven.lifecycle.internal.concurrent.BuildPlan;
+import org.apache.maven.lifecycle.internal.concurrent.BuildPlanExecutor;
 
 final class DefaultLifecyclePlan implements LifecyclePlan {
     private final Project project;
     private final List<String> tasks;
     private final List<MojoExecution> executions;
-    private final BuildPlan buildPlan;
+    private final BuildPlanExecutor.BuildContext buildContext;
     private final Map<org.apache.maven.plugin.MojoExecution, MojoExecution> internalToApiMap;
 
     DefaultLifecyclePlan(
             Project project,
             List<String> tasks,
             List<MojoExecution> executions,
-            BuildPlan buildPlan,
+            BuildPlanExecutor.BuildContext buildContext,
             Map<org.apache.maven.plugin.MojoExecution, MojoExecution> internalToApiMap) {
         this.project = project;
         this.tasks = List.copyOf(tasks);
         this.executions = List.copyOf(executions);
-        this.buildPlan = buildPlan;
+        this.buildContext = buildContext;
         this.internalToApiMap = Map.copyOf(internalToApiMap);
     }
 
@@ -62,8 +62,8 @@ final class DefaultLifecyclePlan implements LifecyclePlan {
         return executions;
     }
 
-    BuildPlan buildPlan() {
-        return buildPlan;
+    BuildPlanExecutor.BuildContext buildContext() {
+        return buildContext;
     }
 
     Map<org.apache.maven.plugin.MojoExecution, MojoExecution> internalToApiMap() {

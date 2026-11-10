@@ -200,15 +200,18 @@ public class BuildPlanExecutor {
     }
 
     /**
-     * Calculates a lifecycle plan for a single project without executing it.
-     * The returned {@link BuildPlan} contains the phase DAG with mojos bound to their steps.
+     * Creates a {@link BuildContext} for a single project, with the lifecycle plan fully
+     * calculated (phases, mojo bindings, aggregator steps, fork plans). The returned context
+     * can be used to inspect the plan via {@link BuildContext#getPlan()} and then execute
+     * steps via {@link BuildContext#configureAndExecuteStep(MavenProject, List)}.
      *
      * @param session the current Maven session
      * @param project the project for which to calculate the plan
      * @param taskSegments the parsed task segments
-     * @return the calculated build plan
+     * @return a build context holding the calculated plan
      */
-    public BuildPlan calculateProjectPlan(MavenSession session, MavenProject project, List<TaskSegment> taskSegments) {
+    public BuildContext createProjectContext(
+            MavenSession session, MavenProject project, List<TaskSegment> taskSegments) {
         BuildContext ctx = new BuildContext(session);
 
         Map<MavenProject, List<MavenProject>> projects = Collections.singletonMap(project, Collections.emptyList());
@@ -221,30 +224,13 @@ public class BuildPlanExecutor {
 
         ctx.plan = plan;
         ctx.bindProjectMojos(project);
+        ctx.splitAggregatorSteps(project);
+        ctx.linkAggregatorSteps();
 
-        return ctx.plan;
+        return ctx;
     }
 
-    /**
-     * Configures and executes a list of mojo executions for a single project.
-     * This applies mojo configuration, finalizes parameters, and delegates to the concurrent MojoExecutor.
-     *
-     * @param session the current Maven session
-     * @param project the project whose mojos are being executed
-     * @param executions the mojo executions to run
-     * @throws LifecycleExecutionException if execution fails
-     */
-    public void configureAndExecute(MavenSession session, MavenProject project, List<MojoExecution> executions)
-            throws LifecycleExecutionException {
-        attachToThread(project);
-        executions.forEach(mojoExecution -> {
-            mojoExecutionConfigurator(mojoExecution).configure(project, mojoExecution, true);
-            finalizeMojoConfiguration(mojoExecution);
-        });
-        mojoExecutor.execute(session, executions);
-    }
-
-    class BuildContext implements AutoCloseable {
+    public class BuildContext implements AutoCloseable {
         final MavenSession session;
         final ReactorContext reactorContext;
         final PhasingExecutor executor;
@@ -283,6 +269,24 @@ public class BuildPlanExecutor {
             this.threads = 1;
             this.executor = null;
             this.plan = null;
+        }
+
+        public BuildPlan getPlan() {
+            return plan;
+        }
+
+        /**
+         * Configures and executes a list of mojo executions for a single project.
+         */
+        public void configureAndExecuteStep(MavenProject project, List<MojoExecution> executions)
+                throws LifecycleExecutionException {
+            BuildPlanExecutor.attachToThread(project);
+            session.setCurrentProject(project);
+            executions.forEach(mojoExecution -> {
+                mojoExecutionConfigurator(mojoExecution).configure(project, mojoExecution, true);
+                finalizeMojoConfiguration(mojoExecution);
+            });
+            mojoExecutor.execute(session, executions);
         }
 
         public BuildPlan buildInitialPlan(List<TaskSegment> taskSegments) {
