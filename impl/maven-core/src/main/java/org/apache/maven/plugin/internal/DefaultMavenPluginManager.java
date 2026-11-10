@@ -59,17 +59,21 @@ import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.api.plugin.descriptor.Resolution;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.api.services.PathScopeRegistry;
 import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
+import org.apache.maven.di.impl.BindingStyler;
+import org.apache.maven.di.impl.InjectorImpl;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.internal.impl.DefaultMojoExecution;
 import org.apache.maven.internal.impl.InternalMavenSession;
+import org.apache.maven.internal.impl.MessageBuilderBindingStyler;
 import org.apache.maven.internal.impl.SisuDiBridgeModule;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.logging.ProjectBuildLogAppender;
@@ -161,6 +165,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final PlexusContainer container;
+    private final MessageBuilderFactory messageBuilderFactory;
     private final ClassRealmManager classRealmManager;
     private final PluginDescriptorCache pluginDescriptorCache;
     private final PluginRealmCache pluginRealmCache;
@@ -189,8 +194,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             MavenPluginValidator pluginValidator,
             List<MavenPluginConfigurationValidator> configurationValidators,
             PluginValidationManager pluginValidationManager,
-            List<MavenPluginPrerequisitesChecker> prerequisitesCheckers) {
+            List<MavenPluginPrerequisitesChecker> prerequisitesCheckers,
+            MessageBuilderFactory messageBuilderFactory) {
         this.container = container;
+        this.messageBuilderFactory = messageBuilderFactory;
         this.classRealmManager = classRealmManager;
         this.pluginDescriptorCache = pluginDescriptorCache;
         this.pluginRealmCache = pluginRealmCache;
@@ -473,7 +480,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                             new SessionScopeModule(container.lookup(SessionScope.class)),
                             new MojoExecutionScopeModule(container.lookup(MojoExecutionScope.class)),
                             new PluginConfigurationModule(plugin.getDelegate()),
-                            new SisuDiBridgeModule(true));
+                            new SisuDiBridgeModule(true, messageBuilderFactory));
         } catch (ComponentLookupException | CycleDetectedInComponentGraphException e) {
             throw new PluginContainerException(
                     plugin,
@@ -581,14 +588,19 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 new DefaultLogger(mojoExecution.getMojoDescriptor().getImplementation(), logProjectId, logMojoId);
         try {
             // Discover components from the effective ClassLoader (module layer loader for modular plugins)
-            Injector injector = Injector.create();
+            Injector injector = new InjectorImpl() {
+                @Override
+                protected BindingStyler getBindingStyler() {
+                    return new MessageBuilderBindingStyler(messageBuilderFactory);
+                }
+            };
             injector.discover(pluginRealm);
             // Add known classes
             // TODO: get those from the existing plexus scopes ?
             injector.bindInstance(Session.class, sessionV4);
             injector.bindInstance(Project.class, project);
             injector.bindInstance(org.apache.maven.api.MojoExecution.class, execution);
-            injector.bindInstance(org.apache.maven.api.plugin.Log.class, log);
+            injector.bindInstance(Log.class, log);
 
             Map<Class<? extends Service>, Supplier<? extends Service>> services = sessionV4.getAllServices();
             services.forEach((itf, svc) -> injector.bindSupplier((Class<Service>) itf, (Supplier<Service>) svc));

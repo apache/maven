@@ -49,6 +49,7 @@ import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.internal.impl.DefaultLookup;
+import org.apache.maven.internal.impl.SisuDiBridgeModule;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.codehaus.plexus.ContainerConfiguration;
@@ -117,7 +118,10 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 collectExportedArtifacts(coreEntry, loadedExtensionsEntries),
                 collectExportedPackages(coreEntry, loadedExtensionsEntries));
         Thread.currentThread().setContextClassLoader(containerRealm);
-        DefaultPlexusContainer container = new DefaultPlexusContainer(cc, getCustomModule(context, exports));
+        DefaultPlexusContainer container = new DefaultPlexusContainer(
+                cc,
+                getCustomModule(context, exports),
+                new SisuDiBridgeModule(true, context.invokerRequest.messageBuilderFactory()));
 
         // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
         container.setLookupRealm(null);
@@ -305,6 +309,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             @Override
             protected void configure() {
                 bind(ILoggerFactory.class).toProvider(() -> context.loggerFactory);
+                bind(MessageBuilderFactory.class).toInstance(context.invokerRequest.messageBuilderFactory());
             }
         });
 
