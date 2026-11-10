@@ -18,8 +18,12 @@
  */
 package org.apache.maven.api.services;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.maven.api.ArtifactCoordinates;
 import org.apache.maven.api.DependencyCoordinates;
+import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
@@ -28,9 +32,11 @@ import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Plugin;
 import org.apache.maven.api.model.ReportPlugin;
 
+import static java.util.Objects.requireNonNull;
+
 /**
- * Service for creating {@link org.apache.maven.api.DependencyCoordinates} instances
- * from requests, model dependencies, plugins, or artifact coordinates.
+ * Service for creating {@link DependencyCoordinates} instances from individual components,
+ * model dependencies, plugins, or artifact coordinates.
  *
  * @since 4.0.0
  */
@@ -38,16 +44,53 @@ import org.apache.maven.api.model.ReportPlugin;
 public interface DependencyCoordinatesFactory extends Service {
 
     /**
-     * Creates a new {@link DependencyCoordinates} object from the request.
+     * Creates dependency coordinates from individual components.
      *
-     * @param request the request containing the various data
-     * @return a new {@link DependencyCoordinates} object
-     *
-     * @throws IllegalArgumentException if {@code request} is null or
-     *         if {@code request.getSession()} is null or invalid
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version constraint
+     * @param classifier the classifier, or null
+     * @param extension the extension, or null
+     * @param type the artifact type, or null
+     * @param scope the dependency scope, or null
+     * @param optional whether the dependency is optional
+     * @param exclusions the dependency exclusions
+     * @return the dependency coordinates
+     * @since 4.2.0
      */
     @Nonnull
-    DependencyCoordinates create(@Nonnull DependencyCoordinatesFactoryRequest request);
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    DependencyCoordinates create(
+            @Nonnull Session session,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String extension,
+            String type,
+            String scope,
+            boolean optional,
+            @Nonnull Collection<Exclusion> exclusions);
+
+    /**
+     * Creates dependency coordinates from a standard artifact coordinates string.
+     *
+     * @param session the session
+     * @param coordinatesString the artifact coordinates string
+     * @param scope the dependency scope, or null
+     * @param optional whether the dependency is optional
+     * @param exclusions the dependency exclusions
+     * @return the dependency coordinates
+     * @since 4.2.0
+     */
+    @Nonnull
+    DependencyCoordinates create(
+            @Nonnull Session session,
+            @Nonnull String coordinatesString,
+            String scope,
+            boolean optional,
+            @Nonnull Collection<Exclusion> exclusions);
 
     /**
      * Creates dependency coordinates from artifact coordinates.
@@ -58,7 +101,18 @@ public interface DependencyCoordinatesFactory extends Service {
      */
     @Nonnull
     default DependencyCoordinates create(@Nonnull Session session, @Nonnull ArtifactCoordinates coordinates) {
-        return create(DependencyCoordinatesFactoryRequest.build(session, coordinates));
+        requireNonNull(coordinates, "coordinates");
+        return create(
+                session,
+                coordinates.groupId(),
+                coordinates.artifactId(),
+                coordinates.versionConstraint().toString(),
+                coordinates.classifier(),
+                coordinates.extension(),
+                null,
+                null,
+                false,
+                List.of());
     }
 
     /**
@@ -71,7 +125,18 @@ public interface DependencyCoordinatesFactory extends Service {
     @Nonnull
     default DependencyCoordinates create(
             @Nonnull Session session, @Nonnull org.apache.maven.api.Dependency dependency) {
-        return create(DependencyCoordinatesFactoryRequest.build(session, dependency));
+        requireNonNull(dependency, "dependency");
+        return create(
+                session,
+                dependency.groupId(),
+                dependency.artifactId(),
+                dependency.version().toString(),
+                dependency.classifier(),
+                dependency.extension(),
+                dependency.type().id(),
+                dependency.scope().id(),
+                dependency.isOptional(),
+                List.of());
     }
 
     /**
@@ -83,14 +148,17 @@ public interface DependencyCoordinatesFactory extends Service {
      */
     @Nonnull
     default DependencyCoordinates create(@Nonnull Session session, Dependency dependency) {
-        return create(DependencyCoordinatesFactoryRequest.build(
+        return create(
                 session,
                 dependency.getGroupId(),
                 dependency.getArtifactId(),
                 dependency.getVersion(),
                 dependency.getClassifier(),
                 null,
-                dependency.getType()));
+                dependency.getType(),
+                null,
+                false,
+                List.of());
     }
 
     /**
@@ -102,9 +170,17 @@ public interface DependencyCoordinatesFactory extends Service {
      */
     @Nonnull
     default DependencyCoordinates create(@Nonnull Session session, Plugin plugin) {
-        // TODO: hard coded string
-        return create(DependencyCoordinatesFactoryRequest.build(
-                session, plugin.getGroupId(), plugin.getArtifactId(), plugin.getVersion(), null, null, "maven-plugin"));
+        return create(
+                session,
+                plugin.getGroupId(),
+                plugin.getArtifactId(),
+                plugin.getVersion(),
+                null,
+                null,
+                "maven-plugin",
+                null,
+                false,
+                List.of());
     }
 
     /**
@@ -116,14 +192,16 @@ public interface DependencyCoordinatesFactory extends Service {
      */
     @Nonnull
     default DependencyCoordinates create(@Nonnull Session session, ReportPlugin reportPlugin) {
-        // TODO: hard coded string
-        return create(DependencyCoordinatesFactoryRequest.build(
+        return create(
                 session,
                 reportPlugin.getGroupId(),
                 reportPlugin.getArtifactId(),
                 reportPlugin.getVersion(),
                 null,
                 null,
-                "maven-plugin"));
+                "maven-plugin",
+                null,
+                false,
+                List.of());
     }
 }

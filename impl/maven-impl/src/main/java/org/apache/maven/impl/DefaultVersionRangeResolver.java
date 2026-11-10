@@ -58,13 +58,18 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
             throws VersionRangeResolverException {
         requireNonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
-        return session.request(request, this::doResolve);
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
+        try {
+            return session.request(request, this::doResolve);
+        } finally {
+            RequestTraceHelper.exit(trace);
+        }
     }
 
     public VersionRangeResolverResult doResolve(VersionRangeResolverRequest request)
             throws VersionRangeResolverException {
         InternalSession session = InternalSession.from(request.getSession());
-        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
+        org.apache.maven.api.services.RequestTrace trace = RequestTraceHelper.getCurrentTrace(session);
         try {
             VersionRangeResult res = repositorySystem.resolveVersionRange(
                     session.getSession(),
@@ -76,7 +81,7 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
                                                     : session.getRemoteRepositories()),
                                     toResolver(request.getNature()),
                                     trace.context())
-                            .setTrace(trace.trace()));
+                            .setTrace(RequestTraceHelper.toResolver(trace)));
 
             Map<String, ArtifactRepository> repos = res.getVersions().stream()
                     .filter(v -> res.getRepository(v) != null)
@@ -112,8 +117,6 @@ public class DefaultVersionRangeResolver implements VersionRangeResolver {
             };
         } catch (VersionRangeResolutionException e) {
             throw new VersionRangeResolverException("Unable to resolve version range", e);
-        } finally {
-            RequestTraceHelper.exit(trace);
         }
     }
 

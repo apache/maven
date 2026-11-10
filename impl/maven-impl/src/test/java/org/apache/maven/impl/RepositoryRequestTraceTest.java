@@ -19,11 +19,15 @@
 package org.apache.maven.impl;
 
 import java.util.List;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.services.ArtifactDeployerRequest;
 import org.apache.maven.api.services.ArtifactInstallerRequest;
+import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
+import org.apache.maven.api.services.Result;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.deployment.DeployRequest;
@@ -32,6 +36,8 @@ import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -44,13 +50,18 @@ class RepositoryRequestTraceTest {
         RepositorySystem repositorySystem = mock(RepositorySystem.class);
         RepositorySystemSession resolverSession = mock(RepositorySystemSession.class);
         InternalSession session = mock(InternalSession.class);
+        when(session.request(any(), any())).thenAnswer(invocation -> {
+            Request<?> request = invocation.getArgument(0);
+            Function<Request<?>, Result<?>> work = invocation.getArgument(1);
+            return work.apply(request);
+        });
         ArtifactInstallerRequest request = mock(ArtifactInstallerRequest.class);
         RequestTrace context = new RequestTrace("context");
         RequestTrace explicitTrace = new RequestTrace("install", context, "install-request");
         when(request.getSession()).thenReturn(session);
         when(request.getTrace()).thenReturn(explicitTrace);
         when(request.getArtifacts()).thenReturn(List.of());
-        when(session.getCurrentTrace()).thenReturn(context);
+        trackTrace(session, context);
         when(session.getSession()).thenReturn(resolverSession);
         when(session.toArtifacts(List.of())).thenReturn(List.of());
 
@@ -68,6 +79,11 @@ class RepositoryRequestTraceTest {
         RepositorySystem repositorySystem = mock(RepositorySystem.class);
         RepositorySystemSession resolverSession = mock(RepositorySystemSession.class);
         InternalSession session = mock(InternalSession.class);
+        when(session.request(any(), any())).thenAnswer(invocation -> {
+            Request<?> request = invocation.getArgument(0);
+            Function<Request<?>, Result<?>> work = invocation.getArgument(1);
+            return work.apply(request);
+        });
         ArtifactDeployerRequest request = mock(ArtifactDeployerRequest.class);
         RemoteRepository repository = mock(RemoteRepository.class);
         org.eclipse.aether.repository.RemoteRepository resolverRepository =
@@ -77,7 +93,7 @@ class RepositoryRequestTraceTest {
         when(request.getSession()).thenReturn(session);
         when(request.getArtifacts()).thenReturn(List.of());
         when(request.getRepository()).thenReturn(repository);
-        when(session.getCurrentTrace()).thenReturn(context);
+        trackTrace(session, context);
         when(session.getSession()).thenReturn(resolverSession);
         when(session.getRepositorySystem()).thenReturn(repositorySystem);
         when(session.toRepository(repository)).thenReturn(resolverRepository);
@@ -89,5 +105,16 @@ class RepositoryRequestTraceTest {
         verify(repositorySystem).deploy(eq(resolverSession), captor.capture());
         assertEquals(request, captor.getValue().getTrace().getData());
         verify(session).setCurrentTrace(context);
+    }
+
+    private static void trackTrace(InternalSession session, RequestTrace initial) {
+        AtomicReference<RequestTrace> current = new AtomicReference<>(initial);
+        when(session.getCurrentTrace()).thenAnswer(invocation -> current.get());
+        doAnswer(invocation -> {
+                    current.set(invocation.getArgument(0));
+                    return null;
+                })
+                .when(session)
+                .setCurrentTrace(any());
     }
 }

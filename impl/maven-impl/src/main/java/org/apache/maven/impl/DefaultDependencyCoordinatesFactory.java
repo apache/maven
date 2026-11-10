@@ -18,13 +18,15 @@
  */
 package org.apache.maven.impl;
 
+import java.util.Collection;
+
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Exclusion;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.DependencyCoordinatesFactory;
-import org.apache.maven.api.services.DependencyCoordinatesFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
 import static java.util.Objects.requireNonNull;
@@ -33,40 +35,51 @@ import static org.apache.maven.impl.ImplUtils.map;
 @Named
 @Singleton
 public class DefaultDependencyCoordinatesFactory implements DependencyCoordinatesFactory {
+    @Nonnull
+    @Override
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public DependencyCoordinates create(
+            @Nonnull Session session,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String extension,
+            String typeId,
+            String scope,
+            boolean optional,
+            @Nonnull Collection<Exclusion> exclusions) {
+        InternalSession internalSession = InternalSession.from(requireNonNull(session, "session"));
+        ArtifactType type = typeId != null
+                ? internalSession.getSession().getArtifactTypeRegistry().get(typeId)
+                : null;
+        return new DefaultDependencyCoordinates(
+                internalSession,
+                new org.eclipse.aether.graph.Dependency(
+                        new org.eclipse.aether.artifact.DefaultArtifact(
+                                groupId, artifactId, classifier, extension, version, type),
+                        scope,
+                        optional,
+                        map(requireNonNull(exclusions, "exclusions"), this::toExclusion)));
+    }
 
     @Nonnull
     @Override
-    public DependencyCoordinates create(@Nonnull DependencyCoordinatesFactoryRequest request) {
-        requireNonNull(request, "request");
-        InternalSession session = InternalSession.from(request.getSession());
-
-        ArtifactType type = null;
-        if (request.getType() != null) {
-            type = session.getSession().getArtifactTypeRegistry().get(request.getType());
-        }
-        if (request.getCoordinatesString() != null) {
-            return new DefaultDependencyCoordinates(
-                    session,
-                    new org.eclipse.aether.graph.Dependency(
-                            new org.eclipse.aether.artifact.DefaultArtifact(request.getCoordinatesString()),
-                            request.getScope(),
-                            request.isOptional(),
-                            map(request.getExclusions(), this::toExclusion)));
-        } else {
-            return new DefaultDependencyCoordinates(
-                    session,
-                    new org.eclipse.aether.graph.Dependency(
-                            new org.eclipse.aether.artifact.DefaultArtifact(
-                                    request.getGroupId(),
-                                    request.getArtifactId(),
-                                    request.getClassifier(),
-                                    request.getExtension(),
-                                    request.getVersion(),
-                                    type),
-                            request.getScope(),
-                            request.isOptional(),
-                            map(request.getExclusions(), this::toExclusion)));
-        }
+    public DependencyCoordinates create(
+            @Nonnull Session session,
+            @Nonnull String coordinatesString,
+            String scope,
+            boolean optional,
+            @Nonnull Collection<Exclusion> exclusions) {
+        InternalSession internalSession = InternalSession.from(requireNonNull(session, "session"));
+        return new DefaultDependencyCoordinates(
+                internalSession,
+                new org.eclipse.aether.graph.Dependency(
+                        new org.eclipse.aether.artifact.DefaultArtifact(
+                                requireNonNull(coordinatesString, "coordinatesString")),
+                        scope,
+                        optional,
+                        map(requireNonNull(exclusions, "exclusions"), this::toExclusion)));
     }
 
     private org.eclipse.aether.graph.Exclusion toExclusion(Exclusion exclusion) {

@@ -18,9 +18,11 @@
  */
 package org.apache.maven.impl;
 
+import java.util.IdentityHashMap;
+import java.util.Map;
 import java.util.stream.Collectors;
 
-import org.apache.maven.api.Session;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.services.Request;
 import org.eclipse.aether.RequestTrace;
 import org.eclipse.aether.collection.CollectRequest;
@@ -37,6 +39,36 @@ import org.eclipse.aether.resolution.DependencyRequest;
  * - Generate human-readable interpretations of trace data
  */
 public final class RequestTraceHelper {
+    private static final ThreadLocal<Map<ProtoSession, org.apache.maven.api.services.RequestTrace>> BOOTSTRAP_TRACES =
+            ThreadLocal.withInitial(IdentityHashMap::new);
+
+    /**
+     * Returns the active trace, including during bootstrap before a full session exists.
+     *
+     * @param session the session
+     * @return the current trace, or null
+     */
+    public static org.apache.maven.api.services.RequestTrace getCurrentTrace(ProtoSession session) {
+        return session instanceof InternalSession fullSession
+                ? fullSession.getCurrentTrace()
+                : BOOTSTRAP_TRACES.get().get(session);
+    }
+
+    private static void setCurrentTrace(ProtoSession session, org.apache.maven.api.services.RequestTrace trace) {
+        if (session instanceof InternalSession fullSession) {
+            fullSession.setCurrentTrace(trace);
+        } else {
+            Map<ProtoSession, org.apache.maven.api.services.RequestTrace> traces = BOOTSTRAP_TRACES.get();
+            if (trace != null) {
+                traces.put(session, trace);
+            } else {
+                traces.remove(session);
+                if (traces.isEmpty()) {
+                    BOOTSTRAP_TRACES.remove();
+                }
+            }
+        }
+    }
 
     /**
      * Represents a resolver trace containing both Maven and Resolver-specific trace information
@@ -47,7 +79,7 @@ public final class RequestTraceHelper {
      * @param previousMvnTrace The Maven trace to restore when leaving this scope
      */
     public record ResolverTrace(
-            Session session,
+            ProtoSession session,
             String context,
             RequestTrace trace,
             org.apache.maven.api.services.RequestTrace mvnTrace,
@@ -59,13 +91,12 @@ public final class RequestTraceHelper {
      * @param data The data object to associate with the trace
      * @return A new ResolverTrace containing both Maven and Resolver trace information
      */
-    public static ResolverTrace enter(Session session, Object data) {
-        InternalSession iSession = InternalSession.from(session);
-        org.apache.maven.api.services.RequestTrace previousTrace = iSession.getCurrentTrace();
+    public static ResolverTrace enter(ProtoSession session, Object data) {
+        org.apache.maven.api.services.RequestTrace previousTrace = getCurrentTrace(session);
         org.apache.maven.api.services.RequestTrace trace = data instanceof Request<?> req && req.getTrace() != null
                 ? req.getTrace()
                 : new org.apache.maven.api.services.RequestTrace(previousTrace, data);
-        iSession.setCurrentTrace(trace);
+        setCurrentTrace(session, trace);
         return new ResolverTrace(session, trace.context(), toResolver(trace), trace, previousTrace);
     }
 
@@ -74,8 +105,7 @@ public final class RequestTraceHelper {
      * @param trace The current resolver trace to exit from
      */
     public static void exit(ResolverTrace trace) {
-        InternalSession iSession = InternalSession.from(trace.session());
-        iSession.setCurrentTrace(trace.previousMvnTrace());
+        setCurrentTrace(trace.session(), trace.previousMvnTrace());
     }
 
     /**

@@ -23,7 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.maven.api.Constants;
-import org.apache.maven.api.Session;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.cache.CacheMetadata;
 import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.services.Request;
@@ -48,11 +48,15 @@ public class CacheConfigurationResolver {
      * @param session the session containing user properties
      * @return the resolved cache configuration
      */
-    public static CacheConfig resolveConfig(Request<?> req, Session session) {
+    public static CacheConfig resolveConfig(Request<?> req, ProtoSession session) {
         // First check if request implements CacheMetadata for backward compatibility
         CacheRetention legacyRetention = null;
         if (req instanceof CacheMetadata metadata) {
             legacyRetention = metadata.getCacheRetention();
+        }
+
+        if (legacyRetention == CacheRetention.DISABLED) {
+            return new CacheConfig(CacheRetention.DISABLED, Cache.ReferenceType.NONE);
         }
 
         // Check for key reference type configuration

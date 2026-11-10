@@ -34,16 +34,6 @@ import org.apache.maven.api.annotations.Nonnull;
 public interface ArtifactFactory extends Service {
 
     /**
-     * Creates an artifact.
-     *
-     * @param request the request holding artifact creation parameters
-     * @return an {@code Artifact}, never {@code null}
-     * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
-     */
-    @Nonnull
-    Artifact create(@Nonnull ArtifactFactoryRequest request);
-
-    /**
      * Creates an artifact from individual components.
      *
      * @param session the session
@@ -56,7 +46,7 @@ public interface ArtifactFactory extends Service {
     @Nonnull
     default Artifact create(
             @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
-        return create(ArtifactFactoryRequest.build(session, groupId, artifactId, version, extension));
+        return create(session, groupId, artifactId, version, null, extension, null);
     }
 
     /**
@@ -72,26 +62,14 @@ public interface ArtifactFactory extends Service {
      * @return an {@code Artifact}, never {@code null}
      */
     @Nonnull
-    default Artifact create(
+    Artifact create(
             @Nonnull Session session,
             String groupId,
             String artifactId,
             String version,
             String classifier,
             String extension,
-            String type) {
-        return create(ArtifactFactoryRequest.build(session, groupId, artifactId, version, classifier, extension, type));
-    }
-
-    /**
-     * Creates an artifact.
-     *
-     * @param request the request holding artifact creation parameters
-     * @return an {@code Artifact}, never {@code null}
-     * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
-     */
-    @Nonnull
-    ProducedArtifact createProduced(@Nonnull ArtifactFactoryRequest request);
+            String type);
 
     /**
      * Creates a produced artifact from individual components.
@@ -106,7 +84,7 @@ public interface ArtifactFactory extends Service {
     @Nonnull
     default ProducedArtifact createProduced(
             @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
-        return createProduced(ArtifactFactoryRequest.build(session, groupId, artifactId, version, extension));
+        return createProduced(session, groupId, artifactId, version, null, extension, null);
     }
 
     /**
@@ -122,15 +100,12 @@ public interface ArtifactFactory extends Service {
      * @return a {@code ProducedArtifact}, never {@code null}
      */
     @Nonnull
-    default ProducedArtifact createProduced(
+    ProducedArtifact createProduced(
             @Nonnull Session session,
             String groupId,
             String artifactId,
             String version,
             String classifier,
             String extension,
-            String type) {
-        return createProduced(
-                ArtifactFactoryRequest.build(session, groupId, artifactId, version, classifier, extension, type));
-    }
+            String type);
 }

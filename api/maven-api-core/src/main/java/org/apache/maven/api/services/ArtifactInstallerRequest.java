@@ -30,6 +30,8 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.CacheMetadata;
+import org.apache.maven.api.cache.CacheRetention;
 
 import static java.util.Objects.requireNonNull;
 
@@ -40,7 +42,19 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ArtifactInstallerRequest extends Request<Session> {
+public interface ArtifactInstallerRequest extends Request<Session>, CacheMetadata {
+
+    /**
+     * Returns the cache retention for this operation.
+     *
+     * @return {@link CacheRetention#DISABLED}
+     * @since 4.2.0
+     */
+    @Nonnull
+    @Override
+    default CacheRetention getCacheRetention() {
+        return CacheRetention.DISABLED;
+    }
 
     /** @return the artifacts to install, never {@code null} */
     @Nonnull

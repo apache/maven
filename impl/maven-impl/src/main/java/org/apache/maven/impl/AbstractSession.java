@@ -49,6 +49,7 @@ import org.apache.maven.api.Listener;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.Node;
+import org.apache.maven.api.OperationService;
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.PathType;
@@ -188,12 +189,12 @@ public abstract class AbstractSession implements InternalSession {
             return Stream.concat(
                             Service.class.isAssignableFrom(clazz) ? Stream.of((Class<Service>) clazz) : Stream.empty(),
                             Stream.of(clazz.getInterfaces()).flatMap(AbstractSession::collectServiceInterfaces))
-                    .filter(itf -> itf != Service.class);
+                    .filter(itf -> itf != Service.class && itf != OperationService.class);
         } else {
             return Stream.concat(
                             Stream.of(clazz.getInterfaces()).flatMap(AbstractSession::collectServiceInterfaces),
                             collectServiceInterfaces(clazz.getSuperclass()))
-                    .filter(itf -> itf != Service.class);
+                    .filter(itf -> itf != Service.class && itf != OperationService.class);
         }
     }
 

@@ -217,7 +217,13 @@ public class DefaultArtifactDescriptorReader implements ArtifactDescriptorReader
                         .build();
 
                 ModelBuilder.ModelBuilderSession builderSession = modelBuilder.newSession();
-                ModelBuilderResult modelResult = iSession.request(modelRequest, builderSession::build);
+                ModelBuilderResult modelResult;
+                RequestTraceHelper.ResolverTrace modelTrace = RequestTraceHelper.enter(iSession, modelRequest);
+                try {
+                    modelResult = iSession.request(modelRequest, builderSession::build);
+                } finally {
+                    RequestTraceHelper.exit(modelTrace);
+                }
                 // ModelBuildingEx is thrown only on FATAL and ERROR severities, but we still can have WARNs
                 // that may lead to unexpected build failure, log them
                 if (modelResult.getProblemCollector().hasWarningProblems()) {

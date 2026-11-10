@@ -28,6 +28,8 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.CacheMetadata;
+import org.apache.maven.api.cache.CacheRetention;
 
 import static java.util.Objects.requireNonNull;
 
@@ -37,7 +39,19 @@ import static java.util.Objects.requireNonNull;
  * @since 4.0.0
  */
 @Experimental
-public interface ToolchainsBuilderRequest extends Request<ProtoSession> {
+public interface ToolchainsBuilderRequest extends Request<ProtoSession>, CacheMetadata {
+
+    /**
+     * Returns the cache retention for this operation.
+     *
+     * @return {@link CacheRetention#SESSION_SCOPED}
+     * @since 4.2.0
+     */
+    @Nonnull
+    @Override
+    default CacheRetention getCacheRetention() {
+        return CacheRetention.SESSION_SCOPED;
+    }
 
     /**
      * Gets the installation Toolchains source.

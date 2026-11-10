@@ -33,7 +33,7 @@ import java.util.Map;
 import java.util.Properties;
 
 import org.apache.maven.api.Constants;
-import org.apache.maven.api.Session;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Interpolator;
 import org.apache.maven.api.services.SettingsBuilderException;
@@ -300,7 +300,7 @@ class DefaultSettingsParserTest {
         var error = assertThrows(
                 SettingsBuilderException.class,
                 () -> builder.build(SettingsBuilderRequest.builder()
-                        .session(mock(Session.class))
+                        .session(mock(ProtoSession.class))
                         .userSettingsSource(source)
                         .build()));
         var fatals = error.getProblemCollector()
@@ -381,7 +381,7 @@ class DefaultSettingsParserTest {
                         .build());
         var result = builder(Map.of("custom", parser))
                 .build(SettingsBuilderRequest.builder()
-                        .session(mock(Session.class))
+                        .session(mock(ProtoSession.class))
                         .installationSettingsSource(source(
                                 "installation.xml",
                                 "<settings><servers><server><id>repository</id>"
@@ -404,7 +404,7 @@ class DefaultSettingsParserTest {
         when(parser.parse(any(), any())).thenReturn(Settings.newInstance().withOffline(true));
         var result = builder(Map.of("custom", parser))
                 .build(SettingsBuilderRequest.builder()
-                        .session(mock(Session.class))
+                        .session(mock(ProtoSession.class))
                         .projectSettingsSource(source("project.custom", ""))
                         .build());
         assertFalse(result.getEffectiveSettings().isOffline());
@@ -415,7 +415,7 @@ class DefaultSettingsParserTest {
     void projectSettingsCannotWidenServerCredentialOrigins() throws Exception {
         var result = builder(Map.of())
                 .build(SettingsBuilderRequest.builder()
-                        .session(mock(Session.class))
+                        .session(mock(ProtoSession.class))
                         .userSettingsSource(source(
                                 "user.xml",
                                 "<settings><servers><server><id>repository</id>"
@@ -451,7 +451,7 @@ class DefaultSettingsParserTest {
                                 .password(encrypted)
                                 .build()))
                         .build());
-        Session session = mock(Session.class);
+        ProtoSession session = mock(ProtoSession.class);
         when(session.getEffectiveProperties())
                 .thenReturn(Map.of(
                         Constants.MAVEN_SETTINGS_SECURITY,
@@ -480,7 +480,7 @@ class DefaultSettingsParserTest {
                 .bindInstance(Interpolator.class, new DefaultInterpolator())
                 .bindInstance(Dispatcher.class, mock(Dispatcher.class));
         injector.bindImplicit(DefaultSettingsBuilder.class);
-        Session session = mock(Session.class);
+        ProtoSession session = mock(ProtoSession.class);
         when(session.getEffectiveProperties()).thenReturn(Map.of("user.home", directory.toString()));
         var result = injector.getInstance(DefaultSettingsBuilder.class)
                 .build(SettingsBuilderRequest.builder()
@@ -500,7 +500,7 @@ class DefaultSettingsParserTest {
         injector.bindImplicit(DefaultSettingsBuilder.class);
         var result = injector.getInstance(DefaultSettingsBuilder.class)
                 .build(SettingsBuilderRequest.builder()
-                        .session(mock(Session.class))
+                        .session(mock(ProtoSession.class))
                         .userSettingsSource(source("memory.properties", propertiesSettings()))
                         .build());
         assertEquals(
@@ -539,7 +539,7 @@ class DefaultSettingsParserTest {
     private SettingsBuilderResult build(Source source, Map<String, SettingsParser> parsers) {
         return builder(parsers)
                 .build(SettingsBuilderRequest.builder()
-                        .session(mock(Session.class))
+                        .session(mock(ProtoSession.class))
                         .userSettingsSource(source)
                         .build());
     }
