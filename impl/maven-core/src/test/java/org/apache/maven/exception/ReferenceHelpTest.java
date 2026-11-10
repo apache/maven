@@ -103,8 +103,7 @@ class ReferenceHelpTest {
                     ReferenceHelp.hasHelpText("http://cwiki.apache.org/confluence/display/MAVEN/" + key),
                     "Expected help text resource for cwiki URL of " + key);
         }
-        assertTrue(ReferenceHelp.hasHelpText(
-                "https://maven.apache.org/resolver/remote-repository-filtering.html"));
+        assertTrue(ReferenceHelp.hasHelpText("https://maven.apache.org/resolver/remote-repository-filtering.html"));
     }
 
     @Test
