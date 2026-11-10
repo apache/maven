@@ -38,8 +38,10 @@ under the License.
             <!-- Ordinary phase work must precede the aggregator in the configured order. -->
             <execution>
               <id>touch</id>
+              <goals>
+                <goal>touch</goal>
+              </goals>
               <phase>package</phase>
-              <goals><goal>touch</goal></goals>
             </execution>
             <execution>
               <id>aggregate</id>

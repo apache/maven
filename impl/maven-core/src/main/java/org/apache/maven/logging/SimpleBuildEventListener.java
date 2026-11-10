@@ -18,8 +18,12 @@
  */
 package org.apache.maven.logging;
 
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.function.Consumer;
 
+import org.apache.maven.api.logging.LogEvent;
+import org.apache.maven.api.logging.LogLevel;
 import org.apache.maven.execution.ExecutionEvent;
 import org.eclipse.aether.transfer.TransferEvent;
 
@@ -38,8 +42,30 @@ public class SimpleBuildEventListener implements BuildEventListener {
     public void projectStarted(String projectId) {}
 
     @Override
-    public void projectLogMessage(String projectId, String event) {
-        log(event);
+    public void projectLogMessage(String projectId, LogEvent event) {
+        String line = event.renderedLine();
+        if (line == null) {
+            // Maven API Logger events (not SLF4J) carry no pre-rendered line;
+            // reconstruct the console format: "[LEVEL] message"
+            line = "[" + renderLevel(event.level()) + "] " + event.message();
+        }
+        log(line);
+        Throwable throwable = event.throwable();
+        if (throwable != null) {
+            StringWriter sw = new StringWriter();
+            try (PrintWriter pw = new PrintWriter(sw)) {
+                throwable.printStackTrace(pw);
+            }
+            log(sw.toString().stripTrailing());
+        }
+    }
+
+    /**
+     * Renders the log level for console output.
+     * Maven traditionally uses {@code WARNING} rather than SLF4J's {@code WARN}.
+     */
+    protected String renderLevel(LogLevel level) {
+        return level == LogLevel.WARN ? "WARNING" : level.name();
     }
 
     @Override

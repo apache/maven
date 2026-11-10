@@ -52,6 +52,8 @@ public class CliRequest {
 
     boolean showErrors = true;
 
+    String failOnSeverity;
+
     Properties userProperties = new Properties();
 
     Properties systemProperties = new Properties();

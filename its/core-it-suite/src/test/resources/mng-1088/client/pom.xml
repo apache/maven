@@ -26,10 +26,8 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-1088 :: Plugin Client</name>
-  <description>
-    Uses the sibling plugin, which must be built by the concurrent builder
-    from source within this same reactor — no pre-installed version in the local repo.
-  </description>
+  <description>Uses the sibling plugin, which must be built by the concurrent builder
+    from source within this same reactor — no pre-installed version in the local repo.</description>
 
   <build>
     <plugins>
