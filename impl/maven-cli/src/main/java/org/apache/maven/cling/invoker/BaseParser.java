@@ -720,6 +720,10 @@ public abstract class BaseParser implements Parser {
         builder.groupId(groupId);
         builder.artifactId(artifactId);
         builder.version(version);
+        builder.location(
+                "",
+                org.apache.maven.api.cli.extensions.InputLocation.of(
+                        -1, -1, org.apache.maven.api.cli.extensions.InputSource.of(sourceFile.toString())));
         if (ext.getClassLoadingStrategy() != null) {
             builder.classLoadingStrategy(ext.getClassLoadingStrategy());
         }
