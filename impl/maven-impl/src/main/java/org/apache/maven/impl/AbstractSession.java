@@ -170,10 +170,14 @@ public abstract class AbstractSession implements InternalSession {
         return (List<Listener>) session.getData().computeIfAbsent(Listener.class, () -> {
             List<Listener> list = new CopyOnWriteArrayList<>();
             if (lookup != null) {
-                for (SpiService spi : lookup.lookupList(SpiService.class)) {
-                    if (spi instanceof Listener listener && !list.contains(listener)) {
-                        list.add(listener);
+                try {
+                    for (SpiService spi : lookup.lookupList(SpiService.class)) {
+                        if (spi instanceof Listener listener && !list.contains(listener)) {
+                            list.add(listener);
+                        }
                     }
+                } catch (LookupException e) {
+                    // ignore if lookup is unavailable in test environments
                 }
             }
             return list;

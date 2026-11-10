@@ -48,6 +48,11 @@ import org.apache.maven.api.annotations.Nonnull;
  *       {@code META-INF/services/org.apache.maven.api.spi.SpiService}. Maven will
  *       discover and register such listeners automatically at session initialization.</li>
  * </ul>
+ * <p>
+ * Implementations should handle their own errors. Any {@link RuntimeException} thrown by {@link #onEvent(Event)}
+ * is caught and logged at {@code WARN} level by event dispatchers (such as {@code EventSpyImpl} for execution events
+ * and {@code MavenRepositoryListener} for repository events) to protect build stability and ensure that other
+ * listeners are still notified. A listener cannot abort or fail the build by throwing an exception.
  *
  * @since 4.0.0
  */
@@ -57,6 +62,9 @@ import org.apache.maven.api.annotations.Nonnull;
 public interface Listener {
     /**
      * Receives a build execution event.
+     * <p>
+     * Any {@link RuntimeException} thrown by this method is caught and logged at {@code WARN} level
+     * by event dispatchers to protect build stability; it will not abort the build.
      *
      * @param event the execution event
      */
