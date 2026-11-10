@@ -600,7 +600,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             injector.bindInstance(Session.class, sessionV4);
             injector.bindInstance(Project.class, project);
             injector.bindInstance(org.apache.maven.api.MojoExecution.class, execution);
-            injector.bindInstance(Log.class, log);
+            injector.bindInstance(org.apache.maven.api.plugin.Log.class, log);
 
             Map<Class<? extends Service>, Supplier<? extends Service>> services = sessionV4.getAllServices();
             services.forEach((itf, svc) -> injector.bindSupplier((Class<Service>) itf, (Supplier<Service>) svc));

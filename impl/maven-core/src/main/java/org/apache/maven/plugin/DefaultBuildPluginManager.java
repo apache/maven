@@ -49,6 +49,8 @@ import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.repository.RemoteRepository;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 // TODO the antrun plugin has its own configurator, the only plugin that does. might need to think about how that works
 // TODO remove the coreArtifactFilterManager

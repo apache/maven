@@ -617,6 +617,7 @@ public class MavenCli {
                 // Ignore
                 //
             }
+        }
 
         LoggerManager.get().reconfigure();
 
