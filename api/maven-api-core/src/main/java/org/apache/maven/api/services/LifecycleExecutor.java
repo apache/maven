@@ -54,8 +54,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * <h2>Example</h2>
  * <pre>{@code
  * // Plan the "resources" phase for a project
- * LifecyclePlanResult planResult = session.planLifecycle(
- *     project, List.of(Lifecycle.Phase.RESOURCES));
+ * LifecyclePlanResult planResult = session.planLifecycle(project, "resources");
  * LifecyclePlan plan = planResult.plan();
  *
  * // Inspect what would run
