@@ -28,11 +28,11 @@ import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.api.Constants;
-import org.apache.maven.cling.logging.Slf4jConfiguration;
-import org.apache.maven.cling.logging.Slf4jConfigurationFactory;
+import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
-import org.apache.maven.slf4j.MavenBaseLogger;
+import org.apache.maven.logging.slf4j.MavenBaseLogger;
+import org.apache.maven.logging.slf4j.MavenLoggerFactory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.spi.TerminalExt;
 import org.junit.jupiter.api.AfterEach;
@@ -40,6 +40,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Isolated;
+import org.slf4j.ILoggerFactory;
 import org.slf4j.LoggerFactory;
 
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -420,8 +421,17 @@ class MavenCliLoggingTest {
     }
 
     private static void activateSlf4j() {
-        Slf4jConfiguration config = Slf4jConfigurationFactory.getConfiguration(LoggerFactory.getILoggerFactory());
-        config.activate();
+        // Disable the LogSink so SLF4J output goes through OutputChoice/PrintStream,
+        // matching the old write path that these tests verify.
+        LoggerManager.get().setLogSink(null);
+        // Ensure at least one logger exists so that reconfigure() → updateExistingLoggers()
+        // calls configure() on it (which may block on FastTerminal.getType() in tests that
+        // verify terminal-await timing).
+        LoggerFactory.getLogger("activateSlf4j-warmup");
+        ILoggerFactory lf = LoggerFactory.getILoggerFactory();
+        if (lf instanceof MavenLoggerFactory mlf) {
+            mlf.reconfigure();
+        }
     }
 
     private static void restoreProperty(String name, String value) {

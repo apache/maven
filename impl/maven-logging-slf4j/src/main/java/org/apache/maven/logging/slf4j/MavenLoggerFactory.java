@@ -82,6 +82,7 @@ public class MavenLoggerFactory implements ILoggerFactory {
     }
 
     private void updateExistingLoggers() {
+        MavenBaseLogger.init();
         loggerMap.values().forEach(l -> {
             if (l instanceof MavenSimpleLogger msl) {
                 msl.configure(logManager.getDefaultLogLevel());
