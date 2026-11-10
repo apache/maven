@@ -29,6 +29,11 @@ public interface MojoExpressionEvaluator {
     /**
      * Evaluates the given expression, optionally coercing the result to the given type.
      *
+     * <p>This method declares {@code throws Exception} rather than
+     * {@code throws MojoExpressionEvaluationException} intentionally: tying the public SPI
+     * signature to a specific exception hierarchy would force implementors to depend on
+     * {@code maven-core} internals. Callers should catch {@code Exception} and wrap as needed.
+     *
      * @param expr the expression to evaluate (e.g. {@code ${project.version}})
      * @param type the desired return type, or {@code null} for no coercion
      * @return the evaluated value, or {@code null}

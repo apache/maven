@@ -709,7 +709,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         if (model.getParent() != null && model.getParent().getGroupId() != null) {
             return model.getParent().getGroupId();
         }
-        throw new Exception("unable to determine groupId");
+        throw new Exception("unable to determine groupId for artifact: " + model.getArtifactId());
     }
 
     private static String resolveVersion(org.apache.maven.api.model.Model model) throws Exception {
@@ -719,7 +719,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         if (model.getParent() != null && model.getParent().getVersion() != null) {
             return model.getParent().getVersion();
         }
-        throw new Exception("unable to determine version");
+        throw new Exception("unable to determine version for artifact: " + model.getArtifactId());
     }
 
     private XmlNode finalizeConfig(XmlNode config, MojoDescriptor mojoDescriptor) {
@@ -822,7 +822,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
     public static void setVariableValueToObject(Object object, String variable, Object value)
             throws IllegalAccessException {
         Field field = getFieldByNameIncludingSuperclasses(variable, object.getClass());
-        requireNonNull(field, "Field " + variable + " not found");
+        requireNonNull(field, "Field " + variable + " not found in " + object.getClass().getName());
         field.setAccessible(true);
         field.set(object, value);
     }

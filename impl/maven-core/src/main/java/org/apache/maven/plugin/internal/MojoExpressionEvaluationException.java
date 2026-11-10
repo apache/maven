@@ -24,11 +24,11 @@ package org.apache.maven.plugin.internal;
  * @since 4.2.0
  */
 public class MojoExpressionEvaluationException extends Exception {
-    MojoExpressionEvaluationException(String message) {
+    public MojoExpressionEvaluationException(String message) {
         super(message);
     }
 
-    MojoExpressionEvaluationException(String message, Throwable cause) {
+    public MojoExpressionEvaluationException(String message, Throwable cause) {
         super(message, cause);
     }
 }
