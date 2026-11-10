@@ -403,6 +403,212 @@ class MojoDescriptorProcessorTest {
     }
 
     // -------------------------------------------------------------------------
+    // Test 8: deriveParameterName() — direct static method tests
+    // -------------------------------------------------------------------------
+
+    @Test
+    void deriveParameterNameFromSetter() {
+        assertEquals("outputDir", MojoDescriptorProcessor.deriveParameterName("setOutputDir"));
+    }
+
+    @Test
+    void deriveParameterNameFromGetter() {
+        assertEquals("outputDir", MojoDescriptorProcessor.deriveParameterName("getOutputDir"));
+    }
+
+    @Test
+    void deriveParameterNameFromIsMethod() {
+        assertEquals("enabled", MojoDescriptorProcessor.deriveParameterName("isEnabled"));
+    }
+
+    @Test
+    void deriveParameterNamePreservesConsecutiveUppercase() {
+        // JavaBeans convention: "URL" stays "URL" when first two chars are uppercase
+        assertEquals("URL", MojoDescriptorProcessor.deriveParameterName("setURL"));
+    }
+
+    @Test
+    void deriveParameterNameNoPrefix() {
+        // Method without set/get/is prefix is returned as-is (decapitalized)
+        assertEquals("doWork", MojoDescriptorProcessor.deriveParameterName("doWork"));
+    }
+
+    @Test
+    void decapitalizeBasic() {
+        assertEquals("hello", MojoDescriptorProcessor.decapitalize("Hello"));
+    }
+
+    @Test
+    void decapitalizeConsecutiveUppercase() {
+        assertEquals("URL", MojoDescriptorProcessor.decapitalize("URL"));
+    }
+
+    @Test
+    void decapitalizeEmpty() {
+        assertEquals("", MojoDescriptorProcessor.decapitalize(""));
+    }
+
+    // -------------------------------------------------------------------------
+    // Test 9: Nested @Mojo class generates correct package and implementation
+    // -------------------------------------------------------------------------
+
+    @Test
+    void nestedMojoClassGeneratesCorrectPackageAndBinaryName() {
+        // Outer class containing the nested @Mojo
+        String outerSource = """
+                package com.example;
+                import org.apache.maven.api.plugin.annotations.Mojo;
+                public class Mojos {
+                    @Mojo(name = "touch")
+                    public static class TouchMojo {
+                        public void execute() {}
+                    }
+                }
+                """;
+
+        CompilationResult result = compile(
+                List.of(inMemorySource("com.example.Mojos", outerSource)),
+                Map.of(
+                        "maven.plugin.groupId", "com.example",
+                        "maven.plugin.artifactId", "example-plugin",
+                        "maven.plugin.version", "1.0.0"));
+
+        assertTrue(result.success, () -> "Compilation failed:\n" + result.diagnosticsToString());
+
+        // plugin.xml: implementation must use '$' for nested class (binary name)
+        String pluginXml = result.getResource("META-INF/maven/plugin.xml");
+        assertNotNull(pluginXml, "plugin.xml must be generated");
+        assertContains(pluginXml, "<goal>touch</goal>");
+        assertContains(pluginXml, "<implementation>com.example.Mojos$TouchMojo</implementation>");
+
+        // Factory must be in the correct package (com.example, NOT com.example.Mojos)
+        String factorySource = result.getGeneratedSource("com.example.TouchMojoMojoFactory");
+        assertNotNull(factorySource, "Factory source must be generated for nested mojo");
+        assertContains(factorySource, "package com.example;");
+        // Factory extends the nested class using its relative name within the package
+        assertContains(factorySource, "extends Mojos.TouchMojo");
+    }
+
+    // -------------------------------------------------------------------------
+    // Test 10: @Parameter on setter methods derives correct name
+    // -------------------------------------------------------------------------
+
+    @Test
+    void parameterOnSetterDerivesNameFromMethodName() {
+        String source = """
+                package com.example;
+                import org.apache.maven.api.plugin.annotations.Mojo;
+                import org.apache.maven.api.plugin.annotations.Parameter;
+                @Mojo(name = "build")
+                public class BuildMojo {
+                    private java.io.File outputDir;
+
+                    @Parameter(property = "output")
+                    public void setOutputDir(java.io.File dir) {
+                        this.outputDir = dir;
+                    }
+
+                    public void execute() {}
+                }
+                """;
+
+        CompilationResult result = compile(
+                List.of(inMemorySource("com.example.BuildMojo", source)),
+                Map.of(
+                        "maven.plugin.groupId", "com.example",
+                        "maven.plugin.artifactId", "example-plugin",
+                        "maven.plugin.version", "1.0.0"));
+
+        assertTrue(result.success, () -> "Compilation failed:\n" + result.diagnosticsToString());
+
+        String pluginXml = result.getResource("META-INF/maven/plugin.xml");
+        assertNotNull(pluginXml, "plugin.xml must be generated");
+        // Name should be "outputDir", not "setOutputDir"
+        assertContains(pluginXml, "<name>outputDir</name>");
+        assertFalse(
+                pluginXml.contains("<name>setOutputDir</name>"),
+                "Setter prefix should be stripped from parameter name");
+    }
+
+    // -------------------------------------------------------------------------
+    // Test 11: Generic type parameters use erasure
+    // -------------------------------------------------------------------------
+
+    @Test
+    void genericTypeParameterUsesErasure() {
+        String source = """
+                package com.example;
+                import org.apache.maven.api.plugin.annotations.Mojo;
+                import org.apache.maven.api.plugin.annotations.Parameter;
+                import java.util.List;
+                @Mojo(name = "process")
+                public class ProcessMojo {
+                    @Parameter
+                    private List<String> includes;
+
+                    public void execute() {}
+                }
+                """;
+
+        CompilationResult result = compile(
+                List.of(inMemorySource("com.example.ProcessMojo", source)),
+                Map.of(
+                        "maven.plugin.groupId", "com.example",
+                        "maven.plugin.artifactId", "example-plugin",
+                        "maven.plugin.version", "1.0.0"));
+
+        assertTrue(result.success, () -> "Compilation failed:\n" + result.diagnosticsToString());
+
+        String pluginXml = result.getResource("META-INF/maven/plugin.xml");
+        assertNotNull(pluginXml, "plugin.xml must be generated");
+        assertContains(pluginXml, "<name>includes</name>");
+        // Type should be erased to raw type, not "java.util.List<java.lang.String>"
+        assertContains(pluginXml, "<type>java.util.List</type>");
+        // In XML, angle brackets are escaped; check that no "&lt;" appears after "List"
+        assertFalse(
+                pluginXml.contains("List&lt;"),
+                "Generic type parameters should be erased (found List&lt; in plugin.xml)");
+    }
+
+    // -------------------------------------------------------------------------
+    // Test 12: @Resolution fields appear in resolutions list (not dependencyResolution)
+    // -------------------------------------------------------------------------
+
+    @Test
+    void resolutionFieldAppearsInResolutionsList() {
+        String source = """
+                package com.example;
+                import org.apache.maven.api.plugin.annotations.Mojo;
+                import org.apache.maven.api.plugin.annotations.Resolution;
+                @Mojo(name = "list-deps")
+                public class ListDepsMojo {
+                    @Resolution(pathScope = "main", requestType = "resolve")
+                    private Object deps;
+
+                    public void execute() {}
+                }
+                """;
+
+        CompilationResult result = compile(
+                List.of(inMemorySource("com.example.ListDepsMojo", source)),
+                Map.of(
+                        "maven.plugin.groupId", "com.example",
+                        "maven.plugin.artifactId", "example-plugin",
+                        "maven.plugin.version", "1.0.0"));
+
+        assertTrue(result.success, () -> "Compilation failed:\n" + result.diagnosticsToString());
+
+        String pluginXml = result.getResource("META-INF/maven/plugin.xml");
+        assertNotNull(pluginXml, "plugin.xml must be generated");
+        // @Resolution fields should appear in the resolutions list, not as dependencyResolution
+        assertContains(pluginXml, "<pathScope>main</pathScope>");
+        assertContains(pluginXml, "<requestType>resolve</requestType>");
+        assertFalse(
+                pluginXml.contains("<dependencyResolution>main</dependencyResolution>"),
+                "dependencyResolution should not be inferred from @Resolution; the build planner uses resolutions directly");
+    }
+
+    // -------------------------------------------------------------------------
     // Test: explicit goalPrefix option overrides derivation
     // -------------------------------------------------------------------------
 

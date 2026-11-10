@@ -55,6 +55,7 @@ import org.apache.maven.api.plugin.annotations.Resolution;
 import org.apache.maven.api.plugin.descriptor.AfterLink;
 import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxReader;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxWriter;
 
 /**
@@ -202,6 +203,28 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
             }
         }
         mojos.add(buildHelpMojoDescriptor(coords));
+        // Merge with existing plugin.xml for incremental compilation support:
+        // keep mojos from a previous compilation that were not reprocessed in this round.
+        Set<String> currentGoals = new LinkedHashSet<>();
+        for (MojoDescriptor m : mojos) {
+            currentGoals.add(m.getGoal());
+        }
+        try {
+            var existing = processingEnv
+                    .getFiler()
+                    .getResource(StandardLocation.CLASS_OUTPUT, "", "META-INF/maven/plugin.xml");
+            try (var r = existing.openReader(false)) {
+                PluginDescriptor prev = new PluginDescriptorStaxReader().read(r);
+                for (MojoDescriptor prevMojo : prev.getMojos()) {
+                    if (!currentGoals.contains(prevMojo.getGoal())) {
+                        mojos.add(prevMojo);
+                    }
+                }
+            }
+        } catch (Exception ex) {
+            // No existing plugin.xml, read not supported, or parse error —
+            // expected during clean builds and in test harnesses
+        }
         PluginDescriptor descriptor = PluginDescriptor.newBuilder(true)
                 .name(coords[4])
                 .groupId(coords[0])
@@ -233,11 +256,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
     private MojoDescriptor buildHelpMojoDescriptor(String[] coords) {
         String pkg = mojoElements.values().stream()
                 .filter(te -> te != null)
-                .map(te -> {
-                    String fqn = te.getQualifiedName().toString();
-                    int dot = fqn.lastIndexOf('.');
-                    return dot > 0 ? fqn.substring(0, dot) : "";
-                })
+                .map(this::getPackageName)
                 .findFirst()
                 .orElse("");
         String impl = pkg.isEmpty() ? "HelpMojo" : pkg + ".HelpMojo";
@@ -286,7 +305,8 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         JavadocInfo doc = parseJavadoc(processingEnv.getElementUtils().getDocComment(mojoType));
         MojoDescriptor.Builder b = MojoDescriptor.newBuilder(true)
                 .goal(mojoAnn.name())
-                .implementation(mojoType.getQualifiedName().toString())
+                .implementation(
+                        processingEnv.getElementUtils().getBinaryName(mojoType).toString())
                 .projectRequired(mojoAnn.projectRequired())
                 .onlineRequired(mojoAnn.onlineRequired())
                 .aggregator(mojoAnn.aggregator());
@@ -324,19 +344,27 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                 if (ann == null) {
                     continue;
                 }
-                String name = ann.name().isEmpty() ? enclosed.getSimpleName().toString() : ann.name();
+                String name;
+                if (!ann.name().isEmpty()) {
+                    name = ann.name();
+                } else if (enclosed.getKind() == ElementKind.METHOD) {
+                    name = deriveParameterName(enclosed.getSimpleName().toString());
+                } else {
+                    name = enclosed.getSimpleName().toString();
+                }
                 if (!seen.add(name)) {
                     continue;
                 }
-                String type = enclosed.getKind() == ElementKind.FIELD
-                        ? enclosed.asType().toString()
-                        : (((ExecutableElement) enclosed).getParameters().isEmpty()
-                                ? ((ExecutableElement) enclosed).getReturnType().toString()
-                                : ((ExecutableElement) enclosed)
-                                        .getParameters()
-                                        .get(0)
-                                        .asType()
-                                        .toString());
+                TypeMirror rawType;
+                if (enclosed.getKind() == ElementKind.FIELD) {
+                    rawType = enclosed.asType();
+                } else {
+                    ExecutableElement method = (ExecutableElement) enclosed;
+                    rawType = method.getParameters().isEmpty()
+                            ? method.getReturnType()
+                            : method.getParameters().get(0).asType();
+                }
+                String type = processingEnv.getTypeUtils().erasure(rawType).toString();
                 String expression = ann.property();
                 if (!expression.isEmpty() && !expression.startsWith("${")) {
                     expression = "${" + expression + "}";
@@ -408,8 +436,10 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
             return;
         }
         String fqn = mojoType.getQualifiedName().toString();
-        String pkg = fqn.contains(".") ? fqn.substring(0, fqn.lastIndexOf('.')) : "";
+        String pkg = getPackageName(mojoType);
         String simpleName = mojoType.getSimpleName().toString();
+        // For nested classes, compute the relative class name within the package (e.g. "Mojos.TouchMojo")
+        String relativeClassName = pkg.isEmpty() ? fqn : fqn.substring(pkg.length() + 1);
         String factoryName = simpleName + "MojoFactory";
         String factoryFqn = pkg.isEmpty() ? factoryName : pkg + "." + factoryName;
         String roleHint = coords[0] + ":" + coords[1] + ":" + coords[2] + ":" + mojoAnn.name();
@@ -427,7 +457,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                 pw.println();
             }
             pw.println("@org.apache.maven.api.di.Named(\"" + roleHint + "\")");
-            pw.println("public class " + factoryName + " extends " + simpleName + " {");
+            pw.println("public class " + factoryName + " extends " + relativeClassName + " {");
             for (ExecutableElement ctor : ctors) {
                 if (ctor.getParameters().isEmpty()) {
                     continue;
@@ -648,11 +678,8 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
     private void generateHelpMojo(String[] coords) throws IOException {
         // Use the first discovered mojo's package for the generated HelpMojo.
         String pkg = mojoElements.values().stream()
-                .map(te -> {
-                    String fqn = te.getQualifiedName().toString();
-                    int dot = fqn.lastIndexOf('.');
-                    return dot > 0 ? fqn.substring(0, dot) : "";
-                })
+                .filter(te -> te != null)
+                .map(this::getPackageName)
                 .findFirst()
                 .orElse("");
 
@@ -763,6 +790,48 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
 
     private static boolean isBlank(String s) {
         return s == null || s.isEmpty();
+    }
+
+    /**
+     * Returns the package name for the given type element, using the annotation
+     * processing API to correctly handle nested classes.
+     */
+    private String getPackageName(TypeElement typeElement) {
+        return processingEnv
+                .getElementUtils()
+                .getPackageOf(typeElement)
+                .getQualifiedName()
+                .toString();
+    }
+
+    /**
+     * Derives a parameter name from a getter/setter method name by stripping the
+     * "set"/"get"/"is" prefix and decapitalizing, following JavaBeans conventions.
+     */
+    static String deriveParameterName(String methodName) {
+        String stripped = methodName;
+        if (methodName.startsWith("set") && methodName.length() > 3) {
+            stripped = methodName.substring(3);
+        } else if (methodName.startsWith("get") && methodName.length() > 3) {
+            stripped = methodName.substring(3);
+        } else if (methodName.startsWith("is") && methodName.length() > 2) {
+            stripped = methodName.substring(2);
+        }
+        return decapitalize(stripped);
+    }
+
+    /**
+     * Decapitalizes a name following JavaBeans conventions: if the first two characters
+     * are both uppercase, the name is returned unchanged (e.g. "URL" stays "URL").
+     */
+    static String decapitalize(String name) {
+        if (name == null || name.isEmpty()) {
+            return name;
+        }
+        if (name.length() > 1 && Character.isUpperCase(name.charAt(1)) && Character.isUpperCase(name.charAt(0))) {
+            return name;
+        }
+        return Character.toLowerCase(name.charAt(0)) + name.substring(1);
     }
 
     private void note(String msg) {

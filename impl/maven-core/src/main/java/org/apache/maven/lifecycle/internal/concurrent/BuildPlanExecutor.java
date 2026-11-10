@@ -192,6 +192,14 @@ public class BuildPlanExecutor {
         this.lifecycles = lifecycles;
     }
 
+    private static boolean requiresDependencyOrdering(MojoDescriptor descriptor) {
+        if (descriptor.isV4Api()) {
+            return !descriptor.getMojoDescriptorV4().getResolutions().isEmpty();
+        }
+        return descriptor.getDependencyCollectionRequired() != null
+                || descriptor.getDependencyResolutionRequired() != null;
+    }
+
     public void execute(MavenSession session, ReactorContext reactorContext, List<TaskSegment> taskSegments)
             throws ExecutionException, InterruptedException {
         try (BuildContext ctx = new BuildContext(session, reactorContext, taskSegments)) {
