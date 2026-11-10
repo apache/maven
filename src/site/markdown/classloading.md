@@ -80,10 +80,22 @@ are picked up from the classpath entry as a transparent fallback.
 
 ## Core Extension Realms (`coreExtension>G:A:V`)
 
-Core extensions are loaded from `.mvn/extensions.xml` during Maven
-startup, **before the POM is parsed**. Each core extension gets its own
-isolated classloader. Because they load before POM parsing, core
-extensions can influence the build itself (e.g. polyglot Maven).
+Core extensions are loaded during Maven startup, **before the POM is
+parsed**. Because they load before POM parsing, core extensions can
+influence the build itself (e.g. polyglot Maven). Each core extension
+gets its own isolated classloader.
+
+Maven reads `extensions.xml` files from three locations, in precedence
+order (project overrides user, user overrides installation):
+
+| Source | Default path |
+|---|---|
+| **Project** | `${session.rootDirectory}/.mvn/extensions.xml` |
+| **User** | `${user.home}/.m2/extensions.xml` |
+| **Installation** | `${maven.home}/conf/extensions.xml` |
+
+The paths are configurable via the `maven.project.extensions`,
+`maven.user.extensions`, and `maven.installation.extensions` properties.
 
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
