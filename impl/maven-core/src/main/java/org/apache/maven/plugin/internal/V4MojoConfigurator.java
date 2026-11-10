@@ -57,9 +57,10 @@ public final class V4MojoConfigurator {
 
     /**
      * Creates a configurator backed by a Plexus {@code TypeAwareExpressionEvaluator}.
-     * For use by callers outside the {@code internal} package that cannot access
-     * {@link PlexusMojoExpressionEvaluatorAdapter} directly (e.g. {@code maven-testing}).
+     *
+     * @deprecated Use {@link #V4MojoConfigurator(MojoExpressionEvaluator, ClassLoader, PluginDescriptor)} instead.
      */
+    @Deprecated
     public V4MojoConfigurator(
             org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator evaluator,
             ClassLoader classLoader,
