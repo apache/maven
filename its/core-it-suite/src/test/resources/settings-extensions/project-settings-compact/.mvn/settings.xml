@@ -17,7 +17,5 @@ KIND, either express or implied.  See the License for the
 limitations under the License.
 -->
 <settings xmlns="http://maven.apache.org/SETTINGS/2.1.0">
-  <extensions>
-    <extension id="org.apache.maven.its.settings-extensions:marker-extension:0.1"/>
-  </extensions>
+  <extension id="org.apache.maven.its.settings-extensions:marker-extension:0.1"/>
 </settings>

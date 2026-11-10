@@ -17,6 +17,5 @@ KIND, either express or implied.  See the License for the
 limitations under the License.
 -->
 <settings xmlns="http://maven.apache.org/SETTINGS/2.1.0">
-  <!-- settings wins: -q (quiet); maven.config has --debug which must be ignored -->
-  <options>--no-transfer-progress -q</options>
+  <options>-q</options>
 </settings>
