@@ -46,9 +46,10 @@ public class DefaultRequestCache extends AbstractRequestCache {
     // Comprehensive cache statistics
     private final CacheStatistics statistics = new CacheStatistics();
 
-    // Weak values prevent cached requests/results from retaining their proto session through this map.
-    private final Cache<ProtoSession, Cache<Object, CachingSupplier<?, ?>>> bootstrapCaches =
-            Cache.newCache(Cache.ReferenceType.WEAK, Cache.ReferenceType.WEAK, "RequestCache-Bootstrap");
+    // Weak session keys and soft cache values avoid strong global retention while keeping
+    // a live session's cache available across ordinary garbage collections.
+    private final Cache<ProtoSession, Cache<CacheConfig, Cache<Object, CachingSupplier<?, ?>>>> bootstrapCaches =
+            Cache.newCache(Cache.ReferenceType.WEAK, Cache.ReferenceType.SOFT, "RequestCache-Bootstrap");
 
     private static volatile boolean shutdownHookRegistered = false;
     private static final List<CacheStatistics> ALL_STATISTICS = new ArrayList<CacheStatistics>();
@@ -445,11 +446,14 @@ public class DefaultRequestCache extends AbstractRequestCache {
             statistics.recordMiss(req.getClass().getSimpleName(), retention);
             return new CachingSupplier<>(supplier);
         }
-        Cache<Object, CachingSupplier<?, ?>> cache = bootstrapCaches.computeIfAbsent(
+        Cache<CacheConfig, Cache<Object, CachingSupplier<?, ?>>> caches = bootstrapCaches.computeIfAbsent(
                 req.getSession(),
-                session -> Cache.newCache(
-                        config.getEffectiveKeyReferenceType(),
-                        config.getEffectiveValueReferenceType(),
+                session -> Cache.newCache(Cache.ReferenceType.SOFT, "RequestCache-Bootstrap-Policies"));
+        Cache<Object, CachingSupplier<?, ?>> cache = caches.computeIfAbsent(
+                config,
+                policy -> Cache.newCache(
+                        policy.getEffectiveKeyReferenceType(),
+                        policy.getEffectiveValueReferenceType(),
                         "RequestCache-Bootstrap-Session"));
         Object key = retention == CacheRetention.REQUEST_SCOPED ? new ScopedRequest(doGetOuterRequest(req), req) : req;
         boolean hit = cache.containsKey(key);

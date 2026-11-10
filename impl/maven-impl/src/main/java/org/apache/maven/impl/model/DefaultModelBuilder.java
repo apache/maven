@@ -225,17 +225,7 @@ public class DefaultModelBuilder implements ModelBuilder {
         public ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException {
             RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
             try {
-                // Create or derive a session based on the request
-                ModelBuilderSessionState session = sessionFor(request);
-                // Build the request
-                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
-                    // build the build poms
-                    session.buildBuildPom();
-                } else {
-                    // simply build the effective model
-                    session.buildEffectiveModel(new LinkedHashSet<>());
-                }
-                return session.result;
+                return InternalSession.from(request.getSession()).request(request, this::doBuild);
             } finally {
                 // Clean up REQUEST_SCOPED cache entries to prevent memory leaks
                 // This is especially important for BUILD_PROJECT requests which are top-level requests
@@ -249,6 +239,16 @@ public class DefaultModelBuilder implements ModelBuilder {
                 }
                 RequestTraceHelper.exit(trace);
             }
+        }
+
+        private ModelBuilderResult doBuild(ModelBuilderRequest request) throws ModelBuilderException {
+            ModelBuilderSessionState session = sessionFor(request);
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
+                session.buildBuildPom();
+            } else {
+                session.buildEffectiveModel(new LinkedHashSet<>());
+            }
+            return session.result;
         }
 
         /**

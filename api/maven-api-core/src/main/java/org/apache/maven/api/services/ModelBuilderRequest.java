@@ -31,6 +31,8 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.CacheMetadata;
+import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.model.Profile;
 
 import static java.util.Objects.requireNonNull;
@@ -43,7 +45,25 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ModelBuilderRequest extends RepositoryAwareRequest {
+public interface ModelBuilderRequest extends RepositoryAwareRequest, CacheMetadata {
+
+    /**
+     * Returns the cache retention for the complete model-building operation.
+     * Project builds update mutable model-builder session state and must execute each time.
+     * Consumer models can be reused within the enclosing operation. Internal model caches
+     * remain independently available to all request types.
+     *
+     * @return the retention policy for the model-building operation
+     * @since 4.2.0
+     */
+    @Nonnull
+    @Override
+    default CacheRetention getCacheRetention() {
+        return switch (getRequestType()) {
+            case CONSUMER_PARENT, CONSUMER_DEPENDENCY -> CacheRetention.REQUEST_SCOPED;
+            default -> CacheRetention.DISABLED;
+        };
+    }
 
     /**
      * The possible request types for building a model.

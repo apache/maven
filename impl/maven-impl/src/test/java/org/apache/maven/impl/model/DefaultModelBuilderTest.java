@@ -42,6 +42,7 @@ import java.util.stream.Stream;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.model.Dependency;
@@ -57,6 +58,7 @@ import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelSource;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.impl.DefaultRemoteRepository;
+import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
@@ -71,9 +73,17 @@ import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  *
@@ -88,6 +98,52 @@ class DefaultModelBuilderTest {
         session = ApiRunner.createSession();
         builder = session.getService(ModelBuilder.class);
         assertNotNull(builder);
+    }
+
+    @Test
+    void directProjectBuildsEnterPipelineAndKeepTheirOwnSessionState() {
+        InternalSession requestSession = spy(InternalSession.from(session));
+        Map<String, String> properties = new HashMap<>(session.getUserProperties());
+        properties.put(Constants.MAVEN_CACHE_CONFIG_PROPERTY, "ModelBuilderRequest { scope: session, ref: hard }");
+        doReturn(Map.copyOf(properties)).when(requestSession).getUserProperties();
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(requestSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("props-and-profiles")))
+                .build();
+        ModelBuilder.ModelBuilderSession first = builder.newSession();
+        ModelBuilder.ModelBuilderSession second = builder.newSession();
+        ModelBuilderResult firstResult = first.build(request);
+        ModelBuilderResult secondResult = second.build(request);
+        verify(requestSession, times(2)).request(same(request), any());
+        assertEquals(CacheRetention.DISABLED, request.getCacheRetention());
+        assertNotSame(firstResult, secondResult);
+        assertNotNull(((DefaultModelBuilder.ModelBuilderSessionImpl) first).mainSession);
+        assertNotNull(((DefaultModelBuilder.ModelBuilderSessionImpl) second).mainSession);
+        assertEquals("21", secondResult.getEffectiveModel().getProperties().get("maven.compiler.release"));
+    }
+
+    @Test
+    void directConsumerBuildsUseRequestCache() throws Exception {
+        Path pom = Files.createTempFile("consumer-pipeline", ".xml");
+        try {
+            Files.writeString(
+                    pom,
+                    "<project><modelVersion>4.0.0</modelVersion><groupId>org.example</groupId>"
+                            + "<artifactId>consumer</artifactId><version>1</version></project>");
+            InternalSession requestSession = spy(InternalSession.from(session));
+            ModelBuilderRequest request = ModelBuilderRequest.builder()
+                    .session(requestSession)
+                    .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                    .source(Sources.buildSource(pom))
+                    .build();
+            ModelBuilderResult first = builder.newSession().build(request);
+            assertSame(first, builder.newSession().build(request));
+            assertEquals(CacheRetention.REQUEST_SCOPED, request.getCacheRetention());
+            verify(requestSession, times(2)).request(same(request), any());
+        } finally {
+            Files.deleteIfExists(pom);
+        }
     }
 
     @Test

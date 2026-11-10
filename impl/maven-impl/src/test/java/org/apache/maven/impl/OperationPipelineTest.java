@@ -19,6 +19,7 @@
 package org.apache.maven.impl;
 
 import java.io.ByteArrayInputStream;
+import java.lang.ref.Reference;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.util.List;
@@ -64,6 +65,7 @@ import org.eclipse.aether.scope.ScopeManager;
 import org.eclipse.aether.spi.connector.transport.Transporter;
 import org.eclipse.aether.spi.connector.transport.TransporterProvider;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
@@ -72,10 +74,12 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.ArgumentMatchers.same;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -252,6 +256,69 @@ class OperationPipelineTest {
         assertSame(otherRequest, builder.build(otherRequest).getRequest());
         assertNull(RequestTraceHelper.getCurrentTrace(first));
         assertNull(RequestTraceHelper.getCurrentTrace(second));
+    }
+
+    @Test
+    void bootstrapCacheSurvivesOrdinaryGarbageCollection() {
+        ProtoSession session = ProtoSession.newBuilder()
+                .withTopDirectory(Path.of("."))
+                .withUserProperties(Map.of(Constants.MAVEN_CACHE_CONFIG_PROPERTY, "* { scope: session, ref: hard }"))
+                .build();
+        DefaultSettingsBuilder builder =
+                new DefaultSettingsBuilder(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), Map.of());
+        SettingsBuilderRequest request =
+                SettingsBuilderRequest.builder().session(session).build();
+        SettingsBuilderResult first = builder.build(request);
+        System.gc();
+        assertSame(first, builder.build(request));
+        Reference.reachabilityFence(session);
+        Reference.reachabilityFence(request);
+        Reference.reachabilityFence(first);
+    }
+
+    @Test
+    void bootstrapRequestsRespectTheirOwnReferencePolicies() {
+        ProtoSession session = ProtoSession.newBuilder()
+                .withTopDirectory(Path.of("."))
+                .withUserProperties(Map.of(Constants.MAVEN_CACHE_CONFIG_PROPERTY, """
+                    ToolchainsBuilderRequest { scope: session, ref: weak }
+                    SettingsBuilderRequest { scope: session, ref: hard }
+                    """))
+                .build();
+        ToolchainsBuilderRequest toolchains =
+                ToolchainsBuilderRequest.builder().session(session).build();
+        new DefaultToolchainsBuilder(new DefaultInterpolator(), new DefaultToolchainsXmlFactory()).build(toolchains);
+        SettingsBuilderRequest request =
+                SettingsBuilderRequest.builder().session(session).build();
+        DefaultSettingsBuilder builder =
+                new DefaultSettingsBuilder(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), Map.of());
+        SettingsBuilderResult first = builder.build(request);
+        System.gc();
+        assertSame(first, builder.build(request));
+        Reference.reachabilityFence(session);
+        Reference.reachabilityFence(request);
+        Reference.reachabilityFence(first);
+    }
+
+    @Test
+    void bootstrapAndFullSessionsUseTheSameExecutionPoint() {
+        AbstractSession session = newSession(mock(RepositorySystem.class));
+        ProtoSession bootstrap =
+                ProtoSession.newBuilder().withTopDirectory(Path.of(".")).build();
+        SettingsBuilderRequest fullRequest =
+                SettingsBuilderRequest.builder().session(session).build();
+        SettingsBuilderRequest bootstrapRequest =
+                SettingsBuilderRequest.builder().session(bootstrap).build();
+        DefaultSettingsBuilder builder =
+                new DefaultSettingsBuilder(new DefaultSettingsXmlFactory(), new DefaultInterpolator(), Map.of());
+        try (MockedStatic<RequestExecutor> execution = mockStatic(RequestExecutor.class, CALLS_REAL_METHODS)) {
+            assertSame(fullRequest, builder.build(fullRequest).getRequest());
+            assertSame(bootstrapRequest, builder.build(bootstrapRequest).getRequest());
+            execution.verify(() -> RequestExecutor.execute(same(fullRequest), any(), any()));
+            execution.verify(() -> RequestExecutor.execute(same(bootstrapRequest), any(), any()));
+        }
+        assertNull(session.getCurrentTrace());
+        assertNull(RequestTraceHelper.getCurrentTrace(bootstrap));
     }
 
     @Test

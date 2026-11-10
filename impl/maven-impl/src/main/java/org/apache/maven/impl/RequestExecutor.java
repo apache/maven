@@ -29,8 +29,9 @@ import static java.util.Objects.requireNonNull;
 
 /**
  * Submits operations to the session pipeline, including requests made during bootstrap.
- * Bootstrap requests use the same cache abstraction before a repository session is available.
- * Services enter and exit their trace scope around this call.
+ * Normal sessions and bootstrap requests converge in {@link #execute(Request, Function, RequestCache)}.
+ * This is the shared execution point for operation lifecycle handling. Services enter and exit
+ * their trace scope around the request call.
  */
 public final class RequestExecutor {
     private RequestExecutor() {}
@@ -41,7 +42,12 @@ public final class RequestExecutor {
         if (request.getSession() instanceof InternalSession session) {
             return session.request(request, supplier);
         }
-        return Bootstrap.CACHE.request(request, supplier);
+        return execute(request, supplier, Bootstrap.CACHE);
+    }
+
+    static <REQ extends Request<?>, REP extends Result<REQ>> REP execute(
+            REQ request, Function<REQ, REP> supplier, RequestCache cache) {
+        return cache.request(request, supplier);
     }
 
     private static final class Bootstrap {

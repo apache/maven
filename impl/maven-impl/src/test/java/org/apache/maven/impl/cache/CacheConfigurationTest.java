@@ -195,7 +195,7 @@ class CacheConfigurationTest {
 
         @Override
         public RequestType getRequestType() {
-            return RequestType.BUILD_PROJECT;
+            return RequestType.CONSUMER_DEPENDENCY;
         }
 
         @Override

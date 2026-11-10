@@ -200,7 +200,7 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public <REQ extends Request<?>, REP extends Result<REQ>> REP request(REQ req, Function<REQ, REP> supplier) {
-        return getRequestCache().request(req, supplier);
+        return RequestExecutor.execute(req, supplier, getRequestCache());
     }
 
     @Override
