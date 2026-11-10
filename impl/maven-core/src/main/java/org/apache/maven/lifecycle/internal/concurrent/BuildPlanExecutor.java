@@ -422,7 +422,9 @@ public class BuildPlanExecutor {
 
         @Override
         public void close() {
-            this.executor.close();
+            if (this.executor != null) {
+                this.executor.close();
+            }
         }
 
         /**

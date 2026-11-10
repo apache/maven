@@ -107,7 +107,6 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
     @Override
     public LifecycleExecutionResult execute(@Nonnull LifecycleExecutionRequest request) {
         requireNonNull(request, "request");
-        InternalMavenSession.from(request.getSession());
         MavenSession mavenSession =
                 InternalMavenSession.from(request.getSession()).getMavenSession();
         if (!(request.plan() instanceof DefaultLifecyclePlan plan)) {
