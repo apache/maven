@@ -56,7 +56,13 @@ public class MavenParser extends BaseParser {
         Map<String, String> userProperties = context.userProperties != null ? context.userProperties : Map.of();
         Map<String, String> effectiveProperties = new HashMap<>(systemProperties);
         effectiveProperties.putAll(userProperties);
+        // Temporarily expose CLI options so that resolveProjectSettingsFile() can honour
+        // the --project-settings (-ps) flag. context.options hasn't been assigned yet
+        // (we are computing it), so set it here for the duration of the call.
+        Options previousOptions = context.options;
+        context.options = cliOptions;
         Path projectSettingsFile = resolveProjectSettingsFile(context, effectiveProperties);
+        context.options = previousOptions;
         Settings projectSettings = readSettingsEarlyCached(projectSettingsFile, context);
         boolean settingsHasArgs = projectSettings != null
                 && (projectSettings.getArgs() != null

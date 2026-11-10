@@ -172,6 +172,8 @@ public class BuildPlanExecutor {
 
     private final List<LifecycleProcessor> lifecycleProcessors;
 
+    private volatile List<Lifecycle> processedLifecyclesCache;
+
     @Inject
     @SuppressWarnings("checkstyle:ParameterNumber")
     public BuildPlanExecutor(
@@ -208,8 +210,13 @@ public class BuildPlanExecutor {
         return processed;
     }
 
-    private Stream<Lifecycle> processedLifecycles() {
-        return lifecycles.stream().map(this::applyProcessors);
+    private List<Lifecycle> processedLifecycles() {
+        List<Lifecycle> cached = processedLifecyclesCache;
+        if (cached == null) {
+            cached = lifecycles.stream().map(this::applyProcessors).toList();
+            processedLifecyclesCache = cached;
+        }
+        return cached;
     }
 
     public void execute(MavenSession session, ReactorContext reactorContext, List<TaskSegment> taskSegments)
@@ -1095,8 +1102,7 @@ public class BuildPlanExecutor {
                         String phaseName = n.startsWith(BEFORE)
                                 ? n.substring(BEFORE.length())
                                 : n.startsWith(AFTER) ? n.substring(AFTER.length()) : n;
-                        lifecycle = BuildPlanExecutor.this
-                                .processedLifecycles()
+                        lifecycle = BuildPlanExecutor.this.processedLifecycles().stream()
                                 .filter(l -> l.allPhases().anyMatch(p -> phaseName.equals(p.name())))
                                 .findFirst()
                                 .orElse(null);
@@ -1129,8 +1135,7 @@ public class BuildPlanExecutor {
         }
 
         private String getResolvedPhase(String phase) {
-            return BuildPlanExecutor.this
-                    .processedLifecycles()
+            return BuildPlanExecutor.this.processedLifecycles().stream()
                     .flatMap(l -> l.aliases().stream())
                     .filter(a -> phase.equals(a.v3Phase()))
                     .findFirst()
@@ -1268,8 +1273,7 @@ public class BuildPlanExecutor {
             /*
              * Determine the lifecycle that corresponds to the given phase.
              */
-            Lifecycle lifecycle = BuildPlanExecutor.this
-                    .processedLifecycles()
+            Lifecycle lifecycle = BuildPlanExecutor.this.processedLifecycles().stream()
                     .filter(l -> l.allPhases().anyMatch(p -> mainPhase.equals(p.name())))
                     .findFirst()
                     .orElse(null);
@@ -1280,8 +1284,7 @@ public class BuildPlanExecutor {
                                 + "\". You must specify a valid lifecycle phase"
                                 + " or a goal in the format <plugin-prefix>:<goal> or"
                                 + " <plugin-group-id>:<plugin-artifact-id>[:<plugin-version>]:<goal>. Available lifecycle phases are: "
-                                + BuildPlanExecutor.this
-                                        .processedLifecycles()
+                                + BuildPlanExecutor.this.processedLifecycles().stream()
                                         .flatMap(l -> l.allPhases().map(Lifecycle.Phase::name))
                                         .collect(Collectors.joining(", "))
                                 + ".",

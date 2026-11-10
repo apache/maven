@@ -185,6 +185,30 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         warnIfPhasesDefinedOutsideProject(context, settingsResult.getInstallationSettings(), "installation");
     }
 
+    /**
+     * Expands build aliases in the given goals list. Each goal that matches an alias key is replaced
+     * by the alias's expanded argument list.
+     *
+     * @param goals the raw goals from the command line
+     * @param aliases the effective aliases map (may be {@code null})
+     * @return the expanded goals list
+     */
+    static List<String> expandAliases(List<String> goals, Map<String, List<String>> aliases) {
+        if (aliases == null || aliases.isEmpty() || goals.isEmpty()) {
+            return goals;
+        }
+        List<String> expanded = new ArrayList<>();
+        for (String goal : goals) {
+            List<String> aliasArgs = aliases.get(goal);
+            if (aliasArgs != null) {
+                expanded.addAll(aliasArgs);
+            } else {
+                expanded.add(goal);
+            }
+        }
+        return expanded;
+    }
+
     static void addAliases(Map<String, List<String>> target, org.apache.maven.api.settings.Settings settings) {
         if (settings == null) {
             return;
@@ -313,7 +337,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                         .collect(Collectors.groupingBy(ToolchainModel::getType)));
 
         request.setNoSnapshotUpdates(context.options().suppressSnapshotUpdates().orElse(false));
-        request.setGoals(context.options().goals().orElse(List.of()));
+        request.setGoals(expandAliases(context.options().goals().orElse(List.of()), context.effectiveAliases));
         request.setReactorFailureBehavior(determineReactorFailureBehaviour(context));
         request.setRecursive(!context.options().nonRecursive().orElse(!request.isRecursive()));
         request.setOffline(context.options().offline().orElse(request.isOffline()));

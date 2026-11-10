@@ -522,6 +522,16 @@ public abstract class BaseParser implements Parser {
                     .map(e -> toCoreExtension(e, projectSettingsFile))
                     .collect(Collectors.toList());
             result.add(new CoreExtensions(projectSettingsFile, fromSettings));
+            // Warn if legacy extensions.xml also exists alongside settings.xml <extensions>
+            Path legacyExtensionsFile = context.cwd.resolve(eff.get(Constants.MAVEN_PROJECT_EXTENSIONS));
+            if (Files.isRegularFile(legacyExtensionsFile)) {
+                context.parserRequest
+                        .logger()
+                        .warn("Both " + projectSettingsFile + " <extensions> and "
+                                + legacyExtensionsFile + " exist. The settings.xml <extensions> take precedence;"
+                                + " consider migrating " + legacyExtensionsFile + " entries into "
+                                + projectSettingsFile + " and removing the legacy file.");
+            }
         } else {
             // legacy fallback: .mvn/extensions.xml
             file = context.cwd.resolve(eff.get(Constants.MAVEN_PROJECT_EXTENSIONS));
