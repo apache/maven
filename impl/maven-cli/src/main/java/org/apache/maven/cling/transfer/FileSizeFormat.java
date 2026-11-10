@@ -153,6 +153,11 @@ public class FileSizeFormat {
         format(builder, size, unit, false);
     }
 
+    /**
+     * Formats a transfer rate into the given builder.
+     *
+     * @see #formatRate(org.apache.maven.api.services.MessageBuilder, double)
+     */
     void formatRate(StringBuilder builder, double rate) {
         builder.append(formatRate(rate));
     }

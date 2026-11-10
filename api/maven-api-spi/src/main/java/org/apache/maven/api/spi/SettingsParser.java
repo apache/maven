@@ -25,7 +25,6 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.di.Named;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.settings.Settings;
 
@@ -43,7 +42,6 @@ import org.apache.maven.api.settings.Settings;
  */
 @Experimental
 @Consumer
-@Named
 public interface SettingsParser extends SpiService {
     /**
      * Option that can be specified in the options map. The value should be a {@code Boolean};

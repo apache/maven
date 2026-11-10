@@ -605,6 +605,11 @@ public class MavenCli {
             File logFile = new File(commandLine.getOptionValue(CLIManager.LOG_FILE));
             logFile = ResolveFile.resolveFile(logFile, cliRequest.workingDirectory);
 
+            // make sure the terminal has finished installing before we grab the streams, otherwise it
+            // could later overwrite our redirection and logs would leak back to the console
+            // (see https://github.com/apache/maven/issues/12188)
+            MessageUtils.awaitTerminalInitialization();
+
             // redirect stdout and stderr to file
             try {
                 PrintStream ps = new PrintStream(new FileOutputStream(logFile));
@@ -615,9 +620,19 @@ public class MavenCli {
                 // Ignore
                 //
             }
-        }
 
-        slf4jConfiguration.activate();
+            // Logging caches System.out; with -l the wait above already ran, so activate now.
+            slf4jConfiguration.activate();
+        } else {
+            // Logging caches System.out, so wait for terminal installation to complete before
+            // activating, except when color is explicitly forced. With forced color the user expects
+            // raw ANSI to flow through the original stdout; waiting causes AnsiConsole to wrap that
+            // stream before the logger caches it, which may strip the escape codes.
+            if (!"always".equals(styleColor) && !"yes".equals(styleColor) && !"force".equals(styleColor)) {
+                MessageUtils.awaitTerminalInitialization();
+            }
+            slf4jConfiguration.activate();
+        }
 
         plexusLoggerManager = new Slf4jLoggerManager();
         slf4jLogger = slf4jLoggerFactory.getLogger(this.getClass().getName());
@@ -973,7 +988,7 @@ public class MavenCli {
 
             for (CoreExtensionEntry entry : reverse(extensions)) {
                 Set<String> exportedPackages = entry.getExportedPackages();
-                ClassRealm realm = entry.getClassRealm();
+                ClassRealm realm = (ClassRealm) entry.getClassRealm();
                 for (String exportedPackage : exportedPackages) {
                     extRealm.importFrom(realm, exportedPackage);
                 }
@@ -1422,7 +1437,8 @@ public class MavenCli {
         request.setReactorFailureBehavior(determineReactorFailureBehaviour(commandLine));
         disableOnPresentOption(commandLine, CLIManager.NON_RECURSIVE, request::setRecursive);
         enableOnPresentOption(commandLine, CLIManager.OFFLINE, request::setOffline);
-        enableOnPresentOption(commandLine, CLIManager.UPDATE_SNAPSHOTS, request::setUpdateSnapshots);
+        enableOnPresentOption(commandLine, CLIManager.UPDATE_ALL, request::setUpdateSnapshots);
+        enableOnPresentOption(commandLine, "update-snapshots", request::setUpdateSnapshots);
         request.setGlobalChecksumPolicy(determineGlobalCheckPolicy(commandLine));
 
         // Update policy options

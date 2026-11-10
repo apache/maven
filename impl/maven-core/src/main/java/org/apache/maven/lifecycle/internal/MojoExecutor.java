@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,6 +48,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.MultilineMessageHelper;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MissingProjectException;
+import org.apache.maven.lifecycle.internal.filter.FilterPredicate;
+import org.apache.maven.lifecycle.internal.filter.MojoExecutionFilter;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoExecution;
@@ -164,20 +167,43 @@ public class MojoExecutor {
 
         final PhaseRecorder phaseRecorder = new PhaseRecorder(session.getCurrentProject());
 
+        // Resolve the mojo execution filter once per project execution.
+        final List<FilterPredicate> filterPredicates = resolveFilterPredicates(session);
+
         mojosExecutionStrategy.get().execute(mojoExecutions, session, new MojoExecutionRunner() {
             @Override
             public void run(MojoExecution mojoExecution) throws LifecycleExecutionException {
-                MojoExecutor.this.execute(session, mojoExecution, dependencyContext, phaseRecorder);
+                MojoExecutor.this.execute(session, mojoExecution, dependencyContext, phaseRecorder, filterPredicates);
             }
         });
+    }
+
+    /**
+     * Resolves the mojo execution filter predicates for this build.
+     * Uses {@code -Dmaven.lifecycle.filter} user property; returns an empty list if absent.
+     */
+    private List<FilterPredicate> resolveFilterPredicates(MavenSession session) throws LifecycleExecutionException {
+        String filterExpression = session.getUserProperties().getProperty(MojoExecutionFilter.PROPERTY_NAME);
+        try {
+            return MojoExecutionFilter.parse(filterExpression);
+        } catch (IllegalArgumentException e) {
+            throw new LifecycleExecutionException(
+                    "Invalid value for '" + MojoExecutionFilter.PROPERTY_NAME + "': " + e.getMessage(), e);
+        }
     }
 
     private void execute(
             MavenSession session,
             MojoExecution mojoExecution,
             DependencyContext dependencyContext,
-            PhaseRecorder phaseRecorder)
+            PhaseRecorder phaseRecorder,
+            List<FilterPredicate> filterPredicates)
             throws LifecycleExecutionException {
+        Optional<FilterPredicate> matchedFilter = MojoExecutionFilter.matches(mojoExecution, filterPredicates);
+        if (matchedFilter.isPresent()) {
+            LOGGER.info("Skipping {} (matched filter: {})", mojoExecution, matchedFilter.get());
+            return;
+        }
         execute(session, mojoExecution, dependencyContext);
         phaseRecorder.observeExecution(mojoExecution);
     }
