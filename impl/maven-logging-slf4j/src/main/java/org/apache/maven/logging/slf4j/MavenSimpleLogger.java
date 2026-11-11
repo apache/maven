@@ -43,7 +43,7 @@ public class MavenSimpleLogger extends LegacyAbstractLogger {
 
     private static final StackWalker STACK_WALKER = StackWalker.getInstance();
     final String pluginId;
-    int currentLogLevel = LocationAwareLogger.INFO_INT;
+    volatile int currentLogLevel = LocationAwareLogger.INFO_INT;
 
     MavenSimpleLogger(String name) {
         this(name, null);

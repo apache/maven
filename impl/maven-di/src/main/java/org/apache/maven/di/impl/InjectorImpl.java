@@ -72,7 +72,7 @@ public class InjectorImpl implements Injector {
     private int registrationDepth;
 
     public InjectorImpl() {
-        this(System.out::println);
+        this(s -> {});
     }
 
     public InjectorImpl(Consumer<String> dumpSink) {

@@ -19,6 +19,7 @@
 package org.apache.maven.logging.slf4j;
 
 import java.util.Objects;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -53,22 +54,30 @@ public class MavenLoggerFactory implements ILoggerFactory {
 
     @Override
     public Logger getLogger(String name) {
-        // Fast path: if a logger is already cached by name alone (non-plugin case),
-        // return it without performing an expensive stack walk.
-        Logger cached = loggerMap.get(name);
-        if (cached != null) {
-            return cached;
-        }
-
+        // Always resolve pluginId first: a fast-path cache-by-name would incorrectly
+        // return a non-plugin logger to a plugin caller that requests the same logger
+        // name. The classloader cache in resolvePluginId() keeps the stack walk cheap
+        // after the first call per classloader.
         String pluginId = resolvePluginId();
         String cacheKey = pluginId != null ? name + "@" + pluginId : name;
         return loggerMap.computeIfAbsent(cacheKey, k -> new MavenSimpleLogger(name, pluginId));
     }
 
-    /** Sentinel value for classloaders that are not associated with any plugin. */
+    /**
+     * Sentinel value meaning "this classloader is not associated with any plugin".
+     * Stored in the cache to avoid repeated {@code LoggerManager.getPluginId()} calls.
+     */
     private static final String NO_PLUGIN = "\0";
 
-    private final ConcurrentMap<ClassLoader, String> classLoaderPluginIds = new ConcurrentHashMap<>();
+    /**
+     * Cache of classloader → pluginId lookups. Uses weak keys so that plugin
+     * classloaders can be GC-collected once their realm is discarded; without this
+     * the map would retain a strong reference to each plugin classloader (and its
+     * entire class graph) for the lifetime of the Maven JVM.
+     *
+     * <p>WeakHashMap is not thread-safe; all accesses are synchronized on this field.</p>
+     */
+    private final WeakHashMap<ClassLoader, String> classLoaderPluginIds = new WeakHashMap<>();
 
     private String resolvePluginId() {
         return STACK_WALKER.walk(frames -> frames.map(f -> {
@@ -84,12 +93,17 @@ public class MavenLoggerFactory implements ILoggerFactory {
         if (cl == null) {
             return null;
         }
-        String id = classLoaderPluginIds.get(cl);
-        if (id != null) {
-            return id == NO_PLUGIN ? null : id;
+        String cached;
+        synchronized (classLoaderPluginIds) {
+            cached = classLoaderPluginIds.get(cl);
+        }
+        if (cached != null) {
+            return cached == NO_PLUGIN ? null : cached;
         }
         String resolved = LoggerManager.get().getPluginId(cl);
-        classLoaderPluginIds.put(cl, resolved != null ? resolved : NO_PLUGIN);
+        synchronized (classLoaderPluginIds) {
+            classLoaderPluginIds.put(cl, resolved != null ? resolved : NO_PLUGIN);
+        }
         return resolved;
     }
 
