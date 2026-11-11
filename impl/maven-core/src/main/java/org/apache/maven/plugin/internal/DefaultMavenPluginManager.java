@@ -588,7 +588,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
                 new DefaultLogger(mojoExecution.getMojoDescriptor().getImplementation(), logProjectId, logMojoId);
         try {
             // Discover components from the effective ClassLoader (module layer loader for modular plugins)
-            Injector injector = new InjectorImpl() {
+            Injector injector = new InjectorImpl(logger::info) {
                 @Override
                 protected BindingStyler getBindingStyler() {
                     return new MessageBuilderBindingStyler(messageBuilderFactory);
