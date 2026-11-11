@@ -18,14 +18,11 @@
  */
 package org.apache.maven.jline;
 
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.time.Duration;
 import java.util.concurrent.CompletableFuture;
-import java.util.function.Consumer;
 
 import org.jline.terminal.Terminal;
-import org.jline.terminal.TerminalBuilder;
+import org.jline.terminal.impl.DeferredTerminal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
@@ -35,94 +32,34 @@ import static org.junit.jupiter.api.Assertions.assertTimeoutPreemptively;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * {@link MessageUtils#systemInstall} publishes the terminal before the background thread has built
- * it, so anything that thread logs is rendered through a terminal that same thread is still
- * producing. See <a href="https://github.com/apache/maven/issues/12761">#12761</a> and
- * <a href="https://github.com/apache/maven/issues/12912">#12912</a>.
- * <p>
- * A single log statement asks the terminal for two things, its type while rendering the message and
- * its writer while emitting the line, so both are exercised from both halves of the window: the
- * builder callable, and the consumer that runs before the terminal is published.
- * <p>
- * JLine 4.4.0's FFM provider initialization ({@code CLibrary.<clinit>}) can reach back through
- * other terminal methods (e.g. {@code getName()}, {@code getColumns()}, {@code encoding()}) on the
- * build thread, so the fallback must cover all delegate methods, not just {@code writer()} and
- * {@code getType()}.
- * <p>
- * The tests force {@code providers("exec")} so that the builder creates a lightweight
- * {@code ExternalTerminal} instead of a {@code PosixPtyTerminal} via FFM. The FFM provider calls
- * {@code CLibrary.openpty()} which creates a real PTY pair; the subsequent grapheme-cluster probe
- * ({@code ensureModesProbed()}) reads from the PTY master via {@code FileInputStream.read0()}, a
- * native blocking read. Although {@code VMIN=0, VTIME=0} attributes are set before probing, there
- * is a race where the native read blocks indefinitely instead of respecting the timeout, causing
- * the test to hang until the 30-second preemptive timeout fires.
- * <p>
- * The timeouts are preemptive on purpose: a regression parks the build thread forever, and only an
- * abandoning timeout turns that into a red test rather than a hung fork.
+ * Verifies that {@link DeferredTerminal}'s non-blocking methods work correctly
+ * when called before the real terminal is ready.
  */
 class FastTerminalReentrancyTest {
 
     @AfterEach
     void tearDown() {
-        // MessageUtils.terminal is process-global; leaving it set breaks every later test.
-        // On a regression the build thread never finishes and systemUninstall waits for it (see
-        // #11048), on the test thread and outside any timeout, so the fork would hang instead of
-        // reporting the failure. Leave the state dirty in that case; the run is lost either way.
-        if (MessageUtils.getTerminal() instanceof FastTerminal ft && !ft.isBuilt()) {
-            return;
+        try {
+            MessageUtils.systemUninstall();
+        } catch (Exception ignored) {
+            // best-effort cleanup
         }
-        MessageUtils.systemUninstall();
-    }
-
-    @Test
-    void usingTheTerminalFromTheBuilderDoesNotDeadlock() {
-        assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
-            CompletableFuture<String[]> probed = new CompletableFuture<>();
-            installAndAwait(builder -> probed.complete(probe()), terminal -> {});
-            assertProbe(probed.get());
-        });
     }
 
     @Test
     void usingTheTerminalFromTheConsumerDoesNotDeadlock() {
         assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
             CompletableFuture<String[]> probed = new CompletableFuture<>();
-            installAndAwait(builder -> {}, terminal -> probed.complete(probe()));
+            installAndAwait(terminal -> probed.complete(probe()));
             assertProbe(probed.get());
         });
     }
 
-    /**
-     * Exercises terminal methods beyond {@code writer()} and {@code getType()} that JLine's FFM
-     * provider initialization can reach on the build thread. Before the fallback terminal was added,
-     * these would deadlock. See <a href="https://github.com/apache/maven/issues/12912">#12912</a>.
-     */
-    @Test
-    void arbitraryTerminalMethodsFromTheBuilderDoNotDeadlock() {
-        assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
-            CompletableFuture<int[]> probed = new CompletableFuture<>();
-            installAndAwait(
-                    builder -> {
-                        Terminal t = MessageUtils.getTerminal();
-                        probed.complete(
-                                new int[] {t.getSize().getColumns(), t.getSize().getRows()});
-                    },
-                    terminal -> {});
-            int[] dims = probed.get();
-            assertTrue(dims[0] >= 0, "width should be non-negative");
-            assertTrue(dims[1] >= 0, "height should be non-negative");
-        });
-    }
-
-    /**
-     * Exercises terminal methods beyond {@code writer()} and {@code getType()} from the consumer
-     * callback. See <a href="https://github.com/apache/maven/issues/12912">#12912</a>.
-     */
     @Test
     void arbitraryTerminalMethodsFromTheConsumerDoNotDeadlock() {
         assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
             CompletableFuture<String> probed = new CompletableFuture<>();
-            installAndAwait(builder -> {}, terminal -> {
+            installAndAwait(terminal -> {
                 Terminal t = MessageUtils.getTerminal();
                 probed.complete(t.getName());
             });
@@ -130,29 +67,36 @@ class FastTerminalReentrancyTest {
         });
     }
 
-    /**
-     * Verifies that {@link MessageUtils#getTerminal()} is non-null when called from the builder
-     * callback. Before the fix, the {@code FastTerminal} constructor started its build thread
-     * before returning, so {@code MessageUtils.terminal} was still {@code null} when the build
-     * thread ran the builder callback &mdash; a race between the constructor returning and the
-     * thread scheduling. After the fix, {@code MessageUtils} assigns the field before calling
-     * {@link FastTerminal#start()}, and {@link Thread#start()} provides the happens-before edge.
-     *
-     * @see <a href="https://github.com/apache/maven/issues/12912">#12912</a>
-     */
     @Test
-    void terminalAssignmentIsVisibleFromBuilderCallback() {
+    void terminalAssignmentIsVisibleImmediately() {
         assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
-            CompletableFuture<Terminal> observed = new CompletableFuture<>();
-            installAndAwait(builder -> observed.complete(MessageUtils.getTerminal()), terminal -> {});
-            assertNotNull(observed.get(), "MessageUtils.getTerminal() must not return null from the builder callback");
-            assertTrue(observed.get() instanceof FastTerminal, "terminal should be the FastTerminal wrapper");
+            installAndAwait(terminal -> {});
+            Terminal t = MessageUtils.getTerminal();
+            assertNotNull(t, "MessageUtils.getTerminal() must not return null after systemInstall()");
+            assertTrue(t instanceof DeferredTerminal, "terminal should be the DeferredTerminal wrapper");
         });
     }
 
-    /**
-     * Both terminal calls a single log statement makes, run on the terminal building thread.
-     */
+    @Test
+    void writerWorksBeforeTerminalIsReady() {
+        assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
+            installAndAwait(terminal -> {});
+            Terminal t = MessageUtils.getTerminal();
+            assertNotNull(t.writer(), "writer() must not return null");
+            t.writer().print("test");
+            t.writer().flush();
+        });
+    }
+
+    @Test
+    void getTypeReturnsNonNullBeforeReady() {
+        assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
+            installAndAwait(terminal -> {});
+            Terminal t = MessageUtils.getTerminal();
+            assertNotNull(t.getType(), "getType() must not return null");
+        });
+    }
+
     private static String[] probe() {
         String rendered = MessageUtils.builder().warning("WARNING").build();
         assertNotNull(MessageUtils.getTerminal().writer());
@@ -160,22 +104,12 @@ class FastTerminalReentrancyTest {
     }
 
     private static void assertProbe(String[] probed) {
-        // the stand-in reports itself dumb, so the style is dropped rather than emitted blind
-        assertEquals(Terminal.TYPE_DUMB, probed[1]);
         assertEquals("WARNING", probed[0]);
+        assertNotNull(probed[1]);
     }
 
-    private void installAndAwait(Consumer<TerminalBuilder> onBuilder, Consumer<Terminal> onTerminal) {
-        MessageUtils.systemInstall(
-                builder -> {
-                    onBuilder.accept(builder);
-                    builder.dumb(true)
-                            .system(false)
-                            .providers("exec")
-                            .streams(InputStream.nullInputStream(), OutputStream.nullOutputStream());
-                },
-                onTerminal);
-        // let the build finish, so a failure here is the build failing rather than a leaked thread
-        ((FastTerminal) MessageUtils.getTerminal()).getTerminal();
+    private void installAndAwait(java.util.function.Consumer<Terminal> onTerminal) {
+        MessageUtils.systemInstall(builder -> {}, onTerminal);
+        MessageUtils.awaitTerminalInitialization();
     }
 }

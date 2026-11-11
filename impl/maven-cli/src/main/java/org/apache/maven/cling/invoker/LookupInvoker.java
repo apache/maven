@@ -77,7 +77,6 @@ import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.SettingsUtilsV4;
-import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.logging.AsyncDrainWriter;
 import org.apache.maven.logging.BuildEventListener;
@@ -90,6 +89,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.AbstractPosixTerminal;
+import org.jline.terminal.impl.DeferredTerminal;
 import org.jline.terminal.spi.TerminalExt;
 import org.jline.utils.OSUtils;
 import org.slf4j.LoggerFactory;
@@ -170,12 +170,12 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected int doInvoke(C context) throws Exception {
+        createTerminal(context);
         validate(context);
         pushCoreProperties(context);
         pushUserProperties(context);
         setupGuiceClassLoading(context);
         configureLogging(context);
-        createTerminal(context);
         activateLogging(context);
         helpOrVersionAndMayExit(context);
         preCommands(context);
@@ -529,8 +529,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         if (terminal == null) {
             return null;
         }
-        if (terminal instanceof FastTerminal ft) {
-            terminal = ft.getTerminal();
+        if (terminal instanceof DeferredTerminal dt) {
+            terminal = dt.getTerminal();
         }
         List<String> subs = new ArrayList<>();
         subs.add("type=" + terminal.getType());

@@ -18,6 +18,7 @@
  */
 package org.apache.maven.jline;
 
+import java.io.IOException;
 import java.util.function.Consumer;
 
 import org.apache.maven.api.services.MessageBuilder;
@@ -27,6 +28,7 @@ import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.terminal.impl.DeferredTerminal;
 
 public class MessageUtils {
 
@@ -47,29 +49,25 @@ public class MessageUtils {
     }
 
     public static void systemInstall(Consumer<TerminalBuilder> builderConsumer, Consumer<Terminal> terminalConsumer) {
-        // Assign the FastTerminal to the field BEFORE starting the build thread so that code
-        // running on that thread (e.g. JLine's FFM provider init, logger calls) sees a non-null
-        // reference when it calls MessageUtils.getTerminal().  Thread.start() provides the
-        // happens-before edge that makes the assignment visible to the new thread.
-        FastTerminal ft = new FastTerminal(
-                () -> {
-                    TerminalBuilder builder =
-                            TerminalBuilder.builder().name("Maven").dumb(true);
-                    if (builderConsumer != null) {
-                        builderConsumer.accept(builder);
-                    }
-                    return builder.build();
-                },
-                terminal -> {
-                    MessageUtils.reader = createReader(terminal);
-                    AnsiConsole.setTerminal(terminal);
-                    AnsiConsole.systemInstall();
-                    if (terminalConsumer != null) {
-                        terminalConsumer.accept(terminal);
-                    }
-                });
-        MessageUtils.terminal = ft;
-        ft.start();
+        TerminalBuilder builder = TerminalBuilder.builder().name("Maven").dumb(true);
+        if (builderConsumer != null) {
+            builderConsumer.accept(builder);
+        }
+        // buildDeferred() returns a DeferredTerminal proxy immediately (~10ms).
+        // The real terminal is built on a background daemon thread; all proxy
+        // methods block transparently until it is ready.
+        DeferredTerminal deferred = (DeferredTerminal) builder.buildDeferred();
+        // Register a callback that runs on the build thread once the real
+        // terminal is ready, before any blocked caller is unblocked.
+        deferred.onComplete(terminal -> {
+            MessageUtils.reader = createReader(terminal);
+            AnsiConsole.setTerminal(terminal);
+            AnsiConsole.systemInstall();
+            if (terminalConsumer != null) {
+                terminalConsumer.accept(terminal);
+            }
+        });
+        MessageUtils.terminal = deferred;
     }
 
     private static LineReader createReader(Terminal terminal) {
@@ -100,11 +98,17 @@ public class MessageUtils {
 
     private static void doSystemUninstall() {
         try {
-            if (terminal instanceof FastTerminal fastTerminal) {
-                // wait for the asynchronous systemInstall call before we uninstall to ensure a consistent state
-                fastTerminal.getTerminal();
+            if (terminal instanceof DeferredTerminal deferred) {
+                if (!deferred.isReady()) {
+                    // Don't wait — drain buffered output to stdout and let
+                    // the daemon build thread die with the JVM.
+                    deferred.close();
+                    return;
+                }
             }
             AnsiConsole.systemUninstall();
+        } catch (IOException e) {
+            // best-effort cleanup
         } finally {
             terminal = null;
         }
@@ -119,8 +123,8 @@ public class MessageUtils {
      * @see <a href="https://github.com/apache/maven/issues/12188">#12188</a>
      */
     public static void awaitTerminalInitialization() {
-        if (terminal instanceof FastTerminal fastTerminal) {
-            fastTerminal.getTerminal();
+        if (terminal instanceof DeferredTerminal deferred) {
+            deferred.getTerminal();
         }
     }
 
