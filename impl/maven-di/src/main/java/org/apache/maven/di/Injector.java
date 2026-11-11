@@ -58,6 +58,8 @@ public interface Injector {
      * <p>
      * A negative value ensures that these fallback bindings are overridden by any
      * plugin-provided {@code @Provides} method (which defaults to priority {@code 0}).
+     *
+     * @since 4.2.0
      */
     int SESSION_SERVICE_PRIORITY = -10;
 
@@ -162,12 +164,17 @@ public interface Injector {
      * Use a negative priority (e.g. {@code -10}) to register a fallback binding that yields to
      * plugin-provided {@code @Provides} methods (which default to priority {@code 0}).
      *
+     * @implSpec The default implementation ignores {@code priority} for backward compatibility
+     *     with existing {@code Injector} implementations. Implementors SHOULD override this method
+     *     to honor the priority parameter.
+     *
      * @param <T> the type of the instance
      * @param cls the class to bind to
      * @param supplier the supplier to use for injection
      * @param priority the binding priority
      * @return this injector instance for method chaining
      * @throws NullPointerException if {@code cls} or {@code supplier} is null
+     * @since 4.2.0
      */
     @Nonnull
     default <T> Injector bindSupplier(@Nonnull Class<T> cls, @Nonnull Supplier<T> supplier, int priority) {
