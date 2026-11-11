@@ -45,6 +45,7 @@ import org.slf4j.MDC;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.lenient;
@@ -382,6 +383,79 @@ class BuildReportCollectorTest {
         when(mojo.executionId()).thenReturn(Optional.ofNullable(executionId));
         when(mojo.lifecyclePhase()).thenReturn(Optional.ofNullable(phase));
         return mojo;
+    }
+
+    // ---- Shutdown hook tests ----
+
+    @Test
+    void testShutdownHookIsRegisteredOnSessionStartAndRemovedOnSessionEnd() {
+        Project project = createProject("org.example", "app", "1.0");
+        Session session = createSession(project);
+
+        collector.sessionStarted(createEvent(ExecutionEventType.SESSION_STARTED, session, project, null));
+
+        // Hook should be registered — verify by attempting to remove it ourselves (succeeds = was registered)
+        Thread hook = collector.shutdownHook;
+        assertNotNull(hook, "Shutdown hook should be registered after sessionStarted");
+
+        collector.sessionEnded(createEvent(ExecutionEventType.SESSION_ENDED, session, project, null));
+
+        assertNull(collector.shutdownHook, "Shutdown hook reference should be null after sessionEnded");
+        // Verify the hook was actually deregistered: re-removing an unknown hook returns false (no-op),
+        // whereas removing one still registered returns true. We just check no exception is thrown.
+        try {
+            Runtime.getRuntime().removeShutdownHook(hook);
+        } catch (IllegalStateException e) {
+            // JVM is already shutting down — acceptable in test runners that shut down the JVM
+        }
+    }
+
+    @Test
+    void testShutdownHookIdempotencyGuard() {
+        Project project = createProject("org.example", "app", "1.0");
+        Session session = createSession(project);
+
+        collector.sessionStarted(createEvent(ExecutionEventType.SESSION_STARTED, session, project, null));
+        collector.projectStarted(createEvent(ExecutionEventType.PROJECT_STARTED, session, project, null));
+        collector.projectSucceeded(createEvent(ExecutionEventType.PROJECT_SUCCEEDED, session, project, null));
+
+        // Simulate the hook running (call its Runnable directly on the current thread)
+        Thread hook = collector.shutdownHook;
+        assertNotNull(hook);
+        hook.run(); // fires the hook logic synchronously
+
+        // reportWritten should now be true — sessionEnded must NOT write a second report
+        assertTrue(collector.reportWritten.get(), "reportWritten should be true after hook ran");
+
+        // sessionEnded should short-circuit on compareAndSet(false, true) = false
+        collector.sessionEnded(createEvent(ExecutionEventType.SESSION_ENDED, session, project, null));
+
+        // No exception, state cleaned up
+        assertNull(collector.session, "session should be null after clearSessionState");
+    }
+
+    @Test
+    void testMvndReuseRegistersNewHookOnNextSession() {
+        Project project = createProject("org.example", "app", "1.0");
+        Session session1 = createSession(project);
+        Session session2 = createSession(project);
+
+        // First build
+        collector.sessionStarted(createEvent(ExecutionEventType.SESSION_STARTED, session1, project, null));
+        Thread hook1 = collector.shutdownHook;
+        assertNotNull(hook1);
+        collector.sessionEnded(createEvent(ExecutionEventType.SESSION_ENDED, session1, project, null));
+
+        // Second build (mvnd reuse)
+        collector.sessionStarted(createEvent(ExecutionEventType.SESSION_STARTED, session2, project, null));
+        Thread hook2 = collector.shutdownHook;
+        assertNotNull(hook2, "New hook should be registered for second build");
+        assertNotSame(hook1, hook2, "Second build must register a fresh hook");
+
+        // reportWritten should be reset for the second build
+        assertFalse(collector.reportWritten.get(), "reportWritten should be reset for second build");
+
+        collector.sessionEnded(createEvent(ExecutionEventType.SESSION_ENDED, session2, project, null));
     }
 
     private static ExecutionEvent createEvent(

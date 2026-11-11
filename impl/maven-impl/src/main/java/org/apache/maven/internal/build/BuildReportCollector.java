@@ -39,6 +39,7 @@ import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.api.BuildInvocation;
 import org.apache.maven.api.Constants;
@@ -53,6 +54,8 @@ import org.apache.maven.api.build.report.BuildStatus;
 import org.apache.maven.api.build.report.FailureReport;
 import org.apache.maven.api.build.report.MojoReport;
 import org.apache.maven.api.build.report.SubprojectReport;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.logging.LogEvent;
 import org.apache.maven.api.logging.LogSink;
 import org.apache.maven.api.spi.SpiService;
@@ -61,7 +64,7 @@ import org.slf4j.LoggerFactory;
 import org.slf4j.MDC;
 
 /**
- * Collects build lifecycle events and produces a structured {@link BuildReport}
+ * Collects build lifecycle events and produces a structured {@code BuildReport}
  * at the end of the session.
  * <p>
  * Implements {@link ExecutionListener} for typed lifecycle callbacks,
@@ -78,6 +81,8 @@ import org.slf4j.MDC;
  *
  * @since 4.2.0
  */
+@Named
+@Singleton
 public final class BuildReportCollector implements ExecutionListener, LogSink, SpiService {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(BuildReportCollector.class);
@@ -127,13 +132,19 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
     private final Map<String, Throwable> projectFailures = new ConcurrentHashMap<>();
 
     /** Session-level state - set once on SessionStarted. */
-    private volatile Session session;
+    volatile Session session;
 
     /** Build invocation - captured once at SessionStarted, immutable thereafter. */
     private volatile BuildInvocation buildInvocation;
 
     /** Session start time. */
     private volatile Instant sessionStartTime;
+
+    /** JVM shutdown hook used to persist a partial build report on unexpected termination. */
+    volatile Thread shutdownHook;
+
+    /** Ensures that normal completion and shutdown hook do not write competing reports. */
+    final AtomicBoolean reportWritten = new AtomicBoolean();
 
     // ---- Log capture state ----
 
@@ -213,12 +224,44 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
                 Constants.MAVEN_BUILD_REPORT_MAX_THROWABLE_LINES,
                 BuildReportJsonWriter.DEFAULT_MAX_THROWABLE_LINES);
         this.buildLogBuffer = new ArrayBlockingQueue<>(this.maxLogEventsPerScope);
+        // Remove any leftover hook from a previous build (mvnd / embedded Maven reuse).
+        // Must be done before resetting reportWritten to prevent the old hook from firing
+        // against the new session's state.
+        removeShutdownHook();
+        this.reportWritten.set(false);
+
+        Thread hook = new Thread(
+                () -> {
+                    Session activeSession = this.session;
+                    if (activeSession == null || !reportWritten.compareAndSet(false, true)) {
+                        return;
+                    }
+                    try {
+                        LOGGER.debug("JVM shutting down: writing partial build report");
+                        // hasFailure=true: an interrupted build is always a failure.
+                        BuildReport report = buildReport(activeSession, true);
+                        writeReport(report, activeSession);
+                    } catch (Exception e) {
+                        LOGGER.warn("Failed to write partial build report during shutdown", e);
+                    }
+                },
+                "maven-build-report-shutdown-hook");
+
+        try {
+            Runtime.getRuntime().addShutdownHook(hook);
+            this.shutdownHook = hook;
+        } catch (IllegalStateException e) {
+            LOGGER.debug("JVM shutdown already in progress", e);
+        }
     }
 
     @Override
     public void sessionEnded(ExecutionEvent event) {
+        removeShutdownHook();
+
         Session endSession = event.session();
-        if (endSession == null) {
+        if (endSession == null || !reportWritten.compareAndSet(false, true)) {
+            clearSessionState();
             return;
         }
 
@@ -382,6 +425,27 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
     // ---- State management ----
 
     /**
+     * Removes the currently-registered JVM shutdown hook, if any.
+     * Safe to call when no hook is registered, or when shutdown is already in progress.
+     * Called from {@link #sessionStarted} (to clean up a leftover hook from a previous build)
+     * and from {@link #sessionEnded} (normal lifecycle cleanup).
+     */
+    private void removeShutdownHook() {
+        Thread hook = shutdownHook;
+        if (hook != null) {
+            try {
+                Runtime.getRuntime().removeShutdownHook(hook);
+            } catch (IllegalStateException e) {
+                LOGGER.debug("JVM shutdown already in progress", e);
+            } catch (SecurityException e) {
+                LOGGER.debug("Unable to remove build report shutdown hook", e);
+            } finally {
+                shutdownHook = null;
+            }
+        }
+    }
+
+    /**
      * Resets all mutable per-session fields. Called at the end of each session so that
      * when the DI container (e.g. mvnd) reuses this singleton across builds the maps do
      * not accumulate stale data from prior builds.
@@ -403,6 +467,7 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
         session = null;
         buildInvocation = null;
         sessionStartTime = null;
+        shutdownHook = null;
         maxLogEventsPerScope = 500;
         maxStacktraceLines = DEFAULT_MAX_STACKTRACE_LINES;
         maxThrowableLines = BuildReportJsonWriter.DEFAULT_MAX_THROWABLE_LINES;
