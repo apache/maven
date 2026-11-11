@@ -68,28 +68,27 @@ class MavenITgh13522LoggerContextTest extends AbstractMavenIntegrationTestCase {
             props.load(is);
         }
 
-        // projectId: groupId:artifactId:version of the consumer project
+        // projectId: artifactId of the consumer project (set by LoggingExecutionListener)
         assertEquals(
-                "org.apache.maven.its.gh13522.consumer:simple-project:1.0-SNAPSHOT",
+                "simple-project",
                 props.getProperty("projectId", ""),
-                "projectId must match the consumer project coordinates");
+                "projectId must match the consumer project artifactId");
 
         // mojoId: fullGoalName@executionId — e.g. "logger-context:check-context@check-logger-context"
         String mojoId = props.getProperty("mojoId", "");
         assertTrue(mojoId.contains("check-context"), "mojoId must contain the goal name: " + mojoId);
         assertTrue(mojoId.contains("check-logger-context"), "mojoId must contain the execution id: " + mojoId);
 
-        // loggerName: the mojo implementation class (name used to construct the DefaultLogger)
-        assertEquals(
-                "org.apache.maven.its.gh13522.CheckContextMojo",
-                props.getProperty("loggerName", ""),
-                "loggerName must be the mojo implementation class name");
+        // loggerName: the mojo class or its DI-generated factory wrapper
+        String loggerName = props.getProperty("loggerName", "");
+        assertTrue(
+                loggerName.startsWith("org.apache.maven.its.gh13522.CheckContextMojo"),
+                "loggerName must start with the mojo implementation class name: " + loggerName);
 
-        // pluginId: not yet set by DefaultBuildPluginManager (3-arg DefaultLogger constructor)
-        // This assertion documents the current state; once pluginId wiring is added it should flip.
+        // pluginId: resolved via SLF4J StackWalker + registered plugin classloaders
         assertEquals(
-                "",
+                "org.apache.maven.its.gh13522:logger-context-maven-plugin:0.1.0-SNAPSHOT",
                 props.getProperty("pluginId", ""),
-                "pluginId is currently not wired by DefaultBuildPluginManager — expected empty");
+                "pluginId must match the plugin GAV");
     }
 }
