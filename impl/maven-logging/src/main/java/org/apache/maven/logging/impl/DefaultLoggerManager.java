@@ -106,6 +106,28 @@ public class DefaultLoggerManager implements LoggerManager {
         return logSink;
     }
 
+    /**
+     * Installs this manager as the global {@link LoggerManager} singleton.
+     * Intended for use by embedders and tests.
+     *
+     * @since 4.2.0
+     */
+    public void install() {
+        LoggerManager.set(this);
+    }
+
+    /**
+     * Clears the global {@link LoggerManager} singleton if it is currently this instance.
+     * Intended for use by tests to restore a clean state after each test method.
+     *
+     * @since 4.2.0
+     */
+    public void uninstall() {
+        if (LoggerManager.get() == this) {
+            LoggerManager.set(null);
+        }
+    }
+
     @Override
     public void setLogSink(LogSink sink) {
         LogSink old = this.logSink;
