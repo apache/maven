@@ -21,7 +21,6 @@ package org.apache.maven.di.impl;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -44,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -67,10 +67,16 @@ public class InjectorImpl implements Injector {
     private final Set<String> loadedUrls = new HashSet<>();
     private final ThreadLocal<Set<Key<?>>> resolutionStack = new ThreadLocal<>();
 
+    private final Consumer<String> dumpSink;
     private final InjectorDiagnostics diagnostics = new InjectorDiagnostics(this, bindings, scopes);
     private int registrationDepth;
 
     public InjectorImpl() {
+        this(System.out::println);
+    }
+
+    public InjectorImpl(Consumer<String> dumpSink) {
+        this.dumpSink = dumpSink;
         bindScope(Singleton.class, new SingletonScope());
     }
 
@@ -627,12 +633,9 @@ public class InjectorImpl implements Injector {
         return BindingStyler.NONE;
     }
 
-    /** Writes a complete block; a separate hook lets tests exercise slow and failing output. */
-    void writeDump(PrintStream output, String dump) {
-        output.println(dump);
-        if (output.checkError()) {
-            throw new IllegalStateException("Unable to write Maven DI diagnostics");
-        }
+    /** Writes a complete diagnostic block via the configured dump sink. */
+    protected void writeDump(String dump) {
+        dumpSink.accept(dump);
     }
 
     /**

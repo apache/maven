@@ -19,7 +19,6 @@
 package org.apache.maven.di.impl;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.List;
 import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -31,7 +30,6 @@ final class InjectorDiagnosticsFixture implements AutoCloseable {
     static final String MAVEN_DI_DEBUG = "maven.di.debug";
 
     private final String previousProperty = System.getProperty(MAVEN_DI_DEBUG);
-    private final PrintStream previousOutput = System.out;
 
     InjectorDiagnosticsFixture() {
         System.setProperty(MAVEN_DI_DEBUG, "true");
@@ -44,7 +42,6 @@ final class InjectorDiagnosticsFixture implements AutoCloseable {
         } else {
             System.setProperty(MAVEN_DI_DEBUG, previousProperty);
         }
-        System.setOut(previousOutput);
     }
 
     static String body(String dump) {
@@ -72,15 +69,19 @@ final class InjectorDiagnosticsFixture implements AutoCloseable {
     }
 
     static class RecordingInjector extends InjectorImpl {
-        final List<String> dumps = new CopyOnWriteArrayList<>();
+        final List<String> dumps;
+
+        RecordingInjector() {
+            this(new CopyOnWriteArrayList<>());
+        }
+
+        private RecordingInjector(List<String> dumps) {
+            super(dumps::add);
+            this.dumps = dumps;
+        }
 
         void checkpoint() {
             debugBindings();
-        }
-
-        @Override
-        void writeDump(PrintStream output, String dump) {
-            dumps.add(dump);
         }
     }
 

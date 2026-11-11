@@ -54,6 +54,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.repository.exception.ComponentLookupException;
 import org.eclipse.sisu.BeanEntry;
 import org.eclipse.sisu.inject.BeanLocator;
+import org.slf4j.LoggerFactory;
 
 import static org.apache.maven.di.impl.Binding.getPriorityComparator;
 
@@ -128,6 +129,7 @@ public class SisuDiBridgeModule extends AbstractModule {
         final MessageBuilderFactory messageBuilderFactory;
 
         BridgeInjectorImpl(Provider<BeanLocator> locator, Binder binder, MessageBuilderFactory messageBuilderFactory) {
+            super(LoggerFactory.getLogger(SisuDiBridgeModule.class)::info);
             this.locator = locator;
             this.binder = binder;
             this.messageBuilderFactory = messageBuilderFactory;
