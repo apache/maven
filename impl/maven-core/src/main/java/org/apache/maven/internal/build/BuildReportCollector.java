@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import org.apache.maven.api.BuildEnvironment;
 import org.apache.maven.api.MonotonicClock;
@@ -63,17 +64,6 @@ import org.slf4j.MDC;
 /**
  * Collects build lifecycle events and produces a structured {@link BuildReport}
  * at the end of the session.
- * <p>
- * Registered as an {@link org.apache.maven.eventspy.EventSpy} via {@code @Named}/{@code @Singleton},
- * following the same pattern as {@code DefaultPluginValidationManager}.
- * <p>
- * Thread-safe: concurrent module builds (with {@code -T}) each write to their
- * own entry in a {@link ConcurrentHashMap}.
- * <p>
- * Log capture: registers a callback on {@link ProjectBuildLogAppender} to
- * receive the already-formed {@link LogEvent} objects produced by the main
- * logging pipeline. Uses thread-based tracking to associate events with
- * the currently-executing mojo or module.
  *
  * @since 4.1.0
  */
@@ -90,57 +80,27 @@ public final class BuildReportCollector extends AbstractEventSpy {
 
     private static final int MAX_STACKTRACE_LINES = 30;
 
-    /**
-     * Maximum number of log events captured per scope (mojo, module, or build).
-     * Beyond this, events are silently dropped to prevent unbounded memory growth.
-     */
     static final int MAX_LOG_EVENTS_PER_SCOPE = 500;
 
-    // ---- Mutable state, populated during the build ----
-
-    /** Per-project mojo tracking: project key -> list of in-flight/completed mojos. */
     private final Map<String, List<MojoTiming>> mojoTimings = new ConcurrentHashMap<>();
-
-    /** Per-project start instants for duration computation. */
     private final Map<String, Instant> projectStartTimes = new ConcurrentHashMap<>();
-
-    /** Per-project trace context captured when the project starts. */
     private final Map<String, TraceContext> projectTraceContexts = new ConcurrentHashMap<>();
-
-    /** Per-mojo start instants for duration computation. */
     private final Map<String, Instant> mojoStartTimes = new ConcurrentHashMap<>();
-
-    /** Per-mojo trace context captured when the mojo starts. */
     private final Map<String, TraceContext> mojoTraceContexts = new ConcurrentHashMap<>();
 
-    /** Session-level state - set once on SessionStarted. */
     private volatile MavenSession session;
-
-    /** Build environment - captured once at SessionStarted, immutable thereafter. */
     private volatile BuildEnvironment buildEnvironment;
 
-    // ---- Log capture state ----
+    /** JVM shutdown hook used to persist a partial build report. */
+    private volatile Thread shutdownHook;
 
-    /**
-     * Maps thread ID -> mojo key for the currently-executing mojo on that thread.
-     * Lifecycle events and mojo execution run on the same thread, so this is safe
-     * for parallel builds with {@code -T}.
-     */
+    /** Ensures that normal completion and shutdown do not write competing reports. */
+    private final AtomicBoolean reportWritten = new AtomicBoolean();
+
     private final Map<Long, String> currentMojoByThread = new ConcurrentHashMap<>();
-
-    /** Per-mojo log buffers: mojo key -> captured log events. */
     private final Map<String, List<LogEvent>> mojoLogBuffers = new ConcurrentHashMap<>();
-
-    /**
-     * Maps thread ID -> project key for the currently-building project on that thread.
-     * Used to route log events that occur between mojo executions to the module-level buffer.
-     */
     private final Map<Long, String> currentProjectByThread = new ConcurrentHashMap<>();
-
-    /** Per-module log buffers: project key -> events captured outside any mojo. */
     private final Map<String, List<LogEvent>> moduleLogBuffers = new ConcurrentHashMap<>();
-
-    /** Build-level log buffer: events captured outside any module lifecycle. */
     private final List<LogEvent> buildLogBuffer = Collections.synchronizedList(new ArrayList<>());
 
     @Override
@@ -182,14 +142,55 @@ public final class BuildReportCollector extends AbstractEventSpy {
     private void onSessionStarted(ExecutionEvent event) {
         this.session = event.getSession();
         this.buildEnvironment = DefaultBuildEnvironment.from(this.session);
+        this.reportWritten.set(false);
+
+        Thread hook = new Thread(
+                () -> {
+                    MavenSession activeSession = this.session;
+
+                    if (activeSession == null || !reportWritten.compareAndSet(false, true)) {
+                        return;
+                    }
+
+                    try {
+                        LOGGER.debug("JVM shutting down: writing partial build report");
+                        BuildReport report = buildReport(activeSession);
+                        writeReport(report, activeSession, true);
+                    } catch (Exception e) {
+                        LOGGER.warn("Failed to write partial build report during shutdown", e);
+                    }
+                },
+                "maven-build-report-shutdown-hook");
+
+        try {
+            Runtime.getRuntime().addShutdownHook(hook);
+            this.shutdownHook = hook;
+        } catch (IllegalStateException e) {
+            LOGGER.debug("JVM shutdown already in progress", e);
+        }
+
         installLogCapture();
     }
 
     private void onSessionEnded(ExecutionEvent event) {
         removeLogCapture();
 
+        Thread hook = shutdownHook;
+        if (hook != null) {
+            try {
+                Runtime.getRuntime().removeShutdownHook(hook);
+            } catch (IllegalStateException e) {
+                LOGGER.debug("JVM shutdown already in progress", e);
+            } catch (SecurityException e) {
+                LOGGER.debug("Unable to remove build report shutdown hook", e);
+            } finally {
+                shutdownHook = null;
+            }
+        }
+
         MavenSession endSession = event.getSession();
-        if (endSession == null) {
+
+        if (endSession == null || !reportWritten.compareAndSet(false, true)) {
             return;
         }
 
@@ -197,10 +198,11 @@ public final class BuildReportCollector extends AbstractEventSpy {
             BuildReport report = buildReport(endSession);
             writeReport(report, endSession);
         } catch (Exception e) {
-            // Never let the report collector crash the build
             LOGGER.debug("Failed to produce build report: {}", e.getMessage(), e);
         }
     }
+
+    // ---- Event handlers ----
 
     private void onProjectStarted(ExecutionEvent event) {
         String key = projectKey(event.getProject());
@@ -212,8 +214,6 @@ public final class BuildReportCollector extends AbstractEventSpy {
     }
 
     private void onProjectFinished(ExecutionEvent event) {
-        // Unregister the project from this thread so subsequent log events
-        // fall through to the build-level buffer
         currentProjectByThread.remove(Thread.currentThread().getId());
     }
 
@@ -222,8 +222,6 @@ public final class BuildReportCollector extends AbstractEventSpy {
         mojoStartTimes.put(mKey, MonotonicClock.now());
         mojoTraceContexts.put(mKey, currentTraceContext());
 
-        // Register the current mojo for this thread so the log event sink
-        // can associate events with this mojo execution
         currentMojoByThread.put(Thread.currentThread().getId(), mKey);
         mojoLogBuffers.put(mKey, Collections.synchronizedList(new ArrayList<>()));
     }
@@ -234,24 +232,24 @@ public final class BuildReportCollector extends AbstractEventSpy {
         String mKey = mojoKey(project, mojo);
         String pKey = projectKey(project);
 
-        // Unregister the mojo from this thread
         currentMojoByThread.remove(Thread.currentThread().getId());
 
         Instant now = MonotonicClock.now();
         Instant startInstant = mojoStartTimes.remove(mKey);
         TraceContext traceContext = mojoTraceContexts.remove(mKey);
+
         if (traceContext == null) {
             traceContext = TraceContext.EMPTY;
         }
         if (startInstant == null) {
             startInstant = now;
         }
+
         Duration duration = Duration.between(startInstant, now);
 
         BuildStatus status =
                 event.getType() == ExecutionEvent.Type.MojoSucceeded ? BuildStatus.SUCCESS : BuildStatus.FAILURE;
 
-        // Drain the log buffer for this mojo
         List<LogEvent> logBuffer = mojoLogBuffers.remove(mKey);
         List<LogEvent> output = logBuffer != null ? List.copyOf(logBuffer) : List.of();
 
@@ -304,11 +302,8 @@ public final class BuildReportCollector extends AbstractEventSpy {
     // ---- Structured log capture ----
 
     /**
-     * Registers a callback on {@link ProjectBuildLogAppender} to receive the
-     * already-formed {@link LogEvent} objects from the main logging pipeline.
-     * This eliminates the need for a separate capture path and ensures the
-     * build report captures the same enriched events (with sequence number,
-     * source metadata) as the console output.
+     * Registers a callback on ProjectBuildLogAppender to receive the
+     * already-formed LogEvent objects from the main logging pipeline.
      */
     private void installLogCapture() {
         ProjectBuildLogAppender.setReportCapture(this::captureLogEvent);
@@ -319,14 +314,13 @@ public final class BuildReportCollector extends AbstractEventSpy {
     }
 
     /**
-     * Routes a pre-formed {@link LogEvent} to the appropriate buffer
-     * (mojo, module, or build-level) based on the current thread's
-     * lifecycle context.
+     * Routes a LogEvent to the appropriate buffer based on the
+     * current thread's lifecycle context.
      */
     private void captureLogEvent(LogEvent event) {
         long threadId = Thread.currentThread().getId();
 
-        // 1. Mojo-level: event belongs to the currently-executing mojo on this thread
+        // Mojo-level output
         String mKey = currentMojoByThread.get(threadId);
         if (mKey != null) {
             List<LogEvent> buffer = mojoLogBuffers.get(mKey);
@@ -336,7 +330,7 @@ public final class BuildReportCollector extends AbstractEventSpy {
             return;
         }
 
-        // 2. Module-level: project is active but no mojo is running
+        // Module-level output
         String pKey = currentProjectByThread.get(threadId);
         if (pKey != null) {
             List<LogEvent> buffer = moduleLogBuffers.get(pKey);
@@ -346,9 +340,7 @@ public final class BuildReportCollector extends AbstractEventSpy {
             return;
         }
 
-        // 3. Build-level: no project active (startup, reactor summary, post-build)
-        // synchronizedList requires external synchronization for the compound check-then-add
-        // to avoid TOCTOU: two threads can both observe size() < MAX and both add().
+        // Build-level output
         synchronized (buildLogBuffer) {
             if (buildLogBuffer.size() < MAX_LOG_EVENTS_PER_SCOPE) {
                 buildLogBuffer.add(event);
@@ -361,45 +353,52 @@ public final class BuildReportCollector extends AbstractEventSpy {
     BuildReport buildReport(MavenSession endSession) {
         Instant now = MonotonicClock.now();
         Instant startInstant = endSession.getRequest().getStartInstant();
+
         if (startInstant == null) {
             startInstant = now;
         }
+
         Duration totalDuration = Duration.between(startInstant, now);
 
         MavenExecutionResult result = endSession.getResult();
         boolean hasFailures = result != null && result.hasExceptions();
+
         BuildStatus overallStatus = hasFailures ? BuildStatus.FAILURE : BuildStatus.SUCCESS;
 
-        // Collect module reports
         List<ModuleReport> moduleReports = new ArrayList<>();
+
         for (MavenProject project : endSession.getProjects()) {
             moduleReports.add(buildModuleReport(project, endSession));
         }
 
-        // Collect failures
         List<FailureReport> failureReports = new ArrayList<>();
+
         if (result != null) {
             for (MavenProject project : endSession.getProjects()) {
                 BuildSummary summary = result.getBuildSummary(project);
+
                 if (summary instanceof BuildFailure buildFailure) {
                     failureReports.add(buildFailureReport(project, buildFailure));
                 }
             }
         }
 
-        // Metadata
         String mavenVersion = endSession.getSystemProperties().getProperty("maven.version", "unknown");
+
         String javaVersion = System.getProperty("java.version", "unknown");
         List<String> goals = endSession.getGoals();
+
         MavenProject topProject = endSession.getTopLevelProject();
+
         String projectId = topProject != null
                 ? topProject.getGroupId() + ":" + topProject.getArtifactId() + ":" + topProject.getVersion()
                 : "unknown";
+
         boolean multiModule = endSession.getProjects().size() > 1;
         int threads = endSession.getRequest().getDegreeOfConcurrency();
 
-        // Build-level log events (outside any module lifecycle)
         List<LogEvent> buildOutput;
+
         synchronized (buildLogBuffer) {
             buildOutput = List.copyOf(buildLogBuffer);
         }
@@ -422,17 +421,20 @@ public final class BuildReportCollector extends AbstractEventSpy {
     }
 
     private ModuleReport buildModuleReport(MavenProject project, MavenSession endSession) {
+
         String key = projectKey(project);
 
-        // Duration from BuildSummary (preferred) or fallback to our own tracking
         MavenExecutionResult result = endSession.getResult();
+
         Duration duration = Duration.ZERO;
         BuildStatus status = BuildStatus.SKIPPED;
+
         Instant moduleStartTime =
                 projectStartTimes.getOrDefault(key, endSession.getRequest().getStartInstant());
 
         if (result != null) {
             BuildSummary summary = result.getBuildSummary(project);
+
             if (summary instanceof BuildSuccess) {
                 status = BuildStatus.SUCCESS;
                 duration = summary.getExecTime();
@@ -440,11 +442,10 @@ public final class BuildReportCollector extends AbstractEventSpy {
                 status = BuildStatus.FAILURE;
                 duration = summary.getExecTime();
             } else if (summary != null) {
-                // Unknown summary type - use its timing
                 duration = summary.getExecTime();
             } else {
-                // No summary means skipped
                 Instant start = projectStartTimes.get(key);
+
                 if (start != null) {
                     duration = Duration.between(start, MonotonicClock.now());
                 }
@@ -453,7 +454,9 @@ public final class BuildReportCollector extends AbstractEventSpy {
 
         // Mojo reports
         List<MojoTiming> timings = mojoTimings.getOrDefault(key, Collections.emptyList());
+
         List<MojoReport> mojoReports;
+
         synchronized (timings) {
             mojoReports = timings.stream()
                     .map(t -> (MojoReport) new DefaultMojoReport(
@@ -472,9 +475,11 @@ public final class BuildReportCollector extends AbstractEventSpy {
                     .toList();
         }
 
-        // Module-level log events (between mojos)
+        // Module-level log events
         List<LogEvent> moduleLogBuffer = moduleLogBuffers.getOrDefault(key, Collections.emptyList());
+
         List<LogEvent> moduleOutput;
+
         synchronized (moduleLogBuffer) {
             moduleOutput = List.copyOf(moduleLogBuffer);
         }
@@ -495,25 +500,30 @@ public final class BuildReportCollector extends AbstractEventSpy {
     }
 
     private FailureReport buildFailureReport(MavenProject project, BuildFailure buildFailure) {
+
         String module = project.getGroupId() + ":" + project.getArtifactId() + ":" + project.getVersion();
 
-        // Try to find which mojo failed
         String mojoId = null;
+
         List<MojoTiming> timings = mojoTimings.getOrDefault(projectKey(project), Collections.emptyList());
+
         synchronized (timings) {
-            for (MojoTiming t : timings) {
-                if (t.status == BuildStatus.FAILURE) {
-                    mojoId = t.artifactId + ":" + t.version + ":" + t.goal;
+            for (MojoTiming timing : timings) {
+                if (timing.status == BuildStatus.FAILURE) {
+                    mojoId = timing.artifactId + ":" + timing.version + ":" + timing.goal;
                     break;
                 }
             }
         }
 
         Throwable cause = buildFailure.getCause();
+
         String message = cause != null ? cause.getMessage() : "Unknown error";
+
         String stackTrace = cause != null ? truncateStackTrace(cause) : null;
 
         Instant failureTimestamp = MonotonicClock.now();
+
         String exceptionType = cause != null ? cause.getClass().getSimpleName() : null;
 
         return new DefaultFailureReport(
@@ -528,7 +538,13 @@ public final class BuildReportCollector extends AbstractEventSpy {
     // ---- JSON persistence ----
 
     void writeReport(BuildReport report, MavenSession endSession) {
+        writeReport(report, endSession, false);
+    }
+
+    void writeReport(BuildReport report, MavenSession endSession, boolean partial) {
+
         Path topDirectory = endSession.getTopDirectory();
+
         if (topDirectory == null) {
             LOGGER.debug("No top directory available, skipping build report");
             return;
@@ -538,17 +554,22 @@ public final class BuildReportCollector extends AbstractEventSpy {
 
         try {
             Files.createDirectories(reportsDir);
+
             String json = BuildReportJsonWriter.toJson(report);
 
-            // Timestamped file: build-report-20250729T143000Z.json
+            // Mark reports written during shutdown as partial.
+            if (partial) {
+                json = addPartialFlag(json);
+            }
+
             String timestamp = DateTimeFormatter.ofPattern("yyyyMMdd'T'HHmmss'Z'")
                     .withZone(ZoneOffset.UTC)
                     .format(report.startTime());
+
             Path timestampedFile = reportsDir.resolve("build-report-" + timestamp + ".json");
 
-            // Write to a temp file, then atomic-move into place so a crash
-            // never leaves a half-written report on disk.
             Path tmpFile = Files.createTempFile(reportsDir, ".build-report-", ".tmp");
+
             try {
                 Files.writeString(tmpFile, json);
                 atomicMove(tmpFile, timestampedFile);
@@ -557,30 +578,52 @@ public final class BuildReportCollector extends AbstractEventSpy {
                 throw e;
             }
 
-            // Latest symlink (or copy on filesystems that don't support symlinks)
+            // Latest symlink, or copy on filesystems that do not support symlinks.
             Path latestFile = reportsDir.resolve(REPORT_LATEST);
+
             try {
-                // Atomic symlink swap: create new link, then rename over the old one
                 Path tmpLink = Files.createTempFile(reportsDir, ".latest-", ".tmp");
-                Files.delete(tmpLink); // createTempFile creates a regular file
+
+                Files.delete(tmpLink);
                 Files.createSymbolicLink(tmpLink, timestampedFile.getFileName());
+
                 atomicMove(tmpLink, latestFile);
             } catch (UnsupportedOperationException | IOException symEx) {
-                // Windows or restricted filesystem - fall back to a plain copy
                 Files.writeString(latestFile, json);
             }
 
             LOGGER.debug("Build report written to {}", timestampedFile);
+
         } catch (IOException e) {
             LOGGER.warn("Failed to write build report to {}: {}", reportsDir, e.getMessage());
         }
     }
 
     /**
-     * Attempts an atomic move; falls back to a plain move if the filesystem
-     * does not support {@code ATOMIC_MOVE}.
+     * Adds the partial flag to the root JSON object.
+     */
+    private static String addPartialFlag(String json) {
+        int lastBrace = json.lastIndexOf('}');
+
+        if (lastBrace < 0) {
+            return json;
+        }
+
+        String beforeBrace = json.substring(0, lastBrace).stripTrailing();
+
+        if (beforeBrace.endsWith("{")) {
+            return beforeBrace + "\"partial\":true}";
+        }
+
+        return beforeBrace + ",\"partial\":true}";
+    }
+
+    /**
+     * Attempts an atomic move; falls back to a regular move when
+     * the filesystem does not support ATOMIC_MOVE.
      */
     private static void atomicMove(Path source, Path target) throws IOException {
+
         try {
             Files.move(source, target, StandardCopyOption.REPLACE_EXISTING, StandardCopyOption.ATOMIC_MOVE);
         } catch (AtomicMoveNotSupportedException e) {
@@ -595,6 +638,7 @@ public final class BuildReportCollector extends AbstractEventSpy {
     }
 
     private static String mojoKey(MavenProject project, MojoExecution mojo) {
+
         return projectKey(project) + "#" + mojo.getGoal() + "@" + mojo.getExecutionId();
     }
 
@@ -609,16 +653,22 @@ public final class BuildReportCollector extends AbstractEventSpy {
     static String truncateStackTrace(Throwable t) {
         StringWriter sw = new StringWriter();
         t.printStackTrace(new PrintWriter(sw));
+
         String full = sw.toString();
         String[] lines = full.split("\n");
+
         if (lines.length <= MAX_STACKTRACE_LINES) {
             return full;
         }
+
         StringBuilder sb = new StringBuilder();
+
         for (int i = 0; i < MAX_STACKTRACE_LINES; i++) {
             sb.append(lines[i]).append('\n');
         }
+
         sb.append("... ").append(lines.length - MAX_STACKTRACE_LINES).append(" more lines truncated\n");
+
         return sb.toString();
     }
 
