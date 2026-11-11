@@ -164,9 +164,11 @@ public interface Injector {
      * Use a negative priority (e.g. {@code -10}) to register a fallback binding that yields to
      * plugin-provided {@code @Provides} methods (which default to priority {@code 0}).
      *
-     * @implSpec The default implementation ignores {@code priority} for backward compatibility
-     *     with existing {@code Injector} implementations. Implementors SHOULD override this method
-     *     to honor the priority parameter.
+     * <p>
+     * <b>Implementation note:</b> The default implementation ignores {@code priority} for
+     * backward compatibility with existing {@code Injector} implementations.
+     * Implementors SHOULD override this method to honor the priority parameter.
+     * </p>
      *
      * @param <T> the type of the instance
      * @param cls the class to bind to
