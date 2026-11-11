@@ -20,7 +20,6 @@ package org.apache.maven.api.services;
 
 import java.util.List;
 
-import org.apache.maven.api.Service;
 import org.apache.maven.api.model.Model;
 
 /**
@@ -31,7 +30,7 @@ import org.apache.maven.api.model.Model;
  *
  * @since 4.0.0
  */
-public interface ModelBuilder extends Service {
+public interface ModelBuilder extends OperationService {
 
     String MODEL_VERSION_4_0_0 = "4.0.0";
 

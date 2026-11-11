@@ -23,13 +23,13 @@ import java.util.Objects;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.OperationService;
 import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.Result;
@@ -39,7 +39,7 @@ import org.apache.maven.api.services.Result;
  *
  * @since 4.0.0
  */
-public interface ModelResolver extends Service {
+public interface ModelResolver extends OperationService {
 
     /**
      * Tries to resolve the POM for the specified parent coordinates possibly updating {@code parent}.

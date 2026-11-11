@@ -19,7 +19,6 @@
 package org.apache.maven.api.services;
 
 import org.apache.maven.api.ArtifactCoordinates;
-import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
@@ -32,7 +31,7 @@ import org.apache.maven.api.annotations.Nonnull;
  */
 @Experimental
 @Consumer
-public interface VersionResolver extends Service {
+public interface VersionResolver extends OperationService {
 
     /**
      * Resolves an artifact's meta version (if any) to a concrete version.
