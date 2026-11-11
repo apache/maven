@@ -847,11 +847,13 @@ public class MavenCli {
         }
     }
 
-    private List<CoreExtension> readCoreExtensionsDescriptor(Path extensionsFile)
-            throws IOException, XmlPullParserException {
+    List<CoreExtension> readCoreExtensionsDescriptor(Path extensionsFile) throws IOException, XmlPullParserException {
         CoreExtensionsXpp3Reader parser = new CoreExtensionsXpp3Reader();
         try (BufferedReader is = Files.newBufferedReader(extensionsFile, StandardCharsets.UTF_8)) {
             return parser.read(is).getExtensions();
+        } catch (IOException | XmlPullParserException e) {
+            throw new IOException(
+                    "Unable to parse core extensions descriptor " + extensionsFile + ": " + e.getMessage(), e);
         }
     }
 
