@@ -199,7 +199,38 @@ public class BuildPlanExecutor {
         }
     }
 
-    class BuildContext implements AutoCloseable {
+    /**
+     * Creates a {@link BuildContext} for a single project, with the lifecycle plan fully
+     * calculated (phases, mojo bindings, aggregator steps, fork plans). The returned context
+     * can be used to inspect the plan via {@link BuildContext#getPlan()} and then execute
+     * steps via {@link BuildContext#configureAndExecuteStep(MavenProject, List)}.
+     *
+     * @param session the current Maven session
+     * @param project the project for which to calculate the plan
+     * @param taskSegments the parsed task segments
+     * @return a build context holding the calculated plan
+     */
+    public BuildContext createProjectContext(
+            MavenSession session, MavenProject project, List<TaskSegment> taskSegments) {
+        BuildContext ctx = new BuildContext(session);
+
+        Map<MavenProject, List<MavenProject>> projects = Collections.singletonMap(project, Collections.emptyList());
+
+        BuildPlan plan = new BuildPlan(projects);
+        for (TaskSegment taskSegment : taskSegments) {
+            BuildPlan segment = ctx.calculateMojoExecutions(projects, taskSegment.getTasks());
+            plan.then(segment);
+        }
+
+        ctx.plan = plan;
+        ctx.bindProjectMojos(project);
+        ctx.splitAggregatorSteps(project);
+        ctx.linkAggregatorSteps();
+
+        return ctx;
+    }
+
+    public class BuildContext implements AutoCloseable {
         final MavenSession session;
         final ReactorContext reactorContext;
         final PhasingExecutor executor;
@@ -230,6 +261,32 @@ public class BuildPlanExecutor {
             this.threads = 1;
             this.executor = null;
             this.plan = null;
+        }
+
+        BuildContext(MavenSession session) {
+            this.session = session;
+            this.reactorContext = null;
+            this.threads = 1;
+            this.executor = null;
+            this.plan = null;
+        }
+
+        public BuildPlan getPlan() {
+            return plan;
+        }
+
+        /**
+         * Configures and executes a list of mojo executions for a single project.
+         */
+        public void configureAndExecuteStep(MavenProject project, List<MojoExecution> executions)
+                throws LifecycleExecutionException {
+            BuildPlanExecutor.attachToThread(project);
+            session.setCurrentProject(project);
+            executions.forEach(mojoExecution -> {
+                mojoExecutionConfigurator(mojoExecution).configure(project, mojoExecution, true);
+                finalizeMojoConfiguration(mojoExecution);
+            });
+            mojoExecutor.execute(session, executions);
         }
 
         public BuildPlan buildInitialPlan(List<TaskSegment> taskSegments) {
@@ -365,7 +422,9 @@ public class BuildPlanExecutor {
 
         @Override
         public void close() {
-            this.executor.close();
+            if (this.executor != null) {
+                this.executor.close();
+            }
         }
 
         /**
@@ -648,35 +707,7 @@ public class BuildPlanExecutor {
                         .filter(step -> step.status.compareAndSet(PLANNING, SCHEDULED))
                         .collect(Collectors.toSet());
                 for (BuildStep step : planSteps) {
-                    MavenProject project = step.project;
-                    for (Plugin plugin : project.getBuild().getPlugins()) {
-                        for (PluginExecution execution : plugin.getExecutions()) {
-                            for (String goal : execution.getGoals()) {
-                                MojoDescriptor mojoDescriptor = getMojoDescriptor(project, plugin, goal);
-                                String phase =
-                                        execution.getPhase() != null ? execution.getPhase() : mojoDescriptor.getPhase();
-                                if (phase == null) {
-                                    continue;
-                                }
-                                String tmpResolvedPhase = plan.aliases().getOrDefault(phase, phase);
-                                String resolvedPhase = tmpResolvedPhase.startsWith(AT)
-                                        ? tmpResolvedPhase.substring(AT.length())
-                                        : tmpResolvedPhase;
-                                plan.step(project, resolvedPhase).ifPresent(n -> {
-                                    MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());
-                                    mojoExecution.setLifecyclePhase(phase);
-                                    if (requiresAggregation(n, mojoExecution)
-                                            && inheritedFromReactorAncestor(
-                                                    project, plugin, execution, goal, resolvedPhase)) {
-                                        return;
-                                    }
-                                    n.addMojo(mojoExecution, execution.getPriority());
-                                    // Apply @After annotation ordering constraints from the mojo descriptor
-                                    applyAfterLinks(mojoDescriptor, project, resolvedPhase);
-                                });
-                            }
-                        }
-                    }
+                    bindProjectMojos(step.project);
                 }
 
                 for (BuildStep step : planSteps) {
@@ -715,6 +746,43 @@ public class BuildPlanExecutor {
             } finally {
                 lock.writeLock().unlock();
             }
+        }
+
+        void bindProjectMojos(MavenProject project) {
+            for (Plugin plugin : project.getBuild().getPlugins()) {
+                for (PluginExecution execution : plugin.getExecutions()) {
+                    for (String goal : execution.getGoals()) {
+                        MojoDescriptor mojoDescriptor = getMojoDescriptor(project, plugin, goal);
+                        String phase = execution.getPhase() != null ? execution.getPhase() : mojoDescriptor.getPhase();
+                        if (phase == null) {
+                            continue;
+                        }
+                        String tmpResolvedPhase = plan.aliases().getOrDefault(phase, phase);
+                        String resolvedPhase = tmpResolvedPhase.startsWith(AT)
+                                ? tmpResolvedPhase.substring(AT.length())
+                                : tmpResolvedPhase;
+                        plan.step(project, resolvedPhase).ifPresent(n -> {
+                            MojoExecution mojoExecution = new MojoExecution(mojoDescriptor, execution.getId());
+                            mojoExecution.setLifecyclePhase(phase);
+                            if (requiresAggregation(n, mojoExecution)
+                                    && inheritedFromReactorAncestor(project, plugin, execution, goal, resolvedPhase)) {
+                                return;
+                            }
+                            n.addMojo(mojoExecution, execution.getPriority());
+                            applyAfterLinks(mojoDescriptor, project, resolvedPhase);
+                        });
+                    }
+                }
+            }
+
+            // Compute fork plans
+            BuildPlan buildPlan = plan;
+            for (BuildStep step : plan.steps(project).toList()) {
+                for (MojoExecution execution : step.executions().toList()) {
+                    buildPlan = computeForkPlan(step, execution, buildPlan);
+                }
+            }
+            plan = buildPlan;
         }
 
         private boolean requiresAggregation(BuildStep step, MojoExecution execution) {

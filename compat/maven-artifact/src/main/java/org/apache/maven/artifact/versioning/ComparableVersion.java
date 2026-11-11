@@ -541,7 +541,7 @@ public class ComparableVersion implements Comparable<ComparableVersion> {
 
         @Override
         public String toString() {
-            return stringPart.toString() + digitPart.toString();
+            return stringPart.toString() + "-" + digitPart.toString();
         }
     }
 

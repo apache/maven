@@ -28,6 +28,7 @@ import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
 import org.apache.maven.impl.model.reflection.ReflectionValueExtractor;
+import org.apache.maven.plugin.internal.MojoExpressionEvaluator;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
 import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
 
@@ -51,7 +52,7 @@ import org.codehaus.plexus.component.configurator.expression.TypeAwareExpression
  * @see org.apache.maven.api.settings.Settings
  * @see MojoExecution
  */
-public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpressionEvaluator {
+public class PluginParameterExpressionEvaluatorV4 implements TypeAwareExpressionEvaluator, MojoExpressionEvaluator {
     private final Session session;
 
     private final MojoExecution mojoExecution;
