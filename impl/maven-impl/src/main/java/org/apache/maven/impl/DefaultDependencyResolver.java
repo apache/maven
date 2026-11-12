@@ -201,33 +201,11 @@ public class DefaultDependencyResolver implements DependencyResolver {
     }
 
     private void warnObsoleteExclusions(RepositorySystemSession session, DependencyResolverRequest request) {
-        if (!LOGGER.isWarnEnabled()) {
-            return;
-        }
         String projectKey = request.getProject()
                 .map(p -> p.getGroupId() + ":" + p.getArtifactId())
                 .orElse(null);
         String projectId = request.getProject().map(Project::getId).orElse(projectKey);
-        List<TrackingExclusionDependencySelector.ExclusionTrackingRecord> records =
-                TrackingExclusionDependencySelector.getTrackingRecords(session, projectKey);
-        for (TrackingExclusionDependencySelector.ExclusionTrackingRecord record : records) {
-            org.eclipse.aether.graph.Dependency directDep = record.getDirectDependency();
-            String depCoord = directDep.getArtifact().getGroupId() + ":"
-                    + directDep.getArtifact().getArtifactId();
-            for (org.eclipse.aether.graph.Exclusion exclusion : record.getDeclaredExclusions()) {
-                if ("*".equals(exclusion.getGroupId()) && "*".equals(exclusion.getArtifactId())) {
-                    continue;
-                }
-                if (!record.getMatchedExclusions().contains(exclusion)) {
-                    LOGGER.warn(
-                            "The exclusion of {}:{} for {} in {} is obsolete - there is no dependency on this exclusion",
-                            exclusion.getGroupId(),
-                            exclusion.getArtifactId(),
-                            depCoord,
-                            projectId != null ? projectId : "project");
-                }
-            }
-        }
+        TrackingExclusionDependencySelector.warnObsoleteExclusions(session, projectKey, projectId, LOGGER);
     }
 
     private static DependencyFilter getScopeDependencyFilter(PathScope scope) {

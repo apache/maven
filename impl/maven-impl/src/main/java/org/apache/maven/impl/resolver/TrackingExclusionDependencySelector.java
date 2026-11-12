@@ -35,6 +35,7 @@ import org.eclipse.aether.collection.DependencySelector;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.util.graph.selector.ExclusionDependencySelector;
+import org.slf4j.Logger;
 
 /**
  * A dependency selector that wraps {@link ExclusionDependencySelector} to track which declared
@@ -64,7 +65,30 @@ public class TrackingExclusionDependencySelector implements DependencySelector {
         }
 
         public Set<Exclusion> getMatchedExclusions() {
-            return matchedExclusions;
+            return Collections.unmodifiableSet(matchedExclusions);
+        }
+
+        void addMatchedExclusion(Exclusion exclusion) {
+            matchedExclusions.add(exclusion);
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (o == null || getClass() != o.getClass()) {
+                return false;
+            }
+            ExclusionTrackingRecord that = (ExclusionTrackingRecord) o;
+            return Objects.equals(directDependency, that.directDependency)
+                    && Objects.equals(declaredExclusions, that.declaredExclusions)
+                    && Objects.equals(matchedExclusions, that.matchedExclusions);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(directDependency, declaredExclusions, matchedExclusions);
         }
     }
 
@@ -94,7 +118,7 @@ public class TrackingExclusionDependencySelector implements DependencySelector {
                 Artifact artifact = dependency.getArtifact();
                 for (Exclusion exclusion : trackingRecord.getDeclaredExclusions()) {
                     if (matches(exclusion, artifact)) {
-                        trackingRecord.getMatchedExclusions().add(exclusion);
+                        trackingRecord.addMatchedExclusion(exclusion);
                     }
                 }
             }
@@ -103,47 +127,28 @@ public class TrackingExclusionDependencySelector implements DependencySelector {
         return true;
     }
 
+    /**
+     * Mirrors {@link ExclusionDependencySelector} matching logic exactly:
+     * {@code "*"} matches any value, otherwise requires exact string equality.
+     */
     private static boolean matches(Exclusion exclusion, Artifact artifact) {
         if (artifact == null) {
             return false;
         }
         return matches(exclusion.getGroupId(), artifact.getGroupId())
-                && matches(exclusion.getArtifactId(), artifact.getArtifactId())
-                && matches(exclusion.getExtension(), artifact.getExtension())
-                && matches(exclusion.getClassifier(), artifact.getClassifier());
+                && matches(exclusion.getArtifactId(), artifact.getArtifactId());
     }
 
-    private static boolean matches(String coordinate, String value) {
-        if ("*".equals(coordinate) || Objects.equals(coordinate, value)) {
-            return true;
-        }
-        if (coordinate != null && value != null && (coordinate.contains("*") || coordinate.contains("?"))) {
-            return matchesGlob(coordinate, value);
-        }
-        return false;
-    }
-
-    private static boolean matchesGlob(String pattern, String text) {
-        StringBuilder sb = new StringBuilder("^");
-        for (int i = 0; i < pattern.length(); i++) {
-            char c = pattern.charAt(i);
-            if (c == '*') {
-                sb.append(".*");
-            } else if (c == '?') {
-                sb.append(".");
-            } else if ("\\.[]{}()+-^$|".indexOf(c) != -1) {
-                sb.append('\\').append(c);
-            } else {
-                sb.append(c);
-            }
-        }
-        sb.append('$');
-        return text.matches(sb.toString());
+    private static boolean matches(String pattern, String value) {
+        return "*".equals(pattern) || Objects.equals(pattern, value);
     }
 
     @Override
     public DependencySelector deriveChildSelector(DependencyCollectionContext context) {
-        ExclusionDependencySelector childDelegate = (ExclusionDependencySelector) delegate.deriveChildSelector(context);
+        DependencySelector childDelegateRaw = delegate.deriveChildSelector(context);
+        // deriveChildSelector() is declared to return DependencySelector; guard against decoration
+        ExclusionDependencySelector childDelegate =
+                childDelegateRaw instanceof ExclusionDependencySelector eds ? eds : new ExclusionDependencySelector();
 
         Dependency dependency = context.getDependency();
         ExclusionTrackingRecord childRecord = this.trackingRecord;
@@ -169,12 +174,8 @@ public class TrackingExclusionDependencySelector implements DependencySelector {
             return;
         }
         String key = rootArtifact != null ? rootArtifact.getGroupId() + ":" + rootArtifact.getArtifactId() : "";
-        Map<String, List<ExclusionTrackingRecord>> map =
-                (Map<String, List<ExclusionTrackingRecord>>) session.getData().get(EXCLUSION_TRACKER_KEY);
-        if (map == null) {
-            map = new ConcurrentHashMap<>();
-            session.getData().set(EXCLUSION_TRACKER_KEY, map);
-        }
+        Map<String, List<ExclusionTrackingRecord>> map = (Map<String, List<ExclusionTrackingRecord>>)
+                session.getData().computeIfAbsent(EXCLUSION_TRACKER_KEY, () -> new ConcurrentHashMap<>());
         map.computeIfAbsent(key, k -> new CopyOnWriteArrayList<>()).add(record);
     }
 
@@ -193,12 +194,11 @@ public class TrackingExclusionDependencySelector implements DependencySelector {
             for (List<ExclusionTrackingRecord> list : map.values()) {
                 all.addAll(list);
             }
-            map.clear();
             return all;
         }
-        List<ExclusionTrackingRecord> records = map.remove(projectKey);
+        List<ExclusionTrackingRecord> records = map.get(projectKey);
         if (records == null) {
-            records = map.remove("");
+            records = map.get("");
         }
         return records != null ? records : Collections.emptyList();
     }
@@ -206,6 +206,41 @@ public class TrackingExclusionDependencySelector implements DependencySelector {
     public static void clearTrackingRecords(RepositorySystemSession session) {
         if (session != null && session.getData() != null) {
             session.getData().set(EXCLUSION_TRACKER_KEY, null);
+        }
+    }
+
+    /**
+     * Logs obsolete exclusion warnings for a given project.
+     * Shared helper used by both {@code DefaultDependencyResolver} and {@code DefaultProjectDependenciesResolver}.
+     *
+     * @param session    the repository session
+     * @param projectKey the {@code groupId:artifactId} key used to look up tracking records
+     * @param projectId  the full project identifier shown in the warning message
+     * @param logger     the logger to write warnings to
+     */
+    public static void warnObsoleteExclusions(
+            RepositorySystemSession session, String projectKey, String projectId, Logger logger) {
+        if (!logger.isWarnEnabled()) {
+            return;
+        }
+        List<ExclusionTrackingRecord> records = getTrackingRecords(session, projectKey);
+        for (ExclusionTrackingRecord record : records) {
+            org.eclipse.aether.graph.Dependency directDep = record.getDirectDependency();
+            String depCoord = directDep.getArtifact().getGroupId() + ":"
+                    + directDep.getArtifact().getArtifactId();
+            for (Exclusion exclusion : record.getDeclaredExclusions()) {
+                if ("*".equals(exclusion.getGroupId()) && "*".equals(exclusion.getArtifactId())) {
+                    continue;
+                }
+                if (!record.getMatchedExclusions().contains(exclusion)) {
+                    logger.warn(
+                            "The exclusion of {}:{} for {} in {} is obsolete - there is no dependency on this exclusion",
+                            exclusion.getGroupId(),
+                            exclusion.getArtifactId(),
+                            depCoord,
+                            projectId != null ? projectId : "project");
+                }
+            }
         }
     }
 
