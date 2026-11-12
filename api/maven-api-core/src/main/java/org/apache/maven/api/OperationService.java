@@ -32,10 +32,11 @@ import org.apache.maven.api.services.Result;
  * caching and the context needed to observe operation lifecycles. Requests and results
  * describe the work, while request traces identify the operations that initiated it.
  *
- * <p>All {@link Request} types already carry a {@link org.apache.maven.api.cache.CacheRetention}
- * policy via {@link org.apache.maven.api.cache.CacheMetadata#getCacheRetention()}, defaulting to
- * {@link org.apache.maven.api.cache.CacheRetention#DISABLED}.
- * Request types whose results are safe to cache override that default.</p>
+ * <p>All {@link Request} types inherit a {@link org.apache.maven.api.cache.CacheRetention}
+ * policy from {@link org.apache.maven.api.cache.CacheMetadata#getCacheRetention()}, which
+ * defaults to {@link org.apache.maven.api.cache.CacheRetention#DISABLED}.
+ * Request types whose results are safe to cache (i.e. read-only, deterministic operations)
+ * must override that default with an appropriate retention policy.</p>
  *
  * <p>Lightweight utilities, factories and leaf operations that do not benefit from the
  * pipeline extend {@link Service} directly.</p>

@@ -42,6 +42,14 @@ import static java.util.Objects.requireNonNull;
 @Experimental
 public interface VersionRangeResolverRequest extends RepositoryAwareRequest {
 
+    /**
+     * Overrides the default {@link CacheRetention#DISABLED} retention with
+     * {@link CacheRetention#REQUEST_SCOPED}, because version range resolution is a
+     * read-only, deterministic operation within a single build.
+     *
+     * @return {@link CacheRetention#REQUEST_SCOPED}
+     * @since 4.2.0
+     */
     @Nonnull
     @Override
     default CacheRetention getCacheRetention() {

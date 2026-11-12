@@ -42,7 +42,9 @@ import static java.util.Objects.requireNonNull;
 public interface SettingsBuilderRequest extends Request<ProtoSession> {
 
     /**
-     * Returns the cache retention for this operation.
+     * Overrides the default {@link CacheRetention#DISABLED} retention with
+     * {@link CacheRetention#SESSION_SCOPED}, because settings are read from stable
+     * sources (files or classpath) that do not change within a session.
      *
      * @return {@link CacheRetention#SESSION_SCOPED}
      * @since 4.2.0
