@@ -88,10 +88,17 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             DefaultPluginDependenciesResolver.class.getName() + ".managedDependencies";
 
     private static final Set<String> EXCLUDED_FROM_CORE_MANAGED_DEPENDENCIES = Set.of(
+            // Plugins must use their own SLF4J binding; aligning to the core version would impose
+            // Maven's binding choice on the plugin classpath.
             "org.slf4j:slf4j-api",
+            // JSR-330 / JSR-250 APIs must remain resolvable by the plugin's DI container
+            // independently of Maven's copy.
             "javax.inject:javax.inject",
             "javax.annotation:javax.annotation-api",
+            // ANSI terminal library — not a core API; plugins may legitimately depend on a
+            // different version than the one Maven ships.
             "org.fusesource.jansi:jansi",
+            // Interactive prompt API — plugin-specific, not a shared core contract.
             "org.codehaus.plexus:plexus-interactivity-api");
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
