@@ -53,7 +53,7 @@ import org.apache.maven.api.services.MavenException;
  * inheritance, or module structure that has already been assembled:
  * <ul>
  *   <li>{@code groupId}, {@code artifactId} — reactor identity</li>
- *   <li>{@code <parent>} — inheritance already resolved</li>
+ *   <li>{@code <parent>}, {@code <mixins>} — inheritance already resolved</li>
  *   <li>{@code <modules>} — project set is fixed at this point</li>
  *   <li>{@code <profiles>} — already activated</li>
  * </ul>
