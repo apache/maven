@@ -128,7 +128,6 @@ public class SisuDiBridgeModule extends AbstractModule {
         final MessageBuilderFactory messageBuilderFactory;
 
         BridgeInjectorImpl(Provider<BeanLocator> locator, Binder binder, MessageBuilderFactory messageBuilderFactory) {
-            super();
             this.locator = locator;
             this.binder = binder;
             this.messageBuilderFactory = messageBuilderFactory;

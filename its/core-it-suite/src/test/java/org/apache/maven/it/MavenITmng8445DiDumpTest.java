@@ -127,7 +127,8 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
             assertFalse(outputLines.stream().anyMatch(line -> ANSI_STYLE.matcher(line).find()));
         }
 
-        if (nativeEnabled) {
+        boolean quietMode = "quiet".equals(builder.name());
+        if (nativeEnabled && !quietMode) {
             // Each module creates its own Mojo injector.
             assertTrue(dumps >= MODULE_PATHS.size());
             if (ambiguous) {

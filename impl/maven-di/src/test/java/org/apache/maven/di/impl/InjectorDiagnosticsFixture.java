@@ -76,8 +76,8 @@ final class InjectorDiagnosticsFixture implements AutoCloseable {
         }
 
         private RecordingInjector(List<String> dumps) {
-            super(dumps::add);
             this.dumps = dumps;
+            setDumpSink(dumps::add);
         }
 
         void checkpoint() {
