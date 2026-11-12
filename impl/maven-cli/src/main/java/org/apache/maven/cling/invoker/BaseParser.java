@@ -528,12 +528,10 @@ public abstract class BaseParser implements Parser {
             // Warn if legacy extensions.xml also exists alongside settings.xml <extensions>
             Path legacyExtensionsFile = context.cwd.resolve(eff.get(Constants.MAVEN_PROJECT_EXTENSIONS));
             if (Files.isRegularFile(legacyExtensionsFile)) {
-                context.parserRequest
-                        .logger()
-                        .warn("Both " + projectSettingsFile + " <extensions> and "
-                                + legacyExtensionsFile + " exist. The settings.xml <extensions> take precedence;"
-                                + " consider migrating " + legacyExtensionsFile + " entries into "
-                                + projectSettingsFile + " and removing the legacy file.");
+                logger().warn("Both " + projectSettingsFile + " <extensions> and "
+                        + legacyExtensionsFile + " exist. The settings.xml <extensions> take precedence;"
+                        + " consider migrating " + legacyExtensionsFile + " entries into "
+                        + projectSettingsFile + " and removing the legacy file.");
             }
         } else {
             // legacy fallback: .mvn/extensions.xml
@@ -665,9 +663,7 @@ public abstract class BaseParser implements Parser {
         try (InputStream is = Files.newInputStream(settingsFile)) {
             return new SettingsStaxReader().read(is, false, null);
         } catch (Exception e) {
-            context.parserRequest
-                    .logger()
-                    .warn("Could not read settings file for early parsing: " + settingsFile + ": " + e.getMessage());
+            logger().warn("Could not read settings file for early parsing: " + settingsFile + ": " + e.getMessage());
             return null;
         }
     }

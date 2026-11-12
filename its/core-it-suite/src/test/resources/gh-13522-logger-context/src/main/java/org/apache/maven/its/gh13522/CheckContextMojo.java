@@ -45,7 +45,7 @@ import org.apache.maven.logging.ProjectBuildLogAppender;
  * {@code loggerName}. Results are written to
  * {@code target/log-context.properties} for the IT verifier.</p>
  */
-@Mojo(name = "check-context", defaultPhase = org.apache.maven.api.Lifecycle.Phase.VALIDATE)
+@Mojo(name = "check-context", defaultPhase = org.apache.maven.api.Lifecycle.Phase.VALIDATE, projectRequired = true)
 public class CheckContextMojo implements org.apache.maven.api.plugin.Mojo {
 
     @Parameter(defaultValue = "${project.build.directory}", readonly = true)
