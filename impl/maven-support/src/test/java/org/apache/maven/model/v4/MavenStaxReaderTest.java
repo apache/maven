@@ -333,14 +333,14 @@ class MavenStaxReaderTest {
         Model model = new MavenStaxReader().read(new StringReader(pomWithNamespace("https://ff.com")), false, null);
 
         assertEquals("https://ff.com", model.getNamespaceUri());
-        assertEquals("missing-namespace", model.getArtifactId());
+        assertEquals("unrecognized-namespace", model.getArtifactId());
     }
 
     private static String pomWithNamespace(String namespace) {
         return "<project xmlns=\"" + namespace + "\">\n"
                 + "  <modelVersion>4.0.0</modelVersion>\n"
                 + "  <groupId>org.apache.maven.its</groupId>\n"
-                + "  <artifactId>missing-namespace</artifactId>\n"
+                + "  <artifactId>unrecognized-namespace</artifactId>\n"
                 + "  <version>1.0-SNAPSHOT</version>\n"
                 + "  <packaging>pom</packaging>\n"
                 + "</project>";
