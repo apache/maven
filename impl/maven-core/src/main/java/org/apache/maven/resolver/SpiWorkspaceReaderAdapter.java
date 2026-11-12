@@ -154,7 +154,7 @@ public class SpiWorkspaceReaderAdapter implements MavenWorkspaceReader {
 
         @Override
         public boolean snapshot() {
-            return artifact.snapshot();
+            return artifact.isSnapshot();
         }
 
         @Nonnull

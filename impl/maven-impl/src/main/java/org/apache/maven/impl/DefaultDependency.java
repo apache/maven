@@ -59,7 +59,7 @@ public class DefaultDependency extends AetherDependencyWrapper implements Depend
     }
 
     @Override
-    public boolean isSnapshot() {
+    public boolean snapshot() {
         return DefaultModelVersionParser.checkSnapshot(dependency.getArtifact().getVersion());
     }
 
