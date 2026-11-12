@@ -72,4 +72,31 @@ class MavenModelVersionTest {
                                 PluginExecution.newInstance().withPriority(5))))));
         assertEquals("4.0.0", new MavenModelVersion().getModelVersion(m));
     }
+
+    @Test
+    void testV4ModelDependencyManagementIncludes() {
+        Model m = model.withDependencyManagement(org.apache.maven.api.model.DependencyManagement.newInstance()
+                .withDependencies(Collections.singleton(org.apache.maven.api.model.Dependency.newInstance()
+                        .withGroupId("org.apache.maven")
+                        .withArtifactId("bom")
+                        .withType("pom")
+                        .withScope("import")
+                        .withIncludes(Collections.singleton(org.apache.maven.api.model.Inclusion.newInstance()
+                                .withGroupId("org.apache.maven")
+                                .withArtifactId("*"))))));
+        assertEquals("4.2.0", new MavenModelVersion().getModelVersion(m));
+    }
+
+    @Test
+    void testV4ModelDependencyManagementIncludesWithId() {
+        Model m = model.withDependencyManagement(org.apache.maven.api.model.DependencyManagement.newInstance()
+                .withDependencies(Collections.singleton(org.apache.maven.api.model.Dependency.newInstance()
+                        .withGroupId("org.apache.maven")
+                        .withArtifactId("bom")
+                        .withType("pom")
+                        .withScope("import")
+                        .withIncludes(Collections.singleton(org.apache.maven.api.model.Inclusion.newInstance()
+                                .withId("org.apache.maven:*"))))));
+        assertEquals("4.2.0", new MavenModelVersion().getModelVersion(m));
+    }
 }

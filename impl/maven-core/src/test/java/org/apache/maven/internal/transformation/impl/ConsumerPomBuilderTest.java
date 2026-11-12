@@ -39,6 +39,7 @@ import org.apache.maven.api.model.ActivationOS;
 import org.apache.maven.api.model.ActivationProperty;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
+import org.apache.maven.api.model.Inclusion;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
@@ -1563,5 +1564,40 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 .filter(profile -> id.equals(profile.getId()))
                 .findFirst()
                 .orElseThrow(() -> new AssertionError("profile " + id + " is missing from the consumer POM"));
+    }
+
+    @Test
+    void testDependencyIncludesThrowsWithoutFlattenOrPreserve() {
+        Inclusion inclusion = Inclusion.newBuilder()
+                .groupId("org.apache.maven")
+                .artifactId("*")
+                .build();
+        Dependency bom = Dependency.newBuilder()
+                .groupId("org.apache.maven")
+                .artifactId("bom")
+                .version("1.0")
+                .type("pom")
+                .scope("import")
+                .includes(List.of(inclusion))
+                .build();
+        Model model = Model.newBuilder()
+                .groupId("com.example")
+                .artifactId("project")
+                .version("1.0.0")
+                .packaging("jar")
+                .dependencyManagement(DependencyManagement.newBuilder()
+                        .dependencies(List.of(bom))
+                        .build())
+                .build();
+
+        MavenProject project = new MavenProject(model);
+        project.setOriginalModel(new org.apache.maven.model.Model(model));
+
+        MavenException ex = assertThrows(
+                MavenException.class, () -> builder.build(session, project, Sources.buildSource(Paths.get("pom.xml"))));
+        assertTrue(ex.getMessage().contains("contains dependency inclusions (<includes>)"));
+        assertTrue(ex.getMessage().contains("preserve.model.version=true"));
+        assertTrue(ex.getMessage().contains("maven.consumer.pom.flatten=true"));
+        assertTrue(ex.getMessage().contains("Remove the <includes> elements from your POM"));
     }
 }
