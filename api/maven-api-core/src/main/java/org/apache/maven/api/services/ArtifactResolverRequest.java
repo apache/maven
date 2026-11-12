@@ -30,6 +30,7 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.CacheRetention;
 
 import static java.util.Objects.requireNonNull;
 
@@ -41,6 +42,12 @@ import static java.util.Objects.requireNonNull;
 @Experimental
 @Immutable
 public interface ArtifactResolverRequest extends RepositoryAwareRequest {
+
+    @Nonnull
+    @Override
+    default CacheRetention getCacheRetention() {
+        return CacheRetention.REQUEST_SCOPED;
+    }
 
     /** @return the coordinates of the artifacts to resolve, never {@code null} */
     @Nonnull
