@@ -104,7 +104,7 @@ The paths are configurable via the `maven.project.extensions`,
     <groupId>...</groupId>
     <artifactId>...</artifactId>
     <version>...</version>
-    <!-- optional: parent-first (default), self-first, plugin -->
+    <!-- optional: self-first (default), parent-first, plugin -->
     <classLoadingStrategy>...</classLoadingStrategy>
   </extension>
 </extensions>
@@ -120,9 +120,9 @@ wiring:
 
 | Strategy | Behavior |
 |---|---|
-| `parent-first` (default) | Imports everything from the core realm. Classes from the core are preferred over the extension's own. |
+| `self-first` (default) | Uses the core realm as parent but checks its own classes first. Allows the extension to override core classes. |
+| `parent-first` | Imports everything from the core realm. Classes from the core are preferred over the extension's own. |
 | `plugin` | Imports only `CoreExports` packages (the Maven API surface). Same isolation as build extensions. |
-| `self-first` | Uses the core realm as parent but checks its own classes first. Allows the extension to override core classes. |
 
 Core extensions are loaded as part of Maven runtime startup and
 disposed of as part of Maven runtime shutdown.
@@ -320,14 +320,17 @@ the realm's import chain:
 ### How It Is Wired
 
 When a core extension realm is created, `PlexusContainerCapsuleFactory`
-wires visibility in two directions:
+wires visibility in both directions:
 
-1. The extension realm imports from the container realm (`maven.ext`)
-   so that Sisu's `FilteredBeans` does not hide container-sourced
-   beans when the TCCL is an extension realm.
-2. If the extension exports no packages, its realm ID is imported as a
-   synthetic marker so that Sisu can still discover the extension's
-   components.
+1. The container realm (`maven.ext`) imports from each extension realm:
+   exported packages are imported so they become part of the Maven API
+   surface. If an extension exports no packages, its realm ID is
+   imported as a synthetic marker so that Sisu can still discover the
+   extension's components.
+2. Each extension realm imports from `maven.ext` so that container-
+   sourced beans remain visible when the TCCL is set to an extension
+   realm. Without this import, Sisu's `FilteredBeans` would hide
+   container beans during lifecycle callbacks.
 
 For plugins, `DefaultMavenPluginManager.discoverPluginComponents()`
 sets the TCCL to the plugin's realm before discovering components. Sisu
@@ -382,23 +385,12 @@ must do so through the Maven API services, not through direct injection.
 
 ### Limitations
 
-Sisu's visibility filtering has known limitations:
-
-- **Filtering only works on explicit lookups**, not on injected
-  collections. For example, `Map<String, LifecycleMapping>` injection
-  does not filter by realm — all lifecycle mappings from all realms are
-  injected. A comment in `DefaultPackagingRegistry` documents this:
-  *"SISU visibility filtering can only happen when an explicit lookup
-  is performed."*
-- **Debugging is difficult.** When a component is not visible due to
-  realm scoping, the lookup silently returns null or an empty
-  collection. There is no error message indicating that the component
-  exists but is hidden by realm boundaries.
-- **Project scope is imprecise.** Build extension components bound in
-  a project classloader have no clean "project scope" definition in
-  Sisu terms. Multiple projects sharing the same extension set share a
-  realm, which means extension components are visible to all projects
-  in that group, not individually scoped.
+- **Forgiving mode.** By default, Sisu operates in "forgiving" mode:
+  when a component is not visible due to realm scoping, the lookup
+  silently returns null or an empty collection. There is no error
+  message indicating that the component exists but is hidden by realm
+  boundaries. This flexibility allows extensions to span support across
+  Maven 3 and Maven 4. A "strict" mode is also available.
 
 [classworlds]: https://github.com/apache/maven/tree/master/impl/maven-classworlds
 [sisu]: https://eclipse.dev/sisu/
