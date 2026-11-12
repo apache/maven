@@ -71,6 +71,11 @@ public class DefaultModelDialectManager implements ModelDialectManager {
     private static ModelDialectProvider getXmlDialectProvider(ModelXmlFactory modelXmlFactory) {
         ModelParser xmlModelParser = new ModelParser() {
             @Override
+            public String id() {
+                return "xml";
+            }
+
+            @Override
             public Optional<Source> locate(Path dir) {
                 if (Files.isDirectory(dir)) {
                     Path pom = dir.resolve("pom.xml");

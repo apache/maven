@@ -26,6 +26,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
@@ -44,6 +45,8 @@ import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
 import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.api.spi.ModelParserException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -74,20 +77,40 @@ import org.apache.maven.api.spi.ModelParserException;
 @Singleton
 public class DefaultModelProcessor implements ModelProcessor {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultModelProcessor.class);
+
     private final ModelXmlFactory modelXmlFactory;
-    private final Map<String, ModelParser> modelParsers;
+    private final List<ModelParser> modelParsers;
 
     @Inject
-    public DefaultModelProcessor(ModelXmlFactory modelXmlFactory, @Nullable Map<String, ModelParser> modelParsers) {
+    public DefaultModelProcessor(ModelXmlFactory modelXmlFactory, @Nullable List<ModelParser> modelParsers) {
         this.modelXmlFactory = modelXmlFactory;
-        this.modelParsers = modelParsers != null ? modelParsers : Map.of();
+        this.modelParsers = deduplicate(modelParsers);
+    }
+
+    private static List<ModelParser> deduplicate(@Nullable List<ModelParser> parsers) {
+        if (parsers == null || parsers.isEmpty()) {
+            return List.of();
+        }
+        Map<String, ModelParser> seen = new LinkedHashMap<>();
+        for (ModelParser parser : parsers) {
+            ModelParser previous = seen.putIfAbsent(parser.id(), parser);
+            if (previous != null) {
+                LOGGER.warn(
+                        "Duplicate model parser id '{}': {} already registered, ignoring {}",
+                        parser.id(),
+                        previous.getClass().getName(),
+                        parser.getClass().getName());
+            }
+        }
+        return List.copyOf(seen.values());
     }
 
     @Override
     public Path locateExistingPom(Path projectDirectory) {
         // Note that the ModelProcessor#locatePom never returns null
         // while the ModelParser#locatePom needs to return an existing path!
-        Path pom = modelParsers.values().stream()
+        Path pom = modelParsers.stream()
                 .map(m -> m.locate(projectDirectory)
                         .map(org.apache.maven.api.services.Source::getPath)
                         .orElse(null))
@@ -108,14 +131,14 @@ public class DefaultModelProcessor implements ModelProcessor {
             // a parser may locate the project directory itself rather than a file within it
             Path projectDirectory = Files.isDirectory(pomFile) ? pomFile : pomFile.getParent();
             Map<String, ModelParserException> exceptions = new LinkedHashMap<>();
-            for (Map.Entry<String, ModelParser> parser : modelParsers.entrySet()) {
+            for (ModelParser parser : modelParsers) {
                 try {
-                    Optional<Model> model = parser.getValue().locateAndParse(projectDirectory, options);
+                    Optional<Model> model = parser.locateAndParse(projectDirectory, options);
                     if (model.isPresent()) {
                         return model.get().withPomFile(pomFile);
                     }
                 } catch (ModelParserException e) {
-                    exceptions.put(parser.getKey(), e);
+                    exceptions.put(parser.id(), e);
                 }
             }
             try {
