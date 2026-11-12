@@ -47,6 +47,9 @@ import org.apache.maven.api.services.BuilderProblem;
  */
 final class BuildReportJsonWriter {
 
+    /** Maximum number of lines captured from a throwable's stack trace to prevent huge JSON output. */
+    private static final int MAX_THROWABLE_LINES = 50;
+
     private BuildReportJsonWriter() {}
 
     /**
@@ -477,16 +480,16 @@ final class BuildReportJsonWriter {
         StringWriter sw = new StringWriter();
         t.printStackTrace(new PrintWriter(sw));
         String full = sw.toString();
-        // Cap at 50 lines to prevent huge JSON output from deeply nested exceptions
-        String[] lines = full.split("\r?\n");
-        if (lines.length <= 50) {
+        // Cap at MAX_THROWABLE_LINES lines to prevent huge JSON output from deeply nested exceptions
+        String[] lines = full.split("\\r?\\n");
+        if (lines.length <= MAX_THROWABLE_LINES) {
             return full.replace("\r\n", "\n");
         }
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < MAX_THROWABLE_LINES; i++) {
             sb.append(lines[i]).append('\n');
         }
-        sb.append("... ").append(lines.length - 50).append(" more lines truncated");
+        sb.append("... ").append(lines.length - MAX_THROWABLE_LINES).append(" more lines truncated");
         return sb.toString();
     }
 }
