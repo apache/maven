@@ -40,6 +40,7 @@ import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.graph.DependencyFilter;
 import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.graph.Exclusion;
 import org.eclipse.aether.resolution.DependencyRequest;
 import org.eclipse.aether.resolution.DependencyResult;
 import org.junit.jupiter.api.Test;
@@ -146,6 +147,13 @@ class DefaultPluginDependenciesResolverTest {
         plugin.setArtifactId("maven-compiler-plugin");
         plugin.setVersion("3.13.0");
 
+        org.apache.maven.model.Dependency coreDep = new org.apache.maven.model.Dependency();
+        coreDep.setGroupId("org.apache.maven");
+        coreDep.setArtifactId("maven-core");
+        coreDep.setVersion("3.9.0");
+        coreDep.setScope("compile");
+        plugin.addDependency(coreDep);
+
         Artifact pluginArtifact =
                 new DefaultArtifact("org.apache.maven.plugins", "maven-compiler-plugin", "jar", "3.13.0");
 
@@ -153,6 +161,7 @@ class DefaultPluginDependenciesResolverTest {
         ArtifactType pluginType = mock(ArtifactType.class);
         when(pluginType.getExtension()).thenReturn("jar");
         when(typeRegistry.get("maven-plugin")).thenReturn(pluginType);
+        when(typeRegistry.get("jar")).thenReturn(pluginType);
 
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
         session.setArtifactTypeRegistry(typeRegistry);
@@ -178,10 +187,18 @@ class DefaultPluginDependenciesResolverTest {
         CollectRequest captured = requestCaptor.getValue();
         assertTrue(captured.getManagedDependencies() == null
                 || captured.getManagedDependencies().isEmpty());
+        List<Dependency> capturedDeps = captured.getDependencies();
+        assertEquals(1, capturedDeps.size());
+        Dependency directCore = capturedDeps.get(0);
+        assertEquals("runtime", directCore.getScope(), "Without core exports, dependency scope remains runtime");
+        assertEquals(
+                "3.9.0",
+                directCore.getArtifact().getVersion(),
+                "Without core exports, dependency version remains declared version");
     }
 
     @Test
-    void testResolvePluginPreservesDirectPluginDependencies() throws Exception {
+    void testResolvePluginAlignsExplicitCoreDependencies() throws Exception {
         RepositorySystem repoSystem = mock(RepositorySystem.class);
         List<MavenPluginDependenciesValidator> validators = Collections.emptyList();
 
@@ -191,6 +208,7 @@ class DefaultPluginDependenciesResolverTest {
 
         Set<String> exportedArtifacts = new LinkedHashSet<>();
         exportedArtifacts.add("org.apache.maven:maven-core");
+        exportedArtifacts.add("org.slf4j:slf4j-api");
 
         CoreExports coreExports = new CoreExports(classRealm, exportedArtifacts, Collections.emptySet());
 
@@ -207,6 +225,11 @@ class DefaultPluginDependenciesResolverTest {
         coreDep.setArtifactId("maven-core");
         coreDep.setVersion("3.9.0");
         coreDep.setScope("compile");
+        coreDep.setOptional(true);
+        org.apache.maven.model.Exclusion exclusion = new org.apache.maven.model.Exclusion();
+        exclusion.setGroupId("org.apache.maven");
+        exclusion.setArtifactId("maven-settings");
+        coreDep.addExclusion(exclusion);
         plugin.addDependency(coreDep);
 
         org.apache.maven.model.Dependency nonCoreDep = new org.apache.maven.model.Dependency();
@@ -215,6 +238,13 @@ class DefaultPluginDependenciesResolverTest {
         nonCoreDep.setVersion("2.11.0");
         nonCoreDep.setScope("compile");
         plugin.addDependency(nonCoreDep);
+
+        org.apache.maven.model.Dependency slf4jDep = new org.apache.maven.model.Dependency();
+        slf4jDep.setGroupId("org.slf4j");
+        slf4jDep.setArtifactId("slf4j-api");
+        slf4jDep.setVersion("1.7.36");
+        slf4jDep.setScope("compile");
+        plugin.addDependency(slf4jDep);
 
         Artifact pluginArtifact =
                 new DefaultArtifact("org.apache.maven.plugins", "maven-compiler-plugin", "jar", "3.13.0");
@@ -248,7 +278,7 @@ class DefaultPluginDependenciesResolverTest {
 
         CollectRequest captured = requestCaptor.getValue();
         List<Dependency> capturedDeps = captured.getDependencies();
-        assertEquals(2, capturedDeps.size());
+        assertEquals(3, capturedDeps.size());
 
         Dependency directCore = capturedDeps.stream()
                 .filter(d -> "org.apache.maven".equals(d.getArtifact().getGroupId())
@@ -256,9 +286,20 @@ class DefaultPluginDependenciesResolverTest {
                 .findFirst()
                 .orElse(null);
         assertNotNull(directCore, "Direct core dependency should be present");
-        assertEquals("runtime", directCore.getScope(), "Direct core dependency scope should be preserved as runtime");
         assertEquals(
-                "3.9.0", directCore.getArtifact().getVersion(), "Direct core dependency version should be preserved");
+                DependencyScope.PROVIDED.id(),
+                directCore.getScope(),
+                "Direct core dependency scope should be aligned to provided");
+        assertNotNull(directCore.getArtifact().getVersion());
+        assertFalse(
+                "3.9.0".equals(directCore.getArtifact().getVersion()),
+                "Direct core dependency version should be aligned to running version");
+        assertFalse(directCore.getArtifact().getVersion().isEmpty());
+        assertTrue(directCore.isOptional(), "Direct core dependency optional flag should be preserved");
+        assertEquals(1, directCore.getExclusions().size(), "Direct core dependency exclusions should be preserved");
+        Exclusion capturedExclusion = directCore.getExclusions().iterator().next();
+        assertEquals("org.apache.maven", capturedExclusion.getGroupId());
+        assertEquals("maven-settings", capturedExclusion.getArtifactId());
 
         Dependency directNonCore = capturedDeps.stream()
                 .filter(d -> "commons-io".equals(d.getArtifact().getGroupId()))
@@ -267,11 +308,32 @@ class DefaultPluginDependenciesResolverTest {
         assertNotNull(directNonCore, "Direct non-core dependency should be present");
         assertEquals("runtime", directNonCore.getScope());
         assertEquals("2.11.0", directNonCore.getArtifact().getVersion());
+        assertFalse(directNonCore.isOptional(), "Direct non-core dependency optional flag should be false");
 
-        boolean coreInManaged = captured.getManagedDependencies().stream()
-                .anyMatch(d -> "org.apache.maven".equals(d.getArtifact().getGroupId())
-                        && "maven-core".equals(d.getArtifact().getArtifactId()));
-        assertFalse(coreInManaged, "Explicit direct dependencies should not be injected into managed dependencies");
+        Dependency capturedSlf4j = capturedDeps.stream()
+                .filter(d -> "org.slf4j".equals(d.getArtifact().getGroupId())
+                        && "slf4j-api".equals(d.getArtifact().getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(capturedSlf4j, "Direct slf4j dependency should be present");
+        assertEquals("runtime", capturedSlf4j.getScope(), "Excluded third-party library should remain runtime scope");
+        assertEquals(
+                "1.7.36",
+                capturedSlf4j.getArtifact().getVersion(),
+                "Excluded third-party library version should not be aligned");
+
+        Dependency managedCore = captured.getManagedDependencies().stream()
+                .filter(d -> "org.apache.maven".equals(d.getArtifact().getGroupId())
+                        && "maven-core".equals(d.getArtifact().getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(
+                managedCore,
+                "Core dependencies should still be present in managed dependencies for transitive mediation");
+        assertEquals(
+                managedCore.getArtifact().getVersion(),
+                directCore.getArtifact().getVersion(),
+                "Direct core dependency version should match the synthetic managed core dependency version");
     }
 
     @Test
@@ -295,12 +357,27 @@ class DefaultPluginDependenciesResolverTest {
         plugin.setArtifactId("extension3");
         plugin.setVersion("0.12.3");
 
+        org.apache.maven.model.Dependency coreDep = new org.apache.maven.model.Dependency();
+        coreDep.setGroupId("org.apache.maven");
+        coreDep.setArtifactId("maven-core");
+        coreDep.setVersion("3.9.0");
+        coreDep.setScope("compile");
+        plugin.addDependency(coreDep);
+
+        org.apache.maven.model.Dependency nonCoreDep = new org.apache.maven.model.Dependency();
+        nonCoreDep.setGroupId("commons-io");
+        nonCoreDep.setArtifactId("commons-io");
+        nonCoreDep.setVersion("2.11.0");
+        nonCoreDep.setScope("compile");
+        plugin.addDependency(nonCoreDep);
+
         Artifact pluginArtifact = new DefaultArtifact("eu.maveniverse.maven.mimir", "extension3", "jar", "0.12.3");
 
         ArtifactTypeRegistry typeRegistry = mock(ArtifactTypeRegistry.class);
         ArtifactType pluginType = mock(ArtifactType.class);
         when(pluginType.getExtension()).thenReturn("jar");
         when(typeRegistry.get("maven-plugin")).thenReturn(pluginType);
+        when(typeRegistry.get("jar")).thenReturn(pluginType);
 
         DefaultRepositorySystemSession session = new DefaultRepositorySystemSession();
         session.setArtifactTypeRegistry(typeRegistry);
@@ -334,5 +411,31 @@ class DefaultPluginDependenciesResolverTest {
                 captured.getManagedDependencies() == null
                         || captured.getManagedDependencies().isEmpty(),
                 "Core extension resolution should not receive managed dependencies");
+
+        List<Dependency> capturedDeps = captured.getDependencies();
+        assertEquals(2, capturedDeps.size());
+
+        Dependency directCore = capturedDeps.stream()
+                .filter(d -> "org.apache.maven".equals(d.getArtifact().getGroupId())
+                        && "maven-core".equals(d.getArtifact().getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(directCore, "Direct core dependency in core extension should be present");
+        assertEquals(
+                "runtime",
+                directCore.getScope(),
+                "Core extension direct dependencies must not be aligned to provided scope");
+        assertEquals(
+                "3.9.0",
+                directCore.getArtifact().getVersion(),
+                "Core extension direct dependency version must remain untouched");
+
+        Dependency directNonCore = capturedDeps.stream()
+                .filter(d -> "commons-io".equals(d.getArtifact().getGroupId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(directNonCore, "Direct non-core dependency in core extension should be present");
+        assertEquals("runtime", directNonCore.getScope());
+        assertEquals("2.11.0", directNonCore.getArtifact().getVersion());
     }
 }

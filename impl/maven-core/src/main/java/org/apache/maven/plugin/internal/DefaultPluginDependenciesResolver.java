@@ -24,10 +24,12 @@ import javax.inject.Singleton;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -307,20 +309,28 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             Map<String, org.eclipse.aether.graph.Dependency> core =
                     injectCoreManagedDeps ? getCoreDependenciesMap(session) : Collections.emptyMap();
             if (injectCoreManagedDeps && !core.isEmpty()) {
-                Set<String> explicitDeps = plugin.getDependencies().stream()
-                        .map(d -> d.getGroupId() + ":" + d.getArtifactId())
-                        .collect(Collectors.toSet());
-                List<org.eclipse.aether.graph.Dependency> managed = core.entrySet().stream()
-                        .filter(e -> !explicitDeps.contains(e.getKey()))
-                        .map(Map.Entry::getValue)
-                        .collect(Collectors.toList());
-                request.setManagedDependencies(managed);
+                request.setManagedDependencies(new ArrayList<>(core.values()));
             }
             for (Dependency dependency : plugin.getDependencies()) {
                 org.eclipse.aether.graph.Dependency pluginDep =
                         RepositoryUtils.toDependency(dependency, session.getArtifactTypeRegistry());
                 if (!DependencyScope.SYSTEM.is(pluginDep.getScope())) {
                     pluginDep = pluginDep.setScope(DependencyScope.RUNTIME.id());
+                }
+                if (injectCoreManagedDeps) {
+                    org.eclipse.aether.graph.Dependency managedDep =
+                            core.get(pluginDep.getArtifact().getGroupId() + ":"
+                                    + pluginDep.getArtifact().getArtifactId());
+                    if (managedDep != null) {
+                        if (!Objects.equals(
+                                pluginDep.getArtifact().getVersion(),
+                                managedDep.getArtifact().getVersion())) {
+                            pluginDep = pluginDep.setArtifact(pluginDep
+                                    .getArtifact()
+                                    .setVersion(managedDep.getArtifact().getVersion()));
+                        }
+                        pluginDep = pluginDep.setScope(managedDep.getScope());
+                    }
                 }
                 request.addDependency(pluginDep);
             }
