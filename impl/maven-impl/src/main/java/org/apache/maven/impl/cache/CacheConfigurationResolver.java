@@ -24,7 +24,6 @@ import java.util.concurrent.ConcurrentMap;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
-import org.apache.maven.api.cache.CacheMetadata;
 import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.services.Request;
 import org.slf4j.Logger;
@@ -49,11 +48,8 @@ public class CacheConfigurationResolver {
      * @return the resolved cache configuration
      */
     public static CacheConfig resolveConfig(Request<?> req, ProtoSession session) {
-        // Read the request's declared retention before applying user-defined selectors.
-        CacheRetention legacyRetention = null;
-        if (req instanceof CacheMetadata metadata) {
-            legacyRetention = metadata.getCacheRetention();
-        }
+        // Request always implements CacheMetadata; read the declared retention directly.
+        CacheRetention legacyRetention = req.getCacheRetention();
 
         // Disabled requests must execute even when a selector would enable caching.
         if (legacyRetention == CacheRetention.DISABLED) {
