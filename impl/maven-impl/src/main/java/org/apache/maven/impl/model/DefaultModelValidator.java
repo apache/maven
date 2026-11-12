@@ -1688,11 +1688,24 @@ public class DefaultModelValidator implements ModelValidator {
                     String parsedGroupId = id.substring(0, colonIdx);
                     String parsedArtifactId = id.substring(colonIdx + 1);
 
-                    if (groupId == null || groupId.isEmpty()) {
-                        groupId = parsedGroupId;
-                    }
-                    if (artifactId == null || artifactId.isEmpty()) {
-                        artifactId = parsedArtifactId;
+                    if (parsedGroupId.isEmpty() || parsedArtifactId.isEmpty()) {
+                        validId = false;
+                        addViolation(
+                                problems,
+                                Severity.ERROR,
+                                Version.V42,
+                                prefix + "includes.include.id",
+                                SourceHint.dependencyManagementKey(dependency),
+                                "with value '" + id
+                                        + "' has an empty groupId or artifactId segment; expected 'groupId:artifactId' format.",
+                                inclusion);
+                    } else {
+                        if (groupId == null || groupId.isEmpty()) {
+                            groupId = parsedGroupId;
+                        }
+                        if (artifactId == null || artifactId.isEmpty()) {
+                            artifactId = parsedArtifactId;
+                        }
                     }
                 }
             }

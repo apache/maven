@@ -1055,6 +1055,46 @@ class DefaultModelValidatorTest {
     }
 
     @Test
+    void testDependencyIncludesWithEmptyIdSegments() throws Exception {
+        String xml = "<project>\n"
+                + "  <modelVersion>4.2.0</modelVersion>\n"
+                + "  <groupId>gid</groupId>\n"
+                + "  <artifactId>aid</artifactId>\n"
+                + "  <version>1.0</version>\n"
+                + "  <dependencyManagement>\n"
+                + "    <dependencies>\n"
+                + "      <dependency>\n"
+                + "        <groupId>test</groupId>\n"
+                + "        <artifactId>bom</artifactId>\n"
+                + "        <version>1.0</version>\n"
+                + "        <type>pom</type>\n"
+                + "        <scope>import</scope>\n"
+                + "        <includes>\n"
+                + "          <include id=\":\"/>\n"
+                + "          <include id=\":bar\"/>\n"
+                + "          <include id=\"foo:\"/>\n"
+                + "        </includes>\n"
+                + "      </dependency>\n"
+                + "    </dependencies>\n"
+                + "  </dependencyManagement>\n"
+                + "</project>";
+        Model model = new MavenStaxReader().read(new StringReader(xml));
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validateEffectiveModel(session, model, ModelValidator.VALIDATION_LEVEL_STRICT, problems);
+
+        assertViolations(problems, 0, 3, 0);
+        assertContains(
+                problems.getErrors().get(0),
+                "with value ':' has an empty groupId or artifactId segment; expected 'groupId:artifactId' format.");
+        assertContains(
+                problems.getErrors().get(1),
+                "with value ':bar' has an empty groupId or artifactId segment; expected 'groupId:artifactId' format.");
+        assertContains(
+                problems.getErrors().get(2),
+                "with value 'foo:' has an empty groupId or artifactId segment; expected 'groupId:artifactId' format.");
+    }
+
+    @Test
     void testSystemPathRefersToProjectBasedir() throws Exception {
         SimpleProblemCollector result = validateFile("basedir-system-path.xml");
 

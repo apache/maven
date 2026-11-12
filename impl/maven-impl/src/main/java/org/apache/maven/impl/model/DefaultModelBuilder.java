@@ -3284,33 +3284,9 @@ public class DefaultModelBuilder implements ModelBuilder {
      * or via the compact {@code id} attribute ('groupId:artifactId').
      */
     private boolean match(Inclusion inclusion, Dependency candidate) {
-        String groupId = getGroupId(inclusion);
-        String artifactId = getArtifactId(inclusion);
+        String groupId = InclusionCoordinates.getGroupId(inclusion);
+        String artifactId = InclusionCoordinates.getArtifactId(inclusion);
         return match(groupId, candidate.getGroupId()) && match(artifactId, candidate.getArtifactId());
-    }
-
-    private static String getGroupId(Inclusion inclusion) {
-        if (inclusion.getGroupId() != null && !inclusion.getGroupId().isEmpty()) {
-            return inclusion.getGroupId();
-        }
-        if (inclusion.getId() != null) {
-            int idx = inclusion.getId().indexOf(':');
-            return idx >= 0 ? inclusion.getId().substring(0, idx) : inclusion.getId();
-        }
-        return null;
-    }
-
-    private static String getArtifactId(Inclusion inclusion) {
-        if (inclusion.getArtifactId() != null && !inclusion.getArtifactId().isEmpty()) {
-            return inclusion.getArtifactId();
-        }
-        if (inclusion.getId() != null) {
-            int idx = inclusion.getId().indexOf(':');
-            if (idx >= 0) {
-                return inclusion.getId().substring(idx + 1);
-            }
-        }
-        return null;
     }
 
     /**
