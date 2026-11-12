@@ -847,7 +847,7 @@ public class MavenCli {
         }
     }
 
-    List<CoreExtension> readCoreExtensionsDescriptor(Path extensionsFile) throws IOException, XmlPullParserException {
+    List<CoreExtension> readCoreExtensionsDescriptor(Path extensionsFile) throws IOException {
         CoreExtensionsXpp3Reader parser = new CoreExtensionsXpp3Reader();
         try (BufferedReader is = Files.newBufferedReader(extensionsFile, StandardCharsets.UTF_8)) {
             return parser.read(is).getExtensions();
