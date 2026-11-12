@@ -49,8 +49,8 @@ import org.apache.maven.api.services.MavenException;
  * </ul>
  *
  * <h2>Frozen fields</h2>
- * The following must <strong>not</strong> be changed — doing so would break reactor identity,
- * inheritance, or module structure that has already been assembled:
+ * The runtime rejects changes to the following fields after all transformers have run — modifying
+ * them would break reactor identity, inheritance, or module structure that has already been assembled:
  * <ul>
  *   <li>{@code groupId}, {@code artifactId} — reactor identity</li>
  *   <li>{@code <parent>}, {@code <mixins>} — inheritance already resolved</li>

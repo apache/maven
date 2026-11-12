@@ -20,6 +20,7 @@ package org.apache.maven.internal.impl;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 
 import org.apache.maven.MavenExecutionException;
 import org.apache.maven.api.Project;
@@ -68,11 +69,37 @@ public final class ProjectTransformerDispatcher {
                 }
 
                 if (model != project.model()) {
+                    validateFrozenFields(project.model(), model, mavenProject.getId());
                     mavenProject.setModel(new org.apache.maven.model.Model(model));
                 }
             }
         } finally {
             thread.setContextClassLoader(originalClassLoader);
+        }
+    }
+
+    private static void validateFrozenFields(Model original, Model transformed, String projectId)
+            throws MavenExecutionException {
+        if (!Objects.equals(original.getGroupId(), transformed.getGroupId())
+                || !Objects.equals(original.getArtifactId(), transformed.getArtifactId())) {
+            throw new MavenExecutionException(
+                    "Project transformer must not change groupId or artifactId of " + projectId, (Throwable) null);
+        }
+        if (!Objects.equals(original.getParent(), transformed.getParent())) {
+            throw new MavenExecutionException(
+                    "Project transformer must not change <parent> of " + projectId, (Throwable) null);
+        }
+        if (!Objects.equals(original.getMixins(), transformed.getMixins())) {
+            throw new MavenExecutionException(
+                    "Project transformer must not change <mixins> of " + projectId, (Throwable) null);
+        }
+        if (!Objects.equals(original.getModules(), transformed.getModules())) {
+            throw new MavenExecutionException(
+                    "Project transformer must not change <modules> of " + projectId, (Throwable) null);
+        }
+        if (!Objects.equals(original.getProfiles(), transformed.getProfiles())) {
+            throw new MavenExecutionException(
+                    "Project transformer must not change <profiles> of " + projectId, (Throwable) null);
         }
     }
 }
