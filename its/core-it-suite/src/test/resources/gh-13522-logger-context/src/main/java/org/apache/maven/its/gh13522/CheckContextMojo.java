@@ -62,11 +62,15 @@ public class CheckContextMojo implements org.apache.maven.api.plugin.Mojo {
         String mojoId = ProjectBuildLogAppender.getMojoId();
 
         // Intercept one event (via the existing sink) to capture pluginId/loggerName.
+        // Filter by logger name to avoid capturing stray events from other threads.
+        String expectedLoggerName = getClass().getName();
         AtomicReference<LogEvent> captured = new AtomicReference<>();
         LoggerManager mgr = LoggerManager.get();
         org.apache.maven.api.logging.LogSink previousSink = mgr.getLogSink();
         mgr.setLogSink(event -> {
-            captured.compareAndSet(null, event);
+            if (expectedLoggerName.equals(event.loggerName())) {
+                captured.compareAndSet(null, event);
+            }
             if (previousSink != null) {
                 previousSink.accept(event);
             }

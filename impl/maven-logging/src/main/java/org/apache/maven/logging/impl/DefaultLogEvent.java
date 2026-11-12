@@ -19,6 +19,7 @@
 package org.apache.maven.logging.impl;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
@@ -126,7 +127,7 @@ public final class DefaultLogEvent implements LogEvent {
         this.pluginId = pluginId;
         this.keyValues = keyValues != null ? Map.copyOf(keyValues) : Map.of();
         this.messageTemplate = messageTemplate;
-        this.messageArgs = messageArgs != null ? Collections.unmodifiableList(messageArgs) : null;
+        this.messageArgs = messageArgs != null ? Collections.unmodifiableList(new ArrayList<>(messageArgs)) : null;
         this.renderedLine = null;
     }
 
@@ -167,7 +168,7 @@ public final class DefaultLogEvent implements LogEvent {
         this.pluginId = pluginId;
         this.keyValues = keyValues != null ? Map.copyOf(keyValues) : Map.of();
         this.messageTemplate = messageTemplate;
-        this.messageArgs = messageArgs != null ? Collections.unmodifiableList(messageArgs) : null;
+        this.messageArgs = messageArgs != null ? Collections.unmodifiableList(new ArrayList<>(messageArgs)) : null;
         this.renderedLine = renderedLine;
     }
 
