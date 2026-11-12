@@ -18,12 +18,14 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
@@ -36,7 +38,6 @@ import com.google.inject.Guice;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
-import org.apache.maven.api.logging.LogSink;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.di.Injector;
@@ -44,7 +45,6 @@ import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.InjectorImpl;
 import org.apache.maven.impl.DefaultMessageBuilder;
 import org.apache.maven.impl.DefaultMessageBuilderFactory;
-import org.apache.maven.logging.impl.DefaultLoggerManager;
 import org.codehaus.plexus.DefaultContainerConfiguration;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusConstants;
@@ -59,9 +59,11 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.parallel.Resources.SYSTEM_OUT;
 import static org.junit.jupiter.api.parallel.Resources.SYSTEM_PROPERTIES;
 
 @ResourceLock(SYSTEM_PROPERTIES)
+@ResourceLock(SYSTEM_OUT)
 class SisuDiDiagnosticsTest {
     private static final String MAVEN_DI_DEBUG = Constants.MAVEN_DI_DEBUG;
 
@@ -122,14 +124,12 @@ class SisuDiDiagnosticsTest {
     @Test
     void bridgeProvidersAndLazyCollectionsObserveLateRegistrations() throws Exception {
         String previous = System.getProperty(MAVEN_DI_DEBUG);
-        List<String> captured = new ArrayList<>();
-        LogSink capturingSink = event -> captured.add(event.message());
-        DefaultLoggerManager manager = new DefaultLoggerManager();
-        manager.setLogSink(capturingSink);
-        manager.install();
+        PrintStream output = System.out;
+        ByteArrayOutputStream captured = new ByteArrayOutputStream();
         LazyNative.CALLS.set(0);
-        try {
+        try (PrintStream sink = new PrintStream(captured, true, StandardCharsets.UTF_8)) {
             System.setProperty(MAVEN_DI_DEBUG, "true");
+            System.setOut(sink);
             DefaultPlexusContainer container =
                     new DefaultPlexusContainer(new DefaultContainerConfiguration(), new SisuDiBridgeModule(false) {
                         @Override
@@ -141,37 +141,37 @@ class SisuDiDiagnosticsTest {
             try {
                 InjectorImpl injector = (InjectorImpl) container.lookup(Injector.class);
                 assertEquals(0, LazyNative.CALLS.get());
-                captured.clear();
+                captured.reset();
                 assertNotNull(container.lookup(NativeService.class, "native"));
                 assertEquals(1, LazyNative.CALLS.get());
                 assertEquals(1, blocks(captured));
-                assertTrue(captured.stream().anyMatch(m -> m.contains(LazyNative.class.getName())));
+                assertTrue(captured.toString(StandardCharsets.UTF_8).contains(LazyNative.class.getName()));
 
                 List<NativeService> list = injector.getInstance(new Key<List<NativeService>>() {});
                 Map<String, NativeService> map = injector.getInstance(new Key<Map<String, NativeService>>() {});
-                captured.clear();
+                captured.reset();
                 injector.bindInstance(Extra.class, new Extra());
                 assertNotNull(list.get(0));
                 assertEquals(1, blocks(captured));
-                assertTrue(captured.stream().anyMatch(m -> m.contains(Extra.class.getName())));
-                captured.clear();
+                assertTrue(captured.toString(StandardCharsets.UTF_8).contains(Extra.class.getName()));
+                captured.reset();
                 injector.bindInstance(Another.class, new Another());
                 assertNotNull(map.get("native"));
                 assertEquals(1, blocks(captured));
-                assertTrue(captured.stream().anyMatch(m -> m.contains(Another.class.getName())));
+                assertTrue(captured.toString(StandardCharsets.UTF_8).contains(Another.class.getName()));
 
-                captured.clear();
+                captured.reset();
                 injector.bindInstance(Extra.class, new Extra());
                 Client client = new Client();
                 injector.injectInstance(client);
                 assertNotNull(client.service);
                 assertEquals(1, blocks(captured));
-                assertTrue(captured.stream().anyMatch(m -> m.contains("+ candidate: " + Extra.class.getName())));
+                assertTrue(captured.toString(StandardCharsets.UTF_8).contains("+ candidate: " + Extra.class.getName()));
             } finally {
                 container.dispose();
             }
         } finally {
-            manager.uninstall();
+            System.setOut(output);
             if (previous == null) {
                 System.clearProperty(MAVEN_DI_DEBUG);
             } else {
@@ -187,15 +187,19 @@ class SisuDiDiagnosticsTest {
         Files.writeString(index, LazyNative.class.getName() + "\nmissing.NativeComponent\n");
         ClassLoader previousLoader = Thread.currentThread().getContextClassLoader();
         String previous = System.getProperty(MAVEN_DI_DEBUG);
+        PrintStream previousOutput = System.out;
+        ByteArrayOutputStream captured = new ByteArrayOutputStream();
         try (URLClassLoader loader =
-                new URLClassLoader(new URL[] {directory.toUri().toURL()}, previousLoader) {
-                    @Override
-                    public Enumeration<URL> getResources(String name) throws IOException {
-                        return findResources(name);
-                    }
-                }) {
+                        new URLClassLoader(new URL[] {directory.toUri().toURL()}, previousLoader) {
+                            @Override
+                            public Enumeration<URL> getResources(String name) throws IOException {
+                                return findResources(name);
+                            }
+                        };
+                PrintStream output = new PrintStream(captured, true, StandardCharsets.UTF_8)) {
             Thread.currentThread().setContextClassLoader(loader);
             System.setProperty(MAVEN_DI_DEBUG, "true");
+            System.setOut(output);
             for (String tag : List.of("first", "second")) {
                 MessageBuilderFactory factory = new DefaultMessageBuilderFactory() {
                     @Override
@@ -208,26 +212,18 @@ class SisuDiDiagnosticsTest {
                         return new DefaultMessageBuilder().a(tag);
                     }
                 };
-                List<String> captured = new ArrayList<>();
-                LogSink capturingSink = event -> captured.add(event.message());
-                DefaultLoggerManager manager = new DefaultLoggerManager();
-                manager.setLogSink(capturingSink);
-                manager.install();
+                captured.reset();
                 LazyNative.CALLS.set(0);
-                try {
-                    SisuDiBridgeModule module = new SisuDiBridgeModule(true, factory);
-                    assertThrows(CreationException.class, () -> bridge(factory, module));
-                    assertTrue(captured.stream().anyMatch(m -> m.contains(", partial")), captured.toString());
-                    assertTrue(
-                            captured.stream().anyMatch(m -> m.contains(tag + LazyNative.class.getName())),
-                            captured.toString());
-                    assertEquals(0, LazyNative.CALLS.get());
-                } finally {
-                    manager.uninstall();
-                }
+                SisuDiBridgeModule module = new SisuDiBridgeModule(true, factory);
+                assertThrows(CreationException.class, () -> bridge(factory, module));
+                String dump = captured.toString(StandardCharsets.UTF_8);
+                assertTrue(dump.contains(", partial"), dump);
+                assertTrue(dump.contains(tag + LazyNative.class.getName()), dump);
+                assertEquals(0, LazyNative.CALLS.get());
             }
         } finally {
             Thread.currentThread().setContextClassLoader(previousLoader);
+            System.setOut(previousOutput);
             if (previous == null) {
                 System.clearProperty(MAVEN_DI_DEBUG);
             } else {
@@ -268,9 +264,10 @@ class SisuDiDiagnosticsTest {
                 module);
     }
 
-    private static long blocks(List<String> messages) {
-        return messages.stream()
-                .filter(m -> m.startsWith("Maven DI native registry "))
+    private static long blocks(ByteArrayOutputStream output) {
+        return output.toString(StandardCharsets.UTF_8)
+                .lines()
+                .filter(line -> line.startsWith("Maven DI native registry "))
                 .count();
     }
 
