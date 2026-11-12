@@ -113,6 +113,20 @@ public class MavenCliTest {
                         null, new ByteArrayInputStream("\n".getBytes(StandardCharsets.UTF_8)), "Password: "));
     }
 
+    /**
+     * An empty or otherwise unparsable extensions descriptor should fail with a message naming the file, not a bare
+     * {@code EOFException} from the XML parser (MNG-8369).
+     */
+    @Test
+    public void testReadCoreExtensionsDescriptorRejectsUnparsableFile(@TempDir Path tempDir) throws Exception {
+        Path extensionsFile = tempDir.resolve("extensions.xml");
+        Files.createFile(extensionsFile);
+
+        IOException e = assertThrows(IOException.class, () -> cli.readCoreExtensionsDescriptor(extensionsFile));
+
+        assertTrue(e.getMessage().contains(extensionsFile.toString()), e.getMessage());
+    }
+
     @Test
     public void testCalculateDegreeOfConcurrency() {
         assertThrows(IllegalArgumentException.class, () -> cli.calculateDegreeOfConcurrency("0"));
