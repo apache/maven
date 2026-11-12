@@ -84,6 +84,9 @@ class MavenJulHandlerTest {
 
     @Test
     void publishIsReentrantSafe() {
+        AtomicReference<LogEvent> captured = new AtomicReference<>();
+        testManager.setLogSink(captured::set);
+
         MavenJulHandler handler = new MavenJulHandler();
         LogRecord record = new LogRecord(Level.INFO, "nested");
 
@@ -93,6 +96,7 @@ class MavenJulHandlerTest {
         } finally {
             MavenJulHandler.setInPublishForTest(false);
         }
+        assertNull(captured.get(), "Re-entrant publish must be silently dropped");
     }
 
     @Test

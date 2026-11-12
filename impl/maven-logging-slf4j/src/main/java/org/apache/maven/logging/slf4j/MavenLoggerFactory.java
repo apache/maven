@@ -31,6 +31,8 @@ import org.slf4j.Logger;
 /**
  * LogFactory for Maven which creates SLF4J loggers that delegate level checks
  * and severity recording to the shared {@link DefaultLoggerManager}.
+ *
+ * @since 4.2.0
  */
 public class MavenLoggerFactory implements ILoggerFactory {
     static volatile MavenLoggerFactory instance;

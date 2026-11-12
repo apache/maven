@@ -37,7 +37,7 @@ import org.slf4j.spi.LocationAwareLogger;
  * via {@link LoggerManager}. Level checks are delegated to
  * {@link DefaultLoggerManager}; formatting is deferred to the {@link LogSink}.
  *
- * @since 3.5.0
+ * @since 4.2.0
  */
 public class MavenSimpleLogger extends LegacyAbstractLogger {
 
