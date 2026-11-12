@@ -221,8 +221,7 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
                 Map<Object, Plugin> master = new LinkedHashMap<>(src.size() * 2);
 
                 for (Plugin element : src) {
-                    if (element.isInherited() || !element.getExecutions().isEmpty()) {
-                        // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions
+                    if (element.isInherited()) {
                         Plugin plugin = new Plugin();
                         plugin.setLocation("", element.getLocation(""));
                         plugin.setGroupId(null);
