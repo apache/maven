@@ -37,6 +37,27 @@ import org.apache.maven.api.services.MavenException;
  * Implementations may return a modified model built via {@code Model.newBuilder(model)...build()},
  * or return the input model unmodified for a no-op. Throwing aborts the build.
  *
+ * <h2>Allowed modifications</h2>
+ * At this point in the build, no artifacts have been resolved and no plugin classloaders have been
+ * created. The following model sections are safe to modify:
+ * <ul>
+ *   <li>{@code <dependencies>} — e.g. injecting resolved platform dependencies</li>
+ *   <li>{@code <dependencyManagement>}</li>
+ *   <li>{@code <build>}, {@code <plugins>}, {@code <pluginManagement>} — e.g. injecting JVM args
+ *       into Surefire/Failsafe configuration</li>
+ *   <li>{@code <properties>}</li>
+ * </ul>
+ *
+ * <h2>Frozen fields</h2>
+ * The following must <strong>not</strong> be changed — doing so would break reactor identity,
+ * inheritance, or module structure that has already been assembled:
+ * <ul>
+ *   <li>{@code groupId}, {@code artifactId} — reactor identity</li>
+ *   <li>{@code <parent>} — inheritance already resolved</li>
+ *   <li>{@code <modules>} — project set is fixed at this point</li>
+ *   <li>{@code <profiles>} — already activated</li>
+ * </ul>
+ *
  * @since 4.2.0
  */
 @Experimental

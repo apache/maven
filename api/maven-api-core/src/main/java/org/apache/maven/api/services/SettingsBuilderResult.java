@@ -40,6 +40,40 @@ public interface SettingsBuilderResult extends Result<SettingsBuilderRequest> {
     Settings getEffectiveSettings();
 
     /**
+     * Gets the installation-scoped settings (before merging).
+     *
+     * @return the installation settings, never {@code null} (empty if not configured)
+     * @since 4.2.0
+     */
+    @Nonnull
+    default Settings getInstallationSettings() {
+        return Settings.newInstance();
+    }
+
+    /**
+     * Gets the project-scoped settings (before merging).
+     * This is the tier where {@code <phases>} and project-specific {@code <extensions>} are authoritative.
+     *
+     * @return the project settings, never {@code null} (empty if not configured)
+     * @since 4.2.0
+     */
+    @Nonnull
+    default Settings getProjectSettings() {
+        return Settings.newInstance();
+    }
+
+    /**
+     * Gets the user-scoped settings (before merging).
+     *
+     * @return the user settings, never {@code null} (empty if not configured)
+     * @since 4.2.0
+     */
+    @Nonnull
+    default Settings getUserSettings() {
+        return Settings.newInstance();
+    }
+
+    /**
      * Gets the problems that were encountered during the settings building. Note that only problems of severity
      * {@link BuilderProblem.Severity#WARNING} and below are reported here. Problems with a higher severity level cause
      * the settings builder to fail with a {@link SettingsBuilderException}.

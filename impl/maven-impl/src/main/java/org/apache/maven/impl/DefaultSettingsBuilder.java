@@ -50,6 +50,7 @@ import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
 import org.apache.maven.api.settings.Activation;
 import org.apache.maven.api.settings.IdentifiableBase;
+import org.apache.maven.api.settings.Mirror;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Proxy;
 import org.apache.maven.api.settings.Repository;
@@ -72,12 +73,35 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     private final DefaultSettingsValidator settingsValidator = new DefaultSettingsValidator();
 
-    private final SettingsMerger settingsMerger = new SettingsMerger() {
+    // Package-private so SettingsUtilsV4 can reuse the same configured merger instance.
+    static final SettingsMerger SETTINGS_MERGER = new SettingsMerger() {
         @Override
         protected KeyComputer<Repository> getRepositoryKey() {
             return IdentifiableBase::getId;
         }
+
+        @Override
+        protected KeyComputer<Mirror> getMirrorKey() {
+            return IdentifiableBase::getId;
+        }
+
+        @Override
+        protected KeyComputer<Server> getServerKey() {
+            return IdentifiableBase::getId;
+        }
+
+        @Override
+        protected KeyComputer<Proxy> getProxyKey() {
+            return IdentifiableBase::getId;
+        }
+
+        @Override
+        protected KeyComputer<Profile> getProfileKey() {
+            return IdentifiableBase::getId;
+        }
     };
+
+    private final SettingsMerger settingsMerger = SETTINGS_MERGER;
 
     private final SettingsParser xmlSettingsParser;
 
@@ -161,7 +185,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             throw new SettingsBuilderException("Error building settings", problems);
         }
 
-        return new DefaultSettingsBuilderResult(request, effective, problems);
+        return new DefaultSettingsBuilderResult(request, installation, project, user, effective, problems);
     }
 
     private Settings readSettings(
@@ -602,13 +626,27 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         private final SettingsBuilderRequest request;
 
+        private final Settings installationSettings;
+
+        private final Settings projectSettings;
+
+        private final Settings userSettings;
+
         private final Settings effectiveSettings;
 
         private final ProblemCollector<BuilderProblem> problems;
 
         DefaultSettingsBuilderResult(
-                SettingsBuilderRequest request, Settings effectiveSettings, ProblemCollector<BuilderProblem> problems) {
+                SettingsBuilderRequest request,
+                Settings installationSettings,
+                Settings projectSettings,
+                Settings userSettings,
+                Settings effectiveSettings,
+                ProblemCollector<BuilderProblem> problems) {
             this.request = request;
+            this.installationSettings = installationSettings != null ? installationSettings : Settings.newInstance();
+            this.projectSettings = projectSettings != null ? projectSettings : Settings.newInstance();
+            this.userSettings = userSettings != null ? userSettings : Settings.newInstance();
             this.effectiveSettings = effectiveSettings;
             this.problems = (problems != null) ? problems : ProblemCollector.empty();
         }
@@ -616,6 +654,21 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         @Override
         public SettingsBuilderRequest getRequest() {
             return request;
+        }
+
+        @Override
+        public Settings getInstallationSettings() {
+            return installationSettings;
+        }
+
+        @Override
+        public Settings getProjectSettings() {
+            return projectSettings;
+        }
+
+        @Override
+        public Settings getUserSettings() {
+            return userSettings;
         }
 
         @Override
