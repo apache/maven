@@ -204,5 +204,6 @@ public interface Artifact {
     @Deprecated(since = "4.2.0", forRemoval = true)
     default boolean isSnapshot() {
        return snapshot();
+    }
 }
 
