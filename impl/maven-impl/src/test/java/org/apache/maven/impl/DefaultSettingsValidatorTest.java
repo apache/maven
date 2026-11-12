@@ -24,6 +24,8 @@ import java.util.Map;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.SettingsBuilder;
+import org.apache.maven.api.settings.Extension;
+import org.apache.maven.api.settings.PhaseInjection;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.Server;
@@ -33,6 +35,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class DefaultSettingsValidatorTest {
 
@@ -222,5 +225,112 @@ class DefaultSettingsValidatorTest {
         Settings settings = Settings.newBuilder().servers(List.of(server)).build();
 
         return validator.validate(settings);
+    }
+
+    // -----------------------------------------------------------------------
+    // New elements: extensions, phases, aliases
+    // -----------------------------------------------------------------------
+
+    @Test
+    void testExtensionsAllowedInProjectSettings() {
+        Extension ext = Extension.newBuilder()
+                .groupId("com.example")
+                .artifactId("my-extension")
+                .version("1.0")
+                .build();
+        Settings settings = Settings.newBuilder().extensions(List.of(ext)).build();
+
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings, true);
+        assertEquals(0, problems.totalProblemsReported());
+    }
+
+    @Test
+    void testExtensionsAlsoAllowedInUserSettings() {
+        Extension ext = Extension.newBuilder()
+                .groupId("com.example")
+                .artifactId("my-extension")
+                .version("1.0")
+                .build();
+        Settings settings = Settings.newBuilder().extensions(List.of(ext)).build();
+
+        // Extensions are now supported in user/installation settings too — no warning
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings, false);
+        assertEquals(0, problems.totalProblemsReported());
+    }
+
+    @Test
+    void testPhasesAllowedInProjectSettings() {
+        PhaseInjection phase =
+                PhaseInjection.newBuilder().name("my-phase").after("compile").build();
+        Settings settings = Settings.newBuilder().phases(List.of(phase)).build();
+
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings, true);
+        assertEquals(0, problems.totalProblemsReported());
+    }
+
+    @Test
+    void testPhasesWarnedInUserSettings() {
+        PhaseInjection phase =
+                PhaseInjection.newBuilder().name("my-phase").after("compile").build();
+        Settings settings = Settings.newBuilder().phases(List.of(phase)).build();
+
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings, false);
+        assertEquals(1, problems.totalProblemsReported());
+        BuilderProblem problem = problems.problems().findFirst().orElseThrow();
+        assertEquals(BuilderProblem.Severity.WARNING, problem.getSeverity());
+        assertEquals(
+                "'phases' is not supported on user or installation settings. "
+                        + "Move <phases> to your project's .mvn/settings.xml.",
+                problem.getMessage());
+    }
+
+    @Test
+    void testExtensionsAndPhasesInUserSettingsOnlyPhasesWarn() {
+        Extension ext = Extension.newBuilder()
+                .groupId("com.example")
+                .artifactId("my-extension")
+                .version("1.0")
+                .build();
+        PhaseInjection phase =
+                PhaseInjection.newBuilder().name("my-phase").after("compile").build();
+        Settings settings = Settings.newBuilder()
+                .extensions(List.of(ext))
+                .phases(List.of(phase))
+                .build();
+
+        // Extensions no longer warn; only phases generate a warning
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings, false);
+        assertEquals(1, problems.totalProblemsReported());
+        BuilderProblem problem = problems.problems().findFirst().orElseThrow();
+        assertEquals(BuilderProblem.Severity.WARNING, problem.getSeverity());
+        assertTrue(problem.getMessage().contains("phases"));
+    }
+
+    @Test
+    void testPhaseMissingNameIsErrorInProjectSettings() {
+        // A <phase> without a name must be reported as ERROR at settings-load time,
+        // not as IllegalStateException at session-init time.
+        PhaseInjection phase = PhaseInjection.newBuilder().after("compile").build();
+        Settings settings = Settings.newBuilder().phases(List.of(phase)).build();
+
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings, true);
+        assertEquals(1, problems.totalProblemsReported());
+        BuilderProblem problem = problems.problems().findFirst().orElseThrow();
+        assertEquals(BuilderProblem.Severity.ERROR, problem.getSeverity());
+        assertTrue(problem.getMessage().contains("non-blank 'name'"));
+    }
+
+    @Test
+    void testPhaseMissingAnchorIsErrorInProjectSettings() {
+        // A <phase> with a name but no parent/after/before must be reported as ERROR.
+        PhaseInjection phase = PhaseInjection.newBuilder().name("orphan").build();
+        Settings settings = Settings.newBuilder().phases(List.of(phase)).build();
+
+        ProblemCollector<BuilderProblem> problems = validator.validate(settings, true);
+        assertEquals(1, problems.totalProblemsReported());
+        BuilderProblem problem = problems.problems().findFirst().orElseThrow();
+        assertEquals(BuilderProblem.Severity.ERROR, problem.getSeverity());
+        assertTrue(problem.getMessage().contains("orphan"));
+        assertTrue(problem.getMessage().contains("after"));
     }
 }

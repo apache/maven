@@ -26,15 +26,13 @@ under the License.
   <packaging>jar</packaging>
 
   <name>Maven Integration Test :: MNG-1088 :: Plugin Client</name>
-  <description>
-    Uses the sibling plugin, which must be built by the concurrent builder
-    from source within this same reactor — no pre-installed version in the local repo.
-  </description>
+  <description>Test that the concurrent builder automatically builds a reactor plugin project up to READY
+    when another project uses that plugin, even if the requested phase is before "compile".</description>
 
   <build>
     <plugins>
       <plugin>
-        <!-- This is the plugin produced by the sibling reactor module -->
+        <!-- NOTE: That's exactly the same plugin as produced by the sibling project -->
         <groupId>org.apache.maven.its.mng1088</groupId>
         <artifactId>p</artifactId>
         <version>0.1-SNAPSHOT</version>
@@ -44,7 +42,7 @@ under the License.
             <goals>
               <goal>touch</goal>
             </goals>
-            <phase>package</phase>
+            <phase>initialize</phase>
             <configuration>
               <file>target/touch.txt</file>
             </configuration>

@@ -93,7 +93,7 @@
         </field>
       </fields>
     </class>
-    <class rootElement="true" xml.tagName="settings">
+    <class rootElement="true" xml.tagName="settings" xsd.compositor="sequence">
       <name>Settings</name>
       <version>1.0.0+</version>
       <superClass>TrackableBase</superClass>
@@ -239,6 +239,79 @@
           </description>
           <association>
             <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field xdoc.separator="blank" xml.tagName="options" xml.format="mixed">
+          <name>args</name>
+          <version>2.1.0+</version>
+          <required>false</required>
+          <description>
+            <![CDATA[
+            CLI options to prepend to every invocation. Two syntaxes are supported inside
+            the {@code <options>} element:
+            <ul>
+              <li><b>Inline text</b> — whitespace-separated tokens, shell quote-aware:
+                  {@code <options>-T4 --no-transfer-progress</options>}</li>
+              <li><b>Structured</b> — one {@literal <arg>} element per token, preserving spaces
+                  inside values:
+                  {@code <options><arg>-T4</arg><arg>-Dmessage=hello world</arg></options>}</li>
+            </ul>
+            Replaces {@code .mvn/maven.config} when present in project-scoped settings.
+            Only honoured in project-scoped settings ({@code .mvn/settings.xml});
+            this field is ignored in user and installation settings.
+            ]]>
+          </description>
+          <association xml.itemsStyle="flat" xml.tagName="arg">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field xdoc.separator="blank">
+          <name>extensions</name>
+          <version>2.1.0+</version>
+          <required>false</required>
+          <description>
+            <![CDATA[
+            Core extensions to load. Replaces {@code .mvn/extensions.xml} (project), the user
+            {@code extensions.xml}, or the installation {@code extensions.xml} when present at the
+            corresponding tier. Valid at all tiers (project, user, and installation).
+            ]]>
+          </description>
+          <association xml.itemsStyle="flat" xml.tagName="extension">
+            <type>Extension</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>aliases</name>
+          <version>2.1.0+</version>
+          <required>false</required>
+          <description>
+            <![CDATA[
+            Named build aliases. Every argument on the command line is checked against alias names in order;
+            each match is replaced in-place by the alias expansion tokens. Expansion is not recursive.
+            Valid at all tiers; last-wins across installation → user → project.
+            ]]>
+          </description>
+          <association xml.itemsStyle="flat" xml.tagName="alias">
+            <type>Alias</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
+          <name>phases</name>
+          <version>2.1.0+</version>
+          <required>false</required>
+          <description>
+            <![CDATA[
+            Custom lifecycle phase injections. Phases are registered in the lifecycle DAG with the declared
+            after/before edges. <strong>Valid only in project-scoped settings</strong> — rejected in user and
+            installation settings.
+            ]]>
+          </description>
+          <association xml.itemsStyle="flat" xml.tagName="phase">
+            <type>PhaseInjection</type>
             <multiplicity>*</multiplicity>
           </association>
         </field>
@@ -1081,6 +1154,147 @@
           </code>
         </codeSegment>
       </codeSegments>
+    </class>
+
+    <class xml.tagName="extension">
+      <name>Extension</name>
+      <description>Describes a core extension to load. Fields may be provided either as XML attributes
+      (compact form) or via the {@code id} attribute using the {@code groupId:artifactId:version} coordinate
+      format. When {@code id} is specified, the individual coordinate attributes must not be set.
+      Valid at all tiers (project, user, and installation).</description>
+      <version>2.1.0+</version>
+      <fields>
+        <field xml.attribute="true">
+          <name>id</name>
+          <description>Compact coordinate in the form {@code groupId:artifactId:version}.
+          Mutually exclusive with the individual {@code groupId}, {@code artifactId}, and {@code version} attributes.
+          Example: {@code io.takari.maven:takari-smart-builder:0.6.1}</description>
+          <version>2.1.0+</version>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>groupId</name>
+          <description>The group ID of the extension's artifact. Must not be set when {@code id} is used.</description>
+          <version>2.1.0+</version>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>artifactId</name>
+          <description>The artifact ID of the extension. Must not be set when {@code id} is used.</description>
+          <version>2.1.0+</version>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>version</name>
+          <description>The version of the extension. Must not be set when {@code id} is used.</description>
+          <version>2.1.0+</version>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>classLoadingStrategy</name>
+          <description>The class loading strategy: {@code self-first} (the default), {@code parent-first} (loads classes from the
+          parent, then from the extension) or {@code plugin} (follows the rules from extensions defined as plugins).</description>
+          <version>2.1.0+</version>
+          <defaultValue>self-first</defaultValue>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field>
+          <name>configuration</name>
+          <description>Extension-specific configuration passed to the extension during initialization.
+          The structure is extension-defined.</description>
+          <version>2.1.0+</version>
+          <required>false</required>
+          <type>DOM</type>
+        </field>
+      </fields>
+    </class>
+
+    <class xml.tagName="alias">
+      <name>Alias</name>
+      <description>A named build alias. Every argument on the command line is checked against alias names;
+      when a match is found it is replaced in-place by the alias expansion tokens. Supports both inline
+      text (shorthand, whitespace-separated) and structured {@literal &lt;arg&gt;} elements for values that
+      contain spaces. Valid at all tiers; last-wins across installation → user → project.</description>
+      <version>2.1.0+</version>
+      <fields>
+        <field xml.attribute="true">
+          <name>name</name>
+          <description>The alias name. Must not start with {@code -}.</description>
+          <version>2.1.0+</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field xml.format="mixed">
+          <name>args</name>
+          <description>
+            <![CDATA[
+            The expansion for this alias. Two syntaxes are supported:
+            <ul>
+              <li><b>Inline text</b> — whitespace-separated tokens, shell quote-aware:
+                  {@code <alias name="ci">verify -Dmaven.test.skip=true</alias>}</li>
+              <li><b>Structured</b> — one {@literal <arg>} element per token, preserving spaces
+                  inside values:
+                  {@code <alias name="release"><arg>deploy</arg><arg>-Prelease</arg></alias>}</li>
+            </ul>
+            ]]>
+          </description>
+          <version>2.1.0+</version>
+          <required>false</required>
+          <association xml.itemsStyle="flat" xml.tagName="arg">
+            <type>String</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+      </fields>
+    </class>
+
+    <class xml.tagName="phase">
+      <name>PhaseInjection</name>
+      <description>A custom phase to inject into the lifecycle DAG.
+      Valid only in project-scoped settings.</description>
+      <version>2.1.0+</version>
+      <fields>
+        <field xml.attribute="true">
+          <name>name</name>
+          <description>The name of the new phase to inject.</description>
+          <version>2.1.0+</version>
+          <required>true</required>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>parent</name>
+          <description>The name of the existing phase whose children list receives this injection.
+          Must be specified to correctly place the new phase in the Maven 4 lifecycle tree.
+          For example, use {@code parent="verify"} to insert a phase alongside
+          {@code unit-test} and {@code integration-test}.</description>
+          <version>2.1.0+</version>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>after</name>
+          <description>Comma-separated names of sibling phases (children of the same parent) that this phase
+          must come after. When multiple names are given, the phase is inserted after the latest (rightmost)
+          anchor. Can be combined with {@code before} to constrain both bounds.</description>
+          <version>2.1.0+</version>
+          <required>false</required>
+          <type>String</type>
+        </field>
+        <field xml.attribute="true">
+          <name>before</name>
+          <description>Comma-separated names of sibling phases (children of the same parent) that this phase
+          must come before. When multiple names are given, the phase is inserted before the earliest (leftmost)
+          anchor. Can be combined with {@code after} to constrain both bounds.</description>
+          <version>2.1.0+</version>
+          <required>false</required>
+          <type>String</type>
+        </field>
+      </fields>
     </class>
   </classes>
 </model>

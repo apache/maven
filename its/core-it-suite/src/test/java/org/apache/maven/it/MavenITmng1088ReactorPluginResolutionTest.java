@@ -25,29 +25,30 @@ import org.junit.jupiter.api.Test;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-1088">MNG-1088</a>.
  *
- * @author Brett Porter
+ * <p>Verifies that the concurrent builder automatically builds a reactor plugin project up to
+ * the READY phase when another project in the reactor uses that plugin, even if the user
+ * requested a phase before "compile" (e.g. "initialize").
  *
+ * @author Brett Porter
  */
-public class MavenITmng1088ReactorPluginResolutionTest extends AbstractMavenIntegrationTestCase {
+class MavenITmng1088ReactorPluginResolutionTest extends AbstractMavenIntegrationTestCase {
 
     /**
-     * Test that the concurrent builder can build a plugin that is part of the reactor and then use it
-     * in a sibling module — without any pre-installed version in the local repository.
-     * <p>
-     * The concurrent builder schedules the plugin project to reach the {@code ready} phase before
-     * planning the consuming project, so {@code mvn package -b concurrent} works on a clean local repo.
+     * Test that a reactor plugin is automatically compiled and made available when the
+     * concurrent builder detects a cross-project plugin dependency, even when the user
+     * only requested a lifecycle phase before "compile" (here: "initialize").
      *
      * @throws Exception in case of failure
      */
     @Test
-    public void testitMNG1088() throws Exception {
+    void testitMNG1088() throws Exception {
         Path testDir = extractResources("mng-1088");
 
         Verifier verifier = newVerifier(testDir);
         verifier.setAutoclean(false);
         verifier.deleteDirectory("client/target");
         verifier.deleteArtifacts("org.apache.maven.its.mng1088");
-        verifier.addCliArguments("-DmavenVersion=" + verifier.getMavenVersion(), "-b", "concurrent", "package");
+        verifier.addCliArguments("-DmavenVersion=" + verifier.getMavenVersion(), "-b", "concurrent", "initialize");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
