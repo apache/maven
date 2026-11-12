@@ -58,4 +58,13 @@ public class AbstractMavenIntegrationTestCaseNIO2Test extends AbstractMavenInteg
         // Verify round-trip conversion
         assertEquals(pathResult, fileResult.toPath());
     }
+
+    @Test
+    void testDefaultCompilerRelease() throws IOException, VerificationException {
+        Path resourceDir = extractResources("test-resource");
+        Verifier verifier = newVerifier(resourceDir);
+        assertEquals("17", verifier.getSystemProperties().getProperty("maven.compiler.release"));
+        assertNull(verifier.getSystemProperties().getProperty("maven.compiler.source"));
+        assertNull(verifier.getSystemProperties().getProperty("maven.compiler.target"));
+    }
 }
