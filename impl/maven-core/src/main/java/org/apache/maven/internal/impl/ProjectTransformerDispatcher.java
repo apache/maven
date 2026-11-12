@@ -66,10 +66,11 @@ public final class ProjectTransformerDispatcher {
                                         + mavenProject.getId(),
                                 (Throwable) null);
                     }
+                    validateFrozenFields(
+                            project.model(), model, transformer.getClass().getName(), mavenProject.getId());
                 }
 
                 if (model != project.model()) {
-                    validateFrozenFields(project.model(), model, mavenProject.getId());
                     mavenProject.setModel(new org.apache.maven.model.Model(model));
                 }
             }
@@ -78,28 +79,29 @@ public final class ProjectTransformerDispatcher {
         }
     }
 
-    private static void validateFrozenFields(Model original, Model transformed, String projectId)
+    private static void validateFrozenFields(
+            Model original, Model transformed, String transformerName, String projectId)
             throws MavenExecutionException {
         if (!Objects.equals(original.getGroupId(), transformed.getGroupId())
                 || !Objects.equals(original.getArtifactId(), transformed.getArtifactId())) {
             throw new MavenExecutionException(
-                    "Project transformer must not change groupId or artifactId of " + projectId, (Throwable) null);
+                    transformerName + " must not change groupId or artifactId of " + projectId, (Throwable) null);
         }
         if (!Objects.equals(original.getParent(), transformed.getParent())) {
             throw new MavenExecutionException(
-                    "Project transformer must not change <parent> of " + projectId, (Throwable) null);
+                    transformerName + " must not change <parent> of " + projectId, (Throwable) null);
         }
         if (!Objects.equals(original.getMixins(), transformed.getMixins())) {
             throw new MavenExecutionException(
-                    "Project transformer must not change <mixins> of " + projectId, (Throwable) null);
+                    transformerName + " must not change <mixins> of " + projectId, (Throwable) null);
         }
         if (!Objects.equals(original.getModules(), transformed.getModules())) {
             throw new MavenExecutionException(
-                    "Project transformer must not change <modules> of " + projectId, (Throwable) null);
+                    transformerName + " must not change <modules> of " + projectId, (Throwable) null);
         }
         if (!Objects.equals(original.getProfiles(), transformed.getProfiles())) {
             throw new MavenExecutionException(
-                    "Project transformer must not change <profiles> of " + projectId, (Throwable) null);
+                    transformerName + " must not change <profiles> of " + projectId, (Throwable) null);
         }
     }
 }
