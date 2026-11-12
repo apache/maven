@@ -58,6 +58,7 @@ import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.Extension;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputLocationTracker;
+import org.apache.maven.api.model.Mixin;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Parent;
 import org.apache.maven.api.model.Plugin;
@@ -375,6 +376,54 @@ public class DefaultModelValidator implements ModelValidator {
 
             // Validate each mixin
             for (Parent mixin : model.getMixins()) {
+                // Validate id/gav attribute format and conflict with child elements
+                if (mixin instanceof Mixin m
+                        && m.getGav() != null
+                        && !m.getGav().isEmpty()) {
+                    String gav = m.getGav();
+                    String[] parts = gav.split(":");
+                    if (parts.length != 3 || parts[0].isEmpty() || parts[1].isEmpty() || parts[2].isEmpty()) {
+                        addViolation(
+                                problems,
+                                Severity.ERROR,
+                                Version.V42,
+                                "mixins.mixin.id",
+                                null,
+                                "must have the format 'groupId:artifactId:version' but is '" + gav + "'.",
+                                mixin);
+                    }
+                    if (mixin.getGroupId() != null && !mixin.getGroupId().isEmpty()) {
+                        addViolation(
+                                problems,
+                                Severity.ERROR,
+                                Version.V42,
+                                "mixins.mixin.groupId",
+                                null,
+                                "must not be specified when the 'id' attribute is used.",
+                                mixin);
+                    }
+                    if (mixin.getArtifactId() != null && !mixin.getArtifactId().isEmpty()) {
+                        addViolation(
+                                problems,
+                                Severity.ERROR,
+                                Version.V42,
+                                "mixins.mixin.artifactId",
+                                null,
+                                "must not be specified when the 'id' attribute is used.",
+                                mixin);
+                    }
+                    if (mixin.getVersion() != null && !mixin.getVersion().isEmpty()) {
+                        addViolation(
+                                problems,
+                                Severity.ERROR,
+                                Version.V42,
+                                "mixins.mixin.version",
+                                null,
+                                "must not be specified when the 'id' attribute is used.",
+                                mixin);
+                    }
+                }
+
                 if (mixin.getRelativePath() != null
                         && !mixin.getRelativePath().isEmpty()
                         && (mixin.getLocation("groupId") != null || mixin.getLocation("artifactId") != null)
@@ -1190,7 +1239,22 @@ public class DefaultModelValidator implements ModelValidator {
         Map<String, Dependency> index = new HashMap<>();
 
         for (Dependency dependency : dependencies) {
-            String key = dependency.getManagementKey();
+            // When 'id' attribute is set, extract the GAV portion (stripping @scope and ?)
+            // for deduplication, since normalization has not yet run
+            String key;
+            if (dependency.getId() != null && !dependency.getId().isEmpty()) {
+                key = managementKeyFromId(dependency.getId());
+            } else {
+                key = dependency.getManagementKey();
+            }
+
+            // Validate id attribute format and conflict with child elements
+            validateDependencyIdAttribute(problems, dependency, prefix + prefix2);
+
+            // Validate id attribute on exclusions
+            for (Exclusion exclusion : dependency.getExclusions()) {
+                validateExclusionIdAttribute(problems, exclusion, prefix + prefix2);
+            }
 
             if ("import".equals(dependency.getScope())) {
                 if (!"pom".equals(dependency.getType())) {
@@ -1304,6 +1368,223 @@ public class DefaultModelValidator implements ModelValidator {
             } else {
                 index.put(key, dependency);
             }
+        }
+    }
+
+    private void validateDependencyIdAttribute(ModelProblemCollector problems, Dependency dependency, String prefix) {
+        String id = dependency.getId();
+        if (id == null || id.isEmpty()) {
+            return;
+        }
+
+        String remaining = id;
+        boolean hasOptionalMarker = false;
+        if (remaining.endsWith("?")) {
+            hasOptionalMarker = true;
+            remaining = remaining.substring(0, remaining.length() - 1);
+        }
+
+        boolean hasScopeMarker = false;
+        int atIndex = remaining.lastIndexOf('@');
+        if (atIndex >= 0) {
+            hasScopeMarker = true;
+            remaining = remaining.substring(0, atIndex);
+        }
+
+        int colonCount = remaining.length() - remaining.replace(":", "").length();
+        if (colonCount < 1 || colonCount > 4) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "id",
+                    null,
+                    "has invalid format '" + id + "', must be 'groupId:artifactId[:]', "
+                            + "'groupId:artifactId:version', "
+                            + "'groupId:artifactId:type:[version]', or "
+                            + "'groupId:artifactId:type:classifier:[version]'. "
+                            + "An optional '@scope' suffix and/or trailing '?' may be appended.",
+                    dependency);
+            return;
+        }
+        if (!isNullOrEmpty(dependency.getGroupId())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "groupId",
+                    null,
+                    "must not be specified when 'id' attribute is used.",
+                    dependency);
+        }
+        if (!isNullOrEmpty(dependency.getArtifactId())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "artifactId",
+                    null,
+                    "must not be specified when 'id' attribute is used.",
+                    dependency);
+        }
+        if (!isNullOrEmpty(dependency.getVersion())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "version",
+                    null,
+                    "must not be specified when 'id' attribute is used.",
+                    dependency);
+        }
+        String[] parts = remaining.split(":", -1);
+        if (parts.length >= 4
+                && !parts[2].isEmpty()
+                && !isNullOrEmpty(dependency.getType())
+                && !"jar".equals(dependency.getType())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "type",
+                    null,
+                    "must not be specified when 'id' attribute includes type.",
+                    dependency);
+        }
+        if (parts.length >= 5 && !parts[3].isEmpty() && !isNullOrEmpty(dependency.getClassifier())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "classifier",
+                    null,
+                    "must not be specified when 'id' attribute includes classifier.",
+                    dependency);
+        }
+        if (hasScopeMarker && !isNullOrEmpty(dependency.getScope())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "scope",
+                    null,
+                    "must not be specified when 'id' attribute contains '@scope'.",
+                    dependency);
+        }
+        if (hasOptionalMarker && !isNullOrEmpty(dependency.getOptional())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "optional",
+                    null,
+                    "must not be specified when 'id' attribute contains '?'.",
+                    dependency);
+        }
+    }
+
+    /**
+     * Derives a management-key equivalent from an {@code id} attribute value, to enable
+     * duplicate-detection in the validator (before normalization has run and expanded the
+     * individual coordinate fields).
+     *
+     * <p>The management key format is {@code groupId:artifactId:type[:classifier]}, i.e. it
+     * intentionally excludes the version (the validator flags same-key/different-version pairs
+     * as errors, just as it does for the regular field-based syntax).</p>
+     *
+     * <p>id formats and their management-key equivalents:
+     * <ul>
+     *   <li>{@code g:a}               → {@code g:a:jar}             (2 parts)</li>
+     *   <li>{@code g:a:v}             → {@code g:a:jar}             (3 parts, version only)</li>
+     *   <li>{@code g:a:type:v}        → {@code g:a:type}            (4 parts, explicit type)</li>
+     *   <li>{@code g:a:type:cls:v}    → {@code g:a:type:cls}        (5 parts, type+classifier)</li>
+     * </ul>
+     * The optional {@code @scope} suffix and trailing {@code ?} are stripped before parsing.</p>
+     */
+    private static String managementKeyFromId(String id) {
+        String remaining = id;
+        if (remaining.endsWith("?")) {
+            remaining = remaining.substring(0, remaining.length() - 1);
+        }
+        int atIndex = remaining.lastIndexOf('@');
+        if (atIndex >= 0) {
+            remaining = remaining.substring(0, atIndex);
+        }
+        String[] parts = remaining.split(":", -1);
+        // Malformed id (fewer than 2 segments) — return raw string; the validator will
+        // catch the format error separately; there's no management key to derive here.
+        if (parts.length < 2) {
+            return remaining;
+        }
+        // parts[0]=groupId, parts[1]=artifactId
+        // 2 parts: g:a           -> key: g:a:jar
+        // 3 parts: g:a:v         -> key: g:a:jar  (version-only shorthand, type defaults to jar)
+        // 4 parts: g:a:type:v    -> key: g:a:type
+        // 5 parts: g:a:type:c:v  -> key: g:a:type:classifier
+        if (parts.length <= 3) {
+            return parts[0] + ":" + parts[1] + ":jar";
+        } else if (parts.length == 4) {
+            return parts[0] + ":" + parts[1] + ":" + (parts[2].isEmpty() ? "jar" : parts[2]);
+        } else {
+            // 5 parts: include classifier when non-empty, mirroring getManagementKey()
+            String type = parts[2].isEmpty() ? "jar" : parts[2];
+            if (!parts[3].isEmpty()) {
+                return parts[0] + ":" + parts[1] + ":" + type + ":" + parts[3];
+            } else {
+                return parts[0] + ":" + parts[1] + ":" + type;
+            }
+        }
+    }
+
+    private void validateExclusionIdAttribute(ModelProblemCollector problems, Exclusion exclusion, String prefix) {
+        String id = exclusion.getId();
+        if (id == null || id.isEmpty()) {
+            return;
+        }
+        int colonCount = id.length() - id.replace(":", "").length();
+        if (colonCount != 1) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "exclusions.exclusion.id",
+                    null,
+                    "has invalid format '" + id + "', must be 'groupId:artifactId'.",
+                    exclusion);
+            return;
+        }
+        // Ensure both segments are non-empty
+        String[] parts = id.split(":", -1);
+        if (parts[0].isEmpty() || parts[1].isEmpty()) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "exclusions.exclusion.id",
+                    null,
+                    "has invalid format '" + id + "', must be 'groupId:artifactId'.",
+                    exclusion);
+            return;
+        }
+        if (!isNullOrEmpty(exclusion.getGroupId())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "exclusions.exclusion.groupId",
+                    null,
+                    "must not be specified when 'id' attribute is used.",
+                    exclusion);
+        }
+        if (!isNullOrEmpty(exclusion.getArtifactId())) {
+            addViolation(
+                    problems,
+                    Severity.ERROR,
+                    Version.V42,
+                    prefix + "exclusions.exclusion.artifactId",
+                    null,
+                    "must not be specified when 'id' attribute is used.",
+                    exclusion);
         }
     }
 
@@ -2612,5 +2893,9 @@ public class DefaultModelValidator implements ModelValidator {
         static SourceHint resourceDirectory(Resource resource) {
             return resource::getDirectory;
         }
+    }
+
+    private static boolean isNullOrEmpty(String s) {
+        return s == null || s.isEmpty();
     }
 }
