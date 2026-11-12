@@ -205,4 +205,38 @@ public interface DependencyCoordinatesFactory extends Service {
                 false,
                 List.of());
     }
+
+    /**
+     * Creates dependency coordinates from a request.
+     *
+     * @param request the request
+     * @return a new {@link DependencyCoordinates}, never {@code null}
+     * @deprecated Use
+     *             {@link #create(Session, String, String, String, String, String, String, String, boolean, Collection)}
+     *             directly.
+     */
+    @Deprecated
+    @Nonnull
+    default DependencyCoordinates create(@Nonnull DependencyCoordinatesFactoryRequest request) {
+        requireNonNull(request, "request");
+        if (request.getCoordinatesString() != null) {
+            return create(
+                    request.getSession(),
+                    request.getCoordinatesString(),
+                    request.getScope(),
+                    request.isOptional(),
+                    request.getExclusions());
+        }
+        return create(
+                request.getSession(),
+                request.getGroupId(),
+                request.getArtifactId(),
+                request.getVersion(),
+                request.getClassifier(),
+                request.getExtension(),
+                request.getType(),
+                request.getScope(),
+                request.isOptional(),
+                request.getExclusions());
+    }
 }
