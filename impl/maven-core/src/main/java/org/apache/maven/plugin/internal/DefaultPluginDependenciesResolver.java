@@ -336,6 +336,10 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                                     .getArtifact()
                                     .setVersion(managedDep.getArtifact().getVersion()));
                         }
+                        // force provided: core artifact is already on Maven's core classloader
+                        // regardless of what the plugin declared; applying it unconditionally
+                        // ensures the ScopeDependencyFilter("provided","test") in resolveInternal
+                        // excludes it from artifact resolution.
                         pluginDep = pluginDep.setScope(managedDep.getScope());
                     }
                 }
