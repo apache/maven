@@ -50,7 +50,7 @@ import org.apache.maven.api.annotations.Provider;
  * log.warn("Deprecated configuration key: {}", key, e);
  * }</pre>
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Provider
@@ -350,7 +350,7 @@ public interface Logger {
      *
      * @param clazz the class whose name is used as the logger name, never {@code null}
      * @return a {@code Logger} instance, never {@code null}
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     static Logger of(@Nonnull Class<?> clazz) {
@@ -366,7 +366,7 @@ public interface Logger {
      *
      * @param name the logger name, never {@code null}
      * @return a {@code Logger} instance, never {@code null}
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     static Logger of(@Nonnull String name) {
@@ -379,22 +379,14 @@ public interface Logger {
      * Returns a child logger whose name is this logger's name with
      * {@code "." + name} appended.
      *
-     * <p>The child logger inherits this logger's structured context —
-     * {@code projectId}, {@code mojoId} and the active {@link LogSink} —
-     * so events emitted by sub-components are automatically tagged with the
-     * correct project and mojo execution without any additional injection.
-     * This is the preferred way for a mojo to pass a scoped logger to a
-     * helper or service it delegates to.</p>
-     *
-     * <p><b>Note:</b> context inheritance only applies when this logger was
-     * obtained via dependency injection in a mojo execution scope (i.e. seeded
-     * by the framework with a concrete {@code projectId} and {@code mojoId}).
-     * When obtained via {@link #of(Class)} or {@link #of(String)}, both
-     * {@code projectId} and {@code mojoId} are {@code null}, and the child
-     * logger will have the same {@code null} values — nothing is inherited.</p>
+     * <p>If this logger was constructed with a {@code projectId} and/or {@code mojoId}
+     * (as is the case for DI-injected mojo loggers), those values are propagated to the
+     * child so sub-component events are automatically tagged with the correct project and
+     * mojo execution. Loggers obtained via {@link #of(Class)} or {@link #of(String)} have
+     * no such context, and the child will likewise carry {@code null} for those fields.</p>
      *
      * @param name the child suffix, never {@code null}
-     * @return a child {@code Logger} instance that inherits this logger's context, never {@code null}
+     * @return a child {@code Logger} instance, never {@code null}
      */
     @Nonnull
     Logger child(@Nonnull String name);

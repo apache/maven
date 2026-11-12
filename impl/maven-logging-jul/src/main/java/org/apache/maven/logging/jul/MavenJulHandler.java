@@ -18,10 +18,9 @@
  */
 package org.apache.maven.logging.jul;
 
-import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.logging.Handler;
 import java.util.logging.Level;
 import java.util.logging.LogManager;
@@ -45,12 +44,10 @@ import org.apache.maven.logging.impl.DefaultLoggerManager;
  * This handler has no SLF4J dependency — events go directly through
  * {@link LoggerManager#get()} for level checking and sink dispatch.
  *
- * @since 4.1.0
+ * @since 4.2.0
  * @see #install()
  */
 public class MavenJulHandler extends Handler {
-
-    private static final AtomicLong SEQUENCE = new AtomicLong();
 
     /**
      * Re-entrancy guard: set to {@code true} while {@link #publish} is routing
@@ -123,7 +120,8 @@ public class MavenJulHandler extends Handler {
                 return;
             }
 
-            String message = formatMessage(record);
+            String messageTemplate = resolveTemplate(record);
+            Object[] messageArgs = record.getParameters();
             Throwable throwable = record.getThrown();
 
             String sourceClass = null;
@@ -138,19 +136,25 @@ public class MavenJulHandler extends Handler {
                 threadName = Thread.currentThread().getName();
             }
 
+            String pluginId = resolvePluginId(mgr);
+
             LogEvent event = new DefaultLogEvent(
                     MonotonicClock.now(),
                     level,
-                    message,
+                    null,
                     loggerName,
                     throwable,
                     sourceClass,
                     sourceMethod,
                     threadId,
-                    SEQUENCE.getAndIncrement(),
+                    mgr instanceof DefaultLoggerManager dlm ? dlm.nextSequenceNumber() : -1,
                     threadName,
                     null,
-                    null);
+                    null,
+                    pluginId,
+                    null,
+                    messageTemplate,
+                    messageArgs != null ? Arrays.asList(messageArgs) : null);
 
             sink.accept(event);
 
@@ -168,6 +172,19 @@ public class MavenJulHandler extends Handler {
     @Override
     public void close() throws SecurityException {}
 
+    private static final StackWalker STACK_WALKER = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
+
+    private static String resolvePluginId(LoggerManager mgr) {
+        // Walk the call stack to find the first frame whose classloader is a registered
+        // plugin classloader — matching the attribution strategy used by MavenLoggerFactory
+        // for SLF4J loggers so both JUL and SLF4J events are attributed consistently.
+        return STACK_WALKER.walk(
+                frames -> frames.map(f -> mgr.getPluginId(f.getDeclaringClass().getClassLoader()))
+                        .filter(java.util.Objects::nonNull)
+                        .findFirst()
+                        .orElse(null));
+    }
+
     static LogLevel julLevelToLogLevel(Level julLevel) {
         int value = julLevel.intValue();
         if (value <= Level.FINEST.intValue()) {
@@ -183,12 +200,11 @@ public class MavenJulHandler extends Handler {
         }
     }
 
-    private static String formatMessage(LogRecord record) {
+    private static String resolveTemplate(LogRecord record) {
         String message = record.getMessage();
         if (message == null) {
             return "";
         }
-
         ResourceBundle bundle = record.getResourceBundle();
         if (bundle != null) {
             try {
@@ -197,16 +213,6 @@ public class MavenJulHandler extends Handler {
                 // use raw message
             }
         }
-
-        Object[] params = record.getParameters();
-        if (params != null && params.length > 0) {
-            try {
-                message = MessageFormat.format(message, params);
-            } catch (IllegalArgumentException e) {
-                // use message as-is if formatting fails
-            }
-        }
-
         return message;
     }
 }

@@ -27,18 +27,35 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
+ * Result of resolving a meta-version, providing the concrete resolved version
+ * and the repository it was resolved from.
  *
  * @since 4.0.0
  */
 @Experimental
 public interface VersionResolverResult extends Result<VersionResolverRequest> {
 
+    /**
+     * Gets the exceptions that occurred during version resolution.
+     *
+     * @return the list of exceptions, never {@code null}
+     */
     @Nonnull
     List<Exception> getExceptions();
 
+    /**
+     * Gets the resolved version.
+     *
+     * @return the resolved version
+     */
     @Nonnull
     Version getVersion();
 
+    /**
+     * Gets the repository from which the version was resolved.
+     *
+     * @return an optional containing the repository, or empty if unknown
+     */
     @Nonnull
     Optional<Repository> getRepository();
 }

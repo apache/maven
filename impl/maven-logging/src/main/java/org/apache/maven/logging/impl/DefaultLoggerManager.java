@@ -19,11 +19,15 @@
 package org.apache.maven.logging.impl;
 
 import java.io.InputStream;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.Properties;
+import java.util.WeakHashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.atomic.AtomicReference;
 
 import org.apache.maven.api.Constants;
@@ -44,7 +48,7 @@ import org.apache.maven.api.logging.LoggerManager;
  * This class has no SLF4J dependency. The SLF4J adapter layer creates
  * an instance and registers it via {@link LoggerManager#set(LoggerManager)}.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 public class DefaultLoggerManager implements LoggerManager {
 
@@ -62,6 +66,8 @@ public class DefaultLoggerManager implements LoggerManager {
     public static final int LOG_LEVEL_ERROR = 40;
     public static final int LOG_LEVEL_OFF = 50;
 
+    private static final AtomicLong SEQUENCE = new AtomicLong();
+
     private volatile LogSink logSink;
     private volatile int defaultLogLevel = LOG_LEVEL_INFO;
     private final AtomicReference<LogLevel> maxReached = new AtomicReference<>(null);
@@ -69,6 +75,7 @@ public class DefaultLoggerManager implements LoggerManager {
     private final ConcurrentHashMap<String, Integer> levelCache = new ConcurrentHashMap<>();
     private final ConcurrentHashMap<String, Logger> loggers = new ConcurrentHashMap<>();
     private final List<Runnable> reconfigurationListeners = new CopyOnWriteArrayList<>();
+    private final Map<ClassLoader, String> pluginClassLoaders = Collections.synchronizedMap(new WeakHashMap<>());
 
     public DefaultLoggerManager() {
         this.logSink = new AccumulatingLogSink();
@@ -82,11 +89,43 @@ public class DefaultLoggerManager implements LoggerManager {
         return loggers.computeIfAbsent(name, DefaultLogger::new);
     }
 
+    @Override
+    public Logger getLogger(Class<?> clazz) {
+        String pluginId = getPluginId(clazz.getClassLoader());
+        if (pluginId != null) {
+            String key = clazz.getName() + "@" + pluginId;
+            return loggers.computeIfAbsent(key, k -> new DefaultLogger(clazz.getName(), null, null, pluginId));
+        }
+        return getLogger(clazz.getName());
+    }
+
     // -- LogManager: sink --
 
     @Override
     public LogSink getLogSink() {
         return logSink;
+    }
+
+    /**
+     * Installs this manager as the global {@link LoggerManager} singleton.
+     * Intended for use by embedders and tests.
+     *
+     * @since 4.2.0
+     */
+    public void install() {
+        LoggerManager.set(this);
+    }
+
+    /**
+     * Clears the global {@link LoggerManager} singleton if it is currently this instance.
+     * Intended for use by tests to restore a clean state after each test method.
+     *
+     * @since 4.2.0
+     */
+    public void uninstall() {
+        if (LoggerManager.get() == this) {
+            LoggerManager.set(null);
+        }
     }
 
     @Override
@@ -178,6 +217,10 @@ public class DefaultLoggerManager implements LoggerManager {
         return reached != null && reached.ordinal() >= level.ordinal();
     }
 
+    public long nextSequenceNumber() {
+        return SEQUENCE.getAndIncrement();
+    }
+
     public void record(LogLevel level) {
         while (true) {
             LogLevel r = maxReached.get();
@@ -188,6 +231,21 @@ public class DefaultLoggerManager implements LoggerManager {
             }
             break;
         }
+    }
+
+    // -- Plugin classloader registry --
+
+    @Override
+    public void registerPluginClassLoader(ClassLoader classLoader, String pluginId) {
+        pluginClassLoaders.put(classLoader, pluginId);
+    }
+
+    @Override
+    public String getPluginId(ClassLoader classLoader) {
+        if (classLoader == null) {
+            return null;
+        }
+        return pluginClassLoaders.get(classLoader);
     }
 
     // -- Level resolution --

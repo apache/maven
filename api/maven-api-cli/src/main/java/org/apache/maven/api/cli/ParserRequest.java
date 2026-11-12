@@ -250,7 +250,7 @@ public interface ParserRequest {
      * @param args the command-line arguments
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     static Builder mvnval(@Nonnull String[] args, @Nonnull MessageBuilderFactory messageBuilderFactory) {
@@ -263,7 +263,7 @@ public interface ParserRequest {
      * @param args the command-line arguments
      * @param messageBuilderFactory the factory for creating message builders
      * @return a new Builder instance
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     static Builder mvnval(@Nonnull List<String> args, @Nonnull MessageBuilderFactory messageBuilderFactory) {

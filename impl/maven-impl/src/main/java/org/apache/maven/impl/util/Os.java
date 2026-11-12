@@ -18,211 +18,27 @@
  */
 package org.apache.maven.impl.util;
 
-import java.io.File;
-import java.util.Locale;
-import java.util.stream.Stream;
-
 /**
- * OS support
+ * @deprecated Use {@link org.apache.maven.utils.Os} instead.
  */
+@Deprecated
 public class Os {
+    public static final String OS_NAME = org.apache.maven.utils.Os.OS_NAME;
+    public static final String OS_ARCH = org.apache.maven.utils.Os.OS_ARCH;
+    public static final String OS_VERSION = org.apache.maven.utils.Os.OS_VERSION;
 
-    /**
-     * The OS Name.
-     */
-    public static final String OS_NAME = System.getProperty("os.name").toLowerCase(Locale.ENGLISH);
+    public static final String OS_FAMILY = org.apache.maven.utils.Os.OS_FAMILY;
 
-    /**
-     * The OA architecture.
-     */
-    public static final String OS_ARCH = System.getProperty("os.arch").toLowerCase(Locale.ENGLISH);
-
-    /**
-     * The OS version.
-     */
-    public static final String OS_VERSION = System.getProperty("os.version").toLowerCase(Locale.ENGLISH);
-
-    /**
-     * OS Family
-     */
-    public static final String OS_FAMILY;
-
-    /**
-     * Boolean indicating if the running OS is a Windows system.
-     */
-    public static final boolean IS_WINDOWS;
-
-    /**
-     * OS family that can be tested for. {@value}
-     */
-    private static final String FAMILY_WINDOWS = "windows";
-
-    /**
-     * OS family that can be tested for. {@value}
-     */
-    private static final String FAMILY_WIN9X = "win9x";
-
-    /**
-     * OS family that can be tested for. {@value}
-     */
-    public static final String FAMILY_NT = "winnt";
-
-    /**
-     * OS family that can be tested for. {@value}
-     */
-    private static final String FAMILY_OS2 = "os/2";
-
-    /**
-     * OS family that can be tested for. {@value}
-     */
-    private static final String FAMILY_NETWARE = "netware";
-
-    /**
-     * OS family that can be tested for. {@value}
-     */
-    private static final String FAMILY_DOS = "dos";
-
-    /**
-     * OS family that can be tested for. {@value}
-     */
-    private static final String FAMILY_MAC = "mac";
-
-    /**
-     * OS family that can be tested for. {@value}
-     */
-    private static final String FAMILY_TANDEM = "tandem";
-
-    /**
-     * OS family that can be tested for. {@value}
-     */
-    private static final String FAMILY_UNIX = "unix";
-
-    /**
-     * OS family that can be tested for. {@value}
-     */
-    private static final String FAMILY_OPENVMS = "openvms";
-
-    /**
-     * OS family that can be tested for. {@value}
-     */
-    private static final String FAMILY_ZOS = "z/os";
-
-    /**
-     * OS family that can be tested for. {@value}
-     */
-    private static final String FAMILY_OS390 = "os/390";
-
-    /**
-     * OS family that can be tested for. {@value}
-     */
-    private static final String FAMILY_OS400 = "os/400";
-
-    /**
-     * Unrecognized OS family. {@value}
-     */
-    private static final String FAMILY_UNKNOWN = "unknown";
-
-    /**
-     * OpenJDK is reported to call Mac OS X "Darwin"
-     *
-     * @see <a href="https://issues.apache.org/bugzilla/show_bug.cgi?id=44889">bugzilla issue</a>
-     * @see <a href="https://issues.apache.org/jira/browse/HADOOP-3318">HADOOP-3318</a>
-     */
-    private static final String DARWIN = "darwin";
-
-    /**
-     * The path separator.
-     */
-    private static final String PATH_SEP = File.pathSeparator;
-
-    static {
-        // Those two public constants are initialized here, as they need all the private constants
-        // above to be initialized first, but the code style imposes the public constants to be
-        // defined above the private ones...
-        OS_FAMILY = getOsFamily();
-        IS_WINDOWS = isFamily(FAMILY_WINDOWS);
-    }
+    public static final boolean IS_WINDOWS = org.apache.maven.utils.Os.IS_WINDOWS;
+    public static final String FAMILY_NT = org.apache.maven.utils.Os.FAMILY_NT;
 
     private Os() {}
 
-    /**
-     * Determines if the OS on which Maven is executing matches the
-     * given OS family.
-     *
-     * @param family the family to check for
-     * @return true if the OS matches
-     *
-     */
     public static boolean isFamily(String family) {
-        return isFamily(family, OS_NAME);
+        return org.apache.maven.utils.Os.isFamily(family);
     }
 
-    /**
-     * Determines if the OS on which Maven is executing matches the
-     * given OS family derived from the given OS name
-     *
-     * @param family the family to check for
-     * @param actualOsName the OS name to check against
-     * @return true if the OS matches
-     *
-     */
     public static boolean isFamily(String family, String actualOsName) {
-        // windows probing logic relies on the word 'windows' in the OS
-        boolean isWindows = actualOsName.contains(FAMILY_WINDOWS);
-        boolean is9x = false;
-        boolean isNT = false;
-        if (isWindows) {
-            // there are only four 9x platforms that we look for
-            is9x = (actualOsName.contains("95")
-                    || actualOsName.contains("98")
-                    || actualOsName.contains("me")
-                    // wince isn't really 9x, but crippled enough to
-                    // be a muchness. Maven doesn't run on CE, anyway.
-                    || actualOsName.contains("ce"));
-            isNT = !is9x;
-        }
-        return switch (family) {
-            case FAMILY_WINDOWS -> isWindows;
-            case FAMILY_WIN9X -> isWindows && is9x;
-            case FAMILY_NT -> isWindows && isNT;
-            case FAMILY_OS2 -> actualOsName.contains(FAMILY_OS2);
-            case FAMILY_NETWARE -> actualOsName.contains(FAMILY_NETWARE);
-            case FAMILY_DOS -> PATH_SEP.equals(";") && !isFamily(FAMILY_NETWARE, actualOsName) && !isWindows;
-            case FAMILY_MAC -> actualOsName.contains(FAMILY_MAC) || actualOsName.contains(DARWIN);
-            case FAMILY_TANDEM -> actualOsName.contains("nonstop_kernel");
-            case FAMILY_UNIX ->
-                PATH_SEP.equals(":")
-                        && !isFamily(FAMILY_OPENVMS, actualOsName)
-                        && (!isFamily(FAMILY_MAC, actualOsName) || actualOsName.endsWith("x"));
-            case FAMILY_ZOS -> actualOsName.contains(FAMILY_ZOS) || actualOsName.contains(FAMILY_OS390);
-            case FAMILY_OS400 -> actualOsName.contains(FAMILY_OS400);
-            case FAMILY_OPENVMS -> actualOsName.contains(FAMILY_OPENVMS);
-            default -> actualOsName.contains(family.toLowerCase(Locale.US));
-        };
-    }
-
-    /**
-     * Helper method to determine the current OS family.
-     *
-     * @return name of current OS family.
-     */
-    private static String getOsFamily() {
-        return Stream.of(
-                        FAMILY_DOS,
-                        FAMILY_MAC,
-                        FAMILY_NETWARE,
-                        FAMILY_NT,
-                        FAMILY_OPENVMS,
-                        FAMILY_OS2,
-                        FAMILY_OS400,
-                        FAMILY_TANDEM,
-                        FAMILY_UNIX,
-                        FAMILY_WIN9X,
-                        FAMILY_WINDOWS,
-                        FAMILY_ZOS,
-                        FAMILY_UNKNOWN)
-                .filter(Os::isFamily)
-                .findFirst()
-                .orElse(null);
+        return org.apache.maven.utils.Os.isFamily(family, actualOsName);
     }
 }

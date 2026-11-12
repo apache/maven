@@ -19,6 +19,9 @@
 package org.apache.maven.logging.impl;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.logging.LogEvent;
@@ -31,11 +34,9 @@ import org.apache.maven.api.logging.LogLevel;
  * the formatted {@link #message()} is computed lazily on first access.
  * When constructed with a pre-formatted message, it is returned as-is.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 public final class DefaultLogEvent implements LogEvent {
-
-    private static final String PLACEHOLDER = "{}";
 
     private final Instant timestamp;
     private final LogLevel level;
@@ -49,9 +50,11 @@ public final class DefaultLogEvent implements LogEvent {
     private final String threadName;
     private final String projectId;
     private final String mojoId;
+    private final String pluginId;
     private final Map<String, Object> keyValues;
     private final String messageTemplate;
-    private final Object[] messageArgs;
+    private final List<Object> messageArgs;
+    private final String renderedLine;
 
     private volatile String formattedMessage;
 
@@ -71,7 +74,44 @@ public final class DefaultLogEvent implements LogEvent {
             String mojoId,
             Map<String, Object> keyValues,
             String messageTemplate,
-            Object[] messageArgs) {
+            List<Object> messageArgs) {
+        this(
+                timestamp,
+                level,
+                message,
+                loggerName,
+                throwable,
+                sourceClassName,
+                sourceMethodName,
+                threadId,
+                sequenceNumber,
+                threadName,
+                projectId,
+                mojoId,
+                null,
+                keyValues,
+                messageTemplate,
+                messageArgs);
+    }
+
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public DefaultLogEvent(
+            Instant timestamp,
+            LogLevel level,
+            String message,
+            String loggerName,
+            Throwable throwable,
+            String sourceClassName,
+            String sourceMethodName,
+            long threadId,
+            long sequenceNumber,
+            String threadName,
+            String projectId,
+            String mojoId,
+            String pluginId,
+            Map<String, Object> keyValues,
+            String messageTemplate,
+            List<Object> messageArgs) {
         this.timestamp = timestamp;
         this.level = level;
         this.message = message;
@@ -84,9 +124,52 @@ public final class DefaultLogEvent implements LogEvent {
         this.threadName = threadName;
         this.projectId = projectId;
         this.mojoId = mojoId;
+        this.pluginId = pluginId;
         this.keyValues = keyValues != null ? Map.copyOf(keyValues) : Map.of();
         this.messageTemplate = messageTemplate;
-        this.messageArgs = messageArgs;
+        this.messageArgs = messageArgs != null ? Collections.unmodifiableList(new ArrayList<>(messageArgs)) : null;
+        this.renderedLine = null;
+    }
+
+    /**
+     * Full constructor for SLF4J-sourced events that carry a pre-rendered console line.
+     */
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public DefaultLogEvent(
+            Instant timestamp,
+            LogLevel level,
+            String message,
+            String loggerName,
+            Throwable throwable,
+            String sourceClassName,
+            String sourceMethodName,
+            long threadId,
+            long sequenceNumber,
+            String threadName,
+            String projectId,
+            String mojoId,
+            String pluginId,
+            Map<String, Object> keyValues,
+            String messageTemplate,
+            List<Object> messageArgs,
+            String renderedLine) {
+        this.timestamp = timestamp;
+        this.level = level;
+        this.message = message;
+        this.loggerName = loggerName;
+        this.throwable = throwable;
+        this.sourceClassName = sourceClassName;
+        this.sourceMethodName = sourceMethodName;
+        this.threadId = threadId;
+        this.sequenceNumber = sequenceNumber;
+        this.threadName = threadName;
+        this.projectId = projectId;
+        this.mojoId = mojoId;
+        this.pluginId = pluginId;
+        this.keyValues = keyValues != null ? Map.copyOf(keyValues) : Map.of();
+        this.messageTemplate = messageTemplate;
+        this.messageArgs = messageArgs != null ? Collections.unmodifiableList(new ArrayList<>(messageArgs)) : null;
+        this.renderedLine = renderedLine;
     }
 
     /**
@@ -121,7 +204,7 @@ public final class DefaultLogEvent implements LogEvent {
                 mojoId,
                 Map.of(),
                 null,
-                null);
+                (List<Object>) null);
     }
 
     /**
@@ -200,6 +283,11 @@ public final class DefaultLogEvent implements LogEvent {
     }
 
     @Override
+    public String pluginId() {
+        return pluginId;
+    }
+
+    @Override
     public Map<String, Object> keyValues() {
         return keyValues;
     }
@@ -210,27 +298,54 @@ public final class DefaultLogEvent implements LogEvent {
     }
 
     @Override
-    public Object[] messageArgs() {
-        return messageArgs != null ? messageArgs.clone() : null;
+    public List<Object> messageArgs() {
+        return messageArgs;
     }
 
-    static String formatMessage(String template, Object[] args) {
+    @Override
+    public String renderedLine() {
+        return renderedLine;
+    }
+
+    static String formatMessage(String template, List<Object> args) {
         if (template == null) {
             return "";
         }
-        if (args == null || args.length == 0) {
+        if (args == null || args.isEmpty()) {
             return template;
         }
-        StringBuilder sb = new StringBuilder();
-        int argIdx = 0;
-        int start = 0;
-        int pos;
-        while ((pos = template.indexOf(PLACEHOLDER, start)) != -1 && argIdx < args.length) {
-            sb.append(template, start, pos);
-            sb.append(args[argIdx++]);
-            start = pos + 2;
+        // Direct positional substitution of {0}, {1}, ... — deliberately avoids
+        // MessageFormat.format() which treats apostrophes as escape characters,
+        // corrupting messages like "Can't find {0}" into "Cant find {0}".
+        StringBuilder sb = new StringBuilder(template.length() + 32);
+        int len = template.length();
+        int i = 0;
+        while (i < len) {
+            char c = template.charAt(i);
+            if (c == '{' && i + 1 < len) {
+                // Parse index digits
+                int j = i + 1;
+                int idx = 0;
+                boolean hasDigits = false;
+                while (j < len && template.charAt(j) >= '0' && template.charAt(j) <= '9') {
+                    idx = idx * 10 + (template.charAt(j) - '0');
+                    j++;
+                    hasDigits = true;
+                }
+                if (hasDigits && j < len && template.charAt(j) == '}') {
+                    if (idx < args.size()) {
+                        sb.append(args.get(idx));
+                    } else {
+                        // Index out of range — emit placeholder as-is
+                        sb.append(template, i, j + 1);
+                    }
+                    i = j + 1;
+                    continue;
+                }
+            }
+            sb.append(c);
+            i++;
         }
-        sb.append(template, start, template.length());
         return sb.toString();
     }
 }

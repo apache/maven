@@ -33,6 +33,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -158,15 +159,45 @@ class DefaultLoggerTest {
         LoggerManager.get().setLogSink(sink);
         DefaultLogger log = new DefaultLogger("test.logger");
 
-        log.atInfo().log("hello {} and {}", "world", 42);
+        log.atInfo().log("hello {0} and {1}", "world", 42);
 
         assertEquals(1, sink.events.size());
         LogEvent e = sink.events.get(0);
-        assertEquals("hello {} and {}", e.messageTemplate());
-        assertEquals(2, e.messageArgs().length);
-        assertEquals("world", e.messageArgs()[0]);
-        assertEquals(42, e.messageArgs()[1]);
+        assertEquals("hello {0} and {1}", e.messageTemplate());
+        assertEquals(2, e.messageArgs().size());
+        assertEquals("world", e.messageArgs().get(0));
+        assertEquals(42, e.messageArgs().get(1));
         assertEquals("hello world and 42", e.message());
+    }
+
+    @Test
+    void fluentBuilderAllowsNullMessageArgs() {
+        CapturingSink sink = new CapturingSink();
+        LoggerManager.get().setLogSink(sink);
+        DefaultLogger log = new DefaultLogger("test.logger");
+
+        // null arg is valid — must not throw at log site
+        log.atInfo().log("value is {0}", (Object) null);
+
+        assertEquals(1, sink.events.size());
+        LogEvent e = sink.events.get(0);
+        assertEquals(1, e.messageArgs().size());
+        assertNull(e.messageArgs().get(0));
+        assertEquals("value is null", e.message());
+    }
+
+    @Test
+    void apostropheInTemplateIsNotCorrupted() {
+        CapturingSink sink = new CapturingSink();
+        LoggerManager.get().setLogSink(sink);
+        DefaultLogger log = new DefaultLogger("test.logger");
+
+        // MessageFormat would corrupt "Can't find {0}" into "Cant find {0}".
+        // The direct positional substitution must preserve apostrophes.
+        log.atInfo().log("Can't find {0}", "file.txt");
+
+        assertEquals(1, sink.events.size());
+        assertEquals("Can't find file.txt", sink.events.get(0).message());
     }
 
     @Test

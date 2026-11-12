@@ -18,6 +18,7 @@
  */
 package org.apache.maven.logging;
 
+import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
@@ -142,7 +143,9 @@ public class ProjectBuildLogAppender implements AutoCloseable {
             final LogEvent full;
             String projectId = event.projectId() != null ? event.projectId() : getProjectId();
             String mojoId = event.mojoId() != null ? event.mojoId() : getMojoId();
-            if (event instanceof DefaultLogEvent && projectId == event.projectId() && mojoId == event.mojoId()) {
+            if (event instanceof DefaultLogEvent
+                    && Objects.equals(projectId, event.projectId())
+                    && Objects.equals(mojoId, event.mojoId())) {
                 full = event;
             } else {
                 full = new DefaultLogEvent(
@@ -158,9 +161,11 @@ public class ProjectBuildLogAppender implements AutoCloseable {
                         event.threadName(),
                         projectId,
                         mojoId,
+                        event.pluginId(),
                         event.keyValues(),
                         event.messageTemplate(),
-                        event.messageArgs());
+                        event.messageArgs(),
+                        event.renderedLine());
             }
 
             queue.add(full);

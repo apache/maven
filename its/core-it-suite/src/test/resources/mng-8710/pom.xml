@@ -17,8 +17,7 @@ KIND, either express or implied.  See the License for the
 specific language governing permissions and limitations
 under the License.
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
 
   <groupId>org.apache.maven.its.mng8710</groupId>
@@ -29,13 +28,13 @@ under the License.
   <name>Maven Integration Test :: MNG-8710 :: Parent</name>
   <description>Parent file-based profile with property interpolation must apply to children</description>
 
-  <properties>
-    <message.file>test.txt</message.file>
-  </properties>
-
   <modules>
     <module>my-lib</module>
   </modules>
+
+  <properties>
+    <message.file>test.txt</message.file>
+  </properties>
 
   <profiles>
     <profile>
@@ -56,18 +55,18 @@ under the License.
             <executions>
               <execution>
                 <id>echo-profile</id>
-                <phase>validate</phase>
-                <configuration>
-                  <target>
-                    <loadfile property="message" srcFile="${message.file}"/>
-                    <echo>Profile activated in ${project.artifactId}: ${message}</echo>
-                    <mkdir dir="${project.build.directory}"/>
-                    <touch file="${project.build.directory}/profile-activated.txt"/>
-                  </target>
-                </configuration>
                 <goals>
                   <goal>run</goal>
                 </goals>
+                <phase>validate</phase>
+                <configuration>
+                  <target>
+                    <loadfile property="message" srcFile="${message.file}" />
+                    <echo>Profile activated in ${project.artifactId}: ${message}</echo>
+                    <mkdir dir="${project.build.directory}" />
+                    <touch file="${project.build.directory}/profile-activated.txt" />
+                  </target>
+                </configuration>
               </execution>
             </executions>
           </plugin>

@@ -132,12 +132,15 @@ public class LifecycleDependencyResolver {
             Set<Artifact> resolvedArtifacts = resolveProjectArtifacts(
                     project, scopesToCollect, scopesToResolve, session, aggregating, projectArtifacts);
 
-            Map<Artifact, File> reactorProjects =
+            // MNG-6300: build a live-lookup map so that reactor files are always up-to-date.
+            // In the concurrent builder a sibling project may install its jar *after* this
+            // resolution starts, so we must read getFile() at lookup time rather than
+            // snapshotting it up-front (a null snapshot would prevent the file from ever
+            // being set, causing NPEs in plugins such as maven-dependency-plugin:properties).
+            Map<Artifact, MavenProject> reactorProjects =
                     new HashMap<>(session.getProjects().size());
             for (MavenProject reactorProject : session.getProjects()) {
-                reactorProjects.put(
-                        reactorProject.getArtifact(),
-                        reactorProject.getArtifact().getFile());
+                reactorProjects.put(reactorProject.getArtifact(), reactorProject);
             }
 
             Map<String, Artifact> map = new HashMap<>();
@@ -147,9 +150,12 @@ public class LifecycleDependencyResolver {
                  * During lifecycle the Artifact.getFile() can change from target/classes to the actual jar.
                  * This clearly shows that target/classes should not be abused as artifactFile just for the classpath
                  */
-                File reactorProjectFile = reactorProjects.get(artifact);
-                if (reactorProjectFile != null) {
-                    artifact.setFile(reactorProjectFile);
+                MavenProject reactorProject = reactorProjects.get(artifact);
+                if (reactorProject != null) {
+                    File reactorProjectFile = reactorProject.getArtifact().getFile();
+                    if (reactorProjectFile != null) {
+                        artifact.setFile(reactorProjectFile);
+                    }
                 }
 
                 map.put(artifact.getDependencyConflictId(), artifact);

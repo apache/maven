@@ -26,6 +26,7 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Type;
 import java.net.URL;
+import java.net.URLConnection;
 import java.util.AbstractList;
 import java.util.AbstractMap;
 import java.util.AbstractSet;
@@ -42,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -52,6 +54,7 @@ import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Qualifier;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.di.Typed;
+import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.Scope;
@@ -65,8 +68,17 @@ public class InjectorImpl implements Injector {
     private final Set<String> loadedUrls = new HashSet<>();
     private final ThreadLocal<Set<Key<?>>> resolutionStack = new ThreadLocal<>();
 
+    private Consumer<String> dumpSink =
+            s -> LoggerManager.get().getLogger("maven.di.diagnostics").info(s);
+    private final InjectorDiagnostics diagnostics = new InjectorDiagnostics(this, bindings, scopes);
+    private int registrationDepth;
+
     public InjectorImpl() {
         bindScope(Singleton.class, new SingletonScope());
+    }
+
+    public void setDumpSink(Consumer<String> dumpSink) {
+        this.dumpSink = dumpSink != null ? dumpSink : s -> {};
     }
 
     @Nonnull
@@ -84,6 +96,7 @@ public class InjectorImpl implements Injector {
     @SuppressWarnings("unchecked")
     @Override
     public <T> void injectInstance(@Nonnull T instance) {
+        debugBindings();
         ReflectionUtils.generateInjectingInitializer(Key.of((Class<T>) instance.getClass()))
                 .compile(this::getCompiledBinding)
                 .accept(instance);
@@ -92,12 +105,17 @@ public class InjectorImpl implements Injector {
     @Nonnull
     @Override
     public Injector discover(@Nonnull ClassLoader classLoader) {
+        registrationDepth++;
+        boolean complete = false;
         try {
             Enumeration<URL> enumeration = classLoader.getResources("META-INF/maven/org.apache.maven.api.di.Inject");
             while (enumeration.hasMoreElements()) {
                 URL url = enumeration.nextElement();
                 if (loadedUrls.add(url.toExternalForm())) {
-                    try (InputStream is = url.openStream();
+                    URLConnection connection = url.openConnection();
+                    // Uncached, so that closing the stream closes the jar (JDK-8239054)
+                    connection.setUseCaches(false);
+                    try (InputStream is = connection.getInputStream();
                             BufferedReader reader =
                                     new BufferedReader(new InputStreamReader(Objects.requireNonNull(is)))) {
                         for (String line : reader.lines()
@@ -111,8 +129,13 @@ public class InjectorImpl implements Injector {
                     }
                 }
             }
+            complete = true;
         } catch (Exception e) {
             throw new DIException("Error while discovering DI classes from classLoader", e);
+        } finally {
+            if (--registrationDepth == 0) {
+                debugBindings("discovery", !complete);
+            }
         }
         return this;
     }
@@ -126,7 +149,10 @@ public class InjectorImpl implements Injector {
     @Nonnull
     @Override
     public Injector bindScope(@Nonnull Class<? extends Annotation> scopeAnnotation, @Nonnull Supplier<Scope> scope) {
-        if (scopes.put(scopeAnnotation, scope) != null) {
+        Supplier<Scope> previous = scopes.put(scopeAnnotation, scope);
+        diagnostics.registryChanged();
+        if (previous != null) {
+            debugBindings("registration", true);
             throw new DIException(
                     "Cannot rebind scope annotation class to a different implementation: " + scopeAnnotation);
         }
@@ -151,39 +177,64 @@ public class InjectorImpl implements Injector {
     @Nonnull
     @Override
     public Injector bindImplicit(@Nonnull Class<?> clazz) {
-        Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
-        if (clazz.isInterface()) {
-            bindings.computeIfAbsent(key, $ -> new HashSet<>());
-            if (key.getQualifier() != null) {
-                bindings.computeIfAbsent(Key.ofType(clazz), $ -> new HashSet<>());
+        registrationDepth++;
+        boolean complete = false;
+        try {
+            Key<?> key = Key.of(clazz, ReflectionUtils.qualifierOf(clazz));
+            if (clazz.isInterface()) {
+                bindEmptyKey(key);
+                if (key.getQualifier() != null) {
+                    bindEmptyKey(Key.ofType(clazz));
+                }
+            } else if (!Modifier.isAbstract(clazz.getModifiers())) {
+                Binding<?> binding = ReflectionUtils.generateImplicitBinding(key);
+                doBind(key, binding);
             }
-        } else if (!Modifier.isAbstract(clazz.getModifiers())) {
-            Binding<?> binding = ReflectionUtils.generateImplicitBinding(key);
-            doBind(key, binding);
+            complete = true;
+            return this;
+        } finally {
+            if (--registrationDepth == 0 && !complete) {
+                debugBindings("registration", true);
+            }
         }
-        return this;
+    }
+
+    private void bindEmptyKey(Key<?> key) {
+        if (!bindings.containsKey(key)) {
+            bindings.put(key, new HashSet<>());
+            diagnostics.registryChanged();
+        }
     }
 
     private final LinkedHashSet<Key<?>> current = new LinkedHashSet<>();
 
     private Injector doBind(Key<?> key, Binding<?> binding) {
-        if (!current.add(key)) {
-            current.add(key);
-            throw new DIException("Circular references: " + current);
-        }
+        registrationDepth++;
+        boolean complete = false;
         try {
-            doBindImplicit(key, binding);
-            Class<?> cls = key.getRawType().getSuperclass();
-            while (cls != Object.class && cls != null) {
-                doBindImplicit(Key.of(cls, key.getQualifier()), binding);
-                if (key.getQualifier() != null) {
-                    bind(Key.ofType(cls), binding);
-                }
-                cls = cls.getSuperclass();
+            if (!current.add(key)) {
+                current.add(key);
+                throw new DIException("Circular references: " + current);
             }
-            return this;
+            try {
+                doBindImplicit(key, binding);
+                Class<?> cls = key.getRawType().getSuperclass();
+                while (cls != Object.class && cls != null) {
+                    doBindImplicit(Key.of(cls, key.getQualifier()), binding);
+                    if (key.getQualifier() != null) {
+                        bind(Key.ofType(cls), binding);
+                    }
+                    cls = cls.getSuperclass();
+                }
+                complete = true;
+                return this;
+            } finally {
+                current.remove(key);
+            }
         } finally {
-            current.remove(key);
+            if (--registrationDepth == 0 && !complete) {
+                debugBindings("registration", true);
+            }
         }
     }
 
@@ -191,6 +242,7 @@ public class InjectorImpl implements Injector {
         Set<Binding<?>> bindingSet = bindings.computeIfAbsent(key, $ -> new HashSet<>());
         if (bindingSet.stream().noneMatch(existing -> isSameBinding(existing, b))) {
             bindingSet.add(b);
+            diagnostics.registryChanged();
         }
         return this;
     }
@@ -236,6 +288,7 @@ public class InjectorImpl implements Injector {
     }
 
     public <Q> Supplier<Q> getCompiledBinding(Dependency<Q> dep) {
+        debugBindings();
         Key<Q> key = dep.key();
         Supplier<Q> originalSupplier = doGetCompiledBinding(dep);
         return () -> {
@@ -248,6 +301,26 @@ public class InjectorImpl implements Injector {
         };
     }
 
+    /**
+     * Resolves a compiled binding supplier for the given dependency.
+     *
+     * <p>The resolution rules differ by key type:
+     * <ul>
+     *   <li><b>Scalar types</b>: a single binding must exist; ambiguous bindings throw
+     *       {@link DIException}. If no binding exists and the dependency is optional,
+     *       returns a supplier of {@code null}; otherwise throws {@link DIException}.</li>
+     *   <li><b>{@code List<T>}</b>: returns all bindings for {@code T}, sorted by priority.
+     *       If no bindings are registered for {@code T}, returns an empty list —
+     *       this is not an error condition.</li>
+     *   <li><b>{@code Map<String, T>}</b>: returns all named bindings for {@code T} keyed
+     *       by their qualifier. If no bindings are registered for {@code T}, returns an
+     *       empty map — this is not an error condition.</li>
+     * </ul>
+     *
+     * @param dep the dependency to resolve
+     * @return a supplier that produces the bound instance(s)
+     * @throws DIException if a required scalar binding is absent or ambiguous
+     */
     public <Q> Supplier<Q> doGetCompiledBinding(Dependency<Q> dep) {
         Key<Q> key = dep.key();
         Set<Binding<Q>> res = getBindings(key);
@@ -281,24 +354,33 @@ public class InjectorImpl implements Injector {
                 //noinspection unchecked
                 return () -> (Q) list(list, Supplier::get);
             }
+            // No bindings registered for this type — an empty list is the correct result,
+            // not an error. Callers such as Lookup.lookupList() document "may be empty if
+            // no components found" and must not receive a DIException for absent bindings.
+            //noinspection unchecked
+            return () -> (Q) List.of();
         }
         if (key.getRawType() == Map.class) {
             Key<?> k = key.getTypeParameter(0);
             Key<Object> v = key.getTypeParameter(1);
             Set<Binding<Object>> res2 = getBindings(v);
             if (k.getRawType() == String.class && res2 != null) {
-                Map<String, Supplier<Object>> map = res2.stream()
+                Map<String, Binding<Object>> namedBindings = res2.stream()
                         .filter(b -> b.getOriginalKey() == null
                                 || b.getOriginalKey().getQualifier() == null
                                 || b.getOriginalKey().getQualifier() instanceof String)
-                        .collect(Collectors.toMap(
-                                b -> (String)
-                                        (b.getOriginalKey() != null
-                                                ? b.getOriginalKey().getQualifier()
-                                                : null),
-                                this::compile));
+                        .collect(Collectors.toMap(InjectorImpl::bindingName, b -> b, (first, second) -> {
+                            throw duplicateBindings(v, first, second);
+                        }));
+                Map<String, Supplier<Object>> map = namedBindings.entrySet().stream()
+                        .collect(Collectors.toMap(Map.Entry::getKey, e -> compile(e.getValue())));
                 //noinspection unchecked
                 return () -> (Q) map(map, Supplier::get);
+            }
+            // No bindings registered for this type — an empty map is the correct result.
+            if (k.getRawType() == String.class) {
+                //noinspection unchecked
+                return () -> (Q) Map.of();
             }
         }
         if (dep.optional()) {
@@ -318,6 +400,22 @@ public class InjectorImpl implements Injector {
         Key<?> key = binding.getOriginalKey();
         Object qualifier = key != null ? key.getQualifier() : null;
         return qualifier == null || "".equals(qualifier);
+    }
+
+    private static String bindingName(Binding<?> binding) {
+        return binding.getOriginalKey() != null
+                ? (String) binding.getOriginalKey().getQualifier()
+                : null;
+    }
+
+    private static DIException duplicateBindings(Key<?> valueKey, Binding<?> first, Binding<?> second) {
+        Object qualifier =
+                first.getOriginalKey() != null ? first.getOriginalKey().getQualifier() : null;
+        Key<?> duplicateKey = qualifier != null ? Key.ofType(valueKey.getType(), qualifier) : valueKey;
+        return new DIException("Duplicate bindings for key " + duplicateKey.getDisplayString() + ":\n"
+                + " - " + first
+                + "\n - " + second
+                + "\nRemove one of the conflicting bindings or use distinct @Named qualifiers.");
     }
 
     @SuppressWarnings("unchecked")
@@ -489,30 +587,56 @@ public class InjectorImpl implements Injector {
     }
 
     private static class SingletonScope implements Scope {
-        Map<Key<?>, java.util.function.Supplier<?>> cache = new ConcurrentHashMap<>();
+        Map<Key<?>, Supplier<?>> cache = new ConcurrentHashMap<>();
 
         @Nonnull
         @SuppressWarnings("unchecked")
         @Override
-        public <T> java.util.function.Supplier<T> scope(
-                @Nonnull Key<T> key, @Nonnull java.util.function.Supplier<T> unscoped) {
-            return (java.util.function.Supplier<T>) cache.computeIfAbsent(
-                    key, k -> new java.util.function.Supplier<T>() {
-                        volatile T instance;
+        public <T> Supplier<T> scope(@Nonnull Key<T> key, @Nonnull Supplier<T> unscoped) {
+            return (Supplier<T>) cache.computeIfAbsent(key, k -> new Supplier<T>() {
+                volatile T instance;
 
-                        @Override
-                        public T get() {
+                @Override
+                public T get() {
+                    if (instance == null) {
+                        synchronized (this) {
                             if (instance == null) {
-                                synchronized (this) {
-                                    if (instance == null) {
-                                        instance = unscoped.get();
-                                    }
-                                }
+                                instance = unscoped.get();
                             }
-                            return instance;
                         }
-                    });
+                    }
+                    return instance;
+                }
+            });
         }
+    }
+
+    /**
+     * Captures a human-readable snapshot of the current native registry for Maven internals,
+     * including direct binding map and metadata changes, without resolving components.
+     * Registration must not run concurrently with this method.
+     */
+    public String dumpBindings() {
+        return diagnostics.dumpBindings();
+    }
+
+    /** Diagnostic checkpoint for native and bridge resolution entry points. */
+    protected final void debugBindings() {
+        debugBindings("lookup", false);
+    }
+
+    private void debugBindings(String reason, boolean partial) {
+        diagnostics.checkpoint(reason, partial);
+    }
+
+    /** Supplies diagnostic styling without resolving components from this injector. */
+    protected BindingStyler getBindingStyler() {
+        return BindingStyler.NONE;
+    }
+
+    /** Writes a complete diagnostic block via the configured dump sink. */
+    protected void writeDump(String dump) {
+        dumpSink.accept(dump);
     }
 
     /**
@@ -533,5 +657,7 @@ public class InjectorImpl implements Injector {
         scopes.clear();
         loadedUrls.clear();
         resolutionStack.remove();
+        diagnostics.reset();
+        diagnostics.registryChanged();
     }
 }

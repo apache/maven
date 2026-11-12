@@ -37,13 +37,9 @@ public class MavenServiceProvider implements SLF4JServiceProvider {
     @SuppressWarnings({"checkstyle:StaticVariableName", "checkstyle:VisibilityModifier"})
     public static String REQUESTED_API_VERSION = "2.0.99"; // !final
 
-    private MavenLoggerFactory loggerFactory = loadMavenLoggerFactory();
+    private MavenLoggerFactory loggerFactory = new MavenLoggerFactory();
     private IMarkerFactory markerFactory = new BasicMarkerFactory();
     private MDCAdapter mdcAdapter = new BasicMDCAdapter();
-
-    protected MavenLoggerFactory loadMavenLoggerFactory() {
-        return ServiceLoader.load(MavenLoggerFactory.class).findFirst().orElseGet(MavenLoggerFactory::new);
-    }
 
     @Override
     public ILoggerFactory getLoggerFactory() {

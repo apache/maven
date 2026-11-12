@@ -20,8 +20,8 @@ package org.apache.maven.logging.impl;
 
 import java.lang.StackWalker.StackFrame;
 import java.time.Instant;
+import java.util.Arrays;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicLong;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.MonotonicClock;
@@ -44,7 +44,7 @@ import static java.util.Objects.requireNonNull;
  * Level checks and sink lookup both go through the {@code LoggerManager},
  * so the sink can be changed at runtime.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @SuppressWarnings("deprecation")
 public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
@@ -53,20 +53,24 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
     private static final String THIS_CLASS = DefaultLogger.class.getName();
     private static final String BUILDER_CLASS = DefaultLogEventBuilder.class.getName();
 
-    private static final AtomicLong SEQUENCE = new AtomicLong();
-
     private final String name;
     private final String projectId;
     private final String mojoId;
+    private final String pluginId;
 
     public DefaultLogger(String name) {
-        this(name, null, null);
+        this(name, null, null, null);
     }
 
     public DefaultLogger(String name, String projectId, String mojoId) {
+        this(name, projectId, mojoId, null);
+    }
+
+    public DefaultLogger(String name, String projectId, String mojoId, String pluginId) {
         this.name = requireNonNull(name, "name");
         this.projectId = projectId;
         this.mojoId = mojoId;
+        this.pluginId = pluginId;
     }
 
     // ---- org.apache.maven.api.logging.Logger ----
@@ -128,7 +132,7 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
     @Override
     public DefaultLogger child(String childName) {
         requireNonNull(childName, "childName");
-        return new DefaultLogger(name + "." + childName, projectId, mojoId);
+        return new DefaultLogger(name + "." + childName, projectId, mojoId, pluginId);
     }
 
     // ---- Internal dispatch ----
@@ -165,7 +169,7 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
         }
 
         Instant timestamp = MonotonicClock.now();
-        long seq = SEQUENCE.getAndIncrement();
+        long seq = mgr instanceof DefaultLoggerManager dlm2 ? dlm2.nextSequenceNumber() : -1;
 
         String sourceClass = null;
         String sourceMethod = null;
@@ -175,7 +179,7 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
         if (sink.needsMetadata()) {
             sourceClass = name;
             sourceMethod = resolveCallerMethod();
-            threadId = Thread.currentThread().getId();
+            threadId = Thread.currentThread().getId(); // TODO: replace with threadId() when baseline ≥ JDK 19
             threadName = Thread.currentThread().getName();
         }
 
@@ -192,9 +196,10 @@ public class DefaultLogger implements Logger, org.apache.maven.api.plugin.Log {
                 threadName,
                 projectIdOverride != null ? projectIdOverride : projectId,
                 mojoIdOverride != null ? mojoIdOverride : mojoId,
+                pluginId,
                 keyValues,
                 messageTemplate,
-                messageArgs);
+                messageArgs != null ? Arrays.asList(messageArgs) : null);
 
         sink.accept(event);
 

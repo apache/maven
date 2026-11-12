@@ -33,6 +33,9 @@ import org.apache.maven.api.settings.Settings;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.Binding;
 import org.apache.maven.di.impl.InjectorImpl;
+import org.apache.maven.impl.InternalSession;
+import org.eclipse.aether.repository.AuthenticationSelector;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -40,6 +43,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -175,6 +179,41 @@ class ApiRunnerSettingsTest {
             assertEquals("my-repo", server.getId());
             assertEquals("myuser", server.getUsername());
             assertEquals("mypassword", server.getPassword());
+        } finally {
+            System.setProperty("user.home", oldHome);
+        }
+    }
+
+    @Test
+    void testServerCredentialsBoundToRepositoryOrigins() throws IOException {
+        Path m2Dir = tempDir.resolve(".m2");
+        Files.createDirectories(m2Dir);
+        Files.writeString(m2Dir.resolve("settings.xml"), """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <settings xmlns="http://maven.apache.org/SETTINGS/1.3.0">
+                  <servers>
+                    <server>
+                      <id>my-repo</id>
+                      <username>myuser</username>
+                      <password>mypassword</password>
+                      <repositoryOrigins>
+                        <repositoryOrigin>https://repo.example.org</repositoryOrigin>
+                      </repositoryOrigins>
+                    </server>
+                  </servers>
+                </settings>
+                """);
+
+        String oldHome = System.getProperty("user.home");
+        try {
+            System.setProperty("user.home", tempDir.toString());
+            Session session = ApiRunner.createSession(null, null, ApiRunner.SecurityMode.NONE);
+            AuthenticationSelector selector =
+                    ((InternalSession) session).getSession().getAuthenticationSelector();
+            assertNotNull(selector.getAuthentication(
+                    new RemoteRepository.Builder("my-repo", "default", "https://repo.example.org/releases/").build()));
+            assertNull(selector.getAuthentication(
+                    new RemoteRepository.Builder("my-repo", "default", "https://evil.example.org/releases/").build()));
         } finally {
             System.setProperty("user.home", oldHome);
         }

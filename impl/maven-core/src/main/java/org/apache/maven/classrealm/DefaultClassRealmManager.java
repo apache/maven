@@ -111,6 +111,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
         Map<String, ClassLoader> apiV4Imports = new HashMap<>();
         apiV4Imports.put("org.apache.maven.api", containerRealm);
+        apiV4Imports.put("org.apache.maven.logging", containerRealm);
         apiV4Imports.put("org.slf4j", containerRealm);
         this.maven4ApiRealm = createRealm(API_V4_REALMID, RealmType.Core, null, null, apiV4Imports, null);
 

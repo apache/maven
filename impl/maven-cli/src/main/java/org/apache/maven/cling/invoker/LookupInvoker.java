@@ -794,6 +794,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         context.effectiveSettings = settingsResult.getEffectiveSettings();
+        context.installationSettings = settingsResult.getInstallationSettings();
+        context.projectSettings = settingsResult.getProjectSettings();
+        context.userSettings = settingsResult.getUserSettings();
         context.interactive = mayDisableInteractiveMode(context, context.effectiveSettings.isInteractiveMode());
         context.localRepositoryPath = localRepositoryPath(context);
 
@@ -801,12 +804,18 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             int totalProblems = settingsResult.getProblems().totalProblemsReported();
             context.logger.info("");
             context.logger.info(String.format(
-                    "%s %s encountered while building the effective settings (use -e to see details)",
+                    "%s %s encountered while building the effective settings",
                     totalProblems, (totalProblems == 1) ? "problem was" : "problems were"));
 
-            if (context.options().showErrors().orElse(false)) {
-                for (BuilderProblem problem :
-                        settingsResult.getProblems().problems().toList()) {
+            // print the problems themselves by default, as Maven 3 does: a settings element that is skipped (unknown
+            // to this settings model, or misspelt) can change what credentials are sent where, and must not go
+            // unnoticed; -e adds the stack trace of the underlying exception
+            boolean showErrors = context.options().showErrors().orElse(false);
+            for (BuilderProblem problem :
+                    settingsResult.getProblems().problems().toList()) {
+                if (showErrors && problem.getException() != null) {
+                    context.logger.warn(problem.getMessage() + " @ " + problem.getLocation(), problem.getException());
+                } else {
                     context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
                 }
             }
@@ -817,6 +826,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             context.projectSettingsPath = null;
             context.userSettingsPath = null;
             context.effectiveSettings = null;
+            context.installationSettings = null;
+            context.projectSettings = null;
+            context.userSettings = null;
             context.interactive = true;
             context.localRepositoryPath = null;
         };

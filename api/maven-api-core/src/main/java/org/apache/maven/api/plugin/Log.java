@@ -31,9 +31,12 @@ import org.apache.maven.api.annotations.Provider;
  * convenience, to enable developers to pass things like <code>java.lang.StringBuffer</code> directly into the logger,
  * rather than formatting first by calling <code>toString()</code>.
  *
+ * @deprecated Use {@link org.apache.maven.api.logging.Logger} instead.
+ *     Obtain an instance via dependency injection or {@link org.apache.maven.api.logging.Logger#of(Class)}.
  * @since 4.0.0
+ * @see org.apache.maven.api.logging.Logger
  */
-@Deprecated(since = "4.1.0", forRemoval = true)
+@Deprecated(since = "4.2.0", forRemoval = true)
 @Experimental
 @Provider
 public interface Log {
@@ -138,8 +141,21 @@ public interface Log {
      */
     void debug(Throwable error);
 
+    /**
+     * Sends a lazily-computed message at the <b>debug</b> error level.
+     * The supplier is only evaluated if debug is enabled.
+     *
+     * @param content the message supplier
+     */
     void debug(Supplier<String> content);
 
+    /**
+     * Sends a lazily-computed message (and accompanying exception) at the <b>debug</b> error level.
+     * The supplier is only evaluated if debug is enabled.
+     *
+     * @param content the message supplier
+     * @param error the error that caused this log
+     */
     void debug(Supplier<String> content, Throwable error);
 
     /**
@@ -171,8 +187,21 @@ public interface Log {
      */
     void info(Throwable error);
 
+    /**
+     * Sends a lazily-computed message at the <b>info</b> error level.
+     * The supplier is only evaluated if info is enabled.
+     *
+     * @param content the message supplier
+     */
     void info(Supplier<String> content);
 
+    /**
+     * Sends a lazily-computed message (and accompanying exception) at the <b>info</b> error level.
+     * The supplier is only evaluated if info is enabled.
+     *
+     * @param content the message supplier
+     * @param error the error that caused this log
+     */
     void info(Supplier<String> content, Throwable error);
 
     /**
@@ -204,8 +233,21 @@ public interface Log {
      */
     void warn(Throwable error);
 
+    /**
+     * Sends a lazily-computed message at the <b>warn</b> error level.
+     * The supplier is only evaluated if warn is enabled.
+     *
+     * @param content the message supplier
+     */
     void warn(Supplier<String> content);
 
+    /**
+     * Sends a lazily-computed message (and accompanying exception) at the <b>warn</b> error level.
+     * The supplier is only evaluated if warn is enabled.
+     *
+     * @param content the message supplier
+     * @param error the error that caused this log
+     */
     void warn(Supplier<String> content, Throwable error);
 
     /**
@@ -237,8 +279,21 @@ public interface Log {
      */
     void error(Throwable error);
 
+    /**
+     * Sends a lazily-computed message at the <b>error</b> error level.
+     * The supplier is only evaluated if error is enabled.
+     *
+     * @param content the message supplier
+     */
     void error(Supplier<String> content);
 
+    /**
+     * Sends a lazily-computed message (and accompanying exception) at the <b>error</b> error level.
+     * The supplier is only evaluated if error is enabled.
+     *
+     * @param content the message supplier
+     * @param error the error that caused this log
+     */
     void error(Supplier<String> content, Throwable error);
 
     /**

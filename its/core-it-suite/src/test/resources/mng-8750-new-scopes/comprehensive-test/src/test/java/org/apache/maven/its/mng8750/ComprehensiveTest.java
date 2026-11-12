@@ -20,8 +20,8 @@ package org.apache.maven.its.mng8750;
 
 import org.apache.maven.its.mng8750.deps.TestDep;
 import org.apache.maven.its.mng8750.deps.TestOnlyDep;
-import org.junit.Assert;
-import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
 
 /**
  * Comprehensive test class that verifies all new Maven 4 scopes work correctly together.
@@ -37,11 +37,11 @@ public class ComprehensiveTest {
 
         // Regular compile dependency should work
         String result = example.useCompileDep();
-        Assert.assertTrue("Compile dependency should be available", result.contains("Used compile dependency"));
+        Assertions.assertTrue(result.contains("Used compile dependency"), "Compile dependency should be available");
 
         // Compile-only dependency is callable at runtime under current behavior
         String co = example.useCompileOnlyDep();
-        Assert.assertTrue(co.contains("Compile-only dependency"));
+        Assertions.assertTrue(co.contains("Compile-only dependency"));
     }
 
     /**
@@ -52,10 +52,10 @@ public class ComprehensiveTest {
         // Test-only dependency should be available during test compilation
         // (proven by the fact that we can import and use it here)
         TestOnlyDep testOnlyDep = new TestOnlyDep();
-        Assert.assertNotNull("Test-only dependency should be available during test compilation", testOnlyDep);
+        Assertions.assertNotNull(testOnlyDep, "Test-only dependency should be available during test compilation");
 
         // And it is available at test runtime in this setup
-        Assert.assertNotNull(testOnlyDep.getMessage());
+        Assertions.assertNotNull(testOnlyDep.getMessage());
     }
 
     /**
@@ -70,16 +70,16 @@ public class ComprehensiveTest {
             Object dep = testRuntimeDepClass.getDeclaredConstructor().newInstance();
             String result = (String) testRuntimeDepClass.getMethod("getMessage").invoke(dep);
 
-            Assert.assertTrue(
-                    "Test-runtime dependency should be available at test runtime",
-                    result.contains("Test runtime dependency"));
+            Assertions.assertTrue(
+                    result.contains("Test runtime dependency"),
+                    "Test-runtime dependency should be available at test runtime");
 
             System.out.println("Test-runtime scope verification: PASSED");
 
         } catch (ClassNotFoundException e) {
-            Assert.fail("Test-runtime dependency should be available at test runtime: " + e.getMessage());
+            Assertions.fail("Test-runtime dependency should be available at test runtime: " + e.getMessage());
         } catch (Exception e) {
-            Assert.fail("Error accessing test-runtime dependency: " + e.getMessage());
+            Assertions.fail("Error accessing test-runtime dependency: " + e.getMessage());
         }
     }
 
@@ -91,8 +91,8 @@ public class ComprehensiveTest {
         // Regular test dependency should be available during both compilation and runtime
         TestDep testDep = new TestDep();
         String result = testDep.getMessage();
-        Assert.assertNotNull("Test dependency should be available", result);
-        Assert.assertTrue(result.toLowerCase().contains("test dependency"));
+        Assertions.assertNotNull(result, "Test dependency should be available");
+        Assertions.assertTrue(result.toLowerCase().contains("test dependency"));
     }
 
     /**
@@ -128,9 +128,9 @@ public class ComprehensiveTest {
             // Test-runtime dependency should be available
         }
 
-        Assert.assertTrue("Compile-only scope should work correctly", compileOnlyPassed);
-        Assert.assertTrue("Test-only scope should work correctly", testOnlyPassed);
-        Assert.assertTrue("Test-runtime scope should work correctly", testRuntimePassed);
+        Assertions.assertTrue(compileOnlyPassed, "Compile-only scope should work correctly");
+        Assertions.assertTrue(testOnlyPassed, "Test-only scope should work correctly");
+        Assertions.assertTrue(testRuntimePassed, "Test-runtime scope should work correctly");
 
         System.out.println("All scope verifications: PASSED");
     }

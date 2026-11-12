@@ -19,6 +19,7 @@
 package org.apache.maven.api.logging;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 import org.apache.maven.api.annotations.Experimental;
@@ -47,7 +48,7 @@ import org.apache.maven.api.annotations.Provider;
  * unformatted message template ({@link #messageTemplate()},
  * {@link #messageArgs()}) alongside the formatted {@link #message()}.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Immutable
@@ -183,6 +184,19 @@ public interface LogEvent {
         return null;
     }
 
+    /**
+     * The plugin that produced this event
+     * (e.g. {@code "org.apache.maven.plugins:maven-compiler-plugin:3.13.0"}), or {@code null}
+     * if the event was logged by Maven core or outside a plugin context.
+     *
+     * @return the plugin identifier, or {@code null}
+     * @since 4.2.0
+     */
+    @Nullable
+    default String pluginId() {
+        return null;
+    }
+
     // ---- Structured data (populated for fluent LogBuilder events) ----
 
     /**
@@ -200,6 +214,22 @@ public interface LogEvent {
     }
 
     /**
+     * The pre-rendered console line produced by the SLF4J logger, including level prefix
+     * and ANSI color codes, or {@code null} when the event was not produced via SLF4J.
+     * <p>
+     * Console sinks that want to emit the exact string the logger formatted (preserving
+     * colors) should use this value when non-null; structured sinks (JSON, XML) should
+     * use {@link #message()} instead.
+     *
+     * @return the pre-rendered console line, or {@code null}
+     * @since 4.2.0
+     */
+    @Nullable
+    default String renderedLine() {
+        return null;
+    }
+
+    /**
      * The unformatted message template as passed to
      * {@link LogEventBuilder#log(String, Object...)}, or {@code null} when the
      * event was produced with a pre-formatted message (no template args).
@@ -212,14 +242,16 @@ public interface LogEvent {
     }
 
     /**
-     * The raw argument array passed to
+     * The arguments passed to
      * {@link LogEventBuilder#log(String, Object...)}, or {@code null} when no
      * template args were supplied.
+     * <p>
+     * The returned list is immutable.
      *
-     * @return the raw args array, or {@code null}
+     * @return the immutable args list, or {@code null}
      */
     @Nullable
-    default Object[] messageArgs() {
+    default List<Object> messageArgs() {
         return null;
     }
 }

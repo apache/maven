@@ -48,7 +48,7 @@ import org.apache.maven.cling.invoker.mvnup.UpgradeInvoker;
 import org.apache.maven.cling.invoker.mvnup.UpgradeParser;
 import org.apache.maven.cling.invoker.mvnval.ValidateInvoker;
 import org.apache.maven.cling.invoker.mvnval.ValidateParser;
-import org.apache.maven.impl.util.Os;
+import org.apache.maven.utils.Os;
 import org.jline.builtins.Completers;
 import org.jline.console.CmdDesc;
 import org.jline.console.CommandInput;

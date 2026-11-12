@@ -70,9 +70,11 @@ class MavenITgh10210SettingsXmlDecryptTest extends AbstractMavenIntegrationTestC
             verifier.execute();
         } catch (VerificationException e) {
             String log = verifier.loadLogContent();
-            assertTrue(log.contains(
-                    "Could not decrypt password (fix the corrupted password or remove it, if unused) for property prop6 in profile just-some-random-profile"));
-            assertFalse(log.contains("L6L/HbmrY+cH+sNkphn-this password is corrupted intentionally-q3fguYepTpM04WlIXb8nB1pk="));
+            assertTrue(
+                    log.contains(
+                            "Could not decrypt password (fix the corrupted password or remove it, if unused) for property prop6 in profile just-some-random-profile"));
+            assertFalse(log.contains(
+                    "L6L/HbmrY+cH+sNkphn-this password is corrupted intentionally-q3fguYepTpM04WlIXb8nB1pk="));
         }
     }
 }

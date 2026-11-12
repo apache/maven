@@ -31,30 +31,77 @@ import org.apache.maven.api.model.Model;
  */
 public interface ModelProblemCollector {
 
+    /**
+     * Returns the underlying problem collector.
+     *
+     * @return the problem collector
+     */
     ProblemCollector<ModelProblem> getProblemCollector();
 
+    /**
+     * Returns {@code true} if any problems with {@link BuilderProblem.Severity#ERROR} or higher have been collected.
+     *
+     * @return {@code true} if errors exist
+     */
     default boolean hasErrors() {
         return getProblemCollector().hasErrorProblems();
     }
 
+    /**
+     * Returns {@code true} if any problems with {@link BuilderProblem.Severity#FATAL} have been collected.
+     *
+     * @return {@code true} if fatal errors exist
+     */
     default boolean hasFatalErrors() {
         return getProblemCollector().hasFatalProblems();
     }
 
+    /**
+     * Adds a problem with the given severity, version, and message.
+     *
+     * @param severity the problem severity
+     * @param version the model version
+     * @param message the problem message
+     */
     default void add(BuilderProblem.Severity severity, ModelProblem.Version version, String message) {
         add(severity, version, message, null, null);
     }
 
+    /**
+     * Adds a problem with the given severity, version, message, and location.
+     *
+     * @param severity the problem severity
+     * @param version the model version
+     * @param message the problem message
+     * @param location the input location where the problem occurred
+     */
     default void add(
             BuilderProblem.Severity severity, ModelProblem.Version version, String message, InputLocation location) {
         add(severity, version, message, location, null);
     }
 
+    /**
+     * Adds a problem with the given severity, version, message, and exception.
+     *
+     * @param severity the problem severity
+     * @param version the model version
+     * @param message the problem message
+     * @param exception the exception that caused the problem
+     */
     default void add(
             BuilderProblem.Severity severity, ModelProblem.Version version, String message, Exception exception) {
         add(severity, version, message, null, exception);
     }
 
+    /**
+     * Adds a problem with the given severity, version, message, location, and exception.
+     *
+     * @param severity the problem severity
+     * @param version the model version
+     * @param message the problem message
+     * @param location the input location where the problem occurred, or {@code null}
+     * @param exception the exception that caused the problem, or {@code null}
+     */
     void add(
             BuilderProblem.Severity severity,
             ModelProblem.Version version,
@@ -62,19 +109,54 @@ public interface ModelProblemCollector {
             InputLocation location,
             Exception exception);
 
+    /**
+     * Adds a pre-constructed model problem directly.
+     *
+     * @param problem the model problem to add
+     */
     default void add(ModelProblem problem) {
         getProblemCollector().reportProblem(problem);
     }
 
+    /**
+     * Creates a {@link ModelBuilderException} from the collected problems.
+     *
+     * @return a new exception summarizing the collected problems
+     */
     ModelBuilderException newModelBuilderException();
 
+    /**
+     * Sets the source hint used to provide context for subsequently collected problems.
+     *
+     * @param location the source location string
+     */
     void setSource(String location);
 
+    /**
+     * Sets the source hint from a model's coordinates.
+     *
+     * @param model the model to derive the source hint from
+     */
     void setSource(Model model);
 
+    /**
+     * Gets the current source hint.
+     *
+     * @return the source hint string
+     */
     String getSource();
 
+    /**
+     * Sets the root model being built.
+     *
+     * @param model the root model
+     */
     void setRootModel(Model model);
 
+    /**
+     * Gets the root model being built.
+     *
+     * @return the root model, or {@code null} if not yet set
+     */
     Model getRootModel();
 }

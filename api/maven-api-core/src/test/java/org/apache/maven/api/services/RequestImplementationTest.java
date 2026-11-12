@@ -22,13 +22,16 @@ import java.util.Arrays;
 import java.util.List;
 
 import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.PathScope;
+import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
@@ -112,5 +115,19 @@ class RequestImplementationTest {
         String toString = request1.toString();
         assertTrue(toString.contains("requestType="), "Expected " + toString + " to contain " + "requestType=");
         assertTrue(toString.contains("pathScope="), "Expected " + toString + " to contain " + "pathScope=");
+    }
+
+    @Test
+    void testDependencyResolverRequestInProjectContext() {
+        Session session = mock(Session.class);
+        Project project = mock(Project.class);
+        DependencyCoordinates dependency = mock(DependencyCoordinates.class);
+
+        DependencyResolverRequest request = DependencyResolverRequest.build(
+                session, DependencyResolverRequest.RequestType.RESOLVE, project, dependency);
+
+        assertSame(project, request.getProject().orElseThrow());
+        assertEquals(List.of(dependency), request.getDependencies());
+        assertEquals(PathScope.MAIN_RUNTIME, request.getPathScope());
     }
 }

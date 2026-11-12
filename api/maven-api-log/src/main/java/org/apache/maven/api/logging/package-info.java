@@ -117,6 +117,6 @@
  *       programmatically during embedder setup.</li>
  * </ul>
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 package org.apache.maven.api.logging;

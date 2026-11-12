@@ -1,0 +1,121 @@
+#
+#  Licensed to the Apache Software Foundation (ASF) under one or more
+#  contributor license agreements.  See the NOTICE file distributed with
+#  this work for additional information regarding copyright ownership.
+#  The ASF licenses this file to You under the Apache License, Version 2.0
+#  (the "License"); you may not use this file except in compliance with
+#  the License.  You may obtain a copy of the License at
+#
+#       http://www.apache.org/licenses/LICENSE-2.0
+#
+#  Unless required by applicable law or agreed to in writing, software
+#  distributed under the License is distributed on an "AS IS" BASIS,
+#  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+#  See the License for the specific language governing permissions and
+#  limitations under the License.
+#
+version: 2
+updates:
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    ignore:
+      # jakarta.annotation-api 2.0+ moves javax.annotation to jakarta.annotation;
+      # maven-core exports javax.annotation.* to plugins
+      - dependency-name: "jakarta.annotation:jakarta.annotation-api"
+        versions: [ "[2.0.0,)" ]
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "maven-4.0.x"
+    labels:
+      - "mvn40"
+      - "dependencies"
+    ignore:
+      # jakarta.annotation-api 2.0+ moves javax.annotation to jakarta.annotation;
+      # maven-core exports javax.annotation.* to plugins
+      - dependency-name: "jakarta.annotation:jakarta.annotation-api"
+        versions: [ "[2.0.0,)" ]
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "maven-3.9.x"
+    labels:
+      - "mvn3"
+      - "dependencies"
+    ignore:
+      - dependency-name: "ch.qos.logback:*"
+        versions: [ "[1.3.0,)" ]
+      - dependency-name: "org.codehaus.plexus:plexus-cipher"
+        versions: [ ">=2.1.0" ]
+      # Mockito 5 requires Java 11; the build still runs on JDK 8
+      - dependency-name: "org.mockito:*"
+        versions: [">= 5.0.0"]
+      # jakarta.annotation-api 2.0+ moves javax.annotation to jakarta.annotation;
+      # maven-core exports javax.annotation.* to plugins
+      - dependency-name: "jakarta.annotation:jakarta.annotation-api"
+        versions: [ "[2.0.0,)" ]
+
+  - package-ecosystem: "maven"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "maven-3.10.x"
+    labels:
+      - "mvn3"
+      - "dependencies"
+    ignore:
+      - dependency-name: "org.jline:*"
+        versions: [ "[4.0.0,)" ]
+      - dependency-name: "ch.qos.logback:*"
+        versions: [ "[1.3.0,)" ]
+      - dependency-name: "org.codehaus.plexus:plexus-cipher"
+        versions: [ ">=2.1.0" ]
+      # Mockito 5 requires Java 11; the build still runs on JDK 8
+      - dependency-name: "org.mockito:*"
+        versions: [">= 5.0.0"]
+      # jakarta.annotation-api 2.0+ moves javax.annotation to jakarta.annotation;
+      # maven-core exports javax.annotation.* to plugins
+      - dependency-name: "jakarta.annotation:jakarta.annotation-api"
+        versions: [ "[2.0.0,)" ]
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "maven-4.0.x"
+    labels:
+      - "mvn40"
+      - "dependencies"
+      - "github_actions"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "maven-3.9.x"
+    labels:
+      - "mvn3"
+      - "dependencies"
+      - "github_actions"
+
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    target-branch: "maven-3.10.x"
+    labels:
+      - "mvn3"
+      - "dependencies"
+      - "github_actions"
