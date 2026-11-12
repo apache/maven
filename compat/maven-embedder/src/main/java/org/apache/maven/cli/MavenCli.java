@@ -906,8 +906,7 @@ public class MavenCli {
         }
     }
 
-    private List<CoreExtension> readCoreExtensionsDescriptor(String extensionsFile)
-            throws IOException, XMLStreamException {
+    List<CoreExtension> readCoreExtensionsDescriptor(String extensionsFile) throws IOException {
         if (extensionsFile != null) {
             Path extensionsPath = Path.of(extensionsFile);
             if (Files.exists(extensionsPath)) {
@@ -915,6 +914,9 @@ public class MavenCli {
                     return new CoreExtensionsStaxReader()
                             .read(is, true, new InputSource(extensionsFile))
                             .getExtensions();
+                } catch (IOException | XMLStreamException e) {
+                    throw new IOException(
+                            "Unable to parse core extensions descriptor " + extensionsFile + ": " + e.getMessage(), e);
                 }
             }
         }
