@@ -21,6 +21,7 @@ package org.apache.maven.impl.model;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -64,11 +65,13 @@ class DefaultModelProcessorTest {
 
         // Create mock parsers that will fail
         ModelParser yamlParser = mock(ModelParser.class);
+        when(yamlParser.id()).thenReturn("yaml");
         when(yamlParser.locateAndParse(any(), any()))
                 .thenThrow(new ModelParserException(
                         "YAML parsing failed", 5, 10, new RuntimeException("Invalid YAML syntax")));
 
         ModelParser tomlParser = mock(ModelParser.class);
+        when(tomlParser.id()).thenReturn("toml");
         when(tomlParser.locateAndParse(any(), any()))
                 .thenThrow(new ModelParserException("TOML parsing failed", 3, 7, null));
 
@@ -78,8 +81,7 @@ class DefaultModelProcessorTest {
                 .thenThrow(new XmlReaderException("XML parsing failed", null, null));
 
         // Create processor with the mock parsers
-        DefaultModelProcessor processor =
-                new DefaultModelProcessor(xmlFactory, Map.of("yaml", yamlParser, "toml", tomlParser));
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, List.of(yamlParser, tomlParser));
 
         // Execute and verify
         ModelParserException exception = assertThrows(
@@ -111,13 +113,14 @@ class DefaultModelProcessorTest {
         Files.writeString(pomFile, "{invalid json}");
 
         ModelParser jsonParser = mock(ModelParser.class);
+        when(jsonParser.id()).thenReturn("json");
         when(jsonParser.locateAndParse(any(), any())).thenThrow(new ModelParserException("JSON parsing failed"));
 
         ModelXmlFactory xmlFactory = mock(ModelXmlFactory.class);
         when(xmlFactory.read(any(XmlReaderRequest.class)))
                 .thenThrow(new XmlReaderException("Not valid XML", null, null));
 
-        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, Map.of("json", jsonParser));
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, List.of(jsonParser));
 
         ModelParserException exception = assertThrows(
                 ModelParserException.class,
@@ -138,11 +141,12 @@ class DefaultModelProcessorTest {
         when(mockModel.withPomFile(any())).thenReturn(mockModel);
 
         ModelParser yamlParser = mock(ModelParser.class);
+        when(yamlParser.id()).thenReturn("yaml");
         when(yamlParser.locateAndParse(any(), any())).thenReturn(Optional.of(mockModel));
 
         ModelXmlFactory xmlFactory = mock(ModelXmlFactory.class);
 
-        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, Map.of("yaml", yamlParser));
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, List.of(yamlParser));
 
         Model result = processor.read(Sources.fromPath(pomFile), Map.of(ModelParser.STRICT, true));
         assertNotNull(result);
@@ -165,6 +169,11 @@ class DefaultModelProcessorTest {
         AtomicInteger parseCalls = new AtomicInteger();
         ModelParser parser = new ModelParser() {
             @Override
+            public String id() {
+                return "test";
+            }
+
+            @Override
             public Optional<Source> locate(Path dir) {
                 return Files.isRegularFile(dir.resolve("META-INF/MANIFEST.MF"))
                         ? Optional.of(Sources.fromPath(dir))
@@ -181,7 +190,7 @@ class DefaultModelProcessorTest {
         ModelXmlFactory xmlFactory = mock(ModelXmlFactory.class);
         when(xmlFactory.read(any(XmlReaderRequest.class)))
                 .thenThrow(new XmlReaderException("Is a directory", null, null));
-        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, Map.of("manifest", parser));
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, List.of(parser));
 
         Path located = processor.locateExistingPom(projectDir);
         assertEquals(projectDir, located);
@@ -210,7 +219,7 @@ class DefaultModelProcessorTest {
         ModelXmlFactory xmlFactory = mock(ModelXmlFactory.class);
         when(xmlFactory.read(any(XmlReaderRequest.class))).thenReturn(mockModel);
 
-        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, Map.of());
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, List.of());
         XmlReaderRequest request =
                 XmlReaderRequest.builder().path(pomFile).strict(true).build();
 
@@ -235,7 +244,7 @@ class DefaultModelProcessorTest {
         ModelXmlFactory xmlFactory = mock(ModelXmlFactory.class);
         when(xmlFactory.read(any(XmlReaderRequest.class))).thenReturn(mockModel);
 
-        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, Map.of());
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, List.of());
         XmlReaderRequest.Transformer transformer = mock(XmlReaderRequest.Transformer.class);
         XmlReaderRequest request = XmlReaderRequest.builder()
                 .path(pomFile)
