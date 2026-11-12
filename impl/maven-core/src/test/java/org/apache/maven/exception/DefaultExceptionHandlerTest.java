@@ -21,9 +21,11 @@ package org.apache.maven.exception;
 import java.io.File;
 import java.io.IOException;
 import java.net.ConnectException;
+import java.net.UnknownHostException;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicReference;
 
+import org.apache.maven.api.plugin.MojoException;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.model.building.DefaultModelProblem;
 import org.apache.maven.model.building.ModelProblem;
@@ -234,6 +236,58 @@ class DefaultExceptionHandlerTest {
                 "the handler's own tree should still render the problem detail exactly once");
 
         assertEquals(1, countOccurrences(flatten(summary), "Malformed POM test.xml: unexpected element"));
+    }
+
+    @Test
+    void testHandleExceptionUnknownHost() {
+        UnknownHostException unknownHostEx = new UnknownHostException("repo.example.com");
+        IOException ioEx = new IOException("repo.example.com", unknownHostEx);
+        MojoExecutionException mojoEx = new MojoExecutionException("Could not transfer artifact", ioEx);
+
+        ExceptionHandler exceptionHandler = new DefaultExceptionHandler();
+        ExceptionSummary exceptionSummary = exceptionHandler.handleException(mojoEx);
+
+        String expectedReference = "http://cwiki.apache.org/confluence/display/MAVEN/UnknownHostException";
+        assertEquals(expectedReference, exceptionSummary.getReference());
+    }
+
+    @Test
+    void testHandleExceptionMojoException() {
+        MojoException mojoEx = new MojoException("Plugin goal failed: invalid configuration");
+
+        ExceptionHandler exceptionHandler = new DefaultExceptionHandler();
+        ExceptionSummary exceptionSummary = exceptionHandler.handleException(mojoEx);
+
+        String expectedReference = "http://cwiki.apache.org/confluence/display/MAVEN/MojoExecutionException";
+        assertEquals(expectedReference, exceptionSummary.getReference());
+    }
+
+    @Test
+    void testHandleExceptionMojoExceptionWithUnknownHost() {
+        UnknownHostException unknownHostEx = new UnknownHostException("repo.example.com");
+        IOException ioEx = new IOException("repo.example.com", unknownHostEx);
+        MojoException mojoEx = new MojoException("Could not transfer artifact", ioEx);
+
+        ExceptionHandler exceptionHandler = new DefaultExceptionHandler();
+        ExceptionSummary exceptionSummary = exceptionHandler.handleException(mojoEx);
+
+        String expectedReference = "http://cwiki.apache.org/confluence/display/MAVEN/UnknownHostException";
+        assertEquals(expectedReference, exceptionSummary.getReference());
+    }
+
+    @Test
+    void testUnknownNoteworthyExceptionProducesNoDeadCwikiUrl() {
+        // A noteworthy exception with no help text resource should NOT produce a cwiki URL
+        IOException ioEx = new IOException("some unknown checked exception");
+
+        ExceptionHandler exceptionHandler = new DefaultExceptionHandler();
+        ExceptionSummary exceptionSummary = exceptionHandler.handleException(ioEx);
+
+        String reference = exceptionSummary.getReference();
+        // must not be a dead cwiki URL
+        assertTrue(
+                reference == null || reference.isEmpty() || !reference.startsWith("http://cwiki"),
+                "Unknown noteworthy exception should not produce a dead cwiki URL, got: " + reference);
     }
 
     private static String flatten(ExceptionSummary summary) {

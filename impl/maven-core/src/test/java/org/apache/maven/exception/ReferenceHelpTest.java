@@ -33,6 +33,7 @@ class ReferenceHelpTest {
     private static final List<String> BUILT_IN_KEYS = List.of(
             "MojoExecutionException",
             "ConnectException",
+            "UnknownHostException",
             "LinkageError",
             "PluginExecutionException",
             "AetherClassNotFound",
