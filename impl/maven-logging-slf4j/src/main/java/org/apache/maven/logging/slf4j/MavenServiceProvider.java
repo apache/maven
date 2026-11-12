@@ -18,8 +18,6 @@
  */
 package org.apache.maven.logging.slf4j;
 
-import java.util.ServiceLoader;
-
 import org.slf4j.ILoggerFactory;
 import org.slf4j.IMarkerFactory;
 import org.slf4j.helpers.BasicMDCAdapter;
