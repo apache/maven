@@ -73,7 +73,6 @@ public class DefaultProjectManager implements ProjectManager {
         this.artifactManager = artifactManager;
     }
 
-
     @Nonnull
     @Override
     public Optional<Path> getPath(@Nonnull Project project) {

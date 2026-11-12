@@ -584,9 +584,9 @@ public class BuildPlanExecutor {
                             failures.forEach(failure::addSuppressed);
                         }
                         List<MojoExecution> failedPlan = executionPlan(step.project);
+                        handleBuildError(reactorContext, session, step.project, failure, isFatal(failures));
                         projectExecutionListener.afterProjectExecutionFailure(
                                 new ProjectExecutionEvent(session, step.project, failedPlan, failure));
-                        handleBuildError(reactorContext, session, step.project, failure, isFatal(failures));
                     } else if (projectStarted && allWorkExecuted) {
                         // If there were no failures, report success
                         List<MojoExecution> successfulPlan = executionPlan(step.project);

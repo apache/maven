@@ -23,7 +23,6 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.annotations.ThreadSafe;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.MavenException;
 
@@ -42,7 +41,6 @@ import org.apache.maven.api.services.MavenException;
  */
 @Experimental
 @Consumer
-@ThreadSafe
 public interface ProjectTransformer extends SpiService {
 
     /**
