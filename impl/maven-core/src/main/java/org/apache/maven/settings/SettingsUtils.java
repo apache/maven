@@ -54,8 +54,10 @@ public final class SettingsUtils {
      * @return a profile
      */
     public static org.apache.maven.model.Profile convertFromSettingsProfile(Profile settingsProfile) {
-        return new org.apache.maven.model.Profile(
+        org.apache.maven.model.Profile result = new org.apache.maven.model.Profile(
                 SettingsUtilsV4.convertFromSettingsProfile(settingsProfile.getDelegate()));
+        result.setSource(org.apache.maven.model.Profile.SOURCE_SETTINGS);
+        return result;
     }
 
     /**
