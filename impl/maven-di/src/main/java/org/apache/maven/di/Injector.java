@@ -54,6 +54,16 @@ import org.apache.maven.di.impl.InjectorImpl;
 public interface Injector {
 
     /**
+     * Priority assigned to session services injected by Maven core into V4 mojos.
+     * <p>
+     * A negative value ensures that these fallback bindings are overridden by any
+     * plugin-provided {@code @Provides} method (which defaults to priority {@code 0}).
+     *
+     * @since 4.2.0
+     */
+    int SESSION_SERVICE_PRIORITY = -10;
+
+    /**
      * Creates a new Injector instance with default settings.
      *
      * @return a new Injector instance
@@ -146,6 +156,32 @@ public interface Injector {
      */
     @Nonnull
     <T> Injector bindSupplier(@Nonnull Class<T> cls, @Nonnull Supplier<T> supplier);
+
+    /**
+     * Binds a supplier to a class with an explicit priority.
+     * <p>
+     * A lower priority value means the binding will be overridden by any binding with a higher priority.
+     * Use a negative priority (e.g. {@code -10}) to register a fallback binding that yields to
+     * plugin-provided {@code @Provides} methods (which default to priority {@code 0}).
+     *
+     * <p>
+     * <b>Implementation note:</b> The default implementation ignores {@code priority} for
+     * backward compatibility with existing {@code Injector} implementations.
+     * Implementors SHOULD override this method to honor the priority parameter.
+     * </p>
+     *
+     * @param <T> the type of the instance
+     * @param cls the class to bind to
+     * @param supplier the supplier to use for injection
+     * @param priority the binding priority
+     * @return this injector instance for method chaining
+     * @throws NullPointerException if {@code cls} or {@code supplier} is null
+     * @since 4.2.0
+     */
+    @Nonnull
+    default <T> Injector bindSupplier(@Nonnull Class<T> cls, @Nonnull Supplier<T> supplier, int priority) {
+        return bindSupplier(cls, supplier);
+    }
 
     /**
      * Performs field and method injection on an existing instance.
