@@ -99,4 +99,30 @@ class ProjectTransformerDispatcherTest {
         assertInstanceOf(RuntimeException.class, ex.getCause());
         assertEquals("buggy extension", ex.getCause().getMessage());
     }
+
+    @Test
+    void frozenFieldViolationThrowsMavenExecutionException() {
+        MavenProject mavenProject = new MavenProject();
+        mavenProject.setGroupId("org.test");
+        mavenProject.setArtifactId("test");
+        mavenProject.setVersion("1.0");
+
+        MavenSession mavenSession = mock(MavenSession.class);
+        InternalMavenSession apiSession = mock(InternalMavenSession.class);
+        when(mavenSession.getSession()).thenReturn(apiSession);
+        when(mavenSession.getProjects()).thenReturn(List.of(mavenProject));
+
+        Project apiProject = mock(Project.class);
+        when(apiSession.getProject(mavenProject)).thenReturn(apiProject);
+        when(apiProject.model()).thenReturn(mavenProject.getModel().getDelegate());
+
+        ProjectTransformer changesGroupId = (session, project, model) -> model.withGroupId("hacked");
+
+        MavenExecutionException ex =
+                assertThrows(MavenExecutionException.class, () -> ProjectTransformerDispatcher.transformProjects(
+                        mavenSession, List.of(changesGroupId)));
+
+        assertTrue(ex.getMessage().contains("groupId/artifactId"));
+        assertTrue(ex.getMessage().contains("must not change"));
+    }
 }

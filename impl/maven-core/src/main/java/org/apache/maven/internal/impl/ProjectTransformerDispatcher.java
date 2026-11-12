@@ -97,6 +97,9 @@ public final class ProjectTransformerDispatcher {
         if (!Objects.equals(original.getModules(), transformed.getModules())) {
             violations.add("<modules>");
         }
+        if (!Objects.equals(original.getSubprojects(), transformed.getSubprojects())) {
+            violations.add("<subprojects>");
+        }
         if (!Objects.equals(original.getProfiles(), transformed.getProfiles())) {
             violations.add("<profiles>");
         }

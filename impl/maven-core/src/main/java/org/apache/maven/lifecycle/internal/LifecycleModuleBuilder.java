@@ -112,9 +112,9 @@ public class LifecycleModuleBuilder {
 
             Instant buildEndTime = MonotonicClock.now();
 
+            successReported = true;
             projectExecutionListener.afterProjectExecutionSuccess(
                     new ProjectExecutionEvent(session, currentProject, mojoExecutions));
-            successReported = true;
 
             reactorContext
                     .getResult()
