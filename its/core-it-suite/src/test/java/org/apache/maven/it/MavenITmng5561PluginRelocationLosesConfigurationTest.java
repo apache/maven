@@ -34,8 +34,6 @@ public class MavenITmng5561PluginRelocationLosesConfigurationTest extends Abstra
         Verifier verifier;
 
         verifier = newVerifier(oldPluginWithRelocationDir);
-        // maven-plugin-plugin:3.6.0 cannot process Java 17 class files (major version 61); keep at Java 8
-        verifier.getSystemProperties().put("maven.compiler.release", "8");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();

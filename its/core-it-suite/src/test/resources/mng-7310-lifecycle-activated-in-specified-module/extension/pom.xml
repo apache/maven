@@ -35,7 +35,7 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.plugin-tools</groupId>
       <artifactId>maven-plugin-annotations</artifactId>
-      <version>3.6.4</version>
+      <version>3.15.1</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
@@ -51,7 +51,7 @@ under the License.
       <plugin>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>sisu-maven-plugin</artifactId>
-        <version>0.3.5</version>
+        <version>1.1.2</version>
         <executions>
           <execution>
             <id>generate-index</id>
@@ -64,7 +64,7 @@ under the License.
 
       <plugin>
         <artifactId>maven-plugin-plugin</artifactId>
-        <version>3.6.4</version>
+        <version>3.15.1</version>
         <configuration>
           <skipErrorNoDescriptorsFound>true</skipErrorNoDescriptorsFound>
         </configuration>
