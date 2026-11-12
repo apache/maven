@@ -190,20 +190,31 @@ public interface Artifact {
     /**
      * Returns whether this artifact is a snapshot.
      *
+     * @return {@code true} if the artifact is a snapshot, {@code false} otherwise
+     * @see org.apache.maven.api.Session#isVersionSnapshot(String)
      * @since 4.2.0
      */
     boolean snapshot();
 
     /**
-    * Determines whether this artifact uses a snapshot version.
-    *
-    * @return {@code true} if the artifact is a snapshot, {@code false} otherwise
-    * @see org.apache.maven.api.Session#isVersionSnapshot(String)
-    * @deprecated Use {@link #snapshot()} instead.
-    */
+     * Determines whether this artifact uses a snapshot version.
+     *
+     * @return {@code true} if the artifact is a snapshot, {@code false} otherwise
+     * @see org.apache.maven.api.Session#isVersionSnapshot(String)
+     * @deprecated Use {@link #snapshot()} instead.
+     */
     @Deprecated(since = "4.2.0", forRemoval = true)
     default boolean isSnapshot() {
-       return snapshot();
+        return snapshot();
     }
+
+    /**
+     * {@return coordinates with the same identifiers as this artifact}.
+     * This is a shortcut for {@code session.createArtifactCoordinates(artifact)}.
+     *
+     * @see org.apache.maven.api.Session#createArtifactCoordinates(Artifact)
+     */
+    @Nonnull
+    ArtifactCoordinates toCoordinates();
 }
 
