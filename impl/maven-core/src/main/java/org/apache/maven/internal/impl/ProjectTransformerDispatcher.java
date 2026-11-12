@@ -18,6 +18,7 @@
  */
 package org.apache.maven.internal.impl;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -82,26 +83,28 @@ public final class ProjectTransformerDispatcher {
     private static void validateFrozenFields(
             Model original, Model transformed, String transformerName, String projectId)
             throws MavenExecutionException {
+        List<String> violations = new ArrayList<>();
         if (!Objects.equals(original.getGroupId(), transformed.getGroupId())
                 || !Objects.equals(original.getArtifactId(), transformed.getArtifactId())) {
-            throw new MavenExecutionException(
-                    transformerName + " must not change groupId or artifactId of " + projectId, (Throwable) null);
+            violations.add("groupId/artifactId");
         }
         if (!Objects.equals(original.getParent(), transformed.getParent())) {
-            throw new MavenExecutionException(
-                    transformerName + " must not change <parent> of " + projectId, (Throwable) null);
+            violations.add("<parent>");
         }
         if (!Objects.equals(original.getMixins(), transformed.getMixins())) {
-            throw new MavenExecutionException(
-                    transformerName + " must not change <mixins> of " + projectId, (Throwable) null);
+            violations.add("<mixins>");
         }
         if (!Objects.equals(original.getModules(), transformed.getModules())) {
-            throw new MavenExecutionException(
-                    transformerName + " must not change <modules> of " + projectId, (Throwable) null);
+            violations.add("<modules>");
         }
         if (!Objects.equals(original.getProfiles(), transformed.getProfiles())) {
+            violations.add("<profiles>");
+        }
+        if (!violations.isEmpty()) {
             throw new MavenExecutionException(
-                    transformerName + " must not change <profiles> of " + projectId, (Throwable) null);
+                    "The ProjectTransformer " + transformerName + " must not change "
+                            + String.join(", ", violations) + " of " + projectId,
+                    (Throwable) null);
         }
     }
 }
