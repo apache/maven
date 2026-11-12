@@ -57,6 +57,11 @@ class DefaultDialectRegistryTest {
             public ModelParser getModelParser() {
                 return new ModelParser() {
                     @Override
+                    public String id() {
+                        return "test-dialect";
+                    }
+
+                    @Override
                     public Optional<Source> locate(Path dir) {
                         return Optional.empty();
                     }
