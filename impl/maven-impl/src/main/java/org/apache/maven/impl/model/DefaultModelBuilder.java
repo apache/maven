@@ -1869,10 +1869,12 @@ public class DefaultModelBuilder implements ModelBuilder {
                             throw e;
                         }
 
+                        // the document parsed successfully once unknown/misplaced elements were tolerated,
+                        // so it is well-formed XML that merely violates the POM schema - invalid, not malformed
                         add(
                                 Severity.ERROR,
                                 Version.V20,
-                                "Malformed POM " + modelSource.getLocation() + ": " + e.getMessage(),
+                                "Invalid POM " + modelSource.getLocation() + ": " + e.getMessage(),
                                 e);
                     }
                 } catch (ModelParserException e) {
