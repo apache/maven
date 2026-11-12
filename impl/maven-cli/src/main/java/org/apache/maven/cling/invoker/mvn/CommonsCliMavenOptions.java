@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Optional;
 
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.DeprecatedAttributes;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.mvn.MavenOptions;
@@ -57,7 +58,7 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
 
     @Override
     public Optional<Boolean> updateSnapshots() {
-        if (commandLine.hasOption(CLIManager.UPDATE_SNAPSHOTS)) {
+        if (commandLine.hasOption(CLIManager.UPDATE_ALL) || commandLine.hasOption("update-snapshots")) {
             return Optional.of(Boolean.TRUE);
         }
         return Optional.empty();
@@ -247,6 +248,11 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     }
 
     @Override
+    public Optional<Boolean> listAliases() {
+        return commandLine.hasOption(CLIManager.LIST_ALIASES) ? Optional.of(true) : Optional.empty();
+    }
+
+    @Override
     protected CommonsCliMavenOptions copy(
             String source, CommonsCliOptions.CLIManager cliManager, CommandLine commandLine) {
         return new CommonsCliMavenOptions(source, (CLIManager) cliManager, commandLine);
@@ -255,7 +261,7 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     protected static class CLIManager extends CommonsCliOptions.CLIManager {
         public static final String ALTERNATE_POM_FILE = "f";
         public static final String NON_RECURSIVE = "N";
-        public static final String UPDATE_SNAPSHOTS = "U";
+        public static final String UPDATE_ALL = "U";
         public static final String ACTIVATE_PROFILES = "P";
         public static final String SUPPRESS_SNAPSHOT_UPDATES = "nsu";
         public static final String CHECKSUM_FAILURE_POLICY = "C";
@@ -279,6 +285,7 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
         public static final String ARTIFACTS_UPDATE_POLICY = "artifacts-update-policy";
         public static final String METADATA_UPDATE_POLICY = "metadata-update-policy";
         public static final String AT_FILE = "af";
+        public static final String LIST_ALIASES = "list-aliases";
 
         @Override
         protected void prepareOptions(org.apache.commons.cli.Options options) {
@@ -293,9 +300,21 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
                     .desc(
                             "Do not recurse into sub-projects. When used together with -pl, do not recurse into sub-projects of selected aggregators")
                     .get());
-            options.addOption(Option.builder(UPDATE_SNAPSHOTS)
+            options.addOption(Option.builder(UPDATE_ALL)
+                    .longOpt("update-all")
+                    .desc(
+                            "Shortcut for --update-metadata --update-artifacts: forces updates of metadata and artifacts on remote repositories")
+                    .get());
+
+            // Keep the old option as a deprecated alias for backwards compatibility.
+            options.addOption(Option.builder()
                     .longOpt("update-snapshots")
-                    .desc("Forces a check for missing releases and updated snapshots on remote repositories")
+                    .desc("<deprecated> Use -U,--update-all instead.")
+                    .deprecated(DeprecatedAttributes.builder()
+                            .setForRemoval(true)
+                            .setSince("4.2.0")
+                            .setDescription("Use -U,--update-all instead.")
+                            .get())
                     .get());
             options.addOption(Option.builder(ACTIVATE_PROFILES)
                     .longOpt("activate-profiles")
@@ -408,6 +427,10 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
                     .hasArg()
                     .desc(
                             "If set, Maven will load command line options from the specified file and merge with CLI specified ones.")
+                    .get());
+            options.addOption(Option.builder()
+                    .longOpt(LIST_ALIASES)
+                    .desc("List effective build aliases defined in settings files and exit.")
                     .get());
         }
     }

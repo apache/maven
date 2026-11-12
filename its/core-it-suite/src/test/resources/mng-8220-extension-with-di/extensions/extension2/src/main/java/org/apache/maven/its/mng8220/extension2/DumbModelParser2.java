@@ -40,6 +40,11 @@ final class DumbModelParser2 implements ModelParser {
     public DumbModelParser2() {}
 
     @Override
+    public String id() {
+        return "dumb2";
+    }
+
+    @Override
     public Optional<Source> locate(Path dir) {
         logger.warn("[MNG-8220] DumbModelParser2 Called from extension");
         return Optional.empty();

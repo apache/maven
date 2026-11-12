@@ -24,6 +24,7 @@ import java.nio.file.Paths;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.model.Source;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -71,6 +72,32 @@ class MojoExtensionModelTest {
         assertTrue(
                 Paths.get(model.getBuild().getOutputDirectory()).endsWith(Paths.get("target", "classes")),
                 "Output directory from defaultModel should be present after merge");
+    }
+
+    @Test
+    void defaultModelDeclaresSourceAndResourceDirectories() {
+        assertSource("main", "java", "src/main/java");
+        assertSource("main", "resources", "src/main/resources");
+        assertSource("test", "java", "src/test/java");
+        assertSource("test", "resources", "src/test/resources");
+    }
+
+    @Test
+    @InjectMojo(goal = COORDINATES, pom = MINIMAL_POM)
+    void mergedModelKeepsDefaultResourceDirectories() {
+        assertSource("main", "resources", "src/main/resources");
+        assertSource("test", "resources", "src/test/resources");
+    }
+
+    private void assertSource(String scope, String lang, String directory) {
+        Path expected = Paths.get(MojoExtension.getBasedir()).resolve(directory);
+        assertTrue(
+                project.getModel().getBuild().getSources().stream()
+                        .filter(source -> scope.equals(source.getScope()) && lang.equals(source.getLang()))
+                        .map(Source::getDirectory)
+                        .anyMatch(dir -> Paths.get(dir).equals(expected)),
+                () -> "Expected a " + scope + " " + lang + " source at " + expected + ", got "
+                        + project.getModel().getBuild().getSources());
     }
 
     @Test

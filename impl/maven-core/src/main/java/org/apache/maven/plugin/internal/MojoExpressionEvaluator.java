@@ -23,18 +23,25 @@ import java.io.File;
 /**
  * Evaluates mojo parameter expressions and aligns paths to the project base directory.
  * Used by {@link V4MojoConfigurator} to resolve plugin parameter values.
+ *
+ * @since 4.2.0
  */
-interface MojoExpressionEvaluator {
+public interface MojoExpressionEvaluator {
 
     /**
      * Evaluates the given expression, optionally coercing the result to the given type.
      *
+     * <p>This method declares {@code throws Exception} rather than
+     * {@code throws MojoExpressionEvaluationException} intentionally: tying the public SPI
+     * signature to a specific exception hierarchy would force implementors to depend on
+     * {@code maven-core} internals. Callers should catch {@code Exception} and wrap as needed.
+     *
      * @param expr the expression to evaluate (e.g. {@code ${project.version}})
      * @param type the desired return type, or {@code null} for no coercion
      * @return the evaluated value, or {@code null}
-     * @throws MojoExpressionEvaluationException if evaluation fails
+     * @throws Exception if evaluation fails
      */
-    Object evaluate(String expr, Class<?> type) throws MojoExpressionEvaluationException;
+    Object evaluate(String expr, Class<?> type) throws Exception;
 
     /**
      * Aligns a relative {@link File} to the project base directory.

@@ -26,27 +26,26 @@ under the License.
   <packaging>maven-plugin</packaging>
 
   <name>Maven Integration Test :: MNG-1088 :: Plugin</name>
-  <description>
-    A simple plugin built within the reactor, to be used by the sibling client module.
-    The concurrent builder must build this plugin first (up to the ready phase),
-    then allow the client to use it — without any pre-installed version.
-  </description>
+  <description>Test that the concurrent builder automatically builds a reactor plugin project up to READY
+    when another project uses that plugin, even if the requested phase is before "compile".</description>
 
   <properties>
     <maven.test.skip>true</maven.test.skip>
+    <mavenPluginPluginVersion>4.0.0-beta-3</mavenPluginPluginVersion>
   </properties>
 
   <dependencies>
+    <!-- Maven 4 API — available in the reactor-built plugin realm without extra JARs -->
     <dependency>
       <groupId>org.apache.maven</groupId>
-      <artifactId>maven-plugin-api</artifactId>
+      <artifactId>maven-api-core</artifactId>
       <version>${mavenVersion}</version>
       <scope>provided</scope>
     </dependency>
     <dependency>
-      <groupId>org.apache.maven.plugin-tools</groupId>
-      <artifactId>maven-plugin-annotations</artifactId>
-      <version>3.15.2</version>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-di</artifactId>
+      <version>${mavenVersion}</version>
       <scope>provided</scope>
     </dependency>
   </dependencies>
@@ -56,8 +55,9 @@ under the License.
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-plugin-plugin</artifactId>
+        <version>${mavenPluginPluginVersion}</version>
         <configuration>
-          <goalPrefix>mng1088</goalPrefix>
+          <goalPrefix>coreit</goalPrefix>
         </configuration>
       </plugin>
     </plugins>

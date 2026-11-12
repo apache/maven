@@ -26,7 +26,6 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.di.Named;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Source;
 
@@ -37,14 +36,29 @@ import org.apache.maven.api.services.Source;
  * Note: to provide a Maven model "dialect" that supports symmetric translation, implement
  * {@link ModelDialectProvider}, which composes a pair of parser and writer.
  *
+ * <p>
+ * Implementations must declare a unique identifier via {@link #id()} to allow Maven to
+ * distinguish parsers in diagnostics and detect conflicts between extensions.
+ *
  * @since 4.0.0
  * @see ModelDialectProvider
  * @see DialectProvider
  */
 @Experimental
 @Consumer
-@Named
 public interface ModelParser extends SpiService {
+
+    /**
+     * Returns a unique identifier for this parser, used in diagnostics when multiple
+     * parsers fail or conflict. Must be globally unique across all extensions.
+     *
+     * @return the parser identifier, never {@code null}
+     * @since 4.2.0
+     */
+    @Nonnull
+    default String id() {
+        return getClass().getName();
+    }
 
     /**
      * Option that can be specified in the options map.  The value should be a Boolean.

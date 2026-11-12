@@ -1499,4 +1499,69 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 DefaultConsumerPomBuilder.hasNonModelProperties("${env.HOME}-${ext.qualifier}", Map.of()),
                 "Should return true when at least one property is not built-in or in the model");
     }
+
+    /**
+     * The properties of a profile that was active when the project was built reach the consumer
+     * model build as request user properties, so that the coordinates they supply can be validated
+     * (MNG-8709). They must not be written into the consumer POM: a consumer re-evaluates the
+     * profile activation itself, so the main block and every profile keep their declared values
+     * (GH-13761).
+     */
+    @Test
+    void testActiveProfilePropertiesAreNotPersistedInConsumerPom() throws Exception {
+        setRootDirectory("profile-properties");
+        Path file = Paths.get("src/test/resources/consumer/profile-properties/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+        activate(project, "active-here");
+
+        Model model = builder.build(session, project, Sources.buildSource(file));
+
+        assertEquals(Map.of("flag", "false", "classifier", "none"), model.getProperties());
+        assertEquals(
+                Map.of("flag", "true", "classifier", "here"),
+                profile(model, "active-here").getProperties());
+        assertEquals(Map.of("flag", "false"), profile(model, "opt-in").getProperties());
+        assertEquals(
+                Map.of("classifier", "elsewhere"), profile(model, "elsewhere").getProperties());
+    }
+
+    /**
+     * A property the user passed on the command line still overrides the declared value in the
+     * consumer POM, as it did before GH-13761, and still takes precedence over the value of an
+     * active profile.
+     */
+    @Test
+    void testUserPropertyStillOverridesDeclaredValueInConsumerPom() throws Exception {
+        MavenExecutionRequest request = setRootDirectory("profile-properties");
+        request.getUserProperties().setProperty("classifier", "cli");
+        Path file = Paths.get("src/test/resources/consumer/profile-properties/pom.xml");
+
+        MavenProject project = getEffectiveModel(file);
+        activate(project, "active-here");
+
+        Model model = builder.build(session, project, Sources.buildSource(file));
+
+        assertEquals(Map.of("flag", "false", "classifier", "cli"), model.getProperties());
+        assertEquals(Map.of("flag", "false"), profile(model, "opt-in").getProperties());
+    }
+
+    /**
+     * Records the given profile as active on the project, as the project builder does for a
+     * profile whose activation held when the project was built.
+     */
+    private static void activate(MavenProject project, String profileId) {
+        List<org.apache.maven.model.Profile> active = project.getModel().getProfiles().stream()
+                .filter(profile -> profileId.equals(profile.getId()))
+                .toList();
+        assertEquals(1, active.size(), "profile " + profileId + " should be declared once");
+        project.setActiveProfiles(active);
+    }
+
+    private static Profile profile(Model model, String id) {
+        return model.getProfiles().stream()
+                .filter(profile -> id.equals(profile.getId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("profile " + id + " is missing from the consumer POM"));
+    }
 }

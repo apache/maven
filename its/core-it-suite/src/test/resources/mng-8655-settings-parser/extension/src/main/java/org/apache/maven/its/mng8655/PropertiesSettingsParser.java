@@ -39,6 +39,11 @@ public class PropertiesSettingsParser implements SettingsParser {
     public PropertiesSettingsParser() {}
 
     @Override
+    public String id() {
+        return "properties";
+    }
+
+    @Override
     public boolean supports(Source source) {
         return source.getLocation().endsWith(".properties");
     }

@@ -24,17 +24,22 @@ import java.util.Map;
 import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.di.Named;
 
 /**
  * Component able to contribute to Maven session user properties. This SPI component is invoked
  * very early, while there is no session created yet.
  *
+ * <p>
+ * Unlike {@link ModelParser} and {@link SettingsParser}, this interface intentionally does not
+ * declare an {@code id()} method: all registered contributors are invoked sequentially and their
+ * effects accumulated, so there is no winner-takes-all conflict to detect. Implementations should
+ * still be annotated with a unique {@code @Named("my-unique-id")} so that the DI container can
+ * distinguish them, but Maven itself does not perform duplicate detection for this SPI.
+ *
  * @since 4.0.0
  */
 @Experimental
 @Consumer
-@Named
 public interface PropertyContributor extends SpiService {
     /**
      * Invoked just before session is created with a mutable map that carries collected user properties so far.

@@ -28,6 +28,7 @@ import org.apache.maven.api.Constants;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Plugin;
+import org.apache.maven.api.Realm;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.PluginExecution;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
@@ -155,6 +156,11 @@ public class MojoExecutionFilter {
             @Override
             public List<Lifecycle> getLifecycles() {
                 return Collections.emptyList();
+            }
+
+            @Override
+            public Realm getRealm() {
+                throw new UnsupportedOperationException("getRealm() is not available in the filter adapter");
             }
 
             @Override

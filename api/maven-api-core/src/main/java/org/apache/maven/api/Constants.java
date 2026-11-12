@@ -151,7 +151,9 @@ public final class Constants {
      * Maven installation extensions.
      *
      * @since 4.0.0
+     * @deprecated Use the {@code <extensions>} section in the installation {@code settings.xml} instead.
      */
+    @Deprecated
     @Config(defaultValue = "${maven.installation.conf}/extensions.xml")
     public static final String MAVEN_INSTALLATION_EXTENSIONS = "maven.installation.extensions";
 
@@ -159,7 +161,9 @@ public final class Constants {
      * Maven user extensions.
      *
      * @since 4.0.0
+     * @deprecated Use the {@code <extensions>} section in the user {@code settings.xml} instead.
      */
+    @Deprecated
     @Config(defaultValue = "${maven.user.conf}/extensions.xml")
     public static final String MAVEN_USER_EXTENSIONS = "maven.user.extensions";
 
@@ -167,7 +171,9 @@ public final class Constants {
      * Maven project extensions.
      *
      * @since 4.0.0
+     * @deprecated Use the {@code <extensions>} section in the project {@code .mvn/settings.xml} instead.
      */
+    @Deprecated
     @Config(defaultValue = "${maven.project.conf}/extensions.xml")
     public static final String MAVEN_PROJECT_EXTENSIONS = "maven.project.extensions";
 
@@ -634,6 +640,20 @@ public final class Constants {
      */
     @Config(type = "java.lang.Integer", defaultValue = "100")
     public static final String MAVEN_BUILDER_MAX_PROBLEMS = "maven.builder.maxProblems";
+
+    /**
+     * Enables diagnostic output for Maven's native dependency injection registry.
+     * When set, Maven prints a sorted snapshot of all DI bindings to stdout at discovery and
+     * lookup checkpoints, without creating components or invoking providers.
+     * Accepted values: {@code true} or empty string (dump every binding),
+     * {@code ambiguous} (dump only keys with more than one candidate),
+     * any other value or unset (diagnostics disabled, the default).
+     * Example: {@code mvn validate -Dmaven.di.debug=ambiguous}
+     *
+     * @since 4.2.0
+     */
+    @Config(source = Config.Source.SYSTEM_PROPERTIES)
+    public static final String MAVEN_DI_DEBUG = "maven.di.debug";
 
     /**
      * Configuration property for version range resolution used metadata "nature".
