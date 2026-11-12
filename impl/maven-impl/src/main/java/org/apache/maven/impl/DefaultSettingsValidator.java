@@ -28,6 +28,7 @@ import java.util.regex.Pattern;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.settings.Mirror;
+import org.apache.maven.api.settings.PhaseInjection;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Proxy;
 import org.apache.maven.api.settings.Repository;
@@ -109,6 +110,53 @@ public class DefaultSettingsValidator {
                             "pluginGroups.pluginGroup[" + i + "]",
                             null,
                             "must denote a valid group id and match the pattern " + ID);
+                }
+            }
+        }
+
+        if (!isProjectSettings) {
+            // User / installation settings: <phases> are only meaningful in project settings.
+            if (settings.getPhases() != null && !settings.getPhases().isEmpty()) {
+                addViolation(
+                        problems,
+                        BuilderProblem.Severity.WARNING,
+                        "phases",
+                        null,
+                        "is not supported on user or installation settings. "
+                                + "Move <phases> to your project's .mvn/settings.xml.");
+            }
+        } else {
+            // Project settings: validate each <phase> declaration eagerly so errors surface
+            // as BuilderProblems rather than as IllegalStateException at session-init time.
+            List<PhaseInjection> phases = settings.getPhases();
+            if (phases != null) {
+                for (int i = 0; i < phases.size(); i++) {
+                    PhaseInjection p = phases.get(i);
+                    String phaseField = "phases.phase[" + i + "]";
+                    if (p.getName() == null || p.getName().isBlank()) {
+                        addViolation(
+                                problems,
+                                BuilderProblem.Severity.ERROR,
+                                phaseField + ".name",
+                                null,
+                                "must have a non-blank 'name' attribute.");
+                    } else {
+                        boolean hasParent =
+                                p.getParent() != null && !p.getParent().isBlank();
+                        boolean hasAfter = p.getAfter() != null && !p.getAfter().isBlank();
+                        boolean hasBefore =
+                                p.getBefore() != null && !p.getBefore().isBlank();
+                        if (!hasParent && !hasAfter && !hasBefore) {
+                            addViolation(
+                                    problems,
+                                    BuilderProblem.Severity.ERROR,
+                                    phaseField,
+                                    null,
+                                    "custom phase '" + p.getName()
+                                            + "' must specify 'parent' and/or at least one of 'after' or 'before'"
+                                            + " to anchor it in the lifecycle DAG.");
+                        }
+                    }
                 }
             }
         }
