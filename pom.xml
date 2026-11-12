@@ -167,6 +167,7 @@ under the License.
     <wagonVersion>3.5.3</wagonVersion>
     <woodstoxVersion>7.3.0</woodstoxVersion>
     <xmlunitVersion>2.14.0</xmlunitVersion>
+    <modelloVersion>2.9.0</modelloVersion>
     <jacocoArgLine />
     <argLine.xmx>-Xmx256m</argLine.xmx>
     <argLine.mockito />
@@ -721,7 +722,7 @@ under the License.
         <plugin>
           <groupId>org.codehaus.modello</groupId>
           <artifactId>modello-maven-plugin</artifactId>
-          <version>2.9.0</version>
+          <version>${modelloVersion}</version>
         </plugin>
         <plugin>
           <groupId>org.apache.maven.plugins</groupId>
