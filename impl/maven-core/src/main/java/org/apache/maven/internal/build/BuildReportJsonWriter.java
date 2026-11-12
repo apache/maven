@@ -40,8 +40,9 @@ import org.apache.maven.api.services.BuilderProblem;
  * appended at the end of each object.
  * <p>
  * Use {@link #write(Writer, BuildReport)} to write directly to any {@link Writer}
- * (e.g. a {@code BufferedWriter} wrapping an {@code OutputStream}) without retaining
- * the JSON string after the write completes. The {@link #toJson(BuildReport)} convenience
+ * (e.g. a {@code BufferedWriter} wrapping an {@code OutputStream}); the caller does not
+ * need to retain a reference to the JSON string after the write completes (the string is
+ * built internally and discarded). The {@link #toJson(BuildReport)} convenience
  * method is provided for testing and in-process consumers that need the string.
  */
 final class BuildReportJsonWriter {
@@ -475,6 +476,17 @@ final class BuildReportJsonWriter {
     private static String throwableToString(Throwable t) {
         StringWriter sw = new StringWriter();
         t.printStackTrace(new PrintWriter(sw));
-        return sw.toString();
+        String full = sw.toString();
+        // Cap at 50 lines to prevent huge JSON output from deeply nested exceptions
+        String[] lines = full.split("\r?\n");
+        if (lines.length <= 50) {
+            return full.replace("\r\n", "\n");
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < 50; i++) {
+            sb.append(lines[i]).append('\n');
+        }
+        sb.append("... ").append(lines.length - 50).append(" more lines truncated");
+        return sb.toString();
     }
 }
