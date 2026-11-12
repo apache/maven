@@ -31,8 +31,6 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.cache.CacheMetadata;
-import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.model.Profile;
 
 import static java.util.Objects.requireNonNull;
@@ -44,22 +42,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ModelBuilderRequest extends RepositoryAwareRequest, CacheMetadata {
-
-    /**
-     * Returns the cache retention for the complete model-building operation.
-     * Model builds depend on mutable model-builder session state, including inherited
-     * repositories and profile activation context, and must execute each time. Internal
-     * model caches remain independently available to all request types.
-     *
-     * @return the retention policy for the model-building operation
-     * @since 4.2.0
-     */
-    @Nonnull
-    @Override
-    default CacheRetention getCacheRetention() {
-        return CacheRetention.DISABLED;
-    }
+public interface ModelBuilderRequest extends RepositoryAwareRequest {
 
     /**
      * The possible request types for building a model.

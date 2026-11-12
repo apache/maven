@@ -20,8 +20,6 @@ package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.ThreadSafe;
-import org.apache.maven.api.cache.CacheMetadata;
-import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.Result;
@@ -34,9 +32,12 @@ import org.apache.maven.api.services.Result;
  * caching and the context needed to observe operation lifecycles. Requests and results
  * describe the work, while request traces identify the operations that initiated it.
  *
- * <p>Participation does not require caching: operations with side effects must disable
- * caching using {@link CacheMetadata} and {@link CacheRetention#DISABLED}.
- * Lightweight utilities, factories and leaf operations that do not benefit from the
+ * <p>All {@link Request} types already carry a {@link org.apache.maven.api.cache.CacheRetention}
+ * policy via {@link org.apache.maven.api.cache.CacheMetadata#getCacheRetention()}, defaulting to
+ * {@link org.apache.maven.api.cache.CacheRetention#DISABLED}.
+ * Request types whose results are safe to cache override that default.</p>
+ *
+ * <p>Lightweight utilities, factories and leaf operations that do not benefit from the
  * pipeline extend {@link Service} directly.</p>
  *
  * @see Request

@@ -29,8 +29,6 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.cache.CacheMetadata;
-import org.apache.maven.api.cache.CacheRetention;
 
 import static java.util.Objects.requireNonNull;
 
@@ -41,19 +39,7 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 @Immutable
-public interface ArtifactDeployerRequest extends Request<Session>, CacheMetadata {
-
-    /**
-     * Returns the cache retention for this operation.
-     *
-     * @return {@link CacheRetention#DISABLED}
-     * @since 4.2.0
-     */
-    @Nonnull
-    @Override
-    default CacheRetention getCacheRetention() {
-        return CacheRetention.DISABLED;
-    }
+public interface ArtifactDeployerRequest extends Request<Session> {
 
     /** @return the remote repository to deploy to, never {@code null} */
     @Nonnull
