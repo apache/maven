@@ -219,6 +219,14 @@ public class BuildPlanExecutor {
         return cached;
     }
 
+    private static boolean requiresDependencyOrdering(MojoDescriptor descriptor) {
+        if (descriptor.isV4Api()) {
+            return !descriptor.getMojoDescriptorV4().getResolutions().isEmpty();
+        }
+        return descriptor.getDependencyCollectionRequired() != null
+                || descriptor.getDependencyResolutionRequired() != null;
+    }
+
     public void execute(MavenSession session, ReactorContext reactorContext, List<TaskSegment> taskSegments)
             throws ExecutionException, InterruptedException {
         try (BuildContext ctx = new BuildContext(session, reactorContext, taskSegments)) {
@@ -797,8 +805,7 @@ public class BuildPlanExecutor {
                             .filter(executionStep -> executionStep.phase != null)
                             .forEach(executionStep -> executionStep.executions().forEach(execution -> {
                                 MojoDescriptor descriptor = execution.getMojoDescriptor();
-                                if (descriptor.getDependencyCollectionRequired() != null
-                                        || descriptor.getDependencyResolutionRequired() != null) {
+                                if (requiresDependencyOrdering(descriptor)) {
                                     for (MavenProject upstream :
                                             plan.getAllProjects().get(step.project)) {
                                         plan.step(upstream, AFTER + PACKAGE).ifPresent(executionStep::executeAfter);
