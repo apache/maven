@@ -28,6 +28,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * @author Guillaume Nodet
@@ -88,6 +89,62 @@ public class DefaultModelBuilderTest {
         assertThrows(ModelBuildingException.class, () -> {
             builder.build(request);
         });
+    }
+
+    /**
+     * MNG-6864: a well-formed POM that merely has an unrecognized/misplaced element is invalid,
+     * not malformed - the "Malformed POM" message is reserved for documents that are not
+     * well-formed XML at all.
+     */
+    @Test
+    public void testInvalidPomIsNotReportedAsMalformed() throws Exception {
+        String pom = "<project>\n" + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>thegroup</groupId>\n"
+                + "  <artifactId>invalid</artifactId>\n"
+                + "  <version>1</version>\n"
+                + "  <dependencies>\n"
+                + "    <project>\n"
+                + "    </project>\n"
+                + "  </dependencies>\n"
+                + "</project>\n";
+
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new StringModelSource(pom));
+
+        ModelBuildingResult result = builder.build(request);
+
+        assertTrue(
+                result.getProblems().stream().anyMatch(p -> p.getMessage().startsWith("Invalid POM")),
+                () -> "Expected an \"Invalid POM\" problem, got: " + result.getProblems());
+        assertTrue(
+                result.getProblems().stream().noneMatch(p -> p.getMessage().startsWith("Malformed POM")),
+                () -> "Did not expect a \"Malformed POM\" problem, got: " + result.getProblems());
+    }
+
+    /**
+     * Contrast case for {@link #testInvalidPomIsNotReportedAsMalformed()}: a document that is not
+     * well-formed XML at all must still fail outright, unaffected by MNG-6864.
+     */
+    @Test
+    public void testNotWellFormedPomFailsBuild() {
+        String pom = "<project>\n" + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>thegroup</groupId>\n"
+                + "  <artifactId>malformed</artifactId>\n"
+                + "  <version>1</version>\n"
+                + "  <name>mismatched</foo>\n"
+                + "</project>\n";
+
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new StringModelSource(pom));
+
+        ModelBuildingException e = assertThrows(ModelBuildingException.class, () -> builder.build(request));
+        assertTrue(
+                e.getProblems().stream().anyMatch(p -> p.getMessage().startsWith("Non-parseable POM")),
+                () -> "Expected a \"Non-parseable POM\" problem, got: " + e.getProblems());
     }
 
     static class CycleInImportsResolver extends BaseModelResolver {
