@@ -18,9 +18,13 @@
  */
 package org.apache.maven.cling.invoker.mvn;
 
+import java.util.List;
+import java.util.Map;
+
 import org.apache.maven.Maven;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvn.MavenOptions;
+import org.apache.maven.api.settings.PhaseInjection;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.transfer.SimplexTransferListener;
 
@@ -32,6 +36,19 @@ public class MavenContext extends LookupContext {
 
     public SimplexTransferListener simplexTransferListener;
     public Maven maven;
+
+    /**
+     * Effective build aliases merged across all settings tiers (installation → user → project, last-wins).
+     * Populated after DI settings loading, in {@code MavenInvoker.customizeSettingsResult()}.
+     */
+    public Map<String, List<String>> effectiveAliases;
+
+    /**
+     * Phase injections from project-scoped settings only.
+     * User and installation settings {@code <phases>} are silently ignored.
+     * Populated after DI settings loading, in {@code MavenInvoker.customizeSettingsResult()}.
+     */
+    public List<PhaseInjection> projectPhases;
 
     @Override
     public void doCloseContainer() throws Exception {

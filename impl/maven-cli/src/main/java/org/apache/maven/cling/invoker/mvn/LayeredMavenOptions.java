@@ -175,6 +175,11 @@ public class LayeredMavenOptions<O extends MavenOptions> extends LayeredOptions<
     }
 
     @Override
+    public Optional<Boolean> listAliases() {
+        return returnFirstPresentOrEmpty(MavenOptions::listAliases);
+    }
+
+    @Override
     public MavenOptions interpolate(UnaryOperator<String> callback) {
         ArrayList<MavenOptions> interpolatedOptions = new ArrayList<>(options.size());
         for (MavenOptions o : options) {

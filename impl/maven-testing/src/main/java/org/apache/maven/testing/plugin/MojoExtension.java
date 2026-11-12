@@ -24,12 +24,14 @@ import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.StringReader;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -43,7 +45,6 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Project;
@@ -86,6 +87,7 @@ import org.apache.maven.model.v4.MavenMerger;
 import org.apache.maven.model.v4.MavenStaxReader;
 import org.apache.maven.plugin.PluginParameterExpressionEvaluatorV4;
 import org.apache.maven.plugin.descriptor.io.PluginDescriptorStaxReader;
+import org.apache.maven.plugin.internal.MojoExpressionEvaluator;
 import org.apache.maven.plugin.internal.V4MojoConfigurator;
 import org.apache.maven.testing.di.MavenDIExtension;
 import org.apache.maven.testing.plugin.stubs.MojoExecutionStub;
@@ -96,13 +98,6 @@ import org.apache.maven.testing.plugin.stubs.RepositorySystemSupplier;
 import org.apache.maven.testing.plugin.stubs.SessionMock;
 import org.apache.maven.utils.StringInterpolator;
 import org.apache.maven.utils.StringInterpolatorException;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException;
-import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.codehaus.plexus.component.configurator.expression.TypeAwareExpressionEvaluator;
-import org.codehaus.plexus.util.ReflectionUtils;
-import org.codehaus.plexus.util.xml.XmlStreamReader;
-import org.codehaus.plexus.util.xml.Xpp3Dom;
-import org.codehaus.plexus.util.xml.Xpp3DomBuilder;
 import org.eclipse.aether.RepositorySystem;
 import org.junit.jupiter.api.extension.BeforeEachCallback;
 import org.junit.jupiter.api.extension.ExtensionContext;
@@ -314,13 +309,10 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             Session session = getInjector().getInstance(Session.class);
             Project project = getInjector().getInstance(Project.class);
             MojoExecution mojoExecution = getInjector().getInstance(MojoExecution.class);
-            ExpressionEvaluator evaluator = new WrapEvaluator(
+            MojoExpressionEvaluator evaluator = new WrapEvaluator(
                     getInjector(), new PluginParameterExpressionEvaluatorV4(session, project, mojoExecution));
 
-            new V4MojoConfigurator(
-                            (TypeAwareExpressionEvaluator) evaluator,
-                            mojo.getClass().getClassLoader(),
-                            null)
+            new V4MojoConfigurator(evaluator, mojo.getClass().getClassLoader(), null)
                     .configure(mojo, pluginConfiguration);
             return mojo;
         } catch (Exception e) {
@@ -478,7 +470,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         try (InputStream is = requireNonNull(
                         classLoader.getResourceAsStream(getPluginDescriptorLocation()),
                         "Unable to find plugin descriptor: " + getPluginDescriptorLocation());
-                Reader reader = new BufferedReader(new XmlStreamReader(is))) {
+                Reader reader = new BufferedReader(new InputStreamReader(is, StandardCharsets.UTF_8))) {
             // new InterpolationFilterReader(reader, map, "${", "}");
             pluginDescriptor = new PluginDescriptorStaxReader().read(reader);
         }
@@ -691,7 +683,7 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             if (url == null) {
                 throw new IllegalStateException("Unable to find pom on classpath: " + pom);
             }
-            return new XmlStreamReader(url.openStream());
+            return new InputStreamReader(url.openStream(), StandardCharsets.UTF_8);
         } else if (pom.stripLeading().startsWith("<")) {
             // inline XML, with or without a prolog or a namespace on the root element
             return new StringReader(pom);
@@ -711,15 +703,37 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             return goal.split(":");
         } else {
             Path pluginPom = Paths.get(getPluginBasedir(), "pom.xml");
-            Xpp3Dom pluginPomDom;
+            org.apache.maven.api.model.Model pomModel;
             try (Reader reader = Files.newBufferedReader(pluginPom)) {
-                pluginPomDom = Xpp3DomBuilder.build(reader);
+                pomModel = new MavenStaxReader().read(reader);
             }
-            String artifactId = pluginPomDom.getChild("artifactId").getValue();
-            String groupId = interpolate(pluginPom, pluginPomDom, resolveFromRootThenParent(pluginPomDom, "groupId"));
-            String version = interpolate(pluginPom, pluginPomDom, resolveFromRootThenParent(pluginPomDom, "version"));
+            String artifactId = pomModel.getArtifactId();
+            String rawGroupId = resolveGroupId(pomModel);
+            String groupId = interpolateModel(pluginPom, pomModel, rawGroupId);
+            String rawVersion = resolveVersion(pomModel);
+            String version = interpolateModel(pluginPom, pomModel, rawVersion);
             return new String[] {groupId, artifactId, version, goal};
         }
+    }
+
+    private static String resolveGroupId(org.apache.maven.api.model.Model model) throws Exception {
+        if (model.getGroupId() != null && !model.getGroupId().isEmpty()) {
+            return model.getGroupId();
+        }
+        if (model.getParent() != null && model.getParent().getGroupId() != null) {
+            return model.getParent().getGroupId();
+        }
+        throw new Exception("unable to determine groupId for artifact: " + model.getArtifactId());
+    }
+
+    private static String resolveVersion(org.apache.maven.api.model.Model model) throws Exception {
+        if (model.getVersion() != null && !model.getVersion().isEmpty()) {
+            return model.getVersion();
+        }
+        if (model.getParent() != null && model.getParent().getVersion() != null) {
+            return model.getParent().getVersion();
+        }
+        throw new Exception("unable to determine version for artifact: " + model.getArtifactId());
     }
 
     private XmlNode finalizeConfig(XmlNode config, MojoDescriptor mojoDescriptor) {
@@ -750,54 +764,18 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
         return XmlNode.newInstance("configuration", null, null, children, null);
     }
 
-    private static Optional<Xpp3Dom> child(Xpp3Dom element, String name) {
-        return Optional.ofNullable(element.getChild(name));
-    }
-
-    private static Stream<Xpp3Dom> children(Xpp3Dom element) {
-        return Stream.of(element.getChildren());
-    }
-
-    public static XmlNode extractPluginConfiguration(String artifactId, Xpp3Dom pomDom) throws Exception {
-        Xpp3Dom pluginConfigurationElement = child(pomDom, "build")
-                .flatMap(buildElement -> child(buildElement, "plugins"))
-                .map(MojoExtension::children)
-                .orElseGet(Stream::empty)
-                .filter(e -> e.getChild("artifactId").getValue().equals(artifactId))
-                .findFirst()
-                .flatMap(buildElement -> child(buildElement, "configuration"))
-                .orElse(Xpp3DomBuilder.build(new StringReader("<configuration/>")));
-        return pluginConfigurationElement.getDom();
-    }
-
-    /**
-     * sometimes the parent element might contain the correct value so generalize that access
-     *
-     * TODO find out where this is probably done elsewhere
-     */
-    private static String resolveFromRootThenParent(Xpp3Dom pluginPomDom, String element) throws Exception {
-        return Optional.ofNullable(child(pluginPomDom, element)
-                        .orElseGet(() -> child(pluginPomDom, "parent")
-                                .flatMap(e -> child(e, element))
-                                .orElse(null)))
-                .map(Xpp3Dom::getValue)
-                .orElseThrow(() -> new Exception("unable to determine " + element));
-    }
-
     /**
      * Resolves {@code ${...}} references in a plugin POM value, such as a CI-friendly
      * {@code ${revision}} version, from the POM's {@code <properties>} and then from the
      * system properties.
      */
-    private static String interpolate(Path pluginPom, Xpp3Dom pluginPomDom, String value) throws Exception {
+    private static String interpolateModel(Path pluginPom, org.apache.maven.api.model.Model model, String value)
+            throws Exception {
+        Map<String, String> properties = model.getProperties();
         String interpolated;
         try {
             interpolated = INTERPOLATOR.interpolate(
-                    value,
-                    key -> child(pluginPomDom, "properties")
-                            .flatMap(p -> child(p, key))
-                            .map(Xpp3Dom::getValue)
-                            .orElseGet(() -> System.getProperty(key)));
+                    value, key -> Optional.ofNullable(properties.get(key)).orElseGet(() -> System.getProperty(key)));
         } catch (StringInterpolatorException e) {
             throw new Exception("unable to resolve " + value + " in " + pluginPom + ": " + e.getMessage(), e);
         }
@@ -813,7 +791,10 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
      * NOTE: the caller is responsible for casting to what the desired type is.
      */
     public static Object getVariableValueFromObject(Object object, String variable) throws IllegalAccessException {
-        Field field = ReflectionUtils.getFieldByNameIncludingSuperclasses(variable, object.getClass());
+        Field field = getFieldByNameIncludingSuperclasses(variable, object.getClass());
+        requireNonNull(
+                field,
+                "Field " + variable + " not found in " + object.getClass().getName());
         field.setAccessible(true);
         return field.get(object);
     }
@@ -854,29 +835,41 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
      */
     public static void setVariableValueToObject(Object object, String variable, Object value)
             throws IllegalAccessException {
-        Field field = ReflectionUtils.getFieldByNameIncludingSuperclasses(variable, object.getClass());
-        requireNonNull(field, "Field " + variable + " not found");
+        Field field = getFieldByNameIncludingSuperclasses(variable, object.getClass());
+        requireNonNull(
+                field,
+                "Field " + variable + " not found in " + object.getClass().getName());
         field.setAccessible(true);
         field.set(object, value);
     }
 
-    static class WrapEvaluator implements TypeAwareExpressionEvaluator {
+    /**
+     * Traverses the class hierarchy from {@code clazz} upward and returns the first
+     * declared field matching {@code name}, or {@code null} if none is found.
+     */
+    private static Field getFieldByNameIncludingSuperclasses(String name, Class<?> clazz) {
+        for (Class<?> type = clazz; type != null && type != Object.class; type = type.getSuperclass()) {
+            try {
+                return type.getDeclaredField(name);
+            } catch (NoSuchFieldException ignored) {
+                // continue
+            }
+        }
+        return null;
+    }
+
+    static class WrapEvaluator implements MojoExpressionEvaluator {
 
         private final Injector injector;
-        private final TypeAwareExpressionEvaluator evaluator;
+        private final MojoExpressionEvaluator evaluator;
 
-        WrapEvaluator(Injector injector, TypeAwareExpressionEvaluator evaluator) {
+        WrapEvaluator(Injector injector, MojoExpressionEvaluator evaluator) {
             this.injector = injector;
             this.evaluator = evaluator;
         }
 
         @Override
-        public Object evaluate(String expression) throws ExpressionEvaluationException {
-            return evaluate(expression, null);
-        }
-
-        @Override
-        public Object evaluate(String expression, Class<?> type) throws ExpressionEvaluationException {
+        public Object evaluate(String expression, Class<?> type) throws Exception {
             Object value = evaluator.evaluate(expression, type);
             if (value == null) {
                 String expr = stripTokens(expression);

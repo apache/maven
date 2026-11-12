@@ -34,12 +34,8 @@ class PlexusMojoExpressionEvaluatorAdapter implements MojoExpressionEvaluator {
     }
 
     @Override
-    public Object evaluate(String expr, Class<?> type) throws MojoExpressionEvaluationException {
-        try {
-            return delegate.evaluate(expr, type);
-        } catch (org.codehaus.plexus.component.configurator.expression.ExpressionEvaluationException e) {
-            throw new MojoExpressionEvaluationException(e.getMessage(), e);
-        }
+    public Object evaluate(String expr, Class<?> type) throws Exception {
+        return delegate.evaluate(expr, type);
     }
 
     @Override

@@ -794,6 +794,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         context.effectiveSettings = settingsResult.getEffectiveSettings();
+        context.installationSettings = settingsResult.getInstallationSettings();
+        context.projectSettings = settingsResult.getProjectSettings();
+        context.userSettings = settingsResult.getUserSettings();
         context.interactive = mayDisableInteractiveMode(context, context.effectiveSettings.isInteractiveMode());
         context.localRepositoryPath = localRepositoryPath(context);
 
@@ -823,6 +826,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             context.projectSettingsPath = null;
             context.userSettingsPath = null;
             context.effectiveSettings = null;
+            context.installationSettings = null;
+            context.projectSettings = null;
+            context.userSettings = null;
             context.interactive = true;
             context.localRepositoryPath = null;
         };

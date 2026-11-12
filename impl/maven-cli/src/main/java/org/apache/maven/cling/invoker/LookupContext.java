@@ -104,6 +104,18 @@ public class LookupContext implements AutoCloseable {
     public boolean interactive;
     public Path localRepositoryPath;
     public Settings effectiveSettings;
+
+    /**
+     * Per-tier Settings objects, populated during {@code LookupInvoker.settings()} so that
+     * sub-invokers (e.g. {@code MavenInvoker}) can access tier-specific data such as
+     * project-only {@code <phases>} or the tier-ordered alias list.
+     */
+    public Settings installationSettings;
+
+    public Settings projectSettings;
+
+    public Settings userSettings;
+
     public PersistedToolchains effectiveToolchains;
 
     public final List<AutoCloseable> closeables = Collections.synchronizedList(new ArrayList<>());
