@@ -607,13 +607,15 @@ public class DefaultModelBuilder implements ModelBuilder {
                     throw e;
                 }
 
+                // the document parsed successfully once unknown/misplaced elements were tolerated,
+                // so it is well-formed XML that merely violates the POM schema - invalid, not malformed
                 if (pomFile != null) {
                     problems.add(new ModelProblemCollectorRequest(Severity.ERROR, Version.V20)
-                            .setMessage("Malformed POM " + modelSource.getLocation() + ": " + e.getMessage())
+                            .setMessage("Invalid POM " + modelSource.getLocation() + ": " + e.getMessage())
                             .setException(e));
                 } else {
                     problems.add(new ModelProblemCollectorRequest(Severity.WARNING, Version.V20)
-                            .setMessage("Malformed POM " + modelSource.getLocation() + ": " + e.getMessage())
+                            .setMessage("Invalid POM " + modelSource.getLocation() + ": " + e.getMessage())
                             .setException(e));
                 }
             }
