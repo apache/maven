@@ -53,27 +53,27 @@ public class DefaultNode extends AbstractNode {
     }
 
     @Override
-    public Artifact getArtifact() {
+    public Artifact artifact() {
         return node.getArtifact() != null ? session.getArtifact(node.getArtifact()) : null;
     }
 
     @Override
-    public Dependency getDependency() {
+    public Dependency dependency() {
         return node.getDependency() != null ? session.getDependency(node.getDependency()) : null;
     }
 
     @Override
-    public List<Node> getChildren() {
+    public List<Node> children() {
         return new MappedList<>(node.getChildren(), n -> session.getNode(n, verbose));
     }
 
     @Override
-    public List<RemoteRepository> getRemoteRepositories() {
+    public List<RemoteRepository> remoteRepositories() {
         return new MappedList<>(node.getRepositories(), session::getRemoteRepository);
     }
 
     @Override
-    public Optional<RemoteRepository> getRepository() {
+    public Optional<RemoteRepository> repository() {
         org.eclipse.aether.artifact.Artifact artifact = node.getArtifact();
         List<org.eclipse.aether.repository.RemoteRepository> repos = node.getRepositories();
         if (artifact == null || repos.isEmpty()) {
@@ -85,6 +85,30 @@ public class DefaultNode extends AbstractNode {
         return Optional.ofNullable(result)
                 .map(LocalArtifactResult::getRepository)
                 .map(session::getRemoteRepository);
+    }
+
+    @Override
+    public Optional<Node> winner() {
+        Object winner = node.getData().get(ConflictResolver.NODE_DATA_WINNER);
+        return winner instanceof DependencyNode
+                ? Optional.of(session.getNode((DependencyNode) winner, verbose))
+                : Optional.empty();
+    }
+
+    @Override
+    public Optional<String> premanagedVersion() {
+        return Optional.ofNullable(DependencyManagerUtils.getPremanagedVersion(node));
+    }
+
+    @Override
+    public Optional<String> premanagedScope() {
+        return Optional.ofNullable(DependencyManagerUtils.getPremanagedScope(node));
+    }
+
+    @Override
+    public Optional<String> originalScope() {
+        Object scope = node.getData().get(ConflictResolver.NODE_DATA_ORIGINAL_SCOPE);
+        return scope instanceof String ? Optional.of((String) scope) : Optional.empty();
     }
 
     /**

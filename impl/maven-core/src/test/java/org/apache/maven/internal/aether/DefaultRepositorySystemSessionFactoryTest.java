@@ -40,12 +40,15 @@ import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.internal.impl.DefaultTypeRegistry;
 import org.apache.maven.rtinfo.RuntimeInformation;
+import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
 import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
 import org.eclipse.aether.collection.VersionFilterBuilder;
+import org.eclipse.aether.repository.AuthenticationSelector;
+import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.version.VersionScheme;
 import org.junit.jupiter.api.Test;
@@ -158,6 +161,50 @@ public class DefaultRepositorySystemSessionFactoryTest {
         assertEquals(
                 RepositoryPolicy.UPDATE_POLICY_ALWAYS,
                 systemSessionFactory.newRepositorySession(request).getUpdatePolicy());
+    }
+
+    @Test
+    void artifactsUpdatePolicyTest() throws InvalidRepositoryException {
+        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Collections.emptyMap(),
+                versionFilterBuilder);
+
+        // No policy set: legacy path, no per-type policy
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        org.eclipse.aether.RepositorySystemSession session = systemSessionFactory.newRepositorySession(request);
+        assertNull(session.getArtifactUpdatePolicy());
+        assertNull(session.getMetadataUpdatePolicy());
+
+        // Artifacts policy only
+        request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setArtifactsUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_ALWAYS);
+        session = systemSessionFactory.newRepositorySession(request);
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_ALWAYS, session.getArtifactUpdatePolicy());
+        assertNull(session.getMetadataUpdatePolicy());
+
+        // Metadata policy only
+        request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setMetadataUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_NEVER);
+        session = systemSessionFactory.newRepositorySession(request);
+        assertNull(session.getArtifactUpdatePolicy());
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_NEVER, session.getMetadataUpdatePolicy());
+
+        // Both per-type policies set (interval:N)
+        request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setArtifactsUpdatePolicy("interval:30");
+        request.setMetadataUpdatePolicy(RepositoryPolicy.UPDATE_POLICY_DAILY);
+        session = systemSessionFactory.newRepositorySession(request);
+        assertEquals("interval:30", session.getArtifactUpdatePolicy());
+        assertEquals(RepositoryPolicy.UPDATE_POLICY_DAILY, session.getMetadataUpdatePolicy());
     }
 
     @Test
@@ -435,6 +482,130 @@ public class DefaultRepositorySystemSessionFactoryTest {
                 "Unknown resolver transport 'illegal'. Supported transports are: wagon, apache, jdk, auto",
                 exception.getMessage());
         properties.remove("maven.resolver.transport");
+    }
+
+    @Test
+    void credentialsServedForOriginDeclaredOnlyByServer() throws InvalidRepositoryException {
+        MavenExecutionRequest request = requestWithServer(
+                serverWithRepositoryOrigins("internal", "https://repo.example.org", "https://mirror.example.org:8443"));
+
+        AuthenticationSelector selector = authenticationSelector(request);
+
+        assertNotNull(selector.getAuthentication(repository("internal", "https://repo.example.org/releases/")));
+        assertNotNull(selector.getAuthentication(repository("internal", "https://mirror.example.org:8443/repo/")));
+        assertNull(selector.getAuthentication(repository("internal", "https://evil.example.org/releases/")));
+    }
+
+    @Test
+    void credentialsServedForOriginDeclaredOnlyByServerInStrictScope() throws InvalidRepositoryException {
+        MavenExecutionRequest request =
+                requestWithServer(serverWithRepositoryOrigins("internal", "https://repo.example.org"));
+        Properties properties = new Properties();
+        properties.put(DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE, "strict");
+        request.setSystemProperties(properties);
+
+        AuthenticationSelector selector = authenticationSelector(request);
+
+        assertNotNull(selector.getAuthentication(repository("internal", "https://repo.example.org/releases/")));
+        assertNull(selector.getAuthentication(repository("internal", "https://evil.example.org/releases/")));
+    }
+
+    @Test
+    void serverWithoutRepositoryOriginsIsRefusedInStrictScope() throws InvalidRepositoryException {
+        MavenExecutionRequest request = requestWithServer(serverWithRepositoryOrigins("internal"));
+        Properties properties = new Properties();
+        properties.put(DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE, "strict");
+        request.setSystemProperties(properties);
+
+        AuthenticationSelector selector = authenticationSelector(request);
+
+        assertNull(selector.getAuthentication(repository("internal", "https://repo.example.org/releases/")));
+    }
+
+    @Test
+    void serverRepositoryOriginsAddToMirrorOrigins() throws InvalidRepositoryException {
+        MavenExecutionRequest request =
+                requestWithServer(serverWithRepositoryOrigins("internal", "https://repo.example.org"));
+        Mirror mirror = new Mirror();
+        mirror.setId("internal");
+        mirror.setUrl("https://mirror.example.org/repo/");
+        mirror.setMirrorOf("*");
+        request.setMirrors(new ArrayList<>(List.of(mirror)));
+
+        AuthenticationSelector selector = authenticationSelector(request);
+
+        assertNotNull(selector.getAuthentication(repository("internal", "https://mirror.example.org/repo/")));
+        assertNotNull(selector.getAuthentication(repository("internal", "https://repo.example.org/releases/")));
+        assertNull(selector.getAuthentication(repository("internal", "https://evil.example.org/releases/")));
+    }
+
+    @Test
+    void malformedServerRepositoryOriginIsIgnored() throws InvalidRepositoryException {
+        MavenExecutionRequest request = requestWithServer(serverWithRepositoryOrigins("internal", "not an origin"));
+        Properties properties = new Properties();
+        properties.put(DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE, "strict");
+        request.setSystemProperties(properties);
+
+        AuthenticationSelector selector = authenticationSelector(request);
+
+        assertNull(selector.getAuthentication(repository("internal", "https://repo.example.org/releases/")));
+    }
+
+    @Test
+    void sessionExtendersReceiveOriginBoundAuthenticationSelector() throws InvalidRepositoryException {
+        MavenExecutionRequest request =
+                requestWithServer(serverWithRepositoryOrigins("internal", "https://repo.example.org"));
+        AtomicReference<AuthenticationSelector> captured = new AtomicReference<>();
+        RepositorySystemSessionExtender extender =
+                (mavenExecutionRequest, configProperties, mirrorSelector, proxySelector, authenticationSelector) ->
+                        captured.set(authenticationSelector);
+        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Map.of("capture", extender),
+                versionFilterBuilder);
+
+        systemSessionFactory.newRepositorySession(request);
+
+        AuthenticationSelector selector = captured.get();
+        assertNotNull(selector);
+        assertNotNull(selector.getAuthentication(repository("internal", "https://repo.example.org/releases/")));
+        assertNull(selector.getAuthentication(repository("internal", "https://evil.example.org/releases/")));
+    }
+
+    private static Server serverWithRepositoryOrigins(String id, String... repositoryOrigins) {
+        Server server = new Server();
+        server.setId(id);
+        server.setUsername("jason");
+        server.setPassword("abc123");
+        server.setRepositoryOrigins(List.of(repositoryOrigins));
+        return server;
+    }
+
+    private MavenExecutionRequest requestWithServer(Server server) throws InvalidRepositoryException {
+        MavenExecutionRequest request = new DefaultMavenExecutionRequest();
+        request.setLocalRepository(getLocalRepository());
+        request.setServers(new ArrayList<>(List.of(server)));
+        return request;
+    }
+
+    private AuthenticationSelector authenticationSelector(MavenExecutionRequest request) {
+        DefaultRepositorySystemSessionFactory systemSessionFactory = new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Collections.emptyMap(),
+                versionFilterBuilder);
+        return systemSessionFactory.newRepositorySession(request).getAuthenticationSelector();
+    }
+
+    private static RemoteRepository repository(String id, String url) {
+        return new RemoteRepository.Builder(id, "default", url).build();
     }
 
     protected ArtifactRepository getLocalRepository() throws InvalidRepositoryException {

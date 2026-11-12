@@ -23,7 +23,7 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-compat-modules</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>4.2.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-model-builder</artifactId>
@@ -39,7 +39,15 @@ under the License.
   <dependencies>
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-utils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-api-annotations</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-api-xml</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -48,6 +56,10 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-model</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-support</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -111,6 +123,19 @@ under the License.
               <version>${maven.baseline}</version>
             </dependency>
           </oldVersion>
+          <!-- Os retains its binary name in the new transitive dependency. -->
+          <newVersions>
+            <dependency>
+              <groupId>${project.groupId}</groupId>
+              <artifactId>${project.artifactId}</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+            <dependency>
+              <groupId>org.apache.maven</groupId>
+              <artifactId>maven-utils</artifactId>
+              <version>${project.version}</version>
+            </dependency>
+          </newVersions>
           <parameter>
             <excludes>
               <!--              <exclude>org.apache.maven.model.building.DefaultModelBuilder#DefaultModelBuilder():CONSTRUCTOR_REMOVED</exclude>-->
@@ -159,6 +184,15 @@ under the License.
               <!--              <exclude>org.apache.maven.model.validation.ModelValidator#validateExternalProfiles(java.util.List,org.apache.maven.model.Model,org.apache.maven.model.building.ModelBuildingRequest,org.apache.maven.model.building.ModelProblemCollector):METHOD_NEW_DEFAULT</exclude>-->
             </excludes>
           </parameter>
+        </configuration>
+      </plugin>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-javadoc-plugin</artifactId>
+        <configuration>
+          <additionalJOptions>
+            <additionalJOption>--add-exports=org.codehaus.plexus.interpolation/org.codehaus.plexus.interpolation.util=org.apache.maven.model.builder</additionalJOption>
+          </additionalJOptions>
         </configuration>
       </plugin>
     </plugins>

@@ -64,6 +64,18 @@ class InitTest {
         "$VAR, my_var, my_var"
     })
     void testPrefixPrependedToUserInput(String template, String userInput, String expectedValue) throws Exception {
+        assertEquals(expectedValue, runInit(template, userInput));
+    }
+
+    @ParameterizedTest
+    @CsvSource(
+            value = {"NULL", "''", "'  '"},
+            nullValues = "NULL")
+    void testEmptyEditableValueIsAskedAgain(String emptyInput) throws Exception {
+        assertEquals("env:my_var", runInit("env:$VARIABLE_NAME", emptyInput, "my_var"));
+    }
+
+    private String runInit(String template, String... userInputs) throws Exception {
         MessageBuilderFactory messageBuilderFactory = mock(MessageBuilderFactory.class, Mockito.RETURNS_DEEP_STUBS);
         SecDispatcher secDispatcher = mock(SecDispatcher.class);
 
@@ -107,16 +119,22 @@ class InitTest {
                     Map<String, PromptResultItemIF> configureResult = new HashMap<>();
                     configureResult.put("password", createResult(template));
 
-                    Map<String, PromptResultItemIF> editResult = new HashMap<>();
-                    editResult.put("edit", createResult(userInput));
+                    List<Map<String, PromptResultItemIF>> answers = new ArrayList<>();
+                    answers.add(configureResult);
+                    for (String userInput : userInputs) {
+                        Map<String, PromptResultItemIF> editResult = new HashMap<>();
+                        editResult.put("edit", createResult(userInput));
+                        answers.add(editResult);
+                    }
 
                     Map<String, PromptResultItemIF> confirmResult = new HashMap<>();
                     ConfirmResult confirm = mock(ConfirmResult.class);
                     when(confirm.getConfirmed()).thenReturn(ConfirmChoice.ConfirmationValue.YES);
                     confirmResult.put("confirm", confirm);
 
+                    answers.add(confirmResult);
                     when(mock.prompt(any(List.class), any(List.class)))
-                            .thenReturn(dispatcherResult, configureResult, editResult, confirmResult);
+                            .thenReturn(dispatcherResult, answers.toArray(new Map[0]));
                 })) {
             init.doExecute(context);
         }
@@ -129,7 +147,7 @@ class InitTest {
         assertEquals(1, config.getProperties().size());
         ConfigProperty prop = config.getProperties().get(0);
         assertEquals("password", prop.getName());
-        assertEquals(expectedValue, prop.getValue());
+        return prop.getValue();
     }
 
     private PromptResultItemIF createResult(String value) {

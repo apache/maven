@@ -93,17 +93,20 @@ public interface Source {
      * <p>
      * The resolution strategy depends on the source type:
      * <ul>
-     *   <li>File sources resolve against their parent directory</li>
+     *   <li>Path sources resolve the relative path against their own path, so they are meant to be used on a
+     *       directory. For a file, the result is a path below that file. To resolve against the directory
+     *       containing a file, use {@link ModelSource#resolve(ModelLocator, String)}.</li>
      *   <li>URL sources resolve against their base URL</li>
      *   <li>Other sources may not support resolution and return null</li>
      * </ul>
      * <p>
-     * The implementation must handle:
-     * <ul>
-     *   <li>Both forward and back slashes as path separators</li>
-     *   <li>Parent directory references (..)</li>
-     *   <li>Both file and directory targets</li>
-     * </ul>
+     * A path source passes the relative path to {@link java.nio.file.Path#resolve(String)}, so the path
+     * separators are those of the platform. The resulting path is normalized with
+     * {@link java.nio.file.Path#normalize()}, which removes the {@code ..} references and does not access the file
+     * system.
+     * <p>
+     * Both forward and back slashes are only handled as separators by
+     * {@link ModelSource#resolve(ModelLocator, String)}.
      *
      * @param relative path to resolve relative to this source
      * @return the resolved source, or null if resolution not possible

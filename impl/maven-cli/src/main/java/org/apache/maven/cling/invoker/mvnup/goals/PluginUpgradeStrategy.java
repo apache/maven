@@ -277,7 +277,7 @@ public class PluginUpgradeStrategy extends AbstractUpgradeStrategy {
 
                     if (hasUpgrades) {
                         modifiedPoms.add(pomPath);
-                        context.success("Plugin upgrades applied");
+                        logChange(context, "Plugin upgrades");
                     } else {
                         context.success("No plugin upgrades needed");
                     }

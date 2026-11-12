@@ -131,8 +131,8 @@ public class SessionMock {
 
     public static InternalSession getMockSession(String localRepo) {
         LocalRepository localRepository = mock(LocalRepository.class);
-        when(localRepository.getId()).thenReturn("local");
-        when(localRepository.getPath()).thenReturn(Paths.get(localRepo));
+        when(localRepository.id()).thenReturn("local");
+        when(localRepository.path()).thenReturn(Paths.get(localRepo));
         return getMockSession(localRepository);
     }
 
@@ -160,9 +160,9 @@ public class SessionMock {
             String url = iom.getArgument(1, String.class);
             RemoteRepository remoteRepository =
                     mock(RemoteRepository.class, withSettings().strictness(Strictness.LENIENT));
-            when(remoteRepository.getId()).thenReturn(id);
-            when(remoteRepository.getUrl()).thenReturn(url);
-            when(remoteRepository.getProtocol()).thenReturn(URI.create(url).getScheme());
+            when(remoteRepository.id()).thenReturn(id);
+            when(remoteRepository.url()).thenReturn(url);
+            when(remoteRepository.protocol()).thenReturn(URI.create(url).getScheme());
             return remoteRepository;
         });
         when(session.getService(RepositoryFactory.class)).thenReturn(repositoryFactory);
@@ -193,7 +193,7 @@ public class SessionMock {
                 .thenAnswer(iom -> {
                     LocalRepository localRepo = iom.getArgument(1, LocalRepository.class);
                     Artifact artifact = iom.getArgument(2, Artifact.class);
-                    return localRepo.getPath().resolve(getPathForArtifact(artifact));
+                    return localRepo.path().resolve(getPathForArtifact(artifact));
                 });
         when(session.getService(LocalRepositoryManager.class)).thenReturn(localRepositoryManager);
 

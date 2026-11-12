@@ -81,6 +81,13 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
 
     private Properties properties;
 
+    /**
+     * Creates an evaluator that is not bound to a mojo execution: the expressions referring to the mojo, its execution
+     * or its plugin ({@code ${mojo}}, {@code ${mojoExecution}}, {@code ${plugin}} and their sub-expressions) evaluate
+     * to {@code null}, as unknown expressions do, while all the other expressions are evaluated normally.
+     *
+     * @param session the session to evaluate the expressions against
+     */
     public PluginParameterExpressionEvaluator(MavenSession session) {
         this(session, null);
     }
@@ -163,7 +170,8 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
             return expression.replace("$$", "$");
         }
 
-        MojoDescriptor mojoDescriptor = mojoExecution.getMojoDescriptor();
+        // the evaluator may be created without a mojo execution, see the single argument constructor
+        MojoDescriptor mojoDescriptor = mojoExecution != null ? mojoExecution.getMojoDescriptor() : null;
 
         if ("localRepository".equals(expression)) {
             value = session.getLocalRepository();
@@ -217,7 +225,7 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
             value = session.getRepositorySession();
         } else if (expression.equals("mojo") || expression.equals("mojoExecution")) {
             value = mojoExecution;
-        } else if (expression.startsWith("mojo")) {
+        } else if (expression.startsWith("mojo") && mojoExecution != null) {
             try {
                 int pathSeparator = expression.indexOf('/');
 
@@ -234,8 +242,8 @@ public class PluginParameterExpressionEvaluator implements TypeAwareExpressionEv
                         "Error evaluating plugin parameter expression: " + expression, e);
             }
         } else if (expression.equals("plugin")) {
-            value = mojoDescriptor.getPluginDescriptor();
-        } else if (expression.startsWith("plugin")) {
+            value = mojoDescriptor != null ? mojoDescriptor.getPluginDescriptor() : null;
+        } else if (expression.startsWith("plugin") && mojoDescriptor != null) {
             try {
                 int pathSeparator = expression.indexOf('/');
 

@@ -58,6 +58,39 @@ class MavenRepositorySystemTest {
         assertFalse(MavenRepositorySystem.isExternalRepo(repo("http://127.0.0.1/m2/")));
     }
 
+    @Test
+    void testLoopbackAddressesAreLocal() {
+        for (String url : new String[] {
+            "http://127.0.0.2/m2/",
+            "http://127.255.255.254:8080/m2/",
+            "http://[::1]/m2/",
+            "http://[::1]:8080/m2/",
+            "http://[0:0:0:0:0:0:0:1]:8080/m2/",
+            // an IPv4 loopback address written as IPv4-mapped IPv6 address
+            "http://[::ffff:127.0.0.1]/m2/",
+            "http://[::ffff:7f00:1]:8080/m2/"
+        }) {
+            assertFalse(MavenRepositorySystem.isExternalRepo(repo(url)), url);
+            assertFalse(MavenRepositorySystem.isExternalHttpRepo(repo(url)), url);
+        }
+    }
+
+    @Test
+    void testOtherAddressesAreExternal() {
+        for (String url : new String[] {
+            "http://128.0.0.1/m2/",
+            "http://127.0.0.1.example.com/m2/",
+            "http://127.example.com/m2/",
+            "http://[2001:db8::1]/m2/",
+            "http://[2001:db8::1]:8080/m2/",
+            // an IPv4-mapped IPv6 address which is not a loopback one
+            "http://[::ffff:8.8.8.8]/m2/"
+        }) {
+            assertTrue(MavenRepositorySystem.isExternalRepo(repo(url)), url);
+            assertTrue(MavenRepositorySystem.isExternalHttpRepo(repo(url)), url);
+        }
+    }
+
     private static ArtifactRepository repo(String url) {
         return new MavenArtifactRepository("test", url, null, null, null);
     }

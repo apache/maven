@@ -61,7 +61,7 @@ abstract class AetherDependencyWrapper {
      * {@return the group identifier of the wrapped dependency}
      * The default implementation delegates to the Eclipse Aether artifact.
      */
-    public String getGroupId() {
+    public String groupId() {
         return dependency.getArtifact().getGroupId();
     }
 
@@ -69,7 +69,7 @@ abstract class AetherDependencyWrapper {
      * {@return the artifact identifier of the wrapped dependency}
      * The default implementation delegates to the Eclipse Aether artifact.
      */
-    public String getArtifactId() {
+    public String artifactId() {
         return dependency.getArtifact().getArtifactId();
     }
 
@@ -77,7 +77,7 @@ abstract class AetherDependencyWrapper {
      * {@return the file extension of the wrapped dependency}
      * The default implementation delegates to the Eclipse Aether artifact.
      */
-    public String getExtension() {
+    public String extension() {
         return dependency.getArtifact().getExtension();
     }
 
@@ -85,8 +85,8 @@ abstract class AetherDependencyWrapper {
      * {@return the type of the wrapped dependency}
      * The default implementation infers the type from the properties associated to the Eclipse Aether artifact.
      */
-    public Type getType() {
-        String type = dependency.getArtifact().getProperty(ArtifactProperties.TYPE, getExtension());
+    public Type type() {
+        String type = dependency.getArtifact().getProperty(ArtifactProperties.TYPE, extension());
         return session.requireType(type);
     }
 
@@ -94,13 +94,13 @@ abstract class AetherDependencyWrapper {
      * {@return the classifier ("jar", "test-jar", …) of the wrapped dependency}
      * The default implementation first delegates to the Eclipse Aether artifact.
      * If the latter does not provide a non-empty classifier,
-     * then the default value is determined by {@linkplain #getType() type}.
+     * then the default value is determined by {@linkplain #type() type}.
      */
     @Nonnull
-    public String getClassifier() {
+    public String classifier() {
         String classifier = dependency.getArtifact().getClassifier();
         if (classifier.isEmpty()) {
-            classifier = getType().getClassifier();
+            classifier = type().getClassifier();
             if (classifier == null) {
                 classifier = "";
             }
@@ -112,7 +112,7 @@ abstract class AetherDependencyWrapper {
      * {@return the scope (compile, test, …) of this dependency}
      */
     @Nonnull
-    public DependencyScope getScope() {
+    public DependencyScope scope() {
         return session.requireDependencyScope(dependency.getScope());
     }
 

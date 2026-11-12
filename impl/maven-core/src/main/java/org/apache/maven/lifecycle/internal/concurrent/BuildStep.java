@@ -116,7 +116,7 @@ public class BuildStep {
     }
 
     public void executeAfter(BuildStep stepToExecuteBefore) {
-        if (!isSuccessorOf(stepToExecuteBefore)) {
+        if (!isSuccessorOf(stepToExecuteBefore) && !stepToExecuteBefore.isSuccessorOf(this)) {
             predecessors.add(stepToExecuteBefore);
             stepToExecuteBefore.successors.add(this);
         }

@@ -36,25 +36,25 @@ public class DefaultRemoteRepository implements RemoteRepository {
 
     @Nonnull
     @Override
-    public String getId() {
+    public String id() {
         return repository.getId();
     }
 
     @Nonnull
     @Override
-    public String getType() {
+    public String type() {
         return repository.getContentType();
     }
 
     @Nonnull
     @Override
-    public String getUrl() {
+    public String url() {
         return repository.getUrl();
     }
 
     @Nonnull
     @Override
-    public String getProtocol() {
+    public String protocol() {
         return repository.getProtocol();
     }
 

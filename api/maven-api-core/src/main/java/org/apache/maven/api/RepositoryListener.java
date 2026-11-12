@@ -27,13 +27,15 @@ import org.apache.maven.api.annotations.Nonnull;
  * Each method corresponds to a specific {@link RepositoryEventType} and has a no-op default implementation,
  * so implementations only need to override the methods they care about.
  * <p>
- * Register a {@code RepositoryListener} via {@link Session#registerListener(Listener)}.
+ * Register a {@code RepositoryListener} via {@link Session#registerListener(Listener)} or by implementing
+ * {@code org.apache.maven.api.spi.SpiService} for auto-discovery.
  * Implementations must be thread-safe because callbacks may occur concurrently.
- * Runtime exceptions thrown by a listener do not stop repository processing or notification of other listeners.
+ * Runtime exceptions thrown by a listener are caught and logged at {@code WARN} level by the repository event dispatcher;
+ * they do not stop repository processing or notification of other listeners, and cannot abort the build.
  *
  * @see RepositoryEvent
  * @see RepositoryEventType
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Consumer

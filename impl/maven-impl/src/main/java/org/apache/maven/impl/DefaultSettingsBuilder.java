@@ -18,11 +18,15 @@
  */
 package org.apache.maven.impl;
 
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -47,6 +51,7 @@ import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.xml.SettingsXmlFactory;
 import org.apache.maven.api.settings.Activation;
 import org.apache.maven.api.settings.IdentifiableBase;
+import org.apache.maven.api.settings.Mirror;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Proxy;
 import org.apache.maven.api.settings.Repository;
@@ -60,6 +65,8 @@ import org.apache.maven.settings.v4.SettingsTransformer;
 import org.codehaus.plexus.components.secdispatcher.Dispatcher;
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import org.codehaus.plexus.components.secdispatcher.internal.DefaultSecDispatcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Builds the effective settings from a user settings file and/or a global settings file.
@@ -67,18 +74,43 @@ import org.codehaus.plexus.components.secdispatcher.internal.DefaultSecDispatche
 @Named
 public class DefaultSettingsBuilder implements SettingsBuilder {
 
+    private static final Logger LOGGER = LoggerFactory.getLogger(DefaultSettingsBuilder.class);
+
     private final DefaultSettingsValidator settingsValidator = new DefaultSettingsValidator();
 
-    private final SettingsMerger settingsMerger = new SettingsMerger() {
+    // Package-private so SettingsUtilsV4 can reuse the same configured merger instance.
+    static final SettingsMerger SETTINGS_MERGER = new SettingsMerger() {
         @Override
         protected KeyComputer<Repository> getRepositoryKey() {
             return IdentifiableBase::getId;
         }
+
+        @Override
+        protected KeyComputer<Mirror> getMirrorKey() {
+            return IdentifiableBase::getId;
+        }
+
+        @Override
+        protected KeyComputer<Server> getServerKey() {
+            return IdentifiableBase::getId;
+        }
+
+        @Override
+        protected KeyComputer<Proxy> getProxyKey() {
+            return IdentifiableBase::getId;
+        }
+
+        @Override
+        protected KeyComputer<Profile> getProfileKey() {
+            return IdentifiableBase::getId;
+        }
     };
+
+    private final SettingsMerger settingsMerger = SETTINGS_MERGER;
 
     private final SettingsParser xmlSettingsParser;
 
-    private final Map<String, SettingsParser> settingsParsers;
+    private final List<SettingsParser> settingsParsers;
 
     private final Interpolator interpolator;
 
@@ -89,7 +121,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
      */
     public DefaultSettingsBuilder(
             SettingsXmlFactory settingsXmlFactory, Interpolator interpolator, Map<String, Dispatcher> dispatchers) {
-        this(settingsXmlFactory, interpolator, dispatchers, Map.of());
+        this(settingsXmlFactory, interpolator, dispatchers, List.of());
     }
 
     @Inject
@@ -97,11 +129,29 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             SettingsXmlFactory settingsXmlFactory,
             Interpolator interpolator,
             Map<String, Dispatcher> dispatchers,
-            @Nullable Map<String, SettingsParser> settingsParsers) {
+            @Nullable List<SettingsParser> settingsParsers) {
         this.xmlSettingsParser = new XmlSettingsParser(settingsXmlFactory);
-        this.settingsParsers = settingsParsers != null ? settingsParsers : Map.of();
+        this.settingsParsers = deduplicate(settingsParsers);
         this.interpolator = interpolator;
         this.dispatchers = dispatchers;
+    }
+
+    private static List<SettingsParser> deduplicate(@Nullable List<SettingsParser> parsers) {
+        if (parsers == null || parsers.isEmpty()) {
+            return List.of();
+        }
+        Map<String, SettingsParser> seen = new LinkedHashMap<>();
+        for (SettingsParser parser : parsers) {
+            SettingsParser previous = seen.putIfAbsent(parser.id(), parser);
+            if (previous != null) {
+                LOGGER.warn(
+                        "Duplicate settings parser id '{}': {} already registered, ignoring {}",
+                        parser.id(),
+                        previous.getClass().getName(),
+                        parser.getClass().getName());
+            }
+        }
+        return List.copyOf(seen.values());
     }
 
     @Override
@@ -120,11 +170,11 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         Settings effective =
                 settingsMerger.merge(user, settingsMerger.merge(project, installation, false, null), false, null);
 
-        // If no repository is defined in the user/global settings,
-        // it means that we have "old" settings (as those are new in 4.0)
-        // so add central to the computed settings for backward compatibility.
+        // Each list is checked independently: a user may define <repositories>
+        // (e.g. an internal mirror) without defining <pluginRepositories>, and
+        // plugin resolution still needs central.
         if (effective.getRepositories().isEmpty()
-                && effective.getPluginRepositories().isEmpty()) {
+                || effective.getPluginRepositories().isEmpty()) {
             Repository central = Repository.newBuilder()
                     .id("central")
                     .name("Central Repository")
@@ -133,10 +183,14 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                     .build();
             Repository centralWithNoUpdate = central.withReleases(
                     RepositoryPolicy.newBuilder().updatePolicy("never").build());
-            effective = Settings.newBuilder(effective)
-                    .repositories(List.of(central))
-                    .pluginRepositories(List.of(centralWithNoUpdate))
-                    .build();
+            Settings.Builder builder = Settings.newBuilder(effective);
+            if (effective.getRepositories().isEmpty()) {
+                builder.repositories(List.of(central));
+            }
+            if (effective.getPluginRepositories().isEmpty()) {
+                builder.pluginRepositories(List.of(centralWithNoUpdate));
+            }
+            effective = builder.build();
         }
 
         // resolve relative local repository paths to absolute to save plugins from trouble.
@@ -154,7 +208,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             throw new SettingsBuilderException("Error building settings", problems);
         }
 
-        return new DefaultSettingsBuilderResult(request, effective, problems);
+        return new DefaultSettingsBuilderResult(request, installation, project, user, effective, problems);
     }
 
     private Settings readSettings(
@@ -166,6 +220,10 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             return Settings.newInstance();
         }
 
+        // Determine if strict parsing mode is requested
+        boolean strictParsing = Boolean.parseBoolean(
+                request.getSession().getEffectiveProperties().get(Constants.MAVEN_SETTINGS_STRICT_PARSING));
+
         Settings settings;
 
         try {
@@ -173,17 +231,28 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
             if (parser == null) {
                 return Settings.newInstance();
             }
+
+            // Interpolate the raw XML before parsing so that non-String fields
+            // (e.g. proxy.port, proxy.active) are resolved at the text level
+            // before Modello converts them to int/boolean.
+            Source interpolatedSource = interpolateSource(settingsSource, request);
+
             try {
-                settings = parser.parse(settingsSource, Map.of(SettingsParser.STRICT, true));
+                settings = parser.parse(interpolatedSource, Map.of(SettingsParser.STRICT, true));
             } catch (SettingsParserException e) {
+                BuilderProblem.Severity severity =
+                        strictParsing ? BuilderProblem.Severity.FATAL : BuilderProblem.Severity.WARNING;
                 problems.reportProblem(new DefaultBuilderProblem(
                         settingsSource.getLocation(),
                         e.getLineNumber(),
                         e.getColumnNumber(),
                         e,
                         e.getMessage(),
-                        BuilderProblem.Severity.WARNING));
-                settings = parser.parse(settingsSource, Map.of(SettingsParser.STRICT, false));
+                        severity));
+                if (strictParsing) {
+                    return Settings.newInstance();
+                }
+                settings = parser.parse(interpolatedSource, Map.of(SettingsParser.STRICT, false));
             }
         } catch (SettingsParserException e) {
             problems.reportProblem(new DefaultBuilderProblem(
@@ -228,6 +297,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
                                     .filePermissions(null)
                                     .directoryPermissions(null)
                                     .aliases(List.of())
+                                    .repositoryOrigins(List.of())
                                     .build())
                             .toList())
                     .build();
@@ -247,35 +317,122 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         return Server.newBuilder(server, true).id(id).aliases(List.of()).build();
     }
 
+    /**
+     * XML-escapes a value so that it can be safely embedded in XML text content.
+     * Replaces the five predefined XML entities: {@code &}, {@code <}, {@code >},
+     * {@code "}, and {@code '}.
+     */
+    private static String xmlEscape(String value) {
+        if (value == null) {
+            return null;
+        }
+        // Quick check: if none of the special chars are present, return as-is
+        if (value.indexOf('&') < 0
+                && value.indexOf('<') < 0
+                && value.indexOf('>') < 0
+                && value.indexOf('"') < 0
+                && value.indexOf('\'') < 0) {
+            return value;
+        }
+        StringBuilder sb = new StringBuilder(value.length() + 16);
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            switch (c) {
+                case '&':
+                    sb.append("&amp;");
+                    break;
+                case '<':
+                    sb.append("&lt;");
+                    break;
+                case '>':
+                    sb.append("&gt;");
+                    break;
+                case '"':
+                    sb.append("&quot;");
+                    break;
+                case '\'':
+                    sb.append("&apos;");
+                    break;
+                default:
+                    sb.append(c);
+            }
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Wraps the source so that when {@code openStream()} is called, the raw XML is read,
+     * interpolated as a string (resolving non-String fields like {@code <port>${test.port}</port>}
+     * before Modello converts them to int/boolean), and returned as a new stream.
+     *
+     * <p>Resolved property values are XML-escaped before substitution so that values containing
+     * XML special characters (e.g. {@code &x=y<>}) do not corrupt the XML structure.</p>
+     */
+    private Source interpolateSource(Source settingsSource, SettingsBuilderRequest request) {
+        UnaryOperator<String> src;
+        if (request.getInterpolationSource().isPresent()) {
+            src = request.getInterpolationSource().get();
+        } else {
+            Map<String, String> userProperties = request.getSession().getUserProperties();
+            Map<String, String> systemProperties = request.getSession().getSystemProperties();
+            src = Interpolator.chain(userProperties::get, systemProperties::get);
+        }
+
+        return new Source() {
+            @Override
+            public Path getPath() {
+                return settingsSource.getPath();
+            }
+
+            @Override
+            public InputStream openStream() throws IOException {
+                String rawXml;
+                try (InputStream in = settingsSource.openStream()) {
+                    byte[] bytes = in.readAllBytes();
+                    rawXml = new String(bytes, StandardCharsets.UTF_8);
+                }
+                // XML-escape resolved values so that property values containing XML special
+                // characters (e.g. &, <, >) do not produce malformed XML after substitution.
+                String interpolatedXml =
+                        interpolator.interpolate(rawXml, src, (name, value) -> xmlEscape(value), false);
+                return new ByteArrayInputStream(interpolatedXml.getBytes(StandardCharsets.UTF_8));
+            }
+
+            @Override
+            public String getLocation() {
+                return settingsSource.getLocation();
+            }
+
+            @Override
+            public Source resolve(String relative) {
+                return settingsSource.resolve(relative);
+            }
+        };
+    }
+
     @Nullable
     private SettingsParser selectParser(Source source, ProblemCollector<BuilderProblem> problems) {
-        List<Map.Entry<String, SettingsParser>> matches = new ArrayList<>();
-        for (Map.Entry<String, SettingsParser> entry : settingsParsers.entrySet()) {
+        List<SettingsParser> matches = new ArrayList<>();
+        for (SettingsParser parser : settingsParsers) {
             try {
-                if (entry.getValue().supports(source)) {
-                    matches.add(entry);
+                if (parser.supports(source)) {
+                    matches.add(parser);
                 }
             } catch (RuntimeException e) {
-                String msg = "Settings parser '" + parserName(entry.getKey())
-                        + "' failed to determine support for this source";
+                String msg = "Settings parser '" + parser.id() + "' failed to determine support for this source";
                 problems.reportProblem(
                         new DefaultBuilderProblem(source.getLocation(), -1, -1, e, msg, BuilderProblem.Severity.FATAL));
                 return null;
             }
         }
         if (matches.size() > 1) {
-            String parsers =
-                    matches.stream().map(e -> parserName(e.getKey())).sorted().collect(Collectors.joining(", "));
+            String parsers = matches.stream().map(SettingsParser::id).sorted().collect(Collectors.joining(", "));
             String msg = "Multiple settings parsers support this source: " + parsers;
             problems.reportProblem(
                     new DefaultBuilderProblem(source.getLocation(), -1, -1, null, msg, BuilderProblem.Severity.FATAL));
             return null;
         }
-        return matches.isEmpty() ? xmlSettingsParser : matches.get(0).getValue();
-    }
-
-    private static String parserName(@Nullable String key) {
-        return key != null ? key : "<unnamed>";
+        return matches.isEmpty() ? xmlSettingsParser : matches.get(0);
     }
 
     private Settings interpolate(
@@ -486,13 +643,27 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
         private final SettingsBuilderRequest request;
 
+        private final Settings installationSettings;
+
+        private final Settings projectSettings;
+
+        private final Settings userSettings;
+
         private final Settings effectiveSettings;
 
         private final ProblemCollector<BuilderProblem> problems;
 
         DefaultSettingsBuilderResult(
-                SettingsBuilderRequest request, Settings effectiveSettings, ProblemCollector<BuilderProblem> problems) {
+                SettingsBuilderRequest request,
+                Settings installationSettings,
+                Settings projectSettings,
+                Settings userSettings,
+                Settings effectiveSettings,
+                ProblemCollector<BuilderProblem> problems) {
             this.request = request;
+            this.installationSettings = installationSettings != null ? installationSettings : Settings.newInstance();
+            this.projectSettings = projectSettings != null ? projectSettings : Settings.newInstance();
+            this.userSettings = userSettings != null ? userSettings : Settings.newInstance();
             this.effectiveSettings = effectiveSettings;
             this.problems = (problems != null) ? problems : ProblemCollector.empty();
         }
@@ -500,6 +671,21 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         @Override
         public SettingsBuilderRequest getRequest() {
             return request;
+        }
+
+        @Override
+        public Settings getInstallationSettings() {
+            return installationSettings;
+        }
+
+        @Override
+        public Settings getProjectSettings() {
+            return projectSettings;
+        }
+
+        @Override
+        public Settings getUserSettings() {
+            return userSettings;
         }
 
         @Override

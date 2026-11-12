@@ -38,6 +38,8 @@ import static org.apache.maven.testing.plugin.MojoExtension.getBasedir;
 @Named
 public class TestProviders {
 
+    private static final int TEST_PROVIDER_PRIORITY = 100;
+
     @Provides
     @Singleton
     @SuppressWarnings("unused")
@@ -52,7 +54,7 @@ public class TestProviders {
     }
 
     @Provides
-    @Priority(100)
+    @Priority(TEST_PROVIDER_PRIORITY)
     @Singleton
     @SuppressWarnings("unused")
     private static DependencyResolver getMockDependencyResolver() {
@@ -60,6 +62,7 @@ public class TestProviders {
     }
 
     @Provides
+    @Priority(TEST_PROVIDER_PRIORITY)
     @Singleton
     @SuppressWarnings("unused")
     private static ToolchainManager getToolchainManager() {
@@ -67,8 +70,8 @@ public class TestProviders {
     }
 
     @Provides
+    @Priority(TEST_PROVIDER_PRIORITY)
     @Singleton
-    @Priority(100)
     @SuppressWarnings("unused")
     private static OsService getOsService() {
         return new DefaultOsService();

@@ -100,6 +100,9 @@ public @interface InjectMojo {
      *
      * <p>If not specified, the default project configuration will be used.</p>
      *
+     * <p>A POM given on a parameter's annotation also builds the test project, in place of the
+     * {@code pom.xml} of the base directory that a method-level annotation without a POM reads.</p>
+     *
      * @return the path to a custom POM file, or an empty string to use defaults
      */
     String pom() default "";

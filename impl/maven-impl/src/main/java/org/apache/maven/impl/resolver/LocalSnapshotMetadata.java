@@ -122,7 +122,7 @@ final class LocalSnapshotMetadata extends MavenMetadata {
     }
 
     private String getKey(String classifier, String extension) {
-        return classifier + ':' + extension;
+        return (classifier == null ? "" : classifier) + ':' + extension;
     }
 
     @Override

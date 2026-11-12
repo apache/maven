@@ -25,7 +25,7 @@ import org.junit.jupiter.api.Test;
 /**
  * This is a test set for <a href="https://issues.apache.org/jira/browse/MNG-8708">MNG-8708</a>.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 class MavenITmng8708ParentInferenceTest extends AbstractMavenIntegrationTestCase {
 

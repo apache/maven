@@ -25,13 +25,37 @@ import org.apache.maven.api.annotations.Nullable;
  * A dependency exclusion.
  *
  * @since 4.0.0
- * @see DependencyCoordinates#getExclusions()
+ * @see DependencyCoordinates#exclusions()
  */
 @Experimental
 public interface Exclusion {
+    /**
+     * {@return the group identifier of the excluded dependency, or {@code null} for a wildcard}.
+     */
     @Nullable
-    String getGroupId();
+    String groupId();
 
+    /**
+     * @deprecated Use {@link #groupId()} instead.
+     */
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nullable
-    String getArtifactId();
+    default String getGroupId() {
+        return groupId();
+    }
+
+    /**
+     * {@return the artifact identifier of the excluded dependency, or {@code null} for a wildcard}.
+     */
+    @Nullable
+    String artifactId();
+
+    /**
+     * @deprecated Use {@link #artifactId()} instead.
+     */
+    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Nullable
+    default String getArtifactId() {
+        return artifactId();
+    }
 }

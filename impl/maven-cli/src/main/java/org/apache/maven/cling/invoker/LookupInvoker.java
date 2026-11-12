@@ -37,6 +37,7 @@ import java.util.Objects;
 import java.util.Properties;
 import java.util.function.Consumer;
 import java.util.function.UnaryOperator;
+import java.util.logging.Handler;
 
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.ProtoSession;
@@ -124,6 +125,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         Properties oldProps = new Properties();
         oldProps.putAll(System.getProperties());
         ClassLoader oldCL = Thread.currentThread().getContextClassLoader();
+        // activateLogging() replaces them with SLF4JBridgeHandler, whose classes live in Maven's realm
+        Handler[] oldRootLoggerHandlers = java.util.logging.Logger.getLogger("").getHandlers();
         try (C context = createContext(invokerRequest)) {
             if (contextConsumer != null) {
                 contextConsumer.accept(context);
@@ -147,6 +150,22 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         } finally {
             Thread.currentThread().setContextClassLoader(oldCL);
             System.setProperties(oldProps);
+            restoreRootLoggerHandlers(oldRootLoggerHandlers);
+        }
+    }
+
+    /**
+     * Puts back the handlers the {@code java.util.logging} root logger had before the invocation. When Maven runs inside
+     * another JVM, the root logger belongs to that JVM, and a {@code SLF4JBridgeHandler} left on it would route the
+     * host's logging to Maven and fail once Maven's class realm is closed.
+     */
+    private static void restoreRootLoggerHandlers(Handler[] handlers) {
+        java.util.logging.Logger root = java.util.logging.Logger.getLogger("");
+        for (Handler handler : root.getHandlers()) {
+            root.removeHandler(handler);
+        }
+        for (Handler handler : handlers) {
+            root.addHandler(handler);
         }
     }
 
@@ -554,10 +573,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void postContainer(C context) throws Exception {
         ProtoSession protoSession = context.protoSession;
-        for (PropertyContributor propertyContributor : context.lookup
-                .lookup(PropertyContributorsHolder.class)
-                .getPropertyContributors()
-                .values()) {
+        for (PropertyContributor propertyContributor :
+                context.lookup.lookup(PropertyContributorsHolder.class).getPropertyContributors()) {
             protoSession = protoSession.toBuilder()
                     .withUserProperties(propertyContributor.contribute(protoSession))
                     .build();
@@ -716,6 +733,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         context.effectiveSettings = settingsResult.getEffectiveSettings();
+        context.installationSettings = settingsResult.getInstallationSettings();
+        context.projectSettings = settingsResult.getProjectSettings();
+        context.userSettings = settingsResult.getUserSettings();
         context.interactive = mayDisableInteractiveMode(context, context.effectiveSettings.isInteractiveMode());
         context.localRepositoryPath = localRepositoryPath(context);
 
@@ -723,12 +743,18 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             int totalProblems = settingsResult.getProblems().totalProblemsReported();
             context.logger.info("");
             context.logger.info(String.format(
-                    "%s %s encountered while building the effective settings (use -e to see details)",
+                    "%s %s encountered while building the effective settings",
                     totalProblems, (totalProblems == 1) ? "problem was" : "problems were"));
 
-            if (context.options().showErrors().orElse(false)) {
-                for (BuilderProblem problem :
-                        settingsResult.getProblems().problems().toList()) {
+            // print the problems themselves by default, as Maven 3 does: a settings element that is skipped (unknown
+            // to this settings model, or misspelt) can change what credentials are sent where, and must not go
+            // unnoticed; -e adds the stack trace of the underlying exception
+            boolean showErrors = context.options().showErrors().orElse(false);
+            for (BuilderProblem problem :
+                    settingsResult.getProblems().problems().toList()) {
+                if (showErrors && problem.getException() != null) {
+                    context.logger.warn(problem.getMessage() + " @ " + problem.getLocation(), problem.getException());
+                } else {
                     context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
                 }
             }
@@ -739,6 +765,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             context.projectSettingsPath = null;
             context.userSettingsPath = null;
             context.effectiveSettings = null;
+            context.installationSettings = null;
+            context.projectSettings = null;
+            context.userSettings = null;
             context.interactive = true;
             context.localRepositoryPath = null;
         };

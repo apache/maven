@@ -23,6 +23,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.ConsoleHandler;
+import java.util.logging.Handler;
 
 import com.google.common.jimfs.Configuration;
 import com.google.common.jimfs.Jimfs;
@@ -30,6 +32,7 @@ import org.apache.maven.api.cli.Invoker;
 import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.Parser;
 import org.apache.maven.cling.invoker.ProtoLookup;
+import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Order;
@@ -37,7 +40,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.CleanupMode;
 import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -47,6 +52,21 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  */
 @Order(200)
 public class MavenInvokerTest extends MavenInvokerTestSupport {
+
+    /**
+     * Test invoker exposing the resume selector for unit testing.
+     */
+    private static class TestMavenInvoker extends MavenInvoker {
+
+        TestMavenInvoker() {
+            super(ProtoLookup.builder().build(), null);
+        }
+
+        String resumeSelector(List<MavenProject> projects, MavenProject failedProject) {
+            return getResumeFromSelector(projects, failedProject);
+        }
+    }
+
     @Override
     protected Invoker createInvoker(ClassWorld classWorld) {
         return new MavenInvoker(
@@ -64,6 +84,38 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
         invoke(cwd, userHome, List.of("verify"), List.of());
+    }
+
+    /**
+     * The invocation replaces the handlers of the {@code java.util.logging} root logger with
+     * {@code SLF4JBridgeHandler}; they must be back afterwards, as the root logger belongs to
+     * the JVM Maven runs in (GH-13362).
+     */
+    @Test
+    void restoresJavaUtilLoggingRootHandlers(
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path cwd,
+            @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
+            throws Exception {
+        java.util.logging.Logger root = java.util.logging.Logger.getLogger("");
+        Handler[] original = root.getHandlers();
+        Handler marker = new ConsoleHandler();
+        for (Handler handler : original) {
+            root.removeHandler(handler);
+        }
+        root.addHandler(marker);
+        try {
+            invoke(cwd, userHome, List.of("validate"), List.of());
+
+            assertArrayEquals(new Handler[] {marker}, root.getHandlers());
+        } finally {
+            root.removeHandler(marker);
+            for (Handler handler : root.getHandlers()) {
+                root.removeHandler(handler);
+            }
+            for (Handler handler : original) {
+                root.addHandler(handler);
+            }
+        }
     }
 
     @Disabled("Enable it when fully moved to NIO2 with Path/Filesystem (ie MavenExecutionRequest)")
@@ -169,45 +221,45 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
             @TempDir(cleanup = CleanupMode.ON_SUCCESS) Path userHome)
             throws Exception {
         String settingsXml = """
-<?xml version="1.0"?>
-<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
-  <interactiveMode>false</interactiveMode>
-  <profiles>
-    <profile>
-      <id>oss-development</id>
-      <repositories>
-        <repository>
-          <id>central</id>
-          <url>https://repo1.maven.org/maven2/</url>
-          <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-        </repository>
-      </repositories>
-      <pluginRepositories>
-        <pluginRepository>
-          <id>central</id>
-          <url>https://repo1.maven.org/maven2/</url>
-          <releases>
-            <enabled>true</enabled>
-            <updatePolicy>never</updatePolicy>
-          </releases>
-          <snapshots>
-            <enabled>false</enabled>
-          </snapshots>
-        </pluginRepository>
-      </pluginRepositories>
-    </profile>
-  </profiles>
-  <activeProfiles>
-    <activeProfile>oss-development</activeProfile>
-  </activeProfiles>
-</settings>""";
+                <?xml version="1.0"?>
+                <settings xmlns="http://maven.apache.org/SETTINGS/1.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                      xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 https://maven.apache.org/xsd/settings-1.0.0.xsd">
+                  <interactiveMode>false</interactiveMode>
+                  <profiles>
+                    <profile>
+                      <id>oss-development</id>
+                      <repositories>
+                        <repository>
+                          <id>central</id>
+                          <url>https://repo1.maven.org/maven2/</url>
+                          <releases>
+                            <enabled>true</enabled>
+                            <updatePolicy>never</updatePolicy>
+                          </releases>
+                          <snapshots>
+                            <enabled>false</enabled>
+                          </snapshots>
+                        </repository>
+                      </repositories>
+                      <pluginRepositories>
+                        <pluginRepository>
+                          <id>central</id>
+                          <url>https://repo1.maven.org/maven2/</url>
+                          <releases>
+                            <enabled>true</enabled>
+                            <updatePolicy>never</updatePolicy>
+                          </releases>
+                          <snapshots>
+                            <enabled>false</enabled>
+                          </snapshots>
+                        </pluginRepository>
+                      </pluginRepositories>
+                    </profile>
+                  </profiles>
+                  <activeProfiles>
+                    <activeProfile>oss-development</activeProfile>
+                  </activeProfiles>
+                </settings>""";
         Path dotMvn = cwd.resolve(".mvn");
         Files.createDirectories(dotMvn);
         Path projectExtensions = dotMvn.resolve("settings.xml");
@@ -228,5 +280,46 @@ public class MavenInvokerTest extends MavenInvokerTestSupport {
         String log = logs.get("eu.maveniverse.maven.plugins:toolbox:" + Environment.TOOLBOX_VERSION + ":dump");
         assertTrue(log.contains("https://repo1.maven.org/maven2"), log);
         assertFalse(log.contains("https://repo.maven.apache.org/maven2"), log);
+    }
+
+    @Test
+    void getResumeFromSelectorWithUniqueArtifactId() {
+        TestMavenInvoker invoker = new TestMavenInvoker();
+
+        MavenProject first = new MavenProject();
+        first.setGroupId("org.apache.maven");
+        first.setArtifactId("maven-core");
+
+        MavenProject failed = new MavenProject();
+        failed.setGroupId("org.apache.maven");
+        failed.setArtifactId("maven-cli");
+
+        assertEquals(":maven-cli", invoker.resumeSelector(List.of(first, failed), failed));
+    }
+
+    @Test
+    void getResumeFromSelectorWithDuplicateArtifactId() {
+        TestMavenInvoker invoker = new TestMavenInvoker();
+
+        MavenProject first = new MavenProject();
+        first.setGroupId("org.apache.maven");
+        first.setArtifactId("maven-core");
+
+        MavenProject failed = new MavenProject();
+        failed.setGroupId("org.example");
+        failed.setArtifactId("maven-core");
+
+        assertEquals("org.example:maven-core", invoker.resumeSelector(List.of(first, failed), failed));
+    }
+
+    @Test
+    void getResumeFromSelectorWithSingleProject() {
+        TestMavenInvoker invoker = new TestMavenInvoker();
+
+        MavenProject failed = new MavenProject();
+        failed.setGroupId("org.apache.maven");
+        failed.setArtifactId("maven-cli");
+
+        assertEquals(":maven-cli", invoker.resumeSelector(List.of(failed), failed));
     }
 }

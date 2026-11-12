@@ -32,11 +32,11 @@ import java.util.Objects;
 import java.util.Properties;
 
 import org.apache.maven.AbstractCoreMavenComponentTestCase;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.bridge.MavenRepositorySystem;
-import org.apache.maven.configuration.internal.EnhancedComponentConfigurator;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -48,13 +48,13 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.internal.V4MojoConfiguratorTestHelper;
 import org.apache.maven.project.CycleDetectedException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.util.Os;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -457,15 +457,20 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
         PluginParameterExpressionEvaluator evaluator =
                 new PluginParameterExpressionEvaluator(mavenSession, new MojoExecution(null));
 
-        DefaultPlexusConfiguration configuration = new DefaultPlexusConfiguration("config");
-        configuration.addChild("uri", "${session.rootDirectory.uri}");
-        configuration.addChild("path", "${session.rootDirectory}");
-        configuration.addChild("uriString", "${session.rootDirectory.uri.string}");
-        configuration.addChild("uriAsciiString", "${session.rootDirectory.uri.ASCIIString}");
-        configuration.addChild("pathString", "${session.rootDirectory.string}");
-
         Mojo mojo = new Mojo();
-        new EnhancedComponentConfigurator().configureComponent(mojo, configuration, evaluator, null);
+        V4MojoConfiguratorTestHelper.configure(
+                evaluator,
+                getClass().getClassLoader(),
+                null,
+                mojo,
+                XmlNode.newInstance(
+                        "configuration",
+                        java.util.List.of(
+                                XmlNode.newInstance("uri", "${session.rootDirectory.uri}"),
+                                XmlNode.newInstance("path", "${session.rootDirectory}"),
+                                XmlNode.newInstance("uriString", "${session.rootDirectory.uri.string}"),
+                                XmlNode.newInstance("uriAsciiString", "${session.rootDirectory.uri.ASCIIString}"),
+                                XmlNode.newInstance("pathString", "${session.rootDirectory.string}"))));
 
         assertEquals(
                 Objects.equals(path.toUri().toString(), path.toUri().toASCIIString()), !Os.isFamily(Os.FAMILY_WINDOWS));
@@ -478,6 +483,45 @@ class PluginParameterExpressionEvaluatorTest extends AbstractCoreMavenComponentT
 
     private MavenProject createDefaultProject() {
         return new MavenProject(new Model());
+    }
+
+    /**
+     * An evaluator created without a mojo execution still evaluates the expressions which do not depend on one.
+     */
+    @Test
+    void testEvaluationWithoutMojoExecution() throws Exception {
+        String sysprop = "PPEET_without_mojo_execution";
+        Properties executionProperties = new Properties();
+        executionProperties.setProperty(sysprop, "value");
+        MavenSession session =
+                createSession((MutablePlexusContainer) getContainer(), getLocalRepository(), executionProperties);
+        session.getRequest().setRootDirectory(rootDirectory);
+
+        ExpressionEvaluator ee = new PluginParameterExpressionEvaluator(session);
+
+        assertEquals("value", ee.evaluate("${" + sysprop + "}"));
+        assertEquals("prefix-value-suffix", ee.evaluate("prefix-${" + sysprop + "}-suffix"));
+        assertSame(session, ee.evaluate("${session}"));
+        assertNull(ee.evaluate("${PPEET_nonexisting_property}"));
+    }
+
+    /**
+     * Without a mojo execution there is no mojo and no plugin to evaluate an expression against, which
+     * yields no value rather than a failure.
+     */
+    @Test
+    void testMojoAndPluginExpressionsWithoutMojoExecution() throws Exception {
+        MavenSession session =
+                createSession((MutablePlexusContainer) getContainer(), getLocalRepository(), new Properties());
+        session.getRequest().setRootDirectory(rootDirectory);
+
+        ExpressionEvaluator ee = new PluginParameterExpressionEvaluator(session);
+
+        assertNull(ee.evaluate("${mojo}"));
+        assertNull(ee.evaluate("${mojoExecution}"));
+        assertNull(ee.evaluate("${mojo.goal}"));
+        assertNull(ee.evaluate("${plugin}"));
+        assertNull(ee.evaluate("${plugin.artifactId}"));
     }
 
     private ExpressionEvaluator createExpressionEvaluator(

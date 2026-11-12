@@ -21,10 +21,14 @@ package org.apache.maven.impl.model;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.Source;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.xml.ModelXmlFactory;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
@@ -32,9 +36,11 @@ import org.apache.maven.api.spi.ModelParser;
 import org.apache.maven.api.spi.ModelParserException;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -59,11 +65,13 @@ class DefaultModelProcessorTest {
 
         // Create mock parsers that will fail
         ModelParser yamlParser = mock(ModelParser.class);
+        when(yamlParser.id()).thenReturn("yaml");
         when(yamlParser.locateAndParse(any(), any()))
                 .thenThrow(new ModelParserException(
                         "YAML parsing failed", 5, 10, new RuntimeException("Invalid YAML syntax")));
 
         ModelParser tomlParser = mock(ModelParser.class);
+        when(tomlParser.id()).thenReturn("toml");
         when(tomlParser.locateAndParse(any(), any()))
                 .thenThrow(new ModelParserException("TOML parsing failed", 3, 7, null));
 
@@ -73,15 +81,12 @@ class DefaultModelProcessorTest {
                 .thenThrow(new XmlReaderException("XML parsing failed", null, null));
 
         // Create processor with the mock parsers
-        DefaultModelProcessor processor =
-                new DefaultModelProcessor(xmlFactory, Map.of("yaml", yamlParser, "toml", tomlParser));
-
-        // Create request
-        XmlReaderRequest request =
-                XmlReaderRequest.builder().path(pomFile).strict(true).build();
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, List.of(yamlParser, tomlParser));
 
         // Execute and verify
-        IOException exception = assertThrows(IOException.class, () -> processor.read(request));
+        ModelParserException exception = assertThrows(
+                ModelParserException.class,
+                () -> processor.read(Sources.fromPath(pomFile), Map.of(ModelParser.STRICT, true)));
 
         String message = exception.getMessage();
 
@@ -97,8 +102,9 @@ class DefaultModelProcessorTest {
         assertTrue(message.contains("default) XML reader also failed"), "Message should mention XML reader failure");
         assertTrue(message.contains("XML parsing failed"), "Message should contain XML error message");
 
-        // Verify suppressed exceptions are still attached
-        assertEquals(3, exception.getSuppressed().length, "Should have 3 suppressed exceptions");
+        // Verify suppressed exceptions are still attached (yaml + toml parsers;
+        // the XML fallback exception is the cause, not a suppressed exception)
+        assertEquals(2, exception.getSuppressed().length, "Should have 2 suppressed exceptions (one per SPI parser)");
     }
 
     @Test
@@ -107,18 +113,18 @@ class DefaultModelProcessorTest {
         Files.writeString(pomFile, "{invalid json}");
 
         ModelParser jsonParser = mock(ModelParser.class);
+        when(jsonParser.id()).thenReturn("json");
         when(jsonParser.locateAndParse(any(), any())).thenThrow(new ModelParserException("JSON parsing failed"));
 
         ModelXmlFactory xmlFactory = mock(ModelXmlFactory.class);
         when(xmlFactory.read(any(XmlReaderRequest.class)))
                 .thenThrow(new XmlReaderException("Not valid XML", null, null));
 
-        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, Map.of("json", jsonParser));
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, List.of(jsonParser));
 
-        XmlReaderRequest request =
-                XmlReaderRequest.builder().path(pomFile).strict(true).build();
-
-        IOException exception = assertThrows(IOException.class, () -> processor.read(request));
+        ModelParserException exception = assertThrows(
+                ModelParserException.class,
+                () -> processor.read(Sources.fromPath(pomFile), Map.of(ModelParser.STRICT, true)));
 
         String message = exception.getMessage();
         assertTrue(message.contains("Tried 1 parser:"), "Message should mention 1 parser (singular)");
@@ -135,17 +141,122 @@ class DefaultModelProcessorTest {
         when(mockModel.withPomFile(any())).thenReturn(mockModel);
 
         ModelParser yamlParser = mock(ModelParser.class);
+        when(yamlParser.id()).thenReturn("yaml");
         when(yamlParser.locateAndParse(any(), any())).thenReturn(Optional.of(mockModel));
 
         ModelXmlFactory xmlFactory = mock(ModelXmlFactory.class);
 
-        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, Map.of("yaml", yamlParser));
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, List.of(yamlParser));
 
+        Model result = processor.read(Sources.fromPath(pomFile), Map.of(ModelParser.STRICT, true));
+        assertNotNull(result);
+        verify(xmlFactory, never()).read(any(XmlReaderRequest.class));
+    }
+
+    @Test
+    void testParserLocatingProjectDirectoryIsInvokedForDirectorySource() throws Exception {
+        // a non-XML syntax whose "pom" is the project directory itself (e.g. a MANIFEST.MF based project)
+        Path projectDir = Files.createDirectories(tempDir.resolve("project"));
+        Files.createDirectories(projectDir.resolve("META-INF"));
+        Files.writeString(projectDir.resolve("META-INF/MANIFEST.MF"), "Bundle-SymbolicName: test");
+
+        Model parsed = Model.newBuilder()
+                .modelVersion("4.0.0")
+                .groupId("g")
+                .artifactId("a")
+                .version("1")
+                .build();
+        AtomicInteger parseCalls = new AtomicInteger();
+        ModelParser parser = new ModelParser() {
+            @Override
+            public String id() {
+                return "test";
+            }
+
+            @Override
+            public Optional<Source> locate(Path dir) {
+                return Files.isRegularFile(dir.resolve("META-INF/MANIFEST.MF"))
+                        ? Optional.of(Sources.fromPath(dir))
+                        : Optional.empty();
+            }
+
+            @Override
+            public Model parse(Source source, Map<String, ?> options) {
+                parseCalls.incrementAndGet();
+                return parsed;
+            }
+        };
+
+        ModelXmlFactory xmlFactory = mock(ModelXmlFactory.class);
+        when(xmlFactory.read(any(XmlReaderRequest.class)))
+                .thenThrow(new XmlReaderException("Is a directory", null, null));
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, List.of(parser));
+
+        Path located = processor.locateExistingPom(projectDir);
+        assertEquals(projectDir, located);
+
+        Model result = processor.read(Sources.fromPath(located), Map.of(ModelParser.STRICT, true));
+
+        assertEquals(1, parseCalls.get(), "ModelParser#parse should be called for the located source");
+        assertEquals("a", result.getArtifactId());
+        assertEquals(located, result.getPomFile());
+        verify(xmlFactory, never()).read(any(XmlReaderRequest.class));
+    }
+
+    @Test
+    void testDeprecatedReadDelegatesToNewRead() throws Exception {
+        Path pomFile = tempDir.resolve("pom.xml");
+        Files.writeString(
+                pomFile,
+                "<project><modelVersion>4.0.0</modelVersion><groupId>g</groupId><artifactId>a</artifactId><version>1</version></project>");
+
+        Model mockModel = Model.newBuilder()
+                .modelVersion("4.0.0")
+                .groupId("g")
+                .artifactId("a")
+                .version("1")
+                .build();
+        ModelXmlFactory xmlFactory = mock(ModelXmlFactory.class);
+        when(xmlFactory.read(any(XmlReaderRequest.class))).thenReturn(mockModel);
+
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, List.of());
         XmlReaderRequest request =
                 XmlReaderRequest.builder().path(pomFile).strict(true).build();
 
         Model result = processor.read(request);
         assertNotNull(result);
-        verify(xmlFactory, never()).read(any(XmlReaderRequest.class));
+        assertEquals("a", result.getArtifactId());
+    }
+
+    @Test
+    void testDeprecatedReadPassesTransformer() throws Exception {
+        Path pomFile = tempDir.resolve("pom.xml");
+        Files.writeString(
+                pomFile,
+                "<project><modelVersion>4.0.0</modelVersion><groupId>g</groupId><artifactId>a</artifactId><version>1</version></project>");
+
+        Model mockModel = Model.newBuilder()
+                .modelVersion("4.0.0")
+                .groupId("g")
+                .artifactId("a")
+                .version("1")
+                .build();
+        ModelXmlFactory xmlFactory = mock(ModelXmlFactory.class);
+        when(xmlFactory.read(any(XmlReaderRequest.class))).thenReturn(mockModel);
+
+        DefaultModelProcessor processor = new DefaultModelProcessor(xmlFactory, List.of());
+        XmlReaderRequest.Transformer transformer = mock(XmlReaderRequest.Transformer.class);
+        XmlReaderRequest request = XmlReaderRequest.builder()
+                .path(pomFile)
+                .strict(true)
+                .transformer(transformer)
+                .build();
+
+        Model result = processor.read(request);
+        assertNotNull(result);
+
+        ArgumentCaptor<XmlReaderRequest> captor = ArgumentCaptor.forClass(XmlReaderRequest.class);
+        verify(xmlFactory).read(captor.capture());
+        assertSame(transformer, captor.getValue().getTransformer());
     }
 }

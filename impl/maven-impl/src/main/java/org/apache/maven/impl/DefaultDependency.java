@@ -33,14 +33,14 @@ public class DefaultDependency extends AetherDependencyWrapper implements Depend
     public DefaultDependency(
             @Nonnull InternalSession session, @Nonnull org.eclipse.aether.graph.Dependency dependency) {
         super(session, dependency);
-        this.key = getGroupId()
+        this.key = groupId()
                 + ':'
-                + getArtifactId()
+                + artifactId()
                 + ':'
-                + getExtension()
-                + (!getClassifier().isEmpty() ? ":" + getClassifier() : "")
+                + extension()
+                + (!classifier().isEmpty() ? ":" + classifier() : "")
                 + ':'
-                + getVersion();
+                + version();
     }
 
     @Override
@@ -49,12 +49,12 @@ public class DefaultDependency extends AetherDependencyWrapper implements Depend
     }
 
     @Override
-    public Version getVersion() {
+    public Version version() {
         return session.parseVersion(dependency.getArtifact().getVersion());
     }
 
     @Override
-    public Version getBaseVersion() {
+    public Version baseVersion() {
         return session.parseVersion(dependency.getArtifact().getBaseVersion());
     }
 

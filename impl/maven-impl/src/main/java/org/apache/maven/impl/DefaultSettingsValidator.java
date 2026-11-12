@@ -18,6 +18,8 @@
  */
 package org.apache.maven.impl;
 
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -26,6 +28,7 @@ import java.util.regex.Pattern;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.settings.Mirror;
+import org.apache.maven.api.settings.PhaseInjection;
 import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Proxy;
 import org.apache.maven.api.settings.Repository;
@@ -76,6 +79,10 @@ public class DefaultSettingsValidator {
                 if (!server.getAliases().isEmpty()) {
                     addViolation(problems, BuilderProblem.Severity.WARNING, serverField + ".aliases", null, msgP);
                 }
+                if (!server.getRepositoryOrigins().isEmpty()) {
+                    addViolation(
+                            problems, BuilderProblem.Severity.WARNING, serverField + ".repositoryOrigins", null, msgP);
+                }
             }
         }
 
@@ -103,6 +110,53 @@ public class DefaultSettingsValidator {
                             "pluginGroups.pluginGroup[" + i + "]",
                             null,
                             "must denote a valid group id and match the pattern " + ID);
+                }
+            }
+        }
+
+        if (!isProjectSettings) {
+            // User / installation settings: <phases> are only meaningful in project settings.
+            if (settings.getPhases() != null && !settings.getPhases().isEmpty()) {
+                addViolation(
+                        problems,
+                        BuilderProblem.Severity.WARNING,
+                        "phases",
+                        null,
+                        "is not supported on user or installation settings. "
+                                + "Move <phases> to your project's .mvn/settings.xml.");
+            }
+        } else {
+            // Project settings: validate each <phase> declaration eagerly so errors surface
+            // as BuilderProblems rather than as IllegalStateException at session-init time.
+            List<PhaseInjection> phases = settings.getPhases();
+            if (phases != null) {
+                for (int i = 0; i < phases.size(); i++) {
+                    PhaseInjection p = phases.get(i);
+                    String phaseField = "phases.phase[" + i + "]";
+                    if (p.getName() == null || p.getName().isBlank()) {
+                        addViolation(
+                                problems,
+                                BuilderProblem.Severity.ERROR,
+                                phaseField + ".name",
+                                null,
+                                "must have a non-blank 'name' attribute.");
+                    } else {
+                        boolean hasParent =
+                                p.getParent() != null && !p.getParent().isBlank();
+                        boolean hasAfter = p.getAfter() != null && !p.getAfter().isBlank();
+                        boolean hasBefore =
+                                p.getBefore() != null && !p.getBefore().isBlank();
+                        if (!hasParent && !hasAfter && !hasBefore) {
+                            addViolation(
+                                    problems,
+                                    BuilderProblem.Severity.ERROR,
+                                    phaseField,
+                                    null,
+                                    "custom phase '" + p.getName()
+                                            + "' must specify 'parent' and/or at least one of 'after' or 'before'"
+                                            + " to anchor it in the lifecycle DAG.");
+                        }
+                    }
                 }
             }
         }
@@ -142,6 +196,8 @@ public class DefaultSettingsValidator {
                                 "must be unique across all server ids and aliases but found duplicate alias " + alias);
                     }
                 }
+
+                validateRepositoryOrigins(problems, server, i);
             }
         }
 
@@ -275,6 +331,87 @@ public class DefaultSettingsValidator {
                         "uses the unsupported value 'legacy', artifact resolution might fail.");
             }
         }
+    }
+
+    private static void validateRepositoryOrigins(ProblemCollector<BuilderProblem> problems, Server server, int index) {
+        for (int o = 0; o < server.getRepositoryOrigins().size(); o++) {
+            String repositoryOrigin = server.getRepositoryOrigins().get(o);
+            String fieldName = "servers.server[" + index + "].repositoryOrigins[" + o + "]";
+
+            if (!validateStringNotEmpty(problems, fieldName, repositoryOrigin, server.getId())) {
+                continue;
+            }
+
+            // settings are interpolated before they are validated, so a placeholder left here is a defect
+            // and would silently never match any repository
+            if (repositoryOrigin.contains("${")) {
+                addViolation(
+                        problems,
+                        BuilderProblem.Severity.ERROR,
+                        fieldName,
+                        server.getId(),
+                        "contains an unresolved property placeholder: '" + repositoryOrigin + "'");
+                continue;
+            }
+
+            String invalid = invalidRepositoryOriginReason(repositoryOrigin);
+            if (invalid != null) {
+                addViolation(problems, BuilderProblem.Severity.ERROR, fieldName, server.getId(), invalid);
+                continue;
+            }
+
+            String ignored = ignoredRepositoryOriginPartsReason(repositoryOrigin);
+            if (ignored != null) {
+                addViolation(problems, BuilderProblem.Severity.WARNING, fieldName, server.getId(), ignored);
+            }
+        }
+    }
+
+    /**
+     * Parses a {@code <server><repositoryOrigins>} value the way the credential scoping does; see
+     * {@link org.apache.maven.impl.resolver.OriginBoundAuthenticationSelector#originOf(String)}, which is the authority
+     * on what an origin is. Returns {@code null} when the value is not a URI at all.
+     */
+    private static URI parseRepositoryOrigin(String value) {
+        try {
+            return new URI(value).parseServerAuthority();
+        } catch (URISyntaxException e) {
+            return null;
+        }
+    }
+
+    /**
+     * @return the reason why no origin can be derived from the given value, or {@code null} if one can
+     */
+    private static String invalidRepositoryOriginReason(String value) {
+        URI uri = parseRepositoryOrigin(value);
+        if (uri == null) {
+            return "must be a repository origin of the form scheme://host[:port] but found '" + value + "'";
+        }
+        if (uri.getScheme() == null) {
+            return "must start with a scheme, for example https://repo.example.org, but found '" + value + "'";
+        }
+        if (uri.getHost() == null) {
+            return "must name a host, for example https://repo.example.org, but found '" + value + "'";
+        }
+        if (uri.getUserInfo() != null) {
+            return "must not carry user information but found '" + value + "'";
+        }
+        return null;
+    }
+
+    /**
+     * @return the reason why parts of the given value are ignored, or {@code null} if it is a bare origin
+     */
+    private static String ignoredRepositoryOriginPartsReason(String value) {
+        URI uri = parseRepositoryOrigin(value);
+        String path = uri.getRawPath();
+        boolean extraPath = path != null && !path.isEmpty() && !"/".equals(path);
+        if (!extraPath && uri.getRawQuery() == null && uri.getRawFragment() == null) {
+            return null;
+        }
+        return "is a repository origin, not a repository URL; only '" + uri.getScheme() + "://" + uri.getAuthority()
+                + "' of '" + value + "' is used";
     }
 
     // ----------------------------------------------------------------------

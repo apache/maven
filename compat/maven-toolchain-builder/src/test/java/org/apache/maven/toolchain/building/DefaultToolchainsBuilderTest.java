@@ -45,6 +45,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.doThrow;
@@ -198,14 +199,12 @@ class DefaultToolchainsBuilderTest {
         ToolchainsParseException parseException = new ToolchainsParseException("MESSAGE", 4, 2);
         doThrow(parseException).when(toolchainsReader).read(any(InputStream.class), ArgumentMatchers.anyMap());
 
-        try {
-            toolchainBuilder.build(request);
-        } catch (ToolchainsBuildingException e) {
-            assertEquals(
-                    "1 problem was encountered while building the effective toolchains" + LS
-                            + "[FATAL] Non-parseable toolchains (memory): MESSAGE @ line 4, column 2" + LS,
-                    e.getMessage());
-        }
+        ToolchainsBuildingException e =
+                assertThrows(ToolchainsBuildingException.class, () -> toolchainBuilder.build(request));
+        assertEquals(
+                "1 problem was encountered while building the effective toolchains" + LS
+                        + "[FATAL] Non-parseable toolchains (memory): MESSAGE @ line 4, column 2" + LS,
+                e.getMessage());
     }
 
     @Test
@@ -218,14 +217,12 @@ class DefaultToolchainsBuilderTest {
         ToolchainsBuildingRequest request = new DefaultToolchainsBuildingRequest();
         request.setGlobalToolchainsSource(src);
 
-        try {
-            toolchainBuilder.build(request);
-        } catch (ToolchainsBuildingException e) {
-            assertEquals(
-                    "1 problem was encountered while building the effective toolchains" + LS
-                            + "[FATAL] Non-readable toolchains LOCATION: MESSAGE" + LS,
-                    e.getMessage());
-        }
+        ToolchainsBuildingException e =
+                assertThrows(ToolchainsBuildingException.class, () -> toolchainBuilder.build(request));
+        assertEquals(
+                "1 problem was encountered while building the effective toolchains" + LS
+                        + "[FATAL] Non-readable toolchains LOCATION: MESSAGE" + LS,
+                e.getMessage());
     }
 
     @Test

@@ -23,13 +23,17 @@ under the License.
   <parent>
     <groupId>org.apache.maven</groupId>
     <artifactId>maven-impl-modules</artifactId>
-    <version>4.1.0-SNAPSHOT</version>
+    <version>4.2.0-SNAPSHOT</version>
   </parent>
 
   <artifactId>maven-cli</artifactId>
 
   <name>Maven 4 CLI</name>
   <description>Maven 4 CLI component, with CLI and logging support.</description>
+
+  <properties>
+    <javaModuleName>org.apache.maven.cling</javaModuleName>
+  </properties>
 
   <dependencies>
     <!--  Maven4 API -->
@@ -73,6 +77,10 @@ under the License.
     <!-- Maven4 impl -->
     <dependency>
       <groupId>org.apache.maven</groupId>
+      <artifactId>maven-utils</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
       <artifactId>maven-core</artifactId>
     </dependency>
     <dependency>
@@ -86,6 +94,30 @@ under the License.
     <dependency>
       <groupId>org.apache.maven</groupId>
       <artifactId>maven-jline</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-terminal</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-reader</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-builtins</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-console</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.jline</groupId>
+      <artifactId>jline-console-ui</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-support</artifactId>
     </dependency>
     <dependency>
       <groupId>org.apache.maven</groupId>
@@ -146,17 +178,12 @@ under the License.
     </dependency>
 
     <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-classworlds</artifactId>
+      <groupId>org.apache.maven</groupId>
+      <artifactId>maven-classworlds</artifactId>
     </dependency>
     <dependency>
       <groupId>org.codehaus.plexus</groupId>
       <artifactId>plexus-sec-dispatcher</artifactId>
-    </dependency>
-
-    <dependency>
-      <groupId>org.codehaus.plexus</groupId>
-      <artifactId>plexus-xml</artifactId>
     </dependency>
 
     <dependency>

@@ -23,12 +23,15 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Stream;
 
 import org.apache.commons.cli.ParseException;
 import org.apache.maven.api.cli.Options;
 import org.apache.maven.api.cli.mvn.MavenOptions;
+import org.apache.maven.api.settings.Settings;
 import org.apache.maven.cling.invoker.BaseParser;
 
 public class MavenParser extends BaseParser {
@@ -47,19 +50,56 @@ public class MavenParser extends BaseParser {
                 throw new IllegalArgumentException("Specified file does not exists (" + file + ")");
             }
         }
-        // maven.config; if exists
-        Path mavenConfig = context.rootDirectory != null ? context.rootDirectory.resolve(".mvn/maven.config") : null;
-        if (mavenConfig != null && Files.isRegularFile(mavenConfig)) {
-            result.add(parseMavenConfigOptions(mavenConfig));
+
+        // Project settings.xml <args>/<options> supersede maven.config when present
+        Map<String, String> systemProperties = context.systemProperties != null ? context.systemProperties : Map.of();
+        Map<String, String> userProperties = context.userProperties != null ? context.userProperties : Map.of();
+        Map<String, String> effectiveProperties = new HashMap<>(systemProperties);
+        effectiveProperties.putAll(userProperties);
+        // Temporarily expose CLI options so that resolveProjectSettingsFile() can honour
+        // the --project-settings (-ps) flag. context.options hasn't been assigned yet
+        // (we are computing it), so set it here for the duration of the call.
+        Options previousOptions = context.options;
+        context.options = cliOptions;
+        Path projectSettingsFile = resolveProjectSettingsFile(context, effectiveProperties);
+        context.options = previousOptions;
+        Settings projectSettings = readSettingsEarlyCached(projectSettingsFile, context);
+        boolean settingsHasArgs = projectSettings != null
+                && (projectSettings.getArgs() != null
+                        && !projectSettings.getArgs().isEmpty());
+        if (settingsHasArgs) {
+            result.add(parseMavenSettingsOptions(projectSettings, projectSettingsFile));
+        } else {
+            // legacy fallback: .mvn/maven.config
+            Path mavenConfig =
+                    context.rootDirectory != null ? context.rootDirectory.resolve(".mvn/maven.config") : null;
+            if (mavenConfig != null && Files.isRegularFile(mavenConfig)) {
+                result.add(parseMavenConfigOptions(mavenConfig));
+            }
         }
         return LayeredMavenOptions.layerMavenOptions(result);
+    }
+
+    protected MavenOptions parseMavenSettingsOptions(Settings settings, Path settingsFile) {
+        List<String> args = settings.getArgs() != null ? settings.getArgs() : List.of();
+        try {
+            MavenOptions options = parseArgs("settings.xml", args);
+            if (options.goals().isPresent()) {
+                throw new IllegalArgumentException("Unrecognized entries in settings.xml (" + settingsFile
+                        + ") <args>/<options>: " + options.goals().get());
+            }
+            return options;
+        } catch (ParseException e) {
+            throw new IllegalArgumentException(
+                    "Failed to parse arguments from settings.xml (" + settingsFile + "): " + e.getMessage(), e);
+        }
     }
 
     protected MavenOptions parseMavenCliOptions(List<String> args) {
         try {
             return parseArgs(Options.SOURCE_CLI, args);
         } catch (ParseException e) {
-            throw new IllegalArgumentException("Failed to parse CLI arguments: " + e.getMessage(), e.getCause());
+            throw new IllegalArgumentException("Failed to parse CLI arguments: " + e.getMessage(), e);
         }
     }
 
@@ -70,7 +110,7 @@ public class MavenParser extends BaseParser {
             return parseArgs("atFile", args);
         } catch (ParseException e) {
             throw new IllegalArgumentException(
-                    "Failed to parse arguments from file (" + atFile + "): " + e.getMessage(), e.getCause());
+                    "Failed to parse arguments from file (" + atFile + "): " + e.getMessage(), e);
         } catch (IOException e) {
             throw new IllegalStateException("Error reading config file: " + atFile, e);
         }
@@ -89,8 +129,7 @@ public class MavenParser extends BaseParser {
             return options;
         } catch (ParseException e) {
             throw new IllegalArgumentException(
-                    "Failed to parse arguments from maven.config file (" + configFile + "): " + e.getMessage(),
-                    e.getCause());
+                    "Failed to parse arguments from maven.config file (" + configFile + "): " + e.getMessage(), e);
         } catch (IOException e) {
             throw new IllegalStateException("Error reading config file: " + configFile, e);
         }

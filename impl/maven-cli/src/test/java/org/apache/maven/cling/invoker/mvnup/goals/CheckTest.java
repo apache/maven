@@ -96,6 +96,7 @@ class CheckTest {
 
                 // Verify that the Check-specific header is logged
                 verify(context.logger).info("Maven Upgrade Tool - Check");
+                assertTrue(context.isDryRun(), "Check should mark the context as a dry run");
             } finally {
                 // Clean up - delete all files in the directory first
                 try {

@@ -25,7 +25,6 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.di.Named;
 import org.apache.maven.api.services.Source;
 import org.apache.maven.api.settings.Settings;
 
@@ -38,13 +37,26 @@ import org.apache.maven.api.settings.Settings;
  * Parsers must be available in the container building the settings. In particular, a parser
  * supplied by a core extension cannot read the bootstrap settings needed to resolve that
  * extension. This SPI does not change settings file discovery or extension loading.
+ * <p>
+ * Implementations must declare a unique identifier via {@link #id()} to allow Maven to
+ * distinguish parsers in diagnostics and detect conflicts between extensions.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Consumer
-@Named
 public interface SettingsParser extends SpiService {
+    /**
+     * Returns a unique identifier for this parser, used in diagnostics when multiple
+     * parsers match or conflict. Must be globally unique across all extensions.
+     *
+     * @return the parser identifier, never {@code null}
+     */
+    @Nonnull
+    default String id() {
+        return getClass().getName();
+    }
+
     /**
      * Option that can be specified in the options map. The value should be a {@code Boolean};
      * when {@code true} or absent, unknown input is rejected.

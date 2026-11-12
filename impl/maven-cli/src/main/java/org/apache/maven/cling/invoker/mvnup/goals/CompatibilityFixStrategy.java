@@ -183,7 +183,7 @@ public class CompatibilityFixStrategy extends AbstractUpgradeStrategy {
                 warnAboutCiFriendlyMissingDependencyVersions(pomDocument, context);
 
                 if (hasIssues) {
-                    context.success("Maven 4 compatibility issues fixed");
+                    logChange(context, "Maven 4 compatibility issues fixed");
                     modifiedPoms.add(pomPath);
                 } else {
                     context.success("No Maven 4 compatibility issues found");

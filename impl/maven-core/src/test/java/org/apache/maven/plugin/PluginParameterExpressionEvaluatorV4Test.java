@@ -35,10 +35,10 @@ import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.MojoExecution;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.xml.XmlNode;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.DefaultArtifactHandler;
 import org.apache.maven.artifact.repository.ArtifactRepository;
-import org.apache.maven.configuration.internal.EnhancedComponentConfigurator;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -54,13 +54,13 @@ import org.apache.maven.model.Model;
 import org.apache.maven.model.root.RootLocator;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.apache.maven.plugin.internal.V4MojoConfiguratorTestHelper;
 import org.apache.maven.project.CycleDetectedException;
 import org.apache.maven.project.DuplicateProjectException;
 import org.apache.maven.project.MavenProject;
 import org.codehaus.plexus.MutablePlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.component.configurator.expression.ExpressionEvaluator;
-import org.codehaus.plexus.configuration.DefaultPlexusConfiguration;
 import org.codehaus.plexus.util.Os;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
@@ -101,7 +101,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         System.out.println("Result: " + result);
 
         assertSame(
-                exec.getPlugin().getDescriptor(),
+                exec.plugin().getDescriptor(),
                 result,
                 "${mojo.plugin.descriptor} expression does not return plugin descriptor.");
     }
@@ -120,9 +120,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         assertNotNull(depResults);
         assertEquals(1, depResults.size());
         assertEquals(
-                exec.getPlugin().getArtifact().key(),
-                depResults.iterator().next().key(),
-                "dependency artifact is wrong.");
+                exec.plugin().getArtifact().key(), depResults.iterator().next().key(), "dependency artifact is wrong.");
     }
 
     @Test
@@ -142,7 +140,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         assertEquals(1, depResults.size());
         assertTrue(depResults.containsKey("org.myco.plugins:my-plugin"));
         assertEquals(
-                exec.getPlugin().getArtifact().key(),
+                exec.plugin().getArtifact().key(),
                 depResults.get("org.myco.plugins:my-plugin").key(),
                 "dependency artifact is wrong.");
     }
@@ -159,7 +157,7 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         System.out.println("Result: " + result);
 
         assertSame(
-                exec.getPlugin().getArtifact().getArtifactId(),
+                exec.plugin().getArtifact().getArtifactId(),
                 result,
                 "${plugin.artifactId} expression does not return plugin descriptor's artifactId.");
     }
@@ -467,15 +465,20 @@ public class PluginParameterExpressionEvaluatorV4Test extends AbstractCoreMavenC
         PluginParameterExpressionEvaluatorV4 evaluator =
                 new PluginParameterExpressionEvaluatorV4(mavenSession.getSession(), null);
 
-        DefaultPlexusConfiguration configuration = new DefaultPlexusConfiguration("config");
-        configuration.addChild("uri", "${session.rootDirectory.uri}");
-        configuration.addChild("path", "${session.rootDirectory}");
-        configuration.addChild("uriString", "${session.rootDirectory.uri.string}");
-        configuration.addChild("uriAsciiString", "${session.rootDirectory.uri.ASCIIString}");
-        configuration.addChild("pathString", "${session.rootDirectory.string}");
-
         Mojo mojo = new Mojo();
-        new EnhancedComponentConfigurator().configureComponent(mojo, configuration, evaluator, null);
+        V4MojoConfiguratorTestHelper.configure(
+                evaluator,
+                getClass().getClassLoader(),
+                null,
+                mojo,
+                XmlNode.newInstance(
+                        "configuration",
+                        java.util.List.of(
+                                XmlNode.newInstance("uri", "${session.rootDirectory.uri}"),
+                                XmlNode.newInstance("path", "${session.rootDirectory}"),
+                                XmlNode.newInstance("uriString", "${session.rootDirectory.uri.string}"),
+                                XmlNode.newInstance("uriAsciiString", "${session.rootDirectory.uri.ASCIIString}"),
+                                XmlNode.newInstance("pathString", "${session.rootDirectory.string}"))));
 
         assertEquals(
                 Objects.equals(path.toUri().toString(), path.toUri().toASCIIString()), !Os.isFamily(Os.FAMILY_WINDOWS));

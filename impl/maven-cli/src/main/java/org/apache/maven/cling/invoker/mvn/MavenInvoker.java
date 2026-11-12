@@ -22,10 +22,13 @@ import java.io.FileNotFoundException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.function.Consumer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -36,11 +39,13 @@ import org.apache.maven.Maven;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cli.InvokerException;
 import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.Logger;
 import org.apache.maven.api.cli.mvn.MavenOptions;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.SettingsBuilderResult;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.api.services.ToolchainsBuilder;
 import org.apache.maven.api.services.ToolchainsBuilderRequest;
@@ -71,6 +76,8 @@ import org.apache.maven.logging.MavenTransferListener;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.toolchain.model.ToolchainModel;
 import org.eclipse.aether.DefaultRepositoryCache;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.transfer.ArtifactFilteredOutException;
 import org.eclipse.aether.transfer.TransferListener;
 
 import static java.util.Comparator.comparing;
@@ -131,6 +138,101 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             logger.info("Disabling strict checksum verification on all artifact downloads.");
         } else if (context.options().strictChecksums().orElse(false)) {
             logger.info("Enabling strict checksum verification on all artifact downloads.");
+        }
+
+        // --list-aliases: print effective aliases and exit
+        if (context.options().listAliases().orElse(false)) {
+            Map<String, List<String>> aliases = context.effectiveAliases;
+            if (aliases == null || aliases.isEmpty()) {
+                logger.info("No build aliases defined in any settings file.");
+            } else {
+                logger.info("Effective build aliases:");
+                aliases.forEach((name, args) -> logger.info("  " + name + " -> " + String.join(" ", args)));
+            }
+            throw new InvokerException.ExitException(0);
+        }
+
+        // If no goals/phases were specified and there is no POM in the current directory,
+        // print usage (like `mvn -h`) and exit successfully instead of failing with
+        // "No goals have been specified for this build."
+        // When a POM is present the default goal (if any) may apply, so let Maven proceed normally.
+        if (context.options().goals().orElse(List.of()).isEmpty() && determinePom(context, context.lookup) == null) {
+            context.options().displayHelp(context.invokerRequest.parserRequest(), determineWriter(context));
+            throw new InvokerException.ExitException(0);
+        }
+    }
+
+    @Override
+    protected void customizeSettingsResult(MavenContext context, SettingsBuilderResult settingsResult)
+            throws Exception {
+        // Collect aliases: installation < user < project (last-wins / project overrides)
+        // EffectiveSettings merge order is project→user→installation (first-wins in merge),
+        // so we build manually to get last-wins from project.
+        Map<String, List<String>> aliases = new java.util.LinkedHashMap<>();
+        addAliases(aliases, settingsResult.getInstallationSettings());
+        addAliases(aliases, settingsResult.getUserSettings());
+        addAliases(aliases, settingsResult.getProjectSettings());
+        context.effectiveAliases = aliases.isEmpty() ? null : java.util.Collections.unmodifiableMap(aliases);
+
+        // Phase injections: project-scoped only; user/installation <phases> are silently ignored.
+        List<org.apache.maven.api.settings.PhaseInjection> phases =
+                settingsResult.getProjectSettings().getPhases();
+        context.projectPhases =
+                (phases != null && !phases.isEmpty()) ? java.util.Collections.unmodifiableList(phases) : null;
+
+        // Warn if user or installation settings define <phases> (not supported at those tiers)
+        warnIfPhasesDefinedOutsideProject(context, settingsResult.getUserSettings(), "user");
+        warnIfPhasesDefinedOutsideProject(context, settingsResult.getInstallationSettings(), "installation");
+    }
+
+    /**
+     * Expands build aliases in the given goals list. Each goal that matches an alias key is replaced
+     * by the alias's expanded argument list.
+     *
+     * @param goals the raw goals from the command line
+     * @param aliases the effective aliases map (may be {@code null})
+     * @return the expanded goals list
+     */
+    static List<String> expandAliases(List<String> goals, Map<String, List<String>> aliases) {
+        if (aliases == null || aliases.isEmpty() || goals.isEmpty()) {
+            return goals;
+        }
+        List<String> expanded = new ArrayList<>();
+        for (String goal : goals) {
+            List<String> aliasArgs = aliases.get(goal);
+            if (aliasArgs != null) {
+                expanded.addAll(aliasArgs);
+            } else {
+                expanded.add(goal);
+            }
+        }
+        return expanded;
+    }
+
+    static void addAliases(Map<String, List<String>> target, org.apache.maven.api.settings.Settings settings) {
+        if (settings == null) {
+            return;
+        }
+        for (org.apache.maven.api.settings.Alias alias : settings.getAliases()) {
+            if (alias.getName() != null && !alias.getName().isBlank()) {
+                List<String> args = alias.getArgs();
+                if (args != null && !args.isEmpty()) {
+                    target.put(alias.getName(), java.util.Collections.unmodifiableList(args));
+                } else {
+                    target.remove(alias.getName()); // explicit removal: empty alias clears inherited one
+                }
+            }
+        }
+    }
+
+    private static void warnIfPhasesDefinedOutsideProject(
+            MavenContext context, org.apache.maven.api.settings.Settings settings, String tier) {
+        if (settings != null
+                && settings.getPhases() != null
+                && !settings.getPhases().isEmpty()) {
+            context.logger.warn("<phases> defined in " + tier
+                    + " settings will be ignored. Phase injections are only supported in project-scoped settings"
+                    + " (.mvn/settings.xml).");
         }
     }
 
@@ -235,12 +337,14 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                         .collect(Collectors.groupingBy(ToolchainModel::getType)));
 
         request.setNoSnapshotUpdates(context.options().suppressSnapshotUpdates().orElse(false));
-        request.setGoals(context.options().goals().orElse(List.of()));
+        request.setGoals(expandAliases(context.options().goals().orElse(List.of()), context.effectiveAliases));
         request.setReactorFailureBehavior(determineReactorFailureBehaviour(context));
         request.setRecursive(!context.options().nonRecursive().orElse(!request.isRecursive()));
         request.setOffline(context.options().offline().orElse(request.isOffline()));
         request.setUpdateSnapshots(context.options().updateSnapshots().orElse(false));
         request.setGlobalChecksumPolicy(determineGlobalChecksumPolicy(context));
+        context.options().artifactsUpdatePolicy().ifPresent(request::setArtifactsUpdatePolicy);
+        context.options().metadataUpdatePolicy().ifPresent(request::setMetadataUpdatePolicy);
 
         Path pom = determinePom(context, lookup);
         if (pom != null) {
@@ -303,6 +407,12 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         //
         if (context.options().builder().isPresent()) {
             request.setBuilderId(context.options().builder().get());
+        }
+
+        // Store project-scoped phase injections on the request data map so that
+        // SettingsLifecycleProcessor can access them without a dependency on maven-cli.
+        if (context.projectPhases != null && !context.projectPhases.isEmpty()) {
+            request.getData().put(SettingsLifecycleProcessor.PHASES_DATA_KEY, context.projectPhases);
         }
     }
 
@@ -402,7 +512,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                         if (selector.charAt(0) == '-' || selector.charAt(0) == '!') {
                             active = false;
                             selector = selector.substring(1);
-                        } else if (token.charAt(0) == '+') {
+                        } else if (selector.charAt(0) == '+') {
                             selector = selector.substring(1);
                         }
                     }
@@ -429,7 +539,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                         if (profileId.charAt(0) == '-' || profileId.charAt(0) == '!') {
                             active = false;
                             profileId = profileId.substring(1);
-                        } else if (token.charAt(0) == '+') {
+                        } else if (profileId.charAt(0) == '+') {
                             profileId = profileId.substring(1);
                         }
                     }
@@ -460,6 +570,7 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             Map<String, String> references = new LinkedHashMap<>();
             List<MavenProject> failedProjects = new ArrayList<>();
 
+            Set<String> hintedArtifacts = new HashSet<>();
             for (Throwable exception : result.getExceptions()) {
                 ExceptionSummary summary = handler.handleException(exception);
                 logSummary(context, summary, references, "");
@@ -467,6 +578,8 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                 if (exception instanceof LifecycleExecutionException lifecycleExecutionException) {
                     failedProjects.add(lifecycleExecutionException.getProject());
                 }
+
+                logFilteredOutHint(context, exception, result, hintedArtifacts);
             }
 
             context.logger.error("");
@@ -521,6 +634,68 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
         context.logger.error("After correcting the problems, you can resume the build with the command");
         context.logger.error(
                 MessageUtils.builder().a("  ").strong(resumeBuildHint).toString());
+    }
+
+    /**
+     * When an {@link ArtifactFilteredOutException} is found in the exception chain, log a reactor-aware hint
+     * that precisely identifies whether the artifact is an unselected project or an already-selected project.
+     * External (non-reactor) artifacts are handled by {@link org.apache.maven.exception.DefaultExceptionHandler}.
+     */
+    protected void logFilteredOutHint(
+            MavenContext context, Throwable exception, MavenExecutionResult result, Set<String> alreadyHinted) {
+        ArtifactFilteredOutException filteredOut = findCause(exception, ArtifactFilteredOutException.class);
+        if (filteredOut == null) {
+            return;
+        }
+
+        Artifact artifact = filteredOut.getArtifact();
+        if (artifact == null) {
+            return;
+        }
+
+        String groupId = artifact.getGroupId();
+        String artifactId = artifact.getArtifactId();
+        String version = artifact.getVersion();
+        String coords = groupId + ":" + artifactId + ":" + version;
+
+        if (!alreadyHinted.add(coords)) {
+            return;
+        }
+
+        List<MavenProject> allProjects = result.getAllProjects();
+        List<MavenProject> selectedProjects = result.getTopologicallySortedProjects();
+
+        boolean inAll = allProjects.stream()
+                .anyMatch(p -> p.getGroupId().equals(groupId)
+                        && p.getArtifactId().equals(artifactId)
+                        && p.getVersion().equals(version));
+        boolean inSelected = selectedProjects.stream()
+                .anyMatch(p -> p.getGroupId().equals(groupId)
+                        && p.getArtifactId().equals(artifactId)
+                        && p.getVersion().equals(version));
+
+        if (inAll && !inSelected) {
+            context.logger.error("");
+            context.logger.error(coords
+                    + " is a project of this build but was not selected."
+                    + " Add -am to also build its dependencies, or run the full reactor.");
+        } else if (inAll) {
+            context.logger.error("");
+            context.logger.error(coords
+                    + " is part of this build but has not been built yet."
+                    + " Build it first or reorder the reactor.");
+        }
+        // external artifact: DefaultExceptionHandler already emits the repo-filter hint
+    }
+
+    private static <T extends Throwable> T findCause(Throwable exception, Class<T> type) {
+        IdentityHashMap<Throwable, Boolean> seen = new IdentityHashMap<>();
+        for (Throwable t = exception; t != null && seen.put(t, Boolean.TRUE) == null; t = t.getCause()) {
+            if (type.isInstance(t)) {
+                return type.cast(t);
+            }
+        }
+        return null;
     }
 
     /**

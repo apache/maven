@@ -151,7 +151,7 @@ public class ResourceFilteringStrategy extends AbstractUpgradeStrategy {
 
                 if (modified) {
                     modifiedPoms.add(pomPath);
-                    context.success("Added nonFilteredFileExtensions to maven-resources-plugin");
+                    logChange(context, "Added nonFilteredFileExtensions to maven-resources-plugin");
                 } else {
                     context.success("No resource filtering issues found");
                 }

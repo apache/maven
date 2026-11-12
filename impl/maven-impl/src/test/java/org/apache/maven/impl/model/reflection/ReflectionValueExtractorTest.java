@@ -45,6 +45,8 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
 /**
  * ReflectionValueExtractorTest class.
@@ -85,6 +87,43 @@ public class ReflectionValueExtractorTest {
      *
      * @throws Exception if any.
      */
+    @Test
+    void preservesExceptionTypeMessageAndCause() throws Exception {
+        IllegalStateException cause = new IllegalStateException("getter failure");
+        IntrospectionException error = assertThrows(
+                IntrospectionException.class,
+                () -> ReflectionValueExtractor.evaluate("bean.value", new ThrowingBean(cause)));
+        assertEquals(cause.toString(), error.getMessage());
+        assertSame(cause, error.getCause());
+        assertEquals(
+                org.apache.maven.utils.ReflectionValueExtractor.class.getName(),
+                error.getStackTrace()[0].getClassName());
+
+        IntrospectionException invalidType = assertThrows(
+                IntrospectionException.class,
+                () -> ReflectionValueExtractor.evaluate("bean.value[0]", new ValueHolder("text")));
+        assertNull(invalidType.getCause());
+        assertEquals(
+                org.apache.maven.utils.ReflectionValueExtractor.class.getName(),
+                invalidType.getStackTrace()[0].getClassName());
+        assertEquals(
+                "The token 'value[' at position '5' refers to a java.util.List or an array, but the value "
+                        + "seems is an instance of 'class java.lang.String'",
+                invalidType.getMessage());
+    }
+
+    public static class ThrowingBean {
+        private final IllegalStateException failure;
+
+        public ThrowingBean(IllegalStateException failure) {
+            this.failure = failure;
+        }
+
+        public Object getValue() {
+            throw failure;
+        }
+    }
+
     @Test
     void testValueExtraction() throws Exception {
         // ----------------------------------------------------------------------
@@ -296,11 +335,9 @@ public class ReflectionValueExtractorTest {
      */
     @Test
     public void testIllegalIndexedType() throws Exception {
-        try {
-            ReflectionValueExtractor.evaluate("h.value[1]", new ValueHolder("string"));
-        } catch (Exception e) {
-            // TODO assert exception message
-        }
+        assertThrows(
+                IntrospectionException.class,
+                () -> ReflectionValueExtractor.evaluate("h.value[1]", new ValueHolder("string")));
     }
 
     /**
@@ -310,11 +347,9 @@ public class ReflectionValueExtractorTest {
      */
     @Test
     public void testIllegalMappedType() throws Exception {
-        try {
-            ReflectionValueExtractor.evaluate("h.value(key)", new ValueHolder("string"));
-        } catch (Exception e) {
-            // TODO assert exception message
-        }
+        assertThrows(
+                IntrospectionException.class,
+                () -> ReflectionValueExtractor.evaluate("h.value(key)", new ValueHolder("string")));
     }
 
     /**
@@ -556,6 +591,57 @@ public class ReflectionValueExtractorTest {
 
         public Object getValue() {
             return value;
+        }
+    }
+
+    /**
+     * Verifies that noun-based accessor methods (zero-arg methods whose name matches the property
+     * name exactly, without a {@code get}/is/to/as prefix) are resolved by {@link ReflectionValueExtractor}.
+     * This is the mechanism that allows {@code ${mojo.plugin}}, {@code ${mojo.goal}},
+     * {@code ${mojo.descriptor}}, etc. to work with the modern Maven 4 noun-style API.
+     */
+    @Test
+    void testNounStyleAccessorResolution() throws Exception {
+        NounStyleBean bean = new NounStyleBean("my-goal", "org.apache.maven", "maven-core", "1.0");
+
+        // trimRootToken=true (default): "bean" is stripped as the root token, then "goal" etc. are resolved
+        assertEquals("my-goal", ReflectionValueExtractor.evaluate("bean.goal", bean));
+        assertEquals("org.apache.maven", ReflectionValueExtractor.evaluate("bean.groupId", bean));
+        assertEquals("maven-core", ReflectionValueExtractor.evaluate("bean.artifactId", bean));
+        assertEquals("1.0", ReflectionValueExtractor.evaluate("bean.version", bean));
+    }
+
+    public static class NounStyleBean {
+        private final String goal;
+        private final String groupId;
+        private final String artifactId;
+        private final String version;
+
+        public NounStyleBean(String goal, String groupId, String artifactId, String version) {
+            this.goal = goal;
+            this.groupId = groupId;
+            this.artifactId = artifactId;
+            this.version = version;
+        }
+
+        /** Noun-style accessor — no {@code get} prefix. */
+        public String goal() {
+            return goal;
+        }
+
+        /** Noun-style accessor — no {@code get} prefix. */
+        public String groupId() {
+            return groupId;
+        }
+
+        /** Noun-style accessor — no {@code get} prefix. */
+        public String artifactId() {
+            return artifactId;
+        }
+
+        /** Noun-style accessor — no {@code get} prefix. */
+        public String version() {
+            return version;
         }
     }
 

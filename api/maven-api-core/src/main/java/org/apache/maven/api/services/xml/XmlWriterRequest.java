@@ -36,21 +36,53 @@ import org.apache.maven.api.annotations.Nullable;
 @Experimental
 public interface XmlWriterRequest<T> {
 
+    /**
+     * Returns the path to write to, or {@code null} if another output target is used.
+     *
+     * @return the file path, or {@code null}
+     */
     @Nullable
     Path getPath();
 
+    /**
+     * Returns the output stream to write to, or {@code null} if another output target is used.
+     *
+     * @return the output stream, or {@code null}
+     */
     @Nullable
     OutputStream getOutputStream();
 
+    /**
+     * Returns the writer to write to, or {@code null} if another output target is used.
+     *
+     * @return the writer, or {@code null}
+     */
     @Nullable
     Writer getWriter();
 
+    /**
+     * Returns the content object to be written as XML.
+     *
+     * @return the content to write
+     */
     @Nonnull
     T getContent();
 
+    /**
+     * Returns the formatter for rendering input location information in the output,
+     * or {@code null} if location information should not be included.
+     *
+     * @return the input location formatter, or {@code null}
+     */
     @Nullable
     Function<Object, String> getInputLocationFormatter();
 
+    /**
+     * Creates a new builder for constructing {@code XmlWriterRequest} instances.
+     *
+     * @param <T> the content type
+     * @return a new builder
+     */
     static <T> XmlWriterRequestBuilder<T> builder() {
         return new XmlWriterRequestBuilder<>();
     }
