@@ -217,4 +217,3 @@ public interface Artifact {
     @Nonnull
     ArtifactCoordinates toCoordinates();
 }
-
