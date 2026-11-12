@@ -221,15 +221,22 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
                 Map<Object, Plugin> master = new LinkedHashMap<>(src.size() * 2);
 
                 for (Plugin element : src) {
-                    if (element.isInherited()) {
+                    if (element.isInherited() || !element.getExecutions().isEmpty()) {
+                        // NOTE: Enforce recursive merge to trigger merging/inheritance logic for executions
                         Plugin plugin = new Plugin();
                         plugin.setLocation("", element.getLocation(""));
                         plugin.setGroupId(null);
                         mergePlugin(plugin, element, sourceDominant, context);
 
-                        Object key = getPluginKey(element);
+                        // a plugin marked inherited=false only reaches the child through an execution
+                        // whose own inherited flag overrides the plugin-level setting (MNG-2103); if no
+                        // execution survives that per-execution filtering, the plugin itself must not be
+                        // inherited either (MNG-6373), so only commit it once we know which case applies
+                        if (element.isInherited() || !plugin.getExecutions().isEmpty()) {
+                            Object key = getPluginKey(element);
 
-                        master.put(key, plugin);
+                            master.put(key, plugin);
+                        }
                     }
                 }
 
