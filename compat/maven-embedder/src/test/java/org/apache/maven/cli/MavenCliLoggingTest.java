@@ -36,10 +36,8 @@ import org.apache.maven.slf4j.MavenLoggerFactory;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.impl.DeferredTerminal;
 import org.jline.terminal.impl.DumbTerminal;
-import org.jline.terminal.spi.TerminalExt;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.parallel.Isolated;
 import org.slf4j.LoggerFactory;
@@ -49,8 +47,6 @@ import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assumptions.assumeTrue;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
 
 @Isolated("Changes JVM-wide streams, system properties, terminal state, and logging configuration")
 class MavenCliLoggingTest {
@@ -172,19 +168,13 @@ class MavenCliLoggingTest {
      * the terminal consumer has already swapped {@code System.out} before the logger caches it.
      * This prevents logs from going to a stale stream instead of the terminal-wrapped one.
      *
-     * <p>Note: with DeferredTerminal, getType() and getPalette() no longer block, so the
-     * logging thread no longer waits for the terminal. This test needs rework for the new model.
      */
-    @Disabled(
-            "DeferredTerminal's non-blocking getType()/getPalette() changes the blocking behavior this test relies on")
     @Test
     void cachesOutputAfterTerminalInstallationWithColorDisabled() throws Exception {
         cachesOutputAfterTerminalInstallation("never");
     }
 
     @Test
-    @Disabled(
-            "DeferredTerminal's non-blocking getType()/getPalette() changes the blocking behavior this test relies on")
     void cachesOutputAfterTerminalInstallationInBatchMode() throws Exception {
         cachesOutputAfterTerminalInstallation("batch");
     }
@@ -196,7 +186,13 @@ class MavenCliLoggingTest {
         ByteArrayOutputStream terminalOutput = new ByteArrayOutputStream();
         Thread loggingThread = null;
         try (PrintStream earlyStream = new PrintStream(earlyOutput, true, UTF_8.name());
-                PrintStream terminalStream = new PrintStream(terminalOutput, true, UTF_8.name())) {
+                PrintStream terminalStream = new PrintStream(terminalOutput, true, UTF_8.name());
+                Terminal dumb = new DumbTerminal(
+                        "Maven",
+                        Terminal.TYPE_DUMB_COLOR,
+                        InputStream.nullInputStream(),
+                        OutputStream.nullOutputStream(),
+                        null)) {
             System.setProperty(MavenBaseLogger.LEGACY_PREFIX + "cacheOutputStream", "true");
             System.setProperty(MavenBaseLogger.LEGACY_PREFIX + "logFile", "System.out");
             System.setOut(earlyStream);
@@ -213,7 +209,7 @@ class MavenCliLoggingTest {
                                         new IllegalStateException("Terminal installation was not released"));
                                 return;
                             }
-                            terminal.complete(mock(TerminalExt.class, RETURNS_DEEP_STUBS));
+                            terminal.complete(dumb);
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                             terminal.completeExceptionally(e);
@@ -221,9 +217,6 @@ class MavenCliLoggingTest {
                     },
                     "deferred-terminal-build");
             buildThread.setDaemon(true);
-            // Inject the DeferredTerminal directly into MessageUtils.terminal before starting the
-            // build thread, to avoid calling systemInstall(Terminal) which also creates a LineReader
-            // from the terminal — that would call DeferredTerminal.getTerminal() and block.
             injectTerminal(terminal);
             buildThread.start();
             assertTrue(buildingTerminal.await(10, SECONDS));

@@ -340,13 +340,41 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                     new ProjectBuildLogAppender(determineBuildEventListener(context));
             context.closeables.add(projectBuildLogAppender);
 
-            MessageUtils.systemInstall(builder -> doCreateTerminal(context, builder), terminal -> {
-                if (OSUtils.IS_WINDOWS && !context.invokerRequest.embedded()) {
-                    // JLine may consume Ctrl+C as terminal input, bypassing the JVM's shutdown hooks.
-                    terminal.handle(Terminal.Signal.INT, signal -> System.exit(SIGINT_EXIT_CODE));
+            if (context.invokerRequest.embedded()) {
+                // Embedded mode: build terminal synchronously (fast with custom streams).
+                // buildDeferred() only supports system terminals, and embedded mode is
+                // fast anyway (no FFM/JNI provider probing with custom streams).
+                try {
+                    TerminalBuilder builder =
+                            TerminalBuilder.builder().name("Maven").dumb(true);
+                    doCreateTerminal(context, builder);
+                    Terminal terminal = builder.build();
+                    MessageUtils.systemInstall(terminal);
+                    // Set terminal and color, then apply raw streams. We cannot call the
+                    // full doConfigureWithTerminal() here because it may wrap System.out
+                    // with LoggingOutputStream (doConfigureWithTerminalWithRawStreamsDisabled)
+                    // which requires loggerFactory and must happen AFTER configureLogging()
+                    // caches the original System.out. In the deferred path, the consumer
+                    // callback fires asynchronously after configureLogging(); here we run
+                    // synchronously before it. Using raw streams avoids the wrapping entirely
+                    // — embedded callers provide their own streams.
+                    context.terminal = terminal;
+                    MessageUtils.setColorEnabled(
+                            context.coloredOutput != null
+                                    ? context.coloredOutput
+                                    : !Terminal.TYPE_DUMB.equals(terminal.getType()));
+                    doConfigureWithTerminalWithRawStreamsEnabled(context);
+                } catch (IOException e) {
+                    throw new InvokerException("Failed to create terminal", e);
                 }
-                doConfigureWithTerminal(context, terminal);
-            });
+            } else {
+                MessageUtils.systemInstall(builder -> doCreateTerminal(context, builder), terminal -> {
+                    if (OSUtils.IS_WINDOWS) {
+                        terminal.handle(Terminal.Signal.INT, signal -> System.exit(SIGINT_EXIT_CODE));
+                    }
+                    doConfigureWithTerminal(context, terminal);
+                });
+            }
 
             context.terminal = MessageUtils.getTerminal();
             context.closeables.add(MessageUtils::systemUninstall);

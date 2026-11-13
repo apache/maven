@@ -107,7 +107,7 @@ public class MessageUtils {
                 }
             }
             AnsiConsole.systemUninstall();
-        } catch (IOException e) {
+        } catch (IOException | IllegalStateException e) {
             // best-effort cleanup
         } finally {
             terminal = null;
