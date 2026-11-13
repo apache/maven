@@ -179,7 +179,7 @@ under the License.
           <defaultValue>java</defaultValue>
           <description>The implementation language for this Mojo (java, beanshell, etc.).</description>
         </field>
-        <field>
+        <field xsd.suggestions="all,each,build,initialize,validate,sources,resources,compile,ready,package,verify,unit-test,test-sources,test-resources,test-compile,test,integration-test,install,deploy,clean,before:,after:">
           <name>phase</name>
           <version>1.0.0+</version>
           <type>String</type>
@@ -208,7 +208,7 @@ under the License.
           <type>String</type>
           <description>Specifies the name of a custom lifecycle to execute when this Mojo is forking execution (used together with {@code executePhase}).</description>
         </field>
-        <field>
+        <field xsd.enumerations="compile,runtime,test,compile+runtime,runtime+system">
           <name>requiresDependencyResolution</name>
           <version>1.0.0/1.1.0</version>
           <type>String</type>
@@ -218,7 +218,7 @@ under the License.
             {@code compile+runtime} (since Maven 3.0) or {@code runtime+system} (since Maven 3.0)
           </description>
         </field>
-        <field>
+        <field xsd.suggestions="compile,runtime,test,compile+runtime,runtime+system,main-compile,main-runtime,test-compile,test-runtime,true">
           <name>dependencyResolution</name>
           <version>2.0.0+</version>
           <type>String</type>
@@ -228,7 +228,7 @@ under the License.
             {@code compile+runtime} (since Maven 3.0) or {@code runtime+system} (since Maven 3.0)
           </description>
         </field>
-        <field>
+        <field xsd.enumerations="compile,runtime,test,compile+runtime,runtime+system">
           <name>requiresDependencyCollection</name>
           <version>1.0.0/1.1.0</version>
           <type>String</type>
@@ -241,7 +241,7 @@ under the License.
             full dependency resolution might fail due to projects which haven't been built yet.
           </description>
         </field>
-        <field>
+        <field xsd.suggestions="compile,runtime,test,compile+runtime,runtime+system,main-compile,main-runtime,test-compile,test-runtime,true">
           <name>dependencyCollection</name>
           <version>2.0.0+</version>
           <type>String</type>
