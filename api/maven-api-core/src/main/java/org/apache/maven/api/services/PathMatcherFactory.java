@@ -21,6 +21,7 @@ package org.apache.maven.api.services;
 import java.nio.file.Path;
 import java.nio.file.PathMatcher;
 import java.util.Collection;
+import java.util.Map;
 import java.util.Objects;
 
 import org.apache.maven.api.Service;
@@ -122,6 +123,33 @@ public interface PathMatcherFactory extends Service {
     default PathMatcher createIncludeOnlyMatcher(@Nonnull Path baseDirectory, Collection<String> includes) {
         return createPathMatcher(baseDirectory, includes, null, false);
     }
+
+    /**
+     * Creates a map of subdirectory paths to path matchers, optimized for targeted directory walks.
+     * <p>
+     * This method decomposes include patterns by parsing their literal leading path segments
+     * to determine the narrowest possible subdirectories that need to be walked. For example,
+     * includes {@code ["src/main/java/**&#47;*.java", "src/test/**&#47;*.java"]} produces two entries
+     * keyed by {@code src/main/java} and {@code src/test}, each with a matcher scoped to only
+     * those patterns.
+     * <p>
+     * Callers can then walk each key directory independently, applying only the associated matcher,
+     * instead of walking the entire base directory. For patterns with no literal prefix (e.g.
+     * {@code "**&#47;*.xml"}), the base directory itself is used as the key.
+     * <p>
+     * For single-file patterns with no wildcards at all, the map key is the file path itself
+     * and the matcher does a direct equality check.
+     *
+     * @param baseDirectory the base directory for resolving paths
+     * @param includes the patterns of files to include, or null/empty for including all files
+     * @param excludes the patterns of files to exclude, or null/empty for no exclusion
+     * @return a map of subdirectory (or file) paths to their corresponding path matchers
+     * @throws NullPointerException if baseDirectory is null
+     * @since 4.1.0
+     */
+    @Nonnull
+    Map<Path, PathMatcher> createSubdirectoryMatchers(
+            @Nonnull Path baseDirectory, Collection<String> includes, Collection<String> excludes);
 
     /**
      * Returns a filter for directories that may contain paths accepted by the given matcher.

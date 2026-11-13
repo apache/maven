@@ -40,12 +40,15 @@ import org.apache.maven.api.services.BuilderProblem;
  * appended at the end of each object.
  * <p>
  * Use {@link #write(Writer, BuildReport)} to write directly to any {@link Writer}
- * (e.g. a {@code BufferedWriter} wrapping an {@code OutputStream}); the caller does not
- * need to retain a reference to the JSON string after the write completes (the string is
- * built internally and discarded). The {@link #toJson(BuildReport)} convenience
- * method is provided for testing and in-process consumers that need the string.
+ * (e.g. a {@code BufferedWriter} wrapping an {@code OutputStream}); the JSON string is
+ * built internally and discarded after writing so the caller does not need to retain a
+ * reference to it. The {@link #toJson(BuildReport)} convenience method is provided for
+ * testing and in-process consumers that need the string.
  */
 final class BuildReportJsonWriter {
+
+    /** Maximum number of lines captured from a throwable's stack trace to prevent huge JSON output. */
+    private static final int MAX_THROWABLE_LINES = 50;
 
     private BuildReportJsonWriter() {}
 
@@ -53,8 +56,8 @@ final class BuildReportJsonWriter {
      * Serialize the given report to a pretty-printed JSON string.
      * <p>
      * Prefer {@link #write(Writer, BuildReport)} when writing directly to a file
-     * or stream — the caller does not need to hold the JSON string in memory after
-     * the write completes.
+     * or stream — the caller does not need to retain a reference to the JSON string
+     * after the write completes.
      */
     static String toJson(BuildReport report) {
         StringBuilder sb = new StringBuilder(4096);
@@ -477,16 +480,16 @@ final class BuildReportJsonWriter {
         StringWriter sw = new StringWriter();
         t.printStackTrace(new PrintWriter(sw));
         String full = sw.toString();
-        // Cap at 50 lines to prevent huge JSON output from deeply nested exceptions
-        String[] lines = full.split("\r?\n");
-        if (lines.length <= 50) {
+        // Cap at MAX_THROWABLE_LINES lines to prevent huge JSON output from deeply nested exceptions
+        String[] lines = full.split("\\r?\\n");
+        if (lines.length <= MAX_THROWABLE_LINES) {
             return full.replace("\r\n", "\n");
         }
         StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < 50; i++) {
+        for (int i = 0; i < MAX_THROWABLE_LINES; i++) {
             sb.append(lines[i]).append('\n');
         }
-        sb.append("... ").append(lines.length - 50).append(" more lines truncated");
+        sb.append("... ").append(lines.length - MAX_THROWABLE_LINES).append(" more lines truncated");
         return sb.toString();
     }
 }

@@ -1,0 +1,59 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.maven.api.build.incremental;
+
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Immutable;
+
+/**
+ * Indicates the change status of a resource between the current and previous build.
+ *
+ * <p>The status is determined by comparing the current file metadata (timestamp, size)
+ * against the state saved from the previous build. It is available on both
+ * {@link Metadata#getStatus()} (before processing) and {@link Resource#getStatus()}
+ * (after processing).</p>
+ *
+ * @since 4.1.0
+ * @see Metadata#getStatus()
+ * @see Resource#getStatus()
+ */
+@Experimental
+@Immutable
+public enum Status {
+
+    /**
+     * Resource is new in this build, i.e. it was not present in the previous build.
+     */
+    NEW,
+
+    /**
+     * Resource changed since the previous build.
+     */
+    MODIFIED,
+
+    /**
+     * Resource did not change since the previous build.
+     */
+    UNMODIFIED,
+
+    /**
+     * Resource was removed since the previous build.
+     */
+    REMOVED
+}
