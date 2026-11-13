@@ -502,7 +502,8 @@ class BuildPlanCreatorTest {
         // "initialize" ends well before "ready" in the lifecycle.
         DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
         BuildPlanExecutor.BuildContext context =
-                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles).new BuildContext();
+                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles, null)
+                .new BuildContext();
 
         BuildPlan plan = context.calculateLifecycleMappings(projects, "initialize");
 
@@ -583,7 +584,8 @@ class BuildPlanCreatorTest {
 
         DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
         BuildPlanExecutor.BuildContext context =
-                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles).new BuildContext();
+                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles, null)
+                .new BuildContext();
 
         BuildPlan plan = context.calculateLifecycleMappings(projects, "initialize");
 
