@@ -104,7 +104,8 @@ class FastTerminalReentrancyTest {
     }
 
     private static void assertProbe(String[] probed) {
-        assertEquals("WARNING", probed[0]);
+        String stripped = probed[0].replaceAll("\u001B\\[[;\\d]*m", "");
+        assertEquals("WARNING", stripped);
         assertNotNull(probed[1]);
     }
 

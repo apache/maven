@@ -655,6 +655,14 @@ public class Verifier {
                 break;
             }
         }
+        if (!result && stdout != null) {
+            for (String line : getStdout().lines().toList()) {
+                if (stripAnsi(line).contains(text)) {
+                    result = true;
+                    break;
+                }
+            }
+        }
         if (!result) {
             throw new VerificationException("Text not found in log: " + text);
         }
