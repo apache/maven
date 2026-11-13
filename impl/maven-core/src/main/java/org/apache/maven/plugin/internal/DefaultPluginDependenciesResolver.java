@@ -22,14 +22,23 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Properties;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.maven.RepositoryUtils;
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.impl.resolver.RelocatedArtifact;
@@ -75,17 +84,49 @@ import org.slf4j.LoggerFactory;
 public class DefaultPluginDependenciesResolver implements PluginDependenciesResolver {
     private static final String REPOSITORY_CONTEXT = org.apache.maven.api.services.RequestTrace.CONTEXT_PLUGIN;
 
+    private static final String MANAGED_DEPENDENCIES_KEY =
+            DefaultPluginDependenciesResolver.class.getName() + ".managedDependencies";
+
+    private static final Set<String> EXCLUDED_FROM_CORE_MANAGED_DEPENDENCIES = Set.of(
+            // Plugins must use their own SLF4J binding; aligning to the core version would impose
+            // Maven's binding choice on the plugin classpath.
+            "org.slf4j:slf4j-api",
+            // JSR-330 / JSR-250 APIs must remain resolvable by the plugin's DI container
+            // independently of Maven's copy.
+            "javax.inject:javax.inject",
+            "javax.annotation:javax.annotation-api",
+            // ANSI terminal library — not a core API; plugins may legitimately depend on a
+            // different version than the one Maven ships.
+            "org.fusesource.jansi:jansi",
+            // Interactive prompt API — plugin-specific, not a shared core contract.
+            "org.codehaus.plexus:plexus-interactivity-api");
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
     private final RepositorySystem repoSystem;
 
     private final List<MavenPluginDependenciesValidator> dependenciesValidators;
 
-    @Inject
+    private final CoreExports coreExports;
+
+    /**
+     * Backward-compatible constructor without {@link CoreExports}.
+     * Core managed dependencies are not injected in this mode.
+     */
+    @Deprecated
     public DefaultPluginDependenciesResolver(
             RepositorySystem repoSystem, List<MavenPluginDependenciesValidator> dependenciesValidators) {
+        this(repoSystem, dependenciesValidators, null);
+    }
+
+    @Inject
+    public DefaultPluginDependenciesResolver(
+            RepositorySystem repoSystem,
+            List<MavenPluginDependenciesValidator> dependenciesValidators,
+            @Nullable CoreExports coreExports) {
         this.repoSystem = repoSystem;
         this.dependenciesValidators = dependenciesValidators;
+        this.coreExports = coreExports;
     }
 
     private Artifact toArtifact(Plugin plugin, RepositorySystemSession session) {
@@ -201,7 +242,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
                         pluginArtifact,
                         message);
             }
-            return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session);
+            return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session, false);
         } catch (ArtifactDescriptorException e) {
             throw new PluginResolutionException(plugin, e.getResult().getExceptions(), e);
         }
@@ -227,7 +268,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             List<RemoteRepository> repositories,
             RepositorySystemSession session)
             throws PluginResolutionException {
-        return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session);
+        return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session, true);
     }
 
     @Override
@@ -238,7 +279,7 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             List<RemoteRepository> repositories,
             RepositorySystemSession session)
             throws PluginResolutionException {
-        return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session)
+        return resolveInternal(plugin, pluginArtifact, dependencyFilter, repositories, session, true)
                 .getRoot();
     }
 
@@ -247,7 +288,8 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             Artifact pluginArtifact,
             DependencyFilter dependencyFilter,
             List<RemoteRepository> repositories,
-            RepositorySystemSession session)
+            RepositorySystemSession session,
+            boolean injectCoreManagedDeps)
             throws PluginResolutionException {
         InternalSession iSession = InternalSession.from(session);
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(iSession, plugin.getDelegate());
@@ -271,11 +313,35 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
             request.setRequestContext(REPOSITORY_CONTEXT);
             request.setRepositories(repositories);
             request.setRoot(new org.eclipse.aether.graph.Dependency(pluginArtifact, null));
+            Map<String, org.eclipse.aether.graph.Dependency> core =
+                    injectCoreManagedDeps ? getCoreDependenciesMap(session) : Collections.emptyMap();
+            if (injectCoreManagedDeps && !core.isEmpty()) {
+                request.setManagedDependencies(new ArrayList<>(core.values()));
+            }
             for (Dependency dependency : plugin.getDependencies()) {
                 org.eclipse.aether.graph.Dependency pluginDep =
                         RepositoryUtils.toDependency(dependency, session.getArtifactTypeRegistry());
                 if (!DependencyScope.SYSTEM.is(pluginDep.getScope())) {
                     pluginDep = pluginDep.setScope(DependencyScope.RUNTIME.id());
+                }
+                if (injectCoreManagedDeps) {
+                    org.eclipse.aether.graph.Dependency managedDep =
+                            core.get(pluginDep.getArtifact().getGroupId() + ":"
+                                    + pluginDep.getArtifact().getArtifactId());
+                    if (managedDep != null) {
+                        if (!Objects.equals(
+                                pluginDep.getArtifact().getVersion(),
+                                managedDep.getArtifact().getVersion())) {
+                            pluginDep = pluginDep.setArtifact(pluginDep
+                                    .getArtifact()
+                                    .setVersion(managedDep.getArtifact().getVersion()));
+                        }
+                        // force provided: core artifact is already on Maven's core classloader
+                        // regardless of what the plugin declared; applying it unconditionally
+                        // ensures the ScopeDependencyFilter("provided","test") in resolveInternal
+                        // excludes it from artifact resolution.
+                        pluginDep = pluginDep.setScope(managedDep.getScope());
+                    }
                 }
                 request.addDependency(pluginDep);
             }
@@ -306,5 +372,60 @@ public class DefaultPluginDependenciesResolver implements PluginDependenciesReso
         } finally {
             RequestTraceHelper.exit(trace);
         }
+    }
+
+    @SuppressWarnings("unchecked")
+    private Map<String, org.eclipse.aether.graph.Dependency> getCoreDependenciesMap(RepositorySystemSession session) {
+        if (coreExports == null) {
+            return Collections.emptyMap();
+        }
+        return (Map<String, org.eclipse.aether.graph.Dependency>)
+                session.getData().computeIfAbsent(MANAGED_DEPENDENCIES_KEY, this::computeCoreDependenciesMap);
+    }
+
+    /**
+     * Computes managed dependencies for core artifacts exported by Maven.
+     * Each managed dependency is set to {@code provided} scope so that the
+     * {@link org.eclipse.aether.util.filter.ScopeDependencyFilter} in
+     * {@link #resolveInternal} excludes them from the plugin classpath — they are
+     * already available through the core classloader.
+     */
+    private Map<String, org.eclipse.aether.graph.Dependency> computeCoreDependenciesMap() {
+        if (coreExports == null || coreExports.getExportedArtifacts() == null) {
+            return Collections.emptyMap();
+        }
+        Map<String, org.eclipse.aether.graph.Dependency> managed = new LinkedHashMap<>();
+        ClassLoader cl = getClass().getClassLoader();
+        for (String ga : coreExports.getExportedArtifacts()) {
+            if (EXCLUDED_FROM_CORE_MANAGED_DEPENDENCIES.contains(ga)) {
+                continue;
+            }
+            int idx = ga.indexOf(':');
+            if (idx <= 0 || idx >= ga.length() - 1) {
+                continue;
+            }
+            String groupId = ga.substring(0, idx);
+            String artifactId = ga.substring(idx + 1);
+            String resource = "META-INF/maven/" + groupId + "/" + artifactId + "/pom.properties";
+            Properties props = new Properties();
+            try (InputStream is = cl.getResourceAsStream(resource)) {
+                if (is != null) {
+                    props.load(is);
+                }
+            } catch (IOException e) {
+                logger.debug("Could not read {}", resource, e);
+            }
+            String version = props.getProperty("version");
+            if (version != null) {
+                version = version.trim();
+                if (!version.isEmpty() && !version.startsWith("${")) {
+                    Artifact artifact = new DefaultArtifact(groupId, artifactId, "jar", version);
+                    managed.put(
+                            groupId + ":" + artifactId,
+                            new org.eclipse.aether.graph.Dependency(artifact, DependencyScope.PROVIDED.id()));
+                }
+            }
+        }
+        return Collections.unmodifiableMap(managed);
     }
 }
