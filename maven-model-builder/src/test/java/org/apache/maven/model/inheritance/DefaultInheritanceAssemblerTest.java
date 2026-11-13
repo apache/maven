@@ -67,6 +67,26 @@ public class DefaultInheritanceAssemblerTest {
     }
 
     /**
+     * MNG-6373: a build plugin marked {@code inherited=false} must not reach child POMs,
+     * even when it declares an execution.
+     * @throws Exception
+     */
+    @Test
+    public void testPluginNotInherited() throws Exception {
+        testInheritance("plugin-not-inherited");
+    }
+
+    /**
+     * MNG-2103: an execution's own {@code inherited=true} overrides a plugin-level
+     * {@code inherited=false}, so the whole plugin must still reach the child.
+     * @throws Exception
+     */
+    @Test
+    public void testPluginNotInheritedWithInheritedExecutionOverride() throws Exception {
+        testInheritance("plugin-not-inherited-execution-override");
+    }
+
+    /**
      * Check most classical urls inheritance: directory structure where parent POM in parent directory
      * and child directory == artifactId
      * @throws IOException Model read problem
