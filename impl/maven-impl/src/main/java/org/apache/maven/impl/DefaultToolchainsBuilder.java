@@ -64,6 +64,15 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
 
     @Override
     public ToolchainsBuilderResult build(ToolchainsBuilderRequest request) throws ToolchainsBuilderException {
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
+        try {
+            return RequestExecutor.request(request, this::doBuild);
+        } finally {
+            RequestTraceHelper.exit(trace);
+        }
+    }
+
+    private ToolchainsBuilderResult doBuild(ToolchainsBuilderRequest request) throws ToolchainsBuilderException {
         ProblemCollector<BuilderProblem> problems = ProblemCollector.create(request.getSession());
 
         Source installationSource = request.getInstallationToolchainsSource().orElse(null);

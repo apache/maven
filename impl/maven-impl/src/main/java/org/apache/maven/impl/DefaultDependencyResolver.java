@@ -120,76 +120,80 @@ public class DefaultDependencyResolver implements DependencyResolver {
         InternalSession session = InternalSession.from(request.getSession());
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
-            Artifact rootArtifact;
-            DependencyCoordinates root;
-            Collection<DependencyCoordinates> dependencies;
-            Collection<DependencyCoordinates> managedDependencies;
-            List<RemoteRepository> remoteRepositories;
-            if (request.getProject().isPresent()) {
-                Project project = request.getProject().get();
-                rootArtifact = project.getPomArtifact();
-                root = null;
-                // Caller-supplied dependencies take precedence to allow plugin-specific resolution in project context.
-                dependencies =
-                        request.getDependencies().isEmpty() ? project.getDependencies() : request.getDependencies();
-                managedDependencies = project.getManagedDependencies();
-                remoteRepositories = request.getRepositories() != null
-                        ? request.getRepositories()
-                        : session.getService(ProjectManager.class).getRemoteProjectRepositories(project);
-            } else {
-                rootArtifact = request.getRootArtifact().orElse(null);
-                root = request.getRoot().orElse(null);
-                dependencies = request.getDependencies();
-                managedDependencies = request.getManagedDependencies();
-                remoteRepositories =
-                        request.getRepositories() != null ? request.getRepositories() : session.getRemoteRepositories();
-            }
-            ResolutionScope resolutionScope = null;
-            if (request.getPathScope() != null) {
-                resolutionScope = session.getSession()
-                        .getScopeManager()
-                        .getResolutionScope(request.getPathScope().id())
-                        .orElseThrow();
-            }
-            List<org.eclipse.aether.graph.Dependency> resolverDependencies =
-                    session.toDependencies(dependencies, false);
-            List<org.eclipse.aether.graph.Dependency> resolverManagedDependencies =
-                    session.toDependencies(managedDependencies, true);
-            if (request.getProject().isPresent() && !request.getDependencies().isEmpty()) {
-                resolverDependencies = applyDependencyManagement(resolverDependencies, resolverManagedDependencies);
-            }
-            CollectRequest collectRequest = new CollectRequest()
-                    .setRootArtifact(rootArtifact != null ? session.toArtifact(rootArtifact) : null)
-                    .setRoot(root != null ? session.toDependency(root, false) : null)
-                    .setDependencies(resolverDependencies)
-                    .setManagedDependencies(resolverManagedDependencies)
-                    .setRepositories(session.toResolvingRepositories(remoteRepositories))
-                    .setRequestContext(trace.context())
-                    .setTrace(trace.trace());
-            collectRequest.setResolutionScope(resolutionScope);
-
-            RepositorySystemSession systemSession = session.getSession();
-            if (request.getVerbose()) {
-                systemSession = new DefaultRepositorySystemSession(systemSession)
-                        .setConfigProperty(ConflictResolver.CONFIG_PROP_VERBOSE, true)
-                        .setConfigProperty(DependencyManagerUtils.CONFIG_PROP_VERBOSE, true);
-            }
-
-            try {
-                final CollectResult result =
-                        session.getRepositorySystem().collectDependencies(systemSession, collectRequest);
-                return new DefaultDependencyResolverResult(
-                        null,
-                        moduleCache(request),
-                        result.getExceptions(),
-                        session.getNode(result.getRoot(), request.getVerbose()),
-                        0);
-            } catch (DependencyCollectionException e) {
-                String enhancedMessage = enhanceCollectionError(e, collectRequest);
-                throw new DependencyResolverException(enhancedMessage, e);
-            }
+            return session.request(request, this::doCollect);
         } finally {
             RequestTraceHelper.exit(trace);
+        }
+    }
+
+    private DependencyResolverResult doCollect(DependencyResolverRequest request) {
+        InternalSession session = InternalSession.from(request.getSession());
+        org.apache.maven.api.services.RequestTrace trace = RequestTraceHelper.getCurrentTrace(session);
+        Artifact rootArtifact;
+        DependencyCoordinates root;
+        Collection<DependencyCoordinates> dependencies;
+        Collection<DependencyCoordinates> managedDependencies;
+        List<RemoteRepository> remoteRepositories;
+        if (request.getProject().isPresent()) {
+            Project project = request.getProject().get();
+            rootArtifact = project.getPomArtifact();
+            root = null;
+            // Caller-supplied dependencies take precedence to allow plugin-specific resolution in project context.
+            dependencies = request.getDependencies().isEmpty() ? project.getDependencies() : request.getDependencies();
+            managedDependencies = project.getManagedDependencies();
+            remoteRepositories = request.getRepositories() != null
+                    ? request.getRepositories()
+                    : session.getService(ProjectManager.class).getRemoteProjectRepositories(project);
+        } else {
+            rootArtifact = request.getRootArtifact().orElse(null);
+            root = request.getRoot().orElse(null);
+            dependencies = request.getDependencies();
+            managedDependencies = request.getManagedDependencies();
+            remoteRepositories =
+                    request.getRepositories() != null ? request.getRepositories() : session.getRemoteRepositories();
+        }
+        ResolutionScope resolutionScope = null;
+        if (request.getPathScope() != null) {
+            resolutionScope = session.getSession()
+                    .getScopeManager()
+                    .getResolutionScope(request.getPathScope().id())
+                    .orElseThrow();
+        }
+        List<org.eclipse.aether.graph.Dependency> resolverDependencies = session.toDependencies(dependencies, false);
+        List<org.eclipse.aether.graph.Dependency> resolverManagedDependencies =
+                session.toDependencies(managedDependencies, true);
+        if (request.getProject().isPresent() && !request.getDependencies().isEmpty()) {
+            resolverDependencies = applyDependencyManagement(resolverDependencies, resolverManagedDependencies);
+        }
+        CollectRequest collectRequest = new CollectRequest()
+                .setRootArtifact(rootArtifact != null ? session.toArtifact(rootArtifact) : null)
+                .setRoot(root != null ? session.toDependency(root, false) : null)
+                .setDependencies(resolverDependencies)
+                .setManagedDependencies(resolverManagedDependencies)
+                .setRepositories(session.toResolvingRepositories(remoteRepositories))
+                .setRequestContext(trace.context())
+                .setTrace(RequestTraceHelper.toResolver(trace));
+        collectRequest.setResolutionScope(resolutionScope);
+
+        RepositorySystemSession systemSession = session.getSession();
+        if (request.getVerbose()) {
+            systemSession = new DefaultRepositorySystemSession(systemSession)
+                    .setConfigProperty(ConflictResolver.CONFIG_PROP_VERBOSE, true)
+                    .setConfigProperty(DependencyManagerUtils.CONFIG_PROP_VERBOSE, true);
+        }
+
+        try {
+            final CollectResult result =
+                    session.getRepositorySystem().collectDependencies(systemSession, collectRequest);
+            return new DefaultDependencyResolverResult(
+                    request,
+                    moduleCache(request),
+                    result.getExceptions(),
+                    session.getNode(result.getRoot(), request.getVerbose()),
+                    0);
+        } catch (DependencyCollectionException e) {
+            String enhancedMessage = enhanceCollectionError(e, collectRequest);
+            throw new DependencyResolverException(enhancedMessage, e);
         }
     }
 
@@ -274,57 +278,63 @@ public class DefaultDependencyResolver implements DependencyResolver {
         InternalSession session =
                 InternalSession.from(requireNonNull(request, "request").getSession());
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
-        DependencyResolverResult result;
         try {
-            DependencyResolverResult collectorResult = collect(request);
-            List<RemoteRepository> repositories = request.getRepositories() != null
-                    ? request.getRepositories()
-                    : request.getProject().isPresent()
-                            ? session.getService(ProjectManager.class)
-                                    .getRemoteProjectRepositories(
-                                            request.getProject().get())
-                            : session.getRemoteRepositories();
-            if (request.getRequestType() == DependencyResolverRequest.RequestType.COLLECT) {
-                result = collectorResult;
-            } else {
-                List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getPathScope());
-                List<ArtifactCoordinates> coordinates = nodes.stream()
-                        .map(Node::getDependency)
-                        .filter(Objects::nonNull)
-                        .map(Artifact::toCoordinates)
-                        .collect(Collectors.toList());
-                Predicate<PathType> filter = request.getPathTypeFilter();
-                DefaultDependencyResolverResult resolverResult = new DefaultDependencyResolverResult(
-                        null,
-                        moduleCache(request),
-                        collectorResult.getExceptions(),
-                        collectorResult.getRoot(),
-                        nodes.size());
-                if (request.getRequestType() == DependencyResolverRequest.RequestType.FLATTEN) {
-                    for (Node node : nodes) {
-                        resolverResult.addNode(node);
-                    }
-                } else {
-                    ArtifactResolverResult artifactResolverResult =
-                            session.getService(ArtifactResolver.class).resolve(session, coordinates, repositories);
-                    for (Node node : nodes) {
-                        Path path = (node.artifact() != null)
-                                ? artifactResolverResult
-                                        .getResult(node.artifact().toCoordinates())
-                                        .getPath()
-                                : null;
-                        try {
-                            resolverResult.addDependency(node, node.dependency(), filter, path);
-                        } catch (IOException e) {
-                            throw cannotReadModuleInfo(path, e);
-                        }
-                    }
-                }
-                result = resolverResult;
-            }
+            return session.request(request, this::doResolve);
         } finally {
             RequestTraceHelper.exit(trace);
         }
+    }
+
+    private DependencyResolverResult doResolve(DependencyResolverRequest request) {
+        InternalSession session = InternalSession.from(request.getSession());
+        DependencyResolverResult result;
+        DependencyResolverResult collectorResult = doCollect(request);
+        List<RemoteRepository> repositories = request.getRepositories() != null
+                ? request.getRepositories()
+                : request.getProject().isPresent()
+                        ? session.getService(ProjectManager.class)
+                                .getRemoteProjectRepositories(
+                                        request.getProject().get())
+                        : session.getRemoteRepositories();
+        if (request.getRequestType() == DependencyResolverRequest.RequestType.COLLECT) {
+            result = collectorResult;
+        } else {
+            List<Node> nodes = flatten(session, collectorResult.getRoot(), request.getPathScope());
+            List<ArtifactCoordinates> coordinates = nodes.stream()
+                    .map(Node::getDependency)
+                    .filter(Objects::nonNull)
+                    .map(Artifact::toCoordinates)
+                    .collect(Collectors.toList());
+            Predicate<PathType> filter = request.getPathTypeFilter();
+            DefaultDependencyResolverResult resolverResult = new DefaultDependencyResolverResult(
+                    request,
+                    moduleCache(request),
+                    collectorResult.getExceptions(),
+                    collectorResult.getRoot(),
+                    nodes.size());
+            if (request.getRequestType() == DependencyResolverRequest.RequestType.FLATTEN) {
+                for (Node node : nodes) {
+                    resolverResult.addNode(node);
+                }
+            } else {
+                ArtifactResolverResult artifactResolverResult =
+                        session.getService(ArtifactResolver.class).resolve(session, coordinates, repositories);
+                for (Node node : nodes) {
+                    Path path = (node.artifact() != null)
+                            ? artifactResolverResult
+                                    .getResult(node.artifact().toCoordinates())
+                                    .getPath()
+                            : null;
+                    try {
+                        resolverResult.addDependency(node, node.dependency(), filter, path);
+                    } catch (IOException e) {
+                        throw cannotReadModuleInfo(path, e);
+                    }
+                }
+            }
+            result = resolverResult;
+        }
+
         return result;
     }
 

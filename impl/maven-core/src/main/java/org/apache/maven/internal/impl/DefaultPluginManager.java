@@ -27,10 +27,17 @@ import java.util.Objects;
 import org.apache.maven.api.Plugin;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.cache.CacheMetadata;
+import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.PluginManager;
 import org.apache.maven.api.services.PluginManagerException;
+import org.apache.maven.api.services.Request;
+import org.apache.maven.api.services.RequestTrace;
+import org.apache.maven.api.services.Result;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.lifecycle.internal.LifecyclePluginResolver;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
@@ -62,6 +69,21 @@ public final class DefaultPluginManager implements PluginManager {
         requireNonNull(project, "project");
         requireNonNull(plugin, "plugin");
 
+        PluginRequest request = new PluginRequest(session, project, plugin);
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
+        try {
+            return InternalSession.from(session)
+                    .request(request, this::doLoadPlugin)
+                    .plugin();
+        } finally {
+            RequestTraceHelper.exit(trace);
+        }
+    }
+
+    private PluginResult doLoadPlugin(PluginRequest request) {
+        Session session = request.getSession();
+        Project project = request.project();
+        org.apache.maven.api.model.Plugin plugin = request.plugin();
         InternalMavenSession internalSession = InternalMavenSession.from(session);
         MavenProject mavenProject =
                 cast(DefaultProject.class, project, "project").getProject();
@@ -81,7 +103,7 @@ public final class DefaultPluginManager implements PluginManager {
             PluginDescriptor descriptor = pluginManager.getPluginDescriptor(
                     legacyPlugin, mavenProject.getRemotePluginRepositories(), executionSession.getRepositorySession());
             pluginManager.setupPluginRealm(descriptor, executionSession, null, null, null);
-            return new DefaultPlugin(internalSession, legacyPlugin, descriptor, lookup);
+            return new PluginResult(request, new DefaultPlugin(internalSession, legacyPlugin, descriptor, lookup));
         } catch (Exception e) {
             throw new PluginManagerException(
                     "Unable to load plugin " + plugin.getGroupId() + ":" + plugin.getArtifactId(), e);
@@ -96,5 +118,30 @@ public final class DefaultPluginManager implements PluginManager {
                 .findFirst()
                 .orElseThrow(() -> new IllegalArgumentException("Plugin " + requestedPlugin.getGroupId() + ":"
                         + requestedPlugin.getArtifactId() + " is not declared by project " + project.getId()));
+    }
+
+    private record PluginRequest(Session session, Project project, org.apache.maven.api.model.Plugin plugin)
+            implements Request<Session>, CacheMetadata {
+        @Override
+        public Session getSession() {
+            return session;
+        }
+
+        @Override
+        public RequestTrace getTrace() {
+            return null;
+        }
+
+        @Override
+        public CacheRetention getCacheRetention() {
+            return CacheRetention.DISABLED;
+        }
+    }
+
+    private record PluginResult(PluginRequest request, Plugin plugin) implements Result<PluginRequest> {
+        @Override
+        public PluginRequest getRequest() {
+            return request;
+        }
     }
 }

@@ -36,8 +36,7 @@ import org.apache.maven.api.model.Profile;
 import static java.util.Objects.requireNonNull;
 
 /**
- * Request used to build a {@link org.apache.maven.api.Project} using
- * the {@link ProjectBuilder} service.
+ * Request used to build a Maven model using the {@link ModelBuilder} service.
  *
  * @since 4.0.0
  */

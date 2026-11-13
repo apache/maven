@@ -28,6 +28,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.CacheRetention;
 
 import static java.util.Objects.requireNonNull;
 
@@ -38,6 +39,20 @@ import static java.util.Objects.requireNonNull;
  */
 @Experimental
 public interface ToolchainsBuilderRequest extends Request<ProtoSession> {
+
+    /**
+     * Overrides the default {@link CacheRetention#DISABLED} retention with
+     * {@link CacheRetention#SESSION_SCOPED}, because toolchains are read from stable
+     * sources (files or classpath) that do not change within a session.
+     *
+     * @return {@link CacheRetention#SESSION_SCOPED}
+     * @since 4.2.0
+     */
+    @Nonnull
+    @Override
+    default CacheRetention getCacheRetention() {
+        return CacheRetention.SESSION_SCOPED;
+    }
 
     /**
      * Gets the installation Toolchains source.

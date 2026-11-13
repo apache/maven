@@ -18,11 +18,14 @@
  */
 package org.apache.maven.impl;
 
+import java.util.Collection;
 import java.util.Objects;
 
 import org.apache.maven.api.DependencyScope;
+import org.apache.maven.api.Exclusion;
 import org.apache.maven.api.Type;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.eclipse.aether.artifact.ArtifactProperties;
 import org.eclipse.aether.graph.Dependency;
 
@@ -114,6 +117,30 @@ abstract class AetherDependencyWrapper {
     @Nonnull
     public DependencyScope scope() {
         return session.requireDependencyScope(dependency.getScope());
+    }
+
+    /**
+     * {@return the transitive dependency exclusions}
+     */
+    @Nonnull
+    public Collection<Exclusion> exclusions() {
+        return new MappedCollection<>(dependency.getExclusions(), this::toExclusion);
+    }
+
+    private Exclusion toExclusion(org.eclipse.aether.graph.Exclusion exclusion) {
+        return new Exclusion() {
+            @Nullable
+            @Override
+            public String groupId() {
+                return exclusion.getGroupId();
+            }
+
+            @Nullable
+            @Override
+            public String artifactId() {
+                return exclusion.getArtifactId();
+            }
+        };
     }
 
     /**

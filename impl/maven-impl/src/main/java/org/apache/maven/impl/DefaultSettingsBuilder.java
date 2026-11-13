@@ -156,6 +156,15 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
 
     @Override
     public SettingsBuilderResult build(SettingsBuilderRequest request) throws SettingsBuilderException {
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
+        try {
+            return RequestExecutor.request(request, this::doBuild);
+        } finally {
+            RequestTraceHelper.exit(trace);
+        }
+    }
+
+    private SettingsBuilderResult doBuild(SettingsBuilderRequest request) throws SettingsBuilderException {
         ProblemCollector<BuilderProblem> problems = ProblemCollector.create(request.getSession());
 
         Source installationSource = request.getInstallationSettingsSource().orElse(null);

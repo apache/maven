@@ -20,9 +20,9 @@ package org.apache.maven.api.services;
 
 import java.util.Collection;
 
+import org.apache.maven.api.OperationService;
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -34,7 +34,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @see Session#deployArtifact(RemoteRepository, ProducedArtifact...)
  */
 @Experimental
-public interface ArtifactDeployer extends Service {
+public interface ArtifactDeployer extends OperationService {
 
     /**
      * @param request {@link ArtifactDeployerRequest}

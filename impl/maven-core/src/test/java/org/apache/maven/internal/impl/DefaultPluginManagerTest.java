@@ -21,9 +21,12 @@ package org.apache.maven.internal.impl;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import org.apache.maven.api.Plugin;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.Request;
+import org.apache.maven.api.services.Result;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.lifecycle.internal.LifecyclePluginResolver;
 import org.apache.maven.model.Build;
@@ -73,6 +76,13 @@ class DefaultPluginManagerTest {
         org.eclipse.aether.graph.Dependency resolverDependency = mock(org.eclipse.aether.graph.Dependency.class);
         org.apache.maven.api.Dependency dependency = mock(org.apache.maven.api.Dependency.class);
 
+        doAnswer(invocation -> {
+                    Request<?> request = invocation.getArgument(0);
+                    Function<Request<?>, Result<?>> work = invocation.getArgument(1);
+                    return work.apply(request);
+                })
+                .when(session)
+                .request(any(), any());
         when(session.getMavenSession()).thenReturn(mavenSession);
         when(mavenSession.clone()).thenReturn(executionSession);
         when(project.getProject()).thenReturn(mavenProject);
@@ -119,6 +129,13 @@ class DefaultPluginManagerTest {
         mavenProject.setVersion("1.0");
         mavenProject.setBuild(build);
 
+        doAnswer(invocation -> {
+                    Request<?> request = invocation.getArgument(0);
+                    Function<Request<?>, Result<?>> work = invocation.getArgument(1);
+                    return work.apply(request);
+                })
+                .when(session)
+                .request(any(), any());
         when(session.getMavenSession()).thenReturn(mavenSession);
         when(mavenSession.clone()).thenReturn(executionSession);
         when(project.getProject()).thenReturn(mavenProject);

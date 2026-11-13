@@ -225,20 +225,10 @@ public class DefaultModelBuilder implements ModelBuilder {
         public ModelBuilderResult build(ModelBuilderRequest request) throws ModelBuilderException {
             RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
             try {
-                // Create or derive a session based on the request
-                ModelBuilderSessionState session = sessionFor(request);
-                // Build the request
-                if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
-                    // build the build poms
-                    session.buildBuildPom();
-                } else {
-                    // simply build the effective model
-                    session.buildEffectiveModel(new LinkedHashSet<>());
-                }
-                return session.result;
+                return InternalSession.from(request.getSession()).request(request, this::doBuild);
             } finally {
-                // Clean up REQUEST_SCOPED cache entries to prevent memory leaks
-                // This is especially important for BUILD_PROJECT requests which are top-level requests
+                // Clear operation results while retaining internal model cache entries.
+                // Project builds can enclose many resolver operations.
                 if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
                     try {
                         clearRequestScopedCache(request);
@@ -251,6 +241,16 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
         }
 
+        private ModelBuilderResult doBuild(ModelBuilderRequest request) throws ModelBuilderException {
+            ModelBuilderSessionState session = sessionFor(request);
+            if (request.getRequestType() == ModelBuilderRequest.RequestType.BUILD_PROJECT) {
+                session.buildBuildPom();
+            } else {
+                session.buildEffectiveModel(new LinkedHashSet<>());
+            }
+            return session.result;
+        }
+
         /**
          * Stops after the raw model, so no inheritance, interpolation or profile injection
          * happens: only the source, the file model, the raw model and the problems are populated
@@ -261,16 +261,22 @@ public class DefaultModelBuilder implements ModelBuilder {
         public ModelBuilderResult validate(ModelBuilderRequest request) throws ModelBuilderException {
             RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
             try {
-                ModelBuilderSessionState session = sessionFor(request);
-                // Map the reactor first: a 4.1.0 subproject may leave out its parent version,
-                // taken from the parent's own file model, so without this a valid subproject
-                // fails with "'parent.version' is missing". A POM outside any project still reads.
-                session.loadReactor(false, false);
-                session.readRawModel();
-                return session.result;
+                ModelOperationRequest operation =
+                        new ModelOperationRequest(request, ModelOperation.VALIDATE, trace.mvnTrace());
+                return InternalSession.from(request.getSession()).request(operation, this::doValidate).response;
             } finally {
                 RequestTraceHelper.exit(trace);
             }
+        }
+
+        private SourceResponse<ModelOperationRequest, ModelBuilderResult> doValidate(ModelOperationRequest operation) {
+            ModelBuilderSessionState session = sessionFor(operation.modelRequest());
+            // Map the reactor first: a 4.1.0 subproject may leave out its parent version,
+            // taken from the parent's own file model, so without this a valid subproject
+            // fails with "'parent.version' is missing". A POM outside any project still reads.
+            session.loadReactor(false, false);
+            session.readRawModel();
+            return new SourceResponse<>(operation, session.result);
         }
 
         /** Creates the session on the first request, then derives one with its own result. */
@@ -3128,14 +3134,11 @@ public class DefaultModelBuilder implements ModelBuilder {
     public Model buildRawModel(ModelBuilderRequest request) throws ModelBuilderException {
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
         try {
-            ModelBuilderSessionState build = new ModelBuilderSessionState(request);
-            Model model = build.readRawModel();
-            if (build.hasErrors()) {
-                throw build.newModelBuilderException();
-            }
-            return model;
+            ModelOperationRequest operation =
+                    new ModelOperationRequest(request, ModelOperation.RAW_MODEL, trace.mvnTrace());
+            return InternalSession.from(request.getSession()).request(operation, this::doBuildRawModel).response;
         } finally {
-            // Clean up REQUEST_SCOPED cache entries for raw model building as well
+            // Clear operation results while retaining internal model cache entries.
             try {
                 clearRequestScopedCache(request);
             } catch (Exception e) {
@@ -3143,6 +3146,38 @@ public class DefaultModelBuilder implements ModelBuilder {
                 logger.debug("Failed to clear REQUEST_SCOPED cache for raw model request: {}", request, e);
             }
             RequestTraceHelper.exit(trace);
+        }
+    }
+
+    private SourceResponse<ModelOperationRequest, Model> doBuildRawModel(ModelOperationRequest operation) {
+        ModelBuilderSessionState build = new ModelBuilderSessionState(operation.modelRequest());
+        Model model = build.readRawModel();
+        if (build.hasErrors()) {
+            throw build.newModelBuilderException();
+        }
+        return new SourceResponse<>(operation, model);
+    }
+
+    enum ModelOperation {
+        VALIDATE,
+        RAW_MODEL
+    }
+
+    record ModelOperationRequest(ModelBuilderRequest modelRequest, ModelOperation operation, RequestTrace trace)
+            implements Request<Session>, CacheMetadata {
+        @Override
+        public Session getSession() {
+            return modelRequest.getSession();
+        }
+
+        @Override
+        public RequestTrace getTrace() {
+            return trace;
+        }
+
+        @Override
+        public CacheRetention getCacheRetention() {
+            return CacheRetention.DISABLED;
         }
     }
 
@@ -3402,11 +3437,10 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     /**
-     * Clears REQUEST_SCOPED cache entries for a specific request.
-     * <p>
-     * The method identifies the outer request and removes the corresponding cache entry from the session data.
+     * Clears operation results from the outer request's cache while preserving
+     * {@link RgavCacheKey} and {@link SourceCacheKey} entries used by internal model caches.
      *
-     * @param req the request whose REQUEST_SCOPED cache should be cleared
+     * @param req the request whose enclosing cache should be cleaned
      * @param <REQ> the request type
      */
     private <REQ extends Request<?>> void clearRequestScopedCache(REQ req) {
@@ -3414,7 +3448,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             // Use the same key as DefaultRequestCache
             SessionData.Key<Cache> key = SessionData.key(Cache.class, CacheMetadata.class);
 
-            // Get the outer request key using the same logic as DefaultRequestCache
+            // Locate the outer request represented by the request's explicit trace ancestry.
             Object outerRequestKey = getOuterRequest(req);
 
             Cache<Object, Object> caches = session.getData().get(key);
@@ -3437,8 +3471,7 @@ public class DefaultModelBuilder implements ModelBuilder {
     }
 
     /**
-     * Gets the outer request for cache key purposes.
-     * This replicates the logic from DefaultRequestCache.doGetOuterRequest().
+     * Gets the outer request represented by the request's explicit trace ancestry.
      */
     private Object getOuterRequest(Request<?> req) {
         RequestTrace trace = req.getTrace();

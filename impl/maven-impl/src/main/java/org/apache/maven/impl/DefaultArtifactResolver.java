@@ -63,7 +63,12 @@ public class DefaultArtifactResolver implements ArtifactResolver {
             throws ArtifactResolverException, IllegalArgumentException {
         requireNonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
-        return session.request(request, this::doResolve);
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
+        try {
+            return session.request(request, this::doResolve);
+        } finally {
+            RequestTraceHelper.exit(trace);
+        }
     }
 
     record ResolverRequest(Session session, RequestTrace trace, ArtifactRequest request) implements Request<Session> {
@@ -90,7 +95,12 @@ public class DefaultArtifactResolver implements ArtifactResolver {
 
     protected ArtifactResolverResult doResolve(ArtifactResolverRequest request) {
         InternalSession session = InternalSession.from(request.getSession());
-        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
+        org.apache.maven.api.services.RequestTrace trace = RequestTraceHelper.getCurrentTrace(session);
+        RequestTraceHelper.ResolverTrace fallbackTrace = null;
+        if (trace == null) {
+            fallbackTrace = RequestTraceHelper.enter(session, request);
+            trace = fallbackTrace.mvnTrace();
+        }
         try {
             List<RemoteRepository> repositories = session.toResolvingRepositories(
                     request.getRepositories() != null ? request.getRepositories() : session.getRemoteRepositories());
@@ -101,8 +111,8 @@ public class DefaultArtifactResolver implements ArtifactResolver {
                 req.setRepositories(repositories);
                 req.setArtifact(session.toArtifact(coords));
                 req.setRequestContext(trace.context());
-                req.setTrace(trace.trace());
-                requests.add(new ResolverRequest(session, trace.mvnTrace(), req));
+                req.setTrace(RequestTraceHelper.toResolver(trace));
+                requests.add(new ResolverRequest(session, trace, req));
             }
             List<ResolverResult> results = session.requests(requests, list -> {
                 try {
@@ -130,7 +140,9 @@ public class DefaultArtifactResolver implements ArtifactResolver {
             }
             throw new ArtifactResolverException(message, e, toResult(request, e));
         } finally {
-            RequestTraceHelper.exit(trace);
+            if (fallbackTrace != null) {
+                RequestTraceHelper.exit(fallbackTrace);
+            }
         }
     }
 

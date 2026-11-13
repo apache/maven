@@ -19,11 +19,11 @@
 package org.apache.maven.impl;
 
 import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.ArtifactCoordinatesFactory;
-import org.apache.maven.api.services.ArtifactCoordinatesFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
 import static java.util.Objects.requireNonNull;
@@ -32,33 +32,33 @@ import static java.util.Objects.requireNonNull;
 @Singleton
 public class DefaultArtifactCoordinatesFactory implements ArtifactCoordinatesFactory {
     @Override
-    public ArtifactCoordinates create(@Nonnull ArtifactCoordinatesFactoryRequest request) {
-        requireNonNull(request, "request");
-        InternalSession session = InternalSession.from(request.getSession());
-        if (request.getCoordinatesString() != null) {
-            return new DefaultArtifactCoordinates(
-                    session, new org.eclipse.aether.artifact.DefaultArtifact(request.getCoordinatesString()));
-        } else {
-            ArtifactType type = null;
-            if (request.getType() != null) {
-                type = session.getSession().getArtifactTypeRegistry().get(request.getType());
-            }
-            String str1 = request.getClassifier();
-            String classifier = str1 != null && !str1.isEmpty()
-                    ? request.getClassifier()
-                    : type != null ? type.getClassifier() : "";
-            String str = request.getExtension();
-            String extension =
-                    str != null && !str.isEmpty() ? request.getExtension() : type != null ? type.getExtension() : "";
-            return new DefaultArtifactCoordinates(
-                    session,
-                    new org.eclipse.aether.artifact.DefaultArtifact(
-                            request.getGroupId(),
-                            request.getArtifactId(),
-                            classifier,
-                            extension,
-                            request.getVersion(),
-                            type));
-        }
+    public ArtifactCoordinates create(@Nonnull Session session, @Nonnull String coordinatesString) {
+        return new DefaultArtifactCoordinates(
+                InternalSession.from(requireNonNull(session, "session")),
+                new org.eclipse.aether.artifact.DefaultArtifact(
+                        requireNonNull(coordinatesString, "coordinatesString")));
+    }
+
+    @Override
+    public ArtifactCoordinates create(
+            @Nonnull Session session,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String extension,
+            String typeId) {
+        InternalSession internalSession = InternalSession.from(requireNonNull(session, "session"));
+        ArtifactType type = typeId != null
+                ? internalSession.getSession().getArtifactTypeRegistry().get(typeId)
+                : null;
+        String effectiveClassifier =
+                classifier != null && !classifier.isEmpty() ? classifier : type != null ? type.getClassifier() : "";
+        String effectiveExtension =
+                extension != null && !extension.isEmpty() ? extension : type != null ? type.getExtension() : "";
+        return new DefaultArtifactCoordinates(
+                internalSession,
+                new org.eclipse.aether.artifact.DefaultArtifact(
+                        groupId, artifactId, effectiveClassifier, effectiveExtension, version, type));
     }
 }

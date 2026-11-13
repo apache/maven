@@ -23,12 +23,11 @@ import java.nio.file.Paths;
 import java.util.Map;
 
 import org.apache.maven.api.Constants;
-import org.apache.maven.api.Session;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.services.SettingsBuilder;
 import org.apache.maven.api.services.SettingsBuilderException;
 import org.apache.maven.api.services.SettingsBuilderRequest;
 import org.apache.maven.api.services.Sources;
-import org.apache.maven.api.services.xml.SettingsXmlFactory;
 import org.apache.maven.impl.model.DefaultInterpolator;
 import org.codehaus.plexus.components.secdispatcher.Dispatcher;
 import org.junit.jupiter.api.BeforeEach;
@@ -55,16 +54,13 @@ class DefaultSettingsBuilderDecryptTest {
             "{L6L/HbmrY+cH+sNkphn-this password is corrupted intentionally-q3fguYepTpM04WlIXb8nB1pk=}";
 
     @Mock
-    Session session;
+    ProtoSession session;
 
     @Mock
     Dispatcher dispatcher;
 
     @BeforeEach
     void setup() {
-        Mockito.lenient()
-                .when(session.getService(SettingsXmlFactory.class))
-                .thenReturn(new DefaultSettingsXmlFactory());
         Mockito.lenient()
                 .when(session.getEffectiveProperties())
                 .thenReturn(Map.of(

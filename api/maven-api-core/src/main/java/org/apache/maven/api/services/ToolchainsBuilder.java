@@ -18,7 +18,7 @@
  */
 package org.apache.maven.api.services;
 
-import org.apache.maven.api.Service;
+import org.apache.maven.api.OperationService;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -29,7 +29,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.0.0
  */
 @Experimental
-public interface ToolchainsBuilder extends Service {
+public interface ToolchainsBuilder extends OperationService {
 
     /**
      * Builds the effective toolchains for the specified toolchains files.

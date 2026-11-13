@@ -24,6 +24,7 @@ import java.util.Locale;
 import java.util.function.Function;
 
 import org.apache.maven.api.Constants;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.SessionData;
 import org.apache.maven.api.cache.CacheMetadata;
@@ -31,7 +32,7 @@ import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.services.Request;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.Result;
-import org.apache.maven.impl.InternalSession;
+import org.apache.maven.impl.RequestTraceHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +45,11 @@ public class DefaultRequestCache extends AbstractRequestCache {
 
     // Comprehensive cache statistics
     private final CacheStatistics statistics = new CacheStatistics();
+
+    // Weak session keys and soft cache values avoid strong global retention.
+    // Soft values can survive routine GC but remain reclaimable under memory pressure.
+    private final Cache<ProtoSession, Cache<CacheConfig, Cache<Object, CachingSupplier<?, ?>>>> bootstrapCaches =
+            Cache.newCache(Cache.ReferenceType.WEAK, Cache.ReferenceType.SOFT, "RequestCache-Bootstrap");
 
     private static volatile boolean shutdownHookRegistered = false;
     private static final List<CacheStatistics> ALL_STATISTICS = new ArrayList<CacheStatistics>();
@@ -193,11 +199,8 @@ public class DefaultRequestCache extends AbstractRequestCache {
     @SuppressWarnings({"unchecked", "checkstyle:MethodLength"})
     protected <REQ extends Request<?>, REP extends Result<REQ>> CachingSupplier<REQ, REP> doCache(
             REQ req, Function<REQ, REP> supplier) {
-        // Early return for non-Session requests (e.g., ProtoSession)
         if (!(req.getSession() instanceof Session session)) {
-            // Record as a miss since no caching is performed for non-Session requests
-            statistics.recordMiss(req.getClass().getSimpleName(), CacheRetention.DISABLED);
-            return new CachingSupplier<>(supplier);
+            return doCacheBootstrap(req, supplier);
         }
 
         // Register shutdown hook for conditional statistics display
@@ -432,6 +435,40 @@ public class DefaultRequestCache extends AbstractRequestCache {
         }
     }
 
+    @SuppressWarnings("unchecked")
+    private <REQ extends Request<?>, REP extends Result<REQ>> CachingSupplier<REQ, REP> doCacheBootstrap(
+            REQ req, Function<REQ, REP> supplier) {
+        CacheConfig config = CacheConfigurationResolver.resolveConfig(req, req.getSession());
+        CacheRetention retention = config.scope();
+        if (retention == CacheRetention.DISABLED
+                || config.getEffectiveKeyReferenceType() == Cache.ReferenceType.NONE
+                || config.getEffectiveValueReferenceType() == Cache.ReferenceType.NONE) {
+            statistics.recordMiss(req.getClass().getSimpleName(), retention);
+            return new CachingSupplier<>(supplier);
+        }
+        Cache<CacheConfig, Cache<Object, CachingSupplier<?, ?>>> caches = bootstrapCaches.computeIfAbsent(
+                req.getSession(),
+                session -> Cache.newCache(Cache.ReferenceType.SOFT, "RequestCache-Bootstrap-Policies"));
+        Cache<Object, CachingSupplier<?, ?>> cache = caches.computeIfAbsent(
+                config,
+                policy -> Cache.newCache(
+                        policy.getEffectiveKeyReferenceType(),
+                        policy.getEffectiveValueReferenceType(),
+                        "RequestCache-Bootstrap-Session"));
+        Object key = retention == CacheRetention.REQUEST_SCOPED ? new ScopedRequest(doGetOuterRequest(req), req) : req;
+        boolean hit = cache.containsKey(key);
+        CachingSupplier<REQ, REP> result =
+                (CachingSupplier<REQ, REP>) cache.computeIfAbsent(key, ignored -> new CachingSupplier<>(supplier));
+        if (hit) {
+            statistics.recordHit(req.getClass().getSimpleName(), retention);
+        } else {
+            statistics.recordMiss(req.getClass().getSimpleName(), retention);
+        }
+        return result;
+    }
+
+    private record ScopedRequest(Object scope, Request<?> request) {}
+
     private static boolean isCacheStatsEnabled(Session session) {
         String showStats = session.getUserProperties().get(Constants.MAVEN_CACHE_STATS);
         return Boolean.parseBoolean(showStats);
@@ -461,8 +498,8 @@ public class DefaultRequestCache extends AbstractRequestCache {
 
     private <REQ extends Request<?>> Object doGetOuterRequest(REQ req) {
         RequestTrace trace = req.getTrace();
-        if (trace == null && req.getSession() instanceof Session session) {
-            trace = InternalSession.from(session).getCurrentTrace();
+        if (trace == null) {
+            trace = RequestTraceHelper.getCurrentTrace(req.getSession());
         }
         while (trace != null && trace.parent() != null) {
             trace = trace.parent();

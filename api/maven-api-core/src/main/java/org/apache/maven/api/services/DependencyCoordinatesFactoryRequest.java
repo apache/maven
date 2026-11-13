@@ -40,7 +40,11 @@ import static java.util.Objects.requireNonNull;
  * {@link ArtifactCoordinatesFactoryRequest} with scope, optionality, and exclusion information.
  *
  * @since 4.0.0
+ * @deprecated Use
+ *             {@link DependencyCoordinatesFactory#create(Session, String, String, String, String, String, String, String, boolean, Collection)}
+ *             directly.
  */
+@Deprecated
 @Experimental
 @Immutable
 public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinatesFactoryRequest {
@@ -66,7 +70,11 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
      * @param extension the file extension
      * @param type the artifact type
      * @return a new request, never {@code null}
+     * @deprecated Use
+     *             {@link DependencyCoordinatesFactory#create(Session, String, String, String, String, String, String, String, boolean, Collection)}
+     *             directly.
      */
+    @Deprecated
     @Nonnull
     static DependencyCoordinatesFactoryRequest build(
             @Nonnull Session session,
@@ -93,7 +101,9 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
      * @param session the session
      * @param coordinates the artifact coordinates
      * @return a new request, never {@code null}
+     * @deprecated Use {@link DependencyCoordinatesFactory#create(Session, ArtifactCoordinates)} directly.
      */
+    @Deprecated
     @Nonnull
     static DependencyCoordinatesFactoryRequest build(
             @Nonnull Session session, @Nonnull ArtifactCoordinates coordinates) {
@@ -114,7 +124,9 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
      * @param session the session
      * @param dependency the dependency to derive coordinates from
      * @return a new request, never {@code null}
+     * @deprecated Use {@link DependencyCoordinatesFactory#create(Session, Dependency)} directly.
      */
+    @Deprecated
     @Nonnull
     static DependencyCoordinatesFactoryRequest build(@Nonnull Session session, @Nonnull Dependency dependency) {
         return builder()
@@ -131,11 +143,13 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
     }
 
     /** @return a new builder instance */
+    @Deprecated
     @Nonnull
     static DependencyCoordinatesFactoryRequestBuilder builder() {
         return new DependencyCoordinatesFactoryRequestBuilder();
     }
 
+    @Deprecated
     @NotThreadSafe
     class DependencyCoordinatesFactoryRequestBuilder {
         private Session session;
@@ -146,7 +160,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
         private String classifier;
         private String extension;
         private String type;
-        private String coordinateString;
+        private String coordinatesString;
         private String scope;
         private boolean optional;
         private Collection<Exclusion> exclusions = Collections.emptyList();
@@ -193,8 +207,8 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
             return this;
         }
 
-        public DependencyCoordinatesFactoryRequestBuilder coordinateString(String coordinateString) {
-            this.coordinateString = coordinateString;
+        public DependencyCoordinatesFactoryRequestBuilder coordinatesString(String coordinatesString) {
+            this.coordinatesString = coordinatesString;
             return this;
         }
 
@@ -238,7 +252,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
                     classifier,
                     extension,
                     type,
-                    coordinateString,
+                    coordinatesString,
                     scope,
                     optional,
                     exclusions);
@@ -252,7 +266,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
             private final String classifier;
             private final String extension;
             private final String type;
-            private final String coordinateString;
+            private final String coordinatesString;
             private final String scope;
             private final boolean optional;
             private final Collection<Exclusion> exclusions;
@@ -267,7 +281,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
                     String classifier,
                     String extension,
                     String type,
-                    String coordinateString,
+                    String coordinatesString,
                     String scope,
                     boolean optional,
                     Collection<Exclusion> exclusions) {
@@ -278,7 +292,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
                 this.classifier = classifier;
                 this.extension = extension;
                 this.type = type;
-                this.coordinateString = coordinateString;
+                this.coordinatesString = coordinatesString;
                 this.scope = scope;
                 this.optional = optional;
                 this.exclusions = exclusions;
@@ -316,7 +330,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
 
             @Override
             public String getCoordinatesString() {
-                return coordinateString;
+                return coordinatesString;
             }
 
             @Override
@@ -345,7 +359,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
                         && Objects.equals(classifier, that.classifier)
                         && Objects.equals(extension, that.extension)
                         && Objects.equals(type, that.type)
-                        && Objects.equals(coordinateString, that.coordinateString)
+                        && Objects.equals(coordinatesString, that.coordinatesString)
                         && Objects.equals(scope, that.scope)
                         && Objects.equals(exclusions, that.exclusions);
             }
@@ -359,7 +373,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
                         classifier,
                         extension,
                         type,
-                        coordinateString,
+                        coordinatesString,
                         scope,
                         optional,
                         exclusions);
@@ -373,8 +387,8 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
                         + version + '\'' + ", classifier='"
                         + classifier + '\'' + ", extension='"
                         + extension + '\'' + ", type='"
-                        + type + '\'' + ", coordinateString='"
-                        + coordinateString + '\'' + ", scope='"
+                        + type + '\'' + ", coordinatesString='"
+                        + coordinatesString + '\'' + ", scope='"
                         + scope + '\'' + ", optional="
                         + optional + ", exclusions="
                         + exclusions + ']';

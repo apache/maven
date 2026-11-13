@@ -25,6 +25,7 @@ import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.ArtifactInstaller;
 import org.apache.maven.api.services.ArtifactInstallerException;
 import org.apache.maven.api.services.ArtifactInstallerRequest;
+import org.apache.maven.api.services.Result;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.installation.InstallRequest;
 import org.eclipse.aether.installation.InstallationException;
@@ -48,15 +49,24 @@ public class DefaultArtifactInstaller implements ArtifactInstaller {
         InternalSession session = InternalSession.from(request.getSession());
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
+            session.request(request, this::doInstall);
+        } finally {
+            RequestTraceHelper.exit(trace);
+        }
+    }
+
+    private Result<ArtifactInstallerRequest> doInstall(ArtifactInstallerRequest request) {
+        InternalSession session = InternalSession.from(request.getSession());
+        org.apache.maven.api.services.RequestTrace trace = RequestTraceHelper.getCurrentTrace(session);
+        try {
             InstallRequest installRequest = new InstallRequest()
                     .setArtifacts(session.toArtifacts(request.getArtifacts()))
-                    .setTrace(trace.trace());
+                    .setTrace(RequestTraceHelper.toResolver(trace));
 
             repositorySystem.install(session.getSession(), installRequest);
         } catch (InstallationException e) {
             throw new ArtifactInstallerException(e.getMessage(), e);
-        } finally {
-            RequestTraceHelper.exit(trace);
         }
+        return () -> request;
     }
 }
