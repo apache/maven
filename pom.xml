@@ -858,8 +858,15 @@ under the License.
           <groupId>org.apache.rat</groupId>
           <artifactId>apache-rat-plugin</artifactId>
           <configuration>
+            <!-- Workaround for https://github.com/apache/creadur-rat/pull/773:
+                 The SCM ignore file discovery walk traverses ALL directories
+                 (including hidden ones like .claude/ and .worktrees/) without
+                 respecting exclusion patterns, causing RAT to hang when large
+                 git worktree trees exist under hidden directories. -->
+            <parseSCMIgnoresAsExcludes>false</parseSCMIgnoresAsExcludes>
             <inputExcludes>
               <exclude>Jenkinsfile</exclude>
+              <exclude>**/.gitignore</exclude>
               <exclude>**/.gitattributes</exclude>
               <exclude>src/main/resources/META-INF/services/**</exclude>
               <exclude>src/test/resources*/**</exclude>
