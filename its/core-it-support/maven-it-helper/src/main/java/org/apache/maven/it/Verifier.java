@@ -655,7 +655,9 @@ public class Verifier {
                 break;
             }
         }
-        if (!result && stdout != null) {
+        if (!result && stdout != null && stdout.size() > 0) {
+            // Embedded mode may not redirect log output to the log file, so also check
+            // captured stdout.  In forked mode stdout is typically empty.
             for (String line : getStdout().lines().toList()) {
                 if (stripAnsi(line).contains(text)) {
                     result = true;

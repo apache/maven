@@ -342,8 +342,12 @@ class MavenCliLoggingTest {
             logging.get(10, SECONDS);
 
             LoggerFactory.getLogger(MavenCliLoggingTest.class).warn("terminal-output-marker");
-            assertTrue(terminalOutput.toString(UTF_8.name()).contains("terminal-output-marker"));
-            assertFalse(earlyOutput.toString(UTF_8.name()).contains("terminal-output-marker"));
+            assertTrue(
+                    terminalOutput.toString(UTF_8.name()).contains("terminal-output-marker"),
+                    "Logger must write to the stream installed by the terminal consumer");
+            assertFalse(
+                    earlyOutput.toString(UTF_8.name()).contains("terminal-output-marker"),
+                    "Logger must not write to the early stream that was active before terminal installation");
         } finally {
             releaseTerminal.countDown();
             if (loggingThread != null) {
