@@ -227,8 +227,7 @@ class BuildPlanCreatorTest {
     @SuppressWarnings("checkstyle:UnusedLocalVariable")
     private BuildPlan calculateLifecycleMappings(Map<MavenProject, List<MavenProject>> projects, String phase) {
         DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
-        BuildPlanExecutor builder = new BuildPlanExecutor(
-                null, null, null, null, null, null, null, null, lifecycles);
+        BuildPlanExecutor builder = new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles);
         BuildPlanExecutor.BuildContext context = builder.new BuildContext();
         return context.calculateLifecycleMappings(projects, phase);
     }
@@ -502,8 +501,7 @@ class BuildPlanCreatorTest {
         // "initialize" ends well before "ready" in the lifecycle.
         DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
         BuildPlanExecutor.BuildContext context =
-                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles)
-                .new BuildContext();
+                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles).new BuildContext();
 
         BuildPlan plan = context.calculateLifecycleMappings(projects, "initialize");
 
@@ -584,8 +582,7 @@ class BuildPlanCreatorTest {
 
         DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
         BuildPlanExecutor.BuildContext context =
-                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles)
-                .new BuildContext();
+                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles).new BuildContext();
 
         BuildPlan plan = context.calculateLifecycleMappings(projects, "initialize");
 
