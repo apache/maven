@@ -677,6 +677,9 @@ public class BuildPlanExecutor {
                     attachToThread(step);
                     transformerManager.injectTransformedArtifacts(session.getRepositorySession(), step.project);
                     projectExecutionListener.beforeProjectExecution(new ProjectExecutionEvent(session, step.project));
+                    List<MojoExecution> executionPlan = executionPlan(step.project);
+                    projectExecutionListener.beforeProjectLifecycleExecution(
+                            new ProjectExecutionEvent(session, step.project, executionPlan));
                     eventCatapult.fire(ExecutionEvent.Type.ProjectStarted, session, null);
                     break;
                 case TEARDOWN:
@@ -721,11 +724,15 @@ public class BuildPlanExecutor {
                             failure = new LifecycleExecutionException("Error building project");
                             failures.forEach(failure::addSuppressed);
                         }
+                        List<MojoExecution> failedPlan = executionPlan(step.project);
                         handleBuildError(reactorContext, session, step.project, failure, isFatal(failures));
+                        projectExecutionListener.afterProjectExecutionFailure(
+                                new ProjectExecutionEvent(session, step.project, failedPlan, failure));
                     } else if (projectStarted && allWorkExecuted) {
                         // If there were no failures, report success
+                        List<MojoExecution> successfulPlan = executionPlan(step.project);
                         projectExecutionListener.afterProjectExecutionSuccess(
-                                new ProjectExecutionEvent(session, step.project, Collections.emptyList()));
+                                new ProjectExecutionEvent(session, step.project, successfulPlan));
                         reactorContext
                                 .getResult()
                                 .addBuildSummary(new BuildSuccess(step.project, clock.wallTime(), clock.execTime()));
@@ -827,6 +834,10 @@ public class BuildPlanExecutor {
             } finally {
                 lock.writeLock().unlock();
             }
+        }
+
+        private List<MojoExecution> executionPlan(MavenProject project) {
+            return plan.steps(project).flatMap(BuildStep::executions).toList();
         }
 
         void bindProjectMojos(MavenProject project) {
