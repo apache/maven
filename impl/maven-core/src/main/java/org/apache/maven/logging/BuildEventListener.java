@@ -18,11 +18,21 @@
  */
 package org.apache.maven.logging;
 
+import org.apache.maven.api.logging.LogEvent;
 import org.apache.maven.execution.ExecutionEvent;
 import org.eclipse.aether.transfer.TransferEvent;
 
 /**
  * An abstract build event sink.
+ *
+ * <p><strong>Compatibility note:</strong> the {@link #projectLogMessage(String, LogEvent)}
+ * method signature changed from {@code projectLogMessage(String, String)} in Maven 4.1
+ * to {@code projectLogMessage(String, LogEvent)} in Maven 4.2.  This is an intentional,
+ * documented binary-incompatible change to the internal SPI: existing embedder
+ * implementations must be recompiled against Maven 4.2.
+ * </p>
+ *
+ * @since 3.0
  */
 public interface BuildEventListener {
 
@@ -30,7 +40,7 @@ public interface BuildEventListener {
 
     void projectStarted(String projectId);
 
-    void projectLogMessage(String projectId, String event);
+    void projectLogMessage(String projectId, LogEvent event);
 
     void projectFinished(String projectId);
 

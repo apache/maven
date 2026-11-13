@@ -136,7 +136,18 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory {
 
         @Override
         public AttributedStyle resolve(String spec) {
-            return styles.computeIfAbsent(spec, this::doResolve);
+            try {
+                return styles.computeIfAbsent(spec, this::doResolve);
+            } catch (IllegalStateException e) {
+                // ConcurrentHashMap.computeIfAbsent throws IllegalStateException("Recursive update")
+                // when the same map is re-entered from within a computeIfAbsent call on the same
+                // thread.  This can happen during FastTerminal initialization: JLine's StyleResolver
+                // logs via JUL, MavenJulHandler routes the event into the Maven logging pipeline,
+                // which may itself call style() → resolve() here before the first computeIfAbsent
+                // has returned, re-entering the same map.  Fall back to DEFAULT for this event;
+                // subsequent calls will hit the populated cache and succeed normally.
+                return AttributedStyle.DEFAULT;
+            }
         }
 
         @Override

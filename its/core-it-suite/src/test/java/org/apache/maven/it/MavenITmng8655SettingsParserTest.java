@@ -48,8 +48,12 @@ class MavenITmng8655SettingsParserTest extends AbstractMavenIntegrationTestCase 
         verifier.setForkJvm(true);
         // User-level core extensions would trigger settings parsing before the classpath parser is loaded.
         verifier.setUserHomeDirectory(Files.createDirectories(directory.resolve("home")));
-        verifier.addCliArguments("-Dmaven.ext.class.path=" + extension,
-                "-s", "settings.properties", "-Dparser.input=custom-settings", "validate");
+        verifier.addCliArguments(
+                "-Dmaven.ext.class.path=" + extension,
+                "-s",
+                "settings.properties",
+                "-Dparser.input=custom-settings",
+                "validate");
         verifier.execute();
         verifier.verifyErrorFreeLog();
         verifier.verifyTextInLog("Building custom-settings 0.1");
@@ -72,8 +76,11 @@ class MavenITmng8655SettingsParserTest extends AbstractMavenIntegrationTestCase 
         Verifier verifier = newVerifier(project);
         verifier.setForkJvm(true);
         verifier.setUserHomeDirectory(Files.createDirectories(directory.resolve("home")));
-        verifier.addCliArguments("-Dmaven.ext.class.path=" + testDir.resolve("extension/target/settings-parser-0.1.jar"),
-                "-s", "settings.properties", "validate");
+        verifier.addCliArguments(
+                "-Dmaven.ext.class.path=" + testDir.resolve("extension/target/settings-parser-0.1.jar"),
+                "-s",
+                "settings.properties",
+                "validate");
         assertThrows(VerificationException.class, verifier::execute);
         verifier.verifyTextInLog("Non-parseable settings");
         verifier.verifyTextInLog("settings.properties");
@@ -90,15 +97,22 @@ class MavenITmng8655SettingsParserTest extends AbstractMavenIntegrationTestCase 
         Files.copy(testDir.resolve("extension/target/settings-parser-0.1.jar"), libExt.resolve("settings-parser.jar"));
 
         Path localRepository = newVerifier(testDir.resolve("extension")).getLocalRepository();
-        var result = new ForkedMavenExecutor(installation).execute(ExecutorRequest.mavenBuilder()
-                .cwd(project)
-                .userHomeDirectory(Files.createDirectories(directory.resolve("home")))
-                .arguments(List.of("-B", "-ntp", "-s", "settings.properties", "-Dparser.input=bootstrap-settings",
-                        "-Dmaven.repo.local=" + localRepository, "validate"))
-                .skipMavenRc(true)
-                .grabOutputAsString(true)
-                .executionTimeout(Duration.ofMinutes(2))
-                .build());
+        var result = new ForkedMavenExecutor(installation)
+                .execute(ExecutorRequest.mavenBuilder()
+                        .cwd(project)
+                        .userHomeDirectory(Files.createDirectories(directory.resolve("home")))
+                        .arguments(List.of(
+                                "-B",
+                                "-ntp",
+                                "-s",
+                                "settings.properties",
+                                "-Dparser.input=bootstrap-settings",
+                                "-Dmaven.repo.local=" + localRepository,
+                                "validate"))
+                        .skipMavenRc(true)
+                        .grabOutputAsString(true)
+                        .executionTimeout(Duration.ofMinutes(2))
+                        .build());
         String output = result.stdOutString().orElse("") + result.stdErrString().orElse("");
         Files.writeString(testDir.resolve("bootstrap.txt"), output);
         assertTrue(result.success(), output);

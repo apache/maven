@@ -25,14 +25,12 @@ under the License.
   <version>1.0-SNAPSHOT</version>
 
   <name>Maven Integration Test :: MNG-8765 :: Runtime Property</name>
-  <description>
-    Verify that a property set dynamically at runtime via
+  <description>Verify that a property set dynamically at runtime via
     project.getProperties().setProperty() is resolved in a URI-typed
     plugin parameter. This is the actual MNG-8765 scenario: a plugin
     (like GMaven/gmavenplus) sets a property during the build lifecycle
     that was NOT available during model interpolation. Without the fix,
-    the unresolved ${...} in the URI causes a URISyntaxException.
-  </description>
+    the unresolved ${...} in the URI causes a URISyntaxException.</description>
 
   <build>
     <plugins>
