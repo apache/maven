@@ -25,6 +25,7 @@ import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -64,6 +65,7 @@ class MavenCliLoggingTest {
     private PrintStream savedOut;
     private Terminal savedTerminal;
     private boolean savedColor;
+    private CompletableFuture<Void> savedTerminalReady;
     private final String[] savedPropertyValues = new String[SAVED_PROPERTIES.length];
 
     @BeforeEach
@@ -71,9 +73,11 @@ class MavenCliLoggingTest {
         savedOut = System.out;
         savedTerminal = getTerminalField();
         savedColor = getColorEnabled();
+        savedTerminalReady = getTerminalReadyField();
         // Null out the terminal so leftover DeferredTerminal threads from other tests cannot
         // race with this test's stream setup via their consumer callbacks.
         injectTerminal(null);
+        clearTerminalReady();
         for (int i = 0; i < SAVED_PROPERTIES.length; i++) {
             savedPropertyValues[i] = System.getProperty(SAVED_PROPERTIES[i]);
         }
@@ -87,6 +91,7 @@ class MavenCliLoggingTest {
     void tearDown() throws Exception {
         System.setOut(savedOut);
         injectTerminal(savedTerminal);
+        setTerminalReady(savedTerminalReady);
         setColorEnabled(savedColor);
         for (int i = 0; i < SAVED_PROPERTIES.length; i++) {
             restoreProperty(SAVED_PROPERTIES[i], savedPropertyValues[i]);
@@ -283,25 +288,32 @@ class MavenCliLoggingTest {
             activateSlf4j();
 
             DeferredTerminal terminal = new DeferredTerminal();
-            terminal.onComplete(installed -> System.setOut(terminalStream));
+            CompletableFuture<Void> terminalReady = new CompletableFuture<>();
+            terminal.onComplete(installed -> {
+                System.setOut(terminalStream);
+                terminalReady.complete(null);
+            });
             Thread buildThread = new Thread(
                     () -> {
                         try {
                             buildingTerminal.countDown();
                             if (!releaseTerminal.await(10, SECONDS)) {
-                                terminal.completeExceptionally(
-                                        new IllegalStateException("Terminal installation was not released"));
+                                IllegalStateException ex =
+                                        new IllegalStateException("Terminal installation was not released");
+                                terminal.completeExceptionally(ex);
+                                terminalReady.completeExceptionally(ex);
                                 return;
                             }
                             terminal.complete(dumb);
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                             terminal.completeExceptionally(e);
+                            terminalReady.completeExceptionally(e);
                         }
                     },
                     "deferred-terminal-build");
             buildThread.setDaemon(true);
-            injectTerminal(terminal);
+            injectTerminal(terminal, terminalReady);
             buildThread.start();
             assertTrue(buildingTerminal.await(10, SECONDS));
 
@@ -319,12 +331,13 @@ class MavenCliLoggingTest {
             loggingThread.start();
 
             // Wait until the logging thread is blocked on awaitTerminalInitialization() →
-            // DeferredTerminal.getTerminal() → CompletableFuture.join(). At this point,
-            // config.init() has NOT yet run (it comes after awaitTerminalInitialization()).
+            // terminalReady.join(). At this point, config.init() has NOT yet run (it
+            // comes after awaitTerminalInitialization()).
             awaitThreadState(loggingThread, Thread.State.WAITING, 10_000);
 
-            // Release the terminal — the consumer sets System.out=terminalStream.
-            // awaitTerminalInitialization() returns, then config.init() captures terminalStream.
+            // Release the terminal — the onComplete callback sets System.out=terminalStream
+            // and completes terminalReady. awaitTerminalInitialization() returns only after
+            // onComplete finishes, then config.init() captures terminalStream.
             releaseTerminal.countDown();
             logging.get(10, SECONDS);
 
@@ -366,6 +379,21 @@ class MavenCliLoggingTest {
         field.set(null, terminal);
     }
 
+    /**
+     * Injects the given terminal and its associated {@code terminalReady} future into
+     * {@link MessageUtils}, mirroring what {@link MessageUtils#systemInstall} does so that
+     * {@link MessageUtils#awaitTerminalInitialization()} correctly waits for the
+     * {@code onComplete} callback to finish.
+     */
+    private static void injectTerminal(Terminal terminal, CompletableFuture<Void> terminalReady) throws Exception {
+        Field terminalField = MessageUtils.class.getDeclaredField("terminal");
+        terminalField.setAccessible(true);
+        terminalField.set(null, terminal);
+        Field readyField = MessageUtils.class.getDeclaredField("terminalReady");
+        readyField.setAccessible(true);
+        readyField.set(null, terminalReady);
+    }
+
     private static boolean getColorEnabled() throws Exception {
         Field field = MessageUtils.class.getDeclaredField("colorEnabled");
         field.setAccessible(true);
@@ -382,6 +410,25 @@ class MavenCliLoggingTest {
         Field field = MessageUtils.class.getDeclaredField("terminal");
         field.setAccessible(true);
         return (Terminal) field.get(null);
+    }
+
+    @SuppressWarnings("unchecked")
+    private static CompletableFuture<Void> getTerminalReadyField() throws Exception {
+        Field field = MessageUtils.class.getDeclaredField("terminalReady");
+        field.setAccessible(true);
+        return (CompletableFuture<Void>) field.get(null);
+    }
+
+    private static void clearTerminalReady() throws Exception {
+        Field field = MessageUtils.class.getDeclaredField("terminalReady");
+        field.setAccessible(true);
+        field.set(null, null);
+    }
+
+    private static void setTerminalReady(CompletableFuture<Void> value) throws Exception {
+        Field field = MessageUtils.class.getDeclaredField("terminalReady");
+        field.setAccessible(true);
+        field.set(null, value);
     }
 
     private static void activateSlf4j() {

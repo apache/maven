@@ -19,6 +19,7 @@
 package org.apache.maven.jline;
 
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 import java.util.function.Consumer;
 
 import org.apache.maven.api.services.MessageBuilder;
@@ -38,6 +39,14 @@ public class MessageUtils {
     static boolean colorEnabled = true;
     static Thread shutdownHook;
     static final Object STARTUP_SHUTDOWN_MONITOR = new Object();
+    /**
+     * Tracks completion of the terminal's {@code onComplete} callback (including
+     * {@link AnsiConsole#systemInstall()}).  Callers of {@link #awaitTerminalInitialization()}
+     * must wait on this future, not just on {@link DeferredTerminal#getTerminal()}, because
+     * the JLine future is resolved <em>before</em> the {@code onComplete} callback runs and
+     * {@code System.out} is wrapped.
+     */
+    static volatile CompletableFuture<Void> terminalReady;
 
     public static void systemInstall(Terminal terminal) {
         MessageUtils.terminal = terminal;
@@ -57,14 +66,23 @@ public class MessageUtils {
         // The real terminal is built on a background daemon thread; all proxy
         // methods block transparently until it is ready.
         DeferredTerminal deferred = (DeferredTerminal) builder.buildDeferred();
+        // Track when the full onComplete callback has finished, not just when the
+        // JLine future resolves.  The JLine future completes *before* the callback
+        // runs, so awaitTerminalInitialization() must wait on this separate future.
+        CompletableFuture<Void> ready = new CompletableFuture<>();
+        terminalReady = ready;
         // Register a callback that runs on the build thread once the real
         // terminal is ready, before any blocked caller is unblocked.
         deferred.onComplete(terminal -> {
-            MessageUtils.reader = createReader(terminal);
-            AnsiConsole.setTerminal(terminal);
-            AnsiConsole.systemInstall();
-            if (terminalConsumer != null) {
-                terminalConsumer.accept(terminal);
+            try {
+                MessageUtils.reader = createReader(terminal);
+                AnsiConsole.setTerminal(terminal);
+                AnsiConsole.systemInstall();
+                if (terminalConsumer != null) {
+                    terminalConsumer.accept(terminal);
+                }
+            } finally {
+                ready.complete(null);
             }
         });
         MessageUtils.terminal = deferred;
@@ -111,19 +129,29 @@ public class MessageUtils {
             // best-effort cleanup
         } finally {
             terminal = null;
+            terminalReady = null;
         }
     }
 
     /**
-     * Blocks until the asynchronous terminal installation completes.
-     * Call this before redirecting {@code System.out}/{@code System.err} to avoid the terminal
-     * thread overwriting your redirection, and before activating logging configuration to ensure
-     * it caches the correct output stream.
+     * Blocks until the asynchronous terminal installation completes, including the
+     * {@code onComplete} callback ({@link AnsiConsole#systemInstall()} and any caller-supplied
+     * consumer).
+     *
+     * <p><b>Why not just {@link DeferredTerminal#getTerminal()}?</b> The JLine
+     * {@link java.util.concurrent.CompletableFuture} is resolved <em>before</em> the
+     * {@code onComplete} callback runs.  Callers that wait only on {@code getTerminal()} can
+     * therefore proceed before {@code System.out} has been wrapped by {@code AnsiConsole},
+     * causing logging configuration to cache the wrong stream.</p>
      *
      * @see <a href="https://github.com/apache/maven/issues/12188">#12188</a>
      */
     public static void awaitTerminalInitialization() {
-        if (terminal instanceof DeferredTerminal deferred) {
+        CompletableFuture<Void> ready = terminalReady;
+        if (ready != null) {
+            ready.join();
+        } else if (terminal instanceof DeferredTerminal deferred) {
+            // Fallback for terminals injected directly (e.g. via systemInstall(Terminal)).
             deferred.getTerminal();
         }
     }
