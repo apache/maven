@@ -119,7 +119,7 @@ public class ArtifactStub implements Artifact {
     }
 
     @Override
-    public boolean isSnapshot() {
+    public boolean snapshot() {
         return false;
     }
 
