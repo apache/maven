@@ -18,6 +18,9 @@
  */
 package org.apache.maven.model.building;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.maven.model.Dependency;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
@@ -145,6 +148,87 @@ public class DefaultModelBuilderTest {
         assertTrue(
                 e.getProblems().stream().anyMatch(p -> p.getMessage().startsWith("Non-parseable POM")),
                 () -> "Expected a \"Non-parseable POM\" problem, got: " + e.getProblems());
+    }
+
+    /**
+     * #13985: an import cached by a build without location tracking must not be reused by a build with it.
+     */
+    @Test
+    public void testImportedDependencyManagementKeepsLocations() throws Exception {
+        String bom = "<project>\n" + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>thegroup</groupId>\n"
+                + "  <artifactId>bom</artifactId>\n"
+                + "  <version>1</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "  <dependencyManagement>\n"
+                + "    <dependencies>\n"
+                + "      <dependency>\n"
+                + "        <groupId>thegroup</groupId>\n"
+                + "        <artifactId>managed</artifactId>\n"
+                + "        <version>1</version>\n"
+                + "      </dependency>\n"
+                + "    </dependencies>\n"
+                + "  </dependencyManagement>\n"
+                + "</project>\n";
+        String pom = "<project>\n" + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>thegroup</groupId>\n"
+                + "  <artifactId>consumer</artifactId>\n"
+                + "  <version>1</version>\n"
+                + "  <dependencyManagement>\n"
+                + "    <dependencies>\n"
+                + "      <dependency>\n"
+                + "        <groupId>thegroup</groupId>\n"
+                + "        <artifactId>bom</artifactId>\n"
+                + "        <version>1</version>\n"
+                + "        <type>pom</type>\n"
+                + "        <scope>import</scope>\n"
+                + "      </dependency>\n"
+                + "    </dependencies>\n"
+                + "  </dependencyManagement>\n"
+                + "</project>\n";
+
+        ModelBuilder builder = new DefaultModelBuilderFactory().newInstance();
+        ModelCache cache = new MapModelCache();
+        ModelResolver resolver = new BaseModelResolver() {
+            @Override
+            public ModelSource resolveModel(String groupId, String artifactId, String version) {
+                return new StringModelSource(bom);
+            }
+        };
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new StringModelSource(pom));
+        request.setModelResolver(resolver);
+        request.setModelCache(cache);
+        request.setLocationTracking(false);
+        builder.build(request);
+
+        request = new DefaultModelBuildingRequest();
+        request.setModelSource(new StringModelSource(pom));
+        request.setModelResolver(resolver);
+        request.setModelCache(cache);
+        request.setLocationTracking(true);
+        ModelBuildingResult result = builder.build(request);
+
+        Dependency managed = result.getEffectiveModel()
+                .getDependencyManagement()
+                .getDependencies()
+                .get(0);
+        assertNotNull(managed.getLocation("version"));
+    }
+
+    static class MapModelCache implements ModelCache {
+        private final Map<String, Object> map = new HashMap<>();
+
+        @Override
+        public void put(String groupId, String artifactId, String version, String tag, Object data) {
+            map.put(groupId + ':' + artifactId + ':' + version + ':' + tag, data);
+        }
+
+        @Override
+        public Object get(String groupId, String artifactId, String version, String tag) {
+            return map.get(groupId + ':' + artifactId + ':' + version + ':' + tag);
+        }
     }
 
     static class CycleInImportsResolver extends BaseModelResolver {
