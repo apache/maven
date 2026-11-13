@@ -227,7 +227,8 @@ class BuildPlanCreatorTest {
     @SuppressWarnings("checkstyle:UnusedLocalVariable")
     private BuildPlan calculateLifecycleMappings(Map<MavenProject, List<MavenProject>> projects, String phase) {
         DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
-        BuildPlanExecutor builder = new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles);
+        BuildPlanExecutor builder = new BuildPlanExecutor(
+                null, null, null, null, null, null, null, null, lifecycles, Collections.emptyList());
         BuildPlanExecutor.BuildContext context = builder.new BuildContext();
         return context.calculateLifecycleMappings(projects, phase);
     }
@@ -500,8 +501,9 @@ class BuildPlanCreatorTest {
         // Without the fix, "ready" (and compile/package/…) would be skipped for p2 because
         // "initialize" ends well before "ready" in the lifecycle.
         DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
-        BuildPlanExecutor.BuildContext context =
-                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles).new BuildContext();
+        BuildPlanExecutor.BuildContext context = new BuildPlanExecutor(
+                null, null, null, null, null, null, null, null, lifecycles, Collections.emptyList())
+        .new BuildContext();
 
         BuildPlan plan = context.calculateLifecycleMappings(projects, "initialize");
 
@@ -581,8 +583,9 @@ class BuildPlanCreatorTest {
         projects.put(p1, Collections.singletonList(p2));
 
         DefaultLifecycleRegistry lifecycles = new DefaultLifecycleRegistry(Collections.emptyList());
-        BuildPlanExecutor.BuildContext context =
-                new BuildPlanExecutor(null, null, null, null, null, null, null, null, lifecycles).new BuildContext();
+        BuildPlanExecutor.BuildContext context = new BuildPlanExecutor(
+                null, null, null, null, null, null, null, null, lifecycles, Collections.emptyList())
+        .new BuildContext();
 
         BuildPlan plan = context.calculateLifecycleMappings(projects, "initialize");
 
