@@ -69,7 +69,8 @@ class ProjectTransformerDispatcherTest {
         ProjectTransformerDispatcher.transformProjects(mavenSession, List.of(addProperty, addProperty2));
 
         assertEquals(List.of("addProperty", "addProperty2"), calls);
-        assertEquals("yes", mavenProject.getModel().getDelegate().getProperties().get("second"));
+        assertEquals(
+                "yes", mavenProject.getModel().getDelegate().getProperties().get("second"));
     }
 
     @Test
@@ -93,9 +94,9 @@ class ProjectTransformerDispatcherTest {
             throw cause;
         };
 
-        MavenExecutionException ex =
-                assertThrows(MavenExecutionException.class, () -> ProjectTransformerDispatcher.transformProjects(
-                        mavenSession, List.of(failing)));
+        MavenExecutionException ex = assertThrows(
+                MavenExecutionException.class,
+                () -> ProjectTransformerDispatcher.transformProjects(mavenSession, List.of(failing)));
 
         assertInstanceOf(RuntimeException.class, ex.getCause());
         assertEquals("buggy extension", ex.getCause().getMessage());
@@ -119,9 +120,9 @@ class ProjectTransformerDispatcherTest {
 
         ProjectTransformer changesGroupId = (session, project, model) -> model.withGroupId("hacked");
 
-        MavenExecutionException ex =
-                assertThrows(MavenExecutionException.class, () -> ProjectTransformerDispatcher.transformProjects(
-                        mavenSession, List.of(changesGroupId)));
+        MavenExecutionException ex = assertThrows(
+                MavenExecutionException.class,
+                () -> ProjectTransformerDispatcher.transformProjects(mavenSession, List.of(changesGroupId)));
 
         assertTrue(ex.getMessage().contains("groupId/artifactId"));
         assertTrue(ex.getMessage().contains("must not change"));

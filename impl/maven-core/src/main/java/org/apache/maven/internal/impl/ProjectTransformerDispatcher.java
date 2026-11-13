@@ -57,8 +57,7 @@ public final class ProjectTransformerDispatcher {
                     try {
                         model = transformer.transformProject(apiSession, project, model);
                     } catch (RuntimeException e) {
-                        throw new MavenExecutionException(
-                                "Project transformer failed for " + mavenProject.getId(), e);
+                        throw new MavenExecutionException("Project transformer failed for " + mavenProject.getId(), e);
                     }
                     if (model == null) {
                         throw new MavenExecutionException(
@@ -105,8 +104,8 @@ public final class ProjectTransformerDispatcher {
         }
         if (!violations.isEmpty()) {
             throw new MavenExecutionException(
-                    "The ProjectTransformer " + transformerName + " must not change "
-                            + String.join(", ", violations) + " of " + projectId,
+                    "The ProjectTransformer " + transformerName + " must not change " + String.join(", ", violations)
+                            + " of " + projectId,
                     (Throwable) null);
         }
     }
