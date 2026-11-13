@@ -176,12 +176,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         pushUserProperties(context);
         setupGuiceClassLoading(context);
         configureLogging(context);
-        // Block until the background terminal thread has completed; this ensures
-        // that doConfigureWithTerminal (which accesses context.loggerFactory) runs
-        // only after configureLogging() has set that field.
+        activateLogging(context);
+        // doConfigureWithTerminal wraps System.out with LoggingOutputStream, so it
+        // must run AFTER activateLogging() caches the original System.out. Otherwise
+        // the logger would resolve the wrapped stream on each write → infinite loop.
+        // awaitTerminalInitialization() blocks until the background build completes.
         MessageUtils.awaitTerminalInitialization();
         doConfigureWithTerminal(context, context.terminal);
-        activateLogging(context);
         helpOrVersionAndMayExit(context);
         preCommands(context);
         container(context);
@@ -420,7 +421,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         // quiet mode implies raw streams — plugins that write to System.out (e.g. help:evaluate
         // -DforceStdout) must not be decorated with "[INFO] [stdout]" prefix, otherwise scripting
         // use cases like $(mvn -q help:evaluate ...) break (see GH-12730)
-        if (context.options().rawStreams().orElse(false)
+        // Embedded mode also uses raw streams — the caller provides its own streams and
+        // doesn't need the "[stdout]" prefix wrapping. More importantly, the wrapping
+        // creates a circular logging loop (StackOverflowError) when logSink is null.
+        if (context.invokerRequest.embedded()
+                || context.options().rawStreams().orElse(false)
                 || context.options().quiet().orElse(false)) {
             doConfigureWithTerminalWithRawStreamsEnabled(context);
         } else {
