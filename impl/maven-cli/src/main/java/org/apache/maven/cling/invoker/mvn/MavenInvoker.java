@@ -24,7 +24,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.IdentityHashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -63,6 +62,7 @@ import org.apache.maven.cling.transfer.Slf4jMavenTransferListener;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
+import org.apache.maven.exception.ReferenceHelp;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -567,13 +567,14 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
         if (result.hasExceptions()) {
             ExceptionHandler handler = new DefaultExceptionHandler();
-            Map<String, String> references = new LinkedHashMap<>();
+            boolean hasDetailedHelp = false;
             List<MavenProject> failedProjects = new ArrayList<>();
 
             Set<String> hintedArtifacts = new HashSet<>();
             for (Throwable exception : result.getExceptions()) {
                 ExceptionSummary summary = handler.handleException(exception);
-                logSummary(context, summary, references, "");
+                hasDetailedHelp |= ReferenceHelp.hasHelpText(summary.getReference());
+                logSummary(context, summary, "");
 
                 if (exception instanceof LifecycleExecutionException lifecycleExecutionException) {
                     failedProjects.add(lifecycleExecutionException.getProject());
@@ -589,17 +590,13 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
                         + MessageUtils.builder().strong("-e") + "' switch");
             }
             if (!context.invokerRequest.effectiveVerbose()) {
-                context.logger.error("Re-run Maven using the '"
-                        + MessageUtils.builder().strong("-X") + "' switch to enable verbose output");
-            }
-
-            if (!references.isEmpty()) {
-                context.logger.error("");
-                context.logger.error("For more information about the errors and possible solutions"
-                        + ", please read the following articles:");
-
-                for (Map.Entry<String, String> entry : references.entrySet()) {
-                    context.logger.error(MessageUtils.builder().strong(entry.getValue()) + " " + entry.getKey());
+                if (hasDetailedHelp) {
+                    context.logger.error("Re-run Maven using the '"
+                            + MessageUtils.builder().strong("-X")
+                            + "' switch to enable full debug logging and details about the error");
+                } else {
+                    context.logger.error("Re-run Maven using the '"
+                            + MessageUtils.builder().strong("-X") + "' switch to enable verbose output");
                 }
             }
 
@@ -734,24 +731,22 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
 
     protected static final String ANSI_RESET = "\u001B\u005Bm";
 
-    protected void logSummary(
-            MavenContext context, ExceptionSummary summary, Map<String, String> references, String indent) {
-        String referenceKey = "";
-
-        if (summary.getReference() != null && !summary.getReference().isEmpty()) {
-            referenceKey =
-                    references.computeIfAbsent(summary.getReference(), k -> "[Help " + (references.size() + 1) + "]");
-        }
-
+    /**
+     * Logs the summary of a failed build, including any embedded detailed help text associated with
+     * {@link ExceptionSummary#getReference()} when verbose output is enabled.
+     * <p>
+     * Migration note: the former {@code logSummary(MavenContext, ExceptionSummary, Map<String, String>,
+     * String)} overload (which collected the reference URLs into a {@code references} map) was replaced by
+     * this three-argument form. The collector map has been dropped: detailed help is now read on demand from
+     * the {@link ReferenceHelp} resources instead. Subclasses overriding the old overload must update to this
+     * signature.
+     *
+     * @param context the Maven context used for logging
+     * @param summary the exception summary to log
+     * @param indent the indentation prefix for nested summary lines
+     */
+    protected void logSummary(MavenContext context, ExceptionSummary summary, String indent) {
         String msg = summary.getMessage();
-
-        if (!referenceKey.isEmpty()) {
-            if (msg.indexOf('\n') < 0) {
-                msg += " -> " + MessageUtils.builder().strong(referenceKey);
-            } else {
-                msg += "\n-> " + MessageUtils.builder().strong(referenceKey);
-            }
-        }
 
         String[] lines = NEXT_LINE.split(msg);
         String currentColor = "";
@@ -785,10 +780,18 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             currentColor = nextColor;
         }
 
+        String reference = summary.getReference();
+        if (reference != null
+                && !reference.isEmpty()
+                && context.invokerRequest.effectiveVerbose()
+                && ReferenceHelp.hasHelpText(reference)) {
+            context.logger.debug(ReferenceHelp.getHelpText(reference));
+        }
+
         indent += "  ";
 
         for (ExceptionSummary child : summary.getChildren()) {
-            logSummary(context, child, references, indent);
+            logSummary(context, child, indent);
         }
     }
 }

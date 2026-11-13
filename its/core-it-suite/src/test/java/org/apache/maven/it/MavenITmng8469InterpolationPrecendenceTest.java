@@ -43,7 +43,7 @@ class MavenITmng8469InterpolationPrecendenceTest extends AbstractMavenIntegratio
 
         // 4.0.0-rc-2 fails as
         // [ERROR] Some problems were encountered while processing the POMs
-        // [ERROR] The build could not read 1 project -> [Help 1]
+        // [ERROR] The build could not read 1 project
         // [ERROR]
         // [ERROR]   The project org.apache.maven.its.mng8469:test:1.0 (...pom.xml) has 1 error
         // [ERROR]     recursive variable reference: scm.connection

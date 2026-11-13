@@ -38,7 +38,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -89,6 +88,7 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
+import org.apache.maven.exception.ReferenceHelp;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -1111,14 +1111,16 @@ public class MavenCli {
         if (result.hasExceptions()) {
             ExceptionHandler handler = new DefaultExceptionHandler();
 
-            Map<String, String> references = new LinkedHashMap<>();
+            boolean hasDetailedHelp = false;
 
             List<MavenProject> failedProjects = new ArrayList<>();
 
             for (Throwable exception : result.getExceptions()) {
                 ExceptionSummary summary = handler.handleException(exception);
 
-                logSummary(summary, references, "", cliRequest.showErrors);
+                hasDetailedHelp |= ReferenceHelp.hasHelpText(summary.getReference());
+
+                logSummary(summary, "", cliRequest.showErrors);
 
                 if (exception instanceof LifecycleExecutionException lifecycleExecutionException) {
                     failedProjects.add(lifecycleExecutionException.getProject());
@@ -1133,18 +1135,14 @@ public class MavenCli {
                         MessageUtils.builder().strong("-e"));
             }
             if (!slf4jLogger.isDebugEnabled()) {
-                slf4jLogger.error(
-                        "Re-run Maven using the '{}' switch to enable verbose output",
-                        MessageUtils.builder().strong("-X"));
-            }
-
-            if (!references.isEmpty()) {
-                slf4jLogger.error("");
-                slf4jLogger.error("For more information about the errors and possible solutions"
-                        + ", please read the following articles:");
-
-                for (Map.Entry<String, String> entry : references.entrySet()) {
-                    slf4jLogger.error("{} {}", MessageUtils.builder().strong(entry.getValue()), entry.getKey());
+                if (hasDetailedHelp) {
+                    slf4jLogger.error(
+                            "Re-run Maven using the '{}' switch to enable full debug logging and details about the error",
+                            MessageUtils.builder().strong("-X"));
+                } else {
+                    slf4jLogger.error(
+                            "Re-run Maven using the '{}' switch to enable verbose output",
+                            MessageUtils.builder().strong("-X"));
                 }
             }
 
@@ -1211,24 +1209,8 @@ public class MavenCli {
         return ":" + firstFailedProject.getArtifactId();
     }
 
-    private void logSummary(
-            ExceptionSummary summary, Map<String, String> references, String indent, boolean showErrors) {
-        String referenceKey = "";
-
-        if (summary.getReference() != null && !summary.getReference().isEmpty()) {
-            referenceKey =
-                    references.computeIfAbsent(summary.getReference(), k -> "[Help " + (references.size() + 1) + "]");
-        }
-
+    private void logSummary(ExceptionSummary summary, String indent, boolean showErrors) {
         String msg = summary.getMessage();
-
-        if (referenceKey != null && !referenceKey.isEmpty()) {
-            if (msg.indexOf('\n') < 0) {
-                msg += " -> " + MessageUtils.builder().strong(referenceKey);
-            } else {
-                msg += "\n-> " + MessageUtils.builder().strong(referenceKey);
-            }
-        }
 
         String[] lines = NEXT_LINE.split(msg);
         String currentColor = "";
@@ -1260,10 +1242,18 @@ public class MavenCli {
             currentColor = nextColor;
         }
 
+        String reference = summary.getReference();
+        if (reference != null
+                && !reference.isEmpty()
+                && slf4jLogger.isDebugEnabled()
+                && ReferenceHelp.hasHelpText(reference)) {
+            slf4jLogger.debug(ReferenceHelp.getHelpText(reference));
+        }
+
         indent += "  ";
 
         for (ExceptionSummary child : summary.getChildren()) {
-            logSummary(child, references, indent, showErrors);
+            logSummary(child, indent, showErrors);
         }
     }
 

@@ -25,9 +25,8 @@ import java.util.List;
  * Provide a summary of the exception, containing:<ul>
  * <li>the exception itself,</li>
  * <li>useful end-user message,</li>
- * <li>useful reference to a solution, or set of solutions: this is usually a wiki page url in
- * <a href="http://cwiki.apache.org/confluence/display/MAVEN/">http://cwiki.apache.org/confluence/display/MAVEN/</a>,
- * </li>
+ * <li>reference identifying the error kind, used to look up detailed help text (see
+ * {@link ReferenceHelp}),</li>
  * <li>child exception summaries.</li>
  * </ul>
  */
