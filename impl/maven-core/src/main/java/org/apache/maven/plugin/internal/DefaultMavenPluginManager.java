@@ -55,7 +55,7 @@ import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
-import org.apache.maven.api.plugin.Log;
+import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.api.plugin.descriptor.Resolution;
 import org.apache.maven.api.services.DependencyResolver;
 import org.apache.maven.api.services.DependencyResolverResult;
@@ -71,12 +71,13 @@ import org.apache.maven.di.impl.InjectorImpl;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
-import org.apache.maven.internal.impl.DefaultLog;
 import org.apache.maven.internal.impl.DefaultMojoExecution;
 import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.internal.impl.MessageBuilderBindingStyler;
 import org.apache.maven.internal.impl.SisuDiBridgeModule;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
+import org.apache.maven.logging.ProjectBuildLogAppender;
+import org.apache.maven.logging.impl.DefaultLogger;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.ContextEnabled;
 import org.apache.maven.plugin.DebugConfigurationListener;
@@ -377,6 +378,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
 
             pluginDescriptor.setClassRealm(pluginRealm);
             pluginDescriptor.setArtifacts(pluginArtifacts);
+            registerPluginClassLoader(pluginDescriptor, pluginRealm);
         } else {
             boolean v4api = pluginDescriptor.getMojos().stream().anyMatch(MojoDescriptor::isV4Api);
             Map<String, ClassLoader> foreignImports = calcImports(project, parent, imports, v4api);
@@ -404,9 +406,16 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             for (ComponentDescriptor<?> componentDescriptor : pluginDescriptor.getComponents()) {
                 componentDescriptor.setRealm(cacheRecord.getRealm());
             }
+            registerPluginClassLoader(pluginDescriptor, cacheRecord.getRealm());
 
             pluginRealmCache.register(project, cacheKey, cacheRecord);
         }
+    }
+
+    private static void registerPluginClassLoader(PluginDescriptor pluginDescriptor, ClassRealm realm) {
+        Plugin plugin = pluginDescriptor.getPlugin();
+        String pluginKey = plugin.getGroupId() + ":" + plugin.getArtifactId() + ":" + plugin.getVersion();
+        LoggerManager.get().registerPluginClassLoader(realm, pluginKey);
     }
 
     private void createPluginRealm(
@@ -573,8 +582,10 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         Project project = sessionV4.getProject(session.getCurrentProject());
 
         org.apache.maven.api.MojoExecution execution = new DefaultMojoExecution(sessionV4, mojoExecution);
-        Log log = new DefaultLog(
-                LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getImplementation()));
+        String logProjectId = ProjectBuildLogAppender.getProjectId();
+        String logMojoId = mojoExecution.getMojoDescriptor().getFullGoalName() + "@" + mojoExecution.getExecutionId();
+        org.apache.maven.api.plugin.Log log =
+                new DefaultLogger(mojoExecution.getMojoDescriptor().getImplementation(), logProjectId, logMojoId);
         try {
             // Discover components from the effective ClassLoader (module layer loader for modular plugins)
             Injector injector = new InjectorImpl() {
@@ -589,7 +600,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             injector.bindInstance(Session.class, sessionV4);
             injector.bindInstance(Project.class, project);
             injector.bindInstance(org.apache.maven.api.MojoExecution.class, execution);
-            injector.bindInstance(Log.class, log);
+            injector.bindInstance(org.apache.maven.api.plugin.Log.class, log);
 
             Map<Class<? extends Service>, Supplier<? extends Service>> services = sessionV4.getAllServices();
             services.forEach((itf, svc) -> injector.bindSupplier(

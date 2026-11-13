@@ -40,6 +40,8 @@ import org.apache.maven.api.cli.InvokerRequest;
 import org.apache.maven.api.cli.mvnval.ValidateOptions;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
+import org.apache.maven.api.logging.LogLevel;
+import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.ModelBuilder;
@@ -51,7 +53,6 @@ import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.cling.invoker.LookupContext;
 import org.apache.maven.cling.invoker.LookupInvoker;
-import org.apache.maven.cling.logging.Slf4jConfiguration;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.apache.maven.jline.MessageUtils;
@@ -296,7 +297,7 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
      * The level is forced to {@code ERROR} — the same effect as {@code -q} — unless {@code -X}
      * or {@code -e} is given, in which case the full log is what the caller wants.
      * <p>
-     * The property must be set <em>before</em> calling {@link Slf4jConfiguration#setRootLoggerLevel}
+     * The property must be set <em>before</em> calling {@link LoggerManager#setRootLoggerLevel}
      * because that method itself logs at {@code INFO} when it overrides a value already set (e.g.
      * a CI runner running with {@code DEBUG}), which would be the very noise we are suppressing.
      */
@@ -305,9 +306,8 @@ public class ValidateInvoker extends LookupInvoker<ValidateContext> {
         super.configureLogging(context);
         if (!context.options().verbose().orElse(false)
                 && !context.options().showErrors().orElse(false)) {
-            context.loggerLevel = Slf4jConfiguration.Level.ERROR;
-            System.setProperty(Constants.MAVEN_LOGGER_DEFAULT_LOG_LEVEL, "error");
-            context.slf4jConfiguration.setRootLoggerLevel(context.loggerLevel);
+            context.loggerLevel = LogLevel.ERROR;
+            LoggerManager.get().setRootLoggerLevel(context.loggerLevel);
         }
     }
 

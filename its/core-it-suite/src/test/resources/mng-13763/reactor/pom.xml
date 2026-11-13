@@ -23,13 +23,13 @@ under the License.
   <artifactId>reactor</artifactId>
   <version>${revision}</version>
   <packaging>pom</packaging>
-  <properties>
-    <revision>1.0-SNAPSHOT</revision>
-  </properties>
   <modules>
     <module>a</module>
     <module>b</module>
   </modules>
+  <properties>
+    <revision>1.0-SNAPSHOT</revision>
+  </properties>
   <build>
     <plugins>
       <plugin>
@@ -40,13 +40,17 @@ under the License.
           <!-- Ordinary phase work must precede the aggregator in the configured order. -->
           <execution>
             <id>touch</id>
+            <goals>
+              <goal>touch</goal>
+            </goals>
             <phase>package</phase>
-            <goals><goal>touch</goal></goals>
           </execution>
           <execution>
             <id>aggregate</id>
+            <goals>
+              <goal>aggregate</goal>
+            </goals>
             <phase>package</phase>
-            <goals><goal>aggregate</goal></goals>
           </execution>
         </executions>
       </plugin>

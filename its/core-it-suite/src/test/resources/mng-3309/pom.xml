@@ -26,10 +26,8 @@ under the License.
   <packaging>pom</packaging>
 
   <name>Maven Integration Test :: MNG-3309</name>
-  <description>
-    Test cascading profile activation: a profile's properties can trigger
-    the activation of subsequent profiles within the same POM.
-  </description>
+  <description>Test cascading profile activation: a profile's properties can trigger
+    the activation of subsequent profiles within the same POM.</description>
 
   <profiles>
     <!-- Profile 1: activated by user property, sets cascade.step1 -->

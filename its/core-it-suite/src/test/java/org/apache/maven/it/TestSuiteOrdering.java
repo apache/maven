@@ -54,8 +54,7 @@ public class TestSuiteOrdering implements ClassOrderer {
     private static final Pattern MDEP_PATTERN = Pattern.compile(".*MavenITmdep(\\d+).*");
 
     private static final PrintStream out = System.out;
-    private static final Set<String> WARNED_CLASSES =
-            Collections.newSetFromMap(new ConcurrentHashMap<>());
+    private static final Set<String> WARNED_CLASSES = Collections.newSetFromMap(new ConcurrentHashMap<>());
 
     private static void infoProperty(PrintStream info, String property) {
         info.println(property + ": " + System.getProperty(property));
@@ -95,7 +94,8 @@ public class TestSuiteOrdering implements ClassOrderer {
 
     @Override
     public void orderClasses(ClassOrdererContext context) {
-        context.getClassDescriptors().sort(Comparator.comparing(this::getOrderKey).reversed());
+        context.getClassDescriptors()
+                .sort(Comparator.comparing(this::getOrderKey).reversed());
     }
 
     private String getOrderKey(ClassDescriptor classDescriptor) {

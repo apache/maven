@@ -20,6 +20,7 @@
 module org.apache.maven.di {
     requires transitive org.apache.maven.api.di;
     requires org.apache.maven.api.annotations;
+    requires org.apache.maven.api.logging;
 
     exports org.apache.maven.di;
     exports org.apache.maven.di.impl to

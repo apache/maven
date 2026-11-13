@@ -76,9 +76,7 @@ class MavenITgh12625BomConsumerPomPropertyResolutionTest extends AbstractMavenIn
         String content = String.join("\n", lines);
 
         // 1. Packaging must be "pom" (not "bom")
-        assertTrue(
-                content.contains("<packaging>pom</packaging>"),
-                "Consumer POM packaging should be 'pom', not 'bom'");
+        assertTrue(content.contains("<packaging>pom</packaging>"), "Consumer POM packaging should be 'pom', not 'bom'");
 
         // 2. The consumer POM strips parent and properties, so inherited
         //    fields must be inlined: groupId and version must be present

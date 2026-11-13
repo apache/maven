@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-
 package org.apache.maven.it;
 
 import java.nio.charset.StandardCharsets;
@@ -47,7 +46,8 @@ class MavenITgh13413QuotedValuesInMavenArgsTest extends AbstractMavenIntegration
         // a path with a space, as the Jenkins Pipeline Maven plugin builds for a workspace like that
         Path localRepo = basedir.resolve("local repo");
 
-        boolean windows = System.getProperty("os.name", "").toLowerCase(Locale.ROOT).startsWith("windows");
+        boolean windows =
+                System.getProperty("os.name", "").toLowerCase(Locale.ROOT).startsWith("windows");
         Path bin = Path.of(System.getProperty("maven.home")).resolve("bin");
         List<String> command = windows
                 ? List.of("cmd.exe", "/c", bin.resolve("mvn.cmd").toString(), "-B", "validate")

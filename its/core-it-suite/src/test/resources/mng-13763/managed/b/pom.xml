@@ -34,8 +34,10 @@ under the License.
         <executions>
           <execution>
             <id>touch</id>
+            <goals>
+              <goal>touch</goal>
+            </goals>
             <phase>package</phase>
-            <goals><goal>touch</goal></goals>
           </execution>
         </executions>
       </plugin>

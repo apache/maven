@@ -21,7 +21,6 @@ package org.apache.maven.di.impl;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
@@ -44,6 +43,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Collectors;
@@ -54,6 +54,7 @@ import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Qualifier;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.di.Typed;
+import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.Scope;
@@ -67,11 +68,17 @@ public class InjectorImpl implements Injector {
     private final Set<String> loadedUrls = new HashSet<>();
     private final ThreadLocal<Set<Key<?>>> resolutionStack = new ThreadLocal<>();
 
+    private volatile Consumer<String> dumpSink =
+            s -> LoggerManager.get().getLogger("maven.di.diagnostics").info(s);
     private final InjectorDiagnostics diagnostics = new InjectorDiagnostics(this, bindings, scopes);
     private int registrationDepth;
 
     public InjectorImpl() {
         bindScope(Singleton.class, new SingletonScope());
+    }
+
+    public void setDumpSink(Consumer<String> dumpSink) {
+        this.dumpSink = dumpSink != null ? dumpSink : s -> {};
     }
 
     @Nonnull
@@ -632,12 +639,9 @@ public class InjectorImpl implements Injector {
         return BindingStyler.NONE;
     }
 
-    /** Writes a complete block; a separate hook lets tests exercise slow and failing output. */
-    void writeDump(PrintStream output, String dump) {
-        output.println(dump);
-        if (output.checkError()) {
-            throw new IllegalStateException("Unable to write Maven DI diagnostics");
-        }
+    /** Writes a complete diagnostic block via the configured dump sink. */
+    protected void writeDump(String dump) {
+        dumpSink.accept(dump);
     }
 
     /**
