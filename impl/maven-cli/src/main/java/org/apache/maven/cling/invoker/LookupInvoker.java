@@ -176,6 +176,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         pushUserProperties(context);
         setupGuiceClassLoading(context);
         configureLogging(context);
+        // Block until the background terminal thread has completed; this ensures
+        // that doConfigureWithTerminal (which accesses context.loggerFactory) runs
+        // only after configureLogging() has set that field.
+        MessageUtils.awaitTerminalInitialization();
+        doConfigureWithTerminal(context, context.terminal);
         activateLogging(context);
         helpOrVersionAndMayExit(context);
         preCommands(context);
@@ -339,35 +344,28 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                 // Embedded mode: build terminal synchronously (fast with custom streams).
                 // buildDeferred() only supports system terminals, and embedded mode is
                 // fast anyway (no FFM/JNI provider probing with custom streams).
+                // doConfigureWithTerminal() is NOT called here; doInvoke() calls it
+                // explicitly after configureLogging() so context.loggerFactory is set.
                 try {
                     TerminalBuilder builder =
                             TerminalBuilder.builder().name("Maven").dumb(true);
                     doCreateTerminal(context, builder);
                     Terminal terminal = builder.build();
                     MessageUtils.systemInstall(terminal);
-                    // Set terminal and color, then apply raw streams. We cannot call the
-                    // full doConfigureWithTerminal() here because it may wrap System.out
-                    // with LoggingOutputStream (doConfigureWithTerminalWithRawStreamsDisabled)
-                    // which requires loggerFactory and must happen AFTER configureLogging()
-                    // caches the original System.out. In the deferred path, the consumer
-                    // callback fires asynchronously after configureLogging(); here we run
-                    // synchronously before it. Using raw streams avoids the wrapping entirely
-                    // — embedded callers provide their own streams.
-                    context.terminal = terminal;
-                    MessageUtils.setColorEnabled(
-                            context.coloredOutput != null
-                                    ? context.coloredOutput
-                                    : !Terminal.TYPE_DUMB.equals(terminal.getType()));
-                    doConfigureWithTerminalWithRawStreamsEnabled(context);
                 } catch (IOException e) {
                     throw new InvokerException("Failed to create terminal", e);
                 }
             } else {
+                // Start the background terminal build.  doConfigureWithTerminal is intentionally
+                // NOT called here — the onComplete callback runs on the background build thread
+                // before configureLogging() has set context.loggerFactory.  Instead, the main
+                // thread calls doConfigureWithTerminal() explicitly after configureLogging()
+                // (see doInvoke).
                 MessageUtils.systemInstall(builder -> doCreateTerminal(context, builder), terminal -> {
                     if (OSUtils.IS_WINDOWS) {
+                        // JLine may consume Ctrl+C as terminal input, bypassing the JVM's shutdown hooks.
                         terminal.handle(Terminal.Signal.INT, signal -> System.exit(SIGINT_EXIT_CODE));
                     }
-                    doConfigureWithTerminal(context, terminal);
                 });
             }
 
@@ -380,7 +378,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                     new ProjectBuildLogAppender(determineBuildEventListener(context));
             context.closeables.add(projectBuildLogAppender);
         } else {
-            doConfigureWithTerminal(context, context.terminal);
+            // context.terminal is pre-set; doConfigureWithTerminal will be called
+            // by doInvoke() after configureLogging() (see note in doInvoke).
         }
     }
 
