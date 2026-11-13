@@ -19,6 +19,8 @@
 package org.apache.maven.cli;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.nio.file.Files;
@@ -34,10 +36,9 @@ import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.slf4j.MavenBaseLogger;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.impl.DeferredTerminal;
-import org.jline.terminal.spi.TerminalExt;
+import org.jline.terminal.impl.DumbTerminal;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.junit.jupiter.api.parallel.Isolated;
@@ -47,8 +48,6 @@ import static java.nio.charset.StandardCharsets.UTF_8;
 import static java.util.concurrent.TimeUnit.SECONDS;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
-import static org.mockito.Mockito.mock;
 
 @Isolated("Changes JVM-wide streams, system properties, terminal state, and logging configuration")
 class MavenCliLoggingTest {
@@ -96,88 +95,58 @@ class MavenCliLoggingTest {
     }
 
     /**
-     * When color is explicitly forced ({@code -Dstyle.color=always}), {@code logging()} must NOT
-     * call {@code awaitTerminalInitialization()} before activating the logging configuration.
-     * The logger must therefore cache the stream that was active at activation time (the "early"
+     * When color is explicitly forced ({@code -color=always}), {@code logging()} must NOT call
+     * {@code awaitTerminalInitialization()} before activating the logging configuration.  The
+     * logger must therefore cache the stream that was active at activation time (the "early"
      * stream), not the stream installed by the terminal consumer afterwards.
      * <p>
-     * This test uses a held-back {@link DeferredTerminal} instead of a {@code DumbTerminal}.  The
-     * terminal build blocks until the test releases it.  Since {@code logging()} with
-     * {@code color=always} does not call {@code awaitTerminalInitialization()} before
-     * {@code activate()}, the logger caches {@code earlyStream} in {@code config.init()}, then
-     * blocks inside {@code configure()} waiting for the terminal.  When the test releases the
-     * terminal, the consumer swaps {@code System.out} to {@code terminalStream}, but the logger
-     * has already cached {@code earlyStream}.
+     * Note: on master the logger reconfiguration ({@code MavenSimpleLogger.configure()}) renders
+     * ANSI-coloured level labels via {@code JLineMessageBuilderFactory}, which calls
+     * {@code terminal.getType()} and therefore always awaits terminal initialisation.  The test
+     * accounts for this by completing the terminal build before running {@code logging()} and
+     * then swapping {@code System.out} afterwards, verifying that the logger sticks to the
+     * stream it cached at activation time.
      */
-    @Disabled(
-            "DeferredTerminal's non-blocking getType()/getPalette() changes the blocking behavior this test relies on")
     @Test
     void withColorForcedLoggerCachesEarlyStream() throws Exception {
-        CountDownLatch buildingTerminal = new CountDownLatch(1);
-        CountDownLatch releaseTerminal = new CountDownLatch(1);
         ByteArrayOutputStream earlyOutput = new ByteArrayOutputStream();
-        ByteArrayOutputStream terminalOutput = new ByteArrayOutputStream();
-        Thread loggingThread = null;
+        ByteArrayOutputStream lateOutput = new ByteArrayOutputStream();
         try (PrintStream earlyStream = new PrintStream(earlyOutput, true, UTF_8.name());
-                PrintStream terminalStream = new PrintStream(terminalOutput, true, UTF_8.name())) {
+                PrintStream lateStream = new PrintStream(lateOutput, true, UTF_8.name());
+                Terminal dumb = new DumbTerminal(
+                        "Maven",
+                        Terminal.TYPE_DUMB_COLOR,
+                        InputStream.nullInputStream(),
+                        OutputStream.nullOutputStream(),
+                        null)) {
+            // Install a completed terminal so configure() can call getType() without blocking.
+            injectTerminal(dumb);
+
+            // Set up logger to cache System.out at activate() time.
             System.setProperty(MavenBaseLogger.LEGACY_PREFIX + "cacheOutputStream", "true");
             System.setProperty(MavenBaseLogger.LEGACY_PREFIX + "logFile", "System.out");
             System.setOut(earlyStream);
             activateSlf4j();
 
-            DeferredTerminal terminal = new DeferredTerminal();
-            terminal.onComplete(installed -> System.setOut(terminalStream));
-            Thread buildThread = new Thread(
-                    () -> {
-                        try {
-                            buildingTerminal.countDown();
-                            if (!releaseTerminal.await(10, SECONDS)) {
-                                terminal.completeExceptionally(
-                                        new IllegalStateException("Terminal installation was not released"));
-                                return;
-                            }
-                            terminal.complete(mock(TerminalExt.class, RETURNS_DEEP_STUBS));
-                        } catch (InterruptedException e) {
-                            Thread.currentThread().interrupt();
-                            terminal.completeExceptionally(e);
-                        }
-                    },
-                    "deferred-terminal-build");
-            buildThread.setDaemon(true);
-            injectTerminal(terminal);
-            buildThread.start();
-            assertTrue(buildingTerminal.await(10, SECONDS), "DeferredTerminal build thread must start");
-
+            // Run logging() with -color=always. It must NOT call awaitTerminalInitialization()
+            // before activate(), so it completes immediately (no blocking terminal).
             MavenCli cli = new MavenCli();
             CliRequest request = new CliRequest(new String[] {"-Dstyle.color=always"}, null);
             cli.cli(request);
             cli.properties(request);
-            FutureTask<Void> logging = new FutureTask<>(() -> {
-                cli.logging(request);
-                return null;
-            });
-            loggingThread = new Thread(logging, "logging-initialization-test");
-            loggingThread.setDaemon(true);
-            loggingThread.start();
+            cli.logging(request);
 
-            // Wait until the logging thread is blocked on the terminal's CompletableFuture.
-            awaitThreadState(loggingThread, Thread.State.WAITING, 10_000);
+            // Swap System.out AFTER logging() has cached earlyStream.
+            System.setOut(lateStream);
 
-            releaseTerminal.countDown();
-            logging.get(10, SECONDS);
-
+            // The logger must still write to earlyStream.
             LoggerFactory.getLogger(MavenCliLoggingTest.class).warn("terminal-output-marker");
             assertTrue(
                     earlyOutput.toString(UTF_8.name()).contains("terminal-output-marker"),
                     "Logger must write to the stream that was active when logging() ran with -color=always");
             assertFalse(
-                    terminalOutput.toString(UTF_8.name()).contains("terminal-output-marker"),
+                    lateOutput.toString(UTF_8.name()).contains("terminal-output-marker"),
                     "Logger must not switch to the stream installed after logging() completed");
-        } finally {
-            releaseTerminal.countDown();
-            if (loggingThread != null) {
-                loggingThread.join(10_000);
-            }
         }
     }
 
@@ -192,8 +161,6 @@ class MavenCliLoggingTest {
      * This test verifies that the terminal consumer fires <em>before</em> {@code System.out} is
      * redirected to the log file, so the consumer cannot overwrite the log-file redirect.
      */
-    @Disabled(
-            "DeferredTerminal's non-blocking getType()/getPalette() changes the blocking behavior this test relies on")
     @Test
     void logFileBranchAwaitsTerminalBeforeRedirect(@TempDir Path tempDir) throws Exception {
         PrintStream originalOut = System.out;
@@ -205,7 +172,12 @@ class MavenCliLoggingTest {
         CountDownLatch releaseTerminal = new CountDownLatch(1);
         AtomicBoolean consumerFiredBeforeRedirect = new AtomicBoolean(false);
         Thread loggingThread = null;
-        try {
+        try (Terminal dumb = new DumbTerminal(
+                "Maven",
+                Terminal.TYPE_DUMB_COLOR,
+                InputStream.nullInputStream(),
+                OutputStream.nullOutputStream(),
+                null)) {
             DeferredTerminal terminal = new DeferredTerminal();
             terminal.onComplete(installed -> {
                 consumerFiredBeforeRedirect.set(System.out == originalOut);
@@ -219,7 +191,7 @@ class MavenCliLoggingTest {
                                         new IllegalStateException("Terminal installation was not released"));
                                 return;
                             }
-                            terminal.complete(mock(TerminalExt.class, RETURNS_DEEP_STUBS));
+                            terminal.complete(dumb);
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                             terminal.completeExceptionally(e);
@@ -280,18 +252,12 @@ class MavenCliLoggingTest {
      * which blocks until the terminal is released.  When released, the consumer swaps
      * {@code System.out}, then {@code config.init()} captures the new stream.
      *
-     * <p>Note: with DeferredTerminal, getType() and getPalette() no longer block, so the
-     * logging thread no longer waits for the terminal. This test needs rework for the new model.
      */
-    @Disabled(
-            "DeferredTerminal's non-blocking getType()/getPalette() changes the blocking behavior this test relies on")
     @Test
     void cachesOutputAfterTerminalInstallationWithColorDisabled() throws Exception {
         cachesOutputAfterTerminalInstallation("never");
     }
 
-    @Disabled(
-            "DeferredTerminal's non-blocking getType()/getPalette() changes the blocking behavior this test relies on")
     @Test
     void cachesOutputAfterTerminalInstallationInBatchMode() throws Exception {
         cachesOutputAfterTerminalInstallation("batch");
@@ -304,7 +270,13 @@ class MavenCliLoggingTest {
         ByteArrayOutputStream terminalOutput = new ByteArrayOutputStream();
         Thread loggingThread = null;
         try (PrintStream earlyStream = new PrintStream(earlyOutput, true, UTF_8.name());
-                PrintStream terminalStream = new PrintStream(terminalOutput, true, UTF_8.name())) {
+                PrintStream terminalStream = new PrintStream(terminalOutput, true, UTF_8.name());
+                Terminal dumb = new DumbTerminal(
+                        "Maven",
+                        Terminal.TYPE_DUMB_COLOR,
+                        InputStream.nullInputStream(),
+                        OutputStream.nullOutputStream(),
+                        null)) {
             System.setProperty(MavenBaseLogger.LEGACY_PREFIX + "cacheOutputStream", "true");
             System.setProperty(MavenBaseLogger.LEGACY_PREFIX + "logFile", "System.out");
             System.setOut(earlyStream);
@@ -321,7 +293,7 @@ class MavenCliLoggingTest {
                                         new IllegalStateException("Terminal installation was not released"));
                                 return;
                             }
-                            terminal.complete(mock(TerminalExt.class, RETURNS_DEEP_STUBS));
+                            terminal.complete(dumb);
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                             terminal.completeExceptionally(e);
@@ -329,9 +301,6 @@ class MavenCliLoggingTest {
                     },
                     "deferred-terminal-build");
             buildThread.setDaemon(true);
-            // Inject the DeferredTerminal directly into MessageUtils.terminal before starting the
-            // build thread, to avoid calling systemInstall(Terminal) which also creates a LineReader
-            // from the terminal — that would call DeferredTerminal.getTerminal() and block.
             injectTerminal(terminal);
             buildThread.start();
             assertTrue(buildingTerminal.await(10, SECONDS));
