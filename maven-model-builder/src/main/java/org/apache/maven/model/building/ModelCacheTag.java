@@ -114,4 +114,31 @@ interface ModelCacheTag<T> {
             return intoCache(data);
         }
     };
+
+    /**
+     * The tag used to denote an effective dependency management section from an imported model that was built with
+     * location tracking enabled.
+     */
+    ModelCacheTag<DependencyManagement> IMPORT_WITH_LOCATIONS = new ModelCacheTag<DependencyManagement>() {
+
+        @Override
+        public String getName() {
+            return "import-with-locations";
+        }
+
+        @Override
+        public Class<DependencyManagement> getType() {
+            return DependencyManagement.class;
+        }
+
+        @Override
+        public DependencyManagement intoCache(DependencyManagement data) {
+            return (data != null) ? data.clone() : null;
+        }
+
+        @Override
+        public DependencyManagement fromCache(DependencyManagement data) {
+            return intoCache(data);
+        }
+    };
 }
