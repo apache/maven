@@ -226,7 +226,7 @@ public class ClassWorld implements Closeable {
         if (isBootLayerModule(source)) {
             LOGGER.warning("module-access: module '" + sourceModuleName
                     + "' is in the boot layer and cannot be modified at runtime;"
-                    + " use --add-reads on the JVM command line instead");
+                    + " use --add-reads " + sourceModuleName + "=ALL-UNNAMED on the JVM command line instead");
             return;
         }
         moduleLayerController.addReads(source, target);
@@ -247,7 +247,7 @@ public class ClassWorld implements Closeable {
         if (isBootLayerModule(source)) {
             LOGGER.warning("module-access: module '" + moduleName
                     + "' is in the boot layer and cannot be modified at runtime;"
-                    + " use --" + (open ? "add-opens" : "add-exports") + " on the JVM command line instead");
+                    + " use --" + (open ? "add-opens" : "add-exports") + " " + moduleName + "/" + packageName + "=ALL-UNNAMED on the JVM command line instead");
             return;
         }
         if (open) {
