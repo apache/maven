@@ -132,6 +132,26 @@ class DefaultInheritanceAssemblerTest {
         testInheritance("plugin-configuration");
     }
 
+    /**
+     * MNG-6373: a build plugin marked {@code inherited=false} must not reach child POMs,
+     * even when it declares an execution.
+     * @throws Exception
+     */
+    @Test
+    void testPluginNotInherited() throws Exception {
+        testInheritance("plugin-not-inherited");
+    }
+
+    /**
+     * MNG-2103: an execution's own {@code inherited=true} overrides a plugin-level
+     * {@code inherited=false}, so the whole plugin must still reach the child.
+     * @throws Exception
+     */
+    @Test
+    void testPluginNotInheritedWithInheritedExecutionOverride() throws Exception {
+        testInheritance("plugin-not-inherited-execution-override");
+    }
+
     public void testInheritance(String baseName) throws Exception {
         testInheritance(baseName, false);
         testInheritance(baseName, true);
