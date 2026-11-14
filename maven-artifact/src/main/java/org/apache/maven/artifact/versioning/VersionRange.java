@@ -54,9 +54,12 @@ public class VersionRange {
     }
 
     /**
-     * Returns the restrictions defining this version range.
+     * Returns the intervals used to match versions against this range.
      *
-     * @return the unmodifiable list of restrictions
+     * <p>If this list is empty, {@link #containsVersion(ArtifactVersion)} returns {@code false}.
+     * A recommended version may still be available from {@link #getRecommendedVersion()}.</p>
+     *
+     * @return an unmodifiable, non-null list of version restrictions
      */
     public List<Restriction> getRestrictions() {
         return restrictions;
