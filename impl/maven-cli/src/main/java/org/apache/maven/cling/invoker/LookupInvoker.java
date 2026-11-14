@@ -81,6 +81,7 @@ import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.logging.AsyncDrainWriter;
 import org.apache.maven.logging.BuildEventListener;
 import org.apache.maven.logging.LoggingOutputStream;
+import org.apache.maven.logging.ProjectBuildLogAppender;
 import org.apache.maven.logging.SimpleBuildEventListener;
 import org.apache.maven.logging.api.LogLevelRecorder;
 import org.apache.maven.slf4j.MavenSimpleLogger;
@@ -372,6 +373,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             context.terminal = MessageUtils.getTerminal();
             context.closeables.add(MessageUtils::systemUninstall);
             MessageUtils.registerShutdownHook(); // safety belt
+
+            // Create the build log appender; also sets MavenSimpleLogger sink
+            ProjectBuildLogAppender projectBuildLogAppender =
+                    new ProjectBuildLogAppender(determineBuildEventListener(context));
+            context.closeables.add(projectBuildLogAppender);
         } else {
             // context.terminal is pre-set; doConfigureWithTerminal will be called
             // by doInvoke() after configureLogging() (see note in doInvoke).
