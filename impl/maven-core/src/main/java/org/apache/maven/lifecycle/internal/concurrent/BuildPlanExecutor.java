@@ -1341,7 +1341,23 @@ public class BuildPlanExecutor {
                 MavenProject pluginProject = reactorGavs.get(gav(plugin));
                 if (pluginProject != null) {
                     // In order to plan the project, we need all its plugins...
-                    plan.requiredStep(project, PLAN).executeAfter(plan.requiredStep(pluginProject, READY));
+                    BuildStep planStep = plan.requiredStep(project, PLAN);
+                    BuildStep readyStep = plan.requiredStep(pluginProject, READY);
+                    planStep.executeAfter(readyStep);
+                    // Force the plugin project — and any reactor libraries it
+                    // transitively depends on — to reach READY even if the
+                    // requested phase is earlier (e.g. initialize). Without this,
+                    // a reactor library that the plugin compiles against would
+                    // remain skipped, causing the plugin's compilation to fail.
+                    //
+                    // Only un-skip steps that were actually skipped (i.e. beyond
+                    // the requested phase).  Steps within the requested phase
+                    // already have skip=false and don't need to be touched.
+                    // Leaving already-unskipped structural steps (SETUP, PLAN,
+                    // before:/after: nodes within the requested phase) untouched
+                    // avoids empty-shell executions that would otherwise trigger
+                    // misleading SETUP/TEARDOWN lifecycle events.
+                    readyStep.allPredecessors().filter(s -> s.skip.get()).forEach(s -> s.skip.set(false));
                 } else {
                     toResolve.add(() -> resolvePlugin(session, project.getRemotePluginRepositories(), plugin));
                 }
