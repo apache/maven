@@ -26,8 +26,13 @@ import java.util.Map;
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationFile;
 import org.apache.maven.api.model.ActivationProperty;
+import org.apache.maven.api.model.InputLocation;
+import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.model.Profile;
+import org.apache.maven.api.services.ModelProblemCollector;
+import org.apache.maven.api.services.model.ProfileActivationContext;
+import org.apache.maven.api.services.model.ProfileActivator;
 import org.apache.maven.impl.DefaultModelVersionParser;
 import org.apache.maven.impl.model.profile.FileProfileActivator;
 import org.apache.maven.impl.model.profile.PropertyProfileActivator;
@@ -41,7 +46,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
- * Tests {@link DefaultProfileSelector} with focus on cascading activation behavior.
+ * Tests {@link DefaultProfileSelector} with focus on cascading activation behavior
+ * and POM vs settings profile distinction via {@link InputSource} model id (issue #2569).
  */
 public class DefaultProfileSelectorTest {
 
@@ -60,8 +66,8 @@ public class DefaultProfileSelectorTest {
     @Test
     void testNonCascadingActivation() {
         // Create profiles with property-based activation
-        Profile profile1 = createProfile("profile1", "prop1", "value1", Profile.SOURCE_POM);
-        Profile profile2 = createProfile("profile2", "prop2", "value2", Profile.SOURCE_POM);
+        Profile profile1 = createPomProfile("profile1", "prop1", "value1");
+        Profile profile2 = createPomProfile("profile2", "prop2", "value2");
 
         List<Profile> profiles = Arrays.asList(profile1, profile2);
 
@@ -82,9 +88,8 @@ public class DefaultProfileSelectorTest {
     @Test
     void testCascadingActivation() {
         // Create profiles where one activates another through properties
-        Profile profile1 = createProfileWithProperties(
-                "profile1", "prop1", "value1", Map.of("prop2", "value2"), Profile.SOURCE_POM);
-        Profile profile2 = createProfile("profile2", "prop2", "value2", Profile.SOURCE_POM);
+        Profile profile1 = createPomProfileWithProperties("profile1", "prop1", "value1", Map.of("prop2", "value2"));
+        Profile profile2 = createPomProfile("profile2", "prop2", "value2");
 
         List<Profile> profiles = Arrays.asList(profile1, profile2);
 
@@ -106,9 +111,8 @@ public class DefaultProfileSelectorTest {
     @Test
     void testCascadingVsNonCascadingDifference() {
         // Create profiles where cascading would activate more profiles
-        Profile profile1 = createProfileWithProperties(
-                "profile1", "prop1", "value1", Map.of("prop2", "value2"), Profile.SOURCE_POM);
-        Profile profile2 = createProfile("profile2", "prop2", "value2", Profile.SOURCE_POM);
+        Profile profile1 = createPomProfileWithProperties("profile1", "prop1", "value1", Map.of("prop2", "value2"));
+        Profile profile2 = createPomProfile("profile2", "prop2", "value2");
 
         List<Profile> profiles = Arrays.asList(profile1, profile2);
 
@@ -124,8 +128,8 @@ public class DefaultProfileSelectorTest {
 
     @Test
     void testActiveByDefaultProfiles() {
-        Profile defaultProfile = createActiveByDefaultProfile("default-profile", Profile.SOURCE_POM);
-        Profile conditionalProfile = createProfile("conditional", "prop1", "value1", Profile.SOURCE_POM);
+        Profile defaultProfile = createPomActiveByDefaultProfile("default-profile");
+        Profile conditionalProfile = createPomProfile("conditional", "prop1", "value1");
 
         List<Profile> profiles = Arrays.asList(defaultProfile, conditionalProfile);
 
@@ -147,8 +151,8 @@ public class DefaultProfileSelectorTest {
 
     @Test
     void testMixedSourceProfiles() {
-        Profile pomProfile = createProfile("pom-profile", "prop1", "value1", Profile.SOURCE_POM);
-        Profile settingsProfile = createProfile("settings-profile", "prop2", "value2", Profile.SOURCE_SETTINGS);
+        Profile pomProfile = createPomProfile("pom-profile", "prop1", "value1");
+        Profile settingsProfile = createSettingsProfile("settings-profile", "prop2", "value2");
 
         List<Profile> profiles = Arrays.asList(pomProfile, settingsProfile);
 
@@ -178,8 +182,8 @@ public class DefaultProfileSelectorTest {
 
     @Test
     void testExplicitlyActivatedProfiles() {
-        Profile profile1 = createProfile("profile1", "nonexistent", "value", Profile.SOURCE_POM);
-        Profile profile2 = createProfile("profile2", "prop2", "value2", Profile.SOURCE_POM);
+        Profile profile1 = createPomProfile("profile1", "nonexistent", "value");
+        Profile profile2 = createPomProfile("profile2", "prop2", "value2");
 
         List<Profile> profiles = Arrays.asList(profile1, profile2);
 
@@ -201,11 +205,9 @@ public class DefaultProfileSelectorTest {
     @Test
     void testCascadingActivationChain() {
         // Create a chain of profiles: profile1 -> profile2 -> profile3
-        Profile profile1 = createProfileWithProperties(
-                "profile1", "prop1", "value1", Map.of("prop2", "value2"), Profile.SOURCE_POM);
-        Profile profile2 = createProfileWithProperties(
-                "profile2", "prop2", "value2", Map.of("prop3", "value3"), Profile.SOURCE_POM);
-        Profile profile3 = createProfile("profile3", "prop3", "value3", Profile.SOURCE_POM);
+        Profile profile1 = createPomProfileWithProperties("profile1", "prop1", "value1", Map.of("prop2", "value2"));
+        Profile profile2 = createPomProfileWithProperties("profile2", "prop2", "value2", Map.of("prop3", "value3"));
+        Profile profile3 = createPomProfile("profile3", "prop3", "value3");
 
         List<Profile> profiles = Arrays.asList(profile1, profile2, profile3);
 
@@ -229,12 +231,10 @@ public class DefaultProfileSelectorTest {
     @Test
     void testCascadingStopCondition() {
         // Test that cascading stops when no more profiles can be activated
-        Profile profile1 = createProfileWithProperties(
-                "profile1", "prop1", "value1", Map.of("prop2", "value2"), Profile.SOURCE_POM);
-        Profile profile2 = createProfileWithProperties(
-                "profile2", "prop2", "value2", Map.of("prop3", "value3"), Profile.SOURCE_POM);
+        Profile profile1 = createPomProfileWithProperties("profile1", "prop1", "value1", Map.of("prop2", "value2"));
+        Profile profile2 = createPomProfileWithProperties("profile2", "prop2", "value2", Map.of("prop3", "value3"));
         // profile3 requires prop4 which is never set, so cascading should stop
-        Profile profile3 = createProfile("profile3", "prop4", "value4", Profile.SOURCE_POM);
+        Profile profile3 = createPomProfile("profile3", "prop4", "value4");
 
         List<Profile> profiles = Arrays.asList(profile1, profile2, profile3);
 
@@ -258,10 +258,8 @@ public class DefaultProfileSelectorTest {
     @Test
     void testCascadingWithCircularDependency() {
         // Test that cascading handles circular dependencies gracefully
-        Profile profile1 = createProfileWithProperties(
-                "profile1", "prop1", "value1", Map.of("prop2", "value2"), Profile.SOURCE_POM);
-        Profile profile2 = createProfileWithProperties(
-                "profile2", "prop2", "value2", Map.of("prop1", "value1"), Profile.SOURCE_POM);
+        Profile profile1 = createPomProfileWithProperties("profile1", "prop1", "value1", Map.of("prop2", "value2"));
+        Profile profile2 = createPomProfileWithProperties("profile2", "prop2", "value2", Map.of("prop1", "value1"));
 
         List<Profile> profiles = Arrays.asList(profile1, profile2);
 
@@ -284,9 +282,8 @@ public class DefaultProfileSelectorTest {
     @Test
     void testCascadingWithInactiveProfile() {
         // Create profiles where one would activate another, but the second is explicitly deactivated
-        Profile profile1 = createProfileWithProperties(
-                "profile1", "prop1", "value1", Map.of("prop2", "value2"), Profile.SOURCE_POM);
-        Profile profile2 = createProfile("profile2", "prop2", "value2", Profile.SOURCE_POM);
+        Profile profile1 = createPomProfileWithProperties("profile1", "prop1", "value1", Map.of("prop2", "value2"));
+        Profile profile2 = createPomProfile("profile2", "prop2", "value2");
 
         List<Profile> profiles = Arrays.asList(profile1, profile2);
 
@@ -318,11 +315,11 @@ public class DefaultProfileSelectorTest {
                 .id("default-on")
                 .activation(Activation.newBuilder().activeByDefault(true).build())
                 .properties(Map.of("prop2", "value2"))
+                .location("", newPomLocation())
                 .build();
-        defaultProfile.setSource(Profile.SOURCE_POM);
 
-        Profile cascadeTarget = createProfile("cascade-target", "prop2", "value2", Profile.SOURCE_POM);
-        Profile explicitProfile = createProfile("explicit", "trigger", "yes", Profile.SOURCE_POM);
+        Profile cascadeTarget = createPomProfile("cascade-target", "prop2", "value2");
+        Profile explicitProfile = createPomProfile("explicit", "trigger", "yes");
 
         List<Profile> profiles = Arrays.asList(defaultProfile, cascadeTarget, explicitProfile);
 
@@ -345,9 +342,9 @@ public class DefaultProfileSelectorTest {
     void testExplicitlyActivatedProfileDoesNotCascade() {
         // Reproduces the Windows CI failure: -Prun-its sets mavenHome as a profile property,
         // which must NOT cascade to activate maven-from-build (which activates on mavenHome).
-        Profile runIts = createProfileWithProperties(
-                "run-its", "nonexistent", "value", Map.of("mavenHome", "target/apache-maven"), Profile.SOURCE_POM);
-        Profile mavenFromBuild = createProfile("maven-from-build", "mavenHome", null, Profile.SOURCE_POM);
+        Profile runIts = createPomProfileWithProperties(
+                "run-its", "nonexistent", "value", Map.of("mavenHome", "target/apache-maven"));
+        Profile mavenFromBuild = createPomProfile("maven-from-build", "mavenHome", null);
 
         List<Profile> profiles = Arrays.asList(runIts, mavenFromBuild);
 
@@ -373,9 +370,9 @@ public class DefaultProfileSelectorTest {
     @Test
     void testCascadingWithRecordImmutability() {
         // Test that profile records remain immutable during cascading
-        Profile originalProfile1 = createProfileWithProperties(
-                "profile1", "prop1", "value1", Map.of("prop2", "value2"), Profile.SOURCE_POM);
-        Profile originalProfile2 = createProfile("profile2", "prop2", "value2", Profile.SOURCE_POM);
+        Profile originalProfile1 =
+                createPomProfileWithProperties("profile1", "prop1", "value1", Map.of("prop2", "value2"));
+        Profile originalProfile2 = createPomProfile("profile2", "prop2", "value2");
 
         List<Profile> profiles = Arrays.asList(originalProfile1, originalProfile2);
 
@@ -404,8 +401,7 @@ public class DefaultProfileSelectorTest {
         String existingDir = System.getProperty("java.io.tmpdir");
 
         // Profile 1: activates on trigger=yes, sets my.path to an existing directory
-        Profile profile1 = createProfileWithProperties(
-                "profile1", "trigger", "yes", Map.of("my.path", existingDir), Profile.SOURCE_POM);
+        Profile profile1 = createPomProfileWithProperties("profile1", "trigger", "yes", Map.of("my.path", existingDir));
 
         // Profile 2: activates on file existence using cascaded property
         Profile profile2 = Profile.newBuilder()
@@ -413,8 +409,8 @@ public class DefaultProfileSelectorTest {
                 .activation(Activation.newBuilder()
                         .file(ActivationFile.newBuilder().exists("${my.path}").build())
                         .build())
+                .location("", newPomLocation())
                 .build();
-        profile2.setSource(Profile.SOURCE_POM);
 
         List<Profile> profiles = Arrays.asList(profile1, profile2);
 
@@ -433,10 +429,173 @@ public class DefaultProfileSelectorTest {
         assertTrue(problems.getErrors().isEmpty());
     }
 
-    // Helper methods for creating test profiles
+    // ---- isFromPom() / activeByDefault: POM profiles (issue #2569) ----
 
-    private Profile createProfile(String id, String propName, String propValue, String source) {
-        Profile profile = Profile.newBuilder()
+    @Test
+    void testPomActiveByDefaultProfileIsActivatedWhenNoOtherPomProfileActive() {
+        Profile defaultProfile = newPomProfile("default", true);
+
+        List<Profile> active = selector.getActiveProfiles(
+                Collections.singletonList(defaultProfile), newContext(), new SimpleProblemCollector());
+
+        assertEquals(1, active.size());
+        assertEquals("default", active.get(0).getId());
+    }
+
+    @Test
+    void testPomActiveByDefaultProfileIsDeactivatedWhenAnotherPomProfileIsExplicitlyActive() {
+        Profile defaultProfile = newPomProfile("default", true);
+        Profile explicitProfile = newPomProfile("explicit", false);
+
+        List<Profile> active = selector.getActiveProfiles(
+                Arrays.asList(defaultProfile, explicitProfile),
+                newContext(Collections.singletonList("explicit")),
+                new SimpleProblemCollector());
+
+        assertEquals(1, active.size());
+        assertEquals("explicit", active.get(0).getId());
+    }
+
+    // ---- isFromPom() / activeByDefault: settings profiles (issue #2569) ----
+
+    @Test
+    void testSettingsActiveByDefaultProfileIsAlwaysActivated() {
+        Profile settingsDefault = newSettingsProfile("settings-default", true);
+
+        List<Profile> active = selector.getActiveProfiles(
+                Collections.singletonList(settingsDefault), newContext(), new SimpleProblemCollector());
+
+        assertEquals(1, active.size());
+        assertEquals("settings-default", active.get(0).getId());
+    }
+
+    @Test
+    void testSettingsActiveByDefaultProfileIsNotSuppressedByExplicitPomProfile() {
+        Profile settingsDefault = newSettingsProfile("settings-default", true);
+        Profile pomExplicit = newPomProfile("pom-explicit", false);
+
+        List<Profile> active = selector.getActiveProfiles(
+                Arrays.asList(settingsDefault, pomExplicit),
+                newContext(Collections.singletonList("pom-explicit")),
+                new SimpleProblemCollector());
+
+        assertEquals(2, active.size());
+        assertTrue(active.stream().anyMatch(p -> "settings-default".equals(p.getId())));
+        assertTrue(active.stream().anyMatch(p -> "pom-explicit".equals(p.getId())));
+    }
+
+    @Test
+    void testSettingsProfileWithNullModelIdTreatedAsNonPom() {
+        Profile settingsDefault = newSettingsProfileNullModelId("settings-null", true);
+        Profile pomExplicit = newPomProfile("pom-explicit", false);
+
+        List<Profile> active = selector.getActiveProfiles(
+                Arrays.asList(settingsDefault, pomExplicit),
+                newContext(Collections.singletonList("pom-explicit")),
+                new SimpleProblemCollector());
+
+        assertEquals(2, active.size());
+        assertTrue(active.stream().anyMatch(p -> "settings-null".equals(p.getId())));
+        assertTrue(active.stream().anyMatch(p -> "pom-explicit".equals(p.getId())));
+    }
+
+    // ---- mixed POM + settings profiles (issue #2569) ----
+
+    @Test
+    void testMixedPomAndSettingsActiveByDefault() {
+        Profile pomDefault = newPomProfile("pom-default", true);
+        Profile settingsDefault = newSettingsProfile("settings-default", true);
+
+        List<Profile> active = selector.getActiveProfiles(
+                Arrays.asList(pomDefault, settingsDefault), newContext(), new SimpleProblemCollector());
+
+        // Both should activate: POM default (no other POM profile active) + settings always
+        assertEquals(2, active.size());
+        assertTrue(active.stream().anyMatch(p -> "pom-default".equals(p.getId())));
+        assertTrue(active.stream().anyMatch(p -> "settings-default".equals(p.getId())));
+    }
+
+    @Test
+    void testExplicitPomProfileSuppressesPomDefaultButNotSettingsDefault() {
+        Profile pomDefault = newPomProfile("pom-default", true);
+        Profile pomExplicit = newPomProfile("pom-explicit", false);
+        Profile settingsDefault = newSettingsProfile("settings-default", true);
+
+        List<Profile> active = selector.getActiveProfiles(
+                Arrays.asList(pomDefault, pomExplicit, settingsDefault),
+                newContext(Collections.singletonList("pom-explicit")),
+                new SimpleProblemCollector());
+
+        // pom-default suppressed (another POM profile explicitly active), settings-default stays
+        assertEquals(2, active.size());
+        assertTrue(active.stream().anyMatch(p -> "pom-explicit".equals(p.getId())));
+        assertTrue(active.stream().anyMatch(p -> "settings-default".equals(p.getId())));
+    }
+
+    // ---- edge case: profile with no location info (issue #2569) ----
+
+    @Test
+    void testProfileWithNoLocationDefaultsToPom() {
+        Profile noLocation = newProfileNoLocation("no-location", true);
+        Profile pomExplicit = newPomProfile("pom-explicit", false);
+
+        List<Profile> active = selector.getActiveProfiles(
+                Arrays.asList(noLocation, pomExplicit),
+                newContext(Collections.singletonList("pom-explicit")),
+                new SimpleProblemCollector());
+
+        // no-location defaults to "from POM", so it should be suppressed
+        assertEquals(1, active.size());
+        assertEquals("pom-explicit", active.get(0).getId());
+    }
+
+    // ---- throwing activator ----
+
+    @Test
+    void testThrowingActivator() {
+        DefaultProfileSelector localSelector = new DefaultProfileSelector();
+        localSelector.addProfileActivator(new ProfileActivator() {
+            @Override
+            public boolean isActive(Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
+                throw new RuntimeException("BOOM");
+            }
+
+            @Override
+            public boolean presentInConfig(
+                    Profile profile, ProfileActivationContext context, ModelProblemCollector problems) {
+                return true;
+            }
+        });
+
+        List<Profile> profiles = Collections.singletonList(newPomProfile("one", false));
+        SimpleProblemCollector localProblems = new SimpleProblemCollector();
+        List<Profile> active = localSelector.getActiveProfiles(profiles, newContext(), localProblems);
+
+        assertTrue(active.isEmpty());
+        assertEquals(1, localProblems.getErrors().size());
+        assertEquals(
+                "Failed to determine activation for profile one: BOOM",
+                localProblems.getErrors().get(0));
+    }
+
+    // ---- Helper methods ----
+
+    /** Creates an InputLocation simulating a POM file origin (non-empty modelId). */
+    private InputLocation newPomLocation() {
+        return InputLocation.of(1, 1, InputSource.of("org.example:myproject:1.0", "pom.xml"));
+    }
+
+    /** Creates an InputLocation simulating a settings.xml origin (empty modelId). */
+    private InputLocation newSettingsLocation() {
+        return InputLocation.of(1, 1, InputSource.of("", "~/.m2/settings.xml"));
+    }
+
+    /**
+     * Creates a POM profile with property-based activation and a POM InputLocation
+     * so that {@link DefaultProfileSelector#isFromPom} returns {@code true}.
+     */
+    private Profile createPomProfile(String id, String propName, String propValue) {
+        return Profile.newBuilder()
                 .id(id)
                 .activation(Activation.newBuilder()
                         .property(ActivationProperty.newBuilder()
@@ -444,14 +603,33 @@ public class DefaultProfileSelectorTest {
                                 .value(propValue)
                                 .build())
                         .build())
+                .location("", newPomLocation())
                 .build();
-        profile.setSource(source);
-        return profile;
     }
 
-    private Profile createProfileWithProperties(
-            String id, String propName, String propValue, Map<String, String> profileProperties, String source) {
-        Profile profile = Profile.newBuilder()
+    /**
+     * Creates a settings profile with property-based activation and a settings InputLocation
+     * so that {@link DefaultProfileSelector#isFromPom} returns {@code false}.
+     */
+    private Profile createSettingsProfile(String id, String propName, String propValue) {
+        return Profile.newBuilder()
+                .id(id)
+                .activation(Activation.newBuilder()
+                        .property(ActivationProperty.newBuilder()
+                                .name(propName)
+                                .value(propValue)
+                                .build())
+                        .build())
+                .location("", newSettingsLocation())
+                .build();
+    }
+
+    /**
+     * Creates a POM profile with property-based activation, extra properties, and a POM InputLocation.
+     */
+    private Profile createPomProfileWithProperties(
+            String id, String propName, String propValue, Map<String, String> profileProperties) {
+        return Profile.newBuilder()
                 .id(id)
                 .activation(Activation.newBuilder()
                         .property(ActivationProperty.newBuilder()
@@ -460,17 +638,87 @@ public class DefaultProfileSelectorTest {
                                 .build())
                         .build())
                 .properties(profileProperties)
+                .location("", newPomLocation())
                 .build();
-        profile.setSource(source);
-        return profile;
     }
 
-    private Profile createActiveByDefaultProfile(String id, String source) {
-        Profile profile = Profile.newBuilder()
+    /**
+     * Creates a POM activeByDefault profile with a POM InputLocation.
+     */
+    private Profile createPomActiveByDefaultProfile(String id) {
+        return Profile.newBuilder()
                 .id(id)
                 .activation(Activation.newBuilder().activeByDefault(true).build())
+                .location("", newPomLocation())
                 .build();
-        profile.setSource(source);
-        return profile;
+    }
+
+    // ---- Helpers for isFromPom() / #2569 tests ----
+
+    /**
+     * Creates a POM profile with an InputSource that has a non-empty modelId,
+     * simulating a profile read from a POM file.
+     */
+    private Profile newPomProfile(String id, boolean activeByDefault) {
+        return Profile.newBuilder()
+                .id(id)
+                .activation(
+                        Activation.newBuilder().activeByDefault(activeByDefault).build())
+                .location("", newPomLocation())
+                .build();
+    }
+
+    /**
+     * Creates a settings profile with an InputSource that has an empty modelId,
+     * simulating a profile read from settings.xml (via SettingsUtilsV4.toLocation).
+     */
+    private Profile newSettingsProfile(String id, boolean activeByDefault) {
+        return Profile.newBuilder()
+                .id(id)
+                .activation(
+                        Activation.newBuilder().activeByDefault(activeByDefault).build())
+                .location("", newSettingsLocation())
+                .build();
+    }
+
+    /**
+     * Creates a settings profile with a null modelId in its InputSource,
+     * simulating a profile read from settings.xml before conversion.
+     */
+    private Profile newSettingsProfileNullModelId(String id, boolean activeByDefault) {
+        InputSource source = InputSource.of(null, "~/.m2/settings.xml");
+        InputLocation location = InputLocation.of(1, 1, source);
+        return Profile.newBuilder()
+                .id(id)
+                .activation(
+                        Activation.newBuilder().activeByDefault(activeByDefault).build())
+                .location("", location)
+                .build();
+    }
+
+    /**
+     * Creates a profile with no InputLocation at all.
+     */
+    private Profile newProfileNoLocation(String id, boolean activeByDefault) {
+        return Profile.newBuilder()
+                .id(id)
+                .activation(
+                        Activation.newBuilder().activeByDefault(activeByDefault).build())
+                .build();
+    }
+
+    private DefaultProfileActivationContext newContext() {
+        return new DefaultProfileActivationContext(new DefaultRootLocator(), new DefaultInterpolator());
+    }
+
+    private DefaultProfileActivationContext newContext(List<String> activeProfileIds) {
+        return new DefaultProfileActivationContext(
+                new DefaultRootLocator(),
+                new DefaultInterpolator(),
+                activeProfileIds,
+                Collections.emptyList(),
+                Collections.emptyMap(),
+                Collections.emptyMap(),
+                null);
     }
 }

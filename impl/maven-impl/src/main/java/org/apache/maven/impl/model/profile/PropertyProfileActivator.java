@@ -103,7 +103,7 @@ public class PropertyProfileActivator implements ProfileActivator {
         // Only cascaded properties (from previously-activated profiles) are checked — the
         // POM's own <properties> must NOT self-activate profiles via PropertyProfileActivator.
         // ONLY for POM profiles - settings profiles should not use cascaded properties.
-        if (sysValue == null && Profile.SOURCE_POM.equals(profile.getSource())) {
+        if (sysValue == null && isFromPom(profile)) {
             sysValue = context.getCascadedProfileProperty(name);
         }
 
@@ -160,5 +160,14 @@ public class PropertyProfileActivator implements ProfileActivator {
         ActivationProperty property = activation.getProperty();
 
         return property != null;
+    }
+
+    /**
+     * Determines whether the given profile originates from a POM file.
+     *
+     * @see ProfileSourceDetector#isFromPom(Profile)
+     */
+    private boolean isFromPom(Profile profile) {
+        return ProfileSourceDetector.isFromPom(profile);
     }
 }
