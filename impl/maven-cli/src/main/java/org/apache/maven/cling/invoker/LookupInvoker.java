@@ -77,7 +77,6 @@ import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.SettingsUtilsV4;
-import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.logging.AsyncDrainWriter;
 import org.apache.maven.logging.BuildEventListener;
@@ -90,6 +89,7 @@ import org.codehaus.plexus.PlexusContainer;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.AbstractPosixTerminal;
+import org.jline.terminal.impl.DeferredTerminal;
 import org.jline.terminal.spi.TerminalExt;
 import org.jline.utils.OSUtils;
 import org.slf4j.LoggerFactory;
@@ -170,13 +170,19 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected int doInvoke(C context) throws Exception {
+        createTerminal(context);
         validate(context);
         pushCoreProperties(context);
         pushUserProperties(context);
         setupGuiceClassLoading(context);
         configureLogging(context);
-        createTerminal(context);
         activateLogging(context);
+        // doConfigureWithTerminal wraps System.out with LoggingOutputStream, so it
+        // must run AFTER activateLogging() caches the original System.out. Otherwise
+        // the logger would resolve the wrapped stream on each write → infinite loop.
+        // awaitTerminalInitialization() blocks until the background build completes.
+        MessageUtils.awaitTerminalInitialization();
+        doConfigureWithTerminal(context, context.terminal);
         helpOrVersionAndMayExit(context);
         preCommands(context);
         container(context);
@@ -335,24 +341,41 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected final void createTerminal(C context) {
         if (context.terminal == null) {
-            // Create the build log appender; also sets MavenSimpleLogger sink
-            ProjectBuildLogAppender projectBuildLogAppender =
-                    new ProjectBuildLogAppender(determineBuildEventListener(context));
-            context.closeables.add(projectBuildLogAppender);
-
-            MessageUtils.systemInstall(builder -> doCreateTerminal(context, builder), terminal -> {
-                if (OSUtils.IS_WINDOWS && !context.invokerRequest.embedded()) {
-                    // JLine may consume Ctrl+C as terminal input, bypassing the JVM's shutdown hooks.
-                    terminal.handle(Terminal.Signal.INT, signal -> System.exit(SIGINT_EXIT_CODE));
+            if (context.invokerRequest.embedded()) {
+                // Embedded mode: build terminal synchronously (fast with custom streams).
+                // buildDeferred() only supports system terminals, and embedded mode is
+                // fast anyway (no FFM/JNI provider probing with custom streams).
+                // doConfigureWithTerminal() is NOT called here; doInvoke() calls it
+                // explicitly after configureLogging() so context.loggerFactory is set.
+                try {
+                    TerminalBuilder builder =
+                            TerminalBuilder.builder().name("Maven").dumb(true);
+                    doCreateTerminal(context, builder);
+                    Terminal terminal = builder.build();
+                    MessageUtils.systemInstall(terminal);
+                } catch (IOException e) {
+                    throw new InvokerException("Failed to create terminal", e);
                 }
-                doConfigureWithTerminal(context, terminal);
-            });
+            } else {
+                // Start the background terminal build.  doConfigureWithTerminal is intentionally
+                // NOT called here — the onComplete callback runs on the background build thread
+                // before configureLogging() has set context.loggerFactory.  Instead, the main
+                // thread calls doConfigureWithTerminal() explicitly after configureLogging()
+                // (see doInvoke).
+                MessageUtils.systemInstall(builder -> doCreateTerminal(context, builder), terminal -> {
+                    if (OSUtils.IS_WINDOWS) {
+                        // JLine may consume Ctrl+C as terminal input, bypassing the JVM's shutdown hooks.
+                        terminal.handle(Terminal.Signal.INT, signal -> System.exit(SIGINT_EXIT_CODE));
+                    }
+                });
+            }
 
             context.terminal = MessageUtils.getTerminal();
             context.closeables.add(MessageUtils::systemUninstall);
             MessageUtils.registerShutdownHook(); // safety belt
         } else {
-            doConfigureWithTerminal(context, context.terminal);
+            // context.terminal is pre-set; doConfigureWithTerminal will be called
+            // by doInvoke() after configureLogging() (see note in doInvoke).
         }
     }
 
@@ -393,7 +416,11 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         // quiet mode implies raw streams — plugins that write to System.out (e.g. help:evaluate
         // -DforceStdout) must not be decorated with "[INFO] [stdout]" prefix, otherwise scripting
         // use cases like $(mvn -q help:evaluate ...) break (see GH-12730)
-        if (context.options().rawStreams().orElse(false)
+        // Embedded mode also uses raw streams — the caller provides its own streams and
+        // doesn't need the "[stdout]" prefix wrapping. More importantly, the wrapping
+        // creates a circular logging loop (StackOverflowError) when logSink is null.
+        if (context.invokerRequest.embedded()
+                || context.options().rawStreams().orElse(false)
                 || context.options().quiet().orElse(false)) {
             doConfigureWithTerminalWithRawStreamsEnabled(context);
         } else {
@@ -529,8 +556,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         if (terminal == null) {
             return null;
         }
-        if (terminal instanceof FastTerminal ft) {
-            terminal = ft.getTerminal();
+        if (terminal instanceof DeferredTerminal dt) {
+            terminal = dt.getTerminal();
         }
         List<String> subs = new ArrayList<>();
         subs.add("type=" + terminal.getType());
