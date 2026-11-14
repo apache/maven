@@ -81,8 +81,9 @@ public class MessageUtils {
                 if (terminalConsumer != null) {
                     terminalConsumer.accept(terminal);
                 }
-            } finally {
                 ready.complete(null);
+            } catch (Throwable t) {
+                ready.completeExceptionally(t);
             }
         });
         MessageUtils.terminal = deferred;
