@@ -2034,6 +2034,594 @@ class DefaultModelBuilderTest {
                 "org.apache.maven.test:profile-parent:1.0.0", warnings.get(0).getModelId());
     }
 
+    private Session setupTestBomSession(Path basedir, String repoName) throws Exception {
+        Path remoteRepoPath = basedir.resolve("target/remote-repo-" + repoName);
+        Path bomDir = remoteRepoPath.resolve("org/apache/maven/its/test-bom/1.0");
+        Files.createDirectories(bomDir);
+
+        String bomPom = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>test-bom</artifactId>
+                  <version>1.0</version>
+                  <packaging>pom</packaging>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.springframework.boot</groupId>
+                        <artifactId>spring-boot</artifactId>
+                        <version>3.0.0</version>
+                      </dependency>
+                      <dependency>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-core</artifactId>
+                        <version>6.0.0</version>
+                      </dependency>
+                      <dependency>
+                        <groupId>org.springframework</groupId>
+                        <artifactId>spring-web</artifactId>
+                        <version>6.0.0</version>
+                      </dependency>
+                      <dependency>
+                        <groupId>com.fasterxml.jackson.core</groupId>
+                        <artifactId>jackson-databind</artifactId>
+                        <version>2.15.0</version>
+                      </dependency>
+                      <dependency>
+                        <groupId>ch.qos.logback</groupId>
+                        <artifactId>logback-classic</artifactId>
+                        <version>1.4.0</version>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                </project>
+                """;
+        Files.writeString(bomDir.resolve("test-bom-1.0.pom"), bomPom);
+
+        Path localRepoPath = basedir.resolve("target/local-repo-" + repoName);
+        Session testSession = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this), localRepoPath);
+        RemoteRepository remoteRepository = testSession.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
+        return testSession.withRemoteRepositories(List.of(remoteRepository));
+    }
+
+    @Test
+    public void testDependencyManagementImportWithIncludes() throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Session testSession = setupTestBomSession(basedir, "includes-1");
+        ModelBuilder testBuilder = testSession.getService(ModelBuilder.class);
+
+        Path projectPom = basedir.resolve("target/project-import-includes-1.xml");
+        String pomContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.2.0">
+                  <modelVersion>4.2.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>consumer-project-1</artifactId>
+                  <version>1.0</version>
+                  <packaging>pom</packaging>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>test-bom</artifactId>
+                        <version>1.0</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                        <includes>
+                          <include>
+                            <groupId>org.springframework*</groupId>
+                          </include>
+                        </includes>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                </project>
+                """;
+        Files.writeString(projectPom, pomContent);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(testSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(projectPom))
+                .build();
+        ModelBuilderResult result = testBuilder.newSession().build(request);
+        assertNotNull(result);
+        List<Dependency> deps =
+                result.getEffectiveModel().getDependencyManagement().getDependencies();
+        Set<String> keys =
+                deps.stream().map(d -> d.getGroupId() + ":" + d.getArtifactId()).collect(Collectors.toSet());
+        assertEquals(3, keys.size());
+        assertTrue(keys.contains("org.springframework.boot:spring-boot"));
+        assertTrue(keys.contains("org.springframework:spring-core"));
+        assertTrue(keys.contains("org.springframework:spring-web"));
+        assertFalse(keys.contains("com.fasterxml.jackson.core:jackson-databind"));
+        assertFalse(keys.contains("ch.qos.logback:logback-classic"));
+    }
+
+    @Test
+    public void testDependencyManagementImportWithIncludesAndExclusions() throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Session testSession = setupTestBomSession(basedir, "includes-2");
+        ModelBuilder testBuilder = testSession.getService(ModelBuilder.class);
+
+        Path projectPom = basedir.resolve("target/project-import-includes-2.xml");
+        String pomContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.2.0">
+                  <modelVersion>4.2.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>consumer-project-2</artifactId>
+                  <version>1.0</version>
+                  <packaging>pom</packaging>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>test-bom</artifactId>
+                        <version>1.0</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                        <includes>
+                          <include>
+                            <groupId>org.springframework*</groupId>
+                          </include>
+                        </includes>
+                        <exclusions>
+                          <exclusion>
+                            <groupId>org.springframework</groupId>
+                            <artifactId>spring-web</artifactId>
+                          </exclusion>
+                        </exclusions>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                </project>
+                """;
+        Files.writeString(projectPom, pomContent);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(testSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(projectPom))
+                .build();
+        ModelBuilderResult result = testBuilder.newSession().build(request);
+        assertNotNull(result);
+        List<Dependency> deps =
+                result.getEffectiveModel().getDependencyManagement().getDependencies();
+        Set<String> keys =
+                deps.stream().map(d -> d.getGroupId() + ":" + d.getArtifactId()).collect(Collectors.toSet());
+        assertEquals(2, keys.size());
+        assertTrue(keys.contains("org.springframework.boot:spring-boot"));
+        assertTrue(keys.contains("org.springframework:spring-core"));
+        assertFalse(keys.contains("org.springframework:spring-web"));
+    }
+
+    @Test
+    public void testDependencyManagementImportWithExclusionWildcardPattern() throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Session testSession = setupTestBomSession(basedir, "exclusion-wildcard");
+        ModelBuilder testBuilder = testSession.getService(ModelBuilder.class);
+
+        Path projectPom = basedir.resolve("target/project-import-exclusion-wildcard.xml");
+        String pomContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.2.0">
+                  <modelVersion>4.2.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>consumer-project-exclusion-wildcard</artifactId>
+                  <version>1.0</version>
+                  <packaging>pom</packaging>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>test-bom</artifactId>
+                        <version>1.0</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                        <exclusions>
+                          <exclusion>
+                            <groupId>org.springframework*</groupId>
+                            <artifactId>*-web</artifactId>
+                          </exclusion>
+                        </exclusions>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                </project>
+                """;
+        Files.writeString(projectPom, pomContent);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(testSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(projectPom))
+                .build();
+        ModelBuilderResult result = testBuilder.newSession().build(request);
+        assertNotNull(result);
+        List<Dependency> deps =
+                result.getEffectiveModel().getDependencyManagement().getDependencies();
+        Set<String> keys =
+                deps.stream().map(d -> d.getGroupId() + ":" + d.getArtifactId()).collect(Collectors.toSet());
+        assertEquals(4, keys.size());
+        assertFalse(keys.contains("org.springframework:spring-web"));
+        assertTrue(keys.contains("org.springframework:spring-core"));
+        assertTrue(keys.contains("org.springframework.boot:spring-boot"));
+        assertTrue(keys.contains("com.fasterxml.jackson.core:jackson-databind"));
+        assertTrue(keys.contains("ch.qos.logback:logback-classic"));
+    }
+
+    @Test
+    public void testDependencyManagementImportWithIncludesArtifactPattern() throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Session testSession = setupTestBomSession(basedir, "includes-3");
+        ModelBuilder testBuilder = testSession.getService(ModelBuilder.class);
+
+        Path projectPom = basedir.resolve("target/project-import-includes-3.xml");
+        String pomContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.2.0">
+                  <modelVersion>4.2.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>consumer-project-3</artifactId>
+                  <version>1.0</version>
+                  <packaging>pom</packaging>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>test-bom</artifactId>
+                        <version>1.0</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                        <includes>
+                          <include>
+                            <artifactId>*-core</artifactId>
+                          </include>
+                        </includes>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                </project>
+                """;
+        Files.writeString(projectPom, pomContent);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(testSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(projectPom))
+                .build();
+        ModelBuilderResult result = testBuilder.newSession().build(request);
+        assertNotNull(result);
+        List<Dependency> deps =
+                result.getEffectiveModel().getDependencyManagement().getDependencies();
+        Set<String> keys =
+                deps.stream().map(d -> d.getGroupId() + ":" + d.getArtifactId()).collect(Collectors.toSet());
+        assertEquals(1, keys.size());
+        assertTrue(keys.contains("org.springframework:spring-core"));
+    }
+
+    @Test
+    public void testDependencyManagementImportWithIncludesQuestionMarkPattern() throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Session testSession = setupTestBomSession(basedir, "includes-qm");
+        ModelBuilder testBuilder = testSession.getService(ModelBuilder.class);
+
+        Path projectPom = basedir.resolve("target/project-import-includes-qm.xml");
+        String pomContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.2.0">
+                  <modelVersion>4.2.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>consumer-project-qm</artifactId>
+                  <version>1.0</version>
+                  <packaging>pom</packaging>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>test-bom</artifactId>
+                        <version>1.0</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                        <includes>
+                          <include>
+                            <artifactId>spring-w?b</artifactId>
+                          </include>
+                        </includes>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                </project>
+                """;
+        Files.writeString(projectPom, pomContent);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(testSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(projectPom))
+                .build();
+        ModelBuilderResult result = testBuilder.newSession().build(request);
+        assertNotNull(result);
+        List<Dependency> deps =
+                result.getEffectiveModel().getDependencyManagement().getDependencies();
+        Set<String> keys =
+                deps.stream().map(d -> d.getGroupId() + ":" + d.getArtifactId()).collect(Collectors.toSet());
+        assertEquals(1, keys.size());
+        assertTrue(keys.contains("org.springframework:spring-web"));
+    }
+
+    @Test
+    public void testDependencyManagementImportWithIncludesOrSemantics() throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Session testSession = setupTestBomSession(basedir, "includes-or");
+        ModelBuilder testBuilder = testSession.getService(ModelBuilder.class);
+
+        Path projectPom = basedir.resolve("target/project-import-includes-or.xml");
+        String pomContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.2.0">
+                  <modelVersion>4.2.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>consumer-project-or</artifactId>
+                  <version>1.0</version>
+                  <packaging>pom</packaging>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>test-bom</artifactId>
+                        <version>1.0</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                        <includes>
+                          <include>
+                            <artifactId>spring-core</artifactId>
+                          </include>
+                          <include>
+                            <artifactId>jackson-databind</artifactId>
+                          </include>
+                        </includes>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                </project>
+                """;
+        Files.writeString(projectPom, pomContent);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(testSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(projectPom))
+                .build();
+        ModelBuilderResult result = testBuilder.newSession().build(request);
+        assertNotNull(result);
+        List<Dependency> deps =
+                result.getEffectiveModel().getDependencyManagement().getDependencies();
+        Set<String> keys =
+                deps.stream().map(d -> d.getGroupId() + ":" + d.getArtifactId()).collect(Collectors.toSet());
+        assertEquals(2, keys.size());
+        assertTrue(keys.contains("org.springframework:spring-core"));
+        assertTrue(keys.contains("com.fasterxml.jackson.core:jackson-databind"));
+    }
+
+    @Test
+    public void testDependencyManagementImportWithIncludesOmittedCoordinates() throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Session testSession = setupTestBomSession(basedir, "includes-omitted");
+        ModelBuilder testBuilder = testSession.getService(ModelBuilder.class);
+
+        Path projectPom = basedir.resolve("target/project-import-includes-omitted.xml");
+        String pomContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.2.0">
+                  <modelVersion>4.2.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>consumer-project-omitted</artifactId>
+                  <version>1.0</version>
+                  <packaging>pom</packaging>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>test-bom</artifactId>
+                        <version>1.0</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                        <includes>
+                          <include>
+                            <!-- omitted groupId matches any groupId -->
+                            <artifactId>jackson-databind</artifactId>
+                          </include>
+                          <include>
+                            <!-- omitted artifactId matches any artifactId -->
+                            <groupId>ch.qos.logback</groupId>
+                          </include>
+                        </includes>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                </project>
+                """;
+        Files.writeString(projectPom, pomContent);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(testSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(projectPom))
+                .build();
+        ModelBuilderResult result = testBuilder.newSession().build(request);
+        assertNotNull(result);
+        List<Dependency> deps =
+                result.getEffectiveModel().getDependencyManagement().getDependencies();
+        Set<String> keys =
+                deps.stream().map(d -> d.getGroupId() + ":" + d.getArtifactId()).collect(Collectors.toSet());
+        assertEquals(2, keys.size());
+        assertTrue(keys.contains("com.fasterxml.jackson.core:jackson-databind"));
+        assertTrue(keys.contains("ch.qos.logback:logback-classic"));
+    }
+
+    @Test
+    public void testDependencyManagementImportWithIncludesUnsupportedSyntaxTreatedAsLiteral() throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Session testSession = setupTestBomSession(basedir, "includes-literals");
+        ModelBuilder testBuilder = testSession.getService(ModelBuilder.class);
+
+        Path projectPom = basedir.resolve("target/project-import-includes-literals.xml");
+        String pomContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.2.0">
+                  <modelVersion>4.2.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>consumer-project-literals</artifactId>
+                  <version>1.0</version>
+                  <packaging>pom</packaging>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>test-bom</artifactId>
+                        <version>1.0</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                        <includes>
+                          <!-- Alternations and character ranges are treated as literal characters, not glob syntax -->
+                          <include>
+                            <artifactId>{spring-core,spring-web}</artifactId>
+                          </include>
+                          <include>
+                            <artifactId>[s]pring-core</artifactId>
+                          </include>
+                        </includes>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                </project>
+                """;
+        Files.writeString(projectPom, pomContent);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(testSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(projectPom))
+                .build();
+        ModelBuilderResult result = testBuilder.newSession().build(request);
+        assertNotNull(result);
+        List<Dependency> deps =
+                result.getEffectiveModel().getDependencyManagement().getDependencies();
+        assertTrue(deps.isEmpty(), "Literal alternations and character sets must not match: " + deps);
+    }
+
+    @Test
+    public void testDependencyManagementImportWithIncludesIdAttribute() throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Session testSession = setupTestBomSession(basedir, "includes-id");
+        ModelBuilder testBuilder = testSession.getService(ModelBuilder.class);
+
+        Path projectPom = basedir.resolve("target/project-import-includes-id.xml");
+        String pomContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.2.0">
+                  <modelVersion>4.2.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>consumer-project-id</artifactId>
+                  <version>1.0</version>
+                  <packaging>pom</packaging>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>test-bom</artifactId>
+                        <version>1.0</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                        <includes>
+                          <include id="org.springframework:*"/>
+                          <include id="com.fasterxml.jackson.core:jackson-databind"/>
+                        </includes>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                </project>
+                """;
+        Files.writeString(projectPom, pomContent);
+
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(testSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(projectPom))
+                .build();
+        ModelBuilderResult result = testBuilder.newSession().build(request);
+        assertNotNull(result);
+        List<Dependency> deps =
+                result.getEffectiveModel().getDependencyManagement().getDependencies();
+        Set<String> keys =
+                deps.stream().map(d -> d.getGroupId() + ":" + d.getArtifactId()).collect(Collectors.toSet());
+        assertEquals(3, keys.size());
+        assertTrue(keys.contains("org.springframework:spring-core"));
+        assertTrue(keys.contains("org.springframework:spring-web"));
+        assertTrue(keys.contains("com.fasterxml.jackson.core:jackson-databind"));
+        assertFalse(keys.contains("org.springframework.boot:spring-boot"));
+    }
+
+    @Test
+    public void testPatternMatchingAndBoundedCacheConcurrency() throws Exception {
+        DefaultModelBuilder defaultModelBuilder = (DefaultModelBuilder) builder;
+
+        // Basic wildcard matching
+        assertTrue(defaultModelBuilder.match("org.springframework*", "org.springframework.boot"));
+        assertTrue(defaultModelBuilder.match("*-core", "spring-core"));
+        assertTrue(defaultModelBuilder.match("spring-???", "spring-web"));
+        assertTrue(defaultModelBuilder.match("spring-co?e", "spring-core"));
+
+        // Literal handling of unsupported syntax
+        assertFalse(defaultModelBuilder.match("{a,b}", "a"));
+        assertFalse(defaultModelBuilder.match("[a-z]", "a"));
+        assertTrue(defaultModelBuilder.match("{a,b}", "{a,b}"));
+        assertTrue(defaultModelBuilder.match("[a-z]", "[a-z]"));
+
+        // Exact match short-circuits without cache
+        assertTrue(defaultModelBuilder.match("exact-string", "exact-string"));
+        assertFalse(defaultModelBuilder.match("exact-string", "other-string"));
+
+        // Concurrent access and bounded cache size test
+        int threads = 8;
+        int iterations = 200;
+        java.util.concurrent.ExecutorService executor = java.util.concurrent.Executors.newFixedThreadPool(threads);
+        java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(threads);
+        List<java.util.concurrent.Future<?>> futures = new ArrayList<>();
+
+        for (int t = 0; t < threads; t++) {
+            final int threadId = t;
+            futures.add(executor.submit(() -> {
+                try {
+                    for (int i = 0; i < iterations; i++) {
+                        String pattern = "test-pattern-" + ((threadId * 100 + i) % 1500) + "-*";
+                        String text = "test-pattern-" + ((threadId * 100 + i) % 1500) + "-match";
+                        assertTrue(defaultModelBuilder.match(pattern, text));
+                    }
+                } finally {
+                    latch.countDown();
+                }
+            }));
+        }
+
+        latch.await();
+        for (java.util.concurrent.Future<?> f : futures) {
+            f.get();
+        }
+        executor.shutdown();
+
+        assertTrue(
+                defaultModelBuilder.patternCache.size() <= DefaultModelBuilder.MAX_PATTERN_CACHE_SIZE,
+                "Cache size " + defaultModelBuilder.patternCache.size() + " must be <= "
+                        + DefaultModelBuilder.MAX_PATTERN_CACHE_SIZE);
+    }
+
     private List<ModelProblem> bomImportWarnings(ModelBuilderResult result) {
         return results(result)
                 .flatMap(r -> r.getProblemCollector().problems())

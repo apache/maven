@@ -56,6 +56,7 @@ import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Exclusion;
 import org.apache.maven.api.model.Extension;
+import org.apache.maven.api.model.Inclusion;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputLocationTracker;
 import org.apache.maven.api.model.Model;
@@ -500,6 +501,8 @@ public class DefaultModelValidator implements ModelValidator {
             }
 
             boolean isModelVersion41OrMore = !Objects.equals(ModelBuilder.MODEL_VERSION_4_0_0, model.getModelVersion());
+            boolean isModelVersion42OrMore =
+                    model.getModelVersion() != null && compareModelVersions("4.2.0", model.getModelVersion()) <= 0;
             if (isModelVersion41OrMore) {
                 validateStringNoExpression("groupId", problems, Severity.FATAL, Version.V41, model.getGroupId(), model);
 
@@ -547,6 +550,7 @@ public class DefaultModelValidator implements ModelValidator {
                     "dependencies.dependency.",
                     EMPTY,
                     isModelVersion41OrMore,
+                    isModelVersion42OrMore,
                     validationLevel);
 
             validate20RawDependenciesSelfReferencing(
@@ -559,6 +563,7 @@ public class DefaultModelValidator implements ModelValidator {
                         "dependencyManagement.dependencies.dependency.",
                         EMPTY,
                         isModelVersion41OrMore,
+                        isModelVersion42OrMore,
                         validationLevel);
             }
 
@@ -603,6 +608,7 @@ public class DefaultModelValidator implements ModelValidator {
                         prefix,
                         "dependencies.dependency.",
                         isModelVersion41OrMore,
+                        isModelVersion42OrMore,
                         validationLevel);
 
                 if (profile.getDependencyManagement() != null) {
@@ -612,6 +618,7 @@ public class DefaultModelValidator implements ModelValidator {
                             prefix,
                             "dependencyManagement.dependencies.dependency.",
                             isModelVersion41OrMore,
+                            isModelVersion42OrMore,
                             validationLevel);
                 }
 
@@ -1183,6 +1190,7 @@ public class DefaultModelValidator implements ModelValidator {
             String prefix,
             String prefix2,
             boolean is41OrBeyond,
+            boolean is42OrBeyond,
             int validationLevel) {
         Severity errOn30 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_0);
         Severity errOn31 = getSeverity(validationLevel, ModelValidator.VALIDATION_LEVEL_MAVEN_3_1);
@@ -1269,6 +1277,29 @@ public class DefaultModelValidator implements ModelValidator {
                                     + "use modelVersion 4.1.0 or remove this scope.",
                             dependency);
                 }
+            }
+
+            if (!is42OrBeyond && !dependency.getIncludes().isEmpty()) {
+                addViolation(
+                        problems,
+                        Severity.ERROR,
+                        Version.V42,
+                        prefix + prefix2 + "includes",
+                        SourceHint.dependencyManagementKey(dependency),
+                        "'includes' is only supported with modelVersion 4.2.0 or higher; "
+                                + "use modelVersion 4.2.0 or remove 'includes'.",
+                        dependency);
+            }
+
+            if (!dependency.getIncludes().isEmpty() && !"import".equals(dependency.getScope())) {
+                addViolation(
+                        problems,
+                        Severity.ERROR,
+                        Version.V42,
+                        prefix + prefix2 + "includes",
+                        SourceHint.dependencyManagementKey(dependency),
+                        "'includes' is only supported for dependency management imports (scope 'import').",
+                        dependency);
             }
 
             if (equals("LATEST", dependency.getVersion()) || equals("RELEASE", dependency.getVersion())) {
@@ -1571,48 +1602,151 @@ public class DefaultModelValidator implements ModelValidator {
         }
 
         if (validationLevel >= ModelValidator.VALIDATION_LEVEL_MAVEN_2_0) {
-            for (Exclusion exclusion : dependency.getExclusions()) {
-                if (validationLevel < ModelValidator.VALIDATION_LEVEL_MAVEN_3_0) {
-                    validateCoordinatesId(
-                            prefix,
-                            "exclusions.exclusion.groupId",
-                            problems,
-                            Severity.WARNING,
-                            Version.V20,
-                            exclusion.getGroupId(),
-                            SourceHint.dependencyManagementKey(dependency),
-                            exclusion);
+            validateDependencyExclusions(problems, dependency, prefix, validationLevel);
+            validateDependencyInclusions(problems, dependency, prefix);
+        }
+    }
 
-                    validateCoordinatesId(
-                            prefix,
-                            "exclusions.exclusion.artifactId",
+    private void validateDependencyExclusions(
+            ModelProblemCollector problems, Dependency dependency, String prefix, int validationLevel) {
+        for (Exclusion exclusion : dependency.getExclusions()) {
+            if (validationLevel < ModelValidator.VALIDATION_LEVEL_MAVEN_3_0) {
+                validateCoordinatesId(
+                        prefix,
+                        "exclusions.exclusion.groupId",
+                        problems,
+                        Severity.WARNING,
+                        Version.V20,
+                        exclusion.getGroupId(),
+                        SourceHint.dependencyManagementKey(dependency),
+                        exclusion);
+
+                validateCoordinatesId(
+                        prefix,
+                        "exclusions.exclusion.artifactId",
+                        problems,
+                        Severity.WARNING,
+                        Version.V20,
+                        exclusion.getArtifactId(),
+                        SourceHint.dependencyManagementKey(dependency),
+                        exclusion);
+            } else {
+                validateCoordinatesIdWithWildcards(
+                        prefix,
+                        "exclusions.exclusion.groupId",
+                        problems,
+                        Severity.WARNING,
+                        Version.V30,
+                        exclusion.getGroupId(),
+                        SourceHint.dependencyManagementKey(dependency),
+                        exclusion);
+
+                validateCoordinatesIdWithWildcards(
+                        prefix,
+                        "exclusions.exclusion.artifactId",
+                        problems,
+                        Severity.WARNING,
+                        Version.V30,
+                        exclusion.getArtifactId(),
+                        SourceHint.dependencyManagementKey(dependency),
+                        exclusion);
+            }
+        }
+    }
+
+    private void validateDependencyInclusions(ModelProblemCollector problems, Dependency dependency, String prefix) {
+        for (Inclusion inclusion : dependency.getIncludes()) {
+            String groupId = inclusion.getGroupId();
+            String artifactId = inclusion.getArtifactId();
+            String id = inclusion.getId();
+
+            boolean validId = true;
+            if (id != null && !id.isEmpty()) {
+                int colonIdx = id.indexOf(':');
+                if (colonIdx < 0) {
+                    validId = false;
+                    addViolation(
                             problems,
-                            Severity.WARNING,
-                            Version.V20,
-                            exclusion.getArtifactId(),
+                            Severity.ERROR,
+                            Version.V42,
+                            prefix + "includes.include.id",
                             SourceHint.dependencyManagementKey(dependency),
-                            exclusion);
+                            "with value '" + id + "' does not match the expected 'groupId:artifactId' format.",
+                            inclusion);
+                } else if (id.indexOf(':', colonIdx + 1) >= 0) {
+                    validId = false;
+                    addViolation(
+                            problems,
+                            Severity.ERROR,
+                            Version.V42,
+                            prefix + "includes.include.id",
+                            SourceHint.dependencyManagementKey(dependency),
+                            "with value '" + id
+                                    + "' contains more than one colon; expected 'groupId:artifactId' format.",
+                            inclusion);
                 } else {
-                    validateCoordinatesIdWithWildcards(
-                            prefix,
-                            "exclusions.exclusion.groupId",
-                            problems,
-                            Severity.WARNING,
-                            Version.V30,
-                            exclusion.getGroupId(),
-                            SourceHint.dependencyManagementKey(dependency),
-                            exclusion);
+                    String parsedGroupId = id.substring(0, colonIdx);
+                    String parsedArtifactId = id.substring(colonIdx + 1);
 
-                    validateCoordinatesIdWithWildcards(
-                            prefix,
-                            "exclusions.exclusion.artifactId",
-                            problems,
-                            Severity.WARNING,
-                            Version.V30,
-                            exclusion.getArtifactId(),
-                            SourceHint.dependencyManagementKey(dependency),
-                            exclusion);
+                    if (parsedGroupId.isEmpty() || parsedArtifactId.isEmpty()) {
+                        validId = false;
+                        addViolation(
+                                problems,
+                                Severity.ERROR,
+                                Version.V42,
+                                prefix + "includes.include.id",
+                                SourceHint.dependencyManagementKey(dependency),
+                                "with value '" + id
+                                        + "' has an empty groupId or artifactId segment; expected 'groupId:artifactId' format.",
+                                inclusion);
+                    } else {
+                        if (groupId == null || groupId.isEmpty()) {
+                            groupId = parsedGroupId;
+                        }
+                        if (artifactId == null || artifactId.isEmpty()) {
+                            artifactId = parsedArtifactId;
+                        }
+                    }
                 }
+            }
+
+            if (!validId) {
+                continue;
+            }
+
+            boolean emptyOrWildcardGroupId = groupId == null || groupId.isEmpty() || "*".equals(groupId);
+            boolean emptyOrWildcardArtifactId = artifactId == null || artifactId.isEmpty() || "*".equals(artifactId);
+            if (emptyOrWildcardGroupId && emptyOrWildcardArtifactId) {
+                addViolation(
+                        problems,
+                        Severity.WARNING,
+                        Version.V42,
+                        prefix + "includes.include",
+                        SourceHint.dependencyManagementKey(dependency),
+                        "must specify at least groupId or artifactId.",
+                        inclusion);
+            }
+            if (groupId != null && !groupId.isEmpty()) {
+                validateCoordinatesIdWithWildcards(
+                        prefix,
+                        "includes.include.groupId",
+                        problems,
+                        Severity.WARNING,
+                        Version.V42,
+                        groupId,
+                        SourceHint.dependencyManagementKey(dependency),
+                        inclusion);
+            }
+            if (artifactId != null && !artifactId.isEmpty()) {
+                validateCoordinatesIdWithWildcards(
+                        prefix,
+                        "includes.include.artifactId",
+                        problems,
+                        Severity.WARNING,
+                        Version.V42,
+                        artifactId,
+                        SourceHint.dependencyManagementKey(dependency),
+                        inclusion);
             }
         }
     }

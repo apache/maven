@@ -26,6 +26,7 @@ import java.nio.file.Paths;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -43,6 +44,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.BiFunction;
 import java.util.function.Supplier;
 import java.util.function.UnaryOperator;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -66,6 +68,7 @@ import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.DeploymentRepository;
 import org.apache.maven.api.model.DistributionManagement;
 import org.apache.maven.api.model.Exclusion;
+import org.apache.maven.api.model.Inclusion;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.Mixin;
 import org.apache.maven.api.model.Model;
@@ -2835,15 +2838,22 @@ public class DefaultModelBuilder implements ModelBuilder {
                 importMgmt = DependencyManagement.newInstance();
             }
 
+            // [MNG-7949] Dependency management import should support explicit inclusion.
+            List<Inclusion> includes = dependency.getIncludes();
             // [MNG-5600] Dependency management import should support exclusions.
             List<Exclusion> exclusions = dependency.getExclusions();
-            if (importMgmt != null && !exclusions.isEmpty()) {
-                // Dependency excluded from import.
-                List<Dependency> dependencies = importMgmt.getDependencies().stream()
-                        .filter(candidate -> exclusions.stream().noneMatch(exclusion -> match(exclusion, candidate)))
-                        .map(candidate -> addExclusions(candidate, exclusions))
-                        .collect(Collectors.toList());
-                importMgmt = importMgmt.withDependencies(dependencies);
+            if (importMgmt != null && (!includes.isEmpty() || !exclusions.isEmpty())) {
+                Stream<Dependency> stream = importMgmt.getDependencies().stream();
+                if (!includes.isEmpty()) {
+                    stream = stream.filter(
+                            candidate -> includes.stream().anyMatch(inclusion -> match(inclusion, candidate)));
+                }
+                if (!exclusions.isEmpty()) {
+                    stream = stream.filter(candidate ->
+                                    exclusions.stream().noneMatch(exclusion -> match(exclusion, candidate)))
+                            .map(candidate -> addExclusions(candidate, exclusions));
+                }
+                importMgmt = importMgmt.withDependencies(stream.collect(Collectors.toList()));
             }
 
             return DependencyManagement.newBuilder(importMgmt, true)
@@ -3290,13 +3300,108 @@ public class DefaultModelBuilder implements ModelBuilder {
                 .toList());
     }
 
+    static final int MAX_PATTERN_CACHE_SIZE = 1000;
+
+    /**
+     * Bounded LRU cache for compiled regex patterns from glob expressions used in BOM inclusion/exclusion matching.
+     * Prevents unbounded memory growth in long-running Maven daemon sessions while maintaining thread safety.
+     */
+    final Map<String, Pattern> patternCache =
+            Collections.synchronizedMap(new LinkedHashMap<String, Pattern>(16, 0.75f, true) {
+                @Override
+                protected boolean removeEldestEntry(Map.Entry<String, Pattern> eldest) {
+                    return size() > MAX_PATTERN_CACHE_SIZE;
+                }
+            });
+
+    /**
+     * Matches a candidate dependency against an {@link Inclusion} specification.
+     * Both groupId and artifactId support simple glob patterns ('*' and '?').
+     * Coordinates can be specified via {@code groupId} and {@code artifactId}
+     * or via the compact {@code id} attribute ('groupId:artifactId').
+     */
+    private boolean match(Inclusion inclusion, Dependency candidate) {
+        String groupId = InclusionCoordinates.getGroupId(inclusion);
+        String artifactId = InclusionCoordinates.getArtifactId(inclusion);
+        return match(groupId, candidate.getGroupId()) && match(artifactId, candidate.getArtifactId());
+    }
+
+    /**
+     * Matches a candidate dependency against an {@link Exclusion} specification.
+     * Both groupId and artifactId support simple glob patterns ('*' and '?').
+     * Note: In earlier Maven versions, exclusions only supported literal '*' or exact equality.
+     * In Maven 4, glob patterns are supported on exclusions as documented in the model specification.
+     */
     private boolean match(Exclusion exclusion, Dependency candidate) {
         return match(exclusion.getGroupId(), candidate.getGroupId())
                 && match(exclusion.getArtifactId(), candidate.getArtifactId());
     }
 
-    private boolean match(String match, String text) {
-        return match.equals("*") || match.equals(text);
+    /**
+     * Matches a candidate text against a glob pattern.
+     * Supported wildcards:
+     * <ul>
+     *   <li>{@code *} matches any sequence of characters (including empty).</li>
+     *   <li>{@code ?} matches exactly one character.</li>
+     * </ul>
+     * Character classes (e.g. {@code [a-z]}) and alternation groups (e.g. {@code {x,y}})
+     * are treated as literal characters.
+     *
+     * @param pattern the glob pattern, or {@code null}/empty/{@code "*"} to match any text
+     * @param text the candidate text to test
+     * @return {@code true} if the text matches the pattern, {@code false} otherwise
+     */
+    boolean match(String pattern, String text) {
+        if (pattern == null || pattern.isEmpty() || "*".equals(pattern)) {
+            return true;
+        }
+        if (text == null) {
+            return false;
+        }
+        if (pattern.equals(text)) {
+            return true;
+        }
+        if (!pattern.contains("*") && !pattern.contains("?")) {
+            return false;
+        }
+        return patternCache
+                .computeIfAbsent(pattern, DefaultModelBuilder::compilePattern)
+                .matcher(text)
+                .matches();
+    }
+
+    private static Pattern compilePattern(String pattern) {
+        StringBuilder regex = new StringBuilder("^");
+        for (int i = 0; i < pattern.length(); i++) {
+            char c = pattern.charAt(i);
+            switch (c) {
+                case '*':
+                    regex.append(".*");
+                    break;
+                case '?':
+                    regex.append(".");
+                    break;
+                case '.':
+                case '$':
+                case '^':
+                case '{':
+                case '}':
+                case '[':
+                case ']':
+                case '(':
+                case ')':
+                case '+':
+                case '|':
+                case '\\':
+                    regex.append('\\').append(c);
+                    break;
+                default:
+                    regex.append(c);
+                    break;
+            }
+        }
+        regex.append("$");
+        return Pattern.compile(regex.toString());
     }
 
     private boolean containsCoordinates(String message, String groupId, String artifactId, String version) {
