@@ -25,20 +25,20 @@ import java.util.List;
  * Quote-aware argument tokenizer for the shorthand form of {@code <options>} and {@code <alias>} elements
  * in {@code settings.xml}.
  *
- * <p>The algorithm is identical to {@code JvmConfigParser.parseArguments()} (the single-file source launcher
- * used by shell scripts to parse {@code .mvn/jvm.config}):</p>
+ * <p>Tokenization follows these rules:</p>
  * <ul>
  *   <li>Whitespace is the delimiter outside quotes.</li>
  *   <li>{@code "..."} and {@code '...'} are both supported — quotes are stripped, content is kept as a
- *       single token.</li>
+ *       single token, including an empty argument when the quotes contain no text.</li>
  *   <li>Outside single-quotes, a backslash ({@code \}) escapes the next character literally
  *       (e.g. {@code \"} → {@code "}, {@code \\} → {@code \}, {@code \ } → a literal space).
  *       Inside single-quotes, backslash has no special meaning.</li>
  * </ul>
  *
  * <p><strong>Note:</strong> {@code JvmConfigParser.java} is a self-contained single-file source launcher
- * invoked directly by shell scripts; it must not share classpath code with Maven. This class is an
- * independent re-implementation of the same algorithm for use within Maven's Java classpath.</p>
+ * invoked directly by shell scripts; it must not share classpath code with Maven. This class provides
+ * tokenization within Maven's Java classpath and preserves quoted empty arguments, which the launcher
+ * parser omits.</p>
  *
  * @since 4.2.0
  */
@@ -59,6 +59,7 @@ public final class ArgumentTokenizer {
         StringBuilder current = new StringBuilder();
         boolean inDoubleQuotes = false;
         boolean inSingleQuotes = false;
+        boolean tokenStarted = false;
 
         for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
@@ -66,21 +67,26 @@ public final class ArgumentTokenizer {
             if (c == '\\' && !inSingleQuotes && i + 1 < input.length()) {
                 // Backslash escape: outside single-quotes, \X is always a literal X.
                 current.append(input.charAt(++i));
+                tokenStarted = true;
             } else if (c == '"' && !inSingleQuotes) {
                 inDoubleQuotes = !inDoubleQuotes;
+                tokenStarted = true;
             } else if (c == '\'' && !inDoubleQuotes) {
                 inSingleQuotes = !inSingleQuotes;
+                tokenStarted = true;
             } else if (Character.isWhitespace(c) && !inDoubleQuotes && !inSingleQuotes) {
-                if (current.length() > 0) {
+                if (tokenStarted) {
                     args.add(current.toString());
                     current.setLength(0);
+                    tokenStarted = false;
                 }
             } else {
                 current.append(c);
+                tokenStarted = true;
             }
         }
 
-        if (current.length() > 0) {
+        if (tokenStarted) {
             args.add(current.toString());
         }
 

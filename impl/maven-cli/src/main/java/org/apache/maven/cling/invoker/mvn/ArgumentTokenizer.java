@@ -24,20 +24,8 @@ import java.util.List;
  * Quote-aware argument tokenizer for the shorthand form of {@code <options>} and {@code <alias>} elements
  * in {@code settings.xml}.
  *
- * <p>The algorithm is identical to {@code JvmConfigParser.parseArguments()} (the single-file source launcher
- * used by shell scripts to parse {@code .mvn/jvm.config}):
- * <ul>
- *   <li>Whitespace is the delimiter outside quotes.</li>
- *   <li>{@code "..."} and {@code '...'} are both supported — quotes are stripped, content is kept as a
- *       single token.</li>
- *   <li>Outside single-quotes, a backslash ({@code \}) escapes the next character literally
- *       (e.g. {@code \"} → {@code "}, {@code \\} → {@code \}, {@code \ } → a literal space).
- *       Inside single-quotes, backslash has no special meaning.</li>
- * </ul>
- *
- * <p><strong>Note:</strong> {@code JvmConfigParser.java} is a self-contained single-file source launcher
- * invoked directly by shell scripts; it must not share classpath code with Maven. This class is an
- * independent re-implementation of the same algorithm for use within Maven's Java classpath.
+ * <p>Delegates to {@link org.apache.maven.settings.v4.ArgumentTokenizer}, which preserves quoted empty
+ * strings as empty arguments.</p>
  *
  * @since 4.2.0
  */
