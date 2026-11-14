@@ -25,7 +25,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * A factory for {@link MessageBuilder}.
  *
- * @since 4.0.0
+ * @since 3.9.17
  */
 @Experimental
 public interface MessageBuilderFactory extends Service {
