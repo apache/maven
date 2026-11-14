@@ -95,7 +95,7 @@ under the License.
 
     <version.palantirJavaFormat>2.90.0</version.palantirJavaFormat>
     <version.maven-shared-resources>6</version.maven-shared-resources>
-    <its.forkCount>0.75C</its.forkCount>
+    <its.forkCount>1</its.forkCount>
     <its.test />
   </properties>
 
