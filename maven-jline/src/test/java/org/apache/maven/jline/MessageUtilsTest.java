@@ -23,12 +23,32 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MessageUtilsTest {
 
     @AfterEach
     void reset() {
         MessageUtils.setColorEnabled(false);
+        MessageUtils.tty = false;
+        MessageUtils.installed = false;
+        MessageUtils.windowsConsole = false;
+    }
+
+    @Test
+    void ansiProcessingNeedsTheCli() {
+        // embedded use never calls systemInstall(), so even the old Windows console is left alone
+        MessageUtils.windowsConsole = true;
+        assertFalse(MessageUtils.enableAnsiProcessing());
+    }
+
+    @Test
+    void ansiProcessingFollowsDetection() {
+        MessageUtils.installed = true;
+        assertFalse(MessageUtils.enableAnsiProcessing()); // redirected, or a console that is not the old host
+        MessageUtils.tty = true;
+        assertTrue(MessageUtils.enableAnsiProcessing());
     }
 
     @Test

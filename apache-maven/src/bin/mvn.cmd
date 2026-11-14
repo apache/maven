@@ -183,6 +183,20 @@ for /F "usebackq tokens=* delims=" %%a in ("%MAVEN_PROJECTBASEDIR%\.mvn\jvm.conf
 @REM do not let MAVEN_PROJECTBASEDIR end with a single backslash which would escape the double quote. This happens when .mvn at drive root.
 if "_%MAVEN_PROJECTBASEDIR:~-1%"=="_\" set "MAVEN_PROJECTBASEDIR=%MAVEN_PROJECTBASEDIR%\"
 
+@REM Java 22+ can switch on ANSI processing in the Windows console, which needs native access.
+@REM The version is read from the JDK's release file, so no other process starts.
+set MAVEN_NATIVE_ACCESS=
+set JAVA_MAJOR=0
+set JAVA_FULL_VERSION=
+for %%i in ("%JAVACMD%") do set "JAVA_RELEASE_FILE=%%~dpi..\release"
+if not exist "%JAVA_RELEASE_FILE%" goto endNativeAccess
+for /F "usebackq tokens=1,* delims==" %%a in ("%JAVA_RELEASE_FILE%") do if "%%a"=="JAVA_VERSION" set "JAVA_FULL_VERSION=%%~b"
+for /F "tokens=1 delims=.-+_ " %%m in ("%JAVA_FULL_VERSION%") do set "JAVA_MAJOR=%%m"
+@REM keep only a plain number; anything else counts as 0
+set /a "JAVA_MAJOR=JAVA_MAJOR" 2>nul || set JAVA_MAJOR=0
+if %JAVA_MAJOR% GEQ 22 set "MAVEN_NATIVE_ACCESS=--enable-native-access=ALL-UNNAMED"
+:endNativeAccess
+
 for %%i in ("%MAVEN_HOME%"\boot\plexus-classworlds-*) do set CLASSWORLDS_JAR="%%i"
 set CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
 
@@ -190,6 +204,7 @@ set CLASSWORLDS_LAUNCHER=org.codehaus.plexus.classworlds.launcher.Launcher
   %JVM_CONFIG_MAVEN_OPTS% ^
   %MAVEN_OPTS% ^
   %MAVEN_DEBUG_OPTS% ^
+  %MAVEN_NATIVE_ACCESS% ^
   -classpath %CLASSWORLDS_JAR% ^
   "-Dclassworlds.conf=%MAVEN_HOME%\bin\m2.conf" ^
   "-Dmaven.home=%MAVEN_HOME%" ^

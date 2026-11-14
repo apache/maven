@@ -527,6 +527,7 @@ public class MavenCli {
         String styleColor = cliRequest.getUserProperties().getProperty(STYLE_COLOR_PROPERTY, "auto");
         styleColor = cliRequest.commandLine.getOptionValue(COLOR, styleColor);
         if ("always".equals(styleColor) || "yes".equals(styleColor) || "force".equals(styleColor)) {
+            MessageUtils.enableAnsiProcessing();
             MessageUtils.setColorEnabled(true);
         } else if ("never".equals(styleColor) || "no".equals(styleColor) || "none".equals(styleColor)) {
             MessageUtils.setColorEnabled(false);
@@ -538,7 +539,7 @@ public class MavenCli {
             MessageUtils.setColorEnabled(false);
         } else {
             // auto: color only on a detected ANSI terminal; embedded use (#13357) never detects one
-            MessageUtils.setColorEnabled(MessageUtils.isTty());
+            MessageUtils.setColorEnabled(MessageUtils.enableAnsiProcessing());
         }
 
         // LOG STREAMS

@@ -37,12 +37,16 @@ public class MessageUtils {
     static MessageBuilderFactory messageBuilderFactory = new JLineMessageBuilderFactory();
     static volatile boolean tty;
     static volatile boolean colorEnabled;
+    static volatile boolean installed;
+    static volatile boolean windowsConsole; // the old Windows console host, which renders ANSI only with VT on
 
     /**
      * Detects whether standard output is an ANSI capable terminal and enables color accordingly. Only the CLI calls
      * this; embedded use never does, so "auto" color stays off there.
      */
     public static void systemInstall() {
+        installed = true;
+        windowsConsole = false;
         tty = detectAnsiTerminal();
         colorEnabled = tty;
         width = 0;
@@ -53,6 +57,21 @@ public class MessageUtils {
      */
     public static boolean isTty() {
         return tty;
+    }
+
+    /**
+     * Prepares standard output for ANSI escape codes once the CLI has decided to use color. In the old Windows console
+     * host this switches on virtual terminal processing, which needs Java 22+ and native access; elsewhere it changes
+     * nothing. Does nothing unless {@link #systemInstall()} ran, so embedded use never touches the console.
+     *
+     * @return {@code true} if escape codes written to standard output will render as colors
+     * @since 3.10.2
+     */
+    public static boolean enableAnsiProcessing() {
+        if (tty) {
+            return true;
+        }
+        return installed && windowsConsole && WindowsConsole.enableVirtualTerminal();
     }
 
     public static void setColorEnabled(boolean enabled) {
@@ -146,13 +165,15 @@ public class MessageUtils {
             // Java < 22: a non-null console already means a terminal
         }
         if (System.getProperty("os.name", "").startsWith("Windows")) {
-            // ponytail: no native call to switch on VT processing, so trust only consoles known to do ANSI already
-            // (Windows Terminal, ConEmu/Cmder, ANSICON, VS Code, mintty & co); legacy conhost users use --color=always
-            return System.getenv("WT_SESSION") != null
+            // consoles known to do ANSI already (Windows Terminal, ConEmu/Cmder, ANSICON, VS Code, mintty & co);
+            // anything else is the old console host: enableAnsiProcessing() may switch on VT processing later
+            boolean ansi = System.getenv("WT_SESSION") != null
                     || "ON".equals(System.getenv("ConEmuANSI"))
                     || System.getenv("ANSICON") != null
                     || "vscode".equals(System.getenv("TERM_PROGRAM"))
                     || System.getenv("TERM") != null;
+            windowsConsole = !ansi;
+            return ansi;
         }
         return true;
     }
