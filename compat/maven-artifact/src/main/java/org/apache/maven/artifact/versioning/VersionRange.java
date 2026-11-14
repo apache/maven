@@ -44,13 +44,18 @@ public class VersionRange {
 
     private VersionRange(ArtifactVersion recommendedVersion, List<Restriction> restrictions) {
         this.recommendedVersion = recommendedVersion;
-        this.restrictions = restrictions;
+        this.restrictions = Collections.unmodifiableList(restrictions);
     }
 
     public ArtifactVersion getRecommendedVersion() {
         return recommendedVersion;
     }
 
+    /**
+     * Returns the restrictions defining this version range.
+     *
+     * @return the unmodifiable list of restrictions
+     */
     public List<Restriction> getRestrictions() {
         return restrictions;
     }
