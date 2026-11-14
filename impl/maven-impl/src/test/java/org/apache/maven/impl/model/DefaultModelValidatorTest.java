@@ -867,9 +867,42 @@ class DefaultModelValidatorTest {
         SimpleProblemCollector problems = new SimpleProblemCollector();
         validator.validateFileModel(session, model, ModelValidator.VALIDATION_LEVEL_STRICT, problems);
 
-        assertViolations(problems, 0, 0, 1);
+        assertViolations(problems, 0, 1, 0);
         assertContains(
-                problems.getWarnings().get(0),
+                problems.getErrors().get(0),
+                "'includes' is only supported for dependency management imports (scope 'import')");
+    }
+
+    @Test
+    void testDependencyManagementIncludesNonImportScope() throws Exception {
+        String xml = "<project>\n"
+                + "  <modelVersion>4.2.0</modelVersion>\n"
+                + "  <groupId>gid</groupId>\n"
+                + "  <artifactId>aid</artifactId>\n"
+                + "  <version>1.0</version>\n"
+                + "  <dependencyManagement>\n"
+                + "    <dependencies>\n"
+                + "      <dependency>\n"
+                + "        <groupId>test</groupId>\n"
+                + "        <artifactId>lib</artifactId>\n"
+                + "        <version>1.0</version>\n"
+                + "        <scope>compile</scope>\n"
+                + "        <includes>\n"
+                + "          <include>\n"
+                + "            <groupId>test</groupId>\n"
+                + "          </include>\n"
+                + "        </includes>\n"
+                + "      </dependency>\n"
+                + "    </dependencies>\n"
+                + "  </dependencyManagement>\n"
+                + "</project>";
+        Model model = new MavenStaxReader().read(new StringReader(xml));
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+        validator.validateFileModel(session, model, ModelValidator.VALIDATION_LEVEL_STRICT, problems);
+
+        assertViolations(problems, 0, 1, 0);
+        assertContains(
+                problems.getErrors().get(0),
                 "'includes' is only supported for dependency management imports (scope 'import')");
     }
 

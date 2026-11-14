@@ -1294,7 +1294,7 @@ public class DefaultModelValidator implements ModelValidator {
             if (!dependency.getIncludes().isEmpty() && !"import".equals(dependency.getScope())) {
                 addViolation(
                         problems,
-                        Severity.WARNING,
+                        Severity.ERROR,
                         Version.V42,
                         prefix + prefix2 + "includes",
                         SourceHint.dependencyManagementKey(dependency),

@@ -93,8 +93,7 @@ import org.slf4j.LoggerFactory;
  * in model version 4.2.0 or later. If a POM contains dependency inclusions:
  * <ul>
  *   <li>Setting {@code preserve.model.version=true} preserves them in the consumer POM with model version 4.2.0</li>
- *   <li>Setting {@code maven.consumer.pom.flatten=true} resolves and flattens dependency management during transformation</li>
- *   <li>Otherwise, an exception is thrown requiring one of the above options or manual removal of {@code <includes>}</li>
+ *   <li>Otherwise, an exception is thrown requiring the above option or manual removal of {@code <includes>}</li>
  * </ul>
  * <p>
  * <b>Dependency Filtering</b>: For non-POM projects with dependency management, the builder:
@@ -154,12 +153,11 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                     + "  3. Remove the mixins from your POM");
         }
 
-        // Check if dependency includes are present without flattening enabled
+        // Check if dependency includes are present without preserveModelVersion enabled
         if ((hasDependencyIncludes(model)
                         || (project.getOriginalModel() != null
                                 && hasDependencyIncludes(
                                         project.getOriginalModel().getDelegate())))
-                && !flattenEnabled
                 && !model.isPreserveModelVersion()) {
             throw new MavenException("The consumer POM for "
                     + project.getId()
@@ -168,9 +166,7 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                     + "You have the following options to resolve this:" + System.lineSeparator()
                     + "  1. Preserve the model version by setting 'preserve.model.version=true' to generate a consumer POM with <modelVersion>4.2.0</modelVersion>, which supports <includes>"
                     + System.lineSeparator()
-                    + "  2. Enable flattening by setting the property 'maven.consumer.pom.flatten=true' to remove <includes> during transformation"
-                    + System.lineSeparator()
-                    + "  3. Remove the <includes> elements from your POM");
+                    + "  2. Remove the <includes> elements from your POM");
         }
 
         // Check if consumer POM flattening is disabled

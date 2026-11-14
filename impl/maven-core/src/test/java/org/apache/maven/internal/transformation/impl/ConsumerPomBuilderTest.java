@@ -1567,7 +1567,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
     }
 
     @Test
-    void testDependencyIncludesThrowsWithoutFlattenOrPreserve() {
+    void testDependencyIncludesThrowsWithoutPreserve() {
         Inclusion inclusion = Inclusion.newBuilder()
                 .groupId("org.apache.maven")
                 .artifactId("*")
@@ -1597,7 +1597,7 @@ public class ConsumerPomBuilderTest extends AbstractRepositoryTestCase {
                 MavenException.class, () -> builder.build(session, project, Sources.buildSource(Paths.get("pom.xml"))));
         assertTrue(ex.getMessage().contains("contains dependency inclusions (<includes>)"));
         assertTrue(ex.getMessage().contains("preserve.model.version=true"));
-        assertTrue(ex.getMessage().contains("maven.consumer.pom.flatten=true"));
+        assertFalse(ex.getMessage().contains("maven.consumer.pom.flatten=true"));
         assertTrue(ex.getMessage().contains("Remove the <includes> elements from your POM"));
     }
 }
