@@ -254,9 +254,15 @@ public class DefaultInheritanceAssembler implements InheritanceAssembler {
                         plugin = mergePlugin(plugin, element, sourceDominant, context);
                         plugin = withElementLocation(plugin, element);
 
-                        Object key = getPluginKey().apply(plugin);
+                        // a plugin marked inherited=false only reaches the child through an execution
+                        // whose own inherited flag overrides the plugin-level setting (MNG-2103); if no
+                        // execution survives that per-execution filtering, the plugin itself must not be
+                        // inherited either (MNG-6373), so only commit it once we know which case applies
+                        if (element.isInherited() || !plugin.getExecutions().isEmpty()) {
+                            Object key = getPluginKey().apply(plugin);
 
-                        master.put(key, plugin);
+                            master.put(key, plugin);
+                        }
                     }
                 }
 
