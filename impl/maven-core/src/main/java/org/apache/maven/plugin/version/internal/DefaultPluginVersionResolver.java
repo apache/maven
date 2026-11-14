@@ -58,6 +58,7 @@ import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.MetadataRequest;
 import org.eclipse.aether.resolution.MetadataResult;
+import org.eclipse.aether.util.version.GenericQualifiers;
 import org.eclipse.aether.version.InvalidVersionSpecificationException;
 import org.eclipse.aether.version.Version;
 import org.eclipse.aether.version.VersionScheme;
@@ -172,7 +173,8 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
         return result;
     }
 
-    private void selectVersion(DefaultPluginVersionResult result, PluginVersionRequest request, Versions versions)
+    // package-private for testing
+    void selectVersion(DefaultPluginVersionResult result, PluginVersionRequest request, Versions versions)
             throws PluginVersionResolutionException {
         String version = null;
         ArtifactRepository repo = null;
@@ -186,6 +188,21 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
             version = versions.latestVersion;
             repo = versions.latestRepository;
         }
+        // A pre-release (alpha/beta/milestone/rc) is a "release" as far as repository metadata is
+        // concerned, but it is not what a user asking for an unversioned plugin expects: such
+        // versions are typically built against unstable APIs. Prefer a stable version whenever the
+        // repository offers one, and fall back to the pre-release only when it does not.
+        if (version != null && isPreRelease(version) && hasStableVersion(versions)) {
+            logger.info(
+                    "Metadata of plugin {}:{} points at pre-release version {}, looking for a stable version",
+                    request.getGroupId(),
+                    request.getArtifactId(),
+                    version);
+            version = null;
+            repo = null;
+            searchPerformed = true;
+        }
+
         if (version != null && !isCompatible(request, version)) {
             logger.info(
                     "Latest version of plugin {}:{} failed compatibility check",
@@ -198,6 +215,7 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
 
         if (version == null) {
             TreeSet<Version> releases = new TreeSet<>(Collections.reverseOrder());
+            TreeSet<Version> preReleases = new TreeSet<>(Collections.reverseOrder());
             TreeSet<Version> snapshots = new TreeSet<>(Collections.reverseOrder());
 
             for (String ver : versions.versions.keySet()) {
@@ -206,6 +224,8 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
 
                     if (ver.endsWith("-SNAPSHOT")) {
                         snapshots.add(v);
+                    } else if (isPreRelease(ver)) {
+                        preReleases.add(v);
                     } else {
                         releases.add(v);
                     }
@@ -214,34 +234,15 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
                 }
             }
 
-            if (!releases.isEmpty()) {
-                logger.info(
-                        "Looking for compatible RELEASE version of plugin {}:{}",
-                        request.getGroupId(),
-                        request.getArtifactId());
-                for (Version v : releases) {
-                    String ver = v.toString();
-                    if (isCompatible(request, ver)) {
-                        version = ver;
-                        repo = versions.versions.get(version);
-                        break;
-                    }
-                }
+            version = selectCompatible(request, releases, "RELEASE");
+            if (version == null) {
+                version = selectCompatible(request, preReleases, "PRE-RELEASE");
             }
-
-            if (version == null && !snapshots.isEmpty()) {
-                logger.info(
-                        "Looking for compatible SNAPSHOT version of plugin {}:{}",
-                        request.getGroupId(),
-                        request.getArtifactId());
-                for (Version v : snapshots) {
-                    String ver = v.toString();
-                    if (isCompatible(request, ver)) {
-                        version = ver;
-                        repo = versions.versions.get(version);
-                        break;
-                    }
-                }
+            if (version == null) {
+                version = selectCompatible(request, snapshots, "SNAPSHOT");
+            }
+            if (version != null) {
+                repo = versions.versions.get(version);
             }
         }
 
@@ -268,6 +269,71 @@ public class DefaultPluginVersionResolver implements PluginVersionResolver {
                             ? "Could not find compatible plugin version in any plugin repository"
                             : "Plugin not found in any plugin repository");
         }
+    }
+
+    /**
+     * Returns the newest version of {@code candidates} that passes {@link #isCompatible}, or {@code null}.
+     */
+    private String selectCompatible(PluginVersionRequest request, TreeSet<Version> candidates, String kind) {
+        if (candidates.isEmpty()) {
+            return null;
+        }
+        logger.info(
+                "Looking for compatible {} version of plugin {}:{}",
+                kind,
+                request.getGroupId(),
+                request.getArtifactId());
+        for (Version v : candidates) {
+            String ver = v.toString();
+            if (isCompatible(request, ver)) {
+                return ver;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Does the repository offer at least one version that is neither a snapshot nor a pre-release?
+     */
+    // package-private for testing
+    boolean hasStableVersion(Versions versions) {
+        for (String ver : versions.versions.keySet()) {
+            if (!ver.endsWith("-SNAPSHOT") && !isPreRelease(ver) && isParseable(ver)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Only versions the scheme can parse are selectable, so only those may count as a stable fallback.
+     */
+    private boolean isParseable(String version) {
+        try {
+            versionScheme.parseVersion(version);
+            return true;
+        } catch (InvalidVersionSpecificationException e) {
+            return false;
+        }
+    }
+
+    /**
+     * Is this an unstable precursor of its base version, such as {@code 4.0.0-beta-1},
+     * {@code 1.0-alpha-2} or {@code 1.0-SNAPSHOT}?
+     * <p>
+     * Delegates to the version scheme's own qualifier table: a negative qualifier shift marks a
+     * preview version (alpha, beta, milestone, rc/cr, snapshot), zero a final one (ga, final,
+     * release) and a positive one a service pack. Versions without a recognised qualifier -- and
+     * that includes build or vendor qualifiers such as {@code 33.7.0-jre} -- are not pre-releases.
+     * Snapshots satisfy this too; callers classify them first, so they never reach the pre-release
+     * bucket.
+     *
+     * @param version the version to inspect, may carry no qualifier at all
+     * @return {@code true} if the version is an unstable precursor of its base version
+     */
+    // package-private for testing
+    boolean isPreRelease(String version) {
+        return GenericQualifiers.qualifier(version).orElse(GenericQualifiers.QUALIFIER_ZERO) < 0;
     }
 
     private boolean isCompatible(PluginVersionRequest request, String version) {
