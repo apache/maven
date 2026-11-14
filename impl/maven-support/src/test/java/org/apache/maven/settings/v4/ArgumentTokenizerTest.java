@@ -47,6 +47,7 @@ class ArgumentTokenizerTest {
     @Test
     void consecutiveEmptyArguments() {
         assertEquals(List.of("", "", ""), ArgumentTokenizer.tokenize("\"\"\t''\n\"\""));
+        // Adjacent quoted fragments without whitespace belong to the same argument.
         assertEquals(List.of(""), ArgumentTokenizer.tokenize("\"\"''"));
     }
 
