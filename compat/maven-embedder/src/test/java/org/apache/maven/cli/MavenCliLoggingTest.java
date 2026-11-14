@@ -176,6 +176,12 @@ class MavenCliLoggingTest {
      * <p>
      * This test verifies that the terminal consumer fires <em>before</em> {@code System.out} is
      * redirected to the log file, so the consumer cannot overwrite the log-file redirect.
+     * <p>
+     * The {@code terminalReady} future is wired through the {@code onComplete} callback so that
+     * {@link MessageUtils#awaitTerminalInitialization()} joins on {@code terminalReady} (the strong
+     * path) rather than falling back to {@code deferred.getTerminal()} (which only blocks until the
+     * {@link java.util.concurrent.CompletableFuture} inside {@link org.jline.terminal.impl.DeferredTerminal}
+     * completes — before the {@code onComplete} callback runs — and would introduce a race).
      */
     @Test
     void logFileBranchAwaitsTerminalBeforeRedirect(@TempDir Path tempDir) throws Exception {
@@ -195,27 +201,32 @@ class MavenCliLoggingTest {
                 OutputStream.nullOutputStream(),
                 null)) {
             DeferredTerminal terminal = new DeferredTerminal();
+            CompletableFuture<Void> terminalReady = new CompletableFuture<>();
             terminal.onComplete(installed -> {
                 consumerFiredBeforeRedirect.set(System.out == originalOut);
+                terminalReady.complete(null);
             });
             Thread buildThread = new Thread(
                     () -> {
                         try {
                             buildingTerminal.countDown();
                             if (!releaseTerminal.await(10, SECONDS)) {
-                                terminal.completeExceptionally(
-                                        new IllegalStateException("Terminal installation was not released"));
+                                IllegalStateException ex =
+                                        new IllegalStateException("Terminal installation was not released");
+                                terminal.completeExceptionally(ex);
+                                terminalReady.completeExceptionally(ex);
                                 return;
                             }
                             terminal.complete(dumb);
                         } catch (InterruptedException e) {
                             Thread.currentThread().interrupt();
                             terminal.completeExceptionally(e);
+                            terminalReady.completeExceptionally(e);
                         }
                     },
                     "deferred-terminal-build");
             buildThread.setDaemon(true);
-            injectTerminal(terminal);
+            injectTerminal(terminal, terminalReady);
             buildThread.start();
             assertTrue(buildingTerminal.await(10, SECONDS), "DeferredTerminal build thread must start");
 
