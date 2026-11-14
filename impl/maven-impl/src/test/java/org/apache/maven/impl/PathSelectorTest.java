@@ -25,14 +25,59 @@ import java.nio.file.PathMatcher;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.regex.Pattern;
 
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class PathSelectorTest {
+    @ParameterizedTest
+    @CsvSource({
+        "foo/*.java, glob:foo/Excluded.java, false",
+        "glob:foo/*.java, glob:foo/Excluded.java, false",
+        "foo/*.java, glob:foo/Excluded*.java, false",
+        "glob:foo/*.java, glob:foo/Excluded*.java, false",
+        "foo/*.java, glob:foo/Excluded.java, true",
+        "glob:foo/*.java, glob:foo/Excluded.java, true",
+        "foo/*.java, glob:foo/Excluded*.java, true",
+        "glob:foo/*.java, glob:foo/Excluded*.java, true",
+        "foo/*.java, foo/Excluded.java, false",
+        "glob:foo/*.java, foo/Excluded.java, false",
+        "foo/*.java, foo/Excluded.java, true",
+        "glob:foo/*.java, foo/Excluded.java, true"
+    })
+    public void testGlobExcludes(String include, String exclude, boolean useDefaultExcludes) {
+        Path directory = Path.of("dummy");
+        PathMatcher matcher = PathSelector.of(directory, List.of(include), List.of(exclude), useDefaultExcludes);
+        assertFalse(matcher.matches(directory.resolve("foo/Excluded.java")));
+        assertTrue(matcher.matches(directory.resolve("foo/Included.java")));
+        assertFalse(matcher.matches(directory.resolve("foo/Included.txt")));
+        assertFalse(matcher.matches(directory.resolve("bar/Included.java")));
+    }
+
+    @Test
+    public void testExplicitGlobExcludeOmission() {
+        PathMatcher matcher = PathSelector.of(
+                Path.of("dummy"), List.of("foo/*.java"), List.of("glob:bar/*.java", "glob:foo/*.txt"), false);
+        assertFalse(matcher.toString().contains("glob:bar/*.java"));
+        assertFalse(matcher.toString().contains("glob:foo/*.txt"));
+    }
+
+    @Test
+    public void testRegexExcludes() {
+        Path directory = Path.of("dummy");
+        String exclude =
+                "regex:" + Pattern.quote(Path.of("foo", "Excluded.java").toString());
+        PathMatcher matcher = PathSelector.of(directory, List.of("foo/*.java"), List.of(exclude), false);
+        assertFalse(matcher.matches(directory.resolve("foo/Excluded.java")));
+        assertTrue(matcher.matches(directory.resolve("foo/Included.java")));
+    }
+
     /**
      * Creates a temporary directory and checks its list of content based on patterns.
      *
