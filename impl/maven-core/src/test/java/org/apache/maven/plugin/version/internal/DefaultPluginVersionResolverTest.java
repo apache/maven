@@ -59,6 +59,15 @@ class DefaultPluginVersionResolverTest {
         return versions;
     }
 
+    private static DefaultPluginVersionResolver.Versions versionsWithLatest(String latest, String... available) {
+        DefaultPluginVersionResolver.Versions versions = new DefaultPluginVersionResolver.Versions();
+        versions.latestVersion = latest;
+        for (String version : available) {
+            versions.versions.put(version, null);
+        }
+        return versions;
+    }
+
     private static String select(DefaultPluginVersionResolver resolver, DefaultPluginVersionResolver.Versions versions)
             throws Exception {
         DefaultPluginVersionResult result = new DefaultPluginVersionResult();
@@ -165,5 +174,13 @@ class DefaultPluginVersionResolverTest {
                 "2.0",
                 select(resolverAcceptingEveryVersion(), versions("2.0", "1.0", "2.0")),
                 "no search is needed when the metadata already names a stable version");
+    }
+
+    @Test
+    void latestVersionIsUsedWhenReleaseVersionIsAbsent() throws Exception {
+        assertEquals(
+                "1.0",
+                select(resolverAcceptingEveryVersion(), versionsWithLatest("1.0", "1.0")),
+                "latestVersion is the fallback when releaseVersion is not set");
     }
 }
