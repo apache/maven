@@ -276,6 +276,47 @@ public class BuildPlanExecutor {
                 Stream.of(pplan, setup, teardown).forEach(step -> plan.addStep(project, step.name, step));
             }
 
+            // Now that PLAN steps exist for every project, apply the reactor-plugin ordering
+            // and skip-clearing constraints.  For each project that uses a reactor plugin:
+            //  1. Wire PLAN(consumer) → READY(plugin) so the consumer isn't planned until
+            //     the plugin is fully built.
+            //  2. Un-skip the plugin's READY step and all its transitive predecessors that
+            //     were marked skipped (i.e. beyond the originally requested phase), so the
+            //     plugin is actually built even when the requested phase is before READY
+            //     (e.g. "initialize").  Cross-project predecessors (reactor libraries the
+            //     plugin depends on) are cleared transitively as well.
+            Map<String, MavenProject> reactorGavsForPlan =
+                    allProjects.keySet().stream().collect(Collectors.toMap(BuildPlanExecutor::gav, p -> p));
+            allProjects
+                    .keySet()
+                    .forEach(project -> project.getBuild().getPlugins().forEach(plugin -> {
+                        MavenProject pluginProject = reactorGavsForPlan.get(gav(plugin));
+                        if (pluginProject != null) {
+                            plan.step(project, PLAN).ifPresent(pp -> {
+                                plan.step(pluginProject, READY).ifPresent(readyStep -> {
+                                    pp.executeAfter(readyStep);
+                                    // Force the plugin project — and any reactor libraries it
+                                    // transitively depends on — to reach READY even if the
+                                    // requested phase is earlier (e.g. initialize). Without this,
+                                    // a reactor library that the plugin compiles against would
+                                    // remain skipped, causing the plugin's compilation to fail.
+                                    //
+                                    // Only un-skip steps that were actually skipped (i.e. beyond
+                                    // the requested phase).  Steps within the requested phase
+                                    // already have skip=false and don't need to be touched.
+                                    // Leaving already-unskipped structural steps (SETUP, PLAN,
+                                    // before:/after: nodes within the requested phase) untouched
+                                    // avoids empty-shell executions that would otherwise trigger
+                                    // misleading SETUP/TEARDOWN lifecycle events.
+                                    readyStep
+                                            .allPredecessors()
+                                            .filter(s -> s.skip.get())
+                                            .forEach(s -> s.skip.set(false));
+                                });
+                            });
+                        }
+                    }));
+
             return plan;
         }
 
@@ -1341,23 +1382,13 @@ public class BuildPlanExecutor {
                 MavenProject pluginProject = reactorGavs.get(gav(plugin));
                 if (pluginProject != null) {
                     // In order to plan the project, we need all its plugins...
-                    BuildStep planStep = plan.requiredStep(project, PLAN);
-                    BuildStep readyStep = plan.requiredStep(pluginProject, READY);
-                    planStep.executeAfter(readyStep);
-                    // Force the plugin project — and any reactor libraries it
-                    // transitively depends on — to reach READY even if the
-                    // requested phase is earlier (e.g. initialize). Without this,
-                    // a reactor library that the plugin compiles against would
-                    // remain skipped, causing the plugin's compilation to fail.
-                    //
-                    // Only un-skip steps that were actually skipped (i.e. beyond
-                    // the requested phase).  Steps within the requested phase
-                    // already have skip=false and don't need to be touched.
-                    // Leaving already-unskipped structural steps (SETUP, PLAN,
-                    // before:/after: nodes within the requested phase) untouched
-                    // avoids empty-shell executions that would otherwise trigger
-                    // misleading SETUP/TEARDOWN lifecycle events.
-                    readyStep.allPredecessors().filter(s -> s.skip.get()).forEach(s -> s.skip.set(false));
+                    // Note: PLAN steps don't exist yet at this point (they are added by
+                    // buildInitialPlan after calculateLifecycleMappings returns), so we use
+                    // plan.step() which is Optional-safe.  The skip-clearing that forces the
+                    // plugin project to reach READY is applied in buildInitialPlan once PLAN
+                    // steps exist and can be properly wired.
+                    plan.step(project, PLAN)
+                            .ifPresent(pp -> plan.step(pluginProject, READY).ifPresent(pp::executeAfter));
                 } else {
                     toResolve.add(() -> resolvePlugin(session, project.getRemotePluginRepositories(), plugin));
                 }
