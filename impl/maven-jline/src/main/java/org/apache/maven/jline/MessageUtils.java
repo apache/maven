@@ -82,8 +82,9 @@ public class MessageUtils {
                     terminalConsumer.accept(terminal);
                 }
                 ready.complete(null);
-            } catch (Throwable t) {
-                ready.completeExceptionally(t);
+            } catch (Exception | LinkageError ex) {
+                ready.completeExceptionally(ex);
+                throw ex;
             }
         });
         MessageUtils.terminal = deferred;
@@ -122,7 +123,6 @@ public class MessageUtils {
                     // Don't wait — drain buffered output to stdout and let
                     // the daemon build thread die with the JVM.
                     deferred.close();
-                    return;
                 }
             }
             AnsiConsole.systemUninstall();
