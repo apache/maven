@@ -33,6 +33,10 @@ import org.junit.jupiter.api.Test;
  */
 class MavenITmng1088ReactorPluginResolutionTest extends AbstractMavenIntegrationTestCase {
 
+    MavenITmng1088ReactorPluginResolutionTest() {
+        super("[4.0.0-rc-1,)");
+    }
+
     /**
      * Test that a reactor plugin is automatically compiled and made available when the
      * concurrent builder detects a cross-project plugin dependency, even when the user
