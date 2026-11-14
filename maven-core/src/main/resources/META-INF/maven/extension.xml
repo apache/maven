@@ -126,8 +126,17 @@ under the License.
     <exportedPackage>org.slf4j.helpers.*</exportedPackage>
     <exportedPackage>org.slf4j.event.*</exportedPackage>
 
-    <!-- JAnsi -->
-    <exportedPackage>org.fusesource.jansi.*</exportedPackage>
+    <!-- JAnsi: maven-embedder ships Ansi, AnsiConsole, AnsiPrintStream and AnsiMode, honouring
+         Maven's own color setting, for backward compatibility with code (e.g. maven-shared-utils)
+         still calling the JAnsi API. The jansi artifact itself stays excluded below, so a plugin that
+         declares org.fusesource.jansi:jansi gets these classes instead of its own copy: that
+         is what keeps AnsiConsole.systemInstall()/systemUninstall() calls from replacing the
+         System.out/System.err Maven writes to. Each class is named exactly, not as org.fusesource.jansi.*,
+         since these four are all maven-embedder provides. -->
+    <exportedPackage>org.fusesource.jansi.Ansi</exportedPackage>
+    <exportedPackage>org.fusesource.jansi.AnsiConsole</exportedPackage>
+    <exportedPackage>org.fusesource.jansi.AnsiPrintStream</exportedPackage>
+    <exportedPackage>org.fusesource.jansi.AnsiMode</exportedPackage>
   </exportedPackages>
 
   <exportedArtifacts>
@@ -174,6 +183,13 @@ under the License.
     <exportedArtifact>javax.inject:javax.inject</exportedArtifact>
     <exportedArtifact>javax.annotation:javax.annotation-api</exportedArtifact>
     <exportedArtifact>org.slf4j:slf4j-api</exportedArtifact>
+    <!--
+      | JAnsi is no longer a maven-core dependency, but stays excluded here: maven-embedder exports
+      | compatible classes for the JAnsi API (see exportedPackages above), and excluding the real jansi
+      | artifact is what makes a plugin's own org.fusesource.jansi:jansi dependency resolve to those
+      | classes instead of shadowing them with the real AnsiConsole, which would install its own
+      | System.out/System.err behind Maven's back.
+     -->
     <exportedArtifact>org.fusesource.jansi:jansi</exportedArtifact>
 
     <!--

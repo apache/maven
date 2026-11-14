@@ -317,8 +317,15 @@ public class MavenCliTest {
 
     @Test
     public void testStyleColors() throws Exception {
-        assumeTrue(MessageUtils.isColorEnabled(), "ANSI not supported");
         CliRequest request;
+
+        // auto without a detected terminal (nothing called AnsiTerminal.detect() here)
+        MessageUtils.setColorEnabled(true);
+        request = new CliRequest(new String[] {}, null);
+        cli.cli(request);
+        cli.properties(request);
+        cli.logging(request);
+        assertFalse(MessageUtils.isColorEnabled());
 
         MessageUtils.setColorEnabled(true);
         request = new CliRequest(new String[] {"-B"}, null);
