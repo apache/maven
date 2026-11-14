@@ -18,6 +18,7 @@
  */
 package org.apache.maven.artifact.versioning;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.maven.artifact.Artifact;
@@ -27,6 +28,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
 
@@ -748,5 +750,65 @@ public class VersionRangeTest {
         assertFalse(
                 spec.equals(version),
                 "check !VersionRange.createFromVersionSpec(x).equals(VersionRange.createFromVersion(x))");
+    }
+
+    @Test
+    public void testCachedRestrictionsAreUnmodifiable() throws InvalidVersionSpecificationException {
+        for (String spec : new String[] {"[1.1234,2.5678]", "[1.1234]", "(,1.1234],[2.5678,)", "1.1234"}) {
+            VersionRange range = VersionRange.createFromVersionSpec(spec);
+            List<Restriction> restrictions = new ArrayList<>(range.getRestrictions());
+            ArtifactVersion version = new DefaultArtifactVersion("1.1234");
+            assertTrue(range.containsVersion(version));
+
+            assertThrows(
+                    UnsupportedOperationException.class,
+                    () -> range.getRestrictions().clear());
+            assertThrows(
+                    UnsupportedOperationException.class,
+                    () -> range.getRestrictions().set(0, Restriction.EVERYTHING));
+
+            VersionRange cached = VersionRange.createFromVersionSpec(spec);
+            assertSame(range, cached);
+            assertEquals(restrictions, cached.getRestrictions());
+            assertTrue(cached.containsVersion(version));
+        }
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    public void testClonedRestrictionsAreUnmodifiable() throws InvalidVersionSpecificationException {
+        VersionRange range = VersionRange.createFromVersionSpec("[3.1234,4.5678]");
+        VersionRange clone = range.cloneOf();
+
+        assertThrows(
+                UnsupportedOperationException.class,
+                () -> clone.getRestrictions().clear());
+        assertEquals(range, clone);
+        assertTrue(clone.containsVersion(new DefaultArtifactVersion("3.5000")));
+        assertFalse(clone.containsVersion(new DefaultArtifactVersion("5.0")));
+    }
+
+    @Test
+    public void testIntersectedRestrictionsAreUnmodifiable() throws InvalidVersionSpecificationException {
+        VersionRange range = VersionRange.createFromVersionSpec("[3.1234,4.5678]")
+                .restrict(VersionRange.createFromVersionSpec("[3.5000,5.0]"));
+
+        assertThrows(
+                UnsupportedOperationException.class,
+                () -> range.getRestrictions().clear());
+        assertTrue(range.containsVersion(new DefaultArtifactVersion("4.0")));
+        assertFalse(range.containsVersion(new DefaultArtifactVersion("3.2500")));
+    }
+
+    @Test
+    public void testVersionRestrictionsAreUnmodifiable() {
+        VersionRange range = VersionRange.createFromVersion("3.1234");
+
+        assertThrows(
+                UnsupportedOperationException.class,
+                () -> range.getRestrictions().add(Restriction.EVERYTHING));
+        assertSame(range, VersionRange.createFromVersion("3.1234"));
+        assertTrue(range.getRestrictions().isEmpty());
+        assertEquals(new DefaultArtifactVersion("3.1234"), range.getRecommendedVersion());
     }
 }
