@@ -21,6 +21,7 @@ package org.apache.maven.model.v4;
 import javax.xml.stream.XMLStreamException;
 
 import java.io.StringReader;
+import java.util.stream.Stream;
 
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.InputLocation;
@@ -28,6 +29,7 @@ import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -279,6 +281,69 @@ class MavenStaxReaderTest {
         assertNotNull(module3Location, "Module 3 location should not be null");
         assertEquals(6, module3Location.getLineNumber(), "Module 3 should start at line 6");
         assertEquals(5, module3Location.getColumnNumber(), "Module 3 should start at column 5");
+    }
+
+    @Test
+    void testRandomRootNamespaceIsRejectedInStrictMode() {
+        // https://github.com/apache/maven/issues/10985
+        String xml = pomWithNamespace("https://ff.com");
+
+        XMLStreamException ex = assertThrows(XMLStreamException.class, () -> fromXml(xml));
+        assertTrue(
+                ex.getMessage().contains("Unrecognized namespace 'https://ff.com' for root element 'project'"),
+                ex.getMessage());
+        assertTrue(ex.getMessage().contains("http://maven.apache.org/POM/4.0.0"), ex.getMessage());
+        assertNotNull(ex.getLocation());
+        assertEquals(1, ex.getLocation().getLineNumber());
+    }
+
+    @Test
+    void testUnknownRootNamespacesAreRejectedInStrictMode() {
+        assertAll(Stream.of(
+                        // only exact matches are accepted, no prefix matching
+                        "http://maven.apache.org/POM/",
+                        "http://maven.apache.org/POM/4.0",
+                        "http://maven.apache.org/POM/4.0.0/",
+                        "http://maven.apache.org/POM/9.9.9",
+                        // namespaces are case-sensitive and the scheme is part of the namespace name
+                        "https://maven.apache.org/POM/4.0.0",
+                        "http://maven.apache.org/pom/4.0.0",
+                        // namespaces of other Maven models are not valid for a POM
+                        "http://maven.apache.org/METADATA/1.1.0",
+                        "http://maven.apache.org/SETTINGS/1.0.0")
+                .map(ns -> () -> {
+                    XMLStreamException ex =
+                            assertThrows(XMLStreamException.class, () -> fromXml(pomWithNamespace(ns)), ns);
+                    assertTrue(ex.getMessage().contains("Unrecognized namespace '" + ns + "'"), ex.getMessage());
+                }));
+    }
+
+    @Test
+    void testKnownRootNamespacesAreAcceptedInStrictMode() {
+        assertAll(Stream.of(
+                        "http://maven.apache.org/POM/4.0.0",
+                        "http://maven.apache.org/POM/4.1.0",
+                        "http://maven.apache.org/POM/4.2.0")
+                .map(ns -> () -> assertEquals(ns, fromXml(pomWithNamespace(ns)).getNamespaceUri(), ns)));
+    }
+
+    @Test
+    void testRandomRootNamespaceIsAcceptedInLenientMode() throws XMLStreamException {
+        // POMs consumed from repositories are read leniently and must keep working
+        Model model = new MavenStaxReader().read(new StringReader(pomWithNamespace("https://ff.com")), false, null);
+
+        assertEquals("https://ff.com", model.getNamespaceUri());
+        assertEquals("unrecognized-namespace", model.getArtifactId());
+    }
+
+    private static String pomWithNamespace(String namespace) {
+        return "<project xmlns=\"" + namespace + "\">\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>org.apache.maven.its</groupId>\n"
+                + "  <artifactId>unrecognized-namespace</artifactId>\n"
+                + "  <version>1.0-SNAPSHOT</version>\n"
+                + "  <packaging>pom</packaging>\n"
+                + "</project>";
     }
 
     private Model fromXml(String xml) throws XMLStreamException {
