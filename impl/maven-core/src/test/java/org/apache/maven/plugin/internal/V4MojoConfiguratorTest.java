@@ -39,6 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -544,5 +545,80 @@ class V4MojoConfiguratorTest {
         Map<String, Object> result = (Map<String, Object>) mojo.objectParam;
         assertEquals("val1", result.get("key1"));
         assertEquals("val2", result.get("key2"));
+    }
+
+    // Object-valued expression for a parameter type without a no-arg constructor (issue #14007)
+    public interface ProducedArtifactLike {
+        String id();
+    }
+
+    public static final class ProducedArtifactImpl implements ProducedArtifactLike {
+        private final String id;
+
+        ProducedArtifactImpl(String id) {
+            this.id = id;
+        }
+
+        @Override
+        public String id() {
+            return id;
+        }
+    }
+
+    public static class ObjectExpressionMojo {
+        ProducedArtifactLike projectArtifact;
+    }
+
+    @Test
+    void testExpressionEvaluatingToParameterTypeInstanceIsAssignedDirectly() throws Exception {
+        ProducedArtifactLike artifact = new ProducedArtifactImpl("main");
+        MojoExpressionEvaluator objectEvaluator = mock(MojoExpressionEvaluator.class);
+        when(objectEvaluator.evaluate(anyString(), any())).thenAnswer(inv -> {
+            String val = inv.getArgument(0);
+            return "${project.mainArtifact}".equals(val) ? artifact : val;
+        });
+        V4MojoConfigurator objectConfigurator =
+                new V4MojoConfigurator(objectEvaluator, getClass().getClassLoader(), pluginDescriptor);
+
+        ObjectExpressionMojo mojo = new ObjectExpressionMojo();
+        XmlNode config = new XmlNodeImpl(
+                "configuration",
+                null,
+                Map.of(),
+                List.of(new XmlNodeImpl("projectArtifact", "${project.mainArtifact}")),
+                null);
+
+        objectConfigurator.configure(mojo, config);
+
+        assertSame(artifact, mojo.projectArtifact);
+    }
+
+    @Test
+    void testExpressionEvaluatingToParameterTypeInstanceViaDefaultValueIsAssignedDirectly() throws Exception {
+        ProducedArtifactLike artifact = new ProducedArtifactImpl("main");
+        MojoExpressionEvaluator objectEvaluator = mock(MojoExpressionEvaluator.class);
+        when(objectEvaluator.evaluate(anyString(), any())).thenAnswer(inv -> {
+            String val = inv.getArgument(0);
+            return "${project.mainArtifact}".equals(val) ? artifact : val;
+        });
+        V4MojoConfigurator objectConfigurator =
+                new V4MojoConfigurator(objectEvaluator, getClass().getClassLoader(), pluginDescriptor);
+
+        ObjectExpressionMojo mojo = new ObjectExpressionMojo();
+        XmlNode config = new XmlNodeImpl(
+                "configuration",
+                null,
+                Map.of(),
+                List.of(new XmlNodeImpl(
+                        "projectArtifact",
+                        null,
+                        Map.of("default-value", "${project.mainArtifact}"),
+                        List.of(),
+                        null)),
+                null);
+
+        objectConfigurator.configure(mojo, config);
+
+        assertSame(artifact, mojo.projectArtifact);
     }
 }
