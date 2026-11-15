@@ -862,7 +862,12 @@ under the License.
                  The SCM ignore file discovery walk traverses ALL directories
                  (including hidden ones like .claude/ and .worktrees/) without
                  respecting exclusion patterns, causing RAT to hang when large
-                 git worktree trees exist under hidden directories. -->
+                 git worktree trees exist under hidden directories.
+                 Note: parseSCMIgnoresAsExcludes is deprecated in RAT 0.18, but
+                 the new API (inputExcludeStds) excludes path matchers only —
+                 NOT file processors — so it cannot suppress the traversal.
+                 This workaround will be removed once a RAT release includes the
+                 upstream fix from creadur-rat#773. -->
             <parseSCMIgnoresAsExcludes>false</parseSCMIgnoresAsExcludes>
             <inputExcludes>
               <exclude>Jenkinsfile</exclude>
