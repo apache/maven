@@ -49,12 +49,12 @@ public interface VersionRangeResolver extends OperationService {
      * @param session the session to use
      * @param artifactCoordinates t
      * @return the version range resolution result
-     * @throws VersionResolverException if an errors occurs
+     * @throws VersionRangeResolverException if the version range could not be resolved
      */
     @Nonnull
     default VersionRangeResolverResult resolve(
             @Nonnull Session session, @Nonnull ArtifactCoordinates artifactCoordinates)
-            throws VersionResolverException {
+            throws VersionRangeResolverException {
         return resolve(VersionRangeResolverRequest.build(session, artifactCoordinates));
     }
 
@@ -70,14 +70,14 @@ public interface VersionRangeResolver extends OperationService {
      * @param artifactCoordinates t
      * @param repositories the repositories to use (if {@code null}, the session repositories are used)
      * @return the version range resolution result
-     * @throws VersionResolverException if an errors occurs
+     * @throws VersionRangeResolverException if the version range could not be resolved
      */
     @Nonnull
     default VersionRangeResolverResult resolve(
             @Nonnull Session session,
             @Nonnull ArtifactCoordinates artifactCoordinates,
             @Nullable List<RemoteRepository> repositories)
-            throws VersionResolverException {
+            throws VersionRangeResolverException {
         return resolve(VersionRangeResolverRequest.build(session, artifactCoordinates, repositories));
     }
 
