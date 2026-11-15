@@ -28,6 +28,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import org.apache.maven.lifecycle.internal.stub.LoggerStub;
+import org.apache.maven.lifecycle.internal.stub.RankedEntriesMap;
 import org.apache.maven.lifecycle.providers.lifecycle.CleanLifecycleProvider;
 import org.apache.maven.lifecycle.providers.lifecycle.DefaultLifecycleProvider;
 import org.apache.maven.lifecycle.providers.lifecycle.SiteLifecycleProvider;
@@ -37,6 +38,7 @@ import org.junit.jupiter.api.Test;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 
 /**
  * @author Kristian Rosenvold
@@ -77,5 +79,29 @@ public class DefaultLifecyclesTest {
         } finally {
             System.clearProperty("maven.site.lifecycle.disabled");
         }
+    }
+
+    @Test
+    public void testHighestRankedLifecycleWinsForDuplicateId() {
+        // a build extension registers its own "clean" lifecycle, which ranks above the one in core
+        Lifecycle extensionClean =
+                new Lifecycle(CleanLifecycleProvider.NAME, Collections.singletonList("extension-clean"), null);
+        RankedEntriesMap<Lifecycle> all = new RankedEntriesMap<Lifecycle>()
+                .add(CleanLifecycleProvider.NAME, extensionClean)
+                .add(
+                        CleanLifecycleProvider.NAME,
+                        new Lifecycle(CleanLifecycleProvider.NAME, Collections.singletonList("clean"), null))
+                .add(
+                        DefaultLifecycleProvider.NAME,
+                        new Lifecycle(DefaultLifecycleProvider.NAME, Collections.singletonList("compile"), null))
+                .add(
+                        SiteLifecycleProvider.NAME,
+                        new Lifecycle(SiteLifecycleProvider.NAME, Collections.singletonList("site"), null));
+
+        DefaultLifecycles lifecycles = new DefaultLifecycles(all, new LoggerStub());
+
+        assertSame(extensionClean, lifecycles.getLifeCycles().get(0));
+        assertSame(extensionClean, lifecycles.get("extension-clean"));
+        assertNull(lifecycles.get("clean"));
     }
 }
