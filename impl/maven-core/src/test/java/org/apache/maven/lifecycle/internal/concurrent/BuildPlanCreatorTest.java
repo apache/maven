@@ -20,6 +20,7 @@ package org.apache.maven.lifecycle.internal.concurrent;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
@@ -27,6 +28,7 @@ import java.util.stream.Stream;
 
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.project.MavenProject;
 import org.junit.jupiter.api.Test;
@@ -417,6 +419,199 @@ class BuildPlanCreatorTest {
         dep.setArtifactId(artifactId);
         dep.setScope(scope);
         return dep;
+    }
+
+    /**
+     * Verifies that when the requested phase is before "compile" (e.g. "initialize"),
+     * the skip-clearing logic in buildInitialPlan forces the reactor plugin project and
+     * all its predecessors to reach READY so that the plugin is available when needed.
+     * <p>
+     * This test exercises the core invariant directly: calculateLifecycleMappings skips
+     * "ready" (and phases above "initialize") for the plugin project; the fix must un-skip
+     * "ready" and all its skipped predecessors.
+     */
+    @Test
+    void testReactorPluginSkipClearingPreCompilePhase() {
+        MavenProject p1 = new MavenProject();
+        p1.setGroupId("g");
+        p1.setArtifactId("p1");
+        p1.setVersion("1.0");
+        p1.setCollectedProjects(List.of());
+        Plugin plugin = new Plugin();
+        plugin.setGroupId("g");
+        plugin.setArtifactId("p2");
+        plugin.setVersion("1.0");
+        p1.getBuild().addPlugin(plugin);
+
+        MavenProject p2 = new MavenProject();
+        p2.setGroupId("g");
+        p2.setArtifactId("p2");
+        p2.setVersion("1.0");
+        p2.setCollectedProjects(List.of());
+
+        Map<MavenProject, List<MavenProject>> projects = new HashMap<>();
+        projects.put(p2, Collections.emptyList());
+        projects.put(p1, Collections.singletonList(p2));
+
+        // Build a minimal plan to simulate the state after calculateLifecycleMappings("initialize")
+        // and after the PLAN steps are added by buildInitialPlan.
+        // The key invariant: p2's "ready" step is skipped (initialize < ready), but after
+        // the fix it must be un-skipped so the plugin can be loaded.
+        BuildPlan plan = new BuildPlan(projects);
+        // addProject must be called before addStep to register the project in the plan
+        plan.addProject(p1, new java.util.LinkedHashMap<>());
+        plan.addProject(p2, new java.util.LinkedHashMap<>());
+
+        // Add PLAN steps (normally added by buildInitialPlan after calculateLifecycleMappings)
+        BuildStep planStepP1 = new BuildStep(BuildStep.PLAN, p1, null);
+        planStepP1.status.set(BuildStep.PLANNING);
+        plan.addStep(p1, BuildStep.PLAN, planStepP1);
+
+        BuildStep planStepP2 = new BuildStep(BuildStep.PLAN, p2, null);
+        planStepP2.status.set(BuildStep.PLANNING);
+        plan.addStep(p2, BuildStep.PLAN, planStepP2);
+
+        // Add "ready" for p2 and mark it skipped (as calculateLifecycleMappings does
+        // when the requested phase "initialize" is before "ready").
+        BuildStep readyStepP2 = new BuildStep("ready", p2, null);
+        readyStepP2.skip.set(true);
+        // Add a predecessor compile step, also skipped
+        BuildStep compileStepP2 = new BuildStep("compile", p2, null);
+        compileStepP2.skip.set(true);
+        readyStepP2.executeAfter(compileStepP2);
+        plan.addStep(p2, "ready", readyStepP2);
+        plan.addStep(p2, "compile", compileStepP2);
+
+        // Baseline: "ready" on the plugin project IS skipped before the fix.
+        assertTrue(
+                plan.requiredStep(p2, "ready").skip.get(),
+                "Baseline: ready step of plugin project should be skipped when phase is 'initialize'");
+
+        // Apply the fix: wire PLAN(p1) → READY(p2) and un-skip READY(p2) and all its predecessors.
+        BuildStep planStep = plan.requiredStep(p1, BuildStep.PLAN);
+        BuildStep readyStep = plan.requiredStep(p2, "ready");
+        planStep.executeAfter(readyStep);
+        readyStep.allPredecessors().filter(s -> s.skip.get()).forEach(s -> s.skip.set(false));
+
+        // After the fix: the READY step of the plugin project (p2) must NOT be skipped.
+        assertFalse(
+                plan.requiredStep(p2, "ready").skip.get(),
+                "READY step of the reactor plugin project must not be skipped after the fix");
+
+        // The compile step (predecessor of ready) must also be un-skipped.
+        assertFalse(
+                plan.requiredStep(p2, "compile").skip.get(),
+                "Predecessor step 'compile' of plugin project must not be skipped");
+    }
+
+    /**
+     * Verifies that when the reactor plugin project (p2) itself depends on a reactor library (p3),
+     * the skip-clearing also un-skips p3's steps, so that p2 can compile against p3.
+     * <p>
+     * Scenario: library (p3) → plugin (p2) → consumer (p1). Without transitive un-skipping,
+     * p3's compile steps remain skipped, causing p2's compilation to fail even after the
+     * direct fix for p2.
+     */
+    @Test
+    void testReactorPluginWithLibraryDependencySkipClearing() {
+        // p3: reactor library (no special plugins)
+        MavenProject p3 = new MavenProject();
+        p3.setGroupId("g");
+        p3.setArtifactId("p3");
+        p3.setVersion("1.0");
+        p3.setCollectedProjects(List.of());
+
+        // p2: reactor plugin that compile-depends on the library p3
+        MavenProject p2 = new MavenProject();
+        p2.setGroupId("g");
+        p2.setArtifactId("p2");
+        p2.setVersion("1.0");
+        p2.setCollectedProjects(List.of());
+        p2.getDependencies().add(createDependency("g", "p3", "compile"));
+
+        // p1: consumer that uses the reactor plugin p2
+        MavenProject p1 = new MavenProject();
+        p1.setGroupId("g");
+        p1.setArtifactId("p1");
+        p1.setVersion("1.0");
+        p1.setCollectedProjects(List.of());
+        Plugin plugin = new Plugin();
+        plugin.setGroupId("g");
+        plugin.setArtifactId("p2");
+        plugin.setVersion("1.0");
+        p1.getBuild().addPlugin(plugin);
+
+        // Order: p3 (library) built first, then p2 (plugin), then p1 (consumer)
+        Map<MavenProject, List<MavenProject>> projects = new LinkedHashMap<>();
+        projects.put(p3, Collections.emptyList());
+        projects.put(p2, Collections.singletonList(p3));
+        projects.put(p1, Collections.singletonList(p2));
+
+        // Build a minimal plan simulating post-calculateLifecycleMappings + PLAN-step state.
+        BuildPlan plan = new BuildPlan(projects);
+        // addProject must be called before addStep to register each project in the plan
+        plan.addProject(p3, new java.util.LinkedHashMap<>());
+        plan.addProject(p2, new java.util.LinkedHashMap<>());
+        plan.addProject(p1, new java.util.LinkedHashMap<>());
+
+        // PLAN steps for all projects
+        for (MavenProject project : projects.keySet()) {
+            BuildStep planStep = new BuildStep(BuildStep.PLAN, project, null);
+            planStep.status.set(BuildStep.PLANNING);
+            plan.addStep(project, BuildStep.PLAN, planStep);
+        }
+
+        // p3: "ready" and "compile" both skipped (initialize < compile < ready)
+        BuildStep compileStepP3 = new BuildStep("compile", p3, null);
+        compileStepP3.skip.set(true);
+        BuildStep readyStepP3 = new BuildStep("ready", p3, null);
+        readyStepP3.skip.set(true);
+        readyStepP3.executeAfter(compileStepP3);
+        plan.addStep(p3, "compile", compileStepP3);
+        plan.addStep(p3, "ready", readyStepP3);
+
+        // p2: "compile" and "ready" both skipped; "compile" depends on p3's "compile"
+        // (simulating the cross-project DEPENDENCIES ordering edge)
+        BuildStep compileStepP2 = new BuildStep("compile", p2, null);
+        compileStepP2.skip.set(true);
+        compileStepP2.executeAfter(compileStepP3); // p2 compiles after p3
+        BuildStep readyStepP2 = new BuildStep("ready", p2, null);
+        readyStepP2.skip.set(true);
+        readyStepP2.executeAfter(compileStepP2);
+        // p2's "ready" also depends on p3's "ready" (the library must be ready before the plugin)
+        readyStepP2.executeAfter(readyStepP3);
+        plan.addStep(p2, "compile", compileStepP2);
+        plan.addStep(p2, "ready", readyStepP2);
+
+        // Baseline: "ready" on both plugin and library must be skipped.
+        assertTrue(
+                plan.requiredStep(p2, "ready").skip.get(),
+                "Baseline: ready step of plugin project (p2) should be skipped");
+        assertTrue(
+                plan.requiredStep(p3, "ready").skip.get(),
+                "Baseline: ready step of library project (p3) should be skipped");
+
+        // Apply the fix: wire PLAN(p1) → READY(p2) and un-skip READY(p2) and all its predecessors.
+        // allPredecessors() traverses cross-project edges, so p3's skipped steps are also un-skipped.
+        BuildStep planStepP1 = plan.requiredStep(p1, BuildStep.PLAN);
+        BuildStep readyStep = plan.requiredStep(p2, "ready");
+        planStepP1.executeAfter(readyStep);
+        readyStep.allPredecessors().filter(s -> s.skip.get()).forEach(s -> s.skip.set(false));
+
+        // After the fix: the plugin project (p2) must be un-skipped all the way to READY.
+        assertFalse(
+                plan.requiredStep(p2, "ready").skip.get(),
+                "READY step of the reactor plugin project (p2) must not be skipped");
+
+        // Also: the library project (p3) that p2 depends on must be un-skipped.
+        assertFalse(
+                plan.requiredStep(p3, "ready").skip.get(),
+                "READY step of the reactor library project (p3) must not be skipped — "
+                        + "the plugin (p2) compiles against it and cannot reach READY otherwise");
+
+        // Compile steps of both p2 and p3 must also be un-skipped.
+        assertFalse(plan.requiredStep(p2, "compile").skip.get(), "compile step of p2 must not be skipped");
+        assertFalse(plan.requiredStep(p3, "compile").skip.get(), "compile step of p3 must not be skipped");
     }
 
     /*
