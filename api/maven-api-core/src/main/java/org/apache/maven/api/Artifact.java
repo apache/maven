@@ -33,8 +33,6 @@ import org.apache.maven.api.annotations.Nonnull;
  * and downloads the artifact in the local repository.  This operation returns a {@link DownloadedArtifact}.
  * </p>
  *
- * <p>Implementations must override either the noun-style accessor or its legacy getter for each property.
- *
  * @since 4.0.0
  */
 @Experimental
@@ -58,10 +56,7 @@ public interface Artifact {
      * @see ArtifactCoordinates#groupId()
      */
     @Nonnull
-    default String groupId() {
-        AccessorBridge.requireOverride(this, Artifact.class, "getGroupId", "groupId");
-        return getGroupId();
-    }
+    String groupId();
 
     /**
      * {@return the group identifier of the artifact}.
@@ -81,10 +76,7 @@ public interface Artifact {
      * @see ArtifactCoordinates#artifactId()
      */
     @Nonnull
-    default String artifactId() {
-        AccessorBridge.requireOverride(this, Artifact.class, "getArtifactId", "artifactId");
-        return getArtifactId();
-    }
+    String artifactId();
 
     /**
      * {@return the identifier of the artifact}.
@@ -108,10 +100,7 @@ public interface Artifact {
      * @see ArtifactCoordinates#versionConstraint()
      */
     @Nonnull
-    default Version version() {
-        AccessorBridge.requireOverride(this, Artifact.class, "getVersion", "version");
-        return getVersion();
-    }
+    Version version();
 
     /**
      * {@return the version of the artifact}.
@@ -136,10 +125,7 @@ public interface Artifact {
      * while they are replaced by, for example, the actual timestamp in the {@linkplain #version() version}.
      */
     @Nonnull
-    default Version baseVersion() {
-        AccessorBridge.requireOverride(this, Artifact.class, "getBaseVersion", "baseVersion");
-        return getBaseVersion();
-    }
+    Version baseVersion();
 
     /**
      * {@return the version or meta-version of the artifact}.
@@ -162,10 +148,7 @@ public interface Artifact {
      * @see ArtifactCoordinates#classifier()
      */
     @Nonnull
-    default String classifier() {
-        AccessorBridge.requireOverride(this, Artifact.class, "getClassifier", "classifier");
-        return getClassifier();
-    }
+    String classifier();
 
     /**
      * Returns the classifier of the artifact.
@@ -188,10 +171,7 @@ public interface Artifact {
      * @see ArtifactCoordinates#extension()
      */
     @Nonnull
-    default String extension() {
-        AccessorBridge.requireOverride(this, Artifact.class, "getExtension", "extension");
-        return getExtension();
-    }
+    String extension();
 
     /**
      * Returns the file extension of the artifact.
@@ -214,10 +194,7 @@ public interface Artifact {
      * @see org.apache.maven.api.Session#isVersionSnapshot(String)
      * @since 4.2.0
      */
-    default boolean snapshot() {
-        AccessorBridge.requireOverride(this, Artifact.class, "isSnapshot", "snapshot");
-        return isSnapshot();
-    }
+    boolean snapshot();
 
     /**
      * Determines whether this artifact uses a snapshot version.

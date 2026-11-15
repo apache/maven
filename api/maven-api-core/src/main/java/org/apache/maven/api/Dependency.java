@@ -33,8 +33,6 @@ import org.apache.maven.api.annotations.Nonnull;
  * The flatten phase keeps only a single version per ({@code groupId}, {@code artifactId}) pair.
  * The resolution phase actually downloads the dependencies (or artifacts) that have been computed.
  *
- * <p>Implementations must override either the noun-style accessor or its legacy getter for each property.
- *
  * @since 4.0.0
  */
 @Experimental
@@ -49,10 +47,7 @@ public interface Dependency extends Artifact {
      * @see DependencyCoordinates#type()
      */
     @Nonnull
-    default Type type() {
-        AccessorBridge.requireOverride(this, Dependency.class, "getType", "type");
-        return getType();
-    }
+    Type type();
 
     /**
      * {@return the type of the dependency}.
@@ -76,10 +71,7 @@ public interface Dependency extends Artifact {
      * @see DependencyCoordinates#scope()
      */
     @Nonnull
-    default DependencyScope scope() {
-        AccessorBridge.requireOverride(this, Dependency.class, "getScope", "scope");
-        return getScope();
-    }
+    DependencyScope scope();
 
     /**
      * {@return the time at which the dependency will be used}.

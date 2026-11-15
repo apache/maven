@@ -24,8 +24,6 @@ import org.apache.maven.api.annotations.Nullable;
 /**
  * A dependency exclusion.
  *
- * <p>Implementations must override either the noun-style accessor or its legacy getter for each property.
- *
  * @since 4.0.0
  * @see DependencyCoordinates#exclusions()
  */
@@ -35,10 +33,7 @@ public interface Exclusion {
      * {@return the group identifier of the excluded dependency, or {@code null} for a wildcard}.
      */
     @Nullable
-    default String groupId() {
-        AccessorBridge.requireOverride(this, Exclusion.class, "getGroupId", "groupId");
-        return getGroupId();
-    }
+    String groupId();
 
     /**
      * @deprecated Use {@link #groupId()} instead.
@@ -53,10 +48,7 @@ public interface Exclusion {
      * {@return the artifact identifier of the excluded dependency, or {@code null} for a wildcard}.
      */
     @Nullable
-    default String artifactId() {
-        AccessorBridge.requireOverride(this, Exclusion.class, "getArtifactId", "artifactId");
-        return getArtifactId();
-    }
+    String artifactId();
 
     /**
      * @deprecated Use {@link #artifactId()} instead.

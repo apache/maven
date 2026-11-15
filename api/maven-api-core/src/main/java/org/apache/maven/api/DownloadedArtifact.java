@@ -26,8 +26,6 @@ import org.apache.maven.api.annotations.Immutable;
 /**
  * An {@link Artifact} that has been resolved, i.e. downloaded to the local repository.
  *
- * <p>Implementations must override either the noun-style accessor or its legacy getter for each property.
- *
  * @since 4.0.0
  */
 @Experimental
@@ -37,10 +35,7 @@ public interface DownloadedArtifact extends Artifact {
     /**
      * {@return the a path to the file that has been downloaded to the file system}.
      */
-    default Path path() {
-        AccessorBridge.requireOverride(this, DownloadedArtifact.class, "getPath", "path");
-        return getPath();
-    }
+    Path path();
 
     /**
      * {@return the a path to the file that has been downloaded to the file system}.
