@@ -1032,7 +1032,7 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public List<Version> resolveVersionRange(ArtifactCoordinates artifact) throws VersionResolverException {
+    public List<Version> resolveVersionRange(ArtifactCoordinates artifact) throws VersionRangeResolverException {
         return checkVersionRangeResult(
                         artifact, getService(VersionRangeResolver.class).resolve(this, artifact))
                 .getVersions();
@@ -1040,7 +1040,7 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public List<Version> resolveVersionRange(ArtifactCoordinates artifact, List<RemoteRepository> repositories)
-            throws VersionResolverException {
+            throws VersionRangeResolverException {
         return checkVersionRangeResult(
                         artifact, getService(VersionRangeResolver.class).resolve(this, artifact, repositories))
                 .getVersions();
@@ -1048,7 +1048,7 @@ public abstract class AbstractSession implements InternalSession {
 
     @Override
     public Optional<Version> resolveHighestVersion(ArtifactCoordinates artifact, List<RemoteRepository> repositories)
-            throws VersionResolverException {
+            throws VersionRangeResolverException {
         return checkVersionRangeResult(
                         artifact, getService(VersionRangeResolver.class).resolve(this, artifact, repositories))
                 .getHighestVersion();
