@@ -23,9 +23,9 @@ import java.util.List;
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Node;
+import org.apache.maven.api.OperationService;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Project;
-import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -35,7 +35,7 @@ import org.apache.maven.api.annotations.Nullable;
  * Collects, flattens and resolves dependencies.
  */
 @Experimental
-public interface DependencyResolver extends Service {
+public interface DependencyResolver extends OperationService {
 
     /**
      * Collects the transitive dependencies of some artifacts and builds a dependency graph for the given path scope.

@@ -23,9 +23,14 @@ import java.net.URISyntaxException;
 
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.cache.CacheMetadata;
+import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.services.Request;
+import org.apache.maven.api.services.RequestTrace;
+import org.apache.maven.api.services.Result;
 import org.apache.maven.api.services.Transport;
 import org.apache.maven.api.services.TransportProvider;
 import org.apache.maven.api.services.TransportProviderException;
@@ -46,17 +51,59 @@ public class DefaultTransportProvider implements TransportProvider {
 
     @Override
     public Transport transport(Session session, RemoteRepository repository) {
+        requireNonNull(session, "session");
+        requireNonNull(repository, "repository");
+        InternalSession internalSession = InternalSession.from(session);
+        TransportRequest request = new TransportRequest(session, repository);
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
+        try {
+            return internalSession.request(request, this::doTransport).transport();
+        } finally {
+            RequestTraceHelper.exit(trace);
+        }
+    }
+
+    private TransportResult doTransport(TransportRequest request) {
+        Session session = request.getSession();
+        RemoteRepository repository = request.repository();
         try {
             URI baseURI = new URI(repository.url());
-            return new DefaultTransport(
-                    baseURI,
-                    transporterProvider.newTransporter(
-                            InternalSession.from(session).getSession(),
-                            ((DefaultRemoteRepository) repository).getRepository()));
+            return new TransportResult(
+                    request,
+                    new DefaultTransport(
+                            baseURI,
+                            transporterProvider.newTransporter(
+                                    InternalSession.from(session).getSession(),
+                                    ((DefaultRemoteRepository) repository).getRepository())));
         } catch (URISyntaxException e) {
             throw new TransportProviderException("Remote repository URL invalid", e);
         } catch (NoTransporterException e) {
             throw new TransportProviderException("Unsupported remote repository", e);
+        }
+    }
+
+    private record TransportRequest(Session session, RemoteRepository repository)
+            implements Request<Session>, CacheMetadata {
+        @Override
+        public Session getSession() {
+            return session;
+        }
+
+        @Override
+        public RequestTrace getTrace() {
+            return null;
+        }
+
+        @Override
+        public CacheRetention getCacheRetention() {
+            return CacheRetention.DISABLED;
+        }
+    }
+
+    private record TransportResult(TransportRequest request, Transport transport) implements Result<TransportRequest> {
+        @Override
+        public TransportRequest getRequest() {
+            return request;
         }
     }
 }

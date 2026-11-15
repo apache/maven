@@ -31,11 +31,13 @@ import javax.tools.StandardLocation;
 import javax.tools.ToolProvider;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringWriter;
 import java.net.URI;
+import java.net.URISyntaxException;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -61,60 +63,25 @@ import static org.junit.jupiter.api.Assertions.fail;
  */
 class MojoDescriptorProcessorTest {
 
-    /** Resolved classpath jars needed for compiling test sources. */
-    private static List<File> classpathJars;
+    private static List<Path> classpathEntries;
 
-    /** The processor JAR (contains the compiled MojoDescriptorProcessor). */
-    private static File processorJar;
+    private static Path processorEntry;
 
     @BeforeAll
     static void resolveClasspath() {
-        String version = System.getProperty("processor.version", "4.2.0-SNAPSHOT");
-
-        // Processor JAR — built from this module
-        processorJar = resolveFile(
-                "impl/maven-plugin-mixin/target/maven-plugin-mixin-" + version + ".jar",
-                "maven-plugin-mixin/" + version + "/maven-plugin-mixin-" + version + ".jar");
-
-        // Annotation JARs needed on the compilation classpath
-        File apiCore = resolveFile(
-                "api/maven-api-core/target/maven-api-core-" + version + ".jar",
-                "maven-api-core/" + version + "/maven-api-core-" + version + ".jar");
-        File apiAnnotations = resolveFile(
-                "api/maven-api-annotations/target/maven-api-annotations-" + version + ".jar",
-                "maven-api-annotations/" + version + "/maven-api-annotations-" + version + ".jar");
-
-        classpathJars = List.of(apiCore, apiAnnotations);
+        processorEntry = classpathEntryOf(MojoDescriptorProcessor.class);
+        classpathEntries = List.of(
+                classpathEntryOf(org.apache.maven.api.plugin.annotations.Mojo.class),
+                classpathEntryOf(org.apache.maven.api.annotations.Nonnull.class));
     }
 
-    /**
-     * Try to resolve a JAR first from the Maven multi-module project build output, then from the local Maven repo.
-     *
-     * <p>In a Maven build, {@code maven.multiModuleProjectDirectory} points to the project root, so
-     * {@code worktreeRelative} is resolved against that directory to find freshly-compiled JARs.
-     * The {@code processor.worktree} system property can override the root for IDE / manual runs.</p>
-     */
-    private static File resolveFile(String worktreeRelative, String m2Relative) {
-        // Prefer the Maven multi-module project directory (set by Maven during build)
-        String worktreeBase =
-                System.getProperty("processor.worktree", System.getProperty("maven.multiModuleProjectDirectory", ""));
-        String m2Base = System.getProperty(
-                "processor.m2", System.getProperty("user.home") + "/.m2/repository/org/apache/maven");
-
-        if (worktreeRelative != null && !worktreeBase.isEmpty()) {
-            File f = new File(worktreeBase, worktreeRelative);
-            if (f.isFile()) {
-                return f;
-            }
+    private static Path classpathEntryOf(Class<?> anchor) {
+        try {
+            return Paths.get(
+                    anchor.getProtectionDomain().getCodeSource().getLocation().toURI());
+        } catch (URISyntaxException e) {
+            return fail("Cannot resolve classpath entry for " + anchor.getName() + ": " + e);
         }
-        if (m2Relative != null) {
-            File f = new File(m2Base, m2Relative);
-            if (f.isFile()) {
-                return f;
-            }
-        }
-        fail("Cannot resolve JAR: worktree=" + worktreeRelative + " m2=" + m2Relative);
-        return null; // unreachable
     }
 
     // -------------------------------------------------------------------------
@@ -749,11 +716,8 @@ class MojoDescriptorProcessorTest {
         StandardJavaFileManager stdFm = compiler.getStandardFileManager(diagnostics, null, null);
 
         try {
-            // Build classpath: maven-api-core + maven-api-annotations for the test sources
-            stdFm.setLocation(StandardLocation.CLASS_PATH, classpathJars);
-
-            // Processor path: the processor JAR
-            stdFm.setLocation(StandardLocation.ANNOTATION_PROCESSOR_PATH, List.of(processorJar));
+            stdFm.setLocationFromPaths(StandardLocation.CLASS_PATH, classpathEntries);
+            stdFm.setLocationFromPaths(StandardLocation.ANNOTATION_PROCESSOR_PATH, List.of(processorEntry));
 
         } catch (IOException e) {
             fail("Failed to configure file manager locations: " + e.getMessage());

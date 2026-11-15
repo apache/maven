@@ -121,6 +121,30 @@ class BindingSelectionTest {
     }
 
     @Test
+    void supplierWithLowerPriorityIsOverriddenByProvidesMethod() {
+        // A binding registered with SESSION_SERVICE_PRIORITY (negative) must lose
+        // to a @Provides method at the default priority (0).
+        // Use NamedService::new for the low-priority supplier so the assertion is not tautological:
+        // if priority selection fails and the supplier wins, the result is NamedService, not DefaultService.
+        Injector injector = Injector.create()
+                .bindSupplier(Service.class, NamedService::new, Injector.SESSION_SERVICE_PRIORITY)
+                .bindImplicit(DefaultAndNamed.class);
+
+        // The @Provides method in DefaultAndNamed wins over the low-priority supplier — no ambiguity.
+        assertInstanceOf(DefaultService.class, injector.getInstance(Service.class));
+    }
+
+    @Test
+    void supplierWithHigherPriorityWinsOverDefaultBindSupplier() {
+        // A binding at positive priority wins over one at priority 0.
+        Injector injector = Injector.create()
+                .bindSupplier(Service.class, DefaultService::new, 0)
+                .bindSupplier(Service.class, NamedService::new, PREFERRED_PRIORITY);
+
+        assertInstanceOf(NamedService.class, injector.getInstance(Service.class));
+    }
+
+    @Test
     void differentProgrammaticFactoriesRemainAmbiguous() {
         InjectorImpl injector = new InjectorImpl();
         Key<Service> key = Key.of(Service.class);

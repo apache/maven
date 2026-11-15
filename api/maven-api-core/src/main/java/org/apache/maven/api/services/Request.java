@@ -23,6 +23,8 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.CacheMetadata;
+import org.apache.maven.api.cache.CacheRetention;
 
 /**
  * Base interface for service requests in Maven. This interface defines the common contract
@@ -58,7 +60,22 @@ import org.apache.maven.api.annotations.Nullable;
  */
 @Experimental
 @Immutable
-public interface Request<S extends ProtoSession> {
+public interface Request<S extends ProtoSession> extends CacheMetadata {
+
+    /**
+     * Returns the cache retention policy for this request.
+     * The default is {@link CacheRetention#DISABLED}: caching is opt-in.
+     * Request types whose results are safe to cache must override this method
+     * and return an appropriate retention policy (e.g. {@link CacheRetention#SESSION_SCOPED}).
+     *
+     * @return the cache retention policy, never {@code null}
+     * @since 4.2.0
+     */
+    @Nonnull
+    @Override
+    default CacheRetention getCacheRetention() {
+        return CacheRetention.DISABLED;
+    }
 
     /**
      * Returns the session associated with this request.

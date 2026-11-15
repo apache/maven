@@ -58,7 +58,7 @@ So some care needs to be taken when introducing new dependencies into the ITs th
 ```
 [ERROR] testit(org.apache.maven.it.MavenITmng...)  Time elapsed: 0.145 s  <<< ERROR!
 ...
-[ERROR] Failed to execute goal ... (...) on project ...: ... Could not find artifact ... in central (file:target/null) -> [Help 1]
+[ERROR] Failed to execute goal ... (...) on project ...: ... Could not find artifact ... in central (file:target/null)
 ```
 
 #[[### Using Local Repository Manager]]#

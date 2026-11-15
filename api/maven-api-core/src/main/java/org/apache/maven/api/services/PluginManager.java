@@ -18,9 +18,9 @@
  */
 package org.apache.maven.api.services;
 
+import org.apache.maven.api.OperationService;
 import org.apache.maven.api.Plugin;
 import org.apache.maven.api.Project;
-import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -31,7 +31,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @since 4.1.0
  */
 @Experimental
-public interface PluginManager extends Service {
+public interface PluginManager extends OperationService {
 
     /**
      * Resolves a plugin, creates its classloader when necessary, and returns its runtime metadata.

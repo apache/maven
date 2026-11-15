@@ -42,6 +42,7 @@ import java.util.stream.Stream;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.model.Dependency;
@@ -51,12 +52,15 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelBuilder;
+import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.impl.DefaultRemoteRepository;
+import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
@@ -66,14 +70,26 @@ import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  *
@@ -88,6 +104,167 @@ class DefaultModelBuilderTest {
         session = ApiRunner.createSession();
         builder = session.getService(ModelBuilder.class);
         assertNotNull(builder);
+    }
+
+    @Test
+    void directProjectBuildsEnterPipelineAndKeepTheirOwnSessionState() {
+        InternalSession requestSession = spy(InternalSession.from(session));
+        Map<String, String> properties = new HashMap<>(session.getUserProperties());
+        properties.put(Constants.MAVEN_CACHE_CONFIG_PROPERTY, "ModelBuilderRequest { scope: session, ref: hard }");
+        doReturn(Map.copyOf(properties)).when(requestSession).getUserProperties();
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(requestSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("props-and-profiles")))
+                .build();
+        ModelBuilder.ModelBuilderSession first = builder.newSession();
+        ModelBuilder.ModelBuilderSession second = builder.newSession();
+        ModelBuilderResult firstResult = first.build(request);
+        ModelBuilderResult secondResult = second.build(request);
+        verify(requestSession, times(2)).request(same(request), any());
+        assertEquals(CacheRetention.DISABLED, request.getCacheRetention());
+        assertNotSame(firstResult, secondResult);
+        assertNotNull(((DefaultModelBuilder.ModelBuilderSessionImpl) first).mainSession);
+        assertNotNull(((DefaultModelBuilder.ModelBuilderSessionImpl) second).mainSession);
+        assertEquals("21", secondResult.getEffectiveModel().getProperties().get("maven.compiler.release"));
+    }
+
+    @Test
+    void directConsumerBuildsEnterPipelineAndInitializeTheirOwnSessionState() throws Exception {
+        Path pom = Files.createTempFile("consumer-pipeline", ".xml");
+        try {
+            Files.writeString(
+                    pom,
+                    "<project><modelVersion>4.0.0</modelVersion><groupId>org.example</groupId>"
+                            + "<artifactId>consumer</artifactId><version>1</version></project>");
+            InternalSession requestSession = spy(InternalSession.from(session));
+            ModelBuilderRequest request = ModelBuilderRequest.builder()
+                    .session(requestSession)
+                    .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                    .source(Sources.buildSource(pom))
+                    .build();
+            ModelBuilder.ModelBuilderSession first = builder.newSession();
+            ModelBuilder.ModelBuilderSession second = builder.newSession();
+            assertNotSame(first.build(request), second.build(request));
+            assertNotNull(((DefaultModelBuilder.ModelBuilderSessionImpl) first).mainSession);
+            assertNotNull(((DefaultModelBuilder.ModelBuilderSessionImpl) second).mainSession);
+            assertEquals(CacheRetention.DISABLED, request.getCacheRetention());
+            verify(requestSession, times(2)).request(same(request), any());
+        } finally {
+            Files.deleteIfExists(pom);
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+            value = ModelBuilderRequest.RequestType.class,
+            names = {"CONSUMER_PARENT", "CONSUMER_DEPENDENCY"})
+    void consumerBuildsKeepTheirBuilderProfileContext(
+            ModelBuilderRequest.RequestType requestType, @TempDir Path directory) throws Exception {
+        InternalSession requestSession = spy(InternalSession.from(session));
+        doReturn(Map.of(Constants.MAVEN_CACHE_CONFIG_PROPERTY, "* { scope: session, ref: hard }"))
+                .when(requestSession)
+                .getUserProperties();
+        Path dependencyPom = directory.resolve("dependency.xml");
+        Path parentPom = directory.resolve("pom.xml");
+        Files.writeString(directory.resolve("marker.txt"), "exists");
+        String header = "<project><modelVersion>4.0.0</modelVersion><groupId>org.example</groupId>"
+                + "<artifactId>consumer</artifactId><version>1</version>";
+        Files.writeString(dependencyPom, header + "</project>");
+        Files.writeString(
+                parentPom,
+                header + "<profiles><profile><id>file</id><activation><file><exists>marker.txt</exists>"
+                        + "</file></activation><properties><marker>ACTIVE</marker></properties>"
+                        + "</profile></profiles></project>");
+        ModelBuilderRequest external = ModelBuilderRequest.builder()
+                .session(requestSession)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.resolvedSource(dependencyPom, "org.example:consumer:1"))
+                .build();
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(requestSession)
+                .requestType(requestType)
+                .source(Sources.buildSource(parentPom))
+                .build();
+        ModelBuilder.ModelBuilderSession externalBuilder = builder.newSession();
+        externalBuilder.build(external);
+        ModelBuilderResult externalResult = externalBuilder.build(request);
+        ModelBuilderResult projectResult = builder.newSession().build(request);
+        assertNull(externalResult.getEffectiveModel().getProperties().get("marker"));
+        assertEquals("ACTIVE", projectResult.getEffectiveModel().getProperties().get("marker"));
+        assertNull(externalBuilder
+                .build(request)
+                .getEffectiveModel()
+                .getProperties()
+                .get("marker"));
+        assertNotSame(externalResult, projectResult);
+        verify(requestSession, times(3)).request(same(request), any());
+        assertNull(requestSession.getCurrentTrace());
+    }
+
+    @Test
+    void validationAndRawModelsUseIndependentPipelineRequests(@TempDir Path directory) throws Exception {
+        Path pom = directory.resolve("pom.xml");
+        Files.writeString(
+                pom,
+                "<project><modelVersion>4.0.0</modelVersion><groupId>org.example</groupId>"
+                        + "<artifactId>consumer</artifactId><version>1</version><name>${label}</name>"
+                        + "<properties><label>expanded</label></properties></project>");
+        InternalSession requestSession = spy(InternalSession.from(session));
+        doReturn(Map.of(Constants.MAVEN_CACHE_CONFIG_PROPERTY, "* { scope: session, ref: hard }"))
+                .when(requestSession)
+                .getUserProperties();
+        RequestTrace parent = new RequestTrace("parent");
+        requestSession.setCurrentTrace(parent);
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(requestSession)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.buildSource(pom))
+                .build();
+        ModelBuilder.ModelBuilderSession modelSession = builder.newSession();
+        ModelBuilderResult built = modelSession.build(request);
+        assertEquals("expanded", built.getEffectiveModel().getName());
+        assertSame(parent, requestSession.getCurrentTrace());
+        ModelBuilderResult validated = modelSession.validate(request);
+        assertSame(request, validated.getRequest());
+        assertNull(validated.getEffectiveModel());
+        assertEquals("${label}", validated.getRawModel().getName());
+        assertSame(parent, requestSession.getCurrentTrace());
+        assertEquals("${label}", builder.buildRawModel(request).getName());
+        assertSame(parent, requestSession.getCurrentTrace());
+        assertEquals("expanded", modelSession.build(request).getEffectiveModel().getName());
+        assertSame(parent, requestSession.getCurrentTrace());
+        ArgumentCaptor<DefaultModelBuilder.ModelOperationRequest> operations =
+                ArgumentCaptor.forClass(DefaultModelBuilder.ModelOperationRequest.class);
+        verify(requestSession, times(2)).request(operations.capture(), any());
+        assertNotEquals(
+                operations.getAllValues().get(0).operation(),
+                operations.getAllValues().get(1).operation());
+        for (DefaultModelBuilder.ModelOperationRequest operation : operations.getAllValues()) {
+            assertSame(request, operation.modelRequest());
+            assertSame(requestSession, operation.getSession());
+            assertSame(request, operation.getTrace().data());
+            assertSame(parent, operation.getTrace().parent());
+            assertEquals(CacheRetention.DISABLED, operation.getCacheRetention());
+        }
+        verify(requestSession, times(2)).request(same(request), any());
+    }
+
+    @Test
+    void validationAndRawModelFailuresRestoreTrace(@TempDir Path directory) {
+        InternalSession requestSession = spy(InternalSession.from(session));
+        RequestTrace parent = new RequestTrace("parent");
+        requestSession.setCurrentTrace(parent);
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(requestSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)
+                .source(Sources.buildSource(directory.resolve("missing.xml")))
+                .build();
+        assertThrows(ModelBuilderException.class, () -> builder.newSession().validate(request));
+        assertSame(parent, requestSession.getCurrentTrace());
+        assertThrows(ModelBuilderException.class, () -> builder.buildRawModel(request));
+        assertSame(parent, requestSession.getCurrentTrace());
+        verify(requestSession, times(2)).request(any(DefaultModelBuilder.ModelOperationRequest.class), any());
     }
 
     @Test

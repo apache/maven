@@ -169,7 +169,7 @@ public class DefaultExceptionHandler implements ExceptionHandler {
         }
 
         if (exception != null) {
-            if (exception instanceof MojoExecutionException) {
+            if (exception instanceof MojoExecutionException || exception instanceof MojoException) {
                 reference = MojoExecutionException.class.getSimpleName();
 
                 Throwable cause = exception.getCause();
@@ -177,6 +177,8 @@ public class DefaultExceptionHandler implements ExceptionHandler {
                     cause = cause.getCause();
                     if (cause instanceof ConnectException) {
                         reference = ConnectException.class.getSimpleName();
+                    } else if (cause instanceof UnknownHostException) {
+                        reference = UnknownHostException.class.getSimpleName();
                     }
                 }
                 if (findCause(exception, ArtifactFilteredOutException.class) != null) {
@@ -214,7 +216,8 @@ public class DefaultExceptionHandler implements ExceptionHandler {
 
         if ((reference != null && !reference.isEmpty())
                 && !reference.startsWith("http:")
-                && !reference.startsWith("https:")) {
+                && !reference.startsWith("https:")
+                && ReferenceHelp.hasHelpText(reference)) {
             reference = "http://cwiki.apache.org/confluence/display/MAVEN/" + reference;
         }
 

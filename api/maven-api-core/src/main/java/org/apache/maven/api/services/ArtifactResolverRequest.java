@@ -30,6 +30,7 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.CacheRetention;
 
 import static java.util.Objects.requireNonNull;
 
@@ -41,6 +42,20 @@ import static java.util.Objects.requireNonNull;
 @Experimental
 @Immutable
 public interface ArtifactResolverRequest extends RepositoryAwareRequest {
+
+    /**
+     * Overrides the default {@link CacheRetention#DISABLED} retention with
+     * {@link CacheRetention#REQUEST_SCOPED}, because artifact resolution is a
+     * read-only, deterministic operation within a single build.
+     *
+     * @return {@link CacheRetention#REQUEST_SCOPED}
+     * @since 4.2.0
+     */
+    @Nonnull
+    @Override
+    default CacheRetention getCacheRetention() {
+        return CacheRetention.REQUEST_SCOPED;
+    }
 
     /** @return the coordinates of the artifacts to resolve, never {@code null} */
     @Nonnull

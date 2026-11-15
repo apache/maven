@@ -28,6 +28,7 @@ import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.ArtifactDeployer;
 import org.apache.maven.api.services.ArtifactDeployerException;
 import org.apache.maven.api.services.ArtifactDeployerRequest;
+import org.apache.maven.api.services.Result;
 import org.eclipse.aether.deployment.DeployRequest;
 import org.eclipse.aether.deployment.DeploymentException;
 
@@ -44,20 +45,29 @@ public class DefaultArtifactDeployer implements ArtifactDeployer {
     public void deploy(@Nonnull ArtifactDeployerRequest request) {
         requireNonNull(request, "request");
         InternalSession session = InternalSession.from(request.getSession());
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
+        try {
+            session.request(request, this::doDeploy);
+        } finally {
+            RequestTraceHelper.exit(trace);
+        }
+    }
+
+    private Result<ArtifactDeployerRequest> doDeploy(ArtifactDeployerRequest request) {
+        InternalSession session = InternalSession.from(request.getSession());
         Collection<ProducedArtifact> artifacts = requireNonNull(request.getArtifacts(), "request.artifacts");
         RemoteRepository repository = requireNonNull(request.getRepository(), "request.repository");
-        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
+        org.apache.maven.api.services.RequestTrace trace = RequestTraceHelper.getCurrentTrace(session);
         try {
             DeployRequest deployRequest = new DeployRequest()
                     .setRepository(session.toRepository(repository))
                     .setArtifacts(session.toArtifacts(artifacts))
-                    .setTrace(trace.trace());
+                    .setTrace(RequestTraceHelper.toResolver(trace));
 
             session.getRepositorySystem().deploy(session.getSession(), deployRequest);
         } catch (DeploymentException e) {
             throw new ArtifactDeployerException("Unable to deploy artifacts", e);
-        } finally {
-            RequestTraceHelper.exit(trace);
         }
+        return () -> request;
     }
 }

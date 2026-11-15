@@ -437,7 +437,7 @@
           </description>
           <type>String</type>
         </field>
-        <field>
+        <field xsd.suggestions="http,https">
           <name>protocol</name>
           <version>1.0.0+</version>
           <description>
@@ -677,7 +677,7 @@
           <type>String</type>
           <description>The URL of the mirror repository.</description>
         </field>
-        <field>
+        <field xsd.suggestions="default,legacy">
           <name>layout</name>
           <version>1.1.0+</version>
           <type>String</type>
@@ -893,7 +893,7 @@
           </description>
           <type>String</type>
         </field>
-        <field>
+        <field xsd.suggestions="default,legacy">
           <name>layout</name>
           <version>1.0.0+</version>
           <description>
@@ -989,7 +989,7 @@
           <type>boolean</type>
           <defaultValue>true</defaultValue>
         </field>
-        <field>
+        <field xsd.suggestions="always,daily,never,interval:30">
           <name>updatePolicy</name>
           <version>1.0.0+</version>
           <description>
@@ -999,7 +999,7 @@
           </description>
           <type>String</type>
         </field>
-        <field>
+        <field xsd.enumerations="fail,warn,ignore">
           <name>checksumPolicy</name>
           <version>1.0.0+</version>
           <description>

@@ -33,7 +33,9 @@ import static java.util.Objects.requireNonNull;
  * Request for creating an {@link org.apache.maven.api.Artifact} from individual coordinate components.
  *
  * @since 4.0.0
+ * @deprecated Use {@link ArtifactFactory#create(Session, String, String, String, String, String, String)} directly.
  */
+@Deprecated
 @Experimental
 @Immutable
 public interface ArtifactFactoryRequest extends Request<Session> {
@@ -65,7 +67,9 @@ public interface ArtifactFactoryRequest extends Request<Session> {
      * @param version the version
      * @param extension the file extension
      * @return a new request
+     * @deprecated Use {@link ArtifactFactory#create(Session, String, String, String, String)} directly.
      */
+    @Deprecated
     static ArtifactFactoryRequest build(
             Session session, String groupId, String artifactId, String version, String extension) {
         return ArtifactFactoryRequest.builder()
@@ -88,7 +92,9 @@ public interface ArtifactFactoryRequest extends Request<Session> {
      * @param extension the file extension
      * @param type the artifact type
      * @return a new request
+     * @deprecated Use {@link ArtifactFactory#create(Session, String, String, String, String, String, String)} directly.
      */
+    @Deprecated
     static ArtifactFactoryRequest build(
             Session session,
             String groupId,
@@ -109,10 +115,12 @@ public interface ArtifactFactoryRequest extends Request<Session> {
     }
 
     /** @return a new builder instance */
+    @Deprecated
     static ArtifactFactoryRequestBuilder builder() {
         return new ArtifactFactoryRequestBuilder();
     }
 
+    @Deprecated
     @NotThreadSafe
     class ArtifactFactoryRequestBuilder {
         private Session session;

@@ -21,8 +21,8 @@ package org.apache.maven.api.services;
 import java.util.List;
 
 import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.OperationService;
 import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
@@ -36,7 +36,7 @@ import org.apache.maven.api.annotations.Nullable;
  */
 @Experimental
 @Consumer
-public interface VersionRangeResolver extends Service {
+public interface VersionRangeResolver extends OperationService {
 
     /**
      * Expands a version range to a list of matching versions, in ascending order.

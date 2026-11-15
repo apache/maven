@@ -85,6 +85,7 @@ public class LifecycleModuleBuilder {
         session.setCurrentProject(currentProject);
 
         Instant buildStartTime = MonotonicClock.now();
+        boolean successReported = false;
 
         try {
 
@@ -111,6 +112,7 @@ public class LifecycleModuleBuilder {
 
             Instant buildEndTime = MonotonicClock.now();
 
+            successReported = true;
             projectExecutionListener.afterProjectExecutionSuccess(
                     new ProjectExecutionEvent(session, currentProject, mojoExecutions));
 
@@ -122,8 +124,10 @@ public class LifecycleModuleBuilder {
         } catch (Throwable t) {
             builderCommon.handleBuildError(reactorContext, rootSession, session, currentProject, t, buildStartTime);
 
-            projectExecutionListener.afterProjectExecutionFailure(
-                    new ProjectExecutionEvent(session, currentProject, t));
+            if (!successReported) {
+                projectExecutionListener.afterProjectExecutionFailure(
+                        new ProjectExecutionEvent(session, currentProject, t));
+            }
 
             // rethrow original errors and runtime exceptions
             if (t instanceof RuntimeException runtimeException) {

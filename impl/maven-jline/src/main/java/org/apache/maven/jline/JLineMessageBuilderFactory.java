@@ -28,6 +28,7 @@ import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
+import org.jline.terminal.Terminal;
 import org.jline.utils.AttributedStringBuilder;
 import org.jline.utils.AttributedStyle;
 import org.jline.utils.StyleResolver;
@@ -112,7 +113,11 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory {
 
         @Override
         public String build() {
-            return builder.toAnsi(MessageUtils.terminal);
+            Terminal terminal = MessageUtils.terminal;
+            if (terminal != null && Terminal.TYPE_DUMB.equals(terminal.getType()) && MessageUtils.isColorEnabled()) {
+                return builder.toAnsi();
+            }
+            return builder.toAnsi(terminal);
         }
 
         @Override

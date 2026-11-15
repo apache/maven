@@ -20,11 +20,15 @@ package org.apache.maven.impl;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
 
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.services.DependencyResolverRequest;
+import org.apache.maven.api.services.DependencyResolverResult;
+import org.apache.maven.api.services.RequestTrace;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -42,6 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -52,6 +57,7 @@ class DefaultDependencyResolverTest {
     @Test
     void collectAppliesProjectManagementToCallerSuppliedDependencies() throws Exception {
         InternalSession session = mock(InternalSession.class);
+        trackTrace(session, null);
         RepositorySystem repositorySystem = mock(RepositorySystem.class);
         RepositorySystemSession repositorySession = mock(RepositorySystemSession.class);
         DependencyResolverRequest request = mock(DependencyResolverRequest.class);
@@ -68,6 +74,11 @@ class DefaultDependencyResolverTest {
         Dependency resolverManagedDependency = new Dependency(
                 new DefaultArtifact("org.example:processor:jar:1.2.3"), "runtime", false, List.of(exclusion));
 
+        when(session.request(any(DependencyResolverRequest.class), any())).thenAnswer(invocation -> {
+            DependencyResolverRequest req = invocation.getArgument(0);
+            Function<DependencyResolverRequest, DependencyResolverResult> work = invocation.getArgument(1);
+            return work.apply(req);
+        });
         when(request.getSession()).thenReturn(session);
         when(request.getProject()).thenReturn(Optional.of(project));
         when(request.getDependencies()).thenReturn(callerDependencies);
@@ -104,6 +115,7 @@ class DefaultDependencyResolverTest {
         // so applyDependencyManagement must NOT be called: the project's own deps go through
         // as-is (no managed version/scope/exclusion merge).
         InternalSession session = mock(InternalSession.class);
+        trackTrace(session, null);
         RepositorySystem repositorySystem = mock(RepositorySystem.class);
         RepositorySystemSession repositorySession = mock(RepositorySystemSession.class);
         DependencyResolverRequest request = mock(DependencyResolverRequest.class);
@@ -118,6 +130,11 @@ class DefaultDependencyResolverTest {
         Dependency resolverManagedDependency =
                 new Dependency(new DefaultArtifact("org.example:processor:jar:1.2.3"), "runtime");
 
+        when(session.request(any(DependencyResolverRequest.class), any())).thenAnswer(invocation -> {
+            DependencyResolverRequest req = invocation.getArgument(0);
+            Function<DependencyResolverRequest, DependencyResolverResult> work = invocation.getArgument(1);
+            return work.apply(req);
+        });
         when(request.getSession()).thenReturn(session);
         when(request.getProject()).thenReturn(Optional.of(project));
         when(request.getDependencies()).thenReturn(List.of()); // no caller-supplied deps
@@ -199,5 +216,16 @@ class DefaultDependencyResolverTest {
 
         assertEquals("1.2.3", result.get(0).getArtifact().getVersion());
         assertSame(unmatched, result.get(1));
+    }
+
+    private static void trackTrace(InternalSession session, RequestTrace initial) {
+        AtomicReference<RequestTrace> current = new AtomicReference<>(initial);
+        when(session.getCurrentTrace()).thenAnswer(invocation -> current.get());
+        doAnswer(invocation -> {
+                    current.set(invocation.getArgument(0));
+                    return null;
+                })
+                .when(session)
+                .setCurrentTrace(any());
     }
 }

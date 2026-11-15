@@ -113,7 +113,13 @@ public class DefaultModelResolver implements ModelResolver {
     public ModelResolverResult resolveModel(
             @Nonnull ModelResolverRequest request, InputLocation location, String modelType)
             throws ModelResolverException {
-        return InternalSession.from(request.session()).request(request, r -> doResolveModel(r, location, modelType));
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.session(), request);
+        try {
+            return InternalSession.from(request.session())
+                    .request(request, r -> doResolveModel(r, location, modelType));
+        } finally {
+            RequestTraceHelper.exit(trace);
+        }
     }
 
     public ModelResolverResult doResolveModel(
@@ -127,7 +133,6 @@ public class DefaultModelResolver implements ModelResolver {
         String extension = request.extension();
         List<RemoteRepository> repositories = request.repositories();
 
-        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
             ArtifactCoordinates coords =
                     session.createArtifactCoordinates(groupId, artifactId, version, classifier, extension, null);
@@ -165,8 +170,6 @@ public class DefaultModelResolver implements ModelResolver {
                     artifactId,
                     version,
                     e);
-        } finally {
-            RequestTraceHelper.exit(trace);
         }
     }
 

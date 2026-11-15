@@ -1,0 +1,25 @@
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+#
+#   http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+# KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+Maven could not connect to a remote host.
+
+This often happens when Java prefers IPv6 while the host or the network only
+supports IPv4. If the stack trace shows a "Connection refused" while establishing
+a loopback connection, force Java to use IPv4 with:
+
+  -Djava.net.preferIPv4Stack=true
+
+Add this option to MAVEN_OPTS to apply it to all Maven commands.

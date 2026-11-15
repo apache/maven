@@ -49,6 +49,7 @@ import org.apache.maven.api.Listener;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.Node;
+import org.apache.maven.api.OperationService;
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.PathType;
@@ -196,18 +197,18 @@ public abstract class AbstractSession implements InternalSession {
             return Stream.concat(
                             Service.class.isAssignableFrom(clazz) ? Stream.of((Class<Service>) clazz) : Stream.empty(),
                             Stream.of(clazz.getInterfaces()).flatMap(AbstractSession::collectServiceInterfaces))
-                    .filter(itf -> itf != Service.class);
+                    .filter(itf -> itf != Service.class && itf != OperationService.class);
         } else {
             return Stream.concat(
                             Stream.of(clazz.getInterfaces()).flatMap(AbstractSession::collectServiceInterfaces),
                             collectServiceInterfaces(clazz.getSuperclass()))
-                    .filter(itf -> itf != Service.class);
+                    .filter(itf -> itf != Service.class && itf != OperationService.class);
         }
     }
 
     @Override
     public <REQ extends Request<?>, REP extends Result<REQ>> REP request(REQ req, Function<REQ, REP> supplier) {
-        return getRequestCache().request(req, supplier);
+        return RequestExecutor.execute(req, supplier, getRequestCache());
     }
 
     @Override
@@ -617,7 +618,7 @@ public abstract class AbstractSession implements InternalSession {
     /**
      * Shortcut for <code>getService(ArtifactCoordinatesFactory.class).create(...)</code>
      *
-     * @see ArtifactFactory#create(Session, String, String, String, String)
+     * @see ArtifactCoordinatesFactory#create(Session, String, String, String, String)
      */
     @Override
     public ArtifactCoordinates createArtifactCoordinates(
@@ -879,7 +880,7 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     /**
-     * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
+     * Shortcut for <code>getService(DependencyCoordinatesFactory.class).create(...)</code>
      *
      * @see DependencyCoordinatesFactory#create(Session, ArtifactCoordinates)
      */
@@ -890,9 +891,9 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     /**
-     * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
+     * Shortcut for <code>getService(DependencyCoordinatesFactory.class).create(...)</code>
      *
-     * @see DependencyCoordinatesFactory#create(Session, ArtifactCoordinates)
+     * @see DependencyCoordinatesFactory#create(Session, Dependency)
      */
     @Nonnull
     @Override
