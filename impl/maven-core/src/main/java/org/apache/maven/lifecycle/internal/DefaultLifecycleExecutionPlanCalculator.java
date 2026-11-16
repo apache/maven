@@ -28,6 +28,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -217,7 +218,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                     MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
                     PluginVersionResolutionException, LifecyclePhaseNotFoundException {
         final List<MojoExecution> mojoExecutions = new ArrayList<>();
-        final Set<String> duplicateLifecyclePhases = new HashSet<>();
+        final Set<String> duplicateLifecyclePhases = new LinkedHashSet<>();
 
         for (Task task : tasks) {
             if (task instanceof GoalTask) {
@@ -258,9 +259,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
             }
         }
         if (!duplicateLifecyclePhases.isEmpty()) {
-            LOG.warn(
-                    "Your Maven Goals contain duplicate lifecycle phases that lead to multiple executions of the same phase: {}. If this is not intended, you should check your Maven Build.",
-                    duplicateLifecyclePhases);
+            LOG.warn("The given lifecycle phases overlap. If this is not intended, you should check your Maven Build.");
         }
         return mojoExecutions;
     }

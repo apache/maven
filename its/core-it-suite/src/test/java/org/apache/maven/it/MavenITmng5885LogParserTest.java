@@ -1,7 +1,4 @@
-package src.test.java.org.apache.maven.it;
-
-import org.apache.maven.it.AbstractMavenIntegrationTestCase;
-import org.apache.maven.it.Verifier;
+package org.apache.maven.it;
 
 import org.junit.jupiter.api.Test;
 
@@ -10,7 +7,7 @@ import java.nio.file.Path;
 public class MavenITmng5885LogParserTest extends AbstractMavenIntegrationTestCase {
 
     @Test
-    public void testGood() throws Exception {
+    public void testDuplicateLifecyclePhases() throws Exception {
         Path testDir = extractResources("mng-5885");
 
         // First, build the test extension
@@ -22,6 +19,21 @@ public class MavenITmng5885LogParserTest extends AbstractMavenIntegrationTestCas
         verifier.execute();
         verifier.verifyErrorFreeLog();
         //Your Maven Goals contain duplicate lifecycle phases that lead to multiple executions of the same phase: [compile, after:sources, resources, after:resources, initialize, validate]. If this is not intended, you should check your Maven Build.
-        verifier.verifyTextInLog("Your Maven Goals contain duplicate lifecycle");
+        verifier.verifyTextInLog("The given lifecycle phases overlap. If this is not intended, you should check your Maven Build.");
+    }
+
+    @Test
+    public void testNormalLifecyclePhases() throws Exception {
+        Path testDir = extractResources("mng-5885");
+
+        // First, build the test extension
+        Verifier verifier = newVerifier(testDir);
+        verifier.setAutoclean(false);
+        verifier.deleteDirectory("target");
+        verifier.addCliArgument("package");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+        //Your Maven Goals contain duplicate lifecycle phases that lead to multiple executions of the same phase: [compile, after:sources, resources, after:resources, initialize, validate]. If this is not intended, you should check your Maven Build.
+        verifier.verifyTextNotInLog("The given lifecycle phases overlap. If this is not intended, you should check your Maven Build.");
     }
 }
