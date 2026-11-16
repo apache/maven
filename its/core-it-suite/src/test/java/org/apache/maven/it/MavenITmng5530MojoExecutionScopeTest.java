@@ -37,6 +37,7 @@ class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrationTestC
 
         // install the test plugin
         verifier = newVerifier(pluginDir);
+        verifier.getSystemProperties().put("maven.compiler.release", "8");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -62,6 +63,7 @@ class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrationTestC
 
         // install the test plugin
         verifier = newVerifier(pluginDir);
+        verifier.getSystemProperties().put("maven.compiler.release", "8");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
@@ -92,12 +94,14 @@ class MavenITmng5530MojoExecutionScopeTest extends AbstractMavenIntegrationTestC
 
         // install the test extension
         verifier = newVerifier(extensionDir);
+        verifier.getSystemProperties().put("maven.compiler.release", "8");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();
 
         // install the test plugin
         verifier = newVerifier(pluginDir);
+        verifier.getSystemProperties().put("maven.compiler.release", "8");
         verifier.addCliArgument("install");
         verifier.execute();
         verifier.verifyErrorFreeLog();

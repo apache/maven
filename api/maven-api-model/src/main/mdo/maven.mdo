@@ -1532,6 +1532,19 @@
           <type>String</type>
         </field>
         <field>
+          <name>deprecated</name>
+          <version>4.1.0+</version>
+          <type>boolean</type>
+          <defaultValue>false</defaultValue>
+          <description>Indicates whether this project/artifact is deprecated.</description>
+       </field>
+       <field>
+           <name>deprecationMessage</name>
+           <version>4.1.0+</version>
+          <type>String</type>
+          <description>A message from developers explaining the deprecation or alternative.</description>
+        </field>
+        <field>
           <name>relocation</name>
           <version>4.0.0+</version>
           <description>

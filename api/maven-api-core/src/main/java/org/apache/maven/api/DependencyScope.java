@@ -102,6 +102,10 @@ public enum DependencyScope {
      * by the JDK or the runtime environment/container. Dependencies in this scope are available on
      * the main compile, test compile, and test runtime classpaths, but not on the main runtime
      * classpath. Dependencies in this scope are not transitive to downstream projects.
+     * <p>
+     * <b>Transitive behavior:</b> Its transitive {@code compile} and {@code runtime} dependencies
+     * become {@code provided}, while its transitive {@code provided} and {@code test} dependencies
+     * are omitted.
      */
     PROVIDED("provided", false),
 
