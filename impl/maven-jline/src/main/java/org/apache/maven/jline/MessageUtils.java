@@ -37,7 +37,7 @@ public class MessageUtils {
 
     private static final int SIGINT_EXIT_CODE = 130;
 
-    static Terminal terminal;
+    static volatile Terminal terminal;
     static volatile LineReader reader;
     static MessageBuilderFactory messageBuilderFactory = new JLineMessageBuilderFactory();
     static volatile Boolean colorEnabled;
