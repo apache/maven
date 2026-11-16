@@ -21,15 +21,15 @@ package org.apache.maven.model.v4;
 import javax.xml.stream.XMLStreamException;
 
 import java.io.StringReader;
-import java.util.stream.Stream;
 
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
-import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -297,34 +297,35 @@ class MavenStaxReaderTest {
         assertEquals(1, ex.getLocation().getLineNumber());
     }
 
-    @Test
-    void testUnknownRootNamespacesAreRejectedInStrictMode() {
-        assertAll(Stream.of(
-                        // only exact matches are accepted, no prefix matching
-                        "http://maven.apache.org/POM/",
-                        "http://maven.apache.org/POM/4.0",
-                        "http://maven.apache.org/POM/4.0.0/",
-                        "http://maven.apache.org/POM/9.9.9",
-                        // namespaces are case-sensitive and the scheme is part of the namespace name
-                        "https://maven.apache.org/POM/4.0.0",
-                        "http://maven.apache.org/pom/4.0.0",
-                        // namespaces of other Maven models are not valid for a POM
-                        "http://maven.apache.org/METADATA/1.1.0",
-                        "http://maven.apache.org/SETTINGS/1.0.0")
-                .map(ns -> () -> {
-                    XMLStreamException ex =
-                            assertThrows(XMLStreamException.class, () -> fromXml(pomWithNamespace(ns)), ns);
-                    assertTrue(ex.getMessage().contains("Unrecognized namespace '" + ns + "'"), ex.getMessage());
-                }));
+    @ParameterizedTest
+    // only exact matches are accepted, no prefix matching
+    @ValueSource(
+            strings = {
+                "http://maven.apache.org/POM/",
+                "http://maven.apache.org/POM/4.0",
+                "http://maven.apache.org/POM/4.0.0/",
+                "http://maven.apache.org/POM/9.9.9",
+                // namespaces are case-sensitive and the scheme is part of the namespace name
+                "https://maven.apache.org/POM/4.0.0",
+                "http://maven.apache.org/pom/4.0.0",
+                // namespaces of other Maven models are not valid for a POM
+                "http://maven.apache.org/METADATA/1.1.0",
+                "http://maven.apache.org/SETTINGS/1.0.0"
+            })
+    void testUnknownRootNamespacesAreRejectedInStrictMode(String ns) {
+        XMLStreamException ex = assertThrows(XMLStreamException.class, () -> fromXml(pomWithNamespace(ns)), ns);
+        assertTrue(ex.getMessage().contains("Unrecognized namespace '" + ns + "'"), ex.getMessage());
     }
 
-    @Test
-    void testKnownRootNamespacesAreAcceptedInStrictMode() {
-        assertAll(Stream.of(
-                        "http://maven.apache.org/POM/4.0.0",
-                        "http://maven.apache.org/POM/4.1.0",
-                        "http://maven.apache.org/POM/4.2.0")
-                .map(ns -> () -> assertEquals(ns, fromXml(pomWithNamespace(ns)).getNamespaceUri(), ns)));
+    @ParameterizedTest
+    @ValueSource(
+            strings = {
+                "http://maven.apache.org/POM/4.0.0",
+                "http://maven.apache.org/POM/4.1.0",
+                "http://maven.apache.org/POM/4.2.0"
+            })
+    void testKnownRootNamespacesAreAcceptedInStrictMode(String ns) throws XMLStreamException {
+        assertEquals(ns, fromXml(pomWithNamespace(ns)).getNamespaceUri(), ns);
     }
 
     @Test
