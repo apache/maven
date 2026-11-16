@@ -804,12 +804,10 @@ class VersionRangeTest {
         ArtifactVersion version = new DefaultArtifactVersion("1.1234");
         assertTrue(range.containsVersion(version));
 
-        assertThrows(
-                UnsupportedOperationException.class,
-                () -> range.getRestrictions().clear());
-        assertThrows(
-                UnsupportedOperationException.class,
-                () -> range.getRestrictions().set(0, Restriction.EVERYTHING));
+        assertThrows(UnsupportedOperationException.class, () -> range.getRestrictions()
+                .clear());
+        assertThrows(UnsupportedOperationException.class, () -> range.getRestrictions()
+                .set(0, Restriction.EVERYTHING));
 
         VersionRange cached = VersionRange.createFromVersionSpec(spec);
         assertSame(range, cached);
@@ -823,9 +821,8 @@ class VersionRangeTest {
         VersionRange range = VersionRange.createFromVersionSpec("[3.1234,4.5678]");
         VersionRange clone = range.cloneOf();
 
-        assertThrows(
-                UnsupportedOperationException.class,
-                () -> clone.getRestrictions().clear());
+        assertThrows(UnsupportedOperationException.class, () -> clone.getRestrictions()
+                .clear());
         assertEquals(range, clone);
         assertTrue(clone.containsVersion(new DefaultArtifactVersion("3.5000")));
         assertFalse(clone.containsVersion(new DefaultArtifactVersion("5.0")));
@@ -836,9 +833,8 @@ class VersionRangeTest {
         VersionRange range = VersionRange.createFromVersionSpec("[3.1234,4.5678]")
                 .restrict(VersionRange.createFromVersionSpec("[3.5000,5.0]"));
 
-        assertThrows(
-                UnsupportedOperationException.class,
-                () -> range.getRestrictions().clear());
+        assertThrows(UnsupportedOperationException.class, () -> range.getRestrictions()
+                .clear());
         assertTrue(range.containsVersion(new DefaultArtifactVersion("4.0")));
         assertFalse(range.containsVersion(new DefaultArtifactVersion("3.2500")));
     }
@@ -847,9 +843,8 @@ class VersionRangeTest {
     void testVersionRestrictionsAreUnmodifiable() {
         VersionRange range = VersionRange.createFromVersion("3.1234");
 
-        assertThrows(
-                UnsupportedOperationException.class,
-                () -> range.getRestrictions().add(Restriction.EVERYTHING));
+        assertThrows(UnsupportedOperationException.class, () -> range.getRestrictions()
+                .add(Restriction.EVERYTHING));
         assertSame(range, VersionRange.createFromVersion("3.1234"));
         assertTrue(range.getRestrictions().isEmpty());
         assertEquals(new DefaultArtifactVersion("3.1234"), range.getRecommendedVersion());
