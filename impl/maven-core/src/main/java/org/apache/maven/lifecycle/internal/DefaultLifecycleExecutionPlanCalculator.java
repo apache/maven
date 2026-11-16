@@ -58,6 +58,8 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -67,6 +69,8 @@ import org.apache.maven.project.MavenProject;
 @Named
 @Singleton
 public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecutionPlanCalculator {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultLifecycleExecutionPlanCalculator.class);
 
     private final BuildPluginManager pluginManager;
 
@@ -233,9 +237,29 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                 Map<String, List<MojoExecution>> phaseToMojoMapping =
                         calculateLifecycleMappings(session, project, lifecyclePhase);
 
+                Set<String> duplicateLifeCycles = new HashSet<>();
+
                 for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values()) {
                     mojoExecutions.addAll(mojoExecutionsFromLifecycle);
+
+                    List<String> containedLifeCycles = mojoExecutions.stream()
+                            .map(MojoExecution::getLifecyclePhase)
+                            .toList();
+                    duplicateLifeCycles.addAll(
+                            mojoExecutionsFromLifecycle.stream()
+                                    .filter(e -> !containedLifeCycles.contains(e.getLifecyclePhase()))
+                                    .toList()
+                                    .stream()
+                                    .map(MojoExecution::getLifecyclePhase)
+                                    .toList());
                 }
+
+                if (!duplicateLifeCycles.isEmpty()) {
+                    LOG.warn(
+                            "Your Maven Goals contain duplicate lifecycle phases that lead to multiple executions of the same phase: {}. If this is not intended, you should check your Maven Build.",
+                            duplicateLifeCycles);
+                }
+
             } else {
                 throw new IllegalStateException("unexpected task " + task);
             }
