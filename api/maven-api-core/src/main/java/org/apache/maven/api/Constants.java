@@ -939,7 +939,7 @@ public final class Constants {
      * Whether to build the terminal on a background thread. When {@code false},
      * the terminal is built synchronously during startup.
      *
-     * @since 4.0.0
+     * @since 4.2.0
      */
     @Config(
             type = "java.lang.Boolean",

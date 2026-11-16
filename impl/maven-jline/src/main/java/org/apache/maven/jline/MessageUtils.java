@@ -88,8 +88,13 @@ public class MessageUtils {
     static LineReader getReader() {
         LineReader r = reader;
         if (r == null) {
-            r = LineReaderBuilder.builder().terminal(terminal).build();
-            reader = r;
+            synchronized (STARTUP_SHUTDOWN_MONITOR) {
+                r = reader;
+                if (r == null) {
+                    r = LineReaderBuilder.builder().terminal(terminal).build();
+                    reader = r;
+                }
+            }
         }
         return r;
     }
