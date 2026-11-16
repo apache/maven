@@ -113,7 +113,7 @@ public class JLineMessageBuilderFactory implements MessageBuilderFactory {
 
         @Override
         public String build() {
-            Terminal terminal = MessageUtils.terminal;
+            Terminal terminal = MessageUtils.getTerminal();
             if (terminal != null && Terminal.TYPE_DUMB.equals(terminal.getType()) && MessageUtils.isColorEnabled()) {
                 return builder.toAnsi();
             }

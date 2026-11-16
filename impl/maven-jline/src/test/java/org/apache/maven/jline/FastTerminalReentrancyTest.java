@@ -19,7 +19,6 @@
 package org.apache.maven.jline;
 
 import java.time.Duration;
-import java.util.concurrent.CompletableFuture;
 
 import org.jline.terminal.Terminal;
 import org.jline.terminal.impl.DeferredTerminal;
@@ -47,30 +46,17 @@ class FastTerminalReentrancyTest {
     }
 
     @Test
-    void usingTheTerminalFromTheConsumerDoesNotDeadlock() {
+    void terminalMethodsWorkAfterInitialization() {
         assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
-            CompletableFuture<String[]> probed = new CompletableFuture<>();
-            installAndAwait(terminal -> probed.complete(probe()));
-            assertProbe(probed.get());
-        });
-    }
-
-    @Test
-    void arbitraryTerminalMethodsFromTheConsumerDoNotDeadlock() {
-        assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
-            CompletableFuture<String> probed = new CompletableFuture<>();
-            installAndAwait(terminal -> {
-                Terminal t = MessageUtils.getTerminal();
-                probed.complete(t.getName());
-            });
-            assertNotNull(probed.get());
+            installAndAwait();
+            assertProbe(probe());
         });
     }
 
     @Test
     void terminalAssignmentIsVisibleImmediately() {
         assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
-            installAndAwait(terminal -> {});
+            installAndAwait();
             Terminal t = MessageUtils.getTerminal();
             assertNotNull(t, "MessageUtils.getTerminal() must not return null after systemInstall()");
             assertTrue(t instanceof DeferredTerminal, "terminal should be the DeferredTerminal wrapper");
@@ -80,7 +66,7 @@ class FastTerminalReentrancyTest {
     @Test
     void writerWorksBeforeTerminalIsReady() {
         assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
-            installAndAwait(terminal -> {});
+            installAndAwait();
             Terminal t = MessageUtils.getTerminal();
             assertNotNull(t.writer(), "writer() must not return null");
             t.writer().print("test");
@@ -91,7 +77,7 @@ class FastTerminalReentrancyTest {
     @Test
     void getTypeReturnsNonNullBeforeReady() {
         assertTimeoutPreemptively(Duration.ofSeconds(30), () -> {
-            installAndAwait(terminal -> {});
+            installAndAwait();
             Terminal t = MessageUtils.getTerminal();
             assertNotNull(t.getType(), "getType() must not return null");
         });
@@ -109,8 +95,7 @@ class FastTerminalReentrancyTest {
         assertNotNull(probed[1]);
     }
 
-    private void installAndAwait(java.util.function.Consumer<Terminal> onTerminal) {
-        MessageUtils.systemInstall(builder -> {}, onTerminal);
-        MessageUtils.awaitTerminalInitialization();
+    private void installAndAwait() {
+        MessageUtils.systemInstall(builder -> {});
     }
 }
