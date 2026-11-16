@@ -29,7 +29,7 @@ under the License.
     <maven.compiler.source>1.8</maven.compiler.source>
     <maven.compiler.target>1.8</maven.compiler.target>
 
-    <plexus-component.version>1.5.5</plexus-component.version>
+    <plexus-component.version>2.2.0</plexus-component.version>
     <maven-version>3.8.6</maven-version>
   </properties>
 
