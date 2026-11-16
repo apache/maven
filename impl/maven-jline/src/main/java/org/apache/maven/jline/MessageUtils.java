@@ -135,11 +135,7 @@ public class MessageUtils {
             return false;
         }
         Boolean c = colorEnabled;
-        if (c == null) {
-            c = !Terminal.TYPE_DUMB.equals(terminal.getType());
-            colorEnabled = c;
-        }
-        return c;
+        return c == null || c;
     }
 
     public static int getTerminalWidth() {
