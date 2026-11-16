@@ -304,6 +304,14 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         }
 
+        // Propagate color setting immediately so that the first log message
+        // (written during activateLogging()) already uses the correct color mode.
+        // Without this, DeferredTerminal.getType() may return "ansi" heuristically
+        // and cause isColorEnabled() to cache true before setColorEnabled(false) is called.
+        if (context.coloredOutput != null) {
+            MessageUtils.setColorEnabled(context.coloredOutput);
+        }
+
         context.loggerFactory = LoggerFactory.getILoggerFactory();
         context.slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(context.loggerFactory);
 
