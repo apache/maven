@@ -935,5 +935,18 @@ public final class Constants {
             readOnly = true)
     public static final String MAVEN_SITE_LIFECYCLE_DISABLED = "maven.site.lifecycle.disabled";
 
+    /**
+     * Whether to build the terminal on a background thread. When {@code false},
+     * the terminal is built synchronously during startup.
+     *
+     * @since 4.2.0
+     */
+    @Config(
+            type = "java.lang.Boolean",
+            defaultValue = "true",
+            source = Config.Source.SYSTEM_PROPERTIES,
+            readOnly = true)
+    public static final String MAVEN_TERMINAL_DEFERRED = "maven.terminal.deferred";
+
     private Constants() {}
 }

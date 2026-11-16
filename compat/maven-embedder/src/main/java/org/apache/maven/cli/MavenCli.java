@@ -605,11 +605,6 @@ public class MavenCli {
             File logFile = new File(commandLine.getOptionValue(CLIManager.LOG_FILE));
             logFile = ResolveFile.resolveFile(logFile, cliRequest.workingDirectory);
 
-            // make sure the terminal has finished installing before we grab the streams, otherwise it
-            // could later overwrite our redirection and logs would leak back to the console
-            // (see https://github.com/apache/maven/issues/12188)
-            MessageUtils.awaitTerminalInitialization();
-
             // redirect stdout and stderr to file
             try {
                 PrintStream ps = new PrintStream(new FileOutputStream(logFile));
@@ -621,16 +616,8 @@ public class MavenCli {
                 //
             }
 
-            // Logging caches System.out; with -l the wait above already ran, so activate now.
             slf4jConfiguration.activate();
         } else {
-            // Logging caches System.out, so wait for terminal installation to complete before
-            // activating, except when color is explicitly forced. With forced color the user expects
-            // raw ANSI to flow through the original stdout; waiting causes AnsiConsole to wrap that
-            // stream before the logger caches it, which may strip the escape codes.
-            if (!"always".equals(styleColor) && !"yes".equals(styleColor) && !"force".equals(styleColor)) {
-                MessageUtils.awaitTerminalInitialization();
-            }
             slf4jConfiguration.activate();
         }
 

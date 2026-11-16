@@ -19,9 +19,10 @@
 package org.apache.maven.jline;
 
 import java.io.IOException;
-import java.util.concurrent.CompletableFuture;
+import java.io.UncheckedIOException;
 import java.util.function.Consumer;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.jline.jansi.AnsiConsole;
@@ -30,66 +31,72 @@ import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.DeferredTerminal;
+import org.jline.utils.OSUtils;
 
 public class MessageUtils {
 
-    static Terminal terminal;
-    static LineReader reader;
+    private static final int SIGINT_EXIT_CODE = 130;
+
+    static volatile Terminal terminal;
+    static volatile LineReader reader;
     static MessageBuilderFactory messageBuilderFactory = new JLineMessageBuilderFactory();
-    static boolean colorEnabled = true;
+    static volatile Boolean colorEnabled;
     static Thread shutdownHook;
     static final Object STARTUP_SHUTDOWN_MONITOR = new Object();
-    /**
-     * Tracks completion of the terminal's {@code onComplete} callback (including
-     * {@link AnsiConsole#systemInstall()}).  Callers of {@link #awaitTerminalInitialization()}
-     * must wait on this future, not just on {@link DeferredTerminal#getTerminal()}, because
-     * the JLine future is resolved <em>before</em> the {@code onComplete} callback runs and
-     * {@code System.out} is wrapped.
-     */
-    static volatile CompletableFuture<Void> terminalReady;
 
     public static void systemInstall(Terminal terminal) {
         MessageUtils.terminal = terminal;
-        MessageUtils.reader = terminal != null ? createReader(terminal) : null;
     }
 
     public static void systemInstall() {
-        systemInstall(null, null);
+        systemInstall((Consumer<TerminalBuilder>) null);
     }
 
-    public static void systemInstall(Consumer<TerminalBuilder> builderConsumer, Consumer<Terminal> terminalConsumer) {
+    public static void systemInstall(Consumer<TerminalBuilder> builderConsumer) {
+        systemInstall(builderConsumer, false);
+    }
+
+    public static void systemInstall(Consumer<TerminalBuilder> builderConsumer, boolean embedded) {
         TerminalBuilder builder = TerminalBuilder.builder().name("Maven").dumb(true);
         if (builderConsumer != null) {
             builderConsumer.accept(builder);
         }
-        // buildDeferred() returns a DeferredTerminal proxy immediately (~10ms).
-        // The real terminal is built on a background daemon thread; all proxy
-        // methods block transparently until it is ready.
-        DeferredTerminal deferred = (DeferredTerminal) builder.buildDeferred();
-        // Track when the full onComplete callback has finished, not just when the
-        // JLine future resolves.  The JLine future completes *before* the callback
-        // runs, so awaitTerminalInitialization() must wait on this separate future.
-        CompletableFuture<Void> ready = new CompletableFuture<>();
-        terminalReady = ready;
-        // Register a callback that runs on the build thread once the real
-        // terminal is ready, before any blocked caller is unblocked.
-        deferred.onComplete(terminal -> {
+        boolean deferred =
+                !embedded && Boolean.parseBoolean(System.getProperty(Constants.MAVEN_TERMINAL_DEFERRED, "true"));
+        if (!deferred) {
             try {
-                MessageUtils.reader = createReader(terminal);
-                AnsiConsole.setTerminal(terminal);
-                AnsiConsole.systemInstall();
-                if (terminalConsumer != null) {
-                    terminalConsumer.accept(terminal);
+                MessageUtils.terminal = builder.build();
+                AnsiConsole.setTerminal(MessageUtils.terminal);
+                if (OSUtils.IS_WINDOWS) {
+                    MessageUtils.terminal.handle(Terminal.Signal.INT, signal -> System.exit(SIGINT_EXIT_CODE));
                 }
-            } finally {
-                ready.complete(null);
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
             }
-        });
-        MessageUtils.terminal = deferred;
+        } else {
+            DeferredTerminal deferredTerminal = (DeferredTerminal) builder.buildDeferred();
+            deferredTerminal.onComplete(terminal -> {
+                if (OSUtils.IS_WINDOWS) {
+                    terminal.handle(Terminal.Signal.INT, signal -> System.exit(SIGINT_EXIT_CODE));
+                }
+                AnsiConsole.setTerminal(terminal);
+            });
+            MessageUtils.terminal = deferredTerminal;
+        }
     }
 
-    private static LineReader createReader(Terminal terminal) {
-        return LineReaderBuilder.builder().terminal(terminal).build();
+    static LineReader getReader() {
+        LineReader r = reader;
+        if (r == null) {
+            synchronized (STARTUP_SHUTDOWN_MONITOR) {
+                r = reader;
+                if (r == null) {
+                    r = LineReaderBuilder.builder().terminal(terminal).build();
+                    reader = r;
+                }
+            }
+        }
+        return r;
     }
 
     public static void registerShutdownHook() {
@@ -116,43 +123,15 @@ public class MessageUtils {
 
     private static void doSystemUninstall() {
         try {
-            if (terminal instanceof DeferredTerminal deferred) {
-                if (!deferred.isReady()) {
-                    // Don't wait — drain buffered output to stdout and let
-                    // the daemon build thread die with the JVM.
-                    deferred.close();
-                    return;
-                }
+            if (terminal != null) {
+                terminal.close();
             }
-            AnsiConsole.systemUninstall();
-        } catch (IOException | IllegalStateException e) {
+        } catch (IOException e) {
             // best-effort cleanup
         } finally {
             terminal = null;
-            terminalReady = null;
-        }
-    }
-
-    /**
-     * Blocks until the asynchronous terminal installation completes, including the
-     * {@code onComplete} callback ({@link AnsiConsole#systemInstall()} and any caller-supplied
-     * consumer).
-     *
-     * <p><b>Why not just {@link DeferredTerminal#getTerminal()}?</b> The JLine
-     * {@link java.util.concurrent.CompletableFuture} is resolved <em>before</em> the
-     * {@code onComplete} callback runs.  Callers that wait only on {@code getTerminal()} can
-     * therefore proceed before {@code System.out} has been wrapped by {@code AnsiConsole},
-     * causing logging configuration to cache the wrong stream.</p>
-     *
-     * @see <a href="https://github.com/apache/maven/issues/12188">#12188</a>
-     */
-    public static void awaitTerminalInitialization() {
-        CompletableFuture<Void> ready = terminalReady;
-        if (ready != null) {
-            ready.join();
-        } else if (terminal instanceof DeferredTerminal deferred) {
-            // Fallback for terminals injected directly (e.g. via systemInstall(Terminal)).
-            deferred.getTerminal();
+            colorEnabled = null;
+            reader = null;
         }
     }
 
@@ -161,7 +140,11 @@ public class MessageUtils {
     }
 
     public static boolean isColorEnabled() {
-        return colorEnabled && terminal != null;
+        if (terminal == null) {
+            return false;
+        }
+        Boolean c = colorEnabled;
+        return c == null || c;
     }
 
     public static int getTerminalWidth() {

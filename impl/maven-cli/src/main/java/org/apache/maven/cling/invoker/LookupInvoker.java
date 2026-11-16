@@ -91,7 +91,6 @@ import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.AbstractPosixTerminal;
 import org.jline.terminal.impl.DeferredTerminal;
 import org.jline.terminal.spi.TerminalExt;
-import org.jline.utils.OSUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.slf4j.spi.LocationAwareLogger;
@@ -106,7 +105,6 @@ import static org.apache.maven.cling.invoker.CliUtils.toProperties;
  * @param <C> The context type.
  */
 public abstract class LookupInvoker<C extends LookupContext> implements Invoker {
-    private static final int SIGINT_EXIT_CODE = 130;
 
     protected final Lookup protoLookup;
 
@@ -177,13 +175,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         setupGuiceClassLoading(context);
         configureLogging(context);
         activateLogging(context);
-        // doConfigureWithTerminal wraps System.out with LoggingOutputStream, so it
-        // must run AFTER activateLogging() caches the original System.out. Otherwise
-        // the logger would resolve the wrapped stream on each write → infinite loop.
-        // awaitTerminalInitialization() blocks until the background build completes.
-        MessageUtils.awaitTerminalInitialization();
-        doConfigureWithTerminal(context, context.terminal);
         helpOrVersionAndMayExit(context);
+        doConfigureWithTerminal(context);
         preCommands(context);
         container(context);
         postContainer(context);
@@ -311,6 +304,12 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         }
 
+        // Propagate color setting immediately so that the first log message
+        // (written during activateLogging()) uses the correct color mode.
+        if (context.coloredOutput != null) {
+            MessageUtils.setColorEnabled(context.coloredOutput);
+        }
+
         context.loggerFactory = LoggerFactory.getILoggerFactory();
         context.slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(context.loggerFactory);
 
@@ -341,34 +340,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected final void createTerminal(C context) {
         if (context.terminal == null) {
-            if (context.invokerRequest.embedded()) {
-                // Embedded mode: build terminal synchronously (fast with custom streams).
-                // buildDeferred() only supports system terminals, and embedded mode is
-                // fast anyway (no FFM/JNI provider probing with custom streams).
-                // doConfigureWithTerminal() is NOT called here; doInvoke() calls it
-                // explicitly after configureLogging() so context.loggerFactory is set.
-                try {
-                    TerminalBuilder builder =
-                            TerminalBuilder.builder().name("Maven").dumb(true);
-                    doCreateTerminal(context, builder);
-                    Terminal terminal = builder.build();
-                    MessageUtils.systemInstall(terminal);
-                } catch (IOException e) {
-                    throw new InvokerException("Failed to create terminal", e);
-                }
-            } else {
-                // Start the background terminal build.  doConfigureWithTerminal is intentionally
-                // NOT called here — the onComplete callback runs on the background build thread
-                // before configureLogging() has set context.loggerFactory.  Instead, the main
-                // thread calls doConfigureWithTerminal() explicitly after configureLogging()
-                // (see doInvoke).
-                MessageUtils.systemInstall(builder -> doCreateTerminal(context, builder), terminal -> {
-                    if (OSUtils.IS_WINDOWS) {
-                        // JLine may consume Ctrl+C as terminal input, bypassing the JVM's shutdown hooks.
-                        terminal.handle(Terminal.Signal.INT, signal -> System.exit(SIGINT_EXIT_CODE));
-                    }
-                });
-            }
+            MessageUtils.systemInstall(
+                    builder -> doCreateTerminal(context, builder), context.invokerRequest.embedded());
 
             context.terminal = MessageUtils.getTerminal();
             context.closeables.add(MessageUtils::systemUninstall);
@@ -395,7 +368,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             OutputStream out = context.invokerRequest.stdOut().orElse(OutputStream.nullOutputStream());
             builder.streams(in, out);
             builder.provider(TerminalBuilder.PROP_PROVIDER_EXEC);
-            context.coloredOutput = context.coloredOutput != null ? context.coloredOutput : false;
+            context.coloredOutput = context.coloredOutput != null && context.coloredOutput;
             context.closeables.add(out::flush);
         } else {
             builder.systemOutput(TerminalBuilder.SystemOutput.SysOut);
@@ -408,14 +381,13 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     /**
      * Called from {@link #createTerminal(LookupContext)} when Terminal was built.
      */
-    protected final void doConfigureWithTerminal(C context, Terminal terminal) {
-        context.terminal = terminal;
-        // Align Maven's color setting with JLine's terminal detection:
-        // if embedded, we default to context.coloredOutput=false unless overridden (see above)
-        // if not embedded, JLine detects redirection via SysOut and will create dumb terminal.
-        // To align Maven with outcomes, we set here color enabled based on these premises.
-        MessageUtils.setColorEnabled(
-                context.coloredOutput != null ? context.coloredOutput : !Terminal.TYPE_DUMB.equals(terminal.getType()));
+    protected final void doConfigureWithTerminal(C context) {
+        // Set color if explicitly configured (--color=always/never, batch mode, etc.).
+        // When null (auto), MessageUtils.isColorEnabled() will lazily resolve from
+        // the terminal type on first access, avoiding a block on the DeferredTerminal.
+        if (context.coloredOutput != null) {
+            MessageUtils.setColorEnabled(context.coloredOutput);
+        }
 
         // handle rawStreams: some would like to act on true, some on false
         // quiet mode implies raw streams — plugins that write to System.out (e.g. help:evaluate
