@@ -60,10 +60,10 @@ public class DefaultPrompter implements Prompter {
                 int lastNl = message.lastIndexOf('\n');
                 String begin = message.substring(0, lastNl + 1);
                 message = message.substring(lastNl + 1);
-                MessageUtils.terminal.writer().print(begin);
-                MessageUtils.terminal.flush();
+                MessageUtils.getTerminal().writer().print(begin);
+                MessageUtils.getTerminal().flush();
             }
-            return MessageUtils.reader.readLine(message, password ? '*' : null);
+            return MessageUtils.getReader().readLine(message, password ? '*' : null);
         } catch (Exception e) {
             throw new PrompterException("Unable to prompt user", e);
         }
@@ -71,8 +71,8 @@ public class DefaultPrompter implements Prompter {
 
     private void doDisplay(String message) {
         try {
-            MessageUtils.terminal.writer().print(message);
-            MessageUtils.terminal.flush();
+            MessageUtils.getTerminal().writer().print(message);
+            MessageUtils.getTerminal().flush();
         } catch (Exception e) {
             throw new PrompterException("Unable to display message", e);
         }
