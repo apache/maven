@@ -40,7 +40,7 @@ public class MessageUtils {
     static Terminal terminal;
     static volatile LineReader reader;
     static MessageBuilderFactory messageBuilderFactory = new JLineMessageBuilderFactory();
-    static Boolean colorEnabled;
+    static volatile Boolean colorEnabled;
     static Thread shutdownHook;
     static final Object STARTUP_SHUTDOWN_MONITOR = new Object();
 
