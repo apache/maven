@@ -6,9 +6,6 @@
   <packaging>jar</packaging>
 
   <properties>
-    <javaVersion>8</javaVersion>
-    <maven.compiler.source>${javaVersion}</maven.compiler.source>
-    <maven.compiler.target>${javaVersion}</maven.compiler.target>
     <maven.version>3.8.6</maven.version>
   </properties>
 
@@ -26,7 +23,7 @@
       <plugin>
         <groupId>org.eclipse.sisu</groupId>
         <artifactId>sisu-maven-plugin</artifactId>
-        <version>0.3.5</version>
+        <version>1.1.2</version>
         <executions>
           <execution>
             <id>index-project</id>
