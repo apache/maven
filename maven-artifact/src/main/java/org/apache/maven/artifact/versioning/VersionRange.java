@@ -46,13 +46,21 @@ public class VersionRange {
 
     private VersionRange(ArtifactVersion recommendedVersion, List<Restriction> restrictions) {
         this.recommendedVersion = recommendedVersion;
-        this.restrictions = restrictions;
+        this.restrictions = Collections.unmodifiableList(restrictions);
     }
 
     public ArtifactVersion getRecommendedVersion() {
         return recommendedVersion;
     }
 
+    /**
+     * Returns the intervals used to match versions against this range.
+     *
+     * <p>If this list is empty, {@link #containsVersion(ArtifactVersion)} returns {@code false}.
+     * A recommended version may still be available from {@link #getRecommendedVersion()}.</p>
+     *
+     * @return an unmodifiable, non-null list of version restrictions
+     */
     public List<Restriction> getRestrictions() {
         return restrictions;
     }
@@ -251,7 +259,7 @@ public class VersionRange {
         if (r1.isEmpty() || r2.isEmpty()) {
             restrictions = Collections.emptyList();
         } else {
-            restrictions = Collections.unmodifiableList(intersection(r1, r2));
+            restrictions = intersection(r1, r2);
         }
 
         ArtifactVersion version = null;
