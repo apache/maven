@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -23,6 +24,8 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class MessageUtilsTest {
 
@@ -38,6 +41,25 @@ class MessageUtilsTest {
         assertEquals(-1, MessageUtils.parseWidth("0"));
         assertEquals(-1, MessageUtils.parseWidth("wide"));
         assertEquals(-1, MessageUtils.parseWidth(null));
+    }
+
+    @Test
+    void detectsWindowsTerminalWhenConsoleIsTerminalWithoutEnvironmentVariables() {
+        assertTrue(MessageUtils.isAnsiTerminalOnWindows(true, null, null, null, null, null));
+    }
+
+    @Test
+    void detectsWindowsTerminalUsingEnvironmentVariablesOnOlderJavaVersions() {
+        assertTrue(MessageUtils.isAnsiTerminalOnWindows(false, "test", null, null, null, null));
+        assertTrue(MessageUtils.isAnsiTerminalOnWindows(false, null, "ON", null, null, null));
+        assertTrue(MessageUtils.isAnsiTerminalOnWindows(false, null, null, "test", null, null));
+        assertTrue(MessageUtils.isAnsiTerminalOnWindows(false, null, null, null, "vscode", null));
+        assertTrue(MessageUtils.isAnsiTerminalOnWindows(false, null, null, null, null, "xterm"));
+    }
+
+    @Test
+    void doesNotDetectWindowsTerminalWithoutConsoleOrEnvironmentVariables() {
+        assertFalse(MessageUtils.isAnsiTerminalOnWindows(false, null, null, null, null, null));
     }
 
     @Test

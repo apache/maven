@@ -1,3 +1,4 @@
+
 /*
  * Licensed to the Apache Software Foundation (ASF) under one
  * or more contributor license agreements.  See the NOTICE file
@@ -65,7 +66,7 @@ public class MessageUtils {
 
     /**
      * Returns the terminal width in columns, or {@code -1} if unknown. Taken from the {@code COLUMNS} environment
-     * variable if set, otherwise (on a detected non-Windows terminal) from {@code stty size}. Computed once.
+     * variable if set, otherwise (on a detected non-Windows terminal) from {@code stty size`. Computed once.
      */
     public static int getTerminalWidth() {
         int w = width;
@@ -132,28 +133,49 @@ public class MessageUtils {
         if ("dumb".equals(System.getenv("TERM"))) {
             return false;
         }
+
         Console console = System.console();
         if (console == null) {
             return false; // stdin or stdout is redirected
         }
+
+        boolean consoleIsTerminal = false;
         try {
             // Java 22+ returns a console even when redirected; isTerminal() tells the truth
             Method isTerminal = Console.class.getMethod("isTerminal");
             if (!(Boolean) isTerminal.invoke(console)) {
                 return false;
             }
+            consoleIsTerminal = true;
         } catch (ReflectiveOperationException e) {
             // Java < 22: a non-null console already means a terminal
         }
+
         if (System.getProperty("os.name", "").startsWith("Windows")) {
-            // ponytail: no native call to switch on VT processing, so trust only consoles known to do ANSI already
-            // (Windows Terminal, ConEmu/Cmder, ANSICON, VS Code, mintty & co); legacy conhost users use --color=always
-            return System.getenv("WT_SESSION") != null
-                    || "ON".equals(System.getenv("ConEmuANSI"))
-                    || System.getenv("ANSICON") != null
-                    || "vscode".equals(System.getenv("TERM_PROGRAM"))
-                    || System.getenv("TERM") != null;
+            return isAnsiTerminalOnWindows(
+                    consoleIsTerminal,
+                    System.getenv("WT_SESSION"),
+                    System.getenv("ConEmuANSI"),
+                    System.getenv("ANSICON"),
+                    System.getenv("TERM_PROGRAM"),
+                    System.getenv("TERM"));
         }
+
         return true;
+    }
+
+    static boolean isAnsiTerminalOnWindows(
+            boolean consoleIsTerminal,
+            String wtSession,
+            String conEmuAnsi,
+            String ansicon,
+            String termProgram,
+            String term) {
+        return consoleIsTerminal
+                || wtSession != null
+                || "ON".equals(conEmuAnsi)
+                || ansicon != null
+                || "vscode".equals(termProgram)
+                || term != null;
     }
 }
