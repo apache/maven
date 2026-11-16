@@ -215,6 +215,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                     MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
                     PluginVersionResolutionException, LifecyclePhaseNotFoundException {
         final List<MojoExecution> mojoExecutions = new ArrayList<>();
+        final Set<String> duplicateLifeCyclePhases = new HashSet<>();
 
         for (Task task : tasks) {
             if (task instanceof GoalTask) {
@@ -237,32 +238,26 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                 Map<String, List<MojoExecution>> phaseToMojoMapping =
                         calculateLifecycleMappings(session, project, lifecyclePhase);
 
-                Set<String> duplicateLifeCycles = new HashSet<>();
-
                 for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values()) {
                     mojoExecutions.addAll(mojoExecutionsFromLifecycle);
 
-                    List<String> containedLifeCycles = mojoExecutions.stream()
+                    List<String> containedLifecyclePhases = mojoExecutions.stream()
                             .map(MojoExecution::getLifecyclePhase)
                             .toList();
-                    duplicateLifeCycles.addAll(
-                            mojoExecutionsFromLifecycle.stream()
-                                    .filter(e -> !containedLifeCycles.contains(e.getLifecyclePhase()))
-                                    .toList()
-                                    .stream()
-                                    .map(MojoExecution::getLifecyclePhase)
-                                    .toList());
-                }
-
-                if (!duplicateLifeCycles.isEmpty()) {
-                    LOG.warn(
-                            "Your Maven Goals contain duplicate lifecycle phases that lead to multiple executions of the same phase: {}. If this is not intended, you should check your Maven Build.",
-                            duplicateLifeCycles);
+                    duplicateLifeCyclePhases.addAll(mojoExecutionsFromLifecycle.stream()
+                            .map(MojoExecution::getLifecyclePhase)
+                            .filter(phase -> !containedLifecyclePhases.contains(phase))
+                            .toList());
                 }
 
             } else {
                 throw new IllegalStateException("unexpected task " + task);
             }
+        }
+        if (!duplicateLifeCyclePhases.isEmpty()) {
+            LOG.warn(
+                    "Your Maven Goals contain duplicate lifecycle phases that lead to multiple executions of the same phase: {}. If this is not intended, you should check your Maven Build.",
+                    duplicateLifeCyclePhases);
         }
         return mojoExecutions;
     }
