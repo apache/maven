@@ -873,7 +873,7 @@ public final class Constants {
      * </ul>
      * Dependency management imported from the local reactor is not affected by this property.
      *
-     * @since 4.2.0
+     * @since 4.0.0
      */
     @Config(type = "java.lang.Boolean", defaultValue = "false")
     public static final String MAVEN_REPOSITORY_DEPENDENCY_MANAGEMENT_ALLOW_SYSTEM_SCOPE =
@@ -891,7 +891,7 @@ public final class Constants {
      * previous Maven versions.</li>
      * </ul>
      *
-     * @since 4.2.0
+     * @since 4.0.0
      */
     @Config(type = "java.lang.Boolean", defaultValue = "false")
     public static final String MAVEN_MODEL_DEPENDENCY_INTERPOLATION_FULL = "maven.model.dependencyInterpolation.full";
