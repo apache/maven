@@ -1,3 +1,4 @@
+
 <?xml version="1.0" encoding="UTF-8"?>
 <!--
 Licensed to the Apache Software Foundation (ASF) under one
@@ -77,8 +78,8 @@ under the License.
       <artifactId>maven-resolver-transport-apache</artifactId>
     </dependency>
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
       <scope>runtime</scope>
     </dependency>
     <dependency>
