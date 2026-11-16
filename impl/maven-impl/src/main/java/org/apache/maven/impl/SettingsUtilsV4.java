@@ -52,7 +52,6 @@ import org.apache.maven.api.settings.Profile;
 import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.RepositoryPolicy;
 import org.apache.maven.api.settings.Settings;
-import org.apache.maven.settings.v4.SettingsMerger;
 
 /**
  * Several convenience methods to handle settings
@@ -69,7 +68,7 @@ public final class SettingsUtilsV4 {
      * @param recessive
      */
     public static Settings merge(Settings dominant, Settings recessive) {
-        return new SettingsMerger().merge(dominant, recessive, true, Collections.emptyMap());
+        return DefaultSettingsBuilder.SETTINGS_MERGER.merge(dominant, recessive, false, Collections.emptyMap());
     }
 
     /**
