@@ -145,10 +145,16 @@ public class MessageUtils {
         } catch (ReflectiveOperationException e) {
             // Java < 22: a non-null console already means a terminal
         }
-        if (System.getProperty("os.name", "").startsWith("Windows")) {
+        String osName = System.getProperty("os.name", "");
+        if (osName.startsWith("Windows")) {
             // ponytail: no native call to switch on VT processing, so trust only consoles known to do ANSI already
             // (Windows Terminal, ConEmu/Cmder, ANSICON, VS Code, mintty & co); legacy conhost users use --color=always
-            return System.getenv("WT_SESSION") != null
+            // Windows 11 defaults to Windows Terminal, which may not set WT_SESSION when it gets a console via
+            // default-terminal handoff (e.g. shells launched by GitHub Desktop); conhost there is opt-in (#14018)
+            // shortcut: Win11 with conhost as default terminal shows raw escapes, use --color=never; needs a JDK
+            // that reports "Windows 11" (older ones say "Windows 10" and keep the env checks)
+            return osName.startsWith("Windows 11")
+                    || System.getenv("WT_SESSION") != null
                     || "ON".equals(System.getenv("ConEmuANSI"))
                     || System.getenv("ANSICON") != null
                     || "vscode".equals(System.getenv("TERM_PROGRAM"))
