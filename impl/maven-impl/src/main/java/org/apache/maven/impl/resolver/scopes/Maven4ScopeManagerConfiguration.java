@@ -168,7 +168,7 @@ public final class Maven4ScopeManagerConfiguration implements ScopeManagerConfig
                 InternalScopeManager.Mode.ELIMINATE,
                 byProjectPath(CommonBuilds.PROJECT_PATH_MAIN),
                 Collections.singletonList(system),
-                nonTransitiveCompileDependencyScopes));
+                nonTransitiveDependencyScopes));
         result.add(internalScopeManager.createResolutionScope(
                 RS_MAIN_RUNTIME,
                 InternalScopeManager.Mode.REMOVE,

@@ -86,4 +86,28 @@ public class MavenITmng8099ApiImplementationScopesTest extends AbstractMavenInte
                 verifier::execute,
                 "Compilation should fail because ImplDep is not transitively visible at compile time");
     }
+
+    /**
+     * Consumer calls Library.getImplMessage() at test runtime — Library internally uses ImplDep
+     * (an implementation-scoped dep). The consumer only compiles against Library, so ImplDep
+     * is invisible at compile time. But at runtime the JVM must be able to load ImplDep
+     * transitively, because implementation deps ARE transitive at runtime.
+     *
+     * <p>This test verifies that RS_MAIN_COMPILE_PLUS_RUNTIME (surefire's resolution scope)
+     * correctly includes transitive implementation deps. If the scope is misconfigured to use
+     * the compile-only non-transitive set, surefire's classpath omits ImplDep and this test
+     * fails with NoClassDefFoundError.
+     */
+    @Test
+    public void testImplementationScopeIsTransitiveAtRuntime() throws Exception {
+        Path testDir = extractResources("mng-8099-api-implementation-scopes");
+        Path consumerDir = testDir.resolve("consumer-runtime-test");
+
+        Verifier verifier = newVerifier(consumerDir.toString(), false);
+        verifier.addCliArgument("clean");
+        verifier.addCliArgument("test");
+        verifier.addCliArgument("-Dmaven.consumer.pom.flatten=true");
+        verifier.execute();
+        verifier.verifyErrorFreeLog();
+    }
 }
