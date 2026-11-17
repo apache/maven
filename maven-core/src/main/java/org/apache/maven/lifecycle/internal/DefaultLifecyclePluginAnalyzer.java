@@ -22,7 +22,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -83,10 +82,9 @@ public class DefaultLifecyclePluginAnalyzer implements LifeCyclePluginAnalyzer {
                     + Thread.currentThread().getContextClassLoader());
         }
 
-        // take "snapshot": will filter by visibility
-        Map<String, LifecycleMapping> filtered = new HashMap<>(this.lifecycleMappings);
-
-        LifecycleMapping lifecycleMappingForPackaging = filtered.get(packaging);
+        // look up directly: the injected map filters by visibility and returns the highest-ranked mapping,
+        // so a build extension can override a packaging that core already maps
+        LifecycleMapping lifecycleMappingForPackaging = lifecycleMappings.get(packaging);
 
         if (lifecycleMappingForPackaging == null) {
             return null;

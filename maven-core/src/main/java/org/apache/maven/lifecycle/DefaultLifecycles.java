@@ -131,8 +131,10 @@ public class DefaultLifecycles {
     public List<Lifecycle> getLifeCycles() {
         // ensure canonical order of standard lifecycles
 
-        // take "snapshot": will filter by visibility
-        Map<String, Lifecycle> lifecycles = new LinkedHashMap<>(this.lifecycles);
+        // take "snapshot": will filter by visibility; keep the highest-ranked lifecycle for each id, so a build
+        // extension can override a lifecycle that core already defines
+        Map<String, Lifecycle> lifecycles = new LinkedHashMap<>();
+        this.lifecycles.forEach(lifecycles::putIfAbsent);
         // apply enabled
         lifecycles.entrySet().removeIf(e -> !isEnabled(e.getKey()));
 
