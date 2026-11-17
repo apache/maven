@@ -75,7 +75,7 @@ project:
     version_method: semver
     cycle_match: (\d+\.\d+)(?:[.\-].*)?
   policy:
-    announce_release_template_url: https://maven.apache.org/atr/templates/announce_release_template.txt
+    announce_release_template_url: https://maven.apache.org/atr/templates/announce_release_template_maven.txt
     start_vote_template_url: https://maven.apache.org/atr/templates/start_vote_template_maven.txt
     finish_vote_template_url: https://maven.apache.org/atr/templates/finish_vote_template.txt
     download_path_suffix: maven-{{MAJOR_VERSION}}/{{VERSION}}
