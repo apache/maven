@@ -445,8 +445,11 @@ public class DefaultXmlService extends XmlService {
                                         children = new ArrayList<>(dominant.children());
                                     }
                                     // recessive children may have been added before the dominant child
-                                    children.set(indexOfSame(children, current), merged);
-                                    mergedChildren.put(dominantChild, merged);
+                                    int mergeIdx = indexOfSame(children, current);
+                                    if (mergeIdx >= 0) {
+                                        children.set(mergeIdx, merged);
+                                        mergedChildren.put(dominantChild, merged);
+                                    }
                                 }
                             }
                         }

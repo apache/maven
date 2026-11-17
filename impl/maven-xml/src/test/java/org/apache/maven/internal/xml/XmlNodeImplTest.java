@@ -370,6 +370,26 @@ class XmlNodeImplTest {
         assertEquals("RHS", p0.child("other").value());
     }
 
+    @Test
+    void testCombineIdAppendsWhenNoDominantMatchExists() throws Exception {
+        String lhs = "<props>" + "<property combine.id='A'><name>A</name></property>" + "</props>";
+
+        String rhs = "<props>" + "<property combine.id='NEW'><name>NEW</name></property>" + "</props>";
+
+        XmlNode leftDom = XmlService.read(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+
+        XmlNode mergeResult = XmlService.merge(leftDom, rightDom, true);
+        assertEquals(2, getChildren(mergeResult, "property").size());
+
+        XmlNode p0 = getNthChild(mergeResult, "property", 0);
+        assertEquals("A", p0.child("name").value());
+
+        XmlNode p1 = getNthChild(mergeResult, "property", 1);
+        assertEquals("NEW", p1.child("name").value());
+        assertEquals("right", p1.child("name").inputLocation());
+    }
+
     private static void assertRecessiveValueIsMergedIntoSecondProperty(String lhs, String rhs) throws Exception {
         XmlNode leftDom = XmlService.read(new StringReader(lhs), new FixedInputLocationBuilder("left"));
         XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
