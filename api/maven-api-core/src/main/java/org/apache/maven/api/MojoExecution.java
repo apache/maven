@@ -23,6 +23,7 @@ import java.util.Optional;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.PluginExecution;
 import org.apache.maven.api.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.api.xml.XmlNode;
@@ -47,6 +48,17 @@ public interface MojoExecution {
     Plugin plugin();
 
     /**
+     * {@return the plugin that owns this execution}
+     *
+     * @deprecated Use {@link #plugin()} instead.
+     */
+    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Nonnull
+    default Plugin getPlugin() {
+        return plugin();
+    }
+
+    /**
      * {@return the {@code <execution>} element from the POM (or from the default lifecycle bindings)
      * that corresponds to this execution, or empty for a direct CLI invocation
      * (e.g. {@code mvn groupId:artifactId:goal})}
@@ -60,9 +72,31 @@ public interface MojoExecution {
     @Nonnull
     Optional<PluginExecution> model();
 
+    /**
+     * {@return the execution element, or null if absent}
+     *
+     * @deprecated Use {@link #model()} instead.
+     */
+    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Nullable
+    default PluginExecution getModel() {
+        return model().orElse(null);
+    }
+
     /** {@return the descriptor of the mojo being executed} */
     @Nonnull
     MojoDescriptor descriptor();
+
+    /**
+     * {@return the descriptor of the mojo being executed}
+     *
+     * @deprecated Use {@link #descriptor()} instead.
+     */
+    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Nonnull
+    default MojoDescriptor getDescriptor() {
+        return descriptor();
+    }
 
     /**
      * {@return the execution identifier as declared in the POM, or empty for a direct CLI invocation
@@ -71,17 +105,61 @@ public interface MojoExecution {
     @Nonnull
     Optional<String> executionId();
 
+    /**
+     * {@return the execution identifier, or null if absent}
+     *
+     * @deprecated Use {@link #executionId()} instead.
+     */
+    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Nullable
+    default String getExecutionId() {
+        return executionId().orElse(null);
+    }
+
     /** {@return the goal being executed} */
     @Nonnull
     String goal();
+
+    /**
+     * {@return the goal being executed}
+     *
+     * @deprecated Use {@link #goal()} instead.
+     */
+    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Nonnull
+    default String getGoal() {
+        return goal();
+    }
 
     /** {@return the lifecycle phase this execution is bound to, or empty for a direct CLI invocation} */
     @Nonnull
     Optional<String> lifecyclePhase();
 
+    /**
+     * {@return the lifecycle phase, or null if absent}
+     *
+     * @deprecated Use {@link #lifecyclePhase()} instead.
+     */
+    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Nullable
+    default String getLifecyclePhase() {
+        return lifecyclePhase().orElse(null);
+    }
+
     /** {@return the merged configuration for this execution, if any} */
     @Nonnull
     Optional<XmlNode> configuration();
+
+    /**
+     * {@return the merged configuration, if any}
+     *
+     * @deprecated Use {@link #configuration()} instead.
+     */
+    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Nonnull
+    default Optional<XmlNode> getConfiguration() {
+        return configuration();
+    }
 
     /**
      * {@return true if this mojo triggers a forked lifecycle execution}
