@@ -167,7 +167,7 @@ public class PropertyProfileActivator implements ProfileActivator {
      *
      * @see ProfileSourceDetector#isFromPom(Profile)
      */
-    private boolean isFromPom(Profile profile) {
+    private static boolean isFromPom(Profile profile) {
         return ProfileSourceDetector.isFromPom(profile);
     }
 }

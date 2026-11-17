@@ -142,7 +142,7 @@ public class DefaultProfileSelector implements ProfileSelector {
         return activation != null && activation.isActiveByDefault();
     }
 
-    private boolean isFromPom(Profile profile) {
+    private static boolean isFromPom(Profile profile) {
         return ProfileSourceDetector.isFromPom(profile);
     }
 }
