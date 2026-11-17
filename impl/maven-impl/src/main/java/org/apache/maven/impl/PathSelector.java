@@ -315,9 +315,12 @@ final class PathSelector implements PathMatcher {
         final Iterator<String> it = excludes.iterator();
         nextExclude:
         while (it.hasNext()) {
-            final String exclude = it.next();
+            String exclude = it.next();
             final int s = exclude.indexOf(':');
             if (s <= MAVEN_SYNTAX_THRESHOLD || exclude.startsWith(DEFAULT_SYNTAX)) {
+                if (s > MAVEN_SYNTAX_THRESHOLD) {
+                    exclude = exclude.substring(DEFAULT_SYNTAX.length());
+                }
                 if (cannotMatch(exclude, prefixes, false) || cannotMatch(exclude, suffixes, true)) {
                     it.remove();
                 }
