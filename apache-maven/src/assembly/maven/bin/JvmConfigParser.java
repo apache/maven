@@ -77,7 +77,7 @@ public class JvmConfigParser {
                 System.out.print(result);
                 System.out.flush();
             }
-        } catch (IOException e) {
+        } catch (IOException | IllegalArgumentException e) {
             // If jvm.config exists but can't be read, this is a configuration error
             // Print clear error and exit with error code to prevent Maven from running
             System.err.println("ERROR: Failed to read .mvn/jvm.config: " + e.getMessage());
@@ -95,36 +95,29 @@ public class JvmConfigParser {
         StringBuilder result = new StringBuilder();
 
         for (String line : Files.readAllLines(jvmConfigPath, StandardCharsets.UTF_8)) {
-            line = processLine(line, mavenProjectBasedir);
+            line = processLine(line);
             if (line.isEmpty()) {
                 continue;
             }
 
             List<String> parsed = parseArguments(line);
-            appendQuotedArguments(result, parsed);
+            appendQuotedArguments(result, parsed, mavenProjectBasedir);
         }
 
         return result.toString();
     }
 
     /**
-     * Process a single line: remove comments, trim whitespace, and replace placeholders.
+     * Process a single line: remove comments and trim whitespace.
      */
-    private static String processLine(String line, String mavenProjectBasedir) {
+    private static String processLine(String line) {
         // Remove comments
         int commentIndex = line.indexOf('#');
         if (commentIndex >= 0) {
             line = line.substring(0, commentIndex);
         }
 
-        // Trim whitespace
-        line = line.trim();
-
-        // Replace MAVEN_PROJECTBASEDIR placeholders
-        line = line.replace("${MAVEN_PROJECTBASEDIR}", mavenProjectBasedir);
-        line = line.replace("$MAVEN_PROJECTBASEDIR", mavenProjectBasedir);
-
-        return line;
+        return line.trim();
     }
 
     /**
@@ -135,8 +128,11 @@ public class JvmConfigParser {
      * Quoting is always valid in {@code @argfile} format and ensures safe parsing
      * by both the Windows and Unix JVM {@code @argfile} consumers.
      */
-    private static void appendQuotedArguments(StringBuilder result, List<String> args) {
+    private static void appendQuotedArguments(StringBuilder result, List<String> args, String mavenProjectBasedir) {
         for (String arg : args) {
+            // Expand after tokenization so spaces and backslashes in the project path remain literal.
+            arg = arg.replace("${MAVEN_PROJECTBASEDIR}", mavenProjectBasedir)
+                    .replace("$MAVEN_PROJECTBASEDIR", mavenProjectBasedir);
             if (result.length() > 0) {
                 result.append(' ');
             }
@@ -150,36 +146,49 @@ public class JvmConfigParser {
     /**
      * Parse a line into individual arguments, respecting quoted strings.
      * Quotes are stripped from the arguments.
+     * Keep this algorithm in sync with org.apache.maven.settings.v4.ArgumentTokenizer.tokenize.
      */
-    private static List<String> parseArguments(String line) {
+    private static List<String> parseArguments(String input) {
         List<String> args = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean inDoubleQuotes = false;
         boolean inSingleQuotes = false;
+        boolean tokenStarted = false;
 
-        for (int i = 0; i < line.length(); i++) {
-            char c = line.charAt(i);
+        for (int i = 0; i < input.length(); i++) {
+            char c = input.charAt(i);
 
-            if (c == '"' && !inSingleQuotes) {
+            if (c == '\\' && !inSingleQuotes && i + 1 < input.length()) {
+                // Backslash escape: outside single-quotes, \X is always a literal X.
+                current.append(input.charAt(++i));
+                tokenStarted = true;
+            } else if (c == '"' && !inSingleQuotes) {
                 inDoubleQuotes = !inDoubleQuotes;
+                tokenStarted = true;
             } else if (c == '\'' && !inDoubleQuotes) {
                 inSingleQuotes = !inSingleQuotes;
-            } else if (c == ' ' && !inDoubleQuotes && !inSingleQuotes) {
-                // Space outside quotes - end of argument
-                if (current.length() > 0) {
+                tokenStarted = true;
+            } else if (Character.isWhitespace(c) && !inDoubleQuotes && !inSingleQuotes) {
+                if (tokenStarted) {
                     args.add(current.toString());
                     current.setLength(0);
+                    tokenStarted = false;
                 }
             } else {
                 current.append(c);
+                tokenStarted = true;
             }
         }
 
-        // Add last argument
-        if (current.length() > 0) {
+        if (tokenStarted) {
             args.add(current.toString());
         }
 
-        return args;
+        if (inDoubleQuotes || inSingleQuotes) {
+            throw new IllegalArgumentException(
+                    "Unclosed " + (inDoubleQuotes ? "double" : "single") + " quote in: " + input);
+        }
+
+        return List.copyOf(args);
     }
 }

@@ -36,9 +36,8 @@ import java.util.List;
  * </ul>
  *
  * <p><strong>Note:</strong> {@code JvmConfigParser.java} is a self-contained single-file source launcher
- * invoked directly by shell scripts; it must not share classpath code with Maven. This class provides
- * tokenization within Maven's Java classpath and preserves quoted empty arguments, which the launcher
- * parser omits.</p>
+ * invoked directly by shell scripts; it must not share classpath code with Maven. Keep this tokenization
+ * algorithm in sync with its {@code parseArguments} method.</p>
  *
  * @since 4.2.0
  */
