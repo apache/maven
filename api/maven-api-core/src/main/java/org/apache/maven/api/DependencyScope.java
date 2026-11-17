@@ -97,7 +97,7 @@ public enum DependencyScope {
     RUNTIME("runtime"),
 
     /**
-     * Api.
+     * API.
      * <p>
      * A dependency available on compile, runtime and test classpaths, transitively exposed to consumers.
      * Semantically equivalent to {@code compile}, but explicitly declares
