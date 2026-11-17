@@ -40,8 +40,16 @@ class JvmConfigParserTest {
                 Arguments.of("'' \"\"", "\"\" \"\""),
                 Arguments.of("first\t\"\"\tthird", "\"first\" \"\" \"third\""),
                 Arguments.of("fi\"\"rst ''third", "\"first\" \"third\""),
-                Arguments.of("-Dname=hello\\ world", "\"-Dname=hello world\""),
+                Arguments.of("-Dname=\"hello world\"", "\"-Dname=hello world\""),
+                Arguments.of("hello\\ world", "\"hello\\\\\" \"world\""),
                 Arguments.of("\"a\\\"b\"", "\"a\\\"b\""),
+                Arguments.of(
+                        "-javaagent:D:\\a\\maven\\target\\agent.jar",
+                        "\"-javaagent:D:\\\\a\\\\maven\\\\target\\\\agent.jar\""),
+                Arguments.of("\"-Dpath=C:\\Program Files\\Maven\"", "\"-Dpath=C:\\\\Program Files\\\\Maven\""),
+                Arguments.of(
+                        "-javaagent:\\\\server\\share\\agent.jar",
+                        "\"-javaagent:\\\\\\\\server\\\\share\\\\agent.jar\""),
                 Arguments.of("'-Dpath=C:\\temp\\config'", "\"-Dpath=C:\\\\temp\\\\config\""),
                 Arguments.of("  \t  ", ""));
     }

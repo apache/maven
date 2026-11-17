@@ -30,9 +30,9 @@ import java.util.List;
  *   <li>Whitespace is the delimiter outside quotes.</li>
  *   <li>{@code "..."} and {@code '...'} are both supported — quotes are stripped, content is kept as a
  *       single token, including an empty argument when the quotes contain no text.</li>
- *   <li>Outside single-quotes, a backslash ({@code \}) escapes the next character literally
- *       (e.g. {@code \"} → {@code "}, {@code \\} → {@code \}, {@code \ } → a literal space).
- *       Inside single-quotes, backslash has no special meaning.</li>
+ *   <li>Inside double quotes, a backslash escapes a double quote or another backslash.
+ *       Other backslashes are literal, including those in unquoted Windows paths.
+ *       Use quotes around arguments containing whitespace.</li>
  * </ul>
  *
  * <p><strong>Note:</strong> {@code JvmConfigParser.java} is a self-contained single-file source launcher
@@ -63,8 +63,10 @@ public final class ArgumentTokenizer {
         for (int i = 0; i < input.length(); i++) {
             char c = input.charAt(i);
 
-            if (c == '\\' && !inSingleQuotes && i + 1 < input.length()) {
-                // Backslash escape: outside single-quotes, \X is always a literal X.
+            if (c == '\\'
+                    && inDoubleQuotes
+                    && i + 1 < input.length()
+                    && (input.charAt(i + 1) == '"' || input.charAt(i + 1) == '\\')) {
                 current.append(input.charAt(++i));
                 tokenStarted = true;
             } else if (c == '"' && !inSingleQuotes) {

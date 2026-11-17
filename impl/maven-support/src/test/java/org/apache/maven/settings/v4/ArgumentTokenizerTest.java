@@ -64,7 +64,22 @@ class ArgumentTokenizerTest {
 
     @Test
     void escapedQuotesAreLiteralArguments() {
-        assertEquals(List.of("\"\"", "''", " "), ArgumentTokenizer.tokenize("\\\"\\\" \\'\\' \\ "));
+        assertEquals(List.of("\"\"", "''", " "), ArgumentTokenizer.tokenize("\"\\\"\\\"\" \"''\" \" \""));
+    }
+
+    @Test
+    void windowsPathsKeepLiteralBackslashes() {
+        assertEquals(
+                List.of("-javaagent:D:\\a\\maven\\target\\agent.jar", "-Dpath=C:\\Program Files\\Maven"),
+                ArgumentTokenizer.tokenize(
+                        "-javaagent:D:\\a\\maven\\target\\agent.jar \"-Dpath=C:\\Program Files\\Maven\""));
+        assertEquals(
+                List.of("\\\\server\\share\\agent.jar"), ArgumentTokenizer.tokenize("\\\\server\\share\\agent.jar"));
+    }
+
+    @Test
+    void unquotedBackslashDoesNotEscapeWhitespace() {
+        assertEquals(List.of("hello\\", "world"), ArgumentTokenizer.tokenize("hello\\ world"));
     }
 
     @Test

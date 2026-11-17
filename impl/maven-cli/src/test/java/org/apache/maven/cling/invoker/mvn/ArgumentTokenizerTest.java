@@ -50,13 +50,13 @@ class ArgumentTokenizerTest {
     }
 
     @Test
-    void backslashEscapeSpace() {
-        assertEquals(List.of("-Dfoo=hello world"), ArgumentTokenizer.tokenize("-Dfoo=hello\\ world"));
+    void backslashOutsideQuotesIsLiteral() {
+        assertEquals(List.of("-Dfoo=hello\\", "world"), ArgumentTokenizer.tokenize("-Dfoo=hello\\ world"));
     }
 
     @Test
     void backslashEscapeDoubleQuote() {
-        assertEquals(List.of("-Dfoo=say \"hi\""), ArgumentTokenizer.tokenize("-Dfoo=say\\ \\\"hi\\\""));
+        assertEquals(List.of("-Dfoo=say \"hi\""), ArgumentTokenizer.tokenize("\"-Dfoo=say \\\"hi\\\"\""));
     }
 
     @Test
@@ -73,7 +73,7 @@ class ArgumentTokenizerTest {
 
     @Test
     void backslashEscapeBackslash() {
-        assertEquals(List.of("a\\b"), ArgumentTokenizer.tokenize("a\\\\b"));
+        assertEquals(List.of("a\\b"), ArgumentTokenizer.tokenize("\"a\\\\b\""));
     }
 
     @Test
