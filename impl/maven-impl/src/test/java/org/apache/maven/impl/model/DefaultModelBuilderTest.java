@@ -44,6 +44,7 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelBuilder;
+import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
@@ -65,6 +66,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -120,6 +122,51 @@ class DefaultModelBuilderTest {
         ModelBuilderResult result = builder.newSession().build(request);
         assertNotNull(result);
         assertEquals("21", result.getEffectiveModel().getProperties().get("maven.compiler.release"));
+    }
+
+    /**
+     * A project POM whose root element is in an unknown namespace must fail the build
+     * (<a href="https://github.com/apache/maven/issues/10985">#10985</a>).
+     */
+    @Test
+    void testRandomNamespaceIsRejectedForProjectBuild() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("random-namespace")))
+                .build();
+
+        ModelBuilderException e = assertThrows(
+                ModelBuilderException.class, () -> builder.newSession().build(request));
+        assertTrue(
+                e.getProblemCollector()
+                        .problems()
+                        .anyMatch(p -> p.getSeverity() == BuilderProblem.Severity.ERROR
+                                && p.getMessage().contains("Unrecognized namespace 'https://ff.com'")),
+                () -> "Expected an error about the unrecognized namespace, got: "
+                        + e.getProblemCollector().problems().toList());
+    }
+
+    /**
+     * POMs consumed from repositories are parsed leniently: an unknown root namespace must not
+     * break the resolution of existing artifacts.
+     */
+    @Test
+    void testRandomNamespaceIsToleratedForDependencyModel() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.buildSource(getPom("random-namespace")))
+                .build();
+
+        ModelBuilderResult result = builder.newSession().build(request);
+
+        assertEquals("random-namespace", result.getEffectiveModel().getArtifactId());
+        assertTrue(
+                result.getProblemCollector().problems().noneMatch(p -> p.getMessage()
+                        .contains("Unrecognized namespace")),
+                () -> "Unexpected namespace problem: "
+                        + result.getProblemCollector().problems().toList());
     }
 
     /**
