@@ -128,14 +128,22 @@ public class JvmConfigParser {
     }
 
     /**
-     * Append parsed arguments as quoted strings to the result builder.
+     * Append parsed arguments in Java {@code @argfile} format.
+     * Every argument is wrapped in double-quotes. Per the JDK {@code @argfile} spec,
+     * backslashes inside double-quoted strings are escape characters and must be
+     * doubled ({@code \\}) to be treated as literal backslashes.
+     * Quoting is always valid in {@code @argfile} format and ensures safe parsing
+     * by both the Windows and Unix JVM {@code @argfile} consumers.
      */
     private static void appendQuotedArguments(StringBuilder result, List<String> args) {
         for (String arg : args) {
             if (result.length() > 0) {
                 result.append(' ');
             }
-            result.append('"').append(arg).append('"');
+            // Escape backslashes first (before escaping double-quotes), then escape double-quotes.
+            // Per JDK @argfile spec, inside a double-quoted string backslash is an escape
+            // character: \\ -> literal backslash, \" -> literal double-quote.
+            result.append('"').append(arg.replace("\\", "\\\\").replace("\"", "\\\"")).append('"');
         }
     }
 

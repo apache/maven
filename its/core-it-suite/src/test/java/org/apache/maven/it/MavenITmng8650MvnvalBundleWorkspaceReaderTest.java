@@ -47,7 +47,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * it proves that the named POMs are fully self-contained: if a parent or BOM import is absent
  * the run exits with code 1 (validation error), never silently fetches it from the network.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 class MavenITmng8650MvnvalBundleWorkspaceReaderTest extends AbstractMavenIntegrationTestCase {
 

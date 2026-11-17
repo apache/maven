@@ -31,7 +31,7 @@ import org.apache.maven.api.annotations.Nullable;
  * Service to create and track temporary files/directories for a Maven build.
  * All created paths are deleted automatically when the session ends.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 public interface TempFileService extends Service {

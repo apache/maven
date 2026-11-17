@@ -20,6 +20,7 @@ package org.apache.maven.cli;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
 /**
@@ -32,7 +33,7 @@ class CleanArgumentTest {
         String[] args = {
             "\"",
         };
-        CleanArgument.cleanArgs(args);
+        assertArrayEquals(new String[] {""}, CleanArgument.cleanArgs(args));
     }
 
     @Test

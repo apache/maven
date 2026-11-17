@@ -21,8 +21,8 @@ package org.apache.maven.api.services;
 import java.util.Collection;
 import java.util.Collections;
 
+import org.apache.maven.api.OperationService;
 import org.apache.maven.api.ProducedArtifact;
-import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
@@ -34,7 +34,7 @@ import org.apache.maven.api.annotations.Nonnull;
  * @see Session#withLocalRepository(org.apache.maven.api.LocalRepository)
  */
 @Experimental
-public interface ArtifactInstaller extends Service {
+public interface ArtifactInstaller extends OperationService {
     /**
      * @param request {@link ArtifactInstallerRequest}
      * @throws ArtifactInstallerException in case of an error

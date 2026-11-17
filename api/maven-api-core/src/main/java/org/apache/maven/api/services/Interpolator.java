@@ -159,6 +159,13 @@ public interface Interpolator extends Service {
         };
     }
 
+    /**
+     * Creates a composite function from a varargs array of functions.
+     *
+     * @param functions the functions to chain
+     * @return a function that applies each function in order until a non-null result is found
+     * @see #chain(Collection)
+     */
     @SafeVarargs
     static UnaryOperator<String> chain(UnaryOperator<String>... functions) {
         return chain(List.of(functions));

@@ -41,7 +41,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.when;
 
 /**
- * Test class for {@link DefaultModelBuilder.InterningTransformer}.
+ * Test class for {@link ModelInterningTransformer}.
  * Verifies that the transformer correctly interns commonly used string values
  * to reduce memory usage during Maven POM parsing.
  */
@@ -49,7 +49,7 @@ class InterningTransformerTest {
 
     @Test
     void testTransformerInternsCorrectContexts() {
-        DefaultModelBuilder.InterningTransformer transformer = new DefaultModelBuilder.InterningTransformer();
+        ModelInterningTransformer transformer = new ModelInterningTransformer();
 
         // Test that contexts in the CONTEXTS set are interned
         String groupId1 = transformer.transform("org.apache.maven", "groupId");
@@ -92,96 +92,87 @@ class InterningTransformerTest {
     void testTransformerContainsExpectedContexts() {
         // Verify that the DEFAULT_CONTEXTS set contains all the expected fields
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("groupId"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "groupId");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("groupId"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "groupId");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("artifactId"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain "
-                        + "artifactId");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("artifactId"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "artifactId");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("version"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "version");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("version"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "version");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("packaging"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "packaging");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("packaging"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "packaging");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("scope"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "scope");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("scope"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "scope");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("type"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "type");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("type"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "type");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("classifier"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain "
-                        + "classifier");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("classifier"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "classifier");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("goal"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "goal");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("goal"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "goal");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("execution"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "execution");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("execution"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "execution");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("phase"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "phase");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("phase"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "phase");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("modelVersion"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain "
-                        + "modelVersion");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("modelVersion"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "modelVersion");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("name"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "name");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("name"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "name");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("url"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "url");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("url"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "url");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("system"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "system");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("system"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "system");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("distribution"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain "
-                        + "distribution");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("distribution"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "distribution");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("status"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "status");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("status"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "status");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("connection"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain "
-                        + "connection");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("connection"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "connection");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("developerConnection"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain "
-                        + "developerConnection");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("developerConnection"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "developerConnection");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("tag"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "tag");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("tag"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "tag");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("id"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "id");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("id"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "id");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("inherited"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "inherited");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("inherited"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "inherited");
         assertTrue(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("optional"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to contain " + "optional");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("optional"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to contain " + "optional");
 
         // Verify that non-interned contexts are not in the set
         assertFalse(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("nonInterned"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to not contain "
-                        + "nonInterned");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("nonInterned"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to not contain " + "nonInterned");
         assertFalse(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("description"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to not contain "
-                        + "description");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("description"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to not contain " + "description");
         assertFalse(
-                DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS.contains("randomField"),
-                "Expected " + DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS + " to not contain "
-                        + "randomField");
+                ModelInterningTransformer.DEFAULT_CONTEXTS.contains("randomField"),
+                "Expected " + ModelInterningTransformer.DEFAULT_CONTEXTS + " to not contain " + "randomField");
     }
 
     @Test
     void testTransformerWithNullAndEmptyValues() {
-        DefaultModelBuilder.InterningTransformer transformer = new DefaultModelBuilder.InterningTransformer();
+        ModelInterningTransformer transformer = new ModelInterningTransformer();
 
         // Test with null value
         String result1 = transformer.transform(null, "groupId");
@@ -282,7 +273,7 @@ class InterningTransformerTest {
             """;
 
         DefaultModelXmlFactory factory = new DefaultModelXmlFactory();
-        DefaultModelBuilder.InterningTransformer transformer = new DefaultModelBuilder.InterningTransformer();
+        ModelInterningTransformer transformer = new ModelInterningTransformer();
 
         XmlReaderRequest request = XmlReaderRequest.builder()
                 .reader(new StringReader(pomXml))
@@ -314,7 +305,7 @@ class InterningTransformerTest {
         Session session = Mockito.mock(Session.class);
         when(session.getUserProperties()).thenReturn(userProperties);
 
-        DefaultModelBuilder.InterningTransformer transformer = new DefaultModelBuilder.InterningTransformer(session);
+        ModelInterningTransformer transformer = new ModelInterningTransformer(session);
 
         // Test that custom contexts are used
         assertTrue(transformer.getContexts().contains("groupId"));
@@ -353,7 +344,7 @@ class InterningTransformerTest {
         Session session = Mockito.mock(Session.class);
         when(session.getSystemProperties()).thenReturn(systemProperties);
 
-        DefaultModelBuilder.InterningTransformer transformer = new DefaultModelBuilder.InterningTransformer(session);
+        ModelInterningTransformer transformer = new ModelInterningTransformer(session);
 
         // Test that custom contexts are used
         assertTrue(transformer.getContexts().contains("scope"));
@@ -379,7 +370,7 @@ class InterningTransformerTest {
         when(session.getUserProperties()).thenReturn(userProperties);
         when(session.getSystemProperties()).thenReturn(systemProperties);
 
-        DefaultModelBuilder.InterningTransformer transformer = new DefaultModelBuilder.InterningTransformer(session);
+        ModelInterningTransformer transformer = new ModelInterningTransformer(session);
 
         // Test that user properties are used, not system properties
         assertTrue(transformer.getContexts().contains("groupId"));
@@ -398,10 +389,10 @@ class InterningTransformerTest {
         Session session = Mockito.mock(Session.class);
         when(session.getUserProperties()).thenReturn(userProperties);
 
-        DefaultModelBuilder.InterningTransformer transformer = new DefaultModelBuilder.InterningTransformer(session);
+        ModelInterningTransformer transformer = new ModelInterningTransformer(session);
 
         // Should use default contexts
-        assertEquals(DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS, transformer.getContexts());
+        assertEquals(ModelInterningTransformer.DEFAULT_CONTEXTS, transformer.getContexts());
     }
 
     @Test
@@ -413,10 +404,10 @@ class InterningTransformerTest {
         Session session = Mockito.mock(Session.class);
         when(session.getUserProperties()).thenReturn(userProperties);
 
-        DefaultModelBuilder.InterningTransformer transformer = new DefaultModelBuilder.InterningTransformer(session);
+        ModelInterningTransformer transformer = new ModelInterningTransformer(session);
 
         // Should use default contexts
-        assertEquals(DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS, transformer.getContexts());
+        assertEquals(ModelInterningTransformer.DEFAULT_CONTEXTS, transformer.getContexts());
     }
 
     @Test
@@ -424,10 +415,10 @@ class InterningTransformerTest {
         // Test with no property set - should use defaults
         Session session = Mockito.mock(Session.class);
 
-        DefaultModelBuilder.InterningTransformer transformer = new DefaultModelBuilder.InterningTransformer(session);
+        ModelInterningTransformer transformer = new ModelInterningTransformer(session);
 
         // Should use default contexts
-        assertEquals(DefaultModelBuilder.InterningTransformer.DEFAULT_CONTEXTS, transformer.getContexts());
+        assertEquals(ModelInterningTransformer.DEFAULT_CONTEXTS, transformer.getContexts());
     }
 
     @Test
@@ -439,7 +430,7 @@ class InterningTransformerTest {
         Session session = Mockito.mock(Session.class);
         when(session.getUserProperties()).thenReturn(userProperties);
 
-        DefaultModelBuilder.InterningTransformer transformer = new DefaultModelBuilder.InterningTransformer(session);
+        ModelInterningTransformer transformer = new ModelInterningTransformer(session);
 
         // Test that all values are parsed correctly (whitespace trimmed)
         assertTrue(transformer.getContexts().contains("groupId"));
@@ -459,7 +450,7 @@ class InterningTransformerTest {
         Session session = Mockito.mock(Session.class);
         when(session.getUserProperties()).thenReturn(userProperties);
 
-        DefaultModelBuilder.InterningTransformer transformer = new DefaultModelBuilder.InterningTransformer(session);
+        ModelInterningTransformer transformer = new ModelInterningTransformer(session);
 
         // Test that empty values are filtered out
         assertTrue(transformer.getContexts().contains("groupId"));

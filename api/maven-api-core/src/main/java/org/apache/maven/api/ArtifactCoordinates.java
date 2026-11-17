@@ -43,7 +43,7 @@ public interface ArtifactCoordinates {
      *
      * @deprecated Use {@link #groupId()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default String getGroupId() {
         return groupId();
@@ -60,7 +60,7 @@ public interface ArtifactCoordinates {
      *
      * @deprecated Use {@link #artifactId()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default String getArtifactId() {
         return artifactId();
@@ -80,7 +80,7 @@ public interface ArtifactCoordinates {
      * @return the classifier or an empty string if none, never {@code null}
      * @deprecated Use {@link #classifier()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default String getClassifier() {
         return classifier();
@@ -99,7 +99,7 @@ public interface ArtifactCoordinates {
      *
      * @deprecated Use {@link #versionConstraint()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default VersionConstraint getVersionConstraint() {
         return versionConstraint();
@@ -121,7 +121,7 @@ public interface ArtifactCoordinates {
      * @return the file extension or an empty string if none, never {@code null}
      * @deprecated Use {@link #extension()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default String getExtension() {
         return extension();

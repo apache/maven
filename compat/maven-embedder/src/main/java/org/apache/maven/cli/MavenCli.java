@@ -20,12 +20,14 @@ package org.apache.maven.cli;
 
 import javax.xml.stream.XMLStreamException;
 
+import java.io.BufferedReader;
 import java.io.Console;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -36,7 +38,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
@@ -87,6 +88,7 @@ import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.exception.DefaultExceptionHandler;
 import org.apache.maven.exception.ExceptionHandler;
 import org.apache.maven.exception.ExceptionSummary;
+import org.apache.maven.exception.ReferenceHelp;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.ExecutionListener;
 import org.apache.maven.execution.MavenExecutionRequest;
@@ -125,6 +127,7 @@ import org.codehaus.plexus.component.repository.exception.ComponentLookupExcepti
 import org.codehaus.plexus.components.secdispatcher.SecDispatcher;
 import org.codehaus.plexus.logging.LoggerManager;
 import org.eclipse.aether.DefaultRepositoryCache;
+import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.transfer.TransferListener;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.impl.DumbTerminal;
@@ -389,11 +392,12 @@ public class MavenCli {
                 throw new ExitException(1);
             }
             File basedir = new File(basedirProperty);
-            try {
-                cliRequest.multiModuleProjectDirectory = basedir.getCanonicalFile();
-            } catch (IOException e) {
-                cliRequest.multiModuleProjectDirectory = basedir.getAbsoluteFile();
-            }
+            // Resolve lexically rather than through getCanonicalFile(), which asks the OS to resolve the path
+            // and can substitute it with a different one when a segment is a symlink, junction, or (on Windows)
+            // a mapped network drive, corrupting the reactor root that every relative module/parent path is
+            // later resolved against (MNG-11167).
+            cliRequest.multiModuleProjectDirectory =
+                    getCanonicalPath(basedir.toPath()).toFile();
         }
 
         // We need to locate the top level project which may be pointed at using
@@ -611,9 +615,11 @@ public class MavenCli {
                 // Ignore
                 //
             }
-        }
 
-        slf4jConfiguration.activate();
+            slf4jConfiguration.activate();
+        } else {
+            slf4jConfiguration.activate();
+        }
 
         plexusLoggerManager = new Slf4jLoggerManager();
         slf4jLogger = slf4jLoggerFactory.getLogger(this.getClass().getName());
@@ -936,8 +942,7 @@ public class MavenCli {
         }
     }
 
-    private List<CoreExtension> readCoreExtensionsDescriptor(String extensionsFile)
-            throws IOException, XMLStreamException {
+    List<CoreExtension> readCoreExtensionsDescriptor(String extensionsFile) throws IOException {
         if (extensionsFile != null) {
             Path extensionsPath = Path.of(extensionsFile);
             if (Files.exists(extensionsPath)) {
@@ -945,6 +950,9 @@ public class MavenCli {
                     return new CoreExtensionsStaxReader()
                             .read(is, true, InputSource.of(extensionsFile))
                             .getExtensions();
+                } catch (IOException | XMLStreamException e) {
+                    throw new IOException(
+                            "Unable to parse core extensions descriptor " + extensionsFile + ": " + e.getMessage(), e);
                 }
             }
         }
@@ -969,7 +977,7 @@ public class MavenCli {
 
             for (CoreExtensionEntry entry : reverse(extensions)) {
                 Set<String> exportedPackages = entry.getExportedPackages();
-                ClassRealm realm = entry.getClassRealm();
+                ClassRealm realm = (ClassRealm) entry.getClassRealm();
                 for (String exportedPackage : exportedPackages) {
                     extRealm.importFrom(realm, exportedPackage);
                 }
@@ -1019,6 +1027,40 @@ public class MavenCli {
         return jars;
     }
 
+    /**
+     * Reads a password from the console and, when there is none because the streams are redirected, from the first
+     * line of the given input.
+     *
+     * @param console the console, or {@code null} if the streams are redirected
+     * @param in the input to read the first line from when there is no console
+     * @param prompt the prompt shown by the console; it is not shown when the password is read from the input, as
+     *               the caller is then not interactive and the prompt would only pollute its output
+     * @return the password, never empty
+     * @throws IOException if the input cannot be read
+     * @throws IllegalStateException if no password could be read, so that an empty one is not encrypted
+     */
+    static String readPassword(Console console, InputStream in, String prompt) throws IOException {
+        String password;
+        if (console != null) {
+            char[] chars = console.readPassword(prompt);
+            password = (chars == null) ? null : String.copyValueOf(chars);
+
+            if (chars != null) {
+                // Sun/Oracle advises to empty the char array
+                java.util.Arrays.fill(chars, ' ');
+            }
+        } else {
+            // do not close the reader, that would close the standard input
+            password = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8)).readLine();
+        }
+
+        if (password == null || password.isEmpty()) {
+            throw new IllegalStateException("No password was provided");
+        }
+
+        return password;
+    }
+
     //
     // This should probably be a separate tool and not be baked into Maven.
     //
@@ -1030,15 +1072,7 @@ public class MavenCli {
             String passwd = cliRequest.commandLine.getOptionValue(CLIManager.ENCRYPT_PASSWORD);
 
             if (passwd == null) {
-                Console cons = System.console();
-                char[] password = (cons == null) ? null : cons.readPassword("Password: ");
-                if (password != null) {
-                    // Cipher uses Strings
-                    passwd = String.copyValueOf(password);
-
-                    // Sun/Oracle advises to empty the char array
-                    java.util.Arrays.fill(password, ' ');
-                }
+                passwd = readPassword(System.console(), System.in, "Password: ");
             }
             System.out.println(dispatcher.encrypt(passwd, null));
             throw new ExitException(0);
@@ -1064,14 +1098,16 @@ public class MavenCli {
         if (result.hasExceptions()) {
             ExceptionHandler handler = new DefaultExceptionHandler();
 
-            Map<String, String> references = new LinkedHashMap<>();
+            boolean hasDetailedHelp = false;
 
             List<MavenProject> failedProjects = new ArrayList<>();
 
             for (Throwable exception : result.getExceptions()) {
                 ExceptionSummary summary = handler.handleException(exception);
 
-                logSummary(summary, references, "", cliRequest.showErrors);
+                hasDetailedHelp |= ReferenceHelp.hasHelpText(summary.getReference());
+
+                logSummary(summary, "", cliRequest.showErrors);
 
                 if (exception instanceof LifecycleExecutionException lifecycleExecutionException) {
                     failedProjects.add(lifecycleExecutionException.getProject());
@@ -1086,18 +1122,14 @@ public class MavenCli {
                         MessageUtils.builder().strong("-e"));
             }
             if (!slf4jLogger.isDebugEnabled()) {
-                slf4jLogger.error(
-                        "Re-run Maven using the '{}' switch to enable verbose output",
-                        MessageUtils.builder().strong("-X"));
-            }
-
-            if (!references.isEmpty()) {
-                slf4jLogger.error("");
-                slf4jLogger.error("For more information about the errors and possible solutions"
-                        + ", please read the following articles:");
-
-                for (Map.Entry<String, String> entry : references.entrySet()) {
-                    slf4jLogger.error("{} {}", MessageUtils.builder().strong(entry.getValue()), entry.getKey());
+                if (hasDetailedHelp) {
+                    slf4jLogger.error(
+                            "Re-run Maven using the '{}' switch to enable full debug logging and details about the error",
+                            MessageUtils.builder().strong("-X"));
+                } else {
+                    slf4jLogger.error(
+                            "Re-run Maven using the '{}' switch to enable verbose output",
+                            MessageUtils.builder().strong("-X"));
                 }
             }
 
@@ -1164,24 +1196,8 @@ public class MavenCli {
         return ":" + firstFailedProject.getArtifactId();
     }
 
-    private void logSummary(
-            ExceptionSummary summary, Map<String, String> references, String indent, boolean showErrors) {
-        String referenceKey = "";
-
-        if (summary.getReference() != null && !summary.getReference().isEmpty()) {
-            referenceKey =
-                    references.computeIfAbsent(summary.getReference(), k -> "[Help " + (references.size() + 1) + "]");
-        }
-
+    private void logSummary(ExceptionSummary summary, String indent, boolean showErrors) {
         String msg = summary.getMessage();
-
-        if (referenceKey != null && !referenceKey.isEmpty()) {
-            if (msg.indexOf('\n') < 0) {
-                msg += " -> " + MessageUtils.builder().strong(referenceKey);
-            } else {
-                msg += "\n-> " + MessageUtils.builder().strong(referenceKey);
-            }
-        }
 
         String[] lines = NEXT_LINE.split(msg);
         String currentColor = "";
@@ -1213,10 +1229,18 @@ public class MavenCli {
             currentColor = nextColor;
         }
 
+        String reference = summary.getReference();
+        if (reference != null
+                && !reference.isEmpty()
+                && slf4jLogger.isDebugEnabled()
+                && ReferenceHelp.hasHelpText(reference)) {
+            slf4jLogger.debug(ReferenceHelp.getHelpText(reference));
+        }
+
         indent += "  ";
 
         for (ExceptionSummary child : summary.getChildren()) {
-            logSummary(child, references, indent, showErrors);
+            logSummary(child, indent, showErrors);
         }
     }
 
@@ -1392,8 +1416,28 @@ public class MavenCli {
         request.setReactorFailureBehavior(determineReactorFailureBehaviour(commandLine));
         disableOnPresentOption(commandLine, CLIManager.NON_RECURSIVE, request::setRecursive);
         enableOnPresentOption(commandLine, CLIManager.OFFLINE, request::setOffline);
-        enableOnPresentOption(commandLine, CLIManager.UPDATE_SNAPSHOTS, request::setUpdateSnapshots);
+        enableOnPresentOption(commandLine, CLIManager.UPDATE_ALL, request::setUpdateSnapshots);
+        enableOnPresentOption(commandLine, "update-snapshots", request::setUpdateSnapshots);
         request.setGlobalChecksumPolicy(determineGlobalCheckPolicy(commandLine));
+
+        // Update policy options
+        String artifactsUpdatePolicy = null;
+        String metadataUpdatePolicy = null;
+        if (commandLine.hasOption(CLIManager.UPDATE_ARTIFACTS)) {
+            artifactsUpdatePolicy = RepositoryPolicy.UPDATE_POLICY_ALWAYS;
+        }
+        if (artifactsUpdatePolicy == null && commandLine.hasOption(CLIManager.ARTIFACTS_UPDATE_POLICY)) {
+            artifactsUpdatePolicy = commandLine.getOptionValue(CLIManager.ARTIFACTS_UPDATE_POLICY);
+        }
+        if (commandLine.hasOption(CLIManager.UPDATE_METADATA)) {
+            metadataUpdatePolicy = RepositoryPolicy.UPDATE_POLICY_ALWAYS;
+        }
+        if (metadataUpdatePolicy == null && commandLine.hasOption(CLIManager.METADATA_UPDATE_POLICY)) {
+            metadataUpdatePolicy = commandLine.getOptionValue(CLIManager.METADATA_UPDATE_POLICY);
+        }
+        request.setArtifactsUpdatePolicy(artifactsUpdatePolicy);
+        request.setMetadataUpdatePolicy(metadataUpdatePolicy);
+
         request.setBaseDirectory(baseDirectory);
         request.setSystemProperties(cliRequest.systemProperties);
         request.setUserProperties(cliRequest.userProperties);

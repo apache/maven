@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.Reader;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -1513,6 +1514,28 @@ class XmlNodeImplTest {
         assertEquals("dom", child.child("item").value());
         // The "extra" child from recessive should survive since combine.self wasn't triggered
         assertNotNull(child.child("extra"), "Recessive children should survive since mvn:combine.self is ignored");
+    }
+
+    @Test
+    @SuppressWarnings("deprecation")
+    void testDeprecatedMergeMethods() throws Exception {
+        Method xmlNodeMerge3 = XmlNode.class.getMethod("merge", XmlNode.class, XmlNode.class, Boolean.class);
+        Deprecated dep1 = xmlNodeMerge3.getAnnotation(Deprecated.class);
+        assertNotNull(dep1, "XmlNode.merge(XmlNode, XmlNode, Boolean) must be annotated with @Deprecated");
+        assertEquals("4.0.0", dep1.since());
+        assertTrue(dep1.forRemoval());
+
+        Method xmlNodeImplMerge3 = XmlNodeImpl.class.getMethod("merge", XmlNode.class, XmlNode.class, Boolean.class);
+        Deprecated dep2 = xmlNodeImplMerge3.getAnnotation(Deprecated.class);
+        assertNotNull(dep2, "XmlNodeImpl.merge(XmlNode, XmlNode, Boolean) must be annotated with @Deprecated");
+        assertEquals("4.0.0", dep2.since());
+        assertTrue(dep2.forRemoval());
+
+        XmlNode dominant = XmlNode.newInstance("root", "domVal");
+        XmlNode recessive = XmlNode.newInstance("root", "recVal");
+        XmlNode merged = XmlNode.merge(dominant, recessive, Boolean.TRUE);
+        XmlNode expected = XmlService.merge(dominant, recessive, Boolean.TRUE);
+        assertEquals(expected, merged);
     }
 
     public static Xpp3Dom build(Reader reader) throws XmlPullParserException, IOException {

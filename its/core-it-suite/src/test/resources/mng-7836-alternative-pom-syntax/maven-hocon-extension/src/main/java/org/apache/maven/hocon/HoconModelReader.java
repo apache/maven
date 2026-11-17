@@ -42,6 +42,11 @@ import org.apache.maven.api.spi.ModelParserException;
 public class HoconModelReader implements ModelParser {
 
     @Override
+    public String id() {
+        return "hocon";
+    }
+
+    @Override
     public Optional<Source> locate(Path path) {
         Path pom = Files.isDirectory(path) ? path.resolve("pom.hocon") : path;
         return Files.isRegularFile(pom) ? Optional.of(new PathSource(pom)) : Optional.empty();

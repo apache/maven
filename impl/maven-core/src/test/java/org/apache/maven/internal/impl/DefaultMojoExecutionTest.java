@@ -18,15 +18,20 @@
  */
 package org.apache.maven.internal.impl;
 
+import org.apache.maven.api.services.Lookup;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
+import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 /**
  * Tests for {@link DefaultMojoExecution} immutable snapshot semantics.
@@ -76,6 +81,7 @@ class DefaultMojoExecutionTest {
     @Test
     void cliInvocationPathExecutionIdAndLifecyclePhaseAreEmpty() {
         InternalMavenSession session = mock(InternalMavenSession.class);
+        when(session.getService(Lookup.class)).thenReturn(mock(Lookup.class));
         MojoExecution delegate = cliExecution("help");
 
         org.apache.maven.api.MojoExecution snapshot = new DefaultMojoExecution(session, delegate);
@@ -85,11 +91,14 @@ class DefaultMojoExecutionTest {
         assertFalse(snapshot.lifecyclePhase().isPresent(), "lifecyclePhase should be empty for CLI invocation");
         assertFalse(snapshot.model().isPresent(), "model should be empty when no plugin in model");
         assertFalse(snapshot.configuration().isPresent(), "configuration should be empty when not set");
+        assertNotNull(snapshot.plugin().getRealm().classLoader());
+        assertLegacyAccessors(snapshot);
     }
 
     @Test
     void lifecycleBoundExecutionExecutionIdAndLifecyclePhasePresentAndImmutable() {
         InternalMavenSession session = mock(InternalMavenSession.class);
+        when(session.getService(Lookup.class)).thenReturn(mock(Lookup.class));
         MojoExecution delegate = lifecycleExecution("compile", "default-compile", "compile");
 
         org.apache.maven.api.MojoExecution snapshot = new DefaultMojoExecution(session, delegate);
@@ -108,6 +117,7 @@ class DefaultMojoExecutionTest {
     @Test
     void snapshotDescriptorMatchesLegacyDescriptor() {
         InternalMavenSession session = mock(InternalMavenSession.class);
+        when(session.getService(Lookup.class)).thenReturn(mock(Lookup.class));
         MojoExecution delegate = cliExecution("clean");
 
         org.apache.maven.api.MojoExecution snapshot = new DefaultMojoExecution(session, delegate);
@@ -116,5 +126,38 @@ class DefaultMojoExecutionTest {
                 delegate.getMojoDescriptor().getMojoDescriptorV4(),
                 snapshot.descriptor(),
                 "descriptor must be a copy of the legacy V4 descriptor");
+    }
+
+    @Test
+    void deprecatedGettersPreservePopulatedExecutionValues() {
+        InternalMavenSession session = mock(InternalMavenSession.class);
+        when(session.getService(Lookup.class)).thenReturn(mock(Lookup.class));
+        MojoExecution delegate = lifecycleExecution("compile", "default-compile", "compile");
+        org.apache.maven.model.PluginExecution model = new org.apache.maven.model.PluginExecution();
+        model.setId("default-compile");
+        org.apache.maven.model.Plugin plugin = new org.apache.maven.model.Plugin();
+        plugin.setGroupId("org.apache.maven.plugins");
+        plugin.setArtifactId("maven-test-plugin");
+        plugin.setVersion("1.0");
+        plugin.addExecution(model);
+        delegate.getMojoDescriptor().getPluginDescriptor().setPlugin(plugin);
+        delegate.setConfiguration(new Xpp3Dom("configuration"));
+
+        org.apache.maven.api.MojoExecution snapshot = new DefaultMojoExecution(session, delegate);
+
+        assertTrue(snapshot.model().isPresent());
+        assertTrue(snapshot.configuration().isPresent());
+        assertLegacyAccessors(snapshot);
+    }
+
+    @SuppressWarnings("removal")
+    private static void assertLegacyAccessors(org.apache.maven.api.MojoExecution snapshot) {
+        assertSame(snapshot.plugin(), snapshot.getPlugin());
+        assertEquals(snapshot.model().orElse(null), snapshot.getModel());
+        assertSame(snapshot.descriptor(), snapshot.getDescriptor());
+        assertEquals(snapshot.executionId().orElse(null), snapshot.getExecutionId());
+        assertEquals(snapshot.goal(), snapshot.getGoal());
+        assertEquals(snapshot.lifecyclePhase().orElse(null), snapshot.getLifecyclePhase());
+        assertEquals(snapshot.configuration(), snapshot.getConfiguration());
     }
 }

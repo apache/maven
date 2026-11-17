@@ -28,19 +28,47 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.CacheRetention;
 
 import static java.util.Objects.requireNonNull;
 
 /**
+ * Request for resolving a meta-version of an artifact to a concrete version.
  *
  * @since 4.0.0
  */
 @Experimental
 public interface VersionResolverRequest extends RepositoryAwareRequest {
 
+    /**
+     * Overrides the default {@link CacheRetention#DISABLED} retention with
+     * {@link CacheRetention#REQUEST_SCOPED}, because version resolution is a
+     * read-only, deterministic operation within a single build.
+     *
+     * @return {@link CacheRetention#REQUEST_SCOPED}
+     * @since 4.2.0
+     */
+    @Nonnull
+    @Override
+    default CacheRetention getCacheRetention() {
+        return CacheRetention.REQUEST_SCOPED;
+    }
+
+    /**
+     * Gets the artifact coordinates whose version should be resolved.
+     *
+     * @return the artifact coordinates
+     */
     @Nonnull
     ArtifactCoordinates getArtifactCoordinates();
 
+    /**
+     * Creates a request for the given session and artifact coordinates.
+     *
+     * @param session the session
+     * @param artifactCoordinates the artifact coordinates
+     * @return the new request
+     */
     @Nonnull
     static VersionResolverRequest build(@Nonnull Session session, @Nonnull ArtifactCoordinates artifactCoordinates) {
         return builder()
@@ -49,6 +77,14 @@ public interface VersionResolverRequest extends RepositoryAwareRequest {
                 .build();
     }
 
+    /**
+     * Creates a request for the given session, artifact coordinates, and repositories.
+     *
+     * @param session the session
+     * @param artifactCoordinates the artifact coordinates
+     * @param repositories the repositories to use, or {@code null} to use the session's repositories
+     * @return the new request
+     */
     @Nonnull
     static VersionResolverRequest build(
             @Nonnull Session session,
@@ -61,6 +97,11 @@ public interface VersionResolverRequest extends RepositoryAwareRequest {
                 .build();
     }
 
+    /**
+     * Creates a new builder for constructing a {@code VersionResolverRequest}.
+     *
+     * @return a new builder
+     */
     @Nonnull
     static VersionResolverRequestBuilder builder() {
         return new VersionResolverRequestBuilder();

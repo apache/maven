@@ -26,6 +26,7 @@ open module org.apache.maven.impl {
     requires org.apache.maven.api.annotations;
     requires org.apache.maven.di;
     requires org.apache.maven.support;
+    requires org.apache.maven.utils;
     requires org.apache.maven.internal.xml;
     requires org.apache.maven.resolver;
     requires org.apache.maven.resolver.spi;

@@ -21,7 +21,6 @@ package org.apache.maven.api.spi;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
-import org.apache.maven.api.di.Named;
 import org.apache.maven.api.model.Model;
 
 /**
@@ -53,7 +52,6 @@ import org.apache.maven.api.model.Model;
  */
 @Experimental
 @Consumer
-@Named
 public interface ModelTransformer extends SpiService {
 
     /**

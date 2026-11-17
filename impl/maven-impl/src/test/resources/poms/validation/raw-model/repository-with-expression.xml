@@ -41,6 +41,10 @@ under the License.
       <id>repo</id>
       <url>file://${x}/sdk/maven/repo</url>
     </repository>
+    <repository>
+      <id>repo2</id>
+      <url>${project.basedir.uri}/sdk/maven/repo</url>
+    </repository>
   </repositories>
 
 </project>

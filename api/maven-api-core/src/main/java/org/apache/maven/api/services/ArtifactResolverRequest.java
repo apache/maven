@@ -30,6 +30,7 @@ import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.CacheRetention;
 
 import static java.util.Objects.requireNonNull;
 
@@ -42,14 +43,37 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface ArtifactResolverRequest extends RepositoryAwareRequest {
 
+    /**
+     * Overrides the default {@link CacheRetention#DISABLED} retention with
+     * {@link CacheRetention#REQUEST_SCOPED}, because artifact resolution is a
+     * read-only, deterministic operation within a single build.
+     *
+     * @return {@link CacheRetention#REQUEST_SCOPED}
+     * @since 4.2.0
+     */
+    @Nonnull
+    @Override
+    default CacheRetention getCacheRetention() {
+        return CacheRetention.REQUEST_SCOPED;
+    }
+
+    /** @return the coordinates of the artifacts to resolve, never {@code null} */
     @Nonnull
     Collection<? extends ArtifactCoordinates> getCoordinates();
 
+    /** @return a new builder instance */
     @Nonnull
     static ArtifactResolverRequestBuilder builder() {
         return new ArtifactResolverRequestBuilder();
     }
 
+    /**
+     * Builds a request to resolve artifacts from their coordinates.
+     *
+     * @param session the session
+     * @param coordinates the artifact coordinates to resolve
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static ArtifactResolverRequest build(
             @Nonnull Session session, @Nonnull Collection<? extends ArtifactCoordinates> coordinates) {
@@ -59,6 +83,14 @@ public interface ArtifactResolverRequest extends RepositoryAwareRequest {
                 .build();
     }
 
+    /**
+     * Builds a request to resolve artifacts from specific repositories.
+     *
+     * @param session the session
+     * @param coordinates the artifact coordinates to resolve
+     * @param repositories the remote repositories to resolve from
+     * @return a new request, never {@code null}
+     */
     @Nonnull
     static ArtifactResolverRequest build(
             @Nonnull Session session,

@@ -21,6 +21,12 @@ package org.apache.maven.api.spi;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.services.MavenException;
 
+/**
+ * Exception thrown when a model parser encounters an error while reading a POM or other model source.
+ * Carries optional line and column number information to help locate the error.
+ *
+ * @since 4.0.0
+ */
 @Experimental
 public class ModelParserException extends MavenException {
 
@@ -56,10 +62,20 @@ public class ModelParserException extends MavenException {
         this(null, cause);
     }
 
+    /**
+     * Returns the one-based line number where the error occurred, or {@code -1} if unknown.
+     *
+     * @return the line number
+     */
     public int getLineNumber() {
         return lineNumber;
     }
 
+    /**
+     * Returns the one-based column number where the error occurred, or {@code -1} if unknown.
+     *
+     * @return the column number
+     */
     public int getColumnNumber() {
         return columnNumber;
     }

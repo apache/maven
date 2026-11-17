@@ -23,8 +23,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
 import org.apache.maven.api.Constants;
-import org.apache.maven.api.Session;
-import org.apache.maven.api.cache.CacheMetadata;
+import org.apache.maven.api.ProtoSession;
 import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.services.Request;
 import org.slf4j.Logger;
@@ -37,7 +36,7 @@ public class CacheConfigurationResolver {
     private static final Logger LOGGER = LoggerFactory.getLogger(CacheConfigurationResolver.class);
 
     /**
-     * Cache for parsed selectors per session to avoid re-parsing.
+     * Parsed selectors shared by sessions with the same configuration string.
      */
     private static final ConcurrentMap<String, List<CacheSelector>> SELECTOR_CACHE = new ConcurrentHashMap<>();
 
@@ -48,11 +47,13 @@ public class CacheConfigurationResolver {
      * @param session the session containing user properties
      * @return the resolved cache configuration
      */
-    public static CacheConfig resolveConfig(Request<?> req, Session session) {
-        // First check if request implements CacheMetadata for backward compatibility
-        CacheRetention legacyRetention = null;
-        if (req instanceof CacheMetadata metadata) {
-            legacyRetention = metadata.getCacheRetention();
+    public static CacheConfig resolveConfig(Request<?> req, ProtoSession session) {
+        // Request always implements CacheMetadata; read the declared retention directly.
+        CacheRetention legacyRetention = req.getCacheRetention();
+
+        // Disabled requests must execute even when a selector would enable caching.
+        if (legacyRetention == CacheRetention.DISABLED) {
+            return new CacheConfig(CacheRetention.DISABLED, Cache.ReferenceType.NONE);
         }
 
         // Check for key reference type configuration

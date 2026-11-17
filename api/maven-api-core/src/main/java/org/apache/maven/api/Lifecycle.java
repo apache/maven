@@ -52,8 +52,39 @@ public interface Lifecycle extends ExtensibleEnum {
     // ======================
     // Phase qualifiers
     // ======================
+
+    /**
+     * Qualifier prefix for binding a mojo to run <em>before</em> a phase's main executions.
+     * Used in plugin descriptors and lifecycle definitions to control execution ordering
+     * within the phase graph.
+     *
+     * <p>Example: a mojo bound to {@code "before:compile"} runs before the mojos bound
+     * to the {@code "compile"} phase itself. When a user requests the {@code "compile"}
+     * phase (e.g. {@code mvn compile}), all three sub-steps execute:
+     * {@code before:compile} → {@code compile} → {@code after:compile}.
+     *
+     * <p>These qualifiers are for <strong>mojo binding</strong>, not for CLI invocation.
+     * Requesting {@code "before:compile"} from the CLI is not supported — the build
+     * engine always executes the full phase including all its sub-steps.
+     *
+     * @see #AFTER
+     * @see #AT
+     */
     String BEFORE = "before:";
+
+    /**
+     * Qualifier prefix for binding a mojo to run <em>after</em> a phase's main executions.
+     *
+     * @see #BEFORE
+     */
     String AFTER = "after:";
+
+    /**
+     * Qualifier prefix that resolves to the phase's main step (stripping the prefix).
+     * Equivalent to using the bare phase name for binding purposes.
+     *
+     * @see #BEFORE
+     */
     String AT = "at:";
 
     /**
@@ -102,8 +133,15 @@ public interface Lifecycle extends ExtensibleEnum {
     /**
      * A phase in the lifecycle.
      *
-     * A phase is identified by its name. It also contains a list of plugins bound to that phase,
-     * a list of {@link Link links}, and a list of sub-phases.  This forms a tree of phases.
+     * <p>A phase is identified by its {@link #name() name} and forms a tree: each phase
+     * can contain {@link #phases() sub-phases} and declare {@link #links() ordering links}
+     * to other phases. During execution, each phase is decomposed into three sub-steps
+     * ({@link #BEFORE before:}<em>name</em>, <em>name</em>, {@link #AFTER after:}<em>name</em>)
+     * that mojos can bind to.
+     *
+     * <p>Predefined phase names for the {@linkplain Lifecycle#DEFAULT default} lifecycle
+     * include {@link #COMPILE}, {@link #TEST}, {@link #PACKAGE}, {@link #VERIFY},
+     * {@link #INSTALL}, and {@link #DEPLOY}, among others.
      */
     interface Phase {
 

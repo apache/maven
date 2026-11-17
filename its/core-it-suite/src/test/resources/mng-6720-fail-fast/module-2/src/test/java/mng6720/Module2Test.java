@@ -18,7 +18,7 @@
  */
 package mng6720;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 
 public class Module2Test {
     @Test

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+Licensed to the Apache Software Foundation (ASF) under one
+or more contributor license agreements.  See the NOTICE file
+distributed with this work for additional information
+regarding copyright ownership.  The ASF licenses this file
+to you under the Apache License, Version 2.0 (the
+"License"); you may not use this file except in compliance
+with the License.  You may obtain a copy of the License at
+
+  http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing,
+software distributed under the License is distributed on an
+"AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+KIND, either express or implied.  See the License for the
+specific language governing permissions and limitations
+under the License.
+-->
+<!--
+  Combined invariant test for MNG-8710 + #13390:
+  - The file profile (activated by ${message.file} path interpolation) MUST fire.
+  - The property-based profile (activated by <property><name>message.file</name>) MUST NOT fire.
+  The same parent property enables path interpolation via interpolationProperties but must NOT
+  be visible through getModelProperty(), preventing self-activation of property/condition profiles.
+-->
+<project xmlns="http://maven.apache.org/POM/4.0.0">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>org.apache.maven.test</groupId>
+  <artifactId>mng-8710-combined-parent</artifactId>
+  <version>1.0.0</version>
+  <packaging>pom</packaging>
+  <properties>
+    <message.file>activate.marker</message.file>
+  </properties>
+  <modules>
+    <module>child</module>
+  </modules>
+  <profiles>
+    <!-- This profile MUST activate: file path resolved via interpolationProperties (#10375) -->
+    <profile>
+      <id>file-profile</id>
+      <activation>
+        <file>
+          <exists>${message.file}</exists>
+        </file>
+      </activation>
+      <properties>
+        <profile.file.activated>true</profile.file.activated>
+      </properties>
+    </profile>
+    <!-- This profile MUST NOT activate: property-based activation must not see
+         interpolationProperties via getModelProperty() (#13390) -->
+    <profile>
+      <id>property-profile</id>
+      <activation>
+        <property>
+          <name>message.file</name>
+        </property>
+      </activation>
+      <properties>
+        <profile.property.activated>true</profile.property.activated>
+      </properties>
+    </profile>
+  </profiles>
+</project>

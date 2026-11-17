@@ -19,6 +19,7 @@
 package org.apache.maven.cling.invoker;
 
 import java.io.File;
+import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -48,6 +49,7 @@ import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.extension.internal.CoreExports;
 import org.apache.maven.extension.internal.CoreExtensionEntry;
 import org.apache.maven.internal.impl.DefaultLookup;
+import org.apache.maven.internal.impl.SisuDiBridgeModule;
 import org.apache.maven.session.scope.internal.SessionScope;
 import org.apache.maven.session.scope.internal.SessionScopeModule;
 import org.codehaus.plexus.ContainerConfiguration;
@@ -93,10 +95,14 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 coreRealm,
                 coreEntry.getExportedArtifacts(),
                 coreExtensionSelector.selectCoreExtensions(invoker, context));
-        List<CoreExtensionEntry> loadedExtensionsEntries =
-                loadedExtensions.stream().map(LoadedCoreExtension::entry).toList();
+        List<CoreExtensionEntry> loadedExtensionsEntries = new ArrayList<>(
+                loadedExtensions.stream().map(LoadedCoreExtension::entry).toList());
         ClassRealm containerRealm =
                 setupContainerRealm(context.logger, classWorld, coreRealm, extClassPath, loadedExtensionsEntries);
+        for (Path entry : extClassPath) {
+            loadedExtensionsEntries.add(
+                    CoreExtensionEntry.discoverFrom(containerRealm, List.of(entry.toFile()), null, null));
+        }
         ContainerConfiguration cc = new DefaultContainerConfiguration()
                 .setClassWorld(classWorld)
                 .setRealm(containerRealm)
@@ -112,7 +118,10 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
                 collectExportedArtifacts(coreEntry, loadedExtensionsEntries),
                 collectExportedPackages(coreEntry, loadedExtensionsEntries));
         Thread.currentThread().setContextClassLoader(containerRealm);
-        DefaultPlexusContainer container = new DefaultPlexusContainer(cc, getCustomModule(context, exports));
+        DefaultPlexusContainer container = new DefaultPlexusContainer(
+                cc,
+                getCustomModule(context, exports),
+                new SisuDiBridgeModule(true, context.invokerRequest.messageBuilderFactory()));
 
         // NOTE: To avoid inconsistencies, we'll use the TCCL exclusively for lookups
         container.setLookupRealm(null);
@@ -211,11 +220,21 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             }
         }
         ArrayList<Path> jars = new ArrayList<>();
+        Set<Path> seen = new HashSet<>();
         if (extClassPath != null && !extClassPath.isEmpty()) {
             for (String jar : extClassPath.split(File.pathSeparator)) {
                 Path file = context.cwd.resolve(jar);
-                context.logger.debug("  included '" + file + "'");
-                jars.add(file);
+                Path realPath;
+                try {
+                    realPath = file.toRealPath();
+                } catch (IOException e) {
+                    // Preserve the existing handling of optional entries that do not exist.
+                    realPath = file.toAbsolutePath().normalize();
+                }
+                if (seen.add(realPath)) {
+                    context.logger.debug("  included '" + file + "'");
+                    jars.add(file);
+                }
             }
         }
         return jars;
@@ -290,6 +309,7 @@ public class PlexusContainerCapsuleFactory<C extends LookupContext> implements C
             @Override
             protected void configure() {
                 bind(ILoggerFactory.class).toProvider(() -> context.loggerFactory);
+                bind(MessageBuilderFactory.class).toInstance(context.invokerRequest.messageBuilderFactory());
             }
         });
 

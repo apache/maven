@@ -25,6 +25,8 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
+import static java.util.Objects.requireNonNull;
+
 /**
  * Service used to create {@link Artifact} objects.
  *
@@ -34,59 +36,120 @@ import org.apache.maven.api.annotations.Nonnull;
 public interface ArtifactFactory extends Service {
 
     /**
-     * Creates an artifact.
+     * Creates an artifact from individual components.
      *
-     * @param request the request holding artifact creation parameters
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param extension the file extension
      * @return an {@code Artifact}, never {@code null}
-     * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
      */
-    @Nonnull
-    Artifact create(@Nonnull ArtifactFactoryRequest request);
-
     @Nonnull
     default Artifact create(
             @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
-        return create(ArtifactFactoryRequest.build(session, groupId, artifactId, version, extension));
-    }
-
-    @Nonnull
-    default Artifact create(
-            @Nonnull Session session,
-            String groupId,
-            String artifactId,
-            String version,
-            String classifier,
-            String extension,
-            String type) {
-        return create(ArtifactFactoryRequest.build(session, groupId, artifactId, version, classifier, extension, type));
+        return create(session, groupId, artifactId, version, null, extension, null);
     }
 
     /**
-     * Creates an artifact.
+     * Creates an artifact from individual components including classifier and type.
      *
-     * @param request the request holding artifact creation parameters
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param classifier the classifier, may be {@code null}
+     * @param extension the file extension, may be {@code null}
+     * @param type the artifact type, may be {@code null}
      * @return an {@code Artifact}, never {@code null}
-     * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
      */
     @Nonnull
-    ProducedArtifact createProduced(@Nonnull ArtifactFactoryRequest request);
-
-    @Nonnull
-    default ProducedArtifact createProduced(
-            @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
-        return createProduced(ArtifactFactoryRequest.build(session, groupId, artifactId, version, extension));
-    }
-
-    @Nonnull
-    default ProducedArtifact createProduced(
+    Artifact create(
             @Nonnull Session session,
             String groupId,
             String artifactId,
             String version,
             String classifier,
             String extension,
-            String type) {
+            String type);
+
+    /**
+     * Creates a produced artifact from individual components.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param extension the file extension
+     * @return a {@code ProducedArtifact}, never {@code null}
+     */
+    @Nonnull
+    default ProducedArtifact createProduced(
+            @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
+        return createProduced(session, groupId, artifactId, version, null, extension, null);
+    }
+
+    /**
+     * Creates a produced artifact from individual components including classifier and type.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param classifier the classifier, may be {@code null}
+     * @param extension the file extension, may be {@code null}
+     * @param type the artifact type, may be {@code null}
+     * @return a {@code ProducedArtifact}, never {@code null}
+     */
+    @Nonnull
+    ProducedArtifact createProduced(
+            @Nonnull Session session,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String extension,
+            String type);
+
+    /**
+     * Creates an artifact from a request.
+     *
+     * @param request the request
+     * @return an {@code Artifact}, never {@code null}
+     * @deprecated Use {@link #create(Session, String, String, String, String, String, String)} directly.
+     */
+    @Deprecated
+    @Nonnull
+    default org.apache.maven.api.Artifact create(@Nonnull ArtifactFactoryRequest request) {
+        requireNonNull(request, "request");
+        return create(
+                request.getSession(),
+                request.getGroupId(),
+                request.getArtifactId(),
+                request.getVersion(),
+                request.getClassifier(),
+                request.getExtension(),
+                request.getType());
+    }
+
+    /**
+     * Creates a produced artifact from a request.
+     *
+     * @param request the request
+     * @return a {@code ProducedArtifact}, never {@code null}
+     * @deprecated Use {@link #createProduced(Session, String, String, String, String, String, String)} directly.
+     */
+    @Deprecated
+    @Nonnull
+    default ProducedArtifact createProduced(@Nonnull ArtifactFactoryRequest request) {
+        requireNonNull(request, "request");
         return createProduced(
-                ArtifactFactoryRequest.build(session, groupId, artifactId, version, classifier, extension, type));
+                request.getSession(),
+                request.getGroupId(),
+                request.getArtifactId(),
+                request.getVersion(),
+                request.getClassifier(),
+                request.getExtension(),
+                request.getType());
     }
 }

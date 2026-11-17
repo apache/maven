@@ -31,6 +31,9 @@ import org.apache.maven.api.Listener;
 import org.apache.maven.api.RepositoryEvent;
 import org.apache.maven.api.RepositoryListener;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.LookupException;
+import org.apache.maven.api.spi.SpiService;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.InternalSession;
@@ -189,6 +192,89 @@ class EventSpyImplTest {
         when(source.getException()).thenReturn(new Exception("changed failure"));
         assertSame(failure, event.exception().orElseThrow());
         assertSame(failure, event.getException().orElseThrow());
+    }
+
+    @Test
+    void autoDiscoversListenerImplementingSpiService() throws Exception {
+        class SpiListener implements ExecutionListener, SpiService {
+            int startedCalls;
+
+            @Override
+            public void sessionStarted(ExecutionEvent event) {
+                startedCalls++;
+            }
+        }
+
+        SpiListener spiListener = new SpiListener();
+        SpiService nonListenerSpi = new SpiService() {};
+        Lookup lookup = mock(Lookup.class);
+        when(lookup.lookupList(SpiService.class)).thenReturn(List.of(nonListenerSpi, spiListener));
+
+        DefaultRepositorySystemSession resolver = new DefaultRepositorySystemSession(h -> false);
+        MavenSession maven = new MavenSession(null, resolver, new DefaultMavenExecutionRequest(), null);
+        DefaultSession session = new DefaultSession(maven, mock(RepositorySystem.class), List.of(), null, lookup, null);
+        maven.setSession(session);
+        resolver.getData().set(InternalSession.class, session);
+
+        assertEquals(1, session.getListeners().size());
+        assertTrue(session.getListeners().contains(spiListener));
+
+        Session derived = session.withRemoteRepositories(List.of());
+        assertEquals(1, derived.getListeners().size());
+        assertTrue(derived.getListeners().contains(spiListener));
+
+        org.apache.maven.execution.ExecutionEvent event = mock(org.apache.maven.execution.ExecutionEvent.class);
+        when(event.getSession()).thenReturn(maven);
+        when(event.getType()).thenReturn(org.apache.maven.execution.ExecutionEvent.Type.SessionStarted);
+        new EventSpyImpl().onEvent(event);
+
+        assertEquals(1, spiListener.startedCalls);
+    }
+
+    @Test
+    void autoDiscoversRepositoryListenerImplementingSpiService() {
+        class SpiRepoListener implements RepositoryListener, SpiService {
+            int resolvingCalls;
+
+            @Override
+            public void artifactResolving(RepositoryEvent event) {
+                resolvingCalls++;
+            }
+        }
+
+        SpiRepoListener spiListener = new SpiRepoListener();
+        Lookup lookup = mock(Lookup.class);
+        when(lookup.lookupList(SpiService.class)).thenReturn(List.of(spiListener));
+
+        DefaultRepositorySystemSession resolver = new DefaultRepositorySystemSession(h -> false);
+        MavenSession maven = new MavenSession(null, resolver, new DefaultMavenExecutionRequest(), null);
+        DefaultSession session = new DefaultSession(maven, mock(RepositorySystem.class), List.of(), null, lookup, null);
+        maven.setSession(session);
+        resolver.getData().set(InternalSession.class, session);
+
+        assertEquals(1, session.getListeners().size());
+        assertTrue(session.getListeners().contains(spiListener));
+
+        new MavenRepositoryListener()
+                .artifactResolving(new org.eclipse.aether.RepositoryEvent.Builder(
+                                resolver, org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_RESOLVING)
+                        .build());
+
+        assertEquals(1, spiListener.resolvingCalls);
+    }
+
+    @Test
+    void handlesLookupExceptionDuringSpiDiscoveryGracefully() {
+        Lookup lookup = mock(Lookup.class);
+        when(lookup.lookupList(SpiService.class)).thenThrow(new LookupException("Simulated provisioning failure"));
+
+        DefaultRepositorySystemSession resolver = new DefaultRepositorySystemSession(h -> false);
+        MavenSession maven = new MavenSession(null, resolver, new DefaultMavenExecutionRequest(), null);
+        DefaultSession session = new DefaultSession(maven, mock(RepositorySystem.class), List.of(), null, lookup, null);
+        maven.setSession(session);
+        resolver.getData().set(InternalSession.class, session);
+
+        assertTrue(session.getListeners().isEmpty());
     }
 
     private static class TestContext {

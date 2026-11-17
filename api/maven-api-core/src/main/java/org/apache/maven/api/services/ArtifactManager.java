@@ -28,6 +28,7 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
+ * Service for associating file system paths with artifacts within the current session.
  *
  * @since 4.0.0
  */

@@ -1148,7 +1148,7 @@ public class RepositorySystemSupplier implements Supplier<RepositorySystem> {
 
     protected ModelBuilder createModelBuilder() {
         // from maven-model-builder
-        DefaultModelProcessor modelProcessor = new DefaultModelProcessor(new DefaultModelXmlFactory(), Map.of());
+        DefaultModelProcessor modelProcessor = new DefaultModelProcessor(new DefaultModelXmlFactory(), List.of());
         return new DefaultModelBuilder(
                 modelProcessor,
                 new DefaultModelValidator(),

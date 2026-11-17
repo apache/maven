@@ -20,4 +20,9 @@ package org.apache.maven.api.services;
 
 import org.apache.maven.api.Packaging;
 
+/**
+ * Registry for {@link Packaging} extensible enum values.
+ *
+ * @since 4.0.0
+ */
 public interface PackagingRegistry extends ExtensibleEnumRegistry<Packaging> {}

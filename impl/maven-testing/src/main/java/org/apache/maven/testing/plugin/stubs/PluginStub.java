@@ -21,12 +21,15 @@ package org.apache.maven.testing.plugin.stubs;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.Plugin;
+import org.apache.maven.api.Realm;
 import org.apache.maven.api.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Lifecycle;
+import org.apache.maven.api.services.Lookup;
 
 /**
  * A stub implementation of {@link Plugin} for testing Maven plugins.
@@ -52,7 +55,7 @@ public class PluginStub implements Plugin {
     org.apache.maven.api.model.Plugin model;
     PluginDescriptor descriptor;
     List<Lifecycle> lifecycles = Collections.emptyList();
-    ClassLoader classLoader;
+    Realm realm;
     Artifact artifact;
     List<Dependency> dependencies = Collections.emptyList();
     Map<String, Dependency> dependenciesMap = Collections.emptyMap();
@@ -85,12 +88,31 @@ public class PluginStub implements Plugin {
     }
 
     @Override
-    public ClassLoader getClassLoader() {
-        return classLoader;
+    public Realm getRealm() {
+        return realm;
     }
 
     public void setClassLoader(ClassLoader classLoader) {
-        this.classLoader = classLoader;
+        this.realm = new Realm() {
+            @Override
+            public ClassLoader classLoader() {
+                return classLoader;
+            }
+
+            @Override
+            public Optional<ModuleLayer> moduleLayer() {
+                return Optional.empty();
+            }
+
+            @Override
+            public Lookup lookup() {
+                return LookupStub.EMPTY;
+            }
+        };
+    }
+
+    public void setRealm(Realm realm) {
+        this.realm = realm;
     }
 
     @Override

@@ -28,5 +28,11 @@ import org.apache.maven.api.Service;
  * @since 4.0.0
  */
 public interface RootDetector extends Service {
+    /**
+     * Checks whether the given directory is a project root directory.
+     *
+     * @param dir the directory to check
+     * @return {@code true} if the directory is a root directory, {@code false} otherwise
+     */
     boolean isRootDirectory(Path dir);
 }

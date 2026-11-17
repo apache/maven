@@ -21,7 +21,6 @@ package org.apache.maven.api.spi;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.di.Named;
 
 /**
  * Service provider interface for registering custom {@link PathScope} implementations.
@@ -49,5 +48,4 @@ import org.apache.maven.api.di.Named;
  */
 @Experimental
 @Consumer
-@Named
 public interface PathScopeProvider extends ExtensibleEnumProvider<PathScope> {}

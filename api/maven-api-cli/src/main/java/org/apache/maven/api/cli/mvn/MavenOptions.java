@@ -55,9 +55,10 @@ public interface MavenOptions extends Options {
     Optional<Boolean> nonRecursive();
 
     /**
-     * Indicates whether Maven should force a check for updated snapshots on remote repositories.
+     * Indicates whether Maven should force a check for missing releases and updated snapshots on remote
+     * repositories. Release artifacts already present in the local repository are not re-downloaded.
      *
-     * @return an {@link Optional} containing true if snapshot updates should be forced, false if not, or empty if not specified
+     * @return an {@link Optional} containing true if update checks should be forced, false if not, or empty if not specified
      */
     @Nonnull
     Optional<Boolean> updateSnapshots();
@@ -77,6 +78,26 @@ public interface MavenOptions extends Options {
      */
     @Nonnull
     Optional<Boolean> suppressSnapshotUpdates();
+
+    /**
+     * The update policy to apply to artifacts ('always', 'daily', 'interval:N', 'never').
+     * The --UA flag overrides this with 'always'.
+     *
+     * @return an {@link Optional} containing the artifacts update policy, or empty if not specified
+     * @since 4.0.0
+     */
+    @Nonnull
+    Optional<String> artifactsUpdatePolicy();
+
+    /**
+     * The update policy to apply to metadata ('always', 'daily', 'interval:N', 'never').
+     * The --UM flag overrides this with 'always'.
+     *
+     * @return an {@link Optional} containing the metadata update policy, or empty if not specified
+     * @since 4.0.0
+     */
+    @Nonnull
+    Optional<String> metadataUpdatePolicy();
 
     /**
      * Indicates whether Maven should use strict checksum verification.
@@ -222,4 +243,14 @@ public interface MavenOptions extends Options {
      */
     @Nonnull
     Optional<List<String>> goals();
+
+    /**
+     * Indicates whether Maven should list effective build aliases and exit.
+     * Aliases are collected from installation, user, and project-scoped settings files.
+     *
+     * @return an {@link Optional} containing true if aliases should be listed, or empty if not specified
+     * @since 4.2.0
+     */
+    @Nonnull
+    Optional<Boolean> listAliases();
 }

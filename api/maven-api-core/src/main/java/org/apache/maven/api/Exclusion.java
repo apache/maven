@@ -29,25 +29,31 @@ import org.apache.maven.api.annotations.Nullable;
  */
 @Experimental
 public interface Exclusion {
+    /**
+     * {@return the group identifier of the excluded dependency, or {@code null} for a wildcard}.
+     */
     @Nullable
     String groupId();
 
     /**
      * @deprecated Use {@link #groupId()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nullable
     default String getGroupId() {
         return groupId();
     }
 
+    /**
+     * {@return the artifact identifier of the excluded dependency, or {@code null} for a wildcard}.
+     */
     @Nullable
     String artifactId();
 
     /**
      * @deprecated Use {@link #artifactId()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nullable
     default String getArtifactId() {
         return artifactId();

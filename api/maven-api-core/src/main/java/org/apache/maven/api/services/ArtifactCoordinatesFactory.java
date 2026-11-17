@@ -39,9 +39,23 @@ public interface ArtifactCoordinatesFactory extends Service {
      * @param request the request holding coordinates creation parameters
      * @return an {@code ArtifactCoordinates}, never {@code null}
      * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
+     * @deprecated Use {@link #create(Session, String, String, String, String, String, String)} directly.
      */
+    @Deprecated
     @Nonnull
-    ArtifactCoordinates create(@Nonnull ArtifactCoordinatesFactoryRequest request);
+    default ArtifactCoordinates create(@Nonnull ArtifactCoordinatesFactoryRequest request) {
+        if (request.getCoordinatesString() != null) {
+            return create(request.getSession(), request.getCoordinatesString());
+        }
+        return create(
+                request.getSession(),
+                request.getGroupId(),
+                request.getArtifactId(),
+                request.getVersion(),
+                request.getClassifier(),
+                request.getExtension(),
+                request.getType());
+    }
 
     /**
      * Creates coordinates out of string that is formatted like:
@@ -53,38 +67,63 @@ public interface ArtifactCoordinatesFactory extends Service {
      * @throws IllegalArgumentException if {@code session} is null or invalid
      */
     @Nonnull
-    default ArtifactCoordinates create(@Nonnull Session session, @Nonnull String coordinatesString) {
-        return create(ArtifactCoordinatesFactoryRequest.build(session, coordinatesString));
-    }
+    ArtifactCoordinates create(@Nonnull Session session, @Nonnull String coordinatesString);
 
+    /**
+     * Creates artifact coordinates from individual components.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param extension the file extension
+     * @return an {@code ArtifactCoordinates}, never {@code null}
+     */
     @Nonnull
     default ArtifactCoordinates create(
             @Nonnull Session session, String groupId, String artifactId, String version, String extension) {
-        return create(ArtifactCoordinatesFactoryRequest.build(session, groupId, artifactId, version, extension));
+        return create(session, groupId, artifactId, version, null, extension, null);
     }
 
+    /**
+     * Creates artifact coordinates from individual components including classifier and type.
+     *
+     * @param session the session
+     * @param groupId the group identifier
+     * @param artifactId the artifact identifier
+     * @param version the version
+     * @param classifier the classifier, may be {@code null}
+     * @param extension the file extension, may be {@code null}
+     * @param type the artifact type, may be {@code null}
+     * @return an {@code ArtifactCoordinates}, never {@code null}
+     * @since 4.2.0
+     */
     @Nonnull
-    default ArtifactCoordinates create(
+    ArtifactCoordinates create(
             @Nonnull Session session,
             String groupId,
             String artifactId,
             String version,
             String classifier,
             String extension,
-            String type) {
-        return create(ArtifactCoordinatesFactoryRequest.build(
-                session, groupId, artifactId, version, classifier, extension, type));
-    }
+            String type);
 
+    /**
+     * Creates artifact coordinates from an existing artifact.
+     *
+     * @param session the session
+     * @param artifact the artifact to derive coordinates from
+     * @return an {@code ArtifactCoordinates}, never {@code null}
+     */
     @Nonnull
     default ArtifactCoordinates create(@Nonnull Session session, Artifact artifact) {
-        return create(ArtifactCoordinatesFactoryRequest.build(
+        return create(
                 session,
                 artifact.groupId(),
                 artifact.artifactId(),
                 artifact.version().toString(),
                 artifact.classifier(),
                 artifact.extension(),
-                null));
+                null);
     }
 }

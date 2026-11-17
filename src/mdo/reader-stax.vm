@@ -27,11 +27,41 @@
 #set ( $rootUcapName = $Helper.capitalise( $root.name ) )
 #set ( $rootLcapName = $Helper.uncapitalise( $root.name ) )
 #
+#if ( $enforceNamespace )
+  ## Compute the root namespaces this reader accepts: one per model version supported by the
+  ## reader, derived from the XML namespace declared in the .mdo file (never hardcoded here).
+  ## The set of versions is collected the same way as in model-version.vm.
+  #set ( $xmlModelMetadata = $model.getMetadata( "org.codehaus.modello.plugins.xml.metadata.XmlModelMetadata" ) )
+  #set ( $String = $model.getClass().forName( "java.lang.String" ) )
+  #set ( $TreeSet = $model.getClass().forName( "java.util.TreeSet" ) )
+  #set ( $Version = $model.getClass().forName( "org.codehaus.modello.model.Version" ) )
+  #set ( $nsVersions = $TreeSet.newInstance() )
+  #foreach ( $class in $model.allClasses )
+    #set ( $dummy = $nsVersions.add( $class.versionRange.fromVersion ) )
+    #foreach ( $field in $class.allFields )
+      #if ( ! $Helper.xmlFieldMetadata( $field ).transient )
+        #set ( $dummy = $nsVersions.add( $field.versionRange.fromVersion ) )
+      #end
+    #end
+  #end
+  #set ( $dummy = $nsVersions.add( $version ) )
+  #set ( $dummy = $nsVersions.remove( $Version.getConstructor( $String ).newInstance( "0.0.0" ) ) )
+  #if ( $minimalVersion )
+    #set ( $minimalNsVersion = $Version.getConstructor( $String ).newInstance( $minimalVersion ) )
+    #set ( $dummy = $nsVersions.add( $minimalNsVersion ) )
+    #set ( $nsVersions = $nsVersions.tailSet( $minimalNsVersion, true ) )
+  #end
+  #set ( $nsVersions = $nsVersions.headSet( $version, true ) )
+  #set ( $allowedNamespaces = [] )
+  #foreach ( $nsVersion in $nsVersions )
+    #set ( $dummy = $allowedNamespaces.add( $xmlModelMetadata.getNamespace( $nsVersion ) ) )
+  #end
+#end
 #set ( $needXmlContext = false )
 #foreach ( $class in $model.allClasses )
   #set ( $allFields = $Helper.xmlFields( $class ) )
   #foreach ( $field in $allFields )
-    #if ( $Helper.xmlFieldMetadata( $field ).format )
+    #if ( $Helper.xmlFieldMetadata( $field ).format && $Helper.xmlFieldMetadata( $field ).format != "mixed" )
       #set ( $needXmlContext = true )
     #end
   #end
@@ -86,6 +116,21 @@ import static java.util.Map.entry;
 
 @Generated
 public class ${className} {
+#if ( $enforceNamespace )
+
+    /**
+     * The XML namespaces accepted on the root element {@code <${rootTag}>} when reading in strict mode,
+     * in addition to no namespace at all.
+     */
+    private static final List<String> ALLOWED_NAMESPACES = List.of(
+#foreach ( $allowedNamespace in $allowedNamespaces )
+#if ( $foreach.hasNext )
+            "${allowedNamespace}",
+#else
+            "${allowedNamespace}");
+#end
+#end
+#end
 
     public static interface ContentTransformer {
         /**
@@ -278,6 +323,11 @@ public class ${className} {
                     // fallback, already expected a XMLStreamException due to invalid XML
                     throw new XMLStreamException("Duplicated tag: '${rootTag}'", parser.getLocation(), null);
                 }
+#if ( $enforceNamespace )
+                if (strict) {
+                    checkRootNamespace(parser);
+                }
+#end
 #if ( $locationTracking )
                 $rootLcapName = parse${rootUcapName}(parser, strict, parser.getNamespaceURI(), inputSrc);
 #elseif ( $needXmlContext )
@@ -366,6 +416,70 @@ public class ${className} {
   #if ( $needXmlContext )
         context.addLast( ${classLcapName} );
   #end
+  ##
+  ## Content/mixed-content fields:
+  ##   - xml.content="true" on a String field → read body text via parser.getElementText()
+  ##   - xml.insertParentFieldsUpTo="mixed" on a flat List<String> field → peek-first:
+  ##       CHARACTERS/CDATA → tokenize with ArgumentTokenizer
+  ##       START_ELEMENT     → collect <arg> children verbatim
+  ##
+  #set ( $contentField = false )
+  #set ( $mixedField = false )
+  #foreach ( $field in $allFields )
+    #if ( $Helper.xmlFieldMetadata( $field ).content )
+      #set ( $contentField = $field )
+    #end
+    #if ( $Helper.xmlFieldMetadata( $field ).format == "mixed" )
+      #set ( $mixedField = $field )
+    #end
+  #end
+  #if ( $contentField )
+    #if ( $contentField.type == "String" )
+        ${classLcapName}.${contentField.name}(interpolatedTrimmed(parser.getElementText(), "${contentField.name}"));
+    #end
+  #end
+  #if ( !$contentField )
+    #if ( $mixedField && !$Helper.xmlFieldMetadata( $mixedField ).tagName )
+      ##
+      ## Body-level mixed content (e.g. Alias): the entire element body is either
+      ## inline text or <arg> children — no child-element wrapper. Handle before the while loop.
+      ##
+      #set ( $mixedItemTag = $Helper.singular( $mixedField.name ) )
+        {
+            int _firstEvent = parser.next();
+            while (_firstEvent == XMLStreamReader.COMMENT
+                    || _firstEvent == XMLStreamReader.PROCESSING_INSTRUCTION
+                    || (_firstEvent == XMLStreamReader.CHARACTERS && parser.isWhiteSpace())) {
+                _firstEvent = parser.next();
+            }
+            if (_firstEvent == XMLStreamReader.CHARACTERS || _firstEvent == XMLStreamReader.CDATA) {
+                StringBuilder _sb = new StringBuilder(parser.getText());
+                int _next = parser.next();
+                while (_next == XMLStreamReader.CHARACTERS || _next == XMLStreamReader.CDATA
+                        || _next == XMLStreamReader.COMMENT) {
+                    if (_next != XMLStreamReader.COMMENT) {
+                        _sb.append(parser.getText());
+                    }
+                    _next = parser.next();
+                }
+                String _text = interpolatedTrimmed(_sb.toString(), "${mixedField.name}");
+                if (_text != null && !_text.isEmpty()) {
+                    ${mixedField.name}.addAll(ArgumentTokenizer.tokenize(_text));
+                }
+            } else if (_firstEvent == XMLStreamReader.START_ELEMENT) {
+                while (_firstEvent == XMLStreamReader.START_ELEMENT) {
+                    if ("${mixedItemTag}".equals(parser.getLocalName())) {
+                        ${mixedField.name}.add(interpolatedTrimmed(nextText(parser, strict), "${mixedItemTag}"));
+                    } else {
+                        checkUnknownElement(parser, strict);
+                    }
+                    _firstEvent = parser.nextTag();
+                }
+            }
+            // else END_ELEMENT: empty element, list stays empty
+        }
+        ${classLcapName}.${mixedField.name}(${mixedField.name});
+    #else
         while ((strict ? parser.nextTag() : nextTag(parser)) == XMLStreamReader.START_ELEMENT) {
             checkNamespace(parser, strict, namespace);
             String childName = checkDuplicate(parser.getLocalName(), parser, parsed);
@@ -377,7 +491,52 @@ public class ${className} {
             switch (childName) {
   #set( $ift = "if" )
   #foreach ( $field in $allFields )
-    #if ( ! $Helper.xmlFieldMetadata( $field ).attribute && ! $Helper.xmlFieldMetadata( $field ).transient && ! $Helper.xmlFieldMetadata( $field ).format )
+    #if ( ! $Helper.xmlFieldMetadata( $field ).attribute && ! $Helper.xmlFieldMetadata( $field ).transient && ! $Helper.xmlFieldMetadata( $field ).content )
+      #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
+      #if ( ! $fieldTagName )
+        #set ( $fieldTagName = $field.name )
+      #end
+      #if ( $Helper.xmlFieldMetadata( $field ).format == "mixed" )
+        ##
+        ## Mixed-content field: the element contains either inline text (tokenized) or <arg> children.
+        ## Tag name comes from xml.tagName (wrapper element, e.g. "options"), item tag from singular of field name.
+        ##
+        #set ( $mixedItemTag = $Helper.singular( $mixedField.name ) )
+                case "${fieldTagName}": {
+                    int _firstEvent = parser.next();
+                    while (_firstEvent == XMLStreamReader.COMMENT
+                            || _firstEvent == XMLStreamReader.PROCESSING_INSTRUCTION
+                            || (_firstEvent == XMLStreamReader.CHARACTERS && parser.isWhiteSpace())) {
+                        _firstEvent = parser.next();
+                    }
+                    if (_firstEvent == XMLStreamReader.CHARACTERS || _firstEvent == XMLStreamReader.CDATA) {
+                        StringBuilder _sb = new StringBuilder(parser.getText());
+                        int _next = parser.next();
+                        while (_next == XMLStreamReader.CHARACTERS || _next == XMLStreamReader.CDATA
+                                || _next == XMLStreamReader.COMMENT) {
+                            if (_next != XMLStreamReader.COMMENT) {
+                                _sb.append(parser.getText());
+                            }
+                            _next = parser.next();
+                        }
+                        String _text = interpolatedTrimmed(_sb.toString(), "${fieldTagName}");
+                        if (_text != null && !_text.isEmpty()) {
+                            ${mixedField.name}.addAll(ArgumentTokenizer.tokenize(_text));
+                        }
+                    } else if (_firstEvent == XMLStreamReader.START_ELEMENT) {
+                        while (_firstEvent == XMLStreamReader.START_ELEMENT) {
+                            if ("${mixedItemTag}".equals(parser.getLocalName())) {
+                                ${mixedField.name}.add(interpolatedTrimmed(nextText(parser, strict), "${mixedItemTag}"));
+                            } else {
+                                checkUnknownElement(parser, strict);
+                            }
+                            _firstEvent = parser.nextTag();
+                        }
+                    }
+                    // else END_ELEMENT: empty element, list stays empty
+                    break;
+                }
+      #elseif ( ! $Helper.xmlFieldMetadata( $field ).format )
       #set ( $fieldTagName = $Helper.xmlFieldMetadata( $field ).tagName )
       #if ( ! $fieldTagName )
         #set ( $fieldTagName = $field.name )
@@ -403,7 +562,7 @@ public class ${className} {
                     ${classLcapName}.${field.name}(buildXmlNode(parser));
         #end
                     break;
-      #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" )
+      #elseif ( $field.type == "java.util.List" && $field.to == "String" && $field.multiplicity == "*" && !$Helper.isFlatItems( $field ) )
                     List<String> ${field.name} = new ArrayList<>();
         #if ( $locationTracking )
                     locations = new HashMap<>();
@@ -452,7 +611,7 @@ public class ${className} {
                     ${classLcapName}.${field.name}(parse${field.toClass.name}(parser, strict, namespace));
         #end
                     break;
-      #elseif ( $field.to && $field.multiplicity == "*" && $Helper.isFlatItems( $field ) )
+      #elseif ( $field.to && $field.multiplicity == "*" && $Helper.isFlatItems( $field ) && $field.to != "String" )
         #if ( $locationTracking )
                     ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace, inputSrc));
         #elseif ( $needXmlContext )
@@ -460,6 +619,9 @@ public class ${className} {
         #else
                     ${field.name}.add(parse${field.toClass.name}(parser, strict, namespace));
         #end
+                    break;
+      #elseif ( $field.to == "String" && $field.multiplicity == "*" && $Helper.isFlatItems( $field ) )
+                    ${field.name}.add(interpolatedTrimmed(nextText(parser, strict), "${fieldTagName}"));
                     break;
       #elseif ( $field.to && $field.multiplicity == "*" )
                     List<$field.to> ${field.name} = new ArrayList<>();
@@ -484,8 +646,10 @@ public class ${className} {
       #end
                 }
       #set( $ift = "else if" )
-    #end
-  #end
+    #end## end #if (!attribute && !transient && !content)
+  #end## end #foreach ( $field in $allFields )
+    #end## end #if ($mixedField && !tagName) / #else (body-only vs while-loop)
+  #if ( !$mixedField || $Helper.xmlFieldMetadata( $mixedField ).tagName )
                 default: {
                     checkUnknownElement(parser, strict);
                     break;
@@ -497,6 +661,7 @@ public class ${className} {
             }
   #end
         }
+  #end## end #if (!body-only-mixed)
   #if ( $needXmlContext )
         context.removeLast();
   #end
@@ -505,8 +670,9 @@ public class ${className} {
         ${classLcapName}.${field.name}(${field.name});
     #end
   #end
+  #end## end #if (!$contentField)
   #foreach ( $field in $allFields )
-    #if ( $Helper.xmlFieldMetadata( $field ).format )
+    #if ( $Helper.xmlFieldMetadata( $field ).format && $Helper.xmlFieldMetadata( $field ).format != "mixed" )
         ${classLcapName}.${field.name}($Helper.xmlFieldMetadata( $field ).format);
     #end
   #end
@@ -515,7 +681,29 @@ public class ${className} {
 
  #end
 #end
+#end## end #foreach ( $class in $model.allClasses )
 
+#if ( $enforceNamespace )
+    /**
+     * Ensures the root element is either in no namespace or in one of the {@link #ALLOWED_NAMESPACES}.
+     *
+     * @param parser the parser, positioned on the root element
+     * @throws XMLStreamException if the root element namespace is not recognized
+     */
+    private static void checkRootNamespace(XMLStreamReader parser) throws XMLStreamException {
+        String ns = parser.getNamespaceURI();
+        if (ns != null && !ns.isEmpty() && !ALLOWED_NAMESPACES.contains(ns)) {
+            throw new XMLStreamException(
+                    String.format("Unrecognized namespace '%s' for root element '%s': expected no namespace or one of %s",
+                        ns,
+                        parser.getLocalName(),
+                        ALLOWED_NAMESPACES),
+                    parser.getLocation(),
+                    null);
+        }
+    }
+
+#end
     private void checkNamespace(XMLStreamReader parser, boolean strict, String namespace) throws XMLStreamException {
         if (strict) {
             String ns = parser.getNamespaceURI();

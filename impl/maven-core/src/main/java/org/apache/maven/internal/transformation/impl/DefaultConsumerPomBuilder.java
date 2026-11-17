@@ -645,7 +645,9 @@ class DefaultConsumerPomBuilder implements PomBuilder {
         request.systemProperties(iSession.getSystemProperties());
         Map<String, String> userProperties = new LinkedHashMap<>();
         // BUILD_CONSUMER does not reactivate project profiles, so expose properties from profiles
-        // that were already active when the project model was built.
+        // that were already active when the project model was built. They serve interpolation and
+        // coordinate validation only: the model builder does not write them into the consumer POM
+        // (see DefaultModelBuilder#overridingUserProperties, GH-13761).
         if (project != null && project.getActiveProfiles() != null) {
             for (org.apache.maven.model.Profile profile : project.getActiveProfiles()) {
                 userProperties.putAll(profile.getDelegate().getProperties());

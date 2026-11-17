@@ -22,7 +22,7 @@ import java.nio.file.FileSystems;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.maven.impl.util.Os;
+import org.apache.maven.utils.Os;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

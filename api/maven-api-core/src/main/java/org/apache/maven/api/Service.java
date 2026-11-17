@@ -27,6 +27,9 @@ import org.apache.maven.api.annotations.ThreadSafe;
  * Services can be retrieved from the session using the
  * {@link Session#getService(Class)} method.
  *
+ * <p>Services that participate in the shared operation request pipeline extend
+ * {@link OperationService}. Lightweight utilities and factories extend this interface directly.</p>
+ *
  * @since 4.0.0
  * @see Session#getService(Class)
  */

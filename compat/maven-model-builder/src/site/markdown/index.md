@@ -33,7 +33,7 @@ The main component is `ModelBuilder` ([javadoc](./apidocs/org/apache/maven/model
 The sequence is divided into 2 phases:
 
 - phase 1
-    - profile activation: see [available activators](./apidocs/org/apache/maven/model/profile/activation/package-summary.html). Notice that model interpolation hasn't happened yet, then interpolation for file-based activation is limited to `${basedir}` (since Maven 3), `${rootDirectory}` (since Maven 4), system properties and user properties
+    - profile activation: see [available activators](./apidocs/org/apache/maven/model/profile/activation/package-summary.html). Notice that model interpolation hasn't happened yet, then interpolation for file-based activation is limited to `${basedir}` (since Maven 3), `${project.rootDirectory}` (since Maven 3.10.0 and Maven 4), system properties and user properties
     - file model validation: `ModelValidator` ([javadoc](./apidocs/org/apache/maven/model/validation/ModelValidator.html)), with its `DefaultModelValidator` implementation ([source](./xref/org/apache/maven/model/validation/DefaultModelValidator.html))
 - phase 2, with optional plugin processing
     - Build up a raw model by re-reading the file and enriching it based on information available in the reactor. Some features:
@@ -73,7 +73,7 @@ Notice that the 5 URLs from the model (`project.url`, `project.scm.connection`, 
 
 Model Interpolation consists in replacing `${...}` with calculated value. It is done in `StringVisitorModelInterpolator` ([javadoc](./apidocs/org/apache/maven/model/interpolation/StringVisitorModelInterpolator.html), [source](./xref/org/apache/maven/model/interpolation/StringVisitorModelInterpolator.html)).
 
-Notice that model interpolation happens _after_ profile activation, and that profile activation doesn't benefit from every values: interpolation for file-based activation is limited to `${basedir}` (which was introduced in Maven 3 and is not deprecated in this context) and `${rootDirectory}` (introduced in Maven 4), system properties and user properties.
+Notice that model interpolation happens _after_ profile activation, and that profile activation doesn't benefit from every values: interpolation for file-based activation is limited to `${basedir}` (which was introduced in Maven 3 and is not deprecated in this context) and `${project.rootDirectory}` (introduced in Maven 3.10.0 and Maven 4), system properties and user properties.
 
 Values are evaluated in sequence from different syntaxes:
 
@@ -82,7 +82,7 @@ Values are evaluated in sequence from different syntaxes:
 |`project.*` <br />`pom.*` (_deprecated_) <br />`*` (_deprecated_)|POM content (see [POM reference](../maven-model/maven.html))|`${project.version}` <br />`${project.build.finalName}` <br />`${project.artifactId}` <br />`${project.build.directory}`|
 |`project.basedir` <br />`pom.basedir` (_deprecated_) <br />`basedir` (_deprecated_)|the directory containing the `pom.xml` file|`${project.basedir}`|
 |`project.baseUri` <br />`pom.baseUri` (_deprecated_)|the directory containing the `pom.xml` file as URI|`${project.baseUri}`|
-|`project.rootDirectory`|the project's root directory (containing a `.mvn` directory or with the `root="true"` xml attribute)|`${project.rootDirectory}`|
+|`project.rootDirectory`|the project's root directory (containing a `.mvn` directory _(since Maven 3.10.0 and Maven 4)_, or with the `root="true"` xml attribute _(since Maven 4)_)|`${project.rootDirectory}`|
 |`build.timestamp` <br />`maven.build.timestamp`|the UTC timestamp of build start, in `yyyy-MM-dd'T'HH:mm:ss'Z'` default format, which can be overridden with `maven.build.timestamp.format` POM property|`${maven.build.timestamp}`|
 |`*`|user properties, set from CLI with `-Dproperty=value`|`${skipTests}`|
 |`*`|model properties, such as project properties set in the pom|`${any.key}`|

@@ -49,6 +49,7 @@ import org.apache.maven.api.Listener;
 import org.apache.maven.api.LocalRepository;
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.Node;
+import org.apache.maven.api.OperationService;
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.PathType;
@@ -98,6 +99,7 @@ import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionRangeResolver;
 import org.apache.maven.api.services.VersionResolver;
 import org.apache.maven.api.services.VersionResolverException;
+import org.apache.maven.api.spi.SpiService;
 import org.apache.maven.di.Injector;
 import org.apache.maven.di.Key;
 import org.apache.maven.di.impl.Binding;
@@ -110,11 +112,15 @@ import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.transfer.TransferResource;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 import static org.apache.maven.impl.ImplUtils.map;
 
 public abstract class AbstractSession implements InternalSession {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(AbstractSession.class);
 
     protected final RepositorySystemSession session;
     protected final RepositorySystem repositorySystem;
@@ -159,14 +165,28 @@ public abstract class AbstractSession implements InternalSession {
         this.repositories = getRepositories(repositories, resolverRepositories);
         this.lookup = lookup;
         this.injector = lookup != null ? lookup.lookupOptional(Injector.class).orElse(null) : null;
-        this.listeners = getListeners(session);
+        this.listeners = getListeners(session, lookup);
         this.context = context;
     }
 
     @SuppressWarnings("unchecked")
-    private static List<Listener> getListeners(RepositorySystemSession session) {
+    private static List<Listener> getListeners(RepositorySystemSession session, Lookup lookup) {
         // Both event families share the registration scope of the underlying repository system session.
-        return (List<Listener>) session.getData().computeIfAbsent(Listener.class, CopyOnWriteArrayList::new);
+        return (List<Listener>) session.getData().computeIfAbsent(Listener.class, () -> {
+            List<Listener> list = new CopyOnWriteArrayList<>();
+            if (lookup != null) {
+                try {
+                    for (SpiService spi : lookup.lookupList(SpiService.class)) {
+                        if (spi instanceof Listener listener && !list.contains(listener)) {
+                            list.add(listener);
+                        }
+                    }
+                } catch (LookupException e) {
+                    LOGGER.warn("Failed to discover Listener implementations via SPI", e);
+                }
+            }
+            return list;
+        });
     }
 
     @SuppressWarnings("unchecked")
@@ -177,18 +197,18 @@ public abstract class AbstractSession implements InternalSession {
             return Stream.concat(
                             Service.class.isAssignableFrom(clazz) ? Stream.of((Class<Service>) clazz) : Stream.empty(),
                             Stream.of(clazz.getInterfaces()).flatMap(AbstractSession::collectServiceInterfaces))
-                    .filter(itf -> itf != Service.class);
+                    .filter(itf -> itf != Service.class && itf != OperationService.class);
         } else {
             return Stream.concat(
                             Stream.of(clazz.getInterfaces()).flatMap(AbstractSession::collectServiceInterfaces),
                             collectServiceInterfaces(clazz.getSuperclass()))
-                    .filter(itf -> itf != Service.class);
+                    .filter(itf -> itf != Service.class && itf != OperationService.class);
         }
     }
 
     @Override
     public <REQ extends Request<?>, REP extends Result<REQ>> REP request(REQ req, Function<REQ, REP> supplier) {
-        return getRequestCache().request(req, supplier);
+        return RequestExecutor.execute(req, supplier, getRequestCache());
     }
 
     @Override
@@ -598,7 +618,7 @@ public abstract class AbstractSession implements InternalSession {
     /**
      * Shortcut for <code>getService(ArtifactCoordinatesFactory.class).create(...)</code>
      *
-     * @see ArtifactFactory#create(Session, String, String, String, String)
+     * @see ArtifactCoordinatesFactory#create(Session, String, String, String, String)
      */
     @Override
     public ArtifactCoordinates createArtifactCoordinates(
@@ -860,7 +880,7 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     /**
-     * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
+     * Shortcut for <code>getService(DependencyCoordinatesFactory.class).create(...)</code>
      *
      * @see DependencyCoordinatesFactory#create(Session, ArtifactCoordinates)
      */
@@ -871,9 +891,9 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     /**
-     * Shortcut for <code>getService(DependencyFactory.class).create(...)</code>
+     * Shortcut for <code>getService(DependencyCoordinatesFactory.class).create(...)</code>
      *
-     * @see DependencyCoordinatesFactory#create(Session, ArtifactCoordinates)
+     * @see DependencyCoordinatesFactory#create(Session, Dependency)
      */
     @Nonnull
     @Override

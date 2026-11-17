@@ -20,7 +20,9 @@ package org.apache.maven.model.profile.activation;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Properties;
 
 import org.apache.maven.api.model.Activation;
 import org.apache.maven.api.model.ActivationFile;
@@ -88,6 +90,47 @@ class FileProfileActivatorTest extends AbstractProfileActivatorTest<FileProfileA
         assertActivation(true, newExistsProfile("${project.rootDirectory}/" + "file.txt"), context);
         assertActivation(false, newMissingProfile("${project.rootDirectory}"), context);
         assertActivation(false, newMissingProfile("${project.rootDirectory}/" + "file.txt"), context);
+    }
+
+    @Test
+    void testCustomRootDirectoryPropertyIsNotShadowed() throws Exception {
+        // GH-13883: a custom ${rootDirectory} property must not be shadowed by ${project.rootDirectory}
+        Properties modelProperties = new Properties();
+        modelProperties.setProperty("rootDirectory", "${project.basedir}");
+        DefaultProfileActivationContext moduleContext = newModuleContext(modelProperties);
+
+        assertActivation(true, newExistsProfile("${rootDirectory}/module-file.txt"), moduleContext);
+        assertActivation(false, newExistsProfile("${rootDirectory}/file.txt"), moduleContext);
+        assertActivation(true, newExistsProfile("${project.rootDirectory}/file.txt"), moduleContext);
+        assertActivation(false, newExistsProfile("${project.rootDirectory}/module-file.txt"), moduleContext);
+    }
+
+    @Test
+    void testUnprefixedRootDirectoryIsNotInterpolated() throws Exception {
+        // GH-13883: only ${project.rootDirectory} is supported, ${rootDirectory} is not an alias
+        DefaultProfileActivationContext moduleContext = newModuleContext(new Properties());
+
+        assertActivation(false, newExistsProfile("${rootDirectory}/file.txt"), moduleContext);
+        assertActivation(true, newMissingProfile("${rootDirectory}/file.txt"), moduleContext);
+    }
+
+    private DefaultProfileActivationContext newModuleContext(Properties modelProperties) throws IOException {
+        Path moduleDir = Files.createDirectories(tempDir.resolve("module"));
+        Files.createFile(moduleDir.resolve("module-file.txt"));
+
+        activator = new FileProfileActivator()
+                .setProfileActivationFilePathInterpolator(new ProfileActivationFilePathInterpolator()
+                        .setPathTranslator(new DefaultPathTranslator())
+                        .setRootLocator(new DefaultRootLocator() {
+                            @Override
+                            public Path findRoot(Path basedir) {
+                                return tempDir;
+                            }
+                        }));
+
+        return new DefaultProfileActivationContext()
+                .setProjectDirectory(moduleDir.toFile())
+                .setProjectProperties(modelProperties);
     }
 
     @Test

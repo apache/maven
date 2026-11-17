@@ -26,7 +26,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for GH-11181.
- * @since 4.1.0-SNAPSHOT
+ * @since 4.2.0-SNAPSHOT
  */
 class MavenITgh11181CoreExtensionsMetaVersionsTest extends AbstractMavenIntegrationTestCase {
 

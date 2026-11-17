@@ -116,6 +116,11 @@ public class DiTest {
         @Singleton
         static class TestModelParser implements ModelParser {
             @Override
+            public String id() {
+                return "test-parser";
+            }
+
+            @Override
             public Optional<Source> locate(Path dir) {
                 return Optional.empty();
             }
@@ -188,6 +193,11 @@ public class DiTest {
         @org.apache.maven.api.di.Singleton
         static class TestModelParser implements ModelParser {
             @Override
+            public String id() {
+                return "test-parser";
+            }
+
+            @Override
             public Optional<Source> locate(Path dir) {
                 return Optional.empty();
             }
@@ -258,6 +268,11 @@ public class DiTest {
 
         @org.apache.maven.api.di.Named
         static class TestModelParser implements ModelParser {
+            @Override
+            public String id() {
+                return "test-parser";
+            }
+
             @Override
             public Optional<Source> locate(Path dir) {
                 return Optional.empty();
@@ -339,6 +354,11 @@ public class DiTest {
         @org.eclipse.sisu.Priority(100)
         static class TestModelParserSisu implements ModelParser {
             @Override
+            public String id() {
+                return "test-parser-sisu";
+            }
+
+            @Override
             public Optional<Source> locate(Path dir) {
                 return Optional.empty();
             }
@@ -351,6 +371,11 @@ public class DiTest {
 
         // @org.apache.maven.api.di.Named("di")
         static class TestModelParserDi implements ModelParser {
+            @Override
+            public String id() {
+                return "test-parser-di";
+            }
+
             @Override
             public Optional<Source> locate(Path dir) {
                 return Optional.empty();

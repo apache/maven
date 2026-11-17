@@ -18,8 +18,11 @@
  */
 package org.apache.maven.jline;
 
+import java.io.IOException;
+import java.io.UncheckedIOException;
 import java.util.function.Consumer;
 
+import org.apache.maven.api.Constants;
 import org.apache.maven.api.services.MessageBuilder;
 import org.apache.maven.api.services.MessageBuilderFactory;
 import org.jline.jansi.AnsiConsole;
@@ -27,53 +30,73 @@ import org.jline.reader.LineReader;
 import org.jline.reader.LineReaderBuilder;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
+import org.jline.terminal.impl.DeferredTerminal;
+import org.jline.utils.OSUtils;
 
 public class MessageUtils {
 
-    static Terminal terminal;
-    static LineReader reader;
+    private static final int SIGINT_EXIT_CODE = 130;
+
+    static volatile Terminal terminal;
+    static volatile LineReader reader;
     static MessageBuilderFactory messageBuilderFactory = new JLineMessageBuilderFactory();
-    static boolean colorEnabled = true;
+    static volatile Boolean colorEnabled;
     static Thread shutdownHook;
     static final Object STARTUP_SHUTDOWN_MONITOR = new Object();
 
     public static void systemInstall(Terminal terminal) {
         MessageUtils.terminal = terminal;
-        MessageUtils.reader = terminal != null ? createReader(terminal) : null;
     }
 
     public static void systemInstall() {
-        systemInstall(null, null);
+        systemInstall((Consumer<TerminalBuilder>) null);
     }
 
-    public static void systemInstall(Consumer<TerminalBuilder> builderConsumer, Consumer<Terminal> terminalConsumer) {
-        // Assign the FastTerminal to the field BEFORE starting the build thread so that code
-        // running on that thread (e.g. JLine's FFM provider init, logger calls) sees a non-null
-        // reference when it calls MessageUtils.getTerminal().  Thread.start() provides the
-        // happens-before edge that makes the assignment visible to the new thread.
-        FastTerminal ft = new FastTerminal(
-                () -> {
-                    TerminalBuilder builder =
-                            TerminalBuilder.builder().name("Maven").dumb(true);
-                    if (builderConsumer != null) {
-                        builderConsumer.accept(builder);
-                    }
-                    return builder.build();
-                },
-                terminal -> {
-                    MessageUtils.reader = createReader(terminal);
-                    AnsiConsole.setTerminal(terminal);
-                    AnsiConsole.systemInstall();
-                    if (terminalConsumer != null) {
-                        terminalConsumer.accept(terminal);
-                    }
-                });
-        MessageUtils.terminal = ft;
-        ft.start();
+    public static void systemInstall(Consumer<TerminalBuilder> builderConsumer) {
+        systemInstall(builderConsumer, false);
     }
 
-    private static LineReader createReader(Terminal terminal) {
-        return LineReaderBuilder.builder().terminal(terminal).build();
+    public static void systemInstall(Consumer<TerminalBuilder> builderConsumer, boolean embedded) {
+        TerminalBuilder builder = TerminalBuilder.builder().name("Maven").dumb(true);
+        if (builderConsumer != null) {
+            builderConsumer.accept(builder);
+        }
+        boolean deferred =
+                !embedded && Boolean.parseBoolean(System.getProperty(Constants.MAVEN_TERMINAL_DEFERRED, "true"));
+        if (!deferred) {
+            try {
+                MessageUtils.terminal = builder.build();
+                AnsiConsole.setTerminal(MessageUtils.terminal);
+                if (OSUtils.IS_WINDOWS) {
+                    MessageUtils.terminal.handle(Terminal.Signal.INT, signal -> System.exit(SIGINT_EXIT_CODE));
+                }
+            } catch (IOException e) {
+                throw new UncheckedIOException(e);
+            }
+        } else {
+            DeferredTerminal deferredTerminal = (DeferredTerminal) builder.buildDeferred();
+            deferredTerminal.onComplete(terminal -> {
+                if (OSUtils.IS_WINDOWS) {
+                    terminal.handle(Terminal.Signal.INT, signal -> System.exit(SIGINT_EXIT_CODE));
+                }
+                AnsiConsole.setTerminal(terminal);
+            });
+            MessageUtils.terminal = deferredTerminal;
+        }
+    }
+
+    static LineReader getReader() {
+        LineReader r = reader;
+        if (r == null) {
+            synchronized (STARTUP_SHUTDOWN_MONITOR) {
+                r = reader;
+                if (r == null) {
+                    r = LineReaderBuilder.builder().terminal(terminal).build();
+                    reader = r;
+                }
+            }
+        }
+        return r;
     }
 
     public static void registerShutdownHook() {
@@ -100,13 +123,15 @@ public class MessageUtils {
 
     private static void doSystemUninstall() {
         try {
-            if (terminal instanceof FastTerminal fastTerminal) {
-                // wait for the asynchronous systemInstall call before we uninstall to ensure a consistent state
-                fastTerminal.getTerminal();
+            if (terminal != null) {
+                terminal.close();
             }
-            AnsiConsole.systemUninstall();
+        } catch (IOException e) {
+            // best-effort cleanup
         } finally {
             terminal = null;
+            colorEnabled = null;
+            reader = null;
         }
     }
 
@@ -115,7 +140,11 @@ public class MessageUtils {
     }
 
     public static boolean isColorEnabled() {
-        return colorEnabled && terminal != null;
+        if (terminal == null) {
+            return false;
+        }
+        Boolean c = colorEnabled;
+        return c == null || c;
     }
 
     public static int getTerminalWidth() {

@@ -42,6 +42,7 @@ import java.util.stream.Stream;
 import org.apache.maven.api.Constants;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.cache.CacheRetention;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.model.Dependency;
@@ -51,12 +52,15 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.BuilderProblem;
 import org.apache.maven.api.services.ModelBuilder;
+import org.apache.maven.api.services.ModelBuilderException;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelBuilderResult;
 import org.apache.maven.api.services.ModelProblem;
 import org.apache.maven.api.services.ModelSource;
+import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.services.Sources;
 import org.apache.maven.impl.DefaultRemoteRepository;
+import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
@@ -66,14 +70,26 @@ import org.eclipse.aether.transport.file.FileTransporterFactory;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.EnumSource;
+import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  *
@@ -88,6 +104,167 @@ class DefaultModelBuilderTest {
         session = ApiRunner.createSession();
         builder = session.getService(ModelBuilder.class);
         assertNotNull(builder);
+    }
+
+    @Test
+    void directProjectBuildsEnterPipelineAndKeepTheirOwnSessionState() {
+        InternalSession requestSession = spy(InternalSession.from(session));
+        Map<String, String> properties = new HashMap<>(session.getUserProperties());
+        properties.put(Constants.MAVEN_CACHE_CONFIG_PROPERTY, "ModelBuilderRequest { scope: session, ref: hard }");
+        doReturn(Map.copyOf(properties)).when(requestSession).getUserProperties();
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(requestSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("props-and-profiles")))
+                .build();
+        ModelBuilder.ModelBuilderSession first = builder.newSession();
+        ModelBuilder.ModelBuilderSession second = builder.newSession();
+        ModelBuilderResult firstResult = first.build(request);
+        ModelBuilderResult secondResult = second.build(request);
+        verify(requestSession, times(2)).request(same(request), any());
+        assertEquals(CacheRetention.DISABLED, request.getCacheRetention());
+        assertNotSame(firstResult, secondResult);
+        assertNotNull(((DefaultModelBuilder.ModelBuilderSessionImpl) first).mainSession);
+        assertNotNull(((DefaultModelBuilder.ModelBuilderSessionImpl) second).mainSession);
+        assertEquals("21", secondResult.getEffectiveModel().getProperties().get("maven.compiler.release"));
+    }
+
+    @Test
+    void directConsumerBuildsEnterPipelineAndInitializeTheirOwnSessionState() throws Exception {
+        Path pom = Files.createTempFile("consumer-pipeline", ".xml");
+        try {
+            Files.writeString(
+                    pom,
+                    "<project><modelVersion>4.0.0</modelVersion><groupId>org.example</groupId>"
+                            + "<artifactId>consumer</artifactId><version>1</version></project>");
+            InternalSession requestSession = spy(InternalSession.from(session));
+            ModelBuilderRequest request = ModelBuilderRequest.builder()
+                    .session(requestSession)
+                    .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                    .source(Sources.buildSource(pom))
+                    .build();
+            ModelBuilder.ModelBuilderSession first = builder.newSession();
+            ModelBuilder.ModelBuilderSession second = builder.newSession();
+            assertNotSame(first.build(request), second.build(request));
+            assertNotNull(((DefaultModelBuilder.ModelBuilderSessionImpl) first).mainSession);
+            assertNotNull(((DefaultModelBuilder.ModelBuilderSessionImpl) second).mainSession);
+            assertEquals(CacheRetention.DISABLED, request.getCacheRetention());
+            verify(requestSession, times(2)).request(same(request), any());
+        } finally {
+            Files.deleteIfExists(pom);
+        }
+    }
+
+    @ParameterizedTest
+    @EnumSource(
+            value = ModelBuilderRequest.RequestType.class,
+            names = {"CONSUMER_PARENT", "CONSUMER_DEPENDENCY"})
+    void consumerBuildsKeepTheirBuilderProfileContext(
+            ModelBuilderRequest.RequestType requestType, @TempDir Path directory) throws Exception {
+        InternalSession requestSession = spy(InternalSession.from(session));
+        doReturn(Map.of(Constants.MAVEN_CACHE_CONFIG_PROPERTY, "* { scope: session, ref: hard }"))
+                .when(requestSession)
+                .getUserProperties();
+        Path dependencyPom = directory.resolve("dependency.xml");
+        Path parentPom = directory.resolve("pom.xml");
+        Files.writeString(directory.resolve("marker.txt"), "exists");
+        String header = "<project><modelVersion>4.0.0</modelVersion><groupId>org.example</groupId>"
+                + "<artifactId>consumer</artifactId><version>1</version>";
+        Files.writeString(dependencyPom, header + "</project>");
+        Files.writeString(
+                parentPom,
+                header + "<profiles><profile><id>file</id><activation><file><exists>marker.txt</exists>"
+                        + "</file></activation><properties><marker>ACTIVE</marker></properties>"
+                        + "</profile></profiles></project>");
+        ModelBuilderRequest external = ModelBuilderRequest.builder()
+                .session(requestSession)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.resolvedSource(dependencyPom, "org.example:consumer:1"))
+                .build();
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(requestSession)
+                .requestType(requestType)
+                .source(Sources.buildSource(parentPom))
+                .build();
+        ModelBuilder.ModelBuilderSession externalBuilder = builder.newSession();
+        externalBuilder.build(external);
+        ModelBuilderResult externalResult = externalBuilder.build(request);
+        ModelBuilderResult projectResult = builder.newSession().build(request);
+        assertNull(externalResult.getEffectiveModel().getProperties().get("marker"));
+        assertEquals("ACTIVE", projectResult.getEffectiveModel().getProperties().get("marker"));
+        assertNull(externalBuilder
+                .build(request)
+                .getEffectiveModel()
+                .getProperties()
+                .get("marker"));
+        assertNotSame(externalResult, projectResult);
+        verify(requestSession, times(3)).request(same(request), any());
+        assertNull(requestSession.getCurrentTrace());
+    }
+
+    @Test
+    void validationAndRawModelsUseIndependentPipelineRequests(@TempDir Path directory) throws Exception {
+        Path pom = directory.resolve("pom.xml");
+        Files.writeString(
+                pom,
+                "<project><modelVersion>4.0.0</modelVersion><groupId>org.example</groupId>"
+                        + "<artifactId>consumer</artifactId><version>1</version><name>${label}</name>"
+                        + "<properties><label>expanded</label></properties></project>");
+        InternalSession requestSession = spy(InternalSession.from(session));
+        doReturn(Map.of(Constants.MAVEN_CACHE_CONFIG_PROPERTY, "* { scope: session, ref: hard }"))
+                .when(requestSession)
+                .getUserProperties();
+        RequestTrace parent = new RequestTrace("parent");
+        requestSession.setCurrentTrace(parent);
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(requestSession)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.buildSource(pom))
+                .build();
+        ModelBuilder.ModelBuilderSession modelSession = builder.newSession();
+        ModelBuilderResult built = modelSession.build(request);
+        assertEquals("expanded", built.getEffectiveModel().getName());
+        assertSame(parent, requestSession.getCurrentTrace());
+        ModelBuilderResult validated = modelSession.validate(request);
+        assertSame(request, validated.getRequest());
+        assertNull(validated.getEffectiveModel());
+        assertEquals("${label}", validated.getRawModel().getName());
+        assertSame(parent, requestSession.getCurrentTrace());
+        assertEquals("${label}", builder.buildRawModel(request).getName());
+        assertSame(parent, requestSession.getCurrentTrace());
+        assertEquals("expanded", modelSession.build(request).getEffectiveModel().getName());
+        assertSame(parent, requestSession.getCurrentTrace());
+        ArgumentCaptor<DefaultModelBuilder.ModelOperationRequest> operations =
+                ArgumentCaptor.forClass(DefaultModelBuilder.ModelOperationRequest.class);
+        verify(requestSession, times(2)).request(operations.capture(), any());
+        assertNotEquals(
+                operations.getAllValues().get(0).operation(),
+                operations.getAllValues().get(1).operation());
+        for (DefaultModelBuilder.ModelOperationRequest operation : operations.getAllValues()) {
+            assertSame(request, operation.modelRequest());
+            assertSame(requestSession, operation.getSession());
+            assertSame(request, operation.getTrace().data());
+            assertSame(parent, operation.getTrace().parent());
+            assertEquals(CacheRetention.DISABLED, operation.getCacheRetention());
+        }
+        verify(requestSession, times(2)).request(same(request), any());
+    }
+
+    @Test
+    void validationAndRawModelFailuresRestoreTrace(@TempDir Path directory) {
+        InternalSession requestSession = spy(InternalSession.from(session));
+        RequestTrace parent = new RequestTrace("parent");
+        requestSession.setCurrentTrace(parent);
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(requestSession)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_EFFECTIVE)
+                .source(Sources.buildSource(directory.resolve("missing.xml")))
+                .build();
+        assertThrows(ModelBuilderException.class, () -> builder.newSession().validate(request));
+        assertSame(parent, requestSession.getCurrentTrace());
+        assertThrows(ModelBuilderException.class, () -> builder.buildRawModel(request));
+        assertSame(parent, requestSession.getCurrentTrace());
+        verify(requestSession, times(2)).request(any(DefaultModelBuilder.ModelOperationRequest.class), any());
     }
 
     @Test
@@ -128,6 +305,52 @@ class DefaultModelBuilderTest {
         ModelBuilderResult result = builder.newSession().build(request);
         assertNotNull(result);
         assertEquals("21", result.getEffectiveModel().getProperties().get("maven.compiler.release"));
+    }
+
+    /**
+     * A project POM whose root element is in an unknown namespace must fail the build
+     * (<a href="https://github.com/apache/maven/issues/10985">#10985</a>).
+     */
+    @Test
+    void testRandomNamespaceIsRejectedForProjectBuild() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                .source(Sources.buildSource(getPom("random-namespace")))
+                .build();
+
+        ModelBuilderException e = assertThrows(
+                ModelBuilderException.class, () -> builder.newSession().build(request));
+        assertTrue(
+                e.getProblemCollector()
+                        .problems()
+                        .anyMatch(p -> p.getSeverity() == BuilderProblem.Severity.ERROR
+                                && p.getMessage().contains("Unrecognized namespace 'https://ff.com'")),
+                () -> "Expected an error about the unrecognized namespace, got: "
+                        + e.getProblemCollector().problems().toList());
+    }
+
+    /**
+     * POMs consumed from repositories are parsed leniently: an unknown root namespace must not
+     * break the resolution of existing artifacts.
+     */
+    @Test
+    void testRandomNamespaceIsToleratedForDependencyModel() {
+        ModelBuilderRequest request = ModelBuilderRequest.builder()
+                .session(session)
+                .requestType(ModelBuilderRequest.RequestType.CONSUMER_DEPENDENCY)
+                .source(Sources.buildSource(getPom("random-namespace")))
+                .build();
+
+        ModelBuilderResult result = builder.newSession().build(request);
+
+        assertEquals("random-namespace", result.getEffectiveModel().getArtifactId());
+        assertTrue(
+                result.getProblemCollector()
+                        .problems()
+                        .noneMatch(p -> p.getMessage().contains("Unrecognized namespace")),
+                () -> "Unexpected namespace problem: "
+                        + result.getProblemCollector().problems().toList());
     }
 
     /**
@@ -374,11 +597,13 @@ class DefaultModelBuilderTest {
         assertEquals("activated", projectParentModel.getProperties().get("profile.property"));
         assertEquals("activated", projectParentModel.getProperties().get("profile.condition"));
         assertEquals("activated", projectParentModel.getProperties().get("profile.jdk"));
-        // POM-declared property via <condition>: doReadAsParentModel() passes parent.getProperties()
-        // into the activation context (start(parent.getProperties())), so getModelProperty() returns
-        // the real POM property and the condition fires for the non-sandboxed project parent path.
-        assertEquals("activated", projectParentModel.getProperties().get("profile.pom.condition"));
         assertTrue(projectParentModel.getRepositories().stream().anyMatch(r -> "profile-repo".equals(r.getId())));
+        // After #13555, parent POM properties are NOT exposed through getModelProperty() in the
+        // project-parent activation path — condition profiles relying on POM-declared properties
+        // must not self-activate (#13390).
+        assertNull(
+                projectParentModel.getProperties().get("profile.pom.condition"),
+                "profile.pom.condition must not self-activate in the project-parent path");
 
         DefaultModelBuilder.ModelBuilderSessionState dependencyState =
                 dependencyAncestorState.derive(sharedParentRequest);
@@ -1785,6 +2010,58 @@ class DefaultModelBuilderTest {
                 "Parent file profile interpolating ${message.file} must inject into child (MNG-8710)");
     }
 
+    /**
+     * Combined invariant test for MNG-8710 + #13390.
+     * <p>
+     * A parent property used to resolve a file-profile path (via {@code interpolationProperties})
+     * must NOT simultaneously self-activate a property-based profile on that same parent.
+     * The file profile fires because the path interpolates correctly (#10375).
+     * The property-based profile must not fire because {@code interpolationProperties} is
+     * intentionally hidden from {@code getModelProperty()} (#13390).
+     */
+    @Test
+    void testMng8710ParentFileProfileFiresButPropertyProfileDoesNot() {
+        Path pom = Paths.get("src/test/resources/poms/factory/mng-8710-combined/pom.xml")
+                .toAbsolutePath();
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .recursive(true)
+                        .source(Sources.buildSource(pom))
+                        .build());
+
+        Model parentModel = result.getEffectiveModel();
+
+        // The file profile MUST activate: ${message.file} resolves via interpolationProperties (#10375)
+        assertEquals(
+                "true",
+                parentModel.getProperties().get("profile.file.activated"),
+                "File profile interpolating ${message.file} must activate (MNG-8710)");
+
+        // The property-based profile MUST NOT activate: interpolationProperties must not be
+        // visible through getModelProperty(), preventing self-activation (#13390)
+        assertNull(
+                parentModel.getProperties().get("profile.property.activated"),
+                "Property-based profile on ${message.file} must NOT activate via interpolationProperties (#13390)");
+
+        // Verify the same invariant holds for child modules
+        ModelBuilderResult childResult = result.getChildren().stream()
+                .filter(r ->
+                        "mng-8710-combined-child".equals(r.getEffectiveModel().getArtifactId()))
+                .findFirst()
+                .orElseThrow(() -> new AssertionError("child result missing: " + result.getChildren()));
+        Model childModel = childResult.getEffectiveModel();
+
+        assertEquals(
+                "true",
+                childModel.getProperties().get("profile.file.activated"),
+                "File profile must also activate for child module (MNG-8710)");
+        assertNull(
+                childModel.getProperties().get("profile.property.activated"),
+                "Property-based profile must not activate for child module either (#13390)");
+    }
+
     @Test
     void testBomImportWarningFromParentProfileActivatedForChild() {
         Path pom = Paths.get("src/test/resources/poms/factory/mng-8450-profile-context/pom.xml")
@@ -1846,6 +2123,173 @@ class DefaultModelBuilderTest {
     static ApacheTransporterFactory newApacheTransporterFactory(
             ChecksumExtractor checksumExtractor, PathProcessor pathProcessor) {
         return new ApacheTransporterFactory(checksumExtractor, pathProcessor);
+    }
+
+    @Test
+    public void testOmitVersionInDependencyManagementWithExclusion(@TempDir Path tempDir) throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Path localRepoPath = tempDir.resolve("local-repo");
+        Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
+        Session session = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this), localRepoPath);
+        RemoteRepository remoteRepository = session.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
+        session = session.withRemoteRepositories(List.of(remoteRepository));
+        ModelBuilder builder = session.getService(ModelBuilder.class);
+
+        Files.createDirectory(tempDir.resolve(".mvn"));
+        Path projectPom = tempDir.resolve("pom.xml");
+        String pomContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>test-project</artifactId>
+                  <version>1.0</version>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>bom</artifactId>
+                        <version>0.1</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                      </dependency>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>a</artifactId>
+                        <exclusions>
+                          <exclusion>
+                            <groupId>org.apache.maven.its</groupId>
+                            <artifactId>b</artifactId>
+                          </exclusion>
+                        </exclusions>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                  <dependencies>
+                    <dependency>
+                      <groupId>org.apache.maven.its</groupId>
+                      <artifactId>a</artifactId>
+                    </dependency>
+                  </dependencies>
+                </project>
+                """;
+        Files.writeString(projectPom, pomContent);
+
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .source(Sources.buildSource(projectPom))
+                        .build());
+
+        assertNotNull(result);
+        Model model = result.getEffectiveModel();
+        assertNotNull(model);
+        Dependency dep = model.getDependencies().stream()
+                .filter(d -> "a".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(dep);
+        assertEquals("0.1", dep.getVersion());
+        assertEquals(1, dep.getExclusions().size());
+        assertEquals("b", dep.getExclusions().get(0).getArtifactId());
+    }
+
+    @Test
+    public void testOmitVersionInDependencyManagementWithExclusionInChild(@TempDir Path tempDir) throws Exception {
+        Path basedir = Paths.get(System.getProperty("basedir", ""));
+        Path localRepoPath = tempDir.resolve("local-repo");
+        Path remoteRepoPath = basedir.resolve("src/test/remote-repo");
+        Session session = ApiRunner.createSession(
+                injector -> injector.bindInstance(DefaultModelBuilderTest.class, this), localRepoPath);
+        RemoteRepository remoteRepository = session.createRemoteRepository(
+                RemoteRepository.CENTRAL_ID, remoteRepoPath.toUri().toString());
+        session = session.withRemoteRepositories(List.of(remoteRepository));
+        ModelBuilder builder = session.getService(ModelBuilder.class);
+
+        Files.createDirectory(tempDir.resolve(".mvn"));
+        Path parentPom = tempDir.resolve("pom.xml");
+        String parentContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <groupId>org.apache.maven.its</groupId>
+                  <artifactId>parent-project</artifactId>
+                  <version>1.0</version>
+                  <packaging>pom</packaging>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>bom</artifactId>
+                        <version>0.1</version>
+                        <type>pom</type>
+                        <scope>import</scope>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                </project>
+                """;
+        Files.writeString(parentPom, parentContent);
+
+        Path childDir = tempDir.resolve("child");
+        Files.createDirectory(childDir);
+        Path childPom = childDir.resolve("pom.xml");
+        String childContent = """
+                <?xml version="1.0" encoding="UTF-8"?>
+                <project xmlns="http://maven.apache.org/POM/4.0.0">
+                  <modelVersion>4.0.0</modelVersion>
+                  <parent>
+                    <groupId>org.apache.maven.its</groupId>
+                    <artifactId>parent-project</artifactId>
+                    <version>1.0</version>
+                    <relativePath>../pom.xml</relativePath>
+                  </parent>
+                  <artifactId>child-project</artifactId>
+                  <dependencyManagement>
+                    <dependencies>
+                      <dependency>
+                        <groupId>org.apache.maven.its</groupId>
+                        <artifactId>a</artifactId>
+                        <exclusions>
+                          <exclusion>
+                            <groupId>org.apache.maven.its</groupId>
+                            <artifactId>b</artifactId>
+                          </exclusion>
+                        </exclusions>
+                      </dependency>
+                    </dependencies>
+                  </dependencyManagement>
+                  <dependencies>
+                    <dependency>
+                      <groupId>org.apache.maven.its</groupId>
+                      <artifactId>a</artifactId>
+                    </dependency>
+                  </dependencies>
+                </project>
+                """;
+        Files.writeString(childPom, childContent);
+
+        ModelBuilderResult result = builder.newSession()
+                .build(ModelBuilderRequest.builder()
+                        .session(session)
+                        .requestType(ModelBuilderRequest.RequestType.BUILD_PROJECT)
+                        .source(Sources.buildSource(childPom))
+                        .build());
+
+        assertNotNull(result);
+        Model model = result.getEffectiveModel();
+        assertNotNull(model);
+        Dependency dep = model.getDependencies().stream()
+                .filter(d -> "a".equals(d.getArtifactId()))
+                .findFirst()
+                .orElse(null);
+        assertNotNull(dep);
+        assertEquals("0.1", dep.getVersion());
+        assertEquals(1, dep.getExclusions().size());
+        assertEquals("b", dep.getExclusions().get(0).getArtifactId());
     }
 
     private Path getPom(String name) {

@@ -116,6 +116,12 @@ class ExecutableFinderTest {
             public boolean exists(String path, boolean glob) {
                 return false;
             }
+
+            @Override
+            public void addProfileProperties(
+                    java.util.Collection<org.apache.maven.api.model.Profile> activatedProfiles) {
+                // no-op for test context
+            }
         };
     }
 

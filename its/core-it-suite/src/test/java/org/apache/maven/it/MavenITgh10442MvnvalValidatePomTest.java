@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * is handled by the {@code mvn} launcher, which points {@code MAVEN_MAIN_CLASS} at
  * {@code MavenValCling}.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 class MavenITgh10442MvnvalValidatePomTest extends AbstractMavenIntegrationTestCase {
 

@@ -19,7 +19,9 @@
 package org.apache.maven.impl;
 
 import java.nio.file.Path;
+import java.time.Instant;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -27,14 +29,27 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.IntStream;
 
 import org.apache.maven.api.Artifact;
+import org.apache.maven.api.Event;
+import org.apache.maven.api.ExecutionEvent;
+import org.apache.maven.api.ExecutionEventType;
+import org.apache.maven.api.ExecutionListener;
 import org.apache.maven.api.Listener;
+import org.apache.maven.api.Project;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.RepositoryEvent;
 import org.apache.maven.api.RepositoryEventType;
 import org.apache.maven.api.RepositoryListener;
 import org.apache.maven.api.RepositoryMetadata;
 import org.apache.maven.api.Session;
+import org.apache.maven.api.Version;
+import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.RequestTrace;
+import org.apache.maven.api.settings.Settings;
+import org.apache.maven.api.spi.SpiService;
+import org.apache.maven.api.toolchain.ToolchainModel;
 import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.metadata.DefaultMetadata;
 import org.eclipse.aether.metadata.Metadata;
 import org.junit.jupiter.api.Test;
@@ -44,6 +59,7 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -230,6 +246,214 @@ class MavenRepositoryListenerTest {
         }
     }
 
+    @Test
+    void spiListenerDiscoveredFromLookupReceivesEventsWithoutManualRegistration() {
+        Lookup lookup = mock(Lookup.class);
+        RecordingListener repoListener = new RecordingListener();
+        RecordingExecutionListener execListener = new RecordingExecutionListener();
+        RecordingCombinedListener combinedListener = new RecordingCombinedListener();
+        NonListenerSpiService nonListenerSpi = new NonListenerSpiService();
+        when(lookup.lookupList(SpiService.class))
+                .thenReturn(List.of(repoListener, execListener, combinedListener, nonListenerSpi));
+
+        DefaultRepositorySystemSession resolverSession = new DefaultRepositorySystemSession(h -> false);
+        TestSession session = new TestSession(resolverSession, lookup);
+        InternalSession.associate(resolverSession, session);
+
+        assertEquals(3, session.getListeners().size());
+        assertTrue(session.getListeners().contains(repoListener));
+        assertTrue(session.getListeners().contains(execListener));
+        assertTrue(session.getListeners().contains(combinedListener));
+
+        MavenRepositoryListener bridge = new MavenRepositoryListener();
+        bridge.artifactResolving(new org.eclipse.aether.RepositoryEvent.Builder(
+                        resolverSession, org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_RESOLVING)
+                .build());
+
+        assertEquals(List.of(RepositoryEventType.ARTIFACT_RESOLVING), repoListener.types);
+        assertEquals(List.of(RepositoryEventType.ARTIFACT_RESOLVING), combinedListener.repositoryTypes);
+        assertTrue(execListener.types.isEmpty());
+
+        ExecutionEvent executionEvent = mock(ExecutionEvent.class);
+        when(executionEvent.type()).thenReturn(ExecutionEventType.SESSION_STARTED);
+        for (Listener listener : session.getListeners()) {
+            listener.onEvent(executionEvent);
+        }
+
+        assertEquals(List.of(ExecutionEventType.SESSION_STARTED), execListener.types);
+        assertEquals(List.of(ExecutionEventType.SESSION_STARTED), combinedListener.executionTypes);
+        assertEquals(List.of(RepositoryEventType.ARTIFACT_RESOLVING), repoListener.types);
+    }
+
+    @Test
+    void manuallyRegisteredListenersContinueToWorkWithSpiListeners() {
+        Lookup lookup = mock(Lookup.class);
+        RecordingListener spiListener = new RecordingListener();
+        when(lookup.lookupList(SpiService.class)).thenReturn(List.of(spiListener));
+
+        DefaultRepositorySystemSession resolverSession = new DefaultRepositorySystemSession(h -> false);
+        TestSession session = new TestSession(resolverSession, lookup);
+        InternalSession.associate(resolverSession, session);
+
+        RecordingListener manual = new RecordingListener();
+        session.registerListener(manual);
+
+        assertEquals(2, session.getListeners().size());
+
+        MavenRepositoryListener bridge = new MavenRepositoryListener();
+        bridge.artifactResolved(new org.eclipse.aether.RepositoryEvent.Builder(
+                        resolverSession, org.eclipse.aether.RepositoryEvent.EventType.ARTIFACT_RESOLVED)
+                .build());
+
+        assertEquals(List.of(RepositoryEventType.ARTIFACT_RESOLVED), spiListener.types);
+        assertEquals(List.of(RepositoryEventType.ARTIFACT_RESOLVED), manual.types);
+
+        session.unregisterListener(manual);
+        assertEquals(1, session.getListeners().size());
+        assertTrue(session.getListeners().contains(spiListener));
+    }
+
+    @Test
+    void nullOrEmptyLookupDoesNotBreakSessionInitialization() {
+        DefaultRepositorySystemSession resolverSessionNull = new DefaultRepositorySystemSession(h -> false);
+        TestSession sessionNull = new TestSession(resolverSessionNull, null);
+        assertTrue(sessionNull.getListeners().isEmpty());
+
+        DefaultRepositorySystemSession resolverSessionEmpty = new DefaultRepositorySystemSession(h -> false);
+        Lookup emptyLookup = mock(Lookup.class);
+        when(emptyLookup.lookupList(SpiService.class)).thenReturn(List.of());
+        TestSession sessionEmpty = new TestSession(resolverSessionEmpty, emptyLookup);
+        assertTrue(sessionEmpty.getListeners().isEmpty());
+    }
+
+    @Test
+    void derivedSessionsDoNotCauseDuplicateListenerNotifications() {
+        Lookup lookup = mock(Lookup.class);
+        RecordingListener spiListener = new RecordingListener();
+        when(lookup.lookupList(SpiService.class)).thenReturn(List.of(spiListener));
+
+        DefaultRepositorySystemSession resolverSession = new DefaultRepositorySystemSession(h -> false);
+        TestSession rootSession = new TestSession(resolverSession, lookup);
+        Session derivedSession = rootSession.withRemoteRepositories(List.of());
+        InternalSession.associate(resolverSession, rootSession);
+
+        assertEquals(1, derivedSession.getListeners().size());
+        verify(lookup, times(1)).lookupList(SpiService.class);
+
+        MavenRepositoryListener bridge = new MavenRepositoryListener();
+        bridge.metadataInstalling(new org.eclipse.aether.RepositoryEvent.Builder(
+                        resolverSession, org.eclipse.aether.RepositoryEvent.EventType.METADATA_INSTALLING)
+                .build());
+
+        assertEquals(1, spiListener.types.size());
+        assertEquals(RepositoryEventType.METADATA_INSTALLING, spiListener.types.get(0));
+    }
+
+    private static class RecordingExecutionListener implements ExecutionListener, SpiService {
+        final List<ExecutionEventType> types = new ArrayList<>();
+        final List<ExecutionEvent> events = new ArrayList<>();
+
+        @Override
+        public void sessionStarted(ExecutionEvent event) {
+            types.add(event.type());
+            events.add(event);
+        }
+    }
+
+    private static class RecordingCombinedListener implements ExecutionListener, RepositoryListener, SpiService {
+        final List<RepositoryEventType> repositoryTypes = new ArrayList<>();
+        final List<RepositoryEvent> repositoryEvents = new ArrayList<>();
+        final List<ExecutionEventType> executionTypes = new ArrayList<>();
+        final List<ExecutionEvent> executionEvents = new ArrayList<>();
+
+        @Override
+        public void onEvent(Event event) {
+            ExecutionListener.super.onEvent(event);
+            RepositoryListener.super.onEvent(event);
+        }
+
+        @Override
+        public void sessionStarted(ExecutionEvent event) {
+            executionTypes.add(event.type());
+            executionEvents.add(event);
+        }
+
+        @Override
+        public void artifactResolving(RepositoryEvent event) {
+            repositoryTypes.add(event.type());
+            repositoryEvents.add(event);
+        }
+    }
+
+    private static class NonListenerSpiService implements SpiService {}
+
+    private static class TestSession extends AbstractSession {
+        TestSession(RepositorySystemSession session, Lookup lookup) {
+            super(session, mock(RepositorySystem.class), List.of(), List.of(), lookup, null);
+        }
+
+        @Override
+        public Settings getSettings() {
+            return null;
+        }
+
+        @Override
+        public Collection<ToolchainModel> getToolchains() {
+            return List.of();
+        }
+
+        @Override
+        public Map<String, String> getUserProperties() {
+            return Map.of();
+        }
+
+        @Override
+        public Map<String, String> getSystemProperties() {
+            return Map.of();
+        }
+
+        @Override
+        public Map<String, String> getEffectiveProperties(Project project) {
+            return Map.of();
+        }
+
+        @Override
+        public Version getMavenVersion() {
+            return null;
+        }
+
+        @Override
+        public Instant getStartTime() {
+            return null;
+        }
+
+        @Override
+        public Path getTopDirectory() {
+            return null;
+        }
+
+        @Override
+        public Path getRootDirectory() {
+            return null;
+        }
+
+        @Override
+        public List<Project> getProjects() {
+            return List.of();
+        }
+
+        @Override
+        public Map<String, Object> getPluginContext(Project project) {
+            return Map.of();
+        }
+
+        @Override
+        protected Session newSession(
+                RepositorySystemSession session, List<RemoteRepository> repositories, RequestTrace context) {
+            return new TestSession(session, lookup);
+        }
+    }
+
     private static final class TestContext {
         private final DefaultRepositorySystemSession resolverSession = new DefaultRepositorySystemSession(h -> false);
         private final InternalSession session = mock(InternalSession.class);
@@ -240,9 +464,9 @@ class MavenRepositoryListenerTest {
         }
     }
 
-    private static final class RecordingListener implements RepositoryListener {
-        private final List<RepositoryEventType> types = new ArrayList<>();
-        private final List<RepositoryEvent> events = new ArrayList<>();
+    private static class RecordingListener implements RepositoryListener, SpiService {
+        final List<RepositoryEventType> types = new ArrayList<>();
+        final List<RepositoryEvent> events = new ArrayList<>();
 
         private void record(RepositoryEvent event) {
             types.add(event.type());

@@ -963,9 +963,9 @@ class DefaultModelValidatorTest {
     @Test
     void repositoryWithBasedirExpression() throws Exception {
         SimpleProblemCollector result = validateRaw("raw-model/repository-with-basedir-expression.xml");
-        // This test runs on raw model without interpolation, so all expressions appear uninterpolated
-        // In the real flow, supported expressions would be interpolated before validation
-        assertViolations(result, 0, 0, 3);
+        // This test runs on raw model without interpolation, but supported expressions (basedir, project.basedir)
+        // are allowed and only project.baseUri is deprecated
+        assertViolations(result, 0, 0, 1);
     }
 
     @Test

@@ -22,8 +22,8 @@ import java.util.Collection;
 import java.util.List;
 
 import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.OperationService;
 import org.apache.maven.api.RemoteRepository;
-import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 
@@ -33,7 +33,7 @@ import org.apache.maven.api.annotations.Experimental;
  * @since 4.0.0
  */
 @Experimental
-public interface ArtifactResolver extends Service {
+public interface ArtifactResolver extends OperationService {
 
     /**
      * @param request {@link ArtifactResolverRequest}

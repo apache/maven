@@ -77,7 +77,6 @@ import org.apache.maven.cling.utils.CLIReportingUtils;
 import org.apache.maven.eventspy.internal.EventSpyDispatcher;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.impl.SettingsUtilsV4;
-import org.apache.maven.jline.FastTerminal;
 import org.apache.maven.jline.MessageUtils;
 import org.apache.maven.logging.AsyncDrainWriter;
 import org.apache.maven.logging.BuildEventListener;
@@ -90,8 +89,8 @@ import org.codehaus.plexus.PlexusContainer;
 import org.jline.terminal.Terminal;
 import org.jline.terminal.TerminalBuilder;
 import org.jline.terminal.impl.AbstractPosixTerminal;
+import org.jline.terminal.impl.DeferredTerminal;
 import org.jline.terminal.spi.TerminalExt;
-import org.jline.utils.OSUtils;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.slf4j.spi.LocationAwareLogger;
@@ -106,7 +105,6 @@ import static org.apache.maven.cling.invoker.CliUtils.toProperties;
  * @param <C> The context type.
  */
 public abstract class LookupInvoker<C extends LookupContext> implements Invoker {
-    private static final int SIGINT_EXIT_CODE = 130;
 
     protected final Lookup protoLookup;
 
@@ -170,14 +168,15 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     }
 
     protected int doInvoke(C context) throws Exception {
+        createTerminal(context);
         validate(context);
         pushCoreProperties(context);
         pushUserProperties(context);
         setupGuiceClassLoading(context);
         configureLogging(context);
-        createTerminal(context);
         activateLogging(context);
         helpOrVersionAndMayExit(context);
+        doConfigureWithTerminal(context);
         preCommands(context);
         container(context);
         postContainer(context);
@@ -305,6 +304,12 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             }
         }
 
+        // Propagate color setting immediately so that the first log message
+        // (written during activateLogging()) uses the correct color mode.
+        if (context.coloredOutput != null) {
+            MessageUtils.setColorEnabled(context.coloredOutput);
+        }
+
         context.loggerFactory = LoggerFactory.getILoggerFactory();
         context.slf4jConfiguration = Slf4jConfigurationFactory.getConfiguration(context.loggerFactory);
 
@@ -335,13 +340,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected final void createTerminal(C context) {
         if (context.terminal == null) {
-            MessageUtils.systemInstall(builder -> doCreateTerminal(context, builder), terminal -> {
-                if (OSUtils.IS_WINDOWS && !context.invokerRequest.embedded()) {
-                    // JLine may consume Ctrl+C as terminal input, bypassing the JVM's shutdown hooks.
-                    terminal.handle(Terminal.Signal.INT, signal -> System.exit(SIGINT_EXIT_CODE));
-                }
-                doConfigureWithTerminal(context, terminal);
-            });
+            MessageUtils.systemInstall(
+                    builder -> doCreateTerminal(context, builder), context.invokerRequest.embedded());
 
             context.terminal = MessageUtils.getTerminal();
             context.closeables.add(MessageUtils::systemUninstall);
@@ -352,7 +352,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
                     new ProjectBuildLogAppender(determineBuildEventListener(context));
             context.closeables.add(projectBuildLogAppender);
         } else {
-            doConfigureWithTerminal(context, context.terminal);
+            // context.terminal is pre-set; doConfigureWithTerminal will be called
+            // by doInvoke() after configureLogging() (see note in doInvoke).
         }
     }
 
@@ -367,7 +368,7 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             OutputStream out = context.invokerRequest.stdOut().orElse(OutputStream.nullOutputStream());
             builder.streams(in, out);
             builder.provider(TerminalBuilder.PROP_PROVIDER_EXEC);
-            context.coloredOutput = context.coloredOutput != null ? context.coloredOutput : false;
+            context.coloredOutput = context.coloredOutput != null && context.coloredOutput;
             context.closeables.add(out::flush);
         } else {
             builder.systemOutput(TerminalBuilder.SystemOutput.SysOut);
@@ -380,20 +381,23 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     /**
      * Called from {@link #createTerminal(LookupContext)} when Terminal was built.
      */
-    protected final void doConfigureWithTerminal(C context, Terminal terminal) {
-        context.terminal = terminal;
-        // Align Maven's color setting with JLine's terminal detection:
-        // if embedded, we default to context.coloredOutput=false unless overridden (see above)
-        // if not embedded, JLine detects redirection via SysOut and will create dumb terminal.
-        // To align Maven with outcomes, we set here color enabled based on these premises.
-        MessageUtils.setColorEnabled(
-                context.coloredOutput != null ? context.coloredOutput : !Terminal.TYPE_DUMB.equals(terminal.getType()));
+    protected final void doConfigureWithTerminal(C context) {
+        // Set color if explicitly configured (--color=always/never, batch mode, etc.).
+        // When null (auto), MessageUtils.isColorEnabled() will lazily resolve from
+        // the terminal type on first access, avoiding a block on the DeferredTerminal.
+        if (context.coloredOutput != null) {
+            MessageUtils.setColorEnabled(context.coloredOutput);
+        }
 
         // handle rawStreams: some would like to act on true, some on false
         // quiet mode implies raw streams — plugins that write to System.out (e.g. help:evaluate
         // -DforceStdout) must not be decorated with "[INFO] [stdout]" prefix, otherwise scripting
         // use cases like $(mvn -q help:evaluate ...) break (see GH-12730)
-        if (context.options().rawStreams().orElse(false)
+        // Embedded mode also uses raw streams — the caller provides its own streams and
+        // doesn't need the "[stdout]" prefix wrapping. More importantly, the wrapping
+        // creates a circular logging loop (StackOverflowError) when logSink is null.
+        if (context.invokerRequest.embedded()
+                || context.options().rawStreams().orElse(false)
                 || context.options().quiet().orElse(false)) {
             doConfigureWithTerminalWithRawStreamsEnabled(context);
         } else {
@@ -530,8 +534,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         if (terminal == null) {
             return null;
         }
-        if (terminal instanceof FastTerminal ft) {
-            terminal = ft.getTerminal();
+        if (terminal instanceof DeferredTerminal dt) {
+            terminal = dt.getTerminal();
         }
         List<String> subs = new ArrayList<>();
         subs.add("type=" + terminal.getType());
@@ -573,10 +577,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
 
     protected void postContainer(C context) throws Exception {
         ProtoSession protoSession = context.protoSession;
-        for (PropertyContributor propertyContributor : context.lookup
-                .lookup(PropertyContributorsHolder.class)
-                .getPropertyContributors()
-                .values()) {
+        for (PropertyContributor propertyContributor :
+                context.lookup.lookup(PropertyContributorsHolder.class).getPropertyContributors()) {
             protoSession = protoSession.toBuilder()
                     .withUserProperties(propertyContributor.contribute(protoSession))
                     .build();
@@ -735,6 +737,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
         }
 
         context.effectiveSettings = settingsResult.getEffectiveSettings();
+        context.installationSettings = settingsResult.getInstallationSettings();
+        context.projectSettings = settingsResult.getProjectSettings();
+        context.userSettings = settingsResult.getUserSettings();
         context.interactive = mayDisableInteractiveMode(context, context.effectiveSettings.isInteractiveMode());
         context.localRepositoryPath = localRepositoryPath(context);
 
@@ -742,12 +747,18 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             int totalProblems = settingsResult.getProblems().totalProblemsReported();
             context.logger.info("");
             context.logger.info(String.format(
-                    "%s %s encountered while building the effective settings (use -e to see details)",
+                    "%s %s encountered while building the effective settings",
                     totalProblems, (totalProblems == 1) ? "problem was" : "problems were"));
 
-            if (context.options().showErrors().orElse(false)) {
-                for (BuilderProblem problem :
-                        settingsResult.getProblems().problems().toList()) {
+            // print the problems themselves by default, as Maven 3 does: a settings element that is skipped (unknown
+            // to this settings model, or misspelt) can change what credentials are sent where, and must not go
+            // unnoticed; -e adds the stack trace of the underlying exception
+            boolean showErrors = context.options().showErrors().orElse(false);
+            for (BuilderProblem problem :
+                    settingsResult.getProblems().problems().toList()) {
+                if (showErrors && problem.getException() != null) {
+                    context.logger.warn(problem.getMessage() + " @ " + problem.getLocation(), problem.getException());
+                } else {
                     context.logger.warn(problem.getMessage() + " @ " + problem.getLocation());
                 }
             }
@@ -758,6 +769,9 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             context.projectSettingsPath = null;
             context.userSettingsPath = null;
             context.effectiveSettings = null;
+            context.installationSettings = null;
+            context.projectSettings = null;
+            context.userSettings = null;
             context.interactive = true;
             context.localRepositoryPath = null;
         };

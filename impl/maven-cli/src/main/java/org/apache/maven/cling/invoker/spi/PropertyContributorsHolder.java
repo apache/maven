@@ -18,25 +18,25 @@
  */
 package org.apache.maven.cling.invoker.spi;
 
-import java.util.Map;
+import java.util.List;
 
 import org.apache.maven.api.di.Inject;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.spi.PropertyContributor;
 
 /**
- * Hack: to circumvent sisu/plexus/di stuff.
+ * Holds the list of {@link PropertyContributor} SPI implementations collected by the DI container.
  */
 @Named
 public final class PropertyContributorsHolder {
-    private final Map<String, PropertyContributor> propertyContributors;
+    private final List<PropertyContributor> propertyContributors;
 
     @Inject
-    public PropertyContributorsHolder(Map<String, PropertyContributor> propertyContributors) {
+    public PropertyContributorsHolder(List<PropertyContributor> propertyContributors) {
         this.propertyContributors = propertyContributors;
     }
 
-    public Map<String, PropertyContributor> getPropertyContributors() {
+    public List<PropertyContributor> getPropertyContributors() {
         return propertyContributors;
     }
 }

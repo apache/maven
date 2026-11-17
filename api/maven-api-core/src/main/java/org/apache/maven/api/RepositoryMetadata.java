@@ -29,7 +29,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Metadata involved in a repository event.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 @Immutable

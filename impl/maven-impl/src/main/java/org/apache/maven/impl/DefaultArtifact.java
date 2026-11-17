@@ -93,7 +93,7 @@ public class DefaultArtifact implements Artifact {
     }
 
     @Override
-    public boolean isSnapshot() {
+    public boolean snapshot() {
         return DefaultModelVersionParser.checkSnapshot(artifact.getVersion());
     }
 

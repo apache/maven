@@ -93,6 +93,8 @@ public class SimpleLoggerConfiguration {
 
     void init() {
         // Reset state before initialization
+        defaultLogLevel = DEFAULT_LOG_LEVEL_DEFAULT;
+        logFile = LOG_FILE_DEFAULT;
         dateFormatter = null;
 
         loadProperties();

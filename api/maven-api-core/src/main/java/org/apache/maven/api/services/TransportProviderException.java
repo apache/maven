@@ -22,6 +22,8 @@ import org.apache.maven.api.annotations.Consumer;
 import org.apache.maven.api.annotations.Experimental;
 
 /**
+ * Exception thrown when a transport provider encounters an error during remote repository access.
+ *
  * @since 4.0.0
  */
 @Experimental

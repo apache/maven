@@ -1,0 +1,57 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+
+  <groupId>org.apache.maven.its.gh13761</groupId>
+  <artifactId>profile-properties</artifactId>
+  <version>1.0</version>
+  <packaging>pom</packaging>
+
+  <!-- The declared values. A consumer must see exactly these, in the main block and in each
+       profile, whatever was active on the machine that built the project (GH-13761). -->
+  <properties>
+    <flag>false</flag>
+    <classifier>none</classifier>
+  </properties>
+
+  <profiles>
+    <!-- Active wherever the project is built: no-such-dir never exists. -->
+    <profile>
+      <id>active-here</id>
+      <activation>
+        <file>
+          <missing>no-such-dir</missing>
+        </file>
+      </activation>
+      <properties>
+        <flag>true</flag>
+        <classifier>here</classifier>
+      </properties>
+    </profile>
+    <!-- An opt-in switch a consumer may activate to set the flag the other way. -->
+    <profile>
+      <id>opt-in</id>
+      <activation>
+        <property>
+          <name>want.flag.off</name>
+        </property>
+      </activation>
+      <properties>
+        <flag>false</flag>
+      </properties>
+    </profile>
+    <!-- A profile for a platform the producer is not on. -->
+    <profile>
+      <id>elsewhere</id>
+      <activation>
+        <os>
+          <family>no-such-os</family>
+        </os>
+      </activation>
+      <properties>
+        <classifier>elsewhere</classifier>
+      </properties>
+    </profile>
+  </profiles>
+</project>

@@ -28,7 +28,7 @@ import org.apache.maven.api.model.Profile;
 import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileActivator;
-import org.apache.maven.impl.util.Os;
+import org.apache.maven.utils.Os;
 
 /**
  * Determines profile activation based on the operating system of the current runtime platform.

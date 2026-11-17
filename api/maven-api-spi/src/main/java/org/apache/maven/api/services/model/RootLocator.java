@@ -43,12 +43,31 @@ public interface RootLocator extends Service {
             + "Create a .mvn directory in the root directory or add the root=\"true\""
             + " attribute on the root project's model to identify it.";
 
+    /**
+     * Finds the root directory by searching from the given base directory upwards.
+     *
+     * @param basedir the starting directory for the search
+     * @return the root directory path, or {@code null} if none was found
+     */
     @Nullable
     Path findRoot(@Nonnull Path basedir);
 
+    /**
+     * Finds the root directory by searching from the given base directory upwards,
+     * throwing an exception if no root can be found.
+     *
+     * @param basedir the starting directory for the search
+     * @return the root directory path, never {@code null}
+     * @throws IllegalStateException if no root directory can be found
+     */
     @Nonnull
     Path findMandatoryRoot(@Nonnull Path basedir);
 
+    /**
+     * Returns the error message to use when no root directory can be found.
+     *
+     * @return the error message, never {@code null}
+     */
     @Nonnull
     default String getNoRootMessage() {
         return UNABLE_TO_FIND_ROOT_PROJECT_MESSAGE;

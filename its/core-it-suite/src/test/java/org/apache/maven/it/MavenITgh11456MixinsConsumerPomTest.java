@@ -32,7 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * This is a test set for <a href="https://github.com/apache/maven/issues/11456">GH-11456</a>.
- * @since 4.1.0
+ * @since 4.2.0
  */
 class MavenITgh11456MixinsConsumerPomTest extends AbstractMavenIntegrationTestCase {
 

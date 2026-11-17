@@ -31,7 +31,7 @@ under the License.
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <javaVersion>17</javaVersion>
-    <mavenVersion>4.1.0-SNAPSHOT</mavenVersion>
+    <mavenVersion>4.2.0-SNAPSHOT</mavenVersion>
     <mavenPluginPluginVersion>4.0.0-beta-1</mavenPluginPluginVersion>
   </properties>
 

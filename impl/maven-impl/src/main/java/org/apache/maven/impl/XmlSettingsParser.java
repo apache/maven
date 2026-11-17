@@ -38,6 +38,11 @@ final class XmlSettingsParser implements SettingsParser {
     }
 
     @Override
+    public String id() {
+        return "xml";
+    }
+
+    @Override
     public boolean supports(Source source) {
         return true;
     }

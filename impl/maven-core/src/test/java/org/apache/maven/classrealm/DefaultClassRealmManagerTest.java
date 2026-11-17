@@ -29,6 +29,7 @@ import org.apache.maven.model.Model;
 import org.codehaus.plexus.DefaultPlexusContainer;
 import org.codehaus.plexus.PlexusContainer;
 import org.codehaus.plexus.PlexusContainerException;
+import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.eclipse.aether.artifact.Artifact;
 import org.junit.jupiter.api.Test;
@@ -58,7 +59,8 @@ class DefaultClassRealmManagerTest {
         return new DefaultClassRealmManager(
                 new DefaultCoreRealm(container),
                 new ArrayList<ClassRealmManagerDelegate>(),
-                new CoreExports(new ClassRealm(null, "test", null), new HashSet<String>(), exportedPackages));
+                new CoreExports(
+                        new ClassRealm(new ClassWorld(), "test", null), new HashSet<String>(), exportedPackages));
     }
 
     private List<Artifact> newTestArtifactList() {

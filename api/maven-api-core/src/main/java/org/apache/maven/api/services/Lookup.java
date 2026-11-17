@@ -25,6 +25,14 @@ import java.util.Optional;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.annotations.Nonnull;
 
+/**
+ * Service for looking up components from the dependency injection container.
+ * <p>
+ * Provides methods to retrieve single components, optional components, and
+ * collections of components by their type and optional name qualifier.
+ *
+ * @since 4.0.0
+ */
 public interface Lookup extends Service {
     /**
      * Performs a lookup for given typed component.

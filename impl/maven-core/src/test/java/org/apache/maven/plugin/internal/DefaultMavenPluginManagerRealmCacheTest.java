@@ -21,12 +21,14 @@ package org.apache.maven.plugin.internal;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.maven.api.services.MessageBuilderFactory;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.classrealm.ClassRealmManager;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.model.Plugin;
 import org.apache.maven.plugin.DefaultPluginRealmCache;
+import org.apache.maven.plugin.ExtensionRealmCache;
 import org.apache.maven.plugin.PluginArtifactsCache;
 import org.apache.maven.plugin.PluginDescriptorCache;
 import org.apache.maven.plugin.PluginValidationManager;
@@ -78,13 +80,14 @@ class DefaultMavenPluginManagerRealmCacheTest {
                 mock(PluginDescriptorCache.class),
                 new DefaultPluginRealmCache(),
                 resolver,
-                mock(org.apache.maven.plugin.ExtensionRealmCache.class),
+                mock(ExtensionRealmCache.class),
                 mock(PluginVersionResolver.class),
                 mock(PluginArtifactsCache.class),
                 mock(MavenPluginValidator.class),
                 List.of(),
                 mock(PluginValidationManager.class),
-                List.of());
+                List.of(),
+                mock(MessageBuilderFactory.class));
 
         Plugin plugin = new Plugin();
         plugin.setGroupId("org.example");

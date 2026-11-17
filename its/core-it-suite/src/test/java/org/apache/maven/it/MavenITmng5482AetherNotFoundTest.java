@@ -68,8 +68,28 @@ public class MavenITmng5482AetherNotFoundTest extends AbstractMavenIntegrationTe
         int msg = indexOf(lines, "Caused by: java.lang.ClassNotFoundException: org.sonatype.aether.+");
         assertTrue(msg >= 0, "ClassNotFoundException message was not found in output.");
 
+        // the legacy wiki URL is no longer printed on standard output
         int url = indexOf(lines, ".*http://cwiki.apache.org/confluence/display/MAVEN/AetherClassNotFound.*");
-        assertTrue(url >= 0, "Url to ClassNotFoundAether was not found in output.");
+        assertTrue(url < 0, "Url to ClassNotFoundAether should not be found in output.");
+
+        // the -X hint is shown, since detailed help is available for this error
+        int hint =
+                indexOf(lines, ".*switch to enable full debug logging and details about the error.*");
+        assertTrue(hint >= 0, "-X hint was not found in output.");
+
+        // with -X, the dedicated help text is logged
+        Verifier debugVerifier = newVerifier(testDir);
+        debugVerifier.setAutoclean(false);
+
+        debugVerifier.addCliArgument("validate");
+        debugVerifier.addCliArgument("-X");
+        assertThrows(
+                VerificationException.class, debugVerifier::execute, "should throw an error during execution.");
+
+        List<String> debugLines = debugVerifier.loadFile(testDir.resolve("log.txt"));
+
+        int help = indexOf(debugLines, ".*Sonatype Aether.*");
+        assertTrue(help >= 0, "AetherClassNotFound help text was not found in debug output.");
     }
 
     private int indexOf(List<String> logLines, String regex) {

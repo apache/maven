@@ -61,7 +61,7 @@ public interface Project {
      *
      * @deprecated Use {@link #groupId()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default String getGroupId() {
         return groupId();
@@ -78,7 +78,7 @@ public interface Project {
      *
      * @deprecated Use {@link #artifactId()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default String getArtifactId() {
         return artifactId();
@@ -95,7 +95,7 @@ public interface Project {
      *
      * @deprecated Use {@link #version()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default String getVersion() {
         return version();
@@ -123,7 +123,7 @@ public interface Project {
      * @see #getArtifacts()
      * @deprecated Use {@link #packaging()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Packaging getPackaging() {
         return packaging();
@@ -145,7 +145,7 @@ public interface Project {
      * @see #getPackaging()
      * @deprecated Use {@link #language()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Language getLanguage() {
         return language();
@@ -169,7 +169,7 @@ public interface Project {
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      * @deprecated Use {@link #pomArtifact()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default ProducedArtifact getPomArtifact() {
         return pomArtifact();
@@ -196,10 +196,23 @@ public interface Project {
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      * @deprecated Use {@link #mainArtifact()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Optional<ProducedArtifact> getMainArtifact() {
         return mainArtifact();
+    }
+
+    /**
+     * {@return whether this project produces a main artifact}.
+     * A project produces a main artifact if its packaging produces one
+     * and the project does not use a module source hierarchy.
+     *
+     * @see Packaging#producesMainArtifact()
+     * @see #mainArtifact()
+     * @since 4.2.0
+     */
+    default boolean producesMainArtifact() {
+        return mainArtifact().isPresent();
     }
 
     /**
@@ -232,7 +245,7 @@ public interface Project {
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
      * @deprecated Use {@link #artifacts()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default List<ProducedArtifact> getArtifacts() {
         return artifacts();
@@ -249,7 +262,7 @@ public interface Project {
      *
      * @deprecated Use {@link #model()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Model getModel() {
         return model();
@@ -272,7 +285,7 @@ public interface Project {
      * @return the build element of the project model
      * @deprecated Use {@link #build()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Build getBuild() {
         return build();
@@ -308,7 +321,7 @@ public interface Project {
      * @see #getBasedir()
      * @deprecated Use {@link #pomPath()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Path getPomPath() {
         return pomPath();
@@ -332,7 +345,7 @@ public interface Project {
      * @return the path of the directory containing the project
      * @deprecated Use {@link #basedir()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Path getBasedir() {
         return basedir();
@@ -464,7 +477,7 @@ public interface Project {
      * @return the absolute path to the output directory for the given scope
      * @deprecated Use {@link #outputDirectory(ProjectScope)} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Path getOutputDirectory(@Nullable ProjectScope scope) {
         return outputDirectory(scope);
@@ -481,7 +494,7 @@ public interface Project {
      *
      * @deprecated Use {@link #dependencies()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default List<DependencyCoordinates> getDependencies() {
         return dependencies();
@@ -498,7 +511,7 @@ public interface Project {
      *
      * @deprecated Use {@link #managedDependencies()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default List<DependencyCoordinates> getManagedDependencies() {
         return managedDependencies();
@@ -555,7 +568,7 @@ public interface Project {
      * @see Session#getRootDirectory()
      * @deprecated Use {@link #rootDirectory()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Path getRootDirectory() {
         return rootDirectory();
@@ -585,7 +598,7 @@ public interface Project {
      * @see Model#getParent()
      * @deprecated Use {@link #parent()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Optional<Project> getParent() {
         return parent();
@@ -615,7 +628,7 @@ public interface Project {
      * @see #getEffectiveProfiles()
      * @deprecated Use {@link #declaredProfiles()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default List<Profile> getDeclaredProfiles() {
         return declaredProfiles();
@@ -647,7 +660,7 @@ public interface Project {
      * @see #getDeclaredProfiles()
      * @deprecated Use {@link #effectiveProfiles()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default List<Profile> getEffectiveProfiles() {
         return effectiveProfiles();
@@ -693,7 +706,7 @@ public interface Project {
      * @see #getEffectiveActiveProfiles()
      * @deprecated Use {@link #declaredActiveProfiles()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default List<Profile> getDeclaredActiveProfiles() {
         return declaredActiveProfiles();
@@ -731,7 +744,7 @@ public interface Project {
      * @see #getDeclaredActiveProfiles()
      * @deprecated Use {@link #effectiveActiveProfiles()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default List<Profile> getEffectiveActiveProfiles() {
         return effectiveActiveProfiles();

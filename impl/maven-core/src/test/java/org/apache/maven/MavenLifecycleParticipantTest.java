@@ -23,7 +23,12 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CopyOnWriteArrayList;
 
+import org.apache.maven.api.Project;
+import org.apache.maven.api.Session;
+import org.apache.maven.api.model.Model;
+import org.apache.maven.api.spi.ProjectTransformer;
 import org.apache.maven.artifact.Artifact;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionResult;
@@ -100,6 +105,38 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
         }
     }
 
+    public static class InjectReactorDependencyV4 implements ProjectTransformer {
+        @Override
+        public Model transformProject(Session session, Project project, Model model) {
+            if (!"module-a".equals(project.artifactId())) {
+                return model;
+            }
+            Project dependency = session.getProjects().stream()
+                    .filter(p -> "module-b".equals(p.artifactId()))
+                    .findFirst()
+                    .orElseThrow();
+
+            List<org.apache.maven.api.model.Dependency> dependencies = new ArrayList<>(model.getDependencies());
+            dependencies.add(org.apache.maven.api.model.Dependency.newBuilder()
+                    .groupId(dependency.groupId())
+                    .artifactId(dependency.artifactId())
+                    .version(dependency.version())
+                    .type("jar")
+                    .build());
+            return model.withDependencies(dependencies);
+        }
+    }
+
+    public static class RecordingProjectTransformer implements ProjectTransformer {
+        private static final List<String> CALLBACKS = new CopyOnWriteArrayList<>();
+
+        @Override
+        public Model transformProject(Session session, Project project, Model model) {
+            CALLBACKS.add("transformProject:" + project.artifactId());
+            return model;
+        }
+    }
+
     @Override
     protected String getProjectsDirectory() {
         return "src/test/projects/lifecycle-listener";
@@ -145,6 +182,32 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
         assertEquals(List.of("root"), reactorOrder);
     }
 
+    @Test
+    void testV4ReactorDependencyInjection() throws Exception {
+        List<String> reactorOrder = getV4ReactorOrder(
+                "lifecycle-participant-reactor-dependency-injection", InjectReactorDependencyV4.class);
+        assertEquals(Arrays.asList("parent", "module-b", "module-a"), reactorOrder);
+    }
+
+    @Test
+    void testV4ProjectTransformer() throws Exception {
+        RecordingProjectTransformer.CALLBACKS.clear();
+        PlexusContainer container = getContainer();
+        ComponentDescriptor<RecordingProjectTransformer> cd =
+                new ComponentDescriptor<>(RecordingProjectTransformer.class, container.getContainerRealm());
+        cd.setRoleClass(ProjectTransformer.class);
+        container.addComponentDescriptor(cd);
+
+        Maven maven = container.lookup(Maven.class);
+        MavenExecutionRequest request =
+                createMavenExecutionRequest(getProject("lifecycle-listener-dependency-injection"));
+        request.setGoals(List.of("validate"));
+        MavenExecutionResult result = maven.execute(request);
+
+        assertFalse(result.hasExceptions(), result.getExceptions().toString());
+        assertEquals(List.of("transformProject:simple"), RecordingProjectTransformer.CALLBACKS);
+    }
+
     private <T> List<String> getReactorOrder(String testProject, Class<T> participant) throws Exception {
         PlexusContainer container = getContainer();
 
@@ -165,5 +228,25 @@ class MavenLifecycleParticipantTest extends AbstractCoreMavenComponentTestCase {
             order.add(project.getArtifactId());
         }
         return order;
+    }
+
+    private <T extends ProjectTransformer> List<String> getV4ReactorOrder(String testProject, Class<T> transformer)
+            throws Exception {
+        PlexusContainer container = getContainer();
+
+        ComponentDescriptor<T> cd = new ComponentDescriptor<>(transformer, container.getContainerRealm());
+        cd.setRoleClass(ProjectTransformer.class);
+        container.addComponentDescriptor(cd);
+
+        Maven maven = container.lookup(Maven.class);
+        File pom = getProject(testProject);
+        MavenExecutionRequest request = createMavenExecutionRequest(pom);
+        request.setGoals(List.of("validate"));
+        MavenExecutionResult result = maven.execute(request);
+
+        assertFalse(result.hasExceptions(), result.getExceptions().toString());
+        return result.getTopologicallySortedProjects().stream()
+                .map(MavenProject::getArtifactId)
+                .toList();
     }
 }

@@ -33,7 +33,7 @@ import org.apache.maven.api.metadata.Versioning;
  * would map onto filesystem path-traversal segments ({@code ..}), separators ({@code /}, {@code \}),
  * drive-letter delimiters ({@code :}), or ISO control characters are rejected.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 public final class MetadataInputValidator {
 

@@ -23,6 +23,8 @@ import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.toolchain.PersistedToolchains;
 
 /**
+ * Result of building the effective toolchains, providing access to the assembled
+ * {@link org.apache.maven.api.toolchain.PersistedToolchains} and any problems encountered.
  *
  * @since 4.0.0
  */

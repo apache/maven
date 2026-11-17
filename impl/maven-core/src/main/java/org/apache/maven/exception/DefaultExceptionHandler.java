@@ -40,6 +40,7 @@ import org.apache.maven.plugin.PluginContainerException;
 import org.apache.maven.plugin.PluginExecutionException;
 import org.apache.maven.project.ProjectBuildingException;
 import org.apache.maven.project.ProjectBuildingResult;
+import org.eclipse.aether.artifact.Artifact;
 import org.eclipse.aether.transfer.ArtifactFilteredOutException;
 
 /*
@@ -168,7 +169,7 @@ public class DefaultExceptionHandler implements ExceptionHandler {
         }
 
         if (exception != null) {
-            if (exception instanceof MojoExecutionException) {
+            if (exception instanceof MojoExecutionException || exception instanceof MojoException) {
                 reference = MojoExecutionException.class.getSimpleName();
 
                 Throwable cause = exception.getCause();
@@ -176,6 +177,8 @@ public class DefaultExceptionHandler implements ExceptionHandler {
                     cause = cause.getCause();
                     if (cause instanceof ConnectException) {
                         reference = ConnectException.class.getSimpleName();
+                    } else if (cause instanceof UnknownHostException) {
+                        reference = UnknownHostException.class.getSimpleName();
                     }
                 }
                 if (findCause(exception, ArtifactFilteredOutException.class) != null) {
@@ -213,7 +216,8 @@ public class DefaultExceptionHandler implements ExceptionHandler {
 
         if ((reference != null && !reference.isEmpty())
                 && !reference.startsWith("http:")
-                && !reference.startsWith("https:")) {
+                && !reference.startsWith("https:")
+                && ReferenceHelp.hasHelpText(reference)) {
             reference = "http://cwiki.apache.org/confluence/display/MAVEN/" + reference;
         }
 
@@ -235,7 +239,7 @@ public class DefaultExceptionHandler implements ExceptionHandler {
     private String getMessage(String message, Throwable exception) {
         String fullMessage = (message != null) ? message : "";
 
-        boolean hasArtifactFilteredOut = false;
+        ArtifactFilteredOutException artifactFilteredOut = null;
 
         // To break out of possible endless loop when getCause returns "this", or dejaVu for n-level recursion (n>1)
         Set<Throwable> dejaVu = Collections.newSetFromMap(new IdentityHashMap<>());
@@ -268,8 +272,8 @@ public class DefaultExceptionHandler implements ExceptionHandler {
                 fullMessage = join(fullMessage, exceptionMessage);
             }
 
-            if (t instanceof ArtifactFilteredOutException) {
-                hasArtifactFilteredOut = true;
+            if (artifactFilteredOut == null && t instanceof ArtifactFilteredOutException filteredOut) {
+                artifactFilteredOut = filteredOut;
             }
 
             if (!dejaVu.add(t)) {
@@ -278,17 +282,25 @@ public class DefaultExceptionHandler implements ExceptionHandler {
             }
         }
 
-        if (hasArtifactFilteredOut) {
+        if (artifactFilteredOut != null) {
             fullMessage += """
 
-                This error indicates that a remote repository filter has rejected this artifact. This commonly happens with repository managers using virtual/group repositories that do not properly aggregate prefix files.
+                This error indicates that a remote repository filter has rejected %s.
+                This commonly happens with repository managers using virtual/group repositories that do not properly aggregate prefix files.
                 To disable remote repository filtering, add one or both of these to your command line or to .mvn/maven.config:
                   -Daether.remoteRepositoryFilter.prefixes=false
                   -Daether.remoteRepositoryFilter.groupId=false
-                See https://maven.apache.org/resolver/remote-repository-filtering.html""";
+                See https://maven.apache.org/resolver/remote-repository-filtering.html""".formatted(coordinates(artifactFilteredOut));
         }
 
         return fullMessage.trim();
+    }
+
+    private static String coordinates(ArtifactFilteredOutException exception) {
+        Artifact artifact = exception.getArtifact();
+        return artifact == null
+                ? "the artifact"
+                : artifact.getGroupId() + ":" + artifact.getArtifactId() + ":" + artifact.getVersion();
     }
 
     private static <T extends Throwable> T findCause(Throwable exception, Class<T> type) {

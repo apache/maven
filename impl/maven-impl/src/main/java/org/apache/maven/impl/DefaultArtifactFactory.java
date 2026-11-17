@@ -20,11 +20,11 @@ package org.apache.maven.impl;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ProducedArtifact;
+import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
 import org.apache.maven.api.services.ArtifactFactory;
-import org.apache.maven.api.services.ArtifactFactoryRequest;
 import org.eclipse.aether.artifact.ArtifactType;
 
 import static java.util.Objects.requireNonNull;
@@ -33,52 +33,50 @@ import static java.util.Objects.requireNonNull;
 @Singleton
 public class DefaultArtifactFactory implements ArtifactFactory {
     @Override
-    public Artifact create(@Nonnull ArtifactFactoryRequest request) {
-        requireNonNull(request, "request");
-        InternalSession session = InternalSession.from(request.getSession());
-        ArtifactType type = null;
-        if (request.getType() != null) {
-            type = session.getSession().getArtifactTypeRegistry().get(request.getType());
-        }
-        String str1 = request.getClassifier();
-        String classifier =
-                str1 != null && !str1.isEmpty() ? request.getClassifier() : type != null ? type.getClassifier() : null;
-        String str = request.getExtension();
-        String extension =
-                str != null && !str.isEmpty() ? request.getExtension() : type != null ? type.getExtension() : null;
+    public Artifact create(
+            @Nonnull Session session,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String extension,
+            String type) {
+        InternalSession internalSession = InternalSession.from(requireNonNull(session, "session"));
         return new DefaultArtifact(
-                session,
-                new org.eclipse.aether.artifact.DefaultArtifact(
-                        request.getGroupId(),
-                        request.getArtifactId(),
-                        classifier,
-                        extension,
-                        request.getVersion(),
-                        type));
+                internalSession,
+                createArtifact(internalSession, groupId, artifactId, version, classifier, extension, type));
     }
 
     @Override
-    public ProducedArtifact createProduced(@Nonnull ArtifactFactoryRequest request) {
-        requireNonNull(request, "request");
-        InternalSession session = InternalSession.from(request.getSession());
-        ArtifactType type = null;
-        if (request.getType() != null) {
-            type = session.getSession().getArtifactTypeRegistry().get(request.getType());
-        }
-        String str1 = request.getClassifier();
-        String classifier =
-                str1 != null && !str1.isEmpty() ? request.getClassifier() : type != null ? type.getClassifier() : null;
-        String str = request.getExtension();
-        String extension =
-                str != null && !str.isEmpty() ? request.getExtension() : type != null ? type.getExtension() : null;
+    public ProducedArtifact createProduced(
+            @Nonnull Session session,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String extension,
+            String type) {
+        InternalSession internalSession = InternalSession.from(requireNonNull(session, "session"));
         return new DefaultProducedArtifact(
-                session,
-                new org.eclipse.aether.artifact.DefaultArtifact(
-                        request.getGroupId(),
-                        request.getArtifactId(),
-                        classifier,
-                        extension,
-                        request.getVersion(),
-                        type));
+                internalSession,
+                createArtifact(internalSession, groupId, artifactId, version, classifier, extension, type));
+    }
+
+    private org.eclipse.aether.artifact.Artifact createArtifact(
+            InternalSession session,
+            String groupId,
+            String artifactId,
+            String version,
+            String classifier,
+            String extension,
+            String typeId) {
+        ArtifactType type =
+                typeId != null ? session.getSession().getArtifactTypeRegistry().get(typeId) : null;
+        String effectiveClassifier =
+                classifier != null && !classifier.isEmpty() ? classifier : type != null ? type.getClassifier() : null;
+        String effectiveExtension =
+                extension != null && !extension.isEmpty() ? extension : type != null ? type.getExtension() : null;
+        return new org.eclipse.aether.artifact.DefaultArtifact(
+                groupId, artifactId, effectiveClassifier, effectiveExtension, version, type);
     }
 }

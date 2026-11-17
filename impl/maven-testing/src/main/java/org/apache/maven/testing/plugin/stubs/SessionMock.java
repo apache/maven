@@ -45,7 +45,6 @@ import org.apache.maven.api.model.Repository;
 import org.apache.maven.api.services.ArtifactDeployer;
 import org.apache.maven.api.services.ArtifactDeployerRequest;
 import org.apache.maven.api.services.ArtifactFactory;
-import org.apache.maven.api.services.ArtifactFactoryRequest;
 import org.apache.maven.api.services.ArtifactInstaller;
 import org.apache.maven.api.services.ArtifactInstallerRequest;
 import org.apache.maven.api.services.ArtifactManager;
@@ -313,35 +312,43 @@ public class SessionMock {
         //
         // ArtifactFactory
         //
-        ArtifactFactory artifactFactory = mock(ArtifactFactory.class);
-        when(artifactFactory.create(any())).then(iom -> {
-            ArtifactFactoryRequest request = iom.getArgument(0, ArtifactFactoryRequest.class);
-            String classifier = request.getClassifier();
-            String extension = request.getExtension();
-            String type = request.getType();
-            if (classifier == null) {
-                classifier = "";
-            }
-            if (extension == null) {
-                extension = type != null ? type : "";
-            }
-            return new ArtifactStub(
-                    request.getGroupId(), request.getArtifactId(), classifier, request.getVersion(), extension);
-        });
-        when(artifactFactory.createProduced(any())).then(iom -> {
-            ArtifactFactoryRequest request = iom.getArgument(0, ArtifactFactoryRequest.class);
-            String classifier = request.getClassifier();
-            String extension = request.getExtension();
-            String type = request.getType();
-            if (classifier == null) {
-                classifier = "";
-            }
-            if (extension == null) {
-                extension = type != null ? type : "";
-            }
-            return new ProducedArtifactStub(
-                    request.getGroupId(), request.getArtifactId(), classifier, request.getVersion(), extension);
-        });
+        ArtifactFactory artifactFactory = mock(ArtifactFactory.class, org.mockito.Mockito.CALLS_REAL_METHODS);
+        when(artifactFactory.create(any(), any(), any(), any(), any(), any(), any()))
+                .then(iom -> {
+                    String classifier = iom.getArgument(4, String.class);
+                    String extension = iom.getArgument(5, String.class);
+                    String type = iom.getArgument(6, String.class);
+                    if (classifier == null) {
+                        classifier = "";
+                    }
+                    if (extension == null) {
+                        extension = type != null ? type : "";
+                    }
+                    return new ArtifactStub(
+                            iom.getArgument(1, String.class),
+                            iom.getArgument(2, String.class),
+                            classifier,
+                            iom.getArgument(3, String.class),
+                            extension);
+                });
+        when(artifactFactory.createProduced(any(), any(), any(), any(), any(), any(), any()))
+                .then(iom -> {
+                    String classifier = iom.getArgument(4, String.class);
+                    String extension = iom.getArgument(5, String.class);
+                    String type = iom.getArgument(6, String.class);
+                    if (classifier == null) {
+                        classifier = "";
+                    }
+                    if (extension == null) {
+                        extension = type != null ? type : "";
+                    }
+                    return new ProducedArtifactStub(
+                            iom.getArgument(1, String.class),
+                            iom.getArgument(2, String.class),
+                            classifier,
+                            iom.getArgument(3, String.class),
+                            extension);
+                });
         when(session.createArtifact(any(), any(), any(), any(), any(), any())).thenAnswer(iom -> {
             String groupId = iom.getArgument(0, String.class);
             String artifactId = iom.getArgument(1, String.class);
@@ -350,29 +357,14 @@ public class SessionMock {
             String extension = iom.getArgument(4, String.class);
             String type = iom.getArgument(5, String.class);
             return session.getService(ArtifactFactory.class)
-                    .create(ArtifactFactoryRequest.builder()
-                            .session(session)
-                            .groupId(groupId)
-                            .artifactId(artifactId)
-                            .version(version)
-                            .classifier(classifier)
-                            .extension(extension)
-                            .type(type)
-                            .build());
+                    .create(session, groupId, artifactId, version, classifier, extension, type);
         });
         when(session.createArtifact(any(), any(), any(), any())).thenAnswer(iom -> {
             String groupId = iom.getArgument(0, String.class);
             String artifactId = iom.getArgument(1, String.class);
             String version = iom.getArgument(2, String.class);
             String extension = iom.getArgument(3, String.class);
-            return session.getService(ArtifactFactory.class)
-                    .create(ArtifactFactoryRequest.builder()
-                            .session(session)
-                            .groupId(groupId)
-                            .artifactId(artifactId)
-                            .version(version)
-                            .extension(extension)
-                            .build());
+            return session.getService(ArtifactFactory.class).create(session, groupId, artifactId, version, extension);
         });
         when(session.createProducedArtifact(any(), any(), any(), any(), any(), any()))
                 .thenAnswer(iom -> {
@@ -383,15 +375,7 @@ public class SessionMock {
                     String extension = iom.getArgument(4, String.class);
                     String type = iom.getArgument(5, String.class);
                     return session.getService(ArtifactFactory.class)
-                            .createProduced(ArtifactFactoryRequest.builder()
-                                    .session(session)
-                                    .groupId(groupId)
-                                    .artifactId(artifactId)
-                                    .version(version)
-                                    .classifier(classifier)
-                                    .extension(extension)
-                                    .type(type)
-                                    .build());
+                            .createProduced(session, groupId, artifactId, version, classifier, extension, type);
                 });
         when(session.createProducedArtifact(any(), any(), any(), any())).thenAnswer(iom -> {
             String groupId = iom.getArgument(0, String.class);
@@ -399,13 +383,7 @@ public class SessionMock {
             String version = iom.getArgument(2, String.class);
             String extension = iom.getArgument(3, String.class);
             return session.getService(ArtifactFactory.class)
-                    .createProduced(ArtifactFactoryRequest.builder()
-                            .session(session)
-                            .groupId(groupId)
-                            .artifactId(artifactId)
-                            .version(version)
-                            .extension(extension)
-                            .build());
+                    .createProduced(session, groupId, artifactId, version, extension);
         });
         when(session.getService(ArtifactFactory.class)).thenReturn(artifactFactory);
 

@@ -55,7 +55,7 @@ public interface VersionRange {
      *
      * @deprecated Use {@link #upperBoundary()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nullable
     default Boundary getUpperBoundary() {
         return upperBoundary();
@@ -72,7 +72,7 @@ public interface VersionRange {
      *
      * @deprecated Use {@link #lowerBoundary()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nullable
     default Boundary getLowerBoundary() {
         return lowerBoundary();
@@ -99,7 +99,7 @@ public interface VersionRange {
          *
          * @deprecated Use {@link #version()} instead.
          */
-        @Deprecated(since = "4.1.0", forRemoval = true)
+        @Deprecated(since = "4.2.0", forRemoval = true)
         default Version getVersion() {
             return version();
         }

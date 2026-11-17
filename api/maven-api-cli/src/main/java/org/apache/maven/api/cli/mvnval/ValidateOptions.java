@@ -28,7 +28,7 @@ import org.apache.maven.api.cli.Options;
 /**
  * Options specific to the POM validation tool.
  *
- * @since 4.1.0
+ * @since 4.2.0
  */
 @Experimental
 public interface ValidateOptions extends Options {

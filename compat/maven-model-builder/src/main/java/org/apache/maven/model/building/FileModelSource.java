@@ -71,6 +71,9 @@ public class FileModelSource extends FileSource implements ModelSource2 {
 
         if (Files.isDirectory(relatedPom)) {
             // TODO figure out how to reuse ModelLocator.locatePom(File) here
+            // so that polyglot ModelParser extensions are honoured.
+            // The new API solves this via ModelSource.resolve(ModelLocator, String).
+            // Same limitation exists in DefaultProjectBuilder.SourceWrapper.getRelatedSource(String).
             relatedPom = relatedPom.resolve("pom.xml");
         }
 

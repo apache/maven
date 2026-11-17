@@ -13,7 +13,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <maven.version>4.1.0-SNAPSHOT</maven.version>
+    <maven.version>4.2.0-SNAPSHOT</maven.version>
     <maven-plugin-plugin.version>4.0.0-beta-1</maven-plugin-plugin.version>
     <maven.compiler.release>17</maven.compiler.release>
   </properties>

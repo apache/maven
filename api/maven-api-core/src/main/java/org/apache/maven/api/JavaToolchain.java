@@ -41,7 +41,17 @@ import org.apache.maven.api.annotations.Experimental;
 @Experimental
 public interface JavaToolchain extends Toolchain {
 
+    /**
+     * Returns the path to the Java home directory for this toolchain.
+     *
+     * @return the Java home path
+     */
     String getJavaHome();
 
+    /**
+     * Returns the Java version provided by this toolchain.
+     *
+     * @return the Java version
+     */
     Version getJavaVersion();
 }

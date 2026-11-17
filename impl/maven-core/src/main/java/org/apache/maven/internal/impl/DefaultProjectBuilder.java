@@ -26,6 +26,8 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URI;
+import java.nio.file.Files;
+import java.nio.file.InvalidPathException;
 import java.nio.file.Path;
 import java.util.Collection;
 import java.util.List;
@@ -40,6 +42,7 @@ import org.apache.maven.api.services.ProjectBuilderException;
 import org.apache.maven.api.services.ProjectBuilderRequest;
 import org.apache.maven.api.services.ProjectBuilderResult;
 import org.apache.maven.api.services.Source;
+import org.apache.maven.api.services.Sources;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.impl.DefaultDependencyResolverResult;
 import org.apache.maven.impl.InternalSession;
@@ -69,13 +72,17 @@ public class DefaultProjectBuilder implements ProjectBuilder {
     public ProjectBuilderResult build(ProjectBuilderRequest request)
             throws ProjectBuilderException, IllegalArgumentException {
         InternalSession session = InternalSession.from(request.getSession());
-        return session.request(request, this::doBuild);
+        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
+        try {
+            return session.request(request, this::doBuild);
+        } finally {
+            RequestTraceHelper.exit(trace);
+        }
     }
 
     protected ProjectBuilderResult doBuild(ProjectBuilderRequest request)
             throws ProjectBuilderException, IllegalArgumentException {
         InternalMavenSession session = InternalMavenSession.from(request.getSession());
-        RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(request.getSession(), request);
         try {
             List<ArtifactRepository> repositories = session.toArtifactRepositories(
                     request.getRepositories() != null ? request.getRepositories() : session.getRemoteRepositories());
@@ -194,12 +201,10 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             };
         } catch (ProjectBuildingException e) {
             throw new ProjectBuilderException("Unable to build project", e);
-        } finally {
-            RequestTraceHelper.exit(trace);
         }
     }
 
-    private static class SourceWrapper implements ModelSource2 {
+    static class SourceWrapper implements ModelSource2 {
         private final Source source;
 
         SourceWrapper(Source source) {
@@ -216,10 +221,44 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             return source.getLocation();
         }
 
+        /**
+         * Returns the POM which the relative path designates, for instance the parent POM of the one of this source.
+         * The path is resolved against the directory which contains the file of this source, like a
+         * {@code FileModelSource} does, and not against the file itself, which {@link Source#resolve(String)} would do.
+         *
+         * @param relPath the path of the related POM, or of its directory, relative to the directory of this source
+         * @return the related source, or {@code null} if this source is not backed by a file, or if there is no
+         *         readable POM at that path
+         */
         @Override
         public ModelSource2 getRelatedSource(String relPath) {
-            Source rel = source.resolve(relPath);
-            return rel != null ? new SourceWrapper(rel) : null;
+            Path path = source.getPath();
+            if (path == null || path.getParent() == null) {
+                // there is no directory to resolve a relative path against
+                return null;
+            }
+
+            // the relative path of a parent may use either kind of slash, whatever the platform is
+            Path related;
+            try {
+                related = path.getParent()
+                        .resolve(relPath.replace('\\', File.separatorChar).replace('/', File.separatorChar));
+            } catch (InvalidPathException e) {
+                return null;
+            }
+
+            if (Files.isDirectory(related)) {
+                // TODO use ModelSource.ModelLocator.locateExistingPom(Path) instead of hardcoding "pom.xml"
+                // so that polyglot ModelParser extensions are honoured.
+                // Same limitation exists in FileModelSource.getRelatedSource(String).
+                related = related.resolve("pom.xml");
+            }
+
+            if (Files.isRegularFile(related) && Files.isReadable(related)) {
+                return new SourceWrapper(Sources.fromPath(related));
+            }
+
+            return null;
         }
 
         @Override

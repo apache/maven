@@ -18,6 +18,12 @@
  */
 package org.apache.maven.api.services.xml;
 
+/**
+ * Represents a location in an XML document, providing line number, column number,
+ * and character offset information for diagnostics and error reporting.
+ *
+ * @since 4.0.0
+ */
 public interface Location {
 
     /**

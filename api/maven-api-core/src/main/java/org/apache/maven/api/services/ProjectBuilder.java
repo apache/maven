@@ -20,16 +20,18 @@ package org.apache.maven.api.services;
 
 import java.nio.file.Path;
 
-import org.apache.maven.api.Service;
+import org.apache.maven.api.OperationService;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 
 /**
+ * Service for building {@link org.apache.maven.api.Project} instances from POM files or other sources.
+ *
  * @since 4.0.0
  */
 @Experimental
-public interface ProjectBuilder extends Service {
+public interface ProjectBuilder extends OperationService {
 
     /**
      * Creates a {@link org.apache.maven.api.Project} from a POM file.

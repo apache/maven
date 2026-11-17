@@ -108,7 +108,7 @@ public class MavenSettingsMerger {
             }
         }
 
-        dominant.addAll(0, identifiables);
+        dominant.addAll(identifiables);
     }
 
     /**

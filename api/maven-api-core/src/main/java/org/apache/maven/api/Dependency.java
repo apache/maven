@@ -18,6 +18,9 @@
  */
 package org.apache.maven.api;
 
+import java.util.Collection;
+import java.util.List;
+
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
@@ -55,7 +58,7 @@ public interface Dependency extends Artifact {
      * @see DependencyCoordinates#getType()
      * @deprecated Use {@link #type()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default Type getType() {
         return type();
@@ -77,7 +80,7 @@ public interface Dependency extends Artifact {
      * @see DependencyCoordinates#getScope()
      * @deprecated Use {@link #scope()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     @Nonnull
     default DependencyScope getScope() {
         return scope();
@@ -92,6 +95,18 @@ public interface Dependency extends Artifact {
      * @see DependencyCoordinates#optional()
      */
     boolean isOptional();
+
+    /**
+     * Returns the transitive dependencies excluded by this dependency.
+     * The default is an empty collection for implementations that do not expose exclusions.
+     *
+     * @return the dependency exclusions, never {@code null}
+     * @since 4.2.0
+     */
+    @Nonnull
+    default Collection<Exclusion> exclusions() {
+        return List.of();
+    }
 
     /**
      * {@return coordinates with the same identifiers as this dependency}.

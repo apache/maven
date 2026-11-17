@@ -28,15 +28,31 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.NotThreadSafe;
 import org.apache.maven.api.annotations.Nullable;
+import org.apache.maven.api.cache.CacheRetention;
 
 import static java.util.Objects.requireNonNull;
 
 /**
+ * Request for building the effective toolchains from installation and user-level toolchain sources.
  *
  * @since 4.0.0
  */
 @Experimental
 public interface ToolchainsBuilderRequest extends Request<ProtoSession> {
+
+    /**
+     * Overrides the default {@link CacheRetention#DISABLED} retention with
+     * {@link CacheRetention#SESSION_SCOPED}, because toolchains are read from stable
+     * sources (files or classpath) that do not change within a session.
+     *
+     * @return {@link CacheRetention#SESSION_SCOPED}
+     * @since 4.2.0
+     */
+    @Nonnull
+    @Override
+    default CacheRetention getCacheRetention() {
+        return CacheRetention.SESSION_SCOPED;
+    }
 
     /**
      * Gets the installation Toolchains source.
@@ -54,6 +70,14 @@ public interface ToolchainsBuilderRequest extends Request<ProtoSession> {
     @Nonnull
     Optional<Source> getUserToolchainsSource();
 
+    /**
+     * Creates a request from installation and user toolchains sources.
+     *
+     * @param session the session
+     * @param installationToolchainsFile the installation toolchains source, or {@code null}
+     * @param userToolchainsSource the user toolchains source, or {@code null}
+     * @return the new request
+     */
     @Nonnull
     static ToolchainsBuilderRequest build(
             @Nonnull ProtoSession session,
@@ -66,6 +90,15 @@ public interface ToolchainsBuilderRequest extends Request<ProtoSession> {
                 .build();
     }
 
+    /**
+     * Creates a request from installation and user toolchains paths.
+     * Paths that do not exist are treated as absent.
+     *
+     * @param session the session
+     * @param installationToolchainsFile the installation toolchains path, or {@code null}
+     * @param userToolchainsPath the user toolchains path, or {@code null}
+     * @return the new request
+     */
     @Nonnull
     static ToolchainsBuilderRequest build(
             @Nonnull ProtoSession session,
@@ -84,6 +117,11 @@ public interface ToolchainsBuilderRequest extends Request<ProtoSession> {
                 .build();
     }
 
+    /**
+     * Creates a new builder for constructing a {@code ToolchainsBuilderRequest}.
+     *
+     * @return a new builder
+     */
     @Nonnull
     static ToolchainsBuilderRequestBuilder builder() {
         return new ToolchainsBuilderRequestBuilder();

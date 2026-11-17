@@ -29,6 +29,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.TreeSet;
 import java.util.concurrent.ConcurrentHashMap;
@@ -47,6 +48,8 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.internal.MultilineMessageHelper;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
 import org.apache.maven.lifecycle.MissingProjectException;
+import org.apache.maven.lifecycle.internal.filter.FilterPredicate;
+import org.apache.maven.lifecycle.internal.filter.MojoExecutionFilter;
 import org.apache.maven.plugin.BuildPluginManager;
 import org.apache.maven.plugin.MavenPluginManager;
 import org.apache.maven.plugin.MojoExecution;
@@ -78,8 +81,10 @@ public class MojoExecutor {
     private static final SessionData.Key<ProjectIndex> PROJECT_INDEX = SessionData.key(ProjectIndex.class);
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    private static final SessionData.Key<Map<MavenProject, OwnerReentrantLock>> PROJECT_LOCKS =
+    protected static final SessionData.Key<Map<MavenProject, OwnerReentrantLock>> PROJECT_LOCKS =
             (SessionData.Key) SessionData.key(Map.class, ProjectLock.class);
+
+    protected static final NoExceptionCloseable NO_LOCK = new NoLock();
 
     private final BuildPluginManager pluginManager;
     private final MavenPluginManager mavenPluginManager;
@@ -92,7 +97,7 @@ public class MojoExecutor {
 
     private final MessageBuilderFactory messageBuilderFactory;
 
-    private final Map<Thread, MojoDescriptor> mojos = new ConcurrentHashMap<>();
+    protected final Map<Thread, MojoDescriptor> mojos = new ConcurrentHashMap<>();
 
     @Inject
     public MojoExecutor(
@@ -162,20 +167,43 @@ public class MojoExecutor {
 
         final PhaseRecorder phaseRecorder = new PhaseRecorder(session.getCurrentProject());
 
+        // Resolve the mojo execution filter once per project execution.
+        final List<FilterPredicate> filterPredicates = resolveFilterPredicates(session);
+
         mojosExecutionStrategy.get().execute(mojoExecutions, session, new MojoExecutionRunner() {
             @Override
             public void run(MojoExecution mojoExecution) throws LifecycleExecutionException {
-                MojoExecutor.this.execute(session, mojoExecution, dependencyContext, phaseRecorder);
+                MojoExecutor.this.execute(session, mojoExecution, dependencyContext, phaseRecorder, filterPredicates);
             }
         });
+    }
+
+    /**
+     * Resolves the mojo execution filter predicates for this build.
+     * Uses {@code -Dmaven.lifecycle.filter} user property; returns an empty list if absent.
+     */
+    private List<FilterPredicate> resolveFilterPredicates(MavenSession session) throws LifecycleExecutionException {
+        String filterExpression = session.getUserProperties().getProperty(MojoExecutionFilter.PROPERTY_NAME);
+        try {
+            return MojoExecutionFilter.parse(filterExpression);
+        } catch (IllegalArgumentException e) {
+            throw new LifecycleExecutionException(
+                    "Invalid value for '" + MojoExecutionFilter.PROPERTY_NAME + "': " + e.getMessage(), e);
+        }
     }
 
     private void execute(
             MavenSession session,
             MojoExecution mojoExecution,
             DependencyContext dependencyContext,
-            PhaseRecorder phaseRecorder)
+            PhaseRecorder phaseRecorder,
+            List<FilterPredicate> filterPredicates)
             throws LifecycleExecutionException {
+        Optional<FilterPredicate> matchedFilter = MojoExecutionFilter.matches(mojoExecution, filterPredicates);
+        if (matchedFilter.isPresent()) {
+            LOGGER.info("Skipping {} (matched filter: {})", mojoExecution, matchedFilter.get());
+            return;
+        }
         execute(session, mojoExecution, dependencyContext);
         phaseRecorder.observeExecution(mojoExecution);
     }
@@ -226,18 +254,18 @@ public class MojoExecutor {
      * by concurrently running mojo executions. To prevent race conditions, an aggregating execution will block
      * all other executions until finished.
      * We also lock on a given project to forbid a forked lifecycle to be executed concurrently with the project.
-     * TODO: ideally, the builder should take care of the ordering in a smarter way
-     * TODO: and concurrency issues fixed with MNG-7157
      */
     protected class ProjectLock implements NoExceptionCloseable {
         final Lock acquiredAggregatorLock;
         final OwnerReentrantLock acquiredProjectLock;
 
         ProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
-            mojos.put(Thread.currentThread(), mojoDescriptor);
             boolean aggregator = mojoDescriptor.isAggregator();
             acquiredAggregatorLock = aggregator ? aggregatorLock.writeLock() : aggregatorLock.readLock();
-            acquiredProjectLock = getProjectLock(session);
+            SessionData data = session.getSession().getData();
+            Map<MavenProject, OwnerReentrantLock> locks = data.computeIfAbsent(PROJECT_LOCKS, ConcurrentHashMap::new);
+            MavenProject currentProject = session.getCurrentProject();
+            acquiredProjectLock = locks.computeIfAbsent(currentProject, p -> new OwnerReentrantLock());
             if (!acquiredAggregatorLock.tryLock()) {
                 Thread owner = aggregatorLock.getOwner();
                 MojoDescriptor ownerMojo = owner != null ? mojos.get(owner) : null;
@@ -254,8 +282,8 @@ public class MojoExecutor {
                 MojoDescriptor ownerMojo = owner != null ? mojos.get(owner) : null;
                 String str = ownerMojo != null ? " The " + ownerMojo.getId() : "A";
                 String msg = str + " mojo is already being executed "
-                        + "on the project " + session.getCurrentProject().getGroupId()
-                        + ":" + session.getCurrentProject().getArtifactId() + ". "
+                        + "on the project " + currentProject.getGroupId()
+                        + ":" + currentProject.getArtifactId() + ". "
                         + "This mojo execution will be blocked "
                         + "until the mojo is done.";
                 warn(msg);
@@ -268,31 +296,28 @@ public class MojoExecutor {
             // release the lock in the reverse order of the acquisition
             acquiredProjectLock.unlock();
             acquiredAggregatorLock.unlock();
-            mojos.remove(Thread.currentThread());
-        }
-
-        private OwnerReentrantLock getProjectLock(MavenSession session) {
-            SessionData data = session.getSession().getData();
-            Map<MavenProject, OwnerReentrantLock> locks = data.computeIfAbsent(PROJECT_LOCKS, ConcurrentHashMap::new);
-            return locks.computeIfAbsent(session.getCurrentProject(), p -> new OwnerReentrantLock());
         }
     }
 
-    static class OwnerReentrantLock extends ReentrantLock {
+    protected static class OwnerReentrantLock extends ReentrantLock {
+        public OwnerReentrantLock() {}
+
         @Override
         public Thread getOwner() {
             return super.getOwner();
         }
     }
 
-    static class OwnerReentrantReadWriteLock extends ReentrantReadWriteLock {
+    protected static class OwnerReentrantReadWriteLock extends ReentrantReadWriteLock {
+        public OwnerReentrantReadWriteLock() {}
+
         @Override
         public Thread getOwner() {
             return super.getOwner();
         }
     }
 
-    private static void warn(String msg) {
+    protected static void warn(String msg) {
         for (String s : MultilineMessageHelper.format(msg)) {
             LOGGER.warn(s);
         }
@@ -305,7 +330,9 @@ public class MojoExecutor {
         List<MavenProject> forkedProjects = executeForkedExecutions(mojoExecution, session);
 
         try (NoExceptionCloseable lock = getProjectLock(session, mojoDescriptor)) {
-            ensureDependenciesAreResolved(mojoDescriptor, session, dependencyContext);
+            if (!mojoDescriptor.isV4Api()) {
+                ensureDependenciesAreResolved(mojoDescriptor, session, dependencyContext);
+            }
 
             doExecute2(session, mojoExecution);
         } finally {
@@ -320,12 +347,25 @@ public class MojoExecutor {
         void close();
     }
 
-    protected NoExceptionCloseable getProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
+    public NoExceptionCloseable getProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
         if (useProjectLock(session)) {
-            return new ProjectLock(session, mojoDescriptor);
+            Thread currentThread = Thread.currentThread();
+            mojos.put(currentThread, mojoDescriptor);
+            NoExceptionCloseable lock = createProjectLock(session, mojoDescriptor);
+            return () -> {
+                try {
+                    lock.close();
+                } finally {
+                    mojos.remove(currentThread);
+                }
+            };
         } else {
-            return new NoLock();
+            return NO_LOCK;
         }
+    }
+
+    protected NoExceptionCloseable createProjectLock(MavenSession session, MojoDescriptor mojoDescriptor) {
+        return new ProjectLock(session, mojoDescriptor);
     }
 
     protected boolean useProjectLock(MavenSession session) {
@@ -398,6 +438,12 @@ public class MojoExecutor {
         }
     }
 
+    /**
+     * Returns the filter for the scopes a mojo declared it needs, or {@code null} if it declared none. A {@code null}
+     * filter is itself a meaningful value that {@link #ensureDependenciesAreResolved} writes to the shared
+     * {@link MavenProject}: it clears whatever filter an earlier mojo may have left there, so that a mojo with no
+     * declared scope sees no project dependencies, not another mojo's leftover ones (MNG-3297).
+     */
     private ArtifactFilter getArtifactFilter(MojoDescriptor mojoDescriptor) {
         String scopeToResolve = mojoDescriptor.getDependencyResolutionRequired();
         String scopeToCollect = mojoDescriptor.getDependencyCollectionRequired();

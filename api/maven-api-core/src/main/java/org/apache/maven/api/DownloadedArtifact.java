@@ -42,7 +42,7 @@ public interface DownloadedArtifact extends Artifact {
      *
      * @deprecated Use {@link #path()} instead.
      */
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     default Path getPath() {
         return path();
     }

@@ -1,0 +1,93 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.maven.api.spi;
+
+import java.nio.file.Path;
+import java.util.List;
+import java.util.Optional;
+
+import org.apache.maven.api.Artifact;
+import org.apache.maven.api.annotations.Consumer;
+import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.di.Named;
+import org.apache.maven.api.model.Model;
+
+/**
+ * SPI for IDE and tool integrators to provide workspace artifact resolution.
+ *
+ * <p>Implementations are discovered via DI and are automatically bridged into the
+ * resolver's workspace reader chain, replacing the need for the internal
+ * {@code @Named("ide")} resolver {@code WorkspaceReader} mechanism.
+ *
+ * <p>Implementations must be annotated with {@link Named} and can be registered either as
+ * <em>core extensions</em> (via {@code .mvn/extensions.xml}) or as <em>project-scoped
+ * extensions</em> (declared in a module's {@code pom.xml} {@code <extensions>} block).
+ * Core-extension readers are active from the very start of the build (before POM resolution),
+ * while project-scoped readers become active after the project graph has been built.
+ *
+ * <p>SPI workspace readers are intentionally <em>excluded</em> from plugin and extension
+ * resolution to avoid stale classloader issues: plugin realms are cached in a
+ * {@code @Singleton} cache and cannot be invalidated within a session, so resolving
+ * plugins from workspace sources would cause stale classes if workspace sources change.
+ *
+ * <p>Unlike the legacy {@code org.eclipse.aether.repository.WorkspaceReader}, this SPI
+ * uses Maven 4 API types only (no maven-resolver-api dependency required).
+ *
+ * @since 4.2.0
+ */
+@Experimental
+@Consumer
+@Named
+public interface WorkspaceReader extends SpiService {
+
+    /**
+     * Finds the path on disk for the given artifact in the workspace, if present.
+     *
+     * @param artifact the artifact to look up, never {@code null}
+     * @return the path to the artifact file, or empty if not found in workspace
+     */
+    Optional<Path> findArtifact(Artifact artifact);
+
+    /**
+     * Returns the list of available versions for the given artifact in the workspace.
+     *
+     * @param artifact the artifact to look up (version is ignored), never {@code null}
+     * @return list of available versions, may be empty
+     */
+    List<String> findVersions(Artifact artifact);
+
+    /**
+     * Returns the model (POM) for the given artifact from the workspace, if available.
+     *
+     * <p>This method allows IDE integrators to provide project models built directly from
+     * their own sources (e.g. Eclipse manifests, Gradle metadata) without writing an
+     * intermediate XML file for Maven to parse. The returned model bypasses
+     * {@code ModelProcessor} entirely and is used as-is by the resolver.
+     *
+     * <p>The default implementation returns empty, preserving backward compatibility for
+     * implementations that only provide artifact resolution.
+     *
+     * @param artifact the artifact whose model to look up, never {@code null}
+     * @return the model, or empty if not available in the workspace
+     * @since 4.2.0
+     */
+    default Optional<Model> findModel(Artifact artifact) {
+        return Optional.empty();
+    }
+}

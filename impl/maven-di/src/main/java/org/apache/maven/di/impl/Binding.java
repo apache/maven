@@ -20,10 +20,12 @@ package org.apache.maven.di.impl;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Member;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -142,6 +144,13 @@ public abstract class Binding<T> {
             }
 
             @Override
+            List<String> getDiagnosticSourceLines(Function<Member, List<String>> memberSource) {
+                List<String> lines = new ArrayList<>(Binding.this.getDiagnosticSourceLines(memberSource));
+                lines.addAll(bindingInitializer.getDiagnosticSourceLines(memberSource));
+                return List.copyOf(lines);
+            }
+
+            @Override
             Object getRegistrationIdentity() {
                 return registrationIdentity != null ? registrationIdentity : this;
             }
@@ -170,7 +179,12 @@ public abstract class Binding<T> {
         return this;
     }
 
-    private static String identityString(Object object) {
+    /** Returns unescaped source lines; the caller handles escaping and indentation. */
+    List<String> getDiagnosticSourceLines(Function<Member, List<String>> memberSource) {
+        return List.of(identityString(this));
+    }
+
+    static String identityString(Object object) {
         return object == null
                 ? "null"
                 : object.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(object));
@@ -204,6 +218,11 @@ public abstract class Binding<T> {
         }
 
         @Override
+        List<String> getDiagnosticSourceLines(Function<Member, List<String>> memberSource) {
+            return List.of("instance " + identityString(instance));
+        }
+
+        @Override
         public String toString() {
             return "BindingToInstance[" + getOriginalKey() + ", " + identityString(instance) + "]" + getDependencies();
         }
@@ -220,6 +239,11 @@ public abstract class Binding<T> {
         @Override
         public Supplier<T> compile(Function<Dependency<?>, Supplier<?>> compiler) {
             return supplier;
+        }
+
+        @Override
+        List<String> getDiagnosticSourceLines(Function<Member, List<String>> memberSource) {
+            return List.of("supplier " + identityString(supplier));
         }
 
         @Override
@@ -252,6 +276,11 @@ public abstract class Binding<T> {
                         Stream.of(this.args).map(compiler).map(Supplier::get).toArray();
                 return constructor.create(args);
             };
+        }
+
+        @Override
+        List<String> getDiagnosticSourceLines(Function<Member, List<String>> memberSource) {
+            return source != null ? memberSource.apply(source) : List.of("constructor " + identityString(constructor));
         }
 
         @Override

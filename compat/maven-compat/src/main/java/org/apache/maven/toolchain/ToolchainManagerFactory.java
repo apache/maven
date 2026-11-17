@@ -141,7 +141,7 @@ public class ToolchainManagerFactory {
                     try {
                         return getToolchainV4(v3Factory.createToolchain(new ToolchainModel(model)));
                     } catch (MisconfiguredToolchainException e) {
-                        throw new RuntimeException(e);
+                        throw new ToolchainFactoryException("Misconfigured toolchain: " + e.getMessage(), e);
                     }
                 }
 

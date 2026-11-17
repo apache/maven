@@ -35,10 +35,10 @@ package org.apache.maven.its.mng5530.mojoexecutionscope.extension;
 
 import javax.inject.Named;
 
+import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.apache.maven.classrealm.ClassRealmManagerDelegate;
 import org.apache.maven.classrealm.ClassRealmRequest;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
-import org.codehaus.plexus.classworlds.realm.ClassRealm;
 
 @Named
 public class TestClassRealmManagerDelegate implements ClassRealmManagerDelegate {

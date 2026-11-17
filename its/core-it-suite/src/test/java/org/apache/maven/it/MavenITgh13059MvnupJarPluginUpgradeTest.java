@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
  * that maven-jar-plugin 3.4.1 works correctly under Maven 4.
  *
  * @see <a href="https://github.com/apache/maven/pull/13059">GH-13059</a>
- * @since 4.1.0
+ * @since 4.2.0
  */
 class MavenITgh13059MvnupJarPluginUpgradeTest extends AbstractMavenIntegrationTestCase {
 

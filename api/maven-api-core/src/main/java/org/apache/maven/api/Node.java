@@ -87,7 +87,7 @@ public interface Node {
      *
      * @return an {@code Optional} containing the winning node, or empty if this node was not omitted or the
      *         information was not collected
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     Optional<Node> winner();
@@ -98,7 +98,7 @@ public interface Node {
      *
      * @return an {@code Optional} containing the declared version, or empty if the version was not managed or the
      *         information was not collected
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     Optional<String> premanagedVersion();
@@ -109,7 +109,7 @@ public interface Node {
      *
      * @return an {@code Optional} containing the declared scope, or empty if the scope was not managed or the
      *         information was not collected
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     Optional<String> premanagedScope();
@@ -120,7 +120,7 @@ public interface Node {
      *
      * @return an {@code Optional} containing the original scope, or empty if the scope was not changed or the
      *         information was not collected
-     * @since 4.1.0
+     * @since 4.2.0
      */
     @Nonnull
     Optional<String> originalScope();
@@ -130,7 +130,7 @@ public interface Node {
      * @deprecated Use {@link #artifact()} instead.
      */
     @Nullable
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     default Artifact getArtifact() {
         return artifact();
     }
@@ -140,7 +140,7 @@ public interface Node {
      * @deprecated Use {@link #dependency()} instead.
      */
     @Nullable
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     default Dependency getDependency() {
         return dependency();
     }
@@ -152,7 +152,7 @@ public interface Node {
      * @deprecated Use {@link #children()} instead.
      */
     @Nonnull
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     default List<Node> getChildren() {
         return children();
     }
@@ -162,7 +162,7 @@ public interface Node {
      * @deprecated Use {@link #remoteRepositories()} instead.
      */
     @Nonnull
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     default List<RemoteRepository> getRemoteRepositories() {
         return remoteRepositories();
     }
@@ -173,7 +173,7 @@ public interface Node {
      * @deprecated Use {@link #repository()} instead.
      */
     @Nonnull
-    @Deprecated(since = "4.1.0", forRemoval = true)
+    @Deprecated(since = "4.2.0", forRemoval = true)
     default Optional<RemoteRepository> getRepository() {
         return repository();
     }

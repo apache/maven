@@ -32,6 +32,8 @@ public class DefaultMavenExecutionResult implements MavenExecutionResult {
 
     private List<MavenProject> topologicallySortedProjects = Collections.emptyList();
 
+    private List<MavenProject> allProjects = Collections.emptyList();
+
     private DependencyResolutionResult dependencyResolutionResult;
 
     private final List<Throwable> exceptions = new CopyOnWriteArrayList<>();
@@ -64,6 +66,18 @@ public class DefaultMavenExecutionResult implements MavenExecutionResult {
         return null == topologicallySortedProjects
                 ? Collections.emptyList()
                 : Collections.unmodifiableList(topologicallySortedProjects);
+    }
+
+    @Override
+    public MavenExecutionResult setAllProjects(List<MavenProject> allProjects) {
+        this.allProjects = allProjects;
+
+        return this;
+    }
+
+    @Override
+    public List<MavenProject> getAllProjects() {
+        return null == allProjects ? Collections.emptyList() : Collections.unmodifiableList(allProjects);
     }
 
     @Override
