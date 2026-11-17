@@ -610,11 +610,7 @@ class V4MojoConfiguratorTest {
                 null,
                 Map.of(),
                 List.of(new XmlNodeImpl(
-                        "projectArtifact",
-                        null,
-                        Map.of("default-value", "${project.mainArtifact}"),
-                        List.of(),
-                        null)),
+                        "projectArtifact", null, Map.of("default-value", "${project.mainArtifact}"), List.of(), null)),
                 null);
 
         objectConfigurator.configure(mojo, config);
