@@ -1235,6 +1235,9 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         ModelBuildingRequest importRequest = null;
 
+        ModelCacheTag<DependencyManagement> importTag =
+                request.isLocationTracking() ? ModelCacheTag.IMPORT_WITH_LOCATIONS : ModelCacheTag.IMPORT;
+
         List<DependencyManagement> importMgmts = null;
 
         for (Iterator<Dependency> it = depMgmt.getDependencies().iterator(); it.hasNext(); ) {
@@ -1289,7 +1292,7 @@ public class DefaultModelBuilder implements ModelBuilder {
             }
 
             DependencyManagement importMgmt =
-                    getCache(request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT);
+                    getCache(request.getModelCache(), groupId, artifactId, version, importTag);
 
             if (importMgmt == null) {
                 if (workspaceResolver == null && modelResolver == null) {
@@ -1363,7 +1366,7 @@ public class DefaultModelBuilder implements ModelBuilder {
                     importMgmt = new DependencyManagement();
                 }
 
-                putCache(request.getModelCache(), groupId, artifactId, version, ModelCacheTag.IMPORT, importMgmt);
+                putCache(request.getModelCache(), groupId, artifactId, version, importTag, importMgmt);
             }
 
             if (importMgmts == null) {
