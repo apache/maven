@@ -111,6 +111,7 @@ under the License.
       <groupId>org.slf4j</groupId>
       <artifactId>jcl-over-slf4j</artifactId>
       <scope>runtime</scope>
+      <optional>true</optional>
     </dependency>
 
     <dependency>
