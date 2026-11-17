@@ -35,6 +35,10 @@ import java.util.List;
  *       Use quotes around arguments containing whitespace.</li>
  * </ul>
  *
+ * <p><strong>Migration note:</strong> If you previously used a backslash-space ({@code \\ }) to embed a
+ * space in an argument (e.g. {@code -Dfoo=hello\ world}), replace it with a quoted argument:
+ * {@code "-Dfoo=hello world"}. Unquoted backslashes are now always treated as literal characters.</p>
+ *
  * <p><strong>Note:</strong> {@code JvmConfigParser.java} is a self-contained single-file source launcher
  * invoked directly by shell scripts; it must not share classpath code with Maven. Keep this tokenization
  * algorithm in sync with its {@code parseArguments} method.</p>
