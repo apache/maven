@@ -109,5 +109,4 @@ public class PropertyProfileActivator implements ProfileActivator {
 
         return property != null;
     }
-
 }
