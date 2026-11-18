@@ -190,9 +190,12 @@ public class Configurator implements ConfigurationHandler {
         if (configuredRealms.containsKey(layerName)) {
             throw new IllegalArgumentException("Name '" + layerName + "' is already used by a realm");
         }
+        if (namedLayerPaths.containsKey(layerName)) {
+            throw new IllegalArgumentException("Layer '" + layerName + "' is already defined");
+        }
         curLayerName = layerName;
         curRealm = null;
-        namedLayerPaths.computeIfAbsent(layerName, k -> new ArrayList<>());
+        namedLayerPaths.put(layerName, new ArrayList<>());
     }
 
     @Override
@@ -373,6 +376,12 @@ public class Configurator implements ConfigurationHandler {
                 ClassRealm parentRealm = configuredRealms.get(parentName);
                 if (parentRealm != null) {
                     realm.setParentRealm(parentRealm);
+                } else {
+                    LOGGER.log(
+                            System.Logger.Level.WARNING,
+                            "classworlds: parent ''{0}'' not found (not a layer, not a realm) for realm ''{1}'' — no parent set",
+                            parentName,
+                            realmId);
                 }
             }
         }
