@@ -19,7 +19,7 @@
 package org.apache.maven.its.gh11378;
 
 import org.apache.maven.api.di.Inject;
-import org.apache.maven.api.plugin.Log;
+import org.apache.maven.api.logging.Logger;
 import org.apache.maven.api.plugin.annotations.Mojo;
 import org.apache.maven.api.plugin.annotations.Parameter;
 
@@ -27,7 +27,7 @@ import org.apache.maven.api.plugin.annotations.Parameter;
 public class TestMojo implements org.apache.maven.api.plugin.Mojo {
 
     @Inject
-    private Log log;
+    private Logger log;
 
     @Parameter
     private Artifact artifact;

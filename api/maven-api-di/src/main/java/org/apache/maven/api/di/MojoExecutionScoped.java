@@ -34,7 +34,7 @@ import static java.lang.annotation.RetentionPolicy.RUNTIME;
  *     <ul>
  *         <li>{@code org.apache.maven.api.MojoExecution}</li>
  *         <li>{@code org.apache.maven.api.Project}</li>
- *         <li>{@code org.apache.maven.api.plugin.Log}</li>
+ *         <li>{@code org.apache.maven.api.logging.Logger}</li>
  *     </ul>
  *
  * @since 4.0.0

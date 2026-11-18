@@ -39,7 +39,7 @@ import org.apache.maven.api.annotations.Nonnull;
  *    .log("Compiling {} source files", count);
  * }</pre>
  *
- * @since 4.2.0
+ * @since 4.0.0
  */
 @Experimental
 public interface LogEventBuilder {
