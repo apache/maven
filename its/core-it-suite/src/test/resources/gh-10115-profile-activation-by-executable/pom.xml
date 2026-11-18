@@ -20,12 +20,12 @@ under the License.
 <project xmlns="http://maven.apache.org/POM/4.1.0">
   <modelVersion>4.1.0</modelVersion>
 
-  <groupId>org.apache.maven.its.mng8768</groupId>
+  <groupId>org.apache.maven.its.gh10115</groupId>
   <artifactId>profile-activation-by-executable</artifactId>
   <version>0.1</version>
   <packaging>pom</packaging>
 
-  <name>Maven Integration Test :: MNG-8768</name>
+  <name>Maven Integration Test :: GH-10115</name>
   <description>Executable profile activation detects files on PATH without executing them.</description>
 
   <properties>
@@ -60,7 +60,7 @@ under the License.
     <profile>
       <id>executable</id>
       <activation>
-        <condition>executable('mng8768-profile-tool')</condition>
+        <condition>executable('gh10115-profile-tool')</condition>
       </activation>
       <properties>
         <executable.profile>active</executable.profile>

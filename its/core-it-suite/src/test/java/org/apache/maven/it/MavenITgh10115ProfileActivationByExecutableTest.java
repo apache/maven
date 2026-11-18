@@ -35,8 +35,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 /**
  * Verifies that executable() profile activation searches the forked Maven process's PATH without running the command.
  */
-class MavenITmng8768ProfileActivationByExecutableTest extends AbstractMavenIntegrationTestCase {
-    private static final String COMMAND = "mng8768-profile-tool";
+class MavenITgh10115ProfileActivationByExecutableTest extends AbstractMavenIntegrationTestCase {
+    private static final String COMMAND = "gh10115-profile-tool";
     private static final String BIN = "fake bin with spaces";
 
     @Test
@@ -88,7 +88,7 @@ class MavenITmng8768ProfileActivationByExecutableTest extends AbstractMavenInteg
     @EnabledOnOs(OS.WINDOWS)
     void testWindowsCustomPathExtIsNotUsed() throws Exception {
         final var project = createProject();
-        createFakeExecutable(project, COMMAND + ".MNG8768", true);
+        createFakeExecutable(project, COMMAND + ".GH10115", true);
         verifyActivation(project, false);
     }
 
@@ -96,12 +96,12 @@ class MavenITmng8768ProfileActivationByExecutableTest extends AbstractMavenInteg
     @EnabledOnOs(OS.WINDOWS)
     void testWindowsCustomPathExtIsUsed() throws Exception {
         final var project = createProject();
-        createFakeExecutable(project, COMMAND + ".MNG8768", true);
-        verifyActivation(project, true, ".EXE;.CMD;.MNG8768");
+        createFakeExecutable(project, COMMAND + ".GH10115", true);
+        verifyActivation(project, true, ".EXE;.CMD;.GH10115");
     }
 
     private Path createProject() throws Exception {
-        final var fixture = extractResources("mng-8768");
+        final var fixture = extractResources("gh-10115-profile-activation-by-executable");
         // Resource extraction returns a shared directory. Never reuse its PATH entries or build output between cases.
         final var project = Files.createTempDirectory(fixture, getName() + "-");
         Files.copy(fixture.resolve("pom.xml"), project.resolve("pom.xml"));
@@ -131,7 +131,11 @@ class MavenITmng8768ProfileActivationByExecutableTest extends AbstractMavenInteg
         final var support = Files.createDirectory(project.resolve("launcher-tools"));
         if (File.separatorChar == '\\') {
             // mvn.cmd uses findstr for compact option parsing. Do not expose all of System32 on PATH.
-            final var findstr = Path.of(System.getenv("SystemRoot"), "System32", "findstr.exe");
+            // SystemRoot is optional in the environment, so never dereference it without a fallback.
+            final var systemRoot = System.getenv("SystemRoot");
+            final var findstr = Path.of(
+                    systemRoot == null || systemRoot.isBlank() ? "C:\\Windows" : systemRoot, "System32", "findstr.exe");
+            assertTrue(Files.isRegularFile(findstr), "Missing Maven launcher prerequisite: " + findstr);
             Files.copy(findstr, support.resolve("findstr.exe"));
         } else {
             // The executor invokes bin/mvn, not java directly. Supply only its required external utilities.

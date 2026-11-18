@@ -40,8 +40,8 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
  * Optional shell locations can be supplied as JVM properties maven.it.gitBash and maven.it.cygwinBash.
  */
 @EnabledOnOs(OS.WINDOWS)
-class MavenITmng8768ExecutableWindowsShellTest extends AbstractMavenIntegrationTestCase {
-    private static final String COMMAND = "mng8768-profile-tool";
+class MavenITgh10115ExecutableWindowsShellTest extends AbstractMavenIntegrationTestCase {
+    private static final String COMMAND = "gh10115-profile-tool";
     private static final String DEFAULT_PATHEXT = ".COM;.EXE;.BAT;.CMD";
     // Written to a temp file to avoid Windows CreateProcess argument-quoting issues
     // when passing multi-line scripts with double quotes via ProcessBuilder + -c.
@@ -100,14 +100,14 @@ class MavenITmng8768ExecutableWindowsShellTest extends AbstractMavenIntegrationT
     private void verifyShell(final Path shell) throws Exception {
         verifyActivation(shell, ".cmd", DEFAULT_PATHEXT, true);
         verifyActivation(shell, ".exe", DEFAULT_PATHEXT, true);
-        verifyActivation(shell, ".mng8768", DEFAULT_PATHEXT + ";.MNG8768", true);
-        verifyActivation(shell, ".mng8768", DEFAULT_PATHEXT, false);
-        verifyActivation(shell, null, DEFAULT_PATHEXT + ";.MNG8768", false);
+        verifyActivation(shell, ".gh10115", DEFAULT_PATHEXT + ";.GH10115", true);
+        verifyActivation(shell, ".gh10115", DEFAULT_PATHEXT, false);
+        verifyActivation(shell, null, DEFAULT_PATHEXT + ";.GH10115", false);
     }
 
     private void verifyActivation(final Path shell, final String suffix, final String pathExt, final boolean active)
             throws Exception {
-        final var fixture = extractResources("mng-8768");
+        final var fixture = extractResources("gh-10115-profile-activation-by-executable");
         final var project = Files.createTempDirectory(fixture, getName() + "-").toAbsolutePath();
         // The unique command name avoids collisions with tools installed in the shell's own bin directories.
         Files.copy(fixture.resolve("pom.xml"), project.resolve("pom.xml"));
