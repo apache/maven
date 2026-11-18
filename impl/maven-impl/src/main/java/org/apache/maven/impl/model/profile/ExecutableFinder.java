@@ -61,7 +61,7 @@ class ExecutableFinder {
         final var windows = isWindows(context);
         final var extensions = windows ? windowsExtensions(context) : List.<String>of();
 
-        if (name.contains("/") || (windows && name.contains("\\"))) {
+        if (name.contains("/") || name.contains("\\")) {
             return matches(null, name, windows, extensions);
         }
 
@@ -70,6 +70,8 @@ class ExecutableFinder {
             return false;
         }
         final var separator = context.getSystemProperty("path.separator");
+        // path.separator may be overridden in tests to simulate a non-native host OS;
+        // at runtime it always matches File.pathSeparator.
         final var pathSeparator = separator == null || separator.isEmpty() ? File.pathSeparator : separator;
         final var delimiter =
                 ":".equals(pathSeparator) || ";".equals(pathSeparator) ? pathSeparator : Pattern.quote(pathSeparator);
