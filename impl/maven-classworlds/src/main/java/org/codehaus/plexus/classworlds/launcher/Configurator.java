@@ -391,39 +391,40 @@ public class Configurator implements ConfigurationHandler {
             xmlFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
             while (urls.hasMoreElements()) {
                 var url = urls.nextElement();
-                try (var is = url.openStream();
-                        XMLStreamReader reader = xmlFactory.createXMLStreamReader(is)) {
-                    boolean inPackages = false;
-                    while (reader.hasNext()) {
-                        int event = reader.next();
-                        if (event == XMLStreamConstants.START_ELEMENT) {
-                            if ("exportedPackages".equals(reader.getLocalName())) {
-                                inPackages = true;
-                            } else if (inPackages && "exportedPackage".equals(reader.getLocalName())) {
-                                String pkg = reader.getElementText().trim();
-                                if (!pkg.isEmpty()) {
-                                    try {
-                                        targetRealm.importFrom(sourceRealm.getId(), pkg);
-                                    } catch (NoSuchRealmException e) {
-                                        LOGGER.log(
-                                                System.Logger.Level.DEBUG,
-                                                "Cannot import ''{0}'' from realm ''{1}''",
-                                                pkg,
-                                                sourceRealm.getId());
+                try (var is = url.openStream()) {
+                    XMLStreamReader reader = xmlFactory.createXMLStreamReader(is);
+                    try {
+                        boolean inPackages = false;
+                        while (reader.hasNext()) {
+                            int event = reader.next();
+                            if (event == XMLStreamConstants.START_ELEMENT) {
+                                if ("exportedPackages".equals(reader.getLocalName())) {
+                                    inPackages = true;
+                                } else if (inPackages && "exportedPackage".equals(reader.getLocalName())) {
+                                    String pkg = reader.getElementText().trim();
+                                    if (!pkg.isEmpty()) {
+                                        try {
+                                            targetRealm.importFrom(sourceRealm.getId(), pkg);
+                                        } catch (NoSuchRealmException e) {
+                                            LOGGER.log(
+                                                    System.Logger.Level.DEBUG,
+                                                    "Cannot import ''{0}'' from realm ''{1}''",
+                                                    pkg,
+                                                    sourceRealm.getId());
+                                        }
                                     }
                                 }
-                            }
-                        } else if (event == XMLStreamConstants.END_ELEMENT) {
-                            if ("exportedPackages".equals(reader.getLocalName())) {
-                                inPackages = false;
+                            } else if (event == XMLStreamConstants.END_ELEMENT) {
+                                if ("exportedPackages".equals(reader.getLocalName())) {
+                                    inPackages = false;
+                                }
                             }
                         }
+                    } finally {
+                        reader.close();
                     }
                 }
             }
-        } catch (NoSuchRealmException e) {
-            // already logged at the import site above — not expected here
-            LOGGER.log(System.Logger.Level.DEBUG, "Realm not found during exported-import processing", e);
         } catch (Exception e) {
             LOGGER.log(
                     System.Logger.Level.WARNING,
