@@ -163,10 +163,8 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
                                         + "Fix the logged issues or remove flag --fail-on-severity (-fos)."));
             }
 
+            infoLine('-');
             logResult(event.getSession());
-
-            logStats(event.getSession());
-
             infoLine('-');
         }
     }
@@ -295,15 +293,36 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     }
 
     private void logResult(MavenSession session) {
-        infoLine('-');
-        MessageBuilder buffer = builder();
-
         boolean failure = session.getResult().hasExceptions();
+        String status = failure ? "BUILD FAILURE" : "BUILD SUCCESS";
+
+        Instant finish = MonotonicClock.now();
+        Duration time = Duration.between(session.getRequest().getStartInstant(), finish);
+        String wallClock = session.getRequest().getDegreeOfConcurrency() > 1 ? " (Wall Clock)" : "";
+        String totalTime = "Total time:  " + formatDuration(time) + wallClock;
+
+        ZonedDateTime rounded = finish.truncatedTo(ChronoUnit.SECONDS).atZone(ZoneId.systemDefault());
+        String finishedAt = "Finished at: " + formatTimestamp(rounded);
+
+        int leftWidth = Math.max(0, (lineLength - finishedAt.length()) / 2);
+        int middleWidth = Math.max(0, lineLength - leftWidth - finishedAt.length());
+
+        int statusPadding = Math.max(0, leftWidth - status.length());
+        int totalTimePadding = Math.max(0, middleWidth - totalTime.length());
+        int overflow = Math.max(0, totalTime.length() - middleWidth);
+        statusPadding = Math.max(0, statusPadding - overflow);
+
+        MessageBuilder buffer = builder();
         if (failure) {
-            buffer.failure("BUILD FAILURE");
+            buffer.failure(status);
         } else {
-            buffer.success("BUILD SUCCESS");
+            buffer.success(status);
         }
+        buffer.a(chars(' ', statusPadding));
+        buffer.a(totalTime);
+        buffer.a(chars(' ', totalTimePadding));
+        buffer.a(finishedAt);
+
         if (failure) {
             logger.error(buffer.toString());
         } else {
@@ -313,21 +332,6 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
 
     private MessageBuilder builder() {
         return messageBuilderFactory.builder();
-    }
-
-    private void logStats(MavenSession session) {
-        infoLine('-');
-
-        Instant finish = MonotonicClock.now();
-
-        Duration time = Duration.between(session.getRequest().getStartInstant(), finish);
-
-        String wallClock = session.getRequest().getDegreeOfConcurrency() > 1 ? " (Wall Clock)" : "";
-
-        logger.info("Total time:  {}{}", formatDuration(time), wallClock);
-
-        ZonedDateTime rounded = finish.truncatedTo(ChronoUnit.SECONDS).atZone(ZoneId.systemDefault());
-        logger.info("Finished at: {}", formatTimestamp(rounded));
     }
 
     @Override

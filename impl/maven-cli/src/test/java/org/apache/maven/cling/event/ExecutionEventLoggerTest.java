@@ -40,18 +40,21 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
 import org.mockito.InOrder;
 import org.mockito.Mockito;
 import org.mockito.MockitoSession;
 import org.slf4j.Logger;
 
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.ArgumentMatchers.eq;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.matches;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -361,10 +364,7 @@ class ExecutionEventLoggerTest {
         // verify
         InOrder inOrder = inOrder(logger);
         inOrder.verify(logger).info("------------------------------------------------------------------------");
-        inOrder.verify(logger).info("BUILD SUCCESS");
-        inOrder.verify(logger).info("------------------------------------------------------------------------");
-        inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
-        inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
+        verifyBuildResultLine(inOrder, false);
         inOrder.verify(logger).info("------------------------------------------------------------------------");
     }
 
@@ -407,10 +407,7 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("Maven Project artifact2 ............................ SUCCESS [  2.000 s]");
         inOrder.verify(logger).info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
-        inOrder.verify(logger).info("BUILD SUCCESS");
-        inOrder.verify(logger).info("------------------------------------------------------------------------");
-        inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
-        inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
+        verifyBuildResultLine(inOrder, false);
         inOrder.verify(logger).info("------------------------------------------------------------------------");
     }
 
@@ -452,10 +449,7 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
         inOrder.verify(logger).info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
-        inOrder.verify(logger).info("BUILD SUCCESS");
-        inOrder.verify(logger).info("------------------------------------------------------------------------");
-        inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
-        inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
+        verifyBuildResultLine(inOrder, false);
         inOrder.verify(logger).info("------------------------------------------------------------------------");
     }
 
@@ -498,10 +492,7 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
         inOrder.verify(logger).info("Maven Project artifact3 ............................ SUCCESS [  3.000 s]");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
-        inOrder.verify(logger).error("BUILD FAILURE");
-        inOrder.verify(logger).info("------------------------------------------------------------------------");
-        inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
-        inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
+        verifyBuildResultLine(inOrder, true);
         inOrder.verify(logger).info("------------------------------------------------------------------------");
     }
 
@@ -545,10 +536,7 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("Maven Project artifact1 ............................ SUCCESS [  1.000 s]");
         inOrder.verify(logger).error("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
-        inOrder.verify(logger).error("BUILD FAILURE");
-        inOrder.verify(logger).info("------------------------------------------------------------------------");
-        inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
-        inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
+        verifyBuildResultLine(inOrder, true);
         inOrder.verify(logger).info("------------------------------------------------------------------------");
     }
 
@@ -603,10 +591,7 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).error("Maven Project artifact2 ............................ FAILURE [  2.000 s]");
         inOrder.verify(logger).error("Maven Project artifact5 ............................ FAILURE [  5.000 s]");
         inOrder.verify(logger).info("------------------------------------------------------------------------");
-        inOrder.verify(logger).error("BUILD FAILURE");
-        inOrder.verify(logger).info("------------------------------------------------------------------------");
-        inOrder.verify(logger).info(eq("Total time:  {}{}"), anyString(), anyString());
-        inOrder.verify(logger).info(eq("Finished at: {}"), anyString());
+        verifyBuildResultLine(inOrder, true);
         inOrder.verify(logger).info("------------------------------------------------------------------------");
     }
 
@@ -629,6 +614,75 @@ class ExecutionEventLoggerTest {
         inOrder.verify(logger).info("Skipping Maven Project artifact2");
         inOrder.verify(logger)
                 .info("{} was not built because a module it depends on failed to build.", "Maven Project artifact2");
+    }
+
+    @Test
+    void testFinalResultLineLayout() {
+        MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
+        executionRequest.setDegreeOfConcurrency(4);
+        ExecutionEvent event = sessionEndedEvent(new DefaultMavenExecutionResult(), executionRequest);
+
+        ExecutionEventLogger loggerWithWidth = new ExecutionEventLogger(messageBuilderFactory, logger, 130);
+        loggerWithWidth.sessionEnded(event);
+
+        String result = captureSuccessResultLine();
+        int totalIndex = result.indexOf("Total time:  ");
+        int finishedIndex = result.indexOf("Finished at: ");
+        int finishedLength = result.length() - finishedIndex;
+        int lineLength = 130 - 8;
+        assertTrue(totalIndex >= 0);
+        assertTrue(result.contains(" (Wall Clock)"));
+        assertEquals((lineLength - finishedLength) / 2, totalIndex);
+        assertEquals(lineLength - finishedLength, finishedIndex);
+    }
+
+    @Test
+    void testFinalResultLineOnNarrowTerminal() {
+        MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
+        ExecutionEvent event = sessionEndedEvent(new DefaultMavenExecutionResult(), executionRequest);
+
+        ExecutionEventLogger loggerWithWidth = new ExecutionEventLogger(messageBuilderFactory, logger, 30);
+        loggerWithWidth.sessionEnded(event);
+
+        String result = captureSuccessResultLine();
+        assertTrue(result.startsWith("BUILD SUCCESSTotal time:"));
+        assertTrue(result.contains("Finished at: "));
+    }
+
+    private static ExecutionEvent sessionEndedEvent(
+            MavenExecutionResult executionResult, MavenExecutionRequest executionRequest) {
+        MavenSession mavenSession = mock(MavenSession.class);
+        when(mavenSession.getResult()).thenReturn(executionResult);
+        when(mavenSession.getRequest()).thenReturn(executionRequest);
+        when(mavenSession.getProjects()).thenReturn(Collections.emptyList());
+
+        ExecutionEvent event = mock(ExecutionEvent.class);
+        when(event.getSession()).thenReturn(mavenSession);
+        return event;
+    }
+
+    private String captureSuccessResultLine() {
+        ArgumentCaptor<String> lines = ArgumentCaptor.forClass(String.class);
+        verify(logger, times(3)).info(lines.capture());
+        return lines.getAllValues().stream()
+                .filter(line -> line.startsWith("BUILD SUCCESS"))
+                .findFirst()
+                .orElseThrow();
+    }
+
+    private void verifyBuildResultLine(InOrder inOrder, boolean failure) {
+        String status = failure ? "BUILD FAILURE" : "BUILD SUCCESS";
+        if (failure) {
+            inOrder.verify(logger)
+                    .error(argThat((String line) -> line.startsWith(status)
+                            && line.contains("Total time:  ")
+                            && line.contains("Finished at: ")));
+        } else {
+            inOrder.verify(logger)
+                    .info(argThat((String line) -> line.startsWith(status)
+                            && line.contains("Total time:  ")
+                            && line.contains("Finished at: ")));
+        }
     }
 
     @Test
