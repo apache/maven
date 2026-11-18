@@ -39,17 +39,7 @@ under the License.
       <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>lib/api</outputDirectory>
       <includes>
-        <include>org.apache.maven:maven-api-annotations</include>
-        <include>org.apache.maven:maven-api-cli</include>
-        <include>org.apache.maven:maven-api-core</include>
-        <include>org.apache.maven:maven-api-di</include>
-        <include>org.apache.maven:maven-api-metadata</include>
-        <include>org.apache.maven:maven-api-model</include>
-        <include>org.apache.maven:maven-api-plugin</include>
-        <include>org.apache.maven:maven-api-settings</include>
-        <include>org.apache.maven:maven-api-spi</include>
-        <include>org.apache.maven:maven-api-toolchain</include>
-        <include>org.apache.maven:maven-api-xml</include>
+        <include>org.apache.maven:maven-api-*</include>
       </includes>
     </dependencySet>
 
@@ -59,17 +49,7 @@ under the License.
       <excludes>
         <exclude>org.apache.maven:maven-classworlds</exclude>
         <exclude>org.jline:*</exclude>
-        <exclude>org.apache.maven:maven-api-annotations</exclude>
-        <exclude>org.apache.maven:maven-api-cli</exclude>
-        <exclude>org.apache.maven:maven-api-core</exclude>
-        <exclude>org.apache.maven:maven-api-di</exclude>
-        <exclude>org.apache.maven:maven-api-metadata</exclude>
-        <exclude>org.apache.maven:maven-api-model</exclude>
-        <exclude>org.apache.maven:maven-api-plugin</exclude>
-        <exclude>org.apache.maven:maven-api-settings</exclude>
-        <exclude>org.apache.maven:maven-api-spi</exclude>
-        <exclude>org.apache.maven:maven-api-toolchain</exclude>
-        <exclude>org.apache.maven:maven-api-xml</exclude>
+        <exclude>org.apache.maven:maven-api-*</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>

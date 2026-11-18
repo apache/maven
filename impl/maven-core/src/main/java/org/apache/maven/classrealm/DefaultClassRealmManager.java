@@ -37,7 +37,6 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -55,6 +54,7 @@ import org.apache.maven.model.Plugin;
 import org.codehaus.plexus.classworlds.ClassWorld;
 import org.codehaus.plexus.classworlds.realm.ClassRealm;
 import org.codehaus.plexus.classworlds.realm.DuplicateRealmException;
+import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 import org.eclipse.aether.artifact.Artifact;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,10 +91,6 @@ public class DefaultClassRealmManager implements ClassRealmManager {
     // this is a live injected collection
     private final List<ClassRealmManagerDelegate> delegates;
 
-    private final ClassRealm mavenApiRealm;
-
-    private final ClassRealm maven4ApiRealm;
-
     /**
      * Patterns of artifacts provided by maven core and exported via maven api realm. These artifacts are filtered from
      * plugin and build extensions realms to avoid presence of duplicate and possibly conflicting classes on classpath.
@@ -110,26 +106,28 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         this.containerRealm = coreRealm.getRealm();
         this.delegates = delegates;
 
-        Map<String, ClassLoader> foreignImports = exports.getExportedPackages();
-
-        this.mavenApiRealm = createRealm(
-                API_REALMID,
-                RealmType.Core,
-                null /* parent */,
-                null /* parentImports */,
-                foreignImports,
-                null /* artifacts */);
-
-        Map<String, ClassLoader> apiV4Imports = new HashMap<>();
-        apiV4Imports.put("org.apache.maven.api", containerRealm);
-        apiV4Imports.put("org.slf4j", containerRealm);
-        this.maven4ApiRealm = createRealm(API_V4_REALMID, RealmType.Core, null, null, apiV4Imports, null);
-
         this.providedArtifacts = exports.getExportedArtifacts();
 
         this.providedArtifactsV4 = providedArtifacts.stream()
                 .filter(ga -> ga.startsWith("org.apache.maven:maven-api-"))
                 .collect(Collectors.toSet());
+
+        // When realms are defined in m2.conf they already exist. For embedders and
+        // tests that skip m2.conf, create them here as a fallback.
+        ensureApiRealms(exports);
+    }
+
+    private void ensureApiRealms(CoreExports exports) {
+        if (world.getClassRealm(API_REALMID) == null) {
+            Map<String, ClassLoader> foreignImports = exports.getExportedPackages();
+            createRealm(API_REALMID, RealmType.Core, null, null, foreignImports, null);
+        }
+        if (world.getClassRealm(API_V4_REALMID) == null) {
+            Map<String, ClassLoader> apiV4Imports = new java.util.HashMap<>();
+            apiV4Imports.put("org.apache.maven.api", containerRealm);
+            apiV4Imports.put("org.slf4j", containerRealm);
+            createRealm(API_V4_REALMID, RealmType.Core, null, null, apiV4Imports, null);
+        }
     }
 
     private ClassRealm newRealm(String id) {
@@ -154,12 +152,23 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
     @Override
     public ClassRealm getMavenApiRealm() {
-        return mavenApiRealm;
+        return lookupRealm(API_REALMID);
     }
 
     @Override
     public ClassRealm getMaven4ApiRealm() {
-        return maven4ApiRealm;
+        return lookupRealm(API_V4_REALMID);
+    }
+
+    private ClassRealm lookupRealm(String id) {
+        try {
+            return world.getRealm(id);
+        } catch (NoSuchRealmException e) {
+            throw new IllegalStateException(
+                    "Required realm '" + id + "' not found. "
+                            + "Ensure it is defined in the classworlds configuration (m2.conf).",
+                    e);
+        }
     }
 
     /**
@@ -184,7 +193,8 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         List<ClassRealmConstituent> constituents = new ArrayList<>(artifacts == null ? 0 : artifacts.size());
 
         if (artifacts != null && !artifacts.isEmpty()) {
-            boolean v4api = foreignImports != null && foreignImports.containsValue(maven4ApiRealm);
+            ClassLoader v4Loader = getMaven4ApiRealm().getClassLoader();
+            boolean v4api = foreignImports != null && foreignImports.containsValue(v4Loader);
             for (Artifact artifact : artifacts) {
                 if (!isProvidedArtifact(artifact, v4api) && artifact.getFile() != null) {
                     constituents.add(new ArtifactClassRealmConstituent(artifact));
@@ -235,7 +245,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
     public ClassRealm createProjectRealm(Model model, List<Artifact> artifacts) {
         Objects.requireNonNull(model, "model cannot be null");
 
-        ClassLoader parent = getMavenApiRealm();
+        ClassLoader parent = getMavenApiRealm().getClassLoader();
 
         return createRealm(getKey(model), RealmType.Project, parent, null, null, artifacts);
     }
@@ -248,7 +258,8 @@ public class DefaultClassRealmManager implements ClassRealmManager {
     public ClassRealm createExtensionRealm(Plugin plugin, List<Artifact> artifacts) {
         Objects.requireNonNull(plugin, "plugin cannot be null");
 
-        Map<String, ClassLoader> foreignImports = Collections.singletonMap("", getMavenApiRealm());
+        Map<String, ClassLoader> foreignImports =
+                Collections.singletonMap("", getMavenApiRealm().getClassLoader());
 
         return createRealm(
                 getKey(plugin, true), RealmType.Extension, PARENT_CLASSLOADER, null, foreignImports, artifacts);
@@ -318,20 +329,18 @@ public class DefaultClassRealmManager implements ClassRealmManager {
                                 + " Ensure the plugin JAR is compiled with a module-info.java.");
             }
 
-            // Parent layer: use the runtime layer from ClassWorld if available (has Maven API
-            // modules), otherwise fall back to the boot layer.
-            // Note: infrastructure modules (e.g. JLine) live in a sibling infraLayer that is NOT
-            // registered as the runtime layer, so they are not reachable as JPMS parents here.
-            // Flat hierarchy — all plugin layers are siblings under this parent.
-            if (!(world instanceof org.codehaus.plexus.classworlds.ClassWorld)) {
+            // Parent layer: use the "api" layer from ClassWorld so plugins can
+            // require maven-api-* modules. Infrastructure modules (e.g. JLine) live
+            // in a sibling "infra" layer that is NOT a JPMS parent here.
+            if (!(world instanceof ClassWorld)) {
                 throw new ModuleLayerCreationException("Cannot create modular plugin realm for " + plugin.getId()
                         + ": the ClassWorld implementation does not support ModuleLayer"
-                        + " (expected org.codehaus.plexus.classworlds.ClassWorld, got "
+                        + " (expected ClassWorld, got "
                         + world.getClass().getName() + ")");
             }
-            org.codehaus.plexus.classworlds.ClassWorld implWorld = (org.codehaus.plexus.classworlds.ClassWorld) world;
-            ModuleLayer parentLayer =
-                    implWorld.getModuleLayer() != null ? implWorld.getModuleLayer() : ModuleLayer.boot();
+            ClassWorld implWorld = (ClassWorld) world;
+            ModuleLayer apiLayer = implWorld.getModuleLayer("api");
+            ModuleLayer parentLayer = apiLayer != null ? apiLayer : ModuleLayer.boot();
 
             // resolveAndBind: resolves modules and binds service providers,
             // enabling ServiceLoader discovery within the plugin layer
@@ -344,14 +353,13 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             ModuleLayer pluginLayer = controller.layer();
 
             // Store per-realm, not per-world
-            if (!(classRealm instanceof org.codehaus.plexus.classworlds.realm.ClassRealm)) {
+            if (!(classRealm instanceof ClassRealm)) {
                 throw new ModuleLayerCreationException("Cannot attach ModuleLayer to plugin realm for " + plugin.getId()
                         + ": the ClassRealm implementation does not support ModuleLayer"
-                        + " (expected org.codehaus.plexus.classworlds.realm.ClassRealm, got "
+                        + " (expected ClassRealm, got "
                         + classRealm.getClass().getName() + ")");
             }
-            org.codehaus.plexus.classworlds.realm.ClassRealm implRealm =
-                    (org.codehaus.plexus.classworlds.realm.ClassRealm) classRealm;
+            var implRealm = (ClassRealm) classRealm;
             implRealm.setModuleLayer(pluginLayer, controller);
 
             // Also populate the realm's classpath with the same artifacts
@@ -507,9 +515,9 @@ public class DefaultClassRealmManager implements ClassRealmManager {
      * </p>
      * <p>
      * <strong>Scope:</strong> This mechanism can only target modules visible to
-     * {@link org.codehaus.plexus.classworlds.ClassWorld#findModule} — that is, modules in the
+     * {@link ClassWorld#findModule} — that is, modules in the
      * boot layer ({@link ModuleLayer#boot()}) and modules in the Maven API layer (registered via
-     * {@link org.codehaus.plexus.classworlds.ClassWorld#setModuleLayer}).  Infrastructure modules
+     * {@link ClassWorld#setModuleLayer}).  Infrastructure modules
      * such as JLine live in a separate {@code infraLayer} that is <em>not</em> registered as the
      * runtime layer and are therefore <strong>not reachable</strong> via this mechanism.
      * </p>
@@ -574,7 +582,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         }
     }
 
-    private void applyModuleAccessDirective(org.codehaus.plexus.classworlds.realm.ClassRealm realm, String line) {
+    private void applyModuleAccessDirective(ClassRealm realm, String line) {
         if (line.startsWith("add-exports ")) {
             applyExportOrOpen(realm, line.substring("add-exports ".length()).trim(), false);
         } else if (line.startsWith("add-opens ")) {
@@ -587,7 +595,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
         }
     }
 
-    private void applyExportOrOpen(org.codehaus.plexus.classworlds.realm.ClassRealm realm, String spec, boolean open) {
+    private void applyExportOrOpen(ClassRealm realm, String spec, boolean open) {
         int slash = spec.indexOf('/');
         if (slash <= 0) {
             logger.warn("Invalid module-access directive (missing '/'): {}", spec);

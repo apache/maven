@@ -127,7 +127,7 @@ class ConfiguratorTest extends AbstractClassWorldsTestCase {
             fail("throw ConfigurationException");
         } catch (ConfigurationException e) {
             // expected and correct
-            assertTrue(e.getMessage().startsWith("Invalid realm"));
+            assertTrue(e.getMessage().startsWith("Invalid section"));
         }
     }
 
