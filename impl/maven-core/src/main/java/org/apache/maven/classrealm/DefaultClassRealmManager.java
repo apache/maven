@@ -37,6 +37,7 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -125,7 +126,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             createRealm(API_REALMID, RealmType.Core, null, null, foreignImports, null);
         }
         if (world.getClassRealm(API_V4_REALMID) == null) {
-            Map<String, ClassLoader> apiV4Imports = new java.util.HashMap<>();
+            Map<String, ClassLoader> apiV4Imports = new HashMap<>();
             apiV4Imports.put("org.apache.maven.api", containerRealm);
             apiV4Imports.put("org.slf4j", containerRealm);
             createRealm(API_V4_REALMID, RealmType.Core, null, null, apiV4Imports, null);

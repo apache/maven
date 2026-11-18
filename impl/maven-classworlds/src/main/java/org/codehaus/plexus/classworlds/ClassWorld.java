@@ -250,27 +250,66 @@ public class ClassWorld implements Closeable {
      */
     public synchronized void addReads(String sourceModuleName, Module target) {
         Module source = findModule(sourceModuleName);
-        if (source == null || isBootLayerModule(source)) {
+        if (source == null) {
+            LOGGER.log(
+                    System.Logger.Level.WARNING,
+                    "module-access: module ''{0}'' not found, ignoring add-reads",
+                    sourceModuleName);
+            return;
+        }
+        if (isBootLayerModule(source)) {
+            LOGGER.log(
+                    System.Logger.Level.WARNING,
+                    "module-access: module ''{0}'' is in the boot layer and cannot be modified at runtime;"
+                            + " use --add-reads {0}=ALL-UNNAMED on the JVM command line instead",
+                    sourceModuleName);
             return;
         }
         ModuleLayer.Controller controller = findControllerFor(source);
-        if (controller != null) {
-            controller.addReads(source, target);
+        if (controller == null) {
+            LOGGER.log(
+                    System.Logger.Level.WARNING,
+                    "module-access: no ModuleLayer controller available, cannot add-reads {0}",
+                    sourceModuleName);
+            return;
         }
+        controller.addReads(source, target);
     }
 
     private void applyModuleAccess(String moduleName, String packageName, Module target, boolean open) {
         Module source = findModule(moduleName);
-        if (source == null || isBootLayerModule(source)) {
+        if (source == null) {
+            LOGGER.log(
+                    System.Logger.Level.WARNING,
+                    "module-access: module ''{0}'' not found, ignoring {1}",
+                    moduleName,
+                    open ? "add-opens" : "add-exports");
+            return;
+        }
+        if (isBootLayerModule(source)) {
+            LOGGER.log(
+                    System.Logger.Level.WARNING,
+                    "module-access: module ''{0}'' is in the boot layer and cannot be modified at runtime;"
+                            + " use --{1} {0}/{2}=ALL-UNNAMED on the JVM command line instead",
+                    moduleName,
+                    open ? "add-opens" : "add-exports",
+                    packageName);
             return;
         }
         ModuleLayer.Controller controller = findControllerFor(source);
-        if (controller != null) {
-            if (open) {
-                controller.addOpens(source, packageName, target);
-            } else {
-                controller.addExports(source, packageName, target);
-            }
+        if (controller == null) {
+            LOGGER.log(
+                    System.Logger.Level.WARNING,
+                    "module-access: no ModuleLayer controller available, cannot {0} {1}/{2}",
+                    open ? "add-opens" : "add-exports",
+                    moduleName,
+                    packageName);
+            return;
+        }
+        if (open) {
+            controller.addOpens(source, packageName, target);
+        } else {
+            controller.addExports(source, packageName, target);
         }
     }
 

@@ -222,6 +222,11 @@ public class Configurator implements ConfigurationHandler {
     public void addModuleFile(File file) {
         if (curLayerName != null) {
             namedLayerPaths.get(curLayerName).add(file.toPath());
+        } else {
+            LOGGER.log(
+                    System.Logger.Level.WARNING,
+                    "addModuleFile called outside a [layer] section — ''{0}'' is ignored",
+                    file.getName());
         }
     }
 
@@ -382,11 +387,12 @@ public class Configurator implements ConfigurationHandler {
         try {
             var urls = sourceRealm.getResources("META-INF/maven/extension.xml");
             XMLInputFactory xmlFactory = XMLInputFactory.newInstance();
+            xmlFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
             xmlFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
             while (urls.hasMoreElements()) {
                 var url = urls.nextElement();
-                try (var is = url.openStream()) {
-                    XMLStreamReader reader = xmlFactory.createXMLStreamReader(is);
+                try (var is = url.openStream();
+                        XMLStreamReader reader = xmlFactory.createXMLStreamReader(is)) {
                     boolean inPackages = false;
                     while (reader.hasNext()) {
                         int event = reader.next();
@@ -415,19 +421,29 @@ public class Configurator implements ConfigurationHandler {
                     }
                 }
             }
+        } catch (NoSuchRealmException e) {
+            // already logged at the import site above — not expected here
+            LOGGER.log(System.Logger.Level.DEBUG, "Realm not found during exported-import processing", e);
         } catch (Exception e) {
             LOGGER.log(
-                    System.Logger.Level.DEBUG,
+                    System.Logger.Level.WARNING,
                     "Failed to read extension descriptors from realm " + sourceRealm.getId(),
                     e);
         }
     }
 
     private void addLayerPathsToClasspath(List<Path> paths) {
-        if (curRealm != null) {
+        // Use plexus.core as the fallback realm for failed layer JARs (the standard
+        // Maven core loader). Do NOT use curRealm: after all realm sections are parsed,
+        // curRealm is the last realm declared (e.g. maven.api.v4), which is wrong.
+        ClassRealm targetRealm = configuredRealms.get("plexus.core");
+        if (targetRealm == null) {
+            targetRealm = curRealm; // best-effort if plexus.core is not yet configured
+        }
+        if (targetRealm != null) {
             for (Path path : paths) {
                 try {
-                    curRealm.addURL(path.toUri().toURL());
+                    targetRealm.addURL(path.toUri().toURL());
                 } catch (MalformedURLException e) {
                     // ignore
                 }
