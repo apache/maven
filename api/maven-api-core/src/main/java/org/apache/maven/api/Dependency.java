@@ -36,6 +36,16 @@ import org.apache.maven.api.annotations.Nonnull;
 @Immutable
 public interface Dependency extends Artifact {
     /**
+     * {@return the type}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Type type() {
+        return getType();
+    }
+
+    /**
      * {@return the type of the dependency}
      * A dependency can be a <abbr>JAR</abbr> file,
      * a modular-<abbr>JAR</abbr> if it is intended to be placed on the module path,
@@ -44,7 +54,18 @@ public interface Dependency extends Artifact {
      * @see DependencyCoordinates#getType()
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Type getType();
+
+    /**
+     * {@return the scope}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default DependencyScope scope() {
+        return getScope();
+    }
 
     /**
      * {@return the time at which the dependency will be used}
@@ -53,6 +74,7 @@ public interface Dependency extends Artifact {
      * @see DependencyCoordinates#getScope()
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     DependencyScope getScope();
 
     /**

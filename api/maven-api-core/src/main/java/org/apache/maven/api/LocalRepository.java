@@ -46,6 +46,16 @@ import org.apache.maven.api.annotations.Nonnull;
 @Immutable
 public interface LocalRepository extends Repository {
 
+    /**
+     * {@return the path}
+     *
+     * @since 4.0.0
+     */
     @Nonnull
+    default Path path() {
+        return getPath();
+    }
+
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Path getPath();
 }

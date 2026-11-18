@@ -46,15 +46,18 @@ public interface Artifact {
      */
     @Nonnull
     default String key() {
-        String c = getClassifier();
-        return getGroupId()
-                + ':'
-                + getArtifactId()
-                + ':'
-                + getExtension()
-                + (c.isEmpty() ? "" : ":" + c)
-                + ':'
-                + getVersion();
+        String c = classifier();
+        return groupId() + ':' + artifactId() + ':' + extension() + (c.isEmpty() ? "" : ":" + c) + ':' + version();
+    }
+
+    /**
+     * {@return the groupId}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String groupId() {
+        return getGroupId();
     }
 
     /**
@@ -63,7 +66,18 @@ public interface Artifact {
      * @see ArtifactCoordinates#getGroupId()
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getGroupId();
+
+    /**
+     * {@return the artifactId}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String artifactId() {
+        return getArtifactId();
+    }
 
     /**
      * {@return the identifier of the artifact}
@@ -71,7 +85,18 @@ public interface Artifact {
      * @see ArtifactCoordinates#getArtifactId()
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getArtifactId();
+
+    /**
+     * {@return the version}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Version version() {
+        return getVersion();
+    }
 
     /**
      * {@return the version of the artifact}
@@ -83,7 +108,18 @@ public interface Artifact {
      * @see ArtifactCoordinates#getVersionConstraint()
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Version getVersion();
+
+    /**
+     * {@return the baseVersion}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Version baseVersion() {
+        return getBaseVersion();
+    }
 
     /**
      * {@return the version or meta-version of the artifact}
@@ -92,7 +128,18 @@ public interface Artifact {
      * while they are replaced by, for example, the actual timestamp in the {@linkplain #getVersion() version}.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Version getBaseVersion();
+
+    /**
+     * {@return the classifier}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String classifier() {
+        return getClassifier();
+    }
 
     /**
      * Returns the classifier of the artifact.
@@ -101,7 +148,18 @@ public interface Artifact {
      * @see ArtifactCoordinates#getClassifier()
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getClassifier();
+
+    /**
+     * {@return the extension}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String extension() {
+        return getExtension();
+    }
 
     /**
      * Returns the file extension of the artifact.
@@ -111,6 +169,7 @@ public interface Artifact {
      * @see ArtifactCoordinates#getExtension()
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getExtension();
 
     /**

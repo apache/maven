@@ -33,16 +33,48 @@ import org.apache.maven.api.annotations.Nonnull;
 @Immutable
 public interface ArtifactCoordinates {
     /**
+     * {@return the groupId}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String groupId() {
+        return getGroupId();
+    }
+
+    /**
      * {@return the group identifier of the artifact}
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getGroupId();
+
+    /**
+     * {@return the artifactId}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String artifactId() {
+        return getArtifactId();
+    }
 
     /**
      * {@return the identifier of the artifact}
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getArtifactId();
+
+    /**
+     * {@return the classifier}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String classifier() {
+        return getClassifier();
+    }
 
     /**
      * Returns the classifier of the artifact.
@@ -50,14 +82,36 @@ public interface ArtifactCoordinates {
      * @return the classifier or an empty string if none, never {@code null}
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getClassifier();
+
+    /**
+     * {@return the versionConstraint}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default VersionConstraint versionConstraint() {
+        return getVersionConstraint();
+    }
 
     /**
      * {@return the specific version, range of versions or meta-version of the artifact}
      * A meta-version is a version suffixed with the {@code SNAPSHOT} keyword.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     VersionConstraint getVersionConstraint();
+
+    /**
+     * {@return the extension}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String extension() {
+        return getExtension();
+    }
 
     /**
      * Returns the file extension of the artifact.
@@ -66,6 +120,7 @@ public interface ArtifactCoordinates {
      * @return the file extension or an empty string if none, never {@code null}
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getExtension();
 
     /**
@@ -78,14 +133,14 @@ public interface ArtifactCoordinates {
      */
     @Nonnull
     default String getId() {
-        String c = getClassifier();
-        return getGroupId()
+        String c = classifier();
+        return groupId()
                 + ':'
-                + getArtifactId()
+                + artifactId()
                 + ':'
-                + getExtension()
+                + extension()
                 + (c.isEmpty() ? "" : ":" + c)
                 + ':'
-                + getVersionConstraint();
+                + versionConstraint();
     }
 }

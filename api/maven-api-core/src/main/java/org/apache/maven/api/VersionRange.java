@@ -45,15 +45,37 @@ public interface VersionRange {
     boolean contains(@Nonnull Version version);
 
     /**
+     * {@return the upperBoundary}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Boundary upperBoundary() {
+        return getUpperBoundary();
+    }
+
+    /**
      * Returns the upper boundary of this range, or {@code null} if none.
      */
     @Nullable
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Boundary getUpperBoundary();
+
+    /**
+     * {@return the lowerBoundary}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Boundary lowerBoundary() {
+        return getLowerBoundary();
+    }
 
     /**
      * Returns the lower boundary of this range, or {@code null} if none.
      */
     @Nullable
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Boundary getLowerBoundary();
 
     /**
@@ -69,12 +91,38 @@ public interface VersionRange {
     interface Boundary {
         /**
          * The bounding version.
+         *
+         * @return the bounding version
+         * @since 4.0.0
          */
+        default Version version() {
+            return getVersion();
+        }
+
+        /**
+         * The bounding version.
+         *
+         * @deprecated Use {@link #version()} instead.
+         */
+        @Deprecated(since = "4.0.0", forRemoval = true)
         Version getVersion();
 
         /**
          * Returns {@code true} if version is included of the range.
+         *
+         * @return {@code true} if inclusive
+         * @since 4.0.0
          */
+        default boolean inclusive() {
+            return isInclusive();
+        }
+
+        /**
+         * Returns {@code true} if version is included of the range.
+         *
+         * @deprecated Use {@link #inclusive()} instead.
+         */
+        @Deprecated(since = "4.0.0", forRemoval = true)
         boolean isInclusive();
     }
 }

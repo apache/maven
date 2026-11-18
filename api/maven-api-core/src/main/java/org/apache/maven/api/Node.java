@@ -41,16 +41,48 @@ import org.apache.maven.api.annotations.Provider;
 public interface Node {
 
     /**
+     * {@return the artifact}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Artifact artifact() {
+        return getArtifact();
+    }
+
+    /**
      * @return artifact for this node
      */
     @Nullable
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Artifact getArtifact();
+
+    /**
+     * {@return the dependency}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Dependency dependency() {
+        return getDependency();
+    }
 
     /**
      * @return dependency for this node
      */
     @Nullable
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Dependency getDependency();
+
+    /**
+     * {@return the children}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default List<Node> children() {
+        return getChildren();
+    }
 
     /**
      * Gets the child nodes of this node.
@@ -58,13 +90,34 @@ public interface Node {
      * @return the child nodes of this node, never {@code null}
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     List<Node> getChildren();
+
+    /**
+     * {@return the remoteRepositories}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default List<RemoteRepository> remoteRepositories() {
+        return getRemoteRepositories();
+    }
 
     /**
      * @return repositories of this node
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     List<RemoteRepository> getRemoteRepositories();
+
+    /**
+     * {@return the repository}
+     *
+     * @since 4.0.0
+     */
+    default Optional<RemoteRepository> repository() {
+        return getRepository();
+    }
 
     /**
      * Returns the remote repository from which this artifact was downloaded, if known.
@@ -74,6 +127,7 @@ public interface Node {
      *         does not track artifact origins such as {@code SimpleLocalRepositoryManager})
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Optional<RemoteRepository> getRepository();
 
     /**

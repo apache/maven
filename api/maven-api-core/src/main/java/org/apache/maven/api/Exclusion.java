@@ -19,6 +19,7 @@
 package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
@@ -30,8 +31,30 @@ import org.apache.maven.api.annotations.Nullable;
 @Experimental
 public interface Exclusion {
     @Nullable
+    /**
+     * {@return the groupId}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String groupId() {
+        return getGroupId();
+    }
+
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getGroupId();
 
     @Nullable
+    /**
+     * {@return the artifactId}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String artifactId() {
+        return getArtifactId();
+    }
+
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getArtifactId();
 }
