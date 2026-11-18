@@ -69,7 +69,7 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     }
 
     public XmlNodeImpl(XmlNode from, String name) {
-        this(name, from.getValue(), from.getAttributes(), from.getChildren(), from.getInputLocation());
+        this(name, from.value(), from.attributes(), from.children(), from.inputLocation());
     }
 
     public XmlNodeImpl(
@@ -94,53 +94,26 @@ public class XmlNodeImpl implements Serializable, XmlNode {
         this.location = location;
     }
 
-    @SuppressWarnings("removal")
-    @Override
-    public XmlNode merge(XmlNode source, Boolean childMergeOverride) {
-        return XmlService.merge(this, source, childMergeOverride);
-    }
-
     // ----------------------------------------------------------------------
     // Name handling
     // ----------------------------------------------------------------------
 
     @Override
     @Nonnull
-    @Deprecated(since = "4.0.0", forRemoval = true)
-    public String getPrefix() {
+    public String prefix() {
         return prefix;
     }
 
     @Override
     @Nonnull
-    public String prefix() {
-        return getPrefix();
-    }
-
-    @Override
-    @Nonnull
-    @Deprecated(since = "4.0.0", forRemoval = true)
-    public String getNamespaceUri() {
+    public String namespaceUri() {
         return namespaceUri;
     }
 
     @Override
     @Nonnull
-    public String namespaceUri() {
-        return getNamespaceUri();
-    }
-
-    @Override
-    @Nonnull
-    @Deprecated(since = "4.0.0", forRemoval = true)
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    @Nonnull
     public String name() {
-        return getName();
+        return name;
     }
 
     // ----------------------------------------------------------------------
@@ -148,14 +121,8 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     // ----------------------------------------------------------------------
 
     @Override
-    @Deprecated(since = "4.0.0", forRemoval = true)
-    public String getValue() {
-        return value;
-    }
-
-    @Override
     public String value() {
-        return getValue();
+        return value;
     }
 
     // ----------------------------------------------------------------------
@@ -164,40 +131,26 @@ public class XmlNodeImpl implements Serializable, XmlNode {
 
     @Override
     @Nonnull
-    @Deprecated(since = "4.0.0", forRemoval = true)
-    public Map<String, String> getAttributes() {
+    public Map<String, String> attributes() {
         return attributes;
     }
 
     @Override
-    @Nonnull
-    public Map<String, String> attributes() {
-        return getAttributes();
-    }
-
-    @Override
-    @Deprecated(since = "4.0.0", forRemoval = true)
-    public String getAttribute(@Nonnull String name) {
-        return attributes.get(name);
-    }
-
-    @Override
     public String attribute(@Nonnull String name) {
-        return getAttribute(name);
+        return attributes.get(name);
     }
 
     // ----------------------------------------------------------------------
     // Child handling
     // ----------------------------------------------------------------------
 
-    @Deprecated(since = "4.0.0", forRemoval = true)
     @Override
-    public XmlNode getChild(String name) {
+    public XmlNode child(String name) {
         if (name != null) {
             ListIterator<XmlNode> it = children.listIterator(children.size());
             while (it.hasPrevious()) {
                 XmlNode child = it.previous();
-                if (name.equals(child.getName())) {
+                if (name.equals(child.name())) {
                     return child;
                 }
             }
@@ -206,75 +159,18 @@ public class XmlNodeImpl implements Serializable, XmlNode {
     }
 
     @Override
-    public XmlNode child(String name) {
-        return getChild(name);
-    }
-
-    @Override
-    @Nonnull
-    @Deprecated(since = "4.0.0", forRemoval = true)
-    public List<XmlNode> getChildren() {
-        return children;
-    }
-
-    @Override
     @Nonnull
     public List<XmlNode> children() {
-        return getChildren();
-    }
-
-    @Deprecated(since = "4.0.0", forRemoval = true)
-    public int getChildCount() {
-        return children.size();
+        return children;
     }
 
     // ----------------------------------------------------------------------
     // Input location handling
     // ----------------------------------------------------------------------
 
-    /**
-     * @since 3.2.0
-     * @return input location
-     */
-    @Deprecated(since = "4.0.0", forRemoval = true)
-    @Override
-    public Object getInputLocation() {
-        return location;
-    }
-
     @Override
     public Object inputLocation() {
-        return getInputLocation();
-    }
-
-    // ----------------------------------------------------------------------
-    // Helpers
-    // ----------------------------------------------------------------------
-
-    /**
-     * @deprecated use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead
-     */
-    @Deprecated(since = "4.0.0", forRemoval = true)
-    @SuppressWarnings("checkstyle:MethodLength")
-    public static XmlNode merge(XmlNode dominant, XmlNode recessive, Boolean childMergeOverride) {
-        return XmlService.merge(dominant, recessive, childMergeOverride);
-    }
-
-    /**
-     * Merge two DOMs, with one having dominance in the case of collision. Merge mechanisms (vs. override for nodes, or
-     * vs. append for children) is determined by attributes of the dominant root node.
-     *
-     * @see XmlService#CHILDREN_COMBINATION_MODE_ATTRIBUTE
-     * @see XmlService#SELF_COMBINATION_MODE_ATTRIBUTE
-     * @param dominant The dominant DOM into which the recessive value/attributes/children will be merged
-     * @param recessive The recessive DOM, which will be merged into the dominant DOM
-     * @return merged DOM
-     *
-     * @deprecated use {@link XmlService#merge(XmlNode, XmlNode, Boolean)} instead
-     */
-    @Deprecated(since = "4.0.0", forRemoval = true)
-    public static XmlNode merge(XmlNode dominant, XmlNode recessive) {
-        return XmlService.merge(dominant, recessive);
+        return location;
     }
 
     // ----------------------------------------------------------------------

@@ -360,7 +360,7 @@ public final class SettingsUtilsV4 {
             org.apache.maven.api.model.InputSource source = location.getSource();
             Map<Object, org.apache.maven.api.settings.InputLocation> locs = location.getLocations().entrySet().stream()
                     .collect(Collectors.toMap(Map.Entry::getKey, e -> toLocation(e.getValue())));
-            return new org.apache.maven.api.settings.InputLocation(
+            return org.apache.maven.api.settings.InputLocation.of(
                     location.getLineNumber(),
                     location.getColumnNumber(),
                     source != null ? new org.apache.maven.api.settings.InputSource(source.getLocation()) : null,

@@ -43,57 +43,22 @@ public final class InputLocation implements Serializable, InputLocationTracker {
     private final InputSource source;
     private final Map<Object, InputLocation> locations;
 
-    /**
-     * Creates an InputLocation with only a source, no line/column information.
-     * The line and column numbers will be set to -1 (unknown).
-     *
-     * @param source the input source where this location originates from
-     * @deprecated since 4.0.0-rc-6, use {@link #of(InputSource)} instead
-     */
-    @Deprecated
-    public InputLocation(InputSource source) {
+    private InputLocation(InputSource source) {
         this.lineNumber = -1;
         this.columnNumber = -1;
         this.source = source;
         this.locations = Collections.singletonMap(0, this);
     }
 
-    /**
-     * Creates an InputLocation with line and column numbers but no source.
-     *
-     * @param lineNumber the line number in the source file (1-based)
-     * @param columnNumber the column number in the source file (1-based)
-     * @deprecated since 4.0.0-rc-6, use {@link #of(int, int)} instead
-     */
-    @Deprecated
-    public InputLocation(int lineNumber, int columnNumber) {
+    private InputLocation(int lineNumber, int columnNumber) {
         this(lineNumber, columnNumber, null, null);
     }
 
-    /**
-     * Creates an InputLocation with line number, column number, and source.
-     *
-     * @param lineNumber the line number in the source file (1-based)
-     * @param columnNumber the column number in the source file (1-based)
-     * @param source the input source where this location originates from
-     * @deprecated since 4.0.0-rc-6, use {@link #of(int, int, InputSource)} instead
-     */
-    @Deprecated
-    public InputLocation(int lineNumber, int columnNumber, InputSource source) {
+    private InputLocation(int lineNumber, int columnNumber, InputSource source) {
         this(lineNumber, columnNumber, source, null);
     }
 
-    /**
-     * Creates an InputLocation with line number, column number, source, and a self-location key.
-     *
-     * @param lineNumber the line number in the source file (1-based)
-     * @param columnNumber the column number in the source file (1-based)
-     * @param source the input source where this location originates from
-     * @param selfLocationKey the key to map this location to itself in the locations map
-     * @deprecated since 4.0.0-rc-6, use {@link #of(int, int, InputSource, Object)} instead
-     */
-    @Deprecated
-    public InputLocation(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
+    private InputLocation(int lineNumber, int columnNumber, InputSource source, Object selfLocationKey) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
@@ -101,17 +66,7 @@ public final class InputLocation implements Serializable, InputLocationTracker {
                 selfLocationKey != null ? Collections.singletonMap(selfLocationKey, this) : Collections.emptyMap();
     }
 
-    /**
-     * Creates an InputLocation with line number, column number, source, and a complete locations map.
-     *
-     * @param lineNumber the line number in the source file (1-based)
-     * @param columnNumber the column number in the source file (1-based)
-     * @param source the input source where this location originates from
-     * @param locations a map of keys to InputLocation instances for nested elements
-     * @deprecated since 4.0.0-rc-6, use {@link #of(int, int, InputSource, Map)} instead
-     */
-    @Deprecated
-    public InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
+    private InputLocation(int lineNumber, int columnNumber, InputSource source, Map<Object, InputLocation> locations) {
         this.lineNumber = lineNumber;
         this.columnNumber = columnNumber;
         this.source = source;
