@@ -45,6 +45,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import java.util.stream.Collectors;
 
+import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.artifact.ArtifactUtils;
 import org.apache.maven.classrealm.ClassRealmRequest.RealmType;
 import org.apache.maven.extension.internal.CoreExports;
@@ -84,6 +85,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Nonnull
     private final ClassWorld world;
 
     private final ClassRealm containerRealm;
@@ -332,14 +334,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             // Parent layer: use the "api" layer from ClassWorld so plugins can
             // require maven-api-* modules. Infrastructure modules (e.g. JLine) live
             // in a sibling "infra" layer that is NOT a JPMS parent here.
-            if (!(world instanceof ClassWorld)) {
-                throw new ModuleLayerCreationException("Cannot create modular plugin realm for " + plugin.getId()
-                        + ": the ClassWorld implementation does not support ModuleLayer"
-                        + " (expected ClassWorld, got "
-                        + world.getClass().getName() + ")");
-            }
-            ClassWorld implWorld = (ClassWorld) world;
-            ModuleLayer apiLayer = implWorld.getModuleLayer("api");
+            ModuleLayer apiLayer = world.getModuleLayer("api");
             ModuleLayer parentLayer = apiLayer != null ? apiLayer : ModuleLayer.boot();
 
             // resolveAndBind: resolves modules and binds service providers,
@@ -353,26 +348,17 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             ModuleLayer pluginLayer = controller.layer();
 
             // Store per-realm, not per-world
-            if (!(classRealm instanceof ClassRealm)) {
-                throw new ModuleLayerCreationException("Cannot attach ModuleLayer to plugin realm for " + plugin.getId()
-                        + ": the ClassRealm implementation does not support ModuleLayer"
-                        + " (expected ClassRealm, got "
-                        + classRealm.getClass().getName() + ")");
-            }
-            var implRealm = (ClassRealm) classRealm;
-            implRealm.setModuleLayer(pluginLayer, controller);
+            classRealm.setModuleLayer(pluginLayer, controller);
 
             // Also populate the realm's classpath with the same artifacts
             // so that ClassRealm.getURLs() returns meaningful results
             // and resource loading works through the realm
             populateRealm(
                     classRealm,
-                    artifacts == null
-                            ? List.of()
-                            : artifacts.stream()
-                                    .filter(a -> a.getFile() != null && !isProvidedArtifact(a, true))
-                                    .map(ArtifactClassRealmConstituent::new)
-                                    .collect(Collectors.toList()));
+                    artifacts.stream()
+                            .filter(a -> a.getFile() != null && !isProvidedArtifact(a, true))
+                            .map(ArtifactClassRealmConstituent::new)
+                            .collect(Collectors.toList()));
 
             // Apply META-INF/maven/module-access descriptors for access to
             // boot-layer modules (e.g. java.base internals)

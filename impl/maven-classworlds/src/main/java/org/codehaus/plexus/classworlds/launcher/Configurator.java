@@ -162,12 +162,17 @@ public class Configurator implements ConfigurationHandler {
 
     /**
      * Associate parent realms with their children based on realm name hierarchy.
+     * Realms that have an explicit {@code parent layer} directive are skipped —
+     * their parent classloader was already set by {@link #applyRealmParentLayers()}.
      */
     // TODO return this to protected when the legacy wrappers can be removed.
     public void associateRealms() {
         List<String> sortRealmNames = new ArrayList<>(configuredRealms.keySet());
         sortRealmNames.sort(String::compareTo);
         for (String realmName : sortRealmNames) {
+            if (realmParentLayers.containsKey(realmName)) {
+                continue;
+            }
             int j = realmName.lastIndexOf('.');
             if (j > 0) {
                 String parentRealmName = realmName.substring(0, j);
