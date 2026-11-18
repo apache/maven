@@ -24,7 +24,7 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.Project;
 import org.apache.maven.api.di.Inject;
-import org.apache.maven.api.logging.Logger;
+import org.apache.maven.api.plugin.Log;
 import org.apache.maven.api.plugin.annotations.After;
 import org.apache.maven.api.plugin.annotations.Mojo;
 
@@ -45,7 +45,7 @@ import org.apache.maven.api.plugin.annotations.Mojo;
 public class TouchMojo implements org.apache.maven.api.plugin.Mojo {
 
     @Inject
-    private Logger log;
+    private Log log;
 
     @Inject
     private Project project;

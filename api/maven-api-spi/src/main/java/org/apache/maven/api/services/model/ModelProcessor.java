@@ -20,12 +20,15 @@ package org.apache.maven.api.services.model;
 
 import java.io.IOException;
 import java.nio.file.Path;
+import java.util.Map;
 
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.model.Model;
+import org.apache.maven.api.services.Source;
 import org.apache.maven.api.services.xml.XmlReaderException;
 import org.apache.maven.api.services.xml.XmlReaderRequest;
+import org.apache.maven.api.spi.ModelParserException;
 
 /**
  * Locates and reads POM files from the filesystem.
@@ -42,6 +45,33 @@ public interface ModelProcessor {
     Path locateExistingPom(@Nonnull Path project);
 
     /**
+     * Reads the model from the specified source.
+     *
+     * <p>The default implementation bridges to {@link #read(XmlReaderRequest)} for backward
+     * compatibility with existing implementations. Implementors are encouraged to override
+     * this method directly in a future release.
+     *
+     * @param source  the source to read the model from, must not be {@code null}
+     * @param options optional reading options, may be {@code null}
+     * @return the deserialized model, never {@code null}
+     * @throws ModelParserException if the model could not be deserialized
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Model read(@Nonnull Source source, @Nullable Map<String, ?> options) throws ModelParserException {
+        try {
+            XmlReaderRequest request = XmlReaderRequest.builder()
+                    .path(source.getPath())
+                    .inputStream(source.getPath() == null ? source.openStream() : null)
+                    .strict(true)
+                    .build();
+            return read(request);
+        } catch (XmlReaderException | IOException e) {
+            throw new ModelParserException(e.getMessage(), e);
+        }
+    }
+
+    /**
      * Reads the model from the specified byte stream. The stream will be automatically closed before the method
      * returns.
      *
@@ -49,6 +79,8 @@ public interface ModelProcessor {
      * @return The deserialized model, never {@code null}.
      * @throws IOException If the model could not be deserialized.
      * @throws XmlReaderException If the input format could not be parsed.
+     * @deprecated Use {@link #read(Source, Map)} instead.
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Model read(XmlReaderRequest request) throws IOException, XmlReaderException;
 }

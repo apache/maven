@@ -19,7 +19,7 @@
 package org.apache.maven.its.mng8572.extension;
 
 import org.apache.maven.api.di.Inject;
-import org.apache.maven.api.logging.Logger;
+import org.apache.maven.api.plugin.Log;
 import org.apache.maven.api.plugin.Mojo;
 import org.apache.maven.api.plugin.annotations.Parameter;
 
@@ -33,7 +33,7 @@ import org.apache.maven.api.plugin.annotations.Parameter;
 public class NoOpMojo implements Mojo {
 
     @Inject
-    private Logger log;
+    private Log log;
 
     @Parameter(defaultValue = "${project.name}", readonly = true)
     private String projectName;

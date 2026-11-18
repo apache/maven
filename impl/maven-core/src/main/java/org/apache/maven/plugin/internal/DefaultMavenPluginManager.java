@@ -67,6 +67,7 @@ import org.apache.maven.di.Key;
 import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
+import org.apache.maven.internal.impl.DefaultLog;
 import org.apache.maven.internal.impl.DefaultLogger;
 import org.apache.maven.internal.impl.DefaultMojoExecution;
 import org.apache.maven.internal.impl.InternalMavenSession;
@@ -574,6 +575,11 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             injector.bindInstance(Project.class, project);
             injector.bindInstance(org.apache.maven.api.MojoExecution.class, execution);
             injector.bindInstance(org.apache.maven.api.logging.Logger.class, log);
+            //noinspection deprecation
+            injector.bindInstance(
+                    org.apache.maven.api.plugin.Log.class,
+                    new DefaultLog(LoggerFactory.getLogger(
+                            mojoExecution.getMojoDescriptor().getImplementation())));
 
             Map<Class<? extends Service>, Supplier<? extends Service>> services = sessionV4.getAllServices();
             services.forEach((itf, svc) -> injector.bindSupplier((Class<Service>) itf, (Supplier<Service>) svc));
