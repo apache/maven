@@ -56,6 +56,9 @@ public interface LocalRepository extends Repository {
         return getPath();
     }
 
+    /**
+     * @deprecated Use {@link #path()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     Path getPath();
 }

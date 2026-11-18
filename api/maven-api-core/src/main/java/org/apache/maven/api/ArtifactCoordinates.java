@@ -44,6 +44,7 @@ public interface ArtifactCoordinates {
 
     /**
      * {@return the group identifier of the artifact}
+     * @deprecated Use {@link #groupId()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -61,6 +62,7 @@ public interface ArtifactCoordinates {
 
     /**
      * {@return the identifier of the artifact}
+     * @deprecated Use {@link #artifactId()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -80,6 +82,7 @@ public interface ArtifactCoordinates {
      * Returns the classifier of the artifact.
      *
      * @return the classifier or an empty string if none, never {@code null}
+     * @deprecated Use {@link #classifier()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -98,6 +101,7 @@ public interface ArtifactCoordinates {
     /**
      * {@return the specific version, range of versions or meta-version of the artifact}
      * A meta-version is a version suffixed with the {@code SNAPSHOT} keyword.
+     * @deprecated Use {@link #versionConstraint()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -118,6 +122,7 @@ public interface ArtifactCoordinates {
      * The dot separator is <em>not</em> included in the returned string.
      *
      * @return the file extension or an empty string if none, never {@code null}
+     * @deprecated Use {@link #extension()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)

@@ -52,6 +52,7 @@ public interface Dependency extends Artifact {
      * a <abbr>JAR</abbr> containing test classes, <i>etc.</i>
      *
      * @see DependencyCoordinates#getType()
+     * @deprecated Use {@link #type()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -72,6 +73,7 @@ public interface Dependency extends Artifact {
      * It may be, for example, at compile time only, at run time or at test time.
      *
      * @see DependencyCoordinates#getScope()
+     * @deprecated Use {@link #scope()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)

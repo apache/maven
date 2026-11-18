@@ -29,7 +29,7 @@
  *   ({@code info(...)}, {@code warn(...)}, etc.).</dd>
  *
  *   <dt>{@link org.apache.maven.api.logging.LogEventBuilder}</dt>
- *   <dd>Fluent builder for a single log event, obtained from {@code Logger.atLevel()}.
+ *   <dd>Fluent builder for a single log event, obtained from {@code Logger.at(LogLevel)}.
  *   When the target level is disabled, returns a no-op singleton (zero allocations).</dd>
  *
  *   <dt>{@link org.apache.maven.api.logging.LogLevel}</dt>

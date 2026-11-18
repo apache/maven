@@ -72,6 +72,7 @@ public interface Repository {
      * Gets the identifier of this repository.
      *
      * @return the (case-sensitive) identifier, never {@code null}
+     * @deprecated Use {@link #id()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -91,6 +92,7 @@ public interface Repository {
      * Gets the type of the repository, for example "default".
      *
      * @return the (case-sensitive) type of the repository, never {@code null}
+     * @deprecated Use {@link #type()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)

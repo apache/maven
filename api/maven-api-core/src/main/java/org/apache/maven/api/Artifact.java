@@ -64,6 +64,7 @@ public interface Artifact {
      * {@return the group identifier of the artifact}
      *
      * @see ArtifactCoordinates#getGroupId()
+     * @deprecated Use {@link #groupId()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -83,6 +84,7 @@ public interface Artifact {
      * {@return the identifier of the artifact}
      *
      * @see ArtifactCoordinates#getArtifactId()
+     * @deprecated Use {@link #artifactId()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -106,6 +108,7 @@ public interface Artifact {
      * those keywords are replaced by, for example, the actual timestamp.
      *
      * @see ArtifactCoordinates#getVersionConstraint()
+     * @deprecated Use {@link #version()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -126,6 +129,7 @@ public interface Artifact {
      * A meta-version is a version suffixed with the {@code SNAPSHOT} keyword.
      * Meta-versions are represented in a base version by their symbols (e.g., {@code SNAPSHOT}),
      * while they are replaced by, for example, the actual timestamp in the {@linkplain #getVersion() version}.
+     * @deprecated Use {@link #baseVersion()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -146,6 +150,7 @@ public interface Artifact {
      *
      * @return the classifier or an empty string if none, never {@code null}
      * @see ArtifactCoordinates#getClassifier()
+     * @deprecated Use {@link #classifier()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -167,6 +172,7 @@ public interface Artifact {
      *
      * @return the file extension or an empty string if none, never {@code null}
      * @see ArtifactCoordinates#getExtension()
+     * @deprecated Use {@link #extension()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)

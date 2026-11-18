@@ -41,6 +41,9 @@ public interface Exclusion {
         return getGroupId();
     }
 
+    /**
+     * @deprecated Use {@link #groupId()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String getGroupId();
 
@@ -55,6 +58,9 @@ public interface Exclusion {
         return getArtifactId();
     }
 
+    /**
+     * @deprecated Use {@link #artifactId()} instead.
+     */
     @Deprecated(since = "4.0.0", forRemoval = true)
     String getArtifactId();
 }

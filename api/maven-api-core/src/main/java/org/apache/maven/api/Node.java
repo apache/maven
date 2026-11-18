@@ -52,6 +52,7 @@ public interface Node {
 
     /**
      * @return artifact for this node
+     * @deprecated Use {@link #artifact()} instead.
      */
     @Nullable
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -69,6 +70,7 @@ public interface Node {
 
     /**
      * @return dependency for this node
+     * @deprecated Use {@link #dependency()} instead.
      */
     @Nullable
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -88,6 +90,7 @@ public interface Node {
      * Gets the child nodes of this node.
      *
      * @return the child nodes of this node, never {@code null}
+     * @deprecated Use {@link #children()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -105,6 +108,7 @@ public interface Node {
 
     /**
      * @return repositories of this node
+     * @deprecated Use {@link #remoteRepositories()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -125,6 +129,7 @@ public interface Node {
      * @return an {@code Optional} containing the repository, or empty if not available
      *         (e.g. local artifact, root node, or when the local repository manager
      *         does not track artifact origins such as {@code SimpleLocalRepositoryManager})
+     * @deprecated Use {@link #repository()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)

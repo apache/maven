@@ -56,6 +56,7 @@ public interface VersionRange {
 
     /**
      * Returns the upper boundary of this range, or {@code null} if none.
+     * @deprecated Use {@link #upperBoundary()} instead.
      */
     @Nullable
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -73,6 +74,7 @@ public interface VersionRange {
 
     /**
      * Returns the lower boundary of this range, or {@code null} if none.
+     * @deprecated Use {@link #lowerBoundary()} instead.
      */
     @Nullable
     @Deprecated(since = "4.0.0", forRemoval = true)

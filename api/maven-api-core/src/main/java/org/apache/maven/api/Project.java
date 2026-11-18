@@ -62,6 +62,7 @@ public interface Project {
 
     /**
      * {@return the project groupId}.
+     * @deprecated Use {@link #groupId()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -79,6 +80,7 @@ public interface Project {
 
     /**
      * {@return the project artifactId}.
+     * @deprecated Use {@link #artifactId()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -96,6 +98,7 @@ public interface Project {
 
     /**
      * {@return the project version}.
+     * @deprecated Use {@link #version()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -119,6 +122,7 @@ public interface Project {
      * {@link #getArtifacts()} to gain access to POM or build artifact.
      *
      * @see #getArtifacts()
+     * @deprecated Use {@link #packaging()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -149,6 +153,7 @@ public interface Project {
      * artifact, even if the existence of backing POM file is NOT a requirement (i.e. for some transient projects).
      *
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     * @deprecated Use {@link #pomArtifact()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -171,6 +176,7 @@ public interface Project {
      *
      * @see #getPackaging()
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     * @deprecated Use {@link #mainArtifact()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -201,6 +207,7 @@ public interface Project {
      * @see #getPomArtifact()
      * @see #getMainArtifact()
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     * @deprecated Use {@link #artifacts()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -218,6 +225,7 @@ public interface Project {
 
     /**
      * {@return the project model}.
+     * @deprecated Use {@link #model()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -237,6 +245,7 @@ public interface Project {
      * Shorthand method.
      *
      * @return the build element of the project model
+     * @deprecated Use {@link #build()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -267,6 +276,7 @@ public interface Project {
      *
      * @return the path of the pom
      * @see #getBasedir()
+     * @deprecated Use {@link #pomPath()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -288,6 +298,7 @@ public interface Project {
      * the directory containing the POM file.
      *
      * @return the path of the directory containing the project
+     * @deprecated Use {@link #basedir()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -424,6 +435,7 @@ public interface Project {
 
     /**
      * {@return the project direct dependencies (directly specified or inherited)}.
+     * @deprecated Use {@link #dependencies()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -441,6 +453,7 @@ public interface Project {
 
     /**
      * {@return the project managed dependencies (directly specified or inherited)}.
+     * @deprecated Use {@link #managedDependencies()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -494,6 +507,7 @@ public interface Project {
      * @return the root directory of the project
      * @throws IllegalStateException if the root directory could not be found
      * @see Session#getRootDirectory()
+     * @deprecated Use {@link #rootDirectory()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -517,6 +531,7 @@ public interface Project {
      *
      * @return an optional containing the parent project
      * @see Model#getParent()
+     * @deprecated Use {@link #parent()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -541,6 +556,7 @@ public interface Project {
      * @return a non-null, possibly empty list of profiles defined in this project
      * @see Profile
      * @see #getEffectiveProfiles()
+     * @deprecated Use {@link #declaredProfiles()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -566,6 +582,7 @@ public interface Project {
      * @return a non-null, possibly empty list of all profiles from this project and its parents
      * @see Profile
      * @see #getDeclaredProfiles()
+     * @deprecated Use {@link #effectiveProfiles()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -598,6 +615,7 @@ public interface Project {
      * @return a non-null, possibly empty list of active profiles for this project
      * @see Profile
      * @see #getEffectiveActiveProfiles()
+     * @deprecated Use {@link #declaredActiveProfiles()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)

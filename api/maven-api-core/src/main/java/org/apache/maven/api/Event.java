@@ -47,6 +47,7 @@ public interface Event {
      * Gets the type of the event.
      *
      * @return the type of the event, never {@code null}
+     * @deprecated Use {@link #type()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -66,6 +67,7 @@ public interface Event {
      * Gets the session from which this event originates.
      *
      * @return the current session, never {@code null}
+     * @deprecated Use {@link #session()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -84,6 +86,7 @@ public interface Event {
      * Gets the current project (if any).
      *
      * @return the current project or {@code empty()} if not applicable
+     * @deprecated Use {@link #project()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -102,6 +105,7 @@ public interface Event {
      * Gets the current mojo execution (if any).
      *
      * @return the current mojo execution or {@code empty()} if not applicable
+     * @deprecated Use {@link #mojoExecution()} instead.
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
@@ -120,6 +124,7 @@ public interface Event {
      * Gets the exception that caused the event (if any).
      *
      * @return the exception or {@code empty()} if none
+     * @deprecated Use {@link #exception()} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     Optional<Exception> getException();

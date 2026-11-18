@@ -89,6 +89,10 @@ public interface LogEventBuilder {
      * The default path resolves {@code projectId} from the current thread's
      * {@code LogContext}; use this method only in the rare cases where the
      * ThreadLocal context is incorrect (e.g. async hand-offs).
+     * <p>
+     * <strong>Note:</strong> enrichment via this method is best-effort and
+     * implementation-defined. Implementations that do not support per-event
+     * project context may silently ignore the supplied value.
      *
      * @param projectId the project id, or {@code null} to clear
      * @return this builder
@@ -98,6 +102,10 @@ public interface LogEventBuilder {
 
     /**
      * Overrides the mojo execution identifier for this event.
+     * <p>
+     * <strong>Note:</strong> enrichment via this method is best-effort and
+     * implementation-defined. Implementations that do not support per-event
+     * mojo context may silently ignore the supplied value.
      *
      * @param mojoId the mojo id, or {@code null} to clear
      * @return this builder

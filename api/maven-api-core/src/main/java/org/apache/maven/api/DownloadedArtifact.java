@@ -45,6 +45,7 @@ public interface DownloadedArtifact extends Artifact {
 
     /**
      * {@return the actual file that has been downloaded in the file system}
+     * @deprecated Use {@link #path()} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
     Path getPath();
