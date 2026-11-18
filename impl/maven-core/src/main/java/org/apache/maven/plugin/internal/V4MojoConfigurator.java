@@ -200,6 +200,17 @@ public final class V4MojoConfigurator {
             return values;
         }
         type = resolveImplementation(node, type);
+        if (node.children().isEmpty()) {
+            // A leaf node whose expression evaluates to an object of the parameter type
+            // (e.g. ${project.mainArtifact} for a ProducedArtifact parameter) is assigned
+            // directly instead of being stringified and re-instantiated, which fails for
+            // types without a no-arg constructor. Evaluate without coercion so plain
+            // text values still fall through to the conversion below.
+            Object evaluated = evaluateNode(node, null);
+            if (evaluated != null && type.isInstance(evaluated)) {
+                return evaluated;
+            }
+        }
         String value = evaluateNodeAsString(node);
         if (value != null && node.children().isEmpty()) {
             Method setter = findDefaultSetter(type);
