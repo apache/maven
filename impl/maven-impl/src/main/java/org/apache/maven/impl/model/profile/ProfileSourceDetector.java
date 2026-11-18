@@ -31,7 +31,7 @@ import org.apache.maven.api.model.Profile;
  * read from a POM file; an empty or null {@code modelId} indicates a settings profile
  * (settings.xml converted via {@code SettingsUtilsV4.toLocation}).
  *
- * @since 4.2.0
+ * @since 4.0.1
  */
 public final class ProfileSourceDetector {
 

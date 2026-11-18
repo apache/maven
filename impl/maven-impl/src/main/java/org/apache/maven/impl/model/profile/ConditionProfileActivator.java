@@ -195,12 +195,4 @@ public class ConditionProfileActivator implements ProfileActivator {
         return v;
     }
 
-    /**
-     * Determines whether the given profile originates from a POM file.
-     *
-     * @see ProfileSourceDetector#isFromPom(Profile)
-     */
-    private static boolean isFromPom(Profile profile) {
-        return ProfileSourceDetector.isFromPom(profile);
-    }
 }

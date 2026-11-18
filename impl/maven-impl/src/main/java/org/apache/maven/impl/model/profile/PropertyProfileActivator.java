@@ -110,12 +110,4 @@ public class PropertyProfileActivator implements ProfileActivator {
         return property != null;
     }
 
-    /**
-     * Determines whether the given profile originates from a POM file.
-     *
-     * @see ProfileSourceDetector#isFromPom(Profile)
-     */
-    private static boolean isFromPom(Profile profile) {
-        return ProfileSourceDetector.isFromPom(profile);
-    }
 }
