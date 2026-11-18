@@ -188,8 +188,8 @@ class ExecutableFinderTest {
 
         String absPath = exec.toAbsolutePath().toString();
         // Absolute paths contain path separators -> direct check
-        assertTrue(ExecutableFinder.isExecutableInPath(
-                absPath, contextWithPathAndOs("", System.getProperty("os.name"))));
+        assertTrue(
+                ExecutableFinder.isExecutableInPath(absPath, contextWithPathAndOs("", System.getProperty("os.name"))));
     }
 
     @Test
