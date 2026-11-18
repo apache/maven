@@ -43,18 +43,19 @@ import static org.junit.jupiter.api.Assumptions.assumeTrue;
 class MavenITmng8768ExecutableWindowsShellTest extends AbstractMavenIntegrationTestCase {
     private static final String COMMAND = "mng8768-profile-tool";
     private static final String DEFAULT_PATHEXT = ".COM;.EXE;.BAT;.CMD";
+    // Written to a temp file to avoid Windows CreateProcess argument-quoting issues
+    // when passing multi-line scripts with double quotes via ProcessBuilder + -c.
     private static final String SCRIPT = """
             set -eu
             # Never expose the inherited host PATH, even in the missing-command case.
             export PATH=/usr/bin:/bin
-            fake_path=$(cygpath --unix --path "$IT_FAKE_PATH")
-            export PATH="/usr/bin:/bin:$fake_path"
-            export JAVA_HOME="$(cygpath --unix "$IT_JAVA_HOME")"
-            export MAVEN_HOME="$(cygpath --unix "$IT_MAVEN_HOME")"
+            fake_path=$(cygpath --unix --path "${IT_FAKE_PATH}")
+            export PATH="/usr/bin:/bin:${fake_path}"
+            export JAVA_HOME=$(cygpath --unix "${IT_JAVA_HOME}")
+            export MAVEN_HOME=$(cygpath --unix "${IT_MAVEN_HOME}")
             export MAVEN_SKIP_RC=true
             unset MAVEN_OPTS MAVEN_ARGS MAVEN_CONFIG MAVEN_PROJECTBASEDIR
-            exec "$MAVEN_HOME/bin/mvn" -B -e --install-settings "$IT_SETTINGS" \
-                "-Dmaven.repo.local=$IT_REPO" "-Duser.home=$IT_USER_HOME" validate
+            exec "${MAVEN_HOME}/bin/mvn" -B -e --install-settings "${IT_SETTINGS}" "-Dmaven.repo.local=${IT_REPO}" "-Duser.home=${IT_USER_HOME}" validate
             """;
 
     @Test
@@ -120,7 +121,11 @@ class MavenITmng8768ExecutableWindowsShellTest extends AbstractMavenIntegrationT
         }
 
         final var log = project.resolve("mvn-output.txt");
-        final var builder = new ProcessBuilder(shell.toString(), "--noprofile", "--norc", "-c", SCRIPT)
+        // Write the script to a file to avoid Windows CreateProcess argument-quoting
+        // issues when passing multi-line scripts with double quotes via -c.
+        final var scriptFile = project.resolve("run-maven.sh");
+        Files.writeString(scriptFile, SCRIPT, StandardCharsets.UTF_8);
+        final var builder = new ProcessBuilder(shell.toString(), "--noprofile", "--norc", scriptFile.toString())
                 .directory(project.toFile())
                 .redirectErrorStream(true)
                 .redirectOutput(log.toFile());
