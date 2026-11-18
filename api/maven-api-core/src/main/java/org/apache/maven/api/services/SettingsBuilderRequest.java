@@ -61,31 +61,52 @@ public interface SettingsBuilderRequest extends Request<ProtoSession> {
      * @return the installation settings source or {@code null} if none
      */
     @Nonnull
-    Optional<Source> getInstallationSettingsSource();
+    Optional<Source> installationSettingsSource();
 
     /**
-     * Gets the project settings source.
-     *
-     * @return the project settings source or {@code null} if none
+     * @deprecated Use {@link #installationSettingsSource()} instead.
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    Optional<Source> getProjectSettingsSource();
+    default Optional<Source> getInstallationSettingsSource() {
+        return installationSettingsSource();
+    }
+
+    @Nonnull
+    Optional<Source> projectSettingsSource();
 
     /**
-     * Gets the user settings source.
-     *
-     * @return the user settings source or {@code null} if none
+     * @deprecated Use {@link #projectSettingsSource()} instead.
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    Optional<Source> getUserSettingsSource();
+    default Optional<Source> getProjectSettingsSource() {
+        return projectSettingsSource();
+    }
+
+    @Nonnull
+    Optional<Source> userSettingsSource();
 
     /**
-     * The optional interpolation source used for interpolation.
-     *
-     * @return the interpolation source for interpolation
+     * @deprecated Use {@link #userSettingsSource()} instead.
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    Optional<UnaryOperator<String>> getInterpolationSource();
+    default Optional<Source> getUserSettingsSource() {
+        return userSettingsSource();
+    }
+
+    @Nonnull
+    Optional<UnaryOperator<String>> interpolationSource();
+
+    /**
+     * @deprecated Use {@link #interpolationSource()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Optional<UnaryOperator<String>> getInterpolationSource() {
+        return interpolationSource();
+    }
 
     /**
      * Creates a request from installation and user settings sources.
@@ -256,25 +277,25 @@ public interface SettingsBuilderRequest extends Request<ProtoSession> {
 
             @Nonnull
             @Override
-            public Optional<Source> getInstallationSettingsSource() {
+            public Optional<Source> installationSettingsSource() {
                 return Optional.ofNullable(installationSettingsSource);
             }
 
             @Nonnull
             @Override
-            public Optional<Source> getProjectSettingsSource() {
+            public Optional<Source> projectSettingsSource() {
                 return Optional.ofNullable(projectSettingsSource);
             }
 
             @Nonnull
             @Override
-            public Optional<Source> getUserSettingsSource() {
+            public Optional<Source> userSettingsSource() {
                 return Optional.ofNullable(userSettingsSource);
             }
 
             @Nonnull
             @Override
-            public Optional<UnaryOperator<String>> getInterpolationSource() {
+            public Optional<UnaryOperator<String>> interpolationSource() {
                 return Optional.ofNullable(interpolationSource);
             }
 

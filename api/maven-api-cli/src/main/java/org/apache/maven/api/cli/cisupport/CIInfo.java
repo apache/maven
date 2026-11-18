@@ -43,7 +43,15 @@ public interface CIInfo {
     /**
      * Some CI systems may allow running jobs in "debug" (or some equivalent) mode.
      */
-    default boolean isVerbose() {
+    default boolean verbose() {
         return false;
+    }
+
+    /**
+     * @deprecated Use {@link #verbose()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default boolean isVerbose() {
+        return verbose();
     }
 }

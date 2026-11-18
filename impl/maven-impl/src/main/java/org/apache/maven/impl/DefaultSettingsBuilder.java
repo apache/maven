@@ -678,7 +678,7 @@ public class DefaultSettingsBuilder implements SettingsBuilder {
         }
 
         @Override
-        public SettingsBuilderRequest getRequest() {
+        public SettingsBuilderRequest request() {
             return request;
         }
 

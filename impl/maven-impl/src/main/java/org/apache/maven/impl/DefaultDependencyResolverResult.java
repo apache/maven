@@ -417,7 +417,7 @@ public class DefaultDependencyResolverResult implements DependencyResolverResult
     }
 
     @Override
-    public DependencyResolverRequest getRequest() {
+    public DependencyResolverRequest request() {
         return request;
     }
 

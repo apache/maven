@@ -101,27 +101,27 @@ public class ProjectStub implements Project {
                     }
 
                     @Override
-                    public Language getLanguage() {
+                    public Language language() {
                         return null;
                     }
 
                     @Override
-                    public String getExtension() {
+                    public String extension() {
                         return model.getPackaging();
                     }
 
                     @Override
-                    public String getClassifier() {
+                    public String classifier() {
                         return "";
                     }
 
                     @Override
-                    public boolean isIncludesDependencies() {
+                    public boolean includesDependencies() {
                         return false;
                     }
 
                     @Override
-                    public Set<PathType> getPathTypes() {
+                    public Set<PathType> pathTypes() {
                         return Set.of();
                     }
                 };

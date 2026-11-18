@@ -65,19 +65,23 @@ public interface RepositoryAwareRequest extends Request<Session> {
     /**
      * Returns the list of remote repositories to be used for this request.
      *
-     * <p>If this method returns {@code null}, the session's default remote repositories
-     * will be used. If a non-null list is returned, it will be used instead of the
-     * session's repositories, allowing for request-specific repository configuration.
-     *
-     * <p>The returned list should not contain duplicate repositories (based on their
-     * equality) or null entries, as these will cause validation failures when the
-     * request is processed.
-     *
      * @return the list of remote repositories to use, or {@code null} to use session defaults
      * @see Session#getRemoteRepositories()
      */
     @Nullable
-    List<RemoteRepository> getRepositories();
+    List<RemoteRepository> repositories();
+
+    /**
+     * Returns the list of remote repositories to be used for this request.
+     *
+     * @return the list of remote repositories to use, or {@code null} to use session defaults
+     * @deprecated Use {@link #repositories()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default List<RemoteRepository> getRepositories() {
+        return repositories();
+    }
 
     /**
      * Validates a list of remote repositories to ensure data integrity.

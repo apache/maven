@@ -162,7 +162,7 @@ public interface VersionResolverRequest extends RepositoryAwareRequest {
 
             @Nullable
             @Override
-            public List<RemoteRepository> getRepositories() {
+            public List<RemoteRepository> repositories() {
                 return repositories;
             }
 
