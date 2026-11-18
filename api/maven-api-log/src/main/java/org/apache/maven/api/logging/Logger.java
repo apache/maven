@@ -50,7 +50,7 @@ import org.apache.maven.api.annotations.Provider;
  * log.warn("Deprecated configuration key: {}", key, e);
  * }</pre>
  *
- * @since 4.2.0
+ * @since 4.0.0
  */
 @Experimental
 @Provider
@@ -336,54 +336,11 @@ public interface Logger {
         atError().withThrowable(t).log(message);
     }
 
-    // ---- Static factory ----
-
-    /**
-     * Returns a {@code Logger} for the given class, using the fully-qualified
-     * class name as the logger name.
-     * <p>
-     * Shorthand for {@code LoggerManager.get().getLogger(clazz)}.
-     * Safe to call at any point — even during early bootstrap before the
-     * real logging implementation is available. In that case, a bootstrap
-     * logger is returned that buffers events until the real implementation
-     * is discovered.
-     *
-     * @param clazz the class whose name is used as the logger name, never {@code null}
-     * @return a {@code Logger} instance, never {@code null}
-     * @since 4.2.0
-     */
-    @Nonnull
-    static Logger of(@Nonnull Class<?> clazz) {
-        return LoggerManager.get().getLogger(clazz);
-    }
-
-    /**
-     * Returns a {@code Logger} with the given name.
-     * <p>
-     * Shorthand for {@code LoggerManager.get().getLogger(name)}. Intended for
-     * framework code or dynamic logger names.
-     * Safe to call at any point — even during early bootstrap.
-     *
-     * @param name the logger name, never {@code null}
-     * @return a {@code Logger} instance, never {@code null}
-     * @since 4.2.0
-     */
-    @Nonnull
-    static Logger of(@Nonnull String name) {
-        return LoggerManager.get().getLogger(name);
-    }
-
     // ---- Child logger ----
 
     /**
      * Returns a child logger whose name is this logger's name with
      * {@code "." + name} appended.
-     *
-     * <p>If this logger was constructed with a {@code projectId} and/or {@code mojoId}
-     * (as is the case for DI-injected mojo loggers), those values are propagated to the
-     * child so sub-component events are automatically tagged with the correct project and
-     * mojo execution. Loggers obtained via {@link #of(Class)} or {@link #of(String)} have
-     * no such context, and the child will likewise carry {@code null} for those fields.</p>
      *
      * @param name the child suffix, never {@code null}
      * @return a child {@code Logger} instance, never {@code null}

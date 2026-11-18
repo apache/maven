@@ -21,12 +21,12 @@ package com.gitlab.tkslaw.ditests;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.di.Inject;
-import org.apache.maven.api.plugin.Log;
+import org.apache.maven.api.logging.Logger;
 import org.apache.maven.api.plugin.Mojo;
 
 public class DITestsMojoBase implements Mojo {
     @Inject
-    protected Log log;
+    protected Logger log;
 
     @Inject
     protected Session session;

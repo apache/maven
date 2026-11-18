@@ -20,7 +20,7 @@ package org.apache.maven.plugins;
 
 import org.apache.maven.api.Lifecycle.Phase;
 import org.apache.maven.api.di.Inject;
-import org.apache.maven.api.plugin.Log;
+import org.apache.maven.api.logging.Logger;
 import org.apache.maven.api.plugin.annotations.Mojo;
 import org.apache.maven.api.plugin.annotations.Parameter;
 
@@ -31,7 +31,7 @@ public class HelloMojo implements org.apache.maven.api.plugin.Mojo {
     private MavenDIComponent component;
 
     @Inject
-    private Log logger;
+    private Logger logger;
 
     @Parameter(property = "name")
     private String name;

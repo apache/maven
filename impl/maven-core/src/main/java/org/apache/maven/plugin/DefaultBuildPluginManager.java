@@ -35,7 +35,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.MojoExecutionEvent;
 import org.apache.maven.execution.MojoExecutionListener;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
-import org.apache.maven.internal.impl.DefaultLog;
+import org.apache.maven.internal.impl.DefaultLogger;
 import org.apache.maven.internal.impl.DefaultMojoExecution;
 import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.model.Plugin;
@@ -123,8 +123,8 @@ public class DefaultBuildPluginManager implements BuildPluginManager {
             scope.seed(MavenProject.class, project);
             scope.seed(MojoExecution.class, mojoExecution);
             scope.seed(
-                    org.apache.maven.api.plugin.Log.class,
-                    new DefaultLog(LoggerFactory.getLogger(
+                    org.apache.maven.api.logging.Logger.class,
+                    new DefaultLogger(LoggerFactory.getLogger(
                             mojoExecution.getMojoDescriptor().getImplementation())));
             InternalMavenSession sessionV4 = InternalMavenSession.from(session.getSession());
             scope.seed(Project.class, sessionV4.getProject(project));
