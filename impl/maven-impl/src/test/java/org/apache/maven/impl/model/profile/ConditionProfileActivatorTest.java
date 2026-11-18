@@ -538,7 +538,8 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
         Profile profile = newProfile("executable('" + absPath + "')");
 
         // PATH content does not matter for absolute paths
-        assertActivation(true, profile, newContext(null, Map.of("env.PATH", "")));
+        assertActivation(
+                true, profile, newContext(null, Map.of("env.PATH", "", "os.name", System.getProperty("os.name"))));
     }
 
     /**
