@@ -28,13 +28,14 @@ import java.io.InputStream;
 import java.io.Reader;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -287,8 +288,10 @@ public class DefaultXmlService extends XmlService {
      *     </ol></li>
      *   <li> Iterate through the recessive children, and:
      *     <ol type="i">
-     *     <li> if mergeChildren == true and there is a corresponding dominant child (matched by element name),
-     *          merge the two.</li>
+     *     <li> if there is a dominant child with the same 'combine.id' attribute or, when the recessive node has a
+     *          'combine.keys' attribute, with the same values for the attributes it lists, merge the two.</li>
+     *     <li> otherwise, if mergeChildren == true and there is a corresponding dominant child (matched by element
+     *          name), merge the two.</li>
      *     <li> otherwise, add the recessive child as a new child on the dominant root node.</li>
      *     </ol></li>
      *   </ol></li>
@@ -340,6 +343,27 @@ public class DefaultXmlService extends XmlService {
                     }
                 }
 
+                String keysValue = recessive.attribute(KEYS_COMBINATION_MODE_ATTRIBUTE);
+                String[] keys = isEmpty(keysValue) ? null : keysValue.split(",");
+
+                // the dominant children matching a recessive child by combine.id or combine.keys
+                Map<XmlNode, XmlNode> matches = new IdentityHashMap<>();
+                for (XmlNode recessiveChild : recessive.children()) {
+                    String idValue = recessiveChild.attribute(ID_COMBINATION_MODE_ATTRIBUTE);
+                    XmlNode match = null;
+                    if (!isEmpty(idValue)) {
+                        match = findNodeById(dominant.children(), idValue);
+                    } else if (keys != null) {
+                        match = findNodeByKeys(dominant.children(), recessiveChild, keys);
+                    }
+                    if (match != null) {
+                        matches.put(recessiveChild, match);
+                    }
+                }
+                Set<XmlNode> matchedChildren = Collections.newSetFromMap(new IdentityHashMap<>());
+                matchedChildren.addAll(matches.values());
+
+                // the other dominant children are merged in order with the recessive children of the same name
                 Map<String, Iterator<XmlNode>> commonChildren = new HashMap<>();
                 Set<String> names =
                         recessive.children().stream().map(XmlNode::name).collect(Collectors.toSet());
@@ -348,79 +372,84 @@ public class DefaultXmlService extends XmlService {
                             .filter(n -> n.name().equals(name))
                             .toList();
                     if (!dominantChildren.isEmpty()) {
-                        commonChildren.put(name, dominantChildren.iterator());
+                        commonChildren.put(
+                                name,
+                                dominantChildren.stream()
+                                        .filter(n -> !matchedChildren.contains(n))
+                                        .iterator());
                     }
                 }
 
-                String keysValue = recessive.attribute(KEYS_COMBINATION_MODE_ATTRIBUTE);
+                // the dominant children already merged with a recessive child, and the result of that merge
+                Map<XmlNode, XmlNode> mergedChildren = new IdentityHashMap<>();
 
                 int recessiveChildIndex = 0;
                 for (XmlNode recessiveChild : recessive.children()) {
                     String idValue = recessiveChild.attribute(ID_COMBINATION_MODE_ATTRIBUTE);
 
-                    XmlNode childDom = null;
-                    if (!isEmpty(idValue)) {
-                        for (XmlNode dominantChild : dominant.children()) {
-                            if (idValue.equals(dominantChild.attribute(ID_COMBINATION_MODE_ATTRIBUTE))) {
-                                childDom = dominantChild;
-                                // we have a match, so don't append but merge
-                                mergeChildren = true;
-                            }
-                        }
-                    } else if (!isEmpty(keysValue)) {
-                        String[] keys = keysValue.split(",");
-                        Map<String, Optional<String>> recessiveKeyValues = Stream.of(keys)
-                                .collect(Collectors.toMap(
-                                        k -> k, k -> Optional.ofNullable(recessiveChild.attribute(k))));
-
-                        for (XmlNode dominantChild : dominant.children()) {
-                            Map<String, Optional<String>> dominantKeyValues = Stream.of(keys)
-                                    .collect(Collectors.toMap(
-                                            k -> k, k -> Optional.ofNullable(dominantChild.attribute(k))));
-
-                            if (recessiveKeyValues.equals(dominantKeyValues)) {
-                                childDom = dominantChild;
-                                // we have a match, so don't append but merge
-                                mergeChildren = true;
-                            }
+                    XmlNode childDom;
+                    boolean matched = false;
+                    if (!isEmpty(idValue) || keys != null) {
+                        childDom = matches.get(recessiveChild);
+                        if (childDom != null) {
+                            matched = true;
+                            // we have a match, so don't append but merge
+                            mergeChildren = true;
                         }
                     } else {
                         childDom = dominant.child(recessiveChild.name());
                     }
 
                     if (mergeChildren && childDom != null) {
-                        String name = recessiveChild.name();
-                        Iterator<XmlNode> it = commonChildren.computeIfAbsent(
-                                name,
-                                n1 -> Stream.of(dominant.children().stream()
-                                                .filter(n2 -> n2.name().equals(n1))
-                                                .collect(Collectors.toList()))
-                                        .filter(l -> !l.isEmpty())
-                                        .findFirst()
-                                        .map(List::iterator)
-                                        .orElse(null));
-                        if (it == null) {
-                            if (children == null) {
-                                children = new ArrayList<>(dominant.children());
+                        XmlNode dominantChild = null;
+                        if (matched) {
+                            // merge with the matching child, wherever it is among its siblings
+                            dominantChild = childDom;
+                        } else {
+                            String name = recessiveChild.name();
+                            Iterator<XmlNode> it = commonChildren.computeIfAbsent(
+                                    name,
+                                    n1 -> Stream.of(dominant.children().stream()
+                                                    .filter(n2 -> n2.name().equals(n1))
+                                                    .collect(Collectors.toList()))
+                                            .filter(l -> !l.isEmpty())
+                                            .findFirst()
+                                            .map(List::iterator)
+                                            .orElse(null));
+                            if (it == null) {
+                                if (children == null) {
+                                    children = new ArrayList<>(dominant.children());
+                                }
+                                children.add(recessiveChild);
+                            } else if (it.hasNext()) {
+                                dominantChild = it.next();
                             }
-                            children.add(recessiveChild);
-                        } else if (it.hasNext()) {
-                            XmlNode dominantChild = it.next();
+                        }
+                        if (dominantChild != null) {
+                            // several recessive children can match the same dominant child
+                            XmlNode current = mergedChildren.getOrDefault(dominantChild, dominantChild);
 
-                            String dominantChildCombinationMode = getSelfCombinationMode(dominantChild);
+                            String dominantChildCombinationMode = getSelfCombinationMode(current);
                             if (SELF_COMBINATION_REMOVE.equals(dominantChildCombinationMode)) {
                                 if (children == null) {
                                     children = new ArrayList<>(dominant.children());
                                 }
-                                children.remove(dominantChild);
+                                int idx = indexOfSame(children, current);
+                                if (idx >= 0) {
+                                    children.remove(idx);
+                                }
                             } else {
-                                int idx = dominant.children().indexOf(dominantChild);
-                                XmlNode merged = merge(dominantChild, recessiveChild, childMergeOverride);
-                                if (merged != dominantChild) {
+                                XmlNode merged = merge(current, recessiveChild, childMergeOverride);
+                                if (merged != current) {
                                     if (children == null) {
                                         children = new ArrayList<>(dominant.children());
                                     }
-                                    children.set(idx, merged);
+                                    // recessive children may have been added before the dominant child
+                                    int mergeIdx = indexOfSame(children, current);
+                                    if (mergeIdx >= 0) {
+                                        children.set(mergeIdx, merged);
+                                        mergedChildren.put(dominantChild, merged);
+                                    }
                                 }
                             }
                         }
@@ -463,6 +492,15 @@ public class DefaultXmlService extends XmlService {
 
     private static boolean isEmpty(String str) {
         return str == null || str.isEmpty();
+    }
+
+    private static int indexOfSame(List<XmlNode> nodes, XmlNode node) {
+        for (int i = 0; i < nodes.size(); i++) {
+            if (nodes.get(i) == node) {
+                return i;
+            }
+        }
+        return -1;
     }
 
     private static String getSelfCombinationMode(XmlNode node) {
