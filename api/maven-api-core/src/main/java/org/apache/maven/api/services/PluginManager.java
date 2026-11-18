@@ -28,7 +28,7 @@ import org.apache.maven.api.annotations.Nonnull;
 /**
  * Provides access to plugin runtimes and the services contributed by them.
  *
- * @since 4.2.0
+ * @since 4.1.0
  */
 @Experimental
 public interface PluginManager extends OperationService {

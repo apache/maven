@@ -25,7 +25,7 @@ import org.apache.maven.api.annotations.Experimental;
 /**
  * Thrown when a plugin runtime cannot be resolved or loaded.
  *
- * @since 4.2.0
+ * @since 4.1.0
  */
 @Experimental
 public class PluginManagerException extends MavenException {

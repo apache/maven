@@ -54,22 +54,29 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 public class Configurator implements ConfigurationHandler {
     private static final System.Logger LOGGER = System.getLogger(Configurator.class.getName());
 
+    /** The launcher to configure. */
     private Launcher launcher;
 
     private ClassWorld world;
 
+    /** Processed realms, keyed by realm name. */
     private Map<String, ClassRealm> configuredRealms;
 
+    /** Current realm being configured (set by {@code [realmName]} sections). */
     private ClassRealm curRealm;
 
     private ClassLoader foreignClassLoader = null;
 
+    /** Current layer being configured (set by {@code [layer name]} sections), or {@code null} if in a realm section. */
     private String curLayerName;
 
+    /** Named JPMS module layers: layer name → list of module-path JARs. Insertion order defines the classloader chain. */
     private final LinkedHashMap<String, List<Path>> namedLayerPaths = new LinkedHashMap<>();
 
+    /** Deferred realm-to-layer parent assignments: realm id → layer name. Applied after layers are created. */
     private final Map<String, String> realmParentLayers = new HashMap<>();
 
+    /** Deferred import-exported directives: [targetRealmId, sourceRealmId]. Applied after realms are created. */
     private final List<String[]> realmExportedImports = new ArrayList<>();
 
     private List<String[]> exportDirectives = new ArrayList<>();
@@ -78,8 +85,14 @@ public class Configurator implements ConfigurationHandler {
 
     private List<String[]> readDirectives = new ArrayList<>();
 
+    /** ClassLoaders created for each named layer, keyed by layer name. */
     private final Map<String, ClassLoader> layerClassLoaders = new LinkedHashMap<>();
 
+    /**
+     * Construct.
+     *
+     * @param launcher The launcher to configure.
+     */
     public Configurator(Launcher launcher) {
         this.launcher = launcher;
         configuredRealms = new HashMap<>();
@@ -88,15 +101,36 @@ public class Configurator implements ConfigurationHandler {
         }
     }
 
+    /**
+     * Construct.
+     *
+     * @param world The classWorld to configure.
+     */
     public Configurator(ClassWorld world) {
         setClassWorld(world);
     }
 
+    /**
+     * Set the ClassWorld to configure.
+     * This setter is provided so you can use the same configurator to configure several "worlds".
+     *
+     * @param world The classWorld to configure.
+     */
     public void setClassWorld(ClassWorld world) {
         this.world = world;
         configuredRealms = new HashMap<>();
     }
 
+    /**
+     * Configure from a stream.
+     *
+     * @param is The config input stream.
+     * @throws IOException             If an error occurs reading the config file.
+     * @throws MalformedURLException   If the config file contains invalid URLs.
+     * @throws ConfigurationException  If the config file is corrupt.
+     * @throws DuplicateRealmException If the config file defines two realms with the same id.
+     * @throws NoSuchRealmException    If the config file references a non-existent realm.
+     */
     public void configure(InputStream is)
             throws IOException, ConfigurationException, DuplicateRealmException, NoSuchRealmException {
         if (world == null) {
@@ -126,6 +160,10 @@ public class Configurator implements ConfigurationHandler {
         }
     }
 
+    /**
+     * Associate parent realms with their children based on realm name hierarchy.
+     */
+    // TODO return this to protected when the legacy wrappers can be removed.
     public void associateRealms() {
         List<String> sortRealmNames = new ArrayList<>(configuredRealms.keySet());
         sortRealmNames.sort(String::compareTo);

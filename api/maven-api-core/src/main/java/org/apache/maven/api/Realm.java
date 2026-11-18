@@ -28,7 +28,7 @@ import org.apache.maven.api.services.Lookup;
  * A runtime scope that bundles classloading information with component lookup.
  * Lookup operations run with this realm's classloader set as the thread context classloader.
  *
- * @since 4.2.0
+ * @since 4.1.0
  */
 @Experimental
 public interface Realm {

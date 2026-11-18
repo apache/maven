@@ -64,7 +64,7 @@ public interface Plugin {
      * Returns the runtime realm for this plugin.
      *
      * @return the plugin realm, never {@code null}
-     * @since 4.2.0
+     * @since 4.1.0
      */
     @Nonnull
     Realm getRealm();
