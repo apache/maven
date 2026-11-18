@@ -182,7 +182,8 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
     /**
      * Returns a filter for the types of path (class-path, module-path, …) accepted by the tool.
      * For example, if a Java tools accepts only class-path elements, then the filter should return
-     * {@code true} for {@link JavaPathType#CLASSES} and {@code false} for {@link JavaPathType#MODULES}.
+     * {@code true} for {@link org.apache.maven.api.JavaPathType#CLASSES} and {@code false} for
+     * {@link org.apache.maven.api.JavaPathType#MODULES}.
      * If no filter is explicitly set, then the default is a filter accepting everything.
      *
      * @return a filter for the types of path (class-path, module-path, …) accepted by the tool
