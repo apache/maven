@@ -284,6 +284,129 @@ class XmlNodeImplTest {
     }
 
     @Test
+    void testCombineIdMergesMatchingElement() throws Exception {
+        String lhs = "<props>" + "<property combine.id='A'><name>A</name></property>"
+                + "<property combine.id='B'><name>B</name></property>" + "</props>";
+
+        String rhs = "<props>" + "<property combine.id='B'><value>RHS</value></property>" + "</props>";
+
+        assertRecessiveValueIsMergedIntoSecondProperty(lhs, rhs);
+    }
+
+    @Test
+    void testCombineKeysMergesMatchingElement() throws Exception {
+        String lhs = "<props combine.keys='key'>" + "<property key='A'><name>A</name></property>"
+                + "<property key='B'><name>B</name></property>" + "</props>";
+
+        String rhs = "<props combine.keys='key'>" + "<property key='B'><value>RHS</value></property>" + "</props>";
+
+        assertRecessiveValueIsMergedIntoSecondProperty(lhs, rhs);
+    }
+
+    @Test
+    void testCombineIdMergesMatchingElementAfterAppendedSibling() throws Exception {
+        String lhs =
+                "<props combine.children='append'>" + "<property combine.id='A'><name>A</name></property>" + "</props>";
+
+        String rhs = "<props>" + "<property combine.id='X'><name>X</name></property>"
+                + "<property combine.id='A'><value>RHS</value></property>" + "</props>";
+
+        XmlNode leftDom = XmlService.read(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+
+        XmlNode mergeResult = XmlService.merge(leftDom, rightDom);
+        assertEquals(2, getChildren(mergeResult, "property").size());
+
+        XmlNode p0 = getNthChild(mergeResult, "property", 0);
+        assertEquals("X", p0.child("name").value());
+        assertEquals("right", p0.child("name").inputLocation());
+
+        XmlNode p1 = getNthChild(mergeResult, "property", 1);
+        assertEquals("A", p1.child("name").value());
+        assertEquals("RHS", p1.child("value").value());
+    }
+
+    @Test
+    void testCombineIdLeavesOtherElementsMergedInOrder() throws Exception {
+        String lhs = "<props>" + "<property combine.id='A'><name>A</name></property>"
+                + "<property><name>B</name></property>" + "</props>";
+
+        String rhs = "<props>" + "<property combine.id='A'><other>RHS-A</other></property>"
+                + "<property><value>RHS</value></property>" + "</props>";
+
+        XmlNode leftDom = XmlService.read(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+
+        XmlNode mergeResult = XmlService.merge(leftDom, rightDom, true);
+        assertEquals(2, getChildren(mergeResult, "property").size());
+
+        XmlNode p0 = getNthChild(mergeResult, "property", 0);
+        assertEquals("A", p0.child("name").value());
+        assertEquals("RHS-A", p0.child("other").value());
+        assertNull(p0.child("value"));
+
+        XmlNode p1 = getNthChild(mergeResult, "property", 1);
+        assertEquals("B", p1.child("name").value());
+        assertEquals("RHS", p1.child("value").value());
+    }
+
+    @Test
+    void testCombineIdMergesEveryElementWithTheSameId() throws Exception {
+        String lhs = "<props>" + "<property combine.id='A'><name>A</name></property>" + "</props>";
+
+        String rhs = "<props>" + "<property combine.id='A'><value>RHS</value></property>"
+                + "<property combine.id='A'><other>RHS</other></property>" + "</props>";
+
+        XmlNode leftDom = XmlService.read(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+
+        XmlNode mergeResult = XmlService.merge(leftDom, rightDom, true);
+        assertEquals(1, getChildren(mergeResult, "property").size());
+
+        XmlNode p0 = getNthChild(mergeResult, "property", 0);
+        assertEquals("A", p0.child("name").value());
+        assertEquals("RHS", p0.child("value").value());
+        assertEquals("RHS", p0.child("other").value());
+    }
+
+    @Test
+    void testCombineIdAppendsWhenNoDominantMatchExists() throws Exception {
+        String lhs = "<props>" + "<property combine.id='A'><name>A</name></property>" + "</props>";
+
+        String rhs = "<props>" + "<property combine.id='NEW'><name>NEW</name></property>" + "</props>";
+
+        XmlNode leftDom = XmlService.read(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+
+        XmlNode mergeResult = XmlService.merge(leftDom, rightDom, true);
+        assertEquals(2, getChildren(mergeResult, "property").size());
+
+        XmlNode p0 = getNthChild(mergeResult, "property", 0);
+        assertEquals("A", p0.child("name").value());
+
+        XmlNode p1 = getNthChild(mergeResult, "property", 1);
+        assertEquals("NEW", p1.child("name").value());
+        assertEquals("right", p1.child("name").inputLocation());
+    }
+
+    private static void assertRecessiveValueIsMergedIntoSecondProperty(String lhs, String rhs) throws Exception {
+        XmlNode leftDom = XmlService.read(new StringReader(lhs), new FixedInputLocationBuilder("left"));
+        XmlNode rightDom = XmlService.read(new StringReader(rhs), new FixedInputLocationBuilder("right"));
+
+        XmlNode mergeResult = XmlService.merge(leftDom, rightDom, true);
+        assertEquals(2, getChildren(mergeResult, "property").size());
+
+        XmlNode p0 = getNthChild(mergeResult, "property", 0);
+        assertEquals("A", p0.child("name").value());
+        assertNull(p0.child("value"));
+
+        XmlNode p1 = getNthChild(mergeResult, "property", 1);
+        assertEquals("B", p1.child("name").value());
+        assertEquals("RHS", p1.child("value").value());
+        assertEquals("right", p1.child("value").inputLocation());
+    }
+
+    @Test
     void testPreserveDominantBlankValue() throws XMLStreamException, IOException {
         String lhs = "<parameter xml:space=\"preserve\"> </parameter>";
 
