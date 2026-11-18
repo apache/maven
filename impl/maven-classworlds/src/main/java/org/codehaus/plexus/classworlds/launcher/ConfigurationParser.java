@@ -405,15 +405,11 @@ public class ConfigurationParser {
             if (curRealm == null) {
                 throw new ConfigurationException("parent requires a realm section", lineNo, line);
             }
-            String rest = line.substring(PARENT_PREFIX.length()).trim();
-            if (!rest.startsWith(LAYER_PREFIX)) {
-                throw new ConfigurationException("Expected 'parent layer <name>'", lineNo, line);
+            String name = line.substring(PARENT_PREFIX.length()).trim();
+            if (name.isEmpty()) {
+                throw new ConfigurationException("Empty parent name", lineNo, line);
             }
-            String layerName = rest.substring(LAYER_PREFIX.length()).trim();
-            if (layerName.isEmpty()) {
-                throw new ConfigurationException("Empty layer name in parent directive", lineNo, line);
-            }
-            handler.setRealmParentLayer(layerName);
+            handler.setRealmParent(name);
             return;
         }
         throw new ConfigurationException("Unhandled configuration", lineNo, line);

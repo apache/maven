@@ -95,10 +95,10 @@ public interface ConfigurationHandler {
     default void addModuleFile(File file) {}
 
     /**
-     * Set the current realm's parent to a named layer's classloader.
-     * @param layerName the name of the layer to use as parent
+     * Set the current realm's parent classloader to the named layer or realm.
+     * @param name the name of the layer or realm to use as parent
      */
-    default void setRealmParentLayer(String layerName) {}
+    default void setRealmParent(String name) {}
 
     /**
      * Import all packages exported via {@code META-INF/maven/extension.xml}

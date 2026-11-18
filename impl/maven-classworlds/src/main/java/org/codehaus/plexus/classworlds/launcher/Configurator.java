@@ -73,8 +73,8 @@ public class Configurator implements ConfigurationHandler {
     /** Named JPMS module layers: layer name → list of module-path JARs. Insertion order defines the classloader chain. */
     private final LinkedHashMap<String, List<Path>> namedLayerPaths = new LinkedHashMap<>();
 
-    /** Deferred realm-to-layer parent assignments: realm id → layer name. Applied after layers are created. */
-    private final Map<String, String> realmParentLayers = new HashMap<>();
+    /** Deferred parent assignments: realm id → parent name (resolved against layers first, then realms). */
+    private final Map<String, String> realmParents = new HashMap<>();
 
     /** Deferred import-exported directives: [targetRealmId, sourceRealmId]. Applied after realms are created. */
     private final List<String[]> realmExportedImports = new ArrayList<>();
@@ -140,7 +140,7 @@ public class Configurator implements ConfigurationHandler {
         curLayerName = null;
         foreignClassLoader = null;
         namedLayerPaths.clear();
-        realmParentLayers.clear();
+        realmParents.clear();
         realmExportedImports.clear();
         exportDirectives = new ArrayList<>();
         openDirectives = new ArrayList<>();
@@ -152,7 +152,7 @@ public class Configurator implements ConfigurationHandler {
         ConfigurationParser parser = new ConfigurationParser(this, System.getProperties());
         parser.parse(is);
         createModuleLayers();
-        applyRealmParentLayers();
+        applyRealmParents();
         applyExportedImports();
         associateRealms();
         if (this.launcher != null) {
@@ -162,15 +162,15 @@ public class Configurator implements ConfigurationHandler {
 
     /**
      * Associate parent realms with their children based on realm name hierarchy.
-     * Realms that have an explicit {@code parent layer} directive are skipped —
-     * their parent classloader was already set by {@link #applyRealmParentLayers()}.
+     * Realms that have an explicit {@code parent} directive are skipped —
+     * their parent classloader was already set by {@link #applyRealmParents()}.
      */
     // TODO return this to protected when the legacy wrappers can be removed.
     public void associateRealms() {
         List<String> sortRealmNames = new ArrayList<>(configuredRealms.keySet());
         sortRealmNames.sort(String::compareTo);
         for (String realmName : sortRealmNames) {
-            if (realmParentLayers.containsKey(realmName)) {
+            if (realmParents.containsKey(realmName)) {
                 continue;
             }
             int j = realmName.lastIndexOf('.');
@@ -187,6 +187,9 @@ public class Configurator implements ConfigurationHandler {
 
     @Override
     public void addLayer(String layerName) {
+        if (configuredRealms.containsKey(layerName)) {
+            throw new IllegalArgumentException("Name '" + layerName + "' is already used by a realm");
+        }
         curLayerName = layerName;
         curRealm = null;
         namedLayerPaths.computeIfAbsent(layerName, k -> new ArrayList<>());
@@ -213,6 +216,9 @@ public class Configurator implements ConfigurationHandler {
 
     @Override
     public void addRealm(String realmName) throws DuplicateRealmException {
+        if (namedLayerPaths.containsKey(realmName)) {
+            throw new DuplicateRealmException(world, realmName);
+        }
         curLayerName = null;
         curRealm = world.newRealm(realmName, foreignClassLoader);
         configuredRealms.put(realmName, curRealm);
@@ -231,9 +237,9 @@ public class Configurator implements ConfigurationHandler {
     }
 
     @Override
-    public void setRealmParentLayer(String layerName) {
+    public void setRealmParent(String name) {
         if (curRealm != null) {
-            realmParentLayers.put(curRealm.getId(), layerName);
+            realmParents.put(curRealm.getId(), name);
         }
     }
 
@@ -352,15 +358,21 @@ public class Configurator implements ConfigurationHandler {
         }
     }
 
-    private void applyRealmParentLayers() {
-        for (Map.Entry<String, String> entry : realmParentLayers.entrySet()) {
+    private void applyRealmParents() {
+        for (Map.Entry<String, String> entry : realmParents.entrySet()) {
             String realmId = entry.getKey();
-            String layerName = entry.getValue();
-            ClassLoader layerLoader = layerClassLoaders.get(layerName);
-            if (layerLoader != null) {
-                ClassRealm realm = configuredRealms.get(realmId);
-                if (realm != null) {
-                    realm.setParentClassLoader(layerLoader);
+            String parentName = entry.getValue();
+            ClassRealm realm = configuredRealms.get(realmId);
+            if (realm == null) {
+                continue;
+            }
+            ClassLoader parentLoader = layerClassLoaders.get(parentName);
+            if (parentLoader != null) {
+                realm.setParentClassLoader(parentLoader);
+            } else {
+                ClassRealm parentRealm = configuredRealms.get(parentName);
+                if (parentRealm != null) {
+                    realm.setParentRealm(parentRealm);
                 }
             }
         }
