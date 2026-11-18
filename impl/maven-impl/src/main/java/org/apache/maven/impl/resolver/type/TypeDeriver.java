@@ -60,13 +60,13 @@ public class TypeDeriver implements DependencyGraphTransformer {
     @Override
     public DependencyNode transformGraph(DependencyNode root, DependencyGraphTransformationContext context) {
         ArtifactTypeRegistry registry = context.getSession().getArtifactTypeRegistry();
-        if (logger.isDebugEnabled()) {
+        if (logger.isTraceEnabled()) {
             StringBuilder sb = new StringBuilder();
             root.accept(new DependencyGraphDumper(
                     l -> sb.append(l).append("\n"),
                     DependencyGraphDumper.defaultsWith(
                             List.of(DependencyGraphDumper.artifactProperties(List.of(ArtifactProperties.TYPE))))));
-            logger.debug("TYPES: Before transform:\n {}", sb);
+            logger.trace("TYPES: Before transform:\n {}", sb);
         }
         root.accept(new TypeDeriverVisitor(registry));
         // Apply processor type info collected by TypeCollector before conflict resolution.
@@ -78,13 +78,13 @@ public class TypeDeriver implements DependencyGraphTransformer {
         if (collectedProcessorTypes != null) {
             root.accept(new ProcessorTypeMerger(collectedProcessorTypes));
         }
-        if (logger.isDebugEnabled()) {
+        if (logger.isTraceEnabled()) {
             StringBuilder sb = new StringBuilder();
             root.accept(new DependencyGraphDumper(
                     l -> sb.append(l).append("\n"),
                     DependencyGraphDumper.defaultsWith(
                             List.of(DependencyGraphDumper.artifactProperties(List.of(ArtifactProperties.TYPE))))));
-            logger.debug("TYPES: After transform:\n {}", sb);
+            logger.trace("TYPES: After transform:\n {}", sb);
         }
         return root;
     }

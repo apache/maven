@@ -218,8 +218,8 @@ public class DefaultRequestCache extends AbstractRequestCache {
         // Debug logging to verify reference types (disabled)
         // System.err.println("DEBUG: Cache config for " + req.getClass().getSimpleName() + ": retention=" + retention
         //         + ", keyRef=" + keyReferenceType + ", valueRef=" + valueReferenceType);
-        if (LOGGER.isDebugEnabled()) {
-            LOGGER.debug(
+        if (LOGGER.isTraceEnabled()) {
+            LOGGER.trace(
                     "Cache config for {}: retention={}, keyRef={}, valueRef={}",
                     req.getClass().getSimpleName(),
                     retention,
@@ -243,7 +243,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
             Cache<Object, Cache<Object, CachingSupplier<?, ?>>> caches = session.getData()
                     .computeIfAbsent(KEY, () -> {
                         if (config.hasSeparateKeyValueReferenceTypes()) {
-                            LOGGER.debug(
+                            LOGGER.trace(
                                     "Creating SESSION_SCOPED parent cache with key={}, value={}",
                                     keyReferenceType,
                                     valueReferenceType);
@@ -256,7 +256,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
             // Use separate key/value reference types if configured
             if (config.hasSeparateKeyValueReferenceTypes()) {
                 cache = caches.computeIfAbsent(ROOT, k -> {
-                    LOGGER.debug(
+                    LOGGER.trace(
                             "Creating SESSION_SCOPED cache with key={}, value={}",
                             keyReferenceType,
                             valueReferenceType);
@@ -286,8 +286,8 @@ public class DefaultRequestCache extends AbstractRequestCache {
             }
             cacheType = "SESSION_SCOPED";
             // Debug logging for cache sizes
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(
                         "Cache access: type={}, request={}, cacheSize={}, totalCaches={}, key={}",
                         cacheType,
                         req.getClass().getSimpleName(),
@@ -300,7 +300,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
             Cache<Object, Cache<Object, CachingSupplier<?, ?>>> caches = session.getData()
                     .computeIfAbsent(KEY, () -> {
                         if (config.hasSeparateKeyValueReferenceTypes()) {
-                            LOGGER.debug(
+                            LOGGER.trace(
                                     "Creating REQUEST_SCOPED parent cache with key={}, value={}",
                                     keyReferenceType,
                                     valueReferenceType);
@@ -313,7 +313,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
             // Use separate key/value reference types if configured
             if (config.hasSeparateKeyValueReferenceTypes()) {
                 cache = caches.computeIfAbsent(key, k -> {
-                    LOGGER.debug(
+                    LOGGER.trace(
                             "Creating REQUEST_SCOPED cache with key={}, value={}",
                             keyReferenceType,
                             valueReferenceType);
@@ -336,8 +336,8 @@ public class DefaultRequestCache extends AbstractRequestCache {
             cacheType = "REQUEST_SCOPED";
 
             // Debug logging for cache sizes
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(
                         "Cache access: type={}, request={}, cacheSize={}, totalCaches={}, key={}",
                         cacheType,
                         req.getClass().getSimpleName(),
@@ -350,7 +350,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
             Cache<Object, Cache<Object, CachingSupplier<?, ?>>> caches = session.getData()
                     .computeIfAbsent(KEY, () -> {
                         if (config.hasSeparateKeyValueReferenceTypes()) {
-                            LOGGER.debug(
+                            LOGGER.trace(
                                     "Creating PERSISTENT parent cache with key={}, value={}",
                                     keyReferenceType,
                                     valueReferenceType);
@@ -364,7 +364,7 @@ public class DefaultRequestCache extends AbstractRequestCache {
             // Use separate key/value reference types if configured
             if (config.hasSeparateKeyValueReferenceTypes()) {
                 cache = caches.computeIfAbsent(KEY, k -> {
-                    LOGGER.debug(
+                    LOGGER.trace(
                             "Creating PERSISTENT cache with key={}, value={}", keyReferenceType, valueReferenceType);
                     Cache<Object, CachingSupplier<?, ?>> newCache =
                             Cache.newCache(keyReferenceType, valueReferenceType, "RequestCache-PERSISTENT");
@@ -384,8 +384,8 @@ public class DefaultRequestCache extends AbstractRequestCache {
             }
             cacheType = "PERSISTENT";
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug(
+            if (LOGGER.isTraceEnabled()) {
+                LOGGER.trace(
                         "Cache access: type={}, request={}, cacheSize={}",
                         cacheType,
                         req.getClass().getSimpleName(),

@@ -69,7 +69,7 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
                 if (relocation.target == SENTINEL) {
                     String message = "The artifact " + original + " has been banned from resolution: "
                             + (relocation.global ? "User global ban" : "User project ban");
-                    LOGGER.debug(message);
+                    LOGGER.trace(message);
                     throw new ArtifactDescriptorException(artifactDescriptorResult, message);
                 }
                 Artifact result = new RelocatedArtifact(
@@ -80,7 +80,7 @@ public final class UserPropertiesArtifactRelocationSource implements MavenArtifa
                         isAny(relocation.target.getExtension()) ? null : relocation.target.getExtension(),
                         isAny(relocation.target.getVersion()) ? null : relocation.target.getVersion(),
                         relocation.global ? "User global relocation" : "User project relocation");
-                LOGGER.debug(
+                LOGGER.trace(
                         "The artifact {} has been relocated to {}: {}",
                         original,
                         result,
