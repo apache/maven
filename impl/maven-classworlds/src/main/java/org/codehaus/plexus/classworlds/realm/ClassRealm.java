@@ -34,6 +34,7 @@ package org.codehaus.plexus.classworlds.realm;
  * limitations under the License.
  */
 
+import java.io.Closeable;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.MalformedURLException;
@@ -76,6 +77,10 @@ public class ClassRealm extends URLClassLoader {
 
     private ClassLoader parentClassLoader;
 
+    private ModuleLayer moduleLayer;
+
+    private ModuleLayer.Controller moduleLayerController;
+
     /**
      * Creates a new class realm.
      *
@@ -115,6 +120,16 @@ public class ClassRealm extends URLClassLoader {
 
     public ClassWorld getWorld() {
         return this.world;
+    }
+
+    /**
+     * Returns the underlying ClassLoader for this realm.
+     * Since ClassRealm extends URLClassLoader, this method returns {@code this}.
+     *
+     * @return this
+     */
+    public ClassLoader getClassLoader() {
+        return this;
     }
 
     public void importFromParent(String packageName) {
@@ -160,7 +175,7 @@ public class ClassRealm extends URLClassLoader {
                 importRealms.add((ClassRealm) entry.getClassLoader());
             }
         }
-        return importRealms;
+        return Collections.unmodifiableCollection(importRealms);
     }
 
     public Strategy getStrategy() {
@@ -222,6 +237,27 @@ public class ClassRealm extends URLClassLoader {
 
     public void addReads(String moduleName) {
         world.addReads(moduleName, getUnnamedModule());
+    }
+
+    /**
+     * Sets the ModuleLayer and Controller for this realm.
+     * Called when the plugin is loaded as a JPMS module.
+     */
+    public void setModuleLayer(ModuleLayer moduleLayer, ModuleLayer.Controller controller) {
+        this.moduleLayer = moduleLayer;
+        this.moduleLayerController = controller;
+    }
+
+    public ModuleLayer getModuleLayer() {
+        return moduleLayer;
+    }
+
+    public ModuleLayer.Controller getModuleLayerController() {
+        return moduleLayerController;
+    }
+
+    public boolean isModular() {
+        return moduleLayer != null;
     }
 
     // ----------------------------------------------------------------------
@@ -352,8 +388,12 @@ public class ClassRealm extends URLClassLoader {
         return null;
     }
 
+    private Object getClassRealmLoadingLock(String name) {
+        return getClassLoadingLock(name);
+    }
+
     public Class<?> loadClassFromSelf(String name) {
-        synchronized (getClassLoadingLock(name)) {
+        synchronized (getClassRealmLoadingLock(name)) {
             try {
                 Class<?> clazz = findLoadedClass(name);
                 if (clazz == null) {
@@ -441,6 +481,20 @@ public class ClassRealm extends URLClassLoader {
 
     @Override
     public void close() throws IOException {
+        if (moduleLayer != null) {
+            // defineModulesWithOneLoader uses a single shared ClassLoader for all modules in the layer.
+            // Close it once to release JAR file handles.
+            moduleLayer.modules().stream().findFirst().ifPresent(m -> {
+                ClassLoader loader = m.getClassLoader();
+                if (loader instanceof Closeable && loader != this) {
+                    try {
+                        ((Closeable) loader).close();
+                    } catch (IOException e) {
+                        // best effort
+                    }
+                }
+            });
+        }
         super.close();
     }
 
