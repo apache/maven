@@ -33,6 +33,7 @@ import org.apache.maven.api.services.ModelProblemCollector;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.apache.maven.api.services.model.ProfileActivator;
 import org.apache.maven.api.services.model.ProfileSelector;
+import org.apache.maven.impl.model.profile.ProfileSourceDetector;
 
 /**
  * Calculates the active profiles among a given collection of profiles.
@@ -71,11 +72,11 @@ public class DefaultProfileSelector implements ProfileSelector {
             if (!context.isProfileInactive(profile.getId())) {
                 if (context.isProfileActive(profile.getId()) || isActive(profile, context, problems)) {
                     activeProfiles.add(profile);
-                    if (Profile.SOURCE_POM.equals(profile.getSource())) {
+                    if (isFromPom(profile)) {
                         activatedPomProfileNotByDefault = true;
                     }
                 } else if (isActiveByDefault(profile)) {
-                    if (Profile.SOURCE_POM.equals(profile.getSource())) {
+                    if (isFromPom(profile)) {
                         activePomProfilesByDefault.add(profile);
                     } else {
                         activeProfiles.add(profile);
@@ -117,5 +118,9 @@ public class DefaultProfileSelector implements ProfileSelector {
     private boolean isActiveByDefault(Profile profile) {
         Activation activation = profile.getActivation();
         return activation != null && activation.isActiveByDefault();
+    }
+
+    private static boolean isFromPom(Profile profile) {
+        return ProfileSourceDetector.isFromPom(profile);
     }
 }
