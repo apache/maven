@@ -319,7 +319,9 @@ public class DefaultClassRealmManager implements ClassRealmManager {
             }
 
             // Parent layer: use the runtime layer from ClassWorld if available (has Maven API
-            // modules + JLine), otherwise fall back to the boot layer.
+            // modules), otherwise fall back to the boot layer.
+            // Note: infrastructure modules (e.g. JLine) live in a sibling infraLayer that is NOT
+            // registered as the runtime layer, so they are not reachable as JPMS parents here.
             // Flat hierarchy — all plugin layers are siblings under this parent.
             if (!(world instanceof org.codehaus.plexus.classworlds.ClassWorld)) {
                 throw new ModuleLayerCreationException("Cannot create modular plugin realm for " + plugin.getId()
@@ -498,14 +500,22 @@ public class DefaultClassRealmManager implements ClassRealmManager {
      * <h4>Purpose</h4>
      * <p>
      * When a plugin (or extension) runs on the <em>classpath</em> (unnamed module) it may need to
-     * call into packages of a <em>named</em> module that lives in Maven's boot/runtime layer —
-     * for example JLine modules in {@code lib/modules/}, or any future Maven API module that ships
-     * as a named module.  Named modules do not export their internals to the unnamed module by
-     * default; the JVM enforces this at runtime via strong encapsulation.
+     * call into packages of a <em>named</em> module that lives in Maven's boot or API layer —
+     * for example {@code org.apache.maven.api.*} modules shipped as named modules.  Named modules
+     * do not export their internals to the unnamed module by default; the JVM enforces this at
+     * runtime via strong encapsulation.
+     * </p>
+     * <p>
+     * <strong>Scope:</strong> This mechanism can only target modules visible to
+     * {@link org.codehaus.plexus.classworlds.ClassWorld#findModule} — that is, modules in the
+     * boot layer ({@link ModuleLayer#boot()}) and modules in the Maven API layer (registered via
+     * {@link org.codehaus.plexus.classworlds.ClassWorld#setModuleLayer}).  Infrastructure modules
+     * such as JLine live in a separate {@code infraLayer} that is <em>not</em> registered as the
+     * runtime layer and are therefore <strong>not reachable</strong> via this mechanism.
      * </p>
      * <p>
      * The {@code META-INF/maven/module-access} file is a plugin-side escape hatch: it lets the
-     * plugin declare which packages of which boot-layer modules it needs opened or exported
+     * plugin declare which packages of which boot or API layer modules it needs opened or exported
      * <strong>to itself</strong> (always {@code ALL-UNNAMED} as the target).  Maven applies these
      * directives programmatically via {@link Module#addExports}/{@link Module#addOpens} on startup
      * of the plugin realm, before any plugin class is loaded.
@@ -513,7 +523,7 @@ public class DefaultClassRealmManager implements ClassRealmManager {
      *
      * <h4>Direction of access</h4>
      * <p>
-     * Directives go from an <em>existing</em> named module in the boot/runtime layer
+     * Directives go from an <em>existing</em> named module in the boot or API layer
      * <strong>to</strong> the unnamed-module classloader of the plugin.  In other words:
      * a plugin cannot use this mechanism to export its <em>own</em> packages; it can only
      * widen access from modules that Maven already owns (and that are loaded before the plugin).
@@ -533,11 +543,11 @@ public class DefaultClassRealmManager implements ClassRealmManager {
      *
      * <h4>Why not {@code module-info.java}?</h4>
      * <p>
-     * The boot-layer modules (e.g. JLine) are compiled independently and cannot reference
-     * the plugin's module name at compile time.  Adding {@code exports … to plugin.module} in
-     * their {@code module-info} would create an unacceptable coupling.  Programmatic
-     * {@code addExports}/{@code addOpens} is the standard JDK-endorsed workaround for
-     * this exact scenario (see {@link java.lang.Module#addExports}).
+     * The named modules targeted here (e.g. Maven API modules) are compiled independently and
+     * cannot reference the plugin's module name at compile time.  Adding
+     * {@code exports … to plugin.module} in their {@code module-info} would create an unacceptable
+     * coupling.  Programmatic {@code addExports}/{@code addOpens} is the standard JDK-endorsed
+     * workaround for this exact scenario (see {@link java.lang.Module#addExports}).
      * </p>
      *
      * @param classRealm the plugin class realm whose JAR(s) are scanned for descriptors
