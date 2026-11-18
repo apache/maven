@@ -45,11 +45,12 @@ public interface VersionRange {
     boolean contains(@Nonnull Version version);
 
     /**
-     * {@return the upperBoundary}
+     * Returns the upper boundary of this range, or {@code null} for an unbounded range (e.g. {@code [1.0,)}).
      *
+     * @return the upper boundary, or {@code null}
      * @since 4.0.0
      */
-    @Nonnull
+    @Nullable
     default Boundary upperBoundary() {
         return getUpperBoundary();
     }
@@ -63,11 +64,12 @@ public interface VersionRange {
     Boundary getUpperBoundary();
 
     /**
-     * {@return the lowerBoundary}
+     * Returns the lower boundary of this range, or {@code null} for an unbounded range (e.g. {@code (,2.0]}).
      *
+     * @return the lower boundary, or {@code null}
      * @since 4.0.0
      */
-    @Nonnull
+    @Nullable
     default Boundary lowerBoundary() {
         return getLowerBoundary();
     }

@@ -41,11 +41,12 @@ import org.apache.maven.api.annotations.Provider;
 public interface Node {
 
     /**
-     * {@return the artifact}
+     * Returns the artifact for this node, or {@code null} for the root node.
      *
+     * @return the artifact, or {@code null}
      * @since 4.0.0
      */
-    @Nonnull
+    @Nullable
     default Artifact artifact() {
         return getArtifact();
     }
@@ -59,11 +60,12 @@ public interface Node {
     Artifact getArtifact();
 
     /**
-     * {@return the dependency}
+     * Returns the dependency for this node, or {@code null} for the root node.
      *
+     * @return the dependency, or {@code null}
      * @since 4.0.0
      */
-    @Nonnull
+    @Nullable
     default Dependency dependency() {
         return getDependency();
     }

@@ -19,7 +19,6 @@
 package org.apache.maven.api;
 
 import org.apache.maven.api.annotations.Experimental;
-import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
 
 /**
@@ -30,13 +29,13 @@ import org.apache.maven.api.annotations.Nullable;
  */
 @Experimental
 public interface Exclusion {
-    @Nullable
     /**
-     * {@return the groupId}
+     * Returns the groupId for this exclusion, or {@code null} if unset.
      *
+     * @return the groupId, or {@code null}
      * @since 4.0.0
      */
-    @Nonnull
+    @Nullable
     default String groupId() {
         return getGroupId();
     }
@@ -44,16 +43,17 @@ public interface Exclusion {
     /**
      * @deprecated Use {@link #groupId()} instead.
      */
+    @Nullable
     @Deprecated(since = "4.0.0", forRemoval = true)
     String getGroupId();
 
-    @Nullable
     /**
-     * {@return the artifactId}
+     * Returns the artifactId for this exclusion, or {@code null} if unset.
      *
+     * @return the artifactId, or {@code null}
      * @since 4.0.0
      */
-    @Nonnull
+    @Nullable
     default String artifactId() {
         return getArtifactId();
     }
@@ -61,6 +61,7 @@ public interface Exclusion {
     /**
      * @deprecated Use {@link #artifactId()} instead.
      */
+    @Nullable
     @Deprecated(since = "4.0.0", forRemoval = true)
     String getArtifactId();
 }

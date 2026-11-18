@@ -38,11 +38,14 @@ import org.apache.maven.api.annotations.Nullable;
 @Experimental
 public interface VersionConstraint {
     /**
-     * {@return the versionRange}
+     * Returns the range of this constraint, or {@code null} if the constraint is a recommended version.
+     * <p>
+     * Note: exactly one of {@link #versionRange()} or {@link #recommendedVersion()} is non-{@code null}.
      *
+     * @return the version range, or {@code null}
      * @since 4.0.0
      */
-    @Nonnull
+    @Nullable
     default VersionRange versionRange() {
         return getVersionRange();
     }
@@ -58,11 +61,14 @@ public interface VersionConstraint {
     VersionRange getVersionRange();
 
     /**
-     * {@return the recommendedVersion}
+     * Returns the recommended version of this constraint, or {@code null} if the constraint is a range.
+     * <p>
+     * Note: exactly one of {@link #versionRange()} or {@link #recommendedVersion()} is non-{@code null}.
      *
+     * @return the recommended version, or {@code null}
      * @since 4.0.0
      */
-    @Nonnull
+    @Nullable
     default Version recommendedVersion() {
         return getRecommendedVersion();
     }
