@@ -264,27 +264,96 @@ public class Configurator implements ConfigurationHandler {
                 Set<String> bootModuleNames = ModuleLayer.boot().modules().stream()
                         .map(Module::getName)
                         .collect(Collectors.toSet());
-                ModuleFinder finder = ModuleFinder.of(modulePaths.toArray(new Path[0]));
-                Set<String> newModules = finder.findAll().stream()
-                        .map(ref -> ref.descriptor().name())
-                        .filter(name -> !bootModuleNames.contains(name))
-                        .collect(Collectors.toSet());
-                if (!newModules.isEmpty()) {
-                    Configuration cf =
-                            ModuleLayer.boot().configuration().resolve(finder, ModuleFinder.of(), newModules);
-                    ClassLoader parent =
-                            foreignClassLoader != null ? foreignClassLoader : ClassLoader.getSystemClassLoader();
-                    ModuleLayer.Controller controller =
-                            ModuleLayer.defineModulesWithOneLoader(cf, List.of(ModuleLayer.boot()), parent);
-                    ModuleLayer layer = controller.layer();
+
+                // Partition module paths into two groups:
+                //   - "infrastructure" modules (e.g. JLine) that plexus.core needs but plugins must NOT see
+                //   - "api" modules (maven-api-*) that form the plugin-visible API surface
+                // Both groups become siblings under ModuleLayer.boot() so that plugin layers can
+                // declare the api layer as their sole JPMS parent and thereby be denied access to
+                // the infrastructure layer.
+                List<Path> apiPaths = new ArrayList<>();
+                List<Path> infraPaths = new ArrayList<>();
+                for (Path path : modulePaths) {
+                    ModuleFinder singleFinder = ModuleFinder.of(path);
+                    boolean isApi = singleFinder.findAll().stream()
+                            .anyMatch(ref -> ref.descriptor().name().startsWith("org.apache.maven.api"));
+                    if (isApi) {
+                        apiPaths.add(path);
+                    } else {
+                        infraPaths.add(path);
+                    }
+                }
+
+                ClassLoader baseParent =
+                        foreignClassLoader != null ? foreignClassLoader : ClassLoader.getSystemClassLoader();
+
+                // --- Infrastructure layer (JLine, etc.) — sibling of boot, NOT parent of plugin layers ---
+                ModuleLayer infraLayer = ModuleLayer.boot();
+                ClassLoader infraLoader = baseParent;
+                if (!infraPaths.isEmpty()) {
+                    ModuleFinder infraFinder = ModuleFinder.of(infraPaths.toArray(new Path[0]));
+                    Set<String> infraModules = infraFinder.findAll().stream()
+                            .map(ref -> ref.descriptor().name())
+                            .filter(name -> !bootModuleNames.contains(name))
+                            .collect(Collectors.toSet());
+                    if (!infraModules.isEmpty()) {
+                        Configuration infraCf = ModuleLayer.boot()
+                                .configuration()
+                                .resolve(infraFinder, ModuleFinder.of(), infraModules);
+                        ModuleLayer.Controller infraController = ModuleLayer.defineModulesWithOneLoader(
+                                infraCf, List.of(ModuleLayer.boot()), baseParent);
+                        infraLayer = infraController.layer();
+                        infraLoader =
+                                infraLayer.findLoader(infraModules.iterator().next());
+                        LOGGER.log(
+                                System.Logger.Level.DEBUG,
+                                "Created infrastructure JPMS layer with modules: {0}",
+                                infraModules);
+                    }
+                }
+
+                // --- Maven API layer — sibling of boot (and infra layer), parent of plugin layers ---
+                // Its ClassLoader parent is infraLoader so that plexus.core (via foreignClassLoader)
+                // can reach both infra (JLine) and api classes through normal ClassLoader delegation.
+                // However, its JPMS parent is only ModuleLayer.boot(), NOT the infra layer, so plugin
+                // layers that declare this as their sole JPMS parent cannot resolve infra modules.
+                if (!apiPaths.isEmpty()) {
+                    ModuleFinder apiFinder = ModuleFinder.of(apiPaths.toArray(new Path[0]));
+                    Set<String> apiModules = apiFinder.findAll().stream()
+                            .map(ref -> ref.descriptor().name())
+                            .filter(name -> !bootModuleNames.contains(name))
+                            .collect(Collectors.toSet());
+                    if (!apiModules.isEmpty()) {
+                        Configuration apiCf =
+                                ModuleLayer.boot().configuration().resolve(apiFinder, ModuleFinder.of(), apiModules);
+                        ModuleLayer.Controller apiController =
+                                ModuleLayer.defineModulesWithOneLoader(apiCf, List.of(ModuleLayer.boot()), infraLoader);
+                        ModuleLayer apiLayer = apiController.layer();
+                        ClassLoader oldForeignClassLoader = foreignClassLoader;
+                        foreignClassLoader =
+                                apiLayer.findLoader(apiModules.iterator().next());
+                        // Store the api layer in ClassWorld — DefaultClassRealmManager uses it as
+                        // the JPMS parent when creating modular plugin layers, ensuring plugins can
+                        // require maven-api-* but cannot require infra modules (e.g. JLine).
+                        world.setModuleLayer(apiLayer, apiController);
+                        LOGGER.log(
+                                System.Logger.Level.DEBUG,
+                                "Created Maven API JPMS layer with modules: {0}",
+                                apiModules);
+                        // Retroactively update realms that used the old foreignClassLoader so they
+                        // inherit both infra and api classes via the new loader chain.
+                        for (ClassRealm realm : configuredRealms.values()) {
+                            if (realm.getParentClassLoader() == oldForeignClassLoader) {
+                                realm.setParentClassLoader(foreignClassLoader);
+                            }
+                        }
+                    }
+                } else if (infraLayer != ModuleLayer.boot()) {
+                    // No api JARs, but infra layer was created: store the infra layer for backward
+                    // compatibility (pre-api-layer deployments, embedders, tests).
                     ClassLoader oldForeignClassLoader = foreignClassLoader;
-                    foreignClassLoader = layer.findLoader(newModules.iterator().next());
-                    world.setModuleLayer(layer, controller);
-                    // Realms created during parsing (before this module layer existed) used the
-                    // old foreignClassLoader as their parent. Retroactively update them so they
-                    // delegate to the new module layer loader, making module-layer classes (e.g.
-                    // JLine) accessible from the classrealm without duplicating jars on the
-                    // classpath.
+                    foreignClassLoader = infraLoader;
+                    world.setModuleLayer(infraLayer, null);
                     for (ClassRealm realm : configuredRealms.values()) {
                         if (realm.getParentClassLoader() == oldForeignClassLoader) {
                             realm.setParentClassLoader(foreignClassLoader);
