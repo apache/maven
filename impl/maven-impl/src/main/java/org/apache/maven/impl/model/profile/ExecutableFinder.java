@@ -38,6 +38,12 @@ import org.apache.maven.api.services.model.ProfileActivationContext;
  * to {@code .COM;.EXE;.BAT;.CMD}; an empty PATHEXT disables suffix probing.
  * Exact files are checked before appending suffixes, preserving explicit-file support.
  * No executable is launched and no implicit current-directory search is performed.
+ * <p>
+ * {@code env.PATH} is split on the {@code path.separator} system property, falling back to
+ * {@link File#pathSeparator} when it is missing or empty.
+ * At runtime both values are identical, so the property is only an override point: it allows the unit tests
+ * to exercise Windows and POSIX separators independently of the host OS, and copes with environments that
+ * explicitly set {@code path.separator}.
  *
  * @since 4.x
  */
