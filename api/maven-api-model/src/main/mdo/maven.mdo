@@ -3102,6 +3102,9 @@
             <li>{@code exists(path)}: Checks if a file matching the given glob pattern exists.</li>
             <li>{@code missing(path)}: Checks if a file matching the given glob pattern does not exist.</li>
             <li>{@code inrange(version, range)}: Checks if the given version is within the specified version range.</li>
+            <li>{@code executable(name)}: Checks whether the given executable can be found on the system {@code PATH}, or – when an absolute or relative path is supplied – whether that path is an executable file. Returns {@code true} or {@code false}.</li>
+            <li>{@code exec(command)}: Executes an external command and returns its trimmed standard output as a string, or an empty string if the command fails, times out, or cannot be found. The command is split on whitespace; arguments with spaces are not supported. Use in combination with {@code extract()} and {@code inrange()} to gate activation on tool versions.</li>
+            <li>{@code extract(string, regex)}: Returns the first match of the regular expression in the string. When the pattern contains a capturing group, the content of the first group is returned; otherwise the entire match is returned. Returns an empty string when the pattern does not match.</li>
             </ul>
 
             <h2>Supported properties</h2>
@@ -3130,6 +3133,8 @@
             <li>Substring with version: {@code substring(${java.version}, 0, 3) == '1.8'}</li>
             <li>Using indexOf: {@code indexOf(${java.version}, '-') > 0}</li>
             <li>Conditional logic: {@code if(contains(${java.version}, '-'), substring(${java.version}, 0, indexOf(${java.version}, '-')), ${java.version})}</li>
+            <li>Executable present: {@code executable('docker')}</li>
+            <li>Tool version gate: {@code executable('docker') &amp;&amp; inrange(extract(exec('docker --version'), '\d+\.\d+[\.\d]*'), '[19.0,)')}</li>
             </ul>
 
             <h2>Cascading Profile Activation</h2>
