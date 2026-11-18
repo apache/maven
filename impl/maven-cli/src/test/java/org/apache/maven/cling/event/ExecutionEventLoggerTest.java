@@ -637,7 +637,7 @@ class ExecutionEventLoggerTest {
     }
 
     @Test
-    void testFinalResultLineOnNarrowTerminal() {
+    void testFinalResultLineAtMinimumTerminalWidth() {
         MavenExecutionRequest executionRequest = new DefaultMavenExecutionRequest();
         ExecutionEvent event = sessionEndedEvent(new DefaultMavenExecutionResult(), executionRequest);
 
