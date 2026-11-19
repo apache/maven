@@ -67,6 +67,7 @@ import org.apache.maven.api.settings.Repository;
 import org.apache.maven.api.settings.Server;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.spi.PropertyContributor;
+import org.apache.maven.api.spi.SpiService;
 import org.apache.maven.artifact.repository.ArtifactRepository;
 import org.apache.maven.artifact.repository.ArtifactRepositoryPolicy;
 import org.apache.maven.artifact.repository.MavenArtifactRepository;
@@ -405,9 +406,8 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
             MessageUtils.registerShutdownHook(); // safety belt
 
             // Create the build log appender; also sets MavenSimpleLogger sink
-            ProjectBuildLogAppender projectBuildLogAppender =
-                    new ProjectBuildLogAppender(determineBuildEventListener(context));
-            context.closeables.add(projectBuildLogAppender);
+            context.projectBuildLogAppender = new ProjectBuildLogAppender(determineBuildEventListener(context));
+            context.closeables.add(context.projectBuildLogAppender);
         } else {
             // context.terminal is pre-set; doConfigureWithTerminal will be called
             // by doInvoke() after configureLogging() (see note in doInvoke).
@@ -648,6 +648,14 @@ public abstract class LookupInvoker<C extends LookupContext> implements Invoker 
     protected void lookup(C context) throws Exception {
         if (context.eventSpyDispatcher == null) {
             context.eventSpyDispatcher = context.lookup.lookup(EventSpyDispatcher.class);
+        }
+        // Wire LogSink SPI implementations into ProjectBuildLogAppender
+        if (context.projectBuildLogAppender != null) {
+            List<LogSink> spiSinks = context.lookup.lookupList(SpiService.class).stream()
+                    .filter(s -> s instanceof LogSink)
+                    .map(s -> (LogSink) s)
+                    .toList();
+            context.projectBuildLogAppender.setSpiSinks(spiSinks);
         }
     }
 

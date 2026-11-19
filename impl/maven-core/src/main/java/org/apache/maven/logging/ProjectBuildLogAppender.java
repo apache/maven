@@ -18,11 +18,12 @@
  */
 package org.apache.maven.logging;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.function.Consumer;
 
 import org.apache.maven.api.MonotonicClock;
 import org.apache.maven.api.logging.LogEvent;
@@ -117,10 +118,10 @@ public class ProjectBuildLogAppender implements AutoCloseable {
 
     private static final AtomicLong SEQUENCE = new AtomicLong();
 
-    private static volatile Consumer<LogEvent> reportCapture;
+    private volatile List<LogSink> secondarySinks = List.of();
 
-    public static void setReportCapture(Consumer<LogEvent> capture) {
-        ProjectBuildLogAppender.reportCapture = capture;
+    public void setSpiSinks(List<LogSink> sinks) {
+        this.secondarySinks = new CopyOnWriteArrayList<>(sinks);
     }
 
     private final BuildEventListener buildEventListener;
@@ -174,7 +175,7 @@ public class ProjectBuildLogAppender implements AutoCloseable {
 
         @Override
         public boolean needsMetadata() {
-            return needsMetadata || reportCapture != null;
+            return needsMetadata;
         }
     }
 
@@ -200,9 +201,8 @@ public class ProjectBuildLogAppender implements AutoCloseable {
         while ((event = queue.poll()) != null) {
             buildEventListener.projectLogMessage(event.projectId(), event);
 
-            Consumer<LogEvent> capture = reportCapture;
-            if (capture != null) {
-                capture.accept(event);
+            for (LogSink secondary : secondarySinks) {
+                secondary.accept(event);
             }
         }
     }

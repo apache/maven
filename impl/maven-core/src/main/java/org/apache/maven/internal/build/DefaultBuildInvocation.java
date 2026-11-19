@@ -111,6 +111,10 @@ public record DefaultBuildInvocation(
         addSystemProp(sysInfo, "java.vm.name");
         addSystemProp(sysInfo, "java.vm.version");
         addSystemProp(sysInfo, "maven.home");
+        // Note: user.home and user.name are captured for diagnostics (e.g. identifying
+        // CI vs developer builds). The report is written to target/build-reports/ which
+        // is local and gitignored. Do not include these properties in reports that may
+        // be shared externally.
         addSystemProp(sysInfo, "user.home");
         addSystemProp(sysInfo, "user.name");
         sysInfo.put("available.processors", String.valueOf(Runtime.getRuntime().availableProcessors()));
