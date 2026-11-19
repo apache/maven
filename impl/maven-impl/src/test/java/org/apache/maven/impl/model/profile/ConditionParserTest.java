@@ -217,6 +217,21 @@ class ConditionParserTest {
         assertThrows(RuntimeException.class, () -> parser.parse("true || (false"));
     }
 
+    /**
+     * {@code &&} and {@code ||} coerce a non-boolean operand as {@code !} and {@code not()} do.
+     */
+    @Test
+    void testLogicalOperatorsCoerceOperands() {
+        assertTrue((Boolean) parser.parse("'abc' && true"));
+        assertFalse((Boolean) parser.parse("'' && true"));
+        assertTrue((Boolean) parser.parse("true && 'abc'"));
+        assertFalse((Boolean) parser.parse("true && ''"));
+        assertTrue((Boolean) parser.parse("'' || 'abc'"));
+        assertFalse((Boolean) parser.parse("'' || 0"));
+        assertTrue((Boolean) parser.parse("1 || false"));
+        assertTrue((Boolean) parser.parse("${os.name} && ${os.arch} == 'amd64'"));
+    }
+
     @Test
     void testContainsFunction() {
         assertTrue((Boolean) parser.parse("contains('Hello, World!', 'World')"));
