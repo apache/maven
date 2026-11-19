@@ -24,6 +24,7 @@ import java.util.Map;
 
 import org.apache.maven.api.settings.Alias;
 import org.apache.maven.api.settings.Settings;
+import org.apache.maven.settings.v4.ArgumentTokenizer;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
