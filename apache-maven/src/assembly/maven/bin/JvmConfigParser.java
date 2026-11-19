@@ -81,7 +81,7 @@ public class JvmConfigParser {
             // If jvm.config exists but can't be read or parsed, this is a configuration error
             // Print clear error and exit with error code to prevent Maven from running
             System.err.println("ERROR: Failed to process .mvn/jvm.config: " + e.getMessage());
-            System.err.println("Please check that the file is readable and has valid syntax.");
+            System.err.println("Please check file permissions and syntax.");
             System.err.flush();
             System.exit(1);
         }
@@ -150,15 +150,8 @@ public class JvmConfigParser {
     /**
      * Parse a line into individual arguments, respecting quoted strings.
      * Quotes are stripped from the arguments. Empty quoted strings ({@code ""} or {@code ''})
-     * produce an empty argument token.
-     *
-     * <p><strong>Migration note (Maven 4.2.0):</strong> in this branch a backslash outside
-     * single-quotes escapes the next character (e.g. {@code \ } embeds a literal space in an
-     * argument). Maven 4.2.0 will change this — unquoted backslashes will be treated as literal
-     * characters, and only {@code \"} and {@code \\} inside double-quoted strings will be
-     * recognised as escapes. A warning is emitted at runtime when this pattern is detected.
-     * Migrate to quoted arguments before upgrading: replace {@code -Dfoo=hello\ world} with
-     * {@code "-Dfoo=hello world"}.
+     * produce an empty argument token. Backslashes are treated as literal characters;
+     * they do not act as escape characters.
      */
     private static List<String> parseArguments(String line) {
         List<String> args = new ArrayList<>();
@@ -170,26 +163,7 @@ public class JvmConfigParser {
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
 
-            if (c == '\\' && !inSingleQuotes && i + 1 < line.length()) {
-                // Backslash escape: outside single-quotes, \X is always a literal X.
-                // NOTE: this behaviour changes in Maven 4.2.0 — only \" and \\ inside
-                // double-quoted strings will remain escape sequences; all other backslashes
-                // will be treated as literal characters.
-                char next = line.charAt(i + 1);
-                if (!inDoubleQuotes) {
-                    // Warn about unquoted backslash escape — this will break in 4.2.0
-                    System.err.println("WARNING: .mvn/jvm.config: unquoted backslash before '" + next
-                            + "' is currently treated as an escape character but will be a literal"
-                            + " backslash in Maven 4.2.0.");
-                    System.err.println(
-                            "         Use quotes to avoid ambiguity:"
-                                    + " e.g. \"-Dfoo=hello world\" instead of -Dfoo=hello\\ world");
-                    System.err.flush();
-                }
-                current.append(next);
-                i++;
-                tokenStarted = true;
-            } else if (c == '"' && !inSingleQuotes) {
+            if (c == '"' && !inSingleQuotes) {
                 inDoubleQuotes = !inDoubleQuotes;
                 tokenStarted = true;
             } else if (c == '\'' && !inDoubleQuotes) {

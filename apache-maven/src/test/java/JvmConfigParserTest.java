@@ -45,15 +45,11 @@ class JvmConfigParserTest {
                 Arguments.of("fi\"\"rst ''third", "\"first\" \"third\""),
                 // Space inside double quotes is preserved
                 Arguments.of("-Dname=\"hello world\"", "\"-Dname=hello world\""),
-                // Escaped double-quote inside double-quoted string
-                Arguments.of("\"a\\\"b\"", "\"a\\\"b\""),
-                // Windows paths inside double quotes: backslash is escape in 4.0.x (escapes next char)
-                // Note: in Maven 4.2.0 this will change — only \" and \\ will be escapes inside "..."
-                // For now, \a -> a, \m -> m, etc. inside double-quoted strings
+                // Windows paths inside double quotes: backslash is literal
                 Arguments.of(
-                        "\"-javaagent:D:\\\\a\\\\maven\\\\target\\\\agent.jar\"",
+                        "\"-javaagent:D:\\a\\maven\\target\\agent.jar\"",
                         "\"-javaagent:D:\\\\a\\\\maven\\\\target\\\\agent.jar\""),
-                // Single-quoted Windows path: backslash is literal (no escape in single-quotes)
+                // Single-quoted Windows path: backslash is literal
                 Arguments.of("'-Dpath=C:\\temp\\config'", "\"-Dpath=C:\\\\temp\\\\config\""),
                 // Blank / whitespace-only line produces empty output
                 Arguments.of("  \t  ", ""));
@@ -79,12 +75,16 @@ class JvmConfigParserTest {
     void preservesProjectBasedirAfterTokenization() throws Exception {
         Path config = tempDir.resolve("jvm.config");
         Files.writeString(config, "'-Dfirst=${MAVEN_PROJECTBASEDIR}/first' \"-Dsecond=$MAVEN_PROJECTBASEDIR/second\"");
-        // In 4.0.x, placeholder expansion happens BEFORE tokenization.
-        // The expanded path "C:\Program Files\Maven" then goes through the tokenizer
-        // where backslash-escapes are active, so each \P, \F, \M becomes P, F, M.
-        // Use a path without backslashes to test the placeholder expansion in 4.0.x.
         assertEquals(
                 "\"-Dfirst=/tmp/maven/first\" \"-Dsecond=/tmp/maven/second\"",
                 JvmConfigParser.parseJvmConfig(config, "/tmp/maven"));
+    }
+
+    @Test
+    void preservesWindowsProjectBasedirBackslashes() throws Exception {
+        Path config = tempDir.resolve("jvm.config");
+        Files.writeString(config, "-Dfirst=${MAVEN_PROJECTBASEDIR}/first");
+        // Windows backslashes in the substituted path must be preserved as literal characters
+        assertEquals("\"-Dfirst=D:\\\\a\\\\maven/first\"", JvmConfigParser.parseJvmConfig(config, "D:\\a\\maven"));
     }
 }
