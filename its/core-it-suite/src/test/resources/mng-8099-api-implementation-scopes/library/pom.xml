@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.2.0">
+  <parent />
+  <artifactId>library</artifactId>
+  <packaging>jar</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.apache.maven.its.mng8099</groupId>
+      <artifactId>lib-api-dep</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>api</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.apache.maven.its.mng8099</groupId>
+      <artifactId>lib-impl-dep</artifactId>
+      <version>1.0-SNAPSHOT</version>
+      <scope>implementation</scope>
+    </dependency>
+  </dependencies>
+</project>
