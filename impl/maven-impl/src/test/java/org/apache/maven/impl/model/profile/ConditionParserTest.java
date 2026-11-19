@@ -230,6 +230,13 @@ class ConditionParserTest {
         assertFalse((Boolean) parser.parse("'' || 0"));
         assertTrue((Boolean) parser.parse("1 || false"));
         assertTrue((Boolean) parser.parse("${os.name} && ${os.arch} == 'amd64'"));
+        assertFalse((Boolean) parser.parse("'a' && 'b' && ''"));
+        // an undefined property is false, as it is for !
+        assertFalse((Boolean) parser.parse("${undefined.property} && true"));
+        assertTrue((Boolean) parser.parse("${undefined.property} || 'abc'"));
+        // the right operand is still not evaluated when the left one decides
+        assertFalse((Boolean) parser.parse("'' && unknown('x')"));
+        assertTrue((Boolean) parser.parse("'abc' || unknown('x')"));
     }
 
     @Test
