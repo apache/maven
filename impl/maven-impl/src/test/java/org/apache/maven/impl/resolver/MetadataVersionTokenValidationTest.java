@@ -28,6 +28,9 @@ import org.apache.maven.api.Session;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Provides;
+import org.apache.maven.api.services.VersionRangeResolver;
+import org.apache.maven.api.services.VersionRangeResolverException;
+import org.apache.maven.api.services.VersionRangeResolverResult;
 import org.apache.maven.impl.standalone.ApiRunner;
 import org.eclipse.aether.spi.connector.transport.http.ChecksumExtractor;
 import org.eclipse.aether.spi.io.PathProcessor;
@@ -37,6 +40,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
@@ -91,8 +95,15 @@ class MetadataVersionTokenValidationTest {
         // The metadata carries a versions[] entry that is not a valid coordinate component, so the whole
         // document is treated as invalid and none of its versions (including the otherwise-valid 1.0 and 2.0)
         // are offered as candidates for the range.
-        List<Version> versions = session.resolveVersionRange(coordinates);
-        assertTrue(versions.isEmpty(), "expected no versions, got " + versions);
+        VersionRangeResolverResult result =
+                session.getService(VersionRangeResolver.class).resolve(session, coordinates);
+        assertTrue(result.getVersions().isEmpty(), "expected no versions, got " + result.getVersions());
+
+        VersionRangeResolverException error =
+                assertThrows(VersionRangeResolverException.class, () -> session.resolveVersionRange(coordinates));
+        assertTrue(
+                error.getMessage().contains("Rejecting metadata with invalid version '1.0:2.0'"), error.getMessage());
+        assertTrue(error.getCause().getMessage().contains("Rejecting metadata with invalid version '1.0:2.0'"));
     }
 
     @Provides

@@ -97,6 +97,8 @@ import org.apache.maven.api.services.Result;
 import org.apache.maven.api.services.TypeRegistry;
 import org.apache.maven.api.services.VersionParser;
 import org.apache.maven.api.services.VersionRangeResolver;
+import org.apache.maven.api.services.VersionRangeResolverException;
+import org.apache.maven.api.services.VersionRangeResolverResult;
 import org.apache.maven.api.services.VersionResolver;
 import org.apache.maven.api.services.VersionResolverException;
 import org.apache.maven.api.spi.SpiService;
@@ -111,6 +113,7 @@ import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.ArtifactType;
 import org.eclipse.aether.repository.ArtifactRepository;
 import org.eclipse.aether.resolution.ArtifactResult;
+import org.eclipse.aether.transfer.MetadataNotFoundException;
 import org.eclipse.aether.transfer.TransferResource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1029,24 +1032,45 @@ public abstract class AbstractSession implements InternalSession {
     }
 
     @Override
-    public List<Version> resolveVersionRange(ArtifactCoordinates artifact) throws VersionResolverException {
-        return getService(VersionRangeResolver.class).resolve(this, artifact).getVersions();
+    public List<Version> resolveVersionRange(ArtifactCoordinates artifact) throws VersionRangeResolverException {
+        return checkVersionRangeResult(
+                        artifact, getService(VersionRangeResolver.class).resolve(this, artifact))
+                .getVersions();
     }
 
     @Override
     public List<Version> resolveVersionRange(ArtifactCoordinates artifact, List<RemoteRepository> repositories)
-            throws VersionResolverException {
-        return getService(VersionRangeResolver.class)
-                .resolve(this, artifact, repositories)
+            throws VersionRangeResolverException {
+        return checkVersionRangeResult(
+                        artifact, getService(VersionRangeResolver.class).resolve(this, artifact, repositories))
                 .getVersions();
     }
 
     @Override
     public Optional<Version> resolveHighestVersion(ArtifactCoordinates artifact, List<RemoteRepository> repositories)
-            throws VersionResolverException {
-        return getService(VersionRangeResolver.class)
-                .resolve(this, artifact, repositories)
+            throws VersionRangeResolverException {
+        return checkVersionRangeResult(
+                        artifact, getService(VersionRangeResolver.class).resolve(this, artifact, repositories))
                 .getHighestVersion();
+    }
+
+    private static VersionRangeResolverResult checkVersionRangeResult(
+            ArtifactCoordinates artifact, VersionRangeResolverResult result) {
+        if (!result.getVersions().isEmpty()) {
+            return result;
+        }
+        // A missing local metadata file is normal when versions are discovered remotely.
+        List<Exception> exceptions = result.getExceptions().stream()
+                .filter(e -> !(e instanceof MetadataNotFoundException missing && missing.getRepository() == null))
+                .toList();
+        if (!exceptions.isEmpty()) {
+            String details = exceptions.stream().map(Exception::getMessage).collect(Collectors.joining("; "));
+            VersionRangeResolverException failure = new VersionRangeResolverException(
+                    "Unable to resolve version range for " + artifact + ": " + details, exceptions.get(0));
+            exceptions.stream().skip(1).forEach(failure::addSuppressed);
+            throw failure;
+        }
+        return result;
     }
 
     @Override
