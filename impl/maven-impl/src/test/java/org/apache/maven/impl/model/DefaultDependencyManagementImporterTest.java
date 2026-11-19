@@ -23,15 +23,18 @@ import java.util.List;
 import org.apache.maven.api.model.Dependency;
 import org.apache.maven.api.model.DependencyManagement;
 import org.apache.maven.api.model.Exclusion;
+import org.apache.maven.api.model.Inclusion;
 import org.apache.maven.api.model.InputLocation;
 import org.apache.maven.api.model.InputSource;
 import org.apache.maven.api.model.Model;
 import org.apache.maven.api.services.ModelBuilderRequest;
 import org.apache.maven.api.services.ModelProblemCollector;
+import org.apache.maven.impl.model.profile.SimpleProblemCollector;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 
 class DefaultDependencyManagementImporterTest {
@@ -191,5 +194,80 @@ class DefaultDependencyManagementImporterTest {
         assertEquals(1, merged.getExclusions().size());
         assertEquals("org.junit.vintage", merged.getExclusions().get(0).getGroupId());
         assertEquals("junit-vintage-engine", merged.getExclusions().get(0).getArtifactId());
+    }
+
+    @Test
+    void testImportManagementWithEquivalentInclusionsUsingIdAndChildElements() {
+        Inclusion inc1 =
+                Inclusion.newBuilder().id("org.junit.jupiter:junit-jupiter-api").build();
+        Inclusion inc2 = Inclusion.newBuilder()
+                .groupId("org.junit.jupiter")
+                .artifactId("junit-jupiter-api")
+                .build();
+
+        Dependency dep1 = Dependency.newBuilder()
+                .groupId("org.junit.jupiter")
+                .artifactId("junit-jupiter-api")
+                .version("5.10.0")
+                .includes(List.of(inc1))
+                .build();
+
+        Dependency dep2 = Dependency.newBuilder()
+                .groupId("org.junit.jupiter")
+                .artifactId("junit-jupiter-api")
+                .version("5.10.0")
+                .includes(List.of(inc2))
+                .build();
+
+        DependencyManagement bom1 =
+                DependencyManagement.newBuilder().dependencies(List.of(dep1)).build();
+        DependencyManagement bom2 =
+                DependencyManagement.newBuilder().dependencies(List.of(dep2)).build();
+
+        Model target = Model.newBuilder().build();
+        DefaultDependencyManagementImporter importer = new DefaultDependencyManagementImporter();
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+
+        Model result =
+                importer.importManagement(target, List.of(bom1, bom2), mock(ModelBuilderRequest.class), problems);
+
+        assertEquals(1, result.getDependencyManagement().getDependencies().size());
+        assertTrue(problems.getWarnings().isEmpty(), "Expected no warnings for semantically identical inclusions");
+    }
+
+    @Test
+    void testImportManagementWithConflictingInclusionsUsingDifferentIds() {
+        Inclusion inc1 = Inclusion.newBuilder().id("org.junit.jupiter:foo").build();
+        Inclusion inc2 = Inclusion.newBuilder().id("org.junit.jupiter:bar").build();
+
+        Dependency dep1 = Dependency.newBuilder()
+                .groupId("org.junit.jupiter")
+                .artifactId("junit-jupiter-api")
+                .version("5.10.0")
+                .includes(List.of(inc1))
+                .build();
+
+        Dependency dep2 = Dependency.newBuilder()
+                .groupId("org.junit.jupiter")
+                .artifactId("junit-jupiter-api")
+                .version("5.10.0")
+                .includes(List.of(inc2))
+                .build();
+
+        DependencyManagement bom1 =
+                DependencyManagement.newBuilder().dependencies(List.of(dep1)).build();
+        DependencyManagement bom2 =
+                DependencyManagement.newBuilder().dependencies(List.of(dep2)).build();
+
+        Model target = Model.newBuilder().build();
+        DefaultDependencyManagementImporter importer = new DefaultDependencyManagementImporter();
+        SimpleProblemCollector problems = new SimpleProblemCollector();
+
+        Model result =
+                importer.importManagement(target, List.of(bom1, bom2), mock(ModelBuilderRequest.class), problems);
+
+        assertEquals(1, result.getDependencyManagement().getDependencies().size());
+        assertEquals(1, problems.getWarnings().size());
+        assertTrue(problems.getWarnings().get(0).contains("Ignored POM import"));
     }
 }

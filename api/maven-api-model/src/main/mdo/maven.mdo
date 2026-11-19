@@ -1313,6 +1313,26 @@
           </association>
         </field>
         <field>
+          <name>includes</name>
+          <version>4.2.0+</version>
+          <description>
+            <![CDATA[
+            Lists a set of artifacts to include when importing a bill of materials.
+            A dependency from the imported BOM is included if it matches at least one
+            {@code <include>} entry (OR semantics). Coordinates can be specified via the
+            {@code id} attribute (in {@code groupId:artifactId} format) or via child
+            {@code <groupId>} and {@code <artifactId>} elements. Omitting {@code groupId} or
+            {@code artifactId} in an {@code <include>} acts as a wildcard matching any value.
+            When both {@code <includes>} and {@code <exclusions>} are present, inclusions
+            are applied first, then exclusions are applied to the remaining set.
+            ]]>
+          </description>
+          <association>
+            <type>Inclusion</type>
+            <multiplicity>*</multiplicity>
+          </association>
+        </field>
+        <field>
           <name>optional</name>
           <version>4.0.0+</version>
           <description>
@@ -1426,11 +1446,12 @@
       <description>
         <![CDATA[
         The {@code <exclusion>} element contains information required to exclude
-        an artifact to the project.
+        an artifact from the project.
         <p>
-        The {@code groupId} and {@code artifactId} fields are interpreted as glob patterns.
-
-        @see java.nio.file.FileSystem#getPathMatcher
+        The {@code groupId} and {@code artifactId} fields support simple glob patterns.
+        Supported wildcards: {@code *} matches any sequence of characters, and
+        {@code ?} matches exactly one character. Character classes and alternation
+        groups (e.g., {@code [a-z]}, {@code {x,y}}) are not supported.
         ]]>
       </description>
       <fields>
@@ -1447,6 +1468,44 @@
           <description>The artifact ID of the project to exclude.</description>
           <type>String</type>
           <required>true</required>
+        </field>
+      </fields>
+    </class>
+    <class>
+      <name>Inclusion</name>
+      <version>4.2.0+</version>
+      <description>
+        <![CDATA[
+        The {@code <inclusion>} element contains information required to include
+        an artifact in the project when importing a bill of materials.
+        <p>
+        Coordinates can be specified via the {@code id} attribute (in {@code groupId:artifactId}
+        format) or via child {@code <groupId>} and {@code <artifactId>} elements.
+        The {@code groupId} and {@code artifactId} fields support simple glob patterns.
+        Supported wildcards: {@code *} matches any sequence of characters, and
+        {@code ?} matches exactly one character. Character classes and alternation
+        groups (e.g., {@code [a-z]}, {@code {x,y}}) are not supported - use separate
+        {@code <include>} elements for multiple patterns.
+        ]]>
+      </description>
+      <fields>
+        <field xml.attribute="true">
+          <name>id</name>
+          <version>4.2.0+</version>
+          <description>A compact identifier in the form 'groupId:artifactId'.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>groupId</name>
+          <version>4.2.0+</version>
+          <description>The group ID of the project to include.</description>
+          <type>String</type>
+        </field>
+        <field>
+          <name>artifactId</name>
+          <version>4.2.0+</version>
+          <description>The artifact ID of the project to include.</description>
+          <type>String</type>
         </field>
       </fields>
     </class>

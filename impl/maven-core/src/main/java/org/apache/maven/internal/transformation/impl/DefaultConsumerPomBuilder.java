@@ -89,6 +89,13 @@ import org.slf4j.LoggerFactory;
  *   <li>Otherwise, an exception is thrown requiring one of the above options or manual mixin removal</li>
  * </ul>
  * <p>
+ * <b>Dependency Inclusions Handling</b>: Dependency inclusions ({@code <includes>}) on BOM imports are only supported
+ * in model version 4.2.0 or later. If a POM contains dependency inclusions:
+ * <ul>
+ *   <li>Setting {@code preserve.model.version=true} preserves them in the consumer POM with model version 4.2.0</li>
+ *   <li>Otherwise, an exception is thrown requiring the above option or manual removal of {@code <includes>}</li>
+ * </ul>
+ * <p>
  * <b>Dependency Filtering</b>: For non-POM projects with dependency management, the builder:
  * <ul>
  *   <li>Filters dependencies to include only those with transitive scopes (compile/runtime)</li>
@@ -144,6 +151,22 @@ class DefaultConsumerPomBuilder implements PomBuilder {
                     + "  2. Enable flattening by setting the property 'maven.consumer.pom.flatten=true' to remove mixins during transformation"
                     + System.lineSeparator()
                     + "  3. Remove the mixins from your POM");
+        }
+
+        // Check if dependency includes are present without preserveModelVersion enabled
+        if ((hasDependencyIncludes(model)
+                        || (project.getOriginalModel() != null
+                                && hasDependencyIncludes(
+                                        project.getOriginalModel().getDelegate())))
+                && !model.isPreserveModelVersion()) {
+            throw new MavenException("The consumer POM for "
+                    + project.getId()
+                    + " cannot be created because the POM contains dependency inclusions (<includes>). "
+                    + "Dependency inclusions are not supported in the default consumer POM format. "
+                    + "You have the following options to resolve this:" + System.lineSeparator()
+                    + "  1. Preserve the model version by setting 'preserve.model.version=true' to generate a consumer POM with <modelVersion>4.2.0</modelVersion>, which supports <includes>"
+                    + System.lineSeparator()
+                    + "  2. Remove the <includes> elements from your POM");
         }
 
         // Check if consumer POM flattening is disabled
@@ -1078,5 +1101,41 @@ class DefaultConsumerPomBuilder implements PomBuilder {
             result.add(repository);
         }
         return result;
+    }
+
+    private static boolean hasDependencyIncludes(Model model) {
+        if (model == null) {
+            return false;
+        }
+        if (hasDependencyIncludes(model.getDependencyManagement())) {
+            return true;
+        }
+        for (Dependency dep : model.getDependencies()) {
+            if (!dep.getIncludes().isEmpty()) {
+                return true;
+            }
+        }
+        for (Profile profile : model.getProfiles()) {
+            if (hasDependencyIncludes(profile.getDependencyManagement())) {
+                return true;
+            }
+            for (Dependency dep : profile.getDependencies()) {
+                if (!dep.getIncludes().isEmpty()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    private static boolean hasDependencyIncludes(DependencyManagement dependencyManagement) {
+        if (dependencyManagement != null) {
+            for (Dependency dep : dependencyManagement.getDependencies()) {
+                if (!dep.getIncludes().isEmpty()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 }
