@@ -30,7 +30,6 @@ import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
 import org.apache.maven.api.annotations.Nonnull;
 import org.apache.maven.api.annotations.Nullable;
-import org.apache.maven.api.cli.logging.AccumulatingLogger;
 import org.apache.maven.api.services.Lookup;
 import org.apache.maven.api.services.LookupException;
 import org.apache.maven.api.services.MessageBuilderFactory;
@@ -63,14 +62,6 @@ public interface ParserRequest {
      */
     @Nonnull
     String commandName();
-
-    /**
-     * Returns the logger to be used during the parsing process.
-     *
-     * @return the logger instance
-     */
-    @Nonnull
-    Logger logger();
 
     /**
      * Returns the factory for creating message builders.
@@ -303,7 +294,6 @@ public interface ParserRequest {
         private final List<String> args;
         private final MessageBuilderFactory messageBuilderFactory;
 
-        private final Logger logger;
         private Lookup lookup = EMPTY_LOOKUP;
         private Path cwd;
         private Path mavenHome;
@@ -319,7 +309,6 @@ public interface ParserRequest {
             this.commandName = requireNonNull(commandName, "commandName");
             this.args = requireNonNull(args, "args");
             this.messageBuilderFactory = requireNonNull(messageBuilderFactory, "messageBuilderFactory");
-            this.logger = new AccumulatingLogger();
         }
 
         public Builder lookup(@Nonnull Lookup lookup) {
@@ -367,7 +356,6 @@ public interface ParserRequest {
                     command,
                     commandName,
                     List.copyOf(args),
-                    lookup.lookupOptional(Logger.class).orElse(logger),
                     messageBuilderFactory,
                     lookup,
                     cwd,
@@ -383,7 +371,6 @@ public interface ParserRequest {
         private static class ParserRequestImpl implements ParserRequest {
             private final String command;
             private final String commandName;
-            private final Logger logger;
             private final MessageBuilderFactory messageBuilderFactory;
             private final List<String> args;
             private final Lookup lookup;
@@ -399,7 +386,6 @@ public interface ParserRequest {
                     String command,
                     String commandName,
                     List<String> args,
-                    Logger logger,
                     MessageBuilderFactory messageBuilderFactory,
                     Lookup lookup,
                     Path cwd,
@@ -412,7 +398,6 @@ public interface ParserRequest {
                 this.command = requireNonNull(command, "command");
                 this.commandName = requireNonNull(commandName, "commandName");
                 this.args = List.copyOf(requireNonNull(args, "args"));
-                this.logger = requireNonNull(logger, "logger");
                 this.messageBuilderFactory = requireNonNull(messageBuilderFactory, "messageBuilderFactory");
                 this.lookup = requireNonNull(lookup, "lookup");
                 this.cwd = cwd;
@@ -432,11 +417,6 @@ public interface ParserRequest {
             @Override
             public String commandName() {
                 return commandName;
-            }
-
-            @Override
-            public Logger logger() {
-                return logger;
             }
 
             @Override

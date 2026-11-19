@@ -18,9 +18,7 @@
  */
 package org.apache.maven.di.impl;
 
-import java.io.PrintStream;
 import java.lang.annotation.Annotation;
-import java.lang.ref.WeakReference;
 import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.Map;
@@ -80,16 +78,11 @@ final class InjectorDiagnostics {
             }
             return;
         }
-        PrintStream output = System.out;
         DiagnosticState state = diagnosticState;
-        if (!partial
-                && state != null
-                && state.mode == mode
-                && state.capturedRevision == registryRevision
-                && state.output.get() == output) {
+        if (!partial && state != null && state.mode == mode && state.capturedRevision == registryRevision) {
             return;
         }
-        writeBindings(output, reason, partial, mode);
+        writeBindings(reason, partial, mode);
     }
 
     private static DiagnosticMode diagnosticMode() {
@@ -107,12 +100,12 @@ final class InjectorDiagnostics {
         }
     }
 
-    private void writeBindings(PrintStream output, String reason, boolean partial, DiagnosticMode mode) {
+    private void writeBindings(String reason, boolean partial, DiagnosticMode mode) {
         DiagnosticWork work;
         synchronized (diagnosticLock) {
             DiagnosticState state = diagnosticState;
-            if (state == null || state.mode != mode || state.output.get() != output) {
-                state = new DiagnosticState(mode, output);
+            if (state == null || state.mode != mode) {
+                state = new DiagnosticState(mode);
                 diagnosticState = state;
             }
             long revision = registryRevision;
@@ -122,7 +115,7 @@ final class InjectorDiagnostics {
             try {
                 BindingSnapshot snapshot = BindingSnapshot.capture(
                         bindings, scopes, state.identities, mode == DiagnosticMode.AMBIGUOUS, revision);
-                work = new DiagnosticWork(state, snapshot, output, reason, partial);
+                work = new DiagnosticWork(state, snapshot, reason, partial);
                 state.capturedRevision = revision;
                 if (diagnosticQueue == null) {
                     diagnosticQueue = new ArrayDeque<>();
@@ -177,7 +170,7 @@ final class InjectorDiagnostics {
                     String dump = work.snapshot.render(
                             injector, work.reason, work.partial, previous, injector.getBindingStyler());
                     if (dump != null) {
-                        injector.writeDump(work.output, dump);
+                        injector.writeDump(dump);
                         synchronized (diagnosticLock) {
                             if (diagnosticState == work.state) {
                                 work.state.emittedSnapshot = work.snapshot;
@@ -218,16 +211,13 @@ final class InjectorDiagnostics {
     private static final class DiagnosticWork {
         final DiagnosticState state;
         final BindingSnapshot snapshot;
-        final PrintStream output;
         final String reason;
         final boolean partial;
         boolean done;
 
-        DiagnosticWork(
-                DiagnosticState state, BindingSnapshot snapshot, PrintStream output, String reason, boolean partial) {
+        DiagnosticWork(DiagnosticState state, BindingSnapshot snapshot, String reason, boolean partial) {
             this.state = state;
             this.snapshot = snapshot;
-            this.output = output;
             this.reason = reason;
             this.partial = partial;
         }
@@ -237,13 +227,10 @@ final class InjectorDiagnostics {
         final DiagnosticIdentity identities = new DiagnosticIdentity();
         final DiagnosticMode mode;
         volatile long capturedRevision = NO_CAPTURED_REVISION;
-        // A reused injector must not retain a previous embedded invocation's output stream.
-        final WeakReference<PrintStream> output;
         BindingSnapshot emittedSnapshot;
 
-        DiagnosticState(DiagnosticMode mode, PrintStream output) {
+        DiagnosticState(DiagnosticMode mode) {
             this.mode = mode;
-            this.output = new WeakReference<>(output);
         }
     }
 }
