@@ -230,6 +230,14 @@ public class CommonsCliOptions implements Options {
     }
 
     @Override
+    public Optional<Boolean> processes() {
+        if (commandLine.hasOption(CLIManager.LIST_PROCESSES)) {
+            return Optional.of(Boolean.TRUE);
+        }
+        return Optional.empty();
+    }
+
+    @Override
     public void warnAboutDeprecatedOptions(ParserRequest request, Consumer<String> printWriter) {
         if (cliManager.getUsedDeprecatedOptions().isEmpty()) {
             return;
@@ -319,6 +327,9 @@ public class CommonsCliOptions implements Options {
         public static final String OFFLINE = "o";
         public static final String HELP = "h";
 
+        // List running Maven processes (MNG-8608). No short form: -ps already used.
+        public static final String LIST_PROCESSES = "list-processes";
+
         // Not an Option: used only for early detection, when CLI args may not be even parsed
         public static final String SHOW_ERRORS_CLI_ARG = "-" + SHOW_ERRORS;
 
@@ -350,6 +361,10 @@ public class CommonsCliOptions implements Options {
             options.addOption(Option.builder(HELP)
                     .longOpt("help")
                     .desc("Display help information")
+                    .get());
+            options.addOption(Option.builder()
+                    .longOpt(LIST_PROCESSES)
+                    .desc("List running Maven processes and exit")
                     .get());
             options.addOption(Option.builder(USER_PROPERTY)
                     .longOpt("define")
