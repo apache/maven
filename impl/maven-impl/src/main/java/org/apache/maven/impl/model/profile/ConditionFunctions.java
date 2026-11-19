@@ -18,8 +18,15 @@
  */
 package org.apache.maven.impl.model.profile;
 
+import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Objects;
+import java.util.concurrent.TimeUnit;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.maven.api.services.InterpolatorException;
 import org.apache.maven.api.services.ModelBuilderException;
@@ -243,6 +250,105 @@ public class ConditionFunctions {
         String version = ConditionParser.toString(args.get(0));
         String range = ConditionParser.toString(args.get(1));
         return versionParser.parseVersionRange(range).contains(versionParser.parseVersion(version));
+    }
+
+    /** Maximum number of stdout bytes captured from an {@link #exec} command. */
+    private static final int EXEC_OUTPUT_LIMIT = 4096;
+
+    /**
+     * Executes a command and returns its standard output as a trimmed string.
+     *
+     * <p>The command string is split on whitespace to build the argument array.
+     * Arguments or executable paths that contain spaces (e.g. Windows paths under
+     * {@code C:\Program Files\}) are <strong>not</strong> supported; use a short
+     * path, symlink, or wrapper script without spaces instead.
+     *
+     * <p>The process is given a 5-second wall-clock timeout; if it does not finish
+     * within that limit, it is forcibly killed and an empty string is returned.
+     * An empty string is also returned when the process exits with a non-zero code
+     * or cannot be started.  Only the first {@value #EXEC_OUTPUT_LIMIT} bytes of
+     * standard output are captured; any additional output is silently discarded.
+     *
+     * <p><strong>Warning:</strong> executing external commands during profile evaluation makes
+     * profile activation non-reproducible and dependent on local system state.  This function
+     * should be used only in local build profiles and never in consumer POMs published to a
+     * remote repository.</p>
+     *
+     * <p>Usage example:
+     * <pre>
+     *   exec('docker --version')
+     *   inrange(extract(exec('docker --version'), '\d+\.\d+[\.\d]*'), '[19.0,)')
+     * </pre>
+     *
+     * @param args A list containing a single string: the command line to execute
+     * @return The trimmed standard output of the command, or an empty string on failure
+     * @throws IllegalArgumentException if the number of arguments is not exactly one
+     */
+    public Object exec(List<Object> args) {
+        if (args.size() != 1) {
+            throw new IllegalArgumentException("exec function requires exactly one argument");
+        }
+        String commandLine = ConditionParser.toString(args.get(0));
+        if (commandLine == null || commandLine.isBlank()) {
+            return "";
+        }
+        String[] tokens = commandLine.trim().split("\\s+");
+        Process process = null;
+        try {
+            process = new ProcessBuilder(Arrays.asList(tokens))
+                    .redirectInput(ProcessBuilder.Redirect.INHERIT)
+                    .redirectError(ProcessBuilder.Redirect.DISCARD)
+                    .start();
+            byte[] buffer = new byte[EXEC_OUTPUT_LIMIT];
+            int total = 0;
+            try (InputStream in = process.getInputStream()) {
+                int read;
+                while (total < buffer.length && (read = in.read(buffer, total, buffer.length - total)) != -1) {
+                    total += read;
+                }
+            }
+            boolean finished = process.waitFor(5, TimeUnit.SECONDS);
+            if (!finished || process.exitValue() != 0) {
+                return "";
+            }
+            return new String(buffer, 0, total, StandardCharsets.UTF_8).trim();
+        } catch (Exception e) {
+            return "";
+        } finally {
+            if (process != null) {
+                process.destroyForcibly();
+            }
+        }
+    }
+
+    /**
+     * Extracts the first occurrence of a regex pattern from a string.
+     *
+     * <p>When the pattern contains a capturing group, the content of the first group is
+     * returned.  When there are no groups, the whole match is returned.  Returns an empty
+     * string when the pattern does not match.
+     *
+     * <p>Usage examples:
+     * <pre>
+     *   extract('Docker version 25.0.1, build abc123', '\d+\.\d+[\.\d]*')   → '25.0.1'
+     *   extract(exec('docker --version'), '\d+\.\d+[\.\d]*')                → '25.0.1'
+     * </pre>
+     *
+     * @param args A list containing two strings: the input string and the regex pattern
+     * @return The first match (or first capturing group), or an empty string if not found
+     * @throws IllegalArgumentException if the number of arguments is not exactly two
+     */
+    public Object extract(List<Object> args) {
+        if (args.size() != 2) {
+            throw new IllegalArgumentException("extract function requires exactly two arguments");
+        }
+        String s = ConditionParser.toString(args.get(0));
+        String regex = ConditionParser.toString(args.get(1));
+        Matcher matcher = Pattern.compile(regex).matcher(s);
+        if (!matcher.find()) {
+            return "";
+        }
+        return matcher.groupCount() > 0 ? Objects.toString(matcher.group(1), "") : matcher.group(0);
     }
 
     /**
