@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ArtifactCoordinates;
+import org.apache.maven.api.BuildInvocation;
 import org.apache.maven.api.Dependency;
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.DependencyScope;
@@ -35,6 +36,7 @@ import org.apache.maven.api.DownloadedArtifact;
 import org.apache.maven.api.Language;
 import org.apache.maven.api.Listener;
 import org.apache.maven.api.LocalRepository;
+import org.apache.maven.api.MakeBehavior;
 import org.apache.maven.api.Node;
 import org.apache.maven.api.Packaging;
 import org.apache.maven.api.PathScope;
@@ -42,6 +44,7 @@ import org.apache.maven.api.PathType;
 import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
+import org.apache.maven.api.ReactorFailureBehavior;
 import org.apache.maven.api.RemoteRepository;
 import org.apache.maven.api.Service;
 import org.apache.maven.api.Session;
@@ -67,6 +70,84 @@ import org.apache.maven.api.toolchain.ToolchainModel;
  * @since 4.0.0
  */
 public class SessionStub implements Session {
+
+    // NOTE: If BuildInvocation gains new abstract methods, update this constant.
+    private static final BuildInvocation EMPTY_BUILD_INVOCATION = new BuildInvocation() {
+        @Override
+        public java.util.List<String> goals() {
+            return java.util.List.of();
+        }
+
+        @Override
+        public java.util.Map<String, String> userProperties() {
+            return java.util.Map.of();
+        }
+
+        @Override
+        public java.util.Map<String, String> systemInfo() {
+            return java.util.Map.of();
+        }
+
+        @Override
+        public java.util.List<String> activeProfiles() {
+            return java.util.List.of();
+        }
+
+        @Override
+        public java.util.List<String> selectedProjects() {
+            return java.util.List.of();
+        }
+
+        @Override
+        public java.util.List<String> excludedProjects() {
+            return java.util.List.of();
+        }
+
+        @Override
+        public MakeBehavior makeBehavior() {
+            return null;
+        }
+
+        @Override
+        public String resumeFrom() {
+            return null;
+        }
+
+        @Override
+        public ReactorFailureBehavior reactorFailureBehavior() {
+            return ReactorFailureBehavior.FAIL_FAST;
+        }
+
+        @Override
+        public boolean offline() {
+            return false;
+        }
+
+        @Override
+        public boolean updateSnapshots() {
+            return false;
+        }
+
+        @Override
+        public boolean batchMode() {
+            return false;
+        }
+
+        @Override
+        public boolean recursive() {
+            return true;
+        }
+
+        @Override
+        public boolean resume() {
+            return false;
+        }
+
+        @Override
+        public int threads() {
+            return 1;
+        }
+    };
 
     private Map<String, String> userProperties;
 
@@ -151,6 +232,11 @@ public class SessionStub implements Session {
     @Override
     public SessionData getData() {
         return null;
+    }
+
+    @Override
+    public BuildInvocation buildInvocation() {
+        return EMPTY_BUILD_INVOCATION;
     }
 
     @Override

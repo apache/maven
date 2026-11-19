@@ -1,0 +1,516 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ *   http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+package org.apache.maven.internal.build;
+
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.Writer;
+
+import org.apache.maven.api.BuildInvocation;
+import org.apache.maven.api.MakeBehavior;
+import org.apache.maven.api.build.report.BuildReport;
+import org.apache.maven.api.build.report.FailureReport;
+import org.apache.maven.api.build.report.MojoReport;
+import org.apache.maven.api.build.report.SubprojectReport;
+import org.apache.maven.api.logging.LogEvent;
+import org.apache.maven.api.services.BuilderProblem;
+
+/**
+ * Serializes a {@link BuildReport} to JSON without any external library dependency.
+ * <p>
+ * The output is human-readable (indented with 2 spaces) and designed to be
+ * stable across Maven versions — field order is fixed, and new fields are
+ * appended at the end of each object.
+ * <p>
+ * <strong>Note on duplication:</strong> This class (along with {@code DefaultBuildReport},
+ * {@code DefaultFailureReport}, {@code DefaultMojoReport}, and {@code DefaultSubprojectReport})
+ * is intentionally duplicated verbatim in both {@code maven-core} and {@code maven-impl}.
+ * The JPMS module split requires each module to carry its own copy — {@code maven-core}
+ * is loaded by the embedder/IDE classloader while {@code maven-impl} is loaded by the
+ * Maven runtime. Any change to these files must be applied to both copies.
+ * <p>
+ * Use {@link #write(Writer, BuildReport, int)} to write directly to any {@link Writer}
+ * (e.g. a {@code BufferedWriter} wrapping an {@code OutputStream}); the JSON string is
+ * built internally and discarded after writing so the caller does not need to retain a
+ * reference to it. The {@link #toJson(BuildReport, int)} convenience method is provided
+ * for testing and in-process consumers that need the string.
+ */
+final class BuildReportJsonWriter {
+
+    /**
+     * Default maximum number of lines captured from a throwable's stack trace per log event.
+     * <p>
+     * TODO: When {@code stacked/stacktrace-beautifier} lands on {@code stacked/unified-logging-api},
+     * replace this hard line-count cap with framework-frame collapsing (reflection, Guice, Plexus, Sisu,
+     * proxy frames collapsed to {@code "... N framework frames"}) so that the useful signal is preserved
+     * regardless of depth. The configurable cap should remain as a final safety net post-collapse.
+     */
+    static final int DEFAULT_MAX_THROWABLE_LINES = 200;
+
+    /** Maximum lines for a single throwable when serialising log events. Configured at construction time. */
+    private final int maxThrowableLines;
+
+    private BuildReportJsonWriter(int maxThrowableLines) {
+        this.maxThrowableLines = maxThrowableLines;
+    }
+
+    /**
+     * Serialize the given report to a pretty-printed JSON string.
+     * <p>
+     * Prefer {@link #write(Writer, BuildReport, int)} when writing directly to a file
+     * or stream — the caller does not need to retain a reference to the JSON string
+     * after the write completes.
+     */
+    static String toJson(BuildReport report, int maxThrowableLines) {
+        StringBuilder sb = new StringBuilder(4096);
+        new BuildReportJsonWriter(maxThrowableLines).writeReport(sb, report, 0);
+        sb.append('\n');
+        return sb.toString();
+    }
+
+    /**
+     * Write the pretty-printed JSON representation of {@code report} to {@code out}.
+     * The caller is responsible for flushing and closing the writer.
+     *
+     * @throws IOException if the underlying writer throws
+     */
+    static void write(Writer out, BuildReport report, int maxThrowableLines) throws IOException {
+        out.write(toJson(report, maxThrowableLines));
+    }
+
+    private void writeReport(StringBuilder sb, BuildReport report, int indent) {
+        sb.append("{\n");
+        writeField(sb, indent + 1, "reportVersion", report.reportVersion());
+        writeField(sb, indent + 1, "status", report.status().name());
+        writeField(sb, indent + 1, "duration", report.duration().toString());
+        writeField(sb, indent + 1, "startTime", report.startTime().toString());
+        writeField(sb, indent + 1, "mavenVersion", report.mavenVersion());
+        writeField(sb, indent + 1, "javaVersion", report.javaVersion());
+        writeStringArray(sb, indent + 1, "goals", report.goals());
+        writeField(sb, indent + 1, "project", report.project());
+        writeField(sb, indent + 1, "multiSubproject", report.multiSubproject());
+        writeField(sb, indent + 1, "threads", report.threads());
+
+        // invocation object
+        writeIndent(sb, indent + 1);
+        sb.append("\"invocation\": ");
+        writeInvocation(sb, report.invocation(), indent + 1);
+        sb.append(",\n");
+
+        // subprojects array
+        writeIndent(sb, indent + 1);
+        sb.append("\"subprojects\": ");
+        if (report.subprojects().isEmpty()) {
+            sb.append("[]");
+        } else {
+            sb.append("[\n");
+            for (int i = 0; i < report.subprojects().size(); i++) {
+                writeIndent(sb, indent + 2);
+                writeSubproject(sb, report.subprojects().get(i), indent + 2);
+                if (i < report.subprojects().size() - 1) {
+                    sb.append(',');
+                }
+                sb.append('\n');
+            }
+            writeIndent(sb, indent + 1);
+            sb.append(']');
+        }
+        sb.append(",\n");
+
+        // failures array
+        writeIndent(sb, indent + 1);
+        sb.append("\"failures\": ");
+        if (report.failures().isEmpty()) {
+            sb.append("[]");
+        } else {
+            sb.append("[\n");
+            for (int i = 0; i < report.failures().size(); i++) {
+                writeIndent(sb, indent + 2);
+                writeFailure(sb, report.failures().get(i), indent + 2);
+                if (i < report.failures().size() - 1) {
+                    sb.append(',');
+                }
+                sb.append('\n');
+            }
+            writeIndent(sb, indent + 1);
+            sb.append(']');
+        }
+        sb.append(",\n");
+
+        // problems array
+        writeIndent(sb, indent + 1);
+        sb.append("\"problems\": ");
+        if (report.problems().isEmpty()) {
+            sb.append("[]");
+        } else {
+            sb.append("[\n");
+            for (int i = 0; i < report.problems().size(); i++) {
+                writeIndent(sb, indent + 2);
+                writeProblem(sb, report.problems().get(i), indent + 2);
+                if (i < report.problems().size() - 1) {
+                    sb.append(',');
+                }
+                sb.append('\n');
+            }
+            writeIndent(sb, indent + 1);
+            sb.append(']');
+        }
+        sb.append(",\n");
+
+        // output array — build-level log lines (outside any subproject)
+        writeOutputArray(sb, indent + 1, report.output());
+        sb.append('\n');
+
+        writeIndent(sb, indent);
+        sb.append('}');
+    }
+
+    private static void writeInvocation(StringBuilder sb, BuildInvocation env, int indent) {
+        sb.append("{\n");
+        writeStringArray(sb, indent + 1, "goals", env.goals());
+        writeStringMap(sb, indent + 1, "userProperties", env.userProperties());
+        writeStringMap(sb, indent + 1, "systemInfo", env.systemInfo());
+        writeStringArray(sb, indent + 1, "activeProfiles", env.activeProfiles());
+        writeStringArray(sb, indent + 1, "selectedProjects", env.selectedProjects());
+        writeNullableField(sb, indent + 1, "resumeFrom", env.resumeFrom());
+        writeField(
+                sb,
+                indent + 1,
+                "reactorFailureBehavior",
+                env.reactorFailureBehavior().name());
+        writeField(sb, indent + 1, "offline", env.offline());
+        writeField(sb, indent + 1, "updateSnapshots", env.updateSnapshots());
+        writeField(sb, indent + 1, "batchMode", env.batchMode());
+        writeField(sb, indent + 1, "threads", env.threads());
+        writeStringArray(sb, indent + 1, "excludedProjects", env.excludedProjects());
+        MakeBehavior makeBehavior = env.makeBehavior();
+        if (makeBehavior != null) {
+            writeField(sb, indent + 1, "makeBehavior", makeBehavior.name());
+        }
+        writeField(sb, indent + 1, "recursive", env.recursive());
+        writeField(sb, indent + 1, "resume", env.resume());
+        removeTrailingComma(sb);
+        writeIndent(sb, indent);
+        sb.append('}');
+    }
+
+    private static void writeStringMap(StringBuilder sb, int indent, String key, java.util.Map<String, String> map) {
+        writeIndent(sb, indent);
+        sb.append('"').append(key).append("\": ");
+        if (map.isEmpty()) {
+            sb.append("{}");
+        } else {
+            sb.append("{\n");
+            var entries = new java.util.ArrayList<>(map.entrySet());
+            entries.sort(java.util.Map.Entry.comparingByKey());
+            for (int i = 0; i < entries.size(); i++) {
+                var entry = entries.get(i);
+                writeIndent(sb, indent + 1);
+                writeJsonString(sb, entry.getKey());
+                sb.append(": ");
+                writeJsonString(sb, entry.getValue());
+                if (i < entries.size() - 1) {
+                    sb.append(',');
+                }
+                sb.append('\n');
+            }
+            writeIndent(sb, indent);
+            sb.append('}');
+        }
+        sb.append(",\n");
+    }
+
+    private static void writeProblem(StringBuilder sb, BuilderProblem problem, int indent) {
+        sb.append("{\n");
+        writeField(sb, indent + 1, "severity", problem.getSeverity().name());
+        writeField(sb, indent + 1, "message", problem.getMessage());
+        String source = problem.getSource();
+        if (source != null && !source.isEmpty()) {
+            writeField(sb, indent + 1, "source", source);
+        }
+        if (problem.getLineNumber() > 0) {
+            writeField(sb, indent + 1, "line", problem.getLineNumber());
+        }
+        if (problem.getColumnNumber() > 0) {
+            writeField(sb, indent + 1, "column", problem.getColumnNumber());
+        }
+        // Remove the trailing comma from the last written field
+        removeTrailingComma(sb);
+        writeIndent(sb, indent);
+        sb.append('}');
+    }
+
+    private void writeSubproject(StringBuilder sb, SubprojectReport subproject, int indent) {
+        sb.append("{\n");
+        writeField(sb, indent + 1, "groupId", subproject.groupId());
+        writeField(sb, indent + 1, "artifactId", subproject.artifactId());
+        writeField(sb, indent + 1, "version", subproject.version());
+        writeField(sb, indent + 1, "status", subproject.status().name());
+        writeField(sb, indent + 1, "startTime", subproject.startTime().toString());
+        writeField(sb, indent + 1, "duration", subproject.duration().toString());
+        writeNullableField(sb, indent + 1, "traceId", subproject.traceId());
+        writeNullableField(sb, indent + 1, "spanId", subproject.spanId());
+
+        // mojos array
+        writeIndent(sb, indent + 1);
+        sb.append("\"mojos\": ");
+        if (subproject.mojos().isEmpty()) {
+            sb.append("[]");
+        } else {
+            sb.append("[\n");
+            for (int i = 0; i < subproject.mojos().size(); i++) {
+                writeIndent(sb, indent + 2);
+                writeMojo(sb, subproject.mojos().get(i), indent + 2);
+                if (i < subproject.mojos().size() - 1) {
+                    sb.append(',');
+                }
+                sb.append('\n');
+            }
+            writeIndent(sb, indent + 1);
+            sb.append(']');
+        }
+        sb.append(",\n");
+
+        // output array — subproject-level log lines (between mojos)
+        writeOutputArray(sb, indent + 1, subproject.output());
+        sb.append('\n');
+
+        writeIndent(sb, indent);
+        sb.append('}');
+    }
+
+    private void writeMojo(StringBuilder sb, MojoReport mojo, int indent) {
+        sb.append("{\n");
+        writeField(sb, indent + 1, "groupId", mojo.groupId());
+        writeField(sb, indent + 1, "artifactId", mojo.artifactId());
+        writeField(sb, indent + 1, "version", mojo.version());
+        writeField(sb, indent + 1, "goal", mojo.goal());
+        writeNullableField(sb, indent + 1, "executionId", mojo.executionId());
+        writeNullableField(sb, indent + 1, "phase", mojo.phase());
+        writeField(sb, indent + 1, "status", mojo.status().name());
+        writeField(sb, indent + 1, "startTime", mojo.startTime().toString());
+        writeField(sb, indent + 1, "duration", mojo.duration().toString());
+        writeNullableField(sb, indent + 1, "traceId", mojo.traceId());
+        writeNullableField(sb, indent + 1, "spanId", mojo.spanId());
+
+        // output array — captured log lines
+        writeOutputArray(sb, indent + 1, mojo.output());
+        sb.append('\n');
+
+        writeIndent(sb, indent);
+        sb.append('}');
+    }
+
+    private static void writeFailure(StringBuilder sb, FailureReport failure, int indent) {
+        sb.append("{\n");
+        writeField(sb, indent + 1, "subproject", failure.subproject());
+        writeNullableField(sb, indent + 1, "mojo", failure.mojo());
+        writeField(sb, indent + 1, "timestamp", failure.timestamp().toString());
+        writeNullableField(sb, indent + 1, "exceptionType", failure.exceptionType());
+        if (failure.stackTrace() != null) {
+            writeField(sb, indent + 1, "message", failure.message());
+            writeLastField(sb, indent + 1, "stackTrace", failure.stackTrace());
+        } else {
+            writeLastField(sb, indent + 1, "message", failure.message());
+        }
+        writeIndent(sb, indent);
+        sb.append('}');
+    }
+
+    /**
+     * Writes an {@code "output": [...]} array of structured log events
+     * (used by report, subproject, and mojo).
+     * This is always the last field in its object, so no trailing comma.
+     */
+    private void writeOutputArray(StringBuilder sb, int indent, java.util.List<LogEvent> events) {
+        writeIndent(sb, indent);
+        sb.append("\"output\": ");
+        if (events.isEmpty()) {
+            sb.append("[]");
+        } else {
+            sb.append("[\n");
+            for (int i = 0; i < events.size(); i++) {
+                writeIndent(sb, indent + 1);
+                writeLogEvent(sb, events.get(i), indent + 1);
+                if (i < events.size() - 1) {
+                    sb.append(',');
+                }
+                sb.append('\n');
+            }
+            writeIndent(sb, indent);
+            sb.append(']');
+        }
+    }
+
+    private void writeLogEvent(StringBuilder sb, LogEvent event, int indent) {
+        sb.append("{\n");
+        writeField(sb, indent + 1, "timestamp", event.timestamp().toString());
+        writeField(sb, indent + 1, "level", event.level().name());
+        if (event.loggerName() != null) {
+            writeField(sb, indent + 1, "loggerName", event.loggerName());
+        }
+        writeField(sb, indent + 1, "message", event.message());
+        if (event.throwable() != null) {
+            writeField(sb, indent + 1, "stackTrace", throwableToString(event.throwable()));
+        }
+        // Source metadata — present for Log API and JUL events
+        if (event.sourceClassName() != null) {
+            writeField(sb, indent + 1, "sourceClassName", event.sourceClassName());
+        }
+        if (event.sourceMethodName() != null) {
+            writeField(sb, indent + 1, "sourceMethodName", event.sourceMethodName());
+        }
+        if (event.threadId() >= 0) {
+            writeField(sb, indent + 1, "threadId", event.threadId());
+        }
+        if (event.sequenceNumber() >= 0) {
+            writeField(sb, indent + 1, "sequenceNumber", event.sequenceNumber());
+        }
+        removeTrailingComma(sb);
+        writeIndent(sb, indent);
+        sb.append('}');
+    }
+
+    // ---- Low-level JSON writing helpers ----
+
+    private static void writeField(StringBuilder sb, int indent, String key, String value) {
+        writeIndent(sb, indent);
+        sb.append('"').append(key).append("\": ");
+        writeJsonString(sb, value);
+        sb.append(",\n");
+    }
+
+    private static void writeField(StringBuilder sb, int indent, String key, int value) {
+        writeIndent(sb, indent);
+        sb.append('"').append(key).append("\": ").append(value).append(",\n");
+    }
+
+    private static void writeField(StringBuilder sb, int indent, String key, long value) {
+        writeIndent(sb, indent);
+        sb.append('"').append(key).append("\": ").append(value).append(",\n");
+    }
+
+    private static void writeField(StringBuilder sb, int indent, String key, boolean value) {
+        writeIndent(sb, indent);
+        sb.append('"').append(key).append("\": ").append(value).append(",\n");
+    }
+
+    /**
+     * Removes the trailing comma from the last field in a JSON object.
+     * Turns {@code "field": value,\n} into {@code "field": value\n}.
+     */
+    private static void removeTrailingComma(StringBuilder sb) {
+        int len = sb.length();
+        if (len >= 2 && sb.charAt(len - 2) == ',' && sb.charAt(len - 1) == '\n') {
+            sb.deleteCharAt(len - 2);
+        }
+    }
+
+    private static void writeLastField(StringBuilder sb, int indent, String key, String value) {
+        writeIndent(sb, indent);
+        sb.append('"').append(key).append("\": ");
+        writeJsonString(sb, value);
+        sb.append('\n');
+    }
+
+    private static void writeNullableField(StringBuilder sb, int indent, String key, String value) {
+        writeIndent(sb, indent);
+        sb.append('"').append(key).append("\": ");
+        if (value != null) {
+            writeJsonString(sb, value);
+        } else {
+            sb.append("null");
+        }
+        sb.append(",\n");
+    }
+
+    private static void writeStringArray(StringBuilder sb, int indent, String key, java.util.List<String> values) {
+        writeIndent(sb, indent);
+        sb.append('"').append(key).append("\": [");
+        for (int i = 0; i < values.size(); i++) {
+            writeJsonString(sb, values.get(i));
+            if (i < values.size() - 1) {
+                sb.append(", ");
+            }
+        }
+        sb.append("],\n");
+    }
+
+    private static void writeJsonString(StringBuilder sb, String value) {
+        sb.append('"');
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            switch (c) {
+                case '"':
+                    sb.append("\\\"");
+                    break;
+                case '\\':
+                    sb.append("\\\\");
+                    break;
+                case '\n':
+                    sb.append("\\n");
+                    break;
+                case '\r':
+                    sb.append("\\r");
+                    break;
+                case '\t':
+                    sb.append("\\t");
+                    break;
+                case '\b':
+                    sb.append("\\b");
+                    break;
+                case '\f':
+                    sb.append("\\f");
+                    break;
+                default:
+                    if (c < 0x20) {
+                        sb.append("\\u");
+                        sb.append(String.format("%04x", (int) c));
+                    } else {
+                        sb.append(c);
+                    }
+            }
+        }
+        sb.append('"');
+    }
+
+    private static void writeIndent(StringBuilder sb, int level) {
+        sb.append("  ".repeat(level));
+    }
+
+    private String throwableToString(Throwable t) {
+        StringWriter sw = new StringWriter();
+        t.printStackTrace(new PrintWriter(sw));
+        String full = sw.toString();
+        // Cap at maxThrowableLines lines to prevent huge JSON output from deeply nested exceptions.
+        // TODO: When stacked/stacktrace-beautifier lands, replace this with framework-frame collapsing
+        //       (MavenSimpleLogger.isFrameworkFrame logic) so the cap applies post-collapse.
+        String[] lines = full.split("\\r?\\n");
+        if (lines.length <= maxThrowableLines) {
+            return full.replace("\r\n", "\n");
+        }
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < maxThrowableLines; i++) {
+            sb.append(lines[i]).append('\n');
+        }
+        sb.append("... ").append(lines.length - maxThrowableLines).append(" more lines truncated");
+        return sb.toString();
+    }
+}
