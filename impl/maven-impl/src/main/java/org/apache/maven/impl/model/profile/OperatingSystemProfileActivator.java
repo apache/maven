@@ -106,7 +106,8 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
         boolean reverse = false;
         final boolean result;
         if (test.startsWith(REGEX_PREFIX)) {
-            // the pattern keeps its case: lower-casing it would turn \S into \s
+            // the pattern keeps its case: lower-casing it would turn \S into \s;
+            // CASE_INSENSITIVE keeps the matching case-insensitive, as it was before
             result = Pattern.compile(expectedVersion.substring(REGEX_PREFIX.length()), Pattern.CASE_INSENSITIVE)
                     .matcher(actualVersion)
                     .matches();

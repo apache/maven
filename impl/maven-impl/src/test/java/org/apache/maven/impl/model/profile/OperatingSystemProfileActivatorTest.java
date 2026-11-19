@@ -84,6 +84,7 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
         Profile profile = newProfile(ActivationOS.newBuilder().version("regex:.*AWS"));
 
         assertActivation(true, profile, newContext(null, newProperties("linux", "6.5.0-1014-aws", "amd64")));
+        assertActivation(true, profile, newContext(null, newProperties("linux", "6.5.0-1014-AWS", "amd64")));
     }
 
     @Test
