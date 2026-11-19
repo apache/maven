@@ -191,4 +191,17 @@ class FeaturesTest {
         assertTrue(Features.deployBuildPom(properties));
         assertTrue(Features.consumerPom(properties));
     }
+
+    @Test
+    void testTestJarTransitiveDepsDefaultsToMaven4Behavior() {
+        assertTrue(Features.testJarTransitiveDeps(Map.of()));
+        assertFalse(Features.testJarTransitiveDeps(Map.of(Constants.MAVEN_MAVEN3_PERSONALITY, "true")));
+    }
+
+    @Test
+    void testTestJarTransitiveDepsCanBeOverridden() {
+        assertFalse(Features.testJarTransitiveDeps(Map.of(Constants.MAVEN_TEST_JAR_TRANSITIVE_DEPS, "false")));
+        assertTrue(Features.testJarTransitiveDeps(
+                Map.of(Constants.MAVEN_MAVEN3_PERSONALITY, "true", Constants.MAVEN_TEST_JAR_TRANSITIVE_DEPS, "true")));
+    }
 }
