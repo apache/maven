@@ -204,6 +204,21 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.apache.maven</groupId>
+        <artifactId>maven-logging-slf4j</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-logging-jul</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-logging-system</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
         <artifactId>maven-core</artifactId>
         <version>${project.version}</version>
       </dependency>
@@ -235,6 +250,11 @@ under the License.
       <dependency>
         <groupId>org.apache.maven</groupId>
         <artifactId>maven-api-annotations</artifactId>
+        <version>${project.version}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.apache.maven</groupId>
+        <artifactId>maven-api-log</artifactId>
         <version>${project.version}</version>
       </dependency>
       <dependency>
@@ -516,20 +536,10 @@ under the License.
       </dependency>
       <dependency>
         <groupId>org.slf4j</groupId>
-        <artifactId>jul-to-slf4j</artifactId>
-        <version>${slf4jVersion}</version>
-      </dependency>
-      <dependency>
-        <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4jVersion}</version>
       </dependency>
-      <dependency>
-        <groupId>ch.qos.logback</groupId>
-        <artifactId>logback-classic</artifactId>
-        <version>${logbackClassicVersion}</version>
-        <optional>true</optional>
-      </dependency>
+
       <!--  Wagon -->
       <dependency>
         <groupId>org.apache.maven.wagon</groupId>

@@ -18,11 +18,6 @@
  */
 package org.apache.maven.di.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.nio.charset.StandardCharsets;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.maven.di.impl.InjectorDiagnosticsFixture.RecordingInjector;
@@ -32,15 +27,12 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.api.parallel.ResourceLock;
 
-import static org.apache.maven.di.impl.InjectorDiagnosticsFixture.body;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.parallel.Resources.SYSTEM_OUT;
 import static org.junit.jupiter.api.parallel.Resources.SYSTEM_PROPERTIES;
 
 @ResourceLock(SYSTEM_PROPERTIES)
-@ResourceLock(SYSTEM_OUT)
 @Timeout(30)
 class InjectorDiagnosticOutputTest {
     private InjectorDiagnosticsFixture environment;
@@ -56,15 +48,15 @@ class InjectorDiagnosticOutputTest {
     }
 
     @Test
-    void outputChangesAndFailedDeltasRestartWithFullSnapshots() {
+    void failedDeltasRestartWithFullSnapshots() {
         AtomicInteger attempts = new AtomicInteger();
         RecordingInjector injector = new RecordingInjector() {
             @Override
-            void writeDump(PrintStream output, String dump) {
+            protected void writeDump(String dump) {
                 if (attempts.incrementAndGet() == 2) {
                     throw new IllegalStateException("delta output failed");
                 }
-                super.writeDump(output, dump);
+                super.writeDump(dump);
             }
         };
         injector.bindInstance(String.class, "value");
@@ -76,78 +68,31 @@ class InjectorDiagnosticOutputTest {
         assertEquals(2, injector.dumps.size());
         assertFalse(injector.dumps.get(1).contains(", delta"));
         assertTrue(injector.dumps.get(1).contains("candidate: java.lang.String"));
-        try (PrintStream other = new PrintStream(new ByteArrayOutputStream())) {
-            System.setOut(other);
-            injector.checkpoint();
-            assertEquals(3, injector.dumps.size());
-            assertFalse(injector.dumps.get(2).contains(", delta"));
-            assertEquals(body(injector.dumps.get(1)), body(injector.dumps.get(2)));
-        }
+        // A further checkpoint with no changes does not produce another dump.
+        injector.checkpoint();
+        assertEquals(2, injector.dumps.size());
+        // The restarted full snapshot contains both bindings.
+        assertTrue(injector.dumps.get(1).contains("candidate: java.lang.Integer"));
     }
 
     @Test
-    void printStreamErrorsDoNotCommitAnUnwrittenSnapshot() {
-        ByteArrayOutputStream captured = new ByteArrayOutputStream();
+    void sinkExceptionKeepsRetryingFullSnapshotsOnNextCheckpoint() {
         AtomicInteger writes = new AtomicInteger();
-        try (PrintStream sink =
-                new PrintStream(
-                        new OutputStream() {
-                            @Override
-                            public void write(int value) throws IOException {
-                                if (writes.getAndIncrement() == 0) {
-                                    throw new IOException("output unavailable");
-                                }
-                                captured.write(value);
-                            }
-                        },
-                        true,
-                        StandardCharsets.UTF_8) {
-                    @Override
-                    public boolean checkError() {
-                        boolean failed = super.checkError();
-                        clearError();
-                        return failed;
-                    }
-                }) {
-            System.setOut(sink);
-            InjectorImpl injector = new InjectorImpl();
-            injector.bindInstance(String.class, "value");
-            assertEquals("value", injector.getInstance(String.class));
-            captured.reset();
-            assertEquals("value", injector.getInstance(String.class));
-            String retry = captured.toString(StandardCharsets.UTF_8);
-            assertTrue(retry.contains("candidate: java.lang.String"), retry);
-            assertFalse(retry.contains(", delta"), retry);
-        }
-    }
-
-    @Test
-    void stickyPrintStreamErrorKeepsRetryingFullSnapshotsUntilOutputChanges() {
-        ByteArrayOutputStream failed = new ByteArrayOutputStream();
-        ByteArrayOutputStream recovered = new ByteArrayOutputStream();
-        try (PrintStream sink = new PrintStream(failed, true, StandardCharsets.UTF_8) {
-                    {
-                        setError();
-                    }
-                };
-                PrintStream recovery = new PrintStream(recovered, true, StandardCharsets.UTF_8)) {
-            InjectorImpl injector = new InjectorImpl();
-            injector.bindInstance(String.class, "fixture");
-            System.setOut(sink);
-            injector.debugBindings();
-            injector.debugBindings();
-            String attempts = failed.toString(StandardCharsets.UTF_8);
-            assertEquals(
-                    2,
-                    attempts.lines()
-                            .filter(line -> line.startsWith("Maven DI native registry "))
-                            .count());
-            assertFalse(attempts.contains(", delta"), attempts);
-            System.setOut(recovery);
-            injector.debugBindings();
-            String success = recovered.toString(StandardCharsets.UTF_8);
-            assertTrue(success.contains("candidate: java.lang.String"), success);
-            assertFalse(success.contains(", delta"), success);
-        }
+        RecordingInjector injector = new RecordingInjector() {
+            @Override
+            protected void writeDump(String dump) {
+                if (writes.getAndIncrement() == 0) {
+                    throw new IllegalStateException("sink unavailable");
+                }
+                super.writeDump(dump);
+            }
+        };
+        injector.bindInstance(String.class, "value");
+        injector.checkpoint(); // fails: nothing recorded
+        assertEquals(0, injector.dumps.size());
+        injector.checkpoint(); // succeeds: full snapshot (not delta)
+        assertEquals(1, injector.dumps.size());
+        assertTrue(injector.dumps.get(0).contains("candidate: java.lang.String"), injector.dumps.get(0));
+        assertFalse(injector.dumps.get(0).contains(", delta"), injector.dumps.get(0));
     }
 }

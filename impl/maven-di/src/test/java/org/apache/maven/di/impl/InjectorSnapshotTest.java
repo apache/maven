@@ -56,11 +56,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.parallel.Resources.SYSTEM_OUT;
 import static org.junit.jupiter.api.parallel.Resources.SYSTEM_PROPERTIES;
 
 @ResourceLock(SYSTEM_PROPERTIES)
-@ResourceLock(SYSTEM_OUT)
 @Timeout(30)
 class InjectorSnapshotTest {
     private InjectorDiagnosticsFixture environment;

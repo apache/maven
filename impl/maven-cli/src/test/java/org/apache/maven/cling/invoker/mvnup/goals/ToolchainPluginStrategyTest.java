@@ -34,11 +34,11 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentMatchers;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.contains;
 import static org.mockito.Mockito.verify;
 
 /**
@@ -514,7 +514,7 @@ class ToolchainPluginStrategyTest {
             assertEquals(1, result.modifiedPoms().size());
             assertTrue(strategy.hasToolchainsPluginWithSelectGoal(doc));
             assertTrue(doc.toXml().contains("select-jdk-toolchain"), "POM should contain select-jdk-toolchain goal");
-            verify(context.logger).warn(contains("must be installed"));
+            verify(context.logger).warn(ArgumentMatchers.<String>contains("must be installed"));
         }
 
         @Test

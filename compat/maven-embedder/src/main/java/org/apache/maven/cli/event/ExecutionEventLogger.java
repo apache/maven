@@ -38,7 +38,6 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.project.MavenProject;
-import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,7 +68,7 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
     private final Map<MavenProject, Integer> projectNumbers = new HashMap<>();
 
     public ExecutionEventLogger(MessageBuilderFactory messageBuilderFactory) {
-        this(messageBuilderFactory, LoggerFactory.getLogger(ExecutionEventLogger.class));
+        this(messageBuilderFactory, LoggerFactory.getLogger(ExecutionEventLogger.class), -1);
     }
 
     public ExecutionEventLogger(MessageBuilderFactory messageBuilderFactory, Logger logger) {
@@ -145,17 +144,6 @@ public class ExecutionEventLogger extends AbstractExecutionListener {
             init();
             if (event.getSession().getProjects().size() > 1) {
                 logReactorSummary(event.getSession());
-            }
-
-            ILoggerFactory iLoggerFactory = LoggerFactory.getILoggerFactory();
-
-            if (iLoggerFactory instanceof org.apache.maven.logging.api.LogLevelRecorder recorder
-                    && recorder.hasReachedMaxLevel()) {
-                event.getSession()
-                        .getResult()
-                        .addException(
-                                new Exception("Build failed due to log statements with a higher severity than allowed. "
-                                        + "Fix the logged issues or remove flag --fail-on-severity (-fos)."));
             }
 
             logResult(event.getSession());

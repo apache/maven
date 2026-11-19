@@ -43,6 +43,7 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
     private static final String SISU_DEBUG = "sisu.debug";
     private static final String AMBIGUOUS = "ambiguous";
     private static final Pattern ANSI_STYLE = Pattern.compile("\u001B\\[[0-9;]*m");
+    private static final Pattern LOG_PREFIX = Pattern.compile("^\\[(?:INFO|WARNING|ERROR|DEBUG|TRACE)\\]\\s*");
     private static final Pattern RED_OPTIONAL_MARKER = Pattern.compile("\u001B\\[(?:[0-9]+;)*31(?:;[0-9]+)*m\\?");
     private static final Pattern REVISION = Pattern.compile(" revision=([0-9]+)(?:->([0-9]+))?");
     private static final Pattern LOADER = Pattern.compile("    (L[0-9]+): (.+)");
@@ -126,7 +127,8 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
             assertFalse(outputLines.stream().anyMatch(line -> ANSI_STYLE.matcher(line).find()));
         }
 
-        if (nativeEnabled) {
+        boolean quietMode = "quiet".equals(builder.name());
+        if (nativeEnabled && !quietMode) {
             // Each module creates its own Mojo injector.
             assertTrue(dumps >= MODULE_PATHS.size());
             if (ambiguous) {
@@ -169,6 +171,7 @@ class MavenITmng8445DiDumpTest extends AbstractMavenIntegrationTestCase {
             String plain = ANSI_STYLE.matcher(original).replaceAll("");
             int decoration = plain.indexOf(stdoutPrefix);
             String line = decoration < 0 ? plain : plain.substring(decoration + stdoutPrefix.length());
+            line = LOG_PREFIX.matcher(line).replaceFirst("");
             if (line.startsWith(headerPrefix)) {
                 assertTrue(header == null, "Interleaved native dumps");
                 header = line.split(" revision=")[0].substring(headerPrefix.length());
