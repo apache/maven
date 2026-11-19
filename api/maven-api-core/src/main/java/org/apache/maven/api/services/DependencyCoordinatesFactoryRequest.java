@@ -49,15 +49,36 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinatesFactoryRequest {
 
-    /** @return the dependency scope, may be {@code null} */
-    String getScope();
+    /** Returns the dependency scope, may be {@code null}. */
+    String scope();
 
-    /** @return whether this dependency is optional */
-    boolean isOptional();
+    /** @deprecated Use {@link #scope()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getScope() {
+        return scope();
+    }
 
-    /** @return the dependency exclusions, never {@code null} */
+    /** Returns whether this dependency is optional. */
+    boolean optional();
+
+    /** @deprecated Use {@link #optional()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default boolean isOptional() {
+        return optional();
+    }
+
+    /** Returns the dependency exclusions, never {@code null}. */
     @Nonnull
-    Collection<Exclusion> getExclusions();
+    Collection<Exclusion> exclusions();
+
+    /**
+     * @deprecated Use {@link #exclusions()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Collection<Exclusion> getExclusions() {
+        return exclusions();
+    }
 
     /**
      * Builds a request from individual components.
@@ -142,7 +163,7 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
                 .build();
     }
 
-    /** @return a new builder instance */
+    /** Returns a new builder instance. */
     @Deprecated
     @Nonnull
     static DependencyCoordinatesFactoryRequestBuilder builder() {
@@ -299,53 +320,53 @@ public interface DependencyCoordinatesFactoryRequest extends ArtifactCoordinates
             }
 
             @Override
-            public String getGroupId() {
+            public String groupId() {
                 return groupId;
             }
 
             @Override
-            public String getArtifactId() {
+            public String artifactId() {
                 return artifactId;
             }
 
             @Override
-            public String getVersion() {
+            public String version() {
                 return version;
             }
 
             @Override
-            public String getClassifier() {
+            public String classifier() {
                 return classifier;
             }
 
             @Override
-            public String getExtension() {
+            public String extension() {
                 return extension;
             }
 
             @Override
-            public String getType() {
+            public String type() {
                 return type;
             }
 
             @Override
-            public String getCoordinatesString() {
+            public String coordinatesString() {
                 return coordinatesString;
             }
 
             @Override
-            public String getScope() {
+            public String scope() {
                 return scope;
             }
 
             @Override
-            public boolean isOptional() {
+            public boolean optional() {
                 return optional;
             }
 
             @Nonnull
             @Override
-            public Collection<Exclusion> getExclusions() {
+            public Collection<Exclusion> exclusions() {
                 return exclusions;
             }
 

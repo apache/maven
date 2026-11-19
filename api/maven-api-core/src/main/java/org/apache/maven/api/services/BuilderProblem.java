@@ -42,33 +42,71 @@ public interface BuilderProblem {
      * @return the hint about the source of the problem or an empty string if unknown, never {@code null}
      */
     @Nonnull
-    String getSource();
+    String source();
+
+    /**
+     * @return the hint about the source of the problem or an empty string if unknown, never {@code null}
+     * @deprecated Use {@link #source()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default String getSource() {
+        return source();
+    }
 
     /**
      * Gets the one-based index of the line containing the problem. The line number should refer to some text file that
-     * is given by {@link #getSource()}.
+     * is given by {@link #source()}.
      *
      * @return the one-based index of the line containing the problem or a non-positive value if unknown
      */
-    int getLineNumber();
+    int lineNumber();
+
+    /**
+     * @return the one-based index of the line containing the problem or a non-positive value if unknown
+     * @deprecated Use {@link #lineNumber()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default int getLineNumber() {
+        return lineNumber();
+    }
 
     /**
      * Gets the one-based index of the column containing the problem. The column number should refer to some text file
-     * that is given by {@link #getSource()}.
+     * that is given by {@link #source()}.
      *
      * @return the one-based index of the column containing the problem or non-positive value if unknown
      */
-    int getColumnNumber();
+    int columnNumber();
+
+    /**
+     * @return the one-based index of the column containing the problem or non-positive value if unknown
+     * @deprecated Use {@link #columnNumber()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default int getColumnNumber() {
+        return columnNumber();
+    }
 
     /**
      * Gets the location of the problem. The location is a user-friendly combination of the values from
-     * {@link #getSource()}, {@link #getLineNumber()} and {@link #getColumnNumber()}. The exact syntax of the returned
+     * {@link #source()}, {@link #lineNumber()} and {@link #columnNumber()}. The exact syntax of the returned
      * value is undefined.
      *
      * @return the location of the problem, never {@code null}
      */
     @Nonnull
-    String getLocation();
+    String location();
+
+    /**
+     * @return the location of the problem, never {@code null}
+     * @deprecated Use {@link #location()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default String getLocation() {
+        return location();
+    }
 
     /**
      * Gets the exception that caused this problem (if any).
@@ -76,7 +114,17 @@ public interface BuilderProblem {
      * @return the exception that caused this problem or {@code null} if not applicable
      */
     @Nullable
-    Exception getException();
+    Exception exception();
+
+    /**
+     * @return the exception that caused this problem or {@code null} if not applicable
+     * @deprecated Use {@link #exception()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default Exception getException() {
+        return exception();
+    }
 
     /**
      * Gets the message that describes this problem.
@@ -84,7 +132,17 @@ public interface BuilderProblem {
      * @return the message describing this problem, never {@code null}
      */
     @Nonnull
-    String getMessage();
+    String message();
+
+    /**
+     * @return the message describing this problem, never {@code null}
+     * @deprecated Use {@link #message()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default String getMessage() {
+        return message();
+    }
 
     /**
      * Gets the severity level of this problem.
@@ -92,7 +150,17 @@ public interface BuilderProblem {
      * @return the severity level of this problem, never {@code null}
      */
     @Nonnull
-    Severity getSeverity();
+    Severity severity();
+
+    /**
+     * @return the severity level of this problem, never {@code null}
+     * @deprecated Use {@link #severity()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Severity getSeverity() {
+        return severity();
+    }
 
     /**
      * The different severity levels for a problem, in decreasing order.

@@ -52,7 +52,7 @@ public interface MojoExecution {
      *
      * @deprecated Use {@link #plugin()} instead.
      */
-    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default Plugin getPlugin() {
         return plugin();
@@ -77,7 +77,7 @@ public interface MojoExecution {
      *
      * @deprecated Use {@link #model()} instead.
      */
-    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default PluginExecution getModel() {
         return model().orElse(null);
@@ -92,7 +92,7 @@ public interface MojoExecution {
      *
      * @deprecated Use {@link #descriptor()} instead.
      */
-    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default MojoDescriptor getDescriptor() {
         return descriptor();
@@ -110,7 +110,7 @@ public interface MojoExecution {
      *
      * @deprecated Use {@link #executionId()} instead.
      */
-    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default String getExecutionId() {
         return executionId().orElse(null);
@@ -125,7 +125,7 @@ public interface MojoExecution {
      *
      * @deprecated Use {@link #goal()} instead.
      */
-    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default String getGoal() {
         return goal();
@@ -140,7 +140,7 @@ public interface MojoExecution {
      *
      * @deprecated Use {@link #lifecyclePhase()} instead.
      */
-    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nullable
     default String getLifecyclePhase() {
         return lifecyclePhase().orElse(null);
@@ -155,7 +155,7 @@ public interface MojoExecution {
      *
      * @deprecated Use {@link #configuration()} instead.
      */
-    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default Optional<XmlNode> getConfiguration() {
         return configuration();

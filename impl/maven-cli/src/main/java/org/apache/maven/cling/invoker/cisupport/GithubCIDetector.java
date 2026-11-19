@@ -42,7 +42,7 @@ public class GithubCIDetector implements CIDetector {
                 }
 
                 @Override
-                public boolean isVerbose() {
+                public boolean verbose() {
                     return "1".equals(System.getenv(RUNNER_DEBUG));
                 }
             });

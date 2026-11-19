@@ -69,7 +69,7 @@ public final class DefaultPluginManager implements PluginManager {
         requireNonNull(project, "project");
         requireNonNull(plugin, "plugin");
 
-        PluginRequest request = new PluginRequest(session, project, plugin);
+        PluginRequest request = new PluginRequest(session, null, project, plugin);
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, request);
         try {
             return InternalSession.from(session)
@@ -120,17 +120,9 @@ public final class DefaultPluginManager implements PluginManager {
                         + requestedPlugin.getArtifactId() + " is not declared by project " + project.getId()));
     }
 
-    private record PluginRequest(Session session, Project project, org.apache.maven.api.model.Plugin plugin)
+    private record PluginRequest(
+            Session session, RequestTrace trace, Project project, org.apache.maven.api.model.Plugin plugin)
             implements Request<Session>, CacheMetadata {
-        @Override
-        public Session getSession() {
-            return session;
-        }
-
-        @Override
-        public RequestTrace getTrace() {
-            return null;
-        }
 
         @Override
         public CacheRetention getCacheRetention() {
@@ -138,10 +130,5 @@ public final class DefaultPluginManager implements PluginManager {
         }
     }
 
-    private record PluginResult(PluginRequest request, Plugin plugin) implements Result<PluginRequest> {
-        @Override
-        public PluginRequest getRequest() {
-            return request;
-        }
-    }
+    private record PluginResult(PluginRequest request, Plugin plugin) implements Result<PluginRequest> {}
 }
