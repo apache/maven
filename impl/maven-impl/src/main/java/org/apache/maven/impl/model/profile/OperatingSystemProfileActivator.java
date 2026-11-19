@@ -19,6 +19,7 @@
 package org.apache.maven.impl.model.profile;
 
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Singleton;
@@ -105,7 +106,11 @@ public class OperatingSystemProfileActivator implements ProfileActivator {
         boolean reverse = false;
         final boolean result;
         if (test.startsWith(REGEX_PREFIX)) {
-            result = actualVersion.matches(test.substring(REGEX_PREFIX.length()));
+            // the pattern keeps its case: lower-casing it would turn \S into \s;
+            // CASE_INSENSITIVE keeps the matching case-insensitive, as it was before
+            result = Pattern.compile(expectedVersion.substring(REGEX_PREFIX.length()), Pattern.CASE_INSENSITIVE)
+                    .matcher(actualVersion)
+                    .matches();
         } else {
             if (test.startsWith("!")) {
                 reverse = true;
