@@ -18,21 +18,9 @@
  */
 package org.codehaus.plexus.classworlds.launcher;
 
-/*
- * Copyright 2001-2006 Codehaus Foundation.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamConstants;
+import javax.xml.stream.XMLStreamReader;
 
 import java.io.File;
 import java.io.IOException;
@@ -46,6 +34,7 @@ import java.net.URL;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -65,40 +54,39 @@ import org.codehaus.plexus.classworlds.realm.NoSuchRealmException;
 public class Configurator implements ConfigurationHandler {
     private static final System.Logger LOGGER = System.getLogger(Configurator.class.getName());
 
-    /**
-     * The launcher to configure.
-     */
+    /** The launcher to configure. */
     private Launcher launcher;
 
     private ClassWorld world;
 
-    /**
-     * Processed Realms.
-     */
+    /** Processed realms, keyed by realm name. */
     private Map<String, ClassRealm> configuredRealms;
 
-    /**
-     * Current Realm.
-     */
+    /** Current realm being configured (set by {@code [realmName]} sections). */
     private ClassRealm curRealm;
 
     private ClassLoader foreignClassLoader = null;
 
-    private List<Path> modulePaths = new ArrayList<>();
+    /** Current layer being configured (set by {@code [layer name]} sections), or {@code null} if in a realm section. */
+    private String curLayerName;
 
-    /**
-     * Module JAR paths that could not be loaded into a JPMS layer and must be added to the
-     * first realm that gets created instead (used when the {@code module} directive in the
-     * configuration file precedes any {@code [section]} header, so no realm exists yet when
-     * the fallback fires).
-     */
-    private List<Path> pendingModuleClasspathFallback = new ArrayList<>();
+    /** Named JPMS module layers: layer name → list of module-path JARs. Insertion order defines the classloader chain. */
+    private final LinkedHashMap<String, List<Path>> namedLayerPaths = new LinkedHashMap<>();
+
+    /** Deferred parent assignments: realm id → parent name (resolved against layers first, then realms). */
+    private final Map<String, String> realmParents = new HashMap<>();
+
+    /** Deferred import-exported directives: [targetRealmId, sourceRealmId]. Applied after realms are created. */
+    private final List<String[]> realmExportedImports = new ArrayList<>();
 
     private List<String[]> exportDirectives = new ArrayList<>();
 
     private List<String[]> openDirectives = new ArrayList<>();
 
     private List<String[]> readDirectives = new ArrayList<>();
+
+    /** ClassLoaders created for each named layer, keyed by layer name. */
+    private final Map<String, ClassLoader> layerClassLoaders = new LinkedHashMap<>();
 
     /**
      * Construct.
@@ -123,8 +111,8 @@ public class Configurator implements ConfigurationHandler {
     }
 
     /**
-     * set world.
-     * this setter is provided so you can use the same configurator to configure several "worlds"
+     * Set the ClassWorld to configure.
+     * This setter is provided so you can use the same configurator to configure several "worlds".
      *
      * @param world The classWorld to configure.
      */
@@ -134,15 +122,14 @@ public class Configurator implements ConfigurationHandler {
     }
 
     /**
-     * Configure from a file.
+     * Configure from a stream.
      *
-     * @param is The config input stream
+     * @param is The config input stream.
      * @throws IOException             If an error occurs reading the config file.
      * @throws MalformedURLException   If the config file contains invalid URLs.
      * @throws ConfigurationException  If the config file is corrupt.
      * @throws DuplicateRealmException If the config file defines two realms with the same id.
-     * @throws NoSuchRealmException    If the config file defines a main entry point in
-     *                                 a non-existent realm.
+     * @throws NoSuchRealmException    If the config file references a non-existent realm.
      */
     public void configure(InputStream is)
             throws IOException, ConfigurationException, DuplicateRealmException, NoSuchRealmException {
@@ -150,42 +137,42 @@ public class Configurator implements ConfigurationHandler {
             world = new ClassWorld();
         }
         curRealm = null;
+        curLayerName = null;
         foreignClassLoader = null;
-        modulePaths = new ArrayList<>();
+        namedLayerPaths.clear();
+        realmParents.clear();
+        realmExportedImports.clear();
         exportDirectives = new ArrayList<>();
         openDirectives = new ArrayList<>();
         readDirectives = new ArrayList<>();
+        layerClassLoaders.clear();
         if (this.launcher != null) {
             foreignClassLoader = this.launcher.getSystemClassLoader();
         }
         ConfigurationParser parser = new ConfigurationParser(this, System.getProperties());
         parser.parse(is);
-        createModuleLayer();
-        // Associate child realms to their parents.
+        createModuleLayers();
+        applyRealmParents();
+        applyExportedImports();
         associateRealms();
         if (this.launcher != null) {
             this.launcher.setWorld(world);
         }
     }
 
-    // TODO return this to protected when the legacy wrappers can be removed.
     /**
-     * Associate parent realms with their children.
+     * Associate parent realms with their children based on realm name hierarchy.
+     * Realms that have an explicit {@code parent} directive are skipped —
+     * their parent classloader was already set by {@link #applyRealmParents()}.
      */
+    // TODO return this to protected when the legacy wrappers can be removed.
     public void associateRealms() {
         List<String> sortRealmNames = new ArrayList<>(configuredRealms.keySet());
-        // sort by name
         sortRealmNames.sort(String::compareTo);
-        // So now we have something like the following for defined
-        // realms:
-        //
-        // root
-        // root.maven
-        // root.maven.plugin
-        //
-        // Now if the name of a realm is a superset of an existing realm
-        // the we want to make child/parent associations.
         for (String realmName : sortRealmNames) {
+            if (realmParents.containsKey(realmName)) {
+                continue;
+            }
             int j = realmName.lastIndexOf('.');
             if (j > 0) {
                 String parentRealmName = realmName.substring(0, j);
@@ -198,106 +185,161 @@ public class Configurator implements ConfigurationHandler {
         }
     }
 
-    public void addImportFrom(String relamName, String importSpec) throws NoSuchRealmException {
-        curRealm.importFrom(relamName, importSpec);
+    @Override
+    public void addLayer(String layerName) {
+        if (configuredRealms.containsKey(layerName)) {
+            throw new IllegalArgumentException("Name '" + layerName + "' is already used by a realm");
+        }
+        if (namedLayerPaths.containsKey(layerName)) {
+            throw new IllegalArgumentException("Layer '" + layerName + "' is already defined");
+        }
+        curLayerName = layerName;
+        curRealm = null;
+        namedLayerPaths.put(layerName, new ArrayList<>());
     }
 
+    @Override
+    public void addImportFrom(String realmName, String importSpec) throws NoSuchRealmException {
+        curRealm.importFrom(realmName, importSpec);
+    }
+
+    @Override
     public void addLoadFile(File file) {
         try {
             curRealm.addURL(file.toURI().toURL());
         } catch (MalformedURLException e) {
-            // can't really happen... or can it?
+            // can't really happen
         }
     }
 
+    @Override
     public void addLoadURL(URL url) {
         curRealm.addURL(url);
     }
 
+    @Override
     public void addRealm(String realmName) throws DuplicateRealmException {
-        curRealm = world.newRealm(realmName, foreignClassLoader);
-        // If the 'module' directive failed to create a JPMS layer before any section was
-        // declared, drain the deferred classpath fallback into this first realm.
-        if (!pendingModuleClasspathFallback.isEmpty()) {
-            for (Path path : pendingModuleClasspathFallback) {
-                try {
-                    curRealm.addURL(path.toUri().toURL());
-                } catch (MalformedURLException e) {
-                    // ignore
-                }
-            }
-            pendingModuleClasspathFallback.clear();
+        if (namedLayerPaths.containsKey(realmName)) {
+            throw new DuplicateRealmException(world, realmName);
         }
-        // Stash the configured realm for subsequent association processing.
+        curLayerName = null;
+        curRealm = world.newRealm(realmName, foreignClassLoader);
         configuredRealms.put(realmName, curRealm);
     }
 
+    @Override
     public void addModuleFile(File file) {
-        modulePaths.add(file.toPath());
+        if (curLayerName != null) {
+            namedLayerPaths.get(curLayerName).add(file.toPath());
+        } else {
+            LOGGER.log(
+                    System.Logger.Level.WARNING,
+                    "addModuleFile called outside a [layer] section — ''{0}'' is ignored",
+                    file.getName());
+        }
+    }
+
+    @Override
+    public void setRealmParent(String name) {
+        if (curRealm != null) {
+            realmParents.put(curRealm.getId(), name);
+        }
+    }
+
+    @Override
+    public void importExportedFrom(String realmName) throws NoSuchRealmException {
+        if (curRealm != null) {
+            realmExportedImports.add(new String[] {curRealm.getId(), realmName});
+        }
     }
 
     public List<Path> getModulePaths() {
-        return modulePaths;
+        List<Path> all = new ArrayList<>();
+        namedLayerPaths.values().forEach(all::addAll);
+        return all;
     }
 
+    @Override
     public void addExports(String module, String pkg, String target) {
         exportDirectives.add(new String[] {module, pkg, target});
     }
 
+    @Override
     public void addOpens(String module, String pkg, String target) {
         openDirectives.add(new String[] {module, pkg, target});
     }
 
+    @Override
     public void addReads(String source, String target) {
         readDirectives.add(new String[] {source, target});
     }
 
-    private void createModuleLayer() {
-        if (modulePaths.isEmpty()
+    private void createModuleLayers() {
+        if (namedLayerPaths.isEmpty()
                 && exportDirectives.isEmpty()
                 && openDirectives.isEmpty()
                 && readDirectives.isEmpty()) {
             return;
         }
-        if (!modulePaths.isEmpty()) {
+
+        Set<String> bootModuleNames =
+                ModuleLayer.boot().modules().stream().map(Module::getName).collect(Collectors.toSet());
+
+        ClassLoader baseParent = foreignClassLoader != null ? foreignClassLoader : ClassLoader.getSystemClassLoader();
+        ClassLoader chainedLoader = baseParent;
+
+        for (Map.Entry<String, List<Path>> entry : namedLayerPaths.entrySet()) {
+            String layerName = entry.getKey();
+            List<Path> paths = entry.getValue();
+            if (paths.isEmpty()) {
+                continue;
+            }
+
             try {
-                Set<String> bootModuleNames = ModuleLayer.boot().modules().stream()
-                        .map(Module::getName)
-                        .collect(Collectors.toSet());
-                ModuleFinder finder = ModuleFinder.of(modulePaths.toArray(new Path[0]));
+                ModuleFinder finder = ModuleFinder.of(paths.toArray(new Path[0]));
                 Set<String> newModules = finder.findAll().stream()
                         .map(ref -> ref.descriptor().name())
                         .filter(name -> !bootModuleNames.contains(name))
                         .collect(Collectors.toSet());
-                if (!newModules.isEmpty()) {
-                    Configuration cf =
-                            ModuleLayer.boot().configuration().resolve(finder, ModuleFinder.of(), newModules);
-                    ClassLoader parent =
-                            foreignClassLoader != null ? foreignClassLoader : ClassLoader.getSystemClassLoader();
-                    ModuleLayer.Controller controller =
-                            ModuleLayer.defineModulesWithOneLoader(cf, List.of(ModuleLayer.boot()), parent);
-                    ModuleLayer layer = controller.layer();
-                    ClassLoader oldForeignClassLoader = foreignClassLoader;
-                    foreignClassLoader = layer.findLoader(newModules.iterator().next());
-                    world.setModuleLayer(layer, controller);
-                    // Realms created during parsing (before this module layer existed) used the
-                    // old foreignClassLoader as their parent. Retroactively update them so they
-                    // delegate to the new module layer loader, making module-layer classes (e.g.
-                    // JLine) accessible from the classrealm without duplicating jars on the
-                    // classpath.
-                    for (ClassRealm realm : configuredRealms.values()) {
-                        if (realm.getParentClassLoader() == oldForeignClassLoader) {
-                            realm.setParentClassLoader(foreignClassLoader);
-                        }
-                    }
+
+                if (newModules.isEmpty()) {
+                    continue;
                 }
+
+                // All layers are siblings under boot — JPMS parent is always boot.
+                // ClassLoader parent chains through previous layers so plexus.core
+                // can reach all layer classes via delegation.
+                Configuration cf = ModuleLayer.boot().configuration().resolve(finder, ModuleFinder.of(), newModules);
+                ModuleLayer.Controller controller =
+                        ModuleLayer.defineModulesWithOneLoader(cf, List.of(ModuleLayer.boot()), chainedLoader);
+                ModuleLayer layer = controller.layer();
+                ClassLoader layerLoader = layer.findLoader(newModules.iterator().next());
+
+                world.setModuleLayer(layerName, layer, controller);
+                layerClassLoaders.put(layerName, layerLoader);
+                chainedLoader = layerLoader;
+
+                LOGGER.log(
+                        System.Logger.Level.DEBUG,
+                        "Created JPMS layer ''{0}'' with modules: {1}",
+                        layerName,
+                        newModules);
+
             } catch (FindException | ResolutionException | LayerInstantiationException e) {
                 LOGGER.log(
                         System.Logger.Level.DEBUG,
-                        "Failed to create JPMS module layer, falling back to classpath mode: " + e.getMessage());
-                addModulePathsToClasspath();
+                        "Failed to create JPMS layer '" + layerName + "', falling back to classpath: "
+                                + e.getMessage());
+                addLayerPathsToClasspath(paths);
             }
         }
+
+        // Update foreignClassLoader to the topmost layer's loader
+        if (chainedLoader != baseParent) {
+            foreignClassLoader = chainedLoader;
+        }
+
+        // Apply module access directives
         Module unnamedTarget = getClass().getModule();
         for (String[] directive : exportDirectives) {
             Module target = resolveTargetModule(directive[2], unnamedTarget);
@@ -319,19 +361,115 @@ public class Configurator implements ConfigurationHandler {
         }
     }
 
-    private void addModulePathsToClasspath() {
-        if (curRealm != null) {
-            for (Path path : modulePaths) {
+    private void applyRealmParents() {
+        for (Map.Entry<String, String> entry : realmParents.entrySet()) {
+            String realmId = entry.getKey();
+            String parentName = entry.getValue();
+            ClassRealm realm = configuredRealms.get(realmId);
+            if (realm == null) {
+                continue;
+            }
+            ClassLoader parentLoader = layerClassLoaders.get(parentName);
+            if (parentLoader != null) {
+                realm.setParentClassLoader(parentLoader);
+            } else {
+                ClassRealm parentRealm = configuredRealms.get(parentName);
+                if (parentRealm != null) {
+                    realm.setParentRealm(parentRealm);
+                } else {
+                    LOGGER.log(
+                            System.Logger.Level.WARNING,
+                            "classworlds: parent ''{0}'' not found (not a layer, not a realm) for realm ''{1}'' — no parent set",
+                            parentName,
+                            realmId);
+                }
+            }
+        }
+    }
+
+    private void applyExportedImports() throws NoSuchRealmException {
+        for (String[] pair : realmExportedImports) {
+            String targetRealmId = pair[0];
+            String sourceRealmId = pair[1];
+            ClassRealm targetRealm = configuredRealms.get(targetRealmId);
+            ClassRealm sourceRealm = configuredRealms.get(sourceRealmId);
+            if (targetRealm == null) {
+                throw new NoSuchRealmException(world, targetRealmId);
+            }
+            if (sourceRealm == null) {
+                throw new NoSuchRealmException(world, sourceRealmId);
+            }
+            // Scan the source realm for META-INF/maven/extension.xml exported packages
+            discoverAndImportExported(targetRealm, sourceRealm);
+        }
+    }
+
+    private void discoverAndImportExported(ClassRealm targetRealm, ClassRealm sourceRealm) {
+        try {
+            var urls = sourceRealm.getResources("META-INF/maven/extension.xml");
+            XMLInputFactory xmlFactory = XMLInputFactory.newInstance();
+            xmlFactory.setProperty(XMLInputFactory.SUPPORT_DTD, false);
+            xmlFactory.setProperty(XMLInputFactory.IS_SUPPORTING_EXTERNAL_ENTITIES, false);
+            while (urls.hasMoreElements()) {
+                var url = urls.nextElement();
+                try (var is = url.openStream()) {
+                    XMLStreamReader reader = xmlFactory.createXMLStreamReader(is);
+                    try {
+                        boolean inPackages = false;
+                        while (reader.hasNext()) {
+                            int event = reader.next();
+                            if (event == XMLStreamConstants.START_ELEMENT) {
+                                if ("exportedPackages".equals(reader.getLocalName())) {
+                                    inPackages = true;
+                                } else if (inPackages && "exportedPackage".equals(reader.getLocalName())) {
+                                    String pkg = reader.getElementText().trim();
+                                    if (!pkg.isEmpty()) {
+                                        try {
+                                            targetRealm.importFrom(sourceRealm.getId(), pkg);
+                                        } catch (NoSuchRealmException e) {
+                                            LOGGER.log(
+                                                    System.Logger.Level.DEBUG,
+                                                    "Cannot import ''{0}'' from realm ''{1}''",
+                                                    pkg,
+                                                    sourceRealm.getId());
+                                        }
+                                    }
+                                }
+                            } else if (event == XMLStreamConstants.END_ELEMENT) {
+                                if ("exportedPackages".equals(reader.getLocalName())) {
+                                    inPackages = false;
+                                }
+                            }
+                        }
+                    } finally {
+                        reader.close();
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(
+                    System.Logger.Level.WARNING,
+                    "Failed to read extension descriptors from realm " + sourceRealm.getId(),
+                    e);
+        }
+    }
+
+    private void addLayerPathsToClasspath(List<Path> paths) {
+        // Use plexus.core as the fallback realm for failed layer JARs (the standard
+        // Maven core loader). Do NOT use curRealm: after all realm sections are parsed,
+        // curRealm is the last realm declared (e.g. maven.api.v4), which is wrong.
+        ClassRealm targetRealm = configuredRealms.get("plexus.core");
+        if (targetRealm == null) {
+            targetRealm = curRealm; // best-effort if plexus.core is not yet configured
+        }
+        if (targetRealm != null) {
+            for (Path path : paths) {
                 try {
-                    curRealm.addURL(path.toUri().toURL());
+                    targetRealm.addURL(path.toUri().toURL());
                 } catch (MalformedURLException e) {
                     // ignore
                 }
             }
-        } else {
-            // The 'module' directive appeared before any [section]: no realm exists yet.
-            // Defer adding these JARs to the classpath of the first realm to be created.
-            pendingModuleClasspathFallback.addAll(modulePaths);
         }
     }
 
@@ -339,8 +477,7 @@ public class Configurator implements ConfigurationHandler {
         if ("ALL-UNNAMED".equals(targetName)) {
             return unnamedTarget;
         }
-        ModuleLayer layer = world.getModuleLayer();
-        if (layer != null) {
+        for (ModuleLayer layer : world.getModuleLayers().values()) {
             Module m = layer.findModule(targetName).orElse(null);
             if (m != null) {
                 return m;
@@ -349,6 +486,7 @@ public class Configurator implements ConfigurationHandler {
         return ModuleLayer.boot().findModule(targetName).orElse(null);
     }
 
+    @Override
     public void setAppMain(String mainClassName, String mainRealmName) {
         if (this.launcher != null) {
             this.launcher.setAppMain(mainClassName, mainRealmName);

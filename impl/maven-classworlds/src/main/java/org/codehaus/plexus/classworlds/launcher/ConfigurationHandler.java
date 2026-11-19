@@ -82,11 +82,31 @@ public interface ConfigurationHandler {
     void addLoadURL(URL url);
 
     /**
-     * Add a file to the module path. Jars added via this method will be loaded
-     * as JPMS named modules in a {@link ModuleLayer}, rather than on the classpath.
+     * Define a new JPMS module layer section.
+     * @param layerName the layer name (e.g. "infra", "api")
+     */
+    default void addLayer(String layerName) {}
+
+    /**
+     * Add a file to the current module layer's module path. Jars added via this method will be loaded
+     * as JPMS named modules in a {@link ModuleLayer}.
      * @param file the jar file to add to the module path
      */
     default void addModuleFile(File file) {}
+
+    /**
+     * Set the current realm's parent classloader to the named layer or realm.
+     * @param name the name of the layer or realm to use as parent
+     */
+    default void setRealmParent(String name) {}
+
+    /**
+     * Import all packages exported via {@code META-INF/maven/extension.xml}
+     * descriptors from the specified realm into the current realm.
+     * @param realmName the realm to import exported packages from
+     * @throws NoSuchRealmException if the realm doesn't exist
+     */
+    default void importExportedFrom(String realmName) throws NoSuchRealmException {}
 
     /**
      * Export a package from a module to a target module.

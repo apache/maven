@@ -62,9 +62,9 @@ public class ClassWorld implements Closeable {
 
     private final List<ClassWorldListener> listeners = new ArrayList<>();
 
-    private ModuleLayer moduleLayer;
+    private final LinkedHashMap<String, ModuleLayer> moduleLayers = new LinkedHashMap<>();
 
-    private ModuleLayer.Controller moduleLayerController;
+    private final LinkedHashMap<String, ModuleLayer.Controller> moduleLayerControllers = new LinkedHashMap<>();
 
     public ClassWorld(String realmId, ClassLoader classLoader) {
         this();
@@ -157,17 +157,60 @@ public class ClassWorld implements Closeable {
         return Collections.unmodifiableList(new ArrayList<>(realms.values()));
     }
 
-    public synchronized void setModuleLayer(ModuleLayer moduleLayer, ModuleLayer.Controller controller) {
-        this.moduleLayer = moduleLayer;
-        this.moduleLayerController = controller;
+    public synchronized void setModuleLayer(String name, ModuleLayer layer, ModuleLayer.Controller controller) {
+        moduleLayers.put(name, layer);
+        if (controller != null) {
+            moduleLayerControllers.put(name, controller);
+        }
     }
 
+    /**
+     * @deprecated use {@link #setModuleLayer(String, ModuleLayer, ModuleLayer.Controller)}
+     */
+    @Deprecated
+    public synchronized void setModuleLayer(ModuleLayer layer, ModuleLayer.Controller controller) {
+        setModuleLayer("default", layer, controller);
+    }
+
+    public ModuleLayer getModuleLayer(String name) {
+        return moduleLayers.get(name);
+    }
+
+    /**
+     * Returns the last registered module layer, or {@code null}.
+     * For backward compatibility with code that expects a single layer.
+     */
     public ModuleLayer getModuleLayer() {
-        return moduleLayer;
+        if (moduleLayers.isEmpty()) {
+            return null;
+        }
+        ModuleLayer last = null;
+        for (ModuleLayer l : moduleLayers.values()) {
+            last = l;
+        }
+        return last;
     }
 
+    public ModuleLayer.Controller getModuleLayerController(String name) {
+        return moduleLayerControllers.get(name);
+    }
+
+    /**
+     * Returns the last registered module layer controller, or {@code null}.
+     */
     public ModuleLayer.Controller getModuleLayerController() {
-        return moduleLayerController;
+        if (moduleLayerControllers.isEmpty()) {
+            return null;
+        }
+        ModuleLayer.Controller last = null;
+        for (ModuleLayer.Controller c : moduleLayerControllers.values()) {
+            last = c;
+        }
+        return last;
+    }
+
+    public Map<String, ModuleLayer> getModuleLayers() {
+        return Collections.unmodifiableMap(moduleLayers);
     }
 
     /**
@@ -214,13 +257,6 @@ public class ClassWorld implements Closeable {
                     sourceModuleName);
             return;
         }
-        if (moduleLayerController == null) {
-            LOGGER.log(
-                    System.Logger.Level.WARNING,
-                    "module-access: no ModuleLayer controller available, cannot add-reads {0}",
-                    sourceModuleName);
-            return;
-        }
         if (isBootLayerModule(source)) {
             LOGGER.log(
                     System.Logger.Level.WARNING,
@@ -229,28 +265,25 @@ public class ClassWorld implements Closeable {
                     sourceModuleName);
             return;
         }
-        moduleLayerController.addReads(source, target);
+        ModuleLayer.Controller controller = findControllerFor(source);
+        if (controller == null) {
+            LOGGER.log(
+                    System.Logger.Level.WARNING,
+                    "module-access: no ModuleLayer controller available, cannot add-reads {0}",
+                    sourceModuleName);
+            return;
+        }
+        controller.addReads(source, target);
     }
 
     private void applyModuleAccess(String moduleName, String packageName, Module target, boolean open) {
-        String directive = open ? "add-opens" : "add-exports";
         Module source = findModule(moduleName);
         if (source == null) {
             LOGGER.log(
                     System.Logger.Level.WARNING,
-                    "module-access: module ''{0}'' not found, ignoring {1} {0}/{2}",
+                    "module-access: module ''{0}'' not found, ignoring {1}",
                     moduleName,
-                    directive,
-                    packageName);
-            return;
-        }
-        if (moduleLayerController == null) {
-            LOGGER.log(
-                    System.Logger.Level.WARNING,
-                    "module-access: no ModuleLayer controller available, cannot {0} {1}/{2}",
-                    directive,
-                    moduleName,
-                    packageName);
+                    open ? "add-opens" : "add-exports");
             return;
         }
         if (isBootLayerModule(source)) {
@@ -259,25 +292,45 @@ public class ClassWorld implements Closeable {
                     "module-access: module ''{0}'' is in the boot layer and cannot be modified at runtime;"
                             + " use --{1} {0}/{2}=ALL-UNNAMED on the JVM command line instead",
                     moduleName,
-                    directive,
+                    open ? "add-opens" : "add-exports",
+                    packageName);
+            return;
+        }
+        ModuleLayer.Controller controller = findControllerFor(source);
+        if (controller == null) {
+            LOGGER.log(
+                    System.Logger.Level.WARNING,
+                    "module-access: no ModuleLayer controller available, cannot {0} {1}/{2}",
+                    open ? "add-opens" : "add-exports",
+                    moduleName,
                     packageName);
             return;
         }
         if (open) {
-            moduleLayerController.addOpens(source, packageName, target);
+            controller.addOpens(source, packageName, target);
         } else {
-            moduleLayerController.addExports(source, packageName, target);
+            controller.addExports(source, packageName, target);
         }
     }
 
     private Module findModule(String moduleName) {
-        if (moduleLayer != null) {
-            Module m = moduleLayer.findModule(moduleName).orElse(null);
+        for (ModuleLayer layer : moduleLayers.values()) {
+            Module m = layer.findModule(moduleName).orElse(null);
             if (m != null) {
                 return m;
             }
         }
         return ModuleLayer.boot().findModule(moduleName).orElse(null);
+    }
+
+    private ModuleLayer.Controller findControllerFor(Module module) {
+        ModuleLayer layer = module.getLayer();
+        for (Map.Entry<String, ModuleLayer> entry : moduleLayers.entrySet()) {
+            if (entry.getValue() == layer) {
+                return moduleLayerControllers.get(entry.getKey());
+            }
+        }
+        return null;
     }
 
     private boolean isBootLayerModule(Module module) {

@@ -37,10 +37,19 @@ under the License.
 
     <dependencySet>
       <useProjectArtifact>false</useProjectArtifact>
+      <outputDirectory>lib/api</outputDirectory>
+      <includes>
+        <include>org.apache.maven:maven-api-*</include>
+      </includes>
+    </dependencySet>
+
+    <dependencySet>
+      <useProjectArtifact>false</useProjectArtifact>
       <outputDirectory>lib</outputDirectory>
       <excludes>
         <exclude>org.apache.maven:maven-classworlds</exclude>
         <exclude>org.jline:*</exclude>
+        <exclude>org.apache.maven:maven-api-*</exclude>
       </excludes>
     </dependencySet>
   </dependencySets>

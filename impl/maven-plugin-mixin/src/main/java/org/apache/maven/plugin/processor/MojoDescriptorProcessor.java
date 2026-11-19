@@ -27,6 +27,7 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Modifier;
+import javax.lang.model.element.ModuleElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
@@ -231,6 +232,7 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
                 .artifactId(coords[1])
                 .version(coords[2])
                 .goalPrefix(coords[3])
+                .modular(isModularPlugin())
                 .mojos(mojos)
                 .build();
         try (Writer w = processingEnv
@@ -245,6 +247,18 @@ public class MojoDescriptorProcessor extends AbstractProcessor {
         }
         note("Generated META-INF/maven/plugin.xml with " + mojos.size() + " mojo(s)");
         pluginXmlGenerated = true;
+    }
+
+    private boolean isModularPlugin() {
+        for (TypeElement mojoType : mojoElements.values()) {
+            if (mojoType != null) {
+                ModuleElement module = processingEnv.getElementUtils().getModuleOf(mojoType);
+                if (module != null && !module.isUnnamed()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     /**

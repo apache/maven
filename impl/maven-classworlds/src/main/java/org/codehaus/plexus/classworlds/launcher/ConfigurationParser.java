@@ -69,11 +69,17 @@ public class ConfigurationParser {
 
     public static final String MODULE_PREFIX = "module";
 
+    public static final String PARENT_PREFIX = "parent";
+
+    public static final String IMPORT_EXPORTED_PREFIX = "import-exported";
+
     public static final String ADD_EXPORTS_PREFIX = "add-exports";
 
     public static final String ADD_OPENS_PREFIX = "add-opens";
 
     public static final String ADD_READS_PREFIX = "add-reads";
+
+    public static final String LAYER_PREFIX = "layer ";
 
     /**
      * Optionally spec prefix.
@@ -111,6 +117,7 @@ public class ConfigurationParser {
             int lineNo = 0;
             boolean mainSet = false;
             String curRealm = null;
+            boolean inLayer = false;
             while (true) {
                 line = reader.readLine();
                 if (line == null) {
@@ -124,7 +131,7 @@ public class ConfigurationParser {
                 char lineFirstChar = line.charAt(0);
                 switch (lineFirstChar) {
                     case 'm':
-                        if (line.startsWith(MODULE_PREFIX)) {
+                        if (line.startsWith(MODULE_PREFIX + " ")) {
                             handleModuleConfiguration(line, lineNo);
                         } else {
                             mainSet = handleMainConfiguration(line, lineNo, mainSet);
@@ -136,13 +143,25 @@ public class ConfigurationParser {
                         }
                         break;
                     case '[':
-                        curRealm = handleRealmConfiguration(line, lineNo);
+                        String[] sectionResult = handleSectionHeader(line, lineNo);
+                        if (sectionResult[0] != null) {
+                            // layer section
+                            inLayer = true;
+                            curRealm = null;
+                        } else {
+                            // realm section
+                            inLayer = false;
+                            curRealm = sectionResult[1];
+                        }
                         break;
                     case 'i':
-                        handleImportConfiguration(line, lineNo, curRealm);
+                        handleImportConfiguration(line, lineNo, curRealm, inLayer);
                         break;
                     case 'l':
                         handleLoadConfiguration(line, lineNo);
+                        break;
+                    case 'p':
+                        handleParentConfiguration(line, lineNo, curRealm);
                         break;
                     case 'a':
                         handleAddDirective(line, lineNo);
@@ -328,19 +347,43 @@ public class ConfigurationParser {
         throw new ConfigurationException("Unhandled configuration", lineNo, line);
     }
 
-    private String handleRealmConfiguration(String line, int lineNo)
+    /**
+     * Handle a {@code [section]} header. Returns a two-element array:
+     * {@code [layerName, null]} for layer sections, {@code [null, realmName]} for realm sections.
+     */
+    private String[] handleSectionHeader(String line, int lineNo)
             throws ConfigurationException, DuplicateRealmException {
         int rbrack = line.indexOf("]");
         if (rbrack < 0) {
-            throw new ConfigurationException("Invalid realm specifier", lineNo, line);
+            throw new ConfigurationException("Invalid section specifier", lineNo, line);
         }
-        String realmName = line.substring(1, rbrack);
-        handler.addRealm(realmName);
-        return realmName;
+        String content = line.substring(1, rbrack).trim();
+        if (content.startsWith(LAYER_PREFIX)) {
+            String layerName = content.substring(LAYER_PREFIX.length()).trim();
+            if (layerName.isEmpty()) {
+                throw new ConfigurationException("Empty layer name", lineNo, line);
+            }
+            handler.addLayer(layerName);
+            return new String[] {layerName, null};
+        }
+        handler.addRealm(content);
+        return new String[] {null, content};
     }
 
-    private void handleImportConfiguration(String line, int lineNo, String curRealm)
+    private void handleImportConfiguration(String line, int lineNo, String curRealm, boolean inLayer)
             throws ConfigurationException, NoSuchRealmException {
+        if (line.startsWith(IMPORT_EXPORTED_PREFIX)) {
+            if (curRealm == null) {
+                throw new ConfigurationException("import-exported requires a realm section", lineNo, line);
+            }
+            int fromLoc = line.indexOf(FROM_SEPARATOR, IMPORT_EXPORTED_PREFIX.length());
+            if (fromLoc < 0) {
+                throw new ConfigurationException("Missing from clause", lineNo, line);
+            }
+            String realmName = line.substring(fromLoc + FROM_SEPARATOR.length()).trim();
+            handler.importExportedFrom(realmName);
+            return;
+        }
         if (line.startsWith(IMPORT_PREFIX)) {
             if (curRealm == null) {
                 throw new ConfigurationException("Unhandled import", lineNo, line);
@@ -352,6 +395,21 @@ public class ConfigurationParser {
             String importSpec = line.substring(IMPORT_PREFIX.length(), fromLoc).trim();
             String realmName = line.substring(fromLoc + FROM_SEPARATOR.length()).trim();
             handler.addImportFrom(realmName, importSpec);
+            return;
+        }
+        throw new ConfigurationException("Unhandled configuration", lineNo, line);
+    }
+
+    private void handleParentConfiguration(String line, int lineNo, String curRealm) throws ConfigurationException {
+        if (line.startsWith(PARENT_PREFIX)) {
+            if (curRealm == null) {
+                throw new ConfigurationException("parent requires a realm section", lineNo, line);
+            }
+            String name = line.substring(PARENT_PREFIX.length()).trim();
+            if (name.isEmpty()) {
+                throw new ConfigurationException("Empty parent name", lineNo, line);
+            }
+            handler.setRealmParent(name);
             return;
         }
         throw new ConfigurationException("Unhandled configuration", lineNo, line);

@@ -197,6 +197,7 @@ public class PluginDescriptorBuilder {
         pluginDescriptor.setDescription(extractDescription(c));
 
         pluginDescriptor.setIsolatedRealm(extractIsolatedRealm(c));
+        pluginDescriptor.setModular(extractModular(c));
         pluginDescriptor.setInheritedByDefault(extractInheritedByDefault(c));
         pluginDescriptor.setRequiredJavaVersion(extractRequiredJavaVersion(c).orElse(null));
         pluginDescriptor.setRequiredMavenVersion(extractRequiredMavenVersion(c).orElse(null));
@@ -258,6 +259,15 @@ public class PluginDescriptorBuilder {
 
         if (isolatedRealm != null) {
             return Boolean.parseBoolean(isolatedRealm);
+        }
+        return false;
+    }
+
+    private boolean extractModular(PlexusConfiguration c) {
+        String modular = c.getChild("modular").getValue();
+
+        if (modular != null) {
+            return Boolean.parseBoolean(modular);
         }
         return false;
     }
