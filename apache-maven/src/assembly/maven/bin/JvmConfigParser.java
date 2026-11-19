@@ -77,11 +77,11 @@ public class JvmConfigParser {
                 System.out.print(result);
                 System.out.flush();
             }
-        } catch (IOException e) {
-            // If jvm.config exists but can't be read, this is a configuration error
+        } catch (IOException | IllegalArgumentException e) {
+            // If jvm.config exists but can't be read or parsed, this is a configuration error
             // Print clear error and exit with error code to prevent Maven from running
-            System.err.println("ERROR: Failed to read .mvn/jvm.config: " + e.getMessage());
-            System.err.println("Please check file permissions and syntax.");
+            System.err.println("ERROR: Failed to process .mvn/jvm.config: " + e.getMessage());
+            System.err.println("Please check that the file is readable and has valid syntax.");
             System.err.flush();
             System.exit(1);
         }
@@ -149,35 +149,45 @@ public class JvmConfigParser {
 
     /**
      * Parse a line into individual arguments, respecting quoted strings.
-     * Quotes are stripped from the arguments.
+     * Quotes are stripped from the arguments. Empty quoted strings ({@code ""} or {@code ''})
+     * produce an empty argument token. Backslashes are treated as literal characters;
+     * they do not act as escape characters.
      */
     private static List<String> parseArguments(String line) {
         List<String> args = new ArrayList<>();
         StringBuilder current = new StringBuilder();
         boolean inDoubleQuotes = false;
         boolean inSingleQuotes = false;
+        boolean tokenStarted = false;
 
         for (int i = 0; i < line.length(); i++) {
             char c = line.charAt(i);
 
             if (c == '"' && !inSingleQuotes) {
                 inDoubleQuotes = !inDoubleQuotes;
+                tokenStarted = true;
             } else if (c == '\'' && !inDoubleQuotes) {
                 inSingleQuotes = !inSingleQuotes;
-            } else if (c == ' ' && !inDoubleQuotes && !inSingleQuotes) {
-                // Space outside quotes - end of argument
-                if (current.length() > 0) {
+                tokenStarted = true;
+            } else if (Character.isWhitespace(c) && !inDoubleQuotes && !inSingleQuotes) {
+                if (tokenStarted) {
                     args.add(current.toString());
                     current.setLength(0);
+                    tokenStarted = false;
                 }
             } else {
                 current.append(c);
+                tokenStarted = true;
             }
         }
 
-        // Add last argument
-        if (current.length() > 0) {
+        if (tokenStarted) {
             args.add(current.toString());
+        }
+
+        if (inDoubleQuotes || inSingleQuotes) {
+            throw new IllegalArgumentException(
+                    "Unclosed " + (inDoubleQuotes ? "double" : "single") + " quote in: " + line);
         }
 
         return args;
