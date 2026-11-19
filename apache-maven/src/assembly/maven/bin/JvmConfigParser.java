@@ -81,7 +81,7 @@ public class JvmConfigParser {
             // If jvm.config exists but can't be read or parsed, this is a configuration error
             // Print clear error and exit with error code to prevent Maven from running
             System.err.println("ERROR: Failed to process .mvn/jvm.config: " + e.getMessage());
-            System.err.println("Please check file permissions and syntax.");
+            System.err.println("Please check that the file is readable and has valid syntax.");
             System.err.flush();
             System.exit(1);
         }
