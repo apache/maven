@@ -320,6 +320,9 @@ final class PathSelector implements PathMatcher {
             if (s <= MAVEN_SYNTAX_THRESHOLD || exclude.startsWith(DEFAULT_SYNTAX)) {
                 if (s > MAVEN_SYNTAX_THRESHOLD) {
                     exclude = exclude.substring(DEFAULT_SYNTAX.length());
+                } else if (exclude.endsWith("/") || exclude.endsWith(File.separator)) {
+                    // As for the includes, a directory stands for everything below it.
+                    exclude += "**";
                 }
                 if (cannotMatch(exclude, prefixes, false) || cannotMatch(exclude, suffixes, true)) {
                     it.remove();
