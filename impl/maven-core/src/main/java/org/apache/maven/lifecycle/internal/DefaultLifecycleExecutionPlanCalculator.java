@@ -259,12 +259,10 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
             }
         }
         if (!duplicateLifecyclePhases.isEmpty()) {
-        if (!duplicateLifecyclePhases.isEmpty()) {
             LOG.warn(
                     "The following lifecycle phases overlap and will cause some plugins to execute multiple times: {}."
                             + " If this is not intended, review the phases passed on the command line.",
                     duplicateLifecyclePhases);
-        }
         }
         return mojoExecutions;
     }
