@@ -28,7 +28,7 @@ public class MavenITmng5885LogParserTest extends AbstractMavenIntegrationTestCas
             "If this is not intended, you should check your Maven Build.";
 
     /**
-     * Test that executes 'mvn clean packe compile'.
+     * Test that executes 'mvn package compile'.
      * This should produce a warning message about duplicate lifecycle phase execution.
      */
     @Test
