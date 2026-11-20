@@ -30,6 +30,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
@@ -228,7 +229,7 @@ class DefaultLoggerTest {
                 processor.read(source, null);
             } catch (Exception ignored) {
             }
-            assert strictSeen[0] : "strict must be true when options is null";
+            assertTrue(strictSeen[0], "strict must be true when options is null");
         } finally {
             java.nio.file.Files.deleteIfExists(tmp);
         }
