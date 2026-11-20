@@ -49,7 +49,8 @@ public interface ModelProcessor {
      *
      * <p>The default implementation bridges to {@link #read(XmlReaderRequest)} for backward
      * compatibility with existing implementations. Implementors are encouraged to override
-     * this method directly in a future release.
+     * this method directly; the deprecated {@link #read(XmlReaderRequest)} overload will
+     * be removed in a future major version.
      *
      * @param source  the source to read the model from, must not be {@code null}
      * @param options optional reading options, may be {@code null}
@@ -59,11 +60,13 @@ public interface ModelProcessor {
      */
     @Nonnull
     default Model read(@Nonnull Source source, @Nullable Map<String, ?> options) throws ModelParserException {
+        Object strictValue = options != null ? options.get(org.apache.maven.api.spi.ModelParser.STRICT) : null;
+        boolean strict = strictValue == null || Boolean.parseBoolean(strictValue.toString());
         try {
             XmlReaderRequest request = XmlReaderRequest.builder()
                     .path(source.getPath())
                     .inputStream(source.getPath() == null ? source.openStream() : null)
-                    .strict(true)
+                    .strict(strict)
                     .build();
             return read(request);
         } catch (XmlReaderException | IOException e) {

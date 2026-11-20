@@ -21,6 +21,7 @@ package org.apache.maven.internal.impl;
 import java.util.function.Supplier;
 
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 import org.apache.maven.api.logging.LogEventBuilder;
 import org.apache.maven.api.logging.LogLevel;
 import org.apache.maven.api.logging.Logger;
@@ -137,13 +138,13 @@ public class DefaultLogger implements Logger {
 
         @Override
         @Nonnull
-        public LogEventBuilder withProjectId(String projectId) {
+        public LogEventBuilder withProjectId(@Nullable String projectId) {
             return this;
         }
 
         @Override
         @Nonnull
-        public LogEventBuilder withMojoId(String mojoId) {
+        public LogEventBuilder withMojoId(@Nullable String mojoId) {
             return this;
         }
 
@@ -224,13 +225,13 @@ public class DefaultLogger implements Logger {
 
         @Override
         @Nonnull
-        public LogEventBuilder withProjectId(String projectId) {
+        public LogEventBuilder withProjectId(@Nullable String projectId) {
             return this;
         }
 
         @Override
         @Nonnull
-        public LogEventBuilder withMojoId(String mojoId) {
+        public LogEventBuilder withMojoId(@Nullable String mojoId) {
             return this;
         }
 

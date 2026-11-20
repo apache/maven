@@ -128,7 +128,7 @@ public interface LogEventBuilder {
      * @return this builder
      */
     @Nonnull
-    LogEventBuilder withProjectId(String projectId);
+    LogEventBuilder withProjectId(@Nullable String projectId);
 
     /**
      * Overrides the mojo execution identifier for this event.
@@ -141,7 +141,7 @@ public interface LogEventBuilder {
      * @return this builder
      */
     @Nonnull
-    LogEventBuilder withMojoId(String mojoId);
+    LogEventBuilder withMojoId(@Nullable String mojoId);
 
     /**
      * Emits the log event with the given pre-formatted message.
