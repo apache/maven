@@ -443,6 +443,18 @@ public final class Constants {
     public static final String MAVEN_REPO_LOCAL_TAIL_IGNORE_AVAILABILITY = "maven.repo.local.tail.ignoreAvailability";
 
     /**
+     * Whether cached artifacts may be reused independently of their recorded remote repository origin.
+     * By default this is enabled for unsplit enhanced local repositories, including chain members,
+     * unless an explicit tail availability policy requests strict checking. Split repositories retain
+     * origin checking by default. An explicit value overrides this automatic policy.
+     * Provenance is still recorded; metadata and snapshot version discovery are unchanged.
+     *
+     * @since 4.2.0
+     */
+    @Config(type = "java.lang.Boolean")
+    public static final String MAVEN_REPO_LOCAL_IGNORE_AVAILABILITY = "maven.repo.local.ignoreAvailability";
+
+    /**
      * User property for reverse dependency tree. If enabled, Maven will record ".tracking" directory into local
      * repository with "reverse dependency tree", essentially explaining WHY given artifact is present in local
      * repository.
