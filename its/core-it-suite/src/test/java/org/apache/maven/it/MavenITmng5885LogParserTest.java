@@ -19,14 +19,19 @@
 package org.apache.maven.it;
 
 import java.nio.file.Path;
+import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 public class MavenITmng5885LogParserTest extends AbstractMavenIntegrationTestCase {
 
-    private static final String OVERLAP_WARNING = "The following lifecycle phases overlap and will cause some plugins " +
-            "to execute multiple times: [after:resources, compile]. If this is not intended, review the phases passed " +
-            "on the command line.";
+    private static final String OVERLAP_WARNING_PREFIX =
+            "The following lifecycle phases overlap and will cause some plugins to execute multiple times:";
+
+    private static final String EXPECTED_WARNING_LINE = "[WARNING] " + OVERLAP_WARNING_PREFIX
+            + " [after:resources, compile]. If this is not intended, review the phases passed on the command line.";
 
     /**
      * Test that executes 'mvn package compile'.
@@ -42,11 +47,17 @@ public class MavenITmng5885LogParserTest extends AbstractMavenIntegrationTestCas
         verifier.addCliArgument("compile");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        verifier.verifyTextInLog(OVERLAP_WARNING);
+
+        List<String> logLines = verifier.loadLogLines();
+        long matchingLines = logLines.stream()
+                .map(Verifier::stripAnsi)
+                .filter(EXPECTED_WARNING_LINE::equals)
+                .count();
+        assertEquals(1, matchingLines, "Expected exactly one log line: " + EXPECTED_WARNING_LINE);
     }
 
     /**
-     * Test that executes 'mvn clean package'.
+     * Test that executes 'mvn package'.
      * The warning message should not be logged.
      */
     @Test
@@ -58,6 +69,6 @@ public class MavenITmng5885LogParserTest extends AbstractMavenIntegrationTestCas
         verifier.addCliArgument("package");
         verifier.execute();
         verifier.verifyErrorFreeLog();
-        verifier.verifyTextNotInLog(OVERLAP_WARNING);
+        verifier.verifyTextNotInLog(OVERLAP_WARNING_PREFIX);
     }
 }
