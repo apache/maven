@@ -53,6 +53,8 @@ class MavenITgh2576ItrNotHonoredTest extends AbstractMavenIntegrationTestCase {
         verifier.verifyErrorFreeLog();
 
         verifier = newVerifier(testDir.resolve("consumer"));
+        // Building dep caches its parent. Evict it so this tests remote repository access, not cache reuse.
+        verifier.deleteArtifacts("org.apache.maven.its.gh2576", "parent", "1.0-SNAPSHOT");
         verifier.addCliArguments("install", "-itr");
         assertThrows(VerificationException.class, verifier::execute);
     }
