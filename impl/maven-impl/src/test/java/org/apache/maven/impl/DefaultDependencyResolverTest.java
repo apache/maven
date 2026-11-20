@@ -18,13 +18,17 @@
  */
 package org.apache.maven.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Function;
 
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Node;
+import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.services.DependencyResolverRequest;
 import org.apache.maven.api.services.DependencyResolverResult;
@@ -36,11 +40,14 @@ import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.Exclusion;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -53,6 +60,67 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 class DefaultDependencyResolverTest {
+
+    @Test
+    void flattenKeepsSystemScopeDependenciesOnCompileAndTestClasspaths() throws Exception {
+        InternalSession session = mock(InternalSession.class);
+        RepositorySystem repositorySystem = mock(RepositorySystem.class);
+        RepositorySystemSession repositorySession = mock(RepositorySystemSession.class);
+
+        Dependency rootDependency =
+                new Dependency(new DefaultArtifact("org.example", "root", "", "jar", "1.0"), "compile");
+        DefaultDependencyNode root = new DefaultDependencyNode(rootDependency);
+        Dependency systemDependency = new Dependency(new DefaultArtifact("t", "syslib", "", "jar", "1"), "system");
+        DefaultDependencyNode systemNode = new DefaultDependencyNode(systemDependency);
+        Dependency compileDependency =
+                new Dependency(new DefaultArtifact("org.example", "lib", "", "jar", "1"), "compile");
+        DefaultDependencyNode compileNode = new DefaultDependencyNode(compileDependency);
+        Dependency runtimeDependency =
+                new Dependency(new DefaultArtifact("org.example", "rt", "", "jar", "1"), "runtime");
+        DefaultDependencyNode runtimeNode = new DefaultDependencyNode(runtimeDependency);
+
+        AbstractNode rootNode = mock(AbstractNode.class);
+        when(rootNode.getDependencyNode()).thenReturn(root);
+
+        when(session.getRepositorySystem()).thenReturn(repositorySystem);
+        when(session.getSession()).thenReturn(repositorySession);
+        when(repositorySystem.flattenDependencyNodes(eq(repositorySession), eq(root), any(DependencyFilter.class)))
+                .thenAnswer(invocation -> {
+                    DependencyFilter filter = invocation.getArgument(2);
+                    List<DependencyNode> flattened = new ArrayList<>();
+                    flattened.add(root);
+                    for (DependencyNode child : List.of(systemNode, compileNode, runtimeNode)) {
+                        if (filter.accept(child, List.of(root))) {
+                            flattened.add(child);
+                        }
+                    }
+                    return flattened;
+                });
+        Map<DependencyNode, Node> nodes = new HashMap<>();
+        when(session.getNode(any())).thenAnswer(invocation -> {
+            DependencyNode dependencyNode = invocation.getArgument(0);
+            return nodes.computeIfAbsent(dependencyNode, node -> mock(Node.class));
+        });
+
+        DefaultDependencyResolver resolver = new DefaultDependencyResolver();
+
+        // system-scope dependencies belong on the main compile, test compile and test runtime
+        // classpaths, like provided-scope ones (see Maven4ScopeManagerConfiguration)
+        List<Node> mainCompile = resolver.flatten(session, rootNode, PathScope.MAIN_COMPILE);
+        assertTrue(mainCompile.contains(nodes.get(systemNode)));
+        assertTrue(mainCompile.contains(nodes.get(compileNode)));
+        assertFalse(mainCompile.contains(nodes.get(runtimeNode)));
+
+        List<Node> testCompile = resolver.flatten(session, rootNode, PathScope.TEST_COMPILE);
+        assertTrue(testCompile.contains(nodes.get(systemNode)));
+
+        List<Node> testRuntime = resolver.flatten(session, rootNode, PathScope.TEST_RUNTIME);
+        assertTrue(testRuntime.contains(nodes.get(systemNode)));
+
+        // ... but not on the main runtime classpath
+        List<Node> mainRuntime = resolver.flatten(session, rootNode, PathScope.MAIN_RUNTIME);
+        assertFalse(mainRuntime.contains(nodes.get(systemNode)));
+    }
 
     @Test
     void collectAppliesProjectManagementToCallerSuppliedDependencies() throws Exception {

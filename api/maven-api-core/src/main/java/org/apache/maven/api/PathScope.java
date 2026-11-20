@@ -68,7 +68,8 @@ public interface PathScope extends ExtensibleEnum {
             ProjectScope.MAIN,
             DependencyScope.COMPILE_ONLY,
             DependencyScope.COMPILE,
-            DependencyScope.PROVIDED);
+            DependencyScope.PROVIDED,
+            DependencyScope.SYSTEM);
 
     PathScope MAIN_RUNTIME =
             pathScope("main-runtime", ProjectScope.MAIN, DependencyScope.COMPILE, DependencyScope.RUNTIME);
@@ -78,6 +79,7 @@ public interface PathScope extends ExtensibleEnum {
             ProjectScope.TEST,
             DependencyScope.COMPILE,
             DependencyScope.PROVIDED,
+            DependencyScope.SYSTEM,
             DependencyScope.TEST_ONLY,
             DependencyScope.TEST);
 
@@ -87,6 +89,7 @@ public interface PathScope extends ExtensibleEnum {
             DependencyScope.COMPILE,
             DependencyScope.RUNTIME,
             DependencyScope.PROVIDED,
+            DependencyScope.SYSTEM,
             DependencyScope.TEST,
             DependencyScope.TEST_RUNTIME);
 }

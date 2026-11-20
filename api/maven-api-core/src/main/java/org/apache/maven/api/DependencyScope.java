@@ -131,7 +131,9 @@ public enum DependencyScope {
      * System.
      * <p>
      * Similar to {@link #PROVIDED}, but the artifact is bound to an explicit path on the local file system
-     * rather than resolved from a repository.
+     * rather than resolved from a repository. Dependencies in this scope are available on
+     * the main compile, test compile, and test runtime classpaths, but not on the main runtime
+     * classpath.
      */
     SYSTEM("system", false);
 
