@@ -21,6 +21,8 @@ package org.apache.maven.internal.aether;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -46,12 +48,17 @@ import org.codehaus.plexus.configuration.PlexusConfiguration;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.codehaus.plexus.util.xml.Xpp3Dom;
 import org.eclipse.aether.ConfigurationProperties;
+import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.collection.VersionFilterBuilder;
 import org.eclipse.aether.repository.AuthenticationSelector;
+import org.eclipse.aether.repository.LocalArtifactRegistration;
+import org.eclipse.aether.repository.LocalArtifactRequest;
+import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.repository.RepositoryPolicy;
 import org.eclipse.aether.version.VersionScheme;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -86,6 +93,43 @@ public class DefaultRepositorySystemSessionFactoryTest {
 
     @Inject
     protected VersionFilterBuilder versionFilterBuilder;
+
+    @Test
+    void cachedOriginsAreIndependentInContainerAndDerivedSessions(@TempDir final Path directory) throws Exception {
+        final var factory = new DefaultRepositorySystemSessionFactory(
+                aetherRepositorySystem,
+                eventSpyDispatcher,
+                information,
+                defaultTypeRegistry,
+                versionScheme,
+                Collections.emptyMap(),
+                versionFilterBuilder);
+        final var artifact = new DefaultArtifact("test:cached:pom:1");
+        final var origin = new RemoteRepository.Builder("old", "default", "https://old.invalid").build();
+        final var other = new RemoteRepository.Builder("new", "default", "https://new.invalid").build();
+        final var lookup = new LocalArtifactRequest(artifact, List.of(other), "");
+        for (final var strict : List.of(false, true)) {
+            final var request = new DefaultMavenExecutionRequest();
+            request.setLocalRepository(mavenRepositorySystem.createLocalRepository(directory.toFile()));
+            final var systemProperties = new Properties();
+            systemProperties.setProperty("maven.repo.local.ignoreAvailability", "false");
+            request.setSystemProperties(systemProperties);
+            final var userProperties = new Properties();
+            userProperties.setProperty("maven.repo.local.ignoreAvailability", Boolean.toString(!strict));
+            request.setUserProperties(userProperties);
+            final var session = factory.newRepositorySession(request);
+            final var manager = session.getLocalRepositoryManager();
+            final var path = manager.getAbsolutePathForRemoteArtifact(artifact, origin, "");
+            Files.createDirectories(path.getParent());
+            Files.writeString(path, "cached");
+            manager.add(session, new LocalArtifactRegistration(artifact, origin, List.of("")));
+            assertEquals(!strict, manager.find(session, lookup).isAvailable());
+            // Derived sessions create new managers through the same provider, not an outer-chain wrapper.
+            final var derived =
+                    aetherRepositorySystem.newLocalRepositoryManager(session, new LocalRepository(directory));
+            assertEquals(!strict, derived.find(session, lookup).isAvailable());
+        }
+    }
 
     @Test
     void exposesRepositoryEventsThroughMavenApi() throws InvalidRepositoryException {

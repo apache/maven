@@ -90,6 +90,48 @@ from `${session.rootDirectory}/.mvn/maven-user.properties`.
 
 For the complete list of available Maven configuration properties and options, see [Maven Configuration Options](configuration.html).
 
+## Local repository origin policy
+
+Maven reuses artifacts in an unsplit enhanced local repository by their coordinates, even when the remote repository that originally supplied them is no longer in the current repository list.
+This also applies independently to each member of a local repository chain, without changing member ordering or where new artifacts are written.
+The enhanced manager still checks file existence and configured real-path safeguards, and still records provenance in `_remote.repositories`.
+There is no need to rename or delete tracking files.
+
+**Trust trade-off:** repositories can publish different bytes under the same coordinates.
+Origin-independent reuse trusts the contents already present in the local cache across builds using different remote repositories.
+Use separate caches, split repositories, or strict origin checking when repository origin is a trust boundary.
+This policy does not change remote repository selection, mirrors, checksum policies, or verification of a new download.
+
+To retain strict origin checking for a single local repository, use:
+
+```sh
+mvn -Dmaven.repo.local.ignoreAvailability=false verify
+```
+
+For strict checking of all members of a chain, also disable the existing tail bypass:
+
+```sh
+mvn -Dmaven.repo.local.ignoreAvailability=false -Dmaven.repo.local.tail.ignoreAvailability=false verify
+```
+
+The policy is selected when each enhanced local repository manager is created:
+
+* An explicit `maven.repo.local.ignoreAvailability` value takes precedence over the automatic policy.
+* Otherwise, split repositories retain strict origin checking, while unsplit repositories allow origin-independent reuse.
+  `aether.lrm.enhanced.split` takes precedence over its legacy alias `aether.enhancedLocalRepository.split`.
+* An explicitly false `maven.repo.local.tail.ignoreAvailability` suppresses automatic origin-independent reuse, including in the head repository.
+  If that Maven alias is absent, an explicitly false `aether.chainedLocalRepository.ignoreTailAvailability` has the same effect.
+* Setting the new property to `false` does not disable Resolver's pre-existing tail bypass, which defaults to `true`.
+  Setting it explicitly to `true` opts in even when the split or tail policy would otherwise select strict checking.
+
+Simple local repositories and custom higher-priority managers retain their own behavior.
+Even an explicit opt-in does not search across split repository paths: a file must exist at a path accepted by the enhanced manager for the current lookup.
+Metadata lookups, version ranges, snapshot version discovery, and update policies are unchanged.
+In particular, this is not a guarantee that every snapshot build can run offline; required metadata or timestamped snapshot files may still be missing.
+
+If you previously changed `aether.lrm.enhanced.trackingFilename` as a workaround, remove that setting to resume using the normal tracking file.
+Maven does not merge alternate tracking files, nor can it reconstruct missing provenance for artifacts downloaded while an alternate tracking filename was configured.
+
 ## Parallel build safety
 
 In a parallel build, Maven serializes concurrent executions of the same legacy mojo class when it is not marked `@threadSafe`. The lock is shared across all projects in the reactor, so an execution in one project blocks the same mojo class in another project even when those projects are otherwise independent. Maven emits a warning only when an execution actually has to wait, but this serialization can noticeably reduce effective parallelism in a large multi-module build.
