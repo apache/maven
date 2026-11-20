@@ -33,9 +33,7 @@ import org.apache.maven.api.annotations.Provider;
  * bootstrap logging.
  * <p>
  * Instances are obtained via dependency injection. A {@code @Singleton} bean
- * may hold a long-lived {@code Logger} instance safely: context fields such as
- * {@code projectId} and {@code mojoId} are resolved from a per-thread
- * {@code LogContext} at event dispatch time, not at injection time.
+ * may hold a long-lived {@code Logger} instance safely.
  *
  * <h2>Fluent API (preferred)</h2>
  * <pre>{@code

@@ -20,6 +20,7 @@ package org.apache.maven.api.logging;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Nonnull;
+import org.apache.maven.api.annotations.Nullable;
 
 /**
  * Fluent builder for a single log statement.
@@ -114,14 +115,10 @@ public interface LogEventBuilder {
      * @return this builder
      */
     @Nonnull
-    LogEventBuilder withThrowable(Throwable t);
+    LogEventBuilder withThrowable(@Nullable Throwable t);
 
     /**
      * Overrides the project identifier for this event.
-     * <p>
-     * The default path resolves {@code projectId} from the current thread's
-     * {@code LogContext}; use this method only in the rare cases where the
-     * ThreadLocal context is incorrect (e.g. async hand-offs).
      * <p>
      * <strong>Note:</strong> enrichment via this method is best-effort and
      * implementation-defined. Implementations that do not support per-event
