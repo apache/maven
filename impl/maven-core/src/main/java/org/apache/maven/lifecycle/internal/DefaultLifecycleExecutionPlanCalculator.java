@@ -28,9 +28,12 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.apache.maven.api.plugin.descriptor.lifecycle.Execution;
 import org.apache.maven.api.plugin.descriptor.lifecycle.Phase;
@@ -58,6 +61,8 @@ import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.plugin.prefix.NoPluginFoundForPrefixException;
 import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <strong>NOTE:</strong> This class is not part of any public api and can be changed or deleted without prior notice.
@@ -67,6 +72,8 @@ import org.apache.maven.project.MavenProject;
 @Named
 @Singleton
 public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecutionPlanCalculator {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DefaultLifecycleExecutionPlanCalculator.class);
 
     private final BuildPluginManager pluginManager;
 
@@ -211,6 +218,7 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                     MojoNotFoundException, NoPluginFoundForPrefixException, InvalidPluginDescriptorException,
                     PluginVersionResolutionException, LifecyclePhaseNotFoundException {
         final List<MojoExecution> mojoExecutions = new ArrayList<>();
+        final Set<String> duplicateLifecyclePhases = new LinkedHashSet<>();
 
         for (Task task : tasks) {
             if (task instanceof GoalTask) {
@@ -233,12 +241,28 @@ public class DefaultLifecycleExecutionPlanCalculator implements LifecycleExecuti
                 Map<String, List<MojoExecution>> phaseToMojoMapping =
                         calculateLifecycleMappings(session, project, lifecyclePhase);
 
+                Set<String> alreadyPlannedPhases = mojoExecutions.stream()
+                        .map(MojoExecution::getLifecyclePhase)
+                        .filter(Objects::nonNull)
+                        .collect(Collectors.toSet());
+
                 for (List<MojoExecution> mojoExecutionsFromLifecycle : phaseToMojoMapping.values()) {
+                    mojoExecutionsFromLifecycle.stream()
+                            .map(MojoExecution::getLifecyclePhase)
+                            .filter(alreadyPlannedPhases::contains)
+                            .forEach(duplicateLifecyclePhases::add);
                     mojoExecutions.addAll(mojoExecutionsFromLifecycle);
                 }
+
             } else {
                 throw new IllegalStateException("unexpected task " + task);
             }
+        }
+        if (!duplicateLifecyclePhases.isEmpty()) {
+            LOG.warn(
+                    "The following lifecycle phases overlap and will cause some plugins to execute multiple times: {}."
+                            + " If this is not intended, review the phases passed on the command line.",
+                    duplicateLifecyclePhases);
         }
         return mojoExecutions;
     }
