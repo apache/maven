@@ -18,9 +18,9 @@
  */
 package org.apache.maven.it;
 
-import org.junit.jupiter.api.Test;
-
 import java.nio.file.Path;
+
+import org.junit.jupiter.api.Test;
 
 public class MavenITmng5885LogParserTest extends AbstractMavenIntegrationTestCase {
 
