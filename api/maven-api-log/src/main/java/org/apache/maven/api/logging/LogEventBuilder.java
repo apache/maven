@@ -39,6 +39,24 @@ import org.apache.maven.api.annotations.Nonnull;
  *    .log("Compiling {} source files", count);
  * }</pre>
  *
+ * <h2>Message format</h2>
+ * <p>
+ * The {@code log(String format, Object...)} family of methods uses a simple
+ * positional placeholder syntax: each occurrence of {@code {}} in the format
+ * string is replaced, in order, by the string representation of the corresponding
+ * argument. No index, type specifier, or locale conversion is supported — this is
+ * intentionally simpler than {@link java.text.MessageFormat} and avoids the
+ * injection risk of {@code printf}-style specifiers.
+ * <p>
+ * Example: {@code log("Building {} module(s) in {}", count, dir)} produces
+ * {@code "Building 3 module(s) in /tmp/build"} when {@code count=3} and
+ * {@code dir="/tmp/build"}.
+ * <p>
+ * This convention is the same as the one used by SLF4J
+ * (<a href="https://www.slf4j.org/api/org/slf4j/helpers/MessageFormatter.html">MessageFormatter</a>),
+ * which is widely used in the Java ecosystem and is already the format employed
+ * by {@code plugin.Log}, the API this interface replaces.
+ *
  * @since 4.0.0
  */
 @Experimental
@@ -46,8 +64,19 @@ public interface LogEventBuilder {
 
     /**
      * Attaches a structured key-value pair to this log event.
+     * <p>
+     * Structured key-value pairs are consumed by structured log appenders
+     * (e.g. JSON, ECS, or Logstash layouts in Logback or Log4j 2) that capture
+     * fields alongside the message text — rather than embedding metadata inside the
+     * message string itself. This enables log aggregators such as Elasticsearch or
+     * Splunk to filter and correlate events by field values directly.
+     * <p>
+     * In a Maven context, typical uses include attaching build metadata such as
+     * project coordinates, mojo identifiers, and elapsed time as first-class indexed
+     * fields. When running with a plain-text appender these pairs are silently ignored
+     * or appended after the message, depending on the appender configuration.
      *
-     * @param key   the key, never {@code null}
+     * @param key   the field name, never {@code null}
      * @param value the string value
      * @return this builder
      */
@@ -56,8 +85,10 @@ public interface LogEventBuilder {
 
     /**
      * Attaches a structured key-value pair with a {@code long} value.
+     * <p>
+     * See {@link #withKeyValue(String, String)} for the purpose of structured key-value pairs.
      *
-     * @param key   the key, never {@code null}
+     * @param key   the field name, never {@code null}
      * @param value the numeric value
      * @return this builder
      */
@@ -66,8 +97,10 @@ public interface LogEventBuilder {
 
     /**
      * Attaches a structured key-value pair with a {@code boolean} value.
+     * <p>
+     * See {@link #withKeyValue(String, String)} for the purpose of structured key-value pairs.
      *
-     * @param key   the key, never {@code null}
+     * @param key   the field name, never {@code null}
      * @param value the boolean value
      * @return this builder
      */
