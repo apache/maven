@@ -32,7 +32,11 @@ import org.apache.maven.api.annotations.Provider;
  * rather than formatting first by calling <code>toString()</code>.
  *
  * @since 4.0.0
+ * @deprecated Use {@link org.apache.maven.api.logging.Logger} instead, which provides a richer API
+ *             including structured key-value pairs, lazy message evaluation, and a fluent builder.
+ *             Inject {@code org.apache.maven.api.logging.Logger} in your Mojo instead of {@code Log}.
  */
+@Deprecated(since = "4.0.0", forRemoval = true)
 @Experimental
 @Provider
 public interface Log {

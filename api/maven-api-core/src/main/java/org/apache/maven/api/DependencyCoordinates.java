@@ -39,32 +39,79 @@ import org.apache.maven.api.annotations.Nullable;
 @Immutable
 public interface DependencyCoordinates extends ArtifactCoordinates {
     /**
+     * {@return the type}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Type type() {
+        return getType();
+    }
+
+    /**
      * {@return the type of the dependency}
      * A dependency can be a <abbr>JAR</abbr> file,
      * a modular-<abbr>JAR</abbr> if it is intended to be placed on the module path,
      * a <abbr>JAR</abbr> containing test classes, a POM file, <i>etc.</i>
+     * @deprecated Use {@link #type()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Type getType();
+
+    /**
+     * {@return the scope}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default DependencyScope scope() {
+        return getScope();
+    }
 
     /**
      * {@return the time at which the dependency will be used}
      * It may be, for example, at compile time only, at run time, or at test time.
+     * @deprecated Use {@link #scope()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     DependencyScope getScope();
+
+    /**
+     * {@return the optional}
+     *
+     * @since 4.0.0
+     */
+    default Boolean optional() {
+        return getOptional();
+    }
 
     /**
      * Returns whether the dependency is optional, mandatory, or of unspecified obligation.
      *
      * @return {@code Boolean.TRUE} and {@code Boolean.FALSE} if optional, or {@code null} if unspecified
+     * @deprecated Use {@link #optional()} instead.
      */
     @Nullable
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Boolean getOptional();
 
     /**
-     * {@return transitive dependencies to exclude}
+     * {@return the exclusions}
+     *
+     * @since 4.0.0
      */
     @Nonnull
+    default Collection<Exclusion> exclusions() {
+        return getExclusions();
+    }
+
+    /**
+     * {@return transitive dependencies to exclude}
+     * @deprecated Use {@link #exclusions()} instead.
+     */
+    @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Collection<Exclusion> getExclusions();
 }

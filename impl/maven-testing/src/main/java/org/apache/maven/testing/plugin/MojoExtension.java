@@ -47,6 +47,7 @@ import org.apache.maven.api.di.Named;
 import org.apache.maven.api.di.Priority;
 import org.apache.maven.api.di.Provides;
 import org.apache.maven.api.di.Singleton;
+import org.apache.maven.api.logging.Logger;
 import org.apache.maven.api.model.Build;
 import org.apache.maven.api.model.ConfigurationContainer;
 import org.apache.maven.api.model.Model;
@@ -79,6 +80,7 @@ import org.apache.maven.impl.model.DefaultInterpolator;
 import org.apache.maven.impl.model.DefaultModelPathTranslator;
 import org.apache.maven.impl.model.DefaultPathTranslator;
 import org.apache.maven.internal.impl.DefaultLog;
+import org.apache.maven.internal.impl.DefaultLogger;
 import org.apache.maven.internal.xml.XmlPlexusConfiguration;
 import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.model.v4.MavenMerger;
@@ -536,6 +538,13 @@ public class MojoExtension extends MavenDIExtension implements ParameterResolver
             @Priority(-10)
             Log createLog() {
                 return new DefaultLog(LoggerFactory.getLogger("anonymous"));
+            }
+
+            @Provides
+            @Singleton
+            @Priority(-10)
+            Logger createLogger() {
+                return new DefaultLogger(LoggerFactory.getLogger("anonymous"));
             }
 
             @Provides

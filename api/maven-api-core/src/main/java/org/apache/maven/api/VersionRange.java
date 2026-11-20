@@ -45,15 +45,41 @@ public interface VersionRange {
     boolean contains(@Nonnull Version version);
 
     /**
-     * Returns the upper boundary of this range, or {@code null} if none.
+     * Returns the upper boundary of this range, or {@code null} for an unbounded range (e.g. {@code [1.0,)}).
+     *
+     * @return the upper boundary, or {@code null}
+     * @since 4.0.0
      */
     @Nullable
+    default Boundary upperBoundary() {
+        return getUpperBoundary();
+    }
+
+    /**
+     * Returns the upper boundary of this range, or {@code null} if none.
+     * @deprecated Use {@link #upperBoundary()} instead.
+     */
+    @Nullable
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Boundary getUpperBoundary();
 
     /**
-     * Returns the lower boundary of this range, or {@code null} if none.
+     * Returns the lower boundary of this range, or {@code null} for an unbounded range (e.g. {@code (,2.0]}).
+     *
+     * @return the lower boundary, or {@code null}
+     * @since 4.0.0
      */
     @Nullable
+    default Boundary lowerBoundary() {
+        return getLowerBoundary();
+    }
+
+    /**
+     * Returns the lower boundary of this range, or {@code null} if none.
+     * @deprecated Use {@link #lowerBoundary()} instead.
+     */
+    @Nullable
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Boundary getLowerBoundary();
 
     /**
@@ -69,12 +95,38 @@ public interface VersionRange {
     interface Boundary {
         /**
          * The bounding version.
+         *
+         * @return the bounding version
+         * @since 4.0.0
          */
+        default Version version() {
+            return getVersion();
+        }
+
+        /**
+         * The bounding version.
+         *
+         * @deprecated Use {@link #version()} instead.
+         */
+        @Deprecated(since = "4.0.0", forRemoval = true)
         Version getVersion();
 
         /**
          * Returns {@code true} if version is included of the range.
+         *
+         * @return {@code true} if inclusive
+         * @since 4.0.0
          */
+        default boolean inclusive() {
+            return isInclusive();
+        }
+
+        /**
+         * Returns {@code true} if version is included of the range.
+         *
+         * @deprecated Use {@link #inclusive()} instead.
+         */
+        @Deprecated(since = "4.0.0", forRemoval = true)
         boolean isInclusive();
     }
 }

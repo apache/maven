@@ -128,7 +128,19 @@ public interface Session extends ProtoSession {
      * Returns the degree of concurrency for the build.
      *
      * @return  the degree of concurrency
+     * @since 4.0.0
      */
+    default int degreeOfConcurrency() {
+        return getDegreeOfConcurrency();
+    }
+
+    /**
+     * Returns the degree of concurrency for the build.
+     *
+     * @return  the degree of concurrency
+     * @deprecated Use {@link #degreeOfConcurrency()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     int getDegreeOfConcurrency();
 
     /**

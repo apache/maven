@@ -68,6 +68,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.execution.scope.internal.MojoExecutionScope;
 import org.apache.maven.execution.scope.internal.MojoExecutionScopeModule;
 import org.apache.maven.internal.impl.DefaultLog;
+import org.apache.maven.internal.impl.DefaultLogger;
 import org.apache.maven.internal.impl.DefaultMojoExecution;
 import org.apache.maven.internal.impl.InternalMavenSession;
 import org.apache.maven.internal.impl.SisuDiBridgeModule;
@@ -563,7 +564,7 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
         Project project = sessionV4.getProject(session.getCurrentProject());
 
         org.apache.maven.api.MojoExecution execution = new DefaultMojoExecution(sessionV4, mojoExecution);
-        org.apache.maven.api.plugin.Log log = new DefaultLog(
+        org.apache.maven.api.logging.Logger log = new DefaultLogger(
                 LoggerFactory.getLogger(mojoExecution.getMojoDescriptor().getImplementation()));
         try {
             Injector injector = Injector.create();
@@ -573,7 +574,12 @@ public class DefaultMavenPluginManager implements MavenPluginManager {
             injector.bindInstance(Session.class, sessionV4);
             injector.bindInstance(Project.class, project);
             injector.bindInstance(org.apache.maven.api.MojoExecution.class, execution);
-            injector.bindInstance(org.apache.maven.api.plugin.Log.class, log);
+            injector.bindInstance(org.apache.maven.api.logging.Logger.class, log);
+            //noinspection deprecation
+            injector.bindInstance(
+                    org.apache.maven.api.plugin.Log.class,
+                    new DefaultLog(LoggerFactory.getLogger(
+                            mojoExecution.getMojoDescriptor().getImplementation())));
 
             Map<Class<? extends Service>, Supplier<? extends Service>> services = sessionV4.getAllServices();
             services.forEach((itf, svc) -> injector.bindSupplier((Class<Service>) itf, (Supplier<Service>) svc));

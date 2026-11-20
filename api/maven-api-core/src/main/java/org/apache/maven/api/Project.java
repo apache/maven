@@ -51,22 +51,68 @@ import org.apache.maven.api.model.Profile;
 public interface Project {
 
     /**
-     * {@return the project groupId}.
+     * {@return the groupId}
+     *
+     * @since 4.0.0
      */
     @Nonnull
+    default String groupId() {
+        return getGroupId();
+    }
+
+    /**
+     * {@return the project groupId}.
+     * @deprecated Use {@link #groupId()} instead.
+     */
+    @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getGroupId();
 
     /**
-     * {@return the project artifactId}.
+     * {@return the artifactId}
+     *
+     * @since 4.0.0
      */
     @Nonnull
+    default String artifactId() {
+        return getArtifactId();
+    }
+
+    /**
+     * {@return the project artifactId}.
+     * @deprecated Use {@link #artifactId()} instead.
+     */
+    @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getArtifactId();
 
     /**
-     * {@return the project version}.
+     * {@return the version}
+     *
+     * @since 4.0.0
      */
     @Nonnull
+    default String version() {
+        return getVersion();
+    }
+
+    /**
+     * {@return the project version}.
+     * @deprecated Use {@link #version()} instead.
+     */
+    @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getVersion();
+
+    /**
+     * {@return the packaging}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Packaging packaging() {
+        return getPackaging();
+    }
 
     /**
      * {@return the project packaging}.
@@ -76,8 +122,10 @@ public interface Project {
      * {@link #getArtifacts()} to gain access to POM or build artifact.
      *
      * @see #getArtifacts()
+     * @deprecated Use {@link #packaging()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Packaging getPackaging();
 
     /**
@@ -91,14 +139,35 @@ public interface Project {
     }
 
     /**
+     * {@return the pomArtifact}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default ProducedArtifact pomArtifact() {
+        return getPomArtifact();
+    }
+
+    /**
      * {@return the project POM artifact}, which is the artifact of the POM of this project. Every project have a POM
      * artifact, even if the existence of backing POM file is NOT a requirement (i.e. for some transient projects).
      *
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     * @deprecated Use {@link #pomArtifact()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     default ProducedArtifact getPomArtifact() {
         return getArtifacts().get(0);
+    }
+
+    /**
+     * {@return the mainArtifact}
+     *
+     * @since 4.0.0
+     */
+    default Optional<ProducedArtifact> mainArtifact() {
+        return getMainArtifact();
     }
 
     /**
@@ -107,11 +176,23 @@ public interface Project {
      *
      * @see #getPackaging()
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     * @deprecated Use {@link #mainArtifact()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     default Optional<ProducedArtifact> getMainArtifact() {
         List<ProducedArtifact> artifacts = getArtifacts();
         return artifacts.size() == 2 ? Optional.of(artifacts.get(1)) : Optional.empty();
+    }
+
+    /**
+     * {@return the artifacts}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default List<ProducedArtifact> artifacts() {
+        return getArtifacts();
     }
 
     /**
@@ -126,25 +207,61 @@ public interface Project {
      * @see #getPomArtifact()
      * @see #getMainArtifact()
      * @see org.apache.maven.api.services.ArtifactManager#getPath(Artifact)
+     * @deprecated Use {@link #artifacts()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     List<ProducedArtifact> getArtifacts();
 
     /**
-     * {@return the project model}.
+     * {@return the model}
+     *
+     * @since 4.0.0
      */
     @Nonnull
+    default Model model() {
+        return getModel();
+    }
+
+    /**
+     * {@return the project model}.
+     * @deprecated Use {@link #model()} instead.
+     */
+    @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Model getModel();
+
+    /**
+     * {@return the build}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Build build() {
+        return getBuild();
+    }
 
     /**
      * Shorthand method.
      *
      * @return the build element of the project model
+     * @deprecated Use {@link #build()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     default Build getBuild() {
         Build build = getModel().getBuild();
         return build != null ? build : Build.newInstance();
+    }
+
+    /**
+     * {@return the pomPath}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Path pomPath() {
+        return getPomPath();
     }
 
     /**
@@ -159,9 +276,21 @@ public interface Project {
      *
      * @return the path of the pom
      * @see #getBasedir()
+     * @deprecated Use {@link #pomPath()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Path getPomPath();
+
+    /**
+     * {@return the basedir}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Path basedir() {
+        return getBasedir();
+    }
 
     /**
      * Returns the project base directory, i.e. the directory containing the project.
@@ -169,8 +298,10 @@ public interface Project {
      * the directory containing the POM file.
      *
      * @return the path of the directory containing the project
+     * @deprecated Use {@link #basedir()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Path getBasedir();
 
     /**
@@ -293,15 +424,39 @@ public interface Project {
     }
 
     /**
-     * {@return the project direct dependencies (directly specified or inherited)}.
+     * {@return the dependencies}
+     *
+     * @since 4.0.0
      */
     @Nonnull
+    default List<DependencyCoordinates> dependencies() {
+        return getDependencies();
+    }
+
+    /**
+     * {@return the project direct dependencies (directly specified or inherited)}.
+     * @deprecated Use {@link #dependencies()} instead.
+     */
+    @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     List<DependencyCoordinates> getDependencies();
 
     /**
-     * {@return the project managed dependencies (directly specified or inherited)}.
+     * {@return the managedDependencies}
+     *
+     * @since 4.0.0
      */
     @Nonnull
+    default List<DependencyCoordinates> managedDependencies() {
+        return getManagedDependencies();
+    }
+
+    /**
+     * {@return the project managed dependencies (directly specified or inherited)}.
+     * @deprecated Use {@link #managedDependencies()} instead.
+     */
+    @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     List<DependencyCoordinates> getManagedDependencies();
 
     /**
@@ -336,15 +491,36 @@ public interface Project {
     boolean isRootProject();
 
     /**
+     * {@return the rootDirectory}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Path rootDirectory() {
+        return getRootDirectory();
+    }
+
+    /**
      * Gets the root directory of the project, which is the parent directory
      * containing the {@code .mvn} directory or flagged with {@code root="true"}.
      *
      * @return the root directory of the project
      * @throws IllegalStateException if the root directory could not be found
      * @see Session#getRootDirectory()
+     * @deprecated Use {@link #rootDirectory()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Path getRootDirectory();
+
+    /**
+     * {@return the parent}
+     *
+     * @since 4.0.0
+     */
+    default Optional<Project> parent() {
+        return getParent();
+    }
 
     /**
      * Returns project parent project, if any.
@@ -355,9 +531,21 @@ public interface Project {
      *
      * @return an optional containing the parent project
      * @see Model#getParent()
+     * @deprecated Use {@link #parent()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Optional<Project> getParent();
+
+    /**
+     * {@return the declaredProfiles}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default List<Profile> declaredProfiles() {
+        return getDeclaredProfiles();
+    }
 
     /**
      * Returns all profiles defined in this project.
@@ -368,9 +556,21 @@ public interface Project {
      * @return a non-null, possibly empty list of profiles defined in this project
      * @see Profile
      * @see #getEffectiveProfiles()
+     * @deprecated Use {@link #declaredProfiles()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     List<Profile> getDeclaredProfiles();
+
+    /**
+     * {@return the effectiveProfiles}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default List<Profile> effectiveProfiles() {
+        return getEffectiveProfiles();
+    }
 
     /**
      * Returns all profiles defined in this project and all of its parent projects.
@@ -382,9 +582,21 @@ public interface Project {
      * @return a non-null, possibly empty list of all profiles from this project and its parents
      * @see Profile
      * @see #getDeclaredProfiles()
+     * @deprecated Use {@link #effectiveProfiles()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     List<Profile> getEffectiveProfiles();
+
+    /**
+     * {@return the declaredActiveProfiles}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default List<Profile> declaredActiveProfiles() {
+        return getDeclaredActiveProfiles();
+    }
 
     /**
      * Returns all active profiles for the current project build.
@@ -403,8 +615,10 @@ public interface Project {
      * @return a non-null, possibly empty list of active profiles for this project
      * @see Profile
      * @see #getEffectiveActiveProfiles()
+     * @deprecated Use {@link #declaredActiveProfiles()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     List<Profile> getDeclaredActiveProfiles();
 
     /**

@@ -38,19 +38,49 @@ import org.apache.maven.api.annotations.Nullable;
 @Experimental
 public interface VersionConstraint {
     /**
+     * Returns the range of this constraint, or {@code null} if the constraint is a recommended version.
+     * <p>
+     * Note: exactly one of {@link #versionRange()} or {@link #recommendedVersion()} is non-{@code null}.
+     *
+     * @return the version range, or {@code null}
+     * @since 4.0.0
+     */
+    @Nullable
+    default VersionRange versionRange() {
+        return getVersionRange();
+    }
+
+    /**
      * Returns the range of this constraint, or {@code null} if none.
      * <p>
      * Note: only one, this method or {@link #getRecommendedVersion()} method must return non-{@code null} value.
+     * @deprecated Use {@link #versionRange()} instead.
      */
     @Nullable
+    @Deprecated(since = "4.0.0", forRemoval = true)
     VersionRange getVersionRange();
+
+    /**
+     * Returns the recommended version of this constraint, or {@code null} if the constraint is a range.
+     * <p>
+     * Note: exactly one of {@link #versionRange()} or {@link #recommendedVersion()} is non-{@code null}.
+     *
+     * @return the recommended version, or {@code null}
+     * @since 4.0.0
+     */
+    @Nullable
+    default Version recommendedVersion() {
+        return getRecommendedVersion();
+    }
 
     /**
      * Returns the recommended version of this constraint, or {@code null} if none.
      * <p>
      * Note: only one, this method or {@link #getVersionRange()} method must return non-{@code null} value.
+     * @deprecated Use {@link #recommendedVersion()} instead.
      */
     @Nullable
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Version getRecommendedVersion();
 
     /**
