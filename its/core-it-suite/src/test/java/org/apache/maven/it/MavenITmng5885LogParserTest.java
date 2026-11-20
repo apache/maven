@@ -24,8 +24,9 @@ import org.junit.jupiter.api.Test;
 
 public class MavenITmng5885LogParserTest extends AbstractMavenIntegrationTestCase {
 
-    private static final String OVERLAP_WARNING = "The given lifecycle phases overlap. " +
-            "If this is not intended, you should check your Maven Build.";
+    private static final String OVERLAP_WARNING = "The following lifecycle phases overlap and will cause some plugins " +
+            "to execute multiple times: [after:resources, compile]. If this is not intended, review the phases passed " +
+            "on the command line.";
 
     /**
      * Test that executes 'mvn package compile'.
