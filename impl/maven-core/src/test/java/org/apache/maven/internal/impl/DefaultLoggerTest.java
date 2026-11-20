@@ -209,38 +209,24 @@ class DefaultLoggerTest {
         verify(mockBuilder).log("Warning");
     }
 
-    // ---- ModelProcessor bridge ----
+    // ---- ModelProcessor bridge: strict option handling ----
 
+    /**
+     * Verifies that the default {@code read(Source, Map)} bridge in {@link org.apache.maven.api.services.model.ModelProcessor}
+     * passes {@code strict=true} to the underlying {@code read(XmlReaderRequest)} when options is {@code null}.
+     */
     @Test
     void modelProcessorReadBridgeUsesStrictTrueByDefault() throws Exception {
-        // Verify that the default read(Source, Map) bridge passes strict=true when no option is set
-        // by checking the deprecated read(XmlReaderRequest) path is invoked with isStrict()==true.
-        // We use a test double that records the request rather than actually reading XML.
         final boolean[] strictSeen = {false};
-        org.apache.maven.api.services.model.ModelProcessor processor =
-                new org.apache.maven.api.services.model.ModelProcessor() {
-                    @Override
-                    public java.nio.file.Path locateExistingPom(java.nio.file.Path project) {
-                        return null;
-                    }
-
-                    @Override
-                    public org.apache.maven.api.model.Model read(
-                            org.apache.maven.api.services.xml.XmlReaderRequest request)
-                            throws java.io.IOException, org.apache.maven.api.services.xml.XmlReaderException {
-                        strictSeen[0] = request.isStrict();
-                        return org.apache.maven.api.model.Model.newInstance();
-                    }
-                };
+        org.apache.maven.api.services.model.ModelProcessor processor = modelProcessorCapturingStrict(strictSeen);
 
         java.nio.file.Path tmp = java.nio.file.Files.createTempFile("pom", ".xml");
         try {
-            java.nio.file.Files.writeString(tmp, "<project/>"); // minimal content to satisfy the bridge
-            org.apache.maven.api.services.Source source = org.apache.maven.api.services.Source.fromPath(tmp);
+            java.nio.file.Files.writeString(tmp, "<project/>");
+            org.apache.maven.api.services.Source source = pathSource(tmp);
             try {
-                processor.read(source, null); // null options → strict defaults to true
+                processor.read(source, null);
             } catch (Exception ignored) {
-                // XML parse failure is expected for this stub content; we only care about strict
             }
             assert strictSeen[0] : "strict must be true when options is null";
         } finally {
@@ -248,29 +234,19 @@ class DefaultLoggerTest {
         }
     }
 
+    /**
+     * Verifies that the default {@code read(Source, Map)} bridge honours the
+     * {@code "strict"} option when explicitly set to {@code "false"}.
+     */
     @Test
     void modelProcessorReadBridgeRespectsStrictFalseOption() throws Exception {
         final boolean[] strictSeen = {true};
-        org.apache.maven.api.services.model.ModelProcessor processor =
-                new org.apache.maven.api.services.model.ModelProcessor() {
-                    @Override
-                    public java.nio.file.Path locateExistingPom(java.nio.file.Path project) {
-                        return null;
-                    }
-
-                    @Override
-                    public org.apache.maven.api.model.Model read(
-                            org.apache.maven.api.services.xml.XmlReaderRequest request)
-                            throws java.io.IOException, org.apache.maven.api.services.xml.XmlReaderException {
-                        strictSeen[0] = request.isStrict();
-                        return org.apache.maven.api.model.Model.newInstance();
-                    }
-                };
+        org.apache.maven.api.services.model.ModelProcessor processor = modelProcessorCapturingStrict(strictSeen);
 
         java.nio.file.Path tmp = java.nio.file.Files.createTempFile("pom", ".xml");
         try {
             java.nio.file.Files.writeString(tmp, "<project/>");
-            org.apache.maven.api.services.Source source = org.apache.maven.api.services.Source.fromPath(tmp);
+            org.apache.maven.api.services.Source source = pathSource(tmp);
             java.util.Map<String, Object> options =
                     java.util.Map.of(org.apache.maven.api.spi.ModelParser.STRICT, "false");
             try {
@@ -281,5 +257,50 @@ class DefaultLoggerTest {
         } finally {
             java.nio.file.Files.deleteIfExists(tmp);
         }
+    }
+
+    // ---- helpers ----
+
+    private static org.apache.maven.api.services.model.ModelProcessor modelProcessorCapturingStrict(
+            boolean[] strictOut) {
+        return new org.apache.maven.api.services.model.ModelProcessor() {
+            @Override
+            public java.nio.file.Path locateExistingPom(java.nio.file.Path project) {
+                return null;
+            }
+
+            @Override
+            @SuppressWarnings("deprecation")
+            public org.apache.maven.api.model.Model read(org.apache.maven.api.services.xml.XmlReaderRequest request)
+                    throws java.io.IOException, org.apache.maven.api.services.xml.XmlReaderException {
+                strictOut[0] = request.isStrict();
+                return org.apache.maven.api.model.Model.newInstance();
+            }
+        };
+    }
+
+    private static org.apache.maven.api.services.Source pathSource(java.nio.file.Path path) {
+        return new org.apache.maven.api.services.Source() {
+            @Override
+            public java.nio.file.Path getPath() {
+                return path;
+            }
+
+            @Override
+            public java.io.InputStream openStream() throws java.io.IOException {
+                return java.nio.file.Files.newInputStream(path);
+            }
+
+            @Override
+            public String getLocation() {
+                return path.toString();
+            }
+
+            @Override
+            public org.apache.maven.api.services.Source resolve(
+                    @org.apache.maven.api.annotations.Nonnull String relative) {
+                return pathSource(path.getParent().resolve(relative));
+            }
+        };
     }
 }
