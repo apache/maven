@@ -451,7 +451,7 @@ public final class Constants {
      *
      * @since 4.2.0
      */
-    @Config(defaultValue = "true for unsplit repositories unless tail availability checking is explicitly enabled")
+    @Config(type = "java.lang.Boolean")
     public static final String MAVEN_REPO_LOCAL_IGNORE_AVAILABILITY = "maven.repo.local.ignoreAvailability";
 
     /**

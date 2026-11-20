@@ -29,7 +29,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /** Verifies origin-independent reuse across real Maven invocations, without plugin or network dependencies. */
-class MavenITLocalRepositoryOriginPolicyTest extends AbstractMavenIntegrationTestCase {
+class MavenITgh14082LocalRepositoryOriginPolicyTest extends AbstractMavenIntegrationTestCase {
     @Test
     void reusesReleaseOfflineAndRetainsStrictOptOut() throws Exception {
         final var directory = extractResources("local-repository-origin-policy");
