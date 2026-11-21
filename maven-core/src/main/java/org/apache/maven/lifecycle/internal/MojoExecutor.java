@@ -22,6 +22,7 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import javax.inject.Singleton;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -333,7 +334,15 @@ public class MojoExecutor {
         eventCatapult.fire(ExecutionEvent.Type.MojoStarted, session, mojoExecution);
         try {
             try {
+                MavenProject project = session.getCurrentProject();
+                File artifactFileBefore = project != null && project.getArtifact() != null
+                        ? project.getArtifact().getFile()
+                        : null;
                 pluginManager.executeMojo(session, mojoExecution);
+                String warning = pomArtifactFileWarning(project, artifactFileBefore, mojoExecution);
+                if (warning != null) {
+                    LOGGER.warn(warning);
+                }
             } catch (MojoFailureException
                     | PluginManagerException
                     | PluginConfigurationException
@@ -348,6 +357,35 @@ public class MojoExecutor {
 
             throw e;
         }
+    }
+
+    /**
+     * MNG-8138: a mojo (e.g. {@code jar:jar} on a pom-packaged project) may set a file on
+     * {@code project.getArtifact()} while that artifact has the POM's coordinates; install and deploy may then publish
+     * that file as the POM. Name the mojo that changed the file, not every later mojo that runs while it is still set.
+     *
+     * @return the warning, or {@code null} when there is nothing to report
+     */
+    static String pomArtifactFileWarning(MavenProject project, File artifactFileBefore, MojoExecution mojoExecution) {
+        if (project == null || project.getFile() == null) {
+            return null;
+        }
+        org.apache.maven.artifact.Artifact artifact = project.getArtifact();
+        if (artifact == null
+                || artifact.getFile() == null
+                || artifact.getArtifactHandler() == null
+                || !"pom".equals(artifact.getArtifactHandler().getExtension())
+                || (artifact.getClassifier() != null
+                        && !artifact.getClassifier().isEmpty())
+                || artifact.getFile().equals(project.getFile())
+                || artifact.getFile().equals(artifactFileBefore)) {
+            return null;
+        }
+        return "Plugin " + mojoExecution.getPlugin().getId() + ":" + mojoExecution.getGoal() + " set the file of "
+                + artifact.getGroupId() + ":" + artifact.getArtifactId() + ":pom:" + artifact.getVersion() + " to "
+                + artifact.getFile() + ", but that artifact is the project's POM (" + project.getFile()
+                + "). Install and deploy may publish this file in place of the POM;"
+                + " attach it with a classifier instead.";
     }
 
     public void ensureDependenciesAreResolved(
