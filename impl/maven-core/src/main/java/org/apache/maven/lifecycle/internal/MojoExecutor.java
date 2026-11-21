@@ -382,7 +382,9 @@ public class MojoExecutor {
         // written below for every mojo, including a null filter for MNG-3297.
         if (dependencyContext.isResolutionRequiredForCurrentProject()
                 && (!dependencyContext.getScopesToCollectForCurrentProject().isEmpty()
-                        || !dependencyContext.getScopesToResolveForCurrentProject().isEmpty())) {
+                        || !dependencyContext
+                                .getScopesToResolveForCurrentProject()
+                                .isEmpty())) {
             Collection<String> scopesToCollect = dependencyContext.getScopesToCollectForCurrentProject();
             Collection<String> scopesToResolve = dependencyContext.getScopesToResolveForCurrentProject();
 
