@@ -77,7 +77,11 @@ public class DefaultArtifactManager implements ArtifactManager {
         }
         if (session.getMavenSession().getAllProjects() != null) {
             for (MavenProject project : session.getMavenSession().getAllProjects()) {
+                // In a pom-packaged project, project.getArtifact() has the POM's coordinates; a plugin such as
+                // jar:jar may still set another file on it. Do not let that file shadow the POM artifact, whose
+                // own path is the project's POM (MNG-8138).
                 if (id.equals(id(project.getArtifact()))
+                        && !id.equals(pomId(project))
                         && project.getArtifact().getFile() != null) {
                     return Optional.of(project.getArtifact().getFile().toPath());
                 }
@@ -121,6 +125,14 @@ public class DefaultArtifactManager implements ArtifactManager {
                         ? ""
                         : ":" + artifact.getClassifier())
                 + ":" + artifact.getVersion();
+    }
+
+    /**
+     * The id of the project's POM artifact, as {@link #id(org.apache.maven.artifact.Artifact)} computes it for
+     * {@link org.apache.maven.project.artifact.ProjectArtifact}: extension {@code pom}, no classifier.
+     */
+    private String pomId(MavenProject project) {
+        return project.getGroupId() + ":" + project.getArtifactId() + ":pom:" + project.getVersion();
     }
 
     private String id(Artifact artifact) {
