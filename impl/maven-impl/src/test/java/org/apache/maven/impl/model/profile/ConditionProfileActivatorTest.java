@@ -570,11 +570,11 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     @Test
     void testExecutableWithCustomWindowsExtensionAndCombinedCondition() throws Exception {
         Files.createFile(tempDir.resolve("docker.custom"));
-        final var sysProps = Map.of(
+        var sysProps = Map.of(
                 "env.PATH", tempDir.toString(),
                 "env.PATHEXT", ".CUSTOM",
                 "os.name", "Windows 11");
-        final var profile = newProfile("executable('docker') && ${enable.docker} == 'true'");
+        var profile = newProfile("executable('docker') && ${enable.docker} == 'true'");
         assertActivation(true, profile, newContext(Map.of("enable.docker", "true"), sysProps));
         assertActivation(false, profile, newContext(Map.of("enable.docker", "false"), sysProps));
         assertActivation(false, newProfile("not(executable('docker'))"), newContext(null, sysProps));
