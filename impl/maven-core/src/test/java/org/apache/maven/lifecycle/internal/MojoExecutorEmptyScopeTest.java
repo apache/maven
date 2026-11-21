@@ -62,8 +62,7 @@ class MojoExecutorEmptyScopeTest {
     private final MojoExecutor executor = new MojoExecutor(null, null, resolver, null, null, null);
 
     private static Artifact artifact(String artifactId, String scope) {
-        return new DefaultArtifact(
-                "g", artifactId, "1", scope, "jar", null, new DefaultArtifactHandler("jar"));
+        return new DefaultArtifact("g", artifactId, "1", scope, "jar", null, new DefaultArtifactHandler("jar"));
     }
 
     private void setUpResolver() throws Exception {
@@ -107,7 +106,8 @@ class MojoExecutorEmptyScopeTest {
         clearInvocations(resolver);
 
         // A fresh step with no scopes must not resolve (and therefore must not clear) the artifacts.
-        DependencyContext noScopeStep = new DependencyContext(project, Collections.emptyList(), Collections.emptyList());
+        DependencyContext noScopeStep =
+                new DependencyContext(project, Collections.emptyList(), Collections.emptyList());
         executor.ensureDependenciesAreResolved(mojo(null), session, noScopeStep);
 
         verifyNoInteractions(resolver);
