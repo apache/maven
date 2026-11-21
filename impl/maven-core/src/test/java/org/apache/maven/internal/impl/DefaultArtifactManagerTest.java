@@ -23,17 +23,23 @@ import java.nio.file.Path;
 import java.util.List;
 import java.util.Optional;
 
+import org.apache.maven.RepositoryUtils;
+import org.apache.maven.api.Artifact;
 import org.apache.maven.api.ProducedArtifact;
+import org.apache.maven.api.Version;
 import org.apache.maven.artifact.DefaultArtifact;
 import org.apache.maven.artifact.handler.ArtifactHandler;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenSession;
+import org.apache.maven.impl.InternalSession;
 import org.apache.maven.project.MavenProject;
+import org.apache.maven.project.artifact.ProjectArtifact;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -115,6 +121,121 @@ class DefaultArtifactManagerTest {
                 result.get(),
                 "getPath() must return the explicitly-set POM path from the paths map,"
                         + " not the JAR file in the project artifact (MINSTALL-315)");
+    }
+
+    /**
+     * MNG-8138: {@code jar:jar} on a pom-packaged project sets the JAR as the file of the project artifact, which has
+     * the POM's coordinates. Without any {@code setPath()} call, {@code getPath(pomArtifact)} must still return the
+     * project's POM file, so install and deploy never publish the JAR under the POM's coordinates.
+     */
+    @Test
+    void pomArtifactPathIsProjectFileEvenWhenProjectArtifactHasJar() {
+        Path pomFile = Path.of("pom.xml").toAbsolutePath();
+        MavenProject project = pomProject(pomFile);
+        project.getArtifact().setFile(new File("target/pom-project-1.0.jar"));
+
+        DefaultArtifactManager manager = manager(project);
+
+        assertEquals(Optional.of(pomFile), manager.getPath(pomArtifact(project)));
+    }
+
+    @Test
+    void explicitSetPathOfPomArtifactWinsOverProjectFile() {
+        MavenProject project = pomProject(Path.of("pom.xml").toAbsolutePath());
+        DefaultArtifactManager manager = manager(project);
+        ProducedArtifact pomArtifact = artifact("com.example:pom-project:pom:1.0");
+        Path flattened = Path.of("target/flattened-pom.xml").toAbsolutePath();
+
+        manager.setPath(pomArtifact, flattened);
+
+        assertEquals(Optional.of(flattened), manager.getPath(pomArtifact));
+    }
+
+    /**
+     * An artifact with a reactor project's POM coordinates but its own path, such as the consumer POM of a project
+     * not selected with {@code -pl}, keeps that path: only the pom-packaged project's main artifact is ignored.
+     */
+    @Test
+    void artifactWithPomCoordinatesKeepsItsOwnPath() {
+        MavenProject project = pomProject(Path.of("pom.xml").toAbsolutePath());
+        project.getArtifact().setFile(new File("target/pom-project-1.0.jar"));
+        Path repositoryPom = Path.of("target/repo/pom-project-1.0.pom").toAbsolutePath();
+
+        DefaultArtifactManager manager = manager(project);
+
+        assertEquals(
+                Optional.of(repositoryPom),
+                manager.getPath(new org.apache.maven.impl.DefaultArtifact(
+                        versionParsingSession(),
+                        new org.eclipse.aether.artifact.DefaultArtifact("com.example", "pom-project", "", "pom", "1.0")
+                                .setPath(repositoryPom))));
+    }
+
+    @Test
+    void mainArtifactOfJarProjectIsStillItsJar() {
+        MavenProject project = new MavenProject();
+        project.setGroupId("com.example");
+        project.setArtifactId("jar-project");
+        project.setVersion("1.0");
+        project.setPackaging("jar");
+        project.setFile(Path.of("pom.xml").toAbsolutePath().toFile());
+        DefaultArtifact main = new DefaultArtifact(
+                "com.example", "jar-project", "1.0", null, "jar", null, new TestArtifactHandler("jar"));
+        File jar = new File("target/jar-project-1.0.jar");
+        main.setFile(jar);
+        project.setArtifact(main);
+
+        DefaultArtifactManager manager = manager(project);
+
+        assertEquals(Optional.of(jar.toPath()), manager.getPath(artifact("com.example:jar-project:jar:1.0")));
+    }
+
+    private static MavenProject pomProject(Path pomFile) {
+        MavenProject project = new MavenProject();
+        project.setGroupId("com.example");
+        project.setArtifactId("pom-project");
+        project.setVersion("1.0");
+        project.setPackaging("pom");
+        if (pomFile != null) {
+            project.setFile(pomFile.toFile());
+        }
+        project.setArtifact(
+                new DefaultArtifact("com.example", "pom-project", "1.0", null, "pom", null, new PomArtifactHandler()));
+        return project;
+    }
+
+    private static Artifact pomArtifact(MavenProject project) {
+        return new org.apache.maven.impl.DefaultArtifact(
+                versionParsingSession(), RepositoryUtils.toArtifact(new ProjectArtifact(project)));
+    }
+
+    /**
+     * {@link org.apache.maven.impl.DefaultArtifact#key()} goes through {@code session.parseVersion()}; a bare mock
+     * would yield {@code null} and a key that never matches a project.
+     */
+    private static InternalSession versionParsingSession() {
+        InternalSession session = mock(InternalSession.class);
+        when(session.parseVersion(anyString())).thenAnswer(invocation -> {
+            Version version = mock(Version.class);
+            when(version.toString()).thenReturn(invocation.getArgument(0));
+            return version;
+        });
+        return session;
+    }
+
+    private static DefaultArtifactManager manager(MavenProject project) {
+        InternalMavenSession internalSession = mock(InternalMavenSession.class);
+        MavenSession mavenSession = new MavenSession(
+                null, new DefaultRepositorySystemSession(h -> false), new DefaultMavenExecutionRequest(), null);
+        mavenSession.setAllProjects(List.of(project));
+        when(internalSession.getMavenSession()).thenReturn(mavenSession);
+        return new DefaultArtifactManager(internalSession);
+    }
+
+    private static ProducedArtifact artifact(String key) {
+        ProducedArtifact artifact = mock(ProducedArtifact.class);
+        when(artifact.key()).thenReturn(key);
+        return artifact;
     }
 
     /**
