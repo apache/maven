@@ -41,13 +41,13 @@ class MavenITgh10115ProfileActivationByExecutableTest extends AbstractMavenInteg
 
     @Test
     void testMissingExecutable() throws Exception {
-        final var project = createProject();
+        var project = createProject();
         verifyActivation(project, false);
     }
 
     @Test
     void testDirectoryIsNotExecutable() throws Exception {
-        final var project = createProject();
+        var project = createProject();
         Files.createDirectory(project.resolve(BIN).resolve(COMMAND));
         verifyActivation(project, false);
     }
@@ -55,7 +55,7 @@ class MavenITgh10115ProfileActivationByExecutableTest extends AbstractMavenInteg
     @Test
     @DisabledOnOs(OS.WINDOWS)
     void testPosixExecutable() throws Exception {
-        final var project = createProject();
+        var project = createProject();
         createFakeExecutable(project, COMMAND, true);
         verifyActivation(project, true);
     }
@@ -63,7 +63,7 @@ class MavenITgh10115ProfileActivationByExecutableTest extends AbstractMavenInteg
     @Test
     @DisabledOnOs(OS.WINDOWS)
     void testPosixNonExecutable() throws Exception {
-        final var project = createProject();
+        var project = createProject();
         createFakeExecutable(project, COMMAND, false);
         verifyActivation(project, false);
     }
@@ -71,7 +71,7 @@ class MavenITgh10115ProfileActivationByExecutableTest extends AbstractMavenInteg
     @Test
     @EnabledOnOs(OS.WINDOWS)
     void testWindowsExeSuffix() throws Exception {
-        final var project = createProject();
+        var project = createProject();
         createFakeExecutable(project, COMMAND + ".EXE", true);
         verifyActivation(project, true);
     }
@@ -79,7 +79,7 @@ class MavenITgh10115ProfileActivationByExecutableTest extends AbstractMavenInteg
     @Test
     @EnabledOnOs(OS.WINDOWS)
     void testWindowsCmdSuffix() throws Exception {
-        final var project = createProject();
+        var project = createProject();
         createFakeExecutable(project, COMMAND + ".CMD", true);
         verifyActivation(project, true);
     }
@@ -87,7 +87,7 @@ class MavenITgh10115ProfileActivationByExecutableTest extends AbstractMavenInteg
     @Test
     @EnabledOnOs(OS.WINDOWS)
     void testWindowsCustomPathExtIsNotUsed() throws Exception {
-        final var project = createProject();
+        var project = createProject();
         createFakeExecutable(project, COMMAND + ".GH10115", true);
         verifyActivation(project, false);
     }
@@ -95,23 +95,22 @@ class MavenITgh10115ProfileActivationByExecutableTest extends AbstractMavenInteg
     @Test
     @EnabledOnOs(OS.WINDOWS)
     void testWindowsCustomPathExtIsUsed() throws Exception {
-        final var project = createProject();
+        var project = createProject();
         createFakeExecutable(project, COMMAND + ".GH10115", true);
         verifyActivation(project, true, ".EXE;.CMD;.GH10115");
     }
 
     private Path createProject() throws Exception {
-        final var fixture = extractResources("gh-10115-profile-activation-by-executable");
+        var fixture = extractResources("gh-10115-profile-activation-by-executable");
         // Resource extraction returns a shared directory. Never reuse its PATH entries or build output between cases.
-        final var project = Files.createTempDirectory(fixture, getName() + "-");
+        var project = Files.createTempDirectory(fixture, getName() + "-");
         Files.copy(fixture.resolve("pom.xml"), project.resolve("pom.xml"));
         Files.createDirectory(project.resolve(BIN));
         return project;
     }
 
-    private void createFakeExecutable(final Path project, final String name, final boolean executable)
-            throws Exception {
-        final var file = project.resolve(BIN).resolve(name);
+    private void createFakeExecutable(Path project, String name, boolean executable) throws Exception {
+        var file = project.resolve(BIN).resolve(name);
         // These are detection-only files, not real tools. An accidental invocation leaves evidence and fails.
         if (File.separatorChar == '\\') {
             Files.writeString(file, "@echo executed>\"%~dp0..\\executed\"\r\n@exit /b 97\r\n");
@@ -123,32 +122,32 @@ class MavenITgh10115ProfileActivationByExecutableTest extends AbstractMavenInteg
         }
     }
 
-    private void verifyActivation(final Path project, final boolean active) throws Exception {
+    private void verifyActivation(Path project, boolean active) throws Exception {
         verifyActivation(project, active, ".EXE;.CMD");
     }
 
-    private void verifyActivation(final Path project, final boolean active, final String pathExt) throws Exception {
-        final var support = Files.createDirectory(project.resolve("launcher-tools"));
+    private void verifyActivation(Path project, boolean active, String pathExt) throws Exception {
+        var support = Files.createDirectory(project.resolve("launcher-tools"));
         if (File.separatorChar == '\\') {
             // mvn.cmd uses findstr for compact option parsing. Do not expose all of System32 on PATH.
             // SystemRoot is optional in the environment, so never dereference it without a fallback.
-            final var systemRoot = System.getenv("SystemRoot");
-            final var findstr = Path.of(
+            var systemRoot = System.getenv("SystemRoot");
+            var findstr = Path.of(
                     systemRoot == null || systemRoot.isBlank() ? "C:\\Windows" : systemRoot, "System32", "findstr.exe");
             assertTrue(Files.isRegularFile(findstr), "Missing Maven launcher prerequisite: " + findstr);
             Files.copy(findstr, support.resolve("findstr.exe"));
         } else {
             // The executor invokes bin/mvn, not java directly. Supply only its required external utilities.
             // Resolve these from fixed OS locations, never from the inherited PATH.
-            for (final var tool : new String[] {"uname", "dirname"}) {
-                final var usrBin = Path.of("/usr/bin", tool);
-                final var source = Files.isExecutable(usrBin) ? usrBin : Path.of("/bin", tool);
+            for (var tool : new String[] {"uname", "dirname"}) {
+                var usrBin = Path.of("/usr/bin", tool);
+                var source = Files.isExecutable(usrBin) ? usrBin : Path.of("/bin", tool);
                 assertTrue(Files.isExecutable(source), "Missing Maven launcher prerequisite: " + source);
                 Files.createSymbolicLink(support.resolve(tool), source);
             }
         }
-        final var path = project.resolve(BIN) + File.pathSeparator + support;
-        final var verifier = newVerifier(project);
+        var path = project.resolve(BIN) + File.pathSeparator + support;
+        var verifier = newVerifier(project);
         verifier.setForkJvm(true);
         verifier.setAutoclean(false);
         verifier.setEnvironmentVariable("JAVA_HOME", System.getProperty("java.home"));
@@ -161,7 +160,7 @@ class MavenITgh10115ProfileActivationByExecutableTest extends AbstractMavenInteg
         try {
             verifier.execute();
             verifier.verifyErrorFreeLog();
-            final var properties = verifier.loadProperties("target/profile.properties");
+            var properties = verifier.loadProperties("target/profile.properties");
             assertEquals(
                     active ? "active" : "inactive", properties.getProperty("project.properties.executable.profile"));
         } finally {

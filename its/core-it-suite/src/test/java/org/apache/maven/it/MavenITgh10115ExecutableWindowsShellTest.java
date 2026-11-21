@@ -60,9 +60,9 @@ class MavenITgh10115ExecutableWindowsShellTest extends AbstractMavenIntegrationT
 
     @Test
     void testGitBash() throws Exception {
-        final var candidates = new ArrayList<Path>();
-        for (final var variable : new String[] {"ProgramFiles", "ProgramFiles(x86)", "LOCALAPPDATA"}) {
-            final var root = System.getenv(variable);
+        var candidates = new ArrayList<Path>();
+        for (var variable : new String[] {"ProgramFiles", "ProgramFiles(x86)", "LOCALAPPDATA"}) {
+            var root = System.getenv(variable);
             if (root != null && !root.isBlank()) {
                 candidates.add(Path.of(root, variable.equals("LOCALAPPDATA") ? "Programs/Git" : "Git", "bin/bash.exe"));
             }
@@ -73,21 +73,21 @@ class MavenITgh10115ExecutableWindowsShellTest extends AbstractMavenIntegrationT
 
     @Test
     void testCygwin() throws Exception {
-        final var drive = System.getenv().getOrDefault("SystemDrive", "C:");
+        var drive = System.getenv().getOrDefault("SystemDrive", "C:");
         verifyShell(findShell(
                 "maven.it.cygwinBash",
                 List.of(Path.of(drive + "/cygwin64/bin/bash.exe"), Path.of(drive + "/cygwin/bin/bash.exe"))));
     }
 
-    private Path findShell(final String property, final Iterable<Path> candidates) {
-        final var configured = System.getProperty(property);
+    private Path findShell(String property, Iterable<Path> candidates) {
+        var configured = System.getProperty(property);
         if (configured != null) {
             assertFalse(configured.isBlank(), property + " must name a bash.exe file");
-            final var shell = Path.of(configured).toAbsolutePath();
+            var shell = Path.of(configured).toAbsolutePath();
             assertTrue(Files.isRegularFile(shell) && Files.isExecutable(shell), property + " is invalid: " + shell);
             return shell;
         }
-        for (final var candidate : candidates) {
+        for (var candidate : candidates) {
             if (Files.isRegularFile(candidate) && Files.isExecutable(candidate)) {
                 return candidate.toAbsolutePath();
             }
@@ -97,7 +97,7 @@ class MavenITgh10115ExecutableWindowsShellTest extends AbstractMavenIntegrationT
         throw new IllegalStateException("Unreachable after failed assumption");
     }
 
-    private void verifyShell(final Path shell) throws Exception {
+    private void verifyShell(Path shell) throws Exception {
         verifyActivation(shell, ".cmd", DEFAULT_PATHEXT, true);
         verifyActivation(shell, ".exe", DEFAULT_PATHEXT, true);
         verifyActivation(shell, ".gh10115", DEFAULT_PATHEXT + ";.GH10115", true);
@@ -105,33 +105,32 @@ class MavenITgh10115ExecutableWindowsShellTest extends AbstractMavenIntegrationT
         verifyActivation(shell, null, DEFAULT_PATHEXT + ";.GH10115", false);
     }
 
-    private void verifyActivation(final Path shell, final String suffix, final String pathExt, final boolean active)
-            throws Exception {
-        final var fixture = extractResources("gh-10115-profile-activation-by-executable");
-        final var project = Files.createTempDirectory(fixture, getName() + "-").toAbsolutePath();
+    private void verifyActivation(Path shell, String suffix, String pathExt, boolean active) throws Exception {
+        var fixture = extractResources("gh-10115-profile-activation-by-executable");
+        var project = Files.createTempDirectory(fixture, getName() + "-").toAbsolutePath();
         // The unique command name avoids collisions with tools installed in the shell's own bin directories.
         Files.copy(fixture.resolve("pom.xml"), project.resolve("pom.xml"));
-        final var fakeBin = Files.createDirectory(project.resolve("fake bin with spaces"));
+        var fakeBin = Files.createDirectory(project.resolve("fake bin with spaces"));
         if (suffix != null) {
             // Detection only: an accidental shell/batch invocation leaves evidence and exits unsuccessfully.
-            final var content = suffix.equals(".cmd")
+            var content = suffix.equals(".cmd")
                     ? "@echo executed>\"%~dp0..\\executed\"\r\n@exit /b 97\r\n"
                     : "#!/bin/sh\n: > \"${0%/*}/../executed\"\nexit 97\n";
             Files.writeString(fakeBin.resolve(COMMAND + suffix), content);
         }
 
-        final var log = project.resolve("mvn-output.txt");
+        var log = project.resolve("mvn-output.txt");
         // Write the script to a file to avoid Windows CreateProcess argument-quoting
         // issues when passing multi-line scripts with double quotes via -c.
-        final var scriptFile = project.resolve("run-maven.sh");
+        var scriptFile = project.resolve("run-maven.sh");
         Files.writeString(scriptFile, SCRIPT, StandardCharsets.UTF_8);
-        final var builder = new ProcessBuilder(shell.toString(), "--noprofile", "--norc", scriptFile.toString())
+        var builder = new ProcessBuilder(shell.toString(), "--noprofile", "--norc", scriptFile.toString())
                 .directory(project.toFile())
                 .redirectErrorStream(true)
                 .redirectOutput(log.toFile());
-        final var env = builder.environment();
+        var env = builder.environment();
         // Noninteractive bash reads BASH_ENV even with --noprofile/--norc. Also discard inherited MSYS overrides.
-        for (final var name : new String[] {
+        for (var name : new String[] {
             "BASH_ENV",
             "ENV",
             "MAVEN_OPTS",
@@ -177,27 +176,26 @@ class MavenITgh10115ExecutableWindowsShellTest extends AbstractMavenIntegrationT
                         .toAbsolutePath()
                         .toString());
 
-        final var process = builder.start();
+        var process = builder.start();
         try {
-            final var ended = process.waitFor(2, TimeUnit.MINUTES);
+            var ended = process.waitFor(2, TimeUnit.MINUTES);
             if (!ended) {
                 // The launcher can still be waiting for Java: do not leave that child running on CI.
-                try (final var descendants = process.descendants()) {
+                try (var descendants = process.descendants()) {
                     descendants.forEach(ProcessHandle::destroyForcibly);
                 }
                 process.destroyForcibly();
                 process.waitFor(10, TimeUnit.SECONDS);
             }
-            final var output = Files.readString(log, StandardCharsets.UTF_8);
-            final var diagnostic =
-                    shell + " (suffix=" + suffix + ", PATHEXT=" + pathExt + "), log: " + log + "\n" + output;
+            var output = Files.readString(log, StandardCharsets.UTF_8);
+            var diagnostic = shell + " (suffix=" + suffix + ", PATHEXT=" + pathExt + "), log: " + log + "\n" + output;
             assertTrue(ended, "Maven did not end in time: " + diagnostic);
             assertEquals(0, process.exitValue(), diagnostic);
             assertTrue(output.contains("BUILD SUCCESS"), diagnostic);
-            final var marker = project.resolve("target/profile.properties");
+            var marker = project.resolve("target/profile.properties");
             assertTrue(Files.isRegularFile(marker), "No profile marker: " + diagnostic);
-            final var properties = new Properties();
-            try (final var input = Files.newInputStream(marker)) {
+            var properties = new Properties();
+            try (var input = Files.newInputStream(marker)) {
                 properties.load(input);
             }
             assertEquals(
@@ -206,7 +204,7 @@ class MavenITgh10115ExecutableWindowsShellTest extends AbstractMavenIntegrationT
                     diagnostic);
         } finally {
             if (process.isAlive()) {
-                try (final var descendants = process.descendants()) {
+                try (var descendants = process.descendants()) {
                     descendants.forEach(ProcessHandle::destroyForcibly);
                 }
                 process.destroyForcibly();

@@ -60,26 +60,26 @@ class ExecutableFinder {
      * @param context current activation context, including environment properties
      * @return whether the executable can be found
      */
-    static boolean isExecutableInPath(final String name, final ProfileActivationContext context) {
+    static boolean isExecutableInPath(String name, ProfileActivationContext context) {
         if (name == null || name.isBlank()) {
             return false;
         }
-        final var windows = isWindows(context);
-        final var extensions = windows ? windowsExtensions(context) : List.<String>of();
+        var windows = isWindows(context);
+        var extensions = windows ? windowsExtensions(context) : List.<String>of();
 
         if (name.contains("/") || name.contains("\\")) {
             return matches(null, name, windows, extensions);
         }
 
-        final var pathValue = context.getSystemProperty("env.PATH");
+        var pathValue = context.getSystemProperty("env.PATH");
         if (pathValue == null || pathValue.isBlank()) {
             return false;
         }
-        final var separator = context.getSystemProperty("path.separator");
+        var separator = context.getSystemProperty("path.separator");
         // path.separator may be overridden in tests to simulate a non-native host OS;
         // at runtime it always matches File.pathSeparator.
-        final var pathSeparator = separator == null || separator.isEmpty() ? File.pathSeparator : separator;
-        final var delimiter =
+        var pathSeparator = separator == null || separator.isEmpty() ? File.pathSeparator : separator;
+        var delimiter =
                 ":".equals(pathSeparator) || ";".equals(pathSeparator) ? pathSeparator : Pattern.quote(pathSeparator);
         for (String directory : pathValue.split(delimiter, -1)) {
             if (windows && directory.length() >= 2 && directory.startsWith("\"") && directory.endsWith("\"")) {
@@ -92,11 +92,11 @@ class ExecutableFinder {
         return false;
     }
 
-    private static List<String> windowsExtensions(final ProfileActivationContext context) {
-        final var value = context.getSystemProperty("env.PATHEXT");
-        final var extensions = new LinkedHashSet<String>();
-        for (final var entry : (value == null ? DEFAULT_WINDOWS_EXTENSIONS : value).split(";")) {
-            final var extension = entry.trim().toLowerCase(Locale.ROOT);
+    private static List<String> windowsExtensions(ProfileActivationContext context) {
+        var value = context.getSystemProperty("env.PATHEXT");
+        var extensions = new LinkedHashSet<String>();
+        for (var entry : (value == null ? DEFAULT_WINDOWS_EXTENSIONS : value).split(";")) {
+            var extension = entry.trim().toLowerCase(Locale.ROOT);
             // PATHEXT entries are suffixes, not paths. Ignore malformed entries.
             if (extension.startsWith(".")
                     && extension.length() > 1
@@ -110,38 +110,37 @@ class ExecutableFinder {
         return List.copyOf(extensions);
     }
 
-    private static boolean matches(
-            final String directory, final String name, final boolean windows, final List<String> extensions) {
+    private static boolean matches(String directory, String name, boolean windows, List<String> extensions) {
         try {
-            final var candidate =
+            var candidate =
                     directory == null ? Path.of(name) : Path.of(directory).resolve(name);
             if (isExecutableFile(candidate, windows)) {
                 return true;
             }
-            final var lowerName = name.toLowerCase(Locale.ROOT);
+            var lowerName = name.toLowerCase(Locale.ROOT);
             if (extensions.stream().anyMatch(lowerName::endsWith)) {
                 return false;
             }
-            for (final var extension : extensions) {
-                final var withExtension = directory == null
+            for (var extension : extensions) {
+                var withExtension = directory == null
                         ? Path.of(name + extension)
                         : Path.of(directory).resolve(name + extension);
                 if (isExecutableFile(withExtension, windows)) {
                     return true;
                 }
             }
-        } catch (final InvalidPathException e) {
+        } catch (InvalidPathException e) {
             // An invalid PATH entry must not hide executables in subsequent directories.
         }
         return false;
     }
 
-    private static boolean isWindows(final ProfileActivationContext context) {
-        final var osName = context.getSystemProperty("os.name");
+    private static boolean isWindows(ProfileActivationContext context) {
+        var osName = context.getSystemProperty("os.name");
         return osName != null && osName.toLowerCase(Locale.ROOT).contains("windows");
     }
 
-    private static boolean isExecutableFile(final Path path, final boolean windows) {
+    private static boolean isExecutableFile(Path path, boolean windows) {
         // Windows uses PATHEXT rather than the POSIX execute permission bit.
         return Files.isRegularFile(path) && (windows || Files.isExecutable(path));
     }
