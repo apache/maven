@@ -375,7 +375,14 @@ public class MojoExecutor {
         MavenProject project = dependencyContext.getProject();
         boolean aggregating = mojoDescriptor.isAggregator();
 
-        if (dependencyContext.isResolutionRequiredForCurrentProject()) {
+        // A fresh DependencyContext starts out needing resolution even when its step has no scopes at
+        // all (the check is an identity comparison on the project's dependency artifacts). Resolving an
+        // empty scope set would replace the project's resolved artifacts with an empty set, which is read
+        // by later mojos of another step of the same project (#14081). The artifact filter is still
+        // written below for every mojo, including a null filter for MNG-3297.
+        if (dependencyContext.isResolutionRequiredForCurrentProject()
+                && (!dependencyContext.getScopesToCollectForCurrentProject().isEmpty()
+                        || !dependencyContext.getScopesToResolveForCurrentProject().isEmpty())) {
             Collection<String> scopesToCollect = dependencyContext.getScopesToCollectForCurrentProject();
             Collection<String> scopesToResolve = dependencyContext.getScopesToResolveForCurrentProject();
 
