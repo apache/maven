@@ -45,5 +45,6 @@ class ApiMessageBuilderFactoryBindingTest {
                         .a(' ')
                         .a(42)
                         .build());
+        assertEquals("", factory.builder(16).a("x").setLength(0).build());
     }
 }

@@ -37,6 +37,10 @@ import org.apache.maven.shared.utils.logging.MessageUtils;
  * Provides the Maven 4 API {@link MessageBuilderFactory}, so that a plugin can use one API on Maven 3 and Maven 4.
  * Colours follow the {@link MessageUtils} setting Maven applies from {@code --color} and {@code --batch-mode}; style
  * names are resolved as Maven 3.10 and Maven 4 resolve them.
+ * <p>
+ * Resolved styles are cached for the lifetime of the JVM, so a {@code maven.style.*} or {@code style.*} system
+ * property must be set before the style is first used. Maven 3.10 and Maven 4 cache them the same way.
+ * </p>
  */
 @Named
 @Singleton

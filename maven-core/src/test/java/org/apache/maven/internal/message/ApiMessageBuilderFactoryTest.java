@@ -20,9 +20,12 @@ package org.apache.maven.internal.message;
 
 import java.util.concurrent.atomic.AtomicBoolean;
 
+import org.apache.maven.shared.utils.logging.MessageUtils;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class ApiMessageBuilderFactoryTest {
 
@@ -50,6 +53,14 @@ class ApiMessageBuilderFactoryTest {
         } finally {
             System.clearProperty("maven.style.test-set");
         }
+    }
+
+    @Test
+    void colorFlagAndWidthFollowMavenSharedUtils() {
+        assertFalse(factory.isColorEnabled());
+        color.set(true);
+        assertTrue(factory.isColorEnabled());
+        assertEquals(MessageUtils.getTerminalWidth(), factory.getTerminalWidth());
     }
 
     @Test
