@@ -21,6 +21,7 @@ package org.apache.maven.internal.aether;
 import javax.inject.Inject;
 
 import java.io.File;
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -32,6 +33,7 @@ import org.apache.maven.execution.DefaultMavenExecutionRequest;
 import org.apache.maven.execution.MavenExecutionRequest;
 import org.apache.maven.settings.Mirror;
 import org.apache.maven.settings.Server;
+import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.repository.AuthenticationSelector;
 import org.eclipse.aether.repository.RemoteRepository;
@@ -40,6 +42,9 @@ import org.junit.jupiter.api.Test;
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 
 /**
  * UT for {@link DefaultRepositorySystemSessionFactory}, focused on how server credentials are scoped
@@ -113,6 +118,62 @@ class DefaultRepositorySystemSessionFactoryTest {
         AuthenticationSelector selector = authenticationSelector(request);
 
         assertNull(selector.getAuthentication(repository("internal", "https://repo.example.org/releases/")));
+    }
+
+    @Test
+    void sessionWarnsAboutEncryptedServerPasswordThatCannotBeDecrypted() throws Exception {
+        Logger logger = mock(Logger.class);
+        Field loggerField = DefaultRepositorySystemSessionFactory.class.getDeclaredField("logger");
+        loggerField.setAccessible(true);
+        Object originalLogger = loggerField.get(systemSessionFactory);
+        String originalSecurityFile = System.getProperty("settings.security");
+        Server server = serverWithRepositoryOrigins("internal");
+        server.setPassword("{ZQHnV2v+3uIHFAJOvC3lR5UwUrt286ghwSlMVyZecU8=}");
+        try {
+            // no settings security file, so nothing can be decrypted, whatever the user home holds
+            System.setProperty("settings.security", new File(getBasedir(), "target/no-such-file.xml").getPath());
+            loggerField.set(systemSessionFactory, logger);
+
+            authenticationSelector(requestWithServer(server));
+        } finally {
+            loggerField.set(systemSessionFactory, originalLogger);
+            if (originalSecurityFile == null) {
+                System.clearProperty("settings.security");
+            } else {
+                System.setProperty("settings.security", originalSecurityFile);
+            }
+        }
+
+        verify(logger)
+                .warn("Could not decrypt the password of server internal, using it as written in the settings;"
+                        + " run with -X for the cause");
+    }
+
+    @Test
+    void encryptedPasswordLeftUndecryptedIsWarnedAbout() {
+        Logger logger = mock(Logger.class);
+        String encrypted = "{ZQHnV2v+3uIHFAJOvC3lR5UwUrt286ghwSlMVyZecU8=}";
+
+        DefaultRepositorySystemSessionFactory.warnIfNotDecrypted(
+                logger, "password of server internal", encrypted, encrypted);
+
+        verify(logger)
+                .warn("Could not decrypt the password of server internal, using it as written in the settings;"
+                        + " run with -X for the cause");
+    }
+
+    @Test
+    void decryptedOrPlainValuesAreNotWarnedAbout() {
+        Logger logger = mock(Logger.class);
+
+        DefaultRepositorySystemSessionFactory.warnIfNotDecrypted(
+                logger, "password of server internal", "{ZQHnV2v+3uIHFAJOvC3lR5UwUrt286ghwSlMVyZecU8=}", "secret");
+        for (String plain : new String[] {null, "abc123", "${env.TOKEN}", "{DESede}y+qq4Cg==", "a{b}c"}) {
+            DefaultRepositorySystemSessionFactory.warnIfNotDecrypted(
+                    logger, "password of server internal", plain, plain);
+        }
+
+        verifyNoInteractions(logger);
     }
 
     private static Properties strictCredentialScope() {
