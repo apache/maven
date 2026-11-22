@@ -47,6 +47,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 import org.mockito.InOrder;
+import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
 
 import static org.junit.jupiter.api.Assertions.assertArrayEquals;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -111,6 +112,86 @@ public class MavenCliTest {
                 IllegalStateException.class,
                 () -> MavenCli.readPassword(
                         null, new ByteArrayInputStream("\n".getBytes(StandardCharsets.UTF_8)), "Password: "));
+    }
+
+    @Test
+    public void testReadMasterPassword(@TempDir Path tempDir) throws Exception {
+        DefaultPlexusCipher cipher = new DefaultPlexusCipher();
+        Path file = settingsSecurity(tempDir, cipher.encryptAndDecorate("master", "settings.security"));
+
+        assertEquals("master", MavenCli.readMasterPassword(cipher, file.toString()));
+        // the location may be a URL as well as a path
+        assertEquals(
+                "master",
+                MavenCli.readMasterPassword(cipher, "file://" + file.toUri().getPath()));
+    }
+
+    @Test
+    public void testReadMasterPasswordRejectsMissingFile(@TempDir Path tempDir) throws Exception {
+        Path file = tempDir.resolve("settings-security.xml");
+
+        String message = masterPasswordFailure(file).getMessage();
+
+        assertTrue(message.contains(file + " does not exist"), message);
+        assertTrue(message.contains("--encrypt-master-password"), message);
+    }
+
+    @Test
+    public void testReadMasterPasswordRejectsUnparsableFile(@TempDir Path tempDir) throws Exception {
+        Path file = tempDir.resolve("settings-security.xml");
+        Files.write(file, "not xml".getBytes(StandardCharsets.UTF_8));
+
+        IllegalStateException e = masterPasswordFailure(file);
+
+        assertTrue(e.getMessage().contains("Cannot read the settings security file " + file), e.getMessage());
+        assertNotNull(e.getCause());
+    }
+
+    @Test
+    public void testReadMasterPasswordRejectsMissingMaster(@TempDir Path tempDir) throws Exception {
+        Path file = tempDir.resolve("settings-security.xml");
+        Files.write(file, "<settingsSecurity/>".getBytes(StandardCharsets.UTF_8));
+
+        String message = masterPasswordFailure(file).getMessage();
+
+        assertTrue(message.contains("Master password is not set in the settings security file " + file), message);
+    }
+
+    /**
+     * A master password that the built-in key does not decrypt used to surface as a {@code BadPaddingException} or an
+     * {@code ArrayIndexOutOfBoundsException} from the cipher, with no hint at the file or the fix.
+     */
+    @Test
+    public void testReadMasterPasswordRejectsUndecryptableMaster(@TempDir Path tempDir) throws Exception {
+        DefaultPlexusCipher cipher = new DefaultPlexusCipher();
+        String[] masters = {
+            // a server password, encrypted with a master password instead of the built-in key
+            cipher.encryptAndDecorate("secret", "master"), "plain-text-master", "{not base64 !!}"
+        };
+
+        for (String master : masters) {
+            Path file = settingsSecurity(tempDir, master);
+
+            IllegalStateException e = masterPasswordFailure(file);
+
+            assertTrue(e.getMessage().contains("Cannot decrypt the master password"), e.getMessage());
+            assertTrue(e.getMessage().contains(file.toString()), e.getMessage());
+            assertTrue(e.getMessage().contains("--encrypt-master-password"), e.getMessage());
+            assertNull(e.getCause(), "the cipher failure must not reach the default output");
+            assertEquals(1, e.getSuppressed().length);
+        }
+    }
+
+    private static Path settingsSecurity(Path dir, String master) throws IOException {
+        Path file = dir.resolve("settings-security.xml");
+        String xml = "<settingsSecurity><master>" + master + "</master></settingsSecurity>";
+        return Files.write(file, xml.getBytes(StandardCharsets.UTF_8));
+    }
+
+    private static IllegalStateException masterPasswordFailure(Path file) {
+        return assertThrows(
+                IllegalStateException.class,
+                () -> MavenCli.readMasterPassword(new DefaultPlexusCipher(), file.toString()));
     }
 
     /**
