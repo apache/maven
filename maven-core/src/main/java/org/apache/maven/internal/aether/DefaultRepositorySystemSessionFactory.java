@@ -31,6 +31,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import org.apache.maven.RepositoryUtils;
@@ -185,6 +186,13 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
 
     private static final String RESOLVER_MAX_PRIORITY = String.valueOf(Float.MAX_VALUE);
 
+    /**
+     * The shape of {@code mvn --encrypt-password} output: Base64 text in braces. With plexus-cipher 2.0 the
+     * shortest output, for a one character password, has 44 Base64 characters; check this bound when the cipher
+     * changes, as a longer minimum is harmless and a shorter one would silence the warning.
+     */
+    private static final Pattern ENCRYPTED_PASSWORD = Pattern.compile("\\{[A-Za-z0-9+/]{34,}={0,2}\\}");
+
     @Inject
     private Logger logger;
 
@@ -215,6 +223,20 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
     private VersionFilterBuilder versionFilterBuilder;
 
     private final GenericVersionScheme versionScheme = new GenericVersionScheme();
+
+    /**
+     * Warns when a value that has the shape of a Maven encrypted password was not decrypted, as it is then
+     * sent to the server as it is written in the settings. Decryption is attempted, and fails, for every value
+     * with braces in it, such as <code>${env.TOKEN}</code> or a password that contains them: those stay silent.
+     */
+    static void warnIfNotDecrypted(Logger logger, String what, String configured, String decrypted) {
+        if (configured != null
+                && configured.equals(decrypted)
+                && ENCRYPTED_PASSWORD.matcher(configured).find()) {
+            logger.warn("Could not decrypt the " + what
+                    + ", using it as written in the settings; run with -X for the cause");
+        }
+    }
 
     /**
      * For legacy consumers; hopefully nobody.
@@ -291,6 +313,22 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
             for (SettingsProblem problem : decrypted.getProblems()) {
                 logger.debug(problem.getMessage(), problem.getException());
             }
+        }
+        for (int i = 0; i < request.getServers().size(); i++) {
+            Server server = request.getServers().get(i);
+            Server result = decrypted.getServers().get(i);
+            warnIfNotDecrypted(
+                    logger, "password of server " + server.getId(), server.getPassword(), result.getPassword());
+            warnIfNotDecrypted(
+                    logger, "passphrase of server " + server.getId(), server.getPassphrase(), result.getPassphrase());
+        }
+        for (int i = 0; i < request.getProxies().size(); i++) {
+            Proxy proxy = request.getProxies().get(i);
+            warnIfNotDecrypted(
+                    logger,
+                    "password of proxy " + proxy.getId(),
+                    proxy.getPassword(),
+                    decrypted.getProxies().get(i).getPassword());
         }
 
         versionFilterBuilder
