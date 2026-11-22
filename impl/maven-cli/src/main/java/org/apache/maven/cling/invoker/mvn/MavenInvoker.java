@@ -571,13 +571,15 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             context.eventSpyDispatcher.close();
         }
 
-        context.options().sbomFile().ifPresent(file -> {
-            try {
-                SbomReportWriter.write(request.getTopDirectory().resolve(file), result);
-            } catch (IOException e) {
-                context.logger.warn("Failed to write SBOM report: " + e.getMessage());
-            }
-        });
+        if (!result.hasExceptions()) {
+            context.options().sbomFile().ifPresent(file -> {
+                try {
+                    SbomReportWriter.write(request.getTopDirectory().resolve(file), result);
+                } catch (IOException e) {
+                    context.logger.warn("Failed to write SBOM report: " + e.getMessage());
+                }
+            });
+        }
 
         if (result.hasExceptions()) {
             ExceptionHandler handler = new DefaultExceptionHandler();

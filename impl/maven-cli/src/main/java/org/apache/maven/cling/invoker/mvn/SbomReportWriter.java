@@ -33,78 +33,79 @@ import org.apache.maven.execution.MavenExecutionResult;
 import org.apache.maven.project.MavenProject;
 
 /**
- * Writes an SBOM report in a protobom-style JSON document from the resolved
- * artifacts of the build. Hand-rolled encoder: maven-cli has no JSON library
- * dependency, and adding one for a single report is not justified.
+ * Writes a CycloneDX 1.6 JSON SBOM from the resolved artifacts of the build.
+ * Hand-rolled encoder: maven-cli has no JSON library dependency, and adding one
+ * for a single report is not justified.
  *
  * <p>Only fields Maven actually retains in the resolved artifact set are emitted:
- * node id/name/version and a synthesised purl, plus dependency edges and root
- * elements. Supplier, license and hash are omitted, never fabricated. Nodes,
- * edges and roots are sorted and the timestamp honours {@code SOURCE_DATE_EPOCH},
- * so the output is deterministic.</p>
+ * component group/name/version and a synthesised purl, plus dependency edges.
+ * Supplier, license and hash are omitted, never fabricated. Components and edges
+ * are sorted and the timestamp honours {@code SOURCE_DATE_EPOCH}, so the output
+ * is deterministic.</p>
  */
 final class SbomReportWriter {
     private SbomReportWriter() {}
 
     static void write(Path file, MavenExecutionResult result) throws IOException {
-        Map<String, String[]> nodes = new TreeMap<>();
-        Map<String, Set<String>> edges = new TreeMap<>();
-        Set<String> roots = new TreeSet<>();
+        Map<String, String[]> components = new TreeMap<>();
+        Map<String, Set<String>> dependencies = new TreeMap<>();
         for (MavenProject project : result.getTopologicallySortedProjects()) {
             String rootPurl = purl(project.getGroupId(), project.getArtifactId(), project.getVersion());
             if (rootPurl == null) {
                 continue;
             }
-            nodes.put(rootPurl, new String[] {project.getArtifactId(), project.getVersion(), rootPurl});
-            roots.add(rootPurl);
+            components.put(
+                    rootPurl,
+                    new String[] {project.getGroupId(), project.getArtifactId(), project.getVersion(), rootPurl});
             for (Artifact artifact : project.getArtifacts()) {
                 String depPurl = purl(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion());
                 if (depPurl == null || depPurl.equals(rootPurl)) {
                     continue;
                 }
-                nodes.put(depPurl, new String[] {artifact.getArtifactId(), artifact.getVersion(), depPurl});
-                edges.computeIfAbsent(rootPurl, k -> new TreeSet<>()).add(depPurl);
+                components.put(
+                        depPurl,
+                        new String[] {artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), depPurl});
+                dependencies.computeIfAbsent(rootPurl, k -> new TreeSet<>()).add(depPurl);
             }
         }
 
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
-        sb.append("  \"sbomFormat\": \"protobom-json\",\n");
+        sb.append("  \"bomFormat\": \"CycloneDX\",\n");
+        sb.append("  \"specVersion\": \"1.6\",\n");
+        sb.append("  \"version\": 1,\n");
         sb.append("  \"metadata\": {\n");
-        sb.append("    \"authors\": [\"Apache Maven\"],\n");
-        sb.append("    \"tools\": [\"mvn\"],\n");
-        sb.append("    \"date\": \"").append(timestamp()).append("\"\n");
+        sb.append("    \"timestamp\": \"").append(timestamp()).append("\",\n");
+        sb.append("    \"tools\": [{\"name\": \"mvn\"}],\n");
+        sb.append("    \"authors\": [{\"name\": \"Apache Maven\"}]\n");
         sb.append("  },\n");
-        sb.append("  \"nodeList\": {\n");
-        sb.append("    \"nodes\": [\n");
+        sb.append("  \"components\": [\n");
         int i = 0;
-        for (String[] c : nodes.values()) {
-            sb.append("      {\"id\": \"").append(escape(c[2]))
-                    .append("\", \"name\": \"").append(escape(c[0]))
-                    .append("\", \"version\": \"").append(escape(c[1])).append("\"}");
-            sb.append(++i < nodes.size() ? ",\n" : "\n");
+        for (String[] c : components.values()) {
+            sb.append("    {\"type\": \"library\", \"group\": \"")
+                    .append(escape(c[0]))
+                    .append("\", \"name\": \"")
+                    .append(escape(c[1]))
+                    .append("\", \"version\": \"")
+                    .append(escape(c[2]))
+                    .append("\", \"purl\": \"")
+                    .append(escape(c[3]))
+                    .append("\"}");
+            sb.append(++i < components.size() ? ",\n" : "\n");
         }
-        sb.append("    ],\n");
-        sb.append("    \"edges\": [\n");
+        sb.append("  ],\n");
+        sb.append("  \"dependencies\": [\n");
         int e = 0;
-        for (Map.Entry<String, Set<String>> edge : edges.entrySet()) {
-            sb.append("      {\"type\": \"dependsOn\", \"from\": \"").append(escape(edge.getKey())).append("\", \"to\": [");
+        for (Map.Entry<String, Set<String>> edge : dependencies.entrySet()) {
+            sb.append("    {\"ref\": \"").append(escape(edge.getKey())).append("\", \"dependsOn\": [");
             int t = 0;
             for (String to : edge.getValue()) {
                 sb.append(t++ > 0 ? ", " : "").append("\"").append(escape(to)).append("\"");
             }
             sb.append("]}");
-            sb.append(++e < edges.size() ? ",\n" : "\n");
+            sb.append(++e < dependencies.size() ? ",\n" : "\n");
         }
-        sb.append("    ],\n");
-        sb.append("    \"rootElements\": [\n");
-        int r = 0;
-        for (String root : roots) {
-            sb.append("      \"").append(escape(root)).append("\"");
-            sb.append(++r < roots.size() ? ",\n" : "\n");
-        }
-        sb.append("    ]\n");
-        sb.append("  }\n");
+        sb.append("  ]\n");
         sb.append("}\n");
         Files.writeString(file, sb.toString(), StandardCharsets.UTF_8);
     }
@@ -129,6 +130,19 @@ final class SbomReportWriter {
     }
 
     private static String escape(String value) {
-        return value.replace("\\", "\\\\").replace("\"", "\\\"");
+        StringBuilder out = new StringBuilder(value.length());
+        for (int i = 0; i < value.length(); i++) {
+            char c = value.charAt(i);
+            if (c == '\\') {
+                out.append("\\\\");
+            } else if (c == '"') {
+                out.append("\\\"");
+            } else if (c < 0x20) {
+                out.append(String.format("\\u%04x", (int) c));
+            } else {
+                out.append(c);
+            }
+        }
+        return out.toString();
     }
 }
