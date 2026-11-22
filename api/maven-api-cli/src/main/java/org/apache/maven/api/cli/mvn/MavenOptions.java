@@ -253,4 +253,17 @@ public interface MavenOptions extends Options {
      */
     @Nonnull
     Optional<Boolean> listAliases();
+
+    /**
+     * Indicates that an SBOM report should be written after the build completes.
+     * The report is written to {@code sbom.json} in the top-level project directory.
+     * The report lists the resolved dependencies of every built project as protobom-style
+     * components; supplier, license and hash are omitted as Maven does not retain them
+     * in the resolved artifact set.
+     *
+     * @return an {@link Optional} containing the report file name, or empty if not specified
+     * @since 4.2.0
+     */
+    @Nonnull
+    Optional<String> sbomFile();
 }
