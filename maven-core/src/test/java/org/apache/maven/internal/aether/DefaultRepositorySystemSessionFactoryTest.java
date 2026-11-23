@@ -107,6 +107,19 @@ class DefaultRepositorySystemSessionFactoryTest {
     }
 
     @Test
+    void centralServerWithItsOwnRepositoryOriginsIsNotServedAtPublishingOrigins() throws Exception {
+        MavenExecutionRequest request =
+                requestWithServer(serverWithRepositoryOrigins("central", "https://repo.example.org"));
+        request.addRemoteRepository(defaultRepository());
+
+        AuthenticationSelector selector = authenticationSelector(request);
+
+        assertNotNull(selector.getAuthentication(repository("central", "https://repo.example.org/releases/")));
+        assertNull(selector.getAuthentication(
+                repository("central", "https://central.sonatype.com/repository/maven-snapshots/")));
+    }
+
+    @Test
     void malformedServerRepositoryOriginIsIgnored() throws Exception {
         MavenExecutionRequest request = requestWithServer(serverWithRepositoryOrigins("internal", "not an origin"));
         request.setSystemProperties(strictCredentialScope());
@@ -114,6 +127,50 @@ class DefaultRepositorySystemSessionFactoryTest {
         AuthenticationSelector selector = authenticationSelector(request);
 
         assertNull(selector.getAuthentication(repository("internal", "https://repo.example.org/releases/")));
+    }
+
+    @Test
+    void centralServerIsServedAtTheOriginsCentralIsPublishedTo() throws Exception {
+        MavenExecutionRequest request = requestWithServer(serverWithRepositoryOrigins("central"));
+        request.addRemoteRepository(defaultRepository());
+
+        AuthenticationSelector selector = authenticationSelector(request);
+
+        assertNotNull(selector.getAuthentication(repository("central", "https://repo.maven.apache.org/maven2")));
+        assertNotNull(selector.getAuthentication(
+                repository("central", "https://central.sonatype.com/repository/maven-snapshots/")));
+        assertNotNull(selector.getAuthentication(repository(
+                "central", "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")));
+        assertNull(selector.getAuthentication(repository("central", "https://evil.example.org/maven2/")));
+    }
+
+    @Test
+    void centralServerIsNotServedAtPublishingOriginsOnceTheIdIsDeclaredElsewhere() throws Exception {
+        MavenExecutionRequest request = requestWithServer(serverWithRepositoryOrigins("central"));
+        request.addRemoteRepository(defaultRepository());
+        Mirror mirror = new Mirror();
+        mirror.setId("central");
+        mirror.setUrl("https://mirror.example.org/repo/");
+        mirror.setMirrorOf("*");
+        request.setMirrors(new ArrayList<>(Collections.singletonList(mirror)));
+
+        AuthenticationSelector selector = authenticationSelector(request);
+
+        assertNotNull(selector.getAuthentication(repository("central", "https://mirror.example.org/repo/")));
+        assertNull(selector.getAuthentication(
+                repository("central", "https://central.sonatype.com/repository/maven-snapshots/")));
+    }
+
+    @Test
+    void publishingOriginsAreBoundToTheCentralIdOnly() throws Exception {
+        MavenExecutionRequest request =
+                requestWithServer(serverWithRepositoryOrigins("internal", "https://repo.example.org"));
+        request.addRemoteRepository(defaultRepository());
+
+        AuthenticationSelector selector = authenticationSelector(request);
+
+        assertNull(selector.getAuthentication(
+                repository("internal", "https://central.sonatype.com/repository/maven-snapshots/")));
     }
 
     private static Properties strictCredentialScope() {
@@ -146,6 +203,10 @@ class DefaultRepositorySystemSessionFactoryTest {
 
     private static RemoteRepository repository(String id, String url) {
         return new RemoteRepository.Builder(id, "default", url).build();
+    }
+
+    private ArtifactRepository defaultRepository() throws Exception {
+        return mavenRepositorySystem.createDefaultRemoteRepository(new DefaultMavenExecutionRequest());
     }
 
     private ArtifactRepository getLocalRepository() throws Exception {

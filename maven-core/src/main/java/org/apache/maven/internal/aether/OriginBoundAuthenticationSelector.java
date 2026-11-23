@@ -20,12 +20,15 @@ package org.apache.maven.internal.aether;
 
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.apache.maven.repository.RepositorySystem;
 import org.codehaus.plexus.logging.Logger;
 import org.eclipse.aether.repository.Authentication;
 import org.eclipse.aether.repository.AuthenticationSelector;
@@ -43,6 +46,9 @@ import static java.util.Objects.requireNonNull;
  * that server's {@code <repositoryOrigins>} in settings. Ids with no operator-declared origin keep the
  * previous behaviour unless {@code strict} scope is requested, and a warning naming the target origin
  * is emitted once per id/origin pair.
+ * <p>
+ * The one origin bound without a declaration is where Maven Central is published to, for the id of the
+ * default repository; see {@link #addCentralPublishingOrigins(Map)}.
  *
  * @see DefaultRepositorySystemSessionFactory#MAVEN_REPOSITORY_CREDENTIAL_SCOPE
  */
@@ -63,6 +69,13 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
      * Legacy behavior: credentials are matched by server id only.
      */
     static final String SCOPE_ID = "id";
+
+    /**
+     * The origins Maven Central is published to: the Central Portal, which also receives snapshots, and
+     * its OSSRH Staging API compatibility service.
+     */
+    private static final Set<String> CENTRAL_PUBLISHING_ORIGINS = Collections.unmodifiableSet(new HashSet<>(
+            Arrays.asList("https://central.sonatype.com", "https://ossrh-staging-api.central.sonatype.com")));
 
     private final AuthenticationSelector delegate;
 
@@ -116,6 +129,22 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
         String origin = originOf(url);
         if (id != null && origin != null) {
             declaredOrigins.computeIfAbsent(id, k -> new HashSet<>()).add(origin);
+        }
+    }
+
+    /**
+     * Binds the id of the default repository to the origins Maven Central is published to, in addition to
+     * the origin it is read from: that id is also the server id commonly used for publishing. Nothing is
+     * added unless the built-in location of the default repository is the only origin of that id, so a
+     * mirror, a repository or a server {@code <repositoryOrigins>} giving it another origin takes over.
+     *
+     * @param declaredOrigins all origins collected for the session, including the ones servers declare
+     */
+    static void addCentralPublishingOrigins(Map<String, Set<String>> declaredOrigins) {
+        Set<String> origins = declaredOrigins.get(RepositorySystem.DEFAULT_REMOTE_REPO_ID);
+        if (origins != null
+                && origins.equals(Collections.singleton(originOf(RepositorySystem.DEFAULT_REMOTE_REPO_URL)))) {
+            origins.addAll(CENTRAL_PUBLISHING_ORIGINS);
         }
     }
 
