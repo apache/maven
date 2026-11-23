@@ -34,41 +34,98 @@ import org.apache.maven.api.annotations.Nonnull;
 public interface Event {
 
     /**
+     * {@return the type}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default EventType type() {
+        return getType();
+    }
+
+    /**
      * Gets the type of the event.
      *
      * @return the type of the event, never {@code null}
+     * @deprecated Use {@link #type()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     EventType getType();
+
+    /**
+     * {@return the session}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Session session() {
+        return getSession();
+    }
 
     /**
      * Gets the session from which this event originates.
      *
      * @return the current session, never {@code null}
+     * @deprecated Use {@link #session()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Session getSession();
+
+    /**
+     * {@return the project}
+     *
+     * @since 4.0.0
+     */
+    default Optional<Project> project() {
+        return getProject();
+    }
 
     /**
      * Gets the current project (if any).
      *
      * @return the current project or {@code empty()} if not applicable
+     * @deprecated Use {@link #project()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Optional<Project> getProject();
+
+    /**
+     * {@return the mojoExecution}
+     *
+     * @since 4.0.0
+     */
+    default Optional<MojoExecution> mojoExecution() {
+        return getMojoExecution();
+    }
 
     /**
      * Gets the current mojo execution (if any).
      *
      * @return the current mojo execution or {@code empty()} if not applicable
+     * @deprecated Use {@link #mojoExecution()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Optional<MojoExecution> getMojoExecution();
+
+    /**
+     * {@return the exception}
+     *
+     * @since 4.0.0
+     */
+    default Optional<Exception> exception() {
+        return getException();
+    }
 
     /**
      * Gets the exception that caused the event (if any).
      *
      * @return the exception or {@code empty()} if none
+     * @deprecated Use {@link #exception()} instead.
      */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Optional<Exception> getException();
 }

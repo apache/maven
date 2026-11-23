@@ -56,9 +56,35 @@ import org.apache.maven.api.model.ModelBase;
 @Immutable
 public interface RemoteRepository extends Repository {
 
+    /**
+     * {@return the url}
+     *
+     * @since 4.0.0
+     */
     @Nonnull
+    default String url() {
+        return getUrl();
+    }
+
+    /**
+     * @deprecated Use {@link #url()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getUrl();
 
+    /**
+     * {@return the protocol}
+     *
+     * @since 4.0.0
+     */
     @Nonnull
+    default String protocol() {
+        return getProtocol();
+    }
+
+    /**
+     * @deprecated Use {@link #protocol()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getProtocol();
 }

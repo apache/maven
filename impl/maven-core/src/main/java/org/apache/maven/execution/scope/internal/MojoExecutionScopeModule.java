@@ -19,6 +19,7 @@
 package org.apache.maven.execution.scope.internal;
 
 import com.google.inject.AbstractModule;
+import org.apache.maven.api.logging.Logger;
 import org.apache.maven.api.plugin.Log;
 import org.apache.maven.execution.scope.MojoExecutionScoped;
 import org.apache.maven.plugin.MojoExecution;
@@ -45,6 +46,10 @@ public class MojoExecutionScopeModule extends AbstractModule {
         bind(MojoExecution.class)
                 .toProvider(MojoExecutionScope.seededKeyProvider(MojoExecution.class))
                 .in(scope);
+        bind(Logger.class)
+                .toProvider(MojoExecutionScope.seededKeyProvider(Logger.class))
+                .in(scope);
+        //noinspection deprecation
         bind(Log.class)
                 .toProvider(MojoExecutionScope.seededKeyProvider(Log.class))
                 .in(scope);

@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import static java.util.Objects.requireNonNull;
 
+@Deprecated(since = "4.0.0", forRemoval = true)
 public class DefaultLog implements Log {
     private final Logger logger;
 

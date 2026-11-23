@@ -59,18 +59,42 @@ public interface Repository {
     String CENTRAL_ID = "central";
 
     /**
+     * {@return the id}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String id() {
+        return getId();
+    }
+
+    /**
      * Gets the identifier of this repository.
      *
      * @return the (case-sensitive) identifier, never {@code null}
+     * @deprecated Use {@link #id()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getId();
+
+    /**
+     * {@return the type}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String type() {
+        return getType();
+    }
 
     /**
      * Gets the type of the repository, for example "default".
      *
      * @return the (case-sensitive) type of the repository, never {@code null}
+     * @deprecated Use {@link #type()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getType();
 }

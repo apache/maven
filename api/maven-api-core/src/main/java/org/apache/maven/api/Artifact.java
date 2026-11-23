@@ -46,32 +46,59 @@ public interface Artifact {
      */
     @Nonnull
     default String key() {
-        String c = getClassifier();
-        return getGroupId()
-                + ':'
-                + getArtifactId()
-                + ':'
-                + getExtension()
-                + (c.isEmpty() ? "" : ":" + c)
-                + ':'
-                + getVersion();
+        String c = classifier();
+        return groupId() + ':' + artifactId() + ':' + extension() + (c.isEmpty() ? "" : ":" + c) + ':' + version();
+    }
+
+    /**
+     * {@return the groupId}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String groupId() {
+        return getGroupId();
     }
 
     /**
      * {@return the group identifier of the artifact}
      *
      * @see ArtifactCoordinates#getGroupId()
+     * @deprecated Use {@link #groupId()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getGroupId();
+
+    /**
+     * {@return the artifactId}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String artifactId() {
+        return getArtifactId();
+    }
 
     /**
      * {@return the identifier of the artifact}
      *
      * @see ArtifactCoordinates#getArtifactId()
+     * @deprecated Use {@link #artifactId()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getArtifactId();
+
+    /**
+     * {@return the version}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Version version() {
+        return getVersion();
+    }
 
     /**
      * {@return the version of the artifact}
@@ -81,27 +108,63 @@ public interface Artifact {
      * those keywords are replaced by, for example, the actual timestamp.
      *
      * @see ArtifactCoordinates#getVersionConstraint()
+     * @deprecated Use {@link #version()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Version getVersion();
+
+    /**
+     * {@return the baseVersion}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default Version baseVersion() {
+        return getBaseVersion();
+    }
 
     /**
      * {@return the version or meta-version of the artifact}
      * A meta-version is a version suffixed with the {@code SNAPSHOT} keyword.
      * Meta-versions are represented in a base version by their symbols (e.g., {@code SNAPSHOT}),
      * while they are replaced by, for example, the actual timestamp in the {@linkplain #getVersion() version}.
+     * @deprecated Use {@link #baseVersion()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Version getBaseVersion();
+
+    /**
+     * {@return the classifier}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String classifier() {
+        return getClassifier();
+    }
 
     /**
      * Returns the classifier of the artifact.
      *
      * @return the classifier or an empty string if none, never {@code null}
      * @see ArtifactCoordinates#getClassifier()
+     * @deprecated Use {@link #classifier()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getClassifier();
+
+    /**
+     * {@return the extension}
+     *
+     * @since 4.0.0
+     */
+    @Nonnull
+    default String extension() {
+        return getExtension();
+    }
 
     /**
      * Returns the file extension of the artifact.
@@ -109,8 +172,10 @@ public interface Artifact {
      *
      * @return the file extension or an empty string if none, never {@code null}
      * @see ArtifactCoordinates#getExtension()
+     * @deprecated Use {@link #extension()} instead.
      */
     @Nonnull
+    @Deprecated(since = "4.0.0", forRemoval = true)
     String getExtension();
 
     /**

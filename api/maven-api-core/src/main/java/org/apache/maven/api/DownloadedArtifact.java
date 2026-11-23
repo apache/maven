@@ -22,6 +22,7 @@ import java.nio.file.Path;
 
 import org.apache.maven.api.annotations.Experimental;
 import org.apache.maven.api.annotations.Immutable;
+import org.apache.maven.api.annotations.Nonnull;
 
 /**
  * An {@link Artifact} that has been resolved, i.e. downloaded to the local repository.
@@ -33,7 +34,19 @@ import org.apache.maven.api.annotations.Immutable;
 public interface DownloadedArtifact extends Artifact {
 
     /**
-     * {@return the actual file that has been downloaded in the file system}
+     * {@return the path}
+     *
+     * @since 4.0.0
      */
+    @Nonnull
+    default Path path() {
+        return getPath();
+    }
+
+    /**
+     * {@return the actual file that has been downloaded in the file system}
+     * @deprecated Use {@link #path()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     Path getPath();
 }
