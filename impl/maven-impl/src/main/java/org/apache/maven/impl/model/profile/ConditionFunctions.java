@@ -246,8 +246,10 @@ public class ConditionFunctions {
     }
 
     /**
-     * Checks whether a given executable can be found in the system PATH, or – if an
-     * absolute / relative path is supplied – whether that path itself is an executable file.
+     * Checks whether a given executable can be found in the system {@code PATH}, or whether
+     * an explicit absolute or relative path identifies an executable file.
+     * The executable is never run. For example, {@code executable('docker')} checks for the
+     * Docker client executable, not whether the Docker daemon is running or reachable.
      *
      * <p><strong>Warning:</strong> relying on local system environment variables like PATH makes
      * profile activation non-reproducible. This function should typically be used only in local
@@ -255,15 +257,27 @@ public class ConditionFunctions {
      *
      * <p>Usage examples in a profile {@code <condition>}:
      * <pre>
+     *   executable('docker')
+     *   executable('/usr/bin/docker')
      *   executable('musl-gcc')
      *   executable('x86_64-linux-musl-gcc')
      *   executable('/usr/bin/musl-gcc')
      * </pre>
      *
-     * <p>When a plain name (without path separators) is given the function searches every
-     * directory listed in the {@code PATH} environment variable.  On Windows, the platform
-     * executable extensions ({@code .exe}, {@code .cmd}, {@code .bat}, {@code .com}) are
-     * tried automatically when the name does not already carry an extension.
+     * <p>When a plain name (without path separators) is given, the function searches the
+     * directories listed in the {@code PATH} environment variable. Empty entries are ignored,
+     * not treated as the current directory. Explicit paths are checked directly, without
+     * searching {@code PATH}. On Windows, suffix probing also applies to explicit paths.</p>
+     *
+     * <p>On Windows, Maven normalizes environment variable names to uppercase, so {@code PATH}
+     * and {@code Path} are exposed as {@code env.PATH}. For plain-name searches, the exact
+     * filename is checked first, followed by suffix probing using {@code PATHEXT}. Its
+     * semicolon-separated entries are trimmed and deduplicated case-insensitively, with empty
+     * entries ignored. The fallback {@code .COM;.EXE;.BAT;.CMD} is used only when {@code PATHEXT}
+     * is absent; an explicitly empty {@code PATHEXT} disables suffix probing.</p>
+     *
+     * <p>Git Bash and Cygwin convert their POSIX {@code PATH} when starting native Windows
+     * Java. Lookup uses that native path list, not shell aliases or functions.</p>
      *
      * @param args A list containing a single string argument: the executable name or path
      * @return {@code true} if the executable is found and is a regular, executable file,
