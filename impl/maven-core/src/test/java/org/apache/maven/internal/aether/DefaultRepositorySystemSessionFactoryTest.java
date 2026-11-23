@@ -481,6 +481,22 @@ public class DefaultRepositorySystemSessionFactoryTest {
     }
 
     @Test
+    void deploymentRepositoryOnTheCommandLineDeclaresItsOrigin() throws Exception {
+        MavenExecutionRequest request = requestWithServer(serverWithRepositoryOrigins("deploy-server"));
+        Properties strict = new Properties();
+        strict.put(DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE, "strict");
+        request.setSystemProperties(strict);
+        Properties userProperties = new Properties();
+        userProperties.put("altDeploymentRepository", "deploy-server::https://deploy.example.org/releases/");
+        request.setUserProperties(userProperties);
+
+        AuthenticationSelector selector = authenticationSelector(request);
+
+        assertNotNull(selector.getAuthentication(repository("deploy-server", "https://deploy.example.org/releases/")));
+        assertNull(selector.getAuthentication(repository("deploy-server", "https://evil.example.org/releases/")));
+    }
+
+    @Test
     void malformedServerRepositoryOriginIsIgnored() throws InvalidRepositoryException {
         MavenExecutionRequest request = requestWithServer(serverWithRepositoryOrigins("internal", "not an origin"));
         Properties properties = new Properties();
