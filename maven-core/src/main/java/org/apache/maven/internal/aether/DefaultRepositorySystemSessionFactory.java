@@ -130,6 +130,10 @@ public class DefaultRepositorySystemSessionFactory {
      *     <li>{@code id}: legacy behavior, credentials are matched by server id only.</li>
      * </ul>
      * <p>
+     * A deployment repository given with the {@code altDeploymentRepository},
+     * {@code altReleaseDeploymentRepository} or {@code altSnapshotDeploymentRepository} user property of
+     * the Maven Deploy Plugin counts as declared on the command line.
+     * <p>
      * Repositories declared inside a settings {@code <profile>} only contribute an origin when the profile
      * id is listed in {@code <activeProfiles>}; profiles activated through {@code <activation>} or
      * {@code -P} contribute none, which is what {@code <server><repositoryOrigins>} is for.
@@ -142,6 +146,14 @@ public class DefaultRepositorySystemSessionFactory {
      * @since 3.9.17
      */
     public static final String MAVEN_REPOSITORY_CREDENTIAL_SCOPE = "maven.repository.credentialScope";
+
+    /**
+     * User properties of the Maven Deploy Plugin naming a deployment repository as {@code id::url}; given
+     * on the command line, they declare the origin of that id like a repository in settings does.
+     */
+    private static final String[] ALT_DEPLOYMENT_REPOSITORY_PROPERTIES = {
+        "altDeploymentRepository", "altReleaseDeploymentRepository", "altSnapshotDeploymentRepository"
+    };
 
     private static final String MAVEN_RESOLVER_TRANSPORT_KEY = "maven.resolver.transport";
 
@@ -378,6 +390,11 @@ public class DefaultRepositorySystemSessionFactory {
 
             configProps.put("aether.connector.perms.fileMode." + server.getId(), server.getFilePermissions());
             configProps.put("aether.connector.perms.dirMode." + server.getId(), server.getDirectoryPermissions());
+        }
+        // deployment repositories the operator named on the command line for the Maven Deploy Plugin
+        for (String property : ALT_DEPLOYMENT_REPOSITORY_PROPERTIES) {
+            OriginBoundAuthenticationSelector.addDeploymentRepositoryOrigin(
+                    declaredRepositoryOrigins, request.getUserProperties().getProperty(property));
         }
         OriginBoundAuthenticationSelector.addCentralPublishingOrigins(declaredRepositoryOrigins);
         String credentialScope = ConfigUtils.getString(
