@@ -124,12 +124,12 @@ public interface ArtifactFactory extends Service {
         requireNonNull(request, "request");
         return create(
                 request.getSession(),
-                request.getGroupId(),
-                request.getArtifactId(),
-                request.getVersion(),
-                request.getClassifier(),
-                request.getExtension(),
-                request.getType());
+                request.groupId(),
+                request.artifactId(),
+                request.version(),
+                request.classifier(),
+                request.extension(),
+                request.type());
     }
 
     /**
@@ -145,11 +145,11 @@ public interface ArtifactFactory extends Service {
         requireNonNull(request, "request");
         return createProduced(
                 request.getSession(),
-                request.getGroupId(),
-                request.getArtifactId(),
-                request.getVersion(),
-                request.getClassifier(),
-                request.getExtension(),
-                request.getType());
+                request.groupId(),
+                request.artifactId(),
+                request.version(),
+                request.classifier(),
+                request.extension(),
+                request.type());
     }
 }

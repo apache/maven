@@ -64,7 +64,7 @@ public class DefaultDependency extends AetherDependencyWrapper implements Depend
     }
 
     @Override
-    public boolean isOptional() {
+    public boolean optional() {
         return dependency.isOptional();
     }
 

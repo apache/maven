@@ -151,7 +151,7 @@ class DefaultProjectBuilderTest {
         }
 
         @Override
-        public ModelBuilderRequest getRequest() {
+        public ModelBuilderRequest request() {
             return null;
         }
 

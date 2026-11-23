@@ -57,11 +57,20 @@ public interface ArtifactResolverRequest extends RepositoryAwareRequest {
         return CacheRetention.REQUEST_SCOPED;
     }
 
-    /** @return the coordinates of the artifacts to resolve, never {@code null} */
+    /** Returns the coordinates of the artifacts to resolve, never {@code null}. */
     @Nonnull
-    Collection<? extends ArtifactCoordinates> getCoordinates();
+    Collection<? extends ArtifactCoordinates> coordinates();
 
-    /** @return a new builder instance */
+    /**
+     * @deprecated Use {@link #coordinates()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Collection<? extends ArtifactCoordinates> getCoordinates() {
+        return coordinates();
+    }
+
+    /** Returns a new builder instance. */
     @Nonnull
     static ArtifactResolverRequestBuilder builder() {
         return new ArtifactResolverRequestBuilder();
@@ -161,13 +170,13 @@ public interface ArtifactResolverRequest extends RepositoryAwareRequest {
 
             @Nonnull
             @Override
-            public Collection<? extends ArtifactCoordinates> getCoordinates() {
+            public Collection<? extends ArtifactCoordinates> coordinates() {
                 return coordinates;
             }
 
             @Nullable
             @Override
-            public List<RemoteRepository> getRepositories() {
+            public List<RemoteRepository> repositories() {
                 return repositories;
             }
 

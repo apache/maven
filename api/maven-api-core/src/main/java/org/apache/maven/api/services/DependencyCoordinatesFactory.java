@@ -219,22 +219,22 @@ public interface DependencyCoordinatesFactory extends Service {
     @Nonnull
     default DependencyCoordinates create(@Nonnull DependencyCoordinatesFactoryRequest request) {
         requireNonNull(request, "request");
-        if (request.getCoordinatesString() != null) {
+        if (request.coordinatesString() != null) {
             return create(
                     request.getSession(),
-                    request.getCoordinatesString(),
+                    request.coordinatesString(),
                     request.getScope(),
                     request.isOptional(),
                     request.getExclusions());
         }
         return create(
                 request.getSession(),
-                request.getGroupId(),
-                request.getArtifactId(),
-                request.getVersion(),
-                request.getClassifier(),
-                request.getExtension(),
-                request.getType(),
+                request.groupId(),
+                request.artifactId(),
+                request.version(),
+                request.classifier(),
+                request.extension(),
+                request.type(),
                 request.getScope(),
                 request.isOptional(),
                 request.getExclusions());

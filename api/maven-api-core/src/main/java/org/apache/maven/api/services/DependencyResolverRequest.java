@@ -28,7 +28,6 @@ import java.util.function.Predicate;
 
 import org.apache.maven.api.Artifact;
 import org.apache.maven.api.DependencyCoordinates;
-import org.apache.maven.api.JavaPathType;
 import org.apache.maven.api.PathScope;
 import org.apache.maven.api.PathType;
 import org.apache.maven.api.Project;
@@ -78,47 +77,128 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
         RESOLVE
     }
 
-    /** @return the type of request (collect, flatten, or resolve) */
+    /** Returns the type of request (collect, flatten, or resolve). */
     @Nonnull
-    RequestType getRequestType();
+    RequestType requestType();
 
-    /** @return the project whose dependencies should be resolved, or empty if not project-based */
+    /**
+     * @deprecated Use {@link #requestType()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    Optional<Project> getProject();
+    default RequestType getRequestType() {
+        return requestType();
+    }
 
-    /** @return the root artifact for the dependency graph, or empty */
+    /** Returns the project whose dependencies should be resolved, or empty if not project-based. */
     @Nonnull
-    Optional<Artifact> getRootArtifact();
+    Optional<Project> project();
 
-    /** @return the root dependency coordinates, or empty */
+    /**
+     * @deprecated Use {@link #project()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    Optional<DependencyCoordinates> getRoot();
+    default Optional<Project> getProject() {
+        return project();
+    }
 
-    /** @return the direct dependencies, never {@code null} */
+    /** Returns the root artifact for the dependency graph, or empty. */
     @Nonnull
-    Collection<DependencyCoordinates> getDependencies();
+    Optional<Artifact> rootArtifact();
 
-    /** @return the managed dependencies for version and scope management, never {@code null} */
+    /**
+     * @deprecated Use {@link #rootArtifact()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    Collection<DependencyCoordinates> getManagedDependencies();
+    default Optional<Artifact> getRootArtifact() {
+        return rootArtifact();
+    }
 
-    /** @return whether to produce a verbose dependency graph */
-    boolean getVerbose();
-
-    /** @return the path scope for dependency resolution */
+    /** Returns the root dependency coordinates, or empty. */
     @Nonnull
-    PathScope getPathScope();
+    Optional<DependencyCoordinates> root();
+
+    /**
+     * @deprecated Use {@link #root()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Optional<DependencyCoordinates> getRoot() {
+        return root();
+    }
+
+    /** Returns the direct dependencies, never {@code null}. */
+    @Nonnull
+    Collection<DependencyCoordinates> dependencies();
+
+    /**
+     * @deprecated Use {@link #dependencies()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Collection<DependencyCoordinates> getDependencies() {
+        return dependencies();
+    }
+
+    /** Returns the managed dependencies for version and scope management, never {@code null}. */
+    @Nonnull
+    Collection<DependencyCoordinates> managedDependencies();
+
+    /**
+     * @deprecated Use {@link #managedDependencies()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Collection<DependencyCoordinates> getManagedDependencies() {
+        return managedDependencies();
+    }
+
+    /** Returns whether to produce a verbose dependency graph. */
+    boolean verbose();
+
+    /**
+     * @deprecated Use {@link #verbose()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default boolean getVerbose() {
+        return verbose();
+    }
+
+    /** Returns the path scope for dependency resolution. */
+    @Nonnull
+    PathScope pathScope();
+
+    /**
+     * @deprecated Use {@link #pathScope()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default PathScope getPathScope() {
+        return pathScope();
+    }
 
     /**
      * Returns a filter for the types of path (class-path, module-path, …) accepted by the tool.
      * For example, if a Java tools accepts only class-path elements, then the filter should return
-     * {@code true} for {@link JavaPathType#CLASSES} and {@code false} for {@link JavaPathType#MODULES}.
+     * {@code true} for {@link org.apache.maven.api.JavaPathType#CLASSES} and {@code false} for
+     * {@link org.apache.maven.api.JavaPathType#MODULES}.
      * If no filter is explicitly set, then the default is a filter accepting everything.
      *
      * @return a filter for the types of path (class-path, module-path, …) accepted by the tool
      */
     @Nullable
-    Predicate<PathType> getPathTypeFilter();
+    Predicate<PathType> pathTypeFilter();
+
+    /**
+     * @deprecated Use {@link #pathTypeFilter()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default Predicate<PathType> getPathTypeFilter() {
+        return pathTypeFilter();
+    }
 
     /**
      * Returns the version of the platform where the code will be executed.
@@ -140,9 +220,16 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
      * @see SourceRoot#targetVersion()
      */
     @Nullable
-    Version getTargetVersion();
+    Version targetVersion();
 
-    /** @return a new builder instance */
+    /** @deprecated Use {@link #targetVersion()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default Version getTargetVersion() {
+        return targetVersion();
+    }
+
+    /** Returns a new builder instance. */
     @Nonnull
     static DependencyResolverRequestBuilder builder() {
         return new DependencyResolverRequestBuilder();
@@ -634,62 +721,62 @@ public interface DependencyResolverRequest extends RepositoryAwareRequest {
 
             @Nonnull
             @Override
-            public RequestType getRequestType() {
+            public RequestType requestType() {
                 return requestType;
             }
 
             @Nonnull
             @Override
-            public Optional<Project> getProject() {
+            public Optional<Project> project() {
                 return Optional.ofNullable(project);
             }
 
             @Nonnull
             @Override
-            public Optional<Artifact> getRootArtifact() {
+            public Optional<Artifact> rootArtifact() {
                 return Optional.ofNullable(rootArtifact);
             }
 
             @Nonnull
             @Override
-            public Optional<DependencyCoordinates> getRoot() {
+            public Optional<DependencyCoordinates> root() {
                 return Optional.ofNullable(root);
             }
 
             @Nonnull
             @Override
-            public Collection<DependencyCoordinates> getDependencies() {
+            public Collection<DependencyCoordinates> dependencies() {
                 return dependencies;
             }
 
             @Nonnull
             @Override
-            public Collection<DependencyCoordinates> getManagedDependencies() {
+            public Collection<DependencyCoordinates> managedDependencies() {
                 return managedDependencies;
             }
 
             @Override
-            public boolean getVerbose() {
+            public boolean verbose() {
                 return verbose;
             }
 
             @Override
-            public PathScope getPathScope() {
+            public PathScope pathScope() {
                 return pathScope;
             }
 
             @Override
-            public Predicate<PathType> getPathTypeFilter() {
+            public Predicate<PathType> pathTypeFilter() {
                 return pathTypeFilter;
             }
 
             @Override
-            public Version getTargetVersion() {
+            public Version targetVersion() {
                 return targetVersion;
             }
 
             @Override
-            public List<RemoteRepository> getRepositories() {
+            public List<RemoteRepository> repositories() {
                 return repositories;
             }
 

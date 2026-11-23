@@ -44,17 +44,17 @@ public interface ArtifactCoordinatesFactory extends Service {
     @Deprecated
     @Nonnull
     default ArtifactCoordinates create(@Nonnull ArtifactCoordinatesFactoryRequest request) {
-        if (request.getCoordinatesString() != null) {
-            return create(request.getSession(), request.getCoordinatesString());
+        if (request.coordinatesString() != null) {
+            return create(request.getSession(), request.coordinatesString());
         }
         return create(
                 request.getSession(),
-                request.getGroupId(),
-                request.getArtifactId(),
-                request.getVersion(),
-                request.getClassifier(),
-                request.getExtension(),
-                request.getType());
+                request.groupId(),
+                request.artifactId(),
+                request.version(),
+                request.classifier(),
+                request.extension(),
+                request.type());
     }
 
     /**

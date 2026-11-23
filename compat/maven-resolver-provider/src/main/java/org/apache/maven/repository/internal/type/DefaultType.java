@@ -81,22 +81,22 @@ public class DefaultType implements Type {
     }
 
     @Override
-    public Language getLanguage() {
+    public Language language() {
         return language;
     }
 
     @Override
-    public String getExtension() {
+    public String extension() {
         return extension;
     }
 
     @Override
-    public String getClassifier() {
+    public String classifier() {
         return classifier;
     }
 
     @Override
-    public boolean isIncludesDependencies() {
+    public boolean includesDependencies() {
         return this.includesDependencies;
     }
 
@@ -105,7 +105,7 @@ public class DefaultType implements Type {
     }
 
     @Override
-    public Set<PathType> getPathTypes() {
+    public Set<PathType> pathTypes() {
         return this.pathTypes;
     }
 
@@ -127,12 +127,12 @@ public class DefaultType implements Type {
 
         @Override
         public String getExtension() {
-            return type.getExtension();
+            return type.extension();
         }
 
         @Override
         public String getClassifier() {
-            return type.getClassifier() == null ? "" : type.getClassifier();
+            return type.classifier() == null ? "" : type.classifier();
         }
 
         @Override

@@ -100,7 +100,14 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
      * @return the model source
      */
     @Nonnull
-    ModelSource getSource();
+    ModelSource source();
+
+    /** @deprecated Use {@link #source()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default ModelSource getSource() {
+        return source();
+    }
 
     /**
      * Gets the type of build request.
@@ -108,53 +115,122 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
      * @return the request type
      */
     @Nonnull
-    RequestType getRequestType();
+    RequestType requestType();
+
+    /**
+     * @deprecated Use {@link #requestType()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default RequestType getRequestType() {
+        return requestType();
+    }
 
     /**
      * Returns whether input location tracking is enabled for the model.
      *
      * @return {@code true} if location tracking is enabled
      */
-    boolean isLocationTracking();
+    boolean locationTracking();
+
+    /**
+     * @deprecated Use {@link #locationTracking()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default boolean isLocationTracking() {
+        return locationTracking();
+    }
 
     /**
      * Returns whether the build should recursively process sub-projects.
      *
      * @return {@code true} if recursive processing is enabled
      */
-    boolean isRecursive();
+    boolean recursive();
+
+    /**
+     * @deprecated Use {@link #recursive()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default boolean isRecursive() {
+        return recursive();
+    }
 
     /**
      * Defines external profiles that may be activated for the given model.
      * Those are external profiles usually defined in {@link org.apache.maven.api.settings.Settings#getProfiles()}.
      */
     @Nonnull
-    Collection<Profile> getProfiles();
+    Collection<Profile> profiles();
+
+    /**
+     * @deprecated Use {@link #profiles()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Collection<Profile> getProfiles() {
+        return profiles();
+    }
 
     /**
      * List of profile ids that have been explicitly activated by the user.
      */
     @Nonnull
-    List<String> getActiveProfileIds();
+    List<String> activeProfileIds();
+
+    /**
+     * @deprecated Use {@link #activeProfileIds()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default List<String> getActiveProfileIds() {
+        return activeProfileIds();
+    }
 
     /**
      * List of profile ids that have been explicitly deactivated by the user.
      */
     @Nonnull
-    List<String> getInactiveProfileIds();
+    List<String> inactiveProfileIds();
+
+    /**
+     * @deprecated Use {@link #inactiveProfileIds()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default List<String> getInactiveProfileIds() {
+        return inactiveProfileIds();
+    }
 
     /**
      * Provides a map of system properties.
      */
     @Nonnull
-    Map<String, String> getSystemProperties();
+    Map<String, String> systemProperties();
+
+    /**
+     * @deprecated Use {@link #systemProperties()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Map<String, String> getSystemProperties() {
+        return systemProperties();
+    }
 
     /**
      * Provides a map of user properties.
-     * User properties
      */
     @Nonnull
-    Map<String, String> getUserProperties();
+    Map<String, String> userProperties();
+
+    /**
+     * @deprecated Use {@link #userProperties()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Map<String, String> getUserProperties() {
+        return userProperties();
+    }
 
     /**
      * Gets the strategy for merging repositories from the POM with those from the request.
@@ -162,7 +238,16 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
      * @return the repository merging strategy
      */
     @Nonnull
-    RepositoryMerging getRepositoryMerging();
+    RepositoryMerging repositoryMerging();
+
+    /**
+     * @deprecated Use {@link #repositoryMerging()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default RepositoryMerging getRepositoryMerging() {
+        return repositoryMerging();
+    }
 
     /**
      * Gets the model transformer used to inject lifecycle bindings.
@@ -170,7 +255,16 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
      * @return the lifecycle bindings injector, or {@code null} if none
      */
     @Nullable
-    ModelTransformer getLifecycleBindingsInjector();
+    ModelTransformer lifecycleBindingsInjector();
+
+    /**
+     * @deprecated Use {@link #lifecycleBindingsInjector()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default ModelTransformer getLifecycleBindingsInjector() {
+        return lifecycleBindingsInjector();
+    }
 
     /**
      * Creates a new request by copying an existing request and replacing the source.
@@ -257,20 +351,20 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
         ModelBuilderRequestBuilder() {}
 
         ModelBuilderRequestBuilder(ModelBuilderRequest request) {
-            this.session = request.getSession();
-            this.trace = request.getTrace();
-            this.requestType = request.getRequestType();
-            this.locationTracking = request.isLocationTracking();
-            this.recursive = request.isRecursive();
-            this.source = request.getSource();
-            this.profiles = request.getProfiles();
-            this.activeProfileIds = request.getActiveProfileIds();
-            this.inactiveProfileIds = request.getInactiveProfileIds();
-            this.systemProperties = request.getSystemProperties();
-            this.userProperties = request.getUserProperties();
-            this.repositoryMerging = request.getRepositoryMerging();
-            this.repositories = request.getRepositories();
-            this.lifecycleBindingsInjector = request.getLifecycleBindingsInjector();
+            this.session = request.session();
+            this.trace = request.trace();
+            this.requestType = request.requestType();
+            this.locationTracking = request.locationTracking();
+            this.recursive = request.recursive();
+            this.source = request.source();
+            this.profiles = request.profiles();
+            this.activeProfileIds = request.activeProfileIds();
+            this.inactiveProfileIds = request.inactiveProfileIds();
+            this.systemProperties = request.systemProperties();
+            this.userProperties = request.userProperties();
+            this.repositoryMerging = request.repositoryMerging();
+            this.repositories = request.repositories();
+            this.lifecycleBindingsInjector = request.lifecycleBindingsInjector();
         }
 
         public ModelBuilderRequestBuilder session(Session session) {
@@ -408,63 +502,63 @@ public interface ModelBuilderRequest extends RepositoryAwareRequest {
             }
 
             @Override
-            public RequestType getRequestType() {
+            public RequestType requestType() {
                 return requestType;
             }
 
             @Override
-            public boolean isLocationTracking() {
+            public boolean locationTracking() {
                 return locationTracking;
             }
 
             @Override
-            public boolean isRecursive() {
+            public boolean recursive() {
                 return recursive;
             }
 
             @Nonnull
             @Override
-            public ModelSource getSource() {
+            public ModelSource source() {
                 return source;
             }
 
             @Override
-            public Collection<Profile> getProfiles() {
+            public Collection<Profile> profiles() {
                 return profiles;
             }
 
             @Override
-            public List<String> getActiveProfileIds() {
+            public List<String> activeProfileIds() {
                 return activeProfileIds;
             }
 
             @Override
-            public List<String> getInactiveProfileIds() {
+            public List<String> inactiveProfileIds() {
                 return inactiveProfileIds;
             }
 
             @Override
-            public Map<String, String> getSystemProperties() {
+            public Map<String, String> systemProperties() {
                 return systemProperties;
             }
 
             @Override
-            public Map<String, String> getUserProperties() {
+            public Map<String, String> userProperties() {
                 return userProperties;
             }
 
             @Override
-            public RepositoryMerging getRepositoryMerging() {
+            public RepositoryMerging repositoryMerging() {
                 return repositoryMerging;
             }
 
             @Override
-            public List<RemoteRepository> getRepositories() {
+            public List<RemoteRepository> repositories() {
                 return repositories;
             }
 
             @Override
-            public ModelTransformer getLifecycleBindingsInjector() {
+            public ModelTransformer lifecycleBindingsInjector() {
                 return lifecycleBindingsInjector;
             }
 

@@ -55,7 +55,7 @@ class DefaultModelBuilderResult implements ModelBuilderResult {
     }
 
     @Override
-    public ModelBuilderRequest getRequest() {
+    public ModelBuilderRequest request() {
         return request;
     }
 
