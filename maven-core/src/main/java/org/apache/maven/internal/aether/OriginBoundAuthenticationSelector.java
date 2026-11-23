@@ -66,6 +66,12 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
     static final String SCOPE_STRICT = "strict";
 
     /**
+     * Credentials are matched by server id only, and a warning is emitted wherever {@link #SCOPE_ORIGIN}
+     * would not use them.
+     */
+    static final String SCOPE_WARN = "warn";
+
+    /**
      * Legacy behavior: credentials are matched by server id only.
      */
     static final String SCOPE_ID = "id";
@@ -83,15 +89,22 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
 
     private final boolean strict;
 
+    private final boolean warnOnly;
+
     private final Logger logger;
 
     private final Set<String> reported = ConcurrentHashMap.newKeySet();
 
     private OriginBoundAuthenticationSelector(
-            AuthenticationSelector delegate, Map<String, Set<String>> declaredOrigins, boolean strict, Logger logger) {
+            AuthenticationSelector delegate,
+            Map<String, Set<String>> declaredOrigins,
+            boolean strict,
+            boolean warnOnly,
+            Logger logger) {
         this.delegate = requireNonNull(delegate, "delegate");
         this.declaredOrigins = requireNonNull(declaredOrigins, "declaredOrigins");
         this.strict = strict;
+        this.warnOnly = warnOnly;
         this.logger = requireNonNull(logger, "logger");
     }
 
@@ -99,7 +112,8 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
      * Wraps the given selector according to the requested credential scope.
      *
      * @param delegate the selector holding the actual credentials, keyed by server id
-     * @param credentialScope one of {@link #SCOPE_ORIGIN}, {@link #SCOPE_STRICT} or {@link #SCOPE_ID}
+     * @param credentialScope one of {@link #SCOPE_WARN}, {@link #SCOPE_ORIGIN}, {@link #SCOPE_STRICT} or
+     *     {@link #SCOPE_ID}
      * @param declaredOrigins origins of operator-declared repositories and mirrors, keyed by id
      * @param logger logger used to report id/origin mismatches
      * @return the delegate itself for {@link #SCOPE_ID}, an origin-bound wrapper otherwise
@@ -111,13 +125,20 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
             Logger logger) {
         if (SCOPE_ID.equals(credentialScope)) {
             return delegate;
-        } else if (SCOPE_ORIGIN.equals(credentialScope) || SCOPE_STRICT.equals(credentialScope)) {
+        } else if (SCOPE_WARN.equals(credentialScope)
+                || SCOPE_ORIGIN.equals(credentialScope)
+                || SCOPE_STRICT.equals(credentialScope)) {
             return new OriginBoundAuthenticationSelector(
-                    delegate, declaredOrigins, SCOPE_STRICT.equals(credentialScope), logger);
+                    delegate,
+                    declaredOrigins,
+                    SCOPE_STRICT.equals(credentialScope),
+                    SCOPE_WARN.equals(credentialScope),
+                    logger);
         } else {
             throw new IllegalArgumentException("Unknown value '" + credentialScope + "' for "
                     + DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE
-                    + ". Supported values are: " + SCOPE_ORIGIN + ", " + SCOPE_STRICT + ", " + SCOPE_ID);
+                    + ". Supported values are: " + SCOPE_WARN + ", " + SCOPE_ORIGIN + ", " + SCOPE_STRICT + ", "
+                    + SCOPE_ID);
         }
     }
 
@@ -161,6 +182,19 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
             if (origin != null && origins.contains(origin)) {
                 return auth;
             }
+            if (warnOnly) {
+                warnOnce(
+                        id,
+                        origin,
+                        "Using credentials of server '" + id + "' for repository " + repository.getUrl()
+                                + ", although the origins declared for this id are " + origins
+                                + ". Maven 3.10 and later do not use them there: add " + originHint(origin)
+                                + " to <repositoryOrigins> of that server in settings if these credentials"
+                                + " belong there, or set "
+                                + DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE + "="
+                                + SCOPE_ORIGIN + " to apply that behavior now.");
+                return auth;
+            }
             warnOnce(
                     id,
                     origin,
@@ -172,6 +206,9 @@ class OriginBoundAuthenticationSelector implements AuthenticationSelector {
                             + DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE + "="
                             + SCOPE_ID + " to restore legacy id-only credential matching.");
             return null;
+        }
+        if (warnOnly) {
+            return auth;
         }
         if (strict) {
             warnOnce(

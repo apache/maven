@@ -172,11 +172,25 @@ class DefaultRepositorySystemSessionFactoryTest {
                 repository("internal", "https://central.sonatype.com/repository/maven-snapshots/")));
     }
 
+    @Test
+    void credentialsAreMatchedByIdOnlyByDefault() throws Exception {
+        MavenExecutionRequest request =
+                requestWithServer(serverWithRepositoryOrigins("internal", "https://repo.example.org"));
+        request.setSystemProperties(new Properties());
+
+        AuthenticationSelector selector = authenticationSelector(request);
+
+        assertNotNull(selector.getAuthentication(repository("internal", "https://repo.example.org/releases/")));
+        assertNotNull(selector.getAuthentication(repository("internal", "https://other.example.org/releases/")));
+    }
+
     private static Properties strictCredentialScope() {
+        return credentialScope(OriginBoundAuthenticationSelector.SCOPE_STRICT);
+    }
+
+    private static Properties credentialScope(String scope) {
         Properties properties = new Properties();
-        properties.put(
-                DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE,
-                OriginBoundAuthenticationSelector.SCOPE_STRICT);
+        properties.put(DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE, scope);
         return properties;
     }
 
@@ -193,6 +207,8 @@ class DefaultRepositorySystemSessionFactoryTest {
         MavenExecutionRequest request = new DefaultMavenExecutionRequest();
         request.setLocalRepository(getLocalRepository());
         request.setServers(new ArrayList<>(Collections.singletonList(server)));
+        // the scoping these tests cover is not the default of this Maven line
+        request.setSystemProperties(credentialScope(OriginBoundAuthenticationSelector.SCOPE_ORIGIN));
         return request;
     }
 

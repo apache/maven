@@ -115,7 +115,10 @@ public class DefaultRepositorySystemSessionFactory {
     /**
      * User property selecting how server credentials configured in settings are scoped to repositories:
      * <ul>
-     *     <li>{@code origin} (default): credentials for a server id are only used with a repository whose
+     *     <li>{@code warn} (default): credentials are matched by server id only, as in earlier Maven 3.9
+     *     releases, and a warning is emitted wherever {@code origin} would not use them. Maven 3.10 and later
+     *     default to {@code origin}.</li>
+     *     <li>{@code origin}: credentials for a server id are only used with a repository whose
      *     origin (protocol, host and port) matches an origin declared for the same id, either by a
      *     repository or mirror declared with that id in settings or on the command line, or by the
      *     {@code <repositoryOrigins>} of that server in settings. For server ids without any such declared
@@ -136,7 +139,7 @@ public class DefaultRepositorySystemSessionFactory {
      * other origin, by a mirror or a repository with that id, by {@code <repositoryOrigins>} of that server
      * or by a default repository location other than the built-in one.
      *
-     * @since 3.9.10
+     * @since 3.9.17
      */
     public static final String MAVEN_REPOSITORY_CREDENTIAL_SCOPE = "maven.repository.credentialScope";
 
@@ -378,7 +381,7 @@ public class DefaultRepositorySystemSessionFactory {
         }
         OriginBoundAuthenticationSelector.addCentralPublishingOrigins(declaredRepositoryOrigins);
         String credentialScope = ConfigUtils.getString(
-                configProps, OriginBoundAuthenticationSelector.SCOPE_ORIGIN, MAVEN_REPOSITORY_CREDENTIAL_SCOPE);
+                configProps, OriginBoundAuthenticationSelector.SCOPE_WARN, MAVEN_REPOSITORY_CREDENTIAL_SCOPE);
         AuthenticationSelector effectiveAuthSelector = OriginBoundAuthenticationSelector.wrap(
                 authSelector, credentialScope, declaredRepositoryOrigins, logger);
         session.setAuthenticationSelector(effectiveAuthSelector);

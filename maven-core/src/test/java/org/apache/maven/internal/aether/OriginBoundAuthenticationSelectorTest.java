@@ -67,6 +67,19 @@ class OriginBoundAuthenticationSelectorTest {
     }
 
     @Test
+    void warnScopeServesCredentialsWhereOriginScopeWouldNot() {
+        AuthenticationSelector selector = OriginBoundAuthenticationSelector.wrap(
+                serverCredentials("releases", "deploy-server"),
+                OriginBoundAuthenticationSelector.SCOPE_WARN,
+                declared("releases", "https://repo.example.org/releases/"),
+                LOGGER);
+
+        assertNotNull(selector.getAuthentication(repo("releases", "https://repo.example.org/releases/")));
+        assertNotNull(selector.getAuthentication(repo("releases", "https://other.example.org/m2/")));
+        assertNotNull(selector.getAuthentication(repo("deploy-server", "https://deploy.example.org/releases/")));
+    }
+
+    @Test
     void credentialsServedForDeclaredOrigin() {
         AuthenticationSelector selector = OriginBoundAuthenticationSelector.wrap(
                 serverCredentials("releases"),
