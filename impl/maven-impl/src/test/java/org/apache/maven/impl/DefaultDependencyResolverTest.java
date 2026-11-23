@@ -18,6 +18,7 @@
  */
 package org.apache.maven.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.concurrent.atomic.AtomicReference;
@@ -25,6 +26,7 @@ import java.util.function.Function;
 
 import org.apache.maven.api.DependencyCoordinates;
 import org.apache.maven.api.Node;
+import org.apache.maven.api.PathScope;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.services.DependencyResolverRequest;
 import org.apache.maven.api.services.DependencyResolverResult;
@@ -36,6 +38,8 @@ import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.collection.CollectResult;
 import org.eclipse.aether.graph.DefaultDependencyNode;
 import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyFilter;
+import org.eclipse.aether.graph.DependencyNode;
 import org.eclipse.aether.graph.Exclusion;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -216,6 +220,71 @@ class DefaultDependencyResolverTest {
 
         assertEquals("1.2.3", result.get(0).getArtifact().getVersion());
         assertSame(unmatched, result.get(1));
+    }
+
+    @Test
+    void flattenKeepsSystemScopeOnCompileAndTestPaths() throws Exception {
+        // main-runtime deliberately excludes system; main-runtimePlusSystem is a separate resolution scope.
+        InternalSession session = mock(InternalSession.class);
+        RepositorySystem repositorySystem = mock(RepositorySystem.class);
+        RepositorySystemSession repositorySession = mock(RepositorySystemSession.class);
+        when(session.getRepositorySystem()).thenReturn(repositorySystem);
+        when(session.getSession()).thenReturn(repositorySession);
+
+        DependencyNode root = scopedNode("root", "compile");
+        List<DependencyNode> children = List.of(
+                scopedNode("syslib", "system"),
+                scopedNode("compilelib", "compile"),
+                scopedNode("runtimelib", "runtime"));
+        Node rootNode = new DefaultNode(session, root, false);
+        when(repositorySystem.flattenDependencyNodes(eq(repositorySession), eq(root), any(DependencyFilter.class)))
+                .thenAnswer(invocation -> {
+                    DependencyFilter filter = invocation.getArgument(2);
+                    List<DependencyNode> kept = new ArrayList<>();
+                    for (DependencyNode child : children) {
+                        if (filter.accept(child, List.of(root))) {
+                            kept.add(child);
+                        }
+                    }
+                    return kept;
+                });
+        List<String> scopes = new ArrayList<>();
+        when(session.getNode(any(DependencyNode.class))).thenAnswer(invocation -> {
+            DependencyNode dependencyNode = invocation.getArgument(0);
+            scopes.add(dependencyNode.getDependency().getScope());
+            return mock(Node.class);
+        });
+
+        DefaultDependencyResolver resolver = new DefaultDependencyResolver();
+        assertEquals(
+                List.of("system", "compile"),
+                flattenedScopes(resolver, session, rootNode, PathScope.MAIN_COMPILE, scopes));
+        assertEquals(
+                List.of("system", "compile"),
+                flattenedScopes(resolver, session, rootNode, PathScope.TEST_COMPILE, scopes));
+        assertEquals(
+                List.of("system", "compile", "runtime"),
+                flattenedScopes(resolver, session, rootNode, PathScope.TEST_RUNTIME, scopes));
+        assertEquals(
+                List.of("compile", "runtime"),
+                flattenedScopes(resolver, session, rootNode, PathScope.MAIN_RUNTIME, scopes));
+    }
+
+    private static List<String> flattenedScopes(
+            DefaultDependencyResolver resolver,
+            InternalSession session,
+            Node rootNode,
+            PathScope pathScope,
+            List<String> scopes)
+            throws Exception {
+        scopes.clear();
+        resolver.flatten(session, rootNode, pathScope);
+        return List.copyOf(scopes);
+    }
+
+    private static DependencyNode scopedNode(String artifactId, String scope) {
+        return new DefaultDependencyNode(
+                new Dependency(new DefaultArtifact("org.example:" + artifactId + ":jar:1"), scope));
     }
 
     private static void trackTrace(InternalSession session, RequestTrace initial) {
