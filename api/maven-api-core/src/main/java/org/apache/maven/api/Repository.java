@@ -64,9 +64,7 @@ public interface Repository {
      * @since 4.0.0
      */
     @Nonnull
-    default String id() {
-        return getId();
-    }
+    String id();
 
     /**
      * Gets the identifier of this repository.
@@ -76,7 +74,9 @@ public interface Repository {
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
-    String getId();
+    default String getId() {
+        return id();
+    }
 
     /**
      * {@return the type}
@@ -84,9 +84,7 @@ public interface Repository {
      * @since 4.0.0
      */
     @Nonnull
-    default String type() {
-        return getType();
-    }
+    String type();
 
     /**
      * Gets the type of the repository, for example "default".
@@ -96,5 +94,7 @@ public interface Repository {
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
-    String getType();
+    default String getType() {
+        return type();
+    }
 }

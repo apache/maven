@@ -28,7 +28,7 @@ public class CIDetectorHelperRunner {
         if (detect.isEmpty()) {
             System.out.print("NONE;");
         } else {
-            detect.forEach(d -> System.out.print(d.name() + (d.isVerbose() ? "+VERBOSE" : "") + ";"));
+            detect.forEach(d -> System.out.print(d.name() + (d.verbose() ? "+VERBOSE" : "") + ";"));
         }
     }
 }

@@ -38,17 +38,59 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface ArtifactFactoryRequest extends Request<Session> {
 
-    String getGroupId();
+    /** Returns the group identifier. */
+    String groupId();
 
-    String getArtifactId();
+    /** @deprecated Use {@link #groupId()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getGroupId() {
+        return groupId();
+    }
 
-    String getVersion();
+    /** Returns the artifact identifier. */
+    String artifactId();
 
-    String getClassifier();
+    /** @deprecated Use {@link #artifactId()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getArtifactId() {
+        return artifactId();
+    }
 
-    String getExtension();
+    /** Returns the version. */
+    String version();
 
-    String getType();
+    /** @deprecated Use {@link #version()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getVersion() {
+        return version();
+    }
+
+    /** Returns the classifier, may be {@code null}. */
+    String classifier();
+
+    /** @deprecated Use {@link #classifier()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getClassifier() {
+        return classifier();
+    }
+
+    /** Returns the file extension, may be {@code null}. */
+    String extension();
+
+    /** @deprecated Use {@link #extension()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getExtension() {
+        return extension();
+    }
+
+    /** Returns the artifact type, may be {@code null}. */
+    String type();
+
+    /** @deprecated Use {@link #type()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getType() {
+        return type();
+    }
 
     static ArtifactFactoryRequest build(
             Session session, String groupId, String artifactId, String version, String extension) {
@@ -80,6 +122,8 @@ public interface ArtifactFactoryRequest extends Request<Session> {
                 .build();
     }
 
+    /** Returns a new builder instance. */
+    @Deprecated
     static ArtifactFactoryRequestBuilder builder() {
         return new ArtifactFactoryRequestBuilder();
     }
@@ -171,32 +215,32 @@ public interface ArtifactFactoryRequest extends Request<Session> {
             }
 
             @Override
-            public String getGroupId() {
+            public String groupId() {
                 return groupId;
             }
 
             @Override
-            public String getArtifactId() {
+            public String artifactId() {
                 return artifactId;
             }
 
             @Override
-            public String getVersion() {
+            public String version() {
                 return version;
             }
 
             @Override
-            public String getClassifier() {
+            public String classifier() {
                 return classifier;
             }
 
             @Override
-            public String getExtension() {
+            public String extension() {
                 return extension;
             }
 
             @Override
-            public String getType() {
+            public String type() {
                 return type;
             }
 

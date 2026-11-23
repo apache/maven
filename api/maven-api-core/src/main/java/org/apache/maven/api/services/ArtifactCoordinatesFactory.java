@@ -41,7 +41,19 @@ public interface ArtifactCoordinatesFactory extends Service {
      * @throws IllegalArgumentException if {@code request} is null or {@code request.session} is null or invalid
      */
     @Nonnull
-    ArtifactCoordinates create(@Nonnull ArtifactCoordinatesFactoryRequest request);
+    default ArtifactCoordinates create(@Nonnull ArtifactCoordinatesFactoryRequest request) {
+        if (request.coordinatesString() != null) {
+            return create(request.getSession(), request.coordinatesString());
+        }
+        return create(
+                request.getSession(),
+                request.groupId(),
+                request.artifactId(),
+                request.version(),
+                request.classifier(),
+                request.extension(),
+                request.type());
+    }
 
     /**
      * Creates coordinates out of string that is formatted like:

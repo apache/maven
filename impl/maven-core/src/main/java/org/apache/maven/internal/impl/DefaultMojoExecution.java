@@ -55,7 +55,7 @@ public class DefaultMojoExecution implements MojoExecution {
     }
 
     @Override
-    public Plugin getPlugin() {
+    public Plugin plugin() {
         return new Plugin() {
             @Override
             public org.apache.maven.api.model.Plugin getModel() {
@@ -107,37 +107,71 @@ public class DefaultMojoExecution implements MojoExecution {
     }
 
     @Override
-    public PluginExecution getModel() {
-        return delegate.getPlugin().getExecutions().stream()
-                .filter(pe -> Objects.equals(pe.getId(), getExecutionId()))
-                .findFirst()
-                .map(org.apache.maven.model.PluginExecution::getDelegate)
-                .orElse(null);
+    public Plugin getPlugin() {
+        return plugin();
     }
 
     @Override
-    public MojoDescriptor getDescriptor() {
+    public Optional<PluginExecution> model() {
+        return delegate.getPlugin().getExecutions().stream()
+                .filter(pe -> Objects.equals(pe.getId(), delegate.getExecutionId()))
+                .findFirst()
+                .map(org.apache.maven.model.PluginExecution::getDelegate);
+    }
+
+    @Override
+    public PluginExecution getModel() {
+        return model().orElse(null);
+    }
+
+    @Override
+    public MojoDescriptor descriptor() {
         return delegate.getMojoDescriptor().getMojoDescriptorV4();
     }
 
     @Override
+    public MojoDescriptor getDescriptor() {
+        return descriptor();
+    }
+
+    @Override
+    public Optional<String> lifecyclePhase() {
+        return Optional.ofNullable(delegate.getLifecyclePhase());
+    }
+
+    @Override
     public String getLifecyclePhase() {
-        return delegate.getLifecyclePhase();
+        return lifecyclePhase().orElse(null);
+    }
+
+    @Override
+    public Optional<String> executionId() {
+        return Optional.ofNullable(delegate.getExecutionId());
     }
 
     @Override
     public String getExecutionId() {
-        return delegate.getExecutionId();
+        return executionId().orElse(null);
     }
 
     @Override
-    public String getGoal() {
+    public String goal() {
         return delegate.getGoal();
     }
 
     @Override
-    public Optional<XmlNode> getConfiguration() {
+    public String getGoal() {
+        return goal();
+    }
+
+    @Override
+    public Optional<XmlNode> configuration() {
         return Optional.of(delegate.getConfiguration()).map(Xpp3Dom::getDom);
+    }
+
+    @Override
+    public Optional<XmlNode> getConfiguration() {
+        return configuration();
     }
 
     @Override

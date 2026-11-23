@@ -208,14 +208,26 @@ public abstract class AbstractSession implements InternalSession {
         return new WorkspaceRepository() {
             @Nonnull
             @Override
-            public String getId() {
+            public String id() {
                 return repository.getId();
             }
 
             @Nonnull
             @Override
-            public String getType() {
+            public String getId() {
+                return id();
+            }
+
+            @Nonnull
+            @Override
+            public String type() {
                 return repository.getContentType();
+            }
+
+            @Nonnull
+            @Override
+            public String getType() {
+                return type();
             }
         };
     }

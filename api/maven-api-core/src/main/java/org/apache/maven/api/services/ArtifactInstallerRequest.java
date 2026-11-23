@@ -42,9 +42,20 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface ArtifactInstallerRequest extends Request<Session> {
 
+    /** Returns the artifacts to install, never {@code null}. */
     @Nonnull
-    Collection<ProducedArtifact> getArtifacts();
+    Collection<ProducedArtifact> artifacts();
 
+    /**
+     * @deprecated Use {@link #artifacts()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Collection<ProducedArtifact> getArtifacts() {
+        return artifacts();
+    }
+
+    /** Returns a new builder instance. */
     @Nonnull
     static ArtifactInstallerRequestBuilder builder() {
         return new ArtifactInstallerRequestBuilder();
@@ -103,7 +114,7 @@ public interface ArtifactInstallerRequest extends Request<Session> {
 
             @Nonnull
             @Override
-            public Collection<ProducedArtifact> getArtifacts() {
+            public Collection<ProducedArtifact> artifacts() {
                 return artifacts;
             }
 

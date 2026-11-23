@@ -81,37 +81,79 @@ public class DefaultType implements Type, ArtifactType {
     }
 
     @Override
+    public Language language() {
+        return language;
+    }
+
+    @Override
+    public String extension() {
+        return extension;
+    }
+
+    @Override
+    public String classifier() {
+        return classifier;
+    }
+
+    @Override
     public String getId() {
         return id();
     }
 
     @Override
-    public Language getLanguage() {
-        return language;
-    }
-
-    @Override
     public String getExtension() {
-        return extension;
+        return extension();
     }
 
     @Override
     public String getClassifier() {
-        return classifier;
-    }
-
-    @Override
-    public boolean isIncludesDependencies() {
-        return this.includesDependencies;
-    }
-
-    @Override
-    public Set<PathType> getPathTypes() {
-        return this.pathTypes;
+        return classifier() == null ? "" : classifier();
     }
 
     @Override
     public Map<String, String> getProperties() {
         return properties;
+    }
+
+    @Override
+    public boolean includesDependencies() {
+        return this.includesDependencies;
+    }
+
+    @Override
+    public Set<PathType> pathTypes() {
+        return this.pathTypes;
+    }
+
+    public ArtifactType toArtifactType() {
+        return new ArtifactTypeAdapter(this);
+    }
+
+    private static class ArtifactTypeAdapter implements ArtifactType {
+        private final DefaultType type;
+
+        private ArtifactTypeAdapter(DefaultType type) {
+            this.type = type;
+        }
+
+        @Override
+        public String getId() {
+            return type.id();
+        }
+
+        @Override
+        public String getExtension() {
+            return type.extension();
+        }
+
+        @Override
+        public String getClassifier() {
+            return type.classifier() == null ? "" : type.classifier();
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return type.getProperties();
+        }
     }
 }

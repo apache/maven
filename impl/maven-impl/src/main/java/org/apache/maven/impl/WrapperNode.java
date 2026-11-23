@@ -43,30 +43,57 @@ class WrapperNode extends AbstractNode {
     }
 
     @Override
-    public List<Node> getChildren() {
+    public List<Node> children() {
         return children;
     }
 
     @Override
+    public List<Node> getChildren() {
+        return children();
+    }
+
+    @Override
+    public Artifact artifact() {
+        return delegate.artifact();
+    }
+
+    @Override
     public Artifact getArtifact() {
-        return delegate.getArtifact();
+        return artifact();
+    }
+
+    @Override
+    public Dependency dependency() {
+        return delegate.dependency();
     }
 
     @Override
     public Dependency getDependency() {
-        return delegate.getDependency();
+        return dependency();
+    }
+
+    @Override
+    @Nonnull
+    public List<RemoteRepository> remoteRepositories() {
+        return delegate.remoteRepositories();
     }
 
     @Override
     @Nonnull
     public List<RemoteRepository> getRemoteRepositories() {
-        return delegate.getRemoteRepositories();
+        return remoteRepositories();
+    }
+
+    @Override
+    @Nonnull
+    public Optional<RemoteRepository> repository() {
+        return delegate.repository();
     }
 
     @Override
     @Nonnull
     public Optional<RemoteRepository> getRepository() {
-        return delegate.getRepository();
+        return repository();
     }
 
     @Override

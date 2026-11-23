@@ -2830,6 +2830,38 @@ public class DefaultModelBuilder implements ModelBuilder {
         }
     }
 
+    private SourceResponse<ModelOperationRequest, Model> doBuildRawModel(ModelOperationRequest operation) {
+        ModelBuilderSessionState build = new ModelBuilderSessionState(operation.modelRequest());
+        Model model = build.readRawModel();
+        if (build.hasErrors()) {
+            throw build.newModelBuilderException();
+        }
+        return new SourceResponse<>(operation, model);
+    }
+
+    enum ModelOperation {
+        VALIDATE,
+        RAW_MODEL
+    }
+
+    record ModelOperationRequest(ModelBuilderRequest modelRequest, ModelOperation operation, RequestTrace trace)
+            implements Request<Session>, CacheMetadata {
+        @Override
+        public Session session() {
+            return modelRequest.session();
+        }
+
+        @Override
+        public RequestTrace trace() {
+            return trace;
+        }
+
+        @Override
+        public CacheRetention getCacheRetention() {
+            return CacheRetention.DISABLED;
+        }
+    }
+
     static String getGroupId(Model model) {
         String groupId = model.getGroupId();
         if (groupId == null && model.getParent() != null) {
@@ -3079,7 +3111,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         @Nonnull
         @Override
-        public R getRequest() {
+        public R request() {
             return request;
         }
     }

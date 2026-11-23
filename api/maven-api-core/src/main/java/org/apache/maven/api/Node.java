@@ -47,9 +47,7 @@ public interface Node {
      * @since 4.0.0
      */
     @Nullable
-    default Artifact artifact() {
-        return getArtifact();
-    }
+    Artifact artifact();
 
     /**
      * @return artifact for this node
@@ -57,7 +55,9 @@ public interface Node {
      */
     @Nullable
     @Deprecated(since = "4.0.0", forRemoval = true)
-    Artifact getArtifact();
+    default Artifact getArtifact() {
+        return artifact();
+    }
 
     /**
      * Returns the dependency for this node, or {@code null} for the root node.
@@ -66,9 +66,7 @@ public interface Node {
      * @since 4.0.0
      */
     @Nullable
-    default Dependency dependency() {
-        return getDependency();
-    }
+    Dependency dependency();
 
     /**
      * @return dependency for this node
@@ -76,7 +74,9 @@ public interface Node {
      */
     @Nullable
     @Deprecated(since = "4.0.0", forRemoval = true)
-    Dependency getDependency();
+    default Dependency getDependency() {
+        return dependency();
+    }
 
     /**
      * {@return the children}
@@ -84,9 +84,7 @@ public interface Node {
      * @since 4.0.0
      */
     @Nonnull
-    default List<Node> children() {
-        return getChildren();
-    }
+    List<Node> children();
 
     /**
      * Gets the child nodes of this node.
@@ -96,7 +94,9 @@ public interface Node {
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
-    List<Node> getChildren();
+    default List<Node> getChildren() {
+        return children();
+    }
 
     /**
      * {@return the remoteRepositories}
@@ -104,9 +104,7 @@ public interface Node {
      * @since 4.0.0
      */
     @Nonnull
-    default List<RemoteRepository> remoteRepositories() {
-        return getRemoteRepositories();
-    }
+    List<RemoteRepository> remoteRepositories();
 
     /**
      * @return repositories of this node
@@ -114,16 +112,16 @@ public interface Node {
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
-    List<RemoteRepository> getRemoteRepositories();
+    default List<RemoteRepository> getRemoteRepositories() {
+        return remoteRepositories();
+    }
 
     /**
      * {@return the repository}
      *
      * @since 4.0.0
      */
-    default Optional<RemoteRepository> repository() {
-        return getRepository();
-    }
+    Optional<RemoteRepository> repository();
 
     /**
      * Returns the remote repository from which this artifact was downloaded, if known.
@@ -135,7 +133,9 @@ public interface Node {
      */
     @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
-    Optional<RemoteRepository> getRepository();
+    default Optional<RemoteRepository> getRepository() {
+        return repository();
+    }
 
     /**
      * Traverses this node and potentially its children using the specified visitor.

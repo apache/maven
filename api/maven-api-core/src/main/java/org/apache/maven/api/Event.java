@@ -39,9 +39,7 @@ public interface Event {
      * @since 4.0.0
      */
     @Nonnull
-    default EventType type() {
-        return getType();
-    }
+    EventType type();
 
     /**
      * Gets the type of the event.
@@ -49,9 +47,11 @@ public interface Event {
      * @return the type of the event, never {@code null}
      * @deprecated Use {@link #type()} instead.
      */
-    @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
-    EventType getType();
+    @Nonnull
+    default EventType getType() {
+        return type();
+    }
 
     /**
      * {@return the session}
@@ -59,9 +59,7 @@ public interface Event {
      * @since 4.0.0
      */
     @Nonnull
-    default Session session() {
-        return getSession();
-    }
+    Session session();
 
     /**
      * Gets the session from which this event originates.
@@ -69,18 +67,19 @@ public interface Event {
      * @return the current session, never {@code null}
      * @deprecated Use {@link #session()} instead.
      */
-    @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
-    Session getSession();
+    @Nonnull
+    default Session getSession() {
+        return session();
+    }
 
     /**
      * {@return the project}
      *
      * @since 4.0.0
      */
-    default Optional<Project> project() {
-        return getProject();
-    }
+    @Nonnull
+    Optional<Project> project();
 
     /**
      * Gets the current project (if any).
@@ -88,18 +87,19 @@ public interface Event {
      * @return the current project or {@code empty()} if not applicable
      * @deprecated Use {@link #project()} instead.
      */
-    @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
-    Optional<Project> getProject();
+    @Nonnull
+    default Optional<Project> getProject() {
+        return project();
+    }
 
     /**
      * {@return the mojoExecution}
      *
      * @since 4.0.0
      */
-    default Optional<MojoExecution> mojoExecution() {
-        return getMojoExecution();
-    }
+    @Nonnull
+    Optional<MojoExecution> mojoExecution();
 
     /**
      * Gets the current mojo execution (if any).
@@ -107,18 +107,18 @@ public interface Event {
      * @return the current mojo execution or {@code empty()} if not applicable
      * @deprecated Use {@link #mojoExecution()} instead.
      */
-    @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
-    Optional<MojoExecution> getMojoExecution();
+    @Nonnull
+    default Optional<MojoExecution> getMojoExecution() {
+        return mojoExecution();
+    }
 
     /**
      * {@return the exception}
      *
      * @since 4.0.0
      */
-    default Optional<Exception> exception() {
-        return getException();
-    }
+    Optional<Exception> exception();
 
     /**
      * Gets the exception that caused the event (if any).
@@ -127,5 +127,7 @@ public interface Event {
      * @deprecated Use {@link #exception()} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
-    Optional<Exception> getException();
+    default Optional<Exception> getException() {
+        return exception();
+    }
 }

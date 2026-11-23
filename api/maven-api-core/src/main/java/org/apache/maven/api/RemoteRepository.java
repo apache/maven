@@ -62,15 +62,16 @@ public interface RemoteRepository extends Repository {
      * @since 4.0.0
      */
     @Nonnull
-    default String url() {
-        return getUrl();
-    }
+    String url();
 
     /**
      * @deprecated Use {@link #url()} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
-    String getUrl();
+    @Nonnull
+    default String getUrl() {
+        return url();
+    }
 
     /**
      * {@return the protocol}
@@ -78,13 +79,14 @@ public interface RemoteRepository extends Repository {
      * @since 4.0.0
      */
     @Nonnull
-    default String protocol() {
-        return getProtocol();
-    }
+    String protocol();
 
     /**
      * @deprecated Use {@link #protocol()} instead.
      */
+    @Nonnull
     @Deprecated(since = "4.0.0", forRemoval = true)
-    String getProtocol();
+    default String getProtocol() {
+        return protocol();
+    }
 }

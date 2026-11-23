@@ -84,27 +84,37 @@ public class DefaultType implements Type, ArtifactType {
     }
 
     @Override
-    public Language getLanguage() {
+    public Language language() {
         return language;
     }
 
     @Override
-    public String getExtension() {
+    public String extension() {
         return extension;
     }
 
     @Override
-    public String getClassifier() {
+    public String getExtension() {
+        return extension();
+    }
+
+    @Override
+    public String classifier() {
         return classifier;
     }
 
     @Override
-    public boolean isIncludesDependencies() {
+    public String getClassifier() {
+        return classifier() == null ? "" : classifier();
+    }
+
+    @Override
+    public boolean includesDependencies() {
         return this.includesDependencies;
     }
 
     @Override
-    public Set<PathType> getPathTypes() {
+    public Set<PathType> pathTypes() {
         return this.pathTypes;
     }
 
@@ -123,5 +133,43 @@ public class DefaultType implements Type, ArtifactType {
                 + includesDependencies + ", pathTypes="
                 + pathTypes + ", properties="
                 + properties + ']';
+    }
+
+    /**
+     * Adapts this instance to Resolver {@link ArtifactType}.
+     * <p>
+     * Note: one notable difference exists, the {@link #getClassifier()} method behavior.
+     * Once that harmonized, this adapting can go away.
+     */
+    public ArtifactType toArtifactType() {
+        return new ArtifactTypeAdapter(this);
+    }
+
+    private static class ArtifactTypeAdapter implements ArtifactType {
+        private final DefaultType type;
+
+        private ArtifactTypeAdapter(DefaultType type) {
+            this.type = type;
+        }
+
+        @Override
+        public String getId() {
+            return type.id();
+        }
+
+        @Override
+        public String getExtension() {
+            return type.extension();
+        }
+
+        @Override
+        public String getClassifier() {
+            return type.classifier() == null ? "" : type.classifier();
+        }
+
+        @Override
+        public Map<String, String> getProperties() {
+            return type.getProperties();
+        }
     }
 }

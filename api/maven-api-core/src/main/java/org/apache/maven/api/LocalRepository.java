@@ -52,13 +52,14 @@ public interface LocalRepository extends Repository {
      * @since 4.0.0
      */
     @Nonnull
-    default Path path() {
-        return getPath();
-    }
+    Path path();
 
     /**
      * @deprecated Use {@link #path()} instead.
      */
     @Deprecated(since = "4.0.0", forRemoval = true)
-    Path getPath();
+    @Nonnull
+    default Path getPath() {
+        return path();
+    }
 }

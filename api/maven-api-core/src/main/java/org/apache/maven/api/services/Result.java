@@ -49,5 +49,17 @@ public interface Result<REQ extends Request<?>> {
      * @return the originating request instance, never {@code null}
      */
     @Nonnull
-    REQ getRequest();
+    REQ request();
+
+    /**
+     * Returns the request that produced this result.
+     *
+     * @return the originating request instance, never {@code null}
+     * @deprecated Use {@link #request()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default REQ getRequest() {
+        return request();
+    }
 }
