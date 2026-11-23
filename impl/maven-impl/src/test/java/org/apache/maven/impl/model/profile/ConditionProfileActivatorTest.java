@@ -637,7 +637,7 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     @DisabledOnOs(OS.WINDOWS)
     void testExecSimpleCommand() {
         // 'echo hello' is a shell built-in on Unix; skip on Windows where it needs cmd /c
-        Profile profile = newProfile("exec('echo hello') != 'this-is-definitely-not-the-output'");
+        Profile profile = newProfile("exec('echo hello') == 'hello'");
         assertActivation(true, profile, newContext(null, null));
     }
 
@@ -659,8 +659,8 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
     @DisabledOnOs(OS.WINDOWS)
     void testExecWithExtract() {
         // exec + extract composition using 'echo' to simulate tool output (Unix only)
-        Profile profile = newProfile(
-                "extract(exec('echo Docker version 25.0.1, build abc'), '\\d+\\.\\d+\\.\\d+') != 'impossible'");
+        Profile profile =
+                newProfile("extract(exec('echo Docker version 25.0.1, build abc'), '\\d+\\.\\d+\\.\\d+') == '25.0.1'");
         assertActivation(true, profile, newContext(null, null));
     }
 }

@@ -296,7 +296,7 @@ public class ConditionFunctions {
         Process process = null;
         try {
             process = new ProcessBuilder(Arrays.asList(tokens))
-                    .redirectInput(ProcessBuilder.Redirect.INHERIT)
+                    .redirectInput(ProcessBuilder.Redirect.PIPE)
                     .redirectError(ProcessBuilder.Redirect.DISCARD)
                     .start();
             byte[] buffer = new byte[EXEC_OUTPUT_LIMIT];
