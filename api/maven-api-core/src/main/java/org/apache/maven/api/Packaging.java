@@ -74,7 +74,7 @@ public interface Packaging extends ExtensibleEnum {
      */
     @Nonnull
     default Language language() {
-        return type().getLanguage();
+        return type().language();
     }
 
     /**

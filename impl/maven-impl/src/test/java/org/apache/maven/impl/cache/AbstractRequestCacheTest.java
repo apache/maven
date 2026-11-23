@@ -663,12 +663,12 @@ class AbstractRequestCacheTest {
 
         @Override
         @Nonnull
-        public ProtoSession getSession() {
+        public ProtoSession session() {
             return session;
         }
 
         @Override
-        public RequestTrace getTrace() {
+        public RequestTrace trace() {
             return null;
         }
 
@@ -705,7 +705,7 @@ class AbstractRequestCacheTest {
 
         @Override
         @Nonnull
-        public TestRequest getRequest() {
+        public TestRequest request() {
             return request;
         }
     }
@@ -767,12 +767,12 @@ class AbstractRequestCacheTest {
 
         @Override
         @Nonnull
-        public ProtoSession getSession() {
+        public ProtoSession session() {
             return mock(ProtoSession.class);
         }
 
         @Override
-        public RequestTrace getTrace() {
+        public RequestTrace trace() {
             return null;
         }
 
@@ -809,7 +809,7 @@ class AbstractRequestCacheTest {
 
         @Override
         @Nonnull
-        public MutableHashCodeRequest getRequest() {
+        public MutableHashCodeRequest request() {
             return request;
         }
     }

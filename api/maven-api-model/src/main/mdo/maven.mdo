@@ -3101,8 +3101,36 @@
             <li>{@code if(condition, trueValue, falseValue)}: Returns trueValue if the condition is true, falseValue otherwise.</li>
             <li>{@code exists(path)}: Checks if a file matching the given glob pattern exists.</li>
             <li>{@code missing(path)}: Checks if a file matching the given glob pattern does not exist.</li>
+            <li>{@code executable(name)}: Checks whether an executable file is available by name on {@code PATH} or at an explicit path, without executing it.</li>
             <li>{@code inrange(version, range)}: Checks if the given version is within the specified version range.</li>
             </ul>
+
+            <h3>Executable Availability</h3>
+
+            <p>{@code executable('docker')} checks for the Docker client executable, not whether
+            the Docker daemon is running or reachable. The executable is never run.</p>
+
+            <p>A plain name is searched for in the directories listed in {@code PATH}; empty
+            entries are ignored rather than treated as the current directory. An explicit
+            absolute or relative path is checked directly, without searching {@code PATH}.
+            On Windows, suffix probing also applies to explicit paths.</p>
+
+            <p>On Windows, Maven normalizes environment variable names to uppercase, so
+            {@code PATH} and {@code Path} are exposed as {@code env.PATH}. For plain-name
+            searches, the exact filename is checked first, followed by suffix probing using
+            {@code PATHEXT}. Its semicolon-separated entries are trimmed and deduplicated
+            case-insensitively, with empty entries ignored. The fallback
+            {@code .COM;.EXE;.BAT;.CMD} is used only when {@code PATHEXT} is absent;
+            an explicitly empty {@code PATHEXT} disables suffix probing.</p>
+
+            <p>This also applies when Maven is launched from Git Bash or Cygwin on Windows:
+            the shell runtime converts its POSIX {@code PATH} to native Windows paths when
+            starting the Windows JVM. Executable lookup uses that native path list, not
+            shell aliases or functions.</p>
+
+            <p><strong>Warning:</strong> relying on local system environment variables like
+            {@code PATH} makes profile activation non-reproducible. Use this function primarily
+            in local build profiles, not in consumer POMs published to a remote repository.</p>
 
             <h2>Supported properties</h2>
 
@@ -3123,6 +3151,8 @@
             <li>JDK version range: {@code inrange(${java.version}, '[11,)')} (JDK 11 or higher)</li>
             <li>OS check: {@code ${os.name} == 'windows'}</li>
             <li>File existence: {@code exists('${project.basedir}/src/**}{@code /*.xsd')}</li>
+            <li>Docker client availability: {@code executable('docker')}</li>
+            <li>Explicit executable path: {@code executable('/usr/bin/docker')}</li>
             <li>Property check: {@code ${my.property} != 'some-value'}</li>
             <li>Regex matching: {@code matches(${os.version}, '.*aws')}</li>
             <li>Complex condition: {@code ${os.name} == 'windows' && ${os.arch} != 'amd64' && inrange(${os.version}, '[10,)')}</li>

@@ -74,6 +74,6 @@ public interface ModelProcessor {
      * @throws XmlReaderException If the input format could not be parsed.
      * @deprecated Use {@link #read(Source, Map)} instead.
      */
-    @Deprecated(since = "4.2.0")
+    @Deprecated(since = "4.0.0")
     Model read(XmlReaderRequest request) throws IOException, XmlReaderException;
 }

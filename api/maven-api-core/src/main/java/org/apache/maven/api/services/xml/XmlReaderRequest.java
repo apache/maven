@@ -44,7 +44,14 @@ public interface XmlReaderRequest {
      * @return the file path, or {@code null}
      */
     @Nullable
-    Path getPath();
+    Path path();
+
+    /** @deprecated Use {@link #path()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default Path getPath() {
+        return path();
+    }
 
     /**
      * Returns the root directory for resolving relative paths, or {@code null} if not set.
@@ -52,7 +59,16 @@ public interface XmlReaderRequest {
      * @return the root directory, or {@code null}
      */
     @Nullable
-    Path getRootDirectory();
+    Path rootDirectory();
+
+    /**
+     * @deprecated Use {@link #rootDirectory()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default Path getRootDirectory() {
+        return rootDirectory();
+    }
 
     /**
      * Returns the URL to read the XML from, or {@code null} if another input source is used.
@@ -60,7 +76,16 @@ public interface XmlReaderRequest {
      * @return the URL, or {@code null}
      */
     @Nullable
-    URL getURL();
+    URL url();
+
+    /**
+     * @deprecated Use {@link #url()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default URL getURL() {
+        return url();
+    }
 
     /**
      * Returns the input stream to read the XML from, or {@code null} if another input source is used.
@@ -68,7 +93,16 @@ public interface XmlReaderRequest {
      * @return the input stream, or {@code null}
      */
     @Nullable
-    InputStream getInputStream();
+    InputStream inputStream();
+
+    /**
+     * @deprecated Use {@link #inputStream()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default InputStream getInputStream() {
+        return inputStream();
+    }
 
     /**
      * Returns the reader to read the XML from, or {@code null} if another input source is used.
@@ -76,7 +110,16 @@ public interface XmlReaderRequest {
      * @return the reader, or {@code null}
      */
     @Nullable
-    Reader getReader();
+    Reader reader();
+
+    /**
+     * @deprecated Use {@link #reader()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default Reader getReader() {
+        return reader();
+    }
 
     /**
      * Returns the transformer to apply during parsing, or {@code null} if none is set.
@@ -84,14 +127,31 @@ public interface XmlReaderRequest {
      * @return the transformer, or {@code null}
      */
     @Nullable
-    Transformer getTransformer();
+    Transformer transformer();
+
+    /**
+     * @deprecated Use {@link #transformer()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default Transformer getTransformer() {
+        return transformer();
+    }
 
     /**
      * Returns whether strict parsing should be enforced.
      *
      * @return {@code true} if strict parsing is enabled
      */
-    boolean isStrict();
+    boolean strict();
+
+    /**
+     * @deprecated Use {@link #strict()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default boolean isStrict() {
+        return strict();
+    }
 
     /**
      * Returns the identifier of the model being parsed, used for error reporting.
@@ -99,7 +159,16 @@ public interface XmlReaderRequest {
      * @return the model identifier, or {@code null}
      */
     @Nullable
-    String getModelId();
+    String modelId();
+
+    /**
+     * @deprecated Use {@link #modelId()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default String getModelId() {
+        return modelId();
+    }
 
     /**
      * Returns the location description used for error reporting.
@@ -107,14 +176,31 @@ public interface XmlReaderRequest {
      * @return the location string, or {@code null}
      */
     @Nullable
-    String getLocation();
+    String location();
+
+    /**
+     * @deprecated Use {@link #location()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default String getLocation() {
+        return location();
+    }
 
     /**
      * Returns whether default XML entities should be added during parsing.
      *
      * @return {@code true} if default entities should be added
      */
-    boolean isAddDefaultEntities();
+    boolean addDefaultEntities();
+
+    /**
+     * @deprecated Use {@link #addDefaultEntities()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default boolean isAddDefaultEntities() {
+        return addDefaultEntities();
+    }
 
     /**
      * Indicates whether location information (line/column tracking) should be
@@ -276,52 +362,52 @@ public interface XmlReaderRequest {
             }
 
             @Override
-            public Path getPath() {
+            public Path path() {
                 return path;
             }
 
             @Override
-            public Path getRootDirectory() {
+            public Path rootDirectory() {
                 return rootDirectory;
             }
 
             @Override
-            public URL getURL() {
+            public URL url() {
                 return url;
             }
 
             @Override
-            public InputStream getInputStream() {
+            public InputStream inputStream() {
                 return inputStream;
             }
 
             @Override
-            public Reader getReader() {
+            public Reader reader() {
                 return reader;
             }
 
             @Override
-            public Transformer getTransformer() {
+            public Transformer transformer() {
                 return transformer;
             }
 
             @Override
-            public boolean isStrict() {
+            public boolean strict() {
                 return strict;
             }
 
             @Override
-            public String getModelId() {
+            public String modelId() {
                 return modelId;
             }
 
             @Override
-            public String getLocation() {
+            public String location() {
                 return location;
             }
 
             @Override
-            public boolean isAddDefaultEntities() {
+            public boolean addDefaultEntities() {
                 return addDefaultEntities;
             }
 

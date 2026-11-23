@@ -538,7 +538,8 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
         Profile profile = newProfile("executable('" + absPath + "')");
 
         // PATH content does not matter for absolute paths
-        assertActivation(true, profile, newContext(null, Map.of("env.PATH", "")));
+        assertActivation(
+                true, profile, newContext(null, Map.of("env.PATH", "", "os.name", System.getProperty("os.name"))));
     }
 
     /**
@@ -564,5 +565,19 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
 
         assertActivation(false, newProfile("not(executable('neg-tool'))"), newContext(null, sysProps));
         assertActivation(true, newProfile("not(executable('no-such-neg-tool'))"), newContext(null, sysProps));
+    }
+
+    @Test
+    void testExecutableWithCustomWindowsExtensionAndCombinedCondition() throws Exception {
+        Files.createFile(tempDir.resolve("docker.custom"));
+        var sysProps = Map.of(
+                "env.PATH", tempDir.toString(),
+                "env.PATHEXT", ".CUSTOM",
+                "os.name", "Windows 11");
+        var profile = newProfile("executable('docker') && ${enable.docker} == 'true'");
+        assertActivation(true, profile, newContext(Map.of("enable.docker", "true"), sysProps));
+        assertActivation(false, profile, newContext(Map.of("enable.docker", "false"), sysProps));
+        assertActivation(false, newProfile("not(executable('docker'))"), newContext(null, sysProps));
+        assertActivation(true, newProfile("not(executable('missing-docker'))"), newContext(null, sysProps));
     }
 }

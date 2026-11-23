@@ -204,12 +204,40 @@ public class ${class.name}
 
     #end
     #if ( $class == $root )
-    public String getNamespaceUri() {
+    /**
+     * The namespace URI of the model.
+     *
+     * @return a {@code String}
+     * @since 4.0.0
+     */
+    public String namespaceUri() {
         return namespaceUri;
     }
 
-    public String getModelEncoding() {
+    /**
+     * @deprecated Use {@link #namespaceUri()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    public String getNamespaceUri() {
+        return namespaceUri();
+    }
+
+    /**
+     * The encoding used for the model.
+     *
+     * @return a {@code String}
+     * @since 4.0.0
+     */
+    public String modelEncoding() {
         return modelEncoding;
+    }
+
+    /**
+     * @deprecated Use {@link #modelEncoding()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    public String getModelEncoding() {
+        return modelEncoding();
     }
 
     #end
@@ -228,6 +256,7 @@ public class ${class.name}
       #end
      *
      * @return a {@code ${type}}
+     * @since 4.0.0
      */
       #foreach( $ann in ${field.annotations} )
     ${ann}
@@ -235,8 +264,19 @@ public class ${class.name}
       #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" )
     @Nonnull
       #end
-    public ${type} ${pfx}${cap}() {
+    public ${type} ${field.name}() {
         return this.${field.name};
+    }
+
+    /**
+     * @deprecated Use {@link #${field.name}()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+      #if ( $field.type == "java.util.List" || $field.type == "java.util.Properties" )
+    @Nonnull
+      #end
+    public ${type} ${pfx}${cap}() {
+        return ${field.name}();
     }
 
     #end

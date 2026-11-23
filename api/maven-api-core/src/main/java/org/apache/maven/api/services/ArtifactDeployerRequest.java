@@ -41,18 +41,44 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface ArtifactDeployerRequest extends Request<Session> {
 
-    /** @return the remote repository to deploy to, never {@code null} */
+    /** Returns the remote repository to deploy to, never {@code null}. */
     @Nonnull
-    RemoteRepository getRepository();
+    RemoteRepository repository();
 
-    /** @return the artifacts to deploy, never {@code null} */
+    /**
+     * @deprecated Use {@link #repository()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
-    Collection<ProducedArtifact> getArtifacts();
+    default RemoteRepository getRepository() {
+        return repository();
+    }
 
-    /** @return the number of times to retry a failed deployment */
-    int getRetryFailedDeploymentCount();
+    /** Returns the artifacts to deploy, never {@code null}. */
+    @Nonnull
+    Collection<ProducedArtifact> artifacts();
 
-    /** @return a new builder instance */
+    /**
+     * @deprecated Use {@link #artifacts()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default Collection<ProducedArtifact> getArtifacts() {
+        return artifacts();
+    }
+
+    /** Returns the number of times to retry a failed deployment. */
+    int retryFailedDeploymentCount();
+
+    /**
+     * @deprecated Use {@link #retryFailedDeploymentCount()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default int getRetryFailedDeploymentCount() {
+        return retryFailedDeploymentCount();
+    }
+
+    /** Returns a new builder instance. */
     @Nonnull
     static ArtifactDeployerRequestBuilder builder() {
         return new ArtifactDeployerRequestBuilder();
@@ -142,18 +168,18 @@ public interface ArtifactDeployerRequest extends Request<Session> {
 
             @Nonnull
             @Override
-            public RemoteRepository getRepository() {
+            public RemoteRepository repository() {
                 return repository;
             }
 
             @Nonnull
             @Override
-            public Collection<ProducedArtifact> getArtifacts() {
+            public Collection<ProducedArtifact> artifacts() {
                 return artifacts;
             }
 
             @Override
-            public int getRetryFailedDeploymentCount() {
+            public int retryFailedDeploymentCount() {
                 return retryFailedDeploymentCount;
             }
 

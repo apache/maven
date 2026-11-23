@@ -85,12 +85,12 @@ public class DefaultTransportProvider implements TransportProvider {
     private record TransportRequest(Session session, RemoteRepository repository)
             implements Request<Session>, CacheMetadata {
         @Override
-        public Session getSession() {
+        public Session session() {
             return session;
         }
 
         @Override
-        public RequestTrace getTrace() {
+        public RequestTrace trace() {
             return null;
         }
 

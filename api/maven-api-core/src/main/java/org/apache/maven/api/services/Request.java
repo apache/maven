@@ -83,7 +83,19 @@ public interface Request<S extends ProtoSession> extends CacheMetadata {
      * @return the session instance, never {@code null}
      */
     @Nonnull
-    S getSession();
+    S session();
+
+    /**
+     * Returns the session associated with this request.
+     *
+     * @return the session instance, never {@code null}
+     * @deprecated Use {@link #session()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nonnull
+    default S getSession() {
+        return session();
+    }
 
     /**
      * Returns the trace information associated with this request, if any.
@@ -93,7 +105,19 @@ public interface Request<S extends ProtoSession> extends CacheMetadata {
      * @return the request trace, or {@code null} if no trace information is available
      */
     @Nullable
-    RequestTrace getTrace();
+    RequestTrace trace();
+
+    /**
+     * Returns the trace information associated with this request, if any.
+     *
+     * @return the request trace, or {@code null} if no trace information is available
+     * @deprecated Use {@link #trace()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    @Nullable
+    default RequestTrace getTrace() {
+        return trace();
+    }
 
     /**
      * Returns a hashcode value for this request, based on all significant fields.

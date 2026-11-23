@@ -111,17 +111,17 @@ public class DefaultModelProblem implements ModelProblem {
     }
 
     @Override
-    public String getSource() {
+    public String source() {
         return source;
     }
 
     @Override
-    public int getLineNumber() {
+    public int lineNumber() {
         return lineNumber;
     }
 
     @Override
-    public int getColumnNumber() {
+    public int columnNumber() {
         return columnNumber;
     }
 
@@ -131,17 +131,17 @@ public class DefaultModelProblem implements ModelProblem {
     }
 
     @Override
-    public Exception getException() {
+    public Exception exception() {
         return exception;
     }
 
     @Override
-    public String getLocation() {
+    public String location() {
         return "";
     }
 
     @Override
-    public String getMessage() {
+    public String message() {
         String msg = null;
 
         if (message != null && !message.isEmpty()) {
@@ -158,7 +158,7 @@ public class DefaultModelProblem implements ModelProblem {
     }
 
     @Override
-    public Severity getSeverity() {
+    public Severity severity() {
         return severity;
     }
 

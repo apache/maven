@@ -42,26 +42,68 @@ import static java.util.Objects.requireNonNull;
 @Immutable
 public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
 
-    /** @return the group identifier */
-    String getGroupId();
+    /** Returns the group identifier. */
+    String groupId();
 
-    /** @return the artifact identifier */
-    String getArtifactId();
+    /** @deprecated Use {@link #groupId()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getGroupId() {
+        return groupId();
+    }
 
-    /** @return the version */
-    String getVersion();
+    /** Returns the artifact identifier. */
+    String artifactId();
 
-    /** @return the classifier, may be {@code null} */
-    String getClassifier();
+    /** @deprecated Use {@link #artifactId()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getArtifactId() {
+        return artifactId();
+    }
 
-    /** @return the file extension, may be {@code null} */
-    String getExtension();
+    /** Returns the version. */
+    String version();
 
-    /** @return the artifact type, may be {@code null} */
-    String getType();
+    /** @deprecated Use {@link #version()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getVersion() {
+        return version();
+    }
 
-    /** @return the coordinate string in the format {@code groupId:artifactId[:extension[:classifier]]:version}, may be {@code null} */
-    String getCoordinatesString();
+    /** Returns the classifier, may be {@code null}. */
+    String classifier();
+
+    /** @deprecated Use {@link #classifier()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getClassifier() {
+        return classifier();
+    }
+
+    /** Returns the file extension, may be {@code null}. */
+    String extension();
+
+    /** @deprecated Use {@link #extension()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getExtension() {
+        return extension();
+    }
+
+    /** Returns the artifact type, may be {@code null}. */
+    String type();
+
+    /** @deprecated Use {@link #type()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getType() {
+        return type();
+    }
+
+    /** Returns the coordinate string in the format {@code groupId:artifactId[:extension[:classifier]]:version}, may be {@code null}. */
+    String coordinatesString();
+
+    /** @deprecated Use {@link #coordinatesString()} instead. */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default String getCoordinatesString() {
+        return coordinatesString();
+    }
 
     /**
      * Builds a request from individual coordinate components.
@@ -160,7 +202,7 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
                 .build();
     }
 
-    /** @return a new builder instance */
+    /** Returns a new builder instance. */
     @Deprecated
     static ArtifactCoordinatesFactoryRequestBuilder builder() {
         return new ArtifactCoordinatesFactoryRequestBuilder();
@@ -263,37 +305,37 @@ public interface ArtifactCoordinatesFactoryRequest extends Request<Session> {
             }
 
             @Override
-            public String getGroupId() {
+            public String groupId() {
                 return groupId;
             }
 
             @Override
-            public String getArtifactId() {
+            public String artifactId() {
                 return artifactId;
             }
 
             @Override
-            public String getVersion() {
+            public String version() {
                 return version;
             }
 
             @Override
-            public String getClassifier() {
+            public String classifier() {
                 return classifier;
             }
 
             @Override
-            public String getExtension() {
+            public String extension() {
                 return extension;
             }
 
             @Override
-            public String getType() {
+            public String type() {
                 return type;
             }
 
             @Override
-            public String getCoordinatesString() {
+            public String coordinatesString() {
                 return coordinatesString;
             }
 
