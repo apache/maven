@@ -540,6 +540,31 @@ public class DefaultRepositorySystemSessionFactoryTest {
     }
 
     @Test
+    void centralServerIsServedAtTheOriginsCentralIsPublishedTo() throws Exception {
+        MavenExecutionRequest request = requestWithServer(serverWithRepositoryOrigins("central"));
+        request.addRemoteRepository(mavenRepositorySystem.createDefaultRemoteRepository(request));
+
+        AuthenticationSelector selector = authenticationSelector(request);
+
+        assertNotNull(selector.getAuthentication(
+                repository("central", "https://central.sonatype.com/repository/maven-snapshots/")));
+        assertNull(selector.getAuthentication(repository("central", "https://evil.example.org/maven2/")));
+    }
+
+    @Test
+    void centralServerWithItsOwnRepositoryOriginsIsNotServedAtPublishingOrigins() throws Exception {
+        MavenExecutionRequest request =
+                requestWithServer(serverWithRepositoryOrigins("central", "https://repo.example.org"));
+        request.addRemoteRepository(mavenRepositorySystem.createDefaultRemoteRepository(request));
+
+        AuthenticationSelector selector = authenticationSelector(request);
+
+        assertNotNull(selector.getAuthentication(repository("central", "https://repo.example.org/releases/")));
+        assertNull(selector.getAuthentication(
+                repository("central", "https://central.sonatype.com/repository/maven-snapshots/")));
+    }
+
+    @Test
     void malformedServerRepositoryOriginIsIgnored() throws InvalidRepositoryException {
         MavenExecutionRequest request = requestWithServer(serverWithRepositoryOrigins("internal", "not an origin"));
         Properties properties = new Properties();
