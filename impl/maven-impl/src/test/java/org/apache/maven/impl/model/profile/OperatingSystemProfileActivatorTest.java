@@ -71,6 +71,23 @@ class OperatingSystemProfileActivatorTest extends AbstractProfileActivatorTest<O
     }
 
     @Test
+    void testVersionRegexKeepsCaseOfThePattern() throws Exception {
+        Profile profile = newProfile(ActivationOS.newBuilder().version("regex:\\S+-generic"));
+
+        assertActivation(true, profile, newContext(null, newProperties("linux", "6.5.0-41-generic", "amd64")));
+
+        assertActivation(false, profile, newContext(null, newProperties("linux", "6.5.0 41-generic", "amd64")));
+    }
+
+    @Test
+    void testVersionRegexMatchingIsCaseInsensitive() throws Exception {
+        Profile profile = newProfile(ActivationOS.newBuilder().version("regex:.*AWS"));
+
+        assertActivation(true, profile, newContext(null, newProperties("linux", "6.5.0-1014-aws", "amd64")));
+        assertActivation(true, profile, newContext(null, newProperties("linux", "6.5.0-1014-AWS", "amd64")));
+    }
+
+    @Test
     void testName() {
         Profile profile = newProfile(ActivationOS.newBuilder().name("windows"));
 

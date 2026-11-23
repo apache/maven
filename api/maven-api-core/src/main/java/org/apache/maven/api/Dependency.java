@@ -58,7 +58,7 @@ public interface Dependency extends Artifact {
      * @see DependencyCoordinates#getType()
      * @deprecated Use {@link #type()} instead.
      */
-    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default Type getType() {
         return type();
@@ -80,7 +80,7 @@ public interface Dependency extends Artifact {
      * @see DependencyCoordinates#getScope()
      * @deprecated Use {@link #scope()} instead.
      */
-    @Deprecated(since = "4.2.0", forRemoval = true)
+    @Deprecated(since = "4.0.0", forRemoval = true)
     @Nonnull
     default DependencyScope getScope() {
         return scope();
@@ -94,7 +94,18 @@ public interface Dependency extends Artifact {
      * @return {@code true} if the dependency is optional, or {@code false} if mandatory
      * @see DependencyCoordinates#optional()
      */
-    boolean isOptional();
+    boolean optional();
+
+    /**
+     * Returns whether the dependency is optional or mandatory.
+     *
+     * @return {@code true} if the dependency is optional, or {@code false} if mandatory
+     * @deprecated Use {@link #optional()} instead.
+     */
+    @Deprecated(since = "4.0.0", forRemoval = true)
+    default boolean isOptional() {
+        return optional();
+    }
 
     /**
      * Returns the transitive dependencies excluded by this dependency.

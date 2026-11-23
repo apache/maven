@@ -27,10 +27,10 @@ import java.util.Map;
 import org.apache.maven.api.services.model.ProfileActivationContext;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.EnabledOnOs;
 import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -43,8 +43,7 @@ class ExecutableFinderTest {
     Path tempDir;
 
     /**
-     * Minimal stub – only {@link ProfileActivationContext#getSystemProperty(String)} is used
-     * by {@link ExecutableFinder#getPathValue}.
+     * Minimal stub providing isolated environment properties.
      */
     private static ProfileActivationContext contextWithPath(String pathValue) {
         return contextWithPathAndOs(pathValue, null);
@@ -54,12 +53,28 @@ class ExecutableFinderTest {
      * Extended stub that also allows setting {@code os.name} for simulating Windows behaviour.
      */
     private static ProfileActivationContext contextWithPathAndOs(String pathValue, String osName) {
+        return contextWithPathAndOs(pathValue, osName, null);
+    }
+
+    private static ProfileActivationContext contextWithPathAndOs(String pathValue, String osName, String pathExt) {
+        return contextWithPathAndOs(
+                pathValue, osName, pathExt, osName != null && osName.startsWith("Windows") ? ";" : File.pathSeparator);
+    }
+
+    private static ProfileActivationContext contextWithPathAndOs(
+            String pathValue, String osName, String pathExt, String separator) {
         Map<String, String> props = new HashMap<>();
         if (pathValue != null) {
             props.put("env.PATH", pathValue);
         }
         if (osName != null) {
             props.put("os.name", osName);
+        }
+        if (pathExt != null) {
+            props.put("env.PATHEXT", pathExt);
+        }
+        if (separator != null) {
+            props.put("path.separator", separator);
         }
         return new ProfileActivationContext() {
             @Override
@@ -126,17 +141,6 @@ class ExecutableFinderTest {
     }
 
     // -----------------------------------------------------------------------
-    // getPathValue()
-    // -----------------------------------------------------------------------
-
-    @Test
-    void getPathValueFromContext() {
-        String expected = "/usr/bin" + File.pathSeparator + "/usr/local/bin";
-        ProfileActivationContext ctx = contextWithPath(expected);
-        assertEquals(expected, ExecutableFinder.getPathValue(ctx));
-    }
-
-    // -----------------------------------------------------------------------
     // isExecutableInPath() - plain name
     // -----------------------------------------------------------------------
 
@@ -183,7 +187,8 @@ class ExecutableFinderTest {
 
         String absPath = exec.toAbsolutePath().toString();
         // Absolute paths contain path separators -> direct check
-        assertTrue(ExecutableFinder.isExecutableInPath(absPath, contextWithPath("")));
+        assertTrue(
+                ExecutableFinder.isExecutableInPath(absPath, contextWithPathAndOs("", System.getProperty("os.name"))));
     }
 
     @Test
@@ -230,5 +235,102 @@ class ExecutableFinderTest {
 
         ProfileActivationContext ctx = contextWithPathAndOs(tempDir.toString(), "Linux");
         assertFalse(ExecutableFinder.isExecutableInPath("my-tool", ctx));
+    }
+
+    @Test
+    void honorsCustomWindowsPathExt() throws Exception {
+        Files.createFile(tempDir.resolve("docker.custom"));
+        var context = contextWithPathAndOs(tempDir.toString(), "Windows 11", " ; .CuStOm ;.CUSTOM;;");
+        assertTrue(ExecutableFinder.isExecutableInPath("docker", context));
+        assertTrue(ExecutableFinder.isExecutableInPath("docker.custom", context));
+    }
+
+    @Test
+    @EnabledOnOs(OS.WINDOWS)
+    void matchesWindowsFileNamesCaseInsensitively() throws Exception {
+        Files.createFile(tempDir.resolve("DOCKER.ExE"));
+        assertTrue(ExecutableFinder.isExecutableInPath(
+                "docker", contextWithPathAndOs(tempDir.toString(), "Windows 11", ".EXE")));
+    }
+
+    @Test
+    void respectsExcludedAndEmptyWindowsExtensions() throws Exception {
+        Files.createFile(tempDir.resolve("docker.exe"));
+        assertFalse(ExecutableFinder.isExecutableInPath(
+                "docker", contextWithPathAndOs(tempDir.toString(), "Windows 11", ".CMD")));
+        assertFalse(ExecutableFinder.isExecutableInPath(
+                "docker", contextWithPathAndOs(tempDir.toString(), "Windows 11", "")));
+        assertTrue(ExecutableFinder.isExecutableInPath(
+                "docker.exe", contextWithPathAndOs(tempDir.toString(), "Windows 11", "")));
+    }
+
+    @Test
+    void usesWindowsDelimiterAndQuotedDirectories() throws Exception {
+        var directory = Files.createDirectory(tempDir.resolve("directory with spaces"));
+        Files.createFile(directory.resolve("docker.cmd"));
+        var path = ";" + tempDir.resolve("missing") + ";\"" + directory + "\";;";
+        assertTrue(ExecutableFinder.isExecutableInPath("docker", contextWithPathAndOs(path, "Windows 11", ".CMD")));
+    }
+
+    @Test
+    void usesLiteralSeparatorFromContextIndependentlyOfOsName() throws Exception {
+        Files.createFile(tempDir.resolve("docker.cmd"));
+        var path = tempDir.resolve("missing") + "|" + tempDir;
+        assertTrue(
+                ExecutableFinder.isExecutableInPath("docker", contextWithPathAndOs(path, "Windows 11", ".CMD", "|")));
+        assertFalse(
+                ExecutableFinder.isExecutableInPath("docker", contextWithPathAndOs(path, "Windows 11", ".CMD", ";")));
+    }
+
+    @Test
+    void fallsBackToNativeSeparatorWhenPropertyIsMissingOrEmpty() throws Exception {
+        Files.createFile(tempDir.resolve("docker.cmd"));
+        var path = tempDir.resolve("missing") + File.pathSeparator + tempDir;
+        assertTrue(
+                ExecutableFinder.isExecutableInPath("docker", contextWithPathAndOs(path, "Windows 11", ".CMD", null)));
+        assertTrue(ExecutableFinder.isExecutableInPath("docker", contextWithPathAndOs(path, "Windows 11", ".CMD", "")));
+    }
+
+    @Test
+    void ignoresInvalidPathEntries() throws Exception {
+        Files.createFile(tempDir.resolve("docker.cmd"));
+        assertTrue(ExecutableFinder.isExecutableInPath(
+                "docker", contextWithPathAndOs("bad\0directory;" + tempDir, "Windows 11", ".CMD")));
+    }
+
+    @Test
+    void rejectsInvalidExplicitPathsAndExtensionEntries() throws Exception {
+        Files.createFile(tempDir.resolve("docker.cmd"));
+        var context = contextWithPathAndOs(tempDir.toString(), "Windows 11", ".bad\0;.bad/path;.bad\\path;.bad:path");
+        assertFalse(ExecutableFinder.isExecutableInPath("docker", context));
+        assertFalse(ExecutableFinder.isExecutableInPath("bad\0/path", context));
+    }
+
+    @Test
+    void probesExtensionsForExplicitPaths() throws Exception {
+        Files.createFile(tempDir.resolve("docker.custom"));
+        assertTrue(ExecutableFinder.isExecutableInPath(
+                tempDir.resolve("docker").toString(), contextWithPathAndOs("", "Windows 11", ".CUSTOM")));
+    }
+
+    @Test
+    void rejectsDirectoriesAndMissingPath() throws Exception {
+        Files.createDirectory(tempDir.resolve("docker.exe"));
+        assertFalse(ExecutableFinder.isExecutableInPath(
+                "docker", contextWithPathAndOs(tempDir.toString(), "Windows 11", ".EXE")));
+        assertFalse(ExecutableFinder.isExecutableInPath("docker", contextWithPath(null)));
+        assertFalse(ExecutableFinder.isExecutableInPath("", contextWithPath(tempDir.toString())));
+        assertFalse(ExecutableFinder.isExecutableInPath(null, contextWithPath(tempDir.toString())));
+    }
+
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    void searchesMultiplePosixDirectoriesWithoutTrimmingSpaces() throws Exception {
+        var directory = Files.createDirectory(tempDir.resolve(" directory with spaces "));
+        var executable = Files.createFile(directory.resolve("docker"));
+        assertTrue(executable.toFile().setExecutable(true));
+        var path = ":bad\0directory:" + tempDir.resolve("missing") + ":" + directory + "::";
+        assertTrue(ExecutableFinder.isExecutableInPath("docker", contextWithPathAndOs(path, "Linux")));
+        assertFalse(ExecutableFinder.isExecutableInPath("docker", contextWithPathAndOs(tempDir.toString(), "Linux")));
     }
 }

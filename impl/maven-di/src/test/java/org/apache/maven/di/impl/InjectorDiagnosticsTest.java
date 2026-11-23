@@ -19,7 +19,6 @@
 package org.apache.maven.di.impl;
 
 import java.io.IOException;
-import java.io.PrintStream;
 import java.lang.reflect.Member;
 import java.net.URL;
 import java.net.URLClassLoader;
@@ -52,11 +51,9 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.parallel.Resources.SYSTEM_OUT;
 import static org.junit.jupiter.api.parallel.Resources.SYSTEM_PROPERTIES;
 
 @ResourceLock(SYSTEM_PROPERTIES)
-@ResourceLock(SYSTEM_OUT)
 @Timeout(30)
 class InjectorDiagnosticsTest {
     private static final String SISU_DEBUG = "sisu.debug";
@@ -158,11 +155,11 @@ class InjectorDiagnosticsTest {
         AtomicInteger attempts = new AtomicInteger();
         RecordingInjector brokenSink = new RecordingInjector() {
             @Override
-            void writeDump(PrintStream output, String dump) {
+            protected void writeDump(String dump) {
                 if (attempts.getAndIncrement() == 0) {
                     throw new IllegalStateException("output failed");
                 }
-                super.writeDump(output, dump);
+                super.writeDump(dump);
             }
         };
         DIException original = assertThrows(DIException.class, () -> brokenSink.bindImplicit(BrokenProvider.class));

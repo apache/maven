@@ -19,17 +19,25 @@
 package org.apache.maven.cling.invoker.mvn;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import org.apache.maven.api.cli.Logger;
+import org.apache.maven.api.logging.LogEvent;
+import org.apache.maven.api.logging.LogLevel;
+import org.apache.maven.api.logging.LogSink;
+import org.apache.maven.api.logging.Logger;
+import org.apache.maven.api.logging.LoggerManager;
 import org.apache.maven.execution.DefaultMavenExecutionResult;
 import org.apache.maven.execution.MavenExecutionResult;
+import org.apache.maven.logging.impl.DefaultLoggerManager;
 import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.artifact.DefaultArtifact;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactResolutionException;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.transfer.ArtifactFilteredOutException;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -41,33 +49,40 @@ import static org.mockito.Mockito.mock;
  */
 class FilteredOutHintTest {
 
-    /** Simple Logger that accumulates error-level messages for assertion. */
+    /** Accumulated ERROR-level messages captured via the LogSink. */
     private final List<String> errorLog = new ArrayList<>();
 
-    private final Logger logger = new Logger() {
-        @Override
-        public void log(Logger.Level level, String message, Throwable error) {
-            if (level == Logger.Level.ERROR) {
-                errorLog.add(message);
+    @BeforeEach
+    void setUp() {
+        DefaultLoggerManager manager = new DefaultLoggerManager();
+        manager.setLogSink(new LogSink() {
+            @Override
+            public void accept(LogEvent event) {
+                if (event.level() == LogLevel.ERROR && event.message() != null) {
+                    errorLog.add(event.message());
+                }
             }
-        }
-    };
+        });
+        LoggerManager.set(manager);
+    }
+
+    @AfterEach
+    void tearDown() {
+        LoggerManager.set(null);
+        errorLog.clear();
+    }
+
+    private MavenContext makeContext() {
+        MavenContext context = mock(MavenContext.class);
+        context.logger = Logger.of(MavenInvoker.class);
+        return context;
+    }
 
     /** Subclass that exposes the protected method without requiring a real Lookup. */
     static class TestableInvoker extends MavenInvoker {
         TestableInvoker() {
             super(mock(org.apache.maven.api.services.Lookup.class), null);
         }
-    }
-
-    private MavenContext context;
-    private TestableInvoker invoker;
-
-    @BeforeEach
-    void setUp() {
-        context = mock(MavenContext.class);
-        context.logger = logger;
-        invoker = new TestableInvoker();
     }
 
     private ArtifactResolutionException makeException(String groupId, String artifactId, String version) {
@@ -92,7 +107,8 @@ class FilteredOutHintTest {
     @Test
     void noHintWhenNoFilteredException() {
         MavenExecutionResult result = new DefaultMavenExecutionResult();
-        invoker.logFilteredOutHint(context, new RuntimeException("unrelated"), result, new java.util.HashSet<>());
+        new TestableInvoker()
+                .logFilteredOutHint(makeContext(), new RuntimeException("unrelated"), result, new HashSet<>());
         assertTrue(errorLog.isEmpty(), "No hint should be logged for unrelated exceptions");
     }
 
@@ -108,7 +124,7 @@ class FilteredOutHintTest {
 
         ArtifactResolutionException exception = makeException("com.example", "lib", "1.0-SNAPSHOT");
 
-        invoker.logFilteredOutHint(context, exception, result, new java.util.HashSet<>());
+        new TestableInvoker().logFilteredOutHint(makeContext(), exception, result, new HashSet<>());
 
         String combined = String.join(" ", errorLog);
         assertTrue(combined.contains("com.example:lib:1.0-SNAPSHOT"), "Should name the artifact");
@@ -128,7 +144,7 @@ class FilteredOutHintTest {
 
         ArtifactResolutionException exception = makeException("com.example", "lib", "1.0-SNAPSHOT");
 
-        invoker.logFilteredOutHint(context, exception, result, new java.util.HashSet<>());
+        new TestableInvoker().logFilteredOutHint(makeContext(), exception, result, new HashSet<>());
 
         String combined = String.join(" ", errorLog);
         assertTrue(combined.contains("com.example:lib:1.0-SNAPSHOT"), "Should name the artifact");
@@ -146,7 +162,7 @@ class FilteredOutHintTest {
 
         ArtifactResolutionException exception = makeException("org.external", "library", "2.0");
 
-        invoker.logFilteredOutHint(context, exception, result, new java.util.HashSet<>());
+        new TestableInvoker().logFilteredOutHint(makeContext(), exception, result, new HashSet<>());
 
         assertTrue(
                 errorLog.isEmpty(),
@@ -160,7 +176,7 @@ class FilteredOutHintTest {
 
         ArtifactResolutionException exception = makeException("org.external", "library", "2.0");
 
-        invoker.logFilteredOutHint(context, exception, result, new java.util.HashSet<>());
+        new TestableInvoker().logFilteredOutHint(makeContext(), exception, result, new HashSet<>());
 
         assertTrue(errorLog.isEmpty(), "MavenInvoker should not log anything for external artifacts with no reactor");
     }
@@ -177,7 +193,9 @@ class FilteredOutHintTest {
 
         ArtifactResolutionException exception = makeException("com.example", "lib", "1.0-SNAPSHOT");
 
-        java.util.Set<String> alreadyHinted = new java.util.HashSet<>();
+        Set<String> alreadyHinted = new HashSet<>();
+        TestableInvoker invoker = new TestableInvoker();
+        MavenContext context = makeContext();
         invoker.logFilteredOutHint(context, exception, result, alreadyHinted);
         int countAfterFirst = errorLog.size();
         invoker.logFilteredOutHint(context, exception, result, alreadyHinted);

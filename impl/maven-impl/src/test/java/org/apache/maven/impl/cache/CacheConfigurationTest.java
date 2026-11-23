@@ -189,72 +189,72 @@ class CacheConfigurationTest {
         }
 
         @Override
-        public Session getSession() {
+        public Session session() {
             return null;
         }
 
         @Override
-        public RequestTrace getTrace() {
+        public RequestTrace trace() {
             return null;
         }
 
         @Override
-        public RequestType getRequestType() {
+        public RequestType requestType() {
             return RequestType.CONSUMER_DEPENDENCY;
         }
 
         @Override
-        public boolean isLocationTracking() {
+        public boolean locationTracking() {
             return false;
         }
 
         @Override
-        public boolean isRecursive() {
+        public boolean recursive() {
             return false;
         }
 
         @Override
-        public ModelSource getSource() {
+        public ModelSource source() {
             return null;
         }
 
         @Override
-        public java.util.Collection<Profile> getProfiles() {
+        public java.util.Collection<Profile> profiles() {
             return java.util.List.of();
         }
 
         @Override
-        public java.util.List<String> getActiveProfileIds() {
+        public java.util.List<String> activeProfileIds() {
             return java.util.List.of();
         }
 
         @Override
-        public java.util.List<String> getInactiveProfileIds() {
+        public java.util.List<String> inactiveProfileIds() {
             return java.util.List.of();
         }
 
         @Override
-        public java.util.Map<String, String> getSystemProperties() {
+        public java.util.Map<String, String> systemProperties() {
             return java.util.Map.of();
         }
 
         @Override
-        public java.util.Map<String, String> getUserProperties() {
+        public java.util.Map<String, String> userProperties() {
             return java.util.Map.of();
         }
 
         @Override
-        public RepositoryMerging getRepositoryMerging() {
+        public RepositoryMerging repositoryMerging() {
             return RepositoryMerging.POM_DOMINANT;
         }
 
         @Override
-        public java.util.List<RemoteRepository> getRepositories() {
+        public java.util.List<RemoteRepository> repositories() {
             return java.util.List.of();
         }
 
         @Override
-        public ModelTransformer getLifecycleBindingsInjector() {
+        public ModelTransformer lifecycleBindingsInjector() {
             return null;
         }
     }

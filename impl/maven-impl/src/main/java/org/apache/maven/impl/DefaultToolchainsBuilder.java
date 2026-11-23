@@ -187,7 +187,7 @@ public class DefaultToolchainsBuilder implements ToolchainsBuilder {
         }
 
         @Override
-        public ToolchainsBuilderRequest getRequest() {
+        public ToolchainsBuilderRequest request() {
             return request;
         }
 

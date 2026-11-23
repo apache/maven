@@ -20,12 +20,12 @@
 module org.apache.maven.api.cli {
     requires transitive org.apache.maven.api;
     requires transitive org.apache.maven.api.annotations;
+    requires transitive org.apache.maven.api.logging;
     requires transitive org.apache.maven.api.xml;
 
     exports org.apache.maven.api.cli;
     exports org.apache.maven.api.cli.cisupport;
     exports org.apache.maven.api.cli.extensions;
-    exports org.apache.maven.api.cli.logging;
     exports org.apache.maven.api.cli.mvn;
     exports org.apache.maven.api.cli.mvnenc;
     exports org.apache.maven.api.cli.mvnsh;

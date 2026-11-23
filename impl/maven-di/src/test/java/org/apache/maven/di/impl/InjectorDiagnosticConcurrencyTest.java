@@ -18,8 +18,6 @@
  */
 package org.apache.maven.di.impl;
 
-import java.io.ByteArrayOutputStream;
-import java.io.PrintStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CountDownLatch;
@@ -47,11 +45,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.parallel.Resources.SYSTEM_OUT;
 import static org.junit.jupiter.api.parallel.Resources.SYSTEM_PROPERTIES;
 
 @ResourceLock(SYSTEM_PROPERTIES)
-@ResourceLock(SYSTEM_OUT)
 @Timeout(30)
 class InjectorDiagnosticConcurrencyTest {
     private InjectorDiagnosticsFixture environment;
@@ -104,7 +100,7 @@ class InjectorDiagnosticConcurrencyTest {
         CountDownLatch releaseOutput = new CountDownLatch(1);
         RecordingInjector injector = new RecordingInjector() {
             @Override
-            void writeDump(PrintStream output, String dump) {
+            protected void writeDump(String dump) {
                 if (dumps.isEmpty()) {
                     firstOutput.countDown();
                     try {
@@ -114,7 +110,7 @@ class InjectorDiagnosticConcurrencyTest {
                         throw new AssertionError(e);
                     }
                 }
-                super.writeDump(output, dump);
+                super.writeDump(dump);
             }
         };
         injector.bindInstance(String.class, "value");
@@ -153,7 +149,7 @@ class InjectorDiagnosticConcurrencyTest {
         CountDownLatch release = new CountDownLatch(1);
         RecordingInjector injector = new RecordingInjector() {
             @Override
-            void writeDump(PrintStream output, String dump) {
+            protected void writeDump(String dump) {
                 if (dump.contains("@Named(\"z\")")) {
                     delayed.countDown();
                     try {
@@ -163,7 +159,7 @@ class InjectorDiagnosticConcurrencyTest {
                         throw new AssertionError(e);
                     }
                 }
-                super.writeDump(output, dump);
+                super.writeDump(dump);
             }
         };
         injector.bindInstance(String.class, "first");
@@ -220,7 +216,7 @@ class InjectorDiagnosticConcurrencyTest {
         AtomicInteger writes = new AtomicInteger();
         RecordingInjector injector = new RecordingInjector() {
             @Override
-            void writeDump(PrintStream output, String dump) {
+            protected void writeDump(String dump) {
                 if (writes.getAndIncrement() == 0) {
                     bindInstance(String.class, "second");
                     checkpoint();
@@ -228,7 +224,7 @@ class InjectorDiagnosticConcurrencyTest {
                     bindInstance(String.class, "third");
                     checkpoint();
                 }
-                super.writeDump(output, dump);
+                super.writeDump(dump);
             }
         };
         injector.bindInstance(String.class, "first");
@@ -241,15 +237,14 @@ class InjectorDiagnosticConcurrencyTest {
 
     @Test
     void resetWhileWritingKeepsOneWriterAndStartsANewFullHistory() throws Exception {
-        PrintStream originalOutput = System.out;
-        for (String reset : List.of("output", "mode", "off", "dispose")) {
+        for (String reset : List.of("mode", "off", "dispose")) {
             CountDownLatch writing = new CountDownLatch(1);
             CountDownLatch release = new CountDownLatch(1);
             AtomicInteger active = new AtomicInteger();
             AtomicInteger maximum = new AtomicInteger();
             RecordingInjector injector = new RecordingInjector() {
                 @Override
-                void writeDump(PrintStream output, String dump) {
+                protected void writeDump(String dump) {
                     maximum.accumulateAndGet(active.incrementAndGet(), Math::max);
                     try {
                         if (dumps.isEmpty()) {
@@ -261,7 +256,7 @@ class InjectorDiagnosticConcurrencyTest {
                                 throw new AssertionError(e);
                             }
                         }
-                        super.writeDump(output, dump);
+                        super.writeDump(dump);
                     } finally {
                         active.decrementAndGet();
                     }
@@ -270,11 +265,10 @@ class InjectorDiagnosticConcurrencyTest {
             System.setProperty(MAVEN_DI_DEBUG, "true");
             injector.bindInstance(String.class, "first");
             ExecutorService workers = Executors.newFixedThreadPool(2);
-            try (PrintStream other = new PrintStream(new ByteArrayOutputStream())) {
+            try {
                 Future<?> first = workers.submit(injector::checkpoint);
                 assertTrue(writing.await(10, TimeUnit.SECONDS));
                 switch (reset) {
-                    case "output" -> System.setOut(other);
                     case "mode" -> System.setProperty(MAVEN_DI_DEBUG, "ambiguous");
                     case "off" -> {
                         System.clearProperty(MAVEN_DI_DEBUG);
@@ -302,7 +296,6 @@ class InjectorDiagnosticConcurrencyTest {
             } finally {
                 release.countDown();
                 workers.shutdownNow();
-                System.setOut(originalOutput);
             }
         }
     }
@@ -312,13 +305,13 @@ class InjectorDiagnosticConcurrencyTest {
         AtomicInteger writes = new AtomicInteger();
         RecordingInjector injector = new RecordingInjector() {
             @Override
-            void writeDump(PrintStream output, String dump) {
+            protected void writeDump(String dump) {
                 if (writes.incrementAndGet() == 2) {
                     bindInstance(Long.class, 2L);
                     checkpoint();
                     throw new IllegalStateException("partially written block");
                 }
-                super.writeDump(output, dump);
+                super.writeDump(dump);
             }
         };
         injector.bindInstance(String.class, "first");

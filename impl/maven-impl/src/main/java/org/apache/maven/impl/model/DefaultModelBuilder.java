@@ -3166,12 +3166,12 @@ public class DefaultModelBuilder implements ModelBuilder {
     record ModelOperationRequest(ModelBuilderRequest modelRequest, ModelOperation operation, RequestTrace trace)
             implements Request<Session>, CacheMetadata {
         @Override
-        public Session getSession() {
-            return modelRequest.getSession();
+        public Session session() {
+            return modelRequest.session();
         }
 
         @Override
-        public RequestTrace getTrace() {
+        public RequestTrace trace() {
             return trace;
         }
 
@@ -3431,7 +3431,7 @@ public class DefaultModelBuilder implements ModelBuilder {
 
         @Nonnull
         @Override
-        public R getRequest() {
+        public R request() {
             return request;
         }
     }

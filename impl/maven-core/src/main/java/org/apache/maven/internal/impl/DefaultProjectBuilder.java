@@ -104,7 +104,7 @@ public class DefaultProjectBuilder implements ProjectBuilder {
             }
             return new ProjectBuilderResult() {
                 @Override
-                public ProjectBuilderRequest getRequest() {
+                public ProjectBuilderRequest request() {
                     return request;
                 }
 
@@ -135,57 +135,57 @@ public class DefaultProjectBuilder implements ProjectBuilder {
                 private BuilderProblem toProblem(ModelProblem problem) {
                     return new BuilderProblem() {
                         @Override
-                        public String getSource() {
+                        public String source() {
                             return problem.getSource();
                         }
 
                         @Override
-                        public int getLineNumber() {
+                        public int lineNumber() {
                             return problem.getLineNumber();
                         }
 
                         @Override
-                        public int getColumnNumber() {
+                        public int columnNumber() {
                             return problem.getColumnNumber();
                         }
 
                         @Override
-                        public String getLocation() {
+                        public String location() {
                             StringBuilder buffer = new StringBuilder(256);
 
-                            if (!getSource().isEmpty()) {
-                                buffer.append(getSource());
+                            if (!source().isEmpty()) {
+                                buffer.append(source());
                             }
 
-                            if (getLineNumber() > 0) {
+                            if (lineNumber() > 0) {
                                 if (!buffer.isEmpty()) {
                                     buffer.append(", ");
                                 }
-                                buffer.append("line ").append(getLineNumber());
+                                buffer.append("line ").append(lineNumber());
                             }
 
-                            if (getColumnNumber() > 0) {
+                            if (columnNumber() > 0) {
                                 if (!buffer.isEmpty()) {
                                     buffer.append(", ");
                                 }
-                                buffer.append("column ").append(getColumnNumber());
+                                buffer.append("column ").append(columnNumber());
                             }
 
                             return buffer.toString();
                         }
 
                         @Override
-                        public Exception getException() {
+                        public Exception exception() {
                             return problem.getException();
                         }
 
                         @Override
-                        public String getMessage() {
+                        public String message() {
                             return problem.getMessage();
                         }
 
                         @Override
-                        public Severity getSeverity() {
+                        public Severity severity() {
                             return Severity.valueOf(problem.getSeverity().name());
                         }
                     };
