@@ -157,6 +157,31 @@ public final class OriginBoundAuthenticationSelector implements AuthenticationSe
         }
     }
 
+    /**
+     * Records the origin of a deployment repository given in the {@code id::url} form of the Maven Deploy
+     * Plugin, or its former {@code id::layout::url} form. Other values are ignored.
+     *
+     * @param declaredOrigins the origins collected so far
+     * @param deploymentRepository the value of an {@code alt*DeploymentRepository} user property, may be
+     *     {@code null}
+     */
+    public static void addDeploymentRepositoryOrigin(
+            Map<String, Set<String>> declaredOrigins, String deploymentRepository) {
+        if (deploymentRepository == null) {
+            return;
+        }
+        int idEnd = deploymentRepository.indexOf("::");
+        if (idEnd > 0) {
+            String id = deploymentRepository.substring(0, idEnd).trim();
+            String url = deploymentRepository
+                    .substring(deploymentRepository.lastIndexOf("::") + 2)
+                    .trim();
+            if (!id.isEmpty()) {
+                addOrigin(declaredOrigins, id, url);
+            }
+        }
+    }
+
     @Override
     public Authentication getAuthentication(RemoteRepository repository) {
         Authentication auth = delegate.getAuthentication(repository);
