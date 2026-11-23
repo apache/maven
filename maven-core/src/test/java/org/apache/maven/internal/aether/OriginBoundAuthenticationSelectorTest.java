@@ -93,6 +93,23 @@ class OriginBoundAuthenticationSelectorTest {
     }
 
     @Test
+    void deploymentRepositoryDeclaresTheOriginOfItsId() {
+        Map<String, Set<String>> origins = new HashMap<>();
+        OriginBoundAuthenticationSelector.addDeploymentRepositoryOrigin(
+                origins, "deploy-server::https://deploy.example.org/releases/");
+        OriginBoundAuthenticationSelector.addDeploymentRepositoryOrigin(
+                origins, "legacy-server::default::https://legacy.example.org:8443/releases/");
+        OriginBoundAuthenticationSelector.addDeploymentRepositoryOrigin(origins, "https://no-id.example.org/");
+        OriginBoundAuthenticationSelector.addDeploymentRepositoryOrigin(origins, "::https://empty-id.example.org/");
+        OriginBoundAuthenticationSelector.addDeploymentRepositoryOrigin(origins, null);
+
+        Map<String, Set<String>> expected = new HashMap<>();
+        OriginBoundAuthenticationSelector.addOrigin(expected, "deploy-server", "https://deploy.example.org");
+        OriginBoundAuthenticationSelector.addOrigin(expected, "legacy-server", "https://legacy.example.org:8443");
+        assertEquals(expected, origins);
+    }
+
+    @Test
     void undeclaredIdKeepsLegacyBehaviorInOriginScope() {
         // e.g. a pure deployment server whose URL only exists in the project's distributionManagement
         AuthenticationSelector selector = OriginBoundAuthenticationSelector.wrap(
