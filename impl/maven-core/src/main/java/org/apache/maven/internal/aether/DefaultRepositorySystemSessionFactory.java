@@ -118,6 +118,11 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
      * Repositories declared inside a settings {@code <profile>} only contribute an origin when the profile
      * id is listed in {@code <activeProfiles>}; profiles activated through {@code <activation>} or
      * {@code -P} contribute none, which is what {@code <server><repositoryOrigins>} is for.
+     * <p>
+     * The id {@code central} of the default repository is bound to the origin of that repository and to the
+     * origins Maven Central is published to. The publishing origins are left out once the id is given any
+     * other origin, by a mirror or a repository with that id, by {@code <repositoryOrigins>} of that server
+     * or by a default repository location other than the built-in one.
      *
      * @since 4.0.0
      */
@@ -370,6 +375,7 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
             configProps.put("aether.transport.wagon.perms.fileMode." + server.getId(), server.getFilePermissions());
             configProps.put("aether.transport.wagon.perms.dirMode." + server.getId(), server.getDirectoryPermissions());
         }
+        OriginBoundAuthenticationSelector.addCentralPublishingOrigins(declaredRepositoryOrigins);
         String credentialScope = mergedProps.getOrDefault(
                 MAVEN_REPOSITORY_CREDENTIAL_SCOPE, OriginBoundAuthenticationSelector.SCOPE_ORIGIN);
         AuthenticationSelector effectiveAuthSelector = OriginBoundAuthenticationSelector.wrap(

@@ -93,6 +93,45 @@ class OriginBoundAuthenticationSelectorTest {
     }
 
     @Test
+    void centralIdIsBoundToTheOriginsCentralIsPublishedTo() {
+        Map<String, Set<String>> origins = declared("central", "https://repo.maven.apache.org/maven2");
+        OriginBoundAuthenticationSelector.addCentralPublishingOrigins(origins);
+        AuthenticationSelector selector = OriginBoundAuthenticationSelector.wrap(
+                serverCredentials("central"), OriginBoundAuthenticationSelector.SCOPE_STRICT, origins, LOGGER);
+
+        assertNotNull(selector.getAuthentication(repo("central", "https://repo.maven.apache.org/maven2")));
+        assertNotNull(selector.getAuthentication(
+                repo("central", "https://central.sonatype.com/repository/maven-snapshots/")));
+        assertNotNull(selector.getAuthentication(repo(
+                "central", "https://ossrh-staging-api.central.sonatype.com/service/local/staging/deploy/maven2/")));
+        assertNull(selector.getAuthentication(repo("central", "https://evil.example.org/maven2/")));
+    }
+
+    @Test
+    void centralIdIsNotBoundToPublishingOriginsOnceDeclaredElsewhere() {
+        Map<String, Set<String>> origins = declared("central", "https://repo.maven.apache.org/maven2");
+        OriginBoundAuthenticationSelector.addOrigin(origins, "central", "https://mirror.example.org/repo/");
+        OriginBoundAuthenticationSelector.addCentralPublishingOrigins(origins);
+        AuthenticationSelector selector = OriginBoundAuthenticationSelector.wrap(
+                serverCredentials("central"), OriginBoundAuthenticationSelector.SCOPE_ORIGIN, origins, LOGGER);
+
+        assertNotNull(selector.getAuthentication(repo("central", "https://mirror.example.org/repo/")));
+        assertNull(selector.getAuthentication(
+                repo("central", "https://central.sonatype.com/repository/maven-snapshots/")));
+    }
+
+    @Test
+    void publishingOriginsAreBoundToTheCentralIdOnly() {
+        Map<String, Set<String>> origins = declared("internal", "https://repo.maven.apache.org/maven2");
+        OriginBoundAuthenticationSelector.addCentralPublishingOrigins(origins);
+        AuthenticationSelector selector = OriginBoundAuthenticationSelector.wrap(
+                serverCredentials("internal"), OriginBoundAuthenticationSelector.SCOPE_ORIGIN, origins, LOGGER);
+
+        assertNull(selector.getAuthentication(
+                repo("internal", "https://central.sonatype.com/repository/maven-snapshots/")));
+    }
+
+    @Test
     void undeclaredIdKeepsLegacyBehaviorInOriginScope() {
         // e.g. a pure deployment server whose URL only exists in the project's distributionManagement
         AuthenticationSelector selector = OriginBoundAuthenticationSelector.wrap(

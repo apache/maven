@@ -43,6 +43,9 @@ import static java.util.Objects.requireNonNull;
  * that server's {@code <repositoryOrigins>} in settings. Ids with no operator-declared origin keep the
  * previous behaviour unless {@code strict} scope is requested, and a warning naming the target origin
  * is emitted once per id/origin pair.
+ * <p>
+ * The one origin bound without a declaration is where Maven Central is published to, for the id of the
+ * default repository; see {@link #addCentralPublishingOrigins(Map)}.
  *
  * <p>
  * Used by the Maven CLI session factory and by the standalone API runner, so both scope credentials the same way.
@@ -72,6 +75,17 @@ public final class OriginBoundAuthenticationSelector implements AuthenticationSe
      * Legacy behavior: credentials are matched by server id only.
      */
     public static final String SCOPE_ID = "id";
+
+    private static final String CENTRAL_ID = "central";
+
+    private static final String CENTRAL_ORIGIN = "https://repo.maven.apache.org";
+
+    /**
+     * The origins Maven Central is published to: the Central Portal, which also receives snapshots, and
+     * its OSSRH Staging API compatibility service.
+     */
+    private static final Set<String> CENTRAL_PUBLISHING_ORIGINS =
+            Set.of("https://central.sonatype.com", "https://ossrh-staging-api.central.sonatype.com");
 
     private final AuthenticationSelector delegate;
 
@@ -125,6 +139,21 @@ public final class OriginBoundAuthenticationSelector implements AuthenticationSe
         String origin = originOf(url);
         if (id != null && origin != null) {
             declaredOrigins.computeIfAbsent(id, k -> new HashSet<>()).add(origin);
+        }
+    }
+
+    /**
+     * Binds the id of the default repository to the origins Maven Central is published to, in addition to
+     * the origin it is read from: that id is also the server id commonly used for publishing. Nothing is
+     * added unless the built-in location of the default repository is the only origin of that id, so a
+     * mirror, a repository or a server {@code <repositoryOrigins>} giving it another origin takes over.
+     *
+     * @param declaredOrigins all origins collected for the session, including the ones servers declare
+     */
+    public static void addCentralPublishingOrigins(Map<String, Set<String>> declaredOrigins) {
+        Set<String> origins = declaredOrigins.get(CENTRAL_ID);
+        if (origins != null && origins.equals(Set.of(CENTRAL_ORIGIN))) {
+            origins.addAll(CENTRAL_PUBLISHING_ORIGINS);
         }
     }
 
