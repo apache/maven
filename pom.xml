@@ -131,6 +131,7 @@ under the License.
     <classWorldsVersion>2.12.1</classWorldsVersion>
     <commonsCliVersion>1.11.0</commonsCliVersion>
     <commonsIoVersion>2.22.0</commonsIoVersion>
+    <commonsLoggingVersion>1.4.0</commonsLoggingVersion>
     <hamcrestVersion>3.0</hamcrestVersion>
     <mockitoVersion>4.11.0</mockitoVersion>
     <plexusVersion>2.2.0</plexusVersion>
@@ -367,11 +368,6 @@ under the License.
         <version>${slf4jVersion}</version>
       </dependency>
       <dependency>
-        <groupId>org.slf4j</groupId>
-        <artifactId>jcl-over-slf4j</artifactId>
-        <version>${slf4jVersion}</version>
-      </dependency>
-      <dependency>
         <groupId>ch.qos.logback</groupId>
         <artifactId>logback-classic</artifactId>
         <version>1.2.13</version>
@@ -460,6 +456,11 @@ under the License.
         <groupId>commons-jxpath</groupId>
         <artifactId>commons-jxpath</artifactId>
         <version>${jxpathVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>${commonsLoggingVersion}</version>
       </dependency>
       <dependency>
         <groupId>org.codehaus.plexus</groupId>
@@ -705,6 +706,7 @@ under the License.
                     <exclude>org.sonatype.plexus:plexus-sec-dispatcher</exclude>
                     <exclude>org.sonatype.plexus:plexus-cipher</exclude>
                     <exclude>com.google.inject:guice</exclude>
+                    <exclude>org.slf4j:jcl-over-slf4j</exclude>
                   </excludes>
                   <includes>
                     <include>com.google.inject:guice:*:*:*:classes</include>
