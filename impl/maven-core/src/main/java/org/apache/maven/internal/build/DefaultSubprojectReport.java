@@ -28,7 +28,7 @@ import org.apache.maven.api.build.report.SubprojectReport;
 import org.apache.maven.api.logging.LogEvent;
 
 /**
- * Internal immutable implementation of {@link SubprojectReport}.
+ * Internal immutable implementation of {@code SubprojectReport}.
  */
 record DefaultSubprojectReport(
         String groupId,

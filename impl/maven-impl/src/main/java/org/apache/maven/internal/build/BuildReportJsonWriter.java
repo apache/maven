@@ -33,7 +33,7 @@ import org.apache.maven.api.logging.LogEvent;
 import org.apache.maven.api.services.BuilderProblem;
 
 /**
- * Serializes a {@link BuildReport} to JSON without any external library dependency.
+ * Serializes a {@code BuildReport} to JSON without any external library dependency.
  * <p>
  * The output is human-readable (indented with 2 spaces) and designed to be
  * stable across Maven versions — field order is fixed, and new fields are
@@ -46,10 +46,10 @@ import org.apache.maven.api.services.BuilderProblem;
  * is loaded by the embedder/IDE classloader while {@code maven-impl} is loaded by the
  * Maven runtime. Any change to these files must be applied to both copies.
  * <p>
- * Use {@link #write(Writer, BuildReport, int)} to write directly to any {@link Writer}
+ * Use {@code #write(Writer, BuildReport, int)} to write directly to any {@link Writer}
  * (e.g. a {@code BufferedWriter} wrapping an {@code OutputStream}); the JSON string is
  * built internally and discarded after writing so the caller does not need to retain a
- * reference to it. The {@link #toJson(BuildReport, int)} convenience method is provided
+ * reference to it. The {@code #toJson(BuildReport, int)} convenience method is provided
  * for testing and in-process consumers that need the string.
  */
 final class BuildReportJsonWriter {

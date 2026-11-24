@@ -27,7 +27,7 @@ import org.apache.maven.api.build.report.MojoReport;
 import org.apache.maven.api.logging.LogEvent;
 
 /**
- * Internal immutable implementation of {@link MojoReport}.
+ * Internal immutable implementation of {@code MojoReport}.
  */
 record DefaultMojoReport(
         String groupId,

@@ -23,7 +23,7 @@ import java.time.Instant;
 import org.apache.maven.api.build.report.FailureReport;
 
 /**
- * Internal immutable implementation of {@link FailureReport}.
+ * Internal immutable implementation of {@code FailureReport}.
  */
 record DefaultFailureReport(
         String subproject, String mojo, Instant timestamp, String exceptionType, String message, String stackTrace)

@@ -34,22 +34,6 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Internal immutable implementation of {@link BuildInvocation}.
- *
- * @param goals                  requested goals/phases
- * @param userProperties         user properties with sensitive values redacted
- * @param systemInfo             curated system properties for reproducibility
- * @param activeProfiles         explicitly activated profiles
- * @param selectedProjects       projects selected via {@code -pl}
- * @param excludedProjects       projects excluded via {@code -pl !module}
- * @param makeBehavior           reactor make behavior ({@code -am}/{@code -amd}), or {@code null}
- * @param resumeFrom             resume-from selector, or {@code null}
- * @param reactorFailureBehavior reactor failure behavior
- * @param offline                whether offline mode was active
- * @param updateSnapshots        whether snapshot updates were forced
- * @param batchMode              whether batch mode was active
- * @param recursive              whether recursive processing is enabled
- * @param resume                 whether resume mode was active
- * @param threads                degree of concurrency
  */
 public record DefaultBuildInvocation(
         List<String> goals,

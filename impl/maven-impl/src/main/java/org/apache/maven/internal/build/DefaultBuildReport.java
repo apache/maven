@@ -31,7 +31,7 @@ import org.apache.maven.api.logging.LogEvent;
 import org.apache.maven.api.services.BuilderProblem;
 
 /**
- * Internal immutable implementation of {@link BuildReport}.
+ * Internal immutable implementation of {@code BuildReport}.
  */
 record DefaultBuildReport(
         BuildInvocation invocation,
