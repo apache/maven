@@ -68,6 +68,9 @@ final class SbomReportWriter {
                 dependencies.computeIfAbsent(rootPurl, k -> new TreeSet<>()).add(depPurl);
             }
         }
+        for (String purl : components.keySet()) {
+            dependencies.putIfAbsent(purl, new TreeSet<>());
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append("{\n");
@@ -76,7 +79,7 @@ final class SbomReportWriter {
         sb.append("  \"version\": 1,\n");
         sb.append("  \"metadata\": {\n");
         sb.append("    \"timestamp\": \"").append(timestamp()).append("\",\n");
-        sb.append("    \"tools\": [{\"name\": \"mvn\"}],\n");
+        sb.append("    \"tools\": {\"components\": [{\"type\": \"application\", \"name\": \"mvn\"}]},\n");
         sb.append("    \"authors\": [{\"name\": \"Apache Maven\"}]\n");
         sb.append("  },\n");
         sb.append("  \"components\": [\n");

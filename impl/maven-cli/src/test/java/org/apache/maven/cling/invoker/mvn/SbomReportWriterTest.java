@@ -59,6 +59,9 @@ class SbomReportWriterTest {
         assertTrue(json.contains("\"name\": \"lib\""), "artifact name must be emitted");
         assertTrue(json.contains("\"ref\": \"pkg:maven/com.example/app@1.0\""), "root ref must be emitted");
         assertTrue(json.contains("\"dependsOn\": [\"pkg:maven/org.example/lib@2.0\"]"), "edge must be emitted");
+        assertTrue(
+                json.contains("{\"ref\": \"pkg:maven/org.example/lib@2.0\", \"dependsOn\": []}"),
+                "dependency component must appear in dependencies with empty dependsOn");
 
         Files.delete(file);
     }
