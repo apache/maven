@@ -34,6 +34,22 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Internal immutable implementation of {@link BuildInvocation}.
+ *
+ * @param goals the requested goals or lifecycle phases
+ * @param userProperties user-provided properties (sensitive values redacted)
+ * @param systemInfo captured JVM and OS system properties
+ * @param activeProfiles active Maven profiles
+ * @param selectedProjects selected projects for the reactor
+ * @param excludedProjects excluded projects from the reactor
+ * @param makeBehavior upstream/downstream make behavior flag, or {@code null} if unset
+ * @param resumeFrom project to resume the build from, or {@code null} if unset
+ * @param reactorFailureBehavior how the reactor responds to build failures
+ * @param offline whether the build runs in offline mode
+ * @param updateSnapshots whether snapshot update checks are forced
+ * @param batchMode whether Maven runs in non-interactive (batch) mode
+ * @param recursive whether sub-modules are built recursively
+ * @param resume whether the build resumes from a previous failure point
+ * @param threads degree of build concurrency
  */
 public record DefaultBuildInvocation(
         List<String> goals,
