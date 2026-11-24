@@ -921,6 +921,25 @@ public final class Constants {
     // ---- Build report ----
 
     /**
+     * Whether the structured build report is written at the end of each build.
+     * When set to {@code false}, no JSON report is produced. Defaults to {@code true}.
+     *
+     * @since 4.2.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "true")
+    public static final String MAVEN_BUILD_REPORT_ENABLED = "maven.buildReport.enabled";
+
+    /**
+     * Whether to include potentially sensitive system properties ({@code user.home}, {@code user.name})
+     * in the build report's {@code systemInfo} section. Defaults to {@code false}.
+     * Set to {@code true} to include these properties for diagnostics.
+     *
+     * @since 4.2.0
+     */
+    @Config(type = "java.lang.Boolean", defaultValue = "false")
+    public static final String MAVEN_BUILD_REPORT_INCLUDE_PII = "maven.buildReport.includePii";
+
+    /**
      * Maximum number of log events captured per scope (mojo, subproject, or build-level) in the
      * structured build report written to {@code target/build-reports/build-report-latest.json}.
      * Each of the three scopes is capped independently: once a buffer reaches this limit, further

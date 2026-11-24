@@ -175,7 +175,7 @@ public class ProjectBuildLogAppender implements AutoCloseable {
 
         @Override
         public boolean needsMetadata() {
-            return needsMetadata;
+            return needsMetadata || secondarySinks.stream().anyMatch(LogSink::needsMetadata);
         }
     }
 

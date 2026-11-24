@@ -96,6 +96,12 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
 
     // ---- Per-session config (read from system properties at SessionStarted) ----
 
+    /** Whether report generation is enabled; set at session start from {@link Constants#MAVEN_BUILD_REPORT_ENABLED}. */
+    private volatile boolean reportEnabled = true;
+
+    /** Whether PII properties are included; set at session start from {@link Constants#MAVEN_BUILD_REPORT_INCLUDE_PII}. */
+    private volatile boolean includePii = false;
+
     /** Cap on log events per scope; set at session start from {@link Constants#MAVEN_BUILD_REPORT_MAX_LOG_EVENTS}. */
     private volatile int maxLogEventsPerScope = 500;
 
@@ -132,6 +138,7 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
     private final Map<String, Throwable> projectFailures = new ConcurrentHashMap<>();
 
     /** Session-level state - set once on SessionStarted. */
+    // visible for testing
     volatile Session session;
 
     /** Build invocation - captured once at SessionStarted, immutable thereafter. */
@@ -141,9 +148,11 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
     private volatile Instant sessionStartTime;
 
     /** JVM shutdown hook used to persist a partial build report on unexpected termination. */
+    // visible for testing
     volatile Thread shutdownHook;
 
     /** Ensures that normal completion and shutdown hook do not write competing reports. */
+    // visible for testing
     final AtomicBoolean reportWritten = new AtomicBoolean();
 
     // ---- Log capture state ----
@@ -214,8 +223,9 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
     public void sessionStarted(ExecutionEvent event) {
         this.session = event.session();
         this.sessionStartTime = MonotonicClock.now();
-        this.buildInvocation = session.buildInvocation();
         // Read configurable caps from session properties (or fall back to defaults)
+        this.reportEnabled = readBooleanProperty(session, Constants.MAVEN_BUILD_REPORT_ENABLED, true);
+        this.includePii = readBooleanProperty(session, Constants.MAVEN_BUILD_REPORT_INCLUDE_PII, false);
         this.maxLogEventsPerScope = readIntProperty(session, Constants.MAVEN_BUILD_REPORT_MAX_LOG_EVENTS, 500);
         this.maxStacktraceLines = readIntProperty(
                 session, Constants.MAVEN_BUILD_REPORT_MAX_STACKTRACE_LINES, DEFAULT_MAX_STACKTRACE_LINES);
@@ -224,11 +234,41 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
                 Constants.MAVEN_BUILD_REPORT_MAX_THROWABLE_LINES,
                 BuildReportJsonWriter.DEFAULT_MAX_THROWABLE_LINES);
         this.buildLogBuffer = new ArrayBlockingQueue<>(this.maxLogEventsPerScope);
+        this.buildInvocation = session.buildInvocation();
+        if (this.buildInvocation == null) {
+            this.buildInvocation = DefaultBuildInvocation.from(session);
+        }
+        if (!includePii && this.buildInvocation instanceof DefaultBuildInvocation inv) {
+            // Strip potentially sensitive system properties from the report unless opted in
+            Map<String, String> filtered = new java.util.TreeMap<>(inv.systemInfo());
+            filtered.remove("user.home");
+            filtered.remove("user.name");
+            this.buildInvocation = new DefaultBuildInvocation(
+                    inv.goals(),
+                    inv.userProperties(),
+                    java.util.Collections.unmodifiableMap(filtered),
+                    inv.activeProfiles(),
+                    inv.selectedProjects(),
+                    inv.excludedProjects(),
+                    inv.makeBehavior(),
+                    inv.resumeFrom(),
+                    inv.reactorFailureBehavior(),
+                    inv.offline(),
+                    inv.updateSnapshots(),
+                    inv.batchMode(),
+                    inv.recursive(),
+                    inv.resume(),
+                    inv.threads());
+        }
         // Remove any leftover hook from a previous build (mvnd / embedded Maven reuse).
         // Must be done before resetting reportWritten to prevent the old hook from firing
         // against the new session's state.
         removeShutdownHook();
         this.reportWritten.set(false);
+
+        if (!reportEnabled) {
+            return;
+        }
 
         Thread hook = new Thread(
                 () -> {
@@ -260,7 +300,7 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
         removeShutdownHook();
 
         Session endSession = event.session();
-        if (endSession == null || !reportWritten.compareAndSet(false, true)) {
+        if (!reportEnabled || endSession == null || !reportWritten.compareAndSet(false, true)) {
             clearSessionState();
             return;
         }
@@ -468,6 +508,8 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
         buildInvocation = null;
         sessionStartTime = null;
         shutdownHook = null;
+        reportEnabled = true;
+        includePii = false;
         maxLogEventsPerScope = 500;
         maxStacktraceLines = DEFAULT_MAX_STACKTRACE_LINES;
         maxThrowableLines = BuildReportJsonWriter.DEFAULT_MAX_THROWABLE_LINES;
@@ -503,7 +545,12 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
         String javaVersion = System.getProperty("java.version", "unknown");
         List<String> goals = buildInvocation != null ? buildInvocation.goals() : List.of();
         List<Project> projects = endSession.getProjects();
-        Project topProject = projects.isEmpty() ? null : projects.get(0);
+        // Find the top-level project: prefer the one at the top directory, fall back to first
+        Path topDir = endSession.getTopDirectory();
+        Project topProject = projects.stream()
+                .filter(p -> topDir != null && topDir.equals(p.getBasedir()))
+                .findFirst()
+                .orElse(projects.isEmpty() ? null : projects.get(0));
         String projectId = topProject != null
                 ? topProject.groupId() + ":" + topProject.artifactId() + ":" + topProject.version()
                 : "unknown";
@@ -669,7 +716,7 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
     // ---- Utility methods ----
 
     private static String projectKey(Project project) {
-        return project.groupId() + ":" + project.artifactId();
+        return project.groupId() + ":" + project.artifactId() + ":" + project.version();
     }
 
     private static String mojoKey(Project project, MojoExecution mojo) {
@@ -704,6 +751,17 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
                         raw,
                         defaultValue);
             }
+        }
+        return defaultValue;
+    }
+
+    private static boolean readBooleanProperty(Session s, String key, boolean defaultValue) {
+        String raw = s.getUserProperties().get(key);
+        if (raw == null) {
+            raw = s.getSystemProperties().get(key);
+        }
+        if (raw != null) {
+            return Boolean.parseBoolean(raw.trim());
         }
         return defaultValue;
     }
