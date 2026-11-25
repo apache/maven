@@ -33,7 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Internal immutable implementation of {@link BuildInvocation}.
+ * Internal immutable implementation of {@link org.apache.maven.api.BuildInvocation}.
  *
  * @param goals                   the goals to execute
  * @param userProperties          user-defined properties (sensitive values masked)
@@ -90,11 +90,7 @@ public record DefaultBuildInvocation(
      * @return a new immutable build invocation instance
      */
     public static BuildInvocation from(Session session) {
-        BuildInvocation existing = session.buildInvocation();
-        if (existing != null) {
-            return existing;
-        }
-        // Fallback: build a minimal invocation from session properties
+        // Build a minimal invocation from session properties
         Map<String, String> userProps = new LinkedHashMap<>();
         session.getUserProperties().forEach((k, v) -> {
             String value = isSensitiveKey(k) ? "***" : v;

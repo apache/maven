@@ -177,7 +177,7 @@ public class DefaultSession extends AbstractSession implements InternalMavenSess
         if (buildInvocation == null) {
             synchronized (buildInvocationLock) {
                 if (buildInvocation == null) {
-                    buildInvocation = DefaultBuildInvocation.from(getMavenSession());
+                    buildInvocation = DefaultBuildInvocation.from(this);
                 }
             }
         }

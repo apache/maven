@@ -46,7 +46,7 @@ import org.apache.maven.api.services.BuilderProblem;
  * is loaded by the embedder/IDE classloader while {@code maven-impl} is loaded by the
  * Maven runtime. Any change to these files must be applied to both copies.
  * <p>
- * Use {@code #write(Writer, BuildReport, int)} to write directly to any {@link Writer}
+ * Use {@link #write(Writer, BuildReport, int)} to write directly to any {@link Writer}
  * (e.g. a {@code BufferedWriter} wrapping an {@code OutputStream}); the JSON string is
  * built internally and discarded after writing so the caller does not need to retain a
  * reference to it. The {@code #toJson(BuildReport, int)} convenience method is provided
