@@ -37,6 +37,8 @@ import org.apache.maven.api.build.report.BuildReport;
 import org.apache.maven.api.build.report.BuildStatus;
 import org.apache.maven.api.logging.LogEvent;
 import org.apache.maven.api.logging.LogLevel;
+import org.apache.maven.impl.build.BuildReportCollector;
+import org.apache.maven.impl.build.DefaultBuildInvocation;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

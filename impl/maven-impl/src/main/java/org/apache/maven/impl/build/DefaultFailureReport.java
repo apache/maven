@@ -16,35 +16,15 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.build;
+package org.apache.maven.impl.build;
 
-import java.time.Duration;
 import java.time.Instant;
-import java.util.List;
 
-import org.apache.maven.api.build.report.BuildStatus;
-import org.apache.maven.api.build.report.MojoReport;
-import org.apache.maven.api.logging.LogEvent;
+import org.apache.maven.api.build.report.FailureReport;
 
 /**
- * Internal immutable implementation of {@code MojoReport}.
+ * Internal immutable implementation of {@code FailureReport}.
  */
-record DefaultMojoReport(
-        String groupId,
-        String artifactId,
-        String version,
-        String goal,
-        String executionId,
-        String phase,
-        BuildStatus status,
-        Instant startTime,
-        Duration duration,
-        String traceId,
-        String spanId,
-        List<LogEvent> output)
-        implements MojoReport {
-
-    DefaultMojoReport {
-        output = List.copyOf(output);
-    }
-}
+record DefaultFailureReport(
+        String subproject, String mojo, Instant timestamp, String exceptionType, String message, String stackTrace)
+        implements FailureReport {}
