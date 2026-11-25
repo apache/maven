@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.build;
+package org.apache.maven.impl.build;
 
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -28,28 +28,28 @@ import java.util.TreeMap;
 import org.apache.maven.api.BuildInvocation;
 import org.apache.maven.api.MakeBehavior;
 import org.apache.maven.api.ReactorFailureBehavior;
-import org.apache.maven.execution.MavenSession;
+import org.apache.maven.api.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Internal immutable implementation of {@link BuildInvocation}.
  *
- * @param goals the requested goals or lifecycle phases
- * @param userProperties user-provided properties (sensitive values redacted)
- * @param systemInfo captured JVM and OS system properties
- * @param activeProfiles active Maven profiles
- * @param selectedProjects selected projects for the reactor
- * @param excludedProjects excluded projects from the reactor
- * @param makeBehavior upstream/downstream make behavior flag, or {@code null} if unset
- * @param resumeFrom project to resume the build from, or {@code null} if unset
- * @param reactorFailureBehavior how the reactor responds to build failures
- * @param offline whether the build runs in offline mode
- * @param updateSnapshots whether snapshot update checks are forced
- * @param batchMode whether Maven runs in non-interactive (batch) mode
- * @param recursive whether sub-modules are built recursively
- * @param resume whether the build resumes from a previous failure point
- * @param threads degree of build concurrency
+ * @param goals                   the goals to execute
+ * @param userProperties          user-defined properties (sensitive values masked)
+ * @param systemInfo              system information captured at invocation time
+ * @param activeProfiles          profiles explicitly activated by the user
+ * @param selectedProjects        projects selected via {@code -pl}
+ * @param excludedProjects        projects excluded via {@code -pl !...}
+ * @param makeBehavior            reactor make behaviour ({@code -am}, {@code -amd})
+ * @param resumeFrom              project to resume from ({@code -rf})
+ * @param reactorFailureBehavior  how the reactor should behave on failures ({@code -fae}, {@code -ff}, {@code -fn})
+ * @param offline                 whether Maven is running in offline mode
+ * @param updateSnapshots         whether to force snapshot updates
+ * @param batchMode               whether Maven is running in batch (non-interactive) mode
+ * @param recursive               whether the build recurses into sub-projects
+ * @param resume                  whether to resume a previously interrupted build
+ * @param threads                 degree of concurrency ({@code -T})
  */
 public record DefaultBuildInvocation(
         List<String> goals,
@@ -86,22 +86,20 @@ public record DefaultBuildInvocation(
     /**
      * Creates a {@link BuildInvocation} snapshot from the current session state.
      *
-     * @param session the Maven session
+     * @param session the Maven session (new API)
      * @return a new immutable build invocation instance
      */
-    public static BuildInvocation from(MavenSession session) {
-        var request = session.getRequest();
-
-        List<String> goals = request.getGoals() != null ? List.copyOf(request.getGoals()) : List.of();
-
-        Map<String, String> userProps = new LinkedHashMap<>();
-        if (request.getUserProperties() != null) {
-            request.getUserProperties().forEach((k, v) -> {
-                String key = String.valueOf(k);
-                String value = isSensitiveKey(key) ? "***" : String.valueOf(v);
-                userProps.put(key, value);
-            });
+    public static BuildInvocation from(Session session) {
+        BuildInvocation existing = session.buildInvocation();
+        if (existing != null) {
+            return existing;
         }
+        // Fallback: build a minimal invocation from session properties
+        Map<String, String> userProps = new LinkedHashMap<>();
+        session.getUserProperties().forEach((k, v) -> {
+            String value = isSensitiveKey(k) ? "***" : v;
+            userProps.put(k, value);
+        });
 
         Map<String, String> sysInfo = new TreeMap<>();
         addSystemProp(sysInfo, "os.name");
@@ -119,53 +117,22 @@ public record DefaultBuildInvocation(
         addSystemProp(sysInfo, "user.name");
         sysInfo.put("available.processors", String.valueOf(Runtime.getRuntime().availableProcessors()));
 
-        List<String> activeProfiles =
-                request.getActiveProfiles() != null ? List.copyOf(request.getActiveProfiles()) : List.of();
-
-        List<String> selectedProjects =
-                request.getSelectedProjects() != null ? List.copyOf(request.getSelectedProjects()) : List.of();
-
-        List<String> excludedProjects =
-                request.getExcludedProjects() != null ? List.copyOf(request.getExcludedProjects()) : List.of();
-
-        MakeBehavior makeBehavior = null;
-        if (request.getMakeBehavior() != null) {
-            try {
-                makeBehavior = MakeBehavior.fromString(request.getMakeBehavior());
-            } catch (IllegalArgumentException e) {
-                LOGGER.debug("Unknown make behavior '{}', ignoring", request.getMakeBehavior());
-            }
-        }
-
-        String resumeFrom = request.getResumeFrom();
-
-        ReactorFailureBehavior failureBehavior = ReactorFailureBehavior.FAIL_FAST;
-        if (request.getReactorFailureBehavior() != null) {
-            try {
-                failureBehavior = ReactorFailureBehavior.fromString(request.getReactorFailureBehavior());
-            } catch (IllegalArgumentException e) {
-                LOGGER.debug(
-                        "Unknown reactor failure behavior '{}', defaulting to FAIL_FAST",
-                        request.getReactorFailureBehavior());
-            }
-        }
-
         return new DefaultBuildInvocation(
-                goals,
+                List.of(),
                 Map.copyOf(userProps),
                 Map.copyOf(sysInfo),
-                activeProfiles,
-                selectedProjects,
-                excludedProjects,
-                makeBehavior,
-                resumeFrom,
-                failureBehavior,
-                request.isOffline(),
-                request.isUpdateSnapshots(),
-                !request.isInteractiveMode(),
-                request.isRecursive(),
-                request.isResume(),
-                request.getDegreeOfConcurrency());
+                List.of(),
+                List.of(),
+                List.of(),
+                null,
+                null,
+                ReactorFailureBehavior.FAIL_FAST,
+                false,
+                false,
+                false,
+                true,
+                false,
+                session.getDegreeOfConcurrency());
     }
 
     static boolean isSensitiveKey(String key) {

@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.build;
+package org.apache.maven.impl.build;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -399,9 +399,9 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
                     TraceContext traceContext = TraceContext.EMPTY;
 
                     MojoTiming timing = new MojoTiming(
-                            mojo.plugin().getModel().getGroupId(),
-                            mojo.plugin().getModel().getArtifactId(),
-                            mojo.plugin().getModel().getVersion(),
+                            mojo.plugin().getModel().groupId(),
+                            mojo.plugin().getModel().artifactId(),
+                            mojo.plugin().getModel().version(),
                             mojo.goal(),
                             mojo.executionId().orElse(null),
                             mojo.lifecyclePhase().orElse(null),
@@ -443,9 +443,9 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
                     List<LogEvent> output = logBuffer != null ? new ArrayList<>(logBuffer) : List.of();
 
                     MojoTiming timing = new MojoTiming(
-                            mojo.plugin().getModel().getGroupId(),
-                            mojo.plugin().getModel().getArtifactId(),
-                            mojo.plugin().getModel().getVersion(),
+                            mojo.plugin().getModel().groupId(),
+                            mojo.plugin().getModel().artifactId(),
+                            mojo.plugin().getModel().version(),
                             mojo.goal(),
                             mojo.executionId().orElse(null),
                             mojo.lifecyclePhase().orElse(null),
@@ -555,7 +555,7 @@ public final class BuildReportCollector implements ExecutionListener, LogSink, S
                 ? topProject.groupId() + ":" + topProject.artifactId() + ":" + topProject.version()
                 : "unknown";
         boolean multiSubproject = projects.size() > 1;
-        int threads = endSession.getDegreeOfConcurrency();
+        int threads = endSession.buildInvocation().threads();
 
         // Build-level log events (outside any subproject lifecycle)
         List<LogEvent> buildOutput = new ArrayList<>(buildLogBuffer);

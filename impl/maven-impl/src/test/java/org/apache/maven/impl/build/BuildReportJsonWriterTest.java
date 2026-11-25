@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.build;
+package org.apache.maven.impl.build;
 
 import java.time.Duration;
 import java.time.Instant;
@@ -32,6 +32,12 @@ import org.apache.maven.api.build.report.MojoReport;
 import org.apache.maven.api.build.report.SubprojectReport;
 import org.apache.maven.api.logging.LogEvent;
 import org.apache.maven.api.logging.LogLevel;
+import org.apache.maven.impl.build.BuildReportJsonWriter;
+import org.apache.maven.impl.build.DefaultBuildInvocation;
+import org.apache.maven.impl.build.DefaultBuildReport;
+import org.apache.maven.impl.build.DefaultFailureReport;
+import org.apache.maven.impl.build.DefaultMojoReport;
+import org.apache.maven.impl.build.DefaultSubprojectReport;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

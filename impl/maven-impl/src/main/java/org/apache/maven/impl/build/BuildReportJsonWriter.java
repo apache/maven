@@ -16,7 +16,7 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.apache.maven.internal.build;
+package org.apache.maven.impl.build;
 
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -239,17 +239,17 @@ final class BuildReportJsonWriter {
 
     private static void writeProblem(StringBuilder sb, BuilderProblem problem, int indent) {
         sb.append("{\n");
-        writeField(sb, indent + 1, "severity", problem.getSeverity().name());
-        writeField(sb, indent + 1, "message", problem.getMessage());
-        String source = problem.getSource();
+        writeField(sb, indent + 1, "severity", problem.severity().name());
+        writeField(sb, indent + 1, "message", problem.message());
+        String source = problem.source();
         if (source != null && !source.isEmpty()) {
             writeField(sb, indent + 1, "source", source);
         }
-        if (problem.getLineNumber() > 0) {
-            writeField(sb, indent + 1, "line", problem.getLineNumber());
+        if (problem.lineNumber() > 0) {
+            writeField(sb, indent + 1, "line", problem.lineNumber());
         }
-        if (problem.getColumnNumber() > 0) {
-            writeField(sb, indent + 1, "column", problem.getColumnNumber());
+        if (problem.columnNumber() > 0) {
+            writeField(sb, indent + 1, "column", problem.columnNumber());
         }
         // Remove the trailing comma from the last written field
         removeTrailingComma(sb);

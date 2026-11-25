@@ -47,7 +47,7 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.AbstractSession;
 import org.apache.maven.impl.DefaultRemoteRepository;
 import org.apache.maven.impl.PropertiesAsMap;
-import org.apache.maven.internal.build.DefaultBuildInvocation;
+import org.apache.maven.impl.build.DefaultBuildInvocation;
 import org.apache.maven.plugin.MojoExecution;
 import org.apache.maven.plugin.descriptor.MojoDescriptor;
 import org.apache.maven.plugin.descriptor.PluginDescriptor;
