@@ -30,6 +30,7 @@ import org.apache.maven.api.ProducedArtifact;
 import org.apache.maven.api.Project;
 import org.apache.maven.api.ProjectScope;
 import org.apache.maven.api.SourceRoot;
+import org.apache.maven.api.Type;
 import org.apache.maven.api.model.Source;
 import org.apache.maven.api.services.ArtifactManager;
 import org.apache.maven.impl.DefaultModelVersionParser;
@@ -63,7 +64,7 @@ class DefaultProjectManagerTest {
         MavenProject mavenProject = new MavenProject();
         mavenProject.setFile(
                 Path.of("target", "project", "pom.xml").toAbsolutePath().toFile());
-        Project project = new DefaultProject(session, mavenProject);
+        Project project = project(session, mavenProject);
         DefaultProjectManager projectManager = new DefaultProjectManager(session, Mockito.mock(ArtifactManager.class));
 
         projectManager.addSourceRoot(
@@ -86,16 +87,16 @@ class DefaultProjectManagerTest {
         InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
         ArtifactManager artifactManager = Mockito.mock(ArtifactManager.class);
         MavenProject mavenProject = new MavenProject();
-        project = new DefaultProject(session, mavenProject);
+        mavenProject.setGroupId("myGroup");
+        mavenProject.setArtifactId("myArtifact");
+        mavenProject.setVersion("1.0-SNAPSHOT");
+        project = project(session, mavenProject);
         artifact = Mockito.mock(ProducedArtifact.class);
         artifactPath = Paths.get("");
         DefaultVersionParser versionParser =
                 new DefaultVersionParser(new DefaultModelVersionParser(new GenericVersionScheme()));
         projectManager = new DefaultProjectManager(session, artifactManager);
 
-        mavenProject.setGroupId("myGroup");
-        mavenProject.setArtifactId("myArtifact");
-        mavenProject.setVersion("1.0-SNAPSHOT");
         when(artifact.getGroupId()).thenReturn("myGroup");
         when(artifact.getArtifactId()).thenReturn("myArtifact");
         when(artifact.getBaseVersion()).thenReturn(versionParser.parseVersion("1.0-SNAPSHOT"));
@@ -160,7 +161,7 @@ class DefaultProjectManagerTest {
         mavenProject.setArtifact(new org.apache.maven.artifact.DefaultArtifact(
                 "org.foo", "bar", "1.0.0", "compile", "jar", "", new TestArtifactHandler("jar")));
 
-        Project project = new DefaultProject(session, mavenProject);
+        Project project = project(session, mavenProject);
         assertTrue(project.packaging().producesMainArtifact());
         assertTrue(project.producesMainArtifact());
         assertSame(project.packaging(), project.packaging());
@@ -174,6 +175,42 @@ class DefaultProjectManagerTest {
         DefaultProjectManager projectManager = new DefaultProjectManager(session, Mockito.mock(ArtifactManager.class));
         Collection<ProducedArtifact> all = projectManager.getAllArtifacts(project);
         assertEquals(2, all.size());
+    }
+
+    @Test
+    void jarPackagingProducesMainArtifactBeforeLegacyArtifactIsInitialized() {
+        InternalMavenSession session = Mockito.mock(InternalMavenSession.class);
+        Packaging packaging = Mockito.mock(Packaging.class);
+        Type type = Mockito.mock(Type.class);
+        when(packaging.producesMainArtifact()).thenReturn(true);
+        when(packaging.type()).thenReturn(type);
+        when(type.extension()).thenReturn("jar");
+        when(session.requirePackaging("jar")).thenReturn(packaging);
+
+        ProducedArtifact pomProduced = Mockito.mock(ProducedArtifact.class);
+        ProducedArtifact jarProduced = Mockito.mock(ProducedArtifact.class);
+        when(session.getArtifact(
+                        Mockito.eq(ProducedArtifact.class),
+                        Mockito.argThat(a -> a != null && "pom".equals(a.getExtension()))))
+                .thenReturn(pomProduced);
+        when(session.getArtifact(
+                        Mockito.eq(ProducedArtifact.class),
+                        Mockito.argThat(a -> a != null && "jar".equals(a.getExtension()))))
+                .thenReturn(jarProduced);
+
+        MavenProject mavenProject = new MavenProject();
+        mavenProject.setGroupId("org.foo");
+        mavenProject.setArtifactId("bar");
+        mavenProject.setVersion("1.0.0");
+        mavenProject.setPackaging("jar");
+        mavenProject.setFile(
+                Path.of("target", "project", "pom.xml").toAbsolutePath().toFile());
+
+        Project project = project(session, mavenProject);
+
+        assertTrue(project.producesMainArtifact());
+        assertEquals(List.of(pomProduced, jarProduced), project.getArtifacts());
+        assertSame(jarProduced, project.mainArtifact().orElseThrow());
     }
 
     @Test
@@ -197,7 +234,7 @@ class DefaultProjectManagerTest {
         mavenProject.setArtifact(new org.apache.maven.artifact.DefaultArtifact(
                 "org.foo", "bar-parent", "1.0.0", "compile", "pom", "", new TestArtifactHandler("pom")));
 
-        Project project = new DefaultProject(session, mavenProject);
+        Project project = project(session, mavenProject);
         assertFalse(project.packaging().producesMainArtifact());
         assertFalse(project.producesMainArtifact());
         assertSame(project.packaging(), project.packaging());
@@ -229,7 +266,7 @@ class DefaultProjectManagerTest {
         mavenProject.setArtifact(new org.apache.maven.artifact.DefaultArtifact(
                 "org.foo", "bar-bom", "1.0.0", "compile", "pom", "", new TestArtifactHandler("pom")));
 
-        Project project = new DefaultProject(session, mavenProject);
+        Project project = project(session, mavenProject);
         assertFalse(project.packaging().producesMainArtifact());
         assertFalse(project.producesMainArtifact());
         assertSame(project.packaging(), project.packaging());
@@ -276,7 +313,7 @@ class DefaultProjectManagerTest {
                 .build();
         mavenProject.setBuild(new org.apache.maven.model.Build(modelBuild));
 
-        Project project = new DefaultProject(session, mavenProject);
+        Project project = project(session, mavenProject);
 
         assertTrue(project.packaging().producesMainArtifact());
         assertFalse(project.producesMainArtifact());
@@ -335,7 +372,7 @@ class DefaultProjectManagerTest {
                 "myGroup", "myArtifact", "1.0-SNAPSHOT", "compile", "jar", "", new TestArtifactHandler("jar"));
         mavenProject.setArtifact(legacyArtifact);
 
-        Project project = new DefaultProject(session, mavenProject);
+        Project project = project(session, mavenProject);
         ArtifactManager artifactManager = Mockito.mock(ArtifactManager.class);
         DefaultProjectManager projectManager = new DefaultProjectManager(session, artifactManager);
 
@@ -360,18 +397,20 @@ class DefaultProjectManagerTest {
                         null,
                         true));
 
-        // After adding module source hierarchy: project does not produce main artifact, but packaging descriptor still
-        // does
-        assertTrue(project.packaging().producesMainArtifact());
-        assertFalse(project.producesMainArtifact());
-        assertSame(project.packaging(), project.packaging());
+        Project updatedProject = ((DefaultProject) project).mutableProject().project();
+
+        // The original snapshot is stable; the holder exposes the replacement state.
+        assertTrue(project.producesMainArtifact());
+        assertTrue(updatedProject.packaging().producesMainArtifact());
+        assertFalse(updatedProject.producesMainArtifact());
+        assertSame(updatedProject.packaging(), updatedProject.packaging());
 
         // project.getArtifacts() contains ONLY POM artifact (directory is NOT exposed as main artifact)
-        List<ProducedArtifact> artifacts = project.getArtifacts();
+        List<ProducedArtifact> artifacts = updatedProject.getArtifacts();
         assertEquals(1, artifacts.size());
         assertTrue(artifacts.contains(pomProduced));
         assertFalse(artifacts.contains(jarProduced));
-        assertFalse(project.mainArtifact().isPresent());
+        assertFalse(updatedProject.mainArtifact().isPresent());
 
         // Legacy MavenProject.getArtifact() remains intact for backward compatibility
         assertEquals(legacyArtifact, mavenProject.getArtifact());
@@ -413,5 +452,15 @@ class DefaultProjectManagerTest {
 
         assertTrue(cause.contains(expectedGAV), message);
         assertTrue(cause.contains(actualGAV), message);
+    }
+
+    private static Project project(InternalMavenSession session, MavenProject mavenProject) {
+        DefaultProject project = new DefaultProject(session, mavenProject);
+        when(session.getMavenProject(Mockito.any(Project.class))).thenReturn(mavenProject);
+        when(session.updateProject(Mockito.any(Project.class))).thenAnswer(invocation -> {
+            DefaultProject supplied = invocation.getArgument(0);
+            return supplied.mutableProject().update(current -> ((DefaultProject) current).newSnapshot(mavenProject));
+        });
+        return project;
     }
 }

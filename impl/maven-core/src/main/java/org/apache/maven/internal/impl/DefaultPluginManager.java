@@ -45,7 +45,6 @@ import org.apache.maven.plugin.version.PluginVersionResolutionException;
 import org.apache.maven.project.MavenProject;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.maven.internal.impl.CoreUtils.cast;
 
 @Named
 @Singleton
@@ -85,8 +84,7 @@ public final class DefaultPluginManager implements PluginManager {
         Project project = request.project();
         org.apache.maven.api.model.Plugin plugin = request.plugin();
         InternalMavenSession internalSession = InternalMavenSession.from(session);
-        MavenProject mavenProject =
-                cast(DefaultProject.class, project, "project").getProject();
+        MavenProject mavenProject = internalSession.getMavenProject(project);
         MavenSession executionSession = internalSession.getMavenSession().clone();
         executionSession.setCurrentProject(mavenProject);
 

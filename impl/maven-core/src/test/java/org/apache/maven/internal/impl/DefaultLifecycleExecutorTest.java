@@ -92,7 +92,7 @@ class DefaultLifecycleExecutorTest {
         when(session.getMavenSession()).thenReturn(mavenSession);
         when(session.getService(Lookup.class)).thenReturn(mock(Lookup.class));
         when(mavenSession.getCurrentProject()).thenReturn(previousProject);
-        when(apiProject.getProject()).thenReturn(project);
+        when(session.getMavenProject(apiProject)).thenReturn(project);
         when(taskSegmentCalculator.calculateTaskSegments(mavenSession, List.of("verify")))
                 .thenReturn(List.of(segment));
 

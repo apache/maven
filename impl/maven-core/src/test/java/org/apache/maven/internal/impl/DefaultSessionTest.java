@@ -25,6 +25,8 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+import org.apache.maven.api.Packaging;
+import org.apache.maven.api.Project;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.execution.DefaultMavenExecutionRequest;
@@ -32,16 +34,22 @@ import org.apache.maven.execution.MavenSession;
 import org.apache.maven.impl.InternalSession;
 import org.apache.maven.impl.RequestTraceHelper;
 import org.apache.maven.model.root.RootLocator;
+import org.apache.maven.project.MavenProject;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.when;
 
 public class DefaultSessionTest {
 
@@ -147,6 +155,68 @@ public class DefaultSessionTest {
         assertEquals(Paths.get("myRootDirectory"), session.getRootDirectory());
     }
 
+    @Test
+    void projectsWithTheSameGavKeepDistinctIdentity() {
+        DefaultSession session = projectSession();
+        MavenProject first = project("first");
+        MavenProject second = project("second");
+
+        Project firstSnapshot = session.getProject(first);
+        Project secondSnapshot = session.getProject(second);
+
+        assertNotSame(firstSnapshot, secondSnapshot);
+        assertSame(first, session.getMavenProject(firstSnapshot));
+        assertSame(second, session.getMavenProject(secondSnapshot));
+        assertSame(firstSnapshot, session.getProject(first));
+        assertSame(secondSnapshot, session.getProject(second));
+    }
+
+    @Test
+    void derivedSessionsShareProjectIdentity() {
+        DefaultSession session = projectSession();
+        MavenProject legacyProject = project("derived");
+        Project snapshot = session.getProject(legacyProject);
+
+        InternalMavenSession derived = (InternalMavenSession)
+                session.withContext(new RequestTrace("derived")).withRemoteRepositories(Collections.emptyList());
+
+        assertSame(snapshot, derived.getProject(legacyProject));
+        assertSame(legacyProject, derived.getMavenProject(snapshot));
+    }
+
+    @Test
+    void updatingOneSameGavProjectReplacesOnlyItsSnapshot() {
+        DefaultSession session = projectSession();
+        MavenProject first = project("first");
+        MavenProject second = project("second");
+        Project originalFirst = session.getProject(first);
+        Project originalSecond = session.getProject(second);
+
+        first.setVersion("2.0");
+        Project updatedFirst = session.updateProject(originalFirst);
+
+        assertEquals("1.0", originalFirst.version());
+        assertEquals("2.0", updatedFirst.version());
+        assertSame(updatedFirst, session.getProject(first));
+        assertSame(originalSecond, session.getProject(second));
+    }
+
+    @Test
+    void forkedProjectDoesNotShareItsExecutionProjectsHolder() {
+        DefaultSession session = projectSession();
+        MavenProject executionProject = project("execution");
+        MavenProject fork = executionProject.clone();
+        fork.setFile(Paths.get("target", "fork", "pom.xml").toAbsolutePath().toFile());
+        fork.setExecutionProject(executionProject);
+
+        Project executionSnapshot = session.getProject(executionProject);
+        Project forkSnapshot = session.getProject(fork);
+
+        assertNotSame(executionSnapshot, forkSnapshot);
+        assertSame(executionProject, session.getMavenProject(executionSnapshot));
+        assertSame(fork, session.getMavenProject(forkSnapshot));
+    }
+
     private static RequestTrace enterAndReadTrace(InternalSession session, CyclicBarrier barrier, String data)
             throws Exception {
         RequestTraceHelper.ResolverTrace trace = RequestTraceHelper.enter(session, data);
@@ -165,5 +235,24 @@ public class DefaultSessionTest {
                 mavenSession, mock(RepositorySystem.class), Collections.emptyList(), null, null, null);
         InternalSession.associate(rss, session);
         return session;
+    }
+
+    private static DefaultSession projectSession() {
+        DefaultSession session = spy(newSession());
+        Packaging packaging = mock(Packaging.class);
+        when(packaging.producesMainArtifact()).thenReturn(false);
+        doReturn(packaging).when(session).requirePackaging(anyString());
+        return session;
+    }
+
+    private static MavenProject project(String directory) {
+        MavenProject project = new MavenProject();
+        project.setGroupId("group");
+        project.setArtifactId("artifact");
+        project.setVersion("1.0");
+        project.setPackaging("pom");
+        project.setFile(
+                Paths.get("target", directory, "pom.xml").toAbsolutePath().toFile());
+        return project;
     }
 }

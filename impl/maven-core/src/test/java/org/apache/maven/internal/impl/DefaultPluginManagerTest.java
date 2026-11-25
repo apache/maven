@@ -85,7 +85,7 @@ class DefaultPluginManagerTest {
                 .request(any(), any());
         when(session.getMavenSession()).thenReturn(mavenSession);
         when(mavenSession.clone()).thenReturn(executionSession);
-        when(project.getProject()).thenReturn(mavenProject);
+        when(session.getMavenProject(project)).thenReturn(mavenProject);
         when(legacyPluginManager.getPluginDescriptor(eq(model), any(), any())).thenReturn(descriptor);
         when(descriptor.getPluginDescriptorV4()).thenReturn(apiDescriptor);
         when(descriptor.getClassRealm()).thenReturn(realm);
@@ -138,7 +138,7 @@ class DefaultPluginManagerTest {
                 .request(any(), any());
         when(session.getMavenSession()).thenReturn(mavenSession);
         when(mavenSession.clone()).thenReturn(executionSession);
-        when(project.getProject()).thenReturn(mavenProject);
+        when(session.getMavenProject(project)).thenReturn(mavenProject);
 
         DefaultPluginManager manager =
                 new DefaultPluginManager(legacyPluginManager, lifecyclePluginResolver, mock(Lookup.class));

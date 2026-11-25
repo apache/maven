@@ -50,7 +50,6 @@ import org.apache.maven.project.MavenProject;
 import org.eclipse.sisu.Typed;
 
 import static java.util.Objects.requireNonNull;
-import static org.apache.maven.internal.impl.CoreUtils.cast;
 
 @Named
 @Typed({LifecycleExecutor.class, Service.class})
@@ -73,8 +72,7 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
         requireNonNull(request, "request");
         InternalMavenSession internalSession = InternalMavenSession.from(request.getSession());
         MavenSession mavenSession = internalSession.getMavenSession();
-        MavenProject mavenProject =
-                cast(DefaultProject.class, request.project(), "project").getProject();
+        MavenProject mavenProject = internalSession.getMavenProject(request.project());
         MavenProject previousProject = mavenSession.getCurrentProject();
 
         mavenSession.setCurrentProject(mavenProject);
@@ -107,13 +105,12 @@ public class DefaultLifecycleExecutor implements LifecycleExecutor {
     @Override
     public LifecycleExecutionResult execute(@Nonnull LifecycleExecutionRequest request) {
         requireNonNull(request, "request");
-        MavenSession mavenSession =
-                InternalMavenSession.from(request.getSession()).getMavenSession();
+        InternalMavenSession internalSession = InternalMavenSession.from(request.getSession());
+        MavenSession mavenSession = internalSession.getMavenSession();
         if (!(request.plan() instanceof DefaultLifecyclePlan plan)) {
             throw new IllegalArgumentException("plan was not produced by this lifecycle executor");
         }
-        MavenProject mavenProject =
-                cast(DefaultProject.class, plan.project(), "project").getProject();
+        MavenProject mavenProject = internalSession.getMavenProject(plan.project());
         MavenProject previousProject = mavenSession.getCurrentProject();
         BuildPlanExecutor.BuildContext buildContext = plan.buildContext();
 
