@@ -1333,6 +1333,11 @@ public class DefaultModelBuilder implements ModelBuilder {
                     }
 
                     importRequest.setModelSource(importSource);
+                    // a reactor BOM imported by a project is built as a project, not as an external model
+                    importRequest.setPomFile(
+                            importSource instanceof ReactorModelSource && !isExternalModelBuildingRequest(request)
+                                    ? ((ReactorModelSource) importSource).getFile()
+                                    : null);
                     importRequest.setModelResolver(modelResolver.newCopy());
 
                     final ModelBuildingResult importResult;
