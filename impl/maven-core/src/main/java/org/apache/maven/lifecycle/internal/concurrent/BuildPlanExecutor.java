@@ -269,7 +269,8 @@ public class BuildPlanExecutor {
                 plan.steps(project).forEach(step -> {
                     if (step.predecessors.stream().noneMatch(s -> s.project == project)) {
                         step.executeAfter(setup);
-                    } else if (step.successors.stream().noneMatch(s -> s.project == project)) {
+                    }
+                    if (step.successors.stream().noneMatch(s -> s.project == project)) {
                         teardown.executeAfter(step);
                     }
                 });
