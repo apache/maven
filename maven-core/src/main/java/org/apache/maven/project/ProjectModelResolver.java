@@ -31,6 +31,7 @@ import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.building.FileModelSource;
 import org.apache.maven.model.building.ModelSource;
+import org.apache.maven.model.building.ReactorModelSource;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
@@ -157,27 +158,24 @@ public class ProjectModelResolver implements ModelResolver {
 
     public ModelSource resolveModel(String groupId, String artifactId, String version)
             throws UnresolvableModelException {
-        File pomFile = null;
-
         if (modelPool != null) {
-            pomFile = modelPool.get(groupId, artifactId, version);
-        }
-
-        if (pomFile == null) {
-            Artifact pomArtifact = new DefaultArtifact(groupId, artifactId, "", "pom", version);
-
-            try {
-                ArtifactRequest request = new ArtifactRequest(pomArtifact, repositories, context);
-                request.setTrace(trace);
-                pomArtifact = resolver.resolveArtifact(session, request).getArtifact();
-            } catch (ArtifactResolutionException e) {
-                throw new UnresolvableModelException(e.getMessage(), groupId, artifactId, version, e);
+            File pomFile = modelPool.get(groupId, artifactId, version);
+            if (pomFile != null) {
+                return new ReactorModelSource(pomFile);
             }
-
-            pomFile = pomArtifact.getFile();
         }
 
-        return new FileModelSource(pomFile);
+        Artifact pomArtifact = new DefaultArtifact(groupId, artifactId, "", "pom", version);
+
+        try {
+            ArtifactRequest request = new ArtifactRequest(pomArtifact, repositories, context);
+            request.setTrace(trace);
+            pomArtifact = resolver.resolveArtifact(session, request).getArtifact();
+        } catch (ArtifactResolutionException e) {
+            throw new UnresolvableModelException(e.getMessage(), groupId, artifactId, version, e);
+        }
+
+        return new FileModelSource(pomArtifact.getFile());
     }
 
     @Override

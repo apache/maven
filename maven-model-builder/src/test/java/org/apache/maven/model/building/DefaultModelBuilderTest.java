@@ -18,17 +18,24 @@
  */
 package org.apache.maven.model.building;
 
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
 
 import org.apache.maven.model.Dependency;
+import org.apache.maven.model.DependencyManagement;
 import org.apache.maven.model.Parent;
 import org.apache.maven.model.Repository;
 import org.apache.maven.model.resolution.InvalidRepositoryException;
 import org.apache.maven.model.resolution.ModelResolver;
 import org.apache.maven.model.resolution.UnresolvableModelException;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -215,6 +222,86 @@ public class DefaultModelBuilderTest {
                 .getDependencies()
                 .get(0);
         assertNotNull(managed.getLocation("version"));
+    }
+
+    /**
+     * A BOM imported from the reactor is built as a project (full profile activation); one from a repository is
+     * sandboxed and must not activate property-based profiles.
+     */
+    @Test
+    public void testReactorImportIsBuiltAsProject(@TempDir Path dir) throws Exception {
+        Path bomFile = dir.resolve("pom.xml");
+        Files.write(
+                bomFile,
+                ("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                                + "<project>\n"
+                                + "  <modelVersion>4.0.0</modelVersion>\n"
+                                + "  <groupId>thegroup</groupId>\n"
+                                + "  <artifactId>bom</artifactId>\n"
+                                + "  <version>1</version>\n"
+                                + "  <packaging>pom</packaging>\n"
+                                + "  <profiles>\n"
+                                + "    <profile>\n"
+                                + "      <id>flagged</id>\n"
+                                + "      <activation><property><name>bom.flag</name></property></activation>\n"
+                                + "      <dependencyManagement>\n"
+                                + "        <dependencies>\n"
+                                + "          <dependency>\n"
+                                + "            <groupId>thegroup</groupId>\n"
+                                + "            <artifactId>managed</artifactId>\n"
+                                + "            <version>1</version>\n"
+                                + "          </dependency>\n"
+                                + "        </dependencies>\n"
+                                + "      </dependencyManagement>\n"
+                                + "    </profile>\n"
+                                + "  </profiles>\n"
+                                + "</project>\n")
+                        .getBytes(StandardCharsets.UTF_8));
+
+        // Reactor source: property profile must be activated (user property bom.flag is present)
+        assertEquals(1, managedCountFromImport(new ReactorModelSource(bomFile.toFile())));
+        // Repository source: property profile must NOT be activated (sandboxed, user props suppressed)
+        assertEquals(0, managedCountFromImport(new FileModelSource(bomFile.toFile())));
+    }
+
+    private static int managedCountFromImport(ModelSource bomSource) throws Exception {
+        String pom = "<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n"
+                + "<project>\n"
+                + "  <modelVersion>4.0.0</modelVersion>\n"
+                + "  <groupId>thegroup</groupId>\n"
+                + "  <artifactId>consumer</artifactId>\n"
+                + "  <version>1</version>\n"
+                + "  <dependencyManagement>\n"
+                + "    <dependencies>\n"
+                + "      <dependency>\n"
+                + "        <groupId>thegroup</groupId>\n"
+                + "        <artifactId>bom</artifactId>\n"
+                + "        <version>1</version>\n"
+                + "        <type>pom</type>\n"
+                + "        <scope>import</scope>\n"
+                + "      </dependency>\n"
+                + "    </dependencies>\n"
+                + "  </dependencyManagement>\n"
+                + "</project>\n";
+        Properties userProperties = new Properties();
+        userProperties.setProperty("bom.flag", "true");
+
+        DefaultModelBuildingRequest request = new DefaultModelBuildingRequest();
+        request.setModelSource(new StringModelSource(pom));
+        request.setUserProperties(userProperties);
+        request.setModelResolver(new BaseModelResolver() {
+            @Override
+            public ModelSource resolveModel(String groupId, String artifactId, String version) {
+                return bomSource;
+            }
+        });
+
+        DependencyManagement depMgmt = new DefaultModelBuilderFactory()
+                .newInstance()
+                .build(request)
+                .getEffectiveModel()
+                .getDependencyManagement();
+        return depMgmt == null ? 0 : depMgmt.getDependencies().size();
     }
 
     static class MapModelCache implements ModelCache {
