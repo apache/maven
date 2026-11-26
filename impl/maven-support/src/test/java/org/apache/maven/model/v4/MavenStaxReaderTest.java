@@ -345,6 +345,7 @@ class MavenStaxReaderTest {
                 + "  <version>1.0-SNAPSHOT</version>\n"
                 + "  <packaging>pom</packaging>\n"
                 + "</project>";
+    }
 
     @Test
     void testDependencyIdAttribute() throws Exception {
