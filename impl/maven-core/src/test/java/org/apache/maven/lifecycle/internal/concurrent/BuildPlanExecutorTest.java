@@ -35,12 +35,18 @@ import org.apache.maven.execution.ProjectExecutionListener;
 import org.apache.maven.internal.impl.DefaultLifecycleRegistry;
 import org.apache.maven.internal.transformation.TransformerManager;
 import org.apache.maven.lifecycle.LifecycleExecutionException;
+import org.apache.maven.lifecycle.internal.GoalTask;
 import org.apache.maven.lifecycle.internal.LifecycleTask;
+import org.apache.maven.lifecycle.internal.MojoDescriptorCreator;
 import org.apache.maven.lifecycle.internal.ReactorBuildStatus;
 import org.apache.maven.lifecycle.internal.ReactorContext;
 import org.apache.maven.lifecycle.internal.TaskSegment;
 import org.apache.maven.lifecycle.internal.stub.ExecutionEventCatapultStub;
+import org.apache.maven.model.Plugin;
+import org.apache.maven.plugin.descriptor.MojoDescriptor;
+import org.apache.maven.plugin.descriptor.PluginDescriptor;
 import org.apache.maven.project.MavenProject;
+import org.codehaus.plexus.configuration.xml.XmlPlexusConfiguration;
 import org.eclipse.aether.DefaultRepositorySystemSession;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.deployment.DeployRequest;
@@ -52,6 +58,12 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.same;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 class BuildPlanExecutorTest {
 
@@ -258,6 +270,56 @@ class BuildPlanExecutorTest {
         BuildStep step = new BuildStep(name, project, phase);
         plan.addStep(project, name, step);
         return step;
+    }
+
+    @Test
+    void teardownWaitsForAnOrdinaryDirectGoalFailure() throws Exception {
+        String goal = "test:example-plugin:1:run";
+        MavenProject project = newProject();
+        MavenSession session = newSession(project);
+        session.getRequest().setGoals(List.of(goal));
+
+        PluginDescriptor plugin = new PluginDescriptor();
+        plugin.setPlugin(new Plugin());
+        MojoDescriptor descriptor = new MojoDescriptor();
+        descriptor.setGoal("run");
+        descriptor.setPluginDescriptor(plugin);
+        descriptor.setMojoConfiguration(new XmlPlexusConfiguration("configuration"));
+        MojoDescriptorCreator descriptors = mock(MojoDescriptorCreator.class);
+        when(descriptors.getMojoDescriptor(goal, session, project)).thenReturn(descriptor);
+        MojoExecutor mojoExecutor = mock(MojoExecutor.class);
+        LifecycleExecutionException failure = new LifecycleExecutionException("goal failed");
+        doThrow(failure).when(mojoExecutor).execute(same(session), anyList());
+
+        TaskSegment segment = new TaskSegment(false);
+        segment.getTasks().add(new GoalTask(goal));
+        try (BuildPlanExecutor.BuildContext context = newDirectGoalExecutor(mojoExecutor, descriptors)
+        .new BuildContext(session, newReactorContext(session), List.of(segment))) {
+            BuildStep goalStep = context.plan.requiredStep(project, goal);
+            assertTrue(goalStep.isSuccessorOf(context.plan.requiredStep(project, BuildStep.SETUP)));
+            assertTrue(
+                    context.plan.requiredStep(project, BuildStep.TEARDOWN).isSuccessorOf(goalStep),
+                    "project teardown must wait for the direct goal");
+            context.execute();
+        }
+
+        verify(mojoExecutor).execute(same(session), anyList());
+        assertEquals(List.of(failure), session.getResult().getExceptions());
+        assertTrue(session.getResult().getBuildSummary(project) instanceof org.apache.maven.execution.BuildFailure);
+    }
+
+    private BuildPlanExecutor newDirectGoalExecutor(MojoExecutor mojoExecutor, MojoDescriptorCreator descriptors) {
+        return new BuildPlanExecutor(
+                mojoExecutor,
+                new ExecutionEventCatapultStub(),
+                List.of(),
+                new NoopTransformerManager(),
+                new BuildPlanLogger(),
+                Map.of("default", (buildProject, execution, usePluginConfig) -> {}),
+                null,
+                descriptors,
+                new DefaultLifecycleRegistry(Collections.emptyList()),
+                Collections.emptyList());
     }
 
     /**
