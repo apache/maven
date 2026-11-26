@@ -49,6 +49,7 @@ import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
@@ -363,6 +364,69 @@ class BuildPlanExecutorTest {
                         + session.getResult().getExceptions());
     }
 
+    /**
+     * When a build step (e.g. {@code test}) fails, the matching {@code after:test} step is run for
+     * cleanup and ends up with status {@code SKIPPED}. Steps that come after it in the lifecycle
+     * (e.g. {@code after:unit-test}, {@code after:verify}, {@code install}, {@code deploy}) must
+     * also be skipped: they must not run as if the build had succeeded.
+     *
+     * <p>This is the scenario reported in
+     * <a href="https://github.com/apache/maven/issues/14114">#14114</a>: with the concurrent builder,
+     * {@code install} and {@code deploy} ran even when {@code test} failed, because the {@code after:*}
+     * cleanup chain converted a {@code FAILED} predecessor into a {@code SKIPPED} predecessor, and the
+     * subsequent {@code shouldExecute} check only guarded against {@code FAILED}, not {@code SKIPPED}.
+     */
+    @Test
+    void afterStepSkippedStatusPropagatesAcrossNestedPhases() throws Exception {
+        MavenProject project = newProject();
+        MavenSession session = newSession(project);
+
+        ReactorContext reactorContext = newReactorContext(session);
+        try (BuildPlanExecutor.BuildContext context = newExecutor((BeforeProjectExecution) event -> {})
+        .new BuildContext(session, reactorContext, List.of(newTaskSegment("deploy")))) {
+
+            BuildStep testStep = context.plan
+                    .step(project, "test")
+                    .orElseThrow(() -> new IllegalStateException("no test step in the deploy plan"));
+            testStep.exception = new LifecycleExecutionException("test failure");
+            testStep.status.set(BuildStep.FAILED);
+
+            context.execute();
+
+            // after:test ran for cleanup and must be SKIPPED (not EXECUTED)
+            int afterTestStatus = context.plan
+                    .step(project, Lifecycle.AFTER + "test")
+                    .map(s -> s.status.get())
+                    .orElse(-1);
+            assertEquals(
+                    BuildStep.SKIPPED, afterTestStatus, "after:test must be SKIPPED (ran for cleanup) when test fails");
+
+            // install must NOT have executed
+            int installStatus = context.plan
+                    .step(project, "install")
+                    .map(s -> s.status.get())
+                    .orElse(-1);
+            assertNotEquals(
+                    BuildStep.EXECUTED,
+                    installStatus,
+                    "install must not execute when a predecessor step (test) has failed");
+
+            // deploy must NOT have executed
+            int deployStatus = context.plan
+                    .step(project, "deploy")
+                    .map(s -> s.status.get())
+                    .orElse(-1);
+            assertNotEquals(
+                    BuildStep.EXECUTED,
+                    deployStatus,
+                    "deploy must not execute when a predecessor step (test) has failed");
+        }
+
+        assertTrue(
+                session.getResult().getBuildSummary(project) instanceof org.apache.maven.execution.BuildFailure,
+                "the project must be recorded as a failure when test fails");
+    }
+
     private ReactorContext execute(MavenSession session, MavenProject project, BeforeProjectExecution listener)
             throws Exception {
         ReactorContext reactorContext = newReactorContext(session);
@@ -381,9 +445,19 @@ class BuildPlanExecutorTest {
             BeforeProjectExecution listener,
             Consumer<BuildPlan> planCustomizer)
             throws Exception {
+        return execute(session, project, listener, planCustomizer, "validate");
+    }
+
+    private ReactorContext execute(
+            MavenSession session,
+            MavenProject project,
+            BeforeProjectExecution listener,
+            Consumer<BuildPlan> planCustomizer,
+            String phase)
+            throws Exception {
         ReactorContext reactorContext = newReactorContext(session);
         try (BuildPlanExecutor.BuildContext context =
-                newExecutor(listener).new BuildContext(session, reactorContext, List.of(newTaskSegment()))) {
+                newExecutor(listener).new BuildContext(session, reactorContext, List.of(newTaskSegment(phase)))) {
             planCustomizer.accept(context.plan);
             context.execute();
         }
@@ -398,8 +472,12 @@ class BuildPlanExecutorTest {
     }
 
     private TaskSegment newTaskSegment() {
+        return newTaskSegment("validate");
+    }
+
+    private TaskSegment newTaskSegment(String phase) {
         TaskSegment taskSegment = new TaskSegment(false);
-        taskSegment.getTasks().add(new LifecycleTask("validate"));
+        taskSegment.getTasks().add(new LifecycleTask(phase));
         return taskSegment;
     }
 
