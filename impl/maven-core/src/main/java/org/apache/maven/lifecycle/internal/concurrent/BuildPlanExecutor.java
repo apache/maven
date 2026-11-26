@@ -419,8 +419,13 @@ public class BuildPlanExecutor {
                         })
                         .orElse(false);
 
-                // Check if any predecessor failed - if so, we'll run the step but mark it as SKIPPED
-                boolean anyPredecessorFailed = step.predecessors.stream().anyMatch(s -> s.status.get() == FAILED);
+                // Check if any predecessor failed or was itself skipped due to a failure. An after:*
+                // cleanup step that ran after its own predecessor failed ends up with status SKIPPED
+                // (not FAILED), so checking FAILED alone is not sufficient: the failure signal would
+                // be lost and later after:* steps (e.g. after:verify, deploy) would run normally
+                // even though a nested step (e.g. test) failed.
+                boolean anyPredecessorFailed =
+                        step.predecessors.stream().anyMatch(s -> s.status.get() == FAILED || s.status.get() == SKIPPED);
 
                 // If any predecessor failed, we'll use a special status transition: CREATED -> SKIPPED
                 // This ensures the step runs for cleanup but is marked as skipped in the end
