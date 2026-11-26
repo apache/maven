@@ -167,6 +167,7 @@ under the License.
     <resolverVersion>2.0.26</resolverVersion>
     <securityDispatcherVersion>4.3.0</securityDispatcherVersion>
     <sisuVersion>1.1.0</sisuVersion>
+    <commonsLoggingVersion>1.4.0</commonsLoggingVersion>
     <slf4jVersion>2.0.20</slf4jVersion>
     <stax2ApiVersion>4.3.2</stax2ApiVersion>
     <wagonVersion>3.5.3</wagonVersion>
@@ -526,6 +527,11 @@ under the License.
         <groupId>org.slf4j</groupId>
         <artifactId>jcl-over-slf4j</artifactId>
         <version>${slf4jVersion}</version>
+      </dependency>
+      <dependency>
+        <groupId>commons-logging</groupId>
+        <artifactId>commons-logging</artifactId>
+        <version>${commonsLoggingVersion}</version>
       </dependency>
       <dependency>
         <groupId>ch.qos.logback</groupId>
@@ -960,8 +966,11 @@ under the License.
                   <excludes>
                     <exclude>org.sonatype.plexus:plexus-sec-dispatcher</exclude>
                     <exclude>org.sonatype.plexus:plexus-cipher</exclude>
+                    <!-- ban jcl-over-slf4j in compile/runtime scopes; test scope is allowed -->
+                    <exclude>org.slf4j:jcl-over-slf4j:*:jar:compile</exclude>
+                    <exclude>org.slf4j:jcl-over-slf4j:*:jar:runtime</exclude>
                   </excludes>
-                  <message>ensure no more org.sonatype.plexus:plexus-cipher and org.sonatype.plexus:plexus-sec-dispatcher.</message>
+                  <message>ensure no more org.sonatype.plexus:plexus-cipher, org.sonatype.plexus:plexus-sec-dispatcher, or org.slf4j:jcl-over-slf4j (compile/runtime).</message>
                 </bannedDependencies>
               </rules>
               <fail>true</fail>
