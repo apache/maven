@@ -107,7 +107,7 @@ public class DefaultType implements Type, ArtifactType {
 
     @Override
     public String getClassifier() {
-        return classifier() == null ? "" : classifier();
+        return classifier();
     }
 
     @Override
