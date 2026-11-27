@@ -476,6 +476,7 @@ public class DefaultLifecycleRegistry implements LifecycleRegistry {
                             phase(
                                     VERIFY,
                                     after(VALIDATE),
+                                    after(BUILD),
                                     phase(
                                             UNIT_TEST,
                                             phase(TEST_SOURCES),
