@@ -970,7 +970,7 @@ under the License.
                     <exclude>org.slf4j:jcl-over-slf4j:*:jar:compile</exclude>
                     <exclude>org.slf4j:jcl-over-slf4j:*:jar:runtime</exclude>
                   </excludes>
-                  <message>ensure no more org.sonatype.plexus:plexus-cipher and org.sonatype.plexus:plexus-sec-dispatcher.</message>
+                  <message>ensure no more org.sonatype.plexus:plexus-cipher, org.sonatype.plexus:plexus-sec-dispatcher, or org.slf4j:jcl-over-slf4j (compile/runtime).</message>
                 </bannedDependencies>
               </rules>
               <fail>true</fail>
