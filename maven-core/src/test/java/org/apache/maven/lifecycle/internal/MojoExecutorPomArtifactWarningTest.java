@@ -74,6 +74,24 @@ class MojoExecutorPomArtifactWarningTest {
         assertNull(MojoExecutor.pomArtifactFileWarning(project("pom", jar), jar, jarJar()));
     }
 
+    @Test
+    void silentWhenPomArtifactHasAnotherPomFile() {
+        assertNull(MojoExecutor.pomArtifactFileWarning(
+                project("pom", new File("target/.flattened-pom.xml")), null, jarJar()));
+        assertNull(
+                MojoExecutor.pomArtifactFileWarning(project("pom", new File("target/test-1.0.pom")), null, jarJar()));
+    }
+
+    @Test
+    void silentForClassifierArtifact() {
+        MavenProject project = project("pom", new File("target/test-1.0-sources.jar"));
+        DefaultArtifact sources = new DefaultArtifact(
+                "org.example", "test", "1.0", null, "pom", "sources", new DefaultArtifactHandler("pom"));
+        sources.setFile(new File("target/test-1.0-sources.jar"));
+        project.setArtifact(sources);
+        assertNull(MojoExecutor.pomArtifactFileWarning(project, null, jarJar()));
+    }
+
     private static MavenProject project(String extension, File artifactFile) {
         MavenProject project = new MavenProject();
         project.setGroupId("org.example");
