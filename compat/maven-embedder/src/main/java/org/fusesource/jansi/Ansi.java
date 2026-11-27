@@ -350,6 +350,56 @@ public class Ansi implements Appendable {
         public Ansi reset() {
             return this;
         }
+
+        @Override
+        public Ansi render(final String text) {
+            return a(renderPlain(text));
+        }
+
+        @Override
+        public Ansi render(final String text, Object... args) {
+            return a(String.format(renderPlain(text), args));
+        }
+
+        private static String renderPlain(final String text) {
+            int j = text.indexOf(org.jline.jansi.AnsiRenderer.BEGIN_TOKEN);
+            if (j == -1) {
+                return text;
+            }
+            StringBuilder sb = new StringBuilder(text.length());
+            int idx = 0;
+            while (true) {
+                sb.append(text, idx, j);
+                int k = text.indexOf(org.jline.jansi.AnsiRenderer.END_TOKEN, j);
+                if (k == -1) {
+                    sb.append(text, j, text.length());
+                    return sb.toString();
+                }
+                int contentStart = j + org.jline.jansi.AnsiRenderer.BEGIN_TOKEN.length();
+                if (k < contentStart) {
+                    throw new IllegalArgumentException("Invalid input string found.");
+                }
+                String spec = text.substring(contentStart, k);
+                int spaceIdx = spec.indexOf(' ');
+                if (spaceIdx == -1) {
+                    sb.append(text, j, text.length());
+                    return sb.toString();
+                }
+                String codes = spec.substring(0, spaceIdx);
+                for (String code : codes.split(",")) {
+                    // Validate code: throws IllegalArgumentException for unknown codes,
+                    // matching the behaviour of the enabled-colour path in AnsiRenderer
+                    org.jline.jansi.AnsiRenderer.Code.valueOf(code.toUpperCase(java.util.Locale.ENGLISH));
+                }
+                sb.append(spec, spaceIdx + 1, spec.length());
+                idx = k + org.jline.jansi.AnsiRenderer.END_TOKEN.length();
+                j = text.indexOf(org.jline.jansi.AnsiRenderer.BEGIN_TOKEN, idx);
+                if (j == -1) {
+                    sb.append(text, idx, text.length());
+                    return sb.toString();
+                }
+            }
+        }
     }
 
     private final StringBuilder builder;
