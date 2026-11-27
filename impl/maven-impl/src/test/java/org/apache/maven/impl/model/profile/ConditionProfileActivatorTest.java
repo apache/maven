@@ -36,6 +36,8 @@ import org.eclipse.aether.util.version.GenericVersionScheme;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.condition.DisabledOnOs;
+import org.junit.jupiter.api.condition.OS;
 import org.junit.jupiter.api.io.TempDir;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -579,5 +581,86 @@ public class ConditionProfileActivatorTest extends AbstractProfileActivatorTest<
         assertActivation(false, profile, newContext(Map.of("enable.docker", "false"), sysProps));
         assertActivation(false, newProfile("not(executable('docker'))"), newContext(null, sysProps));
         assertActivation(true, newProfile("not(executable('missing-docker'))"), newContext(null, sysProps));
+    }
+
+    // -----------------------------------------------------------------------
+    // extract() tests
+    // -----------------------------------------------------------------------
+
+    @Test
+    void testExtractNoGroup() {
+        // No capturing group → return the whole match
+        Profile profile =
+                newProfile("extract('Docker version 25.0.1, build abc123', '\\d+\\.\\d+\\.\\d+') == '25.0.1'");
+        assertActivation(true, profile, newContext(null, null));
+    }
+
+    @Test
+    void testExtractWithCapturingGroup() {
+        // With a capturing group → return group(1)
+        Profile profile = newProfile(
+                "extract('Docker version 25.0.1, build abc123', 'version (\\d+\\.\\d+\\.\\d+)') == '25.0.1'");
+        assertActivation(true, profile, newContext(null, null));
+    }
+
+    @Test
+    void testExtractNoMatch() {
+        // Pattern does not match → empty string
+        Profile profile = newProfile("extract('no version here', '\\d+\\.\\d+') == ''");
+        assertActivation(true, profile, newContext(null, null));
+    }
+
+    @Test
+    void testExtractEmptyInput() {
+        // empty input string → empty string (never throws)
+        Profile profile = newProfile("extract('', '\\d+') == ''");
+        assertActivation(true, profile, newContext(null, null));
+    }
+
+    @Test
+    void testExtractInrangeComposition() {
+        // Typical use case: extract version from a tool output string and check range
+        Profile profile =
+                newProfile("inrange(extract('Docker version 25.0.1, build abc123', '\\d+\\.\\d+\\.\\d+'), '[19.0,)')");
+        assertActivation(true, profile, newContext(null, null));
+
+        Profile tooOld =
+                newProfile("inrange(extract('Docker version 18.09.0, build abc123', '\\d+\\.\\d+\\.\\d+'), '[19.0,)')");
+        assertActivation(false, tooOld, newContext(null, null));
+    }
+
+    // -----------------------------------------------------------------------
+    // exec() tests
+    // -----------------------------------------------------------------------
+
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    void testExecSimpleCommand() {
+        // 'echo hello' is a shell built-in on Unix; skip on Windows where it needs cmd /c
+        Profile profile = newProfile("exec('echo hello') == 'hello'");
+        assertActivation(true, profile, newContext(null, null));
+    }
+
+    @Test
+    void testExecEmptyArgument() {
+        // blank command line → empty string (never throws)
+        Profile profile = newProfile("exec('') == ''");
+        assertActivation(true, profile, newContext(null, null));
+    }
+
+    @Test
+    void testExecNonExistentCommand() {
+        // A command that does not exist must return empty string (never throw)
+        Profile profile = newProfile("exec('this-command-does-not-exist-42xyz') == ''");
+        assertActivation(true, profile, newContext(null, null));
+    }
+
+    @Test
+    @DisabledOnOs(OS.WINDOWS)
+    void testExecWithExtract() {
+        // exec + extract composition using 'echo' to simulate tool output (Unix only)
+        Profile profile =
+                newProfile("extract(exec('echo Docker version 25.0.1, build abc'), '\\d+\\.\\d+\\.\\d+') == '25.0.1'");
+        assertActivation(true, profile, newContext(null, null));
     }
 }
