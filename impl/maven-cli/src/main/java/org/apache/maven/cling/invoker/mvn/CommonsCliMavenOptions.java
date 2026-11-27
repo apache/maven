@@ -253,6 +253,14 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
     }
 
     @Override
+    public Optional<String> sbomFile() {
+        if (commandLine.hasOption(CLIManager.SBOM)) {
+            return Optional.of("sbom.json");
+        }
+        return Optional.empty();
+    }
+
+    @Override
     protected CommonsCliMavenOptions copy(
             String source, CommonsCliOptions.CLIManager cliManager, CommandLine commandLine) {
         return new CommonsCliMavenOptions(source, (CLIManager) cliManager, commandLine);
@@ -286,6 +294,7 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
         public static final String METADATA_UPDATE_POLICY = "metadata-update-policy";
         public static final String AT_FILE = "af";
         public static final String LIST_ALIASES = "list-aliases";
+        public static final String SBOM = "sbom";
 
         @Override
         protected void prepareOptions(org.apache.commons.cli.Options options) {
@@ -431,6 +440,10 @@ public class CommonsCliMavenOptions extends CommonsCliOptions implements MavenOp
             options.addOption(Option.builder()
                     .longOpt(LIST_ALIASES)
                     .desc("List effective build aliases defined in settings files and exit.")
+                    .get());
+            options.addOption(Option.builder()
+                    .longOpt(SBOM)
+                    .desc("Write an SBOM report (sbom.json) to the top-level project directory after the build")
                     .get());
         }
     }

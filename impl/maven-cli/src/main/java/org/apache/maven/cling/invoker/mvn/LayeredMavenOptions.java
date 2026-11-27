@@ -180,6 +180,11 @@ public class LayeredMavenOptions<O extends MavenOptions> extends LayeredOptions<
     }
 
     @Override
+    public Optional<String> sbomFile() {
+        return returnFirstPresentOrEmpty(MavenOptions::sbomFile);
+    }
+
+    @Override
     public MavenOptions interpolate(UnaryOperator<String> callback) {
         ArrayList<MavenOptions> interpolatedOptions = new ArrayList<>(options.size());
         for (MavenOptions o : options) {

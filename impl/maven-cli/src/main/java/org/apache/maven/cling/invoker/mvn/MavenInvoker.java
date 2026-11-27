@@ -19,6 +19,7 @@
 package org.apache.maven.cling.invoker.mvn;
 
 import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -568,6 +569,16 @@ public class MavenInvoker extends LookupInvoker<MavenContext> {
             context.eventSpyDispatcher.onEvent(result);
         } finally {
             context.eventSpyDispatcher.close();
+        }
+
+        if (!result.hasExceptions()) {
+            context.options().sbomFile().ifPresent(file -> {
+                try {
+                    SbomReportWriter.write(request.getTopDirectory().resolve(file), result);
+                } catch (IOException e) {
+                    context.logger.warn("Failed to write SBOM report: " + e.getMessage());
+                }
+            });
         }
 
         if (result.hasExceptions()) {
