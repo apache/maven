@@ -41,6 +41,13 @@ public final class Features {
     }
 
     /**
+     * Check if transitive dependencies of consumed test JARs are enabled.
+     */
+    public static boolean testJarTransitiveDeps(@Nullable Map<String, ?> userProperties) {
+        return doGet(userProperties, Constants.MAVEN_TEST_JAR_TRANSITIVE_DEPS, !mavenMaven3Personality(userProperties));
+    }
+
+    /**
      * Check if the consumer POM feature is active.
      */
     public static boolean consumerPom(@Nullable Map<String, ?> userProperties) {
