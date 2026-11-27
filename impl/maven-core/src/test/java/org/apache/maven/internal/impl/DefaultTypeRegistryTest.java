@@ -101,27 +101,27 @@ class DefaultTypeRegistryTest {
             }
 
             @Override
-            public Language getLanguage() {
+            public Language language() {
                 return Language.JAVA_FAMILY;
             }
 
             @Override
-            public String getExtension() {
+            public String extension() {
                 return "jar";
             }
 
             @Override
-            public String getClassifier() {
+            public String classifier() {
                 return null;
             }
 
             @Override
-            public boolean isIncludesDependencies() {
+            public boolean includesDependencies() {
                 return false;
             }
 
             @Override
-            public Set<PathType> getPathTypes() {
+            public Set<PathType> pathTypes() {
                 return Set.of();
             }
         };
