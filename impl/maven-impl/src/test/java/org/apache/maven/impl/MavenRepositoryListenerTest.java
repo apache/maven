@@ -43,6 +43,8 @@ import org.apache.maven.api.RepositoryMetadata;
 import org.apache.maven.api.Session;
 import org.apache.maven.api.Version;
 import org.apache.maven.api.services.Lookup;
+import org.apache.maven.api.services.ModelProblem;
+import org.apache.maven.api.services.ProblemCollector;
 import org.apache.maven.api.services.RequestTrace;
 import org.apache.maven.api.settings.Settings;
 import org.apache.maven.api.spi.SpiService;
@@ -388,8 +390,15 @@ class MavenRepositoryListenerTest {
     private static class NonListenerSpiService implements SpiService {}
 
     private static class TestSession extends AbstractSession {
+        private final ProblemCollector<ModelProblem> modelProblems = ProblemCollector.create(100);
+
         TestSession(RepositorySystemSession session, Lookup lookup) {
             super(session, mock(RepositorySystem.class), List.of(), List.of(), lookup, null);
+        }
+
+        @Override
+        public ProblemCollector<ModelProblem> getModelProblemCollector() {
+            return modelProblems;
         }
 
         @Override

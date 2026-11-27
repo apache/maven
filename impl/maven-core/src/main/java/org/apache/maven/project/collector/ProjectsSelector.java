@@ -20,8 +20,10 @@ package org.apache.maven.project.collector;
 
 import java.io.File;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 
@@ -37,4 +39,23 @@ public interface ProjectsSelector {
      * @throws ProjectBuildingException In case the POMs are not used.
      */
     List<MavenProject> selectProjects(List<File> files, MavenExecutionRequest request) throws ProjectBuildingException;
+
+    /**
+     * Select Maven projects from a list of POM files and report model problems encountered while building them.
+     *
+     * <p>The default implementation delegates to {@link #selectProjects(List, MavenExecutionRequest)}
+     * for compatibility with existing implementations and does not invoke {@code problemConsumer}.
+     * Implementations must override this method to report model problems to the consumer.
+     *
+     * @param files List of POM files.
+     * @param request The {@link MavenExecutionRequest}
+     * @param problemConsumer Consumer for model problems encountered while building the selected projects.
+     * @return A list of projects that have been found in the specified POM files.
+     * @throws ProjectBuildingException In case the POMs are not used.
+     */
+    default List<MavenProject> selectProjects(
+            List<File> files, MavenExecutionRequest request, Consumer<ModelProblem> problemConsumer)
+            throws ProjectBuildingException {
+        return selectProjects(files, request);
+    }
 }

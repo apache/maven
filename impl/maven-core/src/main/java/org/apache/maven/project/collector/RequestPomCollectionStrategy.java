@@ -25,8 +25,10 @@ import javax.inject.Singleton;
 import java.io.File;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Consumer;
 
 import org.apache.maven.execution.MavenExecutionRequest;
+import org.apache.maven.model.building.ModelProblem;
 import org.apache.maven.project.MavenProject;
 import org.apache.maven.project.ProjectBuildingException;
 
@@ -45,7 +47,12 @@ public class RequestPomCollectionStrategy implements ProjectCollectionStrategy {
 
     @Override
     public List<MavenProject> collectProjects(MavenExecutionRequest request) throws ProjectBuildingException {
+        return collectProjects(request, problem -> {});
+    }
+
+    public List<MavenProject> collectProjects(MavenExecutionRequest request, Consumer<ModelProblem> problemConsumer)
+            throws ProjectBuildingException {
         List<File> files = Collections.singletonList(request.getPom().getAbsoluteFile());
-        return projectsSelector.selectProjects(files, request);
+        return projectsSelector.selectProjects(files, request, problemConsumer);
     }
 }
