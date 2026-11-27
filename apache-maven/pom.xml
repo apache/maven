@@ -62,6 +62,12 @@ under the License.
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
       <artifactId>wagon-http</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.slf4j</groupId>
+          <artifactId>jcl-over-slf4j</artifactId>
+        </exclusion>
+      </exclusions>
     </dependency>
     <dependency>
       <groupId>org.apache.maven.wagon</groupId>
@@ -69,11 +75,10 @@ under the License.
     </dependency>
 
     <!-- CLI -->
-    <!-- bridge from Apache Commons Logging (JCL) to SLF4J-->
+    <!-- Apache Commons Logging routes JCL calls through Maven's SLF4J logger -->
     <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <version>${slf4jVersion}</version>
+      <groupId>commons-logging</groupId>
+      <artifactId>commons-logging</artifactId>
       <scope>runtime</scope>
     </dependency>
     <!-- Boot classpath: logging API and System.Logger bridge (placed in boot/) -->
