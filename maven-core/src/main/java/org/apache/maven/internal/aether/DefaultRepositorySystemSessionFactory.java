@@ -170,7 +170,8 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
      * The id {@code central} of the default repository is bound to the origin of that repository and to the
      * origins Maven Central is published to. The publishing origins are left out once the id is given any
      * other origin, by a mirror or a repository with that id, by {@code <repositoryOrigins>} of that server
-     * or by a default repository location other than the built-in one.
+     * or by a default repository location other than the built-in one. Credentials used through this
+     * binding are reported with a warning once per session; the binding will be removed in a future release.
      *
      * @since 3.10.0
      */
@@ -462,11 +463,12 @@ public class DefaultRepositorySystemSessionFactory implements RepositorySystemSe
             OriginBoundAuthenticationSelector.addDeploymentRepositoryOrigin(
                     declaredRepositoryOrigins, request.getUserProperties().getProperty(property));
         }
-        OriginBoundAuthenticationSelector.addCentralPublishingOrigins(declaredRepositoryOrigins);
+        boolean centralPublishingOriginsImplied =
+                OriginBoundAuthenticationSelector.addCentralPublishingOrigins(declaredRepositoryOrigins);
         String credentialScope = ConfigUtils.getString(
                 configProps, OriginBoundAuthenticationSelector.SCOPE_ORIGIN, MAVEN_REPOSITORY_CREDENTIAL_SCOPE);
         AuthenticationSelector effectiveAuthSelector = OriginBoundAuthenticationSelector.wrap(
-                authSelector, credentialScope, declaredRepositoryOrigins, logger);
+                authSelector, credentialScope, declaredRepositoryOrigins, centralPublishingOriginsImplied, logger);
         mainSessionBuilder.setAuthenticationSelector(effectiveAuthSelector);
 
         Object transport = configProps.getOrDefault(MAVEN_RESOLVER_TRANSPORT_KEY, MAVEN_RESOLVER_TRANSPORT_DEFAULT);

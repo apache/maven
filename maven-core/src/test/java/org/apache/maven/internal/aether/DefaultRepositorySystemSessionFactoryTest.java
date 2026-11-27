@@ -37,6 +37,8 @@ import org.codehaus.plexus.testing.PlexusTest;
 import org.eclipse.aether.repository.AuthenticationSelector;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import static org.codehaus.plexus.testing.PlexusExtension.getBasedir;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -119,14 +121,16 @@ class DefaultRepositorySystemSessionFactoryTest {
                 repository("central", "https://central.sonatype.com/repository/maven-snapshots/")));
     }
 
-    @Test
-    void deploymentRepositoryOnTheCommandLineDeclaresItsOrigin() throws Exception {
+    @ParameterizedTest
+    @ValueSource(
+            strings = {"altDeploymentRepository", "altReleaseDeploymentRepository", "altSnapshotDeploymentRepository"})
+    void deploymentRepositoryOnTheCommandLineDeclaresItsOrigin(String property) throws Exception {
         MavenExecutionRequest request = requestWithServer(serverWithRepositoryOrigins("deploy-server"));
         Properties strict = new Properties();
         strict.put(DefaultRepositorySystemSessionFactory.MAVEN_REPOSITORY_CREDENTIAL_SCOPE, "strict");
         request.setSystemProperties(strict);
         Properties userProperties = new Properties();
-        userProperties.put("altDeploymentRepository", "deploy-server::https://deploy.example.org/releases/");
+        userProperties.put(property, "deploy-server::https://deploy.example.org/releases/");
         request.setUserProperties(userProperties);
 
         AuthenticationSelector selector = authenticationSelector(request);

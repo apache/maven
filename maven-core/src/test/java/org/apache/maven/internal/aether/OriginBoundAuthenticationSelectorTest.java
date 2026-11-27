@@ -18,10 +18,13 @@
  */
 package org.apache.maven.internal.aether;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import org.codehaus.plexus.logging.AbstractLogger;
 import org.codehaus.plexus.logging.Logger;
 import org.codehaus.plexus.logging.console.ConsoleLogger;
 import org.eclipse.aether.repository.AuthenticationSelector;
@@ -31,10 +34,12 @@ import org.eclipse.aether.util.repository.DefaultAuthenticationSelector;
 import org.junit.jupiter.api.Test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * UT for {@link OriginBoundAuthenticationSelector}.
@@ -146,6 +151,42 @@ class OriginBoundAuthenticationSelectorTest {
     }
 
     @Test
+    void credentialsUsedThroughTheImpliedCentralPublishingOriginsAreReportedOnce() {
+        Map<String, Set<String>> origins = declared("central", "https://repo.maven.apache.org/maven2");
+        boolean implied = OriginBoundAuthenticationSelector.addCentralPublishingOrigins(origins);
+        RecordingLogger logger = new RecordingLogger();
+        AuthenticationSelector selector = OriginBoundAuthenticationSelector.wrap(
+                serverCredentials("central"), OriginBoundAuthenticationSelector.SCOPE_STRICT, origins, implied, logger);
+
+        assertNotNull(selector.getAuthentication(repo("central", "https://repo.maven.apache.org/maven2")));
+        assertEquals(0, logger.warnings.size());
+        assertNotNull(selector.getAuthentication(
+                repo("central", "https://central.sonatype.com/repository/maven-snapshots/")));
+        assertNotNull(selector.getAuthentication(
+                repo("central", "https://ossrh-staging-api.central.sonatype.com/service/local/")));
+        assertNotNull(selector.getAuthentication(
+                repo("central", "https://central.sonatype.com/repository/maven-snapshots/")));
+
+        assertEquals(1, logger.warnings.size());
+        assertTrue(logger.warnings.get(0).contains("will be removed in a future release"));
+    }
+
+    @Test
+    void centralPublishingOriginsDeclaredByTheServerAreNotReported() {
+        Map<String, Set<String>> origins = declared("central", "https://repo.maven.apache.org/maven2");
+        OriginBoundAuthenticationSelector.addOrigin(origins, "central", "https://central.sonatype.com");
+        boolean implied = OriginBoundAuthenticationSelector.addCentralPublishingOrigins(origins);
+        RecordingLogger logger = new RecordingLogger();
+        AuthenticationSelector selector = OriginBoundAuthenticationSelector.wrap(
+                serverCredentials("central"), OriginBoundAuthenticationSelector.SCOPE_ORIGIN, origins, implied, logger);
+
+        assertFalse(implied);
+        assertNotNull(selector.getAuthentication(
+                repo("central", "https://central.sonatype.com/repository/maven-snapshots/")));
+        assertEquals(0, logger.warnings.size());
+    }
+
+    @Test
     void unknownScopeIsRejected() {
         assertThrows(
                 IllegalArgumentException.class,
@@ -162,5 +203,35 @@ class OriginBoundAuthenticationSelectorTest {
                 OriginBoundAuthenticationSelector.originOf("http://repo.example.org/releases/"));
         assertNull(OriginBoundAuthenticationSelector.originOf("file:/tmp/repo"));
         assertNull(OriginBoundAuthenticationSelector.originOf(null));
+    }
+
+    private static final class RecordingLogger extends AbstractLogger {
+        private final List<String> warnings = new ArrayList<>();
+
+        RecordingLogger() {
+            super(Logger.LEVEL_DEBUG, "test");
+        }
+
+        @Override
+        public void debug(String message, Throwable throwable) {}
+
+        @Override
+        public void info(String message, Throwable throwable) {}
+
+        @Override
+        public void warn(String message, Throwable throwable) {
+            warnings.add(message);
+        }
+
+        @Override
+        public void error(String message, Throwable throwable) {}
+
+        @Override
+        public void fatalError(String message, Throwable throwable) {}
+
+        @Override
+        public Logger getChildLogger(String name) {
+            return this;
+        }
     }
 }
