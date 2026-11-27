@@ -119,8 +119,10 @@ import org.slf4j.ILoggerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.sonatype.plexus.components.cipher.DefaultPlexusCipher;
+import org.sonatype.plexus.components.cipher.PlexusCipherException;
 import org.sonatype.plexus.components.sec.dispatcher.DefaultSecDispatcher;
 import org.sonatype.plexus.components.sec.dispatcher.SecDispatcher;
+import org.sonatype.plexus.components.sec.dispatcher.SecDispatcherException;
 import org.sonatype.plexus.components.sec.dispatcher.SecUtil;
 import org.sonatype.plexus.components.sec.dispatcher.model.SettingsSecurity;
 
@@ -157,6 +159,8 @@ public class MavenCli {
     private static final String EXTENSIONS_FILENAME = DOT_MVN + "/extensions.xml";
 
     private static final String MVN_MAVEN_CONFIG = DOT_MVN + "/maven.config";
+
+    private static final String ENCRYPTION_GUIDE = "https://maven.apache.org/guides/mini/guide-encryption.html";
 
     public static final String STYLE_COLOR_PROPERTY = "style.color";
 
@@ -898,12 +902,6 @@ public class MavenCli {
 
             throw new ExitException(0);
         } else if (cliRequest.commandLine.hasOption(CLIManager.ENCRYPT_PASSWORD)) {
-            String passwd = cliRequest.commandLine.getOptionValue(CLIManager.ENCRYPT_PASSWORD);
-
-            if (passwd == null) {
-                passwd = readPassword(System.console(), System.in, "Password: ");
-            }
-
             String configurationFile = dispatcher.getConfigurationFile();
 
             if (configurationFile.startsWith("~")) {
@@ -912,22 +910,60 @@ public class MavenCli {
 
             String file = System.getProperty(DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION, configurationFile);
 
-            String master = null;
-
-            SettingsSecurity sec = SecUtil.read(file, true);
-            if (sec != null) {
-                master = sec.getMaster();
-            }
-
-            if (master == null) {
-                throw new IllegalStateException("Master password is not set in the setting security file: " + file);
-            }
-
+            // check the master password before asking for the password to encrypt
             DefaultPlexusCipher cipher = new DefaultPlexusCipher();
-            String masterPasswd = cipher.decryptDecorated(master, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION);
+            String masterPasswd = readMasterPassword(cipher, file);
+
+            String passwd = cliRequest.commandLine.getOptionValue(CLIManager.ENCRYPT_PASSWORD);
+
+            if (passwd == null) {
+                passwd = readPassword(System.console(), System.in, "Password: ");
+            }
+
             System.out.println(cipher.encryptAndDecorate(passwd, masterPasswd));
 
             throw new ExitException(0);
+        }
+    }
+
+    /**
+     * Reads and decrypts the master password, turning every way the settings security file can be wrong into a
+     * message that names the file and the way out.
+     */
+    static String readMasterPassword(DefaultPlexusCipher cipher, String file) {
+        // the location may also be a URL, which only SecUtil can tell is missing
+        if (!file.contains("://") && !new File(file).exists()) {
+            throw new IllegalStateException("The settings security file " + file + " does not exist. Create a master"
+                    + " password with 'mvn --encrypt-master-password' and store it in that file first, see "
+                    + ENCRYPTION_GUIDE);
+        }
+
+        SettingsSecurity sec;
+        try {
+            sec = SecUtil.read(file, true);
+        } catch (SecDispatcherException e) {
+            throw new IllegalStateException("Cannot read the settings security file " + file, e);
+        }
+
+        String master = sec.getMaster();
+        if (master == null || master.trim().isEmpty()) {
+            throw new IllegalStateException("Master password is not set in the settings security file " + file
+                    + ". Create one with 'mvn --encrypt-master-password', see " + ENCRYPTION_GUIDE);
+        }
+
+        try {
+            return cipher.decryptDecorated(master, DefaultSecDispatcher.SYSTEM_PROPERTY_SEC_LOCATION);
+        } catch (PlexusCipherException e) {
+            // A value that is not the output of --encrypt-master-password fails inside the cipher, which wraps a
+            // BadPaddingException or an ArrayIndexOutOfBoundsException. Neither says anything to the user, so it is
+            // kept as suppressed: -e still prints it, the default output does not.
+            IllegalStateException failure =
+                    new IllegalStateException("Cannot decrypt the master password in the settings security file "
+                            + file + ". The <master> value must be the output of 'mvn --encrypt-master-password':"
+                            + " create it again, then encrypt again the passwords that used the old one, see "
+                            + ENCRYPTION_GUIDE);
+            failure.addSuppressed(e);
+            throw failure;
         }
     }
 
