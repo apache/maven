@@ -27,18 +27,26 @@ import static java.lang.annotation.ElementType.TYPE;
 import static java.lang.annotation.RetentionPolicy.RUNTIME;
 
 /**
- * Indicates that the annotated bean has a lifespan limited to a given mojo execution,
- * which means each mojo execution will result in a different instance being injected.
- * <p>
- * The following objects will be bound to the mojo execution scope:
- *     <ul>
- *         <li>{@code org.apache.maven.api.MojoExecution}</li>
- *         <li>{@code org.apache.maven.api.Project}</li>
- *         <li>{@code org.apache.maven.api.logging.Logger}</li>
- *     </ul>
+ * Was intended to indicate that the annotated bean has a lifespan limited to a given
+ * mojo execution, but this annotation is unfinished and has no effect.
+ *
+ * @deprecated Unfinished — do not use. The Guice/Sisu binding for this scope is
+ *     commented out in {@code MojoExecutionScopeModule}, so the annotation has no
+ *     effect. Additionally, unlike {@link SessionScoped}, the mojo execution scope
+ *     does not create a proxy when a scoped component is injected into a wider scope,
+ *     causing a {@code DIException} at startup.
+ *     <p>
+ *     For v4 plugins, no scope annotation is needed: {@code DefaultMavenPluginManager}
+ *     creates a fresh injector per mojo execution and binds {@code Session},
+ *     {@code Project}, {@code MojoExecution}, and {@code Log} directly via
+ *     {@code bindInstance}, so plain {@code @Inject} is sufficient.
+ *     <p>
+ *     For legacy extension components in the shared Plexus/Sisu container, use
+ *     {@code org.apache.maven.execution.scope.MojoExecutionScoped} instead.
  *
  * @since 4.0.0
  */
+@Deprecated(since = "4.0.0", forRemoval = true)
 @Scope
 @Documented
 @Retention(RUNTIME)
