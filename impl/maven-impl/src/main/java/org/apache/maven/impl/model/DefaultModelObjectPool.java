@@ -252,6 +252,7 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
                     && Objects.equals(dep1.getScope(), dep2.getScope())
                     && Objects.equals(dep1.getSystemPath(), dep2.getSystemPath())
                     && Objects.equals(dep1.getExclusions(), dep2.getExclusions())
+                    && Objects.equals(dep1.getIncludes(), dep2.getIncludes())
                     && Objects.equals(dep1.getOptional(), dep2.getOptional())
                     && Objects.equals(dep1.getLocations(), dep2.getLocations())
                     && Objects.equals(dep1.getImportedFrom(), dep2.getImportedFrom());
@@ -281,6 +282,7 @@ public class DefaultModelObjectPool implements ModelObjectProcessor {
             h = 31 * h + Objects.hashCode(dep.getScope());
             h = 31 * h + Objects.hashCode(dep.getSystemPath());
             h = 31 * h + Objects.hashCode(dep.getExclusions());
+            h = 31 * h + Objects.hashCode(dep.getIncludes());
             h = 31 * h + Objects.hashCode(dep.getOptional());
             h = 31 * h + Objects.hashCode(dep.getLocations());
             h = 31 * h + Objects.hashCode(dep.getImportedFrom());

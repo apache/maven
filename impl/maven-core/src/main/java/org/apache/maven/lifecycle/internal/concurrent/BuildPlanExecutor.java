@@ -174,6 +174,30 @@ public class BuildPlanExecutor {
 
     private volatile List<Lifecycle> processedLifecyclesCache;
 
+    @SuppressWarnings("checkstyle:ParameterNumber")
+    public BuildPlanExecutor(
+            @Named("concurrent") MojoExecutor mojoExecutor,
+            ExecutionEventCatapult eventCatapult,
+            List<ProjectExecutionListener> listeners,
+            TransformerManager transformerManager,
+            BuildPlanLogger buildPlanLogger,
+            Map<String, MojoExecutionConfigurator> mojoExecutionConfigurators,
+            MavenPluginManager mavenPluginManager,
+            MojoDescriptorCreator mojoDescriptorCreator,
+            LifecycleRegistry lifecycles) {
+        this(
+                mojoExecutor,
+                eventCatapult,
+                listeners,
+                transformerManager,
+                buildPlanLogger,
+                mojoExecutionConfigurators,
+                mavenPluginManager,
+                mojoDescriptorCreator,
+                lifecycles,
+                Collections.emptyList());
+    }
+
     @Inject
     @SuppressWarnings("checkstyle:ParameterNumber")
     public BuildPlanExecutor(

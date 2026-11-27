@@ -90,6 +90,7 @@ class DefaultModelObjectPoolTest {
                 && Objects.equals(dep1.getScope(), dep2.getScope())
                 && Objects.equals(dep1.getSystemPath(), dep2.getSystemPath())
                 && Objects.equals(dep1.getExclusions(), dep2.getExclusions())
+                && Objects.equals(dep1.getIncludes(), dep2.getIncludes())
                 && Objects.equals(dep1.getOptional(), dep2.getOptional())
                 && Objects.equals(dep1.getLocationKeys(), dep2.getLocationKeys())
                 && locationsEqual(dep1, dep2)
