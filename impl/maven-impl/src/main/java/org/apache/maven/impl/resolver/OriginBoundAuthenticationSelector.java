@@ -45,7 +45,9 @@ import static java.util.Objects.requireNonNull;
  * is emitted once per id/origin pair.
  * <p>
  * The one origin bound without a declaration is where Maven Central is published to, for the id of the
- * default repository; see {@link #addCentralPublishingOrigins(Map)}.
+ * default repository; see {@link #addCentralPublishingOrigins(Map)}. Credentials used through that binding
+ * are reported once per session, so that the server can be given the origins explicitly before the
+ * binding is removed.
  *
  * <p>
  * Used by the Maven CLI session factory and by the standalone API runner, so both scope credentials the same way.
@@ -93,15 +95,22 @@ public final class OriginBoundAuthenticationSelector implements AuthenticationSe
 
     private final boolean strict;
 
+    private final boolean centralPublishingOriginsImplied;
+
     private final Logger logger;
 
     private final Set<String> reported = ConcurrentHashMap.newKeySet();
 
     private OriginBoundAuthenticationSelector(
-            AuthenticationSelector delegate, Map<String, Set<String>> declaredOrigins, boolean strict, Logger logger) {
+            AuthenticationSelector delegate,
+            Map<String, Set<String>> declaredOrigins,
+            boolean strict,
+            boolean centralPublishingOriginsImplied,
+            Logger logger) {
         this.delegate = requireNonNull(delegate, "delegate");
         this.declaredOrigins = requireNonNull(declaredOrigins, "declaredOrigins");
         this.strict = strict;
+        this.centralPublishingOriginsImplied = centralPublishingOriginsImplied;
         this.logger = requireNonNull(logger, "logger");
     }
 
@@ -119,11 +128,35 @@ public final class OriginBoundAuthenticationSelector implements AuthenticationSe
             String credentialScope,
             Map<String, Set<String>> declaredOrigins,
             Logger logger) {
+        return wrap(delegate, credentialScope, declaredOrigins, false, logger);
+    }
+
+    /**
+     * Wraps the given selector according to the requested credential scope.
+     *
+     * @param delegate the selector holding the actual credentials, keyed by server id
+     * @param credentialScope one of {@link #SCOPE_ORIGIN}, {@link #SCOPE_STRICT} or {@link #SCOPE_ID}
+     * @param declaredOrigins origins of operator-declared repositories and mirrors, keyed by id
+     * @param centralPublishingOriginsImplied whether {@link #addCentralPublishingOrigins(Map)} bound the
+     *     publishing origins of Maven Central, so that credentials used there are reported
+     * @param logger logger used to report id/origin mismatches
+     * @return the delegate itself for {@link #SCOPE_ID}, an origin-bound wrapper otherwise
+     */
+    public static AuthenticationSelector wrap(
+            AuthenticationSelector delegate,
+            String credentialScope,
+            Map<String, Set<String>> declaredOrigins,
+            boolean centralPublishingOriginsImplied,
+            Logger logger) {
         if (SCOPE_ID.equals(credentialScope)) {
             return delegate;
         } else if (SCOPE_ORIGIN.equals(credentialScope) || SCOPE_STRICT.equals(credentialScope)) {
             return new OriginBoundAuthenticationSelector(
-                    delegate, declaredOrigins, SCOPE_STRICT.equals(credentialScope), logger);
+                    delegate,
+                    declaredOrigins,
+                    SCOPE_STRICT.equals(credentialScope),
+                    centralPublishingOriginsImplied,
+                    logger);
         } else {
             throw new IllegalArgumentException("Unknown value '" + credentialScope + "' for "
                     + CREDENTIAL_SCOPE
@@ -149,12 +182,15 @@ public final class OriginBoundAuthenticationSelector implements AuthenticationSe
      * mirror, a repository or a server {@code <repositoryOrigins>} giving it another origin takes over.
      *
      * @param declaredOrigins all origins collected for the session, including the ones servers declare
+     * @return whether the publishing origins were added
      */
-    public static void addCentralPublishingOrigins(Map<String, Set<String>> declaredOrigins) {
+    public static boolean addCentralPublishingOrigins(Map<String, Set<String>> declaredOrigins) {
         Set<String> origins = declaredOrigins.get(CENTRAL_ID);
         if (origins != null && origins.equals(Set.of(CENTRAL_ORIGIN))) {
             origins.addAll(CENTRAL_PUBLISHING_ORIGINS);
+            return true;
         }
+        return false;
     }
 
     /**
@@ -193,6 +229,20 @@ public final class OriginBoundAuthenticationSelector implements AuthenticationSe
         Set<String> origins = declaredOrigins.get(id);
         if (origins != null && !origins.isEmpty()) {
             if (origin != null && origins.contains(origin)) {
+                if (centralPublishingOriginsImplied
+                        && CENTRAL_ID.equals(id)
+                        && CENTRAL_PUBLISHING_ORIGINS.contains(origin)) {
+                    warnOnce(
+                            id,
+                            "publishing origins",
+                            "Using credentials of server '" + id + "' for repository " + repository.getUrl()
+                                    + " because Maven binds this id to the origins Maven Central is published to, "
+                                    + "https://central.sonatype.com and https://ossrh-staging-api.central.sonatype.com,"
+                                    + " while nothing else gives this id an origin. This binding will be removed in a"
+                                    + " future release: add these origins to <repositoryOrigins> of that server in"
+                                    + " settings, or publish with a server id of its own, such as the"
+                                    + " publishingServerId of central-publishing-maven-plugin.");
+                }
                 return auth;
             }
             warnOnce(

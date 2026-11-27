@@ -31,10 +31,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.contains;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
 
 /**
  * UT for {@link OriginBoundAuthenticationSelector}.
@@ -182,6 +189,42 @@ class OriginBoundAuthenticationSelectorTest {
 
         assertSame(delegate, selector);
         assertNotNull(selector.getAuthentication(repo("releases", "https://other.example.org/m2/")));
+    }
+
+    @Test
+    void credentialsUsedThroughTheImpliedCentralPublishingOriginsAreReportedOnce() {
+        Map<String, Set<String>> origins = declared("central", "https://repo.maven.apache.org/maven2");
+        boolean implied = OriginBoundAuthenticationSelector.addCentralPublishingOrigins(origins);
+        Logger logger = mock(Logger.class);
+        AuthenticationSelector selector = OriginBoundAuthenticationSelector.wrap(
+                serverCredentials("central"), OriginBoundAuthenticationSelector.SCOPE_STRICT, origins, implied, logger);
+
+        assertNotNull(selector.getAuthentication(repo("central", "https://repo.maven.apache.org/maven2")));
+        verify(logger, never()).warn(anyString());
+        assertNotNull(selector.getAuthentication(
+                repo("central", "https://central.sonatype.com/repository/maven-snapshots/")));
+        assertNotNull(selector.getAuthentication(
+                repo("central", "https://ossrh-staging-api.central.sonatype.com/service/local/")));
+        assertNotNull(selector.getAuthentication(
+                repo("central", "https://central.sonatype.com/repository/maven-snapshots/")));
+
+        verify(logger, times(1)).warn(contains("will be removed in a future release"));
+        verify(logger, times(1)).warn(anyString());
+    }
+
+    @Test
+    void centralPublishingOriginsDeclaredByTheServerAreNotReported() {
+        Map<String, Set<String>> origins = declared("central", "https://repo.maven.apache.org/maven2");
+        OriginBoundAuthenticationSelector.addOrigin(origins, "central", "https://central.sonatype.com");
+        boolean implied = OriginBoundAuthenticationSelector.addCentralPublishingOrigins(origins);
+        Logger logger = mock(Logger.class);
+        AuthenticationSelector selector = OriginBoundAuthenticationSelector.wrap(
+                serverCredentials("central"), OriginBoundAuthenticationSelector.SCOPE_ORIGIN, origins, implied, logger);
+
+        assertFalse(implied);
+        assertNotNull(selector.getAuthentication(
+                repo("central", "https://central.sonatype.com/repository/maven-snapshots/")));
+        verify(logger, never()).warn(anyString());
     }
 
     @Test
